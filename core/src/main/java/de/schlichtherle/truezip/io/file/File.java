@@ -34,6 +34,7 @@ import de.schlichtherle.truezip.io.filesystem.SyncExceptionBuilder;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.io.filesystem.OutputOption;
 import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.ExceptionBuilder;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
@@ -344,7 +345,7 @@ import static de.schlichtherle.truezip.io.filesystem.OutputOption.*;
  * @see DefaultArchiveDetector API reference for configuring archive type
  *      recognition
  * @author  Christian Schlichtherle
- * @version $Id$
+ * @version $Id: File.java,v 100e4ef190c1 2010/12/24 00:02:30 christian $
  */
 public class File extends java.io.File {
 
@@ -1176,9 +1177,12 @@ public class File extends java.io.File {
      */
     public static void sync(@NonNull BitField<SyncOption> options)
     throws ArchiveException {
+        final ExceptionBuilder<IOException, ArchiveException> builder
+                = new ArchiveExceptionBuilder();
         FileSystemManagers
                 .getInstance()
-                .sync(options, new ArchiveExceptionBuilder());
+                .sync(options, builder);
+        builder.check();
     }
 
     /**
@@ -1210,10 +1214,15 @@ public class File extends java.io.File {
             throw new IllegalArgumentException(archive.getPath() + " (not a federated file system)");
         if (null != archive.getEnclArchive())
             throw new IllegalArgumentException(archive.getPath() + " (not a top level federated file system)");
+        final ExceptionBuilder<IOException, ArchiveException> builder
+                = new ArchiveExceptionBuilder();
         new FilterFileSystemManager(
                 FileSystemManagers.getInstance(),
-                archive.getController().getModel().getMountPoint())
-                    .sync(options, new ArchiveExceptionBuilder());
+                archive .getController()
+                        .getModel()
+                        .getMountPoint())
+                        .sync(options, builder);
+        builder.check();
     }
 
     /**
@@ -1576,7 +1585,7 @@ public class File extends java.io.File {
             return null;
 
         assert super.getName().equals(delegate.getName());
-        if (enclArchive != null
+        if (null != enclArchive
                 && enclArchive.getPath().length() == parent.getPath().length()) {
             assert enclArchive.getPath().equals(parent.getPath());
             return enclArchive;
@@ -1596,7 +1605,7 @@ public class File extends java.io.File {
      */
     public File getNonArchivedParentFile() {
         final File enclArchive = this.enclArchive;
-        return enclArchive != null
+        return null != enclArchive
                 ? enclArchive.getNonArchivedParentFile()
                 : getParentFile();
     }
@@ -1604,7 +1613,7 @@ public class File extends java.io.File {
     @Override
     public File getAbsoluteFile() {
         File enclArchive = this.enclArchive;
-        if (enclArchive != null)
+        if (null != enclArchive)
             enclArchive = enclArchive.getAbsoluteFile();
         return detector.newFile(this, delegate.getAbsoluteFile(), enclArchive);
     }
@@ -1623,7 +1632,7 @@ public class File extends java.io.File {
      */
     public File getNormalizedAbsoluteFile() {
         File enclArchive = this.enclArchive;
-        if (enclArchive != null)
+        if (null != enclArchive)
             enclArchive = enclArchive.getNormalizedAbsoluteFile();
         return detector.newFile(
                 this, normalize(delegate.getAbsoluteFile()), enclArchive);
@@ -1674,7 +1683,7 @@ public class File extends java.io.File {
     @Override
     public File getCanonicalFile() throws IOException {
         File enclArchive = this.enclArchive;
-        if (enclArchive != null)
+        if (null != enclArchive)
             enclArchive = enclArchive.getCanonicalFile();
         // Note: entry.getCanonicalFile() may change case!
         return detector.newFile(this, delegate.getCanonicalFile(), enclArchive);
@@ -1690,7 +1699,7 @@ public class File extends java.io.File {
      */
     public final File getCanOrAbsFile() {
         File enclArchive = this.enclArchive;
-        if (enclArchive != null)
+        if (null != enclArchive)
             enclArchive = enclArchive.getCanOrAbsFile();
         return detector.newFile(this, getRealFile(delegate), enclArchive);
     }
@@ -1996,7 +2005,7 @@ public class File extends java.io.File {
         // java.io.File.equals(...) and java.io.File.hashcode() consider case.
         // The following code distinguishes these cases.
         final File enclArchive = this.enclArchive;
-        if (enclArchive != null) {
+        if (null != enclArchive) {
             // This file IS enclosed in an archive file.
             return 31 * enclArchive.hashCode() + enclEntryName.hashCode();
         } else {
@@ -2166,7 +2175,7 @@ public class File extends java.io.File {
      */
     public File getTopLevelArchive() {
         final File enclArchive = this.enclArchive;
-        return enclArchive != null
+        return null != enclArchive
                 ? enclArchive.getTopLevelArchive()
                 : innerArchive;
     }
@@ -2256,7 +2265,7 @@ public class File extends java.io.File {
      */
     @Override
     public boolean isFile() {
-        if (innerArchive != null) {
+        if (null != innerArchive) {
             try {
                 final FileSystemEntry entry = innerArchive.getController().getEntry(getInnerEntryName0());
                 return null != entry && entry.getType() == FILE;
@@ -2285,7 +2294,7 @@ public class File extends java.io.File {
      */
     @Override
     public boolean isDirectory() {
-        if (innerArchive != null) {
+        if (null != innerArchive) {
             try {
                 final FileSystemEntry entry = innerArchive.getController().getEntry(getInnerEntryName0());
                 return null != entry && entry.getType() == DIRECTORY;
@@ -2303,7 +2312,7 @@ public class File extends java.io.File {
      * Otherwise, null is returned.
      */
     public Icon getOpenIcon() {
-        if (innerArchive == this) {
+        if (this == innerArchive) {
             try {
                 return getController().getOpenIcon();
             } catch (IOException ex) {
@@ -2319,7 +2328,7 @@ public class File extends java.io.File {
      * Otherwise, null is returned.
      */
     public Icon getClosedIcon() {
-        if (innerArchive == this) {
+        if (this == innerArchive) {
             try {
                 return getController().getClosedIcon();
             } catch (IOException ex) {
@@ -2330,7 +2339,7 @@ public class File extends java.io.File {
 
     @Override
     public boolean canRead() {
-        if (innerArchive != null) {
+        if (null != innerArchive) {
             try {
                 return innerArchive.getController()
                         .isReadable(getInnerEntryName0());
@@ -2343,7 +2352,7 @@ public class File extends java.io.File {
 
     @Override
     public boolean canWrite() {
-        if (innerArchive != null) {
+        if (null != innerArchive) {
             try {
                 return innerArchive.getController()
                         .isWritable(getInnerEntryName0());
@@ -2365,7 +2374,7 @@ public class File extends java.io.File {
      */
     @Override
     public boolean setReadOnly() {
-        if (innerArchive != null) {
+        if (null != innerArchive) {
             try {
                 innerArchive.getController().setReadOnly(getInnerEntryName0());
                 return true;
@@ -2395,7 +2404,7 @@ public class File extends java.io.File {
      */
     @Override
     public long length() {
-        if (innerArchive != null) {
+        if (null != innerArchive) {
             final FileSystemEntry entry;
             try {
                 entry = innerArchive.getController().getEntry(getInnerEntryName0());
@@ -2433,7 +2442,7 @@ public class File extends java.io.File {
      */
     @Override
     public long lastModified() {
-        if (innerArchive != null) {
+        if (null != innerArchive) {
             final FileSystemEntry entry;
             try {
                 entry = innerArchive.getController().getEntry(getInnerEntryName0());
@@ -2475,7 +2484,7 @@ public class File extends java.io.File {
      */
     @Override
     public boolean setLastModified(final long time) {
-        if (innerArchive != null) {
+        if (null != innerArchive) {
             try {
                 innerArchive.getController()
                         .setTime(getInnerEntryName0(), BitField.of(Access.WRITE), time);
@@ -2500,7 +2509,7 @@ public class File extends java.io.File {
      */
     @Override
     public String[] list() {
-        if (innerArchive != null) {
+        if (null != innerArchive) {
             final FileSystemEntry entry;
             try {
                 entry = innerArchive.getController().getEntry(getInnerEntryName0());
@@ -2530,7 +2539,7 @@ public class File extends java.io.File {
      */
     @Override
     public String[] list(final FilenameFilter filter) {
-        if (innerArchive != null) {
+        if (null != innerArchive) {
             final FileSystemEntry entry;
             try {
                 entry = innerArchive.getController().getEntry(getInnerEntryName0());
@@ -2616,7 +2625,7 @@ public class File extends java.io.File {
     public File[] listFiles(
             final FilenameFilter filter,
             final FileFactory factory) {
-        if (innerArchive != null) {
+        if (null != innerArchive) {
             final FileSystemEntry entry;
             try {
                 entry = innerArchive.getController().getEntry(getInnerEntryName0());
@@ -2680,7 +2689,7 @@ public class File extends java.io.File {
     public File[] listFiles(
             final FileFilter filter,
             final FileFactory factory) {
-        if (innerArchive != null) {
+        if (null != innerArchive) {
             final FileSystemEntry entry;
             try {
                 entry = innerArchive.getController().getEntry(getInnerEntryName0());
@@ -2743,7 +2752,7 @@ public class File extends java.io.File {
      */
     @Override
     public boolean createNewFile() throws IOException {
-        if (innerArchive != null) {
+        if (null != innerArchive) {
             return innerArchive.getController()
                     .mknod(getInnerEntryName0(), FILE,
                         BitField.noneOf(OutputOption.class)
@@ -2755,7 +2764,7 @@ public class File extends java.io.File {
 
     @Override
     public boolean mkdirs() {
-        if (innerArchive == null)
+        if (null == innerArchive)
             return delegate.mkdirs();
 
         final File parent = getParentFile();
@@ -2789,7 +2798,7 @@ public class File extends java.io.File {
     @Override
     public boolean mkdir() {
         try {
-            if (innerArchive != null) {
+            if (null != innerArchive) {
                 return innerArchive.getController()
                         .mknod(getInnerEntryName0(), DIRECTORY,
                             BitField.noneOf(OutputOption.class)
@@ -2813,7 +2822,7 @@ public class File extends java.io.File {
     @Override
     public boolean delete() {
         try {
-            if (innerArchive != null) {
+            if (null != innerArchive) {
                 innerArchive.getController().unlink(getInnerEntryName0());
                 return true;
             }
@@ -2841,16 +2850,14 @@ public class File extends java.io.File {
 
     @Override
     public void deleteOnExit() {
-        if (innerArchive == null) {
-            delegate.deleteOnExit();
-            return;
+        if (innerArchive != null) {
+            // Support for this operation for archive files and entries has been
+            // removed in TrueZIP 7 because using a shutdown hook uncautiously
+            // can easily introduce a memory leak when using multiple class loaders
+            // to load TrueZIP.
+            throw new UnsupportedOperationException();
         }
-
-        // Support for this operation for archive files and entries has been
-        // removed in TrueZIP 7 because using a shutdown hook uncautiously
-        // can easily introduce a memory leak when using multiple class loaders
-        // to load TrueZIP.
-        throw new UnsupportedOperationException();
+        delegate.deleteOnExit();
     }
 
     /**
@@ -2876,8 +2883,8 @@ public class File extends java.io.File {
      */
     public boolean renameTo(final java.io.File dst,
                             final ArchiveDetector detector) {
-        if (innerArchive == null)
-            if (!(dst instanceof File) || ((File) dst).innerArchive == null)
+        if (null == innerArchive)
+            if (!(dst instanceof File) || null == ((File) dst).innerArchive)
                 return delegate.renameTo(dst);
 
         return !dst.exists() && Files.move(this, dst, detector);

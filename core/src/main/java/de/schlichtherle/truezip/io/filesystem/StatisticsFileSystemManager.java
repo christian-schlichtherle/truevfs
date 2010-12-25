@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.io.filesystem;
 
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.ExceptionBuilder;
+import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import net.jcip.annotations.ThreadSafe;
@@ -26,7 +26,7 @@ import net.jcip.annotations.ThreadSafe;
  * file system manager.
  *
  * @author  Christian Schlichtherle
- * @version $Id$
+ * @version $Id: StatisticsFileSystemManager.java,v de8626cc844d 2010/12/20 21:21:08 christian $
  */
 @ThreadSafe
 public final class StatisticsFileSystemManager
@@ -92,10 +92,10 @@ extends DecoratingFileSystemManager<FileSystemManager> {
     @Override
     public <E extends IOException>
     void sync(  BitField<SyncOption> options,
-                ExceptionBuilder<? super IOException, E> builder)
+                ExceptionHandler<? super IOException, E> handler)
     throws E {
         try {
-            super.sync(options, builder);
+            super.sync(options, handler);
         } finally {
             statistics = new FileSystemStatistics(this);
         }

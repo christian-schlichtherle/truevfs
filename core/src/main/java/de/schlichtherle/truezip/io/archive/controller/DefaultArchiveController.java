@@ -70,7 +70,7 @@ import static de.schlichtherle.truezip.io.Paths.isRoot;
  *
  * @param   <E> The type of the archive entries.
  * @author  Christian Schlichtherle
- * @version $Id$
+ * @version $Id: DefaultArchiveController.java,v 100e4ef190c1 2010/12/24 00:02:30 christian $
  */
 @NotThreadSafe
 public final class DefaultArchiveController<E extends ArchiveEntry>
@@ -320,28 +320,31 @@ extends FileSystemArchiveController<E> {
 
     private boolean sync() throws SyncException, FileSystemException {
         getModel().assertWriteLockedByCurrentThread();
-        sync(SYNC_OPTIONS, new SyncExceptionBuilder());
+        final ExceptionBuilder<IOException, SyncException> builder
+                = new SyncExceptionBuilder();
+        sync(SYNC_OPTIONS, builder);
+        builder.check();
         return true;
     }
 
     @Override
     public <X extends IOException>
     void sync(  final BitField<SyncOption> options,
-                final ExceptionBuilder<? super SyncException, X> builder)
+                final ExceptionHandler<? super SyncException, X> handler)
     throws X {
         assert !isTouched() || null != output; // file system touched => output archive
         assert getModel().writeLock().isHeldByCurrentThread();
 
         if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT))
             throw new IllegalArgumentException();
-        awaitSync(options, builder);
-        commenceSync(builder);
+        awaitSync(options, handler);
+        commenceSync(handler);
         try {
             if (!options.get(ABORT_CHANGES) && isTouched())
-                performSync(builder);
+                performSync(handler);
         } finally {
             try {
-                commitSync(builder);
+                commitSync(handler);
             } finally {
                 assert null == getFileSystem();
                 assert null == input;
@@ -349,12 +352,21 @@ extends FileSystemArchiveController<E> {
                 getModel().setTouched(false);
             }
         }
-        builder.check();
     }
 
+    /**
+     * Waits for all entry input and entry output streams to close or forces
+     * them to close, dependending on the {@code options}.
+     *
+     * @param  options the output options.
+     * @param  handler the exception handler.
+     * @throws SyncException If any exceptional condition occurs
+     *         throughout the processing of the container archive file.
+     */
     private <X extends IOException>
-    void awaitSync( final BitField<SyncOption> options,
-                    final ExceptionBuilder<? super SyncException, X> builder)
+    void awaitSync(
+            @NonNull final BitField<SyncOption> options,
+            @NonNull final ExceptionHandler<? super SyncException, X> handler)
     throws X {
         // Check output streams first, because FORCE_CLOSE_INPUT may be
         // set and FORCE_CLOSE_OUTPUT may be unset in which case we
@@ -367,9 +379,9 @@ extends FileSystemArchiveController<E> {
                 final String message =  "Number of open output streams: "
                                         + outStreams;
                 if (!options.get(FORCE_CLOSE_OUTPUT))
-                    throw builder.fail( new SyncException(getModel(),
+                    throw handler.fail( new SyncException(getModel(),
                                             new OutputBusyException(message)));
-                builder.warn(   new SyncWarningException(getModel(),
+                handler.warn(   new SyncWarningException(getModel(),
                                     new OutputBusyException(message)));
             }
         }
@@ -380,9 +392,9 @@ extends FileSystemArchiveController<E> {
                 final String message =  "Number of open input streams: "
                                         + inStreams;
                 if (!options.get(FORCE_CLOSE_INPUT))
-                    throw builder.fail( new SyncException(getModel(),
+                    throw handler.fail( new SyncException(getModel(),
                                             new InputBusyException(message)));
-                builder.warn(   new SyncWarningException(getModel(),
+                handler.warn(   new SyncWarningException(getModel(),
                                     new InputBusyException(message)));
             }
         }
@@ -392,12 +404,13 @@ extends FileSystemArchiveController<E> {
      * Closes and disconnects all entry streams of the output and input
      * archive.
      *
-     * @param handler An exception handler - {@code null} is not permitted.
+     * @param  handler the exception handler.
      * @throws SyncException If any exceptional condition occurs
      *         throughout the processing of the container archive file.
      */
     private <X extends IOException>
-    void commenceSync(final ExceptionHandler<? super SyncException, X> handler)
+    void commenceSync(
+            @NonNull final ExceptionHandler<? super SyncException, X> handler)
     throws X {
         class FilterExceptionHandler
         implements ExceptionHandler<IOException, X> {
@@ -425,12 +438,13 @@ extends FileSystemArchiveController<E> {
      * Synchronizes all entries in the (virtual) archive file system with the
      * (temporary) output archive file.
      *
-     * @param  handler An exception handler - {@code null} is not permitted.
+     * @param  handler the exception handler.
      * @throws IOException If any exceptional condition occurs throughout the
      *         processing of the container archive file.
      */
     private <X extends IOException>
-    void performSync(final ExceptionHandler<? super SyncException, X> handler)
+    void performSync(
+            @NonNull final ExceptionHandler<? super SyncException, X> handler)
     throws X {
         assert isTouched();
         assert null != output;
@@ -499,13 +513,13 @@ extends FileSystemArchiveController<E> {
 
     /**
      * Discards the file system and closes the output and input archive.
-     * 
-     * @param handler An exception handler - {@code null} is not permitted.
+     *
+     * @param  handler the exception handler.
      * @throws SyncException If any exceptional condition occurs
      *         throughout the processing of the container archive file.
      */
     private <X extends IOException>
-    void commitSync(final ExceptionHandler<? super SyncException, X> handler)
+    void commitSync(@NonNull final ExceptionHandler<? super SyncException, X> handler)
     throws X {
         setFileSystem(null);
 

@@ -32,7 +32,7 @@ import de.schlichtherle.truezip.io.socket.IOPool;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.ExceptionBuilder;
+import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.InputStream;
@@ -78,7 +78,7 @@ import static de.schlichtherle.truezip.io.filesystem.SyncOption.CLEAR_CACHE;
  * @param   <M> The type of the file system model.
  * @param   <C> The type of the decorated file system controller.
  * @author  Christian Schlichtherle
- * @version $Id$
+ * @version $Id: EntryCachingFileSystemController.java,v 74ef000e30d1 2010/12/25 07:39:02 christian $
  */
 @NotThreadSafe
 public final class EntryCachingFileSystemController<
@@ -195,16 +195,18 @@ extends DecoratingFileSystemController<M, C> {
 
     @Override
     public <X extends IOException>
-    void sync(  @NonNull final BitField<SyncOption> options,
-                @NonNull final ExceptionBuilder<? super SyncException, X> builder)
+    void sync(
+            @NonNull final BitField<SyncOption> options,
+            @NonNull final ExceptionHandler<? super SyncException, X> handler)
     throws X, FileSystemException {
-        beforeSync(options, builder);
-        delegate.sync(options.clear(CLEAR_CACHE), builder);
+        beforeSync(options, handler);
+        delegate.sync(options.clear(CLEAR_CACHE), handler);
     }
 
     public <X extends IOException>
-    void beforeSync(@NonNull final BitField<SyncOption> options,
-                    @NonNull final ExceptionBuilder<? super SyncException, X> builder)
+    void beforeSync(
+            @NonNull final BitField<SyncOption> options,
+            @NonNull final ExceptionHandler<? super SyncException, X> handler)
     throws X, FileSystemException {
         assert getModel().writeLock().isHeldByCurrentThread();
 
@@ -216,13 +218,13 @@ extends DecoratingFileSystemController<M, C> {
                     if (flush)
                         cache.flush();
                 } catch (IOException ex) {
-                    throw builder.fail(new SyncException(getModel(), ex));
+                    throw handler.fail(new SyncException(getModel(), ex));
                 } finally  {
                     try {
                         if (clear)
                             cache.clear();
                     } catch (IOException ex) {
-                        builder.warn(new SyncWarningException(getModel(), ex));
+                        handler.warn(new SyncWarningException(getModel(), ex));
                     }
                 }
             }

@@ -20,11 +20,10 @@ import de.schlichtherle.truezip.io.entry.Entry.Access;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.ExceptionBuilder;
+import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import javax.swing.Icon;
-import net.jcip.annotations.ThreadSafe;
 
 /**
  * Decorates another file system controller.
@@ -35,7 +34,7 @@ import net.jcip.annotations.ThreadSafe;
  * @param   <M> The type of the file system model.
  * @param   <C> The type of the decorated file system controller.
  * @author  Christian Schlichtherle
- * @version $Id$
+ * @version $Id: DecoratingFileSystemController.java,v de8626cc844d 2010/12/20 21:21:08 christian $
  */
 public abstract class DecoratingFileSystemController<
         M extends FileSystemModel,
@@ -141,8 +140,10 @@ extends FileSystemController<M> {
 
     @Override
     public <X extends IOException>
-    void sync(  final BitField<SyncOption> options, final ExceptionBuilder<? super SyncException, X> builder)
+    void sync(
+            @NonNull final BitField<SyncOption> options,
+            @NonNull final ExceptionHandler<? super SyncException, X> handler)
     throws X, FileSystemException {
-        delegate.sync(options, builder);
+        delegate.sync(options, handler);
     }
 }

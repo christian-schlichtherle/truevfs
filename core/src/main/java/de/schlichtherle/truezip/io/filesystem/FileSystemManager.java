@@ -17,7 +17,7 @@ package de.schlichtherle.truezip.io.filesystem;
 
 import java.util.Iterator;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.ExceptionBuilder;
+import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import net.jcip.annotations.ThreadSafe;
@@ -30,7 +30,7 @@ import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
  * file system.
  *
  * @author Christian Schlichtherle
- * @version $Id$
+ * @version $Id: FileSystemManager.java,v 4472f2e3deeb 2010/12/18 15:42:00 christian $
  */
 @ThreadSafe
 public abstract class FileSystemManager
@@ -89,14 +89,16 @@ implements Iterable<FileSystemController<?>> {
      * Visits the controller of all federated file systems managed by this
      * instance.
      *
-     * @param  <X> the type of the assembled {@code IOException} to throw.
-     * @param  builder the exception builder to use for the assembly of an
-     *         {@code IOException} from one or more input {@code IOException}s.
-     * @throws IOException at the discretion of the exception {@code builder}.
+     * @param  visitor the visitor.
+     * @param  handler the exception handling strategy for dealing with one or
+     *         more input {@code SyncException}s which may trigger an {@code X}.
+     * @param  <X> the type of the {@code IOException} to throw at the
+     *         discretion of the exception {@code handler}.
+     * @throws IOException at the discretion of the exception {@code handler}.
      */
-    public <X extends IOException>
-    void visit( @NonNull Visitor visitor,
-                @NonNull ExceptionBuilder<? super IOException, X> builder)
+    public final <X extends IOException>
+    void visit( @NonNull final Visitor visitor,
+                @NonNull final ExceptionHandler<? super IOException, X> handler)
     throws X {
         for (FileSystemController<?> controller : this) {
             try {
@@ -106,10 +108,9 @@ implements Iterable<FileSystemController<?>> {
                 // exception for some reason.
                 // We are bullheaded and store the exception for later
                 // throwing and continue updating the rest.
-                builder.warn(ex);
+                handler.warn(ex);
             }
         }
-        builder.check();
     }
 
     /**
@@ -117,11 +118,12 @@ implements Iterable<FileSystemController<?>> {
      * by this instance to their respective parent file system.
      * This will reset the state of the respective file system controllers.
      *
-     * @param  <X> the type of the assembled {@code IOException} to throw.
      * @param  options the synchronization options.
-     * @param  builder the exception builder to use for the assembly of an
-     *         {@code IOException} from one or more input {@code IOException}s.
-     * @throws IOException at the discretion of the exception {@code builder}.
+     * @param  handler the exception handling strategy for dealing with one or
+     *         more input {@code SyncException}s which may trigger an {@code X}.
+     * @param  <X> the type of the {@code IOException} to throw at the
+     *         discretion of the exception {@code handler}.
+     * @throws IOException at the discretion of the exception {@code handler}.
      * @throws IllegalArgumentException if the combination of synchronization
      *         options is illegal, e.g. if {@code FORCE_CLOSE_INPUT} is cleared
      *         and {@code FORCE_CLOSE_OUTPUT} is set or if the synchronization
@@ -129,7 +131,7 @@ implements Iterable<FileSystemController<?>> {
      */
     public <X extends IOException>
     void sync(  @NonNull final BitField<SyncOption> options,
-                @NonNull final ExceptionBuilder<? super IOException, X> builder)
+                @NonNull final ExceptionHandler<? super IOException, X> handler)
     throws X {
         if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT)
                 || options.get(ABORT_CHANGES))
@@ -138,10 +140,10 @@ implements Iterable<FileSystemController<?>> {
             @Override
             public void visit(FileSystemController<?> controller)
             throws IOException {
-                controller.sync(options, builder);
+                controller.sync(options, handler);
             }
         }
-        visit(new Sync(), builder);
+        visit(new Sync(), handler);
     }
 
     /**

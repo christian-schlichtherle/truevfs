@@ -30,7 +30,8 @@ import de.schlichtherle.truezip.io.filesystem.OutputOption;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.ExceptionBuilder;
+import de.schlichtherle.truezip.util.ExceptionHandler;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -44,7 +45,7 @@ import static java.io.File.separatorChar;
 
 /**
  * @author Christian Schlichtherle
- * @version $Id$
+ * @version $Id: FileController.java,v 05649425ee35 2010/12/22 02:38:52 christian $
  */
 @ThreadSafe
 final class FileController extends FileSystemController<FileSystemModel>  {
@@ -174,7 +175,9 @@ final class FileController extends FileSystemController<FileSystemModel>  {
 
     @Override
     public <X extends IOException>
-    void sync(  final BitField<SyncOption> options, final ExceptionBuilder<? super SyncException, X> builder)
+    void sync(
+            @NonNull final BitField<SyncOption> options,
+            @NonNull final ExceptionHandler<? super SyncException, X> handler)
     throws X, FileSystemException {
     }
 }

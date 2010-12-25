@@ -33,7 +33,7 @@ import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.DecoratingInputSocket;
 import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.ExceptionBuilder;
+import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
@@ -47,7 +47,7 @@ import net.jcip.annotations.ThreadSafe;
  * 
  * @see     ConcurrentFileSystemModel
  * @author  Christian Schlichtherle
- * @version $Id$
+ * @version $Id: ConcurrentFileSystemController.java,v 2bc9e8605ce8 2010/12/20 22:09:36 christian $
  */
 @ThreadSafe
 public final class ConcurrentFileSystemController<
@@ -360,12 +360,14 @@ extends DecoratingFileSystemController<M, C> {
 
     @Override
     public <X extends IOException>
-    void sync(  final BitField<SyncOption> options, final ExceptionBuilder<? super SyncException, X> builder)
+    void sync(
+            @NonNull final BitField<SyncOption> options,
+            @NonNull final ExceptionHandler<? super SyncException, X> handler)
     throws X, FileSystemException {
         assertNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
-            delegate.sync(options, builder);
+            delegate.sync(options, handler);
         } finally {
             writeLock().unlock();
         }
