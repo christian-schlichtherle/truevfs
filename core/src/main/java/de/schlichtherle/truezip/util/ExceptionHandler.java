@@ -16,6 +16,8 @@
 
 package de.schlichtherle.truezip.util;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+
 /**
  * A generic callback interface designed to be implemented by <i>client
  * applications</i> in order to inject an exception handling strategy into a
@@ -103,10 +105,10 @@ public interface ExceptionHandler<C extends Exception, E extends Exception> {
      * Finally, if the implementation maintains a state, it must be updated
      * so that this instance can be reused to handle more exceptions!
      *
-     * @param   cause the exception to handle - {@code null} is not permitted.
-     * @return  The exception to throw - {@code null} is not permitted.
+     * @param   cause the exception to handle.
+     * @return  The exception to throw.
      */
-    E fail(C cause);
+    @NonNull E fail(@NonNull C cause);
 
     /**
      * Called to handle an exceptional condition which
@@ -121,5 +123,5 @@ public interface ExceptionHandler<C extends Exception, E extends Exception> {
      * @throws Exception if the implementation wants the caller to abort its
      *         task.
      */
-    void warn(C cause) throws E;
+    void warn(@NonNull C cause) throws E;
 }

@@ -16,6 +16,8 @@
 
 package de.schlichtherle.truezip.util;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+
 /**
  * An exception builder is an exception handler which assembles an exception
  * of the parameter type {@code T} from one or more exceptions of the parameter
@@ -37,16 +39,16 @@ extends ExceptionHandler<C, E> {
 
     /**
      * Adds the {@code cause} exception to the assembly and
-     * and checks out and returns
+     * checks out and returns
      * the result
      * in order to enable the assembly of another exception.
      * <p>
      * {@inheritDoc}
      *
-     * @return The assembled exception to throw - {@code null} is not permitted.
+     * @return The assembled exception to throw.
      */
     @Override
-	E fail(C cause);
+    @NonNull E fail(@NonNull C cause);
 
     /**
      * Adds the {@code cause} exception to the assembly and
@@ -60,7 +62,7 @@ extends ExceptionHandler<C, E> {
      *         the caller to abort its task.
      */
     @Override
-	void warn(C cause) throws E;
+    void warn(@NonNull C cause) throws E;
 
     /**
      * Either returns or checks out and throws
