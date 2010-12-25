@@ -42,14 +42,15 @@ import java.util.HashMap;
 import java.util.Map;
 import net.jcip.annotations.NotThreadSafe;
 
-import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
-import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
+import static de.schlichtherle.truezip.io.entry.Entry.Type.FILE;
 import static de.schlichtherle.truezip.io.socket.Cache.Strategy.*;
+import static de.schlichtherle.truezip.io.filesystem.SyncOption.ABORT_CHANGES;
+import static de.schlichtherle.truezip.io.filesystem.SyncOption.CLEAR_CACHE;
 
 /**
- * A caching archive controller implements a caching strategy for entries
- * within its target archive file.
- * Decorating an archive controller with this class has the following effects:
+ * A caching archive controller implements a caching strategy for entry data.
+ * Decorating a concurrent file system controller with this class has the
+ * following effects:
  * <ul>
  * <li>Upon the first read operation, the entry data will be read from the
  *     backing store and temporarily stored in the cache.
@@ -71,7 +72,8 @@ import static de.schlichtherle.truezip.io.socket.Cache.Strategy.*;
  * {@link #getInputSocket input socket} with the input option
  * {@link InputOption#CACHE} is used or an
  * {@link #getOutputSocket output socket} with the output option
- * {@link OutputOption#CACHE} is used.
+ * {@link OutputOption#CACHE} is used <em>and</em> this socket is <em>not</em>
+ * connected.
  *
  * @param   <M> The type of the file system model.
  * @param   <C> The type of the decorated file system controller.
@@ -92,9 +94,9 @@ extends DecoratingFileSystemController<M, C> {
      * Constructs a new content caching file system controller.
      *
      * @param controller the decorated file system controller.
-     * @param pool the pool of temporary entries to cache the contents.
+     * @param pool the pool of temporary entries to cache the entry data.
      */
-    public EntryCachingFileSystemController(   @NonNull final C controller,
+    public EntryCachingFileSystemController(@NonNull final C controller,
                                             @NonNull final IOPool<?> pool) {
         super(controller);
         if (null == pool)
@@ -174,8 +176,8 @@ extends DecoratingFileSystemController<M, C> {
                 }
             }
             // Create marker entry and mind CREATE_PARENTS!
-            delegate.mknod(name, FILE, options, template);
-            getModel().setTouched(true);
+            //delegate.mknod(name, FILE, options, template);
+            //getModel().setTouched(true);
             return (null != cache ? cache : new Cache(name))
                     .configure(options, template).getOutputSocket().bind(this);
         }
@@ -195,6 +197,14 @@ extends DecoratingFileSystemController<M, C> {
     public <X extends IOException>
     void sync(  @NonNull final BitField<SyncOption> options,
                 @NonNull final ExceptionBuilder<? super SyncException, X> builder)
+    throws X, FileSystemException {
+        beforeSync(options, builder);
+        delegate.sync(options.clear(CLEAR_CACHE), builder);
+    }
+
+    public <X extends IOException>
+    void beforeSync(@NonNull final BitField<SyncOption> options,
+                    @NonNull final ExceptionBuilder<? super SyncException, X> builder)
     throws X, FileSystemException {
         assert getModel().writeLock().isHeldByCurrentThread();
 
@@ -219,7 +229,6 @@ extends DecoratingFileSystemController<M, C> {
             if (clear)
                 caches.clear();
         }
-        delegate.sync(options.clear(CLEAR_CACHE), builder);
     }
 
     private static final BitField<InputOption> NO_INPUT_OPTIONS
@@ -233,6 +242,8 @@ extends DecoratingFileSystemController<M, C> {
         final de.schlichtherle.truezip.io.socket.Cache<Entry> cache;
         volatile InputSocket<Entry> input;
         volatile OutputSocket<Entry> output;
+        volatile BitField<OutputOption> options;
+        volatile Entry template;
 
         Cache(@NonNull final FileSystemEntryName name) {
             this.name = name;
@@ -252,8 +263,9 @@ extends DecoratingFileSystemController<M, C> {
         @NonNull
         public Cache configure( @NonNull BitField<OutputOption> options,
                                 @Nullable Entry template) {
-            cache.configure(delegate.getOutputSocket(
-                    name, options.clear(OutputOption.CACHE), template));
+            cache.configure(delegate.getOutputSocket(name,
+                    this.options = options.clear(OutputOption.CACHE),
+                    this.template = template));
             output = null;
             return this;
         }
@@ -285,6 +297,14 @@ extends DecoratingFileSystemController<M, C> {
             public ReadOnlyFile newReadOnlyFile() throws IOException {
                 getModel().assertWriteLockedByCurrentThread();
 
+                if (null != getBoundSocket().getPeerTarget()) {
+                    // The data for connected sockets should not get cached
+                    // because... FIXME: Why exactly?!
+                    // So we flush and bypass the cache.
+                    flush();
+                    return getBoundSocket().newReadOnlyFile();
+                }
+
                 final ReadOnlyFile rof = getBoundSocket().newReadOnlyFile();
                 caches.put(name, Cache.this);
                 return rof;
@@ -293,6 +313,12 @@ extends DecoratingFileSystemController<M, C> {
             @Override
             public InputStream newInputStream() throws IOException {
                 getModel().assertWriteLockedByCurrentThread();
+
+                if (null != getBoundSocket().getPeerTarget()) {
+                    // Dito.
+                    flush();
+                    return getBoundSocket().newInputStream();
+                }
 
                 final InputStream in = getBoundSocket().newInputStream();
                 caches.put(name, Cache.this);
@@ -310,10 +336,16 @@ extends DecoratingFileSystemController<M, C> {
             public OutputStream newOutputStream() throws IOException {
                 assert getModel().writeLock().isHeldByCurrentThread();
 
+                if (null != getBoundSocket().getPeerTarget()) {
+                    // Dito, but this time we clear and bypass the cache.
+                    clear();
+                    return getBoundSocket().newOutputStream();
+                }
+
                 final OutputStream out = getBoundSocket().newOutputStream();
                 // Create marker entry and mind CREATE_PARENTS!
-                //controller.mknod(name, FILE, outputOptions, null);
-                //getModel().setTouched(true);
+                delegate.mknod(name, FILE, options, template);
+                getModel().setTouched(true);
                 caches.put(name, Cache.this);
                 return out;
             }
