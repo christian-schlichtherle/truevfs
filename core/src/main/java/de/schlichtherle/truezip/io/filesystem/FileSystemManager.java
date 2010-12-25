@@ -30,7 +30,7 @@ import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
  * file system.
  *
  * @author Christian Schlichtherle
- * @version $Id: FileSystemManager.java,v 4472f2e3deeb 2010/12/18 15:42:00 christian $
+ * @version $Id$
  */
 @ThreadSafe
 public abstract class FileSystemManager
