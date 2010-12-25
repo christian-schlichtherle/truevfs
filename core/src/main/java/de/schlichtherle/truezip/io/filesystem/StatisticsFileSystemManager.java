@@ -26,7 +26,7 @@ import net.jcip.annotations.ThreadSafe;
  * file system manager.
  *
  * @author  Christian Schlichtherle
- * @version $Id: StatisticsFileSystemManager.java,v de8626cc844d 2010/12/20 21:21:08 christian $
+ * @version $Id$
  */
 @ThreadSafe
 public final class StatisticsFileSystemManager
