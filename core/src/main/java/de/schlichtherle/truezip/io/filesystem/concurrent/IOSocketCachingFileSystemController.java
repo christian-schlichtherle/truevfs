@@ -40,7 +40,7 @@ import net.jcip.annotations.NotThreadSafe;
  * Caches I/O sockets created by its delegate.
  * 
  * @author Christian Schlichtherle
- * @version $Id: IOSocketCachingFileSystemController.java,v f5c420e8744e 2010/12/22 03:03:09 christian $
+ * @version $Id$
  */
 @NotThreadSafe
 public final class IOSocketCachingFileSystemController<
