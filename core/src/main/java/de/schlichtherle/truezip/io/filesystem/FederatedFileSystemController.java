@@ -44,7 +44,7 @@ import javax.swing.Icon;
  * controller and its parent file system controller are thread-safe.
  *
  * @author  Christian Schlichtherle
- * @version $Id: FederatedFileSystemController.java,v 9d5cfdddd0f4 2010/12/23 02:35:53 christian $
+ * @version $Id$
  */
 final class FederatedFileSystemController
 extends DecoratingFileSystemController<FileSystemModel, FileSystemController<?>> {
