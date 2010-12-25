@@ -345,7 +345,7 @@ import static de.schlichtherle.truezip.io.filesystem.OutputOption.*;
  * @see DefaultArchiveDetector API reference for configuring archive type
  *      recognition
  * @author  Christian Schlichtherle
- * @version $Id: File.java,v 100e4ef190c1 2010/12/24 00:02:30 christian $
+ * @version $Id$
  */
 public class File extends java.io.File {
 
