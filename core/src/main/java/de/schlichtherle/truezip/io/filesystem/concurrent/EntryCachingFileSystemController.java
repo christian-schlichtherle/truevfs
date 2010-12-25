@@ -44,7 +44,6 @@ import net.jcip.annotations.NotThreadSafe;
 
 import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
-import static de.schlichtherle.truezip.io.socket.Cache.Scope.*;
 import static de.schlichtherle.truezip.io.socket.Cache.Strategy.*;
 
 /**
@@ -237,7 +236,7 @@ extends DecoratingFileSystemController<M, C> {
 
         Cache(@NonNull final FileSystemEntryName name) {
             this.name = name;
-            this.cache = WRITE_BACK.newCache(Entry.class, DISCONNECTED, pool);
+            this.cache = WRITE_BACK.newCache(pool);
             configure(NO_INPUT_OPTIONS);
             configure(NO_OUTPUT_OPTIONS, null);
         }
