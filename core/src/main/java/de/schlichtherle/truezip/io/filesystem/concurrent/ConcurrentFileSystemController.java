@@ -47,7 +47,7 @@ import net.jcip.annotations.ThreadSafe;
  * 
  * @see     ConcurrentFileSystemModel
  * @author  Christian Schlichtherle
- * @version $Id: ConcurrentFileSystemController.java,v 2bc9e8605ce8 2010/12/20 22:09:36 christian $
+ * @version $Id$
  */
 @ThreadSafe
 public final class ConcurrentFileSystemController<
