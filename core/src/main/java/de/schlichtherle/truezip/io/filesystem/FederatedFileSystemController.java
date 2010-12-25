@@ -23,7 +23,7 @@ import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.ExceptionBuilder;
+import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.InputStream;
 import java.io.IOException;
@@ -44,7 +44,7 @@ import javax.swing.Icon;
  * controller and its parent file system controller are thread-safe.
  *
  * @author  Christian Schlichtherle
- * @version $Id$
+ * @version $Id: FederatedFileSystemController.java,v 9d5cfdddd0f4 2010/12/23 02:35:53 christian $
  */
 final class FederatedFileSystemController
 extends DecoratingFileSystemController<FileSystemModel, FileSystemController<?>> {
@@ -261,10 +261,12 @@ extends DecoratingFileSystemController<FileSystemModel, FileSystemController<?>>
 
     @Override
     public <X extends IOException>
-    void sync(  final BitField<SyncOption> options, final ExceptionBuilder<? super SyncException, X> builder)
+    void sync(
+            @NonNull final BitField<SyncOption> options,
+            @NonNull final ExceptionHandler<? super SyncException, X> handler)
     throws X, FileSystemException {
         try {
-            delegate.sync(options, builder);
+            delegate.sync(options, handler);
         } catch (FalsePositiveException ex) {
             throw new UndeclaredThrowableException(ex);
         }

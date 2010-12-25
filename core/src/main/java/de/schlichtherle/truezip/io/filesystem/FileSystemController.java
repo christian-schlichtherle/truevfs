@@ -22,13 +22,12 @@ import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemCon
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.ExceptionBuilder;
+import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import javax.swing.Icon;
-import net.jcip.annotations.ThreadSafe;
 
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
 
@@ -54,7 +53,7 @@ import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
  * as {@link ConcurrentFileSystemController}.
  *
  * @author  Christian Schlichtherle
- * @version $Id$
+ * @version $Id: FileSystemController.java,v 100e4ef190c1 2010/12/24 00:02:30 christian $
  */
 public abstract class FileSystemController<M extends FileSystemModel> {
 
@@ -166,21 +165,21 @@ public abstract class FileSystemController<M extends FileSystemModel> {
      * Writes all changes to the contents of this file system to its
      * parent file system.
      *
-     * @param  <X> the type of the assembled {@code IOException} to throw.
      * @param  options the synchronization options.
-     * @param  builder the exception builder to use for the assembly of an
-     *         {@code IOException} from one or more input {@code SyncException}s.
-     * @throws IOException at the discretion of the exception {@code builder}.
+     * @param  handler the exception handling strategy for dealing with one or
+     *         more input {@code SyncException}s which may trigger an {@code X}.
+     * @param  <X> the type of the {@code IOException} to throw at the
+     *         discretion of the exception {@code handler}.
+     * @throws IOException at the discretion of the exception {@code handler}.
      * @throws IllegalArgumentException if the combination of synchronization
      *         options is illegal, e.g. if {@code FORCE_CLOSE_INPUT} is cleared
      *         and {@code FORCE_CLOSE_OUTPUT} is set.
-     * @see    FileSystemModel#isTouched
      * @see    #UPDATE
      * @see    #UMOUNT
      */
     public abstract <X extends IOException>
     void sync(  @NonNull BitField<SyncOption> options,
-                @NonNull ExceptionBuilder<? super SyncException, X> builder)
+                @NonNull ExceptionHandler<? super SyncException, X> builder)
     throws X, FileSystemException;
 
     /**

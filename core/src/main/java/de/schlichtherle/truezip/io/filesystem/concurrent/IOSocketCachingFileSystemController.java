@@ -29,7 +29,7 @@ import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.ExceptionBuilder;
+import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.util.Map;
@@ -40,7 +40,7 @@ import net.jcip.annotations.NotThreadSafe;
  * Caches I/O sockets created by its delegate.
  * 
  * @author Christian Schlichtherle
- * @version $Id$
+ * @version $Id: IOSocketCachingFileSystemController.java,v f5c420e8744e 2010/12/22 03:03:09 christian $
  */
 @NotThreadSafe
 public final class IOSocketCachingFileSystemController<
@@ -123,13 +123,14 @@ extends DecoratingFileSystemController<M, C> {
 
     @Override
     public <X extends IOException>
-    void sync(  @NonNull BitField<SyncOption> options,
-                @NonNull ExceptionBuilder<? super SyncException, X> builder)
+    void sync(
+            @NonNull final BitField<SyncOption> options,
+            @NonNull final ExceptionHandler<? super SyncException, X> handler)
     throws X, FileSystemException {
         assert getModel().writeLock().isHeldByCurrentThread();
 
         try {
-            delegate.sync(options, builder);
+            delegate.sync(options, handler);
         } finally {
             inputs.clear();
             outputs.clear();
