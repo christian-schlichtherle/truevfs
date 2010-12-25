@@ -55,12 +55,14 @@
 
     <dependencies>
         <dependency>
+            <!-- TODO: Create a truezip-tar module -->
             <groupId>org.apache.ant</groupId>
             <artifactId>ant</artifactId>
             <version>1.8.1</version>
             <optional>true</optional>
         </dependency>
         <dependency>
+            <!-- TODO: Create a truezip-tzp module -->
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15</artifactId>
             <version>1.45</version>
