@@ -26,8 +26,6 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -68,8 +66,8 @@ public final class Cache<E extends Entry> {
          * {@link NullPointerException}.
          */
         READ_ONLY {
-            @Override <E extends Entry> Cache<E>.OutputPool
-            newOutputPool(Cache<E> cache) {
+            @Override <E extends Entry> Cache<E>.OutputBufferPool
+            newOutputBufferPool(Cache<E> cache) {
                 throw new AssertionError(); // should throw an NPE before we can get here!
             }
         },
@@ -79,9 +77,9 @@ public final class Cache<E extends Entry> {
          * output stream created by the provided output socket gets closed.
          */
         WRITE_THROUGH {
-            @Override <E extends Entry> Cache<E>.OutputPool
-            newOutputPool(Cache<E> cache) {
-                return cache.new WriteThroughOutputPool();
+            @Override <E extends Entry> Cache<E>.OutputBufferPool
+            newOutputBufferPool(Cache<E> cache) {
+                return cache.new WriteThroughOutputBufferPool();
             }
         },
 
@@ -90,88 +88,41 @@ public final class Cache<E extends Entry> {
          * explicitly flushed.
          */
         WRITE_BACK {
-            @Override <E extends Entry> Cache<E>.OutputPool
-            newOutputPool(Cache<E> cache) {
-                return cache.new WriteBackOutputPool();
+            @Override <E extends Entry> Cache<E>.OutputBufferPool
+            newOutputBufferPool(Cache<E> cache) {
+                return cache.new WriteBackOutputBufferPool();
             }
         };
 
         /**
          * Returns a new cache.
          *
-         * @param  clazz the class indicating the type of entries for which this
-         *         cache is going to be used.
-         *         This is only required to infer the type parameter of the
-         *         returned object.
-         * @param  pool the pool of temporary entries to cache the entry
-         *         data.
+         * @param  pool the pool of temporary entries to cache the entry data.
          * @return A new cache.
          */
         @NonNull public <E extends Entry> Cache<E>
-        newCache(@Nullable Class<E> clazz, @NonNull Scope mode, @NonNull IOPool<?> pool) {
-            return new Cache<E>(this, mode, pool);
+        newCache(@NonNull IOPool<?> pool) {
+            return new Cache<E>(this, pool);
         }
 
-        @NonNull <E extends Entry> Cache<E>.InputPool
-        newInputPool(Cache<E> cache) {
-            return cache.new InputPool();
+        @NonNull <E extends Entry> Cache<E>.InputBufferPool
+        newInputBufferPool(Cache<E> cache) {
+            return cache.new InputBufferPool();
         }
 
-        @NonNull abstract <E extends Entry> Cache<E>.OutputPool
-        newOutputPool(Cache<E> cache);
+        @NonNull abstract <E extends Entry> Cache<E>.OutputBufferPool
+        newOutputBufferPool(Cache<E> cache);
     } // enum Strategy
-
-    public enum Scope {
-        DISCONNECTED {
-            @Override <E extends Entry> boolean
-            cache(InputSocket<E> input) throws IOException {
-                // The data for connected sockets cannot not get cached because
-                // sockets may transfer different encoded data depending on
-                // the identity of their peer target!
-                // E.g. if the ZipDriver recognizes a ZipEntry as its peer
-                // target, it transfers deflated data in order to omit
-                // redundant inflating of the data from the source archive file
-                // and deflating it again to the target archive file.
-                // So we must flush and bypass the cache.
-                return null == input.getPeerTarget();
-            }
-
-            @Override <E extends Entry> boolean
-            cache(OutputSocket<E> output) throws IOException {
-                // dito
-                return null == output.getPeerTarget();
-            }
-        },
-
-        ANY {
-            @Override <E extends Entry> boolean
-            cache(InputSocket<E> input) throws IOException {
-                return true;
-            }
-
-            @Override <E extends Entry> boolean
-            cache(OutputSocket<E> output) throws IOException {
-                return true;
-            }
-        };
-
-        @NonNull abstract <E extends Entry> boolean
-        cache(InputSocket<E> input) throws IOException;
-
-        @NonNull abstract <E extends Entry> boolean
-        cache(OutputSocket<E> input) throws IOException;
-    }
 
     private static class Lock { }
 
     private final Lock lock = new Lock();
     private final Strategy strategy;
-    private final Scope mode;
     private final IOPool<?> pool;
     private volatile InputSocket<? extends E> input;
     private volatile OutputSocket<? extends E> output;
-    private volatile InputPool inputPool;
-    private volatile OutputPool outputPool;
+    private volatile InputBufferPool inputBufferPool;
+    private volatile OutputBufferPool outputBufferPool;
     private volatile Buffer buffer;
 
     /**
@@ -187,12 +138,10 @@ public final class Cache<E extends Entry> {
      * @param pool the pool for allocating and releasing temporary I/O entries.
      */
     private Cache(  @NonNull final Strategy strategy,
-                    @NonNull final Scope mode,
                     @NonNull final IOPool<?> pool) {
-        if (null == strategy || null == mode || null == pool)
+        if (null == strategy || null == pool)
             throw new NullPointerException();
         this.strategy = strategy;
-        this.mode = mode;
         this.pool = pool;
     }
 
@@ -253,7 +202,7 @@ public final class Cache<E extends Entry> {
         synchronized (lock) {
             final Buffer buffer = getBuffer();
             if (null != buffer)
-                getOutputPool().release(buffer);
+                getOutputBufferPool().release(buffer);
         }
         return this;
     }
@@ -277,7 +226,7 @@ public final class Cache<E extends Entry> {
      */
     @NonNull
     public InputSocket<E> getInputSocket() {
-        return new BufferInputSocket(input);
+        return new ProxyInputSocket();
     }
 
     /**
@@ -287,7 +236,7 @@ public final class Cache<E extends Entry> {
      */
     @NonNull
     public OutputSocket<E> getOutputSocket() {
-        return new BufferOutputSocket(output);
+        return new ProxyOutputSocket();
     }
 
     private Buffer getBuffer() {
@@ -315,20 +264,13 @@ public final class Cache<E extends Entry> {
         }
     }
 
-    private InputPool getInputPool() {
-        return null != inputPool
-                ? inputPool : (inputPool = strategy.newInputPool(this));
+    private InputBufferPool getInputBufferPool() {
+        return null != inputBufferPool
+                ? inputBufferPool
+                : (inputBufferPool = strategy.newInputBufferPool(this));
     }
 
-    private final class InputPool implements Pool<Buffer, IOException> {
-        ReadOnlyFile newReadOnlyFile(InputSocket<?> input) throws IOException {
-            return allocate().newReadOnlyFile(input);
-        }
-
-        InputStream newInputStream(InputSocket<?> input) throws IOException {
-            return allocate().newInputStream(input);
-        }
-
+    private final class InputBufferPool implements Pool<Buffer, IOException> {
         @Override
         public Buffer allocate() throws IOException {
             synchronized (lock) {
@@ -336,7 +278,7 @@ public final class Cache<E extends Entry> {
                 if (null == buffer) {
                     buffer = new Buffer();
                     try {
-                        IOSocket.copy(input, buffer.getOutputSocket());
+                        IOSocket.copy(input, buffer.data.getOutputSocket());
                     } catch (IOException ex) {
                         buffer.release();
                         throw ex;
@@ -357,16 +299,13 @@ public final class Cache<E extends Entry> {
         }
     } // class InputPool
 
-    private OutputPool getOutputPool() {
-        return null != outputPool
-                ? outputPool : (outputPool = strategy.newOutputPool(this));
+    private OutputBufferPool getOutputBufferPool() {
+        return null != outputBufferPool
+                ? outputBufferPool
+                : (outputBufferPool = strategy.newOutputBufferPool(this));
     }
 
-    private abstract class OutputPool implements Pool<Buffer, IOException> {
-        OutputStream newOutputStream(OutputSocket<?> output) throws IOException {
-            return allocate().newOutputStream(output);
-        }
-
+    private abstract class OutputBufferPool implements Pool<Buffer, IOException> {
         @Override
         public Buffer allocate() throws IOException {
             final Buffer buffer = new Buffer();
@@ -378,14 +317,14 @@ public final class Cache<E extends Entry> {
         public void release(final Buffer buffer) throws IOException {
             buffer.writers = 0;
             try {
-                IOSocket.copy(buffer.getInputSocket(), output);
+                IOSocket.copy(buffer.data.getInputSocket(), output);
             } finally {
                 setBuffer(buffer);
             }
         }
     } // class OutputPool
 
-    private class WriteThroughOutputPool extends OutputPool {
+    private class WriteThroughOutputBufferPool extends OutputBufferPool {
         @Override
         public void release(Buffer buffer) throws IOException {
             if (buffer.writers == 0) // DCL is OK in this context!
@@ -398,7 +337,7 @@ public final class Cache<E extends Entry> {
         }
     } // class WriteThroughOutputPool
 
-    private final class WriteBackOutputPool extends OutputPool {
+    private final class WriteBackOutputBufferPool extends OutputBufferPool {
         @Override
         public void release(final Buffer buffer) throws IOException {
             if (buffer.writers == 0) // DCL is OK in this context!
@@ -419,33 +358,45 @@ public final class Cache<E extends Entry> {
         private final IOPool.Entry<?> data;
         volatile int readers, writers; // max one writer!
 
-        Buffer() throws IOException {
+        private Buffer() throws IOException {
             data = pool.allocate();
         }
 
-        InputSocket<?> getInputSocket() {
-            return data.getInputSocket();
+        private InputSocket<?> getInputSocket() {
+            return new BufferInputSocket(data.getInputSocket());
         }
 
-        OutputSocket<?> getOutputSocket() {
-            return data.getOutputSocket();
+        private OutputSocket<?> getOutputSocket() {
+            return new BufferOutputSocket(data.getOutputSocket());
         }
 
-        void release() throws IOException {
+        private void release() throws IOException {
             assert 0 == writers;
             assert 0 == readers;
             data.release();
         }
 
-        ReadOnlyFile newReadOnlyFile(InputSocket<?> input) throws IOException {
-            return new BufferReadOnlyFile(input);
+        private final class BufferInputSocket extends DecoratingInputSocket<Entry> {
+            private BufferInputSocket(InputSocket<?> input) {
+                super(input);
+            }
+
+            @Override
+            public ReadOnlyFile newReadOnlyFile() throws IOException {
+                return new BufferReadOnlyFile(getBoundSocket().newReadOnlyFile());
+            }
+
+            @Override
+            public InputStream newInputStream() throws IOException {
+                return new BufferInputStream(getBoundSocket().newInputStream());
+            }
         }
 
         private final class BufferReadOnlyFile extends DecoratingReadOnlyFile {
             private boolean closed;
 
-            BufferReadOnlyFile(InputSocket<?> input) throws IOException {
-                super(getInputSocket().bind(input).newReadOnlyFile());
+            BufferReadOnlyFile(ReadOnlyFile rof) {
+                super(rof);
             }
 
             @Override
@@ -456,20 +407,16 @@ public final class Cache<E extends Entry> {
                 try {
                     delegate.close();
                 } finally {
-                    getInputPool().release(Buffer.this);
+                    getInputBufferPool().release(Buffer.this);
                 }
             }
         } // class BufferReadOnlyFile
 
-        InputStream newInputStream(InputSocket<?> input) throws IOException {
-            return new BufferInputStream(input);
-        }
-
         private final class BufferInputStream extends DecoratingInputStream {
             private boolean closed;
 
-            BufferInputStream(InputSocket<?> input) throws IOException {
-                super(getInputSocket().bind(input).newInputStream());
+            BufferInputStream(InputStream in) {
+                super(in);
             }
 
             @Override
@@ -480,20 +427,27 @@ public final class Cache<E extends Entry> {
                 try {
                     delegate.close();
                 } finally {
-                    getInputPool().release(Buffer.this);
+                    getInputBufferPool().release(Buffer.this);
                 }
             }
         } // class BufferInputStream
 
-        OutputStream newOutputStream(OutputSocket<?> output) throws IOException {
-            return new BufferOutputStream(output);
+        private final class BufferOutputSocket extends DecoratingOutputSocket<Entry> {
+            private BufferOutputSocket(OutputSocket<?> output) {
+                super(output);
+            }
+
+            @Override
+            public OutputStream newOutputStream() throws IOException {
+                return new BufferOutputStream(getBoundSocket().newOutputStream());
+            }
         }
 
         private final class BufferOutputStream extends DecoratingOutputStream {
             private boolean closed;
 
-            BufferOutputStream(OutputSocket<?> output) throws IOException {
-                super(getOutputSocket().bind(output).newOutputStream());
+            BufferOutputStream(OutputStream out) {
+                super(out);
             }
 
             @Override
@@ -504,48 +458,46 @@ public final class Cache<E extends Entry> {
                 try {
                     delegate.close();
                 } finally {
-                    getOutputPool().release(Buffer.this);
+                    getOutputBufferPool().release(Buffer.this);
                 }
             }
         } // class BufferOutputStream
     } // class Buffer
 
-    private final class BufferInputSocket extends DecoratingInputSocket<E> {
-        BufferInputSocket(InputSocket <? extends E> input) {
-            super(input);
+    private final class ProxyInputSocket extends InputSocket<E> {
+        @Override
+        public E getLocalTarget() throws IOException {
+            return input.getLocalTarget();
+        }
+
+        private InputSocket<?> getBoundSocket() throws IOException {
+            return getInputBufferPool().allocate().getInputSocket().bind(this);
         }
 
         @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
-            if (!mode.cache(getBoundSocket())) {
-                flush();
-                return getBoundSocket().newReadOnlyFile();
-            }
-            return getInputPool().newReadOnlyFile(this);
+            return getBoundSocket().newReadOnlyFile();
         }
 
         @Override
         public InputStream newInputStream() throws IOException {
-            if (!mode.cache(getBoundSocket())) {
-                flush();
-                return getBoundSocket().newInputStream();
-            }
-            return getInputPool().newInputStream(this);
+            return getBoundSocket().newInputStream();
         }
-    } // class SafeBufferInputSocket
+    } // class BufferInputSocket
 
-    private final class BufferOutputSocket extends DecoratingOutputSocket<E> {
-        BufferOutputSocket(OutputSocket<? extends E> output) {
-            super(output);
+    private final class ProxyOutputSocket extends OutputSocket<E> {
+        @Override
+        public E getLocalTarget() throws IOException {
+            return output.getLocalTarget();
+        }
+
+        private OutputSocket<?> getBoundSocket() throws IOException {
+            return getOutputBufferPool().allocate().getOutputSocket().bind(this);
         }
 
         @Override
         public OutputStream newOutputStream() throws IOException {
-            if (!mode.cache(getBoundSocket())) {
-                clear();
-                return getBoundSocket().newOutputStream();
-            }
-            return getOutputPool().newOutputStream(this);
+            return getBoundSocket().newOutputStream();
         }
-    } // class SafeBufferOutputSocket
+    } // class BufferOutputSocket
 }

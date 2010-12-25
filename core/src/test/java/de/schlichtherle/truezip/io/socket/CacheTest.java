@@ -19,7 +19,6 @@ import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
 import static de.schlichtherle.truezip.io.socket.Cache.Strategy.*;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
-import static de.schlichtherle.truezip.io.socket.Cache.Scope.*;
 
 public class CacheTest {
 
@@ -40,8 +39,7 @@ public class CacheTest {
             WRITE_THROUGH,
             WRITE_BACK,
         }) {
-            final Cache<MockIOEntry> cache = strategy
-                    .newCache(MockIOEntry.class, ANY, pool);
+            final Cache<MockIOEntry> cache = strategy.newCache(pool);
             MockIOEntry front, back;
 
             back = new MockIOEntry(MOCK_ENTRY_DATA_READ);
