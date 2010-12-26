@@ -43,10 +43,10 @@ import java.util.Iterator;
 import java.util.Map;
 import net.jcip.annotations.NotThreadSafe;
 
-import static de.schlichtherle.truezip.io.entry.Entry.Type.FILE;
+import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
 import static de.schlichtherle.truezip.io.socket.Cache.Strategy.*;
-import static de.schlichtherle.truezip.io.filesystem.SyncOption.ABORT_CHANGES;
-import static de.schlichtherle.truezip.io.filesystem.SyncOption.CLEAR_CACHE;
+import static de.schlichtherle.truezip.io.filesystem.OutputOption.*;
+import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
 
 /**
  * A caching archive controller implements a caching strategy for entry data.
@@ -109,8 +109,8 @@ extends DecoratingFileSystemController<M, C>
 
     @Override
     public InputSocket<?> getInputSocket(
-            final FileSystemEntryName name,
-            final BitField<InputOption> options) {
+            FileSystemEntryName name,
+            BitField<InputOption> options) {
         return new Input(name, options);
     }
 
@@ -138,9 +138,9 @@ extends DecoratingFileSystemController<M, C>
 
     @Override
     public OutputSocket<?> getOutputSocket(
-            final FileSystemEntryName name,
-            final BitField<OutputOption> options,
-            final Entry template) {
+            FileSystemEntryName name,
+            BitField<OutputOption> options,
+            Entry template) {
         return new Output(name, options, template);
     }
 
@@ -168,7 +168,7 @@ extends DecoratingFileSystemController<M, C>
                     return super.getBoundSocket(); // don't cache
                 cache = new Cache(name);
             } else {
-                if (options.get(OutputOption.APPEND)) {
+                if (options.get(APPEND)) {
                     // This combination of features would be expected to work
                     // with a WRITE_THROUGH cache strategy.
                     // However, we are using WRITE_BACK for performance reasons
@@ -181,11 +181,28 @@ extends DecoratingFileSystemController<M, C>
                     cache.flush();
                 }
             }
-            // Create marker entry and mind CREATE_PARENTS!
-            if (!delegate.mknod(name, FILE, options, template))
-                getModel().setTouched(true);
-            assert getModel().isTouched();
+            makeMarkerEntry();
             return cache.configure(options, template).getOutputSocket().bind(this);
+        }
+
+        /**
+         * Ensure the existence of an entry in the file system.
+         */
+        private void makeMarkerEntry() throws IOException {
+            boolean exists = false;
+            try {
+                exists = null != delegate.getEntry(name);
+            } catch (IOException ignored) {
+                // This could be a FalsePositiveException, which would cause
+                // unwanted resolution to the parent controller.
+            }
+            if (exists) {
+                getModel().setTouched(true);
+            } else {
+                // EXCLUSIVE is actually redundant, but provided for clarity.
+                delegate.mknod(name, FILE, options.set(EXCLUSIVE), template);
+            }
+            assert getModel().isTouched();
         }
     } // class Output
 
@@ -365,11 +382,7 @@ extends DecoratingFileSystemController<M, C>
                 }
 
                 final OutputStream out = getBoundSocket().newOutputStream();
-                // Create marker entry and mind CREATE_PARENTS!
-                // FIXME: This leaves temps - why?!
-                /*if (!delegate.mknod(name, FILE, options, template))
-                    getModel().setTouched(true);
-                assert getModel().isTouched();*/
+                //makeMarkerEntry();
                 caches.put(name, Cache.this);
                 return out;
             }

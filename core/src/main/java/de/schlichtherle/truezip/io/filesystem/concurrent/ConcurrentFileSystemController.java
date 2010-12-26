@@ -35,6 +35,7 @@ import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
@@ -332,15 +333,16 @@ extends DecoratingFileSystemController<M, C> {
     } // class Output
 
     @Override
-    public boolean mknod(   FileSystemEntryName name,
-                            Type type,
-                            BitField<OutputOption> options,
-                            Entry template)
+    public void mknod(
+            @NonNull FileSystemEntryName name,
+            @NonNull Type type,
+            @NonNull BitField<OutputOption> options,
+            @CheckForNull Entry template)
     throws IOException {
         assertNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
-            return delegate.mknod(name, type, options, template);
+            delegate.mknod(name, type, options, template);
         } finally {
             writeLock().unlock();
         }

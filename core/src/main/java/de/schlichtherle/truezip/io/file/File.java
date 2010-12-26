@@ -32,7 +32,6 @@ import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.io.filesystem.FilterFileSystemManager;
 import de.schlichtherle.truezip.io.filesystem.SyncExceptionBuilder;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
-import de.schlichtherle.truezip.io.filesystem.OutputOption;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -2753,11 +2752,18 @@ public class File extends java.io.File {
     @Override
     public boolean createNewFile() throws IOException {
         if (null != innerArchive) {
-            return innerArchive.getController()
-                    .mknod(getInnerEntryName0(), FILE,
-                        BitField.noneOf(OutputOption.class)
-                            .set(CREATE_PARENTS, isLenient()),
-                        null);
+            final FileSystemController<?> controller
+                    = innerArchive.getController();
+            final FileSystemEntryName entryName = getInnerEntryName0();
+            // This is not really atomic, but should be OK in this case.
+            if (null != controller.getEntry(entryName))
+                return false;
+            controller.mknod(
+                    entryName,
+                    FILE,
+                    BitField.of(EXCLUSIVE).set(CREATE_PARENTS, isLenient()),
+                    null);
+            return true;
         }
         return delegate.createNewFile();
     }
@@ -2797,15 +2803,18 @@ public class File extends java.io.File {
      */
     @Override
     public boolean mkdir() {
-        try {
-            if (null != innerArchive) {
-                return innerArchive.getController()
-                        .mknod(getInnerEntryName0(), DIRECTORY,
-                            BitField.noneOf(OutputOption.class)
-                                .set(CREATE_PARENTS, isLenient()), null);
+        if (null != innerArchive) {
+            try {
+                innerArchive.getController().mknod(
+                        getInnerEntryName0(),
+                        DIRECTORY,
+                        BitField.of(EXCLUSIVE) // redundant for directory entries
+                            .set(CREATE_PARENTS, isLenient()),
+                        null);
+                return true;
+            } catch (IOException ex) {
+                return false;
             }
-        } catch (IOException ex) {
-            return false;
         }
         return delegate.mkdir();
     }

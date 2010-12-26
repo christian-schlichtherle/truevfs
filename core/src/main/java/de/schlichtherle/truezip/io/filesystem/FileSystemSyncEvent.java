@@ -17,7 +17,9 @@ package de.schlichtherle.truezip.io.filesystem;
 
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import net.jcip.annotations.Immutable;
 
@@ -26,12 +28,15 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
+@DefaultAnnotation(NonNull.class)
 public class FileSystemSyncEvent<X extends IOException> extends FileSystemEvent {
 
     private static final long serialVersionUID = 7656343108473675361L;
 
-    private final @NonNull BitField<SyncOption> options;
-    private final @NonNull ExceptionHandler<? super SyncException, X> handler;
+    private final BitField<SyncOption> options;
+
+    @Nullable
+    private final transient ExceptionHandler<? super SyncException, X> handler;
 
     /**
      * Constructs a new file system sync event.
@@ -39,9 +44,9 @@ public class FileSystemSyncEvent<X extends IOException> extends FileSystemEvent 
      * @param source the file system model source which caused this event.
      */
     public FileSystemSyncEvent(
-            @NonNull final FileSystemModel source,
-            @NonNull final BitField<SyncOption> options,
-            @NonNull final ExceptionHandler<? super SyncException, X> handler) {
+            final FileSystemModel source,
+            final BitField<SyncOption> options,
+            final ExceptionHandler<? super SyncException, X> handler) {
         super(source);
         if (null == options || null == handler)
             throw new NullPointerException();
@@ -49,12 +54,23 @@ public class FileSystemSyncEvent<X extends IOException> extends FileSystemEvent 
         this.handler = handler;
     }
 
-    @NonNull
+    /**
+     * Returns the options provided to the constructor.
+     *
+     * @return the options provided to the constructor.
+     */
     public final BitField<SyncOption> getOptions() {
         return options;
     }
 
-    @NonNull
+    /**
+     * Returns the handler provided to the constructor or {@code null} if and
+     * only if this event was deserialized.
+     *
+     * @return the handler provided to the constructor or {@code null} if and
+     *         only if this event was deserialized.
+     */
+    @Nullable
     public final ExceptionHandler<? super SyncException, X> getHandler() {
         return handler;
     }

@@ -31,7 +31,7 @@ public class BitFieldTest {
     public void testSetOne() {
         BitField<Dummy> bits = BitField.noneOf(Dummy.class).set(ONE);
         assertFalse(bits.isEmpty());
-        assertEquals(1, bits.cardinality());
+        assertThat(bits.cardinality(), is(1));
         assertTrue(bits.get(ONE));
         assertTrue(bits.is(ONE));
         assertThat(BitField.of(bits.toEnumSet()), equalTo(bits));
@@ -41,7 +41,7 @@ public class BitFieldTest {
     public void testClearOne() {
         BitField<Dummy> bits = BitField.of(ONE).clear(ONE);
         assertTrue(bits.isEmpty());
-        assertEquals(0, bits.cardinality());
+        assertThat(bits.cardinality(), is(0));
         assertFalse(bits.get(ONE));
         assertFalse(bits.is(ONE));
         assertThat(BitField.of(bits.toEnumSet()), equalTo(bits));
@@ -51,7 +51,7 @@ public class BitFieldTest {
     public void testSetTwo() {
         BitField<Dummy> bits = BitField.of(ONE, TWO);
         assertFalse(bits.isEmpty());
-        assertEquals(2, bits.cardinality());
+        assertThat(bits.cardinality(), is(2));
         assertTrue(bits.get(ONE));
         assertTrue(bits.is(ONE));
         assertTrue(bits.get(TWO));
@@ -63,12 +63,53 @@ public class BitFieldTest {
     public void testClearTwo() {
         BitField<Dummy> bits = BitField.of(ONE, TWO).clear(ONE).clear(TWO);
         assertTrue(bits.isEmpty());
-        assertEquals(0, bits.cardinality());
+        assertThat(bits.cardinality(), is(0));
         assertFalse(bits.get(ONE));
         assertFalse(bits.is(ONE));
         assertFalse(bits.get(TWO));
         assertFalse(bits.is(TWO));
         assertThat(BitField.of(bits.toEnumSet()), equalTo(bits));
+    }
+
+    @Test
+    public void testAllOf() {
+        BitField<Dummy> bits = BitField.allOf(Dummy.class);
+        assertThat(bits.cardinality(), is(3));
+    }
+
+    /*@Test
+    public void testClear() {
+        BitField<Dummy> bits = BitField.allOf(Dummy.class);
+        assertThat(bits.cardinality(), is(3));
+        bits = bits.clear();
+        assertThat(bits.cardinality(), is(0));
+        assertSame(bits, bits.clear());
+    }*/
+
+    @Test
+    public void testNot() {
+        BitField<Dummy> bits = BitField.allOf(Dummy.class);
+        assertThat(bits.cardinality(), is(3));
+        bits = bits.not();
+        assertThat(bits.cardinality(), is(0));
+    }
+
+    @Test
+    public void testAnd() {
+        BitField<Dummy> bits = BitField.allOf(Dummy.class);
+        assertThat(bits.cardinality(), is(3));
+        assertThat(bits.and(BitField.allOf(Dummy.class)), sameInstance(bits));
+        bits = bits.and(BitField.noneOf(Dummy.class));
+        assertThat(bits.cardinality(), is(0));
+    }
+
+    @Test
+    public void testOr() {
+        BitField<Dummy> bits = BitField.noneOf(Dummy.class);
+        assertThat(bits.cardinality(), is(0));
+        assertThat(bits.and(BitField.noneOf(Dummy.class)), sameInstance(bits));
+        bits = bits.or(BitField.allOf(Dummy.class));
+        assertThat(bits.cardinality(), is(3));
     }
 
     enum Dummy { ONE, TWO, THREE }

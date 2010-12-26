@@ -49,8 +49,13 @@ public enum OutputOption {
     CREATE_PARENTS,
 
     /**
-     * Whether or not the new data shall get appended to the existing data
-     * of the local target rather than replacing it entirely.
+     * Whether or not the new entry data shall get appended to the existing
+     * entry data rather than replacing it entirely.
      */
     APPEND,
+
+    /**
+     * Whether or not an entry must be exclusively created.
+     */
+    EXCLUSIVE,
 }
