@@ -15,9 +15,12 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
+import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import java.io.IOException;
 import java.util.Set;
 import java.util.LinkedHashSet;
 import net.jcip.annotations.ThreadSafe;
@@ -37,6 +40,8 @@ public class FileSystemModel {
     private volatile boolean touched;
     private Set<FileSystemTouchedListener> touchedListeners
             = new LinkedHashSet<FileSystemTouchedListener>();
+    private Set<FileSystemSyncListener> syncListeners
+            = new LinkedHashSet<FileSystemSyncListener>();
 
     public FileSystemModel( MountPoint mountPoint) {
         this(mountPoint, null);
@@ -130,15 +135,16 @@ public class FileSystemModel {
         touched = newTouched;
         if (newTouched != oldTouched) {
             final FileSystemEvent event = new FileSystemEvent(this);
-            for (FileSystemTouchedListener listener : getFileSystemTouchedListeners())
+            for (final FileSystemTouchedListener listener
+                    : getFileSystemTouchedListeners())
                 listener.touchedChanged(event);
         }
     }
 
     /**
      * Returns a protective copy of the set of file system touched listeners.
-     * 
-     * @return A clone of the set of file system listeners.
+     *
+     * @return A clone of the set of file system touched listeners.
      */
     @NonNull
     final synchronized Set<FileSystemTouchedListener> getFileSystemTouchedListeners() {
@@ -148,7 +154,7 @@ public class FileSystemModel {
     /**
      * Adds the given listener to the set of file system touched listeners.
      *
-     * @param  listener the listener for file system events.
+     * @param listener the listener for file system touched events.
      */
     public final synchronized void addFileSystemTouchedListener(
             @NonNull FileSystemTouchedListener listener) {
@@ -160,11 +166,55 @@ public class FileSystemModel {
     /**
      * Removes the given listener from the set of file system touched listeners.
      *
-     * @param  listener the listener for file system events.
+     * @param listener the listener for file system touched events.
      */
     public final synchronized void removeFileSystemTouchedListener(
             @Nullable FileSystemTouchedListener listener) {
         touchedListeners.remove(listener);
+    }
+
+    /**
+     * Returns a protective copy of the set of file system sync listeners.
+     *
+     * @return A clone of the set of file system sync listeners.
+     */
+    @NonNull
+    final synchronized Set<FileSystemSyncListener> getFileSystemSyncListeners() {
+        return new LinkedHashSet<FileSystemSyncListener>(syncListeners);
+    }
+
+    /**
+     * Adds the given listener to the set of file system sync listeners.
+     *
+     * @param listener the listener for file system sync events.
+     */
+    public final synchronized void addFileSystemSyncListener(
+            @NonNull FileSystemSyncListener listener) {
+        if (null == listener)
+            throw new NullPointerException();
+        syncListeners.add(listener);
+    }
+
+    /**
+     * Removes the given listener from the set of file system sync listeners.
+     *
+     * @param listener the listener for file system sync events.
+     */
+    public final synchronized void removeFileSystemSyncListener(
+            @Nullable FileSystemSyncListener listener) {
+        syncListeners.remove(listener);
+    }
+
+    public final <X extends IOException>
+    void fireBeforeSyncEvent(
+            @NonNull BitField<SyncOption> options,
+            @NonNull ExceptionHandler<? super SyncException, X> handler)
+    throws X, FileSystemException {
+        final FileSystemSyncEvent<X> event
+                = new FileSystemSyncEvent<X>(this, options, handler);
+        for (final FileSystemSyncListener listener
+                : getFileSystemSyncListeners())
+            listener.beforeSync(event);
     }
 
     /**

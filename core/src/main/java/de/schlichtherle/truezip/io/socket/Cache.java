@@ -285,6 +285,7 @@ public final class Cache<E extends Entry> {
                     }
                     setBuffer(buffer);
                 }
+                assert Strategy.WRITE_BACK == strategy || 0 == buffer.writers;
                 buffer.readers++;
                 return buffer;
             }
@@ -293,6 +294,7 @@ public final class Cache<E extends Entry> {
         @Override
         public void release(final Buffer buffer) throws IOException {
             synchronized (lock) {
+                assert Strategy.WRITE_BACK == strategy || 0 == buffer.writers;
                 if (--buffer.readers == 0 && buffer.writers == 0 && buffer != getBuffer())
                     buffer.release();
             }
@@ -309,12 +311,14 @@ public final class Cache<E extends Entry> {
         @Override
         public Buffer allocate() throws IOException {
             final Buffer buffer = new Buffer();
+            assert 0 == buffer.readers;
             buffer.writers = 1;
             return buffer;
         }
 
         @Override
         public void release(final Buffer buffer) throws IOException {
+            assert Strategy.WRITE_BACK == strategy || 0 == buffer.readers;
             buffer.writers = 0;
             try {
                 IOSocket.copy(buffer.data.getInputSocket(), output);
@@ -476,11 +480,23 @@ public final class Cache<E extends Entry> {
 
         @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
+            /*if (null != getBoundSocket().getPeerTarget()) {
+                // The data for connected sockets should not get cached
+                // because... FIXME: Why exactly?!
+                // So we flush and bypass the cache.
+                flush();
+                return input.newReadOnlyFile();
+            }*/
             return getBoundSocket().newReadOnlyFile();
         }
 
         @Override
         public InputStream newInputStream() throws IOException {
+            /*if (null != getBoundSocket().getPeerTarget()) {
+                // Dito.
+                flush();
+                return input.newInputStream();
+            }*/
             return getBoundSocket().newInputStream();
         }
     } // class BufferInputSocket
@@ -497,6 +513,11 @@ public final class Cache<E extends Entry> {
 
         @Override
         public OutputStream newOutputStream() throws IOException {
+            /*if (null != getBoundSocket().getPeerTarget()) {
+                // Dito, but this time we clear and bypass the cache.
+                clear();
+                return output.newOutputStream();
+            }*/
             return getBoundSocket().newOutputStream();
         }
     } // class BufferOutputSocket
