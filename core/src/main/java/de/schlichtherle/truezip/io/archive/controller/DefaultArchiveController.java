@@ -70,7 +70,7 @@ import static de.schlichtherle.truezip.io.Paths.isRoot;
  *
  * @param   <E> The type of the archive entries.
  * @author  Christian Schlichtherle
- * @version $Id: DefaultArchiveController.java,v 100e4ef190c1 2010/12/24 00:02:30 christian $
+ * @version $Id$
  */
 @NotThreadSafe
 public final class DefaultArchiveController<E extends ArchiveEntry>
@@ -83,7 +83,7 @@ extends FileSystemArchiveController<E> {
             = BitField.noneOf(OutputOption.class);
 
     private static final BitField<SyncOption> SYNC_OPTIONS
-            = BitField.of(WAIT_CLOSE_INPUT, WAIT_CLOSE_OUTPUT);
+            = BitField.of(WAIT_CLOSE_INPUT, WAIT_CLOSE_OUTPUT, CLEAR_CACHE);
 
     private static final class DummyInputService<E extends Entry>
     implements InputShop<E> {
@@ -298,7 +298,8 @@ extends FileSystemArchiveController<E> {
     }
 
     @Override
-    boolean autoSync(final FileSystemEntryName name, final Access intention)
+    boolean autoSync(   @NonNull final FileSystemEntryName name,
+                        @NonNull final Access intention)
     throws SyncException, FileSystemException {
         final ArchiveFileSystem<E> fileSystem;
         final ArchiveFileSystemEntry<E> entry;
@@ -306,12 +307,12 @@ extends FileSystemArchiveController<E> {
                 || null == (entry = fileSystem.getEntry(name)))
             return false;
         String n = null;
-        if (null != output
-                && null != output.getEntry(n = entry.getEntry().getName()))
+        if (null != output && null != output.getEntry(
+                n = entry.getEntry().getName()))
             //if (READ == intention || !output.canAppend(entry.getEntry()))
                 return sync();
-        if (null != input
-                && null != input.getEntry(null != n ? n : (n = entry.getEntry().getName())))
+        if (null != input && null != input.getEntry(
+                null != n ? n : (n = entry.getEntry().getName())))
             return false;
         if (READ == intention)
             return sync();
@@ -328,15 +329,17 @@ extends FileSystemArchiveController<E> {
     }
 
     @Override
-    public <X extends IOException>
-    void sync(  final BitField<SyncOption> options,
-                final ExceptionHandler<? super SyncException, X> handler)
-    throws X {
+    public <X extends IOException> void sync(
+            @NonNull final BitField<SyncOption> options,
+            @NonNull final ExceptionHandler<? super SyncException, X> handler)
+    throws X, FileSystemException {
         assert !isTouched() || null != output; // file system touched => output archive
         assert getModel().writeLock().isHeldByCurrentThread();
 
         if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT))
             throw new IllegalArgumentException();
+
+        getModel().fireBeforeSyncEvent(options, handler);
         awaitSync(options, handler);
         commenceSync(handler);
         try {
@@ -363,8 +366,7 @@ extends FileSystemArchiveController<E> {
      * @throws SyncException If any exceptional condition occurs
      *         throughout the processing of the container archive file.
      */
-    private <X extends IOException>
-    void awaitSync(
+    private <X extends IOException> void awaitSync(
             @NonNull final BitField<SyncOption> options,
             @NonNull final ExceptionHandler<? super SyncException, X> handler)
     throws X {
@@ -408,19 +410,18 @@ extends FileSystemArchiveController<E> {
      * @throws SyncException If any exceptional condition occurs
      *         throughout the processing of the container archive file.
      */
-    private <X extends IOException>
-    void commenceSync(
+    private <X extends IOException> void commenceSync(
             @NonNull final ExceptionHandler<? super SyncException, X> handler)
     throws X {
         class FilterExceptionHandler
         implements ExceptionHandler<IOException, X> {
             @Override
-			public X fail(IOException cannotHappen) {
+            public X fail(IOException cannotHappen) {
                 throw new AssertionError(cannotHappen);
             }
 
             @Override
-			public void warn(IOException cause) throws X {
+            public void warn(IOException cause) throws X {
                 if (null == cause)
                     throw new NullPointerException();
                 handler.warn(new SyncWarningException(getModel(), cause));
@@ -442,8 +443,7 @@ extends FileSystemArchiveController<E> {
      * @throws IOException If any exceptional condition occurs throughout the
      *         processing of the container archive file.
      */
-    private <X extends IOException>
-    void performSync(
+    private <X extends IOException> void performSync(
             @NonNull final ExceptionHandler<? super SyncException, X> handler)
     throws X {
         assert isTouched();
@@ -476,11 +476,11 @@ extends FileSystemArchiveController<E> {
                 (ExceptionHandler<IOException, X>) new FilterExceptionHandler());
     }
 
-    private static <E extends ArchiveEntry, X extends IOException>
-    void copy(  final ArchiveFileSystem<E> fileSystem,
-                final InputService<E> input,
-                final OutputService<E> output,
-                final ExceptionHandler<IOException, X> handler)
+    private static <E extends ArchiveEntry, X extends IOException> void copy(
+            @NonNull final ArchiveFileSystem<E> fileSystem,
+            @NonNull final InputService<E> input,
+            @NonNull final OutputService<E> output,
+            @NonNull final ExceptionHandler<IOException, X> handler)
     throws X {
         for (final ArchiveFileSystemEntry<E> fse : fileSystem) {
             final E e = fse.getEntry();
@@ -518,8 +518,8 @@ extends FileSystemArchiveController<E> {
      * @throws SyncException If any exceptional condition occurs
      *         throughout the processing of the container archive file.
      */
-    private <X extends IOException>
-    void commitSync(@NonNull final ExceptionHandler<? super SyncException, X> handler)
+    private <X extends IOException> void commitSync(
+            @NonNull final ExceptionHandler<? super SyncException, X> handler)
     throws X {
         setFileSystem(null);
 

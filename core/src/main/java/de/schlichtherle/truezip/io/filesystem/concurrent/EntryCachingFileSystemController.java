@@ -20,6 +20,8 @@ import de.schlichtherle.truezip.io.filesystem.DecoratingFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
 import de.schlichtherle.truezip.io.filesystem.FileSystemException;
+import de.schlichtherle.truezip.io.filesystem.FileSystemSyncEvent;
+import de.schlichtherle.truezip.io.filesystem.FileSystemSyncListener;
 import de.schlichtherle.truezip.io.filesystem.InputOption;
 import de.schlichtherle.truezip.io.filesystem.OutputOption;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
@@ -39,13 +41,13 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import net.jcip.annotations.NotThreadSafe;
 
 import static de.schlichtherle.truezip.io.entry.Entry.Type.FILE;
 import static de.schlichtherle.truezip.io.socket.Cache.Strategy.*;
-import static de.schlichtherle.truezip.io.filesystem.SyncOption.ABORT_CHANGES;
-import static de.schlichtherle.truezip.io.filesystem.SyncOption.CLEAR_CACHE;
+import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
 
 /**
  * A caching archive controller implements a caching strategy for entry data.
@@ -78,13 +80,14 @@ import static de.schlichtherle.truezip.io.filesystem.SyncOption.CLEAR_CACHE;
  * @param   <M> The type of the file system model.
  * @param   <C> The type of the decorated file system controller.
  * @author  Christian Schlichtherle
- * @version $Id: EntryCachingFileSystemController.java,v 74ef000e30d1 2010/12/25 07:39:02 christian $
+ * @version $Id$
  */
 @NotThreadSafe
 public final class EntryCachingFileSystemController<
         M extends ConcurrentFileSystemModel,
         C extends FileSystemController<? extends M>>
-extends DecoratingFileSystemController<M, C> {
+extends DecoratingFileSystemController<M, C>
+/*implements FileSystemSyncListener*/ {
 
     private final IOPool<?> pool;
     private final Map<FileSystemEntryName, Cache> caches
@@ -102,6 +105,7 @@ extends DecoratingFileSystemController<M, C> {
         if (null == pool)
             throw new NullPointerException();
         this.pool = pool;
+        //getModel().addFileSystemSyncListener(this);
     }
 
     @Override
@@ -123,11 +127,14 @@ extends DecoratingFileSystemController<M, C> {
 
         @Override
         public InputSocket<?> getBoundSocket() throws IOException {
-            final Cache cache = caches.get(name);
-            if (null == cache && !options.get(InputOption.CACHE))
-                return super.getBoundSocket(); // don't cache
-            return (null != cache ? cache : new Cache(name))
-                    .configure(options).getInputSocket().bind(this);
+            Cache cache = caches.get(name);
+            if (null == cache) {
+                if (!options.get(InputOption.CACHE))
+                    return super.getBoundSocket(); // don't cache
+                cache = new Cache(name);
+                //caches.put(name, cache);
+            }
+            return cache.configure(options).getInputSocket().bind(this);
         }
     } // class Input
 
@@ -157,10 +164,12 @@ extends DecoratingFileSystemController<M, C> {
         public OutputSocket<?> getBoundSocket() throws IOException {
             assert getModel().writeLock().isHeldByCurrentThread();
 
-            final Cache cache = caches.get(name);
+            Cache cache = caches.get(name);
             if (null == cache) {
                 if (!options.get(OutputOption.CACHE))
                     return super.getBoundSocket(); // don't cache
+                cache = new Cache(name);
+                //caches.put(name, cache);
             } else {
                 if (options.get(OutputOption.APPEND)) {
                     // This combination of features would be expected to work
@@ -175,11 +184,7 @@ extends DecoratingFileSystemController<M, C> {
                     cache.flush();
                 }
             }
-            // Create marker entry and mind CREATE_PARENTS!
-            //delegate.mknod(name, FILE, options, template);
-            //getModel().setTouched(true);
-            return (null != cache ? cache : new Cache(name))
-                    .configure(options, template).getOutputSocket().bind(this);
+            return cache.configure(options, template).getOutputSocket().bind(this);
         }
     } // class Output
 
@@ -194,8 +199,7 @@ extends DecoratingFileSystemController<M, C> {
     }
 
     @Override
-    public <X extends IOException>
-    void sync(
+    public <X extends IOException> void sync(
             @NonNull final BitField<SyncOption> options,
             @NonNull final ExceptionHandler<? super SyncException, X> handler)
     throws X, FileSystemException {
@@ -203,33 +207,41 @@ extends DecoratingFileSystemController<M, C> {
         delegate.sync(options.clear(CLEAR_CACHE), handler);
     }
 
+    /*@Override
     public <X extends IOException>
-    void beforeSync(
+    void beforeSync(final FileSystemSyncEvent<X> event)
+    throws X, FileSystemException {
+        beforeSync(event.getOptions(), event.getHandler());
+    }*/
+
+    private <X extends IOException> void beforeSync(
             @NonNull final BitField<SyncOption> options,
             @NonNull final ExceptionHandler<? super SyncException, X> handler)
     throws X, FileSystemException {
         assert getModel().writeLock().isHeldByCurrentThread();
 
-        if (0 < caches.size()) {
-            final boolean flush = !options.get(ABORT_CHANGES);
-            final boolean clear = !flush || options.get(CLEAR_CACHE);
-            for (final Cache cache : caches.values()) {
+        if (0 >= caches.size())
+            return;
+
+        final boolean flush = !options.get(ABORT_CHANGES);
+        final boolean clear = !flush || options.get(CLEAR_CACHE);
+        for (final Iterator<Cache> i = caches.values().iterator(); i.hasNext(); ) {
+            final Cache cache = i.next();
+            try {
+                if (flush)
+                    cache.flush();
+            } catch (IOException ex) {
+                throw handler.fail(new SyncException(getModel(), ex));
+            } finally  {
                 try {
-                    if (flush)
-                        cache.flush();
-                } catch (IOException ex) {
-                    throw handler.fail(new SyncException(getModel(), ex));
-                } finally  {
-                    try {
-                        if (clear)
-                            cache.clear();
-                    } catch (IOException ex) {
-                        handler.warn(new SyncWarningException(getModel(), ex));
+                    if (clear) {
+                        i.remove();
+                        cache.clear();
                     }
+                } catch (IOException ex) {
+                    handler.warn(new SyncWarningException(getModel(), ex));
                 }
             }
-            if (clear)
-                caches.clear();
         }
     }
 
@@ -240,12 +252,12 @@ extends DecoratingFileSystemController<M, C> {
             = BitField.noneOf(OutputOption.class);
 
     private final class Cache {
-        final FileSystemEntryName name;
-        final de.schlichtherle.truezip.io.socket.Cache<Entry> cache;
-        volatile InputSocket<Entry> input;
-        volatile OutputSocket<Entry> output;
-        volatile BitField<OutputOption> options;
-        volatile Entry template;
+        private final FileSystemEntryName name;
+        private final de.schlichtherle.truezip.io.socket.Cache<Entry> cache;
+        private volatile InputSocket<Entry> input;
+        private volatile OutputSocket<Entry> output;
+        private volatile BitField<OutputOption> options;
+        private volatile Entry template;
 
         Cache(@NonNull final FileSystemEntryName name) {
             this.name = name;
@@ -346,8 +358,9 @@ extends DecoratingFileSystemController<M, C> {
 
                 final OutputStream out = getBoundSocket().newOutputStream();
                 // Create marker entry and mind CREATE_PARENTS!
-                delegate.mknod(name, FILE, options, template);
-                getModel().setTouched(true);
+                if (!delegate.mknod(name, FILE, options, template))
+                    getModel().setTouched(true);
+                assert getModel().isTouched();
                 caches.put(name, Cache.this);
                 return out;
             }

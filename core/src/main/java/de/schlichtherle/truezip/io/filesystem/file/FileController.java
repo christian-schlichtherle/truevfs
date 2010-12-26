@@ -45,7 +45,7 @@ import static java.io.File.separatorChar;
 
 /**
  * @author Christian Schlichtherle
- * @version $Id: FileController.java,v 05649425ee35 2010/12/22 02:38:52 christian $
+ * @version $Id$
  */
 @ThreadSafe
 final class FileController extends FileSystemController<FileSystemModel>  {
@@ -171,13 +171,5 @@ final class FileController extends FileSystemController<FileSystemModel>  {
         final File file = new File(target, name.getPath());
         if (!file.delete())
             throw new IOException(file.getPath() + " (cannot delete)");
-    }
-
-    @Override
-    public <X extends IOException>
-    void sync(
-            @NonNull final BitField<SyncOption> options,
-            @NonNull final ExceptionHandler<? super SyncException, X> handler)
-    throws X, FileSystemException {
     }
 }

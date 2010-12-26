@@ -53,7 +53,7 @@ import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
  * as {@link ConcurrentFileSystemController}.
  *
  * @author  Christian Schlichtherle
- * @version $Id: FileSystemController.java,v 100e4ef190c1 2010/12/24 00:02:30 christian $
+ * @version $Id$
  */
 public abstract class FileSystemController<M extends FileSystemModel> {
 
@@ -164,6 +164,10 @@ public abstract class FileSystemController<M extends FileSystemModel> {
     /**
      * Writes all changes to the contents of this file system to its
      * parent file system.
+     * <p>
+     * The implementation in this base class just calls
+     * {@link FileSystemModel#fireBeforeSyncEvent} on the
+     * {@link #getModel file system model}.
      *
      * @param  options the synchronization options.
      * @param  handler the exception handling strategy for dealing with one or
@@ -177,10 +181,12 @@ public abstract class FileSystemController<M extends FileSystemModel> {
      * @see    #UPDATE
      * @see    #UMOUNT
      */
-    public abstract <X extends IOException>
+    public <X extends IOException>
     void sync(  @NonNull BitField<SyncOption> options,
-                @NonNull ExceptionHandler<? super SyncException, X> builder)
-    throws X, FileSystemException;
+                @NonNull ExceptionHandler<? super SyncException, X> handler)
+    throws X, FileSystemException {
+        getModel().fireBeforeSyncEvent(options, handler);
+    }
 
     /**
      * Equivalent to

@@ -16,37 +16,22 @@
 package de.schlichtherle.truezip.io.filesystem;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
-import java.util.EventObject;
-import net.jcip.annotations.Immutable;
+import java.io.IOException;
+import java.util.EventListener;
 
 /**
+ * Used to notify implementations of an event in a {@link FileSystemController}.
+ *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-@Immutable
-public class FileSystemEvent extends EventObject {
-
-    private static final long serialVersionUID = 7656343146323435361L;
+public interface FileSystemSyncListener extends EventListener {
 
     /**
-     * Constructs a new file system event.
-     *
-     * @param source the file system model source which caused this event.
+     * Called before a file system is going to get
+     * {@link FileSystemController#sync synced}.
      */
-    public FileSystemEvent(@NonNull FileSystemModel source) {
-        super(source);
-    }
-
-    /**
-     * Returns the non-{@code null} file system model source which caused
-     * this event.
-     *
-     * @return The non-{@code null} file system model source which caused
-     *         this event.
-     */
-    @Override
-    @NonNull
-    public final FileSystemModel getSource() {
-        return (FileSystemModel) source;
-    }
+    <X extends IOException>
+    void beforeSync(@NonNull FileSystemSyncEvent<X> event)
+    throws X, FileSystemException;
 }

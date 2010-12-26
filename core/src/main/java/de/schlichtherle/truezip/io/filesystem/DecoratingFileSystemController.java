@@ -34,7 +34,7 @@ import javax.swing.Icon;
  * @param   <M> The type of the file system model.
  * @param   <C> The type of the decorated file system controller.
  * @author  Christian Schlichtherle
- * @version $Id: DecoratingFileSystemController.java,v de8626cc844d 2010/12/20 21:21:08 christian $
+ * @version $Id$
  */
 public abstract class DecoratingFileSystemController<
         M extends FileSystemModel,
@@ -141,8 +141,8 @@ extends FileSystemController<M> {
     @Override
     public <X extends IOException>
     void sync(
-            @NonNull final BitField<SyncOption> options,
-            @NonNull final ExceptionHandler<? super SyncException, X> handler)
+            @NonNull BitField<SyncOption> options,
+            @NonNull ExceptionHandler<? super SyncException, X> handler)
     throws X, FileSystemException {
         delegate.sync(options, handler);
     }
