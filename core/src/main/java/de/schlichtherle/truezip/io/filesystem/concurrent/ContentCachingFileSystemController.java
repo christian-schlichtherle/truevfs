@@ -49,8 +49,8 @@ import static de.schlichtherle.truezip.io.filesystem.OutputOption.*;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
 
 /**
- * A caching archive controller implements a caching strategy for entry data.
- * Decorating a concurrent file system controller with this class has the
+ * A content caching archive controller implements a caching strategy for entry
+ * data. Decorating a concurrent file system controller with this class has the
  * following effects:
  * <ul>
  * <li>Upon the first read operation, the entry data will be read from the
@@ -82,7 +82,7 @@ import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
  * @version $Id$
  */
 @NotThreadSafe
-public final class EntryCachingFileSystemController<
+public final class ContentCachingFileSystemController<
         M extends ConcurrentFileSystemModel,
         C extends FileSystemController<? extends M>>
 extends DecoratingFileSystemController<M, C>
@@ -98,7 +98,7 @@ extends DecoratingFileSystemController<M, C>
      * @param controller the decorated file system controller.
      * @param pool the pool of temporary entries to cache the entry data.
      */
-    public EntryCachingFileSystemController(@NonNull final C controller,
+    public ContentCachingFileSystemController(@NonNull final C controller,
                                             @NonNull final IOPool<?> pool) {
         super(controller);
         if (null == pool)
