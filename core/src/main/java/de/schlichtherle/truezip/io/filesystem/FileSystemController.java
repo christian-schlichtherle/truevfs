@@ -29,6 +29,8 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import javax.swing.Icon;
 
+import static de.schlichtherle.truezip.io.filesystem.InputOption.*;
+import static de.schlichtherle.truezip.io.filesystem.OutputOption.*;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
 
 /**
@@ -126,36 +128,36 @@ public abstract class FileSystemController<M extends FileSystemModel> {
      * Creates or replaces and finally links a chain of one or more entries
      * for the given {@code path} into the file system.
      *
-     * @param  name a non-{@code null} relative path name.
-     * @param  type a non-{@code null} entry type.
-     * @param  template if not {@code null}, then the file system entry
-     *         at the end of the chain shall inherit as much properties from
-     *         this entry as possible - with the exception of its name and type.
+     * @param  name the file system entry name.
+     * @param  type the file system entry type.
      * @param  options if {@code CREATE_PARENTS} is set, any missing parent
      *         directories will be created and linked into this file
      *         system with its last modification time set to the system's
      *         current time.
-     * @throws NullPointerException if {@code path} or {@code type} are
-     *         {@code null}.
+     * @param  template if not {@code null}, then the file system entry
+     *         at the end of the chain shall inherit as much properties from
+     *         this entry as possible - with the exception of its name and type.
      * @throws IOException for some other I/O related reason, including but
      *         not exclusively upon one or more of the following conditions:
      *         <ul>
-     *         <li>The file system is read only.</li>
-     *         <li>{@code path} contains characters which are not
-     *             supported by the file system.</li>
-     *         <li>TODO: type is not {@code FILE} or {@code DIRECTORY}.</li>
-     *         <li>The new entry already exists as a directory.</li>
-     *         <li>The new entry shall be a directory, but already exists.</li>
-     *         <li>A parent entry exists but is not a directory.</li>
+     *         <li>The file system is read only.
+     *         <li>{@code name} contains characters which are not
+     *             supported by the file system.
+     *         <li>TODO: type is not {@code FILE} or {@code DIRECTORY}.
+     *         <li>The entry already exists and either the option
+     *             {@link OutputOption#EXCLUSIVE} is set or the entry is a
+     *             directory.
+     *         <li>The entry exists as a different type.
+     *         <li>A parent entry exists but is not a directory.
      *         <li>A parent entry is missing and {@code createParents} is
-     *             {@code false}.</li>
+     *             {@code false}.
      *         </ul>
      */
-    public abstract boolean mknod(
+    public abstract void mknod(
             @NonNull FileSystemEntryName name,
             @NonNull Type type,
             @NonNull BitField<OutputOption> options,
-            @Nullable Entry template)
+            @CheckForNull Entry template)
     throws IOException;
 
     public abstract void unlink(@NonNull FileSystemEntryName name)

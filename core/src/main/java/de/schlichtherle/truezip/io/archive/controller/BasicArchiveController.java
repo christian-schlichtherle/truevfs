@@ -41,6 +41,8 @@ import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.filesystem.OutputOption;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.util.BitField;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -285,8 +287,7 @@ extends FileSystemController<ConcurrentFileSystemModel> {
             // TODO: Use getPeerTarget() instead of template!
             return autoMount(   !isRoot(name.getPath())
                                 && options.get(CREATE_PARENTS), options)
-                    .mknod( name, FILE, options.get(CREATE_PARENTS),
-                            template);
+                    .mknod(name, FILE, options, template);
         }
 
         @Override
@@ -334,15 +335,12 @@ extends FileSystemController<ConcurrentFileSystemModel> {
     abstract OutputSocket<?> getOutputSocket(E entry) throws IOException;
 
     @Override
-    public final boolean mknod(
-            final FileSystemEntryName name,
-            final Type type,
-            final BitField<OutputOption> options,
-            final Entry template)
+    public final void mknod(
+            @NonNull final FileSystemEntryName name,
+            @NonNull final Type type,
+            @NonNull final BitField<OutputOption> options,
+            @CheckForNull final Entry template)
     throws IOException {
-        if (FILE != type && DIRECTORY != type)
-            throw new ArchiveEntryNotFoundException(getModel(),
-                    name, "not yet supported: mknod " + type);
         if (isRoot(name.getPath())) {
             try {
                 autoMount(); // detect false positives!
@@ -350,20 +348,14 @@ extends FileSystemController<ConcurrentFileSystemModel> {
                 if (DIRECTORY != type)
                     throw ex;
                 autoMount(true, options);
-                return true;
+                return;
             }
             throw new ArchiveEntryNotFoundException(getModel(),
                     name, "directory exists already");
-        } else { // !isRoot(entryName)
-            final ArchiveFileSystem<E> fileSystem
-                    = autoMount(options.get(CREATE_PARENTS), options);
-            final boolean created = null == fileSystem.getEntry(name);
-            final ArchiveFileSystemOperation<E> link = fileSystem.mknod(
-                    name, type, options.get(CREATE_PARENTS), template);
-            assert DIRECTORY != type || created : "mknod() must not overwrite directory entries!";
-            if (created)
-                link.run();
-            return created;
+        } else {
+            autoMount(options.get(CREATE_PARENTS), options)
+                    .mknod(name, type, options, template)
+                    .run();
         }
     }
 
@@ -421,6 +413,7 @@ extends FileSystemController<ConcurrentFileSystemModel> {
      * @throws NotWriteLockedException
      * @return Whether or not a synchronization has been performed.
      */
-    abstract boolean autoSync(FileSystemEntryName name, Access intention)
+    abstract boolean autoSync(  @NonNull FileSystemEntryName name,
+                                @CheckForNull Access intention)
     throws SyncException, FileSystemException;
 }

@@ -16,22 +16,18 @@
 package de.schlichtherle.truezip.io.filesystem.file;
 
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
-import de.schlichtherle.truezip.io.filesystem.FileSystemException;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import java.net.URI;
 import de.schlichtherle.truezip.io.entry.Entry;
-import de.schlichtherle.truezip.io.entry.Entry.Access;
-import de.schlichtherle.truezip.io.entry.Entry.Type;
+import de.schlichtherle.truezip.io.file.FileOutputStream;
 import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
-import de.schlichtherle.truezip.io.filesystem.SyncException;
-import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.io.filesystem.InputOption;
 import de.schlichtherle.truezip.io.filesystem.OutputOption;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -39,8 +35,10 @@ import javax.swing.Icon;
 import net.jcip.annotations.ThreadSafe;
 
 import static de.schlichtherle.truezip.io.Files.*;
+import static de.schlichtherle.truezip.io.entry.Entry.*;
 import static de.schlichtherle.truezip.io.entry.Entry.Access.*;
 import static de.schlichtherle.truezip.io.filesystem.FileSystemEntryName.*;
+import static de.schlichtherle.truezip.io.filesystem.OutputOption.*;
 import static java.io.File.separatorChar;
 
 /**
@@ -147,21 +145,35 @@ final class FileController extends FileSystemController<FileSystemModel>  {
     }
 
     @Override
-    public boolean mknod(   FileSystemEntryName name,
-                            Type type,
-                            BitField<OutputOption> options,
-                            Entry template)
+    public void mknod(  final @NonNull FileSystemEntryName name,
+                        final @NonNull Type type,
+                        final @NonNull BitField<OutputOption> options,
+                        final @Nullable Entry template)
     throws IOException {
         final File file = new File(target, name.getPath());
         switch (type) {
             case FILE:
-                return file.createNewFile();
+                if (options.get(EXCLUSIVE)) {
+                    if (!file.createNewFile())
+                        throw new IOException(file.getPath() + " (file exists already)");
+                } else {
+                    new FileOutputStream(file).close();
+                }
+                break;
 
             case DIRECTORY:
-                return file.mkdir();
+                if (!file.mkdir())
+                    throw new IOException(file.getPath() + " (directory exists already)");
+                break;
 
             default:
                 throw new IOException(file.getPath() + " (entry type not supported: " + type + ")");
+        }
+        if (null != template) {
+            final long time = template.getTime(WRITE);
+            if (UNKNOWN != time)
+                if (!file.setLastModified(time))
+                    throw new IOException(file.getPath() + " (cannot set last modification time)");
         }
     }
 

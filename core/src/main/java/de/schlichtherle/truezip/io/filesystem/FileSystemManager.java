@@ -79,7 +79,7 @@ implements Iterable<FileSystemController<?>> {
     /**
      * A visitor for file system controllers.
      *
-     * @see #visit(Visitor, ExceptionBuilder)
+     * @see #visit(Visitor, ExceptionHandler)
      */
     public interface Visitor {
         void visit(FileSystemController<?> controller) throws IOException;

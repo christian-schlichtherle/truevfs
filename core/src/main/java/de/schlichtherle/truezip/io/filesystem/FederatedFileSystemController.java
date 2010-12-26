@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.io.filesystem;
 
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
+import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.DecoratingInputSocket;
 import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
@@ -24,6 +25,7 @@ import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.InputStream;
 import java.io.IOException;
@@ -238,15 +240,16 @@ extends DecoratingFileSystemController<FileSystemModel, FileSystemController<?>>
     } // class Output
 
     @Override
-    public boolean mknod(   FileSystemEntryName name,
-                            Entry.Type type,
-                            BitField<OutputOption> options,
-                            Entry template)
+    public void mknod(
+            @NonNull FileSystemEntryName name,
+            @NonNull Type type,
+            @NonNull BitField<OutputOption> options,
+            @CheckForNull Entry template)
     throws IOException {
         try {
-            return delegate.mknod(name, type, options, template);
+            delegate.mknod(name, type, options, template);
         } catch (FalsePositiveException ex) {
-            return getParent().mknod(resolveParent(name), type, options, template);
+            getParent().mknod(resolveParent(name), type, options, template);
         }
     }
 

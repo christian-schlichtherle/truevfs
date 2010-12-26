@@ -22,7 +22,10 @@ import de.schlichtherle.truezip.io.entry.EntryFactory;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
+import de.schlichtherle.truezip.io.filesystem.OutputOption;
 import de.schlichtherle.truezip.util.BitField;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * A read-only archive file system.
@@ -56,10 +59,12 @@ extends ArchiveFileSystem<E> {
     }
 
     @Override
-    public ArchiveFileSystemOperation<E> mknod( FileSystemEntryName path,
-                                                Type type,
-                                                boolean createParents,
-                                                Entry template)
+    @NonNull
+    public ArchiveFileSystemOperation<E> mknod(
+            @NonNull FileSystemEntryName name,
+            @NonNull Type type,
+            @NonNull BitField<OutputOption> options,
+            @CheckForNull Entry template)
     throws ArchiveFileSystemException {
         throw new ReadOnlyArchiveFileSystemException();
     }

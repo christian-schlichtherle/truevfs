@@ -17,10 +17,12 @@ package de.schlichtherle.truezip.io.filesystem;
 
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
+import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import javax.swing.Icon;
@@ -125,12 +127,13 @@ extends FileSystemController<M> {
     }
 
     @Override
-    public boolean mknod(   FileSystemEntryName name,
-                            Entry.Type type,
-                            BitField<OutputOption> options,
-                            Entry template)
+    public void mknod(
+            @NonNull FileSystemEntryName name,
+            @NonNull Type type,
+            @NonNull BitField<OutputOption> options,
+            @CheckForNull Entry template)
     throws IOException {
-        return delegate.mknod(name, type, options, template);
+        delegate.mknod(name, type, options, template);
     }
 
     @Override

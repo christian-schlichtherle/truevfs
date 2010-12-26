@@ -20,8 +20,8 @@ import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.entry.EntryContainer;
 import de.schlichtherle.truezip.io.entry.EntryFactory;
-import de.schlichtherle.truezip.io.entry.EntryName;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
+import de.schlichtherle.truezip.io.filesystem.OutputOption;
 import de.schlichtherle.truezip.util.Link;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -35,23 +35,23 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import net.jcip.annotations.NotThreadSafe;
 
 import static de.schlichtherle.truezip.io.entry.Entry.*;
 import static de.schlichtherle.truezip.io.entry.Entry.Access.*;
 import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
 import static de.schlichtherle.truezip.io.filesystem.FileSystemEntryName.*;
+import static de.schlichtherle.truezip.io.filesystem.OutputOption.*;
 import static de.schlichtherle.truezip.io.Paths.*;
 
 /**
  * A base class for a virtual file system for archive entries.
- * <p>
- * This class is <em>not</em> thread-safe!
- * Multithreading needs to be addressed by client classes.
  * 
  * @param   <E> The type of the archive entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 public class ArchiveFileSystem<E extends ArchiveEntry>
 implements EntryContainer<ArchiveFileSystemEntry<E>> {
 
@@ -436,9 +436,10 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      *
      * @param  name an entry name.
      * @param  type an entry type.
-     * @param  createParents if {@code true}, any missing parent directories
-     *         will be created and linked into this archive file system with
-     *         its last modification time set to the system's current time.
+     * @param  options if {@code CREATE_PARENTS} is set, any missing parent
+     *         directories will be created and linked into this file
+     *         system with its last modification time set to the system's
+     *         current time.
      * @param  template if not {@code null}, then the archive file system entry
      *         at the end of the chain shall inherit as much properties from
      *         this entry as possible - with the exception of its name and type.
@@ -448,14 +449,17 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      *         only.
      * @throws ArchiveFileSystemException If one of the following is true:
      *         <ul>
-     *         <li>{@code path} contains characters which are not
-     *             supported by the archive file.</li>
-     *         <li>TODO: type is not {@code FILE} or {@code DIRECTORY}.</li>
-     *         <li>The new entry already exists as a directory.</li>
-     *         <li>The new entry shall be a directory, but already exists.</li>
-     *         <li>A parent entry exists but is not a directory.</li>
+     *         <li>The file system is read only.
+     *         <li>{@code name} contains characters which are not
+     *             supported by the file system.
+     *         <li>TODO: type is not {@code FILE} or {@code DIRECTORY}.
+     *         <li>The entry already exists and either the option
+     *             {@link OutputOption#EXCLUSIVE} is set or the entry is a
+     *             directory.
+     *         <li>The entry exists as a different type.
+     *         <li>A parent entry exists but is not a directory.
      *         <li>A parent entry is missing and {@code createParents} is
-     *             {@code false}.</li>
+     *             {@code false}.
      *         </ul>
      * @return A new archive file system operation on a chain of one or more
      *         archive file system entries for the given path name which will
@@ -465,22 +469,29 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
     @NonNull
     public ArchiveFileSystemOperation<E> mknod(
             @NonNull final FileSystemEntryName name,
-            @NonNull final Type type,
-            final boolean createParents,
+            @NonNull final Entry.Type type,
+            @NonNull final BitField<OutputOption> options,
             @CheckForNull Entry template)
     throws ArchiveFileSystemException {
         final String path = name.getPath();
-        if (isRoot(path))
-            throw new ArchiveFileSystemException(path,
-                    "cannot replace (virtual) root directory entry");
         if (null == type)
             throw new NullPointerException();
         if (FILE != type && DIRECTORY != type)
             throw new ArchiveFileSystemException(path,
                     "only FILE and DIRECTORY entries are currently supported");
+        final ArchiveFileSystemEntry<E> oldEntry = master.get(path);
+        if (null != oldEntry) {
+            if (options.get(EXCLUSIVE))
+                throw new ArchiveFileSystemException(path, "entry exists already");
+            final Entry.Type oldEntryType = oldEntry.getType();
+            if (oldEntryType == DIRECTORY)
+                throw new ArchiveFileSystemException(path, "directories cannot get replaced");
+            if (oldEntryType != type)
+                throw new ArchiveFileSystemException(path, "entry exists already as a different type");
+        }
         while (template instanceof ArchiveFileSystemEntry<?>)
             template = ((ArchiveFileSystemEntry<?>) template).getEntry();
-        return new PathLink(path, type, createParents, template);
+        return new PathLink(path, type, options.get(CREATE_PARENTS), template);
     }
 
     /**
@@ -526,17 +537,6 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
                 if (DIRECTORY != parentEntry.getType())
                     throw new ArchiveFileSystemException(entryPath,
                             "parent entry must be a directory");
-                final ArchiveFileSystemEntry<E> oldEntry = master.get(entryPath);
-                if (DIRECTORY == entryType) {
-                    if (oldEntry != null) {
-                        throw new ArchiveFileSystemException(entryPath,
-                                "directory entries cannot replace existing entries");
-                    }
-                } else {
-                    if (oldEntry != null && DIRECTORY == oldEntry.getType())
-                        throw new ArchiveFileSystemException(entryPath,
-                                "directory entries cannot get replaced");
-                }
                 elements = new SegmentLink[level + 1];
                 elements[0] = new SegmentLink<E>(parentEntry, null);
                 newEntry = newEntryChecked(entryPath, entryType, template);

@@ -15,6 +15,9 @@
  */
 package de.schlichtherle.truezip.util;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.Serializable;
 import java.util.EnumSet;
 import java.util.Iterator;
@@ -26,7 +29,7 @@ import java.util.Iterator;
  * All modifying methods return a modified clone of this instance.
  * <p>
  * In general, passing {@code null} as a method parameter results in a
- * {@link NullPointerException}.
+ * {@link NullPointerException} and methods return non-{@code null}.
  * <p>
  * <b>TODO:</b> Add more modifying methods.
  *
@@ -34,6 +37,7 @@ import java.util.Iterator;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public final class BitField<E extends Enum<E>>
 implements Iterable<E>, Cloneable, Serializable {
 
@@ -117,18 +121,18 @@ implements Iterable<E>, Cloneable, Serializable {
      * Constructs a new bit field which contains all or none of the enums
      * of the given element type.
      */
-    private BitField(final Class<E> elementType, final boolean allOf) {
+    private BitField(Class<E> elementType, boolean allOf) {
         this.bits = allOf   ? EnumSet.allOf (elementType)
                             : EnumSet.noneOf(elementType);
     }
 
     /** Constructs a new bit field which contains the given bit. */
-    private BitField(final E bit) {
+    private BitField(E bit) {
         this.bits = EnumSet.of(bit);
     }
 
     /** Constructs a new bit field which contains the given bits. */
-    private BitField(final E bit, final E... bits) {
+    private BitField(E bit, E... bits) {
         this.bits = EnumSet.of(bit, bits);
     }
 
@@ -146,7 +150,7 @@ implements Iterable<E>, Cloneable, Serializable {
     public BitField<E> clone() {
         try {
             @SuppressWarnings("unchecked")
-			final BitField<E> clone = (BitField<E>) super.clone();
+            final BitField<E> clone = (BitField<E>) super.clone();
             clone.bits = bits.clone();
             return clone;
         } catch (CloneNotSupportedException ex) {
@@ -191,32 +195,19 @@ implements Iterable<E>, Cloneable, Serializable {
      * @param set Whether the bit shall get set or cleared.
      */
     public BitField<E> set(final E bit, final boolean set) {
-        final BitField<E> clone;
+        final EnumSet<E> bits;
         if (set) {
-            if (bits.contains(bit))
+            if (this.bits.contains(bit))
                 return this;
-            clone = clone();
-            clone.bits.add(bit);
+            bits = this.bits.clone();
+            bits.add(bit);
         } else {
-            if (!bits.contains(bit))
+            if (!this.bits.contains(bit))
                 return this;
-            clone = clone();
-            clone.bits.remove(bit);
+            bits = this.bits.clone();
+            bits.remove(bit);
         }
-        return clone;
-    }
-
-    /**
-     * Clears all bits.
-     * <p>
-     * Subclasses could override this method in order to return a cached null
-     * bit field.
-     */
-    public BitField<E> clear() {
-        final BitField<E> clone;
-        clone = clone();
-        clone.bits.clear();
-        return clone;
+        return new BitField<E>(bits);
     }
 
     /** Sets the given bit. */
@@ -227,6 +218,20 @@ implements Iterable<E>, Cloneable, Serializable {
     /** Clears the given bit. */
     public BitField<E> clear(E bit) {
         return set(bit, false);
+    }
+
+    public BitField<E> not() {
+        return new BitField<E>(EnumSet.complementOf(bits));
+    }
+
+    public BitField<E> and(BitField<E> that) {
+        final EnumSet<E> bits = this.bits.clone();
+        return bits.retainAll(that.bits) ? new BitField<E>(bits) : this;
+    }
+
+    public BitField<E> or(BitField<E> that) {
+        final EnumSet<E> bits = this.bits.clone();
+        return bits.addAll(that.bits) ? new BitField<E>(bits) : this;
     }
 
     /** Returns a read-only iterator for the bits in this field. */
@@ -249,7 +254,7 @@ implements Iterable<E>, Cloneable, Serializable {
 
     /**
      * Returns a concatenation of the names of the bits in this field,
-     * separated by a &quot;|&quot;.
+     * separated by {@code "|"}.
      */
     @Override
     public String toString() {
@@ -267,7 +272,7 @@ implements Iterable<E>, Cloneable, Serializable {
      * {@code BitField} and contains the same bits.
      */
     @Override
-    public boolean equals(Object that) {
+    public boolean equals(@CheckForNull Object that) {
         return this == that
                 || that instanceof BitField<?>
                     && bits.equals(((BitField<?>) that).bits);

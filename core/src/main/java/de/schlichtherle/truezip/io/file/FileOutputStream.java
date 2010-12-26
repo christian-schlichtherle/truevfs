@@ -149,7 +149,8 @@ public class FileOutputStream extends DecoratingOutputStream {
     private static OutputStream newOutputStream(    final java.io.File dst,
                                                     final boolean append)
     throws FileNotFoundException {
-        final OutputSocket<?> output = Files.getOutputSocket(dst,
+        final OutputSocket<?> output = Files.getOutputSocket(
+                dst,
                 BitField.noneOf(OutputOption.class)
                     .set(APPEND, append)
                     .set(CREATE_PARENTS, File.isLenient()),

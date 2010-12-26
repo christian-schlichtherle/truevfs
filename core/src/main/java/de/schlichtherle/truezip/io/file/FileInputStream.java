@@ -115,8 +115,9 @@ public class FileInputStream extends DecoratingInputStream {
 
     private static InputStream newInputStream(final java.io.File src)
     throws FileNotFoundException {
-        final InputSocket<?> input = Files.getInputSocket(src,
-                    BitField.noneOf(InputOption.class));
+        final InputSocket<?> input = Files.getInputSocket(
+                src,
+                BitField.noneOf(InputOption.class));
         try {
             return input.newInputStream();
         } catch (FileNotFoundException ex) {

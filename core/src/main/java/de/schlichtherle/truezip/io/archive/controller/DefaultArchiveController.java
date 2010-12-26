@@ -49,6 +49,7 @@ import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
 import de.schlichtherle.truezip.util.ExceptionHandler;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.util.Collections;
@@ -61,6 +62,7 @@ import static de.schlichtherle.truezip.io.entry.Entry.Access.*;
 import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
 import static de.schlichtherle.truezip.io.entry.Entry.*;
 import static de.schlichtherle.truezip.io.filesystem.FileSystemEntryName.*;
+import static de.schlichtherle.truezip.io.filesystem.OutputOption.*;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
 import static de.schlichtherle.truezip.io.Paths.isRoot;
 
@@ -75,6 +77,9 @@ import static de.schlichtherle.truezip.io.Paths.isRoot;
 @NotThreadSafe
 public final class DefaultArchiveController<E extends ArchiveEntry>
 extends FileSystemArchiveController<E> {
+
+    private static final BitField<OutputOption> MOUNT_MASK
+            = BitField.of(CREATE_PARENTS);
 
     private static final BitField<InputOption> MOUNT_INPUT_OPTIONS
             = BitField.of(InputOption.CACHE);
@@ -220,16 +225,16 @@ extends FileSystemArchiveController<E> {
     }
 
     @Override
-    void mount(final boolean autoCreate, final BitField<OutputOption> options)
+    void mount(final boolean autoCreate, BitField<OutputOption> options)
     throws IOException {
+        options = options.and(MOUNT_MASK);
         try {
             final FileSystemController<?> parent = getParent();
             final FileSystemEntryName parentName = getModel()
                     .resolveParent(ROOT_ENTRY_NAME);
             // readOnly must be set first because the parent archive controller
-            // could be a FileFileSystemController and on stinky Windows
-            // this property turns to TRUE once a file is opened for
-            // reading!
+            // could be a FileController and on Windows this property turns to
+            // TRUE once a file is opened for reading!
             final boolean readOnly = !parent.isWritable(parentName);
             final InputSocket<?> socket = parent.getInputSocket(
                     parentName, MOUNT_INPUT_OPTIONS);
@@ -269,8 +274,8 @@ extends FileSystemArchiveController<E> {
         getFileSystem().addArchiveFileSystemTouchListener(touchListener);
     }
 
-    void makeOutput(  @NonNull final BitField<OutputOption> options,
-                            @NonNull final ArchiveFileSystemEntry<E> rootTemplate)
+    void makeOutput(@NonNull final BitField<OutputOption> options,
+                    @NonNull final ArchiveFileSystemEntry<E> rootTemplate)
     throws IOException {
         if (null != output)
             return;
@@ -299,7 +304,7 @@ extends FileSystemArchiveController<E> {
 
     @Override
     boolean autoSync(   @NonNull final FileSystemEntryName name,
-                        @NonNull final Access intention)
+                        @CheckForNull final Access intention)
     throws SyncException, FileSystemException {
         final ArchiveFileSystem<E> fileSystem;
         final ArchiveFileSystemEntry<E> entry;
