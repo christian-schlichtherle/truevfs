@@ -20,8 +20,6 @@ import de.schlichtherle.truezip.io.filesystem.DecoratingFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
 import de.schlichtherle.truezip.io.filesystem.FileSystemException;
-import de.schlichtherle.truezip.io.filesystem.FileSystemSyncEvent;
-import de.schlichtherle.truezip.io.filesystem.FileSystemSyncListener;
 import de.schlichtherle.truezip.io.filesystem.InputOption;
 import de.schlichtherle.truezip.io.filesystem.OutputOption;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
@@ -47,7 +45,8 @@ import net.jcip.annotations.NotThreadSafe;
 
 import static de.schlichtherle.truezip.io.entry.Entry.Type.FILE;
 import static de.schlichtherle.truezip.io.socket.Cache.Strategy.*;
-import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
+import static de.schlichtherle.truezip.io.filesystem.SyncOption.ABORT_CHANGES;
+import static de.schlichtherle.truezip.io.filesystem.SyncOption.CLEAR_CACHE;
 
 /**
  * A caching archive controller implements a caching strategy for entry data.
@@ -132,7 +131,6 @@ extends DecoratingFileSystemController<M, C>
                 if (!options.get(InputOption.CACHE))
                     return super.getBoundSocket(); // don't cache
                 cache = new Cache(name);
-                //caches.put(name, cache);
             }
             return cache.configure(options).getInputSocket().bind(this);
         }
@@ -169,7 +167,6 @@ extends DecoratingFileSystemController<M, C>
                 if (!options.get(OutputOption.CACHE))
                     return super.getBoundSocket(); // don't cache
                 cache = new Cache(name);
-                //caches.put(name, cache);
             } else {
                 if (options.get(OutputOption.APPEND)) {
                     // This combination of features would be expected to work
@@ -184,6 +181,10 @@ extends DecoratingFileSystemController<M, C>
                     cache.flush();
                 }
             }
+            // Create marker entry and mind CREATE_PARENTS!
+            if (!delegate.mknod(name, FILE, options, template))
+                getModel().setTouched(true);
+            assert getModel().isTouched();
             return cache.configure(options, template).getOutputSocket().bind(this);
         }
     } // class Output
@@ -256,12 +257,13 @@ extends DecoratingFileSystemController<M, C>
         private final de.schlichtherle.truezip.io.socket.Cache<Entry> cache;
         private volatile InputSocket<Entry> input;
         private volatile OutputSocket<Entry> output;
-        private volatile BitField<OutputOption> options;
+        private volatile BitField<InputOption> inputOptions;
+        private volatile BitField<OutputOption> outputOptions;
         private volatile Entry template;
 
         Cache(@NonNull final FileSystemEntryName name) {
             this.name = name;
-            this.cache = WRITE_BACK.newCache(pool);
+            this.cache = WRITE_BACK.newCache(pool); // FIXME: WRITE_THROUGH leaves temps - why!?
             configure(NO_INPUT_OPTIONS);
             configure(NO_OUTPUT_OPTIONS, null);
         }
@@ -269,7 +271,8 @@ extends DecoratingFileSystemController<M, C>
         @NonNull
         public Cache configure(@NonNull BitField<InputOption> options) {
             cache.configure(new RegisteringInputSocket(delegate.getInputSocket(
-                    name, options.clear(InputOption.CACHE))));
+                    name,
+                    this.inputOptions = options.clear(InputOption.CACHE))));
             input = null;
             return this;
         }
@@ -277,8 +280,9 @@ extends DecoratingFileSystemController<M, C>
         @NonNull
         public Cache configure( @NonNull BitField<OutputOption> options,
                                 @Nullable Entry template) {
-            cache.configure(delegate.getOutputSocket(name,
-                    this.options = options.clear(OutputOption.CACHE),
+            cache.configure(delegate.getOutputSocket(
+                    name,
+                    this.outputOptions = options.clear(OutputOption.CACHE),
                     this.template = template));
             output = null;
             return this;
@@ -316,7 +320,8 @@ extends DecoratingFileSystemController<M, C>
                     // because... FIXME: Why exactly?!
                     // So we flush and bypass the cache.
                     flush();
-                    return getBoundSocket().newReadOnlyFile();
+                    return delegate .getInputSocket(name, inputOptions)
+                                    .newReadOnlyFile();
                 }
 
                 final ReadOnlyFile rof = getBoundSocket().newReadOnlyFile();
@@ -331,7 +336,8 @@ extends DecoratingFileSystemController<M, C>
                 if (null != getBoundSocket().getPeerTarget()) {
                     // Dito.
                     flush();
-                    return getBoundSocket().newInputStream();
+                    return delegate .getInputSocket(name, inputOptions)
+                                    .newInputStream();
                 }
 
                 final InputStream in = getBoundSocket().newInputStream();
@@ -353,14 +359,17 @@ extends DecoratingFileSystemController<M, C>
                 if (null != getBoundSocket().getPeerTarget()) {
                     // Dito, but this time we clear and bypass the cache.
                     clear();
-                    return getBoundSocket().newOutputStream();
+                    return delegate
+                            .getOutputSocket(name, outputOptions, template)
+                            .newOutputStream();
                 }
 
                 final OutputStream out = getBoundSocket().newOutputStream();
                 // Create marker entry and mind CREATE_PARENTS!
-                if (!delegate.mknod(name, FILE, options, template))
+                // FIXME: This leaves temps - why?!
+                /*if (!delegate.mknod(name, FILE, options, template))
                     getModel().setTouched(true);
-                assert getModel().isTouched();
+                assert getModel().isTouched();*/
                 caches.put(name, Cache.this);
                 return out;
             }
