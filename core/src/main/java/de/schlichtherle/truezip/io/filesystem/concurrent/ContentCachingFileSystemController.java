@@ -100,8 +100,8 @@ extends DecoratingFileSystemController<M, C> {
      * @param controller the decorated file system controller.
      * @param pool the pool of temporary entries to cache the entry data.
      */
-    public ContentCachingFileSystemController(@NonNull final C controller,
-                                            @NonNull final IOPool<?> pool) {
+    public ContentCachingFileSystemController(  @NonNull final C controller,
+                                                @NonNull final IOPool<?> pool) {
         super(controller);
         if (null == pool)
             throw new NullPointerException();
@@ -161,8 +161,6 @@ extends DecoratingFileSystemController<M, C> {
 
         @Override
         public OutputSocket<?> getBoundSocket() throws IOException {
-            assert getModel().writeLock().isHeldByCurrentThread();
-
             Cache cache = caches.get(name);
             if (null == cache) {
                 if (!options.get(OutputOption.CACHE))
@@ -182,27 +180,7 @@ extends DecoratingFileSystemController<M, C> {
                     cache.flush();
                 }
             }
-            makeMarkerEntry();
             return cache.configure(options, template).getOutputSocket().bind(this);
-        }
-
-        /**
-         * Ensure the existence of an entry in the file system.
-         */
-        private void makeMarkerEntry() throws IOException {
-            boolean mknod = null != template;
-            if (!mknod) {
-                try {
-                    mknod = null == delegate.getEntry(name);
-                } catch (FalsePositiveException ex) {
-                    mknod = true;
-                }
-            }
-            if (mknod)
-                delegate.mknod(name, FILE, options, template);
-            else
-                getModel().setTouched(true);
-            assert getModel().isTouched();
         }
     } // class Output
 
@@ -277,20 +255,19 @@ extends DecoratingFileSystemController<M, C> {
         private final de.schlichtherle.truezip.io.socket.Cache<Entry> cache;
         private volatile InputSocket<Entry> input;
         private volatile OutputSocket<Entry> output;
-        private volatile BitField<InputOption> inputOptions;
         private volatile BitField<OutputOption> outputOptions;
         private volatile Entry template;
 
         Cache(@NonNull final FileSystemEntryName name) {
             this.name = name;
-            this.cache = WRITE_BACK.newCache(pool); // FIXME: WRITE_THROUGH leaves temps - why!?
+            this.cache = WRITE_BACK.newCache(pool);
         }
 
         @NonNull
         public Cache configure(@NonNull BitField<InputOption> options) {
-            cache.configure(new RegisteringInputSocket(delegate.getInputSocket(
+            cache.configure(delegate.getInputSocket(
                     name,
-                    this.inputOptions = options.clear(InputOption.CACHE))));
+                    options.clear(InputOption.CACHE)));
             input = null;
             return this;
         }
@@ -312,7 +289,7 @@ extends DecoratingFileSystemController<M, C> {
 
         public OutputSocket<Entry> getOutputSocket() {
             return null != output ? output : (output
-                    = new RegisteringOutputSocket(cache.getOutputSocket()));
+                    = new ProxyOutputSocket(cache.getOutputSocket()));
         }
 
         public void flush() throws IOException {
@@ -323,50 +300,9 @@ extends DecoratingFileSystemController<M, C> {
             cache.clear();
         }
 
-        private final class RegisteringInputSocket
-        extends DecoratingInputSocket<Entry> {
-            private RegisteringInputSocket(final InputSocket <?> input) {
-                super(input);
-            }
-
-            @Override
-            public ReadOnlyFile newReadOnlyFile() throws IOException {
-                getModel().assertWriteLockedByCurrentThread();
-
-                if (null != getBoundSocket().getPeerTarget()) {
-                    // The data for connected sockets should not get cached
-                    // because... FIXME: Why exactly?!
-                    // So we flush and bypass the cache.
-                    flush();
-                    return delegate .getInputSocket(name, inputOptions)
-                                    .newReadOnlyFile();
-                }
-
-                final ReadOnlyFile rof = getBoundSocket().newReadOnlyFile();
-                caches.put(name, Cache.this);
-                return rof;
-            }
-
-            @Override
-            public InputStream newInputStream() throws IOException {
-                getModel().assertWriteLockedByCurrentThread();
-
-                if (null != getBoundSocket().getPeerTarget()) {
-                    // Dito.
-                    flush();
-                    return delegate .getInputSocket(name, inputOptions)
-                                    .newInputStream();
-                }
-
-                final InputStream in = getBoundSocket().newInputStream();
-                caches.put(name, Cache.this);
-                return in;
-            }
-        } // class RegisteringInputSocket
-
-        private final class RegisteringOutputSocket
+        private final class ProxyOutputSocket
         extends DecoratingOutputSocket<Entry> {
-            private RegisteringOutputSocket(OutputSocket <?> output) {
+            private ProxyOutputSocket(OutputSocket <?> output) {
                 super(output);
             }
 
@@ -374,19 +310,28 @@ extends DecoratingFileSystemController<M, C> {
             public OutputStream newOutputStream() throws IOException {
                 assert getModel().writeLock().isHeldByCurrentThread();
 
-                if (null != getBoundSocket().getPeerTarget()) {
-                    // Dito, but this time we clear and bypass the cache.
-                    clear();
-                    return delegate
-                            .getOutputSocket(name, outputOptions, template)
-                            .newOutputStream();
-                }
-
                 final OutputStream out = getBoundSocket().newOutputStream();
-                //makeMarkerEntry();
+                makeMarkerEntry();
                 caches.put(name, Cache.this);
                 return out;
             }
-        } // class RegisteringOutputSocket
+
+            /** Ensure the existence of an entry in the file system. */
+            private void makeMarkerEntry() throws IOException {
+                boolean mknod = null != template;
+                if (!mknod) {
+                    try {
+                        mknod = null == delegate.getEntry(name);
+                    } catch (FalsePositiveException ex) {
+                        mknod = true;
+                    }
+                }
+                if (mknod)
+                    delegate.mknod(name, FILE, outputOptions, template);
+                else
+                    getModel().setTouched(true);
+                assert getModel().isTouched();
+            }
+        } // class ProxyOutputSocket
     } // class Cache
 }

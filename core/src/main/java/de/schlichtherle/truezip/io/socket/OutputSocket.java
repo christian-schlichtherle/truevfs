@@ -66,8 +66,6 @@ extends IOSocket<E, Entry> {
      *
      * @param  to the output socket which has a peer target to share.
      * @return {@code this}
-     * @see    #beforePeering
-     * @see    #afterPeering
      */
     @NonNull
     public final OutputSocket<E> bind(@CheckForNull final OutputSocket<?> to) {
@@ -82,8 +80,6 @@ extends IOSocket<E, Entry> {
      *
      * @param  newPeer the nullable peer input socket to connect to.
      * @return This output socket.
-     * @see    #beforePeering
-     * @see    #afterPeering
      */
     @NonNull
     final OutputSocket<E> connect(@CheckForNull final InputSocket<?> newPeer) {
