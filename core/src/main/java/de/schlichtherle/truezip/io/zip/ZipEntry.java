@@ -300,7 +300,7 @@ public class ZipEntry implements Cloneable {
     long getCompressedSize32() {
         if (csize == UNKNOWN)
             return UNKNOWN;
-        return csize > UInt.MAX_VALUE || ZIP64_EXT ? UInt.MAX_VALUE : csize;
+        return csize > UInt.MAX_VALUE || FORCE_ZIP64_EXT ? UInt.MAX_VALUE : csize;
     }
 
     void setCompressedSize32(final long csize) {
@@ -340,7 +340,7 @@ public class ZipEntry implements Cloneable {
     long getSize32() {
         if (size == UNKNOWN)
             return UNKNOWN;
-        return size > UInt.MAX_VALUE || ZIP64_EXT ? UInt.MAX_VALUE : size;
+        return size > UInt.MAX_VALUE || FORCE_ZIP64_EXT ? UInt.MAX_VALUE : size;
     }
 
     void setSize32(final long size) {
@@ -380,7 +380,7 @@ public class ZipEntry implements Cloneable {
     long getOffset32() {
         if (offset == UNKNOWN)
             return UNKNOWN;
-        return offset > UInt.MAX_VALUE || ZIP64_EXT ? UInt.MAX_VALUE : offset;
+        return offset > UInt.MAX_VALUE || FORCE_ZIP64_EXT ? UInt.MAX_VALUE : offset;
     }
 
     void setOffset32(final long offset) {
@@ -539,21 +539,21 @@ public class ZipEntry implements Cloneable {
 
         // Write out Uncompressed Size.
         final long size = getSize();
-        if (size >= UInt.MAX_VALUE || ZIP64_EXT && size >= 0) {
+        if (size >= UInt.MAX_VALUE || FORCE_ZIP64_EXT && size >= 0) {
             LittleEndian.writeLong(size, data, off);
             off += 8;
         }
 
         // Write out Compressed Size.
         final long csize = getCompressedSize();
-        if (csize >= UInt.MAX_VALUE || ZIP64_EXT && csize >= 0) {
+        if (csize >= UInt.MAX_VALUE || FORCE_ZIP64_EXT && csize >= 0) {
             LittleEndian.writeLong(csize, data, off);
             off += 8;
         }
 
         // Write out Relative Header Offset.
         final long offset = getOffset();
-        if (offset >= UInt.MAX_VALUE || ZIP64_EXT && offset >= 0) {
+        if (offset >= UInt.MAX_VALUE || FORCE_ZIP64_EXT && offset >= 0) {
             LittleEndian.writeLong(offset, data, off);
             off += 8;
         }

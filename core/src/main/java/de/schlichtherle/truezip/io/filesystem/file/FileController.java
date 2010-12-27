@@ -20,12 +20,16 @@ import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import java.net.URI;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.file.FileOutputStream;
+import de.schlichtherle.truezip.io.filesystem.FileSystemException;
 import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.filesystem.InputOption;
 import de.schlichtherle.truezip.io.filesystem.OutputOption;
+import de.schlichtherle.truezip.io.filesystem.SyncException;
+import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.File;
@@ -183,5 +187,12 @@ final class FileController extends FileSystemController<FileSystemModel>  {
         final File file = new File(target, name.getPath());
         if (!file.delete())
             throw new IOException(file.getPath() + " (cannot delete)");
+    }
+
+    @Override
+    public <X extends IOException>
+    void sync(  @NonNull BitField<SyncOption> options,
+                @NonNull ExceptionHandler<? super SyncException, X> handler)
+    throws X, FileSystemException {
     }
 }

@@ -73,15 +73,8 @@ extends IOSocket<E, Entry> {
      * @see    #afterPeering
      */
     @NonNull
-    public final InputSocket<E> bind(@CheckForNull final InputSocket<?> to)
-    throws IOException {
-        final OutputSocket<?> newPeer = null == to ? null : to.peer;
-        final OutputSocket<?> oldPeer = peer;
-        if (!equal(oldPeer, newPeer)) {
-            beforePeering();
-            peer = newPeer;
-            afterPeering();
-        }
+    public final InputSocket<E> bind(@CheckForNull final InputSocket<?> to) {
+        peer = null == to ? null : to.peer;
         return this;
     }
 
@@ -96,30 +89,15 @@ extends IOSocket<E, Entry> {
      * @see    #afterPeering
      */
     @NonNull
-    final InputSocket<E> connect(@CheckForNull final OutputSocket<?> newPeer)
-    throws IOException {
+    final InputSocket<E> connect(@CheckForNull final OutputSocket<?> newPeer) {
         final OutputSocket<?> oldPeer = peer;
-        if (!equal(oldPeer, newPeer)) {
+        if (oldPeer != newPeer) {
             peer = null;
-            try {
-                if (null != oldPeer)
-                    oldPeer.connect(null);
-                beforePeering();
-                peer = newPeer;
-                if (null != newPeer)
-                    newPeer.connect(this);
-            } catch (IOException ex) {
-                peer = oldPeer;
-                if (null != oldPeer)
-                    oldPeer.connect(this);
-                throw ex;
-            } catch (RuntimeException ex) {
-                peer = oldPeer;
-                if (null != oldPeer)
-                    oldPeer.connect(this);
-                throw ex;
-            }
-            afterPeering();
+            if (null != oldPeer)
+                oldPeer.connect(null);
+            peer = newPeer;
+            if (null != newPeer)
+                newPeer.connect(this);
         }
         return this;
     }

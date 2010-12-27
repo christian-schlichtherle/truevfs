@@ -401,7 +401,7 @@ implements Iterable<E> {
                 =  csize  >= UInt.MAX_VALUE
                 || size   >= UInt.MAX_VALUE
                 || offset >= UInt.MAX_VALUE
-                || ZIP64_EXT;
+                || FORCE_ZIP64_EXT;
 
         // Compose General Purpose Bit Flag.
         // See appendix D of PKWARE's ZIP File Format Specification.
@@ -591,7 +591,7 @@ implements Iterable<E> {
                 =  csize  >= UInt.MAX_VALUE
                 || size   >= UInt.MAX_VALUE
                 || offset >= UInt.MAX_VALUE
-                || ZIP64_EXT;
+                || FORCE_ZIP64_EXT;
 
         // Data Descriptor Signature.
         dos.writeInt(DD_SIG);
@@ -659,7 +659,7 @@ implements Iterable<E> {
                 =  csize32  >= UInt.MAX_VALUE
                 || size32   >= UInt.MAX_VALUE
                 || offset32 >= UInt.MAX_VALUE
-                || ZIP64_EXT;
+                || FORCE_ZIP64_EXT;
 
         // Central File Header.
         dos.writeInt(CFH_SIG);
@@ -734,9 +734,9 @@ implements Iterable<E> {
         final long cdEntries = entries.size();
         final long cdSize = dos.size() - cdOffset;
         final long cdOffset = this.cdOffset;
-        final boolean cdEntriesZip64 = cdEntries > UShort.MAX_VALUE || ZIP64_EXT;
-        final boolean cdSizeZip64    = cdSize    > UInt  .MAX_VALUE || ZIP64_EXT;
-        final boolean cdOffsetZip64  = cdOffset  > UInt  .MAX_VALUE || ZIP64_EXT;
+        final boolean cdEntriesZip64 = cdEntries > UShort.MAX_VALUE || FORCE_ZIP64_EXT;
+        final boolean cdSizeZip64    = cdSize    > UInt  .MAX_VALUE || FORCE_ZIP64_EXT;
+        final boolean cdOffsetZip64  = cdOffset  > UInt  .MAX_VALUE || FORCE_ZIP64_EXT;
         final int cdEntries16 = cdEntriesZip64 ? UShort.MAX_VALUE : (int) cdEntries;
         final long cdSize32   = cdSizeZip64    ? UInt  .MAX_VALUE : cdSize;
         final long cdOffset32 = cdOffsetZip64  ? UInt  .MAX_VALUE : cdOffset;

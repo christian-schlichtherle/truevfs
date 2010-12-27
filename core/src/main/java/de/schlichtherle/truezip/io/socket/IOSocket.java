@@ -19,7 +19,6 @@ import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -75,36 +74,6 @@ public abstract class IOSocket<LT, PT> {
     public abstract PT getPeerTarget() throws IOException;
 
     /**
-     * This hook is called after a peering has been initiated, but before the
-     * peer socket has been changed.
-     * The implementation in this base class does nothing.
-     * A subclass implementation may throw an {@code IOException} to veto the
-     * peering, e.g. if the socket is not yet ready to do I/O.
-     *
-     * @throws IOException at the discretion of a subclass implementation.
-     * @see    InputSocket#bind
-     * @see    InputSocket#connect
-     * @see    OutputSocket#bind
-     * @see    OutputSocket#connect
-     */
-    protected void beforePeering() throws IOException {
-    }
-
-    /**
-     * This hook is called after a peering has been completed and the peer
-     * socket has been successfully changed.
-     * The implementation in this base class does nothing.
-     *
-     * @throws IOException at the discretion of a subclass implementation.
-     * @see    InputSocket#bind
-     * @see    InputSocket#connect
-     * @see    OutputSocket#bind
-     * @see    OutputSocket#connect
-     */
-    protected void afterPeering() throws IOException {
-    }
-
-    /**
      * Copies an input stream {@link InputSocket#newInputStream created}
      * by the given input socket {@code input} to an output stream
      * {@link OutputSocket#newOutputStream created} by the given output socket
@@ -124,7 +93,7 @@ public abstract class IOSocket<LT, PT> {
         final InputStream in = input.connect(output).newInputStream();
         OutputStream out = null;
         try {
-            out = output.connect(input).newOutputStream();
+            out = output.connect(input).newOutputStream(); // connect(input) is redundant unless newInputStream() messed with the connection.
         } finally {
             if (out == null) { // exception?
                 try {
@@ -162,12 +131,6 @@ public abstract class IOSocket<LT, PT> {
             rts = "(?)";
         }
         return lts + " <-> " + rts;
-    }
-
-    /** Provided for the comfort of subclasses in this package. */
-    static boolean equal(IOSocket<?, ?> o1, IOSocket<?, ?> o2) {
-        assert o1 == o2 || null == o1 || !o1.equals(o2);
-        return o1 == o2;
     }
 
     /**
