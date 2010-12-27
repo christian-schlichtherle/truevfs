@@ -136,14 +136,11 @@ extends DecoratingInputShop<E, InputShop<E>> {
     throws E {
         if (closed)
             return;
-        for (final Iterator<Closeable> it = threads.keySet().iterator();
-        it.hasNext(); ) {
+        for (Iterator<Closeable> i = threads.keySet().iterator(); i.hasNext(); ) {
             try {
-                try {
-                    it.next().close();
-                } finally {
-                    it.remove();
-                }
+                Closeable closeable = i.next();
+                i.remove();
+                closeable.close();
             } catch (IOException ex) {
                 handler.warn(ex);
             }

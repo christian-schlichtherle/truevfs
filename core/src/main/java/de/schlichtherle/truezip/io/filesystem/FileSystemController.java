@@ -29,8 +29,6 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import javax.swing.Icon;
 
-import static de.schlichtherle.truezip.io.filesystem.InputOption.*;
-import static de.schlichtherle.truezip.io.filesystem.OutputOption.*;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
 
 /**
@@ -164,12 +162,8 @@ public abstract class FileSystemController<M extends FileSystemModel> {
     throws IOException;
 
     /**
-     * Writes all changes to the contents of this file system to its
-     * parent file system.
-     * <p>
-     * The implementation in this base class just calls
-     * {@link FileSystemModel#fireBeforeSyncEvent} on the
-     * {@link #getModel file system model}.
+     * Commits all changes to the contents of this file system to its parent
+     * file system.
      *
      * @param  options the synchronization options.
      * @param  handler the exception handling strategy for dealing with one or
@@ -183,12 +177,10 @@ public abstract class FileSystemController<M extends FileSystemModel> {
      * @see    #UPDATE
      * @see    #UMOUNT
      */
-    public <X extends IOException>
+    public abstract <X extends IOException>
     void sync(  @NonNull BitField<SyncOption> options,
                 @NonNull ExceptionHandler<? super SyncException, X> handler)
-    throws X, FileSystemException {
-        getModel().fireBeforeSyncEvent(options, handler);
-    }
+    throws X, FileSystemException;
 
     /**
      * Equivalent to

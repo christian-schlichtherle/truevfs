@@ -25,8 +25,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import net.jcip.annotations.NotThreadSafe;
 
-import static de.schlichtherle.truezip.io.filesystem.OutputOption.APPEND;
-
 /**
  * This archive controller controls the mount state transition.
  * It is up to the sub class to implement the actual mounting/unmounting
@@ -55,7 +53,7 @@ extends BasicArchiveController<E> {
             final boolean autoCreate,
             final BitField<OutputOption> options)
     throws IOException {
-        return mountState.autoMount(autoCreate, options.clear(APPEND));
+        return mountState.autoMount(autoCreate, options);
     }
 
     final ArchiveFileSystem<E> getFileSystem() {

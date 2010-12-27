@@ -556,7 +556,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
 
         @Override
         public void run() throws ArchiveFileSystemException {
-            assert links.length >= 2;
+            assert 2 <= links.length;
 
             touch();
             final int l = links.length;
@@ -593,8 +593,8 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      */
     private static final class SegmentLink<E extends ArchiveEntry>
     implements Link<ArchiveFileSystemEntry<E>> {
-        final ArchiveFileSystemEntry<E> entry;
-        final String base;
+        @NonNull final ArchiveFileSystemEntry<E> entry;
+        @CheckForNull final String base;
 
         /**
          * Constructs a new {@code SegmentLink}.
@@ -605,10 +605,9 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
          */
         SegmentLink(
                 @NonNull final ArchiveFileSystemEntry<E> entry,
-                @Nullable final String base) {
-            assert null != entry;
+                @CheckForNull final String base) {
             this.entry = entry;
-            this.base = base; // may be null!
+            this.base = base;
         }
 
         @Override

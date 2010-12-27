@@ -28,18 +28,19 @@ interface ZipConstants {
 
     /**
      * This boolean field is set by the system property
-     * {@code de.schlichtherle.truezip.io.zip.zip64ext}.
+     * {@code de.schlichtherle.truezip.io.zip.forceZIP64Ext}.
      * If this property is set to {@code true} (case is ignored),
-     * then ZIP64 extensions are always added when writing a ZIP archive file,
+     * then ZIP64 extensions are always added when writing a ZIP file,
      * regardless of its size.
      * This system property is intended for testing purposes only.
      * During normal operations, it should not be set as many
      * third party tools would not treat the redundant ZIP64 extensions
      * correctly.
-     * Note that it's impossible to inhibit ZIP64 extensions.
+     * Note that it's impossible to inhibit ZIP64 extensions if they are
+     * required.
      */
-    boolean ZIP64_EXT
-            = Boolean.getBoolean("de.schlichtherle.truezip.io.zip.zip64ext");
+    boolean FORCE_ZIP64_EXT
+            = Boolean.getBoolean("de.schlichtherle.truezip.io.zip.forceZIP64Ext");
 
     /** Local File Header signature. */
     int LFH_SIG = 0x04034B50;

@@ -15,8 +15,10 @@
  */
 package de.schlichtherle.truezip.io.filesystem.concurrent;
 
+import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.filesystem.DecoratingFileSystemController;
+import de.schlichtherle.truezip.io.filesystem.FalsePositiveException;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
 import de.schlichtherle.truezip.io.filesystem.FileSystemException;
@@ -33,6 +35,7 @@ import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.InputStream;
@@ -85,8 +88,7 @@ import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
 public final class ContentCachingFileSystemController<
         M extends ConcurrentFileSystemModel,
         C extends FileSystemController<? extends M>>
-extends DecoratingFileSystemController<M, C>
-/*implements FileSystemSyncListener*/ {
+extends DecoratingFileSystemController<M, C> {
 
     private final IOPool<?> pool;
     private final Map<FileSystemEntryName, Cache> caches
@@ -104,7 +106,6 @@ extends DecoratingFileSystemController<M, C>
         if (null == pool)
             throw new NullPointerException();
         this.pool = pool;
-        //getModel().addFileSystemSyncListener(this);
     }
 
     @Override
@@ -189,25 +190,40 @@ extends DecoratingFileSystemController<M, C>
          * Ensure the existence of an entry in the file system.
          */
         private void makeMarkerEntry() throws IOException {
-            boolean exists = false;
-            try {
-                exists = null != delegate.getEntry(name);
-            } catch (IOException ignored) {
-                // This could be a FalsePositiveException, which would cause
-                // unwanted resolution to the parent controller.
+            boolean mknod = null != template;
+            if (!mknod) {
+                try {
+                    mknod = null == delegate.getEntry(name);
+                } catch (FalsePositiveException ex) {
+                    mknod = true;
+                }
             }
-            if (exists) {
+            if (mknod)
+                delegate.mknod(name, FILE, options, template);
+            else
                 getModel().setTouched(true);
-            } else {
-                // EXCLUSIVE is actually redundant, but provided for clarity.
-                delegate.mknod(name, FILE, options.set(EXCLUSIVE), template);
-            }
             assert getModel().isTouched();
         }
     } // class Output
 
     @Override
-    public void unlink(final FileSystemEntryName name) throws IOException {
+    public void mknod(
+            @NonNull final FileSystemEntryName name,
+            @NonNull final Type type,
+            @NonNull final BitField<OutputOption> options,
+            @CheckForNull final Entry template)
+    throws IOException {
+        assert getModel().writeLock().isHeldByCurrentThread();
+
+        Cache cache = caches.get(name);
+        if (null != cache)
+            cache.flush();
+        delegate.mknod(name, type, options, template);
+    }
+
+    @Override
+    public void unlink(@NonNull final FileSystemEntryName name)
+    throws IOException {
         assert getModel().writeLock().isHeldByCurrentThread();
 
         delegate.unlink(name);
@@ -224,13 +240,6 @@ extends DecoratingFileSystemController<M, C>
         beforeSync(options, handler);
         delegate.sync(options.clear(CLEAR_CACHE), handler);
     }
-
-    /*@Override
-    public <X extends IOException>
-    void beforeSync(final FileSystemSyncEvent<X> event)
-    throws X, FileSystemException {
-        beforeSync(event.getOptions(), event.getHandler());
-    }*/
 
     private <X extends IOException> void beforeSync(
             @NonNull final BitField<SyncOption> options,
@@ -263,12 +272,6 @@ extends DecoratingFileSystemController<M, C>
         }
     }
 
-    private static final BitField<InputOption> NO_INPUT_OPTIONS
-            = BitField.noneOf(InputOption.class);
-
-    private static final BitField<OutputOption> NO_OUTPUT_OPTIONS
-            = BitField.noneOf(OutputOption.class);
-
     private final class Cache {
         private final FileSystemEntryName name;
         private final de.schlichtherle.truezip.io.socket.Cache<Entry> cache;
@@ -281,8 +284,6 @@ extends DecoratingFileSystemController<M, C>
         Cache(@NonNull final FileSystemEntryName name) {
             this.name = name;
             this.cache = WRITE_BACK.newCache(pool); // FIXME: WRITE_THROUGH leaves temps - why!?
-            configure(NO_INPUT_OPTIONS);
-            configure(NO_OUTPUT_OPTIONS, null);
         }
 
         @NonNull

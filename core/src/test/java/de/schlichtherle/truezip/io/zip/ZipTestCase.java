@@ -512,7 +512,7 @@ public abstract class ZipTestCase extends TestCase {
     }
 
     public void testBadGetCheckedInputStream() throws IOException {
-        if (ZIP64_EXT)
+        if (FORCE_ZIP64_EXT)
             fail("TODO: Adapt this test so that it works when ZIP64 extensions have been forced to use!");
 
         for (int i = 0; i < 4; i++) {

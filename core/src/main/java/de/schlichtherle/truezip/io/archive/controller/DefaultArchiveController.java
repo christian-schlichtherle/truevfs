@@ -344,7 +344,6 @@ extends FileSystemArchiveController<E> {
         if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT))
             throw new IllegalArgumentException();
 
-        getModel().fireBeforeSyncEvent(options, handler);
         awaitSync(options, handler);
         commenceSync(handler);
         try {

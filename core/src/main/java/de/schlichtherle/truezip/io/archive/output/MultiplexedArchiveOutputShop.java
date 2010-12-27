@@ -288,7 +288,7 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
             storeTemps();
             assert temps.isEmpty();
         } finally {
-            super.close();
+            delegate.close();
         }
     }
 

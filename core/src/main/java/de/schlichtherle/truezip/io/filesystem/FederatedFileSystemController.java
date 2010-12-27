@@ -146,12 +146,12 @@ extends DecoratingFileSystemController<FileSystemModel, FileSystemController<?>>
     }
 
     private class Input extends DecoratingInputSocket<Entry> {
-        final FileSystemEntryName parentName;
+        final FileSystemEntryName name;
         final BitField<InputOption> options;
 
         Input(final FileSystemEntryName name, final BitField<InputOption> options) {
             super(delegate.getInputSocket(name, options));
-            this.parentName = resolveParent(name);
+            this.name = name;
             this.options = options;
         }
 
@@ -161,7 +161,7 @@ extends DecoratingFileSystemController<FileSystemModel, FileSystemController<?>>
                 return getBoundSocket().getLocalTarget();
             } catch (FalsePositiveException ex) {
                 return getParent()
-                        .getInputSocket(parentName, options)
+                        .getInputSocket(resolveParent(name), options)
                         .bind(this)
                         .getLocalTarget();
             }
@@ -173,7 +173,7 @@ extends DecoratingFileSystemController<FileSystemModel, FileSystemController<?>>
                 return getBoundSocket().newReadOnlyFile();
             } catch (FalsePositiveException ex) {
                 return getParent()
-                        .getInputSocket(parentName, options)
+                        .getInputSocket(resolveParent(name), options)
                         .bind(this)
                         .newReadOnlyFile();
             }
@@ -185,7 +185,7 @@ extends DecoratingFileSystemController<FileSystemModel, FileSystemController<?>>
                 return getBoundSocket().newInputStream();
             } catch (FalsePositiveException ex) {
                 return getParent()
-                        .getInputSocket(parentName, options)
+                        .getInputSocket(resolveParent(name), options)
                         .bind(this)
                         .newInputStream();
             }
@@ -201,7 +201,7 @@ extends DecoratingFileSystemController<FileSystemModel, FileSystemController<?>>
     }
 
     private class Output extends DecoratingOutputSocket<Entry> {
-        final FileSystemEntryName parentName;
+        final FileSystemEntryName name;
         final BitField<OutputOption> options;
         final Entry template;
 
@@ -209,7 +209,7 @@ extends DecoratingFileSystemController<FileSystemModel, FileSystemController<?>>
                 final BitField<OutputOption> options,
                 final Entry template) {
             super(delegate.getOutputSocket(name, options, template));
-            this.parentName = resolveParent(name);
+            this.name = name;
             this.options = options;
             this.template = template;
         }
@@ -220,7 +220,7 @@ extends DecoratingFileSystemController<FileSystemModel, FileSystemController<?>>
                 return getBoundSocket().getLocalTarget();
             } catch (FalsePositiveException ex) {
                 return getParent()
-                        .getOutputSocket(parentName, options, template)
+                        .getOutputSocket(resolveParent(name), options, template)
                         .bind(this)
                         .getLocalTarget();
             }
@@ -232,7 +232,7 @@ extends DecoratingFileSystemController<FileSystemModel, FileSystemController<?>>
                 return getBoundSocket().newOutputStream();
             } catch (FalsePositiveException ex) {
                 return getParent()
-                        .getOutputSocket(parentName, options, template)
+                        .getOutputSocket(resolveParent(name), options, template)
                         .bind(this)
                         .newOutputStream();
             }

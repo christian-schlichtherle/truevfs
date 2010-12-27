@@ -479,23 +479,11 @@ public final class Cache<E extends Entry> {
 
         @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
-            /*if (null != getBoundSocket().getPeerTarget()) {
-                // The data for connected sockets should not get cached
-                // because... FIXME: Why exactly?!
-                // So we flush and bypass the cache.
-                flush();
-                return input.newReadOnlyFile();
-            }*/
             return getBoundSocket().newReadOnlyFile();
         }
 
         @Override
         public InputStream newInputStream() throws IOException {
-            /*if (null != getBoundSocket().getPeerTarget()) {
-                // Dito.
-                flush();
-                return input.newInputStream();
-            }*/
             return getBoundSocket().newInputStream();
         }
     } // class BufferInputSocket
@@ -512,11 +500,6 @@ public final class Cache<E extends Entry> {
 
         @Override
         public OutputStream newOutputStream() throws IOException {
-            /*if (null != getBoundSocket().getPeerTarget()) {
-                // Dito, but this time we clear and bypass the cache.
-                clear();
-                return output.newOutputStream();
-            }*/
             return getBoundSocket().newOutputStream();
         }
     } // class BufferOutputSocket
