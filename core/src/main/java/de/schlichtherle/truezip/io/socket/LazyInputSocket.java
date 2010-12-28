@@ -40,11 +40,6 @@ extends DecoratingInputSocket<E> {
         return new LazyReadOnlyFile();
     }
 
-    @Override
-    public final InputStream newInputStream() throws IOException {
-        return new LazyInputStream();
-    }
-
     private class LazyReadOnlyFile extends DecoratingReadOnlyFile {
         LazyReadOnlyFile() {
             super(null);
@@ -85,6 +80,11 @@ extends DecoratingInputSocket<E> {
                 delegate.close();
         }
     } // class LazyReadOnlyFile
+
+    @Override
+    public final InputStream newInputStream() throws IOException {
+        return new LazyInputStream();
+    }
 
     private class LazyInputStream extends DecoratingInputStream {
         LazyInputStream() {
