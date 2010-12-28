@@ -73,7 +73,7 @@ public final class Cache<E extends Entry> {
 
         /**
          * A write-through cache flushes any written data as soon as the
-         * output stream created by the provided output socket gets closed.
+         * output stream created by {@link #getOutputSocket} gets closed.
          */
         WRITE_THROUGH {
             @Override <E extends Entry> Cache<E>.OutputBufferPool
@@ -84,7 +84,7 @@ public final class Cache<E extends Entry> {
 
         /**
          * A write-back cache flushes any written data if and only if it gets
-         * explicitly flushed.
+         * explicitly {@link #flush flushed}.
          */
         WRITE_BACK {
             @Override <E extends Entry> Cache<E>.OutputBufferPool
@@ -228,6 +228,27 @@ public final class Cache<E extends Entry> {
         return new ProxyInputSocket();
     }
 
+    private final class ProxyInputSocket extends InputSocket<E> {
+        @Override
+        public E getLocalTarget() throws IOException {
+            return input.getLocalTarget();
+        }
+
+        private InputSocket<?> getBoundSocket() throws IOException {
+            return getInputBufferPool().allocate().getInputSocket().bind(this);
+        }
+
+        @Override
+        public ReadOnlyFile newReadOnlyFile() throws IOException {
+            return getBoundSocket().newReadOnlyFile();
+        }
+
+        @Override
+        public InputStream newInputStream() throws IOException {
+            return getBoundSocket().newInputStream();
+        }
+    } // class ProxyInputSocket
+
     /**
      * Returns an output socket for writing the cached entry data.
      *
@@ -238,30 +259,21 @@ public final class Cache<E extends Entry> {
         return new ProxyOutputSocket();
     }
 
-    private Buffer getBuffer() {
-        return buffer;
-    }
-
-    private void setBuffer(final Buffer newBuffer) throws IOException {
-        final Buffer oldBuffer = this.buffer;
-        if (oldBuffer != newBuffer) {
-            this.buffer = newBuffer;
-            if (oldBuffer != null
-                    && oldBuffer.writers == 0
-                    && oldBuffer.readers == 0)
-                oldBuffer.release();
+    private final class ProxyOutputSocket extends OutputSocket<E> {
+        @Override
+        public E getLocalTarget() throws IOException {
+            return output.getLocalTarget();
         }
-    }
 
-    @Override
-    @SuppressWarnings("FinalizeDeclaration")
-    protected void finalize() throws Throwable {
-        try {
-            setBuffer(null);
-        } finally {
-            super.finalize();
+        private OutputSocket<?> getBoundSocket() throws IOException {
+            return getOutputBufferPool().allocate().getOutputSocket().bind(this);
         }
-    }
+
+        @Override
+        public OutputStream newOutputStream() throws IOException {
+            return getBoundSocket().newOutputStream();
+        }
+    } // class ProxyOutputSocket
 
     private InputBufferPool getInputBufferPool() {
         return null != inputBufferPool
@@ -356,6 +368,31 @@ public final class Cache<E extends Entry> {
             }
         }
     } // class WriteBackOutputPool
+
+    private Buffer getBuffer() {
+        return buffer;
+    }
+
+    private void setBuffer(final Buffer newBuffer) throws IOException {
+        final Buffer oldBuffer = this.buffer;
+        if (oldBuffer != newBuffer) {
+            this.buffer = newBuffer;
+            if (oldBuffer != null
+                    && oldBuffer.writers == 0
+                    && oldBuffer.readers == 0)
+                oldBuffer.release();
+        }
+    }
+
+    @Override
+    @SuppressWarnings("FinalizeDeclaration")
+    protected void finalize() throws Throwable {
+        try {
+            setBuffer(null);
+        } finally {
+            super.finalize();
+        }
+    }
 
     private final class Buffer {
         private final IOPool.Entry<?> data;
@@ -466,41 +503,4 @@ public final class Cache<E extends Entry> {
             }
         } // class BufferOutputStream
     } // class Buffer
-
-    private final class ProxyInputSocket extends InputSocket<E> {
-        @Override
-        public E getLocalTarget() throws IOException {
-            return input.getLocalTarget();
-        }
-
-        private InputSocket<?> getBoundSocket() throws IOException {
-            return getInputBufferPool().allocate().getInputSocket().bind(this);
-        }
-
-        @Override
-        public ReadOnlyFile newReadOnlyFile() throws IOException {
-            return getBoundSocket().newReadOnlyFile();
-        }
-
-        @Override
-        public InputStream newInputStream() throws IOException {
-            return getBoundSocket().newInputStream();
-        }
-    } // class BufferInputSocket
-
-    private final class ProxyOutputSocket extends OutputSocket<E> {
-        @Override
-        public E getLocalTarget() throws IOException {
-            return output.getLocalTarget();
-        }
-
-        private OutputSocket<?> getBoundSocket() throws IOException {
-            return getOutputBufferPool().allocate().getOutputSocket().bind(this);
-        }
-
-        @Override
-        public OutputStream newOutputStream() throws IOException {
-            return getBoundSocket().newOutputStream();
-        }
-    } // class BufferOutputSocket
 }
