@@ -225,10 +225,10 @@ public final class Cache<E extends Entry> {
      */
     @NonNull
     public InputSocket<E> getInputSocket() {
-        return new ProxyInputSocket();
+        return new CacheInputSocket();
     }
 
-    private final class ProxyInputSocket extends InputSocket<E> {
+    private final class CacheInputSocket extends InputSocket<E> {
         @Override
         public E getLocalTarget() throws IOException {
             return input.getLocalTarget();
@@ -247,7 +247,7 @@ public final class Cache<E extends Entry> {
         public InputStream newInputStream() throws IOException {
             return getBoundSocket().newInputStream();
         }
-    } // class ProxyInputSocket
+    } // class CacheInputSocket
 
     /**
      * Returns an output socket for writing the cached entry data.
@@ -256,10 +256,10 @@ public final class Cache<E extends Entry> {
      */
     @NonNull
     public OutputSocket<E> getOutputSocket() {
-        return new ProxyOutputSocket();
+        return new CacheOutputSocket();
     }
 
-    private final class ProxyOutputSocket extends OutputSocket<E> {
+    private final class CacheOutputSocket extends OutputSocket<E> {
         @Override
         public E getLocalTarget() throws IOException {
             return output.getLocalTarget();
@@ -273,7 +273,7 @@ public final class Cache<E extends Entry> {
         public OutputStream newOutputStream() throws IOException {
             return getBoundSocket().newOutputStream();
         }
-    } // class ProxyOutputSocket
+    } // class CacheOutputSocket
 
     private InputBufferPool getInputBufferPool() {
         return null != inputBufferPool
@@ -337,7 +337,7 @@ public final class Cache<E extends Entry> {
                 setBuffer(buffer);
             }
         }
-    } // class OutputPool
+    } // class OutputBufferPool
 
     private class WriteThroughOutputBufferPool extends OutputBufferPool {
         @Override
@@ -350,7 +350,7 @@ public final class Cache<E extends Entry> {
                 super.release(buffer);
             }
         }
-    } // class WriteThroughOutputPool
+    } // class WriteThroughOutputBufferPool
 
     private final class WriteBackOutputBufferPool extends OutputBufferPool {
         @Override
@@ -367,7 +367,7 @@ public final class Cache<E extends Entry> {
                 }
             }
         }
-    } // class WriteBackOutputPool
+    } // class WriteBackOutputBufferPool
 
     private Buffer getBuffer() {
         return buffer;
