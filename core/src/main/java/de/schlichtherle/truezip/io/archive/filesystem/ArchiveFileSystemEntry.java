@@ -133,12 +133,6 @@ extends DecoratingFileSystemEntry<E> {
         }
 
         @Override
-        @NonNull
-        public String getName() {
-            return delegate.getName();
-        }
-
-        @Override
         public Type getType() {
             return FILE;
         }
@@ -182,12 +176,6 @@ extends DecoratingFileSystemEntry<E> {
             final DirectoryEntry<E> clone = (DirectoryEntry<E>) super.clone(fileSystem);
             clone.members = Collections.unmodifiableSet(members);
             return clone;
-        }
-
-        @Override
-        @NonNull
-        public String getName() {
-            return delegate.getName();
         }
 
         @Override
