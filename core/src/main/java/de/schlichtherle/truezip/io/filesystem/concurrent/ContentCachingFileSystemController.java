@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.filesystem.concurrent;
 
+import de.schlichtherle.truezip.io.socket.IOCache.Strategy;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.entry.Entry;
@@ -29,7 +30,6 @@ import de.schlichtherle.truezip.io.filesystem.OutputOption;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.io.filesystem.SyncWarningException;
-import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.DecoratingInputSocket;
 import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.io.socket.IOCache;
@@ -42,7 +42,6 @@ import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -89,6 +88,8 @@ public final class ContentCachingFileSystemController<
         M extends ConcurrentFileSystemModel,
         C extends FileSystemController<? extends M>>
 extends DecoratingFileSystemController<M, C> {
+
+    private static final Strategy STRATEGY = WRITE_BACK;
 
     private final IOPool<?> pool;
     private final Map<FileSystemEntryName, Cache> caches
@@ -186,7 +187,7 @@ extends DecoratingFileSystemController<M, C> {
                     // So if this is really required, change the caching
                     // strategy to WRITE_THROUGH and bear the performance
                     // impact.
-                    assert false; // FIXME: Check and fix this!
+                    assert WRITE_THROUGH == STRATEGY; // FIXME: Check and fix this!
                     cache.flush();
                 }
             }
@@ -280,7 +281,7 @@ extends DecoratingFileSystemController<M, C> {
 
         Cache(@NonNull final FileSystemEntryName name) {
             this.name = name;
-            this.cache = WRITE_BACK.newCache(pool);
+            this.cache = STRATEGY.newCache(pool);
         }
 
         @NonNull
@@ -339,20 +340,9 @@ extends DecoratingFileSystemController<M, C> {
         @CheckForNull
         public FileSystemEntry getEntry() {
             final Entry entry = cache.getEntry();
-            return null == entry ? null : new ProxyFileSystemEntry(entry);
+            return null == entry ? null : new ProxyFileSystemEntry(
+                    null == template ? entry : template);
         }
-
-        private final class ProxyFileSystemEntry extends DecoratingFileSystemEntry<Entry> {
-            ProxyFileSystemEntry(Entry entry) {
-                super(entry);
-                assert DIRECTORY != entry.getType();
-            }
-
-            @Override
-            public Set<String> getMembers() {
-                return null;
-            }
-        } // ProxyFileSystemEntry
 
         public InputSocket<?> getInputSocket() {
             return null != input ? input : (input = cache.getInputSocket());
@@ -398,4 +388,17 @@ extends DecoratingFileSystemController<M, C> {
             }
         } // class ProxyOutputSocket
     } // class Cache
+
+    private static final class ProxyFileSystemEntry
+    extends DecoratingFileSystemEntry<Entry> {
+        private ProxyFileSystemEntry(Entry entry) {
+            super(entry);
+            assert DIRECTORY != entry.getType();
+        }
+
+        @Override
+        public Set<String> getMembers() {
+            return null;
+        }
+    } // ProxyFileSystemEntry
 }
