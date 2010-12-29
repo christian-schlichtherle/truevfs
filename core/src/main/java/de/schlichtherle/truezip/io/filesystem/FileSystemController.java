@@ -77,7 +77,7 @@ public abstract class FileSystemController<M extends FileSystemModel> {
 
     public abstract boolean isReadOnly() throws IOException;
 
-    @Nullable
+    @CheckForNull
     public abstract FileSystemEntry getEntry(@NonNull FileSystemEntryName name)
     throws IOException;
 
