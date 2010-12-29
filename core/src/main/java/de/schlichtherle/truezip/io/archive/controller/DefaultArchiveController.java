@@ -158,16 +158,16 @@ extends FileSystemArchiveController<E> {
     }
 
     private final class TouchListener
-    implements ArchiveFileSystemTouchListener<ArchiveEntry> {
+    implements ArchiveFileSystemTouchListener<E> {
         @Override
-        public void beforeTouch(ArchiveFileSystemEvent<?> event)
+        public void beforeTouch(ArchiveFileSystemEvent<? extends E> event)
         throws IOException {
             assert event.getSource() == getFileSystem();
             makeOutput(MAKE_OUTPUT_OPTIONS, getFileSystem().getEntry(ROOT));
         }
 
         @Override
-        public void afterTouch(ArchiveFileSystemEvent<?> event) {
+        public void afterTouch(ArchiveFileSystemEvent<? extends E> event) {
             assert event.getSource() == getFileSystem();
             getModel().setTouched(true);
         }
@@ -189,7 +189,7 @@ extends FileSystemArchiveController<E> {
      */
     private Output output;
 
-    private final ArchiveFileSystemTouchListener<ArchiveEntry> touchListener
+    private final ArchiveFileSystemTouchListener<E> touchListener
             = new TouchListener();
 
     public DefaultArchiveController(
@@ -251,8 +251,10 @@ extends FileSystemArchiveController<E> {
                 throw new FalsePositiveException(getModel(), ex);
             // The entry does NOT exist in the parent archive
             // file, but we may create it automatically.
-            final ArchiveFileSystem<E> fileSystem = newArchiveFileSystem(driver);
-            final ArchiveFileSystemEntry<E> root = fileSystem.getEntry(ROOT_ENTRY_NAME);
+            final ArchiveFileSystem<E> fileSystem
+                    = newArchiveFileSystem(driver);
+            final ArchiveFileSystemEntry<E> root
+                    = fileSystem.getEntry(ROOT_ENTRY_NAME);
             // This may fail if e.g. the container file is an RAES
             // encrypted ZIP file and the user cancels password
             // prompting.
@@ -266,16 +268,13 @@ extends FileSystemArchiveController<E> {
                 throw new FalsePositiveException(getModel(), ex2);
             }
             setFileSystem(fileSystem);
-            final ArchiveFileSystemEvent<E> event
-                    = new ArchiveFileSystemEvent<E>(getFileSystem());
-            touchListener.beforeTouch(event);
-            touchListener.afterTouch(event);
+            getModel().setTouched(true);
         }
         getFileSystem().addArchiveFileSystemTouchListener(touchListener);
     }
 
     void makeOutput(@NonNull final BitField<OutputOption> options,
-                    @NonNull final ArchiveFileSystemEntry<E> rootTemplate)
+                    @NonNull final Entry rootTemplate)
     throws IOException {
         if (null != output)
             return;
