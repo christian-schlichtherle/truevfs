@@ -584,9 +584,23 @@ public class ZipEntry implements Cloneable {
         this.comment = comment;
     }
 
-    /** Returns {@link #getName()}. */
+    /** Returns a string representation of this object. */
     @Override
     public final String toString() {
-        return getName();
+        return new StringBuilder(getClass().getName())
+                .append("[name=")
+                .append(getName())
+                .append(",method=")
+                .append(getMethod())
+                .append(",crc=")
+                .append(getCrc())
+                .append(",compressedSize=")
+                .append(getCompressedSize())
+                .append(",size=")
+                .append(getSize())
+                .append(",time=")
+                .append(getTime())
+                .append("]")
+                .toString();
     }
 }
