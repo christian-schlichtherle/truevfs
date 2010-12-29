@@ -51,9 +51,9 @@ implements Iterable<E> {
 
     /**
      * The default character set used for entry names and comments in ZIP files.
-     * This is {@value} for compatibility with Sun's JDK implementation.
+     * This is {@code "UTF-8"} for compatibility with Sun's JDK implementation.
      */
-    public static final String DEFAULT_CHARSET = ZipConstants.DEFAULT_CHARSET;
+    public static final Charset DEFAULT_CHARSET = ZipConstants.DEFAULT_CHARSET;
 
     /** The charset to use for entry names and comments. */
     private final Charset charset;
@@ -111,11 +111,11 @@ implements Iterable<E> {
      */
     protected RawZipOutputStream(
             final OutputStream out,
-            final String charset) {
+            final Charset charset) {
         super(toLEDataOutputStream(out));
         if (null == out || null == charset)
             throw new NullPointerException();
-        this.charset = Charset.forName(charset);
+        this.charset = charset;
     }
 
     /**
@@ -405,7 +405,7 @@ implements Iterable<E> {
 
         // Compose General Purpose Bit Flag.
         // See appendix D of PKWARE's ZIP File Format Specification.
-        final boolean utf8 = UTF8.equalsIgnoreCase(charset.name());
+        final boolean utf8 = UTF8.equals(charset);
         final int general = (dd   ? (1 <<  3) : 0)
                           | (utf8 ? (1 << 11) : 0);
 

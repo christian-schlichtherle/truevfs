@@ -24,6 +24,7 @@ import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -102,7 +103,7 @@ public abstract class RaesZipTestCase extends ZipTestCase {
 
     @Override
     protected ZipOutputStream newZipOutputStream(
-            final OutputStream out, final String charset)
+            final OutputStream out, final Charset charset)
     throws IOException {
         final RaesOutputStream ros = RaesOutputStream.getInstance(
                 out, raesParameters);
@@ -135,7 +136,7 @@ public abstract class RaesZipTestCase extends ZipTestCase {
     @Override
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     protected ZipFile newZipFile(
-            final String name, final String charset)
+            final String name, final Charset charset)
     throws IOException {
         if (charset == null)
             throw new NullPointerException();
@@ -176,7 +177,7 @@ public abstract class RaesZipTestCase extends ZipTestCase {
     @Override
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     protected ZipFile newZipFile(
-            final File file, final String charset)
+            final File file, final Charset charset)
     throws IOException {
         if (charset == null)
             throw new NullPointerException();
@@ -217,7 +218,7 @@ public abstract class RaesZipTestCase extends ZipTestCase {
     @Override
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     protected ZipFile newZipFile(
-            final ReadOnlyFile file, final String charset)
+            final ReadOnlyFile file, final Charset charset)
     throws IOException {
         if (charset == null)
             throw new NullPointerException();

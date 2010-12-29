@@ -25,6 +25,7 @@ import de.schlichtherle.truezip.io.zip.ZipEntryFactory;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 import static de.schlichtherle.truezip.io.zip.ZipEntry.*;
 
@@ -41,7 +42,7 @@ implements InputShop<ZipEntry> {
 
     public ZipInputShop(
             ReadOnlyFile rof,
-            String charset,
+            Charset charset,
             boolean preambled,
             boolean postambled,
             ZipEntryFactory<ZipEntry> factory)

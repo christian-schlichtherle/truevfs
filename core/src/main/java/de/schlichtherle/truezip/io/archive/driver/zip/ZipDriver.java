@@ -30,6 +30,7 @@ import de.schlichtherle.truezip.io.zip.ZipEntryFactory;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 
 import static de.schlichtherle.truezip.io.entry.Entry.Access.WRITE;
 import static de.schlichtherle.truezip.io.entry.Entry.Size.DATA;
@@ -59,15 +60,15 @@ implements ZipEntryFactory<ZipEntry> {
 
     /**
      * The default character set to use for entry names and comments,
-     * which is {@value}.
+     * which is {@code "IBM437"}.
      */
-    public static final String ZIP_CHARSET = "IBM437";
+    public static final Charset ZIP_CHARSET = Charset.forName("IBM437");
 
     private final boolean preambled, postambled;
     private final int level;
 
     /**
-     * Equivalent to {@link #ZipDriver(String, boolean, boolean, int)
+     * Equivalent to {@link #ZipDriver(Charset, boolean, boolean, int)
      * this(ZIP_CHARSET, null, null, false, false, Deflater.BEST_COMPRESSION)}.
      */
     public ZipDriver() {
@@ -75,15 +76,15 @@ implements ZipEntryFactory<ZipEntry> {
     }
 
     /**
-     * Equivalent to {@link #ZipDriver(String, boolean, boolean, int)
+     * Equivalent to {@link #ZipDriver(Charset, boolean, boolean, int)
      * this(charset, null, null, false, false, Deflater.BEST_COMPRESSION)}.
      */
-    public ZipDriver(String charset) {
+    public ZipDriver(Charset charset) {
         this(charset, false, false, BEST_COMPRESSION);
     }
 
     /**
-     * Equivalent to {@link #ZipDriver(String, boolean, boolean, int)
+     * Equivalent to {@link #ZipDriver(Charset, boolean, boolean, int)
      * this(ZIP_CHARSET, null, null, false, false, level)}.
      */
     public ZipDriver(int level) {
@@ -122,7 +123,7 @@ implements ZipEntryFactory<ZipEntry> {
      *         and is not {@value java.util.zip.Deflater#DEFAULT_COMPRESSION}.
      */
     public ZipDriver(
-            final String charset,
+            final Charset charset,
             final boolean preambled,
             final boolean postambled,
             final int level) {
@@ -245,3 +246,4 @@ implements ZipEntryFactory<ZipEntry> {
         return new ZipOutputShop(out, getCharset(), level, source); // TODO: Support append strategy!
     }
 }
+

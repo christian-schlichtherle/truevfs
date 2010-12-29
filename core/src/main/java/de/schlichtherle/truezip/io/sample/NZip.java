@@ -30,6 +30,7 @@ import de.schlichtherle.truezip.io.swing.tree.FileTreeModel;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.FieldPosition;
 import java.text.NumberFormat;
@@ -114,7 +115,7 @@ public class NZip extends CommandLineUtility {
      * some extra compatibility tests which they perform on every archive.
      */
     protected DefaultArchiveDetector newDefaultArchiveDetector(
-            final String charset) {
+            final Charset charset) {
         assert charset != null;
         return new DefaultArchiveDetector(ArchiveDetector.ALL,
                 new Object[] {
@@ -355,9 +356,9 @@ public class NZip extends CommandLineUtility {
 
         final ArchiveDetector srcDetector;
         if (cp437in)
-            srcDetector = newDefaultArchiveDetector("IBM437");
+            srcDetector = newDefaultArchiveDetector(Charset.forName("IBM437"));
         else if (utf8in)
-            srcDetector = newDefaultArchiveDetector("UTF-8");
+            srcDetector = newDefaultArchiveDetector(Charset.forName("UTF-8"));
         else
             srcDetector = File.getDefaultArchiveDetector();
 
@@ -365,9 +366,9 @@ public class NZip extends CommandLineUtility {
         if (unzip)
             dstDetector = ArchiveDetector.NULL;
         else if (cp437out)
-            dstDetector = newDefaultArchiveDetector("IBM437");
+            dstDetector = newDefaultArchiveDetector(Charset.forName("IBM437"));
         else if (utf8out)
-            dstDetector = newDefaultArchiveDetector("UTF-8");
+            dstDetector = newDefaultArchiveDetector(Charset.forName("UTF-8"));
         else
             dstDetector = File.getDefaultArchiveDetector();
 

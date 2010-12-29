@@ -17,9 +17,9 @@
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
 import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemModel;
-import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 import static java.util.zip.Deflater.BEST_COMPRESSION;
 
@@ -48,7 +48,7 @@ public class CheckedReadOnlySfxDriver extends ReadOnlySfxDriver {
     private static final long serialVersionUID = -940108057195872802L;
 
     /**
-     * Equivalent to {@link #CheckedReadOnlySfxDriver(String, boolean, int)
+     * Equivalent to {@link #CheckedReadOnlySfxDriver(Charset, boolean, int)
      * this(DEFAULT_CHARSET, false, Deflater.BEST_COMPRESSION)}.
      */
     public CheckedReadOnlySfxDriver() {
@@ -56,15 +56,15 @@ public class CheckedReadOnlySfxDriver extends ReadOnlySfxDriver {
     }
 
     /**
-     * Equivalent to {@link #CheckedReadOnlySfxDriver(String, boolean, int)
+     * Equivalent to {@link #CheckedReadOnlySfxDriver(Charset, boolean, int)
      * this(charset, false, Deflater.BEST_COMPRESSION)}.
      */
-    public CheckedReadOnlySfxDriver(String charset) {
+    public CheckedReadOnlySfxDriver(Charset charset) {
         this(charset, false, BEST_COMPRESSION);
     }
 
     /**
-     * Equivalent to {@link #CheckedReadOnlySfxDriver(String, boolean, int)
+     * Equivalent to {@link #CheckedReadOnlySfxDriver(Charset, boolean, int)
      * this(DEFAULT_CHARSET, false, level)}.
      */
     public CheckedReadOnlySfxDriver(int level) {
@@ -73,7 +73,7 @@ public class CheckedReadOnlySfxDriver extends ReadOnlySfxDriver {
 
     /** Constructs a new checked read-only SFX/EXE driver. */
     public CheckedReadOnlySfxDriver(
-            String charset,
+            Charset charset,
             boolean postambled,
             final int level) {
         super(charset, postambled, level);

@@ -22,6 +22,7 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import org.apache.tools.bzip2.CBZip2InputStream;
 import org.apache.tools.bzip2.CBZip2OutputStream;
 
@@ -60,7 +61,7 @@ public class TarBZip2Driver extends TarDriver {
     private final int inBlockSize;
 
     /**
-     * Equivalent to {@link #TarBZip2Driver(String, int)
+     * Equivalent to {@link #TarBZip2Driver(Charset, int)
      * this(TAR_CHARSET, DEFAULT_BLOCKSIZE)}.
      */
     public TarBZip2Driver() {
@@ -68,15 +69,15 @@ public class TarBZip2Driver extends TarDriver {
     }
 
     /**
-     * Equivalent to {@link #TarBZip2Driver(String, int)
+     * Equivalent to {@link #TarBZip2Driver(Charset, int)
      * this(charset, DEFAULT_BLOCKSIZE)}.
      */
-    public TarBZip2Driver(String charset) {
+    public TarBZip2Driver(Charset charset) {
         this(charset, DEFAULT_BLOCKSIZE);
     }
 
     /**
-     * Equivalent to {@link #TarBZip2Driver(String, int)
+     * Equivalent to {@link #TarBZip2Driver(Charset, int)
      * this(TAR_CHARSET, inBlockSize)}.
      */
     public TarBZip2Driver(int inBlockSize) {
@@ -91,7 +92,7 @@ public class TarBZip2Driver extends TarDriver {
      * @throws IllegalArgumentException If {@code inBlockSize} is not
      *         in the range [1..9].
      */
-    public TarBZip2Driver(final String charset, final int inBlockSize) {
+    public TarBZip2Driver(final Charset charset, final int inBlockSize) {
         super(charset);
         if (inBlockSize < MIN_BLOCKSIZE || MAX_BLOCKSIZE < inBlockSize)
             throw new IllegalArgumentException(inBlockSize + "");

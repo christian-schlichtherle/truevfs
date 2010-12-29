@@ -16,6 +16,8 @@
 
 package de.schlichtherle.truezip.io.zip;
 
+import java.nio.charset.Charset;
+
 /**
  * A package private interface with some useful constants for ZIP archive files.
  * Public classes <em>must not</em> implement this interface - otherwise the
@@ -141,16 +143,16 @@ interface ZipConstants {
             /* end of central directory record */ 8 +
             /* total number of disks           */ 4;
 
-    String UTF8 = "UTF-8";
+    Charset UTF8 = Charset.forName("UTF-8");
 
     /**
      * The default character set used for entry names and comments in ZIP
      * archive files.
-     * This is {@value} for compatibility with Sun's JDK implementation.
+     * This is {@code "UTF-8"} for compatibility with Sun's JDK implementation.
      * Note that you should use &quot;IBM437&quot; for ordinary ZIP archive
      * files instead.
      */
-    String DEFAULT_CHARSET = UTF8;
+    Charset DEFAULT_CHARSET = UTF8;
 
     /**
      * The buffer size used for deflating and inflating.

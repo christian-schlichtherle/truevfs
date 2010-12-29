@@ -19,13 +19,14 @@ package de.schlichtherle.truezip.io.archive.driver.zip;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.entry.Entry;
 import java.io.CharConversionException;
+import java.nio.charset.Charset;
 
 import static java.util.zip.Deflater.BEST_COMPRESSION;
 
 /**
  * An archive driver which builds JAR files.
- * JAR files use {@value #JAR_CHARSET} as the character set for
- * entry names and comments.
+ * JAR files use {@code "UTF-8"} as the character set for entry names and
+ * comments.
  * <p>
  * Other than this, JAR files are treated like regular ZIP files.
  * In particular, this class does <em>not</em> check a JAR file for the
@@ -40,10 +41,11 @@ public class JarDriver extends ZipDriver {
     private static final long serialVersionUID = 3333659381918211087L;
 
     /**
-     * The default character set for entry names and comments, which is {@value}.
+     * The default character set for entry names and comments, which is
+     * {@code "UTF-8"}.
      */
     @SuppressWarnings("FieldNameHidesFieldInSuperclass")
-    public static final String JAR_CHARSET = "UTF-8";
+    public static final Charset JAR_CHARSET = Charset.forName("UTF-8");
 
     /**
      * Equivalent to {@link #JarDriver(boolean, boolean, int)

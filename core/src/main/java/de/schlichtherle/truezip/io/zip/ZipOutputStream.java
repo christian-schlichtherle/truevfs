@@ -17,7 +17,7 @@ package de.schlichtherle.truezip.io.zip;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.charset.UnsupportedCharsetException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -55,9 +55,7 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
     
     /**
      * Constructs a ZIP output stream which decorates the given output stream
-     * using the
-     * {@value de.schlichtherle.truezip.io.zip.RawZipOutputStream#DEFAULT_CHARSET}
-     * charset.
+     * using the {@code "UTF-8"} charset.
      *
      * @throws NullPointerException If {@code out} is {@code null}.
      */
@@ -70,10 +68,8 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
      * using the given charset.
      *
      * @throws NullPointerException If any parameter is {@code null}.
-     * @throws UnsupportedCharsetException If {@code charset} is not supported
-     *         by this JVM.
      */
-    public ZipOutputStream(OutputStream out, String charset) {
+    public ZipOutputStream(OutputStream out, Charset charset) {
         super(out, charset);
     }
 

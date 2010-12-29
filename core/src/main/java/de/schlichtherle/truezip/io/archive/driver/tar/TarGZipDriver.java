@@ -20,6 +20,7 @@ import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemMod
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
 
@@ -43,7 +44,7 @@ public class TarGZipDriver extends TarDriver {
     private final int level;
 
     /**
-     * Equivalent to {@link #TarGZipDriver(String, int)
+     * Equivalent to {@link #TarGZipDriver(Charset, int)
      * this(TAR_CHARSET, Deflater.BEST_COMPRESSION)}.
      */
     public TarGZipDriver() {
@@ -51,15 +52,15 @@ public class TarGZipDriver extends TarDriver {
     }
 
     /**
-     * Equivalent to {@link #TarGZipDriver(String, int)
+     * Equivalent to {@link #TarGZipDriver(Charset, int)
      * this(charset, Deflater.BEST_COMPRESSION)}.
      */
-    public TarGZipDriver(String charset) {
+    public TarGZipDriver(Charset charset) {
         this(charset, BEST_COMPRESSION);
     }
 
     /**
-     * Equivalent to {@link #TarGZipDriver(String, int)
+     * Equivalent to {@link #TarGZipDriver(Charset, int)
      * this(TAR_CHARSET, level)}.
      */
     public TarGZipDriver(int level) {
@@ -77,7 +78,7 @@ public class TarGZipDriver extends TarDriver {
      *         and is not {@value java.util.zip.Deflater#DEFAULT_COMPRESSION}.
      */
     public TarGZipDriver(
-            final String charset,
+            final Charset charset,
             final int level) {
         super(charset);
         if (    (   level < NO_COMPRESSION

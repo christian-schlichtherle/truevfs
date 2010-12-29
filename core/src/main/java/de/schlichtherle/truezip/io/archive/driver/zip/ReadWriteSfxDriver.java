@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
+import java.nio.charset.Charset;
 import static java.util.zip.Deflater.BEST_COMPRESSION;
 
 /**
@@ -43,7 +44,7 @@ public class ReadWriteSfxDriver extends AbstractSfxDriver {
     private static final long serialVersionUID = -937199842631639717L;
 
     /**
-     * Equivalent to {@link #ReadWriteSfxDriver(String, boolean, int)
+     * Equivalent to {@link #ReadWriteSfxDriver(Charset, boolean, int)
      * this(DEFAULT_CHARSET, false, Deflater.BEST_COMPRESSION)}.
      */
     public ReadWriteSfxDriver() {
@@ -51,15 +52,15 @@ public class ReadWriteSfxDriver extends AbstractSfxDriver {
     }
 
     /**
-     * Equivalent to {@link #ReadWriteSfxDriver(String, boolean, int)
+     * Equivalent to {@link #ReadWriteSfxDriver(Charset, boolean, int)
      * this(charset, false, Deflater.BEST_COMPRESSION)}.
      */
-    public ReadWriteSfxDriver(String charset) {
+    public ReadWriteSfxDriver(Charset charset) {
         this(charset, false, BEST_COMPRESSION);
     }
 
     /**
-     * Equivalent to {@link #ReadWriteSfxDriver(String, boolean, int)
+     * Equivalent to {@link #ReadWriteSfxDriver(Charset, boolean, int)
      * this(DEFAULT_CHARSET, false, level)}.
      */
     public ReadWriteSfxDriver(int level) {
@@ -68,7 +69,7 @@ public class ReadWriteSfxDriver extends AbstractSfxDriver {
 
     /** Constructs a new read-write SFX/EXE driver. */
     public ReadWriteSfxDriver(
-            String charset,
+            Charset charset,
             boolean postambled,
             final int level) {
         super(charset, postambled, level);

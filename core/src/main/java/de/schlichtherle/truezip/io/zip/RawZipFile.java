@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.io.zip;
 
-import java.nio.charset.UnsupportedCharsetException;
 import java.nio.ByteBuffer;
 import de.schlichtherle.truezip.util.Pool;
 import java.nio.charset.Charset;
@@ -76,11 +75,11 @@ implements Iterable<E>, Closeable {
 
     /**
      * The default character set used for entry names and comments in ZIP files.
-     * This is {@value} for compatibility with Sun's JDK implementation.
+     * This is {@code "UTF-8"} for compatibility with Sun's JDK implementation.
      * Note that you should use &quot;IBM437&quot; for ordinary ZIP files
      * instead.
      */
-    public static final String DEFAULT_CHARSET = ZipConstants.DEFAULT_CHARSET;
+    public static final Charset DEFAULT_CHARSET = ZipConstants.DEFAULT_CHARSET;
 
     /** Maps entry names to zip entries. */
     private final Map<String, E> entries = new LinkedHashMap<String, E>();
@@ -140,8 +139,6 @@ implements Iterable<E>, Closeable {
      *        large postambles.
      * @param factory a factory for {@link ZipEntry}s.
      * @throws NullPointerException if any reference parameter is {@code null}.
-     * @throws UnsupportedCharsetException If {@code charset} is not supported
-     *         by this JVM.
      * @throws FileNotFoundException if {@code archive} cannot get opened for
      *         reading.
      * @throws ZipException if {@code archive} is not compatible to the ZIP
@@ -150,7 +147,7 @@ implements Iterable<E>, Closeable {
      */
     protected RawZipFile(
             ReadOnlyFile archive,
-            String charset,
+            Charset charset,
             boolean preambled,
             boolean postambled,
             ZipEntryFactory<E> factory)
@@ -161,7 +158,7 @@ implements Iterable<E>, Closeable {
 
     RawZipFile(
             final Pool<ReadOnlyFile, IOException> source,
-            final String charset,
+            final Charset charset,
             final ZipEntryFactory<E> zipEntryFactory,
             final boolean preambled,
             final boolean postambled)
@@ -171,7 +168,7 @@ implements Iterable<E>, Closeable {
         final ReadOnlyFile rof = source.allocate();
         try {
             this.archive = rof;
-            this.charset = Charset.forName(charset);
+            this.charset = charset;
             this.factory = zipEntryFactory;
 
             final BufferedReadOnlyFile brof;
@@ -248,7 +245,7 @@ implements Iterable<E>, Closeable {
             // See appendix D of PKWARE's ZIP File Format Specification.
             final boolean utf8 = (general & (1 << 11)) != 0;
             if (utf8)
-                charset = Charset.forName(UTF8);
+                charset = UTF8;
             final E entry = factory.newEntry(decode(name));
             try {
                 int off = 0;

@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
+import java.nio.charset.Charset;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,11 +38,12 @@ abstract public class AbstractSfxDriver extends ZipDriver {
      * by calling {@code System.getProperty("file.encoding")}.
      */
     @SuppressWarnings("FieldNameHidesFieldInSuperclass")
-    public static final String DEFAULT_CHARSET
-            = System.getProperty("file.encoding");
+    public static final Charset DEFAULT_CHARSET
+            = Charset.forName(System.getProperty("file.encoding"));
 
     static {
-        Logger.getLogger(CLASS_NAME, CLASS_NAME).log(Level.CONFIG, "charset", DEFAULT_CHARSET);
+        Logger  .getLogger(CLASS_NAME, CLASS_NAME)
+                .log(Level.CONFIG, "charset", DEFAULT_CHARSET);
     }
 
     /**
@@ -50,7 +52,7 @@ abstract public class AbstractSfxDriver extends ZipDriver {
      * application code that is required to extract the ZIP file contents.
      */
     protected AbstractSfxDriver(
-            String charset,
+            Charset charset,
             boolean postambled,
             final int level) {
         super(charset, true, postambled, level);
