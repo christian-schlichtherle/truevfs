@@ -20,6 +20,7 @@ import java.util.EventObject;
 
 /**
  * @param   <E> The type of the archive entries.
+ * @see     ArchiveFileSystemTouchListener
  * @author  Christian Schlichtherle
  * @version $Id$
  */
