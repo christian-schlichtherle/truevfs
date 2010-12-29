@@ -176,7 +176,7 @@ extends BasicArchiveController<E> {
         }
 
         @Override
-        ArchiveFileSystem<E> autoMount(boolean autoCreate,
+        ArchiveFileSystem<E> autoMount( boolean autoCreate,
                                         final BitField<OutputOption> options)
         throws FalsePositiveException {
             throw exception;
