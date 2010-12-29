@@ -93,7 +93,9 @@ public abstract class IOSocket<LT, PT> {
         final InputStream in = input.connect(output).newInputStream();
         OutputStream out = null;
         try {
-            out = output.connect(input).newOutputStream(); // connect(input) is redundant unless newInputStream() messed with the connection.
+            // .connect(input) is redundant unless .newInputStream() messed
+            // with the connection.
+            out = output.connect(input).newOutputStream();
         } finally {
             if (out == null) { // exception?
                 try {
