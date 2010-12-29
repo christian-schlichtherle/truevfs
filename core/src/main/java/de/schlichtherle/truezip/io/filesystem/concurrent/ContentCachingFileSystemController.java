@@ -15,9 +15,11 @@
  */
 package de.schlichtherle.truezip.io.filesystem.concurrent;
 
+import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.filesystem.DecoratingFileSystemController;
+import de.schlichtherle.truezip.io.filesystem.DecoratingFileSystemEntry;
 import de.schlichtherle.truezip.io.filesystem.FalsePositiveException;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
@@ -30,6 +32,7 @@ import de.schlichtherle.truezip.io.filesystem.SyncWarningException;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.DecoratingInputSocket;
 import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
+import de.schlichtherle.truezip.io.socket.IOCache;
 import de.schlichtherle.truezip.io.socket.IOPool;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
@@ -38,46 +41,43 @@ import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import net.jcip.annotations.NotThreadSafe;
 
 import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
-import static de.schlichtherle.truezip.io.socket.Cache.Strategy.*;
+import static de.schlichtherle.truezip.io.socket.IOCache.Strategy.*;
 import static de.schlichtherle.truezip.io.filesystem.OutputOption.*;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
 
 /**
- * A content caching archive controller implements a caching strategy for entry
- * data. Decorating a concurrent file system controller with this class has the
- * following effects:
+ * A content caching file system controller implements a combined caching and
+ * buffering strategy for entry data. Decorating a concurrent file system
+ * controller with this class has the following effects:
  * <ul>
- * <li>Upon the first read operation, the entry data will be read from the
- *     backing store and temporarily stored in the cache.
- *     Subsequent or concurrent read operations will be served from the cache
- *     without re-reading the entry data from the backing store again until
- *     the file system gets {@link #sync synced}.
- * <li>At the discretion of the internal caching strategy, entry data written
- *     to the cache may not be written to the backing store until the file
- *     system gets {@link #sync synced}.
- * <li>After a write operation, the entry data will be stored in the cache
- *     for subsequent read operations until the file system gets
+ * <li>Caching and buffering needs to be activated by using the method
+ *     {@link #getInputSocket input socket} with the input option
+ *     {@link InputOption#CACHE} or the method
+ *     {@link #getOutputSocket output socket} with the output option
+ *     {@link OutputOption#CACHE}.
+ * <li>Unless a write operation succeeds, upon each read operation the entry
+ *     data gets copied from the backing store for buffering purposes only.
+ * <li>Upon a successful write operation, the entry data gets cached for
+ *     subsequent read operations until the file system gets
  *     {@link #sync synced}.
+ * <li>Entry data written to the cache is not written to the backing store
+ *     until the file system gets {@link #sync synced} - this is a
+ *     <i>write back</i> strategy.
  * <li>As a side effect, caching decouples the underlying storage from its
  *     clients, allowing it to create, read, update or delete the entry data
- *     while some clients are still busy on reading or writing the cached
+ *     while some clients are still busy on reading or writing the copied
  *     entry data.
  * </ul>
- * Note that caching file system entry data is performed only if an
- * {@link #getInputSocket input socket} with the input option
- * {@link InputOption#CACHE} is used or an
- * {@link #getOutputSocket output socket} with the output option
- * {@link OutputOption#CACHE} is used <em>and</em> this socket is <em>not</em>
- * connected.
  *
  * @param   <M> The type of the file system model.
  * @param   <C> The type of the decorated file system controller.
@@ -98,7 +98,7 @@ extends DecoratingFileSystemController<M, C> {
      * Constructs a new content caching file system controller.
      *
      * @param controller the decorated file system controller.
-     * @param pool the pool of temporary entries to cache the entry data.
+     * @param pool the pool of temporary entries to hold the copied entry data.
      */
     public ContentCachingFileSystemController(  @NonNull final C controller,
                                                 @NonNull final IOPool<?> pool) {
@@ -106,6 +106,16 @@ extends DecoratingFileSystemController<M, C> {
         if (null == pool)
             throw new NullPointerException();
         this.pool = pool;
+    }
+
+    @Override
+    public FileSystemEntry getEntry(final FileSystemEntryName name)
+    throws IOException {
+        final FileSystemEntry entry;
+        final Cache cache = caches.get(name);
+        return null != cache && null != (entry = cache.getEntry())
+                ? entry
+                : delegate.getEntry(name);
     }
 
     @Override
@@ -193,10 +203,15 @@ extends DecoratingFileSystemController<M, C> {
     throws IOException {
         assert getModel().writeLock().isHeldByCurrentThread();
 
-        Cache cache = caches.get(name);
-        if (null != cache)
-            cache.flush();
-        delegate.mknod(name, type, options, template);
+        final Cache cache = caches.get(name);
+        if (null != cache) {
+            //cache.flush(); // redundant
+            delegate.mknod(name, type, options, template);
+            caches.remove(name);
+            cache.clear();
+        } else {
+            delegate.mknod(name, type, options, template);
+        }
     }
 
     @Override
@@ -204,10 +219,15 @@ extends DecoratingFileSystemController<M, C> {
     throws IOException {
         assert getModel().writeLock().isHeldByCurrentThread();
 
-        delegate.unlink(name);
-        final Cache cache = caches.remove(name);
-        if (null != cache)
+        final Cache cache = caches.get(name);
+        if (null != cache) {
+            //cache.flush(); // redundant
+            delegate.unlink(name);
+            caches.remove(name);
             cache.clear();
+        } else {
+            delegate.unlink(name);
+        }
     }
 
     @Override
@@ -252,9 +272,9 @@ extends DecoratingFileSystemController<M, C> {
 
     private final class Cache {
         private final FileSystemEntryName name;
-        private final de.schlichtherle.truezip.io.socket.Cache<Entry> cache;
-        private volatile InputSocket<Entry> input;
-        private volatile OutputSocket<Entry> output;
+        private final IOCache cache;
+        private volatile InputSocket<?> input;
+        private volatile OutputSocket<?> output;
         private volatile BitField<OutputOption> outputOptions;
         private volatile Entry template;
 
@@ -265,12 +285,37 @@ extends DecoratingFileSystemController<M, C> {
 
         @NonNull
         public Cache configure(@NonNull BitField<InputOption> options) {
-            cache.configure(delegate.getInputSocket(
+            cache.configure(/*new ProxyInputSocket(*/delegate.getInputSocket(
                     name,
                     options.clear(InputOption.CACHE)));
             input = null;
             return this;
         }
+
+        /*private final class ProxyInputSocket
+        extends DecoratingInputSocket<Entry> {
+            private ProxyInputSocket(InputSocket <?> input) {
+                super(input);
+            }
+
+            @Override
+            public ReadOnlyFile newReadOnlyFile() throws IOException {
+                getModel().assertWriteLockedByCurrentThread();
+
+                final ReadOnlyFile rof = getBoundSocket().newReadOnlyFile();
+                caches.put(name, Cache.this);
+                return rof;
+            }
+
+            @Override
+            public InputStream newInputStream() throws IOException {
+                getModel().assertWriteLockedByCurrentThread();
+
+                final InputStream in = getBoundSocket().newInputStream();
+                caches.put(name, Cache.this);
+                return in;
+            }
+        } // class ProxyInputSocket*/
 
         @NonNull
         public Cache configure( @NonNull BitField<OutputOption> options,
@@ -283,21 +328,39 @@ extends DecoratingFileSystemController<M, C> {
             return this;
         }
 
-        public InputSocket<Entry> getInputSocket() {
-            return null != input ? input : (input = cache.getInputSocket());
-        }
-
-        public OutputSocket<Entry> getOutputSocket() {
-            return null != output ? output : (output
-                    = new ProxyOutputSocket(cache.getOutputSocket()));
-        }
-
         public void flush() throws IOException {
             cache.flush();
         }
 
         public void clear() throws IOException {
             cache.clear();
+        }
+
+        @CheckForNull
+        public FileSystemEntry getEntry() {
+            final Entry entry = cache.getEntry();
+            return null == entry ? null : new ProxyFileSystemEntry(entry);
+        }
+
+        private final class ProxyFileSystemEntry extends DecoratingFileSystemEntry<Entry> {
+            ProxyFileSystemEntry(Entry entry) {
+                super(entry);
+                assert DIRECTORY != entry.getType();
+            }
+
+            @Override
+            public Set<String> getMembers() {
+                return null;
+            }
+        } // ProxyFileSystemEntry
+
+        public InputSocket<?> getInputSocket() {
+            return null != input ? input : (input = cache.getInputSocket());
+        }
+
+        public OutputSocket<?> getOutputSocket() {
+            return null != output ? output : (output
+                    = new ProxyOutputSocket(cache.getOutputSocket()));
         }
 
         private final class ProxyOutputSocket
@@ -310,18 +373,19 @@ extends DecoratingFileSystemController<M, C> {
             public OutputStream newOutputStream() throws IOException {
                 assert getModel().writeLock().isHeldByCurrentThread();
 
+                makeEntry();
                 final OutputStream out = getBoundSocket().newOutputStream();
-                makeMarkerEntry();
                 caches.put(name, Cache.this);
                 return out;
             }
 
             /** Ensure the existence of an entry in the file system. */
-            private void makeMarkerEntry() throws IOException {
+            private void makeEntry() throws IOException {
                 boolean mknod = null != template;
                 if (!mknod) {
                     try {
-                        mknod = null == delegate.getEntry(name);
+                        final FileSystemEntry entry = delegate.getEntry(name);
+                        mknod = null == entry || entry.getType() != FILE;
                     } catch (FalsePositiveException ex) {
                         mknod = true;
                     }
