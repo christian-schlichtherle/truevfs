@@ -175,9 +175,8 @@ final class FileController extends FileSystemController<FileSystemModel>  {
         }
         if (null != template) {
             final long time = template.getTime(WRITE);
-            if (UNKNOWN != time)
-                if (!file.setLastModified(time))
-                    throw new IOException(file.getPath() + " (cannot set last modification time)");
+            if (UNKNOWN != time && !file.setLastModified(time))
+                throw new IOException(file.getPath() + " (cannot set last modification time)");
         }
     }
 
