@@ -45,6 +45,12 @@ extends FileSystemEntry {
 
     @Override
     @NonNull
+    public String getName() {
+        return delegate.getName();
+    }
+
+    @Override
+    @NonNull
     public Type getType() {
         return delegate.getType();
     }
