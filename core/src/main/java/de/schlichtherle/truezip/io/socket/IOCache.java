@@ -56,7 +56,7 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-public final class Cache {
+public final class IOCache {
 
     /** Provides different cache strategies. */
     public enum Strategy {
@@ -66,8 +66,8 @@ public final class Cache {
          * {@link NullPointerException}.
          */
         READ_ONLY {
-            @Override Cache.OutputBufferPool
-            newOutputBufferPool(Cache cache) {
+            @Override IOCache.OutputBufferPool
+            newOutputBufferPool(IOCache cache) {
                 throw new AssertionError(); // should throw an NPE before we can get here!
             }
         },
@@ -77,8 +77,8 @@ public final class Cache {
          * output stream created by {@link #getOutputSocket} gets closed.
          */
         WRITE_THROUGH {
-            @Override Cache.OutputBufferPool
-            newOutputBufferPool(Cache cache) {
+            @Override IOCache.OutputBufferPool
+            newOutputBufferPool(IOCache cache) {
                 return cache.new WriteThroughOutputBufferPool();
             }
         },
@@ -88,8 +88,8 @@ public final class Cache {
          * explicitly {@link #flush flushed}.
          */
         WRITE_BACK {
-            @Override Cache.OutputBufferPool
-            newOutputBufferPool(Cache cache) {
+            @Override IOCache.OutputBufferPool
+            newOutputBufferPool(IOCache cache) {
                 return cache.new WriteBackOutputBufferPool();
             }
         };
@@ -100,18 +100,18 @@ public final class Cache {
          * @param  pool the pool of temporary entries to cache the entry data.
          * @return A new cache.
          */
-        @NonNull public Cache
+        @NonNull public IOCache
         newCache(@NonNull IOPool<?> pool) {
-            return new Cache(this, pool);
+            return new IOCache(this, pool);
         }
 
-        @NonNull Cache.InputBufferPool
-        newInputBufferPool(Cache cache) {
+        @NonNull IOCache.InputBufferPool
+        newInputBufferPool(IOCache cache) {
             return cache.new InputBufferPool();
         }
 
-        @NonNull abstract Cache.OutputBufferPool
-        newOutputBufferPool(Cache cache);
+        @NonNull abstract IOCache.OutputBufferPool
+        newOutputBufferPool(IOCache cache);
     } // enum Strategy
 
     private static class Lock { }
@@ -137,7 +137,7 @@ public final class Cache {
      * @param strategy the caching strategy.
      * @param pool the pool for allocating and releasing temporary I/O entries.
      */
-    private Cache(  @NonNull final Strategy strategy,
+    private IOCache(  @NonNull final Strategy strategy,
                     @NonNull final IOPool<?> pool) {
         if (null == strategy || null == pool)
             throw new NullPointerException();
@@ -159,7 +159,7 @@ public final class Cache {
      * @return this
      */
     @NonNull
-    public Cache configure(@NonNull final InputSocket<?> input) {
+    public IOCache configure(@NonNull final InputSocket<?> input) {
         if (null == input)
             throw new NullPointerException();
         this.input = input;
@@ -180,7 +180,7 @@ public final class Cache {
      * @return this
      */
     @NonNull
-    public Cache configure(@NonNull final OutputSocket<?> output) {
+    public IOCache configure(@NonNull final OutputSocket<?> output) {
         if (null == output)
             throw new NullPointerException();
         this.output = output;
@@ -196,7 +196,7 @@ public final class Cache {
      *
      * @return this
      */
-    public Cache flush() throws IOException {
+    public IOCache flush() throws IOException {
         if (null == getBuffer()) // DCL is OK in this context!
             return this;
         synchronized (lock) {
@@ -212,7 +212,7 @@ public final class Cache {
      *
      * @return this
      */
-    public Cache clear() throws IOException {
+    public IOCache clear() throws IOException {
         synchronized (lock) {
             setBuffer(null);
         }

@@ -1,6 +1,6 @@
 package de.schlichtherle.truezip.io.socket;
 
-import de.schlichtherle.truezip.io.socket.Cache.Strategy;
+import de.schlichtherle.truezip.io.socket.IOCache.Strategy;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
 import de.schlichtherle.truezip.io.entry.Entry.Size;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
@@ -17,11 +17,11 @@ import org.junit.Test;
 
 import static de.schlichtherle.truezip.io.entry.Entry.Size.*;
 import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
-import static de.schlichtherle.truezip.io.socket.Cache.Strategy.*;
+import static de.schlichtherle.truezip.io.socket.IOCache.Strategy.*;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
-public class CacheTest {
+public class IOCacheTest {
 
     private static final String MOCK_ENTRY_NAME = "mock";
     private static final String MOCK_ENTRY_DATA_READ = "read";
@@ -40,7 +40,7 @@ public class CacheTest {
             WRITE_THROUGH,
             WRITE_BACK,
         }) {
-            final Cache cache = strategy.newCache(pool);
+            final IOCache cache = strategy.newCache(pool);
             MockIOEntry front, back;
 
             back = new MockIOEntry(MOCK_ENTRY_DATA_READ);
