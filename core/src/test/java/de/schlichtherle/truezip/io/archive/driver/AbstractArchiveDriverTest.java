@@ -30,6 +30,7 @@ import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.nio.charset.Charset;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import junit.framework.TestCase;
@@ -48,7 +49,7 @@ public class AbstractArchiveDriverTest extends TestCase {
 
     @Override
     protected void setUp() throws Exception {
-        driver = new DummyArchiveDriver("US-ASCII");
+        driver = new DummyArchiveDriver(Charset.forName("US-ASCII"));
     }
 
     @Override
@@ -63,13 +64,7 @@ public class AbstractArchiveDriverTest extends TestCase {
         } catch (NullPointerException expected) {
         }
 
-        try {
-            new DummyArchiveDriver("foo");
-            fail("Expected RuntimeException!");
-        } catch (RuntimeException expected) {
-        }
-
-        new DummyArchiveDriver("IBM437"); // may fall back to TrueZIP implementation
+        new DummyArchiveDriver(Charset.forName("IBM437")); // may fall back to TrueZIP implementation
     }
 
     public void testOpenIcon() {
@@ -81,7 +76,7 @@ public class AbstractArchiveDriverTest extends TestCase {
     }
 
     public void testCharset() {
-        assertEquals("US-ASCII", driver.getCharset());
+        assertEquals(Charset.forName("US-ASCII"), driver.getCharset());
     }
 
     public void testAssertEncodable() throws CharConversionException {
@@ -104,12 +99,12 @@ public class AbstractArchiveDriverTest extends TestCase {
         final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
         final ObjectInputStream in = new ObjectInputStream(bis);
         @SuppressWarnings("unchecked")
-		final AbstractArchiveDriver<ArchiveEntry> driver2 = (AbstractArchiveDriver<ArchiveEntry>) in.readObject();
+        final AbstractArchiveDriver<ArchiveEntry> driver2
+                = (AbstractArchiveDriver<ArchiveEntry>) in.readObject();
         in.close();
         
         assertNotSame(driver, driver2);
-        assertNotSame(driver.getCharset(), driver2.getCharset());
-        assertEquals(driver.getCharset(), driver2.getCharset());
+        assertSame(driver.getCharset(), driver2.getCharset());
         assertSame(driver.getOpenIcon(null), driver2.getOpenIcon(null)); // static property!
         assertSame(driver.getClosedIcon(null), driver2.getClosedIcon(null)); // static property!
         driver2.assertEncodable("foo/bar");
@@ -172,8 +167,8 @@ public class AbstractArchiveDriverTest extends TestCase {
         static final Icon ICON = new ImageIcon(
                 DummyArchiveDriver.class.getResource("empty.gif"));
 
-        DummyArchiveDriver(final String encoding) {
-            super(encoding);
+        DummyArchiveDriver(final Charset charset) {
+            super(charset);
         }
 
         @Override

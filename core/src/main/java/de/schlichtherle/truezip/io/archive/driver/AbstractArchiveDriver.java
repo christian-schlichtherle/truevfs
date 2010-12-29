@@ -30,12 +30,12 @@ import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.UnsupportedCharsetException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.Icon;
 
@@ -58,12 +58,10 @@ implements ArchiveDriver<E>, Serializable {
 
     private static final long serialVersionUID = 6546816446546846516L;
 
-    private static final String CLASS_NAME
-            = AbstractArchiveDriver.class.getName();
-    private static final Logger LOGGER
-            = Logger.getLogger(CLASS_NAME, CLASS_NAME);
-
-    private final String charset;
+    /**
+     * This field should be considered to be {@code final}!
+     */
+    private transient Charset charset;
 
     /**
      * This field should be considered to be {@code final}!
@@ -75,59 +73,18 @@ implements ArchiveDriver<E>, Serializable {
     /**
      * Constructs a new abstract archive driver.
      *
-     * @param charset The name of a character set to use by default for all
-     *        entry names and probably other meta data when reading or writing
-     *        archive files.
+     * @param  charset The name of a character set to use by default for all
+     *         entry names and probably other meta data when reading or writing
+     *         archive files.
      * @throws NullPointerException If {@code charset} is {@code null}.
-     * @throws UnsupportedCharsetException If {@code charset} is not
-     *         supported by both the JSE 1.1 API and JSE 1.4 API.
-     * @throws InconsistentCharsetSupportError If {@code charset} is
-     *         supported by the JSE 1.1 API, but not the JSE 1.4 API,
-     *         or vice versa.
      */
-    protected AbstractArchiveDriver(final String charset) {
+    protected AbstractArchiveDriver(@NonNull final Charset charset) {
+        if (null == charset)
+            throw new NullPointerException();
         this.charset = charset;
         this.encoder = new ThreadLocalEncoder();
 
-        // Perform fail fast tests for character set charsets using both
-        // JSE 1.1 API and the NIO API.
-        final UnsupportedEncodingException uee = testJSE11Support(charset);
-        final UnsupportedCharsetException  uce = testJSE14Support(charset);
-        if (uee != null || uce != null) {
-            if (uee == null)
-                throw new InconsistentCharsetSupportError(charset, uce);
-            if (uce == null)
-                throw new InconsistentCharsetSupportError(charset, uee);
-            throw uce; // throw away uee - it has same reason
-        }
-
         assert invariants();
-    }
-
-    @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    private static UnsupportedEncodingException testJSE11Support(
-            final String charset) {
-        try {
-            new String(new byte[0], charset);
-        } catch (UnsupportedEncodingException ex) {
-            return ex;
-        }
-        return null;
-    }
-
-    private static UnsupportedCharsetException testJSE14Support(
-            final String charset) {
-        try {
-            final Charset impl = Charset.forName(charset);
-            LOGGER.log(Level.CONFIG, "charset.class", new Object[] { // NOI18N
-                charset,
-                impl.name(),
-                impl.getClass().getName(),
-            });
-        } catch (UnsupportedCharsetException ex) {
-            return ex;
-        }
-        return null;
     }
 
     /**
@@ -160,6 +117,12 @@ implements ArchiveDriver<E>, Serializable {
         return true;
     }
 
+    private void writeObject(final ObjectOutputStream out)
+    throws IOException {
+        out.defaultWriteObject();
+        out.writeObject(charset.name());
+    }
+
     /**
      * Postfixes the instance after its default deserialization.
      *
@@ -168,9 +131,10 @@ implements ArchiveDriver<E>, Serializable {
     private void readObject(final ObjectInputStream in)
     throws IOException, ClassNotFoundException {
         in.defaultReadObject();
+        assert charset == null;
+        charset = Charset.forName((String) in.readObject());
         assert encoder == null;
         encoder = new ThreadLocalEncoder();
-
         try {
             invariants();
         } catch (AssertionError ex) {
@@ -226,7 +190,7 @@ implements ArchiveDriver<E>, Serializable {
      * Returns the value of the property {@code charset} which was
      * provided to the constructor.
      */
-    public final String getCharset() {
+    public final Charset getCharset() {
         return charset;
     }
 
@@ -270,7 +234,7 @@ implements ArchiveDriver<E>, Serializable {
     private final class ThreadLocalEncoder extends ThreadLocal<CharsetEncoder> {
         @Override
         protected CharsetEncoder initialValue() {
-            return Charset.forName(charset).newEncoder();
+            return charset.newEncoder();
         }
 
         boolean canEncode(CharSequence cs) {

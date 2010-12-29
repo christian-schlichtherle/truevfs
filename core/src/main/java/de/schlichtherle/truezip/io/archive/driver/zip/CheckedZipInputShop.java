@@ -23,6 +23,7 @@ import de.schlichtherle.truezip.io.zip.ZipEntryFactory;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 /**
  * A {@link ZipInputShop} which checks the CRC-32 value for all ZIP entries.
@@ -44,7 +45,7 @@ public class CheckedZipInputShop extends ZipInputShop {
     
     public CheckedZipInputShop(
             ReadOnlyFile rof,
-            String charset,
+            Charset charset,
             boolean preambled,
             boolean postambled,
             ZipEntryFactory<ZipEntry> factory)

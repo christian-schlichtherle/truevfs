@@ -17,9 +17,9 @@
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
 import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemModel;
-import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 import static java.util.zip.Deflater.BEST_COMPRESSION;
 
@@ -47,7 +47,7 @@ public class CheckedZipDriver extends ZipDriver {
     private static final long serialVersionUID = -4645615422084918979L;
 
     /**
-     * Equivalent to {@link #CheckedZipDriver(String, boolean, boolean, int)
+     * Equivalent to {@link #CheckedZipDriver(Charset, boolean, boolean, int)
      * this(ZIP_CHARSET, false, false, Deflater.BEST_COMPRESSION)}.
      */
     public CheckedZipDriver() {
@@ -55,15 +55,15 @@ public class CheckedZipDriver extends ZipDriver {
     }
 
     /**
-     * Equivalent to {@link #CheckedZipDriver(String, boolean, boolean, int)
+     * Equivalent to {@link #CheckedZipDriver(Charset, boolean, boolean, int)
      * this(charset, false, false, Deflater.BEST_COMPRESSION)}.
      */
-    public CheckedZipDriver(String charset) {
+    public CheckedZipDriver(Charset charset) {
         this(charset, false, false, BEST_COMPRESSION);
     }
 
     /**
-     * Equivalent to {@link #CheckedZipDriver(String, boolean, boolean, int)
+     * Equivalent to {@link #CheckedZipDriver(Charset, boolean, boolean, int)
      * this(charset, false, false, level)}.
      */
     public CheckedZipDriver(int level) {
@@ -72,7 +72,7 @@ public class CheckedZipDriver extends ZipDriver {
 
     /** Constructs a new checked ZIP driver. */
     public CheckedZipDriver(
-            String charset,
+            Charset charset,
             boolean preambled,
             boolean postambled,
             final int level) {

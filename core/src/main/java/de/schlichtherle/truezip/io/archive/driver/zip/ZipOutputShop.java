@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.zip.CRC32;
@@ -75,7 +76,7 @@ implements OutputShop<ZipEntry> {
      */
     public ZipOutputShop(
             final OutputStream out,
-            final String charset,
+            final Charset charset,
             final int level,
             final ZipInputShop source)
     throws  NullPointerException,

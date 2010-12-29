@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
-import java.nio.charset.UnsupportedCharsetException;
+import java.nio.charset.Charset;
 import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -94,7 +94,7 @@ public abstract class ZipTestCase extends TestCase {
     }
 
     protected ZipOutputStream newZipOutputStream(
-            OutputStream out, String charset)
+            OutputStream out, Charset charset)
     throws IOException {
         return new ZipOutputStream(out, charset);
     }
@@ -112,7 +112,7 @@ public abstract class ZipTestCase extends TestCase {
     }
 
     protected ZipFile newZipFile(
-            String name, String charset)
+            String name, Charset charset)
     throws IOException {
         return new ZipFile(name, charset);
     }
@@ -123,7 +123,7 @@ public abstract class ZipTestCase extends TestCase {
     }
 
     protected ZipFile newZipFile(
-            File file, String charset)
+            File file, Charset charset)
     throws IOException {
         return new ZipFile(file, charset);
     }
@@ -134,7 +134,7 @@ public abstract class ZipTestCase extends TestCase {
     }
 
     protected ZipFile newZipFile(
-            ReadOnlyFile file, String charset)
+            ReadOnlyFile file, Charset charset)
     throws IOException {
         return new ZipFile(file, charset);
     }
@@ -149,7 +149,7 @@ public abstract class ZipTestCase extends TestCase {
         final ReadOnlyFile rof = new SimpleReadOnlyFile(zip);
 
         try {
-            newZipOutputStream(null, (String) null);
+            newZipOutputStream(null, (Charset) null);
             fail("Use of null argument must throw a NullPointerException!");
         } catch (NullPointerException npe) {
         }
@@ -161,7 +161,7 @@ public abstract class ZipTestCase extends TestCase {
         }
 
         try {
-            newZipOutputStream(new ByteArrayOutputStream(), (String) null);
+            newZipOutputStream(new ByteArrayOutputStream(), (Charset) null);
             fail("Use of null argument must throw a NullPointerException!");
         } catch (NullPointerException npe) {
         }
@@ -173,15 +173,9 @@ public abstract class ZipTestCase extends TestCase {
         }
 
         try {
-            newZipOutputStream(null, "UTF-8");
+            newZipOutputStream(null, Charset.forName("UTF-8"));
             fail("Use of null argument must throw a NullPointerException!");
         } catch (NullPointerException npe) {
-        }
-
-        try {
-            newZipOutputStream(new ByteArrayOutputStream(), "unknown");
-            fail("Use of unknown encoding should throw an UnsupportedEncodingException!");
-        } catch (UnsupportedCharsetException uce) {
         }
 
         try {
@@ -197,7 +191,7 @@ public abstract class ZipTestCase extends TestCase {
         }
 
         try {
-            newZipFile((String) null, "UTF-8");
+            newZipFile((String) null, Charset.forName("UTF-8"));
             fail("Use of null argument must throw a NullPointerException!");
         } catch (NullPointerException npe) {
         }
@@ -221,7 +215,7 @@ public abstract class ZipTestCase extends TestCase {
         }
 
         try {
-            newZipFile((File) null, "UTF-8");
+            newZipFile((File) null, Charset.forName("UTF-8"));
             fail("Use of null argument must throw a NullPointerException!");
         } catch (NullPointerException npe) {
         }
@@ -245,7 +239,7 @@ public abstract class ZipTestCase extends TestCase {
         }
 
         try {
-            newZipFile((ReadOnlyFile) null, "UTF-8");
+            newZipFile((ReadOnlyFile) null, Charset.forName("UTF-8"));
             fail("Use of null argument must throw a NullPointerException!");
         } catch (NullPointerException npe) {
         }
@@ -255,12 +249,6 @@ public abstract class ZipTestCase extends TestCase {
             fail("Use of null argument must throw a NullPointerException!");
         } catch (NullPointerException npe) {
         }
-
-        /*try {
-            newZipFile(zip, "unknown");
-            fail("Use of unknown encoding should throw an UnsupportedEncodingException!");
-        } catch (UnsupportedCharsetException uce) {
-        }*/
 
         try {
             newZipFile(zip.getPath());
@@ -281,13 +269,13 @@ public abstract class ZipTestCase extends TestCase {
         }
 
         try {
-            newZipFile(zip, "UTF-8");
+            newZipFile(zip, Charset.forName("UTF-8"));
             fail("This is not a valid ZIP file!");
         } catch (IOException ioe) {
         }
 
         try {
-            newZipFile(rof, "UTF-8");
+            newZipFile(rof, Charset.forName("UTF-8"));
             fail("This is not a valid ZIP file!");
         } catch (IOException ioe) {
         }

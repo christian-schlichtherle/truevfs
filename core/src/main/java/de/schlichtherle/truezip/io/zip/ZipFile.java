@@ -23,7 +23,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.UnsupportedCharsetException;
+import java.nio.charset.Charset;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.zip.ZipException;
@@ -56,28 +56,28 @@ public class ZipFile extends RawZipFile<ZipEntry> {
     private final String name;
 
     /**
-     * Equivalent to {@link #ZipFile(String, String, boolean, boolean)
+     * Equivalent to {@link #ZipFile(String, Charset, boolean, boolean)
      * ZipFile(name, DEFAULT_CHARSET, true, false)}
      */
-    public ZipFile(String name)
+    public ZipFile(String path)
     throws IOException {
-        this(name, DEFAULT_CHARSET, true, false);
+        this(path, DEFAULT_CHARSET, true, false);
     }
 
     /**
-     * Equivalent to {@link #ZipFile(String, String, boolean, boolean)
+     * Equivalent to {@link #ZipFile(String, Charset, boolean, boolean)
      * ZipFile(name, charset, true, false)}
      */
-    public ZipFile(String name, String charset)
+    public ZipFile(String path, Charset charset)
     throws IOException {
-        this(name, charset, true, false);
+        this(path, charset, true, false);
     }
 
     /**
      * Opens the ZIP file identified by the given path name for reading its
      * entries.
      *
-     * @param name the path name of the file.
+     * @param path the path name of the file.
      * @param charset the charset to use for decoding entry names and ZIP file
      *        comment.
      * @param preambled if this is {@code true}, then the ZIP file may have a
@@ -100,8 +100,6 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      *        This may be useful to read Self Extracting ZIP files (SFX) with
      *        large postambles.
      * @throws NullPointerException if any reference parameter is {@code null}.
-     * @throws UnsupportedCharsetException If {@code charset} is not supported
-     *         by this JVM.
      * @throws FileNotFoundException if {@code name} cannot get opened for
      *         reading.
      * @throws ZipException if {@code name} is not compatible with the ZIP
@@ -109,19 +107,19 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      * @throws IOException on any other I/O related issue.
      */
     public ZipFile(
-            final String name,
-            final String charset,
+            final String path,
+            final Charset charset,
             final boolean preambled,
             final boolean postambled)
     throws IOException {
-        super(  new SimpleReadOnlyFilePool(name),
+        super(  new SimpleReadOnlyFilePool(path),
                 charset, DefaultZipEntryFactory.SINGLETON,
                 preambled, postambled);
-        this.name = name;
+        this.name = path;
     }
 
     /**
-     * Equivalent to {@link #ZipFile(File, String, boolean, boolean)
+     * Equivalent to {@link #ZipFile(File, Charset, boolean, boolean)
      * ZipFile(file, DEFAULT_CHARSET, true, false)}
      */
     public ZipFile(File file)
@@ -130,10 +128,10 @@ public class ZipFile extends RawZipFile<ZipEntry> {
     }
 
     /**
-     * Equivalent to {@link #ZipFile(File, String, boolean, boolean)
+     * Equivalent to {@link #ZipFile(File, Charset, boolean, boolean)
      * ZipFile(file, charset, true, false)}
      */
-    public ZipFile(File file, String charset)
+    public ZipFile(File file, Charset charset)
     throws IOException {
         this(file, charset, true, false);
     }
@@ -164,8 +162,6 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      *        This may be useful to read Self Extracting ZIP files (SFX) with
      *        large postambles.
      * @throws NullPointerException if any reference parameter is {@code null}.
-     * @throws UnsupportedCharsetException If {@code charset} is not supported
-     *         by this JVM.
      * @throws FileNotFoundException if {@code file} cannot get opened for
      *         reading.
      * @throws ZipException if {@code file} is not compatible with the ZIP
@@ -174,7 +170,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      */
     public ZipFile(
             final File file,
-            final String charset,
+            final Charset charset,
             final boolean preambled,
             final boolean postambled)
     throws IOException {
@@ -185,7 +181,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
     }
 
     /**
-     * Equivalent to {@link #ZipFile(ReadOnlyFile, String, boolean, boolean)
+     * Equivalent to {@link #ZipFile(ReadOnlyFile, Charset, boolean, boolean)
      * ZipFile(rof, DEFAULT_CHARSET, true, false)}
      */
     public ZipFile(ReadOnlyFile rof)
@@ -194,10 +190,10 @@ public class ZipFile extends RawZipFile<ZipEntry> {
     }
 
     /**
-     * Equivalent to {@link #ZipFile(ReadOnlyFile, String, boolean, boolean)
+     * Equivalent to {@link #ZipFile(ReadOnlyFile, Charset, boolean, boolean)
      * ZipFile(rof, charset, true, false)}
      */
-    public ZipFile(ReadOnlyFile rof, String charset)
+    public ZipFile(ReadOnlyFile rof, Charset charset)
     throws IOException {
         this(rof, charset, true, false);
     }
@@ -228,8 +224,6 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      *        This may be useful to read Self Extracting ZIP files (SFX) with
      *        large postambles.
      * @throws NullPointerException if any reference parameter is {@code null}.
-     * @throws UnsupportedCharsetException If {@code charset} is not supported
-     *         by this JVM.
      * @throws FileNotFoundException if {@code rof} cannot get opened for
      *         reading.
      * @throws ZipException if {@code rof} is not compatible with the ZIP
@@ -238,7 +232,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      */
     public ZipFile(
             ReadOnlyFile rof,
-            String charset,
+            Charset charset,
             boolean preambled,
             boolean postambled)
     throws IOException {

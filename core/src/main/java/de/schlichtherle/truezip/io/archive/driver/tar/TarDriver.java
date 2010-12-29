@@ -29,6 +29,7 @@ import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 
 import static de.schlichtherle.truezip.io.entry.Entry.Access.WRITE;
 import static de.schlichtherle.truezip.io.entry.Entry.Size.DATA;
@@ -50,15 +51,15 @@ extends AbstractArchiveDriver<TarEntry> {
     static final String TEMP_FILE_PREFIX = "tzp-tar";
 
     /**
-     * The character set to use for entry names, which is {@value}.
+     * The character set to use for entry names, which is {@code "US-ASCII"}.
      * TAR files should actually be able to use the system's native character
      * set charset. However, the low level TAR code as of Ant 1.6.5 doesn't
      * support that, hence this constraint.
      */
-    public static final String TAR_CHARSET = "US-ASCII";
+    public static final Charset TAR_CHARSET = Charset.forName("US-ASCII");
 
     /**
-     * Equivalent to {@link #TarDriver(String)
+     * Equivalent to {@link #TarDriver(Charset)
      * this(TAR_CHARSET)}.
      */
     public TarDriver() {
@@ -71,10 +72,9 @@ extends AbstractArchiveDriver<TarEntry> {
      * @param charset The name of a character set to use for all entry names
      *        when reading or writing TAR files.
      *        <b>Warning:</b> Due to limitations in Apache's Ant code, using
-     *        anything else than {@value #TAR_CHARSET} is currently not
-     *        supported!
+     *        anything else than {@code "US-ASCII"} is currently not supported!
      */
-    public TarDriver(String charset) {
+    public TarDriver(Charset charset) {
         super(charset);
     }
 
