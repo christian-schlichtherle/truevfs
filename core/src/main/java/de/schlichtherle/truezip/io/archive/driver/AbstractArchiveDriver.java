@@ -61,6 +61,7 @@ implements ArchiveDriver<E>, Serializable {
     /**
      * This field should be considered to be {@code final}!
      */
+    @NonNull
     private transient Charset charset;
 
     /**
@@ -68,6 +69,7 @@ implements ArchiveDriver<E>, Serializable {
      *
      * @see #assertEncodable
      */
+    @NonNull
     private transient ThreadLocalEncoder encoder;
 
     /**
@@ -76,7 +78,6 @@ implements ArchiveDriver<E>, Serializable {
      * @param  charset The name of a character set to use by default for all
      *         entry names and probably other meta data when reading or writing
      *         archive files.
-     * @throws NullPointerException If {@code charset} is {@code null}.
      */
     protected AbstractArchiveDriver(@NonNull final Charset charset) {
         if (null == charset)
@@ -107,8 +108,7 @@ implements ArchiveDriver<E>, Serializable {
      * @return {@code true}
      */
     private boolean invariants() {
-        if (charset == null)
-            throw new AssertionError("character set not initialized");
+        assert null != charset;
         try {
             assertEncodable("");
         } catch (CharConversionException ex) {
@@ -186,18 +186,22 @@ implements ArchiveDriver<E>, Serializable {
                     " (illegal characters in entry name)");
     }
 
-    /**
-     * Returns the value of the property {@code charset} which was
-     * provided to the constructor.
-     */
-    public final Charset getCharset() {
-        return charset;
+    private final class ThreadLocalEncoder extends ThreadLocal<CharsetEncoder> {
+        @Override
+        protected CharsetEncoder initialValue() {
+            return charset.newEncoder();
+        }
+
+        boolean canEncode(CharSequence cs) {
+            return get().canEncode(cs);
+        }
     }
 
     @Override
-    public FileSystemController<? extends ConcurrentFileSystemModel> newController(
-            @NonNull MountPoint mountPoint,
-            @NonNull FileSystemController<?> parent) {
+    @NonNull
+    public FileSystemController<? extends ConcurrentFileSystemModel>
+    newController(  @NonNull final MountPoint mountPoint,
+                    @NonNull final FileSystemController<?> parent) {
         return  new ConcurrentFileSystemController<ConcurrentFileSystemModel, FileSystemController<? extends ConcurrentFileSystemModel>>(
                     //new IOSocketCachingFileSystemController<ConcurrentFileSystemModel, FileSystemController<? extends ConcurrentFileSystemModel>>(
                         new ContentCachingFileSystemController<ConcurrentFileSystemModel, FileSystemController<? extends ConcurrentFileSystemModel>>(
@@ -205,6 +209,15 @@ implements ArchiveDriver<E>, Serializable {
                                 new ConcurrentFileSystemModel(mountPoint, parent.getModel()),
                                 this, parent, false),
                             TempFilePool.get()));
+    }
+
+    /**
+     * Returns the value of the property {@code charset} which was
+     * provided to the constructor.
+     */
+    @NonNull
+    public final Charset getCharset() {
+        return charset;
     }
 
     /**
@@ -229,83 +242,5 @@ implements ArchiveDriver<E>, Serializable {
     @Override
     public Icon getClosedIcon(ConcurrentFileSystemModel model) {
         return null;
-    }
-
-    private final class ThreadLocalEncoder extends ThreadLocal<CharsetEncoder> {
-        @Override
-        protected CharsetEncoder initialValue() {
-            return charset.newEncoder();
-        }
-
-        boolean canEncode(CharSequence cs) {
-            return get().canEncode(cs);
-        }
-    }
-
-    /**
-     * Thrown to indicate that the character set implementation in the Java
-     * Runtime Environment (JRE) for the Java Standard Edition (JSE) is broken
-     * and needs fixing.
-     * <p>
-     * This error is thrown if and only if the character set provided to the
-     * constructor of the enclosing class is either supported by the JSE 1.1
-     * style API ({@link String#String(byte[], String)}), but not the JSE 1.4
-     * style API ({@link Charset#forName(String)}), or vice versa.
-     * This implies that this error is <em>not</em> thrown if the character
-     * set is consistently supported or not supported by both APIs!
-     * <p>
-     * Most of the time, this error happens when accessing regular ZIP files.
-     * The respective archive drivers require &quot;IBM437&quot; as the
-     * character set.
-     * Unfortunately, this character set is optional and Sun's JSE
-     * implementations usually only install it if the JSE has been fully
-     * installed. Its provider is then located in
-     * <i>$JAVA_HOME/lib/charsets.jar</i>, where <i>$JAVA_HOME</i> is the
-     * path name of the installed JRE.
-     * <p>
-     * To assert that &quot;IBM437&quot; is always available regardless of
-     * the JRE installation, TrueZIP provides its own provider for this charset.
-     * This provider is configured in
-     * <i>truezip.jar/META-INF/services/java.nio.charset.spi.CharsetProvider</i>.
-     * So you should actually never see this happening (cruel world - sigh...).
-     * <p>
-     * Because the detected inconsistency would cause subtle bugs in archive
-     * drivers and may affect other applications, too, it needs fixing.
-     * Your options in order of preference:
-     * <ol>
-     * <li>Upgrade to a more recent JRE or reinstall it.
-     *     When asked during installation, make sure to do a "full install".
-     * <li>Fix the JRE by copying <i>$JAVA_HOME/lib/charsets.jar</i> from some
-     *     other distribution.
-     * </ol>
-     * This should assert that $JAVA_HOME/lib/charsets.jar is present in the
-     * JRE, which contains the provider for the &quot;IBM437&quot; character
-     * set.
-     * Although this should not be necessary due to TrueZIP's own provider,
-     * this seems to fix the issue.
-     * <p>
-     * This error class has protected visibility solely for the purpose of
-     * documenting it in the Javadoc.
-     */
-    protected static final class InconsistentCharsetSupportError extends Error {
-        private static final long serialVersionUID = 5976345821010992606L;
-
-        private InconsistentCharsetSupportError(String charset, Exception cause) {
-            super(message(charset, cause), cause);
-        }
-
-        private static String message(  final String charset,
-                                        final Exception cause) {
-            assert cause instanceof UnsupportedEncodingException
-                || cause instanceof UnsupportedCharsetException;
-            final String[] api = cause instanceof UnsupportedEncodingException
-                    ? new String[] { "J2SE 1.4", "JSE 1.1" }
-                    : new String[] { "JSE 1.1", "J2SE 1.4" };
-            return "The character set '" + charset
-                    + "' is supported by the " + api[0]
-                    + " API, but not the " + api[1] + " API."
-                    + "\nThis requires fixing the Java Runtime Environment!"
-                    + "\nPlease read the Javadoc of this error class for more information.";
-        }
     }
 }
