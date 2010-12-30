@@ -46,20 +46,19 @@ implements Iterable<FileSystemController<?>> {
      * @param  mountPoint the mount point of the file system.
      * @param  driver the file system driver which will be used to create a
      *         new file system controller if required.
-     * @return A non-{@code null} file system controller.
-     * @throws NullPointerException if {@code mountPoint} is {@code null}
+     * @return A file system controller.
      */
-    @NonNull
-    public abstract FileSystemController<?> getController(
-            @NonNull MountPoint mountPoint,
-            @NonNull FileSystemDriver<?> driver);
+    public abstract @NonNull FileSystemController<?>
+    getController(  @NonNull MountPoint mountPoint,
+                    @NonNull FileSystemDriver<?> driver);
 
     /**
      * Returns the number of federated file systems managed by this instance.
      *
      * @return The number of federated file systems managed by this instance.
      */
-    public abstract int getSize();
+    public abstract int
+    getSize();
 
     /**
      * Returns an iterator for the controller of all federated file systems
@@ -72,9 +71,8 @@ implements Iterable<FileSystemController<?>> {
      * @return An iterator for the controller of all federated file systems
      *         managed by this instance.
      */
-    @Override
-    @NonNull
-    public abstract Iterator<FileSystemController<?>> iterator();
+    @Override public abstract Iterator<FileSystemController<?>>
+    iterator();
 
     /**
      * A visitor for file system controllers.
@@ -82,7 +80,8 @@ implements Iterable<FileSystemController<?>> {
      * @see #visit(Visitor, ExceptionHandler)
      */
     public interface Visitor {
-        void visit(FileSystemController<?> controller) throws IOException;
+        void visit(@NonNull FileSystemController<?> controller)
+        throws IOException;
     }
 
     /**
@@ -96,11 +95,11 @@ implements Iterable<FileSystemController<?>> {
      *         discretion of the exception {@code handler}.
      * @throws IOException at the discretion of the exception {@code handler}.
      */
-    public final <X extends IOException>
-    void visit( @NonNull final Visitor visitor,
-                @NonNull final ExceptionHandler<? super IOException, X> handler)
+    public final <X extends IOException> void
+    visit(  @NonNull final Visitor visitor,
+            @NonNull final ExceptionHandler<? super IOException, X> handler)
     throws X {
-        for (FileSystemController<?> controller : this) {
+        for (final FileSystemController<?> controller : this) {
             try {
                 visitor.visit(controller);
             } catch (IOException ex) {
@@ -129,9 +128,9 @@ implements Iterable<FileSystemController<?>> {
      *         and {@code FORCE_CLOSE_OUTPUT} is set or if the synchronization
      *         option {@code ABORT_CHANGES} is set.
      */
-    public <X extends IOException>
-    void sync(  @NonNull final BitField<SyncOption> options,
-                @NonNull final ExceptionHandler<? super IOException, X> handler)
+    public <X extends IOException> void
+    sync(   @NonNull final BitField<SyncOption> options,
+            @NonNull final ExceptionHandler<? super IOException, X> handler)
     throws X {
         if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT)
                 || options.get(ABORT_CHANGES))
@@ -150,9 +149,9 @@ implements Iterable<FileSystemController<?>> {
      * Two file system managers are considered equal if and only if they are
      * identical. This can't get overriden.
      */
-    @Override
     @SuppressWarnings(value = "EqualsWhichDoesntCheckParameterClass")
-    public final boolean equals(Object that) {
+    @Override public final boolean
+    equals(Object that) {
         return this == that;
     }
 
@@ -160,8 +159,8 @@ implements Iterable<FileSystemController<?>> {
      * Returns a hash code which is consistent with {@link #equals}.
      * This can't get overriden.
      */
-    @Override
-    public final int hashCode() {
+    @Override public final int
+    hashCode() {
         return super.hashCode();
     }
 }

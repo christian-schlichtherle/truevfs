@@ -58,43 +58,48 @@ import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
 public abstract class FileSystemController<M extends FileSystemModel> {
 
     /** Returns the non-{@code null} file system model. */
-    @NonNull
-    public abstract M getModel();
+    public abstract @NonNull M
+    getModel();
 
     /**
      * Returns the controller for the parent file system or {@code null} if
      * and only if this file system is not federated, i.e. not a member of
      * another file system.
      */
-    @Nullable
-    public abstract FileSystemController<?> getParent();
+    public abstract @Nullable FileSystemController<?>
+    getParent();
 
-    @Nullable
-    public abstract Icon getOpenIcon() throws IOException;
+    public abstract @Nullable Icon
+    getOpenIcon() throws IOException;
 
-    @Nullable
-    public abstract Icon getClosedIcon() throws IOException;
+    public abstract @Nullable Icon
+    getClosedIcon() throws IOException;
 
-    public abstract boolean isReadOnly() throws IOException;
+    public abstract boolean
+    isReadOnly() throws IOException;
 
-    @CheckForNull
-    public abstract FileSystemEntry getEntry(@NonNull FileSystemEntryName name)
+    public abstract @CheckForNull FileSystemEntry
+    getEntry(@NonNull FileSystemEntryName name)
     throws IOException;
 
-    public abstract boolean isReadable(@NonNull FileSystemEntryName name)
+    public abstract boolean
+    isReadable(@NonNull FileSystemEntryName name)
     throws IOException;
 
-    public abstract boolean isWritable(@NonNull FileSystemEntryName name)
+    public abstract boolean
+    isWritable(@NonNull FileSystemEntryName name)
     throws IOException;
 
-    public abstract void setReadOnly(@NonNull FileSystemEntryName name)
+    public abstract void
+    setReadOnly(@NonNull FileSystemEntryName name)
     throws IOException;
 
     // TODO: Consider putting this into FileSystemEntry and let getEntry()
     // return a proxy instead - mind the IOException however!
-    public abstract boolean setTime(@NonNull FileSystemEntryName name,
-                                    @NonNull BitField<Access> types,
-                                    long value)
+    public abstract boolean
+    setTime(@NonNull FileSystemEntryName name,
+            @NonNull BitField<Access> types,
+            long value)
     throws IOException;
 
     /**
@@ -104,10 +109,9 @@ public abstract class FileSystemController<M extends FileSystemModel> {
      * @param  name a file system entry name.
      * @return An {@code InputSocket}.
      */
-    @NonNull
-    public abstract InputSocket<?> getInputSocket(
-            @NonNull FileSystemEntryName name,
-            @NonNull BitField<InputOption> options);
+    public abstract @NonNull InputSocket<?>
+    getInputSocket( @NonNull FileSystemEntryName name,
+                    @NonNull BitField<InputOption> options);
 
     /**
      * Returns an output socket for writing the given entry to the file
@@ -116,11 +120,10 @@ public abstract class FileSystemController<M extends FileSystemModel> {
      * @param  name a file system entry name.
      * @return An {@code OutputSocket}.
      */
-    @NonNull
-    public abstract OutputSocket<?> getOutputSocket(
-            @NonNull FileSystemEntryName name,
-            @NonNull BitField<OutputOption> options,
-            @CheckForNull Entry template);
+    public abstract @NonNull OutputSocket<?>
+    getOutputSocket(@NonNull FileSystemEntryName name,
+                    @NonNull BitField<OutputOption> options,
+                    @CheckForNull Entry template);
 
     /**
      * Creates or replaces and finally links a chain of one or more entries
@@ -151,14 +154,15 @@ public abstract class FileSystemController<M extends FileSystemModel> {
      *             {@code false}.
      *         </ul>
      */
-    public abstract void mknod(
-            @NonNull FileSystemEntryName name,
+    public abstract void
+    mknod(  @NonNull FileSystemEntryName name,
             @NonNull Type type,
             @NonNull BitField<OutputOption> options,
             @CheckForNull Entry template)
     throws IOException;
 
-    public abstract void unlink(@NonNull FileSystemEntryName name)
+    public abstract void
+    unlink(@NonNull FileSystemEntryName name)
     throws IOException;
 
     /**
@@ -177,9 +181,9 @@ public abstract class FileSystemController<M extends FileSystemModel> {
      * @see    #UPDATE
      * @see    #UMOUNT
      */
-    public abstract <X extends IOException>
-    void sync(  @NonNull BitField<SyncOption> options,
-                @NonNull ExceptionHandler<? super SyncException, X> handler)
+    public abstract <X extends IOException> void
+    sync(   @NonNull BitField<SyncOption> options,
+            @NonNull ExceptionHandler<? super SyncException, X> handler)
     throws X, FileSystemException;
 
     /**
@@ -199,9 +203,9 @@ public abstract class FileSystemController<M extends FileSystemModel> {
      * are identical.
      * This can't get overriden.
      */
-    @Override
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
-    public final boolean equals(Object that) {
+    @Override public final boolean
+    equals(Object that) {
         return this == that;
     }
 
@@ -209,13 +213,13 @@ public abstract class FileSystemController<M extends FileSystemModel> {
      * Returns a hash code which is consistent with {@link #equals}.
      * This can't get overriden.
      */
-    @Override
-    public final int hashCode() {
+    @Override public final int
+    hashCode() {
         return super.hashCode();
     }
 
-    @Override
-    public final String toString() {
+    @Override public final String
+    toString() {
         return new StringBuilder()
                 .append(getClass().getName())
                 .append("[model=")

@@ -29,6 +29,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static de.schlichtherle.truezip.io.filesystem.FileSystemEntryName.*;
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
 /**
@@ -537,4 +538,15 @@ public class NonIOFileTest {
         File file = new File("abc/def" + suffix + "/efg" + suffix + "/hij" + suffix + "/test.txt");
         assertEquals(new java.io.File("abc/def" + suffix), file.getTopLevelArchive());
     }
+
+    /*@Test
+    public void testURIandURL() {
+        for (final String[] params : new String[][] {
+            { "/C:/archive.zip", "zip:file:/C:/archive.zip!/" },
+        }) {
+            final File file = new File(params[0]);
+            final URI uri = URI.create(params[1]);
+            assertThat(file.toURI(), equalTo(uri));
+        }
+    }*/
 }
