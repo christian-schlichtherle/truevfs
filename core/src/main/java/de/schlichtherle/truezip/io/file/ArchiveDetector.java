@@ -18,27 +18,21 @@ package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.archive.driver.registry.GlobalArchiveDriverRegistry;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
+import de.schlichtherle.truezip.io.filesystem.Scheme;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * Detects archive files solely by scanning file paths -
  * usually by testing for file name suffixes like <i>.zip</i> or the
  * like.
- * If the method {@link #getArchiveDriver(String)} detects an archive file, it
- * returns an instance of the {@link ArchiveDriver} interface for subsequent
- * access to it.
- * <p>
- * {@code ArchiveDetector} instances are assigned to {@code File}
- * instances in the following way:
- * <ol>
- * <li>If an archive detector is explicitly provided as a parameter to the
- *     constructor of the {@code File} class or any other method which
- *     creates {@code File} instances (e.g. {@code listFiles(*)}),
- *     then this archive detector is used.
- * <li>Otherwise, the archive detector returned by
- *     {@link File#getDefaultArchiveDetector} is used.
- *     This is initially set to the predefined instance {@link #DEFAULT}.
- *     Both the class property and the predefined instance can be customized.
- * </ol>
+ * If the method {@link #getScheme(String)} detects an archive file, it
+ * returns a {@link Scheme} for accessing files of this type.
+ * Next, for any scheme returned by this method, the method
+ * {@link #getDriver(Scheme)} returns an {@link ArchiveDriver} for accessing
+ * files of this scheme type.
  * <p>
  * An archive file which has been recognized by an {@code ArchiveDetector} is
  * said to be a <i>prospective archive file</i>.
@@ -48,8 +42,7 @@ import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
  * to be compatible to the archive file format, it's said to be a <i>false
  * positive</i> archive file.
  * TrueZIP implements the appropriate behavior for all read or write
- * operations according to the true state.
- * Thanks to this design, TrueZIP detects and handles all kinds of false
+ * operations according to the true state, so it handles all kinds of false
  * positives correctly.
  * <p>
  * Implementations must be (virtually) immutable and hence thread safe.
@@ -66,6 +59,7 @@ import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 public interface ArchiveDetector extends FileFactory {
 
     /**
@@ -74,7 +68,7 @@ public interface ArchiveDetector extends FileFactory {
      * {@code DefaultArchiveDetector} instances or if archive files
      * shall be treated like ordinary files rather than (virtual) directories.
      */
-    DefaultArchiveDetector NULL = new DefaultArchiveDetector(""); // or null
+    DefaultArchiveDetector NULL = new DefaultArchiveDetector("" /* null */);
 
     /**
      * Recognizes the archive file suffixes registered in the global archive
@@ -106,31 +100,44 @@ public interface ArchiveDetector extends FileFactory {
 
     /**
      * Detects whether the given {@code path} identifies a prospective
-     * archive file or not by applying heuristics to it and returns an
-     * appropriate {@code ArchiveDriver} to use or {@code null}
+     * archive file or not by applying heuristics to it and returns a
+     * scheme for accessing archive file of this type or {@code null}
      * if the path does not denote a prospective archive file or an
-     * appropriate {@code ArchiveDriver} is not available for some
-     * reason.
+     * appropriate scheme is unknown.
      * <p>
      * Please note that implementations <em>must not</em> check the actual
      * contents of the file identified by {@code path}!
      * This is because this method may be used to detect prospective archive
      * files by their path names before they are actually created or to detect
-     * prospective archive files which are contained in other archive files,
-     * in which case there is no way to check the file contents in the parent
-     * file systems.
+     * prospective archive files which are contained in other federated file
+     * systems, in which case there is no way to check the file contents in the
+     * parent file systems.
      *
-     * @param path The path name of the file in the federated file system.
-     *        This does not need to be absolute and it does not need to be
-     *        actually accessible in the parent file system!
-     * @return An {@code ArchiveDriver} instance for this archive file
-     *         or {@code null} if the path does not denote an archive
-     *         file (i.e. the path does not have a known suffix)
-     *         or an appropriate {@code ArchiveDriver} is not available
-     *         for some reason.
-     * @throws NullPointerException If {@code path} is {@code null}.
+     * @param  path The path name of the file in the federated file system.
+     *         This does not need to be absolute and it does not need to be
+     *         actually accessible in the parent file system!
+     * @return A {@code scheme} for accessing the archive file or {@code null}
+     *         if the path does not denote an archive file (i.e. the path does
+     *         not have a known suffix) or an appropriate {@code scheme} is
+     *         unknown.
+     */
+    @CheckForNull Scheme getScheme(@NonNull String path);
+
+    /**
+     * Returns an archive driver for accessing archive files of the
+     * given {@code type} or {@code null} if an appropriate archive driver
+     * is unknown.
+     * If the given {@code type} has been returned by {@link #getScheme},
+     * then the return value is never {@code null}. In other words, if an
+     * archive detector names a scheme for a given path, it must also provide
+     * an appropriate archive driver for this scheme.
+     *
+     * @param  type the scheme to look up an appropriate archive driver for.
+     * @return Returns an archive driver for accessing archive files of the
+     *         given {@code type} or {@code null} if an appropriate archive
+     *         driver is unknown.
      * @throws RuntimeException A subclass is thrown if loading or
      *         instantiating an archive driver class fails.
      */
-    ArchiveDriver<?> getArchiveDriver(String path);
+    @Nullable ArchiveDriver<?> getDriver(@NonNull Scheme type);
 }

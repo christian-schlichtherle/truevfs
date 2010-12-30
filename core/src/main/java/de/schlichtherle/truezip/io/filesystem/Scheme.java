@@ -16,8 +16,6 @@
 package de.schlichtherle.truezip.io.filesystem;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.URISyntaxException;
@@ -40,9 +38,6 @@ public final class Scheme implements Serializable, Comparable<Scheme> {
 
     private static final long serialVersionUID = 2765230379628276648L;
 
-    /** Represents the "file" URI scheme. */
-    public static final Scheme FILE = Scheme.create("file");
-
     private final String scheme;
 
     /**
@@ -52,13 +47,12 @@ public final class Scheme implements Serializable, Comparable<Scheme> {
      * and wraps any thrown {@link URISyntaxException} in an
      * {@link IllegalArgumentException}.
      *
-     * @param  scheme the non-{@code null} URI scheme.
-     * @throws NullPointerException if {@code scheme} is {@code null}.
+     * @param  scheme the URI scheme.
      * @throws IllegalArgumentException if {@code scheme} does not conform to
      *         the syntax constraints for URI schemes.
-     * @return A non-{@code null} path.
+     * @return A new scheme.
      */
-    public static Scheme create(String scheme) {
+    public static @NonNull Scheme create(String scheme) {
         try {
             return new Scheme(scheme);
         } catch (URISyntaxException ex) {
@@ -69,12 +63,11 @@ public final class Scheme implements Serializable, Comparable<Scheme> {
     /**
      * Constructs a new URI scheme by parsing the given string.
      *
-     * @param  scheme the non-{@code null} URI scheme.
-     * @throws NullPointerException if {@code scheme} is {@code null}.
+     * @param  scheme the URI scheme.
      * @throws URISyntaxException if {@code scheme} does not conform to the
      *         syntax constraints for URI schemes.
      */
-    public Scheme(final String scheme) throws URISyntaxException {
+    public Scheme(final @NonNull String scheme) throws URISyntaxException {
         int i = scheme.length();
         if (0 >= i) {
             throw new URISyntaxException(scheme, "Empty URI scheme");
@@ -88,6 +81,7 @@ public final class Scheme implements Serializable, Comparable<Scheme> {
         while (--i >= 1) {
             c = scheme.charAt(i);
             if ((c < 'a' || 'z' < c) && (c < 'A' || 'Z' < c)
+                    && (c < '0' || '9' < c)
                     && c != '+' && c != '-' && c != '.') {
                 throw new URISyntaxException(scheme, "Illegal character in URI scheme", i);
             }
