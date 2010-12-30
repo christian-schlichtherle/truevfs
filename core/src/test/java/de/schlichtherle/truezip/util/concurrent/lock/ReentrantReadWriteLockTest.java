@@ -16,7 +16,6 @@
 
 package de.schlichtherle.truezip.util.concurrent.lock;
 
-import de.schlichtherle.truezip.util.Operation;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import junit.framework.TestCase;
@@ -52,9 +51,9 @@ public class ReentrantReadWriteLockTest extends TestCase {
 
         rl.lock();
         try {
-            runWithTimeout(1000, new Operation<InterruptedException>() {
+            runWithTimeout(1000, new Operation() {
                 @Override
-				public void run() throws InterruptedException {
+                public void run() throws InterruptedException {
                     ReentrantLock wl = instance.writeLock();
                     // Upgrading a read lock blocks until interrupted.
                     wl.lockInterruptibly();
@@ -73,9 +72,9 @@ public class ReentrantReadWriteLockTest extends TestCase {
         assertNotNull(wl);
 
         wl.lock();
-        runWithTimeout(1000, new Operation<InterruptedException>() {
+        runWithTimeout(1000, new Operation() {
             @Override
-			public void run() throws InterruptedException {
+            public void run() throws InterruptedException {
                 ReentrantLock rl = instance.readLock();
                 // Downgrading a write lock returns immediately.
                 rl.lockInterruptibly();
@@ -83,14 +82,14 @@ public class ReentrantReadWriteLockTest extends TestCase {
         });
     }
 
-    private <T extends Exception> void runWithTimeout(
+    private void runWithTimeout(
             final long timeout,
-            final Operation<T> action)
-    throws T {
+            final Operation action)
+    throws InterruptedException {
         final Thread target = Thread.currentThread();
         final Thread observer = new Thread(new Runnable() {
+            @SuppressWarnings("CallToThreadDumpStack")
             @Override
-			@SuppressWarnings("CallToThreadDumpStack")
             public void run() {
                 try {
                     Thread.sleep(timeout);
@@ -103,5 +102,9 @@ public class ReentrantReadWriteLockTest extends TestCase {
         observer.setDaemon(true);
         observer.start();
         action.run();
+    }
+
+    public interface Operation {
+        void run() throws InterruptedException;
     }
 }

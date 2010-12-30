@@ -17,7 +17,6 @@ package de.schlichtherle.truezip.io.archive.filesystem;
 
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.util.Link;
-import de.schlichtherle.truezip.util.Operation;
 
 /**
  * Represents an operation on a chain of one or more archive file system
@@ -34,10 +33,8 @@ import de.schlichtherle.truezip.util.Operation;
  * @version $Id$
  */
 public interface ArchiveFileSystemOperation<E extends ArchiveEntry>
-extends Operation<ArchiveFileSystemException>,
-        Link<ArchiveFileSystemEntry<E>> {
+extends Link<ArchiveFileSystemEntry<E>> {
 
     /** Executes this archive file system operation. */
-    @Override
     void run() throws ArchiveFileSystemException;
 }
