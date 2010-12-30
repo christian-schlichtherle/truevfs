@@ -2225,10 +2225,6 @@ public class File extends java.io.File {
         return delegate.toURI();
     }
 
-    /**
-     * @deprecated This method has been deprecated in JSE 6.
-     * @see java.io.File#toURL
-     */
     // FIXME: Use Path!
     @Deprecated
     @Override
