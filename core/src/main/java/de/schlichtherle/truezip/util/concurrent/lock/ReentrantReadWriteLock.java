@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.util.concurrent.lock;
 
-import de.schlichtherle.truezip.util.Operation;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -74,57 +73,6 @@ public final class ReentrantReadWriteLock implements ReadWriteLock {
     @Override
 	public ReentrantLock writeLock() {
         return writeLock;
-    }
-
-    /**
-     * Runs the given operation while the write lock is temporarily acquired
-     * even if the read lock is already acquired by the current thread.
-     * <p>
-     * <b>Warning:</b> This method temporarily releases the read lock
-     * before the write lock is temporarily acquired and the operation is run!
-     * Hence, the operation must recheck the preconditions for running it
-     * before it proceeds with the tasks which require the write lock.
-     * <p>
-     * Upon return, the hold count of the read and write lock for the current
-     * thread is fully restored, even if the operation throws an exception.
-     *
-     * @param  operation a non-{@code null} operation to run while the write
-     *         lock is acquired.
-     * @throws NullPointerException if {@code operation} is {@code null}.
-     * @throws Exception upon the discretion of {@code operation}.
-     * @return {@code operation}
-     */
-    public <E extends Exception, O extends Operation<E>> O runWriteLocked(
-            final O operation)
-    throws E {
-        if (operation == null)
-            throw new NullPointerException();
-
-        if (writeLock.isHeldByCurrentThread()) {
-            // Calls to *.unlock/lock() are redundant.
-            operation.run();
-        } else {
-            // A read lock cannot get upgraded to a write lock.
-            // Hence the following mess is required.
-            // Note that this is not just a limitation of the current
-            // implementation in JSE 5: If automatic upgrading were implemented,
-            // two threads holding a read lock try to upgrade concurrently,
-            // they would dead lock each other!
-            final int readHoldCount = readLock.getHoldCount();
-            for (int c = readHoldCount; c > 0; c--)
-                readLock.unlock();
-
-            // Current thread may get blocked exactly here!
-            writeLock.lock();
-            try {
-                for (int c = readHoldCount; c-- > 0; )
-                    readLock.lock();
-                operation.run(); // beware of side effects on locks!
-            } finally {
-                writeLock.unlock();
-            }
-        }
-        return operation;
     }
 
     private void lockRead() {
