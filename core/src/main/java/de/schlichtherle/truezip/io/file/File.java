@@ -725,15 +725,13 @@ public class File extends java.io.File {
         assert invariants();
     }
 
-    private static final Scheme UNKNOWN = Scheme.create("UNKNOWN");
-
     private void initController() {
         final java.io.File target = getRealFile(delegate);
         final Scheme scheme = detector.getScheme(target.getPath());
         final MountPoint mountPoint;
         try {
             if (null != enclArchive) {
-                mountPoint = MountPoint.create(UNKNOWN, // FIXME: Introduce detector.getScheme(target.getPath())!
+                mountPoint = MountPoint.create(scheme,
                         new Path(   enclArchive
                                         .getController()
                                         .getModel()
@@ -758,7 +756,7 @@ public class File extends java.io.File {
                                     s.substring(0, s.length() - 1),
                                     uri.getQuery(), uri.getFragment());
                 }
-                mountPoint = MountPoint.create(UNKNOWN, Path.create(uri)); // FIXME: Introduce detector.getScheme(target.getPath())!
+                mountPoint = MountPoint.create(scheme, Path.create(uri));
             }
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
