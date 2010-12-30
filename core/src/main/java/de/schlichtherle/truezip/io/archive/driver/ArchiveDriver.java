@@ -69,6 +69,17 @@ public interface ArchiveDriver<E extends ArchiveEntry>
 extends FileSystemDriver<ConcurrentFileSystemModel>, EntryFactory<E> {
 
     /**
+     * {@inheritDoc}
+     * <p>
+     * An archive file system is always federated and therefore has a
+     * non-{@code null} parent file system controller.
+     */
+    @Override
+    @NonNull FileSystemController<? extends ConcurrentFileSystemModel>
+    newController(  @NonNull MountPoint mountPoint,
+                    @NonNull FileSystemController<?> parent);
+
+    /**
      * Creates a new input shop for reading the archive entries of the the
      * described {@code archive} from the given {@code input} socket's target.
      * 
