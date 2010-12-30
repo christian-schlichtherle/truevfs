@@ -17,6 +17,7 @@
 package de.schlichtherle.truezip.io;
 
 import de.schlichtherle.truezip.util.CanonicalStringSet;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import java.io.File;
 import java.util.Collection;
 import java.util.Iterator;
@@ -82,10 +83,9 @@ public final class SuffixSet extends CanonicalStringSet {
     /**
      * Constructs a new suffix set from the given suffix list.
      *
-     * @param list A suffix list - may be {@code null} to
-     *        construct an empty set.
+     * @param list A nullable suffix list.
      */
-    public SuffixSet(final String list) {
+    public SuffixSet(final @CheckForNull String list) {
         super(SEPARATOR);
         if (list != null)
             super.addAll(list);

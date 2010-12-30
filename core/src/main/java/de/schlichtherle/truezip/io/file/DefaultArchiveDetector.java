@@ -19,7 +19,11 @@ import de.schlichtherle.truezip.io.archive.driver.registry.GlobalArchiveDriverRe
 import de.schlichtherle.truezip.io.archive.driver.registry.ArchiveDriverRegistry;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.SuffixSet;
+import de.schlichtherle.truezip.io.filesystem.Scheme;
 import de.schlichtherle.truezip.util.regex.ThreadLocalMatcher;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
@@ -252,9 +256,18 @@ implements Serializable {
         matcher = new ThreadLocalMatcher(new SuffixSet(list).toRegex());
     }
 
+    @Override
+    public @CheckForNull Scheme
+    getScheme(final @NonNull String path) {
+        final Matcher m = matcher.reset(path);
+        return m.matches()
+                ? Scheme.create(m.group(1).toLowerCase(Locale.ENGLISH))
+                : null;
+    }
+
     /**
-     * Looks up a registered archive driver for the given path name by
-     * matching it against the set of registered archive file suffixes.
+     * {@inheritDoc}
+     * <p>
      * An archive driver is looked up in the {@link ArchiveDriverRegistry}
      * as follows:
      * <ol>
@@ -268,19 +281,17 @@ implements Serializable {
      *     {@code ArchiveDriver} implementation, it's returned.
      * <li>Otherwise, {@code null} is returned.
      * </ol>
-     *
-     * @throws RuntimeException A subclass is thrown if loading or
-     *         instantiating an archive driver class fails.
      */
     @Override
-	public ArchiveDriver<?> getArchiveDriver(final String path) {
-        final Matcher m = matcher.reset(path);
-        if (!m.matches())
-            return null;
-        final ArchiveDriver<?> driver = registry.getArchiveDriver(
-                m.group(1).toLowerCase(Locale.ENGLISH));
-        assert driver != null : "missing archive driver for registered suffix";
-        return driver;
+    public @Nullable ArchiveDriver<?>
+    getDriver(final @NonNull Scheme type) {
+        return registry.getArchiveDriver(type.toString());
+    }
+
+    public @CheckForNull ArchiveDriver<?>
+    getDriver(final @NonNull String path) {
+        final Scheme scheme = getScheme(path);
+        return null == scheme ? null : getDriver(scheme);
     }
 
     /**

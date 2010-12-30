@@ -517,11 +517,11 @@ public class NonIOFileTest {
         assertNotSame(innerDetector, inner2Detector);
 
         // Assert that drivers have been persistet.
-        final ArchiveDriver<?> archiveDriver = archiveDetector.getArchiveDriver(archive.getPath());
-        final ArchiveDriver<?> archive2Driver = archive2Detector.getArchiveDriver(archive2.getPath());
+        final ArchiveDriver<?> archiveDriver = archiveDetector.getDriver(archiveDetector.getScheme(archive.getPath()));
+        final ArchiveDriver<?> archive2Driver = archive2Detector.getDriver(archive2Detector.getScheme(archive2.getPath()));
         assertNotSame(archiveDriver, archive2Driver);
-        final ArchiveDriver<?> innerDriver = innerDetector.getArchiveDriver(inner.getPath());
-        final ArchiveDriver<?> inner2Driver = inner2Detector.getArchiveDriver(inner2.getPath());
+        final ArchiveDriver<?> innerDriver = innerDetector.getDriver(innerDetector.getScheme(inner.getPath()));
+        final ArchiveDriver<?> inner2Driver = inner2Detector.getDriver(inner2Detector.getScheme(inner2.getPath()));
         assertNotSame(innerDriver, inner2Driver);
 
         // Assert that the controllers haven't been persistet.

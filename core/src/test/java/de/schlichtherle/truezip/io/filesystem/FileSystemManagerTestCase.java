@@ -141,6 +141,9 @@ public abstract class FileSystemManagerTestCase {
         }
     }
 
+    /** Represents the "file" URI scheme. */
+    private static final Scheme FILE = Scheme.create("file");
+
     static class Driver implements FileSystemDriver<FileSystemModel> {
         @Override
         public FileSystemController<?> newController(
@@ -150,7 +153,7 @@ public abstract class FileSystemManagerTestCase {
                     ? null == parent
                     : mountPoint.getParent().equals(parent.getModel().getMountPoint());
             final Scheme scheme = mountPoint.getScheme();
-            if (Scheme.FILE.equals(scheme)) {
+            if (FILE.equals(scheme)) {
                 return new FileDriver().newController(mountPoint);
             } else if (Scheme.create("zip").equals(scheme)) {
                 return new ZipDriver().newController(mountPoint, parent);

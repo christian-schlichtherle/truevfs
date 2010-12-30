@@ -57,6 +57,7 @@ public class SchemeTest {
             { "foo+bar", },
             { "foo-bar", },
             { "foo.bar", },
+            { "tar.bz2", },
         }) {
             final Scheme original = Scheme.create(params[0]);
             assertThat(original.toString(), equalTo(params[0]));
@@ -142,6 +143,7 @@ public class SchemeTest {
             { "foo+bar", },
             { "foo-bar", },
             { "foo.bar", },
+            { "tar.bz2", },
         }) {
             final Scheme original = Scheme.create(params[0]);
             final Scheme copy = Scheme.create(params[0].toUpperCase(Locale.ENGLISH));

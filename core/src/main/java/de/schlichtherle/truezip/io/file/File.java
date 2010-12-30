@@ -729,8 +729,7 @@ public class File extends java.io.File {
 
     private void initController() {
         final java.io.File target = getRealFile(delegate);
-        final FileSystemDriver<?> driver
-                = detector.getArchiveDriver(target.getPath());
+        final Scheme scheme = detector.getScheme(target.getPath());
         final MountPoint mountPoint;
         try {
             if (null != enclArchive) {
@@ -767,12 +766,12 @@ public class File extends java.io.File {
 
         class Driver implements FileSystemDriver<FileSystemModel> {
             @Override
-            public FileSystemController<?> newController(
-                    MountPoint prospect,
-                    FileSystemController<?> parent) {
+            public FileSystemController<?>
+            newController(  MountPoint prospect,
+                            FileSystemController<?> parent) {
                 // FIXME: Replace new FileDriver() with ArchiveDetectorAdapter!
                 return prospect.equals(mountPoint)
-                        ? driver.newController(mountPoint, parent)
+                        ? detector.getDriver(scheme).newController(mountPoint, parent)
                         : new FileDriver().newController(prospect);
             }
         } // class Driver
@@ -967,7 +966,7 @@ public class File extends java.io.File {
                 }
             }
 
-            final boolean isArchive = detector.getArchiveDriver(path) != null;
+            final boolean isArchive = detector.getScheme(path) != null;
             if (enclEntryNameBuf.length() > 0) {
                 if (isArchive) {
                     enclArchive = detector.newFile(path); // use the same detector for the parent directory
