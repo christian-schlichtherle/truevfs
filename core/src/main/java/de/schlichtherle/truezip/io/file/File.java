@@ -645,13 +645,26 @@ public class File extends java.io.File {
 
         final MountPoint mountPoint = path.getMountPoint();
         final Path mountPointPath = mountPoint.getPath();
-        final FileSystemEntryName entryName = path.getEntryName();
-        this.enclArchive = null == mountPointPath
-                ? null
-                : new File(mountPointPath, detector);
-        this.enclEntryName = entryName;
-        this.innerArchive = entryName.getPath().isEmpty() ? this : this.enclArchive;
-        this.controller = this != innerArchive ? null : FileSystemManagers.getInstance().getController(mountPoint, null);
+
+        if (null == mountPointPath) {
+            this.enclArchive = null;
+            this.enclEntryName = null;
+            this.innerArchive = null;
+            this.controller = null;
+        } else {
+            final FileSystemEntryName entryName = path.getEntryName();
+            this.enclArchive = new File(mountPointPath, detector);
+            this.enclEntryName = entryName;
+            this.innerArchive = entryName.getPath().isEmpty()
+                    ? this
+                    : this.enclArchive;
+            this.controller = this != this.innerArchive
+                    ? null
+                    : FileSystemManagers
+                        .getInstance()
+                        .getController( mountPoint,
+                                        new ArchiveFileSystemDriver(detector));
+        }
 
         assert invariants();
     }*/

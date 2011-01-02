@@ -39,11 +39,11 @@ import junit.framework.TestCase;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class AbstractArchiveDriverTest extends TestCase {
+public class CharsetArchiveDriverTest extends TestCase {
 
-    private AbstractArchiveDriver<ArchiveEntry> driver;
+    private CharsetArchiveDriver<ArchiveEntry> driver;
 
-    public AbstractArchiveDriverTest(String testName) {
+    public CharsetArchiveDriverTest(String testName) {
         super(testName);
     }
 
@@ -99,8 +99,8 @@ public class AbstractArchiveDriverTest extends TestCase {
         final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
         final ObjectInputStream in = new ObjectInputStream(bis);
         @SuppressWarnings("unchecked")
-        final AbstractArchiveDriver<ArchiveEntry> driver2
-                = (AbstractArchiveDriver<ArchiveEntry>) in.readObject();
+        final CharsetArchiveDriver<ArchiveEntry> driver2
+                = (CharsetArchiveDriver<ArchiveEntry>) in.readObject();
         in.close();
         
         assertNotSame(driver, driver2);
@@ -161,7 +161,7 @@ public class AbstractArchiveDriverTest extends TestCase {
         }
     }
 
-    private static class DummyArchiveDriver extends AbstractArchiveDriver<ArchiveEntry> {
+    private static class DummyArchiveDriver extends CharsetArchiveDriver<ArchiveEntry> {
         static final long serialVersionUID = 2382398676900721212L;
 
         static final Icon ICON = new ImageIcon(

@@ -21,6 +21,7 @@ import java.io.ObjectOutputStream;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import java.io.InvalidObjectException;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -80,9 +81,9 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
 
     private transient @Nullable Path path;
 
-    private volatile transient @Nullable Scheme scheme;
+    private transient volatile @Nullable Scheme scheme;
 
-    private volatile transient @Nullable MountPoint hierarchical;
+    private transient volatile @Nullable MountPoint hierarchical;
 
     /**
      * Equivalent to {@link #create(URI, boolean) create(uri, false)}.
@@ -174,7 +175,7 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      * Equivalent to {@link #MountPoint(String, boolean) new MountPoint(uri, false)}.
      */
     public MountPoint(@NonNull String uri) throws URISyntaxException {
-        this(uri, false);
+        parse(uri, false);
     }
 
     /**
@@ -196,7 +197,7 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      * Equivalent to {@link #MountPoint(URI, boolean) new MountPoint(uri, false)}.
      */
     public MountPoint(@NonNull URI uri) throws URISyntaxException {
-        this(uri, false);
+        parse(uri, false);
     }
 
     /**
@@ -251,7 +252,8 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
         try {
             parse(in.readObject().toString(), false);
         } catch (URISyntaxException ex) {
-            throw new IOException(ex);
+            throw (InvalidObjectException) new InvalidObjectException(ex.toString())
+                    .initCause(ex);
         }
     }
 

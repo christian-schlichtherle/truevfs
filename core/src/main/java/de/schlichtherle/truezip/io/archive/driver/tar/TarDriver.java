@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.io.archive.driver.tar;
 
 import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemModel;
-import de.schlichtherle.truezip.io.archive.driver.AbstractArchiveDriver;
+import de.schlichtherle.truezip.io.archive.driver.CharsetArchiveDriver;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.archive.output.MultiplexedArchiveOutputShop;
@@ -43,7 +43,7 @@ import static de.schlichtherle.truezip.io.entry.Entry.Size.DATA;
  * @version $Id$
  */
 public class TarDriver
-extends AbstractArchiveDriver<TarEntry> {
+extends CharsetArchiveDriver<TarEntry> {
 
     private static final long serialVersionUID = 6622746562629104174L;
 
@@ -84,6 +84,7 @@ extends AbstractArchiveDriver<TarEntry> {
             final Type type,
             final Entry template)
     throws CharConversionException {
+        assertEncodable(name);
         name = toZipOrTarEntryName(name, type);
         final TarEntry entry;
         if (null != template) {

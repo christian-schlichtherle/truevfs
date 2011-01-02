@@ -19,6 +19,8 @@ import de.schlichtherle.truezip.io.entry.Entry.Type;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.CharConversionException;
+import net.jcip.annotations.Immutable;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * An immutable, thread-safe factory for entries.
@@ -27,6 +29,8 @@ import java.io.CharConversionException;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@Immutable
+@ThreadSafe
 public interface EntryFactory<E extends Entry> {
 
     /**
@@ -42,18 +46,18 @@ public interface EntryFactory<E extends Entry> {
      * type of this template, then the returned entry shall be a clone of the
      * template which shares no mutable objects with the template.
      *
-     * @param  name a non-{@code null} entry name.
-     * @param  type a non-{@code null} entry type.
+     * @param  name an entry name.
+     * @param  type an entry type.
      * @param  template if not {@code null}, then the new entry shall inherit
      *         as much properties from this entry as possible - with the
      *         exception of its name and type.
      * @return A new entry for the given name.
      * @throws CharConversionException if {@code name} contains characters
      *         which are invalid.
-     * @throws NullPointerException if {@code name} or {@code type} are
-     *         {@code null}.
      */
-    @NonNull
-    E newEntry(@NonNull String name, @NonNull Type type, @CheckForNull Entry template)
+    @NonNull E
+    newEntry(   @NonNull String name,
+                @NonNull Type type,
+                @CheckForNull Entry template)
     throws CharConversionException;
 }

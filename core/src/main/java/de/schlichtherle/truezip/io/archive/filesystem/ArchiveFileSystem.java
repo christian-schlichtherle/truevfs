@@ -414,7 +414,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         }
     }
 
-    final E copy(final E entry) {
+    final @NonNull E copy(@NonNull E entry) {
         try {
             return factory.newEntry(entry.getName(), entry.getType(), entry);
         } catch (CharConversionException ex) {

@@ -193,8 +193,9 @@ public final class FileSystemEntryName extends EntryName {
      * @throws URISyntaxException if {@code uri} does not conform to the
      *         syntax constraints for entry names.
      */
-    public FileSystemEntryName(@NonNull String uri, boolean normalize) throws URISyntaxException {
-        this(new URI(uri), false);
+    public FileSystemEntryName(@NonNull String uri, boolean normalize)
+    throws URISyntaxException {
+        this(new URI(uri), normalize);
     }
 
     /**
@@ -217,6 +218,7 @@ public final class FileSystemEntryName extends EntryName {
     public FileSystemEntryName(@NonNull URI uri, final boolean normalize)
     throws URISyntaxException {
         super(uri, normalize);
+
         if (!normalize && uri.normalize() != uri)
             throw new URISyntaxException(uri.toString(), "URI path not in normal form");
         uri = getUri();

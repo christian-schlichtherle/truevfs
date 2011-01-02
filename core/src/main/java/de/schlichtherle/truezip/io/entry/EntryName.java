@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.io.entry;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
+import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -183,7 +184,7 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      * Equivalent to {@link #EntryName(String, boolean) new EntryName(uri, false)}.
      */
     public EntryName(@NonNull String uri) throws URISyntaxException {
-        this(uri, false);
+        parse(uri, false);
     }
 
     /**
@@ -197,14 +198,14 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      *         syntax constraints for entry names.
      */
     public EntryName(@NonNull String uri, boolean normalize) throws URISyntaxException {
-        this(new URI(uri), false);
+        parse(uri, normalize);
     }
 
     /**
      * Equivalent to {@link #EntryName(URI, boolean) new EntryName(uri, false)}.
      */
     public EntryName(@NonNull URI uri) throws URISyntaxException {
-        this(uri, false);
+        parse(uri, false);
     }
 
     /**
@@ -218,15 +219,7 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      */
     public EntryName(@NonNull URI uri, final boolean normalize)
     throws URISyntaxException {
-        if (uri.isAbsolute())
-            throw new URISyntaxException(uri.toString(), "Scheme not allowed");
-        if (uri.getRawAuthority() != null)
-            throw new URISyntaxException(uri.toString(), "Authority not allowed");
-        if (null != uri.getRawFragment())
-            throw new URISyntaxException(uri.toString(), "Fragment not allowed");
-        this.uri = normalize ? uri.normalize() : uri;
-
-        assert invariants();
+        parse(uri, normalize);
     }
 
     /**
@@ -276,10 +269,27 @@ public class EntryName implements Serializable, Comparable<EntryName> {
     private void readObject(@NonNull ObjectInputStream in)
     throws IOException, ClassNotFoundException {
         try {
-            uri = new URI(in.readObject().toString());
+            parse(in.readObject().toString(), false);
         } catch (URISyntaxException ex) {
-            throw new IOException(ex);
+            throw (InvalidObjectException) new InvalidObjectException(ex.toString())
+                    .initCause(ex);
         }
+    }
+
+    private void parse(@NonNull String uri, final boolean normalize)
+    throws URISyntaxException {
+        parse(new URI(uri), normalize);
+    }
+
+    private void parse(final @NonNull URI uri, final boolean normalize)
+    throws URISyntaxException {
+        if (uri.isAbsolute())
+            throw new URISyntaxException(uri.toString(), "Scheme not allowed");
+        if (uri.getRawAuthority() != null)
+            throw new URISyntaxException(uri.toString(), "Authority not allowed");
+        if (null != uri.getRawFragment())
+            throw new URISyntaxException(uri.toString(), "Fragment not allowed");
+        this.uri = normalize ? uri.normalize() : uri;
 
         assert invariants();
     }

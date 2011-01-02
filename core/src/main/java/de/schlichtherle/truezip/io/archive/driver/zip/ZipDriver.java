@@ -22,7 +22,7 @@ import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputShop;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
-import de.schlichtherle.truezip.io.archive.driver.AbstractArchiveDriver;
+import de.schlichtherle.truezip.io.archive.driver.CharsetArchiveDriver;
 import de.schlichtherle.truezip.io.archive.output.MultiplexedArchiveOutputShop;
 import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
@@ -50,7 +50,7 @@ import static java.util.zip.Deflater.NO_COMPRESSION;
  * @version $Id$
  */
 public class ZipDriver
-extends AbstractArchiveDriver<ZipEntry>
+extends CharsetArchiveDriver<ZipEntry>
 implements ZipEntryFactory<ZipEntry> {
 
     private static final long serialVersionUID = -7061546656075796996L;
@@ -167,6 +167,7 @@ implements ZipEntryFactory<ZipEntry> {
             final Type type,
             final Entry template)
     throws CharConversionException {
+        assertEncodable(name);
         name = toZipOrTarEntryName(name, type);
         final ZipEntry entry;
         if (null != template) {

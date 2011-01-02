@@ -237,8 +237,9 @@ public class NonIOFileTest {
         for (final String[] param : new String[][] {
             { "file:/", },
             { "file:/foo", },
-            { "zip:file:/foo!/", },
-            { "zip:file:/foo!/bar", },
+            { "zip:file:/archive.zip!/", },
+            { "zip:file:/archive.zip!/META-INF/MANIFEST.MF", },
+            { "jar:tar.gz:file:/app.tar.gz!/app.jar!/META-INF/MANIFEST.MF", },
         }) {
             final Path path = Path.create(param[0]);
             final File file = new File(path, ArchiveDetector.ALL);
