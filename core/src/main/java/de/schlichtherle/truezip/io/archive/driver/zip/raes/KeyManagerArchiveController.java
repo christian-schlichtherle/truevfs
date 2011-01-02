@@ -17,12 +17,13 @@ package de.schlichtherle.truezip.io.archive.driver.zip.raes;
 
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
-import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemModel;
+import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.filesystem.DecoratingFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
 import de.schlichtherle.truezip.io.filesystem.FileSystemException;
+import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.key.KeyManager;
 import java.io.CharConversionException;
 import java.io.IOException;
@@ -42,8 +43,8 @@ import static de.schlichtherle.truezip.io.Paths.*;
 @ThreadSafe
 final class KeyManagerArchiveController
 extends DecoratingFileSystemController<
-        ConcurrentFileSystemModel,
-        FileSystemController<? extends ConcurrentFileSystemModel>> {
+        FileSystemModel,
+        FileSystemController<? extends FileSystemModel>> {
 
     private final ArchiveDriver<?> driver;
 
@@ -52,9 +53,8 @@ extends DecoratingFileSystemController<
      *
      * @param controller the non-{@code null} archive controller.
      */
-    KeyManagerArchiveController(
-            final FileSystemController<? extends ConcurrentFileSystemModel> controller,
-            final ArchiveDriver<?> driver) {
+    KeyManagerArchiveController(final FileSystemController<?> controller,
+                                final ArchiveDriver<?> driver) {
         super(controller);
         this.driver = driver;
     }
@@ -69,19 +69,18 @@ extends DecoratingFileSystemController<
         } catch (IOException ex) {
             if (!isRoot(name.getPath()))
                 return null;
-            final FileSystemEntry entry = getParent()
-                    .getEntry(getModel().resolveParent(name));
+            Entry entry
+                    = getParent().getEntry(getModel().resolveParent(name));
             if (null == entry)
                 return null;
             // The entry exists, but we can't access it for some reason.
             // This may be because the cipher key is not available.
             // Now mask the entry as a special file.
+            while (entry instanceof ArchiveFileSystemEntry<?>)
+                entry = ((ArchiveFileSystemEntry<?>) entry).getEntry();
             try {
                 return ArchiveFileSystemEntry.create(ROOT_ENTRY_NAME, SPECIAL,
-                        driver.newEntry(ROOT, SPECIAL,
-                            entry instanceof ArchiveFileSystemEntry<?>
-                                ? ((ArchiveFileSystemEntry<?>) entry).getEntry()
-                                : entry));
+                        driver.newEntry(ROOT, SPECIAL, entry));
             } catch (CharConversionException cannotHappen) {
                 throw new AssertionError(cannotHappen);
             }

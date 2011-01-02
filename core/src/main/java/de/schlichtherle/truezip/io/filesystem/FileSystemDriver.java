@@ -24,10 +24,10 @@ import edu.umd.cs.findbugs.annotations.Nullable;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface FileSystemDriver<M extends FileSystemModel> {
+public interface FileSystemDriver {
 
     /**
-     * Constructs a new file system controller for the given mount point
+     * Returns a new file system controller for the given mount point
      * and parent file system controller.
      * <p>
      * When called, the following expression is a precondition:
@@ -37,15 +37,14 @@ public interface FileSystemDriver<M extends FileSystemModel> {
                     : mountPoint.getParent().equals(parent.getModel().getMountPoint())
      * }
      * <p>
-     * <strong>Important:</strong> The returned file system controller must be
-     * thread-safe!
+     * Note that the returned file system controller must be thread-safe!
      *
      * @param  mountPoint the mount point of the file system.
      * @param  parent the parent file system controller.
      * @return A new file system controller for the given mount point and
      *         parent file system controller.
      */
-    @NonNull FileSystemController<? extends M> newController(
-            @NonNull MountPoint mountPoint,
-            @Nullable FileSystemController<?> parent);
+    @NonNull FileSystemController<?>
+    newController(  @NonNull MountPoint mountPoint,
+                    @Nullable FileSystemController<?> parent);
 }

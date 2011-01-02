@@ -59,17 +59,16 @@ public final class FederatedFileSystemManager extends FileSystemManager {
     }
 
     @Override
-    @NonNull
-    public synchronized FileSystemController<?> getController(
-            @NonNull MountPoint mountPoint,
-            @NonNull FileSystemDriver<?> driver) {
+    @NonNull public synchronized FileSystemController<?>
+    getController(  @NonNull MountPoint mountPoint,
+                    @NonNull FileSystemDriver driver) {
         return getController(mountPoint, driver, null);
     }
 
-    private FileSystemController<?> getController(
-            final MountPoint mountPoint,
-            final FileSystemDriver<?> driver,
-            FileSystemController<?> parent) {
+    private FileSystemController<?>
+    getController(  final MountPoint mountPoint,
+                    final FileSystemDriver driver,
+                    FileSystemController<?> parent) {
         if (null == mountPoint.getParent()) {
             if (null != parent)
                 throw new IllegalArgumentException("Parent/member mismatch!");

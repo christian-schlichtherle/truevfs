@@ -57,7 +57,7 @@ import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
  */
 public abstract class FileSystemController<M extends FileSystemModel> {
 
-    /** Returns the non-{@code null} file system model. */
+    /** Returns the file system model. */
     public abstract @NonNull M
     getModel();
 

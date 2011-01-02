@@ -76,21 +76,19 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
 
     private static final long serialVersionUID = 5723957985634276648L;
 
-    @NonNull
-    private URI uri; // not final for serialization only!
+    private @NonNull URI uri; // not final for serialization only!
 
-    @Nullable
-    private transient Path path;
+    private transient @Nullable Path path;
 
-    private volatile transient Scheme scheme;
+    private volatile transient @Nullable Scheme scheme;
 
-    private volatile transient MountPoint hierarchical;
+    private volatile transient @Nullable MountPoint hierarchical;
 
     /**
      * Equivalent to {@link #create(URI, boolean) create(uri, false)}.
      */
-    @NonNull
-    public static MountPoint create(@NonNull String uri) {
+    public static @NonNull MountPoint
+    create(@NonNull String uri) {
         return create(uri, false);
     }
 
@@ -109,8 +107,8 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      *         syntax constraints for mount points.
      * @return A new mount point.
      */
-    @NonNull
-    public static MountPoint create(@NonNull String uri, boolean normalize) {
+    public static @NonNull MountPoint
+    create(@NonNull String uri, boolean normalize) {
         try {
             return new MountPoint(uri, normalize);
         } catch (URISyntaxException ex) {
@@ -121,8 +119,8 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
     /**
      * Equivalent to {@link #create(URI, boolean) create(uri, false)}.
      */
-    @NonNull
-    public static MountPoint create(@NonNull URI uri) {
+    public static @NonNull MountPoint
+    create(@NonNull URI uri) {
         return create(uri, false);
     }
 
@@ -140,8 +138,8 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      *         syntax constraints for mount points.
      * @return A new mount point.
      */
-    @NonNull
-    public static MountPoint create(@NonNull URI uri, boolean normalize) {
+    public static @NonNull MountPoint
+    create(@NonNull URI uri, boolean normalize) {
         try {
             return new MountPoint(uri, normalize);
         } catch (URISyntaxException ex) {
@@ -163,8 +161,8 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      *         would not conform to the syntax constraints for mount points.
      * @return A new mount point.
      */
-    @NonNull
-    public static MountPoint create(@NonNull Scheme scheme, @NonNull Path path) {
+    public static @NonNull MountPoint
+    create(@NonNull Scheme scheme, @NonNull Path path) {
         try {
             return new MountPoint(scheme, path);
         } catch (URISyntaxException ex) {
@@ -330,8 +328,7 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      *
      * @return The URI scheme.
      */
-    @NonNull
-    public Scheme getScheme() {
+    public @NonNull Scheme getScheme() {
         return null != scheme ? scheme : (scheme = Scheme.create(uri.getScheme()));
     }
 
@@ -341,8 +338,7 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      *
      * @return The nullable path.
      */
-    @Nullable
-    public Path getPath() {
+    public @Nullable Path getPath() {
         return path;
     }
 
@@ -353,8 +349,7 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      * 
      * @return The nullable parent mount point.
      */
-    @Nullable
-    public MountPoint getParent() {
+    public @Nullable MountPoint getParent() {
         assert null == path || null != path.getMountPoint();
         return null == path ? null : path.getMountPoint();
     }
@@ -369,8 +364,8 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      * @return A new entry name relative to the parent mount point.
      * @see    #getParent
      */
-    @NonNull
-    public FileSystemEntryName resolveParent(@NonNull FileSystemEntryName entryName) {
+    public @NonNull FileSystemEntryName
+    resolveParent(@NonNull FileSystemEntryName entryName) {
         return new FileSystemEntryName(path.getEntryName(), entryName);
     }
 
@@ -380,8 +375,8 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      * @param  entryName an entry name relative to this mount point.
      * @return A new path with an absolute URI.
      */
-    @NonNull
-    public Path resolvePath(@NonNull FileSystemEntryName entryName) {
+    public @NonNull Path
+    resolvePath(@NonNull FileSystemEntryName entryName) {
         return new Path(this, entryName);
     }
 
@@ -397,8 +392,7 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      * @return A mount point which has its URI converted from the URI of
      *         this mount point so that it's absolute and hierarchical.
      */
-    @NonNull
-    public MountPoint hierarchicalize() {
+    public @NonNull MountPoint hierarchicalize() {
         if (null != hierarchical)
             return hierarchical;
         if (uri.isOpaque()) {
@@ -421,8 +415,7 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      *
      * @return The non-{@code null} URI.
      */
-    @NonNull
-    public URI getUri() {
+    public @NonNull URI getUri() {
         return uri;
     }
 
@@ -459,8 +452,7 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      * Equivalent to calling {@link URI#toString()} on {@link #getUri()}.
      */
     @Override
-    @NonNull
-    public String toString() {
+    public @NonNull String toString() {
         return uri.toString();
     }
 }

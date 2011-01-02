@@ -26,7 +26,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class FileDriver implements FileSystemDriver<FileSystemModel> {
+public final class FileDriver implements FileSystemDriver {
 
     public FileSystemController<?> newController(
             MountPoint mountPoint) {

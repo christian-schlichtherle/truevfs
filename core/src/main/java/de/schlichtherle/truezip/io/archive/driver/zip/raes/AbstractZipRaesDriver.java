@@ -92,10 +92,9 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
     }
 
     @Override
-    @NonNull
-    public FileSystemController<? extends ConcurrentFileSystemModel> newController(
-            @NonNull MountPoint mountPoint,
-            @NonNull FileSystemController<?> parent) {
+    @NonNull public FileSystemController<?>
+    newController(  @NonNull MountPoint mountPoint,
+                    @NonNull FileSystemController<?> parent) {
         return new KeyManagerArchiveController(
                 super.newController(mountPoint, parent), this);
     }
