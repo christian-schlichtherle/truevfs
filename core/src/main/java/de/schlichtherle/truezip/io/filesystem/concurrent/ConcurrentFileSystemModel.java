@@ -17,10 +17,11 @@ package de.schlichtherle.truezip.io.filesystem.concurrent;
 
 import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.filesystem.MountPoint;
-import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
-import de.schlichtherle.truezip.util.concurrent.lock.ReentrantReadWriteLock;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -32,23 +33,19 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 public class ConcurrentFileSystemModel extends FileSystemModel {
-    private final ReentrantLock readLock;
-    private final ReentrantLock writeLock;
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
-    public ConcurrentFileSystemModel(   @NonNull final MountPoint mountPoint,
-                                        @CheckForNull final FileSystemModel parent) {
+    public ConcurrentFileSystemModel(   @NonNull MountPoint mountPoint,
+                                        @CheckForNull FileSystemModel parent) {
         super(mountPoint, parent);
-        final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-        readLock = lock.readLock();
-        writeLock = lock.writeLock();
     }
 
-    public final ReentrantLock readLock() {
-        return readLock;
+    public final ReadLock readLock() {
+        return lock.readLock();
     }
 
-    public final ReentrantLock writeLock() {
-        return writeLock;
+    public final WriteLock writeLock() {
+        return lock.writeLock();
     }
 
     /**
@@ -57,7 +54,7 @@ public class ConcurrentFileSystemModel extends FileSystemModel {
      */
     public final void assertWriteLockedByCurrentThread()
     throws NotWriteLockedException {
-        if (!writeLock().isHeldByCurrentThread())
+        if (!lock.isWriteLockedByCurrentThread())
             throw new NotWriteLockedException(this);
     }
 
@@ -67,7 +64,7 @@ public class ConcurrentFileSystemModel extends FileSystemModel {
      */
     public final void assertNotReadLockedByCurrentThread(NotWriteLockedException ex)
     throws NotWriteLockedException {
-        if (readLock().isHeldByCurrentThread())
+        if (0 < lock.getReadHoldCount())
             throw new NotWriteLockedException(this, ex);
     }
 }
