@@ -114,8 +114,6 @@ extends DecoratingFileSystemController<M, C> {
 
     @Override
     public void unlink(final FileSystemEntryName name) throws IOException {
-        assert getModel().writeLock().isHeldByCurrentThread();
-
         delegate.unlink(name);
         inputs.remove(name);
         outputs.remove(name);
@@ -127,8 +125,6 @@ extends DecoratingFileSystemController<M, C> {
             @NonNull final BitField<SyncOption> options,
             @NonNull final ExceptionHandler<? super SyncException, X> handler)
     throws X, FileSystemException {
-        assert getModel().writeLock().isHeldByCurrentThread();
-
         try {
             delegate.sync(options, handler);
         } finally {

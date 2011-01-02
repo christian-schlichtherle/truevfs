@@ -202,8 +202,6 @@ extends DecoratingFileSystemController<M, C> {
             @NonNull final BitField<OutputOption> options,
             @CheckForNull final Entry template)
     throws IOException {
-        assert getModel().writeLock().isHeldByCurrentThread();
-
         final Cache cache = caches.get(name);
         if (null != cache) {
             //cache.flush(); // redundant
@@ -218,8 +216,6 @@ extends DecoratingFileSystemController<M, C> {
     @Override
     public void unlink(@NonNull final FileSystemEntryName name)
     throws IOException {
-        assert getModel().writeLock().isHeldByCurrentThread();
-
         final Cache cache = caches.get(name);
         if (null != cache) {
             //cache.flush(); // redundant
@@ -244,8 +240,6 @@ extends DecoratingFileSystemController<M, C> {
             @NonNull final BitField<SyncOption> options,
             @NonNull final ExceptionHandler<? super SyncException, X> handler)
     throws X, FileSystemException {
-        assert getModel().writeLock().isHeldByCurrentThread();
-
         if (0 >= caches.size())
             return;
 
@@ -361,8 +355,6 @@ extends DecoratingFileSystemController<M, C> {
 
             @Override
             public OutputStream newOutputStream() throws IOException {
-                assert getModel().writeLock().isHeldByCurrentThread();
-
                 makeEntry();
                 final OutputStream out = getBoundSocket().newOutputStream();
                 caches.put(name, Cache.this);

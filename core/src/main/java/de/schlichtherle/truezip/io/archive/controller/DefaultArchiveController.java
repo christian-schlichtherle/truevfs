@@ -338,7 +338,6 @@ extends FileSystemArchiveController<E> {
             @NonNull final ExceptionHandler<? super SyncException, X> handler)
     throws X, FileSystemException {
         assert !isTouched() || null != output; // file system touched => output archive
-        assert getModel().writeLock().isHeldByCurrentThread();
 
         if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT))
             throw new IllegalArgumentException();
