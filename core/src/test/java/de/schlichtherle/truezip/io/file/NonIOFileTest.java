@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
+import de.schlichtherle.truezip.io.filesystem.Path;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -230,6 +231,19 @@ public class NonIOFileTest {
         } catch (IllegalArgumentException ex) {
         }
     }
+
+    /*@Test
+    public void testPathConstructor() {
+        for (final String[] param : new String[][] {
+            { "file:/", },
+            { "file:/foo", },
+            { "zip:file:/foo!/", },
+            { "zip:file:/foo!/bar", },
+        }) {
+            final Path path = Path.create(param[0]);
+            final File file = new File(path, ArchiveDetector.ALL);
+        }
+    }*/
 
     @Test
     @SuppressWarnings("ResultOfObjectAllocationIgnored")

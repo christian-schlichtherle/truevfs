@@ -396,71 +396,10 @@ String[] names = { <font color="#800080">&quot;a&quot;</font>, <font color="#800
             modification time) before its content to the archive file. So if the meta data is
             to be modified, the archive entry and hence the whole archive file needs to get
             rewritten, which is what the implicit remount is doing.</p>
-        <p>To avoid accidental remounting when copying data, you should consider using the
-            advanced <a href="File.html#copy_methods">copy methods</a> instead. These methods
-            are easy to use, work reliably and provide superior performance.</p>
-        <h4><a name="monitoring">Monitoring Progress</a></h4>
-        <p>When unmounting, the client application can monitor the progress by another thread
-            using {@link de.schlichtherle.truezip.io.file.File#getFileSystemStatistics()}. The returned
-            instance is a proxy which returns live statistics about the updating process.</p>
-        <p>Here&#39;s an example how to monitor unmounting progress on standard error output
-            after an initial delay of two seconds:</p>
-        <blockquote>
-            <pre><code><b><font color="#000080">class</font></b> ProgressMonitor <b><font color="#000080">extends</font></b> Thread {
-    Long[] args = <b><font color="#000080">new</font></b> Long[<font color="#800080">2</font>];
-    FileSystemStatistics liveStats = File.<b>getFileSystemStatistics</b>();
-
-    <b>ProgressMonitor</b>() {
-        <b>setPriority</b>(Thread.MAX_PRIORITY);
-        <b>setDaemon</b>(<b><font color="#000080">true</font></b>);
-    }
-
-    <b><font color="#000080">public</font></b> <b><font color="#000080">void</font></b> <b>run</b>() {
-        <b><font color="#000080">boolean</font></b> run = <b><font color="#000080">false</font></b>;
-        <b><font color="#000080">for</font></b> (<b><font color="#000080">long</font></b> sleep = <font color="#800080">2000</font>; ; sleep = <font color="#800080">200</font>, run = <b><font color="#000080">true</font></b>) {
-            <b><font color="#000080">try</font></b> {
-                Thread.<b>sleep</b>(sleep);
-            } <b><font color="#000080">catch</font></b> (InterruptedException shutdown) {
-                <b><font color="#000080">break</font></b>;
-            }
-            <b>showProgress</b>();
-        }
-        <b><font color="#000080">if</font></b> (run) {
-            <b>showProgress</b>();
-            System.err.<b>println</b>();
-        }
-    }
-
-    <b><font color="#000080">void</font></b> <b>showProgress</b>() {
-<font color="#808080">        // Round up to kilobytes.
-</font>        args[0] = <b><font color="#000080">new</font></b> <b>Long</b>(
-                (liveStats.<b>getUpdateTotalByteCountRead</b>() + <font color="#800080">1023</font>) / <font color="#800080">1024</font>);
-        args[1] = <b><font color="#000080">new</font></b> <b>Long</b>(
-                (liveStats.<b>getUpdateTotalByteCountWritten</b>() + <font color="#800080">1023</font>) / <font color="#800080">1024</font>);
-        System.err.<b>print</b>(MessageFormat.<b>format</b>(
-                <font color="#800080">&quot;Top level archive IO: {0} / {1} KB        \r&quot;</font>, args));
-    }
-
-    <b><font color="#000080">void</font></b> <b>shutdown</b>() {
-        <b>interrupt</b>();
-        <b><font color="#000080">try</font></b> {
-            <b>join</b>();
-        } <b><font color="#000080">catch</font></b> (InterruptedException interrupted) {
-            interrupted.<b>printStackTrace</b>();
-        }
-    }
-}
-
-<font color="#808080">// ...
-</font>
-ProgressMonitor monitor = new <b>ProgressMonitor</b>();
-monitor.<b>start</b>();
-<b><font color="#000080">try</font></b> {
-    File.<b>umount</b>();
-} <b><font color="#000080">finally</font></b> {
-    monitor.<b>shutdown</b>();
-}</code></pre>
-        </blockquote>
+        <p>To avoid accidental synchronization when copying data, please
+            consider using the advanced
+            <a href="File.html#copy_methods">copy methods</a> instead.
+            These methods are easy to use and provide best performance.</p>
         <h4><a name="conclusions">Conclusions</a></h4>
         <p>Here are some guidelines to find the right balance between performance and control:</p>
         <ol>

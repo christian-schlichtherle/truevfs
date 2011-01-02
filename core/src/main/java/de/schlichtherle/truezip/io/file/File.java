@@ -16,7 +16,6 @@
 package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.filesystem.file.FileDriver;
-import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Paths.Splitter;
@@ -35,6 +34,7 @@ import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
@@ -637,6 +637,25 @@ public class File extends java.io.File {
         assert invariants();
     }
 
+    /*public File(final Path path, final ArchiveDetector detector) {
+        super(path.hierarchicalize().getUri());
+
+        this.delegate = new java.io.File(super.getPath());
+        this.detector = detector;
+
+        final MountPoint mountPoint = path.getMountPoint();
+        final Path mountPointPath = mountPoint.getPath();
+        final FileSystemEntryName entryName = path.getEntryName();
+        this.enclArchive = null == mountPointPath
+                ? null
+                : new File(mountPointPath, detector);
+        this.enclEntryName = entryName;
+        this.innerArchive = entryName.getPath().isEmpty() ? this : this.enclArchive;
+        this.controller = this != innerArchive ? null : FileSystemManagers.getInstance().getController(mountPoint, null);
+
+        assert invariants();
+    }*/
+
     /**
      * Converts a (jar:)*file: URI to a plain file: URI or returns the
      * provided URI again if it doesn't match this pattern.
@@ -728,6 +747,7 @@ public class File extends java.io.File {
     private void initController() {
         final java.io.File target = getRealFile(delegate);
         final Scheme scheme = detector.getScheme(target.getPath());
+        assert null != scheme; // make FindBugs happy
         final MountPoint mountPoint;
         try {
             if (null != enclArchive) {
@@ -762,7 +782,7 @@ public class File extends java.io.File {
             throw new AssertionError(ex);
         }
 
-        class Driver implements FileSystemDriver<FileSystemModel> {
+        class Driver implements FileSystemDriver {
             @Override
             public FileSystemController<?>
             newController(  MountPoint prospect,
@@ -805,9 +825,8 @@ public class File extends java.io.File {
      * @deprecated This constructor is not intended for public use - do <em>not</em> use it!
      * @see FileFactory
      */
-    @Deprecated
-	public File(
-            final File template,
+    @Deprecated public
+    File(   final File template,
             final java.io.File delegate,
             final File enclArchive) {
         super(delegate.getPath());
@@ -1122,28 +1141,19 @@ public class File extends java.io.File {
      * @return {@code true}
      */
     private boolean invariants() {
-        if (delegate == null)
-            throw new AssertionError();
-        if (delegate instanceof File)
-            throw new AssertionError();
-        if (!delegate.getPath().equals(super.getPath()))
-            throw new AssertionError();
-        if (detector == null)
-            throw new AssertionError();
-        if ((innerArchive != null) != (getInnerEntryName() != null))
-            throw new AssertionError();
-        if ((enclArchive != null) != (enclEntryName != null))
-            throw new AssertionError();
-        if (enclArchive == this)
-            throw new AssertionError();
-        if (!((innerArchive == this && controller != null)
-                ^ (innerArchive == enclArchive && controller == null)))
-            throw new AssertionError();
-        if (!(enclArchive == null
-                || contains(enclArchive.getPath(), delegate.getParentFile().getPath())
-                    && enclEntryName.toString().length() > 0))
-            throw new AssertionError();
-
+        assert null != delegate;
+        assert !(delegate instanceof File);
+        assert delegate.getPath().equals(super.getPath());
+        assert null != detector;
+        assert (innerArchive != null) == (getInnerEntryName() != null);
+        assert (enclArchive != null) == (enclEntryName != null);
+        assert this != enclArchive;
+        assert (this == innerArchive && null != controller)
+                ^ (innerArchive == enclArchive && null == controller);
+        assert null == enclArchive
+                || contains(enclArchive.getPath(),
+                            delegate.getParentFile().getPath())
+                    && 0 < enclEntryName.toString().length();
         return true;
     }
 
@@ -1884,7 +1894,8 @@ public class File extends java.io.File {
      * Returns an archive controller if and only if the path denotes an
      * archive file, or {@code null} otherwise.
      */
-    final FileSystemController<?> getController() {
+    final @Nullable FileSystemController<?>
+    getController() {
         assert (null != controller) == isArchive();
         return controller;
     }

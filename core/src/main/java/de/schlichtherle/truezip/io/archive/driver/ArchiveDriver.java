@@ -66,16 +66,16 @@ import net.jcip.annotations.ThreadSafe;
 @ExtendOneOf(AbstractArchiveDriver.class)
 @ThreadSafe
 public interface ArchiveDriver<E extends ArchiveEntry>
-extends FileSystemDriver<ConcurrentFileSystemModel>, EntryFactory<E> {
+extends FileSystemDriver, EntryFactory<E> {
 
     /**
      * {@inheritDoc}
      * <p>
-     * An archive file system is always federated and therefore has a
-     * non-{@code null} parent file system controller.
+     * Note that an archive file system is always federated and therefore its
+     * parent file system controller is never {@code null}.
      */
     @Override
-    @NonNull FileSystemController<? extends ConcurrentFileSystemModel>
+    @NonNull FileSystemController<?>
     newController(  @NonNull MountPoint mountPoint,
                     @NonNull FileSystemController<?> parent);
 

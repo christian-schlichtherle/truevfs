@@ -85,8 +85,8 @@ public final class FileSystemEntryName extends EntryName {
     /**
      * Equivalent to {@link #create(String, boolean) create(uri, false)}.
      */
-    @NonNull
-    public static FileSystemEntryName create(@NonNull String uri) {
+    public static @NonNull FileSystemEntryName
+    create(@NonNull String uri) {
         return create(uri, false);
     }
 
@@ -105,8 +105,8 @@ public final class FileSystemEntryName extends EntryName {
      *         syntax constraints for entry names.
      * @return A new file system entry name.
      */
-    @NonNull
-    public static FileSystemEntryName create(@NonNull String uri, boolean normalize) {
+    public static @NonNull FileSystemEntryName
+    create(@NonNull String uri, boolean normalize) {
         try {
             return new FileSystemEntryName(uri, normalize);
         } catch (URISyntaxException ex) {
@@ -117,8 +117,8 @@ public final class FileSystemEntryName extends EntryName {
     /**
      * Equivalent to {@link #create(String, String, boolean) create(path, query, false)}.
      */
-    @NonNull
-    public static FileSystemEntryName create(@NonNull String path, @CheckForNull String query) {
+    public static @NonNull FileSystemEntryName
+    create(@NonNull String path, @CheckForNull String query) {
         return create(path, query, false);
     }
 
@@ -138,8 +138,8 @@ public final class FileSystemEntryName extends EntryName {
      *         syntax constraints for entry names.
      * @return A new file system entry name.
      */
-    @NonNull
-    public static FileSystemEntryName create(@NonNull String path, @CheckForNull String query, boolean normalize) {
+    public static @NonNull FileSystemEntryName
+    create(@NonNull String path, @CheckForNull String query, boolean normalize) {
         try {
             return new FileSystemEntryName(new URI(null, null, path, query, null), normalize);
         } catch (URISyntaxException ex) {
@@ -148,8 +148,8 @@ public final class FileSystemEntryName extends EntryName {
     }
 
     /** Equivalent to {@link #create(URI, boolean) create(uri, false)}. */
-    @NonNull
-    public static FileSystemEntryName create(@NonNull URI uri) {
+    public static @NonNull FileSystemEntryName
+    create(@NonNull URI uri) {
         return create(uri, false);
     }
 
@@ -167,8 +167,8 @@ public final class FileSystemEntryName extends EntryName {
      *         syntax constraints for entry names.
      * @return A new file system entry name.
      */
-    @NonNull
-    public static FileSystemEntryName create(@NonNull URI uri, boolean normalize) {
+    public static @NonNull FileSystemEntryName
+    create(@NonNull URI uri, boolean normalize) {
         try {
             return new FileSystemEntryName(uri, normalize);
         } catch (URISyntaxException ex) {

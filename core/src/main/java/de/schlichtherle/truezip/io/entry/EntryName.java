@@ -93,8 +93,7 @@ public class EntryName implements Serializable, Comparable<EntryName> {
     /**
      * Equivalent to {@link #create(String, boolean) create(uri, false)}.
      */
-    @NonNull
-    public static EntryName create(@NonNull String uri) {
+    public static @NonNull EntryName create(@NonNull String uri) {
         return create(uri, false);
     }
 
@@ -113,8 +112,8 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      *         syntax constraints for entry names.
      * @return A new entry name.
      */
-    @NonNull
-    public static EntryName create(@NonNull String uri, boolean normalize) {
+    public static @NonNull EntryName
+    create(@NonNull String uri, boolean normalize) {
         try {
             return new EntryName(uri, normalize);
         } catch (URISyntaxException ex) {
@@ -125,8 +124,8 @@ public class EntryName implements Serializable, Comparable<EntryName> {
     /**
      * Equivalent to {@link #create(String, String, boolean) create(path, query, false)}.
      */
-    @NonNull
-    public static EntryName create(@NonNull String path, @CheckForNull String query) {
+    public static @NonNull EntryName
+    create(@NonNull String path, @CheckForNull String query) {
         return create(path, query, false);
     }
 
@@ -143,8 +142,8 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      *         parsing it.
      * @return A new entry name.
      */
-    @NonNull
-    public static EntryName create(@NonNull String path, @CheckForNull String query, boolean normalize) {
+    public static @NonNull EntryName
+    create(@NonNull String path, @CheckForNull String query, boolean normalize) {
         try {
             return new EntryName(new URI(null, null, path, query, null), normalize);
         } catch (URISyntaxException ex) {
@@ -153,8 +152,7 @@ public class EntryName implements Serializable, Comparable<EntryName> {
     }
 
     /** Equivalent to {@link #create(URI, boolean) create(uri, false)}. */
-    @NonNull
-    public static EntryName create(@NonNull URI uri) {
+    public static @NonNull EntryName create(@NonNull URI uri) {
         return create(uri, false);
     }
 
@@ -172,8 +170,8 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      *         syntax constraints for entry names.
      * @return A new entry name.
      */
-    @NonNull
-    public static EntryName create(@NonNull URI uri, boolean normalize) {
+    public static @NonNull EntryName
+    create(@NonNull URI uri, boolean normalize) {
         try {
             return new EntryName(uri, normalize);
         } catch (URISyntaxException ex) {
@@ -300,8 +298,7 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      *
      * @return The path of this entry name.
      */
-    @NonNull
-    public final String getPath() {
+    public final @NonNull String getPath() {
         return uri.getPath();
     }
 
@@ -311,8 +308,7 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      *
      * @return The query of this entry name.
      */
-    @CheckForNull
-    public final String getQuery() {
+    public final @CheckForNull String getQuery() {
         return uri.getQuery();
     }
 
@@ -321,8 +317,7 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      *
      * @return The URI of this entry name.
      */
-    @NonNull
-    public final URI getUri() {
+    public final @NonNull URI getUri() {
         return uri;
     }
 
@@ -358,8 +353,7 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      * Equivalent to calling {@link URI#toString()} on {@link #getUri()}.
      */
     @Override
-    @NonNull
-    public final String toString() {
+    public final @NonNull String toString() {
         return uri.toString();
     }
 }

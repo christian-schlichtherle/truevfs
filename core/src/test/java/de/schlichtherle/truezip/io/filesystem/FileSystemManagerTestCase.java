@@ -35,7 +35,7 @@ import static org.junit.Assert.*;
 public abstract class FileSystemManagerTestCase {
 
     protected FileSystemManager manager;
-    final FileSystemDriver<?> driver = new Driver();
+    final FileSystemDriver driver = new Driver();
 
     @Before
     public void setUp() {
@@ -144,7 +144,7 @@ public abstract class FileSystemManagerTestCase {
     /** Represents the "file" URI scheme. */
     private static final Scheme FILE = Scheme.create("file");
 
-    static class Driver implements FileSystemDriver<FileSystemModel> {
+    static class Driver implements FileSystemDriver {
         @Override
         public FileSystemController<?> newController(
                 final MountPoint mountPoint,

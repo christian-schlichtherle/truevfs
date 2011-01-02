@@ -41,9 +41,9 @@ extends FileSystemManager {
     }
 
     @Override
-    public FileSystemController<?> getController(
-            MountPoint mountPoint,
-            FileSystemDriver<?> driver) {
+    public FileSystemController<?>
+    getController(  MountPoint mountPoint,
+                    FileSystemDriver driver) {
         return delegate.getController(mountPoint, driver);
     }
 

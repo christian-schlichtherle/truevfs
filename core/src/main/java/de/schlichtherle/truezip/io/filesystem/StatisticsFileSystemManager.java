@@ -47,9 +47,9 @@ extends DecoratingFileSystemManager<FileSystemManager> {
     @Override
     public FileSystemController<?> getController(
             final MountPoint mountPoint,
-            final FileSystemDriver<?> driver) {
+            final FileSystemDriver driver) {
 
-        class Driver implements FileSystemDriver<FileSystemModel> {
+        class Driver implements FileSystemDriver {
             @Override
             public FileSystemController<?> newController(
                     MountPoint mountPoint,

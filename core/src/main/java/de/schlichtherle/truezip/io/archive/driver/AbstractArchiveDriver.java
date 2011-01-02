@@ -32,11 +32,8 @@ import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.logging.Logger;
 import javax.swing.Icon;
 
 import static de.schlichtherle.truezip.io.filesystem.FileSystemEntryName.*;
@@ -198,10 +195,9 @@ implements ArchiveDriver<E>, Serializable {
     }
 
     @Override
-    @NonNull
-    public FileSystemController<? extends ConcurrentFileSystemModel>
-    newController(  @NonNull final MountPoint mountPoint,
-                    @NonNull final FileSystemController<?> parent) {
+    @NonNull public FileSystemController<?>
+    newController(  @NonNull MountPoint mountPoint,
+                    @NonNull FileSystemController<?> parent) {
         return  new ConcurrentFileSystemController<ConcurrentFileSystemModel, FileSystemController<? extends ConcurrentFileSystemModel>>(
                     //new IOSocketCachingFileSystemController<ConcurrentFileSystemModel, FileSystemController<? extends ConcurrentFileSystemModel>>(
                         new ContentCachingFileSystemController<ConcurrentFileSystemModel, FileSystemController<? extends ConcurrentFileSystemModel>>(

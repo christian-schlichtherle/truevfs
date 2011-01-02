@@ -87,21 +87,19 @@ public final class Path implements Serializable, Comparable<Path> {
      */
     public static final String MOUNT_POINT_SEPARATOR = "!" + SEPARATOR;
 
-    @NonNull
-    private URI uri; // not final for serialization only!
+    private @NonNull URI uri; // not final for serialization only!
 
-    @Nullable
-    private transient MountPoint mountPoint;
+    private transient @Nullable MountPoint mountPoint;
 
-    @NonNull
-    private transient FileSystemEntryName entryName;
+    private transient @NonNull FileSystemEntryName entryName;
 
-    private volatile transient Path hierarchical;
+    private volatile transient @Nullable Path hierarchical;
 
     /**
      * Equivalent to {@link #create(String, boolean) create(uri, false)}.
      */
-    public static Path create(@NonNull String uri) {
+    public static @NonNull Path
+    create(@NonNull String uri) {
         return create(uri, false);
     }
 
@@ -120,7 +118,8 @@ public final class Path implements Serializable, Comparable<Path> {
      *         syntax constraints for paths.
      * @return A new path.
      */
-    public static Path create(@NonNull String uri, boolean normalize) {
+    public static @NonNull Path
+    create(@NonNull String uri, boolean normalize) {
         try {
             return new Path(uri, normalize);
         } catch (URISyntaxException ex) {
@@ -131,7 +130,8 @@ public final class Path implements Serializable, Comparable<Path> {
     /**
      * Equivalent to {@link #create(URI, boolean) create(uri, false)}.
      */
-    public static Path create(@NonNull URI uri) {
+    public static @NonNull Path
+    create(@NonNull URI uri) {
         return create(uri, false);
     }
 
@@ -149,7 +149,8 @@ public final class Path implements Serializable, Comparable<Path> {
      *         syntax constraints for paths.
      * @return A new path.
      */
-    public static Path create(@NonNull URI uri, boolean normalize) {
+    public static @NonNull Path
+    create(@NonNull URI uri, boolean normalize) {
         try {
             return new Path(uri, normalize);
         } catch (URISyntaxException ex) {
@@ -312,8 +313,7 @@ public final class Path implements Serializable, Comparable<Path> {
      *
      * @return The nullable mount point.
      */
-    @Nullable
-    public MountPoint getMountPoint() {
+    public @Nullable MountPoint getMountPoint() {
         return mountPoint;
     }
 
@@ -323,8 +323,7 @@ public final class Path implements Serializable, Comparable<Path> {
      *
      * @return The entry name.
      */
-    @NonNull
-    public FileSystemEntryName getEntryName() {
+    public @NonNull FileSystemEntryName getEntryName() {
         return entryName;
     }
 
@@ -343,8 +342,7 @@ public final class Path implements Serializable, Comparable<Path> {
      *
      * @return A hierarchical URI for this path.
      */
-    @NonNull
-    public Path hierarchicalize() {
+    public @NonNull Path hierarchicalize() {
         return null != hierarchical
                 ? hierarchical
                 : (hierarchical = !uri.isOpaque()
@@ -359,8 +357,7 @@ public final class Path implements Serializable, Comparable<Path> {
      *
      * @return The URI of this path.
      */
-    @NonNull
-    public URI getUri() {
+    public @NonNull URI getUri() {
         return uri;
     }
 
@@ -397,8 +394,7 @@ public final class Path implements Serializable, Comparable<Path> {
      * Equivalent to calling {@link URI#toString()} on {@link #getUri()}.
      */
     @Override
-    @NonNull
-    public String toString() {
+    public @NonNull String toString() {
         return uri.toString();
     }
 }
