@@ -26,11 +26,11 @@ import java.util.logging.Logger;
  * confuse users.
  * <p>
  * <b>Note:</b> In accordance with JSE 5, any attempt to upgrade a read lock
- * to a write will lock the current thread.
+ * to a write lock will dead lock the current thread.
  * This is by design: If this limitation would not exist, two reader threads
  * could try to upgrade from a read lock to a write lock concurrently,
  * effectively dead locking each other.
- * By locking this thread immediately on any attempt to do so, this is
+ * By dead locking this thread immediately on any attempt to do so, this is
  * considered to be a programming error which can be easily fixed without
  * affecting any other thread.
  * <p>
