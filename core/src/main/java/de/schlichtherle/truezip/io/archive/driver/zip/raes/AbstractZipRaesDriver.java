@@ -162,10 +162,9 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      * This feature strengthens the security of the authentication process.
      */
     @Override
-    public JarEntry newEntry(
-            final String path,
-            final Type type,
-            final Entry template)
+    public JarEntry newEntry(   final String path,
+                                final Type type,
+                                final Entry template)
     throws CharConversionException {
         final JarEntry entry = super.newEntry(path, type, template);
         if (entry.getMethod() != DEFLATED) {

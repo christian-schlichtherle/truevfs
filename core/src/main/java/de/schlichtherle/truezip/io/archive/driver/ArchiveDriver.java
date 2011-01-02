@@ -16,8 +16,8 @@
 
 package de.schlichtherle.truezip.io.archive.driver;
 
-import de.schlichtherle.truezip.annotations.ExtendOneOf;
 import de.schlichtherle.truezip.io.TabuFileException;
+import de.schlichtherle.truezip.io.archive.controller.DefaultArchiveController;
 import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemModel;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.OutputShop;
@@ -27,6 +27,9 @@ import de.schlichtherle.truezip.io.archive.driver.registry.ArchiveDriverRegistry
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemDriver;
 import de.schlichtherle.truezip.io.filesystem.MountPoint;
+import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemController;
+import de.schlichtherle.truezip.io.filesystem.concurrent.ContentCachingFileSystemController;
+import de.schlichtherle.truezip.io.filesystem.file.TempFilePool;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -36,6 +39,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import javax.swing.Icon;
+import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -46,27 +50,26 @@ import net.jcip.annotations.ThreadSafe;
  * <p>
  * The following requirements must be met by any implementation:
  * <ul>
- * <li>Implementations must be thread-safe.
- * <li>Implementations must be (at least virtually) immutable.
- * <li>Implementations must not assume that they are used as singletons:
+ * <li>The implementation must be thread-safe.
+ * <li>The implementation must be immutable with respect to its public state.
+ * <li>The implementation must not assume that it's a singleton:
  *     Multiple instances of an implementation may be used for the same
  *     archive type.
- * <li>If the driver shall be supported by the {@link ArchiveDriverRegistry},
- *     a no-arguments constructor must be provided.
- * <li>Although not required, it's recommended to implement the
- *     {@link Serializable} interface, so that objects which are referring to
- *     it can be serialized.
+ * <li>If the implementation shall get supported by the
+ *     {@link ArchiveDriverRegistry}, a no-arguments constructor must be
+ *     provided.
  * </ul>
  *
  * @param   <E> The type of the archive entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-// TODO: Consider making this an abstract class.
-@ExtendOneOf(AbstractArchiveDriver.class)
+@Immutable
 @ThreadSafe
-public interface ArchiveDriver<E extends ArchiveEntry>
-extends FileSystemDriver, EntryFactory<E> {
+public abstract class ArchiveDriver<E extends ArchiveEntry>
+implements FileSystemDriver, EntryFactory<E>, Serializable {
+
+    //private static final long serialVersionUID = 1259452938351765017L;
 
     /**
      * {@inheritDoc}
@@ -75,9 +78,17 @@ extends FileSystemDriver, EntryFactory<E> {
      * parent file system controller is never {@code null}.
      */
     @Override
-    @NonNull FileSystemController<?>
+    public @NonNull FileSystemController<?>
     newController(  @NonNull MountPoint mountPoint,
-                    @NonNull FileSystemController<?> parent);
+                    @NonNull FileSystemController<?> parent) {
+        return  new ConcurrentFileSystemController<ConcurrentFileSystemModel, FileSystemController<? extends ConcurrentFileSystemModel>>(
+                    //new IOSocketCachingFileSystemController<ConcurrentFileSystemModel, FileSystemController<? extends ConcurrentFileSystemModel>>(
+                        new ContentCachingFileSystemController<ConcurrentFileSystemModel, FileSystemController<? extends ConcurrentFileSystemModel>>(
+                            new DefaultArchiveController<E>(
+                                new ConcurrentFileSystemModel(mountPoint, parent.getModel()),
+                                this, parent, false),
+                            TempFilePool.get()));
+    }
 
     /**
      * Creates a new input shop for reading the archive entries of the the
@@ -106,9 +117,9 @@ extends FileSystemDriver, EntryFactory<E> {
      *         as a <i>regular file</i> until the archive file system is
      *         synchronized with its parent file system.
      */
-    @NonNull
-    InputShop<E> newInputShop(  @NonNull ConcurrentFileSystemModel model,
-                                @NonNull InputSocket<?> input)
+    public abstract @NonNull InputShop<E>
+    newInputShop(   @NonNull ConcurrentFileSystemModel model,
+                    @NonNull InputSocket<?> input)
     throws IOException;
 
     /**
@@ -146,24 +157,29 @@ extends FileSystemDriver, EntryFactory<E> {
      *         as a <i>regular file</i> until the archive file system is
      *         synchronized with its parent file system.
      */
-    @NonNull
-    OutputShop<E> newOutputShop(@NonNull ConcurrentFileSystemModel model,
-                                @NonNull OutputSocket<?> output,
-                                @Nullable InputShop<E> source)
+    public abstract @NonNull OutputShop<E>
+    newOutputShop(  @NonNull ConcurrentFileSystemModel model,
+                    @NonNull OutputSocket<?> output,
+                    @Nullable InputShop<E> source)
     throws IOException;
 
     /**
      * Returns the icon that
      * {@link de.schlichtherle.truezip.io.swing.tree.FileTreeCellRenderer}
      * should display for the given archive file.
+     * <p>
+     * The implementation in the abstract class {@code ArchiveDriver} simply
+     * returns {@code null}.
      *
      * @param  model the concurrent file system model.
      * @return The icon that should be displayed for the given archive file
      *         if it's open/expanded in the view.
      *         If {@code null} is returned, a default icon should be displayed.
      */
-    @CheckForNull
-    Icon getOpenIcon(@NonNull ConcurrentFileSystemModel model);
+    public @CheckForNull Icon
+    getOpenIcon(@NonNull ConcurrentFileSystemModel model) {
+        return null;
+    }
 
     /**
      * Returns the icon that
@@ -171,12 +187,17 @@ extends FileSystemDriver, EntryFactory<E> {
      * and
      * {@link de.schlichtherle.truezip.io.swing.tree.FileTreeCellRenderer}
      * should display for the given archive file.
+     * <p>
+     * The implementation in the abstract class {@code ArchiveDriver} simply
+     * returns {@code null}.
      *
      * @param  model the concurrent file system model.
      * @return The icon that should be displayed for the given archive file
      *         if it's closed/collapsed in the view.
      *         If {@code null} is returned, a default icon should be displayed.
      */
-    @CheckForNull
-    Icon getClosedIcon(@NonNull ConcurrentFileSystemModel model);
+    public @CheckForNull Icon
+    getClosedIcon(@NonNull ConcurrentFileSystemModel model) {
+        return null;
+    }
 }

@@ -22,6 +22,7 @@ import de.schlichtherle.truezip.io.entry.EntryName;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import java.io.InvalidObjectException;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -93,7 +94,7 @@ public final class Path implements Serializable, Comparable<Path> {
 
     private transient @NonNull FileSystemEntryName entryName;
 
-    private volatile transient @Nullable Path hierarchical;
+    private transient volatile @Nullable Path hierarchical;
 
     /**
      * Equivalent to {@link #create(String, boolean) create(uri, false)}.
@@ -238,7 +239,8 @@ public final class Path implements Serializable, Comparable<Path> {
         try {
             parse(in.readObject().toString(), false);
         } catch (URISyntaxException ex) {
-            throw new IOException(ex);
+            throw (InvalidObjectException) new InvalidObjectException(ex.toString())
+                    .initCause(ex);
         }
     }
 

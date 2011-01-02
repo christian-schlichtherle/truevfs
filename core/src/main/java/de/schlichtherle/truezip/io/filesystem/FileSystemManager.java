@@ -75,44 +75,6 @@ implements Iterable<FileSystemController<?>> {
     iterator();
 
     /**
-     * A visitor for file system controllers.
-     *
-     * @see #visit(Visitor, ExceptionHandler)
-     */
-    public interface Visitor {
-        void visit(@NonNull FileSystemController<?> controller)
-        throws IOException;
-    }
-
-    /**
-     * Visits the controller of all federated file systems managed by this
-     * instance.
-     *
-     * @param  visitor the visitor.
-     * @param  handler the exception handling strategy for dealing with one or
-     *         more input {@code SyncException}s which may trigger an {@code X}.
-     * @param  <X> the type of the {@code IOException} to throw at the
-     *         discretion of the exception {@code handler}.
-     * @throws IOException at the discretion of the exception {@code handler}.
-     */
-    public final <X extends IOException> void
-    visit(  @NonNull final Visitor visitor,
-            @NonNull final ExceptionHandler<? super IOException, X> handler)
-    throws X {
-        for (final FileSystemController<?> controller : this) {
-            try {
-                visitor.visit(controller);
-            } catch (IOException ex) {
-                // Visiting the file system controller resulted in an I/O
-                // exception for some reason.
-                // We are bullheaded and store the exception for later
-                // throwing and continue updating the rest.
-                handler.warn(ex);
-            }
-        }
-    }
-
-    /**
      * Writes all changes to the contents of the federated file systems managed
      * by this instance to their respective parent file system.
      * This will reset the state of the respective file system controllers.
@@ -129,20 +91,55 @@ implements Iterable<FileSystemController<?>> {
      *         option {@code ABORT_CHANGES} is set.
      */
     public <X extends IOException> void
-    sync(   @NonNull final BitField<SyncOption> options,
-            @NonNull final ExceptionHandler<? super IOException, X> handler)
+    sync(   final @NonNull BitField<SyncOption> options,
+            final @NonNull ExceptionHandler<? super IOException, X> handler)
     throws X {
         if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT)
                 || options.get(ABORT_CHANGES))
             throw new IllegalArgumentException();
+
         class Sync implements Visitor {
-            @Override
-            public void visit(FileSystemController<?> controller)
-            throws IOException {
+            @Override public void
+            visit(FileSystemController<?> controller) throws IOException {
                 controller.sync(options, handler);
             }
-        }
+        } // class Sync
+
         visit(new Sync(), handler);
+    }
+
+    /**
+     * Visits the controller of all federated file systems managed by this
+     * instance.
+     *
+     * @param  visitor the visitor.
+     * @param  handler the exception handling strategy for dealing with one or
+     *         more input {@code SyncException}s which may trigger an {@code X}.
+     * @param  <X> the type of the {@code IOException} to throw at the
+     *         discretion of the exception {@code handler}.
+     * @throws IOException at the discretion of the exception {@code handler}.
+     */
+    private <X extends IOException> void
+    visit(  @NonNull Visitor visitor,
+            @NonNull ExceptionHandler<? super IOException, X> handler)
+    throws X {
+        for (FileSystemController<?> controller : this) {
+            try {
+                visitor.visit(controller);
+            } catch (IOException ex) {
+                handler.warn(ex);
+            }
+        }
+    }
+
+    /**
+     * A visitor for file system controllers.
+     *
+     * @see #visit(Visitor, ExceptionHandler)
+     */
+    private interface Visitor {
+        void visit(@NonNull FileSystemController<?> controller)
+        throws IOException;
     }
 
     /**

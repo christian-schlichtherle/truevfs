@@ -56,7 +56,7 @@ extends DecoratingFileSystemController<FileSystemModel, FileSystemController<?>>
      *
      * @param controller the decorated file system controller.
      */
-    FederatedFileSystemController(@NonNull final FileSystemController<?> controller) {
+    FederatedFileSystemController(final @NonNull FileSystemController<?> controller) {
         super(controller);
         assert null != getParent();
     }

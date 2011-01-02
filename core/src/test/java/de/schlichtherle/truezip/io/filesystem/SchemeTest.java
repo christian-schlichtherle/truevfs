@@ -26,7 +26,6 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Locale;
 import org.junit.Test;

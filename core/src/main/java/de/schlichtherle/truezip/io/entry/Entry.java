@@ -140,16 +140,14 @@ public interface Entry {
      * @return The entry name.
      * @see    EntryName#create(java.lang.String, java.lang.String)
      */
-    @NonNull
-    String getName();
+    @NonNull String getName();
 
     /**
      * Returns the type of this entry.
      *
      * @return The type of this entry.
      */
-    @NonNull
-    Type getType();
+    @NonNull Type getType();
 
     /**
      * Returns the size of this entry.
