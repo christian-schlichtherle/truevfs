@@ -34,12 +34,13 @@ import de.schlichtherle.truezip.io.socket.DecoratingInputSocket;
 import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
-import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import javax.swing.Icon;
 import net.jcip.annotations.ThreadSafe;
 
@@ -56,8 +57,8 @@ public final class ConcurrentFileSystemController<
         C extends FileSystemController<? extends M>>
 extends DecoratingFileSystemController<M, C> {
 
-    private volatile ReentrantLock readLock;
-    private volatile ReentrantLock writeLock;
+    private volatile ReadLock readLock;
+    private volatile WriteLock writeLock;
 
     /**
      * Constructs a new concurrent file system controller.
@@ -68,11 +69,11 @@ extends DecoratingFileSystemController<M, C> {
         super(controller);
     }
 
-    private ReentrantLock readLock() {
+    private ReadLock readLock() {
         return null != readLock ? readLock : (readLock = getModel().readLock());
     }
 
-    private ReentrantLock writeLock() {
+    private WriteLock writeLock() {
         return null != writeLock ? writeLock : (writeLock = getModel().writeLock());
     }
 
