@@ -307,8 +307,8 @@ public final class Path implements Serializable, Comparable<Path> {
     }
 
     /**
-     * Returns the mount point or {@code null} iff the {@link #getUri() URI}
-     * is not absolute.
+     * Returns the mount point or {@code null} iff this path's
+     * {@link #getUri() URI} is not absolute.
      *
      * @return The nullable mount point.
      */
@@ -330,15 +330,16 @@ public final class Path implements Serializable, Comparable<Path> {
 
     /**
      * Returns a hierarchical URI for this path.
-     * If the path names a {@link #getMountPoint() mount point}, its
-     * {@link MountPoint#hierarchicalize() hierarchical URI} with the
+     * If this path's {@link #getUri() URI} is opaque, the
+     * {@link MountPoint#hierarchicalize() hierarchical URI} of its
+     * {@link #getMountPoint() mount point} with its
      * {@link #getEntryName() entry name} resolved against it is returned.
-     * Otherwise, the {@link #getUri() URI} of this mount point is returned.
+     * Otherwise, this path is returned.
      * <p>
      * Note that the URI returned by this method is not unique anymore.
-     * For example, the mount point URIs {@code zip:file:/archive!/} and
-     * {@code tar:file:/archive!/} have both the same hierarchical URI
-     * {@code file:/archive/}.
+     * For example, the path URIs {@code zip:file:/archive!/entry} and
+     * {@code tar:file:/archive!/entry} have both the same hierarchical URI
+     * {@code file:/archive/entry}.
      *
      * @return A hierarchical URI for this path.
      */
@@ -348,7 +349,7 @@ public final class Path implements Serializable, Comparable<Path> {
                 ? hierarchical
                 : (hierarchical = !uri.isOpaque()
                     ? this
-                    : 0 >= entryName.toString().length()
+                    : 0 == entryName.toString().length()
                         ? Path.create(mountPoint.hierarchicalize().getUri())
                         : mountPoint.hierarchicalize().resolvePath(entryName));
     }

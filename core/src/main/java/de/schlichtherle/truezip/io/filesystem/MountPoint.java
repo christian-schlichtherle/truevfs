@@ -326,9 +326,9 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
     }
 
     /**
-     * Returns the non-{@code null} URI scheme.
+     * Returns the URI scheme.
      *
-     * @return The non-{@code null} URI scheme.
+     * @return The URI scheme.
      */
     @NonNull
     public Scheme getScheme() {
@@ -336,8 +336,8 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
     }
 
     /**
-     * Returns the path or {@code null} iff the {@link #getUri() URI}
-     * is hierarchical.
+     * Returns the path or {@code null} iff this mount point's
+     * {@link #getUri() URI} is hierarchical.
      *
      * @return The nullable path.
      */
