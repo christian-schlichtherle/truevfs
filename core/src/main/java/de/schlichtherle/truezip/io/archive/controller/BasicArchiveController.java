@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.filesystem.FileSystemEntryNotFoundException;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
@@ -230,7 +231,7 @@ extends FileSystemController<ConcurrentFileSystemModel> {
             }
             final ArchiveFileSystemEntry<E> entry = autoMount().getEntry(name);
             if (null == entry)
-                throw new ArchiveEntryNotFoundException(getModel(),
+                throw new FileSystemEntryNotFoundException(getModel(),
                         name, "no such file or directory");
             return entry.getEntry();
         }
@@ -238,7 +239,7 @@ extends FileSystemController<ConcurrentFileSystemModel> {
         InputSocket<?> getBoundSocket() throws IOException {
             final E entry = getLocalTarget();
             if (DIRECTORY == entry.getType())
-                throw new ArchiveEntryNotFoundException(getModel(),
+                throw new FileSystemEntryNotFoundException(getModel(),
                         name, "cannot read directories");
             return BasicArchiveController
                     .this
@@ -285,7 +286,7 @@ extends FileSystemController<ConcurrentFileSystemModel> {
             // Start creating or overwriting the archive entry.
             // This will fail if the entry already exists as a directory.
             // TODO: Use getPeerTarget() instead of template!
-            return autoMount(   !isRoot(name.getPath())
+            return autoMount(   !name.isRoot()
                                 && options.get(CREATE_PARENTS), options)
                     .mknod(name, FILE, options, template);
         }
@@ -341,7 +342,7 @@ extends FileSystemController<ConcurrentFileSystemModel> {
             @NonNull final BitField<OutputOption> options,
             @CheckForNull final Entry template)
     throws IOException {
-        if (isRoot(name.getPath())) {
+        if (name.isRoot()) {
             try {
                 autoMount(); // detect false positives!
             } catch (FalsePositiveException ex) {
@@ -350,7 +351,7 @@ extends FileSystemController<ConcurrentFileSystemModel> {
                 autoMount(true, options);
                 return;
             }
-            throw new ArchiveEntryNotFoundException(getModel(),
+            throw new FileSystemEntryNotFoundException(getModel(),
                     name, "directory exists already");
         } else {
             autoMount(options.get(CREATE_PARENTS), options)
@@ -361,9 +362,8 @@ extends FileSystemController<ConcurrentFileSystemModel> {
 
     @Override
     public void unlink(final FileSystemEntryName name) throws IOException {
-        final String path = name.getPath();
         autoSync(name, null);
-        if (isRoot(path)) {
+        if (name.isRoot()) {
             final ArchiveFileSystem<E> fileSystem;
             try {
                 fileSystem = autoMount();
@@ -382,7 +382,7 @@ extends FileSystemController<ConcurrentFileSystemModel> {
                 }
                 throw ex; // continue with unlinking our target archive file.
             }
-            if (!fileSystem.getEntry(ROOT_ENTRY_NAME).getMembers().isEmpty())
+            if (!fileSystem.getEntry(ROOT).getMembers().isEmpty())
                 throw new IOException("root directory not empty");
             // Check for any archive entries with absolute entry names.
             // Subtract one for the ROOT entry.

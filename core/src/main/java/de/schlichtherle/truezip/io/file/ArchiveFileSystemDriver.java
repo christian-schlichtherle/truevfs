@@ -20,6 +20,7 @@ import de.schlichtherle.truezip.io.filesystem.FileSystemDriver;
 import de.schlichtherle.truezip.io.filesystem.MountPoint;
 import de.schlichtherle.truezip.io.filesystem.Scheme;
 import de.schlichtherle.truezip.io.filesystem.file.FileDriver;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * @author Christian Schlichtherle
@@ -31,9 +32,14 @@ final class ArchiveFileSystemDriver implements FileSystemDriver {
 
     private final ArchiveDetector detector;
 
-    ArchiveFileSystemDriver(final ArchiveDetector detector) {
-        assert null != detector;
+    ArchiveFileSystemDriver(final @NonNull ArchiveDetector detector) {
+        if (null == detector)
+            throw new NullPointerException();
         this.detector = detector;
+    }
+
+    final @NonNull ArchiveDetector getDetector() {
+        return detector;
     }
 
     /**

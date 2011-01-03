@@ -69,18 +69,11 @@ public final class FileSystemEntryName extends EntryName {
     private static final long serialVersionUID = 2212342253466752478L;
 
     /**
-     * The entry name of the root directory,
-     * which is {@value}.
-     * Note that this name is empty and hence does <em>not</em> contain a
-     * separator character.
-     *
-     * @see #SEPARATOR_CHAR
+     * The file system entry name of the root directory,
+     * which is an empty URI.
      */
-    public static final String ROOT = "";
-
-    /** Represents a file system entry name with an empty URI. */
-    public static final FileSystemEntryName ROOT_ENTRY_NAME
-            = FileSystemEntryName.create(URI.create(ROOT));
+    public static final FileSystemEntryName ROOT
+            = FileSystemEntryName.create(URI.create(""));
 
     /**
      * Equivalent to {@link #create(String, boolean) create(uri, false)}.
@@ -268,6 +261,18 @@ public final class FileSystemEntryName extends EntryName {
         assert !p.startsWith("." + SEPARATOR);
         assert !p.startsWith(".." + SEPARATOR);
         assert !p.endsWith(SEPARATOR);
+        return true;
+    }
+
+    public boolean isRoot() {
+        //return getUri().toString().isEmpty();
+        final URI uri = getUri();
+        final String path = uri.getRawPath();
+        if (null != path && !path.isEmpty())
+            return false;
+        final String query = uri.getRawQuery();
+        if (null != query && !query.isEmpty())
+            return false;
         return true;
     }
 }

@@ -346,7 +346,7 @@ import static de.schlichtherle.truezip.io.filesystem.OutputOption.*;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class File extends java.io.File {
+public final class File extends java.io.File {
 
     //
     // Static fields:
@@ -637,40 +637,87 @@ public class File extends java.io.File {
         assert invariants();
     }
 
-    /*public File(final Path path, final ArchiveDetector detector) {
+    public File(final @NonNull Path path,
+                final @NonNull ArchiveDetector detector) {
+        this(path, new ArchiveFileSystemDriver(detector));
+    }
+
+    private File(   final @NonNull Path path,
+                    final @NonNull ArchiveFileSystemDriver driver) {
         super(path.hierarchicalize().getUri());
 
         this.delegate = new java.io.File(super.getPath());
-        this.detector = detector;
+        this.detector = driver.getDetector();
 
         final MountPoint mountPoint = path.getMountPoint();
         final Path mountPointPath = mountPoint.getPath();
 
         if (null == mountPointPath) {
+            assert !path.getUri().isOpaque();
             this.enclArchive = null;
             this.enclEntryName = null;
             this.innerArchive = null;
             this.controller = null;
         } else {
+            assert path.getUri().isOpaque();
             final FileSystemEntryName entryName = path.getEntryName();
-            if (entryName.getPath().isEmpty()) {
-                this.enclArchive = new File(mountPoint.resolve(entryName), detector);
-                this.enclEntryName = mountPoint.resolveParent(entryName).getEntryName();
+            if (entryName.isRoot()) {
+                if (mountPointPath.getUri().isOpaque()) {
+                    this.enclArchive
+                            = new File(mountPointPath.getMountPoint(), driver);
+                    this.enclEntryName = mountPointPath.getEntryName();
+                } else {
+                    this.enclArchive = null;
+                    this.enclEntryName = null;
+                }
                 this.innerArchive = this;
                 this.controller = FileSystemManagers
                         .getInstance()
-                        .getController( mountPoint,
-                                        new ArchiveFileSystemDriver(detector));
+                        .getController(mountPoint, driver);
             } else {
-                this.enclArchive = new File(mountPointPath, detector);
-                this.enclEntryName = mountPoint.resolveParent(entryName).getEntryName();
+                this.enclArchive = new File(mountPoint, driver);
+                this.enclEntryName = entryName;
                 this.innerArchive = this.enclArchive;
                 this.controller = null;
             }
         }
 
         assert invariants();
-    }*/
+    }
+
+    private File(   final @NonNull MountPoint mountPoint,
+                    final @NonNull ArchiveFileSystemDriver driver) {
+        super(mountPoint.hierarchicalize().getUri());
+
+        this.delegate = new java.io.File(super.getPath());
+        this.detector = driver.getDetector();
+
+        final Path mountPointPath = mountPoint.getPath();
+
+        if (null == mountPointPath) {
+            assert !mountPoint.getUri().isOpaque();
+            this.enclArchive = null;
+            this.enclEntryName = null;
+            this.innerArchive = null;
+            this.controller = null;
+        } else {
+            assert mountPoint.getUri().isOpaque();
+            if (mountPointPath.getUri().isOpaque()) {
+                this.enclArchive
+                        = new File(mountPointPath.getMountPoint(), driver);
+                this.enclEntryName = mountPointPath.getEntryName();
+            } else {
+                this.enclArchive = null;
+                this.enclEntryName = null;
+            }
+            this.innerArchive = this;
+            this.controller = FileSystemManagers
+                    .getInstance()
+                    .getController(mountPoint, driver);
+        }
+
+        assert invariants();
+    }
 
     /**
      * Converts a (jar:)*file: URI to a plain file: URI or returns the
@@ -1822,14 +1869,14 @@ public class File extends java.io.File {
      */
     public final String getInnerEntryName() {
         return this == innerArchive
-                ? ROOT
+                ? ROOT.getPath()
                 : null == enclEntryName
                     ? null
                     : enclEntryName.getPath();
     }
 
     final FileSystemEntryName getInnerEntryName0() {
-        return this == innerArchive ? ROOT_ENTRY_NAME : enclEntryName;
+        return this == innerArchive ? ROOT : enclEntryName;
     }
 
     /**

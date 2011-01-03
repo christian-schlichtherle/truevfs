@@ -330,6 +330,28 @@ public final class Path implements Serializable, Comparable<Path> {
     }
 
     /**
+     * Returns the URI of this path.
+     *
+     * @return The URI of this path.
+     */
+    public @NonNull URI getUri() {
+        return uri;
+    }
+
+    /**
+     * Resolves the given entry name against this path.
+     *
+     * @param  entryName an entry name relative to this path.
+     * @return A new path with an absolute URI.
+     */
+    public @NonNull Path
+    resolve(final @NonNull FileSystemEntryName entryName) {
+        return new Path(
+                this.mountPoint,
+                new FileSystemEntryName(this.entryName, entryName));
+    }
+
+    /**
      * Returns a hierarchical URI for this path.
      * If this path's {@link #getUri() URI} is opaque, the
      * {@link MountPoint#hierarchicalize() hierarchical URI} of its
@@ -339,7 +361,7 @@ public final class Path implements Serializable, Comparable<Path> {
      * <p>
      * Note that the URI returned by this method is not unique anymore.
      * For example, the path URIs {@code zip:file:/archive!/entry} and
-     * {@code tar:file:/archive!/entry} have both the same hierarchical URI
+     * {@code tar:file:/archive!/entry} both have the same hierarchical URI
      * {@code file:/archive/entry}.
      *
      * @return A hierarchical URI for this path.
@@ -352,15 +374,6 @@ public final class Path implements Serializable, Comparable<Path> {
                     : 0 == entryName.toString().length()
                         ? Path.create(mountPoint.hierarchicalize().getUri())
                         : mountPoint.hierarchicalize().resolve(entryName));
-    }
-
-    /**
-     * Returns the URI of this path.
-     *
-     * @return The URI of this path.
-     */
-    public @NonNull URI getUri() {
-        return uri;
     }
 
     /**
