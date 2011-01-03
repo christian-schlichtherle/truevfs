@@ -617,29 +617,18 @@ public final class File extends java.io.File {
      * @throws IllegalArgumentException if any precondition for the
      *         parameter {@code uri} does not hold.
      */
-    // TODO: Use Path constructor!
     public File(URI uri) {
-        this(uri, ArchiveDetector.ALL);
+        this(Path.create(uri), new ArchiveFileSystemDriver(ArchiveDetector.ALL));
     }
 
-    // Unfortunately, this constructor has a significant overhead as the jar:
-    // schemes need to be processed twice, first before initializing the super
-    // class and second when initializing this sub class.
-    // TODO: Use Path constructor!
+    @Deprecated
     File(   final URI uri,
             final ArchiveDetector detector) {
-        super(unjarFileURI(uri));
-
-        delegate = new java.io.File(super.getPath());
-        this.detector = detector;
-        init(uri);
-
-        assert invariants();
+        this(Path.create(uri), new ArchiveFileSystemDriver(detector));
     }
 
-    public File(final @NonNull Path path,
-                final @NonNull ArchiveDetector detector) {
-        this(path, new ArchiveFileSystemDriver(detector));
+    public File(final @NonNull Path path) {
+        this(path, new ArchiveFileSystemDriver(ArchiveDetector.ALL));
     }
 
     private File(   final @NonNull Path path,
@@ -717,53 +706,6 @@ public final class File extends java.io.File {
         }
 
         assert invariants();
-    }
-
-    /**
-     * Converts a (jar:)*file: URI to a plain file: URI or returns the
-     * provided URI again if it doesn't match this pattern.
-     */
-    private static URI unjarFileURI(final URI uri) {
-        try {
-            final String scheme = uri.getScheme();
-            final String ssp = normalize(uri.getSchemeSpecificPart(), '/');
-            return unjarFileURI0(new URI(scheme, ssp, null));
-        } catch (URISyntaxException ignored) {
-            // Ignore any exception with possibly only a subpart of the
-            // original URI.
-        }
-        throw new IllegalArgumentException(uri + ": Not a valid (possibly jared) file URI!");
-    }
-
-    private static URI unjarFileURI0(final URI uri)
-    throws URISyntaxException {
-        final String scheme = uri.getScheme();
-        if ("jar".equalsIgnoreCase(scheme)) {
-            final String rssp = uri.getRawSchemeSpecificPart();
-            final int i;
-            if (rssp.endsWith("!"))
-                i = rssp.length() - 1;
-            else
-                i = rssp.lastIndexOf("!/");
-
-            if (i <= 0)
-                return unjarFileURI(new URI(rssp)); // ignore redundant jar: scheme
-
-            final URI subURI = new URI(
-                    rssp.substring(0, i) + rssp.substring(i + 1)); // cut out '!'
-            final String subScheme = subURI.getScheme();
-            if ("jar".equalsIgnoreCase(subScheme)) {
-                final URI processedSubURI = unjarFileURI0(subURI);
-                if (processedSubURI != subURI)
-                    return processedSubURI;
-                // No match, e.g. "jar:jar:http://host/dir!/dir!/file".
-            } else if ("file".equalsIgnoreCase(subScheme)) {
-                return subURI; // e.g. "file:///usr/bin"
-            }
-        } else if ("file".equalsIgnoreCase(scheme)) {
-            return uri;
-        }
-        throw new URISyntaxException(uri.toString(), "Not a valid (possibly jared) file URI!");
     }
 
     /**
@@ -1064,103 +1006,6 @@ public final class File extends java.io.File {
         }
 
         init(ancestor, detector, skip, parent, enclEntryNameBuf, splitter);
-    }
-
-    /**
-     * Uses the given (jar:)*file: URI to initialize this file object.
-     * Note that we already know that the provided URI matches this pattern!
-     * {@code entry} and {@code detector} must already be
-     * initialized!
-     * Must not be called to re-initialize this object!
-     */
-    private void init(final URI uri) {
-        assert uri != null;
-        assert delegate.getPath().equals(super.getPath());
-        assert detector != null;
-
-        init(uri, 0,
-                cutTrailingSeparators(uri.getSchemeSpecificPart(), '/'),
-                new Splitter('/'));
-
-        if (innerArchive == this) {
-            // controller init has been deferred until now in
-            // order to provide the FileSystemController with a fully
-            // initialized object.
-            initController();
-        }
-    }
-
-    /**
-     * TODO: Provide a means to detect other archive schemes, not only
-     * {@code "jar:"}.
-     */
-    private void init(
-            URI uri,
-            int skip,
-            final String path,
-            final Splitter splitter) {
-        String scheme = uri.getScheme();
-        if (path == null || !"jar".equalsIgnoreCase(scheme)) {
-            assert enclArchive == null;
-            enclEntryName = null;
-            return;
-        }
-        splitter.split(path);
-        String parent = splitter.getParentPath();
-        final String member = splitter.getMemberName();
-        if (member.length() == 0 || ".".equals(member)) {
-            // Fall through.
-        } else if ("..".equals(member)) {
-            skip++;
-        } else if (skip > 0) {
-            skip--;
-        } else {
-            final int baseEnd = member.length() - 1;
-            final boolean isArchive = member.charAt(baseEnd) == '!';
-            if (null != enclEntryName) {
-                if (isArchive) {
-                    enclArchive = detector.newFile(newURI(scheme, path)); // use the same detector for the parent directory
-                    if (innerArchive != this) {
-                        innerArchive = enclArchive;
-                    }
-                    return;
-                }
-                enclEntryName = FileSystemEntryName.create(
-                        member + "/" + enclEntryName.getPath(),
-                        null);
-            } else {
-                if (isArchive) {
-                    innerArchive = this;
-                    int i = parent.indexOf(':');
-                    assert i >= 0;
-                    scheme = parent.substring(0, i);
-                    assert scheme.matches("[a-zA-Z]+");
-                    if (i == parent.length() - 1) // scheme only?
-                        return;
-                    uri = newURI(parent.substring(0, i), parent.substring(i + 1));
-                    enclEntryName = FileSystemEntryName.create(
-                            member.substring(0, baseEnd), // cut off trailing '!'!
-                            null);
-                    parent = uri.getSchemeSpecificPart();
-                } else {
-                    enclEntryName = FileSystemEntryName.create(member, null);
-                }
-            }
-        }
-        init(uri, skip, parent, splitter);
-    }
-
-    /**
-     * Creates a URI from a scheme and a scheme specific part.
-     * Note that the scheme specific part may contain whitespace.
-     */
-    private static URI newURI(String scheme, String ssp)
-    throws IllegalArgumentException {
-        try {
-            return new URI(scheme, ssp, null);
-        } catch (URISyntaxException syntaxError) {
-            throw new IllegalArgumentException(syntaxError);
-        }
     }
 
     /**

@@ -284,14 +284,18 @@ public class EntryName implements Serializable, Comparable<EntryName> {
     private void parse(final @NonNull URI uri, final boolean normalize)
     throws URISyntaxException {
         if (uri.isAbsolute())
-            throw new URISyntaxException(uri.toString(), "Scheme not allowed");
+            throw new URISyntaxException(quote(uri), "Scheme not allowed");
         if (uri.getRawAuthority() != null)
-            throw new URISyntaxException(uri.toString(), "Authority not allowed");
+            throw new URISyntaxException(quote(uri), "Authority not allowed");
         if (null != uri.getRawFragment())
-            throw new URISyntaxException(uri.toString(), "Fragment not allowed");
+            throw new URISyntaxException(quote(uri), "Fragment not allowed");
         this.uri = normalize ? uri.normalize() : uri;
 
         assert invariants();
+    }
+
+    private static String quote(Object s) {
+        return "\"" + s + "\"";
     }
 
     private boolean invariants() {

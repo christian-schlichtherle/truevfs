@@ -227,10 +227,10 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
     throws URISyntaxException {
         final URI pathUri = path.getUri();
         if (!pathUri.isAbsolute())
-            throw new URISyntaxException(pathUri.toString(), "Path not absolute");
+            throw new URISyntaxException(quote(pathUri), "Path not absolute");
         final String pathEntryNameUriPath = path.getEntryName().getUri().getPath();
         if (0 == pathEntryNameUriPath.length())
-            throw new URISyntaxException(pathUri.toString(), "Empty entry name");
+            throw new URISyntaxException(quote(pathUri), "Empty entry name");
         this.uri = new URI(new StringBuilder(scheme.toString())
                 .append(':')
                 .append(path.toString())
@@ -265,19 +265,19 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
     private void parse(@NonNull URI uri, final boolean normalize)
     throws URISyntaxException {
         if (null != uri.getRawFragment())
-            throw new URISyntaxException(uri.toString(), "Fragment not allowed");
+            throw new URISyntaxException(quote(uri), "Fragment not allowed");
         if (uri.isOpaque()) {
             final String ssp = uri.getRawSchemeSpecificPart();
             final int i = ssp.lastIndexOf(MOUNT_POINT_SEPARATOR);
             if (ssp.length() - 2 != i)
-                throw new URISyntaxException(uri.toString(),
+                throw new URISyntaxException(quote(uri),
                         "Doesn't end with mount point separator \"" + MOUNT_POINT_SEPARATOR + '"');
             path = new Path(ssp.substring(0, i), normalize);
             final URI pathUri = path.getUri();
             if (!pathUri.isAbsolute())
-                throw new URISyntaxException(uri.toString(), "Path not absolute");
+                throw new URISyntaxException(quote(uri), "Path not absolute");
             if (0 == path.getEntryName().getPath().length())
-                throw new URISyntaxException(uri.toString(), "Empty entry name");
+                throw new URISyntaxException(quote(uri), "Empty entry name");
             if (normalize) {
                 final URI nuri = new URI(new StringBuilder(uri.getScheme())
                         .append(':')
@@ -287,24 +287,28 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
                 if (!uri.equals(nuri))
                     uri = nuri;
             } else if (pathUri.normalize() != pathUri)
-                throw new URISyntaxException(uri.toString(),
+                throw new URISyntaxException(quote(uri),
                         "URI path not in normal form");
         } else {
             if (!uri.isAbsolute())
-                throw new URISyntaxException(uri.toString(), "Not absolute");
+                throw new URISyntaxException(quote(uri), "Not absolute");
             if (normalize)
                 uri = uri.normalize();
             else if (uri.normalize() != uri)
-                throw new URISyntaxException(uri.toString(),
+                throw new URISyntaxException(quote(uri),
                         "URI path not in normal form");
             if (!uri.getRawPath().endsWith(SEPARATOR))
-                throw new URISyntaxException(uri.toString(),
+                throw new URISyntaxException(quote(uri),
                         "URI path doesn't end with separator \"" + SEPARATOR + '"');
             path = null;
         }
         this.uri = uri;
 
         assert invariants();
+    }
+
+    private static String quote(Object s) {
+        return "\"" + s + "\"";
     }
 
     private boolean invariants() {

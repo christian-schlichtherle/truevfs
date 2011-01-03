@@ -70,23 +70,27 @@ public final class Scheme implements Serializable, Comparable<Scheme> {
     public Scheme(final @NonNull String scheme) throws URISyntaxException {
         int i = scheme.length();
         if (0 >= i) {
-            throw new URISyntaxException(scheme, "Empty URI scheme");
+            throw new URISyntaxException(quote(scheme), "Empty URI scheme");
         }
         char c;
         c = scheme.charAt(0);
         // TODO: Character class is no help here - consider table lookup!
         if ((c < 'a' || 'z' < c) && (c < 'A' || 'Z' < c)) {
-            throw new URISyntaxException(scheme, "Illegal character in URI scheme", 0);
+            throw new URISyntaxException(quote(scheme), "Illegal character in URI scheme", 0);
         }
         while (--i >= 1) {
             c = scheme.charAt(i);
             if ((c < 'a' || 'z' < c) && (c < 'A' || 'Z' < c)
                     && (c < '0' || '9' < c)
                     && c != '+' && c != '-' && c != '.') {
-                throw new URISyntaxException(scheme, "Illegal character in URI scheme", i);
+                throw new URISyntaxException(quote(scheme), "Illegal character in URI scheme", i);
             }
         }
         this.scheme = scheme;
+    }
+
+    private static String quote(Object s) {
+        return "\"" + s + "\"";
     }
 
     @Override
