@@ -20,6 +20,8 @@ import java.util.logging.Logger;
 
 /**
  * The {@code IBM437} character set, also known as {@code CP437}.
+ * This is the original character set used to encode entry names and file
+ * comments in ZIP files.
  *
  * @author Christian Schlichtherle
  * @version $Id$
