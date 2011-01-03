@@ -213,20 +213,24 @@ public final class FileSystemEntryName extends EntryName {
         super(uri, normalize);
 
         if (!normalize && uri.normalize() != uri)
-            throw new URISyntaxException(uri.toString(), "URI path not in normal form");
+            throw new URISyntaxException(quote(uri), "URI path not in normal form");
         uri = getUri();
         final String p = uri.getRawPath();
         if (    "..".equals(p)
                 || p.startsWith(SEPARATOR)
                 || p.startsWith("." + SEPARATOR)
                 || p.startsWith(".." + SEPARATOR))
-            throw new URISyntaxException(uri.toString(),
+            throw new URISyntaxException(quote(uri),
                     "Illegal start of URI path");
         if (p.endsWith(SEPARATOR))
-            throw new URISyntaxException(uri.toString(),
+            throw new URISyntaxException(quote(uri),
                     "Illegal separator \"" + SEPARATOR + "\" at end of URI path");
 
         assert invariants();
+    }
+
+    private static String quote(Object s) {
+        return "\"" + s + "\"";
     }
 
     /**

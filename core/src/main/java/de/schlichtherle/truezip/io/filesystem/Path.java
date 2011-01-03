@@ -252,12 +252,12 @@ public final class Path implements Serializable, Comparable<Path> {
     private void parse(@NonNull URI uri, final boolean normalize)
     throws URISyntaxException {
         if (null != uri.getRawFragment())
-            throw new URISyntaxException(uri.toString(), "Fragment not allowed");
+            throw new URISyntaxException(quote(uri), "Fragment not allowed");
         if (uri.isOpaque()) {
             final String ssp = uri.getSchemeSpecificPart();
             final int i = ssp.lastIndexOf(MOUNT_POINT_SEPARATOR);
             if (0 > i)
-                throw new URISyntaxException(uri.toString(),
+                throw new URISyntaxException(quote(uri),
                         "Missing mount point separator \"" + MOUNT_POINT_SEPARATOR + '"');
             mountPoint = new MountPoint(
                     new URI(uri.getScheme(), ssp.substring(0, i + 2), null),
@@ -275,7 +275,7 @@ public final class Path implements Serializable, Comparable<Path> {
             if (normalize)
                 uri = uri.normalize();
             else if (uri.normalize() != uri)
-                throw new URISyntaxException(uri.toString(),
+                throw new URISyntaxException(quote(uri),
                         "URI path not in normal form");
             mountPoint = new MountPoint(uri.resolve("."));
             entryName = new FileSystemEntryName(mountPoint.getUri().relativize(uri));
@@ -288,6 +288,10 @@ public final class Path implements Serializable, Comparable<Path> {
         this.uri = uri;
 
         assert invariants();
+    }
+
+    private static String quote(Object s) {
+        return "\"" + s + "\"";
     }
 
     private boolean invariants() {
