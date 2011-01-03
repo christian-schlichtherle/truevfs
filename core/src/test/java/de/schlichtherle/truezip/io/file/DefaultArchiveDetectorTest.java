@@ -42,8 +42,6 @@ public class DefaultArchiveDetectorTest {
     public void testDefaultConfiguration() {
         assertEquals("",
                 NULL.getSuffixes());
-        assertEquals("ear|jar|war|zip",
-                DEFAULT.getSuffixes());
         assertEquals("ear|exe|jar|odb|odf|odg|odm|odp|ods|odt|otg|oth|otp|ots|ott|tar|tar.bz2|tar.gz|tbz2|tgz|tzp|war|zip|zip.rae|zip.raes",
                 ALL.getSuffixes());
     }
@@ -312,8 +310,8 @@ public class DefaultArchiveDetectorTest {
                 NULL, "zip", null); // remove zip suffix
         assertEquals("", detector.getSuffixes());
         detector = new DefaultArchiveDetector(
-                DEFAULT, ".ZIP", null); // remove zip suffix
-        assertEquals("ear|jar|war", detector.getSuffixes());
+                NULL, ".ZIP", null); // remove zip suffix
+        assertEquals("", detector.getSuffixes());
     }
 
     @Test
@@ -378,47 +376,6 @@ public class DefaultArchiveDetectorTest {
             assertThat(type, notNullValue());
             assertThat(ALL.getDriver(type), notNullValue());
         }
-
-        testGetArchiveDriver(DEFAULT, new Object[] {
-            null, "",
-            null, ".",
-            null, ".all",
-            null, ".default",
-            ALL.getDriver(Scheme.create("ear")), ".ear",
-            null, ".exe",
-            ALL.getDriver(Scheme.create("jar")), ".jar",
-            null, ".null",
-            null, ".tar",
-            null, ".tar.bz2",
-            null, ".tar.gz",
-            null, ".tbz2",
-            null, ".tgz",
-            null, ".tzp",
-            ALL.getDriver(Scheme.create("war")), ".war",
-            null, ".z",
-            ALL.getDriver(Scheme.create("zip")), ".zip",
-            null, ".zip.rae",
-            null, ".zip.raes",
-            null, "test",
-            null, "test.",
-            null, "test.all",
-            null, "test.default",
-            ALL.getDriver(Scheme.create("ear")), "test.ear",
-            null, "test.exe",
-            ALL.getDriver(Scheme.create("jar")), "test.jar",
-            null, "test.null",
-            null, "test.tar",
-            null, "test.tar.bz2",
-            null, "test.tar.gz",
-            null, "test.tbz2",
-            null, "test.tgz",
-            null, "test.tzp",
-            ALL.getDriver(Scheme.create("war")), "test.war",
-            null, "test.z",
-            ALL.getDriver(Scheme.create("zip")), "test.zip",
-            null, "test.zip.rae",
-            null, "test.zip.raes",
-        });
 
         testGetArchiveDriver(ArchiveDetector.ALL, new Object[] {
             null, "",
@@ -519,7 +476,7 @@ public class DefaultArchiveDetectorTest {
     @Test
     public void testSerialization() throws IOException, ClassNotFoundException {
         // Preamble.
-        DefaultArchiveDetector detector = ArchiveDetector.DEFAULT;
+        DefaultArchiveDetector detector = ArchiveDetector.ALL;
 
         // Serialize.
         final ByteArrayOutputStream bos = new ByteArrayOutputStream();

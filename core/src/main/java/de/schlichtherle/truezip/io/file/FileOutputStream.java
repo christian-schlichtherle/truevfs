@@ -82,7 +82,7 @@ import static de.schlichtherle.truezip.io.filesystem.OutputOption.CREATE_PARENTS
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class FileOutputStream extends DecoratingOutputStream {
+public final class FileOutputStream extends DecoratingOutputStream {
 
     /**
      * Creates a new {@code FileOutputStream} for accessing regular files or
@@ -95,8 +95,7 @@ public class FileOutputStream extends DecoratingOutputStream {
      */
     public FileOutputStream(String name)
     throws FileNotFoundException {
-        super(newOutputStream(
-                File.getDefaultArchiveDetector().newFile(name), false));
+        super(newOutputStream(new File(name), false));
     }
 
     /**
@@ -110,8 +109,7 @@ public class FileOutputStream extends DecoratingOutputStream {
      */
     public FileOutputStream(String name, boolean append)
     throws FileNotFoundException {
-        super(newOutputStream(
-                File.getDefaultArchiveDetector().newFile(name), append));
+        super(newOutputStream(new File(name), append));
     }
 
     /**

@@ -79,7 +79,7 @@ import java.io.InputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class FileInputStream extends DecoratingInputStream {
+public final class FileInputStream extends DecoratingInputStream {
 
     /**
      * Creates a new {@code FileInputStream} for accessing regular files or
@@ -92,7 +92,7 @@ public class FileInputStream extends DecoratingInputStream {
      */
     public FileInputStream(String name)
     throws FileNotFoundException {
-        super(newInputStream(File.getDefaultArchiveDetector().newFile(name)));
+        super(newInputStream(new File(name)));
     }
 
     /**

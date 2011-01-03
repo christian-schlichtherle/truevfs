@@ -23,7 +23,6 @@ import de.schlichtherle.truezip.io.filesystem.Scheme;
 import de.schlichtherle.truezip.util.regex.ThreadLocalMatcher;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
@@ -80,9 +79,9 @@ import java.util.regex.Matcher;
  * @see ArchiveDetector#ALL
  */
 // TODO: Consider removing support for serialization in this class.
-public class DefaultArchiveDetector
-extends AbstractArchiveDetector
-implements Serializable {
+public final class DefaultArchiveDetector
+implements ArchiveDetector, Serializable {
+
     private static final long serialVersionUID = 848158760183179884L;
 
     /**

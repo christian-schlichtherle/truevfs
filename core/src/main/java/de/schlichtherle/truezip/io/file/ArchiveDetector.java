@@ -60,7 +60,7 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-public interface ArchiveDetector extends FileFactory {
+public interface ArchiveDetector {
 
     /**
      * Never recognizes archive files in a path.
@@ -83,6 +83,7 @@ public interface ArchiveDetector extends FileFactory {
      *
      * @see GlobalArchiveDriverRegistry
      */
+    @Deprecated
     DefaultArchiveDetector DEFAULT = new DefaultArchiveDetector(
             GlobalArchiveDriverRegistry.INSTANCE.DEFAULT_SUFFIXES);
 

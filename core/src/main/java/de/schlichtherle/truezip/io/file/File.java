@@ -61,7 +61,6 @@ import static de.schlichtherle.truezip.io.filesystem.FileSystemEntryName.*;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
 import static de.schlichtherle.truezip.io.entry.Entry.Size.*;
 import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
-import static de.schlichtherle.truezip.io.Files.cutTrailingSeparators;
 import static de.schlichtherle.truezip.io.Files.getRealFile;
 import static de.schlichtherle.truezip.io.Files.normalize;
 import static de.schlichtherle.truezip.io.filesystem.OutputOption.*;
@@ -502,8 +501,8 @@ public final class File extends java.io.File {
      * Equivalent to {@link #File(String, String, ArchiveDetector)
      * File(parent, child, getDefaultArchiveDetector())}.
      */
-    public File(String parent, String child) {
-        this(parent, child, defaultDetector);
+    public File(String parent, String member) {
+        this(parent, member, defaultDetector);
     }
 
     /**
@@ -512,17 +511,17 @@ public final class File extends java.io.File {
      *
      * @param parent The parent path as a {@link String}.
      * @param detector The object used to detect any archive files in the path.
-     * @param child The child path as a {@link String}.
+     * @param member The child path as a {@link String}.
      * @see <a href="package-summary.html#third_parties">Third Party
      *      Access using different Archive Detectors</a>
      */
     public File(
             final String parent,
-            final String child,
+            final String member,
             final ArchiveDetector detector) {
-        super(parent, child);
+        super(parent, member);
 
-        delegate = new java.io.File(parent, child);
+        delegate = new java.io.File(parent, member);
         this.detector = detector;
         init((File) null);
 
@@ -541,10 +540,10 @@ public final class File extends java.io.File {
      *        This is used in order to make this {@code File} instance
      *        behave as if it had been created by one of the {@link #listFiles}
      *        methods called on {@code parent} instead.
-     * @param child The child path as a {@link String}.
+     * @param member The child path as a {@link String}.
      */
-    public File(java.io.File parent, String child) {
-        this(parent, child, null);
+    public File(java.io.File parent, String member) {
+        this(parent, member, null);
     }
 
     /**
@@ -553,7 +552,7 @@ public final class File extends java.io.File {
      * and configure their parameters.
      *
      * @param parent The parent directory as a {@code File} instance.
-     * @param child The child path as a {@link String}.
+     * @param member The child path as a {@link String}.
      * @param detector The object used to detect any archive files in the path.
      *        If this is {@code null} and {@code parent} is an
      *        instance of this class, the archive detector is inherited from
@@ -567,11 +566,11 @@ public final class File extends java.io.File {
      */
     public File(
             final java.io.File parent,
-            final String child,
+            final String member,
             final ArchiveDetector detector) {
-        super(parent, child);
+        super(parent, member);
 
-        delegate = new java.io.File(parent, child);
+        delegate = new java.io.File(parent, member);
         if (parent instanceof File) {
             final File smartParent = (File) parent;
             this.detector = detector != null ? detector : smartParent.detector;
@@ -621,16 +620,11 @@ public final class File extends java.io.File {
         this(Path.create(uri), new ArchiveFileSystemDriver(ArchiveDetector.ALL));
     }
 
-    @Deprecated
-    File(   final URI uri,
-            final ArchiveDetector detector) {
-        this(Path.create(uri), new ArchiveFileSystemDriver(detector));
-    }
-
     public File(final @NonNull Path path) {
         this(path, new ArchiveFileSystemDriver(ArchiveDetector.ALL));
     }
 
+    @SuppressWarnings("LeakingThisInConstructor")
     private File(   final @NonNull Path path,
                     final @NonNull ArchiveFileSystemDriver driver) {
         super(path.hierarchicalize().getUri());
@@ -674,6 +668,7 @@ public final class File extends java.io.File {
         assert invariants();
     }
 
+    @SuppressWarnings("LeakingThisInConstructor")
     private File(   final @NonNull MountPoint mountPoint,
                     final @NonNull ArchiveFileSystemDriver driver) {
         super(mountPoint.hierarchicalize().getUri());
@@ -712,10 +707,9 @@ public final class File extends java.io.File {
      * @deprecated This constructor is not intended for public use - do <em>not</em> use it!
      * @see FileFactory
      */
-    @Deprecated
     @SuppressWarnings("LeakingThisInConstructor")
-    public File(
-            final java.io.File delegate,
+    @Deprecated
+    File(   final java.io.File delegate,
             final File innerArchive,
             final ArchiveDetector detector) {
         super(delegate.getPath());
@@ -830,7 +824,7 @@ public final class File extends java.io.File {
      * @deprecated This constructor is not intended for public use - do <em>not</em> use it!
      * @see FileFactory
      */
-    @Deprecated public
+    @Deprecated
     File(   final File template,
             final java.io.File delegate,
             final File enclArchive) {
@@ -991,7 +985,7 @@ public final class File extends java.io.File {
             final boolean isArchive = detector.getScheme(path) != null;
             if (enclEntryNameBuf.length() > 0) {
                 if (isArchive) {
-                    enclArchive = detector.newFile(path); // use the same detector for the parent directory
+                    enclArchive = new File(path, detector); // use the same detector for the parent directory
                     if (innerArchive != this)
                         innerArchive = enclArchive;
                     return;
@@ -1510,7 +1504,7 @@ public final class File extends java.io.File {
         // archive files with a different detector, which could
         // trigger an update and reconfiguration of the respective
         // archive controller!
-        return detector.newFile(parent, enclArchive);
+        return new File(parent, enclArchive, detector);
     }
 
     /**
@@ -1529,7 +1523,7 @@ public final class File extends java.io.File {
         File enclArchive = this.enclArchive;
         if (null != enclArchive)
             enclArchive = enclArchive.getAbsoluteFile();
-        return detector.newFile(this, delegate.getAbsoluteFile(), enclArchive);
+        return new File(this, delegate.getAbsoluteFile(), enclArchive);
     }
 
     /**
@@ -1548,8 +1542,7 @@ public final class File extends java.io.File {
         File enclArchive = this.enclArchive;
         if (null != enclArchive)
             enclArchive = enclArchive.getNormalizedAbsoluteFile();
-        return detector.newFile(
-                this, normalize(delegate.getAbsoluteFile()), enclArchive);
+        return new File(this, normalize(delegate.getAbsoluteFile()), enclArchive);
     }
 
     /**
@@ -1581,7 +1574,7 @@ public final class File extends java.io.File {
             return this;
         assert !(normalizedFile instanceof File);
         assert enclArchive == null || normalize(enclArchive) == enclArchive;
-        return detector.newFile(this, normalizedFile, enclArchive);
+        return new File(this, normalizedFile, enclArchive);
     }
 
     /**
@@ -1600,7 +1593,7 @@ public final class File extends java.io.File {
         if (null != enclArchive)
             enclArchive = enclArchive.getCanonicalFile();
         // Note: entry.getCanonicalFile() may change case!
-        return detector.newFile(this, delegate.getCanonicalFile(), enclArchive);
+        return new File(this, delegate.getCanonicalFile(), enclArchive);
     }
 
     /**
@@ -1615,7 +1608,7 @@ public final class File extends java.io.File {
         File enclArchive = this.enclArchive;
         if (null != enclArchive)
             enclArchive = enclArchive.getCanOrAbsFile();
-        return detector.newFile(this, getRealFile(delegate), enclArchive);
+        return new File(this, getRealFile(delegate), enclArchive);
     }
 
     /**
@@ -2475,7 +2468,7 @@ public final class File extends java.io.File {
     }
 
     /**
-     * Equivalent to {@link #listFiles(FilenameFilter, FileFactory)
+     * Equivalent to {@link #listFiles(FilenameFilter, ArchiveDetector)
      * listFiles((FilenameFilter) null, getArchiveDetector())}.
      */
     @Override
@@ -2493,19 +2486,17 @@ public final class File extends java.io.File {
      * <p>
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      *
-     * @param factory The factory used to create the member file of this
-     *        directory.
-     *        This could be an {@link ArchiveDetector} in order to detect any
-     *        archives by the member file names.
+     * @param  detector The archive detector to detect any archives files in
+     *         the member file names.
      * @return {@code null} if this is not a directory or an archive file,
      *         a valid (but maybe empty) array otherwise.
      */
-    public File[] listFiles(final FileFactory factory) {
-        return listFiles((FilenameFilter) null, factory);
+    public File[] listFiles(final ArchiveDetector detector) {
+        return listFiles((FilenameFilter) null, detector);
     }
 
     /**
-     * Equivalent to {@link #listFiles(FilenameFilter, FileFactory)
+     * Equivalent to {@link #listFiles(FilenameFilter, ArchiveDetector)
      * listFiles(filenameFilter, getArchiveDetector())}.
      */
     @Override
@@ -2524,18 +2515,16 @@ public final class File extends java.io.File {
      * <p>
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      *
-     * @param factory The factory used to create the member file of this
-     *        directory.
-     *        This could be an {@link ArchiveDetector} in order to detect any
-     *        archives by the member file names.
+     * @param  detector The archive detector to detect any archives files in
+     *         the member file names.
      * @return {@code null} if this is not a directory or an archive file,
      *         a valid (but maybe empty) array otherwise.
-     * @see <a href="package-summary.html#third_parties">Third Party
-     *      Access using different Archive Detectors</a>
+     * @see    <a href="package-summary.html#third_parties">Third Party
+     *         Access using different Archive Detectors</a>
      */
     public File[] listFiles(
             final FilenameFilter filter,
-            final FileFactory factory) {
+            final ArchiveDetector detector) {
         if (null != innerArchive) {
             final FileSystemEntry entry;
             try {
@@ -2552,25 +2541,25 @@ public final class File extends java.io.File {
                     = new ArrayList<File>(members.size());
             for (final String member : members)
                 if (filter == null || filter.accept(this, member))
-                    filtered.add(factory.newFile(File.this, member));
+                    filtered.add(new File(File.this, member, detector));
             return filtered.toArray(new File[filtered.size()]);
         }
-        return convert(delegate.listFiles(filter), factory);
+        return convert(delegate.listFiles(filter), detector);
     }
 
     private static File[] convert(
             final java.io.File[] files,
-            final FileFactory factory) {
+            final ArchiveDetector detector) {
         if (files == null)
             return null; // no directory
         File[] results = new File[files.length];
         for (int i = files.length; 0 <= --i; )
-            results[i] = factory.newFile(files[i]);
+            results[i] = new File(files[i], detector);
         return results;
     }
 
     /**
-     * Equivalent to {@link #listFiles(FileFilter, FileFactory)
+     * Equivalent to {@link #listFiles(FileFilter, ArchiveDetector)
      * listFiles(fileFilter, getArchiveDetector())}.
      */
     @Override
@@ -2588,10 +2577,8 @@ public final class File extends java.io.File {
      * <p>
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      *
-     * @param factory The factory used to create the member file of this
-     *        directory.
-     *        This could be an {@link ArchiveDetector} in order to detect any
-     *        archives by the member file names.
+     * @param  detector The archive detector to detect any archives files in
+     *         the member file names.
      * @return {@code null} if this is not a directory or an archive file,
      *         a valid (but maybe empty) array otherwise.
      * @see <a href="package-summary.html#third_parties">Third Party
@@ -2599,7 +2586,7 @@ public final class File extends java.io.File {
      */
     public File[] listFiles(
             final FileFilter filter,
-            final FileFactory factory) {
+            final ArchiveDetector detector) {
         if (null != innerArchive) {
             final FileSystemEntry entry;
             try {
@@ -2615,18 +2602,18 @@ public final class File extends java.io.File {
             final Collection<File> filtered
                     = new ArrayList<File>(members.size());
             for (final String member : members) {
-                final File file = factory.newFile(File.this, member);
+                final File file = new File(this, member, detector);
                 if (filter == null || filter.accept(file))
                     filtered.add(file);
             }
             return filtered.toArray(new File[filtered.size()]);
         }
-        return delegateListFiles(filter, factory);
+        return delegateListFiles(filter, detector);
     }
 
     private File[] delegateListFiles(
             final FileFilter filter,
-            final FileFactory factory) {
+            final ArchiveDetector detector) {
         // When filtering, we want to pass in {@code de.schlichtherle.truezip.io.File}
         // objects rather than {@code java.io.File} objects, so we cannot
         // just call {@code entry.listFiles(FileFilter)}.
@@ -2636,13 +2623,13 @@ public final class File extends java.io.File {
         // result list.
 
         final List<File> filteredList = new ArrayList<File>();
-        final String[] children = delegate.list();
-        if (children == null)
+        final String[] members = delegate.list();
+        if (members == null)
             return null; // no directory
 
-        for (int i = 0, l = children.length; i < l; i++) {
-            final String child = children[i];
-            final File file = factory.newFile(this, child);
+        for (int i = 0, l = members.length; i < l; i++) {
+            final String member = members[i];
+            final File file = new File(this, member, detector);
             if (filter == null || filter.accept(file))
                 filteredList.add(file);
         }
@@ -2859,7 +2846,7 @@ public final class File extends java.io.File {
      */
     public boolean copyFrom(final InputStream in) {
         try {
-            final OutputStream out = detector.newFileOutputStream(this, false);
+            final OutputStream out = new FileOutputStream(this, false);
             try {
                 cp(in, out); // always closes in and out
                 return true;
@@ -3180,7 +3167,7 @@ public final class File extends java.io.File {
      */
     public boolean copyTo(final OutputStream out) {
         try {
-            final InputStream in = detector.newFileInputStream(this);
+            final InputStream in = new FileInputStream(this);
             cp(in, out); // always closes in and out
             return true;
         } catch (IOException failed) {
@@ -4255,7 +4242,7 @@ public final class File extends java.io.File {
      */
     public boolean catFrom(final InputStream in) {
         try {
-            final OutputStream out = detector.newFileOutputStream(this, false);
+            final OutputStream out = new FileOutputStream(this, false);
             try {
                 try {
                     Streams.cat(in, out);
@@ -4321,7 +4308,7 @@ public final class File extends java.io.File {
      */
     public boolean catTo(final OutputStream out) {
         try {
-            final InputStream in = detector.newFileInputStream(this);
+            final InputStream in = new FileInputStream(this);
             try {
                 Streams.cat(in, out);
             } finally {

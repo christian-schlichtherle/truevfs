@@ -118,8 +118,9 @@ final class FileView extends DecoratingFileView {
     }
 
     private static File newNonArchiveFile(File file) {
-        return ArchiveDetector.NULL.newFile(
-                file .getParentFile(), file.getName());
+        return new File(file.getParentFile(),
+                        file.getName(),
+                        ArchiveDetector.NULL);
     }
 
     private static boolean isEntryInValidArchive(File file) {
@@ -130,7 +131,7 @@ final class FileView extends DecoratingFileView {
         java.io.File parent = file.getParentFile();
         assert parent != null : "An archive entry must always name a parent!";
         return parent.isDirectory()
-                && !ArchiveDetector.NULL.newFile(parent.getPath())
+                && !new File(parent.getPath(), ArchiveDetector.NULL)
                     .isDirectory();
     }
 }
