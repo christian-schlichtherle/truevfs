@@ -634,6 +634,7 @@ public final class File extends java.io.File {
 
         final MountPoint mountPoint = path.getMountPoint();
         final Path mountPointPath = mountPoint.getPath();
+        final FileSystemEntryName entryName;
 
         if (null == mountPointPath) {
             assert !path.getUri().isOpaque();
@@ -641,28 +642,26 @@ public final class File extends java.io.File {
             this.enclEntryName = null;
             this.innerArchive = null;
             this.controller = null;
+        } else if ((entryName = path.getEntryName()).isRoot()) {
+            assert path.getUri().isOpaque();
+            if (mountPointPath.getUri().isOpaque()) {
+                this.enclArchive
+                        = new File(mountPointPath.getMountPoint(), driver);
+                this.enclEntryName = mountPointPath.getEntryName();
+            } else {
+                this.enclArchive = null;
+                this.enclEntryName = null;
+            }
+            this.innerArchive = this;
+            this.controller = FileSystemManagers
+                    .getInstance()
+                    .getController(mountPoint, driver);
         } else {
             assert path.getUri().isOpaque();
-            final FileSystemEntryName entryName = path.getEntryName();
-            if (entryName.isRoot()) {
-                if (mountPointPath.getUri().isOpaque()) {
-                    this.enclArchive
-                            = new File(mountPointPath.getMountPoint(), driver);
-                    this.enclEntryName = mountPointPath.getEntryName();
-                } else {
-                    this.enclArchive = null;
-                    this.enclEntryName = null;
-                }
-                this.innerArchive = this;
-                this.controller = FileSystemManagers
-                        .getInstance()
-                        .getController(mountPoint, driver);
-            } else {
-                this.enclArchive = new File(mountPoint, driver);
-                this.enclEntryName = entryName;
-                this.innerArchive = this.enclArchive;
-                this.controller = null;
-            }
+            this.enclArchive = new File(mountPoint, driver);
+            this.enclEntryName = entryName;
+            this.innerArchive = this.enclArchive;
+            this.controller = null;
         }
 
         assert invariants();
@@ -781,21 +780,9 @@ public final class File extends java.io.File {
             throw new AssertionError(ex);
         }
 
-        class Driver implements FileSystemDriver {
-            @Override
-            public FileSystemController<?>
-            newController(  MountPoint prospect,
-                            FileSystemController<?> parent) {
-                // FIXME: Replace new FileDriver() with ArchiveDetectorAdapter!
-                return prospect.equals(mountPoint)
-                        ? detector.getDriver(scheme).newController(mountPoint, parent)
-                        : new FileDriver().newController(prospect);
-            }
-        } // class Driver
-
         this.controller = FileSystemManagers
                 .getInstance()
-                .getController(mountPoint, new Driver());
+                .getController(mountPoint, new ArchiveFileSystemDriver(detector));
     }
 
     /**
