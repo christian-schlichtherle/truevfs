@@ -69,8 +69,8 @@ extends DecoratingFileSystemController<
         } catch (IOException ex) {
             if (!isRoot(name.getPath()))
                 return null;
-            Entry entry
-                    = getParent().getEntry(getModel().resolveParent(name));
+            Entry entry = getParent().getEntry(
+                    getModel().resolveParent(name).getEntryName());
             if (null == entry)
                 return null;
             // The entry exists, but we can't access it for some reason.

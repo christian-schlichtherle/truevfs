@@ -257,8 +257,7 @@ implements Serializable {
     }
 
     @Override
-    public @CheckForNull Scheme
-    getScheme(final @NonNull String path) {
+    public Scheme getScheme(final String path) {
         final Matcher m = matcher.reset(path);
         return m.matches()
                 ? Scheme.create(m.group(1).toLowerCase(Locale.ENGLISH))
@@ -283,8 +282,7 @@ implements Serializable {
      * </ol>
      */
     @Override
-    public @Nullable ArchiveDriver<?>
-    getDriver(final @NonNull Scheme type) {
+    public ArchiveDriver<?> getDriver(final Scheme type) {
         return registry.getArchiveDriver(type.toString());
     }
 
@@ -307,7 +305,12 @@ implements Serializable {
      * @see #DefaultArchiveDetector(String)
      * @see SuffixSet Syntax definition for canonical suffix lists.
      */
-    public String getSuffixes() {
+    public @NonNull String getSuffixes() {
         return list; // canonical form
+    }
+
+    /** Equivalent to {@link #getSuffixes()}. */
+    @Override public String toString() {
+        return list;
     }
 }

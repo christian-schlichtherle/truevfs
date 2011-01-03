@@ -230,8 +230,8 @@ extends FileSystemArchiveController<E> {
         options = options.and(MOUNT_MASK);
         try {
             final FileSystemController<?> parent = getParent();
-            final FileSystemEntryName parentName = getModel()
-                    .resolveParent(ROOT_ENTRY_NAME);
+            final FileSystemEntryName parentName
+                    = getModel().resolveParent(ROOT_ENTRY_NAME).getEntryName();
             // readOnly must be set first because the parent archive controller
             // could be a FileController and on Windows this property turns to
             // TRUE once a file is opened for reading!
@@ -278,8 +278,8 @@ extends FileSystemArchiveController<E> {
     throws IOException {
         if (null != output)
             return;
-        final FileSystemEntryName parentName = getModel()
-                .resolveParent(ROOT_ENTRY_NAME);
+        final FileSystemEntryName parentName
+                = getModel().resolveParent(ROOT_ENTRY_NAME).getEntryName();
         final OutputSocket<?> socket = getParent().getOutputSocket(
                 parentName, options.set(OutputOption.CACHE),
                 useRootTemplate ? rootTemplate : null);
@@ -558,6 +558,6 @@ extends FileSystemArchiveController<E> {
     public void unlink(FileSystemEntryName name) throws IOException {
         super.unlink(name);
         if (isRoot(name.getPath()))
-            getParent().unlink(getModel().resolveParent(name));
+            getParent().unlink(getModel().resolveParent(name).getEntryName());
     }
 }

@@ -62,7 +62,7 @@ extends DecoratingFileSystemController<FileSystemModel, FileSystemController<?>>
     }
 
     private FileSystemEntryName resolveParent(FileSystemEntryName name) {
-        return getModel().resolveParent(name);
+        return getModel().resolveParent(name).getEntryName();
     }
 
     @Override

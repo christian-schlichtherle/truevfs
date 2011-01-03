@@ -617,7 +617,7 @@ public class File extends java.io.File {
      * @throws IllegalArgumentException if any precondition for the
      *         parameter {@code uri} does not hold.
      */
-    // TODO: Use Path!
+    // TODO: Use Path constructor!
     public File(URI uri) {
         this(uri, ArchiveDetector.ALL);
     }
@@ -625,7 +625,7 @@ public class File extends java.io.File {
     // Unfortunately, this constructor has a significant overhead as the jar:
     // schemes need to be processed twice, first before initializing the super
     // class and second when initializing this sub class.
-    // TODO: Use Path!
+    // TODO: Use Path constructor!
     File(   final URI uri,
             final ArchiveDetector detector) {
         super(unjarFileURI(uri));
@@ -653,17 +653,20 @@ public class File extends java.io.File {
             this.controller = null;
         } else {
             final FileSystemEntryName entryName = path.getEntryName();
-            this.enclArchive = new File(mountPointPath, detector);
-            this.enclEntryName = entryName;
-            this.innerArchive = entryName.getPath().isEmpty()
-                    ? this
-                    : this.enclArchive;
-            this.controller = this != this.innerArchive
-                    ? null
-                    : FileSystemManagers
+            if (entryName.getPath().isEmpty()) {
+                this.enclArchive = new File(mountPoint.resolve(entryName), detector);
+                this.enclEntryName = mountPoint.resolveParent(entryName).getEntryName();
+                this.innerArchive = this;
+                this.controller = FileSystemManagers
                         .getInstance()
                         .getController( mountPoint,
                                         new ArchiveFileSystemDriver(detector));
+            } else {
+                this.enclArchive = new File(mountPointPath, detector);
+                this.enclEntryName = mountPoint.resolveParent(entryName).getEntryName();
+                this.innerArchive = this.enclArchive;
+                this.controller = null;
+            }
         }
 
         assert invariants();
