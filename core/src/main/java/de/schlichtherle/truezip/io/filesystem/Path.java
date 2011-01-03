@@ -351,7 +351,7 @@ public final class Path implements Serializable, Comparable<Path> {
                     ? this
                     : 0 == entryName.toString().length()
                         ? Path.create(mountPoint.hierarchicalize().getUri())
-                        : mountPoint.hierarchicalize().resolvePath(entryName));
+                        : mountPoint.hierarchicalize().resolve(entryName));
     }
 
     /**

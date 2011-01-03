@@ -70,6 +70,18 @@ public class FileSystemModel {
     }
 
     /**
+     * Resolves the given entry name against the file system's mount point.
+     *
+     * @param  entryName an entry name relative to the file system's mount
+     *         point.
+     * @return A new path with an absolute URI.
+     */
+    @NonNull
+    public final Path resolve(@NonNull FileSystemEntryName entryName) {
+        return mountPoint.resolve(entryName);
+    }
+
+    /**
      * Returns the model of the parent file system or {@code null} if and
      * only if the file system is not federated, i.e. if it's not a member of
      * a parent file system.
@@ -82,33 +94,19 @@ public class FileSystemModel {
     }
 
     /**
-     * Resolves the given entry name against the entry name of the file system
-     * in its parent file system.
+     * Resolves the given entry name against the path of the file system's
+     * mount point.
      *
-     * @param  entryName an entry name relative to the file system's mount
-     *         point.
+     * @param  entryName an entry name relative to the path of the file
+     *         system's mount point.
      * @throws NullPointerException if {@code entryName} is {@code null} or if
      *         the file system is not federated, i.e. if it's not a member of
      *         a parent file system.
-     * @return an entry name relative to the parent file system's mount point.
-     * @see    #getParent
-     */
-    @NonNull
-    public final FileSystemEntryName resolveParent(
-            @NonNull FileSystemEntryName entryName) {
-        return mountPoint.resolveParent(entryName);
-    }
-
-    /**
-     * Resolves the given entry name against the file system's mount point.
-     *
-     * @param  entryName an entry name relative to the file system's mount
-     *         point.
      * @return A new path with an absolute URI.
      */
-    @NonNull
-    public final Path resolvePath(@NonNull FileSystemEntryName entryName) {
-        return mountPoint.resolvePath(entryName);
+    public final @NonNull Path
+    resolveParent(@NonNull FileSystemEntryName entryName) {
+        return mountPoint.resolveParent(entryName);
     }
 
     /**

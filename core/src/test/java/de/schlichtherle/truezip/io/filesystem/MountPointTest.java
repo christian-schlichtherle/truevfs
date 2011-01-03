@@ -212,6 +212,7 @@ public class MountPointTest {
             "foo:bar:/baz!/../",
             "foo:bar:/baz!/bang",
             "foo:bar:/baz!/#bang",
+            "foo:bar:/baz/!/",
             "foo:bar:baz:/bang!/!/",
         }) {
             final URI uri = URI.create(param);
@@ -287,8 +288,8 @@ public class MountPointTest {
             assertThat(MountPoint.create(mountPoint.getScheme(), mountPoint.getPath()), equalTo(mountPoint));
             assertThat(MountPoint.create(mountPoint.getUri().toString()), equalTo(mountPoint));
             assertThat(MountPoint.create(mountPoint.getUri().toString()).hashCode(), equalTo(mountPoint.hashCode()));
-            //assertThat(MountPoint.create(mountPoint.getScheme(), new Path(mountPoint.getParent(), mountPoint.resolveParent(ROOT_ENTRY_NAME))), equalTo(mountPoint));
-            assertThat(MountPoint.create(mountPoint.resolvePath(ROOT_ENTRY_NAME).getUri()), equalTo(mountPoint));
+            //assertThat(MountPoint.create(mountPoint.getScheme(), new Path(mountPoint.getParent(), mountPoint.resolveParentEntryName(ROOT_ENTRY_NAME))), equalTo(mountPoint));
+            assertThat(MountPoint.create(mountPoint.resolve(ROOT_ENTRY_NAME).getUri()), equalTo(mountPoint));
         }
     }
 
@@ -312,9 +313,9 @@ public class MountPointTest {
             final FileSystemEntryName parentEntryName = null == params[2] ? null : FileSystemEntryName.create(params[2]);
             final Path path = Path.create(params[3]);
             if (null != parentEntryName)
-                assertThat(mountPoint.resolveParent(entryName), equalTo(parentEntryName));
-            assertThat(mountPoint.resolvePath(entryName), equalTo(path));
-            assertThat(mountPoint.resolvePath(entryName).getUri().isAbsolute(), is(true));
+                assertThat(mountPoint.resolveParent(entryName).getEntryName(), equalTo(parentEntryName));
+            assertThat(mountPoint.resolve(entryName), equalTo(path));
+            assertThat(mountPoint.resolve(entryName).getUri().isAbsolute(), is(true));
         }
     }
 

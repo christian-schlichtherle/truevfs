@@ -49,7 +49,7 @@ public class FileSystemModelTest {
             assertThat(model.getMountPoint(), sameInstance(mountPoint));
             assertThat(model.getParent(), nullValue());
             try {
-                model.resolveParent(FileSystemEntryName.create(URI.create(ROOT)));
+                model.resolveParent(ROOT_ENTRY_NAME);
                 fail();
             } catch (RuntimeException expected) {
             }
@@ -90,8 +90,8 @@ public class FileSystemModelTest {
 
             assertThat(model.getMountPoint(), sameInstance(mountPoint));
             assertThat(model.getParent(), sameInstance(parent));
-            assertThat(model.resolveParent(entryName), equalTo(parentEntryName));
-            assertThat(model.resolvePath(entryName), equalTo(path));
+            assertThat(model.resolveParent(entryName).getEntryName(), equalTo(parentEntryName));
+            assertThat(model.resolve(entryName), equalTo(path));
             assertThat(model.isTouched(), is(false));
         }
     }
