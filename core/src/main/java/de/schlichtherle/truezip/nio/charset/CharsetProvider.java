@@ -16,10 +16,7 @@
 
 package de.schlichtherle.truezip.nio.charset;
 
-import de.schlichtherle.truezip.nio.charset.IBM437Charset;
 import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -35,19 +32,18 @@ import java.util.Map;
  */
 public class CharsetProvider extends java.nio.charset.spi.CharsetProvider {
 
-    private static final Collection<Charset> charsets;
-    private static final Map<String, Charset> name2charset;
+    private static final Map<String, Charset> CHARSETS;
 
     static {
-        charsets = Collections.unmodifiableCollection(
-                Arrays.asList(new Charset[] { new IBM437Charset() }));
-
-        name2charset = new HashMap<String, Charset>();
-        for (final Charset charset : charsets) {
-            name2charset.put(lowerCase(charset.name()), charset);
+        final Map<String, Charset> map = new HashMap<String, Charset>();
+        for (final Charset charset : new Charset[] {
+            new IBM437Charset(),
+        }) {
+            map.put(lowerCase(charset.name()), charset);
             for (final String alias : charset.aliases())
-                name2charset.put(lowerCase(alias), charset);
+                map.put(lowerCase(alias), charset);
         }
+        CHARSETS = Collections.unmodifiableMap(map);
     }
 
     private static String lowerCase(String s) {
@@ -55,12 +51,12 @@ public class CharsetProvider extends java.nio.charset.spi.CharsetProvider {
     }
 
     @Override
-	public Iterator<Charset> charsets() {
-        return charsets.iterator();
+    public Iterator<Charset> charsets() {
+        return CHARSETS.values().iterator();
     }
 
     @Override
-	public Charset charsetForName(String charset) {
-        return name2charset.get(lowerCase(charset));
+    public Charset charsetForName(String charset) {
+        return CHARSETS.get(lowerCase(charset));
     }
 }
