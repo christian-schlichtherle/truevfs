@@ -702,15 +702,10 @@ public final class File extends java.io.File {
         assert invariants();
     }
 
-    /**
-     * @deprecated This constructor is not intended for public use - do <em>not</em> use it!
-     * @see FileFactory
-     */
     @SuppressWarnings("LeakingThisInConstructor")
-    @Deprecated
-    File(   final java.io.File delegate,
-            final File innerArchive,
-            final ArchiveDetector detector) {
+    private File(   final java.io.File delegate,
+                    final File innerArchive,
+                    final ArchiveDetector detector) {
         super(delegate.getPath());
 
         assert parameters(delegate, innerArchive, detector);
@@ -807,14 +802,9 @@ public final class File extends java.io.File {
         return true;
     }
 
-    /**
-     * @deprecated This constructor is not intended for public use - do <em>not</em> use it!
-     * @see FileFactory
-     */
-    @Deprecated
-    File(   final File template,
-            final java.io.File delegate,
-            final File enclArchive) {
+    private File(   final File template,
+                    final java.io.File delegate,
+                    final File enclArchive) {
         super(delegate.getPath());
 
         assert parameters(template, delegate, enclArchive);
