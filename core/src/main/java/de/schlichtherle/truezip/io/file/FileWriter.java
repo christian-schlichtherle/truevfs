@@ -37,7 +37,7 @@ import java.io.OutputStreamWriter;
  * @version $Id$
  */
 
-public class FileWriter extends OutputStreamWriter {
+public final class FileWriter extends OutputStreamWriter {
 
     public FileWriter(String path) throws IOException {
 	super(new FileOutputStream(path));

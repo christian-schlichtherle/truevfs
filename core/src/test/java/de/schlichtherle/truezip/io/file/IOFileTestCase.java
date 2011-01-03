@@ -89,7 +89,7 @@ public abstract class IOFileTestCase extends TestCase {
     protected IOFileTestCase(String testName) {
         super(testName);
         
-        File.setDefaultArchiveDetector(ArchiveDetector.DEFAULT);
+        File.setDefaultArchiveDetector(ArchiveDetector.ALL);
     }
 
     /**
@@ -146,8 +146,9 @@ public abstract class IOFileTestCase extends TestCase {
     }
 
     private static File newNonArchiveFile(File file) {
-        return ArchiveDetector.NULL.newFile(
-                file.getParentFile(), file.getName());
+        return new File(file.getParentFile(),
+                        file.getName(),
+                        ArchiveDetector.NULL);
     }
 
     public void testArchiveControllerStateWithInputStream()

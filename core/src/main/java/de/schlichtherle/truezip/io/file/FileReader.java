@@ -35,7 +35,7 @@ import java.io.InputStreamReader;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class FileReader extends InputStreamReader {
+public final class FileReader extends InputStreamReader {
 
     public FileReader(String path) throws FileNotFoundException {
 	super(new FileInputStream(path));

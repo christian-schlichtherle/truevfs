@@ -71,10 +71,10 @@ public class RaesFiles {
         final File raesFile = getNonArchiveFile(raesFilePath, detector);
         final RaesParameters params = new KeyManagerRaesParameters(
                 raesFile.getCanonicalFile().toURI());
-        final InputStream in = detector.newFileInputStream(plainFile);
+        final InputStream in = new FileInputStream(plainFile);
         try {
             final RaesOutputStream out = RaesOutputStream.getInstance(
-                    detector.newFileOutputStream(raesFile, false),
+                    new FileOutputStream(raesFile, false),
                     params);
             File.cp(in, out);
         } finally {
@@ -127,7 +127,7 @@ public class RaesFiles {
                 rrof.authenticate();
             final InputStream in = new ReadOnlyFileInputStream(rrof);
             final OutputStream out
-                    = detector.newFileOutputStream(plainFile, false);
+                    = new FileOutputStream(plainFile, false);
             File.cp(in, out);
         } finally {
             rof.close();
@@ -143,7 +143,7 @@ public class RaesFiles {
     private static File getNonArchiveFile(
             final String path,
             final ArchiveDetector detector) {
-        final File file = detector.newFile(path);
-        return ArchiveDetector.NULL.newFile(file.getParentFile(), file.getName());
+        final File file = new File(path, detector);
+        return new File(file.getParentFile(), file.getName(), ArchiveDetector.NULL);
     }
 }

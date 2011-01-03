@@ -120,7 +120,7 @@ public class FileSystemView extends DecoratingFileSystemView {
             return null;
         return file instanceof File
                 ? (File) file
-                : getArchiveDetector().newFile(file);
+                : new File(file, getArchiveDetector());
     }
 
     /** Unwraps the delegate of a possibly archive enabled file. */
@@ -213,22 +213,24 @@ public class FileSystemView extends DecoratingFileSystemView {
     throws IOException {
         final File wParent = wrap(parent);
         if (wParent.isArchive() || wParent.isEntry()) {
-            File folder = getArchiveDetector().newFile(
+            File folder = new File(
                     wParent,
                     UIManager.getString(File.separatorChar == '\\'
                             ? "FileChooser.win32.newFolder"
-                            : "FileChooser.other.newFolder"));
+                            : "FileChooser.other.newFolder"),
+                    getArchiveDetector());
 
             for (int i = 2; !folder.mkdirs(); i++) {
                 if (i > 100)
                     throw new IOException(wParent + ": Could not create new directory entry!");
-                folder = getArchiveDetector().newFile(
+                folder = new File(
                         wParent,
                         MessageFormat.format(
                             UIManager.getString(File.separatorChar == '\\'
                                 ? "FileChooser.win32.newFolder.subsequent"
                                 : "FileChooser.other.newFolder.subsequent"),
-                            new Object[] { Integer.valueOf(i) }));
+                            new Object[] { Integer.valueOf(i) }),
+                        getArchiveDetector());
             }
 
             return folder;

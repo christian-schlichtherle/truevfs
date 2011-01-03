@@ -105,8 +105,8 @@ class Files {
             }
             for (int i = 0, l = members.length; i < l; i++) {
                 final String member = members[i];
-                ok &= move0(  detector.newFile(src, member),
-                            detector.newFile(dst,  member),
+                ok &= move0(new File(src, member, detector),
+                            new File(dst, member, detector),
                             detector);
             }
             if (!srcIsGhost)
@@ -172,10 +172,10 @@ class Files {
             }
             for (int i = 0, l = members.length; i < l; i++) {
                 final String member = members[i];
-                copyAll0(  preserve,
-                        srcDetector.newFile(src, member),
-                        dstDetector.newFile(dst, member),
-                        srcDetector, dstDetector);
+                copyAll0(   preserve,
+                            new File(src, member, srcDetector),
+                            new File(dst, member, dstDetector),
+                            srcDetector, dstDetector);
             }
             if (preserve && !srcIsGhost)
                 if (!dst.setLastModified(srcLastModified))
