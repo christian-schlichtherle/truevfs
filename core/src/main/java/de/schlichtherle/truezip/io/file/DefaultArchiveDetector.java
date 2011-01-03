@@ -282,11 +282,11 @@ implements Serializable {
      * </ol>
      */
     @Override
-    public ArchiveDriver<?> getDriver(final Scheme type) {
+    public ArchiveDriver<?> getDriver(Scheme type) {
         return registry.getArchiveDriver(type.toString());
     }
 
-    public @CheckForNull ArchiveDriver<?>
+    public final @CheckForNull ArchiveDriver<?>
     getDriver(final @NonNull String path) {
         final Scheme scheme = getScheme(path);
         return null == scheme ? null : getDriver(scheme);

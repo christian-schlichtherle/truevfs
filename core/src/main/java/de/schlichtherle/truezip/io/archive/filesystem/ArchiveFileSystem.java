@@ -94,10 +94,10 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         master = new LinkedHashMap<String, ArchiveFileSystemEntry<E>>(64);
 
         // Setup root.
-        root = newEntryUnchecked(ROOT, DIRECTORY, null);
+        root = newEntryUnchecked(ROOT.toString(), DIRECTORY, null);
         for (Access access : BitField.allOf(Access.class))
             root.getEntry().setTime(access, System.currentTimeMillis());
-        master.put(ROOT, root);
+        master.put(ROOT.toString(), root);
         try {
             touch();
         } catch (ArchiveFileSystemException ex) {
@@ -163,14 +163,14 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         for (final E entry : container) {
             String path = cutTrailingSeparators(entry.getName(), SEPARATOR_CHAR);
             //path = EntryName.create(path, null, true).getPath();
-            path = new Normalizer(SEPARATOR_CHAR).normalize(path); // faster and more space efficient
+            path = new Normalizer(SEPARATOR_CHAR).normalize(path); // faster and more memory efficient
             master.put(path, ArchiveFileSystemEntry.create(path, entry.getType(), entry));
         }
 
         // Setup root file system entry, potentially replacing its previous
         // mapping from the input archive.
-        root = newEntryUnchecked(ROOT, DIRECTORY, rootTemplate);
-        master.put(ROOT, root);
+        root = newEntryUnchecked(ROOT.toString(), DIRECTORY, rootTemplate);
+        master.put(ROOT.toString(), root);
 
         // Now perform a file system check to create missing parent directories
         // and populate directories with their members - this needs to be done
@@ -182,7 +182,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
             try {
                 fsck.fix(new FileSystemEntryName(
                         new URI(null, null, path, null, null),
-                        true).getPath());
+                        true).toString());
             } catch (URISyntaxException dontFix) {
             }
         }
@@ -203,7 +203,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         @NonNull
         public String getParentPath() {
             final String parentPath = super.getParentPath();
-            return null != parentPath ? parentPath : ROOT;
+            return null != parentPath ? parentPath : ROOT.toString();
         }
     }
 
@@ -631,7 +631,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      */
     public void unlink(@NonNull final FileSystemEntryName name) throws ArchiveFileSystemException {
         final String path = name.getPath();
-        if (isRoot(path))
+        if (name.isRoot())
             throw new ArchiveFileSystemException(path,
                     "(virtual) root directory cannot get unlinked");
         final ArchiveFileSystemEntry<E> entry = master.get(path);

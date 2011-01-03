@@ -31,7 +31,6 @@ import net.jcip.annotations.ThreadSafe;
 
 import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
 import static de.schlichtherle.truezip.io.filesystem.FileSystemEntryName.*;
-import static de.schlichtherle.truezip.io.Paths.*;
 
 /**
  * This archive controller resets the key provider in the key manager if the
@@ -67,10 +66,14 @@ extends DecoratingFileSystemController<
         } catch (FileSystemException ex) {
             throw ex;
         } catch (IOException ex) {
-            if (!isRoot(name.getPath()))
+            if (!name.isRoot())
                 return null;
             Entry entry = getParent().getEntry(
-                    getModel().resolveParent(name).getEntryName());
+                    getModel()
+                        .getMountPoint()
+                        .getPath()
+                        .resolve(name)
+                        .getEntryName());
             if (null == entry)
                 return null;
             // The entry exists, but we can't access it for some reason.
@@ -79,8 +82,8 @@ extends DecoratingFileSystemController<
             while (entry instanceof ArchiveFileSystemEntry<?>)
                 entry = ((ArchiveFileSystemEntry<?>) entry).getEntry();
             try {
-                return ArchiveFileSystemEntry.create(ROOT_ENTRY_NAME, SPECIAL,
-                        driver.newEntry(ROOT, SPECIAL, entry));
+                return ArchiveFileSystemEntry.create(ROOT, SPECIAL,
+                        driver.newEntry(ROOT.toString(), SPECIAL, entry));
             } catch (CharConversionException cannotHappen) {
                 throw new AssertionError(cannotHappen);
             }
@@ -88,9 +91,9 @@ extends DecoratingFileSystemController<
     }
 
     @Override
-    public void unlink(FileSystemEntryName path) throws IOException {
-        delegate.unlink(path);
-        if (isRoot(path.getPath()))
+    public void unlink(FileSystemEntryName name) throws IOException {
+        delegate.unlink(name);
+        if (name.isRoot())
             KeyManager.resetKeyProvider(getModel().getMountPoint().getUri());
     }
 }

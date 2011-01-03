@@ -29,7 +29,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static de.schlichtherle.truezip.io.file.ArchiveDetector.*;
 import static de.schlichtherle.truezip.io.filesystem.FileSystemEntryName.*;
+import static java.io.File.*;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
@@ -46,7 +48,7 @@ public class NonIOFileTest {
 
     @Before
     public void setUp() {
-        File.setDefaultArchiveDetector(ArchiveDetector.DEFAULT);
+        File.setDefaultArchiveDetector(ALL);
         suffix = ".zip";
         archive = new File("archive.zip");
     }
@@ -57,9 +59,36 @@ public class NonIOFileTest {
     }
 
     @Test
+    public void testValidPathConstructor() {
+        for (final String[] params : new String[][] {
+            { "jar:tar.gz:file:/app.tar.gz!/app.jar!/META-INF/MANIFEST.MF", "/app.tar.gz/app.jar/META-INF/MANIFEST.MF", "/app.tar.gz/app.jar", "/app.tar.gz/app.jar", "META-INF/MANIFEST.MF", },
+            { "jar:tar.gz:file:/app.tar.gz!/app.jar!/", "/app.tar.gz/app.jar", "/app.tar.gz/app.jar", "/app.tar.gz", "app.jar", },
+            { "zip:file:/archive.zip!/META-INF/MANIFEST.MF", "/archive.zip/META-INF/MANIFEST.MF", "/archive.zip", "/archive.zip", "META-INF/MANIFEST.MF", },
+            { "zip:file:/archive.zip!/", "/archive.zip", "/archive.zip", null, null, },
+            { "file:/foo", "/foo", null, null, null, },
+            { "file:/", "/", null, null, null, },
+        }) {
+            final File file = new File(Path.create(params[0]), ALL);
+            assertThat(file.getPath(), equalTo(params[1].replace('/', separatorChar)));
+            if (null != params[2]) {
+                assertThat(file.getInnerArchive().getPath(), equalTo(params[2].replace('/', separatorChar)));
+            } else {
+                assertThat(file.getInnerArchive(), nullValue());
+            }
+            if (null != params[3]) {
+                assertThat(file.getEnclArchive().getPath(), equalTo(params[3].replace('/', separatorChar)));
+                assertThat(file.getEnclEntryName(), equalTo(params[4]));
+            } else {
+                assertThat(file.getEnclArchive(), nullValue());
+                assertThat(file.getEnclEntryName(), nullValue());
+            }
+        }
+    }
+
+    @Test
     public void testURIConstructor() throws Exception {
         File file;
-        final String fs = File.separator;
+        final String fs = separator;
 
         // Whitespace in path. See issue #1. Thanks to mrudat for submitting this!
         file = new File(new URI("file", "/with a space", null));
@@ -86,13 +115,13 @@ public class NonIOFileTest {
         // One ZIP file in path.
         file = new File(new URI("jar", "file:/a " + suffix + "/b " + suffix + "!/", null));
         assertSame(file, file.getInnerArchive());
-        assertSame(ROOT, file.getInnerEntryName());
+        assertSame(ROOT, file.getInnerEntryName0());
         assertNull(file.getEnclArchive());
         assertNull(file.getEnclEntryName());
 
         file = new File(new URI("jar", "file:/a " + suffix + "/b " + suffix + "!", null));
         assertSame(file, file.getInnerArchive());
-        assertSame(ROOT, file.getInnerEntryName());
+        assertSame(ROOT, file.getInnerEntryName0());
         assertNull(file.getEnclArchive());
         assertNull(file.getEnclEntryName());
 
@@ -164,13 +193,13 @@ public class NonIOFileTest {
 
         file = new File(new URI("jar", "jar:file:/a " + suffix + "!/b " + suffix + "!/", null));
         assertSame(file, file.getInnerArchive());
-        assertSame(ROOT, file.getInnerEntryName());
+        assertSame(ROOT, file.getInnerEntryName0());
         assertEquals(fs + "a " + suffix + "", file.getEnclArchive().getPath());
         assertEquals("b " + suffix + "", file.getEnclEntryName());
 
         file = new File(new URI("jar", "jar:file:/a " + suffix + "!/b " + suffix + "!", null));
         assertSame(file, file.getInnerArchive());
-        assertSame(ROOT, file.getInnerEntryName());
+        assertSame(ROOT, file.getInnerEntryName0());
         assertEquals(fs + "a " + suffix + "", file.getEnclArchive().getPath());
         assertEquals("b " + suffix + "", file.getEnclEntryName());
 
@@ -178,13 +207,13 @@ public class NonIOFileTest {
 
         file = new File(new URI("jar", "file:/a " + suffix + "!/b " + suffix + "!/", null));
         assertSame(file, file.getInnerArchive());
-        assertSame(ROOT, file.getInnerEntryName());
+        assertSame(ROOT, file.getInnerEntryName0());
         assertNull(file.getEnclArchive());
         assertNull(file.getEnclEntryName());
 
         file = new File(new URI("jar", "file:/a " + suffix + "!/b " + suffix + "!", null));
         assertSame(file, file.getInnerArchive());
-        assertSame(ROOT, file.getInnerEntryName());
+        assertSame(ROOT, file.getInnerEntryName0());
         assertNull(file.getEnclArchive());
         assertNull(file.getEnclEntryName());
 
@@ -192,13 +221,13 @@ public class NonIOFileTest {
 
         file = new File(new URI("jar", "jar:file:/a " + suffix + "!/b " + suffix + "!/../c " + suffix + "!/", null));
         assertSame(file, file.getInnerArchive());
-        assertSame(ROOT, file.getInnerEntryName());
+        assertSame(ROOT, file.getInnerEntryName0());
         assertEquals(fs + "a " + suffix + "", file.getEnclArchive().getPath());
         assertEquals("c " + suffix + "", file.getEnclEntryName());
 
         file = new File(new URI("jar", "jar:file:/a " + suffix + "!/b " + suffix + "!/../c " + suffix + "!", null));
         assertSame(file, file.getInnerArchive());
-        assertSame(ROOT, file.getInnerEntryName());
+        assertSame(ROOT, file.getInnerEntryName0());
         assertEquals(fs + "a " + suffix + "", file.getEnclArchive().getPath());
         assertEquals("c " + suffix + "", file.getEnclEntryName());
 
@@ -232,20 +261,6 @@ public class NonIOFileTest {
         }
     }
 
-    /*@Test
-    public void testPathConstructor() {
-        for (final String[] param : new String[][] {
-            { "file:/", },
-            { "file:/foo", },
-            { "zip:file:/archive.zip!/", },
-            { "zip:file:/archive.zip!/META-INF/MANIFEST.MF", },
-            { "jar:tar.gz:file:/app.tar.gz!/app.jar!/META-INF/MANIFEST.MF", },
-        }) {
-            final Path path = Path.create(param[0]);
-            final File file = new File(path, ArchiveDetector.ALL);
-        }
-    }*/
-
     @Test
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testParentConstructor() throws Exception {
@@ -266,7 +281,7 @@ public class NonIOFileTest {
             }
         }
 
-        final String fs = File.separator;
+        final String fs = separator;
 
         {
             final File[] files = {
@@ -439,7 +454,7 @@ public class NonIOFileTest {
      */
     @Test
     public void testEqualsAndHashCode() {
-        final boolean win = File.separatorChar == '\\'; // Windoze?
+        final boolean win = separatorChar == '\\'; // Windoze?
         
         assertFalse(new File("dir/test.txt").equals(new File("dir" + suffix + "/test.txt")));
         assertFalse(new File("dir" + suffix + "/test.txt").equals(new File("dir/test.txt")));
@@ -483,7 +498,7 @@ public class NonIOFileTest {
     }
 
     void testEqualsAndHashCode(File a, File b) {
-        if (File.separatorChar == '\\') {
+        if (separatorChar == '\\') {
             assertTrue(a.equals(b));
             assertTrue(b.equals(a));
             assertEquals(a.hashCode(), b.hashCode());

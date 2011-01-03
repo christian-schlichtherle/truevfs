@@ -51,6 +51,8 @@ import javax.swing.Icon;
 final class FederatedFileSystemController
 extends DecoratingFileSystemController<FileSystemModel, FileSystemController<?>> {
 
+    private volatile Path path;
+
     /**
      * Constructs a new federated file system controller.
      *
@@ -62,7 +64,11 @@ extends DecoratingFileSystemController<FileSystemModel, FileSystemController<?>>
     }
 
     private FileSystemEntryName resolveParent(FileSystemEntryName name) {
-        return getModel().resolveParent(name).getEntryName();
+        return getPath().resolve(name).getEntryName();
+    }
+
+    private Path getPath() {
+        return null != path ? path : (path = getModel().getMountPoint().getPath());
     }
 
     @Override

@@ -336,8 +336,8 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
 
     /**
      * Returns the path or {@code null} iff this mount point's
-     * {@link #getUri URI} names a parent mount point, i.e. if it's
-     * opaque.
+     * {@link #getUri URI} doesn't name a parent mount point, i.e. if it's
+     * hierarchical.
      *
      * @return The nullable path.
      */
@@ -346,14 +346,12 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
     }
 
     /**
-     * Resolves the given entry name against this mount point.
+     * Returns the non-{@code null} URI.
      *
-     * @param  entryName an entry name relative to this mount point.
-     * @return A new path with an absolute URI.
+     * @return The non-{@code null} URI.
      */
-    public @NonNull Path
-    resolve(@NonNull FileSystemEntryName entryName) {
-        return new Path(this, entryName);
+    public @NonNull URI getUri() {
+        return uri;
     }
 
     /**
@@ -370,19 +368,14 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
     }
 
     /**
-     * Resolves the given entry name against the path of this mount point.
+     * Resolves the given entry name against this mount point.
      *
-     * @param  entryName an entry name relative to the path of this mount point.
-     * @throws NullPointerException if {@code entryName} is {@code null} or if
-     *         this mount point's {@link #getUri URI} doesn't name a parent
-     *         mount point, i.e. if it's hierarchical.
+     * @param  entryName an entry name relative to this mount point.
      * @return A new path with an absolute URI.
      */
     public @NonNull Path
-    resolveParent(@NonNull FileSystemEntryName entryName) {
-        return new Path(
-                path.getMountPoint(),
-                new FileSystemEntryName(path.getEntryName(), entryName));
+    resolve(@NonNull FileSystemEntryName entryName) {
+        return new Path(this, entryName);
     }
 
     /**
@@ -413,15 +406,6 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
         } else {
             return hierarchical = this;
         }
-    }
-
-    /**
-     * Returns the non-{@code null} URI.
-     *
-     * @return The non-{@code null} URI.
-     */
-    public @NonNull URI getUri() {
-        return uri;
     }
 
     /**

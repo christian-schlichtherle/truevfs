@@ -18,7 +18,6 @@ package de.schlichtherle.truezip.io.filesystem;
 import java.net.URI;
 import org.junit.Test;
 
-import static de.schlichtherle.truezip.io.filesystem.FileSystemEntryName.*;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
@@ -47,12 +46,8 @@ public class FileSystemModelTest {
             final MountPoint mountPoint = MountPoint.create(URI.create(params[0]));
             final FileSystemModel model = new FileSystemModel(mountPoint);
             assertThat(model.getMountPoint(), sameInstance(mountPoint));
+            assertThat(model.getMountPoint().getPath(), nullValue());
             assertThat(model.getParent(), nullValue());
-            try {
-                model.resolveParent(ROOT_ENTRY_NAME);
-                fail();
-            } catch (RuntimeException expected) {
-            }
             assertThat(model.isTouched(), is(false));
         }
     }
@@ -90,8 +85,8 @@ public class FileSystemModelTest {
 
             assertThat(model.getMountPoint(), sameInstance(mountPoint));
             assertThat(model.getParent(), sameInstance(parent));
-            assertThat(model.resolveParent(entryName).getEntryName(), equalTo(parentEntryName));
-            assertThat(model.resolve(entryName), equalTo(path));
+            assertThat(model.getMountPoint().getPath().resolve(entryName).getEntryName(), equalTo(parentEntryName));
+            assertThat(model.getMountPoint().resolve(entryName), equalTo(path));
             assertThat(model.isTouched(), is(false));
         }
     }

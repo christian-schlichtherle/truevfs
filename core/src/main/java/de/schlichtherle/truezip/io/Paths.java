@@ -252,7 +252,7 @@ public class Paths {
      * directory, i.e. if it's empty.
      */
     public static boolean isRoot(@NonNull String path) {
-        return 0 == path.length();
+        return path.isEmpty();
     }
 
     /**

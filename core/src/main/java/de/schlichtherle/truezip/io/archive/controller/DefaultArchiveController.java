@@ -230,8 +230,11 @@ extends FileSystemArchiveController<E> {
         options = options.and(MOUNT_MASK);
         try {
             final FileSystemController<?> parent = getParent();
-            final FileSystemEntryName parentName
-                    = getModel().resolveParent(ROOT_ENTRY_NAME).getEntryName();
+            final FileSystemEntryName parentName = getModel()
+                    .getMountPoint()
+                    .getPath()
+                    .resolve(ROOT)
+                    .getEntryName();
             // readOnly must be set first because the parent archive controller
             // could be a FileController and on Windows this property turns to
             // TRUE once a file is opened for reading!
@@ -254,7 +257,7 @@ extends FileSystemArchiveController<E> {
             final ArchiveFileSystem<E> fileSystem
                     = newArchiveFileSystem(driver);
             final ArchiveFileSystemEntry<E> root
-                    = fileSystem.getEntry(ROOT_ENTRY_NAME);
+                    = fileSystem.getEntry(ROOT);
             // This may fail if e.g. the container file is an RAES
             // encrypted ZIP file and the user cancels password
             // prompting.
@@ -278,8 +281,11 @@ extends FileSystemArchiveController<E> {
     throws IOException {
         if (null != output)
             return;
-        final FileSystemEntryName parentName
-                = getModel().resolveParent(ROOT_ENTRY_NAME).getEntryName();
+        final FileSystemEntryName parentName = getModel()
+                .getMountPoint()
+                .getPath()
+                .resolve(ROOT)
+                .getEntryName();
         final OutputSocket<?> socket = getParent().getOutputSocket(
                 parentName, options.set(OutputOption.CACHE),
                 useRootTemplate ? rootTemplate : null);
@@ -557,7 +563,12 @@ extends FileSystemArchiveController<E> {
     @Override
     public void unlink(FileSystemEntryName name) throws IOException {
         super.unlink(name);
-        if (isRoot(name.getPath()))
-            getParent().unlink(getModel().resolveParent(name).getEntryName());
+        if (name.isRoot())
+            getParent().unlink(
+                    getModel()
+                        .getMountPoint()
+                        .getPath()
+                        .resolve(name)
+                        .getEntryName());
     }
 }
