@@ -363,7 +363,10 @@ public final class Path implements Serializable, Comparable<Path> {
      * {@link #getEntryName() entry name} resolved against it is returned.
      * Otherwise, this path is returned.
      * <p>
-     * Note that the URI returned by this method is not unique anymore.
+     * Note that this function is idempotent, so calling it repeatedly will
+     * produce the same result again.
+     * However, this function is not injective, so two different paths
+     * may produce equal results.
      * For example, the path URIs {@code zip:file:/archive!/entry} and
      * {@code tar:file:/archive!/entry} both have the same hierarchical URI
      * {@code file:/archive/entry}.

@@ -45,49 +45,49 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
 
     private static final String TEMP_FILE_POOL_PREFIX = ".tzp";
 
-    private final FileEntry file;
+    private final FileEntry entry;
     private final BitField<OutputOption> options;
     private final Entry template;
     private volatile TempFilePool pool;
 
-    FileOutputSocket(   @NonNull final FileEntry file,
-                        @NonNull final BitField<OutputOption> options,
-                        @Nullable final Entry template) {
-        assert null != file;
+    FileOutputSocket(   final @NonNull FileEntry entry,
+                        final @NonNull BitField<OutputOption> options,
+                        final @Nullable Entry template) {
+        assert null != entry;
         assert null != options;
-        this.file = file;
-        this.template = template;
+        this.entry = entry;
         this.options = options;
+        this.template = template;
     }
 
     private TempFilePool getTempFilePool() {
         if (null == pool)
             pool = new TempFilePool(    TEMP_FILE_POOL_PREFIX, null,
-                                        file.getFile().getParentFile());
+                                        entry.getFile().getParentFile());
         return pool;
     }
 
     @Override
     public FileEntry getLocalTarget() {
-        return file;
+        return entry;
     }
 
     @Override
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
     public OutputStream newOutputStream() throws IOException {
-        final File fileTarget = file.getFile();
+        final File entryFile = entry.getFile();
         if (options.get(CREATE_PARENTS))
-            fileTarget.getParentFile().mkdirs();
-        final FileEntry temp = options.get(CACHE) && !fileTarget.createNewFile()
+            entryFile.getParentFile().mkdirs();
+        final FileEntry temp = options.get(CACHE) && !entryFile.createNewFile()
                 ? getTempFilePool().allocate()
-                : file;
-        final File tempTarget = temp.getFile();
+                : entry;
+        final File tempFile = temp.getFile();
 
         class OutputStream extends DecoratingOutputStream {
             boolean closed;
 
             OutputStream() throws FileNotFoundException {
-                super(new FileOutputStream(tempTarget, options.get(APPEND))); // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
+                super(new FileOutputStream(tempFile, options.get(APPEND))); // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
             }
 
             @Override
@@ -99,13 +99,13 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
                     super.close();
                 } finally {
                     try {
-                        if (temp != file) {
+                        if (temp != entry) {
                             IOException cause = null;
                             try {
-                                if (!tempTarget.renameTo(fileTarget)
-                                        && (!fileTarget.delete() || !tempTarget.renameTo(fileTarget)))
+                                if (!tempFile.renameTo(entryFile)
+                                        && (!entryFile.delete() || !tempFile.renameTo(entryFile)))
                                     IOSocket.copy(  temp.getInputSocket(),
-                                                    file.getOutputSocket());
+                                                    entry.getOutputSocket());
                             } catch (IOException ex) {
                                 throw cause = ex;
                             } finally {
@@ -120,8 +120,8 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
                         if (null != template) {
                             final long time = template.getTime(WRITE);
                             if (UNKNOWN != time
-                                    && !fileTarget.setLastModified(time))
-                                throw new IOException(fileTarget.getPath() + " (cannot preserve last modification time)");
+                                    && !entryFile.setLastModified(time))
+                                throw new IOException(entryFile.getPath() + " (cannot preserve last modification time)");
                         }
                     }
                 }
@@ -129,12 +129,12 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
         } // class OutputStream
 
         try {
-            if (temp != file && options.get(APPEND))
-                IOSocket.copy(  file.getInputSocket(),
+            if (temp != entry && options.get(APPEND))
+                IOSocket.copy(  entry.getInputSocket(),
                                 temp.getOutputSocket());
             return new OutputStream();
         } catch (IOException cause) {
-            if (temp != file) {
+            if (temp != entry) {
                 try {
                     ((IOPool.Entry<FileEntry>) temp).release();
                 } catch (IOException ex) {

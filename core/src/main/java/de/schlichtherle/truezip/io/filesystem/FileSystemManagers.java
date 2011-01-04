@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
@@ -55,11 +56,10 @@ public class FileSystemManagers {
      * {@link #setInstance}, then this instance is returned.
      * Otherwise, the service is located by loading the class name from the
      * resource file {@code /META-INF/services/de.schlichtherle.truezip.io.filesystem.FileSystemManager}.
-     * <p>
      * In order to support this plug-in architecture, you should <em>not</em>
      * cache the instance returned by this method!
      * <p>
-     * In any case, the returned file system manager is instrumented to run its
+     * Note that the returned file system manager is instrumented to run its
      * {@link FileSystemManager#sync} method when the JVM terminates by means
      * of a shutdown hook.
      *
@@ -101,19 +101,20 @@ public class FileSystemManagers {
      * returned by its {@link FileSystemManager#getController} method prior to
      * calling this method.
      * <p>
-     * If not {@code null}, the file system manager instance is instrumented
-     * to run its {@link FileSystemManager#sync} method when the JVM terminates
-     * by means of a shutdown hook.
+     * If the given file system manager is {@code null}, a new instance will
+     * be created on the next call to {@link #getInstance}.
+     * <p>
+     * If the given file system manager is not {@code null}, this instance is
+     * instrumented to run its {@link FileSystemManager#sync} method when the
+     * JVM terminates by means of a shutdown hook.
      *
      * @param  manager the nullable file system manager value of this class
      *         property.
-     *         If this is {@code null}, a new instance will be created on the
-     *         next call to {@link #getInstance}.
      * @throws IllegalStateException if the current file system manager has any
      *         managed file systems.
      */
     public static synchronized void setInstance(
-            @Nullable final FileSystemManager manager) {
+            @CheckForNull final FileSystemManager manager) {
         final int count = null == instance ? 0 : instance.getSize();
         if (0 < count)
             throw new IllegalStateException("There are still " + count + " managed federated file systems!");
@@ -129,7 +130,6 @@ public class FileSystemManagers {
             }
         }
         instance = manager;
-
         assert invariants();
     }
 
@@ -158,7 +158,9 @@ public class FileSystemManagers {
         @SuppressWarnings("CallToThreadDumpStack")
         public void run() {
             try {
-                manager.sync(UMOUNT, new SyncExceptionBuilder());
+                SyncExceptionBuilder builder = new SyncExceptionBuilder();
+                manager.sync(UMOUNT, builder);
+                builder.check();
             } catch (IOException ouch) {
                 // Logging doesn't work in a shutdown hook!
                 ouch.printStackTrace();

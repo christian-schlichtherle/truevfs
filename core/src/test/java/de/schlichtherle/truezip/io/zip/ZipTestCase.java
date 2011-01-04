@@ -47,7 +47,7 @@ import static de.schlichtherle.truezip.io.zip.ZipConstants.*;
  */
 public abstract class ZipTestCase extends TestCase {
 
-    private static final Logger LOGGER
+    private static final Logger logger
             = Logger.getLogger(ZipTestCase.class.getName());
 
     /** May be used by some tests or sub classes. */
@@ -82,7 +82,7 @@ public abstract class ZipTestCase extends TestCase {
     protected void tearDown() throws Exception {
         final boolean deleted = zip.delete();
         if (!deleted && zip.exists())
-            LOGGER.log(Level.WARNING, "{0} (could not delete)", zip);
+            logger.log(Level.WARNING, "{0} (could not delete)", zip);
         zip = null;
 
         data = null;

@@ -39,7 +39,7 @@ abstract class FileSystemArchiveController<E extends ArchiveEntry>
 extends BasicArchiveController<E> {
 
     /** The mount state of the archive file system. */
-    private MountState mountState = new ResetFileSystem();
+    private MountState<E> mountState = new ResetFileSystem();
 
     /**
      * Creates a new instance of FileSystemArchiveController
@@ -88,9 +88,9 @@ extends BasicArchiveController<E> {
      * Represents the mount state of the archive file system.
      * This is an abstract class: The state is implemented in the subclasses.
      */
-    private abstract class MountState {
-        abstract ArchiveFileSystem<E> autoMount(   boolean autoCreate,
-                                                    BitField<OutputOption> options)
+    private static abstract class MountState<E extends ArchiveEntry> {
+        abstract ArchiveFileSystem<E> autoMount(boolean autoCreate,
+                                                BitField<OutputOption> options)
         throws IOException;
 
         ArchiveFileSystem<E> getFileSystem() {
@@ -98,11 +98,11 @@ extends BasicArchiveController<E> {
         }
 
         abstract void setFileSystem(ArchiveFileSystem<E> fileSystem);
-    } // class AutoMounter
+    } // class MountState
 
-    private class ResetFileSystem extends MountState {
+    private class ResetFileSystem extends MountState<E> {
         @Override
-        ArchiveFileSystem<E> autoMount(final boolean autoCreate,
+        ArchiveFileSystem<E> autoMount( final boolean autoCreate,
                                         final BitField<OutputOption> options)
         throws IOException {
             getModel().assertWriteLockedByCurrentThread();
@@ -138,7 +138,7 @@ extends BasicArchiveController<E> {
         }
     } // class ResetFileSystem
 
-    private class MountedFileSystem extends MountState {
+    private class MountedFileSystem extends MountState<E> {
         private final ArchiveFileSystem<E> fileSystem;
 
         MountedFileSystem(final ArchiveFileSystem<E> fileSystem) {
@@ -166,7 +166,7 @@ extends BasicArchiveController<E> {
         }
     } // class MountedFileSystem
 
-    private class FalsePositiveFileSystem extends MountState {
+    private class FalsePositiveFileSystem extends MountState<E> {
         private FalsePositiveException exception;
 
         private FalsePositiveFileSystem(final FalsePositiveException exception) {
@@ -177,7 +177,7 @@ extends BasicArchiveController<E> {
 
         @Override
         ArchiveFileSystem<E> autoMount( boolean autoCreate,
-                                        final BitField<OutputOption> options)
+                                        BitField<OutputOption> options)
         throws FalsePositiveException {
             throw exception;
         }

@@ -387,6 +387,10 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      * this mount point so that it's absolute and hierarchical.
      * If this mount point is already in hierarchical form, it's returned.
      * <p>
+     * Note that this function is idempotent, so calling it repeatedly will
+     * produce the same result again.
+     * However, this function is not injective, so two different mount points
+     * may produce equal results.
      * For example, the mount point URIs {@code zip:file:/archive!/} and
      * {@code tar:file:/archive!/} will both produce an equal mount point
      * with the absolute, hierarchical URI {@code file:/archive/}.

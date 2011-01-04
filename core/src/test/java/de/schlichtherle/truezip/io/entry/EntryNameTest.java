@@ -39,7 +39,7 @@ import static org.junit.Assert.*;
  */
 public class EntryNameTest {
 
-    private static final Logger LOGGER
+    private static final Logger logger
             = Logger.getLogger(EntryNameTest.class.getName());
 
     @Test
@@ -80,7 +80,7 @@ public class EntryNameTest {
                 oos.writeObject(original);
                 oos.close();
 
-                LOGGER.log(Level.FINE, "Number of serialized bytes: {0}", bos.size());
+                logger.log(Level.FINE, "Number of serialized bytes: {0}", bos.size());
 
                 final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
                 final ObjectInputStream ois = new ObjectInputStream(bis);
@@ -98,7 +98,7 @@ public class EntryNameTest {
                 enc.writeObject(original);
                 enc.close();
 
-                LOGGER.log(Level.FINE, bos.toString("UTF-8"));
+                logger.log(Level.FINE, bos.toString("UTF-8"));
 
                 final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
                 final XMLDecoder dec = new XMLDecoder(bis);

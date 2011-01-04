@@ -45,7 +45,7 @@ import junit.framework.TestCase;
  */
 public abstract class IOFileTestCase extends TestCase {
 
-    private static final Logger LOGGER = Logger.getLogger(
+    private static final Logger logger = Logger.getLogger(
             IOFileTestCase.class.getName());
 
     private static final java.io.File TEMP_DIR = new java.io.File(
@@ -56,16 +56,16 @@ public abstract class IOFileTestCase extends TestCase {
     static {
         boolean ea = false;
         assert ea = true; // NOT ea == true !
-        LOGGER.log(Level.CONFIG, "Java assertions {0}", (ea ? "enabled." : "disabled!"));
+        logger.log(Level.CONFIG, "Java assertions {0}", (ea ? "enabled." : "disabled!"));
         if (!ea)
-            LOGGER.warning("Please enable assertions for additional white box testing.");
+            logger.warning("Please enable assertions for additional white box testing.");
 
         new Random().nextBytes(DATA);
-        LOGGER.log(Level.CONFIG, "Created {0} bytes of random data.", DATA.length);
-        LOGGER.log(Level.CONFIG, "Temporary directory: {0}", TEMP_DIR.getPath());
-        LOGGER.log(Level.CONFIG, "Free memory: {0}", mb(Runtime.getRuntime().freeMemory()));
-        LOGGER.log(Level.CONFIG, "Total memory: {0}", mb(Runtime.getRuntime().totalMemory()));
-        LOGGER.log(Level.CONFIG, "Max memory: {0}", mb(Runtime.getRuntime().maxMemory()));
+        logger.log(Level.CONFIG, "Created {0} bytes of random data.", DATA.length);
+        logger.log(Level.CONFIG, "Temporary directory: {0}", TEMP_DIR.getPath());
+        logger.log(Level.CONFIG, "Free memory: {0}", mb(Runtime.getRuntime().freeMemory()));
+        logger.log(Level.CONFIG, "Total memory: {0}", mb(Runtime.getRuntime().totalMemory()));
+        logger.log(Level.CONFIG, "Max memory: {0}", mb(Runtime.getRuntime().maxMemory()));
     }
 
     private static String mb(long value) {
@@ -126,7 +126,7 @@ public abstract class IOFileTestCase extends TestCase {
         if (archive != null)
             archive.delete(); // archive, not _archive!
         if (_archive.exists() && !_archive.delete())
-            LOGGER.log(Level.WARNING, "{0} (File.delete() failed)", _archive);
+            logger.log(Level.WARNING, "{0} (File.delete() failed)", _archive);
         _archive = archive = null;
 
         // sync now to delete temps and free memory.
@@ -593,7 +593,7 @@ public abstract class IOFileTestCase extends TestCase {
         try {
             new FileOutputStream(file2);
         } catch (FileBusyException busy) {
-            LOGGER.warning("This archive driver does NOT support concurrent writing of different entries in the same archive file.");
+            logger.warning("This archive driver does NOT support concurrent writing of different entries in the same archive file.");
         }
 
         // fos1 is still open!
@@ -960,21 +960,21 @@ public abstract class IOFileTestCase extends TestCase {
             assertTrue(file.createNewFile());
         }
         time = System.currentTimeMillis() - time;
-        LOGGER.log(Level.FINER, "Time required to create {0} archive file entries: {1}ms", new Object[]{i, time});
+        logger.log(Level.FINER, "Time required to create {0} archive file entries: {1}ms", new Object[]{i, time});
         
         time = System.currentTimeMillis();
         for (j = 0; j < 100; j++) {
             archive.listFiles((FilenameFilter) null);
         }
         time = System.currentTimeMillis() - time;
-        LOGGER.log(Level.FINER, "Time required to list these entries {0} times using a nullary FilenameFilter: {1}ms", new Object[]{j, time});
+        logger.log(Level.FINER, "Time required to list these entries {0} times using a nullary FilenameFilter: {1}ms", new Object[]{j, time});
         
         time = System.currentTimeMillis();
         for (j = 0; j < 100; j++) {
             archive.listFiles((FileFilter) null);
         }
         time = System.currentTimeMillis() - time;
-        LOGGER.log(Level.FINER, "Time required to list these entries {0} times using a nullary FileFilter: {1}ms", new Object[]{j, time});
+        logger.log(Level.FINER, "Time required to list these entries {0} times using a nullary FileFilter: {1}ms", new Object[]{j, time});
         
         assertFalse(archive.delete()); // directory not empty!
         File.umount(); // allow external modifications!
@@ -988,7 +988,7 @@ public abstract class IOFileTestCase extends TestCase {
     // This test needs to be redesigned: It primarily lacks a clear intention.
     /*public void testGarbageCollection()
     throws Throwable {
-        LOGGER.fine("testGarbageCollection");
+        logger.fine("testGarbageCollection");
      
         // Preamble:
         {

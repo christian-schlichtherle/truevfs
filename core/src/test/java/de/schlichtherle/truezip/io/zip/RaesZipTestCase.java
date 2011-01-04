@@ -37,7 +37,7 @@ import java.util.logging.Logger;
  */
 public abstract class RaesZipTestCase extends ZipTestCase {
 
-    private static final Logger LOGGER
+    private static final Logger logger
             = Logger.getLogger(RaesZipTestCase.class.getName());
 
     /** Cipher text shorter than this gets authenticated. */
@@ -54,7 +54,7 @@ public abstract class RaesZipTestCase extends ZipTestCase {
     private static int createKeyStrength() {
         final int keyStrength = keyStrengths[rnd.nextInt(keyStrengths.length)];
         //final int keyStrength = KEY_STRENGTH_ULTRA;
-        LOGGER.log(Level.FINE, "Using {0} bits cipher key.", (128 + keyStrength * 64));
+        logger.log(Level.FINE, "Using {0} bits cipher key.", (128 + keyStrength * 64));
         return keyStrength;
     }
 

@@ -28,7 +28,7 @@ import java.util.logging.Logger;
  */
 public class KeyMgmtLifeCycleThread extends Thread {
 
-    private static final Logger LOGGER
+    private static final Logger logger
             = Logger.getLogger(KeyMgmtLifeCycleThread.class.getName());
 
     private final KeyMgmtLifeCycle rlc;
@@ -58,7 +58,7 @@ public class KeyMgmtLifeCycleThread extends Thread {
 
     @Override
     public void start() {
-        LOGGER.log(Level.FINE, "{0}: Starting Key Management Life Cycle Thread...", rlc.id);
+        logger.log(Level.FINE, "{0}: Starting Key Management Life Cycle Thread...", rlc.id);
         super.start();
     }
 

@@ -69,7 +69,7 @@ implements Serializable {
     private static final long serialVersionUID = 1579600190374703884L;
     private static final String CLASS_NAME
             = GlobalArchiveDriverRegistry.class.getName();
-    private static final Logger LOGGER
+    private static final Logger logger
             = Logger.getLogger(CLASS_NAME, CLASS_NAME);
     private static final String PACKAGE_NAME
             = GlobalArchiveDriverRegistry.class.getPackage().getName();
@@ -89,6 +89,7 @@ implements Serializable {
      * The canonical list of archive file suffixes in the global registry
      * which have been configured to be recognized by default.
      */
+    @Deprecated
     public final String DEFAULT_SUFFIXES;
 
     /**
@@ -97,7 +98,7 @@ implements Serializable {
     public final String ALL_SUFFIXES;
 
     static {
-        LOGGER.config("banner"); // NOI18N
+        logger.config("banner"); // NOI18N
     }
 
     /**
@@ -166,7 +167,7 @@ implements Serializable {
         try {
             urls = getResources(service, GlobalArchiveDriverRegistry.class);
         } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, "lookup.ex", ex); // NOI18N
+            logger.log(Level.WARNING, "lookup.ex", ex); // NOI18N
             return;
         }
 
@@ -189,7 +190,7 @@ implements Serializable {
         assert clientRegistry != null;
 
         // Load the configuration map from the properties file.
-        LOGGER.log(Level.CONFIG, "loading", url); // NOI18N
+        logger.log(Level.CONFIG, "loading", url); // NOI18N
         final Properties config = new Properties();
         try {
             final InputStream in = url.openStream();
@@ -200,7 +201,7 @@ implements Serializable {
                 in.close();
             }
         } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, "loading.ex", ex); // NOI18N
+            logger.log(Level.WARNING, "loading.ex", ex); // NOI18N
             // Continue normally.
         }
     }
@@ -240,6 +241,7 @@ implements Serializable {
      *         entry with the key {@code DEFAULT} in the map of drivers.
      *         May be empty, but never {@code null}.
      */
+    @Deprecated
     private SuffixSet getDefaultSuffixes() {
         final SuffixSet set;
         final String defaultSuffixesProperty
@@ -265,7 +267,7 @@ implements Serializable {
                 addAll = true;
             } else if (!all.contains(suffix)) {
                 i.remove();
-                LOGGER.log(Level.WARNING, "unknownSuffix", suffix); // NOI18N
+                logger.log(Level.WARNING, "unknownSuffix", suffix); // NOI18N
             }
         }
         if (clear)
@@ -280,17 +282,17 @@ implements Serializable {
         if (i.hasNext()) {
             do {
                 final Map.Entry<String, Object> entry = i.next();
-                LOGGER.log(Level.CONFIG, "driverRegistered", // NOI18N
+                logger.log(Level.CONFIG, "driverRegistered", // NOI18N
                         new Object[] { entry.getKey(), entry.getValue() });
             } while (i.hasNext());
 
-            LOGGER.log(Level.CONFIG, "allSuffixList", ALL_SUFFIXES); // NOI18N
+            logger.log(Level.CONFIG, "allSuffixList", ALL_SUFFIXES); // NOI18N
             if (DEFAULT_SUFFIXES.length() > 0)
-                LOGGER.log(Level.CONFIG, "defaultSuffixList", DEFAULT_SUFFIXES); // NOI18N
+                logger.log(Level.CONFIG, "defaultSuffixList", DEFAULT_SUFFIXES); // NOI18N
             else
-                LOGGER.config("noDefaultSuffixes"); // NOI18N
+                logger.config("noDefaultSuffixes"); // NOI18N
         } else {
-            LOGGER.warning("noDriversRegistered"); // NOI18N
+            logger.warning("noDriversRegistered"); // NOI18N
         }
     }
 }

@@ -19,7 +19,6 @@ import de.schlichtherle.truezip.io.filesystem.FileSystemManagers;
 import de.schlichtherle.truezip.io.filesystem.Path;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemException;
 import de.schlichtherle.truezip.io.entry.Entry;
-import de.schlichtherle.truezip.io.filesystem.file.FileDriver;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.InputBusyException;
 import de.schlichtherle.truezip.io.OutputBusyException;
@@ -29,12 +28,17 @@ import de.schlichtherle.truezip.io.socket.IOSocket;
 import de.schlichtherle.truezip.io.filesystem.OutputOption;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 
-import static de.schlichtherle.truezip.io.filesystem.OutputOption.CREATE_PARENTS;
-import static de.schlichtherle.truezip.io.Files.contains;
+import static de.schlichtherle.truezip.io.filesystem.FileSystemEntryName.*;
+import static de.schlichtherle.truezip.io.filesystem.OutputOption.*;
+import static de.schlichtherle.truezip.io.Files.*;
+import static java.io.File.*;
 
 /**
  * Provides static utility methods for {@link File}s.
@@ -240,18 +244,17 @@ class Files {
             final java.io.File src,
             final BitField<InputOption> options) {
         if (src instanceof File) {
-            // TODO: Get rid of this and use the more general pattern below!
+            // TODO: Consider removing this block and using the more general pattern below!
             final File file = (File) src;
             final File archive = file.getInnerArchive();
             if (null != archive)
                 return archive.getController()
                         .getInputSocket(file.getInnerEntryName0(), options);
         }
-        // TODO: Replace new FileDriver() with an adapter for an ArchiveDetector!
-        final Path path = Path.create(src.toURI(), true);
+        final Path path = Path.create(fix(getRealFile(src).toURI()), true);
         return FileSystemManagers
                 .getInstance()
-                .getController( path.getMountPoint(), new FileDriver())
+                .getController( path.getMountPoint(), new ArchiveFileSystemDriver())
                 .getInputSocket(path.getEntryName(), options);
     }
 
@@ -260,19 +263,51 @@ class Files {
             final BitField<OutputOption> options,
             final Entry template) {
         if (dst instanceof File) {
-            // TODO: Get rid of this and use the more general pattern below!
+            // TODO: Consider removing this block and using the more general pattern below!
             final File file = (File) dst;
             final File archive = file.getInnerArchive();
             if (null != archive)
                 return archive.getController()
                         .getOutputSocket(file.getInnerEntryName0(), options, template);
         }
-        // TODO: Replace new FileDriver() with an adapter for an ArchiveDetector!
-        final Path path = Path.create(dst.toURI(), true);
+        final Path path = Path.create(fix(getRealFile(dst).toURI()), true);
         return FileSystemManagers
                 .getInstance()
-                .getController(  path.getMountPoint(), new FileDriver())
+                .getController(  path.getMountPoint(), new ArchiveFileSystemDriver())
                 .getOutputSocket(path.getEntryName(), options, template);
+    }
+
+    static @NonNull URI fix(@NonNull URI uri) {
+        if (uri.isOpaque())
+            return uri;
+        try {
+            // Postfix: Move Windows UNC host from path to authority.
+            if ('\\' == separatorChar
+                    && uri.getRawPath().startsWith(SEPARATOR + SEPARATOR)) {
+                final String s = uri.getPath();
+                final int i = s.indexOf(SEPARATOR_CHAR, 2);
+                if (0 <= i) {
+                    uri = new URI(  uri.getScheme(),
+                                    s.substring(2, i),
+                                    s.substring(i),
+                                    uri.getQuery(),
+                                    uri.getFragment());
+                }
+            }
+            // Postfix: Delete trailing slash separator from directory URI.
+            for (String s; (s = uri.getPath()).endsWith(SEPARATOR)
+                    && 2 <= s.length()
+                    && ('\\' != separatorChar || ':' != s.charAt(s.length() - 2));) {
+                uri = new URI(  uri.getScheme(),
+                                uri.getAuthority(),
+                                s.substring(0, s.length() - 1),
+                                uri.getQuery(),
+                                uri.getFragment());
+            }
+            return uri;
+        } catch (URISyntaxException ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     /**

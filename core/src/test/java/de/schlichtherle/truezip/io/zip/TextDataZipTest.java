@@ -25,7 +25,7 @@ import java.util.logging.Logger;
  */
 public class TextDataZipTest extends PlainZipTestCase {
 
-    private static final Logger LOGGER
+    private static final Logger logger
             = Logger.getLogger(TextDataZipTest.class.getName());
 
     @SuppressWarnings("FieldNameHidesFieldInSuperclass")
@@ -33,7 +33,7 @@ public class TextDataZipTest extends PlainZipTestCase {
     static {
         boolean ea = false;
         assert ea = true; // NOT ea == true !
-        LOGGER.log(Level.CONFIG, "Java assertions enabled: {0}", ea);
+        logger.log(Level.CONFIG, "Java assertions enabled: {0}", ea);
 
         final String text = "This is a truly compressible text!\n";
         final int count = 1024 / text.length();
@@ -43,7 +43,7 @@ public class TextDataZipTest extends PlainZipTestCase {
             buf.append(text);
         }
         data = buf.toString().getBytes();
-        LOGGER.log(Level.CONFIG, "Created {0} bytes of highly compressible text as the data.", data.length);
+        logger.log(Level.CONFIG, "Created {0} bytes of highly compressible text as the data.", data.length);
     }
     
     /** Creates a new instance of RandomMessageZipTest */

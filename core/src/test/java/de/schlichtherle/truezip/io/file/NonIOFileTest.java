@@ -82,6 +82,8 @@ public class NonIOFileTest {
                 assertThat(file.getEnclArchive(), nullValue());
                 assertThat(file.getEnclEntryName(), nullValue());
             }
+            assertThat(new File(file.toPath()), equalTo(file.getNormalizedAbsoluteFile()));
+            assertThat(new File(file.toURI()), equalTo(file.getAbsoluteFile()));
         }
     }
 
