@@ -17,7 +17,7 @@ package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.filesystem.FSManagers;
 import de.schlichtherle.truezip.io.filesystem.FSPath;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemException;
+import de.schlichtherle.truezip.io.archive.ArchiveFileSystemException;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.filesystem.FSSyncException;
 import de.schlichtherle.truezip.io.InputBusyException;

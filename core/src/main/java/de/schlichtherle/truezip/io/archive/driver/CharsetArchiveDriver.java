@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.driver;
 
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.ArchiveEntry;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.entry.EntryFactory;
 import edu.umd.cs.findbugs.annotations.NonNull;

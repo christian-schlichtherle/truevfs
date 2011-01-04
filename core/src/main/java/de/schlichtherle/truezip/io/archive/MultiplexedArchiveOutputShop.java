@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.archive.output;
+package de.schlichtherle.truezip.io.archive;
 
 import de.schlichtherle.truezip.io.socket.IOPool;
 import de.schlichtherle.truezip.io.socket.DecoratorInputSocket;
@@ -31,7 +31,7 @@ import de.schlichtherle.truezip.io.socket.IOSocket;
 import de.schlichtherle.truezip.io.ChainableIOException;
 import de.schlichtherle.truezip.io.ChainableIOExceptionBuilder;
 import de.schlichtherle.truezip.io.InputException;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.ArchiveEntry;
 import de.schlichtherle.truezip.io.filesystem.file.FSTempFilePool;
 import de.schlichtherle.truezip.util.JointIterator;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -41,7 +41,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.UNKNOWN;
+import static de.schlichtherle.truezip.io.archive.ArchiveEntry.UNKNOWN;
 
 /**
  * Decorates an {@code OutputShop} in order to support a virtually

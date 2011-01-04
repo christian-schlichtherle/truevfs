@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.io.archive.driver.zip.raes;
 
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
+import de.schlichtherle.truezip.io.archive.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.filesystem.FSDecoratorController;
 import de.schlichtherle.truezip.io.filesystem.FSController;

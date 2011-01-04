@@ -13,12 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.archive.controller;
+package de.schlichtherle.truezip.io.archive;
 
 import de.schlichtherle.truezip.io.filesystem.concurrency.FSConcurrencyModel;
 import de.schlichtherle.truezip.io.filesystem.FSFalsePositiveException;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.filesystem.FSOutputOption;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.FileNotFoundException;

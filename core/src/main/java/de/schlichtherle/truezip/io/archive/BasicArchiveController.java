@@ -13,18 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.archive.controller;
+package de.schlichtherle.truezip.io.archive;
 
 import de.schlichtherle.truezip.io.filesystem.FSEntryNotFoundException;
 import de.schlichtherle.truezip.io.filesystem.FSEntry;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.io.filesystem.concurrency.FSNotWriteLockedException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemOperation;
+import de.schlichtherle.truezip.io.filesystem.concurrency.FSNotWriteLockedException;
 import de.schlichtherle.truezip.io.filesystem.concurrency.FSConcurrencyModel;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
@@ -55,7 +51,6 @@ import static de.schlichtherle.truezip.io.entry.Entry.Access.*;
 import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
 import static de.schlichtherle.truezip.io.filesystem.FSEntryName.*;
 import static de.schlichtherle.truezip.io.filesystem.FSSyncOption.*;
-import static de.schlichtherle.truezip.io.Paths.*;
 import static de.schlichtherle.truezip.io.filesystem.FSOutputOption.*;
 
 /**

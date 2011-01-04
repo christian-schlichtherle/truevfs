@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * @see     FileOutputSocket
+ * @see     FSFileOutputSocket
  * @author  Christian Schlichtherle
  * @version $Id$
  */

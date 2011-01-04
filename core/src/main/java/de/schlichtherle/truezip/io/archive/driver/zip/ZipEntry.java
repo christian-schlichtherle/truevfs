@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.ArchiveEntry;
 import de.schlichtherle.truezip.io.zip.DateTimeConverter;
 
 import static de.schlichtherle.truezip.io.entry.Entry.Access.WRITE;

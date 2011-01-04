@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.archive.filesystem;
+package de.schlichtherle.truezip.io.archive;
 
 import de.schlichtherle.truezip.io.filesystem.FSDecoratorEntry;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.ArchiveEntry;
 import de.schlichtherle.truezip.io.filesystem.FSEntry;
 import de.schlichtherle.truezip.io.filesystem.FSEntryName;
 import edu.umd.cs.findbugs.annotations.NonNull;
