@@ -37,7 +37,7 @@ import static de.schlichtherle.truezip.io.entry.Entry.Access.WRITE;
 import static de.schlichtherle.truezip.io.entry.Entry.UNKNOWN;
 
 /**
- * @see     FileInputSocket
+ * @see     FSFileInputSocket
  * @author  Christian Schlichtherle
  * @version $Id$
  */

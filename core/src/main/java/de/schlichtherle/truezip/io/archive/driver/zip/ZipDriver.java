@@ -23,7 +23,7 @@ import de.schlichtherle.truezip.io.socket.InputShop;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.archive.driver.CharsetArchiveDriver;
-import de.schlichtherle.truezip.io.archive.output.MultiplexedArchiveOutputShop;
+import de.schlichtherle.truezip.io.archive.MultiplexedArchiveOutputShop;
 import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.zip.ZipEntryFactory;

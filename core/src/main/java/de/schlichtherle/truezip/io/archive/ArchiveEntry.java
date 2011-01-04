@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.archive.entry;
+package de.schlichtherle.truezip.io.archive;
 
 import de.schlichtherle.truezip.io.entry.Entry;
 import edu.umd.cs.findbugs.annotations.NonNull;

@@ -20,7 +20,7 @@ import de.schlichtherle.truezip.io.DecoratorOutputStream;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.io.archive.output.MultiplexedArchiveOutputShop;
+import de.schlichtherle.truezip.io.archive.MultiplexedArchiveOutputShop;
 import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.OutputBusyException;
 import java.io.File;

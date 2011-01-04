@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.archive.filesystem;
+package de.schlichtherle.truezip.io.archive;
 
 import java.io.IOException;
 
