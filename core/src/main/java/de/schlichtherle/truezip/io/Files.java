@@ -31,6 +31,11 @@ import static java.io.File.*;
  */
 public class Files extends Paths {
 
+    /** The prefix of a UNC (a Windows concept). */
+    private static final String UNC_PREFIX = separator + separator;
+
+    private static File TEMP_DIRECTORY;
+
     Files() {
     }
 
@@ -41,7 +46,7 @@ public class Files extends Paths {
      * system property {@code java.io.tmpdir}.
      */
     public static File getTempDirectory() {
-        return tempDirectory;
+        return TEMP_DIRECTORY;
     }
 
     /**
@@ -50,10 +55,8 @@ public class Files extends Paths {
      * {@code java.io.tmpdir} is used by {@link #createTempFile}.
      */
     public static void setTempDirectory(final File directory) {
-        Files.tempDirectory = directory;
+        TEMP_DIRECTORY = directory;
     }
-
-    private static File tempDirectory;
 
     /**
      * Equivalent to
@@ -88,7 +91,7 @@ public class Files extends Paths {
                                         File directory)
     throws IOException {
         return File.createTempFile(prefix, suffix,
-                null == directory ? tempDirectory : directory);
+                null == directory ? TEMP_DIRECTORY : directory);
     }
 
     public static @NonNull String getRealPath(@NonNull File file) {
@@ -288,15 +291,12 @@ public class Files extends Paths {
         return contains(getRealFile(a).getPath(), getRealFile(b).getPath());
     }
 
-    /** The prefix of a UNC (a Windows concept). */
-    private static final String uncPrefix = separator + separator;
-
     /**
      * Returns {@code true} if and only if the given path is a UNC.
      * Note that this may be only relevant on the Windows platform.
      */
     public static boolean isUNC(String path) {
-        return path.startsWith(uncPrefix) && path.indexOf(separatorChar, 2) > 2;
+        return path.startsWith(UNC_PREFIX) && path.indexOf(separatorChar, 2) > 2;
     }
 
     public static boolean isUNC(File file) {
