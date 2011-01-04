@@ -15,10 +15,8 @@
  */
 package de.schlichtherle.truezip.io.file;
 
-import de.schlichtherle.truezip.io.filesystem.file.FileDriver;
 import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.InputException;
-import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemManagers;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
@@ -26,13 +24,13 @@ import de.schlichtherle.truezip.io.filesystem.Scheme;
 import de.schlichtherle.truezip.io.filesystem.Path;
 import de.schlichtherle.truezip.io.filesystem.MountPoint;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.io.filesystem.FileSystemDriver;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.io.filesystem.FilterFileSystemManager;
 import de.schlichtherle.truezip.io.filesystem.SyncExceptionBuilder;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.FileFilter;
@@ -61,8 +59,8 @@ import static de.schlichtherle.truezip.io.filesystem.FileSystemEntryName.*;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
 import static de.schlichtherle.truezip.io.entry.Entry.Size.*;
 import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
-import static de.schlichtherle.truezip.io.Files.getRealFile;
-import static de.schlichtherle.truezip.io.Files.normalize;
+import static de.schlichtherle.truezip.io.file.Files.*;
+import static de.schlichtherle.truezip.io.Files.*;
 import static de.schlichtherle.truezip.io.filesystem.OutputOption.*;
 
 /**
@@ -357,13 +355,10 @@ public final class File extends java.io.File {
     private static final Set<java.io.File> roots
     		= new TreeSet<java.io.File>(Arrays.asList(listRoots()));
 
-    /** The prefix of a UNC (a Windows concept). */
-    private static final String uncPrefix = separator + separator;
-
     private static boolean lenient
             = !Boolean.getBoolean(File.class.getPackage().getName() + ".strict");
 
-    private static ArchiveDetector defaultDetector = ArchiveDetector.DEFAULT;
+    private static @NonNull ArchiveDetector defaultDetector = ArchiveDetector.DEFAULT;
 
     //
     // Instance fields:
@@ -380,12 +375,12 @@ public final class File extends java.io.File {
      * to enable the broken implementation in
      * {@code javax.swing.JFileChooser} to browse archive files.
      */
-    private final java.io.File delegate;
+    private final @NonNull java.io.File delegate;
 
     /**
      * @see #getArchiveDetector
      */
-    private final ArchiveDetector detector;
+    private final @NonNull ArchiveDetector detector;
 
     /**
      * This field should be considered final!
@@ -393,21 +388,21 @@ public final class File extends java.io.File {
      * @see #getInnerArchive
      * @see #readObject
      */
-    private File innerArchive;
+    private @CheckForNull File innerArchive;
 
     /**
      * This field should be considered final!
      *
      * @see #getEnclArchive
      */
-    private File enclArchive;
+    private @CheckForNull File enclArchive;
 
     /**
      * This field should be considered final!
      *
      * @see #getEnclEntryName
      */
-    private FileSystemEntryName enclEntryName;
+    private @Nullable FileSystemEntryName enclEntryName;
 
     /**
      * This refers to the file system controller if and only if this file
@@ -416,7 +411,7 @@ public final class File extends java.io.File {
      *
      * @see #readObject
      */
-    private transient FileSystemController<?> controller;
+    private @Nullable transient FileSystemController<?> controller;
 
     //
     // Constructor and helper methods:
@@ -490,7 +485,7 @@ public final class File extends java.io.File {
             final ArchiveDetector detector) {
         super(path);
 
-        delegate = new java.io.File(path);
+        this.delegate = new java.io.File(path);
         this.detector = detector;
         init((File) null);
 
@@ -617,7 +612,8 @@ public final class File extends java.io.File {
      *         parameter {@code uri} does not hold.
      */
     public File(URI uri) {
-        this(Path.create(uri), new ArchiveFileSystemDriver(ArchiveDetector.ALL));
+        this(   Path.create(fix(uri), true),
+                new ArchiveFileSystemDriver(ArchiveDetector.ALL));
     }
 
     public File(final @NonNull Path path) {
@@ -728,56 +724,14 @@ public final class File extends java.io.File {
                 this.enclEntryName = FileSystemEntryName.create(
                         path.substring(innerArchivePathLength + 1) // cut off leading separatorChar
                             .replace(separatorChar, SEPARATOR_CHAR),
-                        null);
+                        null,
+                        true);
             }
         } else {
             this.detector = detector;
         }
 
         assert invariants();
-    }
-
-    private void initController() {
-        final java.io.File target = getRealFile(delegate);
-        final Scheme scheme = detector.getScheme(target.getPath());
-        assert null != scheme; // make FindBugs happy
-        final MountPoint mountPoint;
-        try {
-            if (null != enclArchive) {
-                mountPoint = MountPoint.create(scheme,
-                        new Path(   enclArchive
-                                        .getController()
-                                        .getModel()
-                                        .getMountPoint(),
-                                    enclEntryName));
-            } else {
-                URI uri = target.toURI();
-                // Postfix: Move Windows UNC host from path to authority.
-                if ('\\' == separatorChar && uri.getRawPath().startsWith(SEPARATOR + SEPARATOR)) {
-                    final String s = uri.getPath();
-                    final int i = s.indexOf(SEPARATOR_CHAR, 2);
-                    if (0 <= i) {
-                        uri = new URI(  uri.getScheme(), s.substring(2, i),
-                                        s.substring(i),
-                                        uri.getQuery(), uri.getFragment());
-                    }
-                }
-                // Postfix: Delete trailing slash separator from directory URI.
-                while (uri.getRawPath().endsWith(SEPARATOR)) {
-                    final String s = uri.getPath();
-                    uri = new URI(  uri.getScheme(), uri.getAuthority(),
-                                    s.substring(0, s.length() - 1),
-                                    uri.getQuery(), uri.getFragment());
-                }
-                mountPoint = MountPoint.create(scheme, Path.create(uri));
-            }
-        } catch (URISyntaxException ex) {
-            throw new AssertionError(ex);
-        }
-
-        this.controller = FileSystemManagers
-                .getInstance()
-                .getController(mountPoint, new ArchiveFileSystemDriver(detector));
     }
 
     /**
@@ -795,71 +749,9 @@ public final class File extends java.io.File {
         assert !(delegate instanceof File);
         if (innerArchive != null) {
             assert innerArchive.isArchive();
-            assert contains(innerArchive.getPath(), delegate.getPath());
+            assert de.schlichtherle.truezip.io.Files.contains(innerArchive.getPath(), delegate.getPath());
         }
         assert detector != null;
-
-        return true;
-    }
-
-    private File(   final File template,
-                    final java.io.File delegate,
-                    final File enclArchive) {
-        super(delegate.getPath());
-
-        assert parameters(template, delegate, enclArchive);
-
-        this.delegate = delegate;
-        this.detector = template.detector;
-        this.enclArchive = enclArchive;
-        this.enclEntryName = template.enclEntryName;
-        this.innerArchive = template.isArchive() ? this : enclArchive;
-        this.controller = template.controller;
-
-        assert invariants();
-    }
-
-    /**
-     * This is called by some private constructors if and only if assertions
-     * are enabled to assert that their parameters are valid.
-     * If assertions are disabled, the call to this method is thrown away by
-     * the HotSpot compiler, so there is no performance penalty.
-     */
-    private static boolean parameters(
-            final File template,
-            final java.io.File delegate,
-            final File enclArchive)
-    throws AssertionError {
-        assert delegate != null;
-        assert !(delegate instanceof File);
-        assert template != null;
-
-        String delegatePath = delegate.getPath();
-        final java.io.File normalizedTemplate = normalize(template);
-        String normalizedTemplatePath = normalizedTemplate.getPath();
-        String normalizedTemplateBase = normalizedTemplate.getName();
-        // Windows and MacOS are case preserving, however UNIX is case
-        // sensitive. If we meet an unknown platform, we assume that it is
-        // case preserving, which means that two paths are considered
-        // equal if they differ by case only.
-        // In the context of this constructor, this implements a liberal
-        // in-dubio-pro-reo parameter check.
-        if (separatorChar != '/') {
-            delegatePath = delegatePath.toLowerCase();
-            normalizedTemplatePath = normalizedTemplatePath.toLowerCase();
-            normalizedTemplateBase = normalizedTemplateBase.toLowerCase();
-        }
-        if (!".".equals(normalizedTemplateBase)
-            && !"..".equals(normalizedTemplateBase)
-            && !normalizedTemplatePath.startsWith("." + separator)
-            && !normalizedTemplatePath.startsWith(".." + separator)) {
-            assert delegatePath.endsWith(normalizedTemplatePath)
-                    : "delegate and template must identify the same file or directory!";
-            if (enclArchive != null) {
-                assert enclArchive.isArchive();
-                assert enclArchive.isParentOf(delegate);
-            }
-        }
 
         return true;
     }
@@ -880,7 +772,7 @@ public final class File extends java.io.File {
         final StringBuilder enclEntryNameBuf = new StringBuilder(path.length());
         init(ancestor, detector, 0, path, enclEntryNameBuf, new Splitter(separatorChar));
         enclEntryName = 0 < enclEntryNameBuf.length()
-                ? FileSystemEntryName.create(enclEntryNameBuf.toString(), null)
+                ? FileSystemEntryName.create(enclEntryNameBuf.toString(), null, true)
                 : null;
 
         if (innerArchive == this) {
@@ -990,7 +882,7 @@ public final class File extends java.io.File {
 
         if (innerArchive == this) {
             assert controller == null;      // transient!
-            initController();               // postfix!
+            initController();               // fix!
         }
 
         try {
@@ -998,6 +890,31 @@ public final class File extends java.io.File {
         } catch (AssertionError ex) {
             throw (InvalidObjectException) new InvalidObjectException(ex.toString()).initCause(ex);
         }
+    }
+
+    private void initController() {
+        final java.io.File target = getRealFile(delegate);
+        final Scheme scheme = detector.getScheme(target.getPath());
+        assert null != scheme; // make FindBugs happy
+        final MountPoint mountPoint;
+        try {
+            if (null != enclArchive) {
+                mountPoint = new MountPoint(scheme,
+                        new Path(   enclArchive
+                                        .getController()
+                                        .getModel()
+                                        .getMountPoint(),
+                                    enclEntryName));
+            } else {
+                mountPoint = new MountPoint(scheme,
+                        new Path(fix(target.toURI())));
+            }
+        } catch (URISyntaxException ex) {
+            throw new AssertionError(ex);
+        }
+        this.controller = FileSystemManagers
+                .getInstance()
+                .getController(mountPoint, new ArchiveFileSystemDriver(detector));
     }
 
     /**
@@ -1030,7 +947,7 @@ public final class File extends java.io.File {
         assert (this == innerArchive && null != controller)
                 ^ (innerArchive == enclArchive && null == controller);
         assert null == enclArchive
-                || contains(enclArchive.getPath(),
+                || de.schlichtherle.truezip.io.Files.contains(enclArchive.getPath(),
                             delegate.getParentFile().getPath())
                     && 0 < enclEntryName.toString().length();
         return true;
@@ -1062,11 +979,8 @@ public final class File extends java.io.File {
      */
     public static void sync(@NonNull BitField<SyncOption> options)
     throws ArchiveException {
-        final ExceptionBuilder<IOException, ArchiveException> builder
-                = new ArchiveExceptionBuilder();
-        FileSystemManagers
-                .getInstance()
-                .sync(options, builder);
+        ArchiveExceptionBuilder builder = new ArchiveExceptionBuilder();
+        FileSystemManagers.getInstance().sync(options, builder);
         builder.check();
     }
 
@@ -1476,11 +1390,10 @@ public final class File extends java.io.File {
             return enclArchive;
         }
 
-        // This must not only be called for performance reasons, but also in
-        // order to prevent the parent path from being rescanned for
-        // archive files with a different detector, which could
-        // trigger an update and reconfiguration of the respective
-        // archive controller!
+        // This is not only called for performance reasons, but also in order
+        // to prevent the parent path from being rescanned for archive files
+        // with a different detector, which could trigger an update and
+        // reconfiguration of the respective archive controller!
         return new File(parent, enclArchive, detector);
     }
 
@@ -1496,11 +1409,29 @@ public final class File extends java.io.File {
     }
 
     @Override
+    public String getAbsolutePath() {
+        return delegate.getAbsolutePath();
+    }
+
+    @Override
     public File getAbsoluteFile() {
-        File enclArchive = this.enclArchive;
-        if (null != enclArchive)
-            enclArchive = enclArchive.getAbsoluteFile();
-        return new File(this, delegate.getAbsoluteFile(), enclArchive);
+        String p = getAbsolutePath();
+        return p.equals(getPath()) ? this : new File(p, detector);
+    }
+
+    /**
+     * Similar to {@link #getAbsolutePath()}, but removes any redundant
+     * {@code "."} and {@code ".."} directories from the path name.
+     * The result is similar to {@link #getCanonicalPath()}, but symbolic
+     * links are not resolved.
+     * This may be useful if {@code getCanonicalPath()} throws an
+     * IOException.
+     *
+     * @see #getCanonicalPath()
+     * @see #getNormalizedPath()
+     */
+    public String getNormalizedAbsolutePath() {
+        return normalize(getAbsolutePath());
     }
 
     /**
@@ -1516,25 +1447,18 @@ public final class File extends java.io.File {
      * @see #getNormalizedFile()
      */
     public File getNormalizedAbsoluteFile() {
-        File enclArchive = this.enclArchive;
-        if (null != enclArchive)
-            enclArchive = enclArchive.getNormalizedAbsoluteFile();
-        return new File(this, normalize(delegate.getAbsoluteFile()), enclArchive);
+        String p = getNormalizedAbsolutePath();
+        return p.equals(getPath()) ? this : new File(p, detector);
     }
 
     /**
-     * Similar to {@link #getAbsolutePath()}, but removes any redundant
-     * {@code "."} and {@code ".."} directories from the path name.
-     * The result is similar to {@link #getCanonicalPath()}, but symbolic
-     * links are not resolved.
-     * This may be useful if {@code getCanonicalPath()} throws an
-     * IOException.
+     * Removes any redundant {@code "."}, {@code ".."} directories from the
+     * path name.
      *
-     * @see #getCanonicalPath()
-     * @see #getNormalizedPath()
+     * @return The normalized path of this file as a {@link String}.
      */
-    public String getNormalizedAbsolutePath() {
-        return normalize(getAbsolutePath(), separatorChar);
+    public String getNormalizedPath() {
+        return normalize(getPath());
     }
 
     /**
@@ -1545,47 +1469,19 @@ public final class File extends java.io.File {
      *         Otherwise a new instance of this class is returned.
      */
     public File getNormalizedFile() {
-        final java.io.File normalizedFile = normalize(this);
-        assert normalizedFile != null;
-        if (normalizedFile == this)
-            return this;
-        assert !(normalizedFile instanceof File);
-        assert enclArchive == null || normalize(enclArchive) == enclArchive;
-        return new File(this, normalizedFile, enclArchive);
+        String p = getNormalizedPath();
+        return p.equals(getPath()) ? this : new File(p, detector);
     }
 
-    /**
-     * Removes any redundant {@code "."}, {@code ".."} directories from the
-     * path name.
-     *
-     * @return The normalized path of this file as a {@link String}.
-     */
-    public String getNormalizedPath() {
-        return normalize(getPath(), separatorChar);
+    @Override
+    public String getCanonicalPath() throws IOException {
+        return delegate.getCanonicalPath();
     }
 
     @Override
     public File getCanonicalFile() throws IOException {
-        File enclArchive = this.enclArchive;
-        if (null != enclArchive)
-            enclArchive = enclArchive.getCanonicalFile();
-        // Note: entry.getCanonicalFile() may change case!
-        return new File(this, delegate.getCanonicalFile(), enclArchive);
-    }
-
-    /**
-     * This convenience method simply returns the canonical form of this
-     * abstract path or the normalized absolute form if resolving the
-     * prior fails.
-     *
-     * @return The canonical or absolute path of this file as an
-     *         instance of this class.
-     */
-    public final File getCanOrAbsFile() {
-        File enclArchive = this.enclArchive;
-        if (null != enclArchive)
-            enclArchive = enclArchive.getCanOrAbsFile();
-        return new File(this, getRealFile(delegate), enclArchive);
+        String p = getCanonicalPath();
+        return p.equals(getPath()) ? this : new File(p, detector);
     }
 
     /**
@@ -1597,7 +1493,20 @@ public final class File extends java.io.File {
      *         {@code String} instance.
      */
     public String getCanOrAbsPath() {
-        return getCanOrAbsFile().getPath();
+        return getRealPath(delegate);
+    }
+
+    /**
+     * This convenience method simply returns the canonical form of this
+     * abstract path or the normalized absolute form if resolving the
+     * prior fails.
+     *
+     * @return The canonical or absolute path of this file as an
+     *         instance of this class.
+     */
+    public final File getCanOrAbsFile() {
+        String p = getCanOrAbsPath();
+        return p.equals(getPath()) ? this : new File(p, detector);
     }
 
     /**
@@ -1797,9 +1706,7 @@ public final class File extends java.io.File {
      * @throws NullPointerException If the parameter is {@code null}.
      */
     public boolean isParentOf(final java.io.File file) {
-        final String a = getRealFile(this).getPath();
-        final String b = getRealFile(file).getParent();
-        return b != null ? contains(a, b) : false;
+        return de.schlichtherle.truezip.io.Files.contains(this, file);
     }
 
     /**
@@ -1849,33 +1756,21 @@ public final class File extends java.io.File {
         return de.schlichtherle.truezip.io.Files.contains(a, b);
     }
 
-    private static boolean contains(String a, String b) {
-        return de.schlichtherle.truezip.io.Files.contains(a, b);
-    }
-
     /**
      * Returns {@code true} if and only if this file denotes a file system
      * root or a UNC (if running on the Windows platform).
      */
     public boolean isFileSystemRoot() {
         File canOrAbsFile = getCanOrAbsFile();
-        return roots.contains(canOrAbsFile) || isUNC(canOrAbsFile.getPath());
+        return roots.contains(canOrAbsFile) || de.schlichtherle.truezip.io.Files.isUNC(canOrAbsFile.getPath());
     }
 
     /**
      * Returns {@code true} if and only if this file denotes a UNC.
-     * Note that this may be only relevant on the Windows platform.
+     * Note that this should be relevant on the Windows platform only.
      */
     public boolean isUNC() {
-        return isUNC(getCanOrAbsFile().getPath());
-    }
-
-    /**
-     * Returns {@code true} if and only if the given path is a UNC.
-     * Note that this may be only relevant on the Windows platform.
-     */
-    private static boolean isUNC(final String path) {
-        return path.startsWith(uncPrefix) && path.indexOf(separatorChar, 2) > 2;
+        return de.schlichtherle.truezip.io.Files.isUNC(this);
     }
 
     @Override
@@ -1978,7 +1873,7 @@ public final class File extends java.io.File {
     public boolean equals(final Object other) {
         if (other instanceof File)
             return compareTo((File) other) == 0;
-        return super.equals(other); // don't use entry - would break symmetry requirement!
+        return super.equals(other); // don't use delegate - would break symmetry requirement!
     }
 
     /**
@@ -2047,7 +1942,7 @@ public final class File extends java.io.File {
 
         // Degrade this file to a plain file in order to ensure
         // sgn(this.compareTo(other)) == -sgn(other.compareTo(this)).
-        return super.compareTo(other); // don't use entry - would break antisymmetry requirement!
+        return super.compareTo(other); // don't use delegate - would break antisymmetry requirement!
     }
 
     /**
@@ -2063,16 +1958,6 @@ public final class File extends java.io.File {
         return null != enclArchive
                 ? enclArchive.getTopLevelArchive()
                 : innerArchive;
-    }
-
-    @Override
-    public String getAbsolutePath() {
-        return delegate.getAbsolutePath();
-    }
-
-    @Override
-    public String getCanonicalPath() throws IOException {
-        return delegate.getCanonicalPath();
     }
 
     @Override
@@ -2105,17 +1990,73 @@ public final class File extends java.io.File {
         return delegate.toString();
     }
 
-    // FIXME: Use Path!
-    @Override
-    public java.net.URI toURI() {
-        return delegate.toURI();
+    public @NonNull Path toPath() {
+        try {
+            if (this == innerArchive) {
+                final Scheme scheme = detector.getScheme(delegate.getPath());
+                assert null != scheme; // make FindBugs happy!
+                if (null != enclArchive) {
+                    return new Path(
+                            new MountPoint(
+                                scheme,
+                                new Path(
+                                    new MountPoint(fix(enclArchive.toURI()), true),
+                                    enclEntryName)),
+                            ROOT);
+                } else {
+                    return new Path(
+                            new MountPoint(
+                                scheme,
+                                new Path(fix(delegate.toURI()), true)),
+                            ROOT);
+                }
+            } else if (null != enclArchive) {
+                return new Path(
+                        new MountPoint(fix(enclArchive.toURI()), true),
+                        enclEntryName);
+            } else {
+                return new Path(fix(delegate.toURI()), true);
+            }
+        } catch (URISyntaxException ex) {
+            throw new AssertionError(ex);
+        }
     }
 
-    // FIXME: Use Path!
+    @Override
+    public @NonNull URI toURI() {
+        try {
+            if (this == innerArchive) {
+                final Scheme scheme = detector.getScheme(delegate.getPath());
+                assert null != scheme; // make FindBugs happy!
+                if (null != enclArchive) {
+                    return new MountPoint(
+                            scheme,
+                            new Path(
+                                new MountPoint(fix(enclArchive.toURI()), true),
+                                enclEntryName)).getUri();
+                } else {
+                    return new MountPoint(
+                            scheme,
+                            new Path(fix(delegate.toURI()), true)).getUri();
+                }
+            } else if (null != enclArchive) {
+                return new Path(
+                        new MountPoint(fix(enclArchive.toURI()), true),
+                        enclEntryName).getUri();
+            } else {
+                return delegate.toURI();
+            }
+        } catch (URISyntaxException ex) {
+            throw new AssertionError(ex);
+        }
+    }
+
     @Deprecated
     @Override
     public URL toURL() throws MalformedURLException {
-        return delegate.toURL();
+        return null != innerArchive
+                ? toURI().toURL()
+                : delegate.toURL();
     }
 
     /**

@@ -116,7 +116,7 @@ extends FileSystemController<ConcurrentFileSystemModel> {
     private static final String CLASS_NAME
             = BasicArchiveController.class.getName();
 
-    private static final Logger LOGGER
+    private static final Logger logger
             = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 
     private static final BitField<OutputOption> AUTO_MOUNT_OPTIONS
@@ -387,7 +387,7 @@ extends FileSystemController<ConcurrentFileSystemModel> {
             // Check for any archive entries with absolute entry names.
             // Subtract one for the ROOT entry.
             if (1 != fileSystem.getSize())
-                LOGGER.log(Level.WARNING, "unlink.absolute",
+                logger.log(Level.WARNING, "unlink.absolute",
                         new Object[] {  fileSystem.getSize() - 1,
                                         getModel().getMountPoint() });
             sync(UNLINK_SYNC_OPTIONS, new SyncExceptionBuilder());

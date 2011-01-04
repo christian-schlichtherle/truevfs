@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.io;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import java.util.Locale;
 
 /**
  * Provides static utility methods for path names.
@@ -321,8 +322,8 @@ public class Paths {
     public static boolean contains(@NonNull String a, @NonNull String b, char separatorChar) {
         // Windows is just case preserving, all others are case sensitive.
         if (separatorChar == '\\') {
-            a = a.toLowerCase();
-            b = b.toLowerCase();
+            a = a.toLowerCase(Locale.ENGLISH);
+            b = b.toLowerCase(Locale.ENGLISH);
         }
         if (!b.startsWith(a)) {
             return false;

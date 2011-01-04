@@ -35,7 +35,7 @@ import junit.framework.TestCase;
  */
 public abstract class ReadOnlyFileTestCase extends TestCase {
 
-    private static final Logger LOGGER = Logger.getLogger(
+    private static final Logger logger = Logger.getLogger(
             BufferedReadOnlyFileTest.class.getName());
 
     private static final Random rnd = new SecureRandom();
@@ -43,9 +43,9 @@ public abstract class ReadOnlyFileTestCase extends TestCase {
     static {
         boolean ea = false;
         assert ea = true; // NOT ea == true !
-        LOGGER.log(Level.CONFIG, "Java assertions {0}", (ea ? "enabled." : "disabled!"));
+        logger.log(Level.CONFIG, "Java assertions {0}", (ea ? "enabled." : "disabled!"));
         if (!ea)
-            LOGGER.warning("Please enable assertions for additional white box testing.");
+            logger.warning("Please enable assertions for additional white box testing.");
     }
 
     /** The test data. */

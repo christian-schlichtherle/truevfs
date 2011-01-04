@@ -42,7 +42,7 @@ public class FileComboBoxBrowserUITest extends TestCase {
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput()); // shut up!
     }
 
-    private static final Logger LOGGER
+    private static final Logger logger
             = Logger.getLogger(FileComboBoxBrowserUITest.class.getName());
 
     public FileComboBoxBrowserUITest(String testName) {
@@ -98,7 +98,7 @@ public class FileComboBoxBrowserUITest extends TestCase {
     public void testAutoCompletion(final java.io.File dir) {
         final String[] entries = dir.list();
         if (entries == null || entries.length == 0) {
-            LOGGER.warning("Current directory does not contain any files - skipping test!");
+            logger.warning("Current directory does not contain any files - skipping test!");
             return;
         }
 

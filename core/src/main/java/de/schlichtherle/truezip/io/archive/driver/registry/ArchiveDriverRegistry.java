@@ -53,7 +53,7 @@ public class ArchiveDriverRegistry implements Serializable {
             = ArchiveDriverRegistry.class.getName();
     private static final ResourceBundle RESOURCES
             = ResourceBundle.getBundle(CLASS_NAME);
-    private static final Logger LOGGER
+    private static final Logger logger
             = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 
     static final String KWD_DRIVER = "DRIVER";      // NOI18N
@@ -170,7 +170,7 @@ public class ArchiveDriverRegistry implements Serializable {
             if (eager)
                 throw new IllegalArgumentException(getString("noSuffixes")); // NOI18N
             else
-                LOGGER.log(Level.WARNING, "noSuffixes"); // NOI18N
+                logger.log(Level.WARNING, "noSuffixes"); // NOI18N
         } else {
             driver = eager ? newArchiveDriver(driver) : (String) driver; // force cast
             for (String suffix : set)
@@ -221,7 +221,7 @@ public class ArchiveDriverRegistry implements Serializable {
                 // an ArchiveDriver, so we probably need to load its class
                 // first and instantiate it.
                 driver = newArchiveDriver(driver);
-                LOGGER.log(Level.FINE, "installed", // NOI18N
+                logger.log(Level.FINE, "installed", // NOI18N
                         new Object[] { suffix, driver });
             }
             // Cache the driver in the local registry.

@@ -57,8 +57,7 @@ implements Iterable<FileSystemController<?>> {
      *
      * @return The number of federated file systems managed by this instance.
      */
-    public abstract int
-    getSize();
+    public abstract int getSize();
 
     /**
      * Returns an iterator for the controller of all federated file systems

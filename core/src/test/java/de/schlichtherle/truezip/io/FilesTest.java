@@ -36,7 +36,7 @@ import static de.schlichtherle.truezip.io.Files.split;
  */
 public class FilesTest extends TestCase {
 
-    private static final Logger LOGGER = Logger.getLogger(
+    private static final Logger logger = Logger.getLogger(
             FilesTest.class.getName());
 
     public FilesTest(String testName) {
@@ -495,7 +495,7 @@ public class FilesTest extends TestCase {
             fin.close();
         }
         if (!result)
-            LOGGER.finer("Overwriting a file which has an open FileInputStream is not tolerated!");
+            logger.finer("Overwriting a file which has an open FileInputStream is not tolerated!");
 
         final String[] modes = { "r", "rw", "rws", "rwd" };
         for (int i = 0, l = modes.length; i < l; i++) {
@@ -508,11 +508,11 @@ public class FilesTest extends TestCase {
                 raf.close();
             }
             if (!result)
-                LOGGER.log(Level.FINER, "Overwriting a file which has an open RandomAccessFile in \"{0}\" mode is not tolerated!", mode);
+                logger.log(Level.FINER, "Overwriting a file which has an open RandomAccessFile in \"{0}\" mode is not tolerated!", mode);
         }
 
         if (!total)
-            LOGGER.finer(
+            logger.finer(
                     "Applications should ALWAYS close their streams or you may face strange 'errors'.\n"
                     + "Note that this issue is NOT AT ALL specific to TrueZIP, but rather imposed by this platform!");
 

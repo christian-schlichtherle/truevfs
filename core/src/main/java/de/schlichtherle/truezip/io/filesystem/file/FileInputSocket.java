@@ -30,26 +30,25 @@ import java.io.InputStream;
  */
 final class FileInputSocket extends InputSocket<FileEntry> {
 
-    private final FileEntry file;
+    private final FileEntry entry;
 
-    FileInputSocket(@NonNull final FileEntry file) {
-        if (null == file)
-            throw new NullPointerException();
-        this.file = file;
+    FileInputSocket(final @NonNull FileEntry entry) {
+        assert null != entry;
+        this.entry = entry;
     }
 
     @Override
     public FileEntry getLocalTarget() {
-        return file;
+        return entry;
     }
 
     @Override
     public ReadOnlyFile newReadOnlyFile() throws IOException {
-        return new SimpleReadOnlyFile(file.getFile());
+        return new SimpleReadOnlyFile(entry.getFile());
     }
 
     @Override
     public InputStream newInputStream() throws IOException {
-        return new FileInputStream(file.getFile());
+        return new FileInputStream(entry.getFile());
     }
 }

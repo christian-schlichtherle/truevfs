@@ -30,7 +30,7 @@ public final class IBM437Charset extends OctetCharset {
 
     private static final String CLASS_NAME
             = "de.schlichtherle.truezip.nio.charset.IBM437Charset";
-    private static final Logger LOGGER = Logger.getLogger(CLASS_NAME, CLASS_NAME);
+    private static final Logger logger = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 
     private static final String NAME = "IBM437";
 
@@ -64,7 +64,7 @@ public final class IBM437Charset extends OctetCharset {
 
     public IBM437Charset() {
         super(NAME, ALIASES, BYTE2CHAR);
-        LOGGER.log(Level.FINE, "instantiated",
+        logger.log(Level.FINE, "instantiated",
                 new String[] { displayName(), aliases().toString() });
     }
 }

@@ -31,12 +31,13 @@ import net.jcip.annotations.ThreadSafe;
 /**
  * Implements statistics for its decorated file system controller.
  * <p>
- * This class is thread-safe if and only if the decorated file system
- * controller is thread-safe.
+ * This class is thread-safe iff the decorated file system controller is
+ * thread-safe.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 class StatisticsFileSystemController
 extends DecoratingFileSystemController<FileSystemModel, FileSystemController<?>> {
 

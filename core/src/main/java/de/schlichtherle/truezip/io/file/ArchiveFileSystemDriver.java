@@ -32,6 +32,10 @@ final class ArchiveFileSystemDriver implements FileSystemDriver {
 
     private final ArchiveDetector detector;
 
+    ArchiveFileSystemDriver() {
+        this(ArchiveDetector.ALL);
+    }
+
     ArchiveFileSystemDriver(final @NonNull ArchiveDetector detector) {
         if (null == detector)
             throw new NullPointerException();

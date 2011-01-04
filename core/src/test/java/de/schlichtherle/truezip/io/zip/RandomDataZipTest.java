@@ -25,7 +25,7 @@ import java.util.logging.Logger;
  */
 public class RandomDataZipTest extends PlainZipTestCase {
 
-    private static final Logger LOGGER
+    private static final Logger logger
             = Logger.getLogger(RandomDataZipTest.class.getName());
 
     @SuppressWarnings("FieldNameHidesFieldInSuperclass")
@@ -33,10 +33,10 @@ public class RandomDataZipTest extends PlainZipTestCase {
     static {
         boolean ea = false;
         assert ea = true; // NOT ea == true !
-        LOGGER.log(Level.CONFIG, "Java assertions enabled: {0}", ea);
+        logger.log(Level.CONFIG, "Java assertions enabled: {0}", ea);
 
         rnd.nextBytes(data);
-        LOGGER.log(Level.CONFIG, "Created {0} bytes of random data.", data.length);
+        logger.log(Level.CONFIG, "Created {0} bytes of random data.", data.length);
     }
     
     /**

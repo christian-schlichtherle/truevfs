@@ -31,7 +31,7 @@ import org.bouncycastle.crypto.prng.RandomGenerator;
  */
 public class RaesTest extends ReadOnlyFileTestCase {
 
-    private static final Logger LOGGER = Logger.getLogger(
+    private static final Logger logger = Logger.getLogger(
             RaesTest.class.getName());
 
     private static final String PASSWD = "secret";
@@ -56,7 +56,7 @@ public class RaesTest extends ReadOnlyFileTestCase {
             @Override
             public char[] getOpenPasswd() {
                 if (secondTry) {
-                    LOGGER.finer("First returned password was wrong, providing the right one now!");
+                    logger.finer("First returned password was wrong, providing the right one now!");
                     return PASSWD.toCharArray();
                 } else {
                     secondTry = true;
@@ -70,7 +70,7 @@ public class RaesTest extends ReadOnlyFileTestCase {
 
             @Override
             public void invalidOpenPasswd() {
-                LOGGER.finer("Password wrong!");
+                logger.finer("Password wrong!");
             }
 
             @Override
@@ -87,7 +87,7 @@ public class RaesTest extends ReadOnlyFileTestCase {
 
             @Override
             public void setKeyStrength(int keyStrength) {
-                LOGGER.log(Level.FINER, "Key strength: {0}", keyStrength);
+                logger.log(Level.FINER, "Key strength: {0}", keyStrength);
             }
         };
     }
@@ -132,7 +132,7 @@ public class RaesTest extends ReadOnlyFileTestCase {
             } finally {
                 out.close();
             }
-            LOGGER.log(Level.FINE,
+            logger.log(Level.FINE,
                     "Encrypted {0} bytes of random data using AES-{1}/CTR/Hmac-SHA-256/PBKDFv2.",
                     new Object[]{ data.length, out.getKeySizeBits() });
             // Open cipherFile for random access decryption.

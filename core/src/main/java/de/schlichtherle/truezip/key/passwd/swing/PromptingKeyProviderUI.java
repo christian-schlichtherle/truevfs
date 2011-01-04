@@ -51,7 +51,7 @@ implements de.schlichtherle.truezip.key.PromptingKeyProviderUI<Cloneable, P> {
 
     private static final String CLASS_NAME
             = PromptingKeyProviderUI.class.getName();
-    private static final Logger LOGGER = Logger.getLogger(CLASS_NAME);
+    private static final Logger logger = Logger.getLogger(CLASS_NAME);
     private static final ResourceBundle resources
             = ResourceBundle.getBundle(CLASS_NAME);
     private static final String PACKAGE_NAME
@@ -173,11 +173,11 @@ implements de.schlichtherle.truezip.key.PromptingKeyProviderUI<Cloneable, P> {
             Feedback f = (Feedback) c.newInstance();
             return f;
         } catch (ClassNotFoundException ex) {
-            LOGGER.log(Level.WARNING, "", ex);
+            logger.log(Level.WARNING, "", ex);
         } catch (IllegalAccessException ex) {
-            LOGGER.log(Level.WARNING, "", ex);
+            logger.log(Level.WARNING, "", ex);
         } catch (InstantiationException ex) {
-            LOGGER.log(Level.WARNING, "", ex);
+            logger.log(Level.WARNING, "", ex);
         }
         return null;
     }

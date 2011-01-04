@@ -27,7 +27,7 @@ import java.util.logging.Logger;
  */
 public class AesKeyMgmtLifeCycle extends KeyMgmtLifeCycle {
 
-    private static final Logger LOGGER
+    private static final Logger logger
             = Logger.getLogger(AesKeyMgmtLifeCycle.class.getName());
 
     private int keyStrength;
@@ -81,6 +81,6 @@ public class AesKeyMgmtLifeCycle extends KeyMgmtLifeCycle {
                 throw new AssertionError("Illegal key strength!");
         }
         msg += " bits.";
-        LOGGER.fine(msg);
+        logger.fine(msg);
     }
 }

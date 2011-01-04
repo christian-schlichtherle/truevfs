@@ -15,11 +15,12 @@
  */
 package de.schlichtherle.truezip.io;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
-import static java.io.File.separatorChar;
+import static java.io.File.*;
 
 /**
  * Provides static utility methods for file objects and path names.
@@ -90,26 +91,25 @@ public class Files extends Paths {
                 null == directory ? tempDirectory : directory);
     }
 
+    public static @NonNull String getRealPath(@NonNull File file) {
+        try {
+            return file.getCanonicalPath();
+        } catch (IOException ex) {
+            return normalize(file.getAbsolutePath());
+        }
+    }
+
     /**
      * Returns the canonical path of the given file or the normalized absolute
      * path if canonicalizing the path fails due to an {@code IOException}.
      *
-     * @param  file the nullable file.
+     * @param  file the file.
      * @return The canonical or absolute path of this file as a
-     *         {@code File} instance or {@code null} iff {@code file} is
-     *         {@code null}.
+     *         {@code File} instance.
      */
-    public static File getRealFile(final File file) {
-        if (null == file)
-            return null;
-        try {
-            return file.getCanonicalFile();
-        } catch (IOException ex) {
-            final File parent = file.getParentFile();
-            return normalize(null != parent
-                    ? new File(getRealFile0(parent), file.getName())
-                    : file.getAbsoluteFile());
-        }
+    public static @NonNull File getRealFile(@NonNull File file) {
+        String p = getRealPath(file);
+        return p.equals(file.getPath()) ? file : new File(p);
     }
 
     private static File getRealFile0(final File file) {
@@ -212,6 +212,14 @@ public class Files extends Paths {
     }
 
     /**
+     * Equivalent to {@link #normalize(String, char)
+     * normalize(path, File.separatorChar)}.
+     */
+    public static String normalize(String path) {
+        return normalize(path, separatorChar);
+    }
+
+    /**
      * Removes all redundant separators, dot directories ({@code "."}) and
      * dot-dot directories ({@code ".."}) from the path name and returns the
      * result.
@@ -223,19 +231,10 @@ public class Files extends Paths {
      *         Otherwise, an object which's runtime class is guaranteed to
      *         be {@code File}.
      */
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("ES_COMPARING_STRINGS_WITH_EQ")
-    public static File normalize(final File file) {
-        final String path = file.getPath();
-        final String newPath = normalize(path, separatorChar);
-        return newPath == path ? file : new File(newPath); // mind contract!
-    }
-
-    /**
-     * Equivalent to {@link #normalize(String, char)
-     * normalize(path, File.separatorChar)}.
-     */
-    public static String normalize(final String path) {
-        return normalize(path, separatorChar);
+    public static File normalize(File file) {
+        String p = file.getPath();
+        String n = normalize(p);
+        return n.equals(p) ? file : new File(n);
     }
 
     /**
@@ -252,6 +251,18 @@ public class Files extends Paths {
      */
     public static boolean isAbsolute(String path) {
         return isAbsolute(path, separatorChar);
+    }
+
+    /**
+     * Returns true if and only if the path name represented by {@code a}
+     * contains the path name represented by {@code b}.
+     *
+     * @param a A non-{@code null} {@link String} reference.
+     * @param b A non-{@code null} {@link String} reference.
+     * @throws NullPointerException If any parameter is {@code null}.
+     */
+    public static boolean contains(String a, String b) {
+        return contains(a, b, separatorChar);
     }
 
     /**
@@ -277,15 +288,18 @@ public class Files extends Paths {
         return contains(getRealFile(a).getPath(), getRealFile(b).getPath());
     }
 
+    /** The prefix of a UNC (a Windows concept). */
+    private static final String uncPrefix = separator + separator;
+
     /**
-     * Returns true if and only if the path name represented by {@code a}
-     * contains the path name represented by {@code b}.
-     *
-     * @param a A non-{@code null} {@link String} reference.
-     * @param b A non-{@code null} {@link String} reference.
-     * @throws NullPointerException If any parameter is {@code null}.
+     * Returns {@code true} if and only if the given path is a UNC.
+     * Note that this may be only relevant on the Windows platform.
      */
-    public static boolean contains(String a, String b) {
-        return contains(a, b, separatorChar);
+    public static boolean isUNC(String path) {
+        return path.startsWith(uncPrefix) && path.indexOf(separatorChar, 2) > 2;
+    }
+
+    public static boolean isUNC(File file) {
+        return isUNC(getRealFile(file).getPath());
     }
 }

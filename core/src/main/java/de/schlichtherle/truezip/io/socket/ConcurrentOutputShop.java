@@ -43,7 +43,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
 
     private static final String CLASS_NAME
             = ConcurrentOutputShop.class.getName();
-    private static final Logger LOGGER
+    private static final Logger logger
             = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 
     /**
@@ -105,7 +105,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
                 wait(toWait);
             }
         } catch (InterruptedException ex) {
-            LOGGER.log(Level.WARNING, "wait.interrupted", ex);
+            logger.log(Level.WARNING, "wait.interrupted", ex);
         }
         return threads.size();
     }

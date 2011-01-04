@@ -36,7 +36,7 @@ import java.util.logging.Logger;
  */
 public class KeyMgmtLifeCycle implements Runnable {
 
-    private static final Logger LOGGER
+    private static final Logger logger
             = Logger.getLogger(KeyMgmtLifeCycle.class.getName());
 
     /** The identifier of the protected resource. */
@@ -94,7 +94,7 @@ public class KeyMgmtLifeCycle implements Runnable {
         // key manager when opening the resource.
         refKey = provider.getCreateKey();
         String msg = id + ": getCreateKey() returned " + toString(refKey) + ".";
-        LOGGER.fine(msg);
+        logger.fine(msg);
 
         createResourceHook(provider);
     }
@@ -125,11 +125,11 @@ public class KeyMgmtLifeCycle implements Runnable {
         nullify(providedKey);
         if (correct) {
             msg += "That's correct.";
-            LOGGER.fine(msg);
+            logger.fine(msg);
         }  else {
             provider.invalidOpenKey();
             msg += "That's wrong!";
-            LOGGER.fine(msg);
+            logger.fine(msg);
             try {
                 Thread.sleep(3000);
             }  catch (InterruptedException ex) {
