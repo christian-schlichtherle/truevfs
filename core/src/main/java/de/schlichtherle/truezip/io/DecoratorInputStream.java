@@ -24,7 +24,7 @@ import java.io.InputStream;
  * in the JSE, but optimized for performance and <em>without</em>
  * multithreading support.
  *
- * @see     DecoratingOutputStream
+ * @see     DecoratorOutputStream
  * @author  Christian Schlichtherle
  * @version $Id$
  */

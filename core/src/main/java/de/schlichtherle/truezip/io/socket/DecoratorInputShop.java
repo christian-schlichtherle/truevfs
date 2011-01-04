@@ -26,7 +26,7 @@ import java.io.IOException;
  * Multithreading needs to be addressed by client applications.
  *
  * @param   <E> The type of the entries.
- * @see     DecoratingOutputShop
+ * @see     DecoratorOutputShop
  * @author  Christian Schlichtherle
  * @version $Id$
  */
