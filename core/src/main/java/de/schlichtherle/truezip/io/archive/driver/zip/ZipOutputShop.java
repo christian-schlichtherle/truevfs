@@ -17,14 +17,14 @@ package de.schlichtherle.truezip.io.archive.driver.zip;
 
 import de.schlichtherle.truezip.io.socket.IOPool;
 import de.schlichtherle.truezip.io.socket.InputSocket;
-import de.schlichtherle.truezip.io.DecoratingOutputStream;
+import de.schlichtherle.truezip.io.DecoratorOutputStream;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.archive.output.MultiplexedArchiveOutputShop;
 import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.io.filesystem.file.TempFilePool;
+import de.schlichtherle.truezip.io.filesystem.file.FSTempFilePool;
 import de.schlichtherle.truezip.io.zip.RawZipOutputStream;
 import de.schlichtherle.truezip.util.JointIterator;
 import java.io.File;
@@ -98,7 +98,7 @@ implements OutputShop<ZipEntry> {
                 }
             }
             if (0 < source.getPostambleLength()) {
-                postamble = TempFilePool.get().allocate();
+                postamble = FSTempFilePool.get().allocate();
                 Streams.copy(   source.getPostambleInputStream(),
                                 postamble.getOutputSocket().newOutputStream());
             } else {
@@ -216,7 +216,7 @@ implements OutputShop<ZipEntry> {
      * write the entry header.
      * These preconditions are checked by {@link #getOutputSocket(ZipEntry) t}.
      */
-    private class EntryOutputStream extends DecoratingOutputStream {
+    private class EntryOutputStream extends DecoratorOutputStream {
         EntryOutputStream(ZipEntry entry) throws IOException {
             this(entry, true);
         }

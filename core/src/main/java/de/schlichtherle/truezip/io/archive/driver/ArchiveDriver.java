@@ -18,18 +18,18 @@ package de.schlichtherle.truezip.io.archive.driver;
 
 import de.schlichtherle.truezip.io.TabuFileException;
 import de.schlichtherle.truezip.io.archive.controller.DefaultArchiveController;
-import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemModel;
+import de.schlichtherle.truezip.io.filesystem.concurrency.FSConcurrencyModel;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.socket.InputShop;
 import de.schlichtherle.truezip.io.entry.EntryFactory;
 import de.schlichtherle.truezip.io.archive.driver.registry.ArchiveDriverRegistry;
-import de.schlichtherle.truezip.io.filesystem.FileSystemController;
-import de.schlichtherle.truezip.io.filesystem.FileSystemDriver;
-import de.schlichtherle.truezip.io.filesystem.MountPoint;
-import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemController;
-import de.schlichtherle.truezip.io.filesystem.concurrent.ContentCachingFileSystemController;
-import de.schlichtherle.truezip.io.filesystem.file.TempFilePool;
+import de.schlichtherle.truezip.io.filesystem.FSController;
+import de.schlichtherle.truezip.io.filesystem.FSDriver;
+import de.schlichtherle.truezip.io.filesystem.FSMountPoint;
+import de.schlichtherle.truezip.io.filesystem.concurrency.FSConcurrencyController;
+import de.schlichtherle.truezip.io.filesystem.concurrency.FSContentCacheController;
+import de.schlichtherle.truezip.io.filesystem.file.FSTempFilePool;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -67,7 +67,7 @@ import net.jcip.annotations.ThreadSafe;
 @Immutable
 @ThreadSafe
 public abstract class ArchiveDriver<E extends ArchiveEntry>
-implements FileSystemDriver, EntryFactory<E>, Serializable {
+implements FSDriver, EntryFactory<E>, Serializable {
 
     //private static final long serialVersionUID = 1259452938351765017L;
 
@@ -78,16 +78,16 @@ implements FileSystemDriver, EntryFactory<E>, Serializable {
      * parent file system controller is never {@code null}.
      */
     @Override
-    public @NonNull FileSystemController<?>
-    newController(  @NonNull MountPoint mountPoint,
-                    @NonNull FileSystemController<?> parent) {
-        return  new ConcurrentFileSystemController<ConcurrentFileSystemModel, FileSystemController<? extends ConcurrentFileSystemModel>>(
-                    //new IOSocketCachingFileSystemController<ConcurrentFileSystemModel, FileSystemController<? extends ConcurrentFileSystemModel>>(
-                        new ContentCachingFileSystemController<ConcurrentFileSystemModel, FileSystemController<? extends ConcurrentFileSystemModel>>(
+    public @NonNull FSController<?>
+    newController(  @NonNull FSMountPoint mountPoint,
+                    @NonNull FSController<?> parent) {
+        return  new FSConcurrencyController<FSConcurrencyModel, FSController<? extends FSConcurrencyModel>>(
+                    //new IOSocketCachingFileSystemController<FSConcurrencyModel, FSController<? extends FSConcurrencyModel>>(
+                        new FSContentCacheController<FSConcurrencyModel, FSController<? extends FSConcurrencyModel>>(
                             new DefaultArchiveController<E>(
-                                new ConcurrentFileSystemModel(mountPoint, parent.getModel()),
+                                new FSConcurrencyModel(mountPoint, parent.getModel()),
                                 this, parent, false),
-                            TempFilePool.get()));
+                            FSTempFilePool.get()));
     }
 
     /**
@@ -118,7 +118,7 @@ implements FileSystemDriver, EntryFactory<E>, Serializable {
      *         synchronized with its parent file system.
      */
     public abstract @NonNull InputShop<E>
-    newInputShop(   @NonNull ConcurrentFileSystemModel model,
+    newInputShop(   @NonNull FSConcurrencyModel model,
                     @NonNull InputSocket<?> input)
     throws IOException;
 
@@ -158,7 +158,7 @@ implements FileSystemDriver, EntryFactory<E>, Serializable {
      *         synchronized with its parent file system.
      */
     public abstract @NonNull OutputShop<E>
-    newOutputShop(  @NonNull ConcurrentFileSystemModel model,
+    newOutputShop(  @NonNull FSConcurrencyModel model,
                     @NonNull OutputSocket<?> output,
                     @Nullable InputShop<E> source)
     throws IOException;
@@ -177,7 +177,7 @@ implements FileSystemDriver, EntryFactory<E>, Serializable {
      *         If {@code null} is returned, a default icon should be displayed.
      */
     public @CheckForNull Icon
-    getOpenIcon(@NonNull ConcurrentFileSystemModel model) {
+    getOpenIcon(@NonNull FSConcurrencyModel model) {
         return null;
     }
 
@@ -197,7 +197,7 @@ implements FileSystemDriver, EntryFactory<E>, Serializable {
      *         If {@code null} is returned, a default icon should be displayed.
      */
     public @CheckForNull Icon
-    getClosedIcon(@NonNull ConcurrentFileSystemModel model) {
+    getClosedIcon(@NonNull FSConcurrencyModel model) {
         return null;
     }
 }

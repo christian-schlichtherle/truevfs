@@ -17,7 +17,7 @@ package de.schlichtherle.truezip.io.zip;
 
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.charset.Charset;
-import de.schlichtherle.truezip.io.DecoratingOutputStream;
+import de.schlichtherle.truezip.io.DecoratorOutputStream;
 import java.util.Iterator;
 import de.schlichtherle.truezip.io.LEDataOutputStream;
 import java.io.IOException;
@@ -46,7 +46,7 @@ import static de.schlichtherle.truezip.io.zip.ZipEntry.STORED;
  * @version $Id$
  */
 public abstract class RawZipOutputStream<E extends ZipEntry>
-extends DecoratingOutputStream
+extends DecoratorOutputStream
 implements Iterable<E> {
 
     /**

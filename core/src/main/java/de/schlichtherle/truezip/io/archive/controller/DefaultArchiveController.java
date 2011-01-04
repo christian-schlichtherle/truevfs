@@ -15,8 +15,8 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.filesystem.FileSystemController;
-import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
+import de.schlichtherle.truezip.io.filesystem.FSController;
+import de.schlichtherle.truezip.io.filesystem.FSEntryName;
 import de.schlichtherle.truezip.io.InputBusyException;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.OutputBusyException;
@@ -27,22 +27,22 @@ import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEvent;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemTouchListener;
-import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemModel;
+import de.schlichtherle.truezip.io.filesystem.concurrency.FSConcurrencyModel;
 import de.schlichtherle.truezip.io.entry.Entry;
-import de.schlichtherle.truezip.io.filesystem.FalsePositiveException;
-import de.schlichtherle.truezip.io.filesystem.FileSystemException;
-import de.schlichtherle.truezip.io.filesystem.SyncExceptionBuilder;
-import de.schlichtherle.truezip.io.filesystem.SyncException;
-import de.schlichtherle.truezip.io.filesystem.SyncOption;
-import de.schlichtherle.truezip.io.filesystem.SyncWarningException;
+import de.schlichtherle.truezip.io.filesystem.FSFalsePositiveException;
+import de.schlichtherle.truezip.io.filesystem.FSException;
+import de.schlichtherle.truezip.io.filesystem.FSSyncExceptionBuilder;
+import de.schlichtherle.truezip.io.filesystem.FSSyncException;
+import de.schlichtherle.truezip.io.filesystem.FSSyncOption;
+import de.schlichtherle.truezip.io.filesystem.FSSyncWarningException;
 import de.schlichtherle.truezip.io.socket.ConcurrentInputShop;
 import de.schlichtherle.truezip.io.socket.ConcurrentOutputShop;
-import de.schlichtherle.truezip.io.filesystem.InputOption;
+import de.schlichtherle.truezip.io.filesystem.FSInputOption;
 import de.schlichtherle.truezip.io.socket.InputService;
 import de.schlichtherle.truezip.io.socket.InputShop;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.IOSocket;
-import de.schlichtherle.truezip.io.filesystem.OutputOption;
+import de.schlichtherle.truezip.io.filesystem.FSOutputOption;
 import de.schlichtherle.truezip.io.socket.OutputService;
 import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
@@ -61,9 +61,9 @@ import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.*
 import static de.schlichtherle.truezip.io.entry.Entry.Access.*;
 import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
 import static de.schlichtherle.truezip.io.entry.Entry.*;
-import static de.schlichtherle.truezip.io.filesystem.FileSystemEntryName.*;
-import static de.schlichtherle.truezip.io.filesystem.OutputOption.*;
-import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
+import static de.schlichtherle.truezip.io.filesystem.FSEntryName.*;
+import static de.schlichtherle.truezip.io.filesystem.FSOutputOption.*;
+import static de.schlichtherle.truezip.io.filesystem.FSSyncOption.*;
 import static de.schlichtherle.truezip.io.Paths.isRoot;
 
 /**
@@ -78,16 +78,16 @@ import static de.schlichtherle.truezip.io.Paths.isRoot;
 public final class DefaultArchiveController<E extends ArchiveEntry>
 extends FileSystemArchiveController<E> {
 
-    private static final BitField<OutputOption> MOUNT_MASK
+    private static final BitField<FSOutputOption> MOUNT_MASK
             = BitField.of(CREATE_PARENTS);
 
-    private static final BitField<InputOption> MOUNT_INPUT_OPTIONS
-            = BitField.of(InputOption.CACHE);
+    private static final BitField<FSInputOption> MOUNT_INPUT_OPTIONS
+            = BitField.of(FSInputOption.CACHE);
 
-    private static final BitField<OutputOption> MAKE_OUTPUT_OPTIONS
-            = BitField.noneOf(OutputOption.class);
+    private static final BitField<FSOutputOption> MAKE_OUTPUT_OPTIONS
+            = BitField.noneOf(FSOutputOption.class);
 
-    private static final BitField<SyncOption> SYNC_OPTIONS
+    private static final BitField<FSSyncOption> SYNC_OPTIONS
             = BitField.of(WAIT_CLOSE_INPUT, WAIT_CLOSE_OUTPUT, CLEAR_CACHE);
 
     private static final class DummyInputService<E extends Entry>
@@ -174,7 +174,7 @@ extends FileSystemArchiveController<E> {
     }
 
     private final ArchiveDriver<E> driver;
-    private final FileSystemController<?> parent;
+    private final FSController<?> parent;
     private final boolean useRootTemplate;
 
     /**
@@ -193,9 +193,9 @@ extends FileSystemArchiveController<E> {
             = new TouchListener();
 
     public DefaultArchiveController(
-            final ConcurrentFileSystemModel model,
+            final FSConcurrencyModel model,
             final ArchiveDriver<E> driver,
-            final FileSystemController<?> parent,
+            final FSController<?> parent,
             final boolean useRootTemplate) {
         super(model);
         if (null == driver)
@@ -208,7 +208,7 @@ extends FileSystemArchiveController<E> {
     }
 
     @Override
-    public FileSystemController<?> getParent() {
+    public FSController<?> getParent() {
         return parent;
     }
 
@@ -225,12 +225,12 @@ extends FileSystemArchiveController<E> {
     }
 
     @Override
-    void mount(final boolean autoCreate, BitField<OutputOption> options)
+    void mount(final boolean autoCreate, BitField<FSOutputOption> options)
     throws IOException {
         options = options.and(MOUNT_MASK);
         try {
-            final FileSystemController<?> parent = getParent();
-            final FileSystemEntryName parentName = getModel()
+            final FSController<?> parent = getParent();
+            final FSEntryName parentName = getModel()
                     .getMountPoint()
                     .getPath()
                     .resolve(ROOT)
@@ -245,13 +245,13 @@ extends FileSystemArchiveController<E> {
             setFileSystem(newArchiveFileSystem(
                     input.getDelegate(), driver,
                     socket.getLocalTarget(), readOnly));
-        } catch (FileSystemException ex) {
+        } catch (FSException ex) {
             throw ex;
         } catch (TabuFileException ex) {
             throw ex;
         } catch (IOException ex) {
             if (!autoCreate)
-                throw new FalsePositiveException(getModel(), ex);
+                throw new FSFalsePositiveException(getModel(), ex);
             // The entry does NOT exist in the parent archive
             // file, but we may create it automatically.
             final ArchiveFileSystem<E> fileSystem
@@ -263,12 +263,12 @@ extends FileSystemArchiveController<E> {
             // prompting.
             try {
                 makeOutput(options, root);
-            } catch (FileSystemException ex2) {
+            } catch (FSException ex2) {
                 throw ex2;
             } catch (TabuFileException ex2) {
                 throw ex2;
             } catch (IOException ex2) {
-                throw new FalsePositiveException(getModel(), ex2);
+                throw new FSFalsePositiveException(getModel(), ex2);
             }
             setFileSystem(fileSystem);
             getModel().setTouched(true);
@@ -276,18 +276,18 @@ extends FileSystemArchiveController<E> {
         getFileSystem().addArchiveFileSystemTouchListener(touchListener);
     }
 
-    void makeOutput(@NonNull final BitField<OutputOption> options,
+    void makeOutput(@NonNull final BitField<FSOutputOption> options,
                     @NonNull final Entry rootTemplate)
     throws IOException {
         if (null != output)
             return;
-        final FileSystemEntryName parentName = getModel()
+        final FSEntryName parentName = getModel()
                 .getMountPoint()
                 .getPath()
                 .resolve(ROOT)
                 .getEntryName();
         final OutputSocket<?> socket = getParent().getOutputSocket(
-                parentName, options.set(OutputOption.CACHE),
+                parentName, options.set(FSOutputOption.CACHE),
                 useRootTemplate ? rootTemplate : null);
         output = new Output(driver.newOutputShop(getModel(), socket,
                     null == input ? null : input.getDelegate()));
@@ -308,9 +308,9 @@ extends FileSystemArchiveController<E> {
     }
 
     @Override
-    boolean autoSync(   @NonNull final FileSystemEntryName name,
+    boolean autoSync(   @NonNull final FSEntryName name,
                         @CheckForNull final Access intention)
-    throws SyncException, FileSystemException {
+    throws FSSyncException, FSException {
         final ArchiveFileSystem<E> fileSystem;
         final ArchiveFileSystemEntry<E> entry;
         if (null == (fileSystem = getFileSystem())
@@ -329,10 +329,10 @@ extends FileSystemArchiveController<E> {
         return false;
     }
 
-    private boolean sync() throws SyncException, FileSystemException {
+    private boolean sync() throws FSSyncException, FSException {
         getModel().assertWriteLockedByCurrentThread();
-        final ExceptionBuilder<IOException, SyncException> builder
-                = new SyncExceptionBuilder();
+        final ExceptionBuilder<IOException, FSSyncException> builder
+                = new FSSyncExceptionBuilder();
         sync(SYNC_OPTIONS, builder);
         builder.check();
         return true;
@@ -340,9 +340,9 @@ extends FileSystemArchiveController<E> {
 
     @Override
     public <X extends IOException> void sync(
-            @NonNull final BitField<SyncOption> options,
-            @NonNull final ExceptionHandler<? super SyncException, X> handler)
-    throws X, FileSystemException {
+            @NonNull final BitField<FSSyncOption> options,
+            @NonNull final ExceptionHandler<? super FSSyncException, X> handler)
+    throws X, FSException {
         assert !isTouched() || null != output; // file system touched => output archive
         assert getModel().writeLock().isHeldByCurrentThread();
 
@@ -372,12 +372,12 @@ extends FileSystemArchiveController<E> {
      *
      * @param  options the output options.
      * @param  handler the exception handler.
-     * @throws SyncException If any exceptional condition occurs
+     * @throws FSSyncException If any exceptional condition occurs
      *         throughout the processing of the container archive file.
      */
     private <X extends IOException> void awaitSync(
-            @NonNull final BitField<SyncOption> options,
-            @NonNull final ExceptionHandler<? super SyncException, X> handler)
+            @NonNull final BitField<FSSyncOption> options,
+            @NonNull final ExceptionHandler<? super FSSyncException, X> handler)
     throws X {
         // Check output streams first, because FORCE_CLOSE_INPUT may be
         // set and FORCE_CLOSE_OUTPUT may be unset in which case we
@@ -390,9 +390,9 @@ extends FileSystemArchiveController<E> {
                 final String message =  "Number of open output streams: "
                                         + outStreams;
                 if (!options.get(FORCE_CLOSE_OUTPUT))
-                    throw handler.fail( new SyncException(getModel(),
+                    throw handler.fail( new FSSyncException(getModel(),
                                             new OutputBusyException(message)));
-                handler.warn(   new SyncWarningException(getModel(),
+                handler.warn(   new FSSyncWarningException(getModel(),
                                     new OutputBusyException(message)));
             }
         }
@@ -403,9 +403,9 @@ extends FileSystemArchiveController<E> {
                 final String message =  "Number of open input streams: "
                                         + inStreams;
                 if (!options.get(FORCE_CLOSE_INPUT))
-                    throw handler.fail( new SyncException(getModel(),
+                    throw handler.fail( new FSSyncException(getModel(),
                                             new InputBusyException(message)));
-                handler.warn(   new SyncWarningException(getModel(),
+                handler.warn(   new FSSyncWarningException(getModel(),
                                     new InputBusyException(message)));
             }
         }
@@ -416,11 +416,11 @@ extends FileSystemArchiveController<E> {
      * archive.
      *
      * @param  handler the exception handler.
-     * @throws SyncException If any exceptional condition occurs
+     * @throws FSSyncException If any exceptional condition occurs
      *         throughout the processing of the container archive file.
      */
     private <X extends IOException> void commenceSync(
-            @NonNull final ExceptionHandler<? super SyncException, X> handler)
+            @NonNull final ExceptionHandler<? super FSSyncException, X> handler)
     throws X {
         class FilterExceptionHandler
         implements ExceptionHandler<IOException, X> {
@@ -433,7 +433,7 @@ extends FileSystemArchiveController<E> {
             public void warn(IOException cause) throws X {
                 if (null == cause)
                     throw new NullPointerException();
-                handler.warn(new SyncWarningException(getModel(), cause));
+                handler.warn(new FSSyncWarningException(getModel(), cause));
             }
         } // class FilterExceptionHandler
 
@@ -453,7 +453,7 @@ extends FileSystemArchiveController<E> {
      *         processing of the container archive file.
      */
     private <X extends IOException> void performSync(
-            @NonNull final ExceptionHandler<? super SyncException, X> handler)
+            @NonNull final ExceptionHandler<? super FSSyncException, X> handler)
     throws X {
         assert isTouched();
         assert null != output;
@@ -465,7 +465,7 @@ extends FileSystemArchiveController<E> {
             @Override
             public X fail(final IOException cause) {
                 last = cause;
-                return handler.fail(new SyncException(getModel(), cause));
+                return handler.fail(new FSSyncException(getModel(), cause));
             }
 
             @Override
@@ -474,8 +474,8 @@ extends FileSystemArchiveController<E> {
                 final IOException old = last;
                 last = cause;
                 if (null != old || !(cause instanceof InputException))
-                    throw handler.fail(new SyncException(getModel(), cause));
-                handler.warn(new SyncWarningException(getModel(), cause));
+                    throw handler.fail(new FSSyncException(getModel(), cause));
+                handler.warn(new FSSyncWarningException(getModel(), cause));
             }
         } // class FilterExceptionHandler
 
@@ -524,11 +524,11 @@ extends FileSystemArchiveController<E> {
      * Discards the file system and closes the output and input archive.
      *
      * @param  handler the exception handler.
-     * @throws SyncException If any exceptional condition occurs
+     * @throws FSSyncException If any exceptional condition occurs
      *         throughout the processing of the container archive file.
      */
     private <X extends IOException> void commitSync(
-            @NonNull final ExceptionHandler<? super SyncException, X> handler)
+            @NonNull final ExceptionHandler<? super FSSyncException, X> handler)
     throws X {
         setFileSystem(null);
 
@@ -539,7 +539,7 @@ extends FileSystemArchiveController<E> {
                 try {
                     input.close();
                 } catch (IOException ex) {
-                    handler.warn(new SyncWarningException(getModel(), ex));
+                    handler.warn(new FSSyncWarningException(getModel(), ex));
                 }
             }
         } finally {
@@ -549,7 +549,7 @@ extends FileSystemArchiveController<E> {
                 try {
                     output.close();
                 } catch (IOException ex) {
-                    throw handler.fail(new SyncException(getModel(), ex));
+                    throw handler.fail(new FSSyncException(getModel(), ex));
                 }
             }
         }
@@ -561,7 +561,7 @@ extends FileSystemArchiveController<E> {
     }
 
     @Override
-    public void unlink(FileSystemEntryName name) throws IOException {
+    public void unlink(FSEntryName name) throws IOException {
         super.unlink(name);
         if (name.isRoot())
             getParent().unlink(

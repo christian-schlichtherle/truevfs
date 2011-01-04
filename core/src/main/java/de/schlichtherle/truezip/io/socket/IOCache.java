@@ -15,11 +15,11 @@
  */
 package de.schlichtherle.truezip.io.socket;
 
-import de.schlichtherle.truezip.io.DecoratingInputStream;
-import de.schlichtherle.truezip.io.DecoratingOutputStream;
-import de.schlichtherle.truezip.io.entry.DecoratingEntry;
+import de.schlichtherle.truezip.io.DecoratorInputStream;
+import de.schlichtherle.truezip.io.DecoratorOutputStream;
+import de.schlichtherle.truezip.io.entry.DecoratorEntry;
 import de.schlichtherle.truezip.io.entry.Entry;
-import de.schlichtherle.truezip.io.rof.DecoratingReadOnlyFile;
+import de.schlichtherle.truezip.io.rof.DecoratorReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.util.Pool;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -225,7 +225,7 @@ public final class IOCache {
         return null == buffer ? null : new CacheEntry(buffer.data);
     }
 
-    private static final class CacheEntry extends DecoratingEntry<Entry> {
+    private static final class CacheEntry extends DecoratorEntry<Entry> {
         private CacheEntry(Entry entry) {
             super(entry);
         }
@@ -451,7 +451,7 @@ public final class IOCache {
             data.release();
         }
 
-        private final class BufferInputSocket extends DecoratingInputSocket<Entry> {
+        private final class BufferInputSocket extends DecoratorInputSocket<Entry> {
             private BufferInputSocket() {
                 super(data.getInputSocket());
             }
@@ -467,7 +467,7 @@ public final class IOCache {
             }
         }
 
-        private final class BufferReadOnlyFile extends DecoratingReadOnlyFile {
+        private final class BufferReadOnlyFile extends DecoratorReadOnlyFile {
             private boolean closed;
 
             BufferReadOnlyFile(ReadOnlyFile rof) {
@@ -487,7 +487,7 @@ public final class IOCache {
             }
         } // class BufferReadOnlyFile
 
-        private final class BufferInputStream extends DecoratingInputStream {
+        private final class BufferInputStream extends DecoratorInputStream {
             private boolean closed;
 
             BufferInputStream(InputStream in) {
@@ -507,7 +507,7 @@ public final class IOCache {
             }
         } // class BufferInputStream
 
-        private final class BufferOutputSocket extends DecoratingOutputSocket<Entry> {
+        private final class BufferOutputSocket extends DecoratorOutputSocket<Entry> {
             private BufferOutputSocket() {
                 super(data.getOutputSocket());
             }
@@ -518,7 +518,7 @@ public final class IOCache {
             }
         }
 
-        private final class BufferOutputStream extends DecoratingOutputStream {
+        private final class BufferOutputStream extends DecoratorOutputStream {
             private boolean closed;
 
             BufferOutputStream(OutputStream out) {

@@ -15,11 +15,11 @@
  */
 package de.schlichtherle.truezip.io.socket;
 
-import de.schlichtherle.truezip.io.DecoratingInputStream;
+import de.schlichtherle.truezip.io.DecoratorInputStream;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.InputBusyException;
 import de.schlichtherle.truezip.io.SynchronizedInputStream;
-import de.schlichtherle.truezip.io.rof.DecoratingReadOnlyFile;
+import de.schlichtherle.truezip.io.rof.DecoratorReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.SynchronizedReadOnlyFile;
 import de.schlichtherle.truezip.util.ExceptionHandler;
@@ -43,7 +43,7 @@ import java.util.logging.Logger;
  * @version $Id$
  */
 public class ConcurrentInputShop<E extends Entry>
-extends DecoratingInputShop<E, InputShop<E>> {
+extends DecoratorInputShop<E, InputShop<E>> {
 
     private static final String CLASS_NAME
             = ConcurrentInputShop.class.getName();
@@ -176,7 +176,7 @@ extends DecoratingInputShop<E, InputShop<E>> {
         if (null == name)
             throw new NullPointerException();
 
-        class Input extends DecoratingInputSocket<E> {
+        class Input extends DecoratorInputSocket<E> {
             Input() {
                 super(ConcurrentInputShop.super.getInputSocket(name));
             }
@@ -253,7 +253,7 @@ extends DecoratingInputShop<E, InputShop<E>> {
         }
     } // class SynchronizedConcurrentReadOnlyFile
 
-    private final class ConcurrentInputStream extends DecoratingInputStream {
+    private final class ConcurrentInputStream extends DecoratorInputStream {
         ConcurrentInputStream(final InputStream in) {
             super(in);
         }
@@ -321,7 +321,7 @@ extends DecoratingInputShop<E, InputShop<E>> {
         }
     } // class ConcurrentInputStream
 
-    private final class ConcurrentReadOnlyFile extends DecoratingReadOnlyFile {
+    private final class ConcurrentReadOnlyFile extends DecoratorReadOnlyFile {
         ConcurrentReadOnlyFile(ReadOnlyFile rof) {
             super(rof);
         }

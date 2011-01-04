@@ -15,20 +15,20 @@
  */
 package de.schlichtherle.truezip.io.file;
 
-import de.schlichtherle.truezip.io.filesystem.FileSystemController;
-import de.schlichtherle.truezip.io.filesystem.FileSystemDriver;
-import de.schlichtherle.truezip.io.filesystem.MountPoint;
-import de.schlichtherle.truezip.io.filesystem.Scheme;
-import de.schlichtherle.truezip.io.filesystem.file.FileDriver;
+import de.schlichtherle.truezip.io.filesystem.FSController;
+import de.schlichtherle.truezip.io.filesystem.FSDriver;
+import de.schlichtherle.truezip.io.filesystem.FSMountPoint;
+import de.schlichtherle.truezip.io.filesystem.FSScheme;
+import de.schlichtherle.truezip.io.filesystem.file.FSFileDriver;
 import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class ArchiveFileSystemDriver implements FileSystemDriver {
-    private static final Scheme FILE_SCHEME = Scheme.create("file");
-    private static final FileSystemDriver FILE_DRIVER = new FileDriver();
+final class ArchiveFileSystemDriver implements FSDriver {
+    private static final FSScheme FILE_SCHEME = FSScheme.create("file");
+    private static final FSDriver FILE_DRIVER = new FSFileDriver();
 
     private final ArchiveDetector detector;
 
@@ -54,9 +54,9 @@ final class ArchiveFileSystemDriver implements FileSystemDriver {
      *         point.
      */
     @Override
-    public FileSystemController<?>
-    newController(MountPoint mountPoint, FileSystemController<?> parent) {
-        Scheme scheme = mountPoint.getScheme();
+    public FSController<?>
+    newController(FSMountPoint mountPoint, FSController<?> parent) {
+        FSScheme scheme = mountPoint.getScheme();
         return FILE_SCHEME.equals(scheme)
                 ? FILE_DRIVER.newController(mountPoint, parent)
                 : detector.getDriver(scheme).newController(mountPoint, parent);

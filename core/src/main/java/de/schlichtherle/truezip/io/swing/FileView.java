@@ -37,7 +37,7 @@ import javax.swing.UIManager;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class FileView extends DecoratingFileView {
+final class FileView extends DecoratorFileView {
 
     private static final String CLASS_NAME
             = "de.schlichtherle.truezip.io.swing.FileView";

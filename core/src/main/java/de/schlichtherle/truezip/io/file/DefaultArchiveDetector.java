@@ -19,7 +19,7 @@ import de.schlichtherle.truezip.io.archive.driver.registry.GlobalArchiveDriverRe
 import de.schlichtherle.truezip.io.archive.driver.registry.ArchiveDriverRegistry;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.SuffixSet;
-import de.schlichtherle.truezip.io.filesystem.Scheme;
+import de.schlichtherle.truezip.io.filesystem.FSScheme;
 import de.schlichtherle.truezip.util.regex.ThreadLocalMatcher;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -256,10 +256,10 @@ implements ArchiveDetector, Serializable {
     }
 
     @Override
-    public Scheme getScheme(final String path) {
+    public FSScheme getScheme(final String path) {
         final Matcher m = matcher.reset(path);
         return m.matches()
-                ? Scheme.create(m.group(1).toLowerCase(Locale.ENGLISH))
+                ? FSScheme.create(m.group(1).toLowerCase(Locale.ENGLISH))
                 : null;
     }
 
@@ -281,13 +281,13 @@ implements ArchiveDetector, Serializable {
      * </ol>
      */
     @Override
-    public ArchiveDriver<?> getDriver(Scheme type) {
+    public ArchiveDriver<?> getDriver(FSScheme type) {
         return registry.getArchiveDriver(type.toString());
     }
 
     public final @CheckForNull ArchiveDriver<?>
     getDriver(final @NonNull String path) {
-        final Scheme scheme = getScheme(path);
+        final FSScheme scheme = getScheme(path);
         return null == scheme ? null : getDriver(scheme);
     }
 

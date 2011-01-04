@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.io.zip;
 import java.nio.ByteBuffer;
 import de.schlichtherle.truezip.util.Pool;
 import java.nio.charset.Charset;
-import de.schlichtherle.truezip.io.DecoratingInputStream;
+import de.schlichtherle.truezip.io.DecoratorInputStream;
 import java.util.Iterator;
 import de.schlichtherle.truezip.io.rof.BufferedReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
@@ -933,7 +933,7 @@ implements Iterable<E>, Closeable {
      * checked in the method {@code close}.
      */
     private static final class RawCheckedInputStream
-    extends DecoratingInputStream {
+    extends DecoratorInputStream {
 
         private final Checksum crc = new CRC32();
         private final byte[] singleByteBuf = new byte[1];
