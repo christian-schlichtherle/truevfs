@@ -19,6 +19,7 @@ import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Iterator;
 
@@ -39,9 +40,11 @@ import java.util.Iterator;
  */
 @DefaultAnnotation(NonNull.class)
 public final class BitField<E extends Enum<E>>
-implements Iterable<E>, Cloneable, Serializable {
+implements Iterable<E>, Serializable {
 
     private static final long serialVersionUID = 3203876204846746524L;
+
+    private final EnumSet<E> bits;
 
     /**
      * Returns a bit field which can contain the given element type and is
@@ -53,8 +56,8 @@ implements Iterable<E>, Cloneable, Serializable {
      * }</pre>
      * where {@code Option} is an arbitrary enum type.
      */
-    public static <E extends Enum<E>>
-    BitField<E> noneOf(Class<E> elementType) {
+    public static <E extends Enum<E>> BitField<E>
+    noneOf(Class<E> elementType) {
         return new BitField<E>(elementType, false);
     }
 
@@ -67,8 +70,8 @@ implements Iterable<E>, Cloneable, Serializable {
      * }</pre>
      * where {@code Option} is an arbitrary enum type.
      */
-    public static <E extends Enum<E>>
-    BitField<E> allOf(Class<E> elementType) {
+    public static <E extends Enum<E>> BitField<E>
+    allOf(Class<E> elementType) {
         return new BitField<E>(elementType, true);
     }
 
@@ -81,8 +84,8 @@ implements Iterable<E>, Cloneable, Serializable {
      * }</pre>
      * where {@code Option.ONE} is an arbitrary enum.
      */
-    public static <E extends Enum<E>>
-    BitField<E> of(E bit) {
+    public static <E extends Enum<E>> BitField<E>
+    of(E bit) {
         return new BitField<E>(bit);
     }
 
@@ -95,8 +98,8 @@ implements Iterable<E>, Cloneable, Serializable {
      * }</pre>
      * where {@code Option.ONE} and {@code Option.TWO} are arbitrary enums.
      */
-    public static <E extends Enum<E>>
-    BitField<E> of(E bit, E... bits) {
+    public static <E extends Enum<E>> BitField<E>
+    of(E bit, E... bits) {
         return new BitField<E>(bit, bits);
     }
 
@@ -110,12 +113,18 @@ implements Iterable<E>, Cloneable, Serializable {
      * }</pre>
      * where {@code bits} is an {@code EnumSet<Option>}.
      */
-    public static <E extends Enum<E>>
-    BitField<E> of(EnumSet<E> bits) {
-        return new BitField<E>(bits);
+    public static <E extends Enum<E>> BitField<E>
+    of(EnumSet<E> bits) {
+        return new BitField<E>(bits.clone());
     }
 
-    private EnumSet<E> bits;
+    public static <E extends Enum<E>> BitField<E>
+    of(final Class<E> elementType, final String list) {
+        final EnumSet<E> bits = EnumSet.noneOf(elementType);
+        for (final String bit : list.split("\\|"))
+            bits.add(Enum.valueOf(elementType, bit));
+        return new BitField<E>(bits);
+    }
 
     /**
      * Constructs a new bit field which contains all or none of the enums
@@ -137,25 +146,14 @@ implements Iterable<E>, Cloneable, Serializable {
     }
 
     /**
-     * Constructs a new bit field by cloning the given set of enums.
+     * Constructs a new bit field by sharing the given set of enums.
+     * Note that this constructor does NOT make a protective copy
+     * - use with care!
      *
-     * @param bits the non-{@code null} set of enums.
+     * @param bits the set of enums to share with this instance.
      */
     private BitField(final EnumSet<E> bits) {
-        this.bits = bits.clone();
-    }
-
-    /** Returns a clone of this bit field. */
-    @Override
-    public BitField<E> clone() {
-        try {
-            @SuppressWarnings("unchecked")
-            final BitField<E> clone = (BitField<E>) super.clone();
-            clone.bits = bits.clone();
-            return clone;
-        } catch (CloneNotSupportedException ex) {
-            throw new AssertionError(ex);
-        }
+        this.bits = bits;
     }
 
     /**
@@ -237,7 +235,7 @@ implements Iterable<E>, Cloneable, Serializable {
     /** Returns a read-only iterator for the bits in this field. */
     @Override
     public Iterator<E> iterator() {
-        return new BitFieldIterator();
+        return Collections.unmodifiableSet(bits).iterator();
     }
 
     /**
@@ -282,24 +280,5 @@ implements Iterable<E>, Cloneable, Serializable {
     @Override
     public int hashCode() {
         return bits.hashCode();
-    }
-
-    private final class BitFieldIterator implements Iterator<E> {
-        private final Iterator<E> i = bits.iterator();
-
-        @Override
-        public boolean hasNext() {
-            return i.hasNext();
-        }
-
-        @Override
-        public E next() {
-            return i.next();
-        }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException("BitField class is immutable");
-        }
     }
 }

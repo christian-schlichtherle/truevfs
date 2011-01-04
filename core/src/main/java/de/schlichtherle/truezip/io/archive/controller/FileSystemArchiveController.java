@@ -15,11 +15,11 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemModel;
-import de.schlichtherle.truezip.io.filesystem.FalsePositiveException;
+import de.schlichtherle.truezip.io.filesystem.concurrency.FSConcurrencyModel;
+import de.schlichtherle.truezip.io.filesystem.FSFalsePositiveException;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
-import de.schlichtherle.truezip.io.filesystem.OutputOption;
+import de.schlichtherle.truezip.io.filesystem.FSOutputOption;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -44,14 +44,14 @@ extends BasicArchiveController<E> {
     /**
      * Creates a new instance of FileSystemArchiveController
      */
-    FileSystemArchiveController(ConcurrentFileSystemModel model) {
+    FileSystemArchiveController(FSConcurrencyModel model) {
         super(model);
     }
 
     @Override
     final ArchiveFileSystem<E> autoMount(
             final boolean autoCreate,
-            final BitField<OutputOption> options)
+            final BitField<FSOutputOption> options)
     throws IOException {
         return mountState.autoMount(autoCreate, options);
     }
@@ -81,7 +81,7 @@ extends BasicArchiveController<E> {
      *        directory is created with its last modification time set to the
      *        system's current time.
      */
-    abstract void mount(boolean autoCreate, BitField<OutputOption> options)
+    abstract void mount(boolean autoCreate, BitField<FSOutputOption> options)
     throws IOException;
 
     /**
@@ -90,7 +90,7 @@ extends BasicArchiveController<E> {
      */
     private static abstract class MountState<E extends ArchiveEntry> {
         abstract ArchiveFileSystem<E> autoMount(boolean autoCreate,
-                                                BitField<OutputOption> options)
+                                                BitField<FSOutputOption> options)
         throws IOException;
 
         ArchiveFileSystem<E> getFileSystem() {
@@ -103,12 +103,12 @@ extends BasicArchiveController<E> {
     private class ResetFileSystem extends MountState<E> {
         @Override
         ArchiveFileSystem<E> autoMount( final boolean autoCreate,
-                                        final BitField<OutputOption> options)
+                                        final BitField<FSOutputOption> options)
         throws IOException {
             getModel().assertWriteLockedByCurrentThread();
             try {
                 mount(autoCreate, options);
-            } catch (FalsePositiveException ex) {
+            } catch (FSFalsePositiveException ex) {
                 // Catch and cache exceptions for false positive archive files.
                 // The state is reset when unlink() is called on the false
                 // positive archive file or sync().
@@ -149,7 +149,7 @@ extends BasicArchiveController<E> {
 
         @Override
         ArchiveFileSystem<E> autoMount(boolean autoCreate,
-                                        BitField<OutputOption> options) {
+                                        BitField<FSOutputOption> options) {
             return fileSystem;
         }
 
@@ -167,9 +167,9 @@ extends BasicArchiveController<E> {
     } // class MountedFileSystem
 
     private class FalsePositiveFileSystem extends MountState<E> {
-        private FalsePositiveException exception;
+        private FSFalsePositiveException exception;
 
-        private FalsePositiveFileSystem(final FalsePositiveException exception) {
+        private FalsePositiveFileSystem(final FSFalsePositiveException exception) {
             if (exception == null)
                 throw new NullPointerException();
             this.exception = exception;
@@ -177,8 +177,8 @@ extends BasicArchiveController<E> {
 
         @Override
         ArchiveFileSystem<E> autoMount( boolean autoCreate,
-                                        BitField<OutputOption> options)
-        throws FalsePositiveException {
+                                        BitField<FSOutputOption> options)
+        throws FSFalsePositiveException {
             throw exception;
         }
 

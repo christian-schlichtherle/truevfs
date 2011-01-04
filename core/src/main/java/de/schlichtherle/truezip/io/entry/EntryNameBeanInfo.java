@@ -45,7 +45,7 @@ public class EntryNameBeanInfo extends SimpleBeanInfo {
                     });
             }
         };
-        beanDescriptor.setValue("persistenceDelegate", pd);
+        beanDescriptor.setValue("persistenceDelegate", pd); // NOI18N
 
 }//GEN-LAST:BeanDescriptor
 

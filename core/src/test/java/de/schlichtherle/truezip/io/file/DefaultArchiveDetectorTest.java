@@ -19,7 +19,7 @@ package de.schlichtherle.truezip.io.file;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.zip.JarDriver;
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipDriver;
-import de.schlichtherle.truezip.io.filesystem.Scheme;
+import de.schlichtherle.truezip.io.filesystem.FSScheme;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -372,7 +372,7 @@ public class DefaultArchiveDetectorTest {
             "test.zip.rae",
             "test.zip.raes",
         }) {
-            final Scheme type = ALL.getScheme(param);
+            final FSScheme type = ALL.getScheme(param);
             assertThat(type, notNullValue());
             assertThat(ALL.getDriver(type), notNullValue());
         }
@@ -382,40 +382,40 @@ public class DefaultArchiveDetectorTest {
             null, ".",
             null, ".all",
             null, ".default",
-            ALL.getDriver(Scheme.create("ear")), ".ear",
-            ALL.getDriver(Scheme.create("exe")), ".exe",
-            ALL.getDriver(Scheme.create("jar")), ".jar",
+            ALL.getDriver(FSScheme.create("ear")), ".ear",
+            ALL.getDriver(FSScheme.create("exe")), ".exe",
+            ALL.getDriver(FSScheme.create("jar")), ".jar",
             null, ".null",
-            ALL.getDriver(Scheme.create("tar")), ".tar",
-            ALL.getDriver(Scheme.create("tar.bz2")), ".tar.bz2",
-            ALL.getDriver(Scheme.create("tar.gz")), ".tar.gz",
-            ALL.getDriver(Scheme.create("tbz2")), ".tbz2",
-            ALL.getDriver(Scheme.create("tgz")), ".tgz",
-            ALL.getDriver(Scheme.create("tzp")), ".tzp",
-            ALL.getDriver(Scheme.create("war")), ".war",
+            ALL.getDriver(FSScheme.create("tar")), ".tar",
+            ALL.getDriver(FSScheme.create("tar.bz2")), ".tar.bz2",
+            ALL.getDriver(FSScheme.create("tar.gz")), ".tar.gz",
+            ALL.getDriver(FSScheme.create("tbz2")), ".tbz2",
+            ALL.getDriver(FSScheme.create("tgz")), ".tgz",
+            ALL.getDriver(FSScheme.create("tzp")), ".tzp",
+            ALL.getDriver(FSScheme.create("war")), ".war",
             null, ".z",
-            ALL.getDriver(Scheme.create("zip")), ".zip",
-            ALL.getDriver(Scheme.create("zip.rae")), ".zip.rae",
-            ALL.getDriver(Scheme.create("zip.raes")), ".zip.raes",
+            ALL.getDriver(FSScheme.create("zip")), ".zip",
+            ALL.getDriver(FSScheme.create("zip.rae")), ".zip.rae",
+            ALL.getDriver(FSScheme.create("zip.raes")), ".zip.raes",
             null, "test",
             null, "test.",
             null, "test.all",
             null, "test.default",
-            ALL.getDriver(Scheme.create("ear")), "test.ear",
-            ALL.getDriver(Scheme.create("exe")), "test.exe",
-            ALL.getDriver(Scheme.create("jar")), "test.jar",
+            ALL.getDriver(FSScheme.create("ear")), "test.ear",
+            ALL.getDriver(FSScheme.create("exe")), "test.exe",
+            ALL.getDriver(FSScheme.create("jar")), "test.jar",
             null, "test.null",
-            ALL.getDriver(Scheme.create("tar")), "test.tar",
-            ALL.getDriver(Scheme.create("tar.bz2")), "test.tar.bz2",
-            ALL.getDriver(Scheme.create("tar.gz")), "test.tar.gz",
-            ALL.getDriver(Scheme.create("tbz2")), "test.tbz2",
-            ALL.getDriver(Scheme.create("tgz")), "test.tgz",
-            ALL.getDriver(Scheme.create("tzp")), "test.tzp",
-            ALL.getDriver(Scheme.create("war")), "test.war",
+            ALL.getDriver(FSScheme.create("tar")), "test.tar",
+            ALL.getDriver(FSScheme.create("tar.bz2")), "test.tar.bz2",
+            ALL.getDriver(FSScheme.create("tar.gz")), "test.tar.gz",
+            ALL.getDriver(FSScheme.create("tbz2")), "test.tbz2",
+            ALL.getDriver(FSScheme.create("tgz")), "test.tgz",
+            ALL.getDriver(FSScheme.create("tzp")), "test.tzp",
+            ALL.getDriver(FSScheme.create("war")), "test.war",
             null, "test.z",
-            ALL.getDriver(Scheme.create("zip")), "test.zip",
-            ALL.getDriver(Scheme.create("zip.rae")), "test.zip.rae",
-            ALL.getDriver(Scheme.create("zip.raes")), "test.zip.raes",
+            ALL.getDriver(FSScheme.create("zip")), "test.zip",
+            ALL.getDriver(FSScheme.create("zip.rae")), "test.zip.rae",
+            ALL.getDriver(FSScheme.create("zip.raes")), "test.zip.raes",
         });
     }
 
@@ -429,7 +429,7 @@ public class DefaultArchiveDetectorTest {
         }
 
         try {
-            detector.getDriver((Scheme) null);
+            detector.getDriver((FSScheme) null);
             fail("Expected NullPointerException!");
         } catch (NullPointerException expected) {
         }

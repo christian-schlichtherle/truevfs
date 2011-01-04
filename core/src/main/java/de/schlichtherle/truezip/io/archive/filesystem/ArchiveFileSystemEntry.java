@@ -15,26 +15,26 @@
  */
 package de.schlichtherle.truezip.io.archive.filesystem;
 
-import de.schlichtherle.truezip.io.filesystem.DecoratingFileSystemEntry;
+import de.schlichtherle.truezip.io.filesystem.FSDecoratorEntry;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
-import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
+import de.schlichtherle.truezip.io.filesystem.FSEntry;
+import de.schlichtherle.truezip.io.filesystem.FSEntryName;
 import edu.umd.cs.findbugs.annotations.NonNull;
 
 import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
 
 /**
- * Adapts an {@link ArchiveEntry} to a {@link FileSystemEntry}.
+ * Adapts an {@link ArchiveEntry} to a {@link FSEntry}.
  * 
  * @param   <E> The type of the decorated archive entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 public abstract class ArchiveFileSystemEntry<E extends ArchiveEntry>
-extends DecoratingFileSystemEntry<E> {
+extends FSDecoratorEntry<E> {
 
     /**
      * Constructs a new archive file system entry which decorates the given
@@ -42,7 +42,7 @@ extends DecoratingFileSystemEntry<E> {
      */
     @NonNull
     public static <E extends ArchiveEntry>
-    ArchiveFileSystemEntry<E> create(   @NonNull final FileSystemEntryName name,
+    ArchiveFileSystemEntry<E> create(   @NonNull final FSEntryName name,
                                         @NonNull final Type type,
                                         @NonNull final E entry) {
         return create(name.getPath(), type, entry);

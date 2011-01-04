@@ -16,8 +16,8 @@
 package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
-import de.schlichtherle.truezip.io.filesystem.FileSystemController;
-import de.schlichtherle.truezip.io.filesystem.Path;
+import de.schlichtherle.truezip.io.filesystem.FSController;
+import de.schlichtherle.truezip.io.filesystem.FSPath;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -30,7 +30,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static de.schlichtherle.truezip.io.file.ArchiveDetector.*;
-import static de.schlichtherle.truezip.io.filesystem.FileSystemEntryName.*;
+import static de.schlichtherle.truezip.io.filesystem.FSEntryName.*;
 import static java.io.File.*;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
@@ -68,7 +68,7 @@ public class NonIOFileTest {
             { "file:/foo", "/foo", null, null, null, },
             { "file:/", "/", null, null, null, },
         }) {
-            final File file = new File(Path.create(params[0]));
+            final File file = new File(FSPath.create(params[0]));
             assertThat(file.getPath(), equalTo(params[1].replace('/', separatorChar)));
             if (null != params[2]) {
                 assertThat(file.getInnerArchive().getPath(), equalTo(params[2].replace('/', separatorChar)));
@@ -82,7 +82,7 @@ public class NonIOFileTest {
                 assertThat(file.getEnclArchive(), nullValue());
                 assertThat(file.getEnclEntryName(), nullValue());
             }
-            assertThat(new File(file.toPath()), equalTo(file.getNormalizedAbsoluteFile()));
+            assertThat(new File(file.toFSPath()), equalTo(file.getNormalizedAbsoluteFile()));
             assertThat(new File(file.toURI()), equalTo(file.getAbsoluteFile()));
         }
     }
@@ -557,11 +557,11 @@ public class NonIOFileTest {
         assertNotSame(innerDriver, inner2Driver);
 
         // Assert that the controllers haven't been persistet.
-        final FileSystemController<?> archiveController = archive.getController();
-        final FileSystemController<?> archive2Controller = archive2.getController();
+        final FSController<?> archiveController = archive.getController();
+        final FSController<?> archive2Controller = archive2.getController();
         assertSame(archiveController, archive2Controller);
-        final FileSystemController<?> innerController = inner.getController();
-        final FileSystemController<?> inner2Controller = inner2.getController();
+        final FSController<?> innerController = inner.getController();
+        final FSController<?> inner2Controller = inner2.getController();
         assertSame(innerController, inner2Controller);
     }
 

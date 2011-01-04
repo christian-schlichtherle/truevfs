@@ -26,7 +26,7 @@ import java.io.OutputStream;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class SynchronizedOutputStream extends DecoratingOutputStream {
+public class SynchronizedOutputStream extends DecoratorOutputStream {
 
     /** The object to synchronize on - never {@code null}. */
     protected final Object lock;

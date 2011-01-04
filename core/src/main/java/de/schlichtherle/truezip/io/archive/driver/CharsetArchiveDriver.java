@@ -27,7 +27,7 @@ import java.io.ObjectOutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 
-import static de.schlichtherle.truezip.io.filesystem.FileSystemEntryName.*;
+import static de.schlichtherle.truezip.io.filesystem.FSEntryName.*;
 import static de.schlichtherle.truezip.io.Paths.*;
 
 /**

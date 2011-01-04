@@ -18,19 +18,19 @@ package de.schlichtherle.truezip.io.archive.driver.zip.raes;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.entry.Entry;
-import de.schlichtherle.truezip.io.filesystem.DecoratingFileSystemController;
-import de.schlichtherle.truezip.io.filesystem.FileSystemController;
-import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
-import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
-import de.schlichtherle.truezip.io.filesystem.FileSystemException;
-import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
+import de.schlichtherle.truezip.io.filesystem.FSDecoratorController;
+import de.schlichtherle.truezip.io.filesystem.FSController;
+import de.schlichtherle.truezip.io.filesystem.FSEntry;
+import de.schlichtherle.truezip.io.filesystem.FSEntryName;
+import de.schlichtherle.truezip.io.filesystem.FSException;
+import de.schlichtherle.truezip.io.filesystem.FSModel;
 import de.schlichtherle.truezip.key.KeyManager;
 import java.io.CharConversionException;
 import java.io.IOException;
 import net.jcip.annotations.ThreadSafe;
 
 import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
-import static de.schlichtherle.truezip.io.filesystem.FileSystemEntryName.*;
+import static de.schlichtherle.truezip.io.filesystem.FSEntryName.*;
 
 /**
  * This archive controller resets the key provider in the key manager if the
@@ -41,9 +41,9 @@ import static de.schlichtherle.truezip.io.filesystem.FileSystemEntryName.*;
  */
 @ThreadSafe
 final class KeyManagerArchiveController
-extends DecoratingFileSystemController<
-        FileSystemModel,
-        FileSystemController<? extends FileSystemModel>> {
+extends FSDecoratorController<
+        FSModel,
+        FSController<? extends FSModel>> {
 
     private final ArchiveDriver<?> driver;
 
@@ -52,18 +52,18 @@ extends DecoratingFileSystemController<
      *
      * @param controller the non-{@code null} archive controller.
      */
-    KeyManagerArchiveController(final FileSystemController<?> controller,
+    KeyManagerArchiveController(final FSController<?> controller,
                                 final ArchiveDriver<?> driver) {
         super(controller);
         this.driver = driver;
     }
 
     @Override
-    public final FileSystemEntry getEntry(final FileSystemEntryName name)
+    public final FSEntry getEntry(final FSEntryName name)
     throws IOException {
         try {
             return delegate.getEntry(name);
-        } catch (FileSystemException ex) {
+        } catch (FSException ex) {
             throw ex;
         } catch (IOException ex) {
             if (!name.isRoot())
@@ -91,7 +91,7 @@ extends DecoratingFileSystemController<
     }
 
     @Override
-    public void unlink(FileSystemEntryName name) throws IOException {
+    public void unlink(FSEntryName name) throws IOException {
         delegate.unlink(name);
         if (name.isRoot())
             KeyManager.resetKeyProvider(getModel().getMountPoint().getUri());

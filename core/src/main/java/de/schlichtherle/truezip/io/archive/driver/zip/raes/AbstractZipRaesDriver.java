@@ -15,13 +15,13 @@
  */
 package de.schlichtherle.truezip.io.archive.driver.zip.raes;
 
-import de.schlichtherle.truezip.io.filesystem.FileSystemController;
-import de.schlichtherle.truezip.io.filesystem.MountPoint;
-import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemModel;
+import de.schlichtherle.truezip.io.filesystem.FSController;
+import de.schlichtherle.truezip.io.filesystem.FSMountPoint;
+import de.schlichtherle.truezip.io.filesystem.concurrency.FSConcurrencyModel;
 import de.schlichtherle.truezip.io.socket.LazyOutputSocket;
-import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
+import de.schlichtherle.truezip.io.socket.DecoratorOutputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
-import de.schlichtherle.truezip.io.socket.DecoratingInputSocket;
+import de.schlichtherle.truezip.io.socket.DecoratorInputSocket;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.InputShop;
@@ -92,9 +92,9 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
     }
 
     @Override
-    @NonNull public FileSystemController<?>
-    newController(  @NonNull MountPoint mountPoint,
-                    @NonNull FileSystemController<?> parent) {
+    @NonNull public FSController<?>
+    newController(  @NonNull FSMountPoint mountPoint,
+                    @NonNull FSController<?> parent) {
         return new KeyManagerArchiveController(
                 super.newController(mountPoint, parent), this);
     }
@@ -118,10 +118,10 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      */
     @Override
     public ZipInputShop newInputShop(
-            final ConcurrentFileSystemModel model,
+            final FSConcurrencyModel model,
             final InputSocket<?> target)
     throws IOException {
-        class Input extends DecoratingInputSocket<Entry> {
+        class Input extends DecoratorInputSocket<Entry> {
             Input() {
                 super(target);
             }
@@ -183,11 +183,11 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      */
     @Override
     public OutputShop<ZipEntry> newOutputShop(
-            final ConcurrentFileSystemModel model,
+            final FSConcurrencyModel model,
             final OutputSocket<?> target,
             final InputShop<ZipEntry> source)
     throws IOException {
-        class Output extends DecoratingOutputSocket<Entry> {
+        class Output extends DecoratorOutputSocket<Entry> {
             Output() {
                 super(target);
             }
@@ -227,7 +227,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      * @return The {@link RaesParameters} to use for accessing the
      *         prospective RAES encrypted ZIP file.
      */
-    protected RaesParameters getRaesParameters(ConcurrentFileSystemModel model) {
+    protected RaesParameters getRaesParameters(FSConcurrencyModel model) {
         return new KeyManagerRaesParameters(model.getMountPoint().getUri());
     }
 }

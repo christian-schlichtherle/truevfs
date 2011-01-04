@@ -17,9 +17,9 @@
 package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.FileBusyException;
-import de.schlichtherle.truezip.io.DecoratingInputStream;
-import de.schlichtherle.truezip.io.filesystem.SyncException;
-import de.schlichtherle.truezip.io.filesystem.InputOption;
+import de.schlichtherle.truezip.io.DecoratorInputStream;
+import de.schlichtherle.truezip.io.filesystem.FSSyncException;
+import de.schlichtherle.truezip.io.filesystem.FSInputOption;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.FileDescriptor;
@@ -79,7 +79,7 @@ import java.io.InputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class FileInputStream extends DecoratingInputStream {
+public final class FileInputStream extends DecoratorInputStream {
 
     /**
      * Creates a new {@code FileInputStream} for accessing regular files or
@@ -117,12 +117,12 @@ public final class FileInputStream extends DecoratingInputStream {
     throws FileNotFoundException {
         final InputSocket<?> input = Files.getInputSocket(
                 src,
-                BitField.noneOf(InputOption.class));
+                BitField.noneOf(FSInputOption.class));
         try {
             return input.newInputStream();
         } catch (FileNotFoundException ex) {
             throw ex;
-        } catch (SyncException ex) {
+        } catch (FSSyncException ex) {
             throw ex.getCause() instanceof FileBusyException
                     ? (FileBusyException) ex.getCause()
                     : (FileNotFoundException) new FileNotFoundException(

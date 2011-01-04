@@ -15,32 +15,32 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.filesystem.FileSystemEntryNotFoundException;
-import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
+import de.schlichtherle.truezip.io.filesystem.FSEntryNotFoundException;
+import de.schlichtherle.truezip.io.filesystem.FSEntry;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.io.filesystem.concurrent.NotWriteLockedException;
+import de.schlichtherle.truezip.io.filesystem.concurrency.FSNotWriteLockedException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemOperation;
-import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemModel;
+import de.schlichtherle.truezip.io.filesystem.concurrency.FSConcurrencyModel;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
-import de.schlichtherle.truezip.io.filesystem.FalsePositiveException;
-import de.schlichtherle.truezip.io.filesystem.FileSystemController;
-import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
-import de.schlichtherle.truezip.io.filesystem.FileSystemException;
-import de.schlichtherle.truezip.io.filesystem.SyncException;
-import de.schlichtherle.truezip.io.filesystem.SyncExceptionBuilder;
+import de.schlichtherle.truezip.io.filesystem.FSFalsePositiveException;
+import de.schlichtherle.truezip.io.filesystem.FSController;
+import de.schlichtherle.truezip.io.filesystem.FSEntryName;
+import de.schlichtherle.truezip.io.filesystem.FSException;
+import de.schlichtherle.truezip.io.filesystem.FSSyncException;
+import de.schlichtherle.truezip.io.filesystem.FSSyncExceptionBuilder;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.InputSocket;
-import de.schlichtherle.truezip.io.filesystem.InputOption;
+import de.schlichtherle.truezip.io.filesystem.FSInputOption;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
-import de.schlichtherle.truezip.io.filesystem.OutputOption;
-import de.schlichtherle.truezip.io.filesystem.SyncOption;
+import de.schlichtherle.truezip.io.filesystem.FSOutputOption;
+import de.schlichtherle.truezip.io.filesystem.FSSyncOption;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -53,10 +53,10 @@ import net.jcip.annotations.NotThreadSafe;
 
 import static de.schlichtherle.truezip.io.entry.Entry.Access.*;
 import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
-import static de.schlichtherle.truezip.io.filesystem.FileSystemEntryName.*;
-import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
+import static de.schlichtherle.truezip.io.filesystem.FSEntryName.*;
+import static de.schlichtherle.truezip.io.filesystem.FSSyncOption.*;
 import static de.schlichtherle.truezip.io.Paths.*;
-import static de.schlichtherle.truezip.io.filesystem.OutputOption.*;
+import static de.schlichtherle.truezip.io.filesystem.FSOutputOption.*;
 
 /**
  * This is the base class for any archive controller, providing all the
@@ -65,7 +65,7 @@ import static de.schlichtherle.truezip.io.filesystem.OutputOption.*;
  * (the <i>target file</i>) in order to allow random access to it as if it
  * were a regular directory in the real file system.
  * <p>
- * In terms of software patterns, an {@code FileSystemController} is
+ * In terms of software patterns, an {@code FSController} is
  * similar to a Director in a Builder pattern, with the {@link ArchiveDriver}
  * interface as its Builder or Abstract Factory.
  * However, an archive controller does not necessarily build a new archive.
@@ -87,7 +87,7 @@ import static de.schlichtherle.truezip.io.filesystem.OutputOption.*;
  * recognized to be <i>prospective archive files</i>.
  * <p>
  * To ensure that for each archive file there is at most one
- * {code FileSystemController}, the path path of the archive file (called
+ * {code FSController}, the path path of the archive file (called
  * <i>target</i>) must be canonicalized, so it doesn't matter whether a target
  * archive file is addressed as {@code "archive.zip"} or
  * {@code "/dir/archive.zip"} if {@code "/dir"} is the client application's
@@ -111,7 +111,7 @@ import static de.schlichtherle.truezip.io.filesystem.OutputOption.*;
  */
 @NotThreadSafe
 abstract class BasicArchiveController<E extends ArchiveEntry>
-extends FileSystemController<ConcurrentFileSystemModel> {
+extends FSController<FSConcurrencyModel> {
 
     private static final String CLASS_NAME
             = BasicArchiveController.class.getName();
@@ -119,20 +119,20 @@ extends FileSystemController<ConcurrentFileSystemModel> {
     private static final Logger logger
             = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 
-    private static final BitField<OutputOption> AUTO_MOUNT_OPTIONS
-            = BitField.noneOf(OutputOption.class);
+    private static final BitField<FSOutputOption> AUTO_MOUNT_OPTIONS
+            = BitField.noneOf(FSOutputOption.class);
 
-    private static final BitField<SyncOption> UNLINK_SYNC_OPTIONS
+    private static final BitField<FSSyncOption> UNLINK_SYNC_OPTIONS
             = BitField.of(ABORT_CHANGES);
 
-    private final ConcurrentFileSystemModel model;
+    private final FSConcurrencyModel model;
 
     /**
      * Constructs a new basic archive controller.
      *
      * @param model the non-{@code null} archive model.
      */
-    BasicArchiveController(final ConcurrentFileSystemModel model) {
+    BasicArchiveController(final FSConcurrencyModel model) {
         if (null == model)
             throw new NullPointerException();
         if (null == model.getParent())
@@ -141,7 +141,7 @@ extends FileSystemController<ConcurrentFileSystemModel> {
     }
 
     @Override
-    public final ConcurrentFileSystemModel getModel() {
+    public final FSConcurrencyModel getModel() {
         return model;
     }
 
@@ -165,10 +165,10 @@ extends FileSystemController<ConcurrentFileSystemModel> {
      *        directory is created with its last modification time set to the
      *        system's current time.
      * @return A valid archive file system - {@code null} is never returned.
-     * @throws FalsePositiveException
+     * @throws FSFalsePositiveException
      */
     abstract ArchiveFileSystem<E> autoMount(boolean autoCreate,
-                                            BitField<OutputOption> options)
+                                            BitField<FSOutputOption> options)
     throws IOException;
 
     @Override
@@ -177,28 +177,28 @@ extends FileSystemController<ConcurrentFileSystemModel> {
     }
 
     @Override
-    public final FileSystemEntry getEntry(FileSystemEntryName name)
+    public final FSEntry getEntry(FSEntryName name)
     throws IOException {
         return autoMount().getEntry(name);
     }
 
     @Override
-    public final boolean isReadable(FileSystemEntryName name) throws IOException {
+    public final boolean isReadable(FSEntryName name) throws IOException {
         return autoMount().getEntry(name) != null;
     }
 
     @Override
-    public final boolean isWritable(FileSystemEntryName name) throws IOException {
+    public final boolean isWritable(FSEntryName name) throws IOException {
         return autoMount().isWritable(name);
     }
 
     @Override
-    public final void setReadOnly(FileSystemEntryName name) throws IOException {
+    public final void setReadOnly(FSEntryName name) throws IOException {
         autoMount().setReadOnly(name);
     }
 
     @Override
-    public final boolean setTime(   FileSystemEntryName name,
+    public final boolean setTime(   FSEntryName name,
                                     BitField<Access> types,
                                     long value)
     throws IOException {
@@ -208,17 +208,17 @@ extends FileSystemController<ConcurrentFileSystemModel> {
 
     @Override
     public final InputSocket<?> getInputSocket(
-            FileSystemEntryName name,
-            BitField<InputOption> options) {
+            FSEntryName name,
+            BitField<FSInputOption> options) {
         return new Input(name, options);
     }
 
     private class Input extends InputSocket<E> {
-        final FileSystemEntryName name;
-        final BitField<InputOption> options;
+        final FSEntryName name;
+        final BitField<FSInputOption> options;
 
-        Input(  final FileSystemEntryName name,
-                final BitField<InputOption> options) {
+        Input(  final FSEntryName name,
+                final BitField<FSInputOption> options) {
             this.name = name;
             this.options = options;
         }
@@ -231,7 +231,7 @@ extends FileSystemController<ConcurrentFileSystemModel> {
             }
             final ArchiveFileSystemEntry<E> entry = autoMount().getEntry(name);
             if (null == entry)
-                throw new FileSystemEntryNotFoundException(getModel(),
+                throw new FSEntryNotFoundException(getModel(),
                         name, "no such file or directory");
             return entry.getEntry();
         }
@@ -239,7 +239,7 @@ extends FileSystemController<ConcurrentFileSystemModel> {
         InputSocket<?> getBoundSocket() throws IOException {
             final E entry = getLocalTarget();
             if (DIRECTORY == entry.getType())
-                throw new FileSystemEntryNotFoundException(getModel(),
+                throw new FSEntryNotFoundException(getModel(),
                         name, "cannot read directories");
             return BasicArchiveController
                     .this
@@ -262,19 +262,19 @@ extends FileSystemController<ConcurrentFileSystemModel> {
 
     @Override
     public final OutputSocket<?> getOutputSocket(
-            FileSystemEntryName name,
-            BitField<OutputOption> options,
+            FSEntryName name,
+            BitField<FSOutputOption> options,
             Entry template) {
         return new Output(name, options, template);
     }
 
     private class Output extends OutputSocket<E> {
-        final FileSystemEntryName name;
-        final BitField<OutputOption> options;
+        final FSEntryName name;
+        final BitField<FSOutputOption> options;
         final Entry template;
 
-        Output( final FileSystemEntryName name,
-                final BitField<OutputOption> options,
+        Output( final FSEntryName name,
+                final BitField<FSOutputOption> options,
                 final Entry template) {
             this.name = name;
             this.options = options;
@@ -337,21 +337,21 @@ extends FileSystemController<ConcurrentFileSystemModel> {
 
     @Override
     public final void mknod(
-            @NonNull final FileSystemEntryName name,
+            @NonNull final FSEntryName name,
             @NonNull final Type type,
-            @NonNull final BitField<OutputOption> options,
+            @NonNull final BitField<FSOutputOption> options,
             @CheckForNull final Entry template)
     throws IOException {
         if (name.isRoot()) {
             try {
                 autoMount(); // detect false positives!
-            } catch (FalsePositiveException ex) {
+            } catch (FSFalsePositiveException ex) {
                 if (DIRECTORY != type)
                     throw ex;
                 autoMount(true, options);
                 return;
             }
-            throw new FileSystemEntryNotFoundException(getModel(),
+            throw new FSEntryNotFoundException(getModel(),
                     name, "directory exists already");
         } else {
             autoMount(options.get(CREATE_PARENTS), options)
@@ -361,13 +361,13 @@ extends FileSystemController<ConcurrentFileSystemModel> {
     }
 
     @Override
-    public void unlink(final FileSystemEntryName name) throws IOException {
+    public void unlink(final FSEntryName name) throws IOException {
         autoSync(name, null);
         if (name.isRoot()) {
             final ArchiveFileSystem<E> fileSystem;
             try {
                 fileSystem = autoMount();
-            } catch (FalsePositiveException ex) {
+            } catch (FSFalsePositiveException ex) {
                 try {
                     // The parent archive controller will unlink our target
                     // archive file next, so we need to reset anyway.
@@ -376,7 +376,7 @@ extends FileSystemController<ConcurrentFileSystemModel> {
                     // that the file system can be successfully mounted again
                     // if the target archive file is subsequently modified to
                     // be a regular archive file.
-                    sync(UNLINK_SYNC_OPTIONS, new SyncExceptionBuilder());
+                    sync(UNLINK_SYNC_OPTIONS, new FSSyncExceptionBuilder());
                 } catch (IOException cannotHappen) {
                     throw new AssertionError(cannotHappen);
                 }
@@ -390,7 +390,7 @@ extends FileSystemController<ConcurrentFileSystemModel> {
                 logger.log(Level.WARNING, "unlink.absolute",
                         new Object[] {  fileSystem.getSize() - 1,
                                         getModel().getMountPoint() });
-            sync(UNLINK_SYNC_OPTIONS, new SyncExceptionBuilder());
+            sync(UNLINK_SYNC_OPTIONS, new FSSyncExceptionBuilder());
         } else { // !isRoot(path)
             autoMount().unlink(name);
         }
@@ -407,13 +407,13 @@ extends FileSystemController<ConcurrentFileSystemModel> {
      * @param  name the non-{@code null} entry name.
      * @param  intention the intended operation on the entry. If {@code null},
      *         a pure file system operation with no I/O is intended.
-     * @see    FileSystemController#sync
+     * @see    FSController#sync
      * @throws IOException if any exceptional condition occurs
      *         throughout the synchronization of the target archive file.
-     * @throws NotWriteLockedException
+     * @throws FSNotWriteLockedException
      * @return Whether or not a synchronization has been performed.
      */
-    abstract boolean autoSync(  @NonNull FileSystemEntryName name,
+    abstract boolean autoSync(  @NonNull FSEntryName name,
                                 @CheckForNull Access intention)
-    throws SyncException, FileSystemException;
+    throws FSSyncException, FSException;
 }

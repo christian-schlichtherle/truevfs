@@ -17,8 +17,8 @@
 package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.ChainableIOException;
-import de.schlichtherle.truezip.io.filesystem.SyncException;
-import de.schlichtherle.truezip.io.filesystem.SyncWarningException;
+import de.schlichtherle.truezip.io.filesystem.FSSyncException;
+import de.schlichtherle.truezip.io.filesystem.FSSyncWarningException;
 import de.schlichtherle.truezip.util.AbstractExceptionBuilder;
 import java.io.IOException;
 
@@ -34,10 +34,10 @@ extends AbstractExceptionBuilder<IOException, ArchiveException> {
         final ArchiveException next;
         if (cause instanceof ArchiveException)
             next = (ArchiveException) cause;
-        else if (cause instanceof SyncWarningException)
-            next = new ArchiveWarningException(cause.getMessage(), cause.getCause()); // remove SyncWarningException - it's not thrown yet so it has no stack trace anyway!
-        else if (cause instanceof SyncException)
-            next = new ArchiveException(cause.getMessage(), cause.getCause()); // remove SyncWarningException - it's not thrown yet so it has no stack trace anyway!
+        else if (cause instanceof FSSyncWarningException)
+            next = new ArchiveWarningException(cause.getMessage(), cause.getCause()); // remove FSSyncWarningException - it's not thrown yet so it has no stack trace anyway!
+        else if (cause instanceof FSSyncException)
+            next = new ArchiveException(cause.getMessage(), cause.getCause()); // remove FSSyncWarningException - it's not thrown yet so it has no stack trace anyway!
         else
             next = new ArchiveException(cause.getMessage(), cause);
         try {

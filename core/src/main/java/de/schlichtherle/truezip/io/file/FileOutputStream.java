@@ -17,9 +17,9 @@
 package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.FileBusyException;
-import de.schlichtherle.truezip.io.DecoratingOutputStream;
-import de.schlichtherle.truezip.io.filesystem.SyncException;
-import de.schlichtherle.truezip.io.filesystem.OutputOption;
+import de.schlichtherle.truezip.io.DecoratorOutputStream;
+import de.schlichtherle.truezip.io.filesystem.FSSyncException;
+import de.schlichtherle.truezip.io.filesystem.FSOutputOption;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.FileDescriptor;
@@ -27,8 +27,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import static de.schlichtherle.truezip.io.filesystem.OutputOption.APPEND;
-import static de.schlichtherle.truezip.io.filesystem.OutputOption.CREATE_PARENTS;
+import static de.schlichtherle.truezip.io.filesystem.FSOutputOption.APPEND;
+import static de.schlichtherle.truezip.io.filesystem.FSOutputOption.CREATE_PARENTS;
 
 /**
  * A drop-in replacement for {@link java.io.FileOutputStream} which
@@ -82,7 +82,7 @@ import static de.schlichtherle.truezip.io.filesystem.OutputOption.CREATE_PARENTS
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class FileOutputStream extends DecoratingOutputStream {
+public final class FileOutputStream extends DecoratorOutputStream {
 
     /**
      * Creates a new {@code FileOutputStream} for accessing regular files or
@@ -149,7 +149,7 @@ public final class FileOutputStream extends DecoratingOutputStream {
     throws FileNotFoundException {
         final OutputSocket<?> output = Files.getOutputSocket(
                 dst,
-                BitField.noneOf(OutputOption.class)
+                BitField.noneOf(FSOutputOption.class)
                     .set(APPEND, append)
                     .set(CREATE_PARENTS, File.isLenient()),
                 null);
@@ -157,7 +157,7 @@ public final class FileOutputStream extends DecoratingOutputStream {
             return output.newOutputStream();
         } catch (FileNotFoundException ex) {
             throw ex;
-        } catch (SyncException ex) {
+        } catch (FSSyncException ex) {
             throw ex.getCause() instanceof FileBusyException
                     ? (FileBusyException) ex.getCause()
                     : (FileNotFoundException) new FileNotFoundException(

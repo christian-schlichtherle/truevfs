@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.tar;
 
-import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemModel;
+import de.schlichtherle.truezip.io.filesystem.concurrency.FSConcurrencyModel;
 import de.schlichtherle.truezip.io.archive.driver.CharsetArchiveDriver;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
@@ -118,7 +118,7 @@ extends CharsetArchiveDriver<TarEntry> {
      * {@link #newTarInputShop}.
      */
     @Override
-    public TarInputShop newInputShop(ConcurrentFileSystemModel model, InputSocket<?> input)
+    public TarInputShop newInputShop(FSConcurrencyModel model, InputSocket<?> input)
     throws IOException {
         final InputStream in = input.newInputStream();
         try {
@@ -128,7 +128,7 @@ extends CharsetArchiveDriver<TarEntry> {
         }
     }
 
-    protected TarInputShop newTarInputShop(ConcurrentFileSystemModel model, InputStream in)
+    protected TarInputShop newTarInputShop(FSConcurrencyModel model, InputStream in)
     throws IOException {
         return new TarInputShop(in);
     }
@@ -141,7 +141,7 @@ extends CharsetArchiveDriver<TarEntry> {
      */
     @Override
     public OutputShop<TarEntry> newOutputShop(
-            ConcurrentFileSystemModel model,
+            FSConcurrencyModel model,
             OutputSocket<?> output,
             InputShop<TarEntry> source)
     throws IOException {
@@ -156,7 +156,7 @@ extends CharsetArchiveDriver<TarEntry> {
     }
 
     protected TarOutputShop newTarOutputShop(
-            ConcurrentFileSystemModel model, OutputStream out, TarInputShop source)
+            FSConcurrencyModel model, OutputStream out, TarInputShop source)
     throws IOException {
         return new TarOutputShop(out);
     }

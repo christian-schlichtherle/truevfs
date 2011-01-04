@@ -16,8 +16,8 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
-import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemModel;
-import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
+import de.schlichtherle.truezip.io.filesystem.concurrency.FSConcurrencyModel;
+import de.schlichtherle.truezip.io.filesystem.FSModel;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.IOException;
 
@@ -71,7 +71,7 @@ public class CheckedOdfDriver extends OdfDriver {
     }
 
     @Override
-    protected ZipInputShop newZipInputShop(ConcurrentFileSystemModel model, ReadOnlyFile rof)
+    protected ZipInputShop newZipInputShop(FSConcurrencyModel model, ReadOnlyFile rof)
     throws IOException {
         return new CheckedZipInputShop(
                 rof, getCharset(), getPreambled(), getPostambled(), this);

@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.socket;
 
-import de.schlichtherle.truezip.io.DecoratingOutputStream;
+import de.schlichtherle.truezip.io.DecoratorOutputStream;
 import de.schlichtherle.truezip.io.entry.Entry;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -27,7 +27,7 @@ import java.io.OutputStream;
  * @version $Id$
  */
 public final class LazyOutputSocket<E extends Entry>
-extends DecoratingOutputSocket<E> {
+extends DecoratorOutputSocket<E> {
 
     public LazyOutputSocket(final OutputSocket<? extends E> output) {
         super(output);
@@ -38,7 +38,7 @@ extends DecoratingOutputSocket<E> {
         return new LazyOutputStream();
     }
 
-    private class LazyOutputStream extends DecoratingOutputStream {
+    private class LazyOutputStream extends DecoratorOutputStream {
         LazyOutputStream() {
             super(null);
         }

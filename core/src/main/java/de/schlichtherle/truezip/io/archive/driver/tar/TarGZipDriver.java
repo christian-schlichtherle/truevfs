@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.tar;
 
-import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemModel;
+import de.schlichtherle.truezip.io.filesystem.concurrency.FSConcurrencyModel;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -97,14 +97,14 @@ public class TarGZipDriver extends TarDriver {
     }
 
     @Override
-    protected TarInputShop newTarInputShop(ConcurrentFileSystemModel model, InputStream in)
+    protected TarInputShop newTarInputShop(FSConcurrencyModel model, InputStream in)
     throws IOException {
         return new TarInputShop(new GZIPInputStream(in, BUFSIZE));
     }
 
     @Override
     protected TarOutputShop newTarOutputShop(
-            final ConcurrentFileSystemModel model,
+            final FSConcurrencyModel model,
             final OutputStream out,
             final TarInputShop source)
     throws IOException {
