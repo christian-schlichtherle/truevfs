@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.sample;
+package de.schlichtherle.truezip.samples;
 
 import de.schlichtherle.truezip.io.file.File;
 import de.schlichtherle.truezip.io.filesystem.FSManagers;

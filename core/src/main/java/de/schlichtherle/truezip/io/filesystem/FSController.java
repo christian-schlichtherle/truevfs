@@ -39,10 +39,9 @@ import static de.schlichtherle.truezip.io.filesystem.FSSyncOption.*;
  * of this chain of federated file systems.
  * <p>
  * Where the methods of this abstract class accept a
- * {@link FSEntry#getName path name} string as a parameter, this will
- * be resolved against the
- * {@link FSModel#getMountPoint() mount point} URI of this
- * controller's file system.
+ * {@link FSEntryName file system entry name} as a parameter, this will get
+ * resolved against the {@link FSModel#getMountPoint() mount point} URI of this
+ * controller's {@link #getModel() file system model}.
  * <p>
  * All method implementations of this abstract class must be reentrant on
  * exceptions - so client applications may repeatedly call them.
@@ -52,6 +51,7 @@ import static de.schlichtherle.truezip.io.filesystem.FSSyncOption.*;
  * Otherwise, it's instances must be decorated by a synchronization guard such
  * as {@link FSConcurrencyController}.
  *
+ * @param   <M> The type of the file system model.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -97,8 +97,6 @@ public abstract class FSController<M extends FSModel> {
     setReadOnly(@NonNull FSEntryName name)
     throws IOException;
 
-    // TODO: Consider putting this into FSEntry and let getEntry()
-    // return a proxy instead - mind the IOException however!
     public abstract boolean
     setTime(@NonNull FSEntryName name,
             @NonNull BitField<Access> types,
@@ -106,8 +104,8 @@ public abstract class FSController<M extends FSModel> {
     throws IOException;
 
     /**
-     * Returns an input socket for reading the given entry from the file
-     * system.
+     * Returns an input socket for reading the contents of the entry addressed
+     * by the given name from the file system.
      *
      * @param  name a file system entry name.
      * @return An {@code InputSocket}.
@@ -117,8 +115,8 @@ public abstract class FSController<M extends FSModel> {
                     @NonNull BitField<FSInputOption> options);
 
     /**
-     * Returns an output socket for writing the given entry to the file
-     * system.
+     * Returns an output socket for writing the contents of the entry addressed
+     * by the given name to the file system.
      *
      * @param  name a file system entry name.
      * @return An {@code OutputSocket}.
@@ -130,14 +128,14 @@ public abstract class FSController<M extends FSModel> {
 
     /**
      * Creates or replaces and finally links a chain of one or more entries
-     * for the given {@code path} into the file system.
+     * for the given entry {@code name} into the file system.
      *
      * @param  name the file system entry name.
      * @param  type the file system entry type.
-     * @param  options if {@code CREATE_PARENTS} is set, any missing parent
-     *         directories will be created and linked into this file
-     *         system with its last modification time set to the system's
-     *         current time.
+     * @param  options the file system output options.
+     *         If {@code CREATE_PARENTS} is set, any missing parent directories
+     *         will be created and linked into this file system with its last
+     *         modification time set to the system's current time.
      * @param  template if not {@code null}, then the file system entry
      *         at the end of the chain shall inherit as much properties from
      *         this entry as possible - with the exception of its name and type.

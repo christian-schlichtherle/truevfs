@@ -22,6 +22,8 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Iterator;
+import net.jcip.annotations.Immutable;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * A type-safe, immutable set of enums which emulates the concept of a bit
@@ -39,6 +41,7 @@ import java.util.Iterator;
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
+@Immutable
 public final class BitField<E extends Enum<E>>
 implements Iterable<E>, Serializable {
 
