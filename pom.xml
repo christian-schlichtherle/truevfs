@@ -51,6 +51,7 @@
 
     <modules>
         <module>core</module>
+        <module>samples</module>
     </modules>
 
     <dependencies>
