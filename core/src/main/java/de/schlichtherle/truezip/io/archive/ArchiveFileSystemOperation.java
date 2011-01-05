@@ -32,7 +32,7 @@ import de.schlichtherle.truezip.util.Link;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface ArchiveFileSystemOperation<E extends ArchiveEntry>
+interface ArchiveFileSystemOperation<E extends ArchiveEntry>
 extends Link<ArchiveFileSystemEntry<E>> {
 
     /** Executes this archive file system operation. */

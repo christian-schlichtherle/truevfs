@@ -19,7 +19,6 @@ import de.schlichtherle.truezip.io.filesystem.FSDecoratorEntry;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import de.schlichtherle.truezip.io.archive.ArchiveEntry;
 import de.schlichtherle.truezip.io.filesystem.FSEntry;
 import de.schlichtherle.truezip.io.filesystem.FSEntryName;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -42,17 +41,17 @@ extends FSDecoratorEntry<E> {
      */
     @NonNull
     public static <E extends ArchiveEntry>
-    ArchiveFileSystemEntry<E> create(   @NonNull final FSEntryName name,
-                                        @NonNull final Type type,
-                                        @NonNull final E entry) {
+    ArchiveFileSystemEntry<E> create(   final @NonNull FSEntryName name,
+                                        final @NonNull Type        type,
+                                        final @NonNull E           entry) {
         return create(name.getPath(), type, entry);
     }
 
     @NonNull
     static <E extends ArchiveEntry>
-    ArchiveFileSystemEntry<E> create(   @NonNull final String path,
-                                        @NonNull final Type type,
-                                        @NonNull final E entry) {
+    ArchiveFileSystemEntry<E> create(   final @NonNull String path,
+                                        final @NonNull Type   type,
+                                        final @NonNull E      entry) {
         switch (type) {
             case FILE:
                 assert FILE == entry.getType();

@@ -19,7 +19,7 @@ package de.schlichtherle.truezip.io.archive;
  * Thrown to indicate that an operation was trying to modify a read-only
  * {@link ArchiveFileSystem}.
  */
-class ReadOnlyArchiveFileSystemException
+public class ReadOnlyArchiveFileSystemException
 extends ArchiveFileSystemException {
 
     private static final long serialVersionUID = 987645923519873262L;

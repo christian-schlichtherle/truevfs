@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.io.archive;
 
-import de.schlichtherle.truezip.io.archive.ArchiveEntry;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.entry.EntryContainer;
 import de.schlichtherle.truezip.io.entry.EntryFactory;
@@ -43,7 +42,7 @@ extends ArchiveFileSystem<E> {
         final EntryContainer<E> container,
         final EntryFactory<E> factory,
         final Entry rootTemplate) {
-        super(container, factory, rootTemplate);
+        super(factory, container, rootTemplate);
     }
 
     /** The implementation in this class returns {@code true}. */

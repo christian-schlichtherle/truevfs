@@ -238,8 +238,8 @@ extends FileSystemArchiveController<E> {
                     parentName, MOUNT_INPUT_OPTIONS);
             input = new Input(driver.newInputShop(getModel(), socket));
             setFileSystem(newArchiveFileSystem(
-                    input.getDelegate(), driver,
-                    socket.getLocalTarget(), readOnly));
+                    driver,
+                    input.getDelegate(), socket.getLocalTarget(), readOnly));
         } catch (FSException ex) {
             throw ex;
         } catch (TabuFileException ex) {

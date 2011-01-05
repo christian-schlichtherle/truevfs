@@ -52,7 +52,7 @@ import static de.schlichtherle.truezip.io.Paths.*;
  * @version $Id$
  */
 @NotThreadSafe
-public class ArchiveFileSystem<E extends ArchiveEntry>
+class ArchiveFileSystem<E extends ArchiveEntry>
 implements EntryContainer<ArchiveFileSystemEntry<E>> {
 
     private final EntryFactory<E> factory;
@@ -89,7 +89,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         return new ArchiveFileSystem<AE>(factory);
     }
 
-    private ArchiveFileSystem(@NonNull final EntryFactory<E> factory) {
+    private ArchiveFileSystem(final @NonNull EntryFactory<E> factory) {
         this.factory = factory;
         master = new LinkedHashMap<String, ArchiveFileSystemEntry<E>>(64);
 
@@ -137,19 +137,19 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      */
     public static <E extends ArchiveEntry>
     ArchiveFileSystem<E> newArchiveFileSystem(
-            @NonNull EntryContainer<E> container,
             @NonNull EntryFactory<E> factory,
+            @NonNull EntryContainer<E> container,
             @CheckForNull Entry rootTemplate,
             boolean readOnly) {
         return readOnly
             ? new ReadOnlyArchiveFileSystem<E>(container, factory, rootTemplate)
-            : new ArchiveFileSystem<E>(container, factory, rootTemplate);
+            : new ArchiveFileSystem<E>(factory, container, rootTemplate);
     }
 
     ArchiveFileSystem(
-            @NonNull final EntryContainer<E> container,
-            @NonNull final EntryFactory<E> factory,
-            @CheckForNull final Entry rootTemplate) {
+            final @NonNull EntryFactory<E> factory,
+            final @NonNull EntryContainer<E> container,
+            final @CheckForNull Entry rootTemplate) {
         if (null == rootTemplate)
             throw new NullPointerException();
         if (rootTemplate instanceof ArchiveFileSystemEntry<?>)
@@ -161,7 +161,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
 
         // Load entries from input archive.
         for (final E entry : container) {
-            String path = cutTrailingSeparators(entry.getName(), SEPARATOR_CHAR);
+            String path = getEntryName(entry);
             //path = EntryName.create(path, null, true).getPath();
             path = new Normalizer(SEPARATOR_CHAR).normalize(path); // faster and more memory efficient
             master.put(path, ArchiveFileSystemEntry.create(path, entry.getType(), entry));
@@ -169,8 +169,8 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
 
         // Setup root file system entry, potentially replacing its previous
         // mapping from the input archive.
-        root = newEntryUnchecked(ROOT.toString(), DIRECTORY, rootTemplate);
-        master.put(ROOT.toString(), root);
+        root = newEntryUnchecked(ROOT.getPath(), DIRECTORY, rootTemplate);
+        master.put(ROOT.getPath(), root);
 
         // Now perform a file system check to create missing parent directories
         // and populate directories with their members - this needs to be done
@@ -178,14 +178,20 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         // entries = Collections.enumeration(master.values()); // concurrent modification!
         final Checker fsck = new Checker();
         for (final E entry : container) {
-            String path = cutTrailingSeparators(entry.getName(), SEPARATOR_CHAR);
+            String path = getEntryName(entry);
             try {
                 fsck.fix(new FSEntryName(
                         new URI(null, null, path, null, null),
-                        true).toString());
+                        true).getPath());
             } catch (URISyntaxException dontFix) {
             }
         }
+    }
+
+    private @NonNull String getEntryName(E entry) {
+        return cutTrailingSeparators(
+                entry.getName().replace('\\', SEPARATOR_CHAR),
+                SEPARATOR_CHAR);
     }
 
     /** Splits a path name into a parent path name and a base path. */
@@ -220,7 +226,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
          * If a parent directory does exist, the respective member is added
          * (possibly yet again) and the process is continued.
          */
-        void fix(@NonNull final String path) {
+        void fix(final @NonNull String path) {
             // When recursing into this method, it may be called with the root
             // directory as its parameter, so we may NOT skip the following test.
             if (isRoot(path))
