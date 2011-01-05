@@ -162,7 +162,7 @@ public class Paths {
      */
     @NonNull
     public static String cutTrailingSeparators(
-            @NonNull final String path,
+            final @NonNull String path,
             final char separatorChar) {
         int i = path.length();
         if (0 >= i || separatorChar != path.charAt(--i))
