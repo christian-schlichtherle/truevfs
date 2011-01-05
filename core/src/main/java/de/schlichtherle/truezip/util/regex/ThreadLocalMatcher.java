@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.util.regex;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -28,13 +29,13 @@ import java.util.regex.PatternSyntaxException;
  * @version $Id$
  */
 public class ThreadLocalMatcher extends ThreadLocal<Matcher> {
-    private final Pattern pattern;
+    private final @NonNull Pattern pattern;
 
     /**
      * Equivalent to {@code new}
      * {@link #ThreadLocalMatcher(String, int) ThreadLocal(regex, 0)}.
      */
-    public ThreadLocalMatcher(String regex)
+    public ThreadLocalMatcher(@NonNull String regex)
     throws PatternSyntaxException {
         this(regex, 0);
     }
@@ -47,7 +48,7 @@ public class ThreadLocalMatcher extends ThreadLocal<Matcher> {
      * @param flags The flags to use for compilation.
      * @throws PatternSyntaxException If the expression's syntax is invalid.
      */
-    public ThreadLocalMatcher(final String regex, final int flags)
+    public ThreadLocalMatcher(@NonNull String regex, int flags)
     throws PatternSyntaxException {
         this.pattern = Pattern.compile(regex, flags);
     }
@@ -58,7 +59,7 @@ public class ThreadLocalMatcher extends ThreadLocal<Matcher> {
      * @param pattern The pattern to be used.
      * @throws NullPointerException If the parameter is {@code null}.
      */
-    public ThreadLocalMatcher(final Pattern pattern) {
+    public ThreadLocalMatcher(@NonNull Pattern pattern) {
         if (pattern == null)
             throw new NullPointerException();
         this.pattern = pattern;
@@ -73,7 +74,7 @@ public class ThreadLocalMatcher extends ThreadLocal<Matcher> {
      * Resets the thread local matcher with the given character sequence and
      * returns it.
      */
-    public final Matcher reset(CharSequence input) {
+    public final @NonNull Matcher reset(CharSequence input) {
         return get().reset(input);
     }
 }
