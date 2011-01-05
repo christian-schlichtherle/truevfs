@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive;
 
+import java.util.List;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.archive.ArchiveEntry;
@@ -33,6 +34,7 @@ import java.net.URISyntaxException;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 import net.jcip.annotations.NotThreadSafe;
@@ -158,10 +160,11 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
                 (int) (container.getSize() / .75f) + 1);
 
         // Load entries from input archive.
+        final Normalizer normalizer = new Normalizer(SEPARATOR_CHAR);
         for (final E entry : container) {
             String path = getEntryName(entry);
             //path = EntryName.create(path, null, true).getPath();
-            path = new Normalizer(SEPARATOR_CHAR).normalize(path); // faster and more memory efficient
+            path = normalizer.normalize(path); // faster and more memory efficient
             master.put(path, ArchiveFileSystemEntry.create(path, entry.getType(), entry));
         }
 

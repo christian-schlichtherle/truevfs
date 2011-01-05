@@ -15,11 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive;
 
-import de.schlichtherle.truezip.io.archive.ArchiveFileSystemTouchListener;
-import de.schlichtherle.truezip.io.archive.ArchiveFileSystemEvent;
-import de.schlichtherle.truezip.io.archive.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipDriver;
-import de.schlichtherle.truezip.io.archive.ArchiveEntry;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -68,27 +64,6 @@ public class ArchiveFileSystemTest {
         model.removeArchiveFileSystemTouchListener(listener2);
         assertThat(model.getArchiveFileSystemTouchListeners().size(), is(0));
     }
-
-    /*@Test
-    public void testNotifyArchiveFileSystemListeners()
-    throws ArchiveFileSystemException {
-        final ArchiveFileSystem<?> model
-                = ArchiveFileSystem.newArchiveFileSystem(new ZipDriver());
-        final Listener listener1 = new Listener(model);
-        final Listener listener2 = new Listener(model);
-
-        model.setTime(ROOT, BitField.of(WRITE), System.currentTimeMillis());
-        assertThat(listener1.before, is(1));
-        assertThat(listener2.before, is(1));
-        assertThat(listener1.after, is(1));
-        assertThat(listener2.after, is(1));
-
-        model.setTime(ROOT, BitField.of(WRITE), System.currentTimeMillis());
-        assertThat(listener1.before, is(1));
-        assertThat(listener2.before, is(1));
-        assertThat(listener1.after, is(1));
-        assertThat(listener2.after, is(1));
-    }*/
 
     private static class Listener
     implements ArchiveFileSystemTouchListener<ArchiveEntry> {
