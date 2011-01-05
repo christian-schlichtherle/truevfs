@@ -47,6 +47,8 @@ import net.jcip.annotations.ThreadSafe;
 /**
  * Supports multiple concurrent reader threads.
  * 
+ * @param   <M> The type of the file system concurrency model.
+ * @param   <C> The type of the decorated file system controller.
  * @see     FSConcurrencyModel
  * @author  Christian Schlichtherle
  * @version $Id$
