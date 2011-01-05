@@ -162,6 +162,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         final List<String> paths = new LinkedList<String>();
         final Normalizer normalizer = new Normalizer(SEPARATOR_CHAR);
         for (final E entry : container) {
+            // Fix issue #42 - see https://truezip.dev.java.net/issues/show_bug.cgi?id=42
             final String path = cutTrailingSeparators(
                 normalizer.normalize(entry.getName().replace('\\', SEPARATOR_CHAR)),
                 SEPARATOR_CHAR);
