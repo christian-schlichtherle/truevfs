@@ -18,7 +18,6 @@ package de.schlichtherle.truezip.io.archive;
 import java.util.List;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.io.entry.Entry;
-import de.schlichtherle.truezip.io.archive.ArchiveEntry;
 import de.schlichtherle.truezip.io.entry.EntryContainer;
 import de.schlichtherle.truezip.io.entry.EntryFactory;
 import de.schlichtherle.truezip.io.filesystem.FSEntryName;
@@ -86,7 +85,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      * @param  factory the archive entry factory to use.
      * @throws NullPointerException If {@code factory} is {@code null}.
      */
-    static <AE extends ArchiveEntry> @NonNull ArchiveFileSystem<AE>
+    static @NonNull <AE extends ArchiveEntry> ArchiveFileSystem<AE>
     newArchiveFileSystem(@NonNull EntryFactory<AE> factory) {
         return new ArchiveFileSystem<AE>(factory);
     }
@@ -137,7 +136,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      * @throws IllegalArgumentException If {@code rootTemplate} is an instance
      *         of {@link ArchiveFileSystemEntry}.
      */
-    static <E extends ArchiveEntry> @NonNull ArchiveFileSystem<E>
+    static @NonNull <E extends ArchiveEntry> ArchiveFileSystem<E>
     newArchiveFileSystem(   @NonNull EntryFactory<E> factory,
                             @NonNull EntryContainer<E> container,
                             @CheckForNull Entry rootTemplate,
@@ -157,15 +156,17 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
 
         this.factory = factory;
         master = new LinkedHashMap<String, ArchiveFileSystemEntry<E>>(
-                (int) (container.getSize() / .75f) + 1);
+                (int) (container.getSize() / .7f) + 1); // allow overhead to create missing parent directories
 
         // Load entries from input archive.
+        final List<String> paths = new LinkedList<String>();
         final Normalizer normalizer = new Normalizer(SEPARATOR_CHAR);
         for (final E entry : container) {
-            String path = getEntryName(entry);
-            //path = EntryName.create(path, null, true).getPath();
-            path = normalizer.normalize(path); // faster and more memory efficient
+            final String path = cutTrailingSeparators(
+                normalizer.normalize(entry.getName().replace('\\', SEPARATOR_CHAR)),
+                SEPARATOR_CHAR);
             master.put(path, ArchiveFileSystemEntry.create(path, entry.getType(), entry));
+            paths.add(path);
         }
 
         // Setup root file system entry, potentially replacing its previous
@@ -178,8 +179,8 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         // separately!
         // entries = Collections.enumeration(master.values()); // concurrent modification!
         final Checker fsck = new Checker();
-        for (final E entry : container) {
-            String path = getEntryName(entry);
+        for (final Iterator<String> i = paths.iterator(); i.hasNext(); i.remove()) {
+            final String path = i.next();
             try {
                 fsck.fix(new FSEntryName(
                         new URI(null, null, path, null, null),
@@ -187,12 +188,6 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
             } catch (URISyntaxException dontFix) {
             }
         }
-    }
-
-    private @NonNull String getEntryName(E entry) {
-        return cutTrailingSeparators(
-                entry.getName().replace('\\', SEPARATOR_CHAR),
-                SEPARATOR_CHAR);
     }
 
     /** Splits a path name into a parent path name and a base path. */
