@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.sample;
+package de.schlichtherle.truezip.samples;
 
 import de.schlichtherle.truezip.io.file.ArchiveDetector;
 import de.schlichtherle.truezip.io.file.DefaultArchiveDetector;

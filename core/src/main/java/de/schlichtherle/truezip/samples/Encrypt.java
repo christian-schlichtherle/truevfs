@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.sample;
+package de.schlichtherle.truezip.samples;
 
 import de.schlichtherle.truezip.io.file.File;
 import de.schlichtherle.truezip.io.file.RaesFiles;
@@ -23,39 +23,39 @@ import java.io.OutputStream;
 import java.util.ResourceBundle;
 
 /**
- * Decrypts the contents of the RAES file provided as the first argument
- * into the file provided as the second argument for the main method.
+ * Encrypts the contents of the file provided as the first argument
+ * into the RAES file provided as the second argument for the main method.
  * <p>
- * Please note that you should not use this utility to decrypt an RAES
- * encrypted ZIP file (usually a file with a {@code ".tzp"} or
- * {@code ".zip.rae"} suffix) back to a plain ZIP file.
+ * Please note that you should not use this utility to encrypt a plain
+ * ZIP file to an RAES encrypted ZIP file (usually a files with a
+ * {@code ".tzp"} or {@code ".zip.rae"} suffix).
  * This is because RAES encrypted ZIP files use the &quot;UTF-8&quot;
  * as their character set, whereas plain ZIP files use &quot;IBM437&quot;,
  * a.k.a. &quot;CP437&quot;.
- * To decrypt an RAES encrypted ZIP file to a plain ZIP file, use the
+ * To encrypt a plain ZIP file to an RAES encrypted ZIP file, use the
  * {@code "cp"} command of the {@link NZip} class instead.
- * This class knows about the correct character set charsets for the
- * various flavours of ZIP compatible files.
+ * This class knows about the correct character sets for the various
+ * flavours of ZIP compatible files.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class Decrypt extends CommandLineUtility {
+public class Encrypt extends CommandLineUtility {
 
-    private static final String CLASS_NAME = Decrypt.class.getName();
+    private static final String CLASS_NAME = Encrypt.class.getName();
     private static final ResourceBundle resources
             = ResourceBundle.getBundle(CLASS_NAME);
 
-    public Decrypt() {
+    public Encrypt() {
     }
 
-    public Decrypt(OutputStream out, OutputStream err, boolean autoFlush) {
+    public Encrypt(OutputStream out, OutputStream err, boolean autoFlush) {
         super(out, err, autoFlush);
     }
 
-    /** Equivalent to {@code System.exit(new Decrypt().run(args));}. */
+    /** Equivalent to {@code System.exit(new Encrypt().run(args));}. */
     public static void main(final String[] args) {
-        System.exit(new Decrypt().run(args));
+        System.exit(new Encrypt().run(args));
     }
 
     @Override
@@ -67,7 +67,7 @@ public class Decrypt extends CommandLineUtility {
         if (new File(args[1]).isEntry())
             monitor.start();
 
-        RaesFiles.decrypt(args[0], args[1], true);
+        RaesFiles.encrypt(args[0], args[1]);
         return 0;
     }
 }
