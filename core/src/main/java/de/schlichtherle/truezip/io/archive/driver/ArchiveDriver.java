@@ -24,13 +24,12 @@ import de.schlichtherle.truezip.io.archive.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.socket.InputShop;
 import de.schlichtherle.truezip.io.entry.EntryFactory;
-import de.schlichtherle.truezip.io.archive.driver.registry.ArchiveDriverRegistry;
 import de.schlichtherle.truezip.io.filesystem.FSController;
 import de.schlichtherle.truezip.io.filesystem.FSDriver;
 import de.schlichtherle.truezip.io.filesystem.FSMountPoint;
 import de.schlichtherle.truezip.io.filesystem.concurrency.FSConcurrencyController;
 import de.schlichtherle.truezip.io.filesystem.concurrency.FSContentCacheController;
-import de.schlichtherle.truezip.io.filesystem.file.FSTempFilePool;
+import de.schlichtherle.truezip.io.filesystem.file.FSFilePool;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -88,7 +87,7 @@ implements FSDriver, EntryFactory<E>, Serializable {
                             new DefaultArchiveController<E>(
                                 new FSConcurrencyModel(mountPoint, parent.getModel()),
                                 this, parent, false),
-                            FSTempFilePool.get()));
+                            FSFilePool.get()));
     }
 
     /**

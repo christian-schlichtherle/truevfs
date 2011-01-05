@@ -30,10 +30,9 @@ import java.io.InputStream;
  */
 final class FSFileInputSocket extends InputSocket<FSFileEntry> {
 
-    private final FSFileEntry entry;
+    private final @NonNull FSFileEntry entry;
 
     FSFileInputSocket(final @NonNull FSFileEntry entry) {
-        assert null != entry;
         this.entry = entry;
     }
 

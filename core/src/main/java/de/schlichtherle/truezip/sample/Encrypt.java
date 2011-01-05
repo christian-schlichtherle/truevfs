@@ -42,8 +42,7 @@ import java.util.ResourceBundle;
  */
 public class Encrypt extends CommandLineUtility {
 
-    private static final String CLASS_NAME
-            = "de.schlichtherle.truezip.io.samples.Encrypt";
+    private static final String CLASS_NAME = Encrypt.class.getName();
     private static final ResourceBundle resources
             = ResourceBundle.getBundle(CLASS_NAME);
 

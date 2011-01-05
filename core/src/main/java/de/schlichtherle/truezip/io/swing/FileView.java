@@ -39,8 +39,7 @@ import javax.swing.UIManager;
  */
 final class FileView extends DecoratorFileView {
 
-    private static final String CLASS_NAME
-            = "de.schlichtherle.truezip.io.swing.FileView";
+    private static final String CLASS_NAME = FileView.class.getName();
     private static final ResourceBundle resources
             = ResourceBundle.getBundle(CLASS_NAME);
 

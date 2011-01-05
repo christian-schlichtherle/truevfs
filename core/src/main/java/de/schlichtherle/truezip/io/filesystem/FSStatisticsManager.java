@@ -49,7 +49,7 @@ extends FSDecoratorManager<FSManager> {
             final FSMountPoint mountPoint,
             final FSDriver driver) {
 
-        class Driver implements FSDriver {
+        class StatisticsDriver implements FSDriver {
             @Override
             public FSController<?> newController(
                     FSMountPoint mountPoint,
@@ -62,7 +62,7 @@ extends FSDecoratorManager<FSManager> {
             }
         } // class Driver
 
-        return delegate.getController(mountPoint, new Driver());
+        return delegate.getController(mountPoint, new StatisticsDriver());
     }
 
     /**

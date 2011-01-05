@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.archive.driver.registry;
+package de.schlichtherle.truezip.io.archive.driver;
 
-import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.SuffixSet;
 import java.io.File;
 import java.io.IOException;

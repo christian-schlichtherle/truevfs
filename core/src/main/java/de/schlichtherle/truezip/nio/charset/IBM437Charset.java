@@ -28,8 +28,7 @@ import java.util.logging.Logger;
  */
 public final class IBM437Charset extends OctetCharset {
 
-    private static final String CLASS_NAME
-            = "de.schlichtherle.truezip.nio.charset.IBM437Charset";
+    private static final String CLASS_NAME = IBM437Charset.class.getName();
     private static final Logger logger = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 
     private static final String NAME = "IBM437";

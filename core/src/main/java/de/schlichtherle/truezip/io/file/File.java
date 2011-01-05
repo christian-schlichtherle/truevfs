@@ -613,16 +613,16 @@ public final class File extends java.io.File {
      */
     public File(URI uri) {
         this(   FSPath.create(fix(uri), true),
-                new ArchiveFileSystemDriver(ArchiveDetector.ALL));
+                new ArchiveDetectorFSDriver(ArchiveDetector.ALL));
     }
 
     public File(final @NonNull FSPath path) {
-        this(path, new ArchiveFileSystemDriver(ArchiveDetector.ALL));
+        this(path, new ArchiveDetectorFSDriver(ArchiveDetector.ALL));
     }
 
     @SuppressWarnings("LeakingThisInConstructor")
     private File(   final @NonNull FSPath path,
-                    final @NonNull ArchiveFileSystemDriver driver) {
+                    final @NonNull ArchiveDetectorFSDriver driver) {
         super(path.hierarchicalize().getUri());
 
         this.delegate = new java.io.File(super.getPath());
@@ -665,7 +665,7 @@ public final class File extends java.io.File {
 
     @SuppressWarnings("LeakingThisInConstructor")
     private File(   final @NonNull FSMountPoint mountPoint,
-                    final @NonNull ArchiveFileSystemDriver driver) {
+                    final @NonNull ArchiveDetectorFSDriver driver) {
         super(mountPoint.hierarchicalize().getUri());
 
         this.delegate = new java.io.File(super.getPath());
@@ -914,7 +914,7 @@ public final class File extends java.io.File {
         }
         this.controller = FSManagers
                 .getInstance()
-                .getController(mountPoint, new ArchiveFileSystemDriver(detector));
+                .getController(mountPoint, new ArchiveDetectorFSDriver(detector));
     }
 
     /**

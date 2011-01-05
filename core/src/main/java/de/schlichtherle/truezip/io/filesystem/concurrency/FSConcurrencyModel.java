@@ -35,8 +35,8 @@ import net.jcip.annotations.ThreadSafe;
 public class FSConcurrencyModel extends FSModel {
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
-    public FSConcurrencyModel(   @NonNull FSMountPoint mountPoint,
-                                        @CheckForNull FSModel parent) {
+    public FSConcurrencyModel(  @NonNull FSMountPoint mountPoint,
+                                @CheckForNull FSModel parent) {
         super(mountPoint, parent);
     }
 

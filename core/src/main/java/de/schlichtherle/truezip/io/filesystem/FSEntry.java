@@ -38,16 +38,14 @@ public abstract class FSEntry implements Entry {
      *         {@link FSEntryName file system entry name}.
      */
     @Override
-    @NonNull
-    public abstract String getName();
+    public abstract @NonNull String getName();
 
     /**
      * If this is not a directory entry, {@code null} is returned.
      * Otherwise, an unmodifiable set of strings is returned which
      * represent the base names of the members of this directory entry.
      */
-    @Nullable
-    public abstract Set<String> getMembers();
+    public abstract @Nullable Set<String> getMembers();
 
     /**
      * Two file system entries are considered equal if and only if they are

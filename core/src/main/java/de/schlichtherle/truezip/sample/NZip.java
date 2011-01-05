@@ -67,8 +67,7 @@ import java.util.ResourceBundle;
  */
 public class NZip extends CommandLineUtility {
 
-    private static final String CLASS_NAME
-            = "de.schlichtherle.truezip.io.samples.NZip";
+    private static final String CLASS_NAME = NZip.class.getName();
     private static final ResourceBundle resources
             = ResourceBundle.getBundle(CLASS_NAME);
 
@@ -290,7 +289,11 @@ public class NZip extends CommandLineUtility {
         if (detailed)
             buf.append(file.isDirectory()
                     ? File.separator
-                    : (file.isFile() ? "" : "?"));
+                    : file.isFile()
+                        ? ""
+                        : file.exists()
+                            ? "?"
+                            : "\u2020"); // dagger '†'
         out.println(buf.toString());
     }
 

@@ -34,7 +34,7 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-public final class FSTempFilePool
+public final class FSFilePool
 implements IOPool<FSFileEntry> {
 
     // Declared package private for unit testing purposes.
@@ -42,22 +42,22 @@ implements IOPool<FSFileEntry> {
     static final String DEFAULT_SUFFIX = null;
     static final File   DEFAULT_DIR    = null;
 
-    private static final FSTempFilePool INSTANCE
-            = new FSTempFilePool(DEFAULT_PREFIX, DEFAULT_SUFFIX, DEFAULT_DIR);
+    private static final FSFilePool INSTANCE
+            = new FSFilePool(DEFAULT_PREFIX, DEFAULT_SUFFIX, DEFAULT_DIR);
 
-    @NonNull private final String prefix;
-    @Nullable private final String suffix;
-    @Nullable private final File   dir;
+    private final @NonNull  String prefix;
+    private final @Nullable String suffix;
+    private final @Nullable File   dir;
 
     /** Returns the default instance of this temp file pool. */
-    public static FSTempFilePool get() {
+    public static FSFilePool get() {
         return INSTANCE;
     }
 
     /** Constructs a new temp file pool. */
-    public FSTempFilePool(@NonNull final String prefix,
-                        @Nullable final String suffix,
-                        @Nullable final File dir) {
+    public FSFilePool(  final @NonNull  String prefix,
+                        final @Nullable String suffix,
+                        final @Nullable File dir) {
         if (null == prefix)
             throw new NullPointerException();
         this.prefix = prefix;
@@ -80,9 +80,9 @@ implements IOPool<FSFileEntry> {
     extends FSFileEntry
     implements IOPool.Entry<FSFileEntry> {
 
-        private FSTempFilePool pool;
+        private FSFilePool pool;
 
-        private Entry(FSTempFilePool pool, File file) {
+        private Entry(FSFilePool pool, File file) {
             super(file);
             assert null != pool;
             this.pool = pool;
@@ -95,8 +95,8 @@ implements IOPool<FSFileEntry> {
             pool(null);
         }
 
-        private FSTempFilePool pool(final FSTempFilePool newPool) throws IOException {
-            final FSTempFilePool oldPool = pool;
+        private FSFilePool pool(final FSFilePool newPool) throws IOException {
+            final FSFilePool oldPool = pool;
             this.pool = newPool;
             if (oldPool != newPool) {
                 final File file = getFile();
