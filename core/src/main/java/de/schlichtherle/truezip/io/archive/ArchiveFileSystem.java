@@ -84,8 +84,8 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      * @param  factory the archive entry factory to use.
      * @throws NullPointerException If {@code factory} is {@code null}.
      */
-    public static <AE extends ArchiveEntry>
-    ArchiveFileSystem<AE> newArchiveFileSystem(@NonNull EntryFactory<AE> factory) {
+    static <AE extends ArchiveEntry> @NonNull ArchiveFileSystem<AE>
+    newArchiveFileSystem(@NonNull EntryFactory<AE> factory) {
         return new ArchiveFileSystem<AE>(factory);
     }
 
@@ -135,21 +135,19 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      * @throws IllegalArgumentException If {@code rootTemplate} is an instance
      *         of {@link ArchiveFileSystemEntry}.
      */
-    public static <E extends ArchiveEntry>
-    ArchiveFileSystem<E> newArchiveFileSystem(
-            @NonNull EntryFactory<E> factory,
-            @NonNull EntryContainer<E> container,
-            @CheckForNull Entry rootTemplate,
-            boolean readOnly) {
+    static <E extends ArchiveEntry> @NonNull ArchiveFileSystem<E>
+    newArchiveFileSystem(   @NonNull EntryFactory<E> factory,
+                            @NonNull EntryContainer<E> container,
+                            @CheckForNull Entry rootTemplate,
+                            boolean readOnly) {
         return readOnly
             ? new ReadOnlyArchiveFileSystem<E>(container, factory, rootTemplate)
             : new ArchiveFileSystem<E>(factory, container, rootTemplate);
     }
 
-    ArchiveFileSystem(
-            final @NonNull EntryFactory<E> factory,
-            final @NonNull EntryContainer<E> container,
-            final @CheckForNull Entry rootTemplate) {
+    ArchiveFileSystem(  final @NonNull EntryFactory<E> factory,
+                        final @NonNull EntryContainer<E> container,
+                        final @CheckForNull Entry rootTemplate) {
         if (null == rootTemplate)
             throw new NullPointerException();
         if (rootTemplate instanceof ArchiveFileSystemEntry<?>)
