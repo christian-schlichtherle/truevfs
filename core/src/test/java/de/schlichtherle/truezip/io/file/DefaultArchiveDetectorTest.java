@@ -419,6 +419,7 @@ public class DefaultArchiveDetectorTest {
         });
     }
 
+    @SuppressWarnings("deprecation")
     private void testGetArchiveDriver(
             DefaultArchiveDetector detector,
             final Object[] args) {

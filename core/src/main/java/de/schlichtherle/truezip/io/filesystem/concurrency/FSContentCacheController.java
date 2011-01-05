@@ -78,16 +78,13 @@ import static de.schlichtherle.truezip.io.filesystem.FSSyncOption.*;
  *     entry data.
  * </ul>
  *
- * @param   <M> The type of the file system model.
- * @param   <C> The type of the decorated file system controller.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @NotThreadSafe
-public final class FSContentCacheController<
-        M extends FSConcurrencyModel,
-        C extends FSController<? extends M>>
-extends FSDecoratorController<M, C> {
+public final class FSContentCacheController
+extends FSDecoratorController<  FSConcurrencyModel,
+                                FSController<? extends FSConcurrencyModel>> {
 
     private static final Strategy STRATEGY = WRITE_BACK;
 
@@ -101,8 +98,9 @@ extends FSDecoratorController<M, C> {
      * @param controller the decorated file system controller.
      * @param pool the pool of temporary entries to hold the copied entry data.
      */
-    public FSContentCacheController(  @NonNull final C controller,
-                                                @NonNull final IOPool<?> pool) {
+    public FSContentCacheController(
+            final @NonNull FSController<? extends FSConcurrencyModel> controller,
+            final @NonNull IOPool<?> pool) {
         super(controller);
         if (null == pool)
             throw new NullPointerException();
