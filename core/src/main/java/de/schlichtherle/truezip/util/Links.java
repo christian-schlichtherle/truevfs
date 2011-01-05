@@ -17,6 +17,8 @@
 package de.schlichtherle.truezip.util;
 
 import de.schlichtherle.truezip.util.Link.Type;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * Provides static utility methods for links.
@@ -39,7 +41,7 @@ public class Links {
      * @param  target the nullable target.
      * @return A nullable (strong) link to the given target.
      */
-    public static <T> Link<T> newLink(final T target) {
+    public static @CheckForNull <T> Link<T> newLink(@CheckForNull T target) {
         return newLink(Type.STRONG, target);
     }
 
@@ -52,7 +54,8 @@ public class Links {
      * @param  target the nullable target.
      * @return A nullable typed link to the given target.
      */
-    public static <T> Link<T> newLink(final Type type, final T target) {
+    public static @CheckForNull <T> Link<T> newLink(@NonNull Type type,
+                                                    @CheckForNull T target) {
         return null == target ? null : type.newLink(target);
     }
 
@@ -65,7 +68,7 @@ public class Links {
      * @param  link a nullable link.
      * @return The nullable {@link Link#getTarget() target} of the given link.
      */
-    public static <T> T getTarget(final Link<T> link) {
+    public static @CheckForNull <T> T getTarget(@CheckForNull Link<T> link) {
         return null == link ? null : link.getTarget();
     }
 }

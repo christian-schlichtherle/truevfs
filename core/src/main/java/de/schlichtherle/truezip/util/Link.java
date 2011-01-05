@@ -15,11 +15,13 @@
  */
 package de.schlichtherle.truezip.util;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 
 /**
- * A link has a {@link #getTarget() target} property.
+ * A link has a nullable {@link #getTarget() target} property.
  * This interface is useful if a class is decorating or adapting another class
  * and access to the decorated or adapted object should be provided as part of
  * the public API of the decorating or adapting class.
@@ -33,12 +35,12 @@ public interface Link<T> {
     /**
      * Returns the target of this link.
      * <p>
-     * The returned object reference may be {@code null}.
-     * This term may be overridden by sub-interfaces or implementations.
+     * The returned object reference may be {@code null} subject to the terms
+     * and conditions of sub-interfaces or implementations.
      * 
      * @return The target of this link.
      */
-    T getTarget();
+    @Nullable T getTarget();
 
     /**
      * A link type defines the terms and conditions for clearing its target
@@ -77,7 +79,7 @@ public interface Link<T> {
         };
 
         /** Returns a new typed link to the given nullable target. */
-        public abstract <T> Link<T> newLink(T target);
+        public abstract @NonNull <T> Link<T> newLink(@Nullable T target);
 
         private static class StrongLink<T> implements Link<T> {
             private final T target;
