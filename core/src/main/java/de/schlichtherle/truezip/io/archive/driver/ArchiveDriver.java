@@ -81,13 +81,12 @@ implements FSDriver, EntryFactory<E>, Serializable {
     public @NonNull FSController<?>
     newController(  @NonNull FSMountPoint mountPoint,
                     @NonNull FSController<?> parent) {
-        return  new FSConcurrencyController<FSConcurrencyModel, FSController<? extends FSConcurrencyModel>>(
-                    //new IOSocketCachingFileSystemController<FSConcurrencyModel, FSController<? extends FSConcurrencyModel>>(
-                        new FSContentCacheController<FSConcurrencyModel, FSController<? extends FSConcurrencyModel>>(
-                            new DefaultArchiveController<E>(
-                                new FSConcurrencyModel(mountPoint, parent.getModel()),
-                                this, parent, false),
-                            FSFilePool.get()));
+        return  new FSConcurrencyController(
+                    new FSContentCacheController(
+                        new DefaultArchiveController<E>(
+                            new FSConcurrencyModel(mountPoint, parent.getModel()),
+                            this, parent, false),
+                        FSFilePool.get()));
     }
 
     /**
