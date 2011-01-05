@@ -285,9 +285,19 @@ implements ArchiveDetector, Serializable {
         return registry.getArchiveDriver(type.toString());
     }
 
-    public final @CheckForNull ArchiveDriver<?>
-    getDriver(final @NonNull String path) {
-        final FSScheme scheme = getScheme(path);
+    /**
+     * Equivalent to {@code
+        FSScheme scheme = getScheme(path);
+        return null == scheme ? null : getDriver(scheme);
+     * }
+     * 
+     * @deprecated This method is not part of the {@link ArchiveDetector}
+     *             interface anymore and is only kept for backwards
+     *             compatibility.
+     */
+    @Deprecated
+    public @CheckForNull ArchiveDriver<?> getArchiveDriver(@NonNull String path) {
+        FSScheme scheme = getScheme(path);
         return null == scheme ? null : getDriver(scheme);
     }
 

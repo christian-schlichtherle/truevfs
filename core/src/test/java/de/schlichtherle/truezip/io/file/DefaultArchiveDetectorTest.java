@@ -423,7 +423,7 @@ public class DefaultArchiveDetectorTest {
             DefaultArchiveDetector detector,
             final Object[] args) {
         try {
-            detector.getDriver((String) null);
+            detector.getArchiveDriver((String) null);
             fail("Expected NullPointerException!");
         } catch (NullPointerException expected) {
         }
@@ -456,19 +456,19 @@ public class DefaultArchiveDetectorTest {
             final String uPath = path.toUpperCase();
 
             ArchiveDriver<?> driver;
-            driver = detector.getDriver(lPath);
+            driver = detector.getArchiveDriver(lPath);
             assertSame(expResult, driver);
 
-            driver = detector.getDriver(uPath);
+            driver = detector.getArchiveDriver(uPath);
             assertSame(expResult, driver);
 
             DefaultArchiveDetector detector2;
             detector2 = new DefaultArchiveDetector(detector, new Object[0]);
 
-            driver = detector2.getDriver(lPath);
+            driver = detector2.getArchiveDriver(lPath);
             assertSame(expResult, driver);
 
-            driver = detector2.getDriver(uPath);
+            driver = detector2.getArchiveDriver(uPath);
             assertSame(expResult, driver);
         }
     }
