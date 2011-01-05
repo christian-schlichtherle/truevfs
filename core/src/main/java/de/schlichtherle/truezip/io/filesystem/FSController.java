@@ -70,13 +70,16 @@ public abstract class FSController<M extends FSModel> {
     getParent();
 
     public abstract @Nullable Icon
-    getOpenIcon() throws IOException;
+    getOpenIcon()
+    throws IOException;
 
     public abstract @Nullable Icon
-    getClosedIcon() throws IOException;
+    getClosedIcon()
+    throws IOException;
 
     public abstract boolean
-    isReadOnly() throws IOException;
+    isReadOnly()
+    throws IOException;
 
     public abstract @CheckForNull FSEntry
     getEntry(@NonNull FSEntryName name)

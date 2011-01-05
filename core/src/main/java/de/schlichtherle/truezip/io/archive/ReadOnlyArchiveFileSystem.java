@@ -38,10 +38,9 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 final class ReadOnlyArchiveFileSystem<E extends ArchiveEntry>
 extends ArchiveFileSystem<E> {
 
-    ReadOnlyArchiveFileSystem(
-        final EntryContainer<E> container,
-        final EntryFactory<E> factory,
-        final Entry rootTemplate) {
+    ReadOnlyArchiveFileSystem(  final @NonNull EntryContainer<E> container,
+                                final @NonNull EntryFactory<E> factory,
+                                final @CheckForNull Entry rootTemplate) {
         super(factory, container, rootTemplate);
     }
 
