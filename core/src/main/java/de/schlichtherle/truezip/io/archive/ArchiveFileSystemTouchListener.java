@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.io.archive;
 
-import de.schlichtherle.truezip.io.archive.ArchiveEntry;
 import java.io.IOException;
 import java.util.EventListener;
 
@@ -26,7 +25,7 @@ import java.util.EventListener;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface ArchiveFileSystemTouchListener<E extends ArchiveEntry>
+interface ArchiveFileSystemTouchListener<E extends ArchiveEntry>
 extends EventListener {
 
     /**

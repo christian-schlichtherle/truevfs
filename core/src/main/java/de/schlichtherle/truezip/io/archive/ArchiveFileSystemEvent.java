@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.io.archive;
 
-import de.schlichtherle.truezip.io.archive.ArchiveEntry;
 import java.util.EventObject;
 
 /**
@@ -24,7 +23,7 @@ import java.util.EventObject;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class ArchiveFileSystemEvent<E extends ArchiveEntry>
+class ArchiveFileSystemEvent<E extends ArchiveEntry>
 extends EventObject {
 
     private static final long serialVersionUID = 7205624082374036401L;
@@ -35,7 +34,7 @@ extends EventObject {
      * @param source the non-{@code null} archive file system source which
      *        caused this event.
      */
-    public ArchiveFileSystemEvent(ArchiveFileSystem<E> source) {
+    ArchiveFileSystemEvent(ArchiveFileSystem<E> source) {
         super(source);
     }
 
