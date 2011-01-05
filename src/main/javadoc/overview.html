@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (C) 2005-2010 Schlichtherle IT Services
+  -
+  - Licensed under the Apache License, Version 2.0 (the "License");
+  - you may not use this file except in compliance with the License.
+  - You may obtain a copy of the License at
+  -
+  -     http://www.apache.org/licenses/LICENSE-2.0
+  -
+  - Unless required by applicable law or agreed to in writing, software
+  - distributed under the License is distributed on an "AS IS" BASIS,
+  - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  - See the License for the specific language governing permissions and
+  - limitations under the License.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head/>
+    <body>
+        <p>TrueZIP is a Java based Virtual File System (VFS) to enable transparent,
+            multi-threaded read/write access to archive files (ZIP, TAR, etc) as if they
+            were directories.
+            Archive files may be arbitrarily nested and the nesting level is only limited
+            by heap and file system size.</p>
+        <p>TrueZIP&#39;s design strategy is to &quot;make simple things easy and
+            complex things possible&quot;.
+            For example, when using the default configuration, the instance
+            {@link de.schlichtherle.truezip.io.file.File#File(java.lang.String) new File("app.ear/web.war/WEB-INF/lib/lib.jar/META-INF/MANIFEST.MF")}
+            would refer to the text file entry <i>META-INF/MANIFEST.MF</i> within the JAR file
+            entry <i>WEB-INF/lib/lib.jar</i> within the WAR file entry <i>web.war</i> within
+            the EAR file <i>app.ear</i>. The same applies for any other supported and configured
+            archive type.</p>
+        <p><b>Limitation:</b> TrueZIP works on <b>files</b> only. If an archive is just
+            available as an {@code InputStream}, it needs to be saved to a (temporary)
+            file first. If this is not an option, TrueZIP can&#39;t be used.</p>
+        <p>TrueZIP provides a pluggable archive driver architecture to support virtually
+            any archive type: Out of the box, TrueZIP supports ZIP, SFX/EXE, JAR, TZP, TAR,
+            TAR.BZ2 and TAR.GZ. This list will be extended in future releases. Note that some
+            of these archive types require additional JARs on the runtime class path.</p>
+        <p>To be minimal intrusive, TrueZIP provides drop-in replacements for many classes
+            in the {@code java.io} package. This reduces the learning curve to the essential
+            minimum and allows to introduce TrueZIP&#39;s functionality gradually within legacy
+            applications or even other VFS solutions which are currently built on top of
+            {@code java.io.File*}.</p>
+        <h3><a name="defaults"></a>Default Configuration</h3>
+        <p>The following archive types and access parameters are defined by the
+            default configuration resource file in <i>truezip.jar/META-INF/services/de.schlichtherle.truezip.io.archive.driver.registry.properties</i>.
+            Note that only the archive file suffixes {@code "ear|jar|war|zip"}
+            are recognized in file paths by default.</p>
+        <table border="2" cellpadding="0" cellspacing="2">
+            <tr>
+                <th>
+                    <p>Type</p>
+                </th>
+                <th>
+                    <p>Canonical Suffixes<sup>0</sup></p>
+                </th>
+                <th>
+                    <p>DEFAULT<sup>1</sup></p>
+                </th>
+                <th>
+                    <p>ALL<sup>2</sup></p>
+                </th>
+                <th>
+                    <p>Charset<sup>3</sup></p>
+                </th>
+                <th>
+                    <p>Dependencies<sup>4</sup></p>
+                </th>
+                <th>
+                    <p>Description</p>
+                </th>
+            </tr>
+            <tr>
+                <td>
+                    <p>ZIP</p>
+                </td>
+                <td>
+                    <p>zip</p>
+                </td>
+                <td>
+                    <p><b>Yes</b></p>
+                </td>
+                <td>
+                    <p><b>Yes</b></p>
+                </td>
+                <td>
+                    <p>IBM437<sup>5</sup></p>
+                </td>
+                <td>
+                    <p>&nbsp;</p>
+                </td>
+                <td>
+                    <p>ZIP file: Archive file with central directory and compressible entries</p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p>JAR</p>
+                </td>
+                <td>
+                    <p>ear|jar|war</p>
+                </td>
+                <td>
+                    <p><b>Yes</b></p>
+                </td>
+                <td>
+                    <p><b>Yes</b></p>
+                </td>
+                <td>
+                    <p>UTF-8</p>
+                </td>
+                <td>
+                    <p>&nbsp;</p>
+                </td>
+                <td>
+                    <p>Java Archive: ZIP with custom directory tree layout</p>
+                </td>
+            </tr>
+            <tr>
+                <td>ODF</td>
+                <td>odb|odf|odg|odm|odp|ods|odt|otg|oth|otp|ots|ott</td>
+                <td>No</td>
+                <td><b>Yes</b></td>
+                <td>UTF-8</td>
+                <td>&nbsp;</td>
+                <td>OpenDocument Format: If present, the <i>mimetype</i> entry is written
+		first with STORED method.</td>
+            </tr>
+            <tr>
+                <td>TZP</td>
+                <td>
+                    <p>tzp|zip.rae|zip.raes</p>
+                </td>
+                <td>
+                    <p>No</p>
+                </td>
+                <td>
+                    <p><b>Yes</b></p>
+                </td>
+                <td>
+                    <p>UTF-8</p>
+                </td>
+                <td>
+                    <p><i>lcrypto.jar</i><sup>6</sup></p>
+                </td>
+                <td>
+                    <p>{@linkplain de.schlichtherle.truezip.io.archive.driver.zip.raes RAES encrypted ZIP file}.</p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p>SFX/EXE</p>
+                </td>
+                <td>
+                    <p>exe</p>
+                </td>
+                <td>
+                    <p>No</p>
+                </td>
+                <td>
+                    <p><b>Yes</b></p>
+                </td>
+                <td>
+                    <p>system specific</p>
+                </td>
+                <td>
+                    <p>&nbsp;</p>
+                </td>
+                <td>
+                    <p>ZIP file with a code preamble for self extraction. This driver is pretty
+		slow.</p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p>TAR</p>
+                </td>
+                <td>
+                    <p>tar</p>
+                </td>
+                <td>
+                    <p>No</p>
+                </td>
+                <td>
+                    <p><b>Yes</b></p>
+                </td>
+                <td>
+                    <p>US-ASCII<sup>7</sup></p>
+                </td>
+                <td>
+                    <p><i>ant.jar</i><sup>8</sup></p>
+                </td>
+                <td>
+                    <p>TAR: Uncompressed tape archive file.</p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p>TAR.BZ2</p>
+                </td>
+                <td>
+                    <p>tbz2|tar.bz2</p>
+                </td>
+                <td>
+                    <p>No</p>
+                </td>
+                <td>
+                    <p><b>Yes</b></p>
+                </td>
+                <td>
+                    <p>US-ASCII<sup>7</sup></p>
+                </td>
+                <td>
+                    <p><i>ant.jar</i><sup>8</sup></p>
+                </td>
+                <td>
+                    <p>TAR file wrapped in BZIP2 compression format.</p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p>TAR.GZ</p>
+                </td>
+                <td>
+                    <p>tar.gz|tgz</p>
+                </td>
+                <td>
+                    <p>No</p>
+                </td>
+                <td>
+                    <p><b>Yes</b></p>
+                </td>
+                <td>
+                    <p>US-ASCII<sup>7</sup></p>
+                </td>
+                <td>
+                    <p><i>ant.jar</i><sup>8</sup></p>
+                </td>
+                <td>
+                    <p>TAR file wrapped in GZIP compression format.</p>
+                </td>
+            </tr>
+        </table>
+        <p><sup>0</sup> Suffix recognition is case insensitive with the {@link de.schlichtherle.truezip.io.file.DefaultArchiveDetector}
+            class.<br/>
+            <sup>1</sup> Recognized by the predefined instance {@link de.schlichtherle.truezip.io.file.ArchiveDetector#DEFAULT}?
+            Note that this may be extended (but not restricted) in future releases.<br/>
+            <sup>2</sup> Recognized by the predefined instance {@link de.schlichtherle.truezip.io.file.ArchiveDetector#ALL}?
+            Note that this may be extended (but not restricted) in future releases.<br/>
+            <sup>3</sup> The code page to use for entry names and other entry meta data. This
+            access parameter is determined by the archive driver (not the archive detector)
+            and can be customized by subclassing it.<br/>
+            <sup>4</sup> This needs to be on the runtime class path.<br/>
+            <sup>5</sup> The charset for ZIP files is not specified. This is a heuristic value
+            which is based on the fact that IBM437 is the original PC character set for the
+            USA and the ZIP file format has been invented there. <b>Do not rely on this!<br/>
+            </b><sup>6</sup> Bouncy Castle&#39;s Lightweight Crypto API for JDK 1.5, version 1.45
+            or higher. Available at
+            <a href="http://www.bouncycastle.org/latest_releases.html">http://www.bouncycastle.org/latest_releases.html</a>.<br/>
+            <sup>7</sup> The charset for TAR files is not specified. This is a heuristic value
+            which is based on the fact that the TAR file format stems from UNIX implementations
+            of the seventies.<br/>
+            <sup>8</sup> Apache&#39;s Ant, version 1.8.1 or higher.
+            Available at <a href="http://ant.apache.org/">http://ant.apache.org</a>.</p>
+    </body>
+</html>
