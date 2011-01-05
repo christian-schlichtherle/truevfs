@@ -254,7 +254,7 @@ class Files {
         final FSPath path = FSPath.create(fix(getRealFile(src).toURI()), true);
         return FSManagers
                 .getInstance()
-                .getController( path.getMountPoint(), new ArchiveFileSystemDriver())
+                .getController( path.getMountPoint(), new ArchiveDetectorFSDriver())
                 .getInputSocket(path.getEntryName(), options);
     }
 
@@ -273,7 +273,7 @@ class Files {
         final FSPath path = FSPath.create(fix(getRealFile(dst).toURI()), true);
         return FSManagers
                 .getInstance()
-                .getController(  path.getMountPoint(), new ArchiveFileSystemDriver())
+                .getController(  path.getMountPoint(), new ArchiveDetectorFSDriver())
                 .getOutputSocket(path.getEntryName(), options, template);
     }
 

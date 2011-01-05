@@ -22,6 +22,7 @@ import de.schlichtherle.truezip.io.socket.IOPool;
 import de.schlichtherle.truezip.io.socket.IOSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.File;
@@ -43,28 +44,26 @@ import static de.schlichtherle.truezip.io.entry.Entry.UNKNOWN;
  */
 final class FSFileOutputSocket extends OutputSocket<FSFileEntry> {
 
-    private static final String TEMP_FILE_POOL_PREFIX = ".tzp";
+    private static final String FILE_POOL_PREFIX = ".tzp";
 
-    private final FSFileEntry entry;
-    private final BitField<FSOutputOption> options;
-    private final Entry template;
-    private volatile FSTempFilePool pool;
+    private final    @NonNull      FSFileEntry              entry;
+    private final    @NonNull      BitField<FSOutputOption> options;
+    private final    @CheckForNull Entry                    template;
+    private volatile @CheckForNull FSFilePool               pool;
 
-    FSFileOutputSocket(   final @NonNull FSFileEntry entry,
-                        final @NonNull BitField<FSOutputOption> options,
-                        final @Nullable Entry template) {
-        assert null != entry;
-        assert null != options;
-        this.entry = entry;
-        this.options = options;
+    FSFileOutputSocket( final @NonNull      FSFileEntry              entry,
+                        final @NonNull      BitField<FSOutputOption> options,
+                        final @CheckForNull Entry                    template) {
+        this.entry    = entry;
+        this.options  = options;
         this.template = template;
     }
 
-    private FSTempFilePool getTempFilePool() {
-        if (null == pool)
-            pool = new FSTempFilePool(    TEMP_FILE_POOL_PREFIX, null,
-                                        entry.getFile().getParentFile());
-        return pool;
+    private FSFilePool getTempFilePool() {
+        return null != pool
+                ? pool
+                : (pool = new FSFilePool(   FILE_POOL_PREFIX, null,
+                                            entry.getFile().getParentFile()));
     }
 
     @Override
@@ -83,6 +82,7 @@ final class FSFileOutputSocket extends OutputSocket<FSFileEntry> {
                 : entry;
         final File tempFile = temp.getFile();
 
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE") // False positive with org.codehaus.mojo:findbugs-maven-plugin:2.3.1
         class OutputStream extends DecoratorOutputStream {
             boolean closed;
 

@@ -25,6 +25,7 @@ import java.io.OutputStream;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.EntryName;
 import de.schlichtherle.truezip.io.filesystem.FSEntry;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Collections;
@@ -46,21 +47,21 @@ public class FSFileEntry extends FSEntry implements IOEntry<FSFileEntry> {
     private static final BitField<FSOutputOption> NO_OUTPUT_OPTIONS
             = BitField.noneOf(FSOutputOption.class);
 
-    private final File file;
-    private final EntryName name;
+    private final @NonNull File file;
+    private final @NonNull EntryName name;
 
-    FSFileEntry(final File file) {
+    FSFileEntry(final @NonNull File file) {
         this.file = file;
         this.name = EntryName.create(file.getName()); // Path.create(file.toURI()).getEntryName();
     }
 
-    FSFileEntry(final File file, final EntryName name) {
+    FSFileEntry(final @NonNull File file, final @NonNull EntryName name) {
         this.file = new File(file, name.getPath());
         this.name = name;
     }
 
     /** Returns the decorated file. */
-    public final File getFile() {
+    public final @NonNull File getFile() {
         return file;
     }
 
@@ -120,29 +121,7 @@ public class FSFileEntry extends FSEntry implements IOEntry<FSFileEntry> {
 
     public final OutputSocket<FSFileEntry> getOutputSocket(
             @NonNull BitField<FSOutputOption> options,
-            @Nullable Entry template) {
+            @CheckForNull Entry template) {
         return new FSFileOutputSocket(this, options, template);
     }
-
-    private class Output extends OutputSocket<FSFileEntry> {
-        final BitField<FSOutputOption> options;
-        final Entry template;
-
-        Output( final BitField<FSOutputOption> options,
-                final Entry template) {
-            this.options = options;
-            this.template = template;
-        }
-
-        @Override
-        public FSFileEntry getLocalTarget() {
-            return FSFileEntry.this;
-        }
-
-        @Override
-        public OutputStream newOutputStream() throws IOException {
-            return new FSFileOutputSocket(FSFileEntry.this, options, template)
-                    .newOutputStream();
-        }
-    } // class Output
 }

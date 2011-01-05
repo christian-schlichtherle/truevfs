@@ -31,8 +31,7 @@ import javax.swing.DefaultComboBoxModel;
 public class AesKeyStrengthPanel extends EnhancedPanel {
     private static final long serialVersionUID = 5629581723148235643L;
 
-    private static final String CLASS_NAME
-            = "de.schlichtherle.truezip.key.passwd.swing.AesKeyStrengthPanel";
+    private static final String CLASS_NAME = AesKeyStrengthPanel.class.getName();
     private static final ResourceBundle resources
             = ResourceBundle.getBundle(CLASS_NAME);
 

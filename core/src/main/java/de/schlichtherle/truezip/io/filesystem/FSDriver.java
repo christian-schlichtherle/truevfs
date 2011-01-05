@@ -20,6 +20,8 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 
 /**
  * A factory for file system controllers.
+ * The factory may select the type of the created file system controllers
+ * depending on the given mount point.
  * 
  * @author  Christian Schlichtherle
  * @version $Id$

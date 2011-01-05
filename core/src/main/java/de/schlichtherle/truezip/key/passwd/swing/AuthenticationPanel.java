@@ -41,8 +41,7 @@ import javax.swing.text.JTextComponent;
  */
 public class AuthenticationPanel extends JPanel {
 
-    private static final String CLASS_NAME
-            = "de.schlichtherle.truezip.key.passwd.swing.AuthenticationPanel";
+    private static final String CLASS_NAME = AuthenticationPanel.class.getName();
     private static final ResourceBundle resources
             = ResourceBundle.getBundle(CLASS_NAME);
     private static final File BASE_DIR = new File(".", ArchiveDetector.NULL);

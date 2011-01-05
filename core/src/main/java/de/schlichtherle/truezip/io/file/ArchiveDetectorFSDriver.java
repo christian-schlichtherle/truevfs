@@ -23,20 +23,23 @@ import de.schlichtherle.truezip.io.filesystem.file.FSFileDriver;
 import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
+ * Adapts the {@link ArchiveDetector} interface to the {@link FSDriver}
+ * interface for use with the {@link File} class.
+ *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class ArchiveFileSystemDriver implements FSDriver {
+final class ArchiveDetectorFSDriver implements FSDriver {
     private static final FSScheme FILE_SCHEME = FSScheme.create("file");
     private static final FSDriver FILE_DRIVER = new FSFileDriver();
 
     private final ArchiveDetector detector;
 
-    ArchiveFileSystemDriver() {
+    ArchiveDetectorFSDriver() {
         this(ArchiveDetector.ALL);
     }
 
-    ArchiveFileSystemDriver(final @NonNull ArchiveDetector detector) {
+    ArchiveDetectorFSDriver(final @NonNull ArchiveDetector detector) {
         if (null == detector)
             throw new NullPointerException();
         this.detector = detector;
