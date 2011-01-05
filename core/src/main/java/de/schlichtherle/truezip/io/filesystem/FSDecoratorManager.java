@@ -20,7 +20,8 @@ import java.util.Iterator;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * @author Christian Schlichtherle
+ * @param   <M> The type of the file system model.
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
