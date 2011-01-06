@@ -19,31 +19,18 @@
 
     <parent>
         <groupId>de.schlichtherle.truezip</groupId>
-        <artifactId>truezip-pom</artifactId>
+        <artifactId>truezip-driver-pom</artifactId>
         <version>7.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>truezip-driver-pom</artifactId>
-    <packaging>pom</packaging>
-    <name>TrueZIP Driver POM</name>
-
-    <modules>
-        <module>tar</module>
-        <module>tzp</module>
-        <module>zip</module>
-    </modules>
+    <artifactId>truezip-driver-zip</artifactId>
+    <name>TrueZIP ZIP Driver Family</name>
 
     <dependencies>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truezip-kernel</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truezip-tck</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant</artifactId>
+            <version>1.8.1</version>
         </dependency>
     </dependencies>
 </project>
