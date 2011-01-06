@@ -16,14 +16,18 @@
 package de.schlichtherle.truezip.tck;
 
 import de.schlichtherle.truezip.io.FileBusyException;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.file.ArchiveDetector;
 import de.schlichtherle.truezip.io.file.ArchiveException;
 import de.schlichtherle.truezip.io.file.ArchiveWarningException;
 import de.schlichtherle.truezip.io.file.ContainsFileException;
+import de.schlichtherle.truezip.io.file.DefaultArchiveDetector;
 import de.schlichtherle.truezip.io.file.File;
 import de.schlichtherle.truezip.io.file.FileInputStream;
 import de.schlichtherle.truezip.io.file.FileOutputStream;
+import de.schlichtherle.truezip.io.filesystem.FSScheme;
 import de.schlichtherle.truezip.io.socket.OutputClosedException;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileFilter;
@@ -37,7 +41,6 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import junit.framework.AssertionFailedError;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -56,9 +59,6 @@ public abstract class FileTestCase {
     private static final Logger logger = Logger.getLogger(
             FileTestCase.class.getName());
 
-    private static final java.io.File TEMP_DIR = new java.io.File(
-            System.getProperty("java.io.tmpdir"));
-
     /** The data to get compressed. */
     private static final byte[] DATA = new byte[1024]; // enough to waste some heat on CPU cycles
     static {
@@ -70,7 +70,6 @@ public abstract class FileTestCase {
 
         new Random().nextBytes(DATA);
         logger.log(Level.CONFIG, "Created {0} bytes of random data.", DATA.length);
-        logger.log(Level.CONFIG, "Temporary directory: {0}", TEMP_DIR.getPath());
         logger.log(Level.CONFIG, "Free memory: {0}", mb(Runtime.getRuntime().freeMemory()));
         logger.log(Level.CONFIG, "Total memory: {0}", mb(Runtime.getRuntime().totalMemory()));
         logger.log(Level.CONFIG, "Max memory: {0}", mb(Runtime.getRuntime().maxMemory()));
@@ -79,21 +78,30 @@ public abstract class FileTestCase {
     private static String mb(long value) {
         return ((value - 1 + 1024 * 1024) / (1024 * 1024)) + " MB"; // round up
     }
+
+    private static final String TEMP_FILE_PREFIX = "tzp";
     
-    protected byte[] data;
-    
-    protected String prefix;
-    
-    /**
-     * The lowercase suffix including the dot which shall be used when
-     * creating archive files.
-     */
-    protected String suffix;
-    
+    private final FSScheme scheme;
+    private final ArchiveDriver<?> driver;
+
+    private byte[] data;
+        
     /** The temporary file to use as an archive file. */
     private java.io.File _archive;
 
-    protected File archive;
+    private File archive;
+
+    protected FileTestCase( final @NonNull FSScheme scheme,
+                            final @NonNull ArchiveDriver<?> driver) {
+        if (null == scheme || null == driver)
+            throw new NullPointerException();
+        this.scheme = scheme;
+        this.driver = driver;
+    }
+
+    private String getSuffix() {
+        return "." + scheme.toString();
+    }
 
     /**
      * A subclass must override this method to create the {@link #data}
@@ -102,15 +110,13 @@ public abstract class FileTestCase {
      * the temporary file to be used as an archive file.
      */
     @Before
-    public void setUp() throws Exception {
+    public final void setUp() throws Exception {
+        File.setDefaultArchiveDetector(
+                new DefaultArchiveDetector(scheme.toString(), driver));
         if (data == null)
             data = DATA; // (byte[]) _data.clone();
-        if (prefix == null)
-            prefix = "tzp-test";
-        if (suffix == null)
-            suffix = ".zip";
         if (archive == null) {
-            _archive = createTempFile(prefix, suffix);
+            _archive = createTempFile();
             assertTrue(_archive.delete());
             archive = new File(_archive);
         }
@@ -120,10 +126,8 @@ public abstract class FileTestCase {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public final void tearDown() throws Exception {
         data = null;
-        prefix = null;
-        suffix = null;
 
         if (archive != null)
             archive.delete(); // archive, not _archive!
@@ -209,7 +213,7 @@ public abstract class FileTestCase {
         falsePositive(archive);
 
         // Dito for entry.
-        final File entry = new File(archive, "entry" + suffix);
+        final File entry = new File(archive, "entry" + getSuffix());
 
         assertTrue(archive.mkdir());
         falsePositive(entry);
@@ -328,7 +332,7 @@ public abstract class FileTestCase {
     }
     
     private void createNewPlainFile() throws IOException {
-        final java.io.File archive = createTempFile(prefix, suffix);
+        final java.io.File archive = createTempFile();
         assertTrue(archive.delete());
         final java.io.File file1 = new java.io.File(archive, "test.txt");
         final java.io.File file2 = new java.io.File(file1, "test.txt");
@@ -398,7 +402,7 @@ public abstract class FileTestCase {
     @Test
     public final void testIllegalDirectoryOperations() throws IOException {
         final String[] names = {
-            "inner" + suffix,
+            "inner" + getSuffix(),
             "dir",
         };
         File file = archive;
@@ -429,7 +433,7 @@ public abstract class FileTestCase {
             fail("Expected FileNotFoundException!");
         } catch (FileNotFoundException expected) {
         }
-        java.io.File tmp = createTempFile(prefix, ".tmp");
+        java.io.File tmp = File.createTempFile(TEMP_FILE_PREFIX, null);
         try {
             try {
                 File.cp(tmp, dir);
@@ -465,7 +469,7 @@ public abstract class FileTestCase {
     
     @Test
     public final void testLenientFileOutputStream() throws IOException {
-        File file = new File(archive, "dir/inner" + suffix + "/dir/test.txt");
+        File file = new File(archive, "dir/inner" + getSuffix() + "/dir/test.txt");
 
         fileOutputStream(file);
 
@@ -644,9 +648,9 @@ public abstract class FileTestCase {
     public final void testMkdir() throws IOException {
         final File dir1 = archive;
         final File dir2 = new File(dir1, "dir");
-        final File dir3 = new File(dir2, "inner" + suffix);
+        final File dir3 = new File(dir2, "inner" + getSuffix());
         final File dir4 = new File(dir3, "dir");
-        final File dir5 = new File(dir4, "nuts" + suffix);
+        final File dir5 = new File(dir4, "nuts" + getSuffix());
         final File dir6 = new File(dir5, "dir");
         
         File.setLenient(true);
@@ -694,7 +698,7 @@ public abstract class FileTestCase {
     public final void testDirectoryTree() throws IOException {
         directoryTree(
                 new File(System.getProperty("java.io.tmpdir")), // base directory
-                new File("dir/inner" + suffix + "/dir/outer" + suffix + "/" + archive.getName())); // this path is reversed!!!
+                new File("dir/inner" + getSuffix() + "/dir/outer" + getSuffix() + "/" + archive.getName())); // this path is reversed!!!
     }
 
     private void directoryTree(File basePath, File reversePath)
@@ -749,7 +753,7 @@ public abstract class FileTestCase {
         final File archiveTest = new File(archive, "test");
         cat(archiveTest);
         
-        final File archive2 = new File(archive, "inner" + suffix);
+        final File archive2 = new File(archive, "inner" + getSuffix());
         final File archive2Test = new File(archive2, "test");
         cat(archive2Test);
         assertTrue(archive2.delete());
@@ -836,9 +840,9 @@ public abstract class FileTestCase {
     @Test
     public final void testCopyDelete() throws IOException {
         final String[] names = {
-            "0" + suffix,
-            "1" + suffix,
-            //"2" + suffix,
+            "0" + getSuffix(),
+            "1" + getSuffix(),
+            //"2" + getSuffix(),
         };
 
         assertTrue(archive.mkdir());
@@ -871,9 +875,9 @@ public abstract class FileTestCase {
     private void copyDelete(final File parent, final File dir)
     throws IOException {
         final File parentA = new File(parent, "a");
-        final File parentB = new File(parent, "b" + suffix);
+        final File parentB = new File(parent, "b" + getSuffix());
         final File dirA = new File(dir, "a");
-        final File dirB = new File(dir, "b" + suffix);
+        final File dirB = new File(dir, "b" + getSuffix());
 
         copyDelete0(dirA, dirB);
         copyDelete0(dirA, parentA);
@@ -999,7 +1003,7 @@ public abstract class FileTestCase {
         try {
             File file = new File(archive);
             for (int i = 0; i < 100; i++) {
-                file = new File(file, i + suffix);
+                file = new File(file, i + getSuffix());
                 assertTrue(file.mkdir());
             }
         } catch (Throwable failure) {
@@ -1104,7 +1108,7 @@ public abstract class FileTestCase {
         // Create false positive archive.
         // Note that archive is a File instance which returns isArchive()
         // == true, so we must create a new File instance which is guaranteed
-        // to ignore the archive suffix in the path.
+        // to ignore the archive getSuffix() in the path.
         // Furthermore, data is an array containing random data
         // - not a regular archive.
         // So upon completion of this step, the object "archive" refers to a
@@ -1124,8 +1128,8 @@ public abstract class FileTestCase {
         assert archive.isArchive(); // regular archive or false positive
         assert !archive.isEntry(); // not contained in another archive file
 
-        // Create a temporary path.
-        File tmp = new File(createTempFile(prefix, null));
+        // Create a temporary file.
+        File tmp = new File(File.createTempFile(TEMP_FILE_PREFIX, null));
         assertTrue(tmp.delete());
         assertFalse(tmp.exists());
         assertFalse(getPlainFile(tmp).exists());
@@ -1146,9 +1150,9 @@ public abstract class FileTestCase {
 
     @Test
     public final void testRenameRecursively() throws IOException {
-        final File temp = new File(createTempFile(prefix, suffix));
-        final File archive2 = new File(archive, "inner" + suffix);
-        final File archive3 = new File(archive2, "nuts" + suffix);
+        final File temp = new File(createTempFile());
+        final File archive2 = new File(archive, "inner" + getSuffix());
+        final File archive3 = new File(archive2, "nuts" + getSuffix());
         final File archive1a = new File(archive, "a");
         final File archive1b = new File(archive, "b");
         final File archive2a = new File(archive2, "a");
@@ -1210,7 +1214,7 @@ public abstract class FileTestCase {
     
     @Test
     public final void testList() throws IOException {
-        final java.io.File dir = createTempFile(prefix, suffix);
+        final java.io.File dir = createTempFile();
         final File dir2 = new File(dir);
 
         assertTrue(dir.delete());
@@ -1459,7 +1463,7 @@ public abstract class FileTestCase {
             @Override
             public void run() {
                 try {
-                    final File archive = new File(createTempFile(prefix, suffix));
+                    final File archive = new File(createTempFile());
                     assertTrue(archive.delete());
                     final File file = new File(archive, "entry");
                     try {
@@ -1515,10 +1519,8 @@ public abstract class FileTestCase {
         }
     }
     
-    private java.io.File createTempFile(
-            String prefix,
-            String suffix)
+    private java.io.File createTempFile()
     throws IOException {
-        return File.createTempFile(prefix, suffix, TEMP_DIR).getCanonicalFile();
+        return File.createTempFile(TEMP_FILE_PREFIX, getSuffix()).getCanonicalFile();
     }
 }
