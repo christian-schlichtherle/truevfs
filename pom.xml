@@ -24,11 +24,11 @@
     </parent>
 
     <groupId>de.schlichtherle.truezip</groupId>
-    <artifactId>truezip-root</artifactId>
+    <artifactId>truezip-pom</artifactId>
     <version>7.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>TrueZIP Root POM</name>
+    <name>TrueZIP POM</name>
     <description>
         TrueZIP is an extensible Java based Virtual File System (VFS) to enable
         multi-threaded read/write access to archive files (ZIP, TAR etc.) as if
@@ -50,20 +50,13 @@
     </scm>
 
     <modules>
-        <module>core</module>
         <module>driver</module>
+        <module>kernel</module>
         <module>samples</module>
         <module>tck</module>
     </modules>
 
     <dependencies>
-        <dependency>
-            <!-- TODO: Create a truezip-driver-tzp module -->
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15</artifactId>
-            <version>1.45</version>
-            <optional>true</optional>
-        </dependency>
         <dependency>
             <groupId>findbugs</groupId>
             <artifactId>annotations</artifactId>

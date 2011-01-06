@@ -23,19 +23,6 @@
         <version>7.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>truezip-tck</artifactId>
-    <name>TrueZIP TCK</name>
-
-    <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truezip-kernel</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.8.2</version>
-        </dependency>
-    </dependencies>
+    <artifactId>truezip-kernel</artifactId>
+    <name>TrueZIP Kernel</name>
 </project>
