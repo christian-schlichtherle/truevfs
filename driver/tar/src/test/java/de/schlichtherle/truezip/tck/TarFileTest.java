@@ -15,8 +15,8 @@
  */
 package de.schlichtherle.truezip.tck;
 
-import de.schlichtherle.truezip.io.file.DefaultArchiveDetector;
-import de.schlichtherle.truezip.io.file.File;
+import de.schlichtherle.truezip.io.archive.driver.tar.TarDriver;
+import de.schlichtherle.truezip.io.filesystem.FSScheme;
 
 /**
  * @author Christian Schlichtherle
@@ -24,10 +24,7 @@ import de.schlichtherle.truezip.io.file.File;
  */
 public class TarFileTest extends FileTestCase {
 
-    @Override
-    public void setUp() throws Exception {
-        suffix = ".tar";
-        File.setDefaultArchiveDetector(new DefaultArchiveDetector("tar"));
-        super.setUp();
+    TarFileTest() {
+        super(FSScheme.create("tar"), new TarDriver());
     }
 }
