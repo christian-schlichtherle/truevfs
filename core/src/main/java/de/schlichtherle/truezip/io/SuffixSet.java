@@ -18,10 +18,12 @@ package de.schlichtherle.truezip.io;
 
 import de.schlichtherle.truezip.util.CanonicalStringSet;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.File;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 /**
  * An ordered set of canonicalized suffixes.
@@ -83,27 +85,22 @@ public final class SuffixSet extends CanonicalStringSet {
     /**
      * Constructs a new suffix set from the given suffix list.
      *
-     * @param list A nullable suffix list.
+     * @param suffixes A list of suffixes.
      */
-    public SuffixSet(final @CheckForNull String list) {
+    public SuffixSet(final @NonNull String suffixes) {
         super(SEPARATOR);
-        if (list != null)
-            super.addAll(list);
+        super.addAll(suffixes);
     }
 
     /**
      * Constructs a new suffix set by adding the canonical form of all suffixes
      * for all suffix lists in the given collection.
      *
-     * @param c A collection of suffix lists - may be {@code null} to
-     *        construct an empty set.
-     * @throws ClassCastException If the collection does not only contain
-     *         {@code String}s.
+     * @param  c A collection of suffix lists.
      */
-    public SuffixSet(final Collection<String> c) {
+    public SuffixSet(final @NonNull Collection<String> c) {
         super(SEPARATOR);
-        if (null != c)
-            super.addAll(c);
+        super.addAll(c);
     }
 
     /**
@@ -131,7 +128,7 @@ public final class SuffixSet extends CanonicalStringSet {
      * the first matching group.
      * If this suffix set is empty, an unmatchable expression is returned.
      */
-    public String toRegex() {
+    public Pattern toPattern() {
         final Iterator<String> i = iterator();
         if (i.hasNext()) {
             final StringBuilder sb = new StringBuilder(".*\\.(?i)("); // NOI18N
@@ -143,9 +140,13 @@ public final class SuffixSet extends CanonicalStringSet {
                 sb.append("\\Q").append(suffix).append("\\E"); // NOI18N
             } while (i.hasNext());
             assert 0 < c;
-            return sb.append(")[\\").append(File.separatorChar).append("/]*").toString();
+            return Pattern.compile(
+                    sb  .append(")[\\")
+                        .append(File.separatorChar)
+                        .append("/]*")
+                        .toString());
         } else {
-            return "\\00"; // NOT "\00"! Effectively never matches anything. // NOI18N
+            return Pattern.compile("\\00"); // NOT "\00"! Effectively never matches anything. // NOI18N
         }
     }
 }

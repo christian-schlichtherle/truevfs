@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
+import de.schlichtherle.truezip.io.archive.driver.DummyArchiveDriver;
 import de.schlichtherle.truezip.io.filesystem.FSController;
 import de.schlichtherle.truezip.io.filesystem.FSPath;
 import java.io.ByteArrayInputStream;
@@ -29,7 +30,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static de.schlichtherle.truezip.io.file.ArchiveDetector.*;
+import static de.schlichtherle.truezip.io.file.ArchiveDetector.NULL;
 import static de.schlichtherle.truezip.io.filesystem.FSEntryName.*;
 import static java.io.File.*;
 import static org.hamcrest.CoreMatchers.*;
@@ -43,12 +44,17 @@ import static org.junit.Assert.*;
  */
 public class NonIOFileTest {
 
+    private static final DefaultArchiveDetector DETECTOR
+            = new DefaultArchiveDetector(
+                "ear|exe|jar|odb|odf|odg|odm|odp|ods|odt|otg|oth|otp|ots|ott|tar|tar.bz2|tar.gz|tbz2|tgz|tzp|war|zip|zip.rae|zip.raes",
+                new DummyArchiveDriver());
+
     private File archive;
     private String suffix;
 
     @Before
     public void setUp() {
-        File.setDefaultArchiveDetector(ALL);
+        File.setDefaultArchiveDetector(DETECTOR);
         suffix = ".zip";
         archive = new File("archive.zip");
     }
@@ -61,8 +67,10 @@ public class NonIOFileTest {
     @Test
     public void testValidPathConstructor() {
         for (final String[] params : new String[][] {
-            { "jar:tar.gz:file:/app.tar.gz!/app.jar!/META-INF/MANIFEST.MF", "/app.tar.gz/app.jar/META-INF/MANIFEST.MF", "/app.tar.gz/app.jar", "/app.tar.gz/app.jar", "META-INF/MANIFEST.MF", },
-            { "jar:tar.gz:file:/app.tar.gz!/app.jar!/", "/app.tar.gz/app.jar", "/app.tar.gz/app.jar", "/app.tar.gz", "app.jar", },
+            //{ "jar:tar.gz:file:/app.tar.gz!/app.jar!/META-INF/MANIFEST.MF", "/app.tar.gz/app.jar/META-INF/MANIFEST.MF", "/app.tar.gz/app.jar", "/app.tar.gz/app.jar", "META-INF/MANIFEST.MF", },
+            //{ "jar:tar.gz:file:/app.tar.gz!/app.jar!/", "/app.tar.gz/app.jar", "/app.tar.gz/app.jar", "/app.tar.gz", "app.jar", },
+            //{ "tar.gz:file:/archive.tar.gz!/META-INF/MANIFEST.MF", "/archive.tar.gz/META-INF/MANIFEST.MF", "/archive.tar.gz", "/archive.tar.gz", "META-INF/MANIFEST.MF", },
+            { "tar.gz:file:/archive.tar.gz!/", "/archive.tar.gz", "/archive.tar.gz", null, null, },
             { "zip:file:/archive.zip!/META-INF/MANIFEST.MF", "/archive.zip/META-INF/MANIFEST.MF", "/archive.zip", "/archive.zip", "META-INF/MANIFEST.MF", },
             { "zip:file:/archive.zip!/", "/archive.zip", "/archive.zip", null, null, },
             { "file:/foo", "/foo", null, null, null, },
@@ -356,7 +364,7 @@ public class NonIOFileTest {
                 c.getEnclEntryName());
 
         b = new File("../removed.dir/removed.dir/../../dir/./inner" + suffix);
-        c = new File(a, b.getPath(), ArchiveDetector.NULL);
+        c = new File(a, b.getPath(), NULL);
         assertFalse(c.isArchive());
         assertTrue(c.isEntry());
         assertEquals("outer" + suffix,
@@ -460,8 +468,8 @@ public class NonIOFileTest {
         
         assertFalse(new File("dir/test.txt").equals(new File("dir" + suffix + "/test.txt")));
         assertFalse(new File("dir" + suffix + "/test.txt").equals(new File("dir/test.txt")));
-        assertEquals(new File("dir" + suffix + "/test.txt", ArchiveDetector.NULL), new File("dir" + suffix + "/test.txt"));
-        assertEquals(new File("dir" + suffix + "/test.txt"), new File("dir" + suffix + "/test.txt", ArchiveDetector.NULL));
+        assertEquals(new File("dir" + suffix + "/test.txt", NULL), new File("dir" + suffix + "/test.txt"));
+        assertEquals(new File("dir" + suffix + "/test.txt"), new File("dir" + suffix + "/test.txt", NULL));
         testEqualsAndHashCode(
                 new File(win ? "c:\\any.txt" : "/any.txt"),
                 new File(win ? "C:\\ANY.TXT" : "/ANY.TXT"));

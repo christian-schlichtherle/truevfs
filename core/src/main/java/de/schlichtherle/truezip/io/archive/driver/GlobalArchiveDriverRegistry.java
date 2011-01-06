@@ -212,8 +212,8 @@ implements Serializable {
      * @throws NullPointerException If any archive driver ID in the
      *         configuration is {@code null}.
      */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private static void registerArchiveDrivers(
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    private static void registerArchiveDrivers(
             final Properties config,
             final ArchiveDriverRegistry driverRegistry,
             final ArchiveDriverRegistry clientRegistry) {
@@ -245,7 +245,7 @@ implements Serializable {
         final SuffixSet set;
         final String defaultSuffixesProperty
                 = System.getProperty(PROP_KEY_DEFAULT_SUFFIXES);
-        if (defaultSuffixesProperty != null) {
+        if (null != defaultSuffixesProperty) {
             set = new SuffixSet(defaultSuffixesProperty);
         } else {
             set = (SuffixSet) drivers.remove(KWD_DEFAULT);

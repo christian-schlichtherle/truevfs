@@ -22,6 +22,7 @@ import de.schlichtherle.truezip.io.filesystem.FSScheme;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -59,7 +60,7 @@ import net.jcip.annotations.ThreadSafe;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-@ThreadSafe
+@Immutable
 public interface ArchiveDetector {
 
     /**
@@ -68,7 +69,7 @@ public interface ArchiveDetector {
      * {@code DefaultArchiveDetector} instances or if archive files
      * shall be treated like ordinary files rather than (virtual) directories.
      */
-    DefaultArchiveDetector NULL = new DefaultArchiveDetector("" /* null */);
+    DefaultArchiveDetector NULL = new DefaultArchiveDetector("");
 
     /**
      * Recognizes the archive file suffixes registered in the global archive

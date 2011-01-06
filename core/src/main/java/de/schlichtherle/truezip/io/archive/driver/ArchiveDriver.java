@@ -50,11 +50,9 @@ import net.jcip.annotations.ThreadSafe;
  * <p>
  * The following requirements must be met by any implementation:
  * <ul>
- * <li>The implementation must be thread-safe.
  * <li>The implementation must be immutable with respect to its public state.
- * <li>The implementation must not assume that it's a singleton:
- *     Multiple instances of an implementation may be used for the same
- *     archive type.
+ * <li>The implementation must be serializable.
+ * <li>Hence it would be an error to assume that it's a singleton.
  * <li>If the implementation shall get supported by the
  *     {@link ArchiveDriverRegistry}, a no-arguments constructor must be
  *     provided.
@@ -65,11 +63,8 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @Immutable
-@ThreadSafe
 public abstract class ArchiveDriver<E extends ArchiveEntry>
-implements FSDriver, EntryFactory<E>, Serializable {
-
-    //private static final long serialVersionUID = 1259452938351765017L;
+implements EntryFactory<E>, FSDriver, Serializable {
 
     /**
      * {@inheritDoc}
