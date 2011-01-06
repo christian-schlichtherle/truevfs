@@ -89,20 +89,6 @@
             <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
-                    <groups>
-                        <group>
-                            <title>Access Tier</title>
-                            <packages>de.schlichtherle.truezip.io.file:de.schlichtherle.truezip.io.sample:de.schlichtherle.truezip.awt:de.schlichtherle.truezip.io.swing*:de.schlichtherle.truezip.swing*</packages>
-                        </group>
-                        <group>
-                            <title>Engine Tier</title>
-                            <packages>de.schlichtherle.truezip.io.archive*:de.schlichtherle.truezip.io.filesystem*</packages>
-                        </group>
-                        <group>
-                            <title>Data Tier</title>
-                            <packages>de.schlichtherle.truezip.io.zip:de.schlichtherle.truezip.crypto.io.raes</packages>
-                        </group>
-                    </groups>
                     <links>
                         <link>http://www.bouncycastle.org/docs/docs1.5/</link>
                     </links>
@@ -126,20 +112,6 @@
                                 <quiet>true</quiet>
                                 <splitindex>${javadoc.splitindex}</splitindex>
                                 <version>true</version>
-                                <groups>
-                                    <group>
-                                        <title>Access Tier</title>
-                                        <packages>de.schlichtherle.truezip.io.file:de.schlichtherle.truezip.io.sample:de.schlichtherle.truezip.awt:de.schlichtherle.truezip.io.swing*:de.schlichtherle.truezip.swing*</packages>
-                                    </group>
-                                    <group>
-                                        <title>Engine Tier</title>
-                                        <packages>de.schlichtherle.truezip.io.archive*:de.schlichtherle.truezip.io.filesystem*</packages>
-                                    </group>
-                                    <group>
-                                        <title>Data Tier</title>
-                                        <packages>de.schlichtherle.truezip.io.zip:de.schlichtherle.truezip.crypto.io.raes</packages>
-                                    </group>
-                                </groups>
                                 <links>
                                     <link>http://www.bouncycastle.org/docs/docs1.5/</link>
                                 </links>
