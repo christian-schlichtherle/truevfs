@@ -19,19 +19,22 @@
 
     <parent>
         <groupId>de.schlichtherle.truezip</groupId>
-        <artifactId>truezip-parent</artifactId>
+        <artifactId>truezip-root</artifactId>
         <version>7.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>truezip-samples</artifactId>
-    <packaging>jar</packaging>
-
-    <name>TrueZIP Samples</name>
+    <name>TrueZIP Sample Applications</name>
 
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truezip-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truezip-driver-tar</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
