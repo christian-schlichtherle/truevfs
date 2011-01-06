@@ -85,10 +85,7 @@ public abstract class FileTestCase {
     private final ArchiveDriver<?> driver;
 
     private byte[] data;
-        
-    /** The temporary file to use as an archive file. */
-    private java.io.File _archive;
-
+    private java.io.File temp;
     private File archive;
 
     protected FileTestCase( final @NonNull FSScheme scheme,
@@ -110,30 +107,31 @@ public abstract class FileTestCase {
      * the temporary file to be used as an archive file.
      */
     @Before
-    public final void setUp() throws Exception {
+    public final void setUp() throws IOException {
+        File.setLenient(true); // Restore default
         File.setDefaultArchiveDetector(
                 new DefaultArchiveDetector(scheme.toString(), driver));
-        if (data == null)
-            data = DATA; // (byte[]) _data.clone();
-        if (archive == null) {
-            _archive = createTempFile();
-            assertTrue(_archive.delete());
-            archive = new File(_archive);
-        }
-
-        File.setLenient(true); // Restore default
         File.umount();
+        data = DATA.clone();
+        temp = createTempFile();
+        assertTrue(temp.delete());
+        archive = new File(temp);
+    }
+
+    private java.io.File createTempFile() throws IOException {
+        return File.createTempFile(TEMP_FILE_PREFIX, getSuffix()).getCanonicalFile();
     }
 
     @After
-    public final void tearDown() throws Exception {
-        data = null;
-
+    public final void tearDown() throws IOException {
+        final File archive = this.archive;
+        this.archive = null;
         if (archive != null)
-            archive.delete(); // archive, not _archive!
-        if (_archive.exists() && !_archive.delete())
-            logger.log(Level.WARNING, "{0} (File.delete() failed)", _archive);
-        _archive = archive = null;
+            archive.delete();
+        final java.io.File temp = this.temp;
+        this.temp = null;
+        if (temp.exists() && !temp.delete())
+            logger.log(Level.WARNING, "{0} (File.delete() failed)", temp);
 
         // sync now to delete temps and free memory.
         // This prevents subsequent warnings about left over temporary files
@@ -148,7 +146,9 @@ public abstract class FileTestCase {
             // of failed tests and we don't want any exception from the tests
             // to be overridden by an exception thrown in this clean up method.
         }
-        File.setDefaultArchiveDetector(ArchiveDetector.ALL);
+
+        File.setDefaultArchiveDetector(ArchiveDetector.ALL); // restore default
+        File.setLenient(true); // Restore default
     }
 
     private static File newNonArchiveFile(File file) {
@@ -328,9 +328,10 @@ public abstract class FileTestCase {
     @Test
     public final void testCreateNewFile() throws IOException{
         createNewPlainFile();
-        createNewSmartFile();
+        createNewEnhancedFile();
     }
     
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
     private void createNewPlainFile() throws IOException {
         final java.io.File archive = createTempFile();
         assertTrue(archive.delete());
@@ -344,7 +345,8 @@ public abstract class FileTestCase {
         createNewFile(archive, file1, file2);
     }
 
-    private void createNewSmartFile() throws IOException {
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
+    private void createNewEnhancedFile() throws IOException {
         final java.io.File file1 = new File(archive, "test.txt");
         final java.io.File file2 = new File(file1, "test.txt");
 
@@ -361,6 +363,7 @@ public abstract class FileTestCase {
         createNewFile(archive, file1, file2);
     }
 
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
     private void createNewFile( final java.io.File dir,
                                 final java.io.File file1,
                                 final java.io.File file2)
@@ -514,6 +517,7 @@ public abstract class FileTestCase {
     }
     
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OS_OPEN_STREAM")
     @Test
     public final void testBusyFileInputStream() throws IOException {
         final File file1 = new File(archive, "file1");
@@ -568,6 +572,7 @@ public abstract class FileTestCase {
     }
 
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OS_OPEN_STREAM")
     @Test
     public final void testBusyFileOutputStream() throws IOException {
         File file1 = new File(archive, "file1");
@@ -733,12 +738,10 @@ public abstract class FileTestCase {
     }
 
     private void listFiles(File dir, String entry) {
-        java.io.File[] files = dir.listFiles();
-        assertTrue(files instanceof File[]);
+        final File[] files = dir.listFiles();
         boolean found = false;
         for (int i = 0, l = files.length; i < l; i++) {
-            File file = (File) files[i];
-            assertTrue(file instanceof File);
+            final File file = files[i];
             if (file.getName().equals(entry))
                 found = true;
         }
@@ -1089,6 +1092,7 @@ public abstract class FileTestCase {
         assertFalse(getPlainFile(archive).exists());
     }
     
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OS_OPEN_STREAM")
     @Test
     public final void testRenameValidArchive() throws IOException {
         // Create a regular archive with a single archive entry which
@@ -1244,7 +1248,6 @@ public abstract class FileTestCase {
             final java.io.File ref = refs[i];
             final File file2 = files[i];
             assertTrue(!(ref instanceof File));
-            assertTrue(file2 instanceof File);
             assertEquals(ref.getPath(), file2.getPath());
             assertNull(file2.list());
             assertNull(file2.list(null));
@@ -1517,10 +1520,5 @@ public abstract class FileTestCase {
             if (thread.failure != null)
                 throw new Exception(thread.failure);
         }
-    }
-    
-    private java.io.File createTempFile()
-    throws IOException {
-        return File.createTempFile(TEMP_FILE_PREFIX, getSuffix()).getCanonicalFile();
     }
 }
