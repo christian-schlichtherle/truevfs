@@ -358,7 +358,8 @@ public final class File extends java.io.File {
     private static boolean lenient
             = !Boolean.getBoolean(File.class.getPackage().getName() + ".strict");
 
-    private static @NonNull ArchiveDetector defaultDetector = ArchiveDetector.DEFAULT;
+    private static @NonNull ArchiveDetector defaultDetector
+            = ArchiveDetector.ALL;
 
     //
     // Instance fields:
@@ -601,8 +602,8 @@ public final class File extends java.io.File {
      *   }
      * }
      * </pre>
-     * The newly created {@code File} instance uses
-     * {@link ArchiveDetector#ALL} as its {@code ArchiveDetector}.
+     * The newly created {@code File} instance uses the
+     * {@link #getDefaultArchiveDetector() default archive detector}.
      *
      * @param  uri an absolute, hierarchical URI with a scheme equal to
      *         {@code file} or {@code jar}, a non-empty path component,
@@ -613,11 +614,11 @@ public final class File extends java.io.File {
      */
     public File(URI uri) {
         this(   FSPath.create(fix(uri), true),
-                new ArchiveDetectorFSDriver(ArchiveDetector.ALL));
+                new ArchiveDetectorFSDriver(defaultDetector));
     }
 
     public File(final @NonNull FSPath path) {
-        this(path, new ArchiveDetectorFSDriver(ArchiveDetector.ALL));
+        this(path, new ArchiveDetectorFSDriver(defaultDetector));
     }
 
     @SuppressWarnings("LeakingThisInConstructor")
@@ -1339,39 +1340,29 @@ public final class File extends java.io.File {
      * archive detector is passed explicitly to the constructor of a
      * {@code File} instance.
      * <p>
-     * This class property is initially map to
-     * {@code ArchiveDetector.DEFAULT}
+     * This class property is initially set to
+     * {@link ArchiveDetector#ALL}
      *
-     * @see ArchiveDetector
      * @see #setDefaultArchiveDetector
      */
-    public static ArchiveDetector getDefaultArchiveDetector() {
+    public static @NonNull ArchiveDetector getDefaultArchiveDetector() {
         return defaultDetector;
     }
 
     /**
      * This class property controls how archive files are recognized.
-     * When a new {@code File} instance is created and no
-     * {@link ArchiveDetector} is provided to the constructor,
-     * or when some method of this class are called which accept an
-     * {@code ArchiveDetector} parameter,
-     * then this class property is used.
-     * Changing this value affects all newly created {@code File}
-     * instances, but not any existing ones.
+     * When a new {@code File} instance is constructed, but no archive detector
+     * parameter is provided, then the value of this class property is used.
+     * So changing the value of this class property only affects all
+     * subsequently constructed {@code File} instances, but not any existing
+     * ones.
      *
-     * @param detector The default {@link ArchiveDetector} to use
-     *        for newly created {@code File} instances which have not
-     *        been constructed with an explicit {@code ArchiveDetector}
-     *        parameter
-     * @throws NullPointerException If {@code detector} is
-     *         {@code null}.
-     * @see ArchiveDetector
-     * @see #getDefaultArchiveDetector()
-     * @see <a href="package-summary.html#third_parties">Third Party
-     *      Access using different Archive Detectors</a>
+     * @param detector the default {@link ArchiveDetector} to use
+     *        for subsequently constructed {@code File} instances.
+     * @see   #getDefaultArchiveDetector()
      */
     public static void setDefaultArchiveDetector(
-            final ArchiveDetector detector) {
+            final @NonNull ArchiveDetector detector) {
         if (null == detector)
             throw new NullPointerException();
         File.defaultDetector = detector;
@@ -1513,10 +1504,8 @@ public final class File extends java.io.File {
      * Returns {@code true} if and only if the path represented by this
      * instance denotes an archive file.
      * Whether or not this is true solely depends on the
-     * {@link ArchiveDetector} which was used to construct this
-     * {@code File} instance: If no {@code ArchiveDetector} is
-     * explicitly passed to the constructor,
-     * {@link #getDefaultArchiveDetector()} is used.
+     * {@link ArchiveDetector} which was used to construct this {@code File}
+     * instance.
      * <p>
      * Please note that no file system tests are performed!
      * If a client application needs to know whether this file really isExisting
@@ -1530,18 +1519,16 @@ public final class File extends java.io.File {
      * @see #isDirectory
      * @see #isEntry
      */
-    public final boolean isArchive() {
+    public boolean isArchive() {
         return innerArchive == this;
     }
 
     /**
      * Returns {@code true} if and only if the path represented by this
      * instance names an archive file as an ancestor.
-     * <p>
-     * Whether or not this is true depends solely on the {@link ArchiveDetector}
-     * used to construct this instance.
-     * If no {@code ArchiveDetector} was explicitly passed to the
-     * constructor, {@link #getDefaultArchiveDetector()} is used.
+     * Whether or not this is true solely depends on the
+     * {@link ArchiveDetector} which was used to construct this {@code File}
+     * instance.
      * <p>
      * Please note that no tests on the file's true state are performed!
      * If you need to know whether this file is really an entry in an archive
@@ -1553,7 +1540,7 @@ public final class File extends java.io.File {
      *
      * @see #isArchive
      */
-    public final boolean isEntry() {
+    public boolean isEntry() {
         return enclEntryName != null;
     }
 
@@ -1573,7 +1560,7 @@ public final class File extends java.io.File {
      * a {@code File} instance which again could be an entry within
      * another archive file.
      */
-    public final File getInnerArchive() {
+    public File getInnerArchive() {
         return innerArchive;
     }
 
@@ -1591,7 +1578,7 @@ public final class File extends java.io.File {
      * {@code "."} and {@code ".."} in the path name are removed according to
      * their meaning wherever possible.
      */
-    public final String getInnerEntryName() {
+    public String getInnerEntryName() {
         return this == innerArchive
                 ? ROOT.getPath()
                 : null == enclEntryName
@@ -1599,7 +1586,7 @@ public final class File extends java.io.File {
                     : enclEntryName.getPath();
     }
 
-    final FSEntryName getInnerEntryName0() {
+    FSEntryName getInnerEntryName0() {
         return this == innerArchive ? ROOT : enclEntryName;
     }
 
@@ -1617,7 +1604,7 @@ public final class File extends java.io.File {
      * a {@code File} instance which again could be an entry within
      * another archive file.
      */
-    public final File getEnclArchive() {
+    public File getEnclArchive() {
         return enclArchive;
     }
 
@@ -1673,7 +1660,7 @@ public final class File extends java.io.File {
      *         one of its subclasses, but never an instance of this class or
      *         its subclasses and never {@code null}.
      */
-    public final java.io.File getDelegate() {
+    public @NonNull java.io.File getDelegate() {
         return delegate;
     }
 
@@ -1681,7 +1668,7 @@ public final class File extends java.io.File {
      * Returns an archive controller if and only if the path denotes an
      * archive file, or {@code null} otherwise.
      */
-    final @Nullable FSController<?>
+    @CheckForNull FSController<?>
     getController() {
         assert (null != controller) == isArchive();
         return controller;

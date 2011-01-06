@@ -26,23 +26,19 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
+import net.jcip.annotations.Immutable;
 
 import static de.schlichtherle.truezip.io.filesystem.FSEntryName.*;
 import static de.schlichtherle.truezip.io.Paths.*;
 
 /**
  * Provides convenience methods for dealing with a character set.
- * <p>
- * This class is serializable in order to meet the requirements of some client
- * classes.
  * 
  * @author Christian Schlichtherle
  * @version $Id$
  */
 public abstract class CharsetArchiveDriver<E extends ArchiveEntry>
 extends ArchiveDriver<E> {
-
-    private static final long serialVersionUID = 6546816446205675936L;
 
     /**
      * This field should be considered to be {@code final}!

@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.util;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.AbstractSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -75,10 +76,9 @@ public class CanonicalStringSet extends AbstractSet<String> {
      * @param set A set of canonical strings - may be {@code null} to
      *        construct an empty set.
      */
-    public CanonicalStringSet(final char separator, final CanonicalStringSet set) {
+    public CanonicalStringSet(final char separator, final @NonNull CanonicalStringSet set) {
         this.separator = separator;
-        if (null != set)
-            addAll(set); // no dangerous constructor - method is final!
+        addAll(set); // FIXME: dangerous constructor - calls canonicalize(*)!
     }
 
     /**
@@ -341,8 +341,8 @@ public class CanonicalStringSet extends AbstractSet<String> {
     //
 
     /**
-     * Returns the canonical string representation of this set.
-     * If this string set is empty, an empty string is returned.
+     * Returns the string representation of this canonical string set.
+     * If this canonical string set is empty, an empty string is returned.
      */
     @Override
     public final String toString() {

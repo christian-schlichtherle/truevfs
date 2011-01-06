@@ -145,14 +145,14 @@ public class SuffixSetTest extends TestCase {
     public void testToRegex() {
         for (int i = 0; i < sets.length; i++) {
             final SuffixSet set = sets[i];
-            assertTrue(Pattern.matches(set.toRegex(), ".suffix1"));
-            assertTrue(Pattern.matches(set.toRegex(), ".suffix2"));
-            assertTrue(Pattern.matches(set.toRegex(), "a.SUFFIX1"));
-            assertTrue(Pattern.matches(set.toRegex(), "a.SUFFIX2"));
-            assertTrue(Pattern.matches(set.toRegex(), "a.b.suffix1"));
-            assertTrue(Pattern.matches(set.toRegex(), "a.b.suffix2"));
-            assertTrue(Pattern.matches(set.toRegex(), "a.b.c.SUFFIX1"));
-            assertTrue(Pattern.matches(set.toRegex(), "a.b.c.SUFFIX2"));
+            assertTrue(set.toPattern().matcher(".suffix1").matches());
+            assertTrue(set.toPattern().matcher(".suffix2").matches());
+            assertTrue(set.toPattern().matcher("a.SUFFIX1").matches());
+            assertTrue(set.toPattern().matcher("a.SUFFIX2").matches());
+            assertTrue(set.toPattern().matcher("a.b.suffix1").matches());
+            assertTrue(set.toPattern().matcher("a.b.suffix2").matches());
+            assertTrue(set.toPattern().matcher("a.b.c.SUFFIX1").matches());
+            assertTrue(set.toPattern().matcher("a.b.c.SUFFIX2").matches());
         }
     }
 }

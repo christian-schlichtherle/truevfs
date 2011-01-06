@@ -16,6 +16,9 @@
 package de.schlichtherle.truezip.io.archive.driver;
 
 import de.schlichtherle.truezip.io.SuffixSet;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -96,8 +99,8 @@ public class ArchiveDriverRegistry implements Serializable {
      * @see    SuffixSet Syntax Definition for Suffix Lists
      */
     public ArchiveDriverRegistry(
-            final ArchiveDriverRegistry parent,
-            final Map<String, ?> config) {
+            final @CheckForNull ArchiveDriverRegistry parent,
+            final @NonNull Map<String, ?> config) {
         if (parent == null)
             throw new NullPointerException(getString("null", "delegate")); // NOI18N
         this.parent = parent;
@@ -121,8 +124,8 @@ public class ArchiveDriverRegistry implements Serializable {
      * @throws IllegalArgumentException if any other parameter precondition
      *         does not hold or the keyword {@code DRIVER} is found.
      */
-    final void registerArchiveDrivers(	final Map<String, ?> config,
-    									final boolean eager) {
+    final void registerArchiveDrivers(	final @NonNull Map<String, ?> config,
+                                        final boolean eager) {
         for (final Map.Entry<String, ?> entry : config.entrySet()) {
             final String key = entry.getKey();
             if (KWD_DRIVER.equals(key))
@@ -134,7 +137,7 @@ public class ArchiveDriverRegistry implements Serializable {
                     throw new IllegalArgumentException(
                             getString("keyword", KWD_DEFAULT)); // NOI18N
                 final SuffixSet set = (SuffixSet) drivers.get(key);
-                if (set != null)
+                if (null != set)
                     set.addAll((String) value);
                 else
                     drivers.put(key, new SuffixSet((String) value));
@@ -145,12 +148,11 @@ public class ArchiveDriverRegistry implements Serializable {
     }
 
     /**
-     * Registers the given archive {@code id} for the given
+     * Registers the given archive {@code driver} for the given
      * list of {@code suffixes}.
      * 
      * @param  eager Whether the archive driver shall get instantiated now or
      *         later.
-     * @throws NullPointerException If {@code id} is {@code null}.
      * @throws ClassCastException If {@code eager} is {@code false}
      *         and {@code driver} isn't a string.
      * @throws IllegalArchiveDriverException If {@code eager} is
@@ -159,12 +161,10 @@ public class ArchiveDriverRegistry implements Serializable {
      *         The cause is wrapped in the exception.
      */
     private void registerArchiveDriver(
-            final String list,
-            Object driver,
+            final @NonNull String suffixes,
+            @NonNull Object driver,
             final boolean eager) {
-        if (list == null)
-            throw new NullPointerException(getString("noSuffixes")); // NOI18N
-        final SuffixSet set = new SuffixSet(list);
+        final SuffixSet set = new SuffixSet(suffixes);
         if (set.isEmpty()) {
             if (eager)
                 throw new IllegalArgumentException(getString("noSuffixes")); // NOI18N
@@ -206,7 +206,7 @@ public class ArchiveDriverRegistry implements Serializable {
      *         instantiating an archive driver class fails.
      */
     public final synchronized ArchiveDriver<?> getArchiveDriver(
-            final String suffix) {
+            final @NonNull String suffix) {
         // Lookup driver locally.
         Object driver = drivers.get(suffix);
         if (!(driver instanceof ArchiveDriver<?>)) {
@@ -241,7 +241,7 @@ public class ArchiveDriverRegistry implements Serializable {
      *         returned. Its cause provides more detail.
      */
     @SuppressWarnings("unchecked")
-    private static ArchiveDriver<?> newArchiveDriver(Object driver) {
+    private static @Nullable ArchiveDriver<?> newArchiveDriver(@CheckForNull Object driver) {
         try {
             if (driver instanceof String)
                 driver = loadClass((String) driver, ArchiveDriverRegistry.class);
@@ -259,7 +259,7 @@ public class ArchiveDriverRegistry implements Serializable {
      * This includes the drivers found in the entire registry chain, not just
      * this registry object.
      */
-    public final SuffixSet getSuffixes() {
+    public final @NonNull SuffixSet getSuffixes() {
         return decorate(null != parent ? parent.getSuffixes() : new SuffixSet());
     }
 
@@ -272,7 +272,7 @@ public class ArchiveDriverRegistry implements Serializable {
      * @return {@code set}, decorated according to the mappings in the
      *         local registry.
      */
-    public final SuffixSet decorate(final SuffixSet set) {
+    public final @NonNull SuffixSet decorate(final @NonNull SuffixSet set) {
         for (final String suffix : drivers.keySet()) {
             if (null != drivers.get(suffix))
                 set.addAll(suffix);
@@ -282,11 +282,11 @@ public class ArchiveDriverRegistry implements Serializable {
         return set;
     }
 
-    private static String getString(String key) {
+    private static @NonNull String getString(@NonNull String key) {
         return RESOURCES.getString(key);
     }
 
-    private static String getString(String key, String arg) {
+    private static @NonNull String getString(@NonNull String key, @NonNull String arg) {
         return MessageFormat.format(RESOURCES.getString(key),
                                     (Object[]) new String[] { arg });
     }

@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.io.filesystem;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * A factory for file system controllers.
@@ -26,6 +27,7 @@ import edu.umd.cs.findbugs.annotations.Nullable;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 public interface FSDriver {
 
     /**

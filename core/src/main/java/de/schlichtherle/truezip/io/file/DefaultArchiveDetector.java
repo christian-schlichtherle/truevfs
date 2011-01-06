@@ -78,7 +78,6 @@ import java.util.regex.Matcher;
  * @see ArchiveDetector#DEFAULT
  * @see ArchiveDetector#ALL
  */
-// TODO: Consider removing support for serialization in this class.
 public final class DefaultArchiveDetector
 implements ArchiveDetector, Serializable {
 
@@ -88,67 +87,68 @@ implements ArchiveDetector, Serializable {
      * The local registry for archive file suffixes and archive drivers.
      * This could actually be the global registry
      * ({@link GlobalArchiveDriverRegistry#INSTANCE}), filtered by a custom
-     * {@link #list}.
+     * {@link #suffixes}.
      */
-    private final ArchiveDriverRegistry registry;
+    private final @NonNull ArchiveDriverRegistry registry;
 
     /**
-     * The canonical suffix list recognized by this archive detector.
-     * This list is used to filter the registered archive file suffixes in
+     * The canonical string respresentation of the set of suffixes recognized
+     * by this archive detector.
+     * This set is used to filter the registered archive file suffixes in
      * {@link #registry}.
      */
-    private final String list;
+    private final @NonNull String suffixes;
 
     /**
      * The thread local matcher used to match archive file suffixes.
      * This field should be considered final.
      */
-    private transient ThreadLocalMatcher matcher; // never transmit this over the wire!
+    private transient @NonNull ThreadLocalMatcher matcher; // never transmit this over the wire!
 
     /**
      * Creates a new {@code DefaultArchiveDetector} by filtering the
      * {@link GlobalArchiveDriverRegistry} for all canonicalized suffixes in
-     * the {@code list}.
+     * the {@code suffixes} list.
      * 
-     * @param list A list of suffixes which shall identify prospective
+     * @param suffixes A list of suffixes which shall identify prospective
      *        archive files.
-     *        May be {@code null} or empty.
      * @see SuffixSet Syntax definition for suffix lists.
      * @throws IllegalArgumentException If any of the suffixes in the suffix
      *         list names a suffix for which no {@link ArchiveDriver} is
      *         configured in the {@link GlobalArchiveDriverRegistry}.
      */
-    public DefaultArchiveDetector(final String list) {
-        registry = GlobalArchiveDriverRegistry.INSTANCE;
-        final SuffixSet set = new SuffixSet(list);
+    public DefaultArchiveDetector(final @NonNull String suffixes) {
+        this.registry = GlobalArchiveDriverRegistry.INSTANCE;
+        final SuffixSet set = new SuffixSet(suffixes);
         final SuffixSet all = registry.getSuffixes();
         if (set.retainAll(all)) {
             final SuffixSet unknown = new SuffixSet(set);
             unknown.removeAll(all);
             throw new IllegalArgumentException("\"" + unknown + "\" (no archive driver installed for these suffixes)");
         }
-        this.list = set.toString();
-        matcher = new ThreadLocalMatcher(set.toRegex());
+        this.suffixes = set.toString();
+        this.matcher = new ThreadLocalMatcher(set.toPattern());
     }
 
     /**
      * Equivalent to
      * {@link #DefaultArchiveDetector(DefaultArchiveDetector, String, ArchiveDriver)
-     * DefaultArchiveDetector(ArchiveDetector.NULL, list, driver)}.
+     * DefaultArchiveDetector(ArchiveDetector.NULL, suffixes, driver)}.
      */
-    public DefaultArchiveDetector(String set, ArchiveDriver<?> driver) {
-        this(NULL, set, driver);
+    public DefaultArchiveDetector(  @NonNull String suffixes,
+                                    @CheckForNull ArchiveDriver<?> driver) {
+        this(NULL, suffixes, driver);
     }
 
     /**
      * Creates a new {@code DefaultArchiveDetector} by
      * decorating the configuration of {@code delegate} with
-     * mappings for all canonicalized suffixes in {@code list} to
+     * mappings for all canonicalized suffixes in {@code suffixes} to
      * {@code driver}.
      * 
      * @param delegate The {@code DefaultArchiveDetector} which's
      *        configuration is to be virtually inherited.
-     * @param list A list of suffixes which shall identify prospective
+     * @param suffixes A list of suffixes which shall identify prospective
      *        archive files.
      *        Must not be {@code null} and must not be empty.
      * @see SuffixSet Syntax definition for suffix lists.
@@ -158,17 +158,14 @@ implements ArchiveDetector, Serializable {
      *        A {@code null} archive driver may be used to shadow a
      *        mapping for the same archive driver in {@code delegate},
      *        effectively removing it.
-     * @throws NullPointerException If {@code delegate} or
-     *         {@code list} is {@code null}.
      * @throws IllegalArgumentException If any other parameter precondition
      *         does not hold or an illegal keyword is found in the
      *         suffix list.
      */
-    public DefaultArchiveDetector(
-            DefaultArchiveDetector delegate,
-            String list,
-            ArchiveDriver<?> driver) {
-        this(delegate, new Object[] { list, driver });
+    public DefaultArchiveDetector(  @NonNull DefaultArchiveDetector delegate,
+                                    @NonNull String suffixes,
+                                    @CheckForNull ArchiveDriver<?> driver) {
+        this(delegate, new Object[] { suffixes, driver });
     }
 
     /**
@@ -198,20 +195,16 @@ implements ArchiveDetector, Serializable {
      * @see    SuffixSet Syntax definition for suffix lists.
      */
     public DefaultArchiveDetector(
-            DefaultArchiveDetector delegate,
-            Object[] config) {
+            @NonNull DefaultArchiveDetector delegate,
+            @NonNull Object[] config) {
         this(delegate, toMap(config));
     }
 
-    private static Map<String, Object> toMap(final Object[] config) {
-        if (config == null)
-            return null;
-
+    private static @NonNull Map<String, Object> toMap(final @NonNull Object[] config) {
         final Map<String, Object> map
                 = new LinkedHashMap<String, Object>((int) (config.length / .75f) + 1); // order may be important!
         for (int i = 0, l = config.length; i < l; i++)
             map.put((String) config[i], config[++i]);
-
         return map;
     }
 
@@ -241,18 +234,18 @@ implements ArchiveDetector, Serializable {
      * @see SuffixSet Syntax definition for suffix lists.
      */
     public DefaultArchiveDetector(
-            final DefaultArchiveDetector delegate,
-            final Map<String, Object> config) {
-        registry = new ArchiveDriverRegistry(delegate.registry, config);
-        final SuffixSet set = registry.decorate(new SuffixSet(delegate.list)); // may be a subset of delegate.registry.decorate(new SuffixSet())!
-        list = set.toString();
-        matcher = new ThreadLocalMatcher(set.toRegex());
+            final @NonNull DefaultArchiveDetector delegate,
+            final @NonNull Map<String, Object> config) {
+        this.registry = new ArchiveDriverRegistry(delegate.registry, config);
+        final SuffixSet set = registry.decorate(new SuffixSet(delegate.suffixes)); // may be a subset of delegate.registry.decorate(new SuffixSet())!
+        this.suffixes = set.toString();
+        this.matcher = new ThreadLocalMatcher(set.toPattern());
     }
 
     private void readObject(final ObjectInputStream in)
     throws IOException, ClassNotFoundException {
         in.defaultReadObject();
-        matcher = new ThreadLocalMatcher(new SuffixSet(list).toRegex());
+        matcher = new ThreadLocalMatcher(new SuffixSet(suffixes).toPattern());
     }
 
     @Override
@@ -315,11 +308,12 @@ implements ArchiveDetector, Serializable {
      * @see SuffixSet Syntax definition for canonical suffix lists.
      */
     public @NonNull String getSuffixes() {
-        return list; // canonical form
+        return suffixes; // canonical form
     }
 
     /** Equivalent to {@link #getSuffixes()}. */
-    @Override public String toString() {
-        return list;
+    @Override
+    public String toString() {
+        return suffixes;
     }
 }

@@ -100,7 +100,6 @@ public abstract class IOFileTestCase extends TestCase {
      */
     @Override
     protected void setUp() throws Exception {
-        super.setUp();
         if (data == null)
             data = DATA; // (byte[]) _data.clone();
         if (prefix == null)
@@ -741,12 +740,7 @@ public abstract class IOFileTestCase extends TestCase {
 
     public void testCat()
     throws IOException {
-        try {
-            testCat(archive);
-            fail("Writing to files with an archive file suffix should not be possible!");
-        } catch (AssertionFailedError ok) {
-            // This is exactly what we expect here!
-        }
+        testCat(archive);
         
         final File archiveTest = new File(archive, "test");
         testCat(archiveTest);
