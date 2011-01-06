@@ -22,9 +22,9 @@ import de.schlichtherle.truezip.io.filesystem.FSScheme;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class FooTest extends FileTestCase {
+public class TarBZip2FileTest extends FileTestCase {
 
-    FooTest() {
+    public TarBZip2FileTest() {
         super(FSScheme.create("tar.bz2"), new TarBZip2Driver(1));
     }
 }

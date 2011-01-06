@@ -24,7 +24,7 @@ import de.schlichtherle.truezip.io.filesystem.FSScheme;
  */
 public class TarGZipFileTest extends FileTestCase {
 
-    TarGZipFileTest() {
+    public TarGZipFileTest() {
         super(FSScheme.create("tar.gz"), new TarGZipDriver());
     }
 }
