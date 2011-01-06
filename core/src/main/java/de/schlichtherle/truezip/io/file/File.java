@@ -1668,8 +1668,7 @@ public final class File extends java.io.File {
      * Returns an archive controller if and only if the path denotes an
      * archive file, or {@code null} otherwise.
      */
-    @CheckForNull FSController<?>
-    getController() {
+    @Nullable FSController<?> getController() {
         assert (null != controller) == isArchive();
         return controller;
     }
