@@ -15,16 +15,11 @@
  */
 package de.schlichtherle.truezip.io.file;
 
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
+import de.schlichtherle.truezip.io.filesystem.FSController;
 import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
-import de.schlichtherle.truezip.io.file.ArchiveDetector;
-import de.schlichtherle.truezip.io.file.ArchiveException;
-import de.schlichtherle.truezip.io.file.ArchiveWarningException;
-import de.schlichtherle.truezip.io.file.ContainsFileException;
-import de.schlichtherle.truezip.io.file.DefaultArchiveDetector;
-import de.schlichtherle.truezip.io.file.File;
-import de.schlichtherle.truezip.io.file.FileInputStream;
-import de.schlichtherle.truezip.io.file.FileOutputStream;
 import de.schlichtherle.truezip.io.filesystem.FSScheme;
 import de.schlichtherle.truezip.io.socket.OutputClosedException;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -149,7 +144,7 @@ public abstract class FileTestCase {
                         ArchiveDetector.NULL);
     }
 
-    /*@Test
+    @Test
     public void testArchiveControllerStateWithInputStream()
     throws IOException, InterruptedException {
         final String path = archive.getPath() + "/test";
@@ -189,7 +184,7 @@ public abstract class FileTestCase {
         File.umount();
         gc();
         assertNull(ref.get());
-    }*/
+    }
 
     protected static void gc() {
         System.gc();
