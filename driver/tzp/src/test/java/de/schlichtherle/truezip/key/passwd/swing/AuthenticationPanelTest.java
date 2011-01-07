@@ -40,14 +40,14 @@ import org.netbeans.jemmy.util.NameComponentChooser;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class AuthenticationPanelUITest extends TestCase {
+public class AuthenticationPanelTest extends TestCase {
 
     static {
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput()); // shut up!
     }
 
     private static final Logger logger = Logger.getLogger(
-            AuthenticationPanelUITest.class.getName());
+            AuthenticationPanelTest.class.getName());
 
     static final File rootDir;
     static {
@@ -60,7 +60,7 @@ public class AuthenticationPanelUITest extends TestCase {
     private final ComponentChooser keyFileChooser
             = new NameComponentChooser("keyFileChooser");
 
-    public AuthenticationPanelUITest(String testName) {
+    public AuthenticationPanelTest(String testName) {
         super(testName);
     }
 

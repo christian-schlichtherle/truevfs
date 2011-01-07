@@ -40,7 +40,7 @@ import static org.junit.Assert.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class EnhancedPanelUITest {
+public final class EnhancedPanelTest {
     static {
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput()); // shut up!
     }
