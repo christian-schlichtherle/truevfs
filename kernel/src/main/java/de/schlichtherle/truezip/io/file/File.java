@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.io.file;
 
-import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.filesystem.FSController;
 import de.schlichtherle.truezip.io.filesystem.FSManagers;
@@ -3896,14 +3895,6 @@ public final class File extends java.io.File {
      * @param dst The destination file. Note that although this just needs to
      *        be a plain {@code java.io.File}, archive entries are only
      *        supported for instances of this class.
-     * @throws FileBusyException If an archive entry cannot get accessed
-     *         because the client application is trying to input or output
-     *         to the same archive file simultaneously and the respective
-     *         archive driver does not support this or the archive file needs
-     *         an automatic update which cannot get performed because the
-     *         client is still using other open {@link FileInputStream}s or
-     *         {@link FileOutputStream}s for other entries in the same archive
-     *         file.
      * @throws FileNotFoundException If either the source or the destination
      *         cannot get accessed.
      * @throws InputException If copying the data fails because of an
@@ -3968,14 +3959,6 @@ public final class File extends java.io.File {
      * @param dst The destination file. Note that although this just needs to
      *        be a plain {@code java.io.File}, archive entries are only
      *        supported for instances of this class.
-     * @throws FileBusyException If an archive entry cannot get accessed
-     *         because the client application is trying to input or output
-     *         to the same archive file simultaneously and the respective
-     *         archive driver does not support this or the archive file needs
-     *         an automatic update which cannot get performed because the
-     *         client is still using other open {@link FileInputStream}s or
-     *         {@link FileOutputStream}s for other entries in the same archive
-     *         file.
      * @throws FileNotFoundException If either the source or the destination
      *         cannot get accessed.
      * @throws InputException If copying the data fails because of an
