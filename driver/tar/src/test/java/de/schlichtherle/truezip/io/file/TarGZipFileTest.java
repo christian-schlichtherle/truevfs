@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.file;
 
-import de.schlichtherle.truezip.io.archive.driver.tar.TarGZipDriver;
+import de.schlichtherle.truezip.io.fs.archive.driver.tar.TarGZipDriver;
 import de.schlichtherle.truezip.io.fs.FSScheme;
 
 /**

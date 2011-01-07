@@ -19,7 +19,7 @@ import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import de.schlichtherle.truezip.io.fs.FSController;
 import de.schlichtherle.truezip.io.FileBusyException;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
+import de.schlichtherle.truezip.io.fs.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.fs.FSScheme;
 import de.schlichtherle.truezip.io.socket.OutputClosedException;
 import edu.umd.cs.findbugs.annotations.NonNull;
