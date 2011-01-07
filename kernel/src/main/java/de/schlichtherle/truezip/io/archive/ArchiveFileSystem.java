@@ -20,8 +20,8 @@ import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.EntryContainer;
 import de.schlichtherle.truezip.io.entry.EntryFactory;
-import de.schlichtherle.truezip.io.filesystem.FSEntryName;
-import de.schlichtherle.truezip.io.filesystem.FSOutputOption;
+import de.schlichtherle.truezip.io.fs.FSEntryName;
+import de.schlichtherle.truezip.io.fs.FSOutputOption;
 import de.schlichtherle.truezip.util.Link;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -41,8 +41,8 @@ import net.jcip.annotations.NotThreadSafe;
 import static de.schlichtherle.truezip.io.entry.Entry.*;
 import static de.schlichtherle.truezip.io.entry.Entry.Access.*;
 import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
-import static de.schlichtherle.truezip.io.filesystem.FSEntryName.*;
-import static de.schlichtherle.truezip.io.filesystem.FSOutputOption.*;
+import static de.schlichtherle.truezip.io.fs.FSEntryName.*;
+import static de.schlichtherle.truezip.io.fs.FSOutputOption.*;
 import static de.schlichtherle.truezip.io.Paths.*;
 
 /**

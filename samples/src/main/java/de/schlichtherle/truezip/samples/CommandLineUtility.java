@@ -16,9 +16,9 @@
 package de.schlichtherle.truezip.samples;
 
 import de.schlichtherle.truezip.io.file.File;
-import de.schlichtherle.truezip.io.filesystem.FSManagers;
-import de.schlichtherle.truezip.io.filesystem.FSStatistics;
-import de.schlichtherle.truezip.io.filesystem.FSStatisticsManager;
+import de.schlichtherle.truezip.io.fs.FSManagers;
+import de.schlichtherle.truezip.io.fs.FSStatistics;
+import de.schlichtherle.truezip.io.fs.FSStatisticsManager;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;

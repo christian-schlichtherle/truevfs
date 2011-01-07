@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip.raes;
 
-import de.schlichtherle.truezip.io.filesystem.concurrency.FSConcurrencyModel;
+import de.schlichtherle.truezip.io.fs.concurrency.FSConcurrencyModel;
 import de.schlichtherle.truezip.io.archive.driver.zip.CheckedZipInputShop;
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipInputShop;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;

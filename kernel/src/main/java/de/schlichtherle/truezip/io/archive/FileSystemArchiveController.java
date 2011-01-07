@@ -15,9 +15,9 @@
  */
 package de.schlichtherle.truezip.io.archive;
 
-import de.schlichtherle.truezip.io.filesystem.concurrency.FSConcurrencyModel;
-import de.schlichtherle.truezip.io.filesystem.FSFalsePositiveException;
-import de.schlichtherle.truezip.io.filesystem.FSOutputOption;
+import de.schlichtherle.truezip.io.fs.concurrency.FSConcurrencyModel;
+import de.schlichtherle.truezip.io.fs.FSFalsePositiveException;
+import de.schlichtherle.truezip.io.fs.FSOutputOption;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.FileNotFoundException;
 import java.io.IOException;

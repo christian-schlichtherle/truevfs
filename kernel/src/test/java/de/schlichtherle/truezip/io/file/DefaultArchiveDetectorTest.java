@@ -17,7 +17,7 @@ package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.archive.driver.DummyArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
-import de.schlichtherle.truezip.io.filesystem.FSScheme;
+import de.schlichtherle.truezip.io.fs.FSScheme;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

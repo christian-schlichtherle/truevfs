@@ -15,9 +15,9 @@
  */
 package de.schlichtherle.truezip.io.archive.driver.zip.raes;
 
-import de.schlichtherle.truezip.io.filesystem.FSController;
-import de.schlichtherle.truezip.io.filesystem.FSMountPoint;
-import de.schlichtherle.truezip.io.filesystem.concurrency.FSConcurrencyModel;
+import de.schlichtherle.truezip.io.fs.FSController;
+import de.schlichtherle.truezip.io.fs.FSMountPoint;
+import de.schlichtherle.truezip.io.fs.concurrency.FSConcurrencyModel;
 import de.schlichtherle.truezip.io.socket.LazyOutputSocket;
 import de.schlichtherle.truezip.io.socket.DecoratorOutputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;

@@ -15,28 +15,28 @@
  */
 package de.schlichtherle.truezip.io.archive;
 
-import de.schlichtherle.truezip.io.filesystem.FSEntryNotFoundException;
-import de.schlichtherle.truezip.io.filesystem.FSEntry;
+import de.schlichtherle.truezip.io.fs.FSEntryNotFoundException;
+import de.schlichtherle.truezip.io.fs.FSEntry;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
-import de.schlichtherle.truezip.io.filesystem.concurrency.FSNotWriteLockedException;
-import de.schlichtherle.truezip.io.filesystem.concurrency.FSConcurrencyModel;
+import de.schlichtherle.truezip.io.fs.concurrency.FSNotWriteLockedException;
+import de.schlichtherle.truezip.io.fs.concurrency.FSConcurrencyModel;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
-import de.schlichtherle.truezip.io.filesystem.FSFalsePositiveException;
-import de.schlichtherle.truezip.io.filesystem.FSController;
-import de.schlichtherle.truezip.io.filesystem.FSEntryName;
-import de.schlichtherle.truezip.io.filesystem.FSException;
-import de.schlichtherle.truezip.io.filesystem.FSSyncException;
-import de.schlichtherle.truezip.io.filesystem.FSSyncExceptionBuilder;
+import de.schlichtherle.truezip.io.fs.FSFalsePositiveException;
+import de.schlichtherle.truezip.io.fs.FSController;
+import de.schlichtherle.truezip.io.fs.FSEntryName;
+import de.schlichtherle.truezip.io.fs.FSException;
+import de.schlichtherle.truezip.io.fs.FSSyncException;
+import de.schlichtherle.truezip.io.fs.FSSyncExceptionBuilder;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.InputSocket;
-import de.schlichtherle.truezip.io.filesystem.FSInputOption;
+import de.schlichtherle.truezip.io.fs.FSInputOption;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
-import de.schlichtherle.truezip.io.filesystem.FSOutputOption;
-import de.schlichtherle.truezip.io.filesystem.FSSyncOption;
+import de.schlichtherle.truezip.io.fs.FSOutputOption;
+import de.schlichtherle.truezip.io.fs.FSSyncOption;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -49,9 +49,9 @@ import net.jcip.annotations.NotThreadSafe;
 
 import static de.schlichtherle.truezip.io.entry.Entry.Access.*;
 import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
-import static de.schlichtherle.truezip.io.filesystem.FSEntryName.*;
-import static de.schlichtherle.truezip.io.filesystem.FSSyncOption.*;
-import static de.schlichtherle.truezip.io.filesystem.FSOutputOption.*;
+import static de.schlichtherle.truezip.io.fs.FSEntryName.*;
+import static de.schlichtherle.truezip.io.fs.FSSyncOption.*;
+import static de.schlichtherle.truezip.io.fs.FSOutputOption.*;
 
 /**
  * This is the base class for any archive controller, providing all the

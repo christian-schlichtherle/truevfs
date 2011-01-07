@@ -18,8 +18,8 @@ package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.DecoratorInputStream;
-import de.schlichtherle.truezip.io.filesystem.FSSyncException;
-import de.schlichtherle.truezip.io.filesystem.FSInputOption;
+import de.schlichtherle.truezip.io.fs.FSSyncException;
+import de.schlichtherle.truezip.io.fs.FSInputOption;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.FileDescriptor;

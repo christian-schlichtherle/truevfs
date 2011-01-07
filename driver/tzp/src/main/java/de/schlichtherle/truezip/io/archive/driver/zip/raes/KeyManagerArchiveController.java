@@ -18,19 +18,19 @@ package de.schlichtherle.truezip.io.archive.driver.zip.raes;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.entry.Entry;
-import de.schlichtherle.truezip.io.filesystem.FSDecoratorController;
-import de.schlichtherle.truezip.io.filesystem.FSController;
-import de.schlichtherle.truezip.io.filesystem.FSEntry;
-import de.schlichtherle.truezip.io.filesystem.FSEntryName;
-import de.schlichtherle.truezip.io.filesystem.FSException;
-import de.schlichtherle.truezip.io.filesystem.FSModel;
+import de.schlichtherle.truezip.io.fs.FSDecoratorController;
+import de.schlichtherle.truezip.io.fs.FSController;
+import de.schlichtherle.truezip.io.fs.FSEntry;
+import de.schlichtherle.truezip.io.fs.FSEntryName;
+import de.schlichtherle.truezip.io.fs.FSException;
+import de.schlichtherle.truezip.io.fs.FSModel;
 import de.schlichtherle.truezip.key.KeyManager;
 import java.io.CharConversionException;
 import java.io.IOException;
 import net.jcip.annotations.ThreadSafe;
 
 import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
-import static de.schlichtherle.truezip.io.filesystem.FSEntryName.*;
+import static de.schlichtherle.truezip.io.fs.FSEntryName.*;
 
 /**
  * This archive controller resets the key provider in the key manager if the

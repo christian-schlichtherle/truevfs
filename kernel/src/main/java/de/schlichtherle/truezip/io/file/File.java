@@ -16,17 +16,17 @@
 package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.InputException;
-import de.schlichtherle.truezip.io.filesystem.FSController;
-import de.schlichtherle.truezip.io.filesystem.FSManagers;
-import de.schlichtherle.truezip.io.filesystem.FSEntryName;
-import de.schlichtherle.truezip.io.filesystem.FSScheme;
-import de.schlichtherle.truezip.io.filesystem.FSPath;
-import de.schlichtherle.truezip.io.filesystem.FSMountPoint;
+import de.schlichtherle.truezip.io.fs.FSController;
+import de.schlichtherle.truezip.io.fs.FSManagers;
+import de.schlichtherle.truezip.io.fs.FSEntryName;
+import de.schlichtherle.truezip.io.fs.FSScheme;
+import de.schlichtherle.truezip.io.fs.FSPath;
+import de.schlichtherle.truezip.io.fs.FSMountPoint;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.io.filesystem.FSEntry;
-import de.schlichtherle.truezip.io.filesystem.FSFilterManager;
-import de.schlichtherle.truezip.io.filesystem.FSSyncExceptionBuilder;
-import de.schlichtherle.truezip.io.filesystem.FSSyncOption;
+import de.schlichtherle.truezip.io.fs.FSEntry;
+import de.schlichtherle.truezip.io.fs.FSFilterManager;
+import de.schlichtherle.truezip.io.fs.FSSyncExceptionBuilder;
+import de.schlichtherle.truezip.io.fs.FSSyncOption;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -52,15 +52,15 @@ import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.Icon;
 
-import static de.schlichtherle.truezip.io.filesystem.FSController.*;
-import static de.schlichtherle.truezip.io.filesystem.FSEntry.*;
-import static de.schlichtherle.truezip.io.filesystem.FSEntryName.*;
-import static de.schlichtherle.truezip.io.filesystem.FSSyncOption.*;
+import static de.schlichtherle.truezip.io.fs.FSController.*;
+import static de.schlichtherle.truezip.io.fs.FSEntry.*;
+import static de.schlichtherle.truezip.io.fs.FSEntryName.*;
+import static de.schlichtherle.truezip.io.fs.FSSyncOption.*;
 import static de.schlichtherle.truezip.io.entry.Entry.Size.*;
 import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
 import static de.schlichtherle.truezip.io.file.Files.*;
 import static de.schlichtherle.truezip.io.Files.*;
-import static de.schlichtherle.truezip.io.filesystem.FSOutputOption.*;
+import static de.schlichtherle.truezip.io.fs.FSOutputOption.*;
 
 /**
  * A drop-in replacement for its subclass which provides transparent
