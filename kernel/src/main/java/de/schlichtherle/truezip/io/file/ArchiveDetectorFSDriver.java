@@ -15,11 +15,11 @@
  */
 package de.schlichtherle.truezip.io.file;
 
-import de.schlichtherle.truezip.io.filesystem.FSController;
-import de.schlichtherle.truezip.io.filesystem.FSDriver;
-import de.schlichtherle.truezip.io.filesystem.FSMountPoint;
-import de.schlichtherle.truezip.io.filesystem.FSScheme;
-import de.schlichtherle.truezip.io.filesystem.file.FSFileDriver;
+import de.schlichtherle.truezip.io.fs.FSController;
+import de.schlichtherle.truezip.io.fs.FSDriver;
+import de.schlichtherle.truezip.io.fs.FSMountPoint;
+import de.schlichtherle.truezip.io.fs.FSScheme;
+import de.schlichtherle.truezip.io.fs.file.FSFileDriver;
 import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**

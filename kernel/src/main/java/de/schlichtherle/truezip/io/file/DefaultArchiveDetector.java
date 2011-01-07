@@ -19,7 +19,7 @@ import de.schlichtherle.truezip.io.archive.driver.GlobalArchiveDriverRegistry;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriverRegistry;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.SuffixSet;
-import de.schlichtherle.truezip.io.filesystem.FSScheme;
+import de.schlichtherle.truezip.io.fs.FSScheme;
 import de.schlichtherle.truezip.util.regex.ThreadLocalMatcher;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;

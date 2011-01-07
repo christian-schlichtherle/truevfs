@@ -19,7 +19,7 @@ import de.schlichtherle.truezip.io.archive.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.DummyArchiveEntry;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
-import de.schlichtherle.truezip.io.filesystem.concurrency.FSConcurrencyModel;
+import de.schlichtherle.truezip.io.fs.concurrency.FSConcurrencyModel;
 import de.schlichtherle.truezip.io.socket.InputShop;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputShop;

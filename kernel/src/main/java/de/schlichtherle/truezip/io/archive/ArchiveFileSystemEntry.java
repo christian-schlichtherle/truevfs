@@ -15,12 +15,12 @@
  */
 package de.schlichtherle.truezip.io.archive;
 
-import de.schlichtherle.truezip.io.filesystem.FSDecoratorEntry;
+import de.schlichtherle.truezip.io.fs.FSDecoratorEntry;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import de.schlichtherle.truezip.io.filesystem.FSEntry;
-import de.schlichtherle.truezip.io.filesystem.FSEntryName;
+import de.schlichtherle.truezip.io.fs.FSEntry;
+import de.schlichtherle.truezip.io.fs.FSEntryName;
 import edu.umd.cs.findbugs.annotations.NonNull;
 
 import static de.schlichtherle.truezip.io.entry.Entry.Type.*;

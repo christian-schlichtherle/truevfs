@@ -24,7 +24,7 @@ import de.schlichtherle.truezip.io.archive.MultiplexedArchiveOutputShop;
 import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.io.filesystem.file.FSFilePool;
+import de.schlichtherle.truezip.io.fs.file.FSFilePool;
 import de.schlichtherle.truezip.io.zip.RawZipOutputStream;
 import de.schlichtherle.truezip.util.JointIterator;
 import java.io.File;

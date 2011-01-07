@@ -17,8 +17,8 @@ package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.DummyArchiveDriver;
-import de.schlichtherle.truezip.io.filesystem.FSController;
-import de.schlichtherle.truezip.io.filesystem.FSPath;
+import de.schlichtherle.truezip.io.fs.FSController;
+import de.schlichtherle.truezip.io.fs.FSPath;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -31,7 +31,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static de.schlichtherle.truezip.io.file.ArchiveDetector.NULL;
-import static de.schlichtherle.truezip.io.filesystem.FSEntryName.*;
+import static de.schlichtherle.truezip.io.fs.FSEntryName.*;
 import static java.io.File.*;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;

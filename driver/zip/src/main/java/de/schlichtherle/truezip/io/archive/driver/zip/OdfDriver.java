@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
-import de.schlichtherle.truezip.io.filesystem.concurrency.FSConcurrencyModel;
+import de.schlichtherle.truezip.io.fs.concurrency.FSConcurrencyModel;
 import java.io.OutputStream;
 import de.schlichtherle.truezip.io.socket.InputShop;
 import de.schlichtherle.truezip.io.socket.OutputShop;

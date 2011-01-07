@@ -15,17 +15,17 @@
  */
 package de.schlichtherle.truezip.io.file;
 
-import de.schlichtherle.truezip.io.filesystem.FSManagers;
-import de.schlichtherle.truezip.io.filesystem.FSPath;
+import de.schlichtherle.truezip.io.fs.FSManagers;
+import de.schlichtherle.truezip.io.fs.FSPath;
 import de.schlichtherle.truezip.io.archive.ArchiveFileSystemException;
 import de.schlichtherle.truezip.io.entry.Entry;
-import de.schlichtherle.truezip.io.filesystem.FSSyncException;
+import de.schlichtherle.truezip.io.fs.FSSyncException;
 import de.schlichtherle.truezip.io.InputBusyException;
 import de.schlichtherle.truezip.io.OutputBusyException;
-import de.schlichtherle.truezip.io.filesystem.FSInputOption;
+import de.schlichtherle.truezip.io.fs.FSInputOption;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.IOSocket;
-import de.schlichtherle.truezip.io.filesystem.FSOutputOption;
+import de.schlichtherle.truezip.io.fs.FSOutputOption;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -35,8 +35,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 
-import static de.schlichtherle.truezip.io.filesystem.FSEntryName.*;
-import static de.schlichtherle.truezip.io.filesystem.FSOutputOption.*;
+import static de.schlichtherle.truezip.io.fs.FSEntryName.*;
+import static de.schlichtherle.truezip.io.fs.FSOutputOption.*;
 import static de.schlichtherle.truezip.io.Files.*;
 import static java.io.File.*;
 

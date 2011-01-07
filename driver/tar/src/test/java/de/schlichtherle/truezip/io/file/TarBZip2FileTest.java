@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.archive.driver.tar.TarBZip2Driver;
-import de.schlichtherle.truezip.io.filesystem.FSScheme;
+import de.schlichtherle.truezip.io.fs.FSScheme;
 
 /**
  * @author Christian Schlichtherle
