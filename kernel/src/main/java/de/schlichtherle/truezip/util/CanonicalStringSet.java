@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.util;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.AbstractSet;
 import java.util.Iterator;
@@ -53,6 +53,20 @@ import java.util.TreeMap;
  */
 public class CanonicalStringSet extends AbstractSet<String> {
 
+    public interface Mapper {
+        /**
+         * Returns the canonical form of {@code s} or {@code null} if the
+         * given string does not have a canonical form.
+         *
+         * @param s The string to get canonicalized.
+         * @return The canonical form of {@code s} or {@code null} if
+         *         {@code s} does not have a canonical form.
+         */
+        @CheckForNull String canonicalize(@NonNull String s);
+    } // interface Mapper
+
+    private final Mapper mapper;
+
     /** The separator for string lists. */
     private final char separator;
 
@@ -64,7 +78,10 @@ public class CanonicalStringSet extends AbstractSet<String> {
      *
      * @param separator The separator character to use in string lists.
      */
-    public CanonicalStringSet(final char separator) {
+    public CanonicalStringSet(final @NonNull Mapper mapper, final char separator) {
+        if (null == mapper)
+            throw new NullPointerException();
+        this.mapper = mapper;
         this.separator = separator;
     }
 
@@ -73,32 +90,16 @@ public class CanonicalStringSet extends AbstractSet<String> {
      * canonical strings.
      *
      * @param separator The separator character to use in string lists.
-     * @param set A set of canonical strings - may be {@code null} to
-     *        construct an empty set.
+     * @param set A set of canonical strings to canonicalize and add to this set.
      */
-    public CanonicalStringSet(final char separator, final @NonNull CanonicalStringSet set) {
+    public CanonicalStringSet(  final @NonNull Mapper mapper,
+                                final char separator,
+                                final @NonNull CanonicalStringSet set) {
+        if (null == mapper)
+            throw new NullPointerException();
+        this.mapper = mapper;
         this.separator = separator;
-        addAll(set); // FIXME: dangerous constructor - calls canonicalize(*)!
-    }
-
-    /**
-     * A template method which returns the canonical form of {@code s} or
-     * {@code null} if the given string does not have a canonical form.
-     * <p>
-     * The implementation in the class {@link CanonicalStringSet} simply
-     * returns the method parameter.
-     * <p>
-     * <b>WARNING:</b> This method may get called from the constructor of this
-     * class!
-     *
-     * @param s The string to get canonicalized.
-     *        Never {@code null} and never contains the separator.
-     * @return The canonical form of {@code s} or {@code null} if
-     *         {@code s} does not have a canonical form.
-     */
-    protected String canonicalize(final String s) {
-        assert 0 > s.indexOf(separator) : "illegal separator position in suffix";
-        return s;
+        addAll(set);
     }
 
     @Override
@@ -264,7 +265,7 @@ public class CanonicalStringSet extends AbstractSet<String> {
         boolean changed = false;
         for (final Iterator<String> i = new StringIterator(list); i.hasNext(); ) {
             final String element = i.next();
-            final String canonical = canonicalize(element);
+            final String canonical = mapper.canonicalize(element);
             if (null != canonical)
                 changed |= null == map.put(canonical, element);
         }
@@ -291,18 +292,9 @@ public class CanonicalStringSet extends AbstractSet<String> {
      * @throws NullPointerException If {@code list} is {@code null}.
      */
     public final boolean retainAll(final String list) {
-        class CustomSet extends CanonicalStringSet {
-            CustomSet() {
-                super(separator);
-                super.addAll(list);
-            }
-
-            @Override
-            protected String canonicalize(String s) {
-                return CanonicalStringSet.this.canonicalize(s);
-            }
-        }
-        return map.keySet().retainAll(new CustomSet());
+        final CanonicalStringSet set = new CanonicalStringSet(mapper, separator);
+        set.addAll(list);
+        return map.keySet().retainAll(set);
     }
 
     /**
@@ -391,7 +383,7 @@ public class CanonicalStringSet extends AbstractSet<String> {
 
         private void advance() {
             while (i.hasNext()) {
-                canonical = canonicalize(i.next());
+                canonical = mapper.canonicalize(i.next());
                 if (canonical != null)
                     return;
             }
