@@ -1759,176 +1759,69 @@ public final class File extends java.io.File {
         return de.schlichtherle.truezip.io.Files.isUNC(this);
     }
 
+    // Make static code analysis shut up about missing hashCode().
     @Override
     public int hashCode() {
-        // Note that we cannot just return the paths' hash code:
-        // Some platforms consider the case of files when comparing file
-        // paths and some don't.
-        // However, the entries INSIDE a archive file ALWAYS consider
-        // case.
-        // In addition, on Mac OS the Java implementation is not consistent
-        // with the filesystem, i.e. the fs ignores case whereas
-        // java.io.File.equals(...) and java.io.File.hashcode() consider case.
-        // The following code distinguishes these cases.
-        final File enclArchive = this.enclArchive;
-        if (null != enclArchive) {
-            // This file IS enclosed in an archive file.
-            return 31 * enclArchive.hashCode() + enclEntryName.hashCode();
-        } else {
-            // This file is NOT enclosed in an archive file.
-            return delegate.hashCode();
-        }
+        return super.hashCode();
     }
 
     /**
-     * Tests this abstract path for equality with the given object.
-     * Returns {@code true} if and only if the argument is not
-     * {@code null} and is an abstract path that denotes the same
-     * abstract path for a file or directory as this abstract path.
+     * {@inheritDoc}
      * <p>
-     * If the given file is not an instance of this class, the call is
-     * forwarded to the superclass in order to ensure the required symmetry
-     * of {@link Object#equals(Object)}.
+     * The implementation in this class behaves exactly like its superclass.
+     * Note that this implies that only the hierarchicalized file system path
+     * of this file instance is considered in the comparison.
+     * E.g. {@code new File(FSPath.create("zip:file:/archive!/entry"))} and
+     * {@code new File(FSPath.create("tar:file:/archive!/entry"))} would
+     * compare equal because their hierarchicalized file system path is
+     * {@code "file:/archive/entry"}.
      * <p>
-     * Otherwise, whether or not two abstract paths are equal depends upon the
-     * underlying operating and file system:
-     * On UNIX systems, alphabetic case is significant in comparing paths.
-     * On Microsoft Windows systems it is not unless the path denotes
-     * an entry in an archive file. In the latter case, the left part of the
-     * path up to the (leftmost) archive file is compared ignoring case
-     * while the remainder (the entry name) is compared considering case.
-     * This case distinction allows an application on Windows to deal with
-     * archive files generated on other platforms which may contain different
-     * entry with names that just differ in case (like e.g. hello.txt and
-     * HELLO.txt).
+     * More formally, let {@code a} and {@code b} be two File objects.
+     * Then if the expression
+     * {@code a.toFSPath().hierarchicalize().equals(b.toFSPath().hierarchicalize())}
+     * is true, the expression {@code a.equals(b)} is also true.
      * <p>
-     * Thus, on Windows the following assertions all succeed:
-     * <pre>
-     * File a, b;
-     * a = new File(&quot;c:\\any.txt&quot;);
-     * b = new File(&quot;C:\\ANY.TXT&quot;);
-     * assert a.equals(b);
-     * assert b.equals(a);
-     * a = new File(&quot;c:\\any.zip\\test.txt&quot;),
-     * b = new File(&quot;C:\\ANY.ZIP\\test.txt&quot;);
-     * assert a.equals(b);
-     * assert b.equals(a);
-     * a = new File(&quot;c:/any.zip/test.txt&quot;);
-     * b = new File(&quot;C:\\ANY.ZIP\\test.txt&quot;);
-     * assert a.equals(b);
-     * assert b.equals(a);
-     * a = new File(&quot;c:\\any.zip\\test.txt&quot;);
-     * b = new File(&quot;C:/ANY.ZIP/test.txt&quot;);
-     * assert a.equals(b);
-     * assert b.equals(a);
-     * a = new File(&quot;c:/any.zip/test.txt&quot;);
-     * b = new File(&quot;C:/ANY.ZIP/test.txt&quot;);
-     * assert a.equals(b);
-     * assert b.equals(a);
-     * a = new File(&quot;\\\\localhost\\any.zip\\test.txt&quot;);
-     * b = new File(&quot;\\\\LOCALHOST\\ANY.ZIP\\test.txt&quot;);
-     * assert a.equals(b);
-     * assert b.equals(a);
-     * a = new File(&quot;//localhost/any.zip/test.txt&quot;);
-     * b = new File(&quot;\\\\LOCALHOST\\ANY.ZIP\\test.txt&quot;);
-     * assert a.equals(b);
-     * assert b.equals(a);
-     * a = new File(&quot;\\\\localhost\\any.zip\\test.txt&quot;);
-     * b = new File(&quot;//LOCALHOST/ANY.ZIP/test.txt&quot;);
-     * assert a.equals(b);
-     * assert b.equals(a);
-     * a = new File(&quot;//localhost/any.zip/test.txt&quot;);
-     * b = new File(&quot;//LOCALHOST/ANY.ZIP/test.txt&quot;);
-     * assert a.equals(b);
-     * assert b.equals(a);
-     * a = new File(&quot;c:\\any.zip\\test.txt&quot;);
-     * b = new File(&quot;c:\\any.zip\\TEST.TXT&quot;);
-     * assert !a.equals(b); // two different entries in same ZIP file!
-     * assert !b.equals(a);
-     * </pre>
+     * Note that this does <em>not</em> work vice versa:
+     * E.g. on Windows, the expression
+     * {@code new File("file").equals(new File("FILE"))} is true, but
+     * {@code new File("file").toFSPath().hierarchicalize().equals(new File("FILE").toFSPath().hierarchicalize())}
+     * is false because {@link FSPath#equals(Object)} is case sensitive.
      *
-     * @param other The object to be compared with this abstract path.
-     *
-     * @return {@code true} if and only if the objects are equal,
-     *         {@code false} otherwise
-     *
-     * @see #compareTo(Object)
-     * @see Object#equals(Object)
+     * @see #compareTo(java.io.File)
      */
     @Override
-    public boolean equals(final Object other) {
-        if (other instanceof File)
-            return compareTo((File) other) == 0;
-        return super.equals(other); // don't use delegate - would break symmetry requirement!
+    @SuppressWarnings({"EqualsWhichDoesntCheckParameterClass"})
+    public boolean equals(Object that) {
+        return super.equals(that);
     }
 
     /**
-     * Compares this file's path to the given file's path.
+     * {@inheritDoc}
      * <p>
-     * If the given file is not an instance of this class, the call is
-     * forwarded to the superclass in order to ensure the required symmetry
-     * of {@link Comparable#compareTo(Object)}.
+     * The implementation in this class behaves exactly like its superclass.
+     * Note that this implies that only the hierarchicalized file system path
+     * of this file instance is considered in the comparison.
+     * E.g. {@code new File(FSPath.create("zip:file:/archive!/entry"))} and
+     * {@code new File(FSPath.create("tar:file:/archive!/entry"))} would
+     * compare equal because their hierarchicalized file system path is
+     * {@code "file:/archive/entry"}.
      * <p>
-     * Otherwise, whether or not two abstract paths compare equal depends
-     * upon the underlying operating and file system:
-     * On UNIX platforms, alphabetic case is significant in comparing paths.
-     * On the Windows platform it is not unless the path denotes
-     * an entry in an archive file. In the latter case, the left part of the
-     * path up to the (leftmost) archive file is compared in platform
-     * dependent manner (hence ignoring case) while the remainder (the entry
-     * name) is compared considering case.
-     * This case distinction allows an application on the Windows platform to
-     * deal with archive files generated on other platforms which may contain
-     * different entries with names that just differ in case
-     * (like e.g. {@code "hello.txt"} and {@code "HELLO.txt"}).
-     *
-     * @param other The file to be compared with this abstract path.
-     *
-     * @return A negative integer, zero, or a positive integer as this object
-     *         is less than, equal to, or greater than the given file.
+     * More formally, let {@code a} and {@code b} be two File objects.
+     * Then if the expression
+     * {@code a.toFSPath().hierarchicalize().compareTo(b.toFSPath().hierarchicalize()) == 0}
+     * is true, the expression {@code a.compareTo(b) == 0} is also true.
+     * <p>
+     * Note that this does <em>not</em> work vice versa:
+     * E.g. on Windows, the expression
+     * {@code new File("file").compareTo(new File("FILE")) == 0} is true, but
+     * {@code new File("file").toFSPath().hierarchicalize().compareTo(new File("FILE").toFSPath().hierarchicalize()) == 0}
+     * is false because {@link FSPath#equals(Object)} is case sensitive.
      *
      * @see #equals(Object)
-     * @see Comparable#compareTo(Object)
      */
     @Override
     public int compareTo(java.io.File other) {
-        if (this == other)
-            return 0;
-
-        if (!(other instanceof File)) {
-            // Degrade this file to a plain file in order to ensure
-            // sgn(this.compareTo(other)) == -sgn(other.compareTo(this)).
-            return super.compareTo(other); // don't use entry - would break antisymmetry requirement!
-        }
-
-        final File file = (File) other;
-
-        // Note that we cannot just compare the paths:
-        // Some platforms consider the case of files when comparing file
-        // paths and some don't.
-        // However, the entries INSIDE a archive file ALWAYS consider
-        // case.
-        // The following code distinguishes these cases.
-        final File enclArchive = this.enclArchive;
-        if (enclArchive != null) {
-            // This file IS enclosed in a archive file.
-            final File fileEnclArchive = file.enclArchive;
-            if (fileEnclArchive != null) {
-                // The given file IS enclosed in a archive file, too.
-                int ret = enclArchive.compareTo(fileEnclArchive);
-                if (ret == 0) {
-                    // Now that the paths of the enclosing archive
-                    // files compare equal, let's compare the entry names.
-                    ret = enclEntryName.compareTo(file.enclEntryName);
-                }
-
-                return ret;
-            }
-        }
-
-        // Degrade this file to a plain file in order to ensure
-        // sgn(this.compareTo(other)) == -sgn(other.compareTo(this)).
-        return super.compareTo(other); // don't use delegate - would break antisymmetry requirement!
+        return super.compareTo(other);
     }
 
     /**
