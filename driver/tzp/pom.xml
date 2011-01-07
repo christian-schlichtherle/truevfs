@@ -52,7 +52,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <exclude>**/PromptingKeyManagerUITest.java</exclude> <!-- FIXME: Make this test work again! -->
+                        <exclude>**/PromptingKeyManagerTest.java</exclude> <!-- FIXME: Make this test work again! -->
                     </excludes>
                 </configuration>
             </plugin>

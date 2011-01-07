@@ -31,7 +31,7 @@ import org.netbeans.jemmy.operators.JDialogOperator;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class PromptingKeyManagerUITest extends TestCase {
+public class PromptingKeyManagerTest extends TestCase {
     static {
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput()); // shut up!
 
@@ -48,7 +48,7 @@ public class PromptingKeyManagerUITest extends TestCase {
                     "de.schlichtherle.truezip.key.passwd.swing.HurlingWindowFeedback"));
     }
 
-    public PromptingKeyManagerUITest(String testName) {
+    public PromptingKeyManagerTest(String testName) {
         super(testName);
     }
 

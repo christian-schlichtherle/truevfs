@@ -32,7 +32,7 @@ import org.netbeans.jemmy.operators.JFrameOperator;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class AesKeyStrengthPanelUITest extends TestCase {
+public class AesKeyStrengthPanelTest extends TestCase {
     static {
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput()); // shut up!
     }
@@ -41,7 +41,7 @@ public class AesKeyStrengthPanelUITest extends TestCase {
     private JFrame frame;
     private JFrameOperator frameOp;
 
-    public AesKeyStrengthPanelUITest(String testName) {
+    public AesKeyStrengthPanelTest(String testName) {
         super(testName);
     }
 
@@ -178,7 +178,7 @@ public class AesKeyStrengthPanelUITest extends TestCase {
         try {
             Thread.sleep(50);
         } catch (InterruptedException ex) {
-            Logger.getLogger(AesKeyStrengthPanelUITest.class.getName()).log(Level.WARNING, "Current thread was interrupted while waiting!", ex);
+            Logger.getLogger(AesKeyStrengthPanelTest.class.getName()).log(Level.WARNING, "Current thread was interrupted while waiting!", ex);
         }
     }
 }

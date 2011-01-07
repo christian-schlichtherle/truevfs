@@ -27,7 +27,6 @@ import org.netbeans.jemmy.ComponentChooser;
 import org.netbeans.jemmy.JemmyProperties;
 import org.netbeans.jemmy.TestOut;
 import org.netbeans.jemmy.operators.JButtonOperator;
-import org.netbeans.jemmy.operators.JCheckBoxOperator;
 import org.netbeans.jemmy.operators.JComboBoxOperator;
 import org.netbeans.jemmy.operators.JFileChooserOperator;
 import org.netbeans.jemmy.operators.JFrameOperator;
@@ -42,24 +41,24 @@ import org.netbeans.jemmy.util.NameComponentChooser;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class OpenKeyPanelUITest extends TestCase {
+public class CreateKeyPanelTest extends TestCase {
     static {
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput()); // shut up!
     }
 
-    private OpenKeyPanel instance;
+    private CreateKeyPanel instance;
     private JFrameOperator frame;
     private JLabelOperator errorLabel;
     private final ComponentChooser keyFileChooser
                 = new NameComponentChooser("keyFileChooser");
 
-    public OpenKeyPanelUITest(String testName) {
+    public CreateKeyPanelTest(String testName) {
         super(testName);
     }
 
     @Override
     protected void setUp() throws Exception {
-        instance = new OpenKeyPanel();
+        instance = new CreateKeyPanel();
         frame = showInstanceInFrame();
         errorLabel = findErrorLabel(frame);
     }
@@ -89,13 +88,8 @@ public class OpenKeyPanelUITest extends TestCase {
 
     @Override
     protected void tearDown() throws Exception {
-        EventQueue.invokeAndWait(new Runnable() {
-            @Override
-			public void run() {
-                //frame.setVisible(false);
-                frame.dispose();
-            }
-        });
+        frame.setVisible(false);
+        //frame.dispose();
     }
 
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
@@ -108,7 +102,7 @@ public class OpenKeyPanelUITest extends TestCase {
     }
 
     /**
-     * Test of setError method, of class de.schlichtherle.truezip.key.passwd.swing.OpenKeyPanel.
+     * Test of setError method, of class de.schlichtherle.truezip.key.passwd.swing.CreateKeyPanel.
      */
     public void testSetError() {
         instance.setError("This is a test error message!");
@@ -129,44 +123,58 @@ public class OpenKeyPanelUITest extends TestCase {
     }
 
     /**
-     * Test of getOpenKey method, of class de.schlichtherle.truezip.key.passwd.swing.OpenKeyPanel.
+     * Test of getCreateKey method, of class de.schlichtherle.truezip.key.passwd.swing.CreateKeyPanel.
      */
     public void testPasswd() {
         String passwd;
         Object result;
 
-        final JLabelOperator errorLabel = findErrorLabel(frame);
-
         // Check default.
-        result = instance.getOpenKey();
-        assertTrue(result instanceof char[]);
-        assertTrue(Arrays.equals("".toCharArray(), (char[]) result));
-        assertTrue(isBlank(errorLabel.getText()));
+        result = instance.getCreateKey();
+        assertNull(result);
+        assertFalse(isBlank(errorLabel.getText()));
 
-        passwd = "secret";
-        new JPasswordFieldOperator(frame).setText(passwd);
-        result = instance.getOpenKey();
+        // Enter mismatching passwords.
+        new JPasswordFieldOperator(frame, 0).setText("foofoo");
+        new JPasswordFieldOperator(frame, 1).setText("barbar");
+        result = instance.getCreateKey();
+        assertNull(result);
+        assertFalse(isBlank(errorLabel.getText()));
+
+        // Enter matching passwords, too short.
+        passwd = "secre"; // 5 chars is too short
+        new JPasswordFieldOperator(frame, 0).setText(passwd);
+        new JPasswordFieldOperator(frame, 1).setText(passwd);
+        result = instance.getCreateKey();
+        assertNull(result);
+        assertFalse(isBlank(errorLabel.getText()));
+
+        // Enter matching passwords, long enough.
+        passwd = "secret"; // min 6 chars is OK
+        new JPasswordFieldOperator(frame, 0).setText(passwd);
+        new JPasswordFieldOperator(frame, 1).setText(passwd);
+        result = instance.getCreateKey();
         assertTrue(result instanceof char[]);
         assertTrue(Arrays.equals(passwd.toCharArray(), (char[]) result));
         assertTrue(isBlank(errorLabel.getText()));
     }
 
     /**
-     * Test of getOpenKey method, of class de.schlichtherle.truezip.key.passwd.swing.OpenKeyPanel.
+     * Test of getCreateKey method, of class de.schlichtherle.truezip.key.passwd.swing.CreateKeyPanel.
      */
-    public void testKeyFile() {
+    public void testGetFileAsCreateKey() {
         new JTabbedPaneOperator(frame).selectPage(AuthenticationPanel.AUTH_KEY_FILE); // select tab for key files
 
         new JButtonOperator(frame, keyFileChooser).push(); // open file chooser
         new JFileChooserOperator().chooseFile("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"$%&/()=?");
         assertTrue(isBlank(errorLabel.getText()));
-        assertNull(instance.getOpenKey());
-        assertNotNull(errorLabel.getText());
+        assertNull(instance.getCreateKey());
+        assertFalse(isBlank(errorLabel.getText()));
 
         new JButtonOperator(frame, keyFileChooser).push(); // open file chooser
         JFileChooserOperator fc = new JFileChooserOperator();
         File[] files = fc.getFiles();
-        fc.cancel(); // close file chooser
+        fc.cancel(); // revert to password panel
 
         for (int i = 0, l = files.length; i < l; i++) {
             final File file = files[i];
@@ -176,8 +184,8 @@ public class OpenKeyPanelUITest extends TestCase {
             new JButtonOperator(frame, keyFileChooser).push(); // open file chooser
             fc = new JFileChooserOperator();
             fc.setSelectedFile(file);
-            fc.approve(); // close file chooser
-            final Object key = instance.getOpenKey();
+            fc.approve();
+            final Object key = instance.getCreateKey();
             if (key != null) {
                 assertTrue(key instanceof byte[]);
                 assertTrue(isBlank(errorLabel.getText()));
@@ -188,29 +196,7 @@ public class OpenKeyPanelUITest extends TestCase {
     }
 
     /**
-     * Test of is/setKeyChangeRequested method, of class de.schlichtherle.truezip.key.passwd.swing.OpenKeyPanel.
-     */
-    public void testKeyChangeRequested() {
-        assertFalse(instance.isKeyChangeRequested());
-        assertFalse(new JCheckBoxOperator(frame).isSelected());
-
-        instance.setKeyChangeRequested(true);
-        assertTrue(instance.isKeyChangeRequested());
-        assertTrue(new JCheckBoxOperator(frame).isSelected());
-
-        instance.setKeyChangeRequested(false);
-        assertFalse(instance.isKeyChangeRequested());
-        assertFalse(new JCheckBoxOperator(frame).isSelected());
-
-        new JCheckBoxOperator(frame).setSelected(true);
-        assertTrue(instance.isKeyChangeRequested());
-
-        new JCheckBoxOperator(frame).setSelected(false);
-        assertFalse(instance.isKeyChangeRequested());
-    }
-
-    /**
-     * Test of get/setExtraDataUI method, of class de.schlichtherle.truezip.key.passwd.swing.OpenKeyPanel.
+     * Test of get/setExtraDataUI method, of class de.schlichtherle.truezip.key.passwd.swing.CreateKeyPanel.
      */
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testExtraDataUI() {
