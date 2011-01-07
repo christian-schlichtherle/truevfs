@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.io.archive.driver;
 
 import de.schlichtherle.truezip.io.archive.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.DummyArchiveEntry;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.filesystem.concurrency.FSConcurrencyModel;
@@ -34,17 +35,25 @@ public final class DummyArchiveDriver extends ArchiveDriver<ArchiveEntry> {
     private static final long serialVersionUID = 1L;
 
     @Override
-    public InputShop<ArchiveEntry> newInputShop(FSConcurrencyModel model, InputSocket<?> input) throws IOException {
+    public InputShop<ArchiveEntry> newInputShop(
+            FSConcurrencyModel model,
+            InputSocket<?> input)
+    throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public OutputShop<ArchiveEntry> newOutputShop(FSConcurrencyModel model, OutputSocket<?> output, InputShop<ArchiveEntry> source) throws IOException {
+    public OutputShop<ArchiveEntry> newOutputShop(
+            FSConcurrencyModel model,
+            OutputSocket<?> output,
+            InputShop<ArchiveEntry> source)
+    throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public ArchiveEntry newEntry(String name, Type type, Entry template) throws CharConversionException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public ArchiveEntry newEntry(String name, Type type, Entry template)
+    throws CharConversionException {
+        return new DummyArchiveEntry(name, type, template);
     }
 }

@@ -29,8 +29,8 @@ import static org.junit.Assert.*;
 public class FSFilterManagerTest extends FSManagerTestCase {
 
     @Override
-    public void setUp() {
-        manager = new FSFilterManager(
+    protected FSManager newManager() {
+        return new FSFilterManager(
                 new FSFederationManager(),
                 FSMountPoint.create("file:/"));
     }
@@ -50,7 +50,7 @@ public class FSFilterManagerTest extends FSManagerTestCase {
             final FSManager manager = new FSFederationManager(
                     STRONG);
             for (final String param : params[1])
-                manager.getController(FSMountPoint.create(param), driver);
+                manager.getController(FSMountPoint.create(param), new FSDummyDriver());
             assertThat(manager.getSize(), is(params[1].length));
 
             final Set<FSMountPoint> set = new HashSet<FSMountPoint>();

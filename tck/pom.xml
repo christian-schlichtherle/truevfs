@@ -19,19 +19,21 @@
 
     <parent>
         <groupId>de.schlichtherle.truezip</groupId>
-        <artifactId>truezip-pom</artifactId>
+        <artifactId>truezip</artifactId>
         <version>7.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>truezip-tck</artifactId>
-    <name>TrueZIP TCK</name>
+    <packaging>pom</packaging>
+    <name>TrueZIP TCK (POM)</name>
+    <description>The Project Object Model (POM) for Technology Compatibility Kits (TCK).</description>
+
+    <modules>
+        <module>driver</module>
+        <module>kernel</module>
+    </modules>
 
     <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truezip-kernel</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

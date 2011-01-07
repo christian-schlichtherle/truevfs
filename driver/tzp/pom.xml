@@ -19,18 +19,30 @@
 
     <parent>
         <groupId>de.schlichtherle.truezip</groupId>
-        <artifactId>truezip-driver-pom</artifactId>
+        <artifactId>truezip-driver</artifactId>
         <version>7.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>truezip-driver-tzp</artifactId>
-    <name>TrueZIP ZIP/RAES Driver Family</name>
+    <name>TrueZIP Driver TZP (ZIP.RAES)</name>
+    <description>The RAES encrypted ZIP driver family. Add this artifact to the run time class path in order to make the File* API recognize this archive type.</description>
 
     <dependencies>
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk16</artifactId>
             <version>1.45</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truezip-driver-zip</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truezip-tck-driver-zip</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

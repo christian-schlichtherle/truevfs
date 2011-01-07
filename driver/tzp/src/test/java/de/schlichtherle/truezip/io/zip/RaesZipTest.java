@@ -22,7 +22,6 @@ import de.schlichtherle.truezip.crypto.io.raes.RaesReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.zip.ZipFile;
 import de.schlichtherle.truezip.io.zip.ZipOutputStream;
-import de.schlichtherle.truezip.io.zip.ZipTestCase;
 
 import java.io.File;
 import java.io.IOException;

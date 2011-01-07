@@ -16,8 +16,7 @@
 package de.schlichtherle.truezip.io.filesystem;
 
 import java.util.Iterator;
-import de.schlichtherle.truezip.io.filesystem.file.FSFileDriver;
-import de.schlichtherle.truezip.io.archive.driver.zip.ZipDriver;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,12 +33,15 @@ import static org.junit.Assert.*;
  */
 public abstract class FSManagerTestCase {
 
-    protected FSManager manager;
-    final FSDriver driver = new Driver();
+    private final FSDriver driver = new FSDummyDriver();
+    private FSManager manager;
 
     @Before
     public void setUp() {
+        manager = newManager();
     }
+
+    protected abstract @NonNull FSManager newManager();
 
     @After
     public final void tearDown() {
@@ -138,27 +140,6 @@ public abstract class FSManagerTestCase {
             Thread.sleep(50);
         } catch (InterruptedException ex) {
             Logger.getLogger(FSManagerTestCase.class.getName()).log(Level.WARNING, "Current thread was interrupted while waiting!", ex);
-        }
-    }
-
-    /** Represents the "file" URI scheme. */
-    private static final FSScheme FILE = FSScheme.create("file");
-
-    static class Driver implements FSDriver {
-        @Override
-        public FSController<?> newController(
-                final FSMountPoint mountPoint,
-                final FSController<?> parent) {
-            assert null == mountPoint.getParent()
-                    ? null == parent
-                    : mountPoint.getParent().equals(parent.getModel().getMountPoint());
-            final FSScheme scheme = mountPoint.getScheme();
-            if (FILE.equals(scheme)) {
-                return new FSFileDriver().newController(mountPoint);
-            } else if (FSScheme.create("zip").equals(scheme)) {
-                return new ZipDriver().newController(mountPoint, parent);
-            } else
-                throw new IllegalArgumentException();
         }
     }
 }

@@ -22,8 +22,7 @@ package de.schlichtherle.truezip.io.filesystem;
 public class FSStatisticsManagerTest extends FSManagerTestCase {
 
     @Override
-    public void setUp() {
-        manager = new FSStatisticsManager(
-                new FSFederationManager());
+    protected FSManager newManager() {
+        return new FSStatisticsManager(new FSFederationManager());
     }
 }

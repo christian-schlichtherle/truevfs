@@ -19,18 +19,11 @@
 
     <parent>
         <groupId>de.schlichtherle.truezip</groupId>
-        <artifactId>truezip-driver-pom</artifactId>
+        <artifactId>truezip-driver</artifactId>
         <version>7.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>truezip-driver-zip</artifactId>
-    <name>TrueZIP ZIP Driver Family</name>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.ant</groupId>
-            <artifactId>ant</artifactId>
-            <version>1.8.1</version>
-        </dependency>
-    </dependencies>
+    <name>TrueZIP Driver ZIP</name>
+    <description>The ZIP driver family. Add this artifact to the run time class path in order to make the File* API recognize this archive type.</description>
 </project>

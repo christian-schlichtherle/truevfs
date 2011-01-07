@@ -226,12 +226,6 @@ public class DefaultArchiveDetectorTest {
     @Test
     public void testGetSuffixes() {
         testGetSuffixes(new String[] {
-            "", "",
-            "", ".",
-            "", "|",
-            "", ".|",
-            "", "|.",
-
             "zip", "zip",
             "zip", ".zip",
             "zip", "|zip",
@@ -294,19 +288,13 @@ public class DefaultArchiveDetectorTest {
         for (int i = 0; i < args.length; i++) {
             final String result = args[i++];
             final String suffixes = args[i];
-            DefaultArchiveDetector detector;
-            detector = new DefaultArchiveDetector(suffixes);
+            DefaultArchiveDetector
+            detector = new DefaultArchiveDetector(suffixes, DRIVER);
             assertEquals(result, detector.getSuffixes());
-            if (result.length() > 0) {
-                detector = new DefaultArchiveDetector(suffixes, DRIVER);
-                assertEquals(result, detector.getSuffixes());
-                detector = new DefaultArchiveDetector(
-                        NULL, suffixes, DRIVER);
-                assertEquals(result, detector.getSuffixes());
-                detector = new DefaultArchiveDetector(
-                        NULL, new Object[] { suffixes, DRIVER });
-                assertEquals(result, detector.getSuffixes());
-            }
+            detector = new DefaultArchiveDetector(NULL, suffixes, DRIVER);
+            assertEquals(result, detector.getSuffixes());
+            detector = new DefaultArchiveDetector(NULL, new Object[] { suffixes, DRIVER });
+            assertEquals(result, detector.getSuffixes());
         }
     }
 

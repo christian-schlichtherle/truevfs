@@ -19,28 +19,53 @@
 
     <parent>
         <groupId>de.schlichtherle.truezip</groupId>
-        <artifactId>truezip-pom</artifactId>
+        <artifactId>truezip</artifactId>
         <version>7.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>truezip-samples</artifactId>
-    <name>TrueZIP Sample Applications</name>
+    <name>TrueZIP Samples</name>
+    <description>TrueZIP sample applications. Some of them use advanced/exotic features.</description>
 
     <dependencies>
+        <!-- Any TrueZIP application has a compile time dependency on the
+             kernel. -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truezip-kernel</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <!-- A TrueZIP application typically has a runtime dependency on one
+             or more archive drivers.
+             When found on the class path, an archive driver is automatically
+             registered for use by the File* API. -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truezip-driver-tar</artifactId>
             <version>${project.version}</version>
+            <!-- Note that TrueZIP applications would typically only have a
+                 runtime dependency.
+                 However, these sample applications differ. -->
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truezip-driver-tzp</artifactId>
             <version>${project.version}</version>
+            <!-- Note that TrueZIP applications would typically only have a
+                 runtime dependency.
+                 However, these sample applications differ. -->
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truezip-driver-zip</artifactId>
+            <version>${project.version}</version>
+            <!-- Note that TrueZIP applications would typically only have a
+                 runtime dependency.
+                 However, these sample applications differ. -->
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>
