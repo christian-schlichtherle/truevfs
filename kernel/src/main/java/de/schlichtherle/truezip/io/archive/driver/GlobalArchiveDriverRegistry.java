@@ -73,8 +73,6 @@ implements Serializable {
     private static final String PACKAGE_NAME
             = GlobalArchiveDriverRegistry.class.getPackage().getName();
     private static final String PROP_KEY_REGISTRY = PACKAGE_NAME;
-    private static final String PROP_KEY_DEFAULT_SUFFIXES
-            = PROP_KEY_REGISTRY + ".default";
 
     static final String KWD_NULL = "NULL";  // NOI18N
     static final String KWD_ALL = "ALL";    // NOI18N
@@ -84,20 +82,9 @@ implements Serializable {
     public static final GlobalArchiveDriverRegistry INSTANCE
             = new GlobalArchiveDriverRegistry();
 
-    /**
-     * The canonical list of archive file suffixes in the global registry
-     * which have been configured to be recognized by default.
-     */
-    @Deprecated
-    public final String DEFAULT_SUFFIXES;
-
-    /**
-     * The canonical list of all archive file suffixes in the global registry.
-     */
-    public final String ALL_SUFFIXES;
-
     static {
         logger.config("banner"); // NOI18N
+        INSTANCE.logConfiguration();
     }
 
     /**
@@ -114,15 +101,6 @@ implements Serializable {
      */
     private GlobalArchiveDriverRegistry() {
         registerArchiveDrivers();
-
-        // Initialize suffix lists.
-        // Note that retrieval of the default suffix list must be done first
-        // in order to remove the DEFAULT key from the drivers map if present.
-        // The driver lookup would throw an exception on this entry otherwise.
-        DEFAULT_SUFFIXES = getDefaultSuffixes().toString();
-        ALL_SUFFIXES = getSuffixes().toString();
-
-        logConfiguration();
     }
 
     /**
@@ -230,52 +208,6 @@ implements Serializable {
                 (Map) config, false);
     }
 
-    /**
-     * Consumes and processes the entry for the keyword {@code DEFAULT}
-     * in the map.
-     * If a suffix is specified for which no driver is registered, then a
-     * warning is logged and the suffix is removed from the return value.
-     *
-     * @return The set of suffixes processed by evaluating the value of the
-     *         entry with the key {@code DEFAULT} in the map of drivers.
-     *         May be empty, but never {@code null}.
-     */
-    @Deprecated
-    private SuffixSet getDefaultSuffixes() {
-        final SuffixSet set;
-        final String defaultSuffixesProperty
-                = System.getProperty(PROP_KEY_DEFAULT_SUFFIXES);
-        if (null != defaultSuffixesProperty) {
-            set = new SuffixSet(defaultSuffixesProperty);
-        } else {
-            set = (SuffixSet) drivers.remove(KWD_DEFAULT);
-            if (set == null)
-                return new SuffixSet();
-        }
-
-        final SuffixSet all = getSuffixes();
-        boolean clear = false;
-        boolean addAll = false;
-        for (final Iterator<String> i = set.originalIterator(); i.hasNext(); ) {
-            final String suffix = i.next();
-            if (KWD_NULL.equals(suffix)) {
-                i.remove();
-                clear = true;
-            } else if (KWD_ALL.equals(suffix)) {
-                i.remove();
-                addAll = true;
-            } else if (!all.contains(suffix)) {
-                i.remove();
-                logger.log(Level.WARNING, "unknownSuffix", suffix); // NOI18N
-            }
-        }
-        if (clear)
-            set.clear();
-        else if (addAll)
-            set.addAll(all);
-        return set;
-    }
-
     private void logConfiguration() {
         final Iterator<Map.Entry<String, Object>> i = drivers.entrySet().iterator();
         if (i.hasNext()) {
@@ -284,14 +216,9 @@ implements Serializable {
                 logger.log(Level.CONFIG, "driverRegistered", // NOI18N
                         new Object[] { entry.getKey(), entry.getValue() });
             } while (i.hasNext());
-
-            logger.log(Level.CONFIG, "allSuffixList", ALL_SUFFIXES); // NOI18N
-            if (DEFAULT_SUFFIXES.length() > 0)
-                logger.log(Level.CONFIG, "defaultSuffixList", DEFAULT_SUFFIXES); // NOI18N
-            else
-                logger.config("noDefaultSuffixes"); // NOI18N
+            logger.log(Level.CONFIG, "suffixList", getSuffixes().toString()); // NOI18N
         } else {
-            logger.warning("noDriversConfigured"); // NOI18N
+            logger.warning("noDriversRegistered"); // NOI18N
         }
     }
 }

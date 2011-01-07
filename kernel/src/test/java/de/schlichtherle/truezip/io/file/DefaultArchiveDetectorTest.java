@@ -51,7 +51,7 @@ public class DefaultArchiveDetectorTest {
     @Test
     public void testDefaultConfiguration() {
         assertTrue(NULL.getSuffixes().isEmpty());
-        //assertTrue(!ALL.getSuffixes().isEmpty());
+        //assertTrue(!ALL.getSuffixes().isEmpty()); // depends on run time class path configuration
     }
 
     @Test
@@ -83,7 +83,6 @@ public class DefaultArchiveDetectorTest {
                     { "ALL" },
                     { "unknownSuffix" },
                     { "DRIVER", DRIVER }, // illegal keyword
-                    { "DEFAULT", DRIVER }, // illegal keyword
                     { "", DRIVER }, // empty suffix set
                     { ".", DRIVER }, // empty suffix set
                     { "|", DRIVER }, // empty suffix set
@@ -93,7 +92,6 @@ public class DefaultArchiveDetectorTest {
                     { "|.|", DRIVER }, // empty suffix set
                     { "|.|.", DRIVER }, // empty suffix set
                     { NULL, "DRIVER", DRIVER }, // illegal keyword
-                    { NULL, "DEFAULT", DRIVER }, // illegal keyword
                     { NULL, "", DRIVER }, // empty suffix set
                     { NULL, ".", DRIVER }, // empty suffix set
                     { NULL, "|", DRIVER }, // empty suffix set
@@ -103,7 +101,6 @@ public class DefaultArchiveDetectorTest {
                     { NULL, "|.|", DRIVER }, // empty suffix set
                     { NULL, "|.|.", DRIVER }, // empty suffix set
                     { NULL, new Object[] { "DRIVER", DRIVER } }, // illegal keyword
-                    { NULL, new Object[] { "DEFAULT", DRIVER } }, // illegal keyword
                     { NULL, new Object[] { "", DRIVER } }, // empty suffix set
                     { NULL, new Object[] { ".", DRIVER } }, // empty suffix set
                     { NULL, new Object[] { "|", DRIVER } }, // empty suffix set

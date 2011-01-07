@@ -39,7 +39,7 @@ import javax.swing.UIManager;
 // The reason for this is the completely broken design of the genuine
 // JFileChooser, FileSystemView, FileView, ShellFolder and BasicFileChooserUI
 // classes.
-// The FileSystemView uses a lot of "instanceof" runtime type detections
+// The FileSystemView uses a lot of "instanceof" run time type detections
 // in conjunction with Sun's proprietory (and platform dependent) ShellFolder
 // class, which subclasses java.io.File.
 // Other classes like BasicFileChooserUI also rely on the use of the

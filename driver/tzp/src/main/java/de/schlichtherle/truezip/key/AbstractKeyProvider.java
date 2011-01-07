@@ -61,7 +61,7 @@ public abstract class AbstractKeyProvider<K extends Cloneable>
      *         In case of an array, a shallow copy of the array is returned.
      * @throws UnknownKeyException If {@code getCreateKeyImpl} throws
      *         this or the returned key is {@code null}.
-     * @throws RuntimeException If cloning the key results in a runtime
+     * @throws RuntimeException If cloning the key results in a run time
      *         exception.
      * @see KeyProvider#getCreateKey
      */
@@ -100,7 +100,7 @@ public abstract class AbstractKeyProvider<K extends Cloneable>
      *         In case of an array, a shallow copy of the array is returned.
      * @throws UnknownKeyException If {@code getOpenKeyImpl} throws
      *         this or the returned key is {@code null}.
-     * @throws RuntimeException If cloning the key results in a runtime
+     * @throws RuntimeException If cloning the key results in a run time
      *         exception.
      * @see KeyProvider#getOpenKey
      */
