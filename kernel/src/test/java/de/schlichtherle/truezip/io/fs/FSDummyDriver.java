@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.fs;
 
-import de.schlichtherle.truezip.io.archive.driver.DummyArchiveDriver;
+import de.schlichtherle.truezip.io.fs.archive.driver.DummyArchiveDriver;
 import de.schlichtherle.truezip.io.fs.file.FSFileDriver;
 
 /**

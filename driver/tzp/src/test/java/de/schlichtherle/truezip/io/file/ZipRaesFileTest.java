@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.file;
 
-import de.schlichtherle.truezip.io.archive.driver.zip.raes.SafeZipRaesDriver;
+import de.schlichtherle.truezip.io.fs.archive.driver.zip.raes.SafeZipRaesDriver;
 import de.schlichtherle.truezip.io.fs.FSScheme;
 import de.schlichtherle.truezip.key.AesKeyProvider;
 import de.schlichtherle.truezip.key.KeyManager;

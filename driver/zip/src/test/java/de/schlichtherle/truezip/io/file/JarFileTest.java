@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.file;
 
-import de.schlichtherle.truezip.io.archive.driver.zip.JarDriver;
+import de.schlichtherle.truezip.io.fs.archive.driver.zip.JarDriver;
 import de.schlichtherle.truezip.io.fs.FSScheme;
 
 /**
