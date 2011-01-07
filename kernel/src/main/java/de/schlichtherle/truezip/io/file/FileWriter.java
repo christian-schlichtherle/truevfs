@@ -13,10 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.file;
 
-import de.schlichtherle.truezip.io.FileBusyException;
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -28,7 +26,6 @@ import java.io.OutputStreamWriter;
  * <a href="package-summary.html#atomicity">virtually atomic</a>.
  *
  * @see     <a href="package-summary.html#streams">Using Archive Entry Streams</a>
- * @see     FileBusyException
  * @see     File#cat
  * @see     File#umount
  * @see     File#update
