@@ -15,11 +15,11 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
+import de.schlichtherle.truezip.util.ServiceLocator;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.lang.reflect.UndeclaredThrowableException;
-import java.util.ServiceLoader;
 import net.jcip.annotations.ThreadSafe;
 
 import static de.schlichtherle.truezip.io.filesystem.FSController.*;
@@ -76,11 +76,10 @@ public class FSManagers {
                 manager = instance;
                 if (null == manager) {
                     // TODO: Check compatibility with OSGi.
-                    manager = ServiceLoader
-                            .load(  FSManager.class,
-                                    FSManagers.class.getClassLoader())
-                            .iterator()
-                            .next();
+                    manager
+                            = new ServiceLocator(FSManagers.class.getClassLoader())
+                                .getServices(FSManager.class)
+                                .next();
                     setInstance(manager);
                 }
             }

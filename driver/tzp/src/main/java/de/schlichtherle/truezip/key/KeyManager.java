@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.key;
 
-import java.util.ServiceLoader;
+import de.schlichtherle.truezip.util.ServiceLocator;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -89,11 +89,10 @@ public abstract class KeyManager {
                 manager = instance;
                 if (null == manager) {
                     // TODO: Check compatibility with OSGi.
-                    instance = manager = ServiceLoader
-                            .load(  KeyManager.class,
-                                    KeyManager.class.getClassLoader())
-                            .iterator()
-                            .next();
+                    instance = manager
+                            = new ServiceLocator(KeyManager.class.getClassLoader())
+                                .getServices(KeyManager.class)
+                                .next();
                 }
             }
         }
