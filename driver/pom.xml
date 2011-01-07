@@ -19,13 +19,14 @@
 
     <parent>
         <groupId>de.schlichtherle.truezip</groupId>
-        <artifactId>truezip-pom</artifactId>
+        <artifactId>truezip</artifactId>
         <version>7.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>truezip-driver-pom</artifactId>
+    <artifactId>truezip-driver</artifactId>
     <packaging>pom</packaging>
-    <name>TrueZIP Driver POM</name>
+    <name>TrueZIP Driver (POM)</name>
+    <description>The Project Object Model (POM) for pluggable file system drivers.</description>
 
     <modules>
         <module>tar</module>
@@ -41,7 +42,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truezip-tck</artifactId>
+            <artifactId>truezip-tck-kernel</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>

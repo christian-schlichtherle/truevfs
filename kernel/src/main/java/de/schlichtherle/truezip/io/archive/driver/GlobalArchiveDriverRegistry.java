@@ -291,7 +291,7 @@ implements Serializable {
             else
                 logger.config("noDefaultSuffixes"); // NOI18N
         } else {
-            logger.warning("noDriversRegistered"); // NOI18N
+            logger.warning("noDriversConfigured"); // NOI18N
         }
     }
 }

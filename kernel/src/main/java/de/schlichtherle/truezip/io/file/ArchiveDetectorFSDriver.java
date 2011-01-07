@@ -30,6 +30,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * @version $Id$
  */
 final class ArchiveDetectorFSDriver implements FSDriver {
+
     private static final FSScheme FILE_SCHEME = FSScheme.create("file");
     private static final FSDriver FILE_DRIVER = new FSFileDriver();
 

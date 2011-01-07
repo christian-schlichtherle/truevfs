@@ -122,7 +122,7 @@ implements ArchiveDetector, Serializable {
         final SuffixSet set = new SuffixSet(suffixes);
         final SuffixSet all = registry.getSuffixes();
         if (set.retainAll(all)) {
-            final SuffixSet unknown = new SuffixSet(set);
+            final SuffixSet unknown = new SuffixSet(suffixes);
             unknown.removeAll(all);
             throw new IllegalArgumentException("\"" + unknown + "\" (no archive driver installed for these suffixes)");
         }

@@ -19,12 +19,13 @@
 
     <parent>
         <groupId>de.schlichtherle.truezip</groupId>
-        <artifactId>truezip-driver-pom</artifactId>
+        <artifactId>truezip-driver</artifactId>
         <version>7.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>truezip-driver-tar</artifactId>
-    <name>TrueZIP TAR Driver Family</name>
+    <name>TrueZIP Driver TAR</name>
+    <description>The TAR driver family. Add this artifact to the run time class path in order to make the File* API recognize this archive type.</description>
 
     <dependencies>
         <dependency>

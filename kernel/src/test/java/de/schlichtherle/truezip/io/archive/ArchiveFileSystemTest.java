@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive;
 
-import de.schlichtherle.truezip.io.archive.driver.zip.ZipDriver;
+import de.schlichtherle.truezip.io.archive.driver.DummyArchiveDriver;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -30,7 +30,7 @@ public class ArchiveFileSystemTest {
     @Test
     public void testAddRemoveArchiveFileSystemListeners() {
         final ArchiveFileSystem<?> model
-                = ArchiveFileSystem.newArchiveFileSystem(new ZipDriver());
+                = ArchiveFileSystem.newArchiveFileSystem(new DummyArchiveDriver());
 
         try {
             model.addArchiveFileSystemTouchListener(null);

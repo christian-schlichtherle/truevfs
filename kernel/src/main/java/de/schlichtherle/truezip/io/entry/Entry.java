@@ -154,7 +154,7 @@ public interface Entry {
      *
      * @return The size of the given size type for this entry in bytes,
      * or {@link #UNKNOWN} if not specified or the type is unsupported.
-     * This method is not meaningful for directory entries.
+     * This method may not be meaningful for non-file entries.
      */
     long getSize(@NonNull Size type);
 
