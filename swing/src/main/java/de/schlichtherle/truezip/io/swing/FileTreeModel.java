@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.swing.tree;
+package de.schlichtherle.truezip.io.swing;
 
 import java.io.FileFilter;
 import java.io.IOException;
@@ -558,15 +558,8 @@ public class FileTreeModel implements TreeModel {
     /**
      * Clears the internal cache associated with {@code node} and all
      * of its children.
-     *
-     * @deprecated This method is only public in order to make it available to
-     *             {@link de.schlichtherle.truezip.io.swing.JFileTree}
-     *             - it is <em>not</em> intended for public use!
-     *             In particular, this method does <em>not</em> notify the
-     *             tree of any structural changes in the file system.
      */
-    @Deprecated
-    public final void forget(final java.io.File node) {
+    final void forget(java.io.File node) {
         forget(node, true);
     }
 

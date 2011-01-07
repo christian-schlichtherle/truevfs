@@ -13,11 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.swing;
 
-import de.schlichtherle.truezip.io.swing.tree.FileTreeCellRenderer;
-import de.schlichtherle.truezip.io.swing.tree.FileTreeModel;
 import java.awt.Toolkit;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,7 +40,7 @@ import javax.swing.tree.TreePath;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class JFileTree extends JTree {
+public final class JFileTree extends JTree {
 
     /** The name of the property {@code displayingSuffixes}. */
     private static final String PROPERTY_DISPLAYING_SUFFIXES = "displayingSuffixes"; // NOI18N
@@ -104,6 +101,11 @@ public class JFileTree extends JTree {
     //
     // Properties.
     //
+
+    @Override
+    public FileTreeModel getModel() {
+        return (FileTreeModel) super.getModel();
+    }
 
     /**
      * @throws ClassCastException If {@code model} is not an instance
@@ -332,7 +334,7 @@ public class JFileTree extends JTree {
      * selection path if necessary.
      */
     public void refresh() {
-        final FileTreeModel ftm = (FileTreeModel) getModel();
+        final FileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath((java.io.File) ftm.getRoot());
         if (path != null)
             refresh(new TreePath[] { path });
@@ -351,7 +353,7 @@ public class JFileTree extends JTree {
         if (node == null)
             throw new NullPointerException();
 
-        final FileTreeModel ftm = (FileTreeModel) getModel();
+        final FileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
         if (path != null)
             refresh(new TreePath[] { path });
@@ -369,7 +371,7 @@ public class JFileTree extends JTree {
         if (paths == null || paths.length <= 0)
             return;
 
-        final FileTreeModel ftm = (FileTreeModel) getModel();
+        final FileTreeModel ftm = getModel();
 
         final TreePath lead = getLeadSelectionPath();
         final TreePath anchor = getAnchorSelectionPath();
@@ -392,7 +394,7 @@ public class JFileTree extends JTree {
         if (expansions == null)
             return;
         while (expansions.hasMoreElements())
-            setExpandedState((TreePath) expansions.nextElement(), true);
+            setExpandedState(expansions.nextElement(), true);
     }
 
     //
@@ -407,7 +409,7 @@ public class JFileTree extends JTree {
      * check {@link #copyFrom(de.schlichtherle.truezip.io.file.File, InputStream)}.
      */
     public boolean createNewFile(final java.io.File node) throws IOException {
-        final FileTreeModel ftm = (FileTreeModel) getModel();
+        final FileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
         if (path == null)
             return false;
@@ -427,7 +429,7 @@ public class JFileTree extends JTree {
      * is selected and visible.
      */
     public boolean mkdir(final java.io.File node) {
-        final FileTreeModel ftm = (FileTreeModel) getModel();
+        final FileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
         if (path == null)
             return false;
@@ -447,7 +449,7 @@ public class JFileTree extends JTree {
      * is selected and visible.
      */
     public boolean mkdirs(final java.io.File node) {
-        final FileTreeModel ftm = (FileTreeModel) getModel();
+        final FileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
         if (path == null)
             return false;
@@ -467,7 +469,7 @@ public class JFileTree extends JTree {
      * is selected and visible.
      */
     public boolean copyFrom(final de.schlichtherle.truezip.io.file.File node, final InputStream in) {
-        final FileTreeModel ftm = (FileTreeModel) getModel();
+        final FileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
         if (path == null)
             return false;
@@ -487,7 +489,7 @@ public class JFileTree extends JTree {
      * is selected and visible.
      */
     public boolean copyTo(final de.schlichtherle.truezip.io.file.File oldNode, final java.io.File node) {
-        final FileTreeModel ftm = (FileTreeModel) getModel();
+        final FileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
         if (path == null)
             return false;
@@ -507,7 +509,7 @@ public class JFileTree extends JTree {
      * is selected and visible.
      */
     public boolean copyAllTo(final de.schlichtherle.truezip.io.file.File oldNode, final java.io.File node) {
-        final FileTreeModel ftm = (FileTreeModel) getModel();
+        final FileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
         if (path == null)
             return false;
@@ -527,7 +529,7 @@ public class JFileTree extends JTree {
      * is selected and visible.
      */
     public boolean archiveCopyTo(final de.schlichtherle.truezip.io.file.File oldNode, final java.io.File node) {
-        final FileTreeModel ftm = (FileTreeModel) getModel();
+        final FileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
         if (path == null)
             return false;
@@ -547,7 +549,7 @@ public class JFileTree extends JTree {
      * is selected and visible.
      */
     public boolean archiveCopyAllTo(final de.schlichtherle.truezip.io.file.File oldNode, final java.io.File node) {
-        final FileTreeModel ftm = (FileTreeModel) getModel();
+        final FileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
         if (path == null)
             return false;
@@ -567,7 +569,7 @@ public class JFileTree extends JTree {
      * it if necessary.
      */
     public boolean renameTo(final java.io.File oldNode, final java.io.File node) {
-        final FileTreeModel ftm = (FileTreeModel) getModel();
+        final FileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
         if (path == null)
             return false;
@@ -585,8 +587,7 @@ public class JFileTree extends JTree {
         if (expansions != null)
             while (expansions.hasMoreElements())
                 setExpandedState(
-                        substPath((TreePath) expansions.nextElement(),
-                            oldPath, path),
+                        substPath(expansions.nextElement(), oldPath, path),
                         true);
         setSelectionPath(path);
         scrollPathToVisible(path);
@@ -615,7 +616,7 @@ public class JFileTree extends JTree {
      * is selected and visible.
      */
     public boolean delete(final java.io.File node) {
-        final FileTreeModel ftm = (FileTreeModel) getModel();
+        final FileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
         if (path == null)
             return false;
@@ -636,7 +637,7 @@ public class JFileTree extends JTree {
      * is selected and visible.
      */
     public boolean deleteAll(final de.schlichtherle.truezip.io.file.File node) {
-        final FileTreeModel ftm = (FileTreeModel) getModel();
+        final FileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
         if (path == null)
             return false;
@@ -652,7 +653,7 @@ public class JFileTree extends JTree {
     }
 
     public void setSelectionNode(final java.io.File node) {
-        final FileTreeModel ftm = (FileTreeModel) getModel();
+        final FileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
         if (path != null) {
             setSelectionPath(path);
@@ -660,8 +661,7 @@ public class JFileTree extends JTree {
     }
 
     public void setSelectionNodes(final java.io.File[] nodes) {
-        final FileTreeModel ftm = (FileTreeModel) getModel();
-
+        final FileTreeModel ftm = getModel();
         final java.util.List<TreePath> list = new LinkedList<TreePath>();
         TreePath lastPath = null;
         for (int i = 0, l = nodes.length; i < l; i++) {
@@ -679,7 +679,7 @@ public class JFileTree extends JTree {
     }
 
     public void scrollNodeToVisible(final java.io.File node) {
-        final FileTreeModel ftm = (FileTreeModel) getModel();
+        final FileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
         if (path != null)
             scrollPathToVisible(path);
@@ -690,26 +690,24 @@ public class JFileTree extends JTree {
     //
 
     private class Controller
-            implements TreeExpansionListener, CellEditorListener, Serializable {
+    implements TreeExpansionListener, CellEditorListener, Serializable {
         private static final long serialVersionUID = 6027634928673290123L;
 
         @Override
-		@java.lang.SuppressWarnings("deprecation")
         public void treeCollapsed(TreeExpansionEvent evt) {
-            ((FileTreeModel) getModel()).forget(
-                    (java.io.File) evt.getPath().getLastPathComponent());
+            getModel().forget((java.io.File) evt.getPath().getLastPathComponent());
         }
 
         @Override
-		public void treeExpanded(TreeExpansionEvent evt) {
+        public void treeExpanded(TreeExpansionEvent evt) {
         }
 
         @Override
-		public void editingCanceled(ChangeEvent evt) {
+        public void editingCanceled(ChangeEvent evt) {
         }
 
         @Override
-		public void editingStopped(ChangeEvent evt) {
+        public void editingStopped(ChangeEvent evt) {
             onEditingStopped(evt);
         }
     }

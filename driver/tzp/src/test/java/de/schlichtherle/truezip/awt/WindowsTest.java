@@ -27,9 +27,9 @@ import junit.framework.TestCase;
  * @since TrueZIP 6.1
  * @version $Id$
  */
-public class WindowsUITest extends TestCase {
+public class WindowsTest extends TestCase {
     
-    public WindowsUITest(String testName) {
+    public WindowsTest(String testName) {
         super(testName);
     }
 

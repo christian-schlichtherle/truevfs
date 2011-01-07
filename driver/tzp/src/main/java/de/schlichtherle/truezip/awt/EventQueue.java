@@ -19,8 +19,7 @@ package de.schlichtherle.truezip.awt;
 import java.lang.reflect.InvocationTargetException;
 
 /**
- * Subclasses {@link java.awt.EventQueue} in order to provide utility methods
- * for dealing with the AWT Event Queue.
+ * Provide static utility methods for dealing with the AWT Event Queue.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -72,9 +71,8 @@ public class EventQueue extends java.awt.EventQueue {
      *         which must be a {@link RuntimeException} or an {@link Error}.
      * @see Thread#interrupted
      */
-    public static void invokeAndWaitUninterruptibly(
-            Runnable task,
-            long startTimeout)
+    public static void invokeAndWaitUninterruptibly(Runnable task,
+                                                    long startTimeout)
     throws  EventDispatchTimeoutException,
             InvocationTargetException {
         try {
@@ -84,10 +82,9 @@ public class EventQueue extends java.awt.EventQueue {
         }
     }
 
-    public static void invokeAndWait(
-            final Runnable task,
-            final boolean interruptibly,
-            final long startTimeout)
+    private static void invokeAndWait(  final Runnable task,
+                                        final boolean interruptibly,
+                                        final long startTimeout)
     throws  EventDispatchTimeoutException,
             InterruptedException,
             InvocationTargetException {

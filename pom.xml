@@ -58,6 +58,7 @@
         <module>driver</module>
         <module>kernel</module>
         <module>samples</module>
+        <module>swing</module>
         <module>tck</module>
     </modules>
 

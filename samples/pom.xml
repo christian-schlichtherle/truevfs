@@ -36,6 +36,13 @@
             <version>${project.version}</version>
         </dependency>
 
+        <!-- Provides some nice swing classes which use the File* API. -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truezip-swing</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <!-- A TrueZIP application typically has a run time dependency on one
              or more archive drivers.
              When found on the class path, an archive driver is automatically

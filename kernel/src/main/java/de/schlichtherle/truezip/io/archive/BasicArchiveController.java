@@ -290,7 +290,7 @@ extends FSController<FSConcurrencyModel> {
         public E getLocalTarget() throws IOException {
             if (options.get(APPEND)) {
                 throw new UnsupportedOperationException("This feature is not yet implemented!");
-                // return null; // FIXME: broken interface contract!
+                // return null; // TODO: broken interface contract!
             }
             return newLink().getTarget().getEntry();
         }

@@ -261,7 +261,7 @@ public class PromptingKeyManager extends KeyManager {
         final KeyProvider<?> kp = super.getKeyProvider(resource, type);
         if (kp instanceof PromptingKeyProvider) {
             final PromptingKeyProvider<?> pkp = (PromptingKeyProvider<?>) kp;
-            pkp.setUI((PromptingKeyProviderUI) getUI(pkp.getUITypeKey())); // FIXME: This is cheating!
+            pkp.setUI((PromptingKeyProviderUI) getUI(pkp.getUITypeKey())); // TODO: This is cheating!
         }
         return kp;
     }
