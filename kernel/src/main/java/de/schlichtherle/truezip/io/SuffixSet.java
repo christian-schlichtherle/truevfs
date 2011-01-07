@@ -13,11 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io;
 
 import de.schlichtherle.truezip.util.CanonicalStringSet;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.File;
 import java.util.Collection;
@@ -79,7 +77,7 @@ public final class SuffixSet extends CanonicalStringSet {
 
     /** Constructs a new, empty suffix set. */
     public SuffixSet() {
-        super(SEPARATOR);
+        super(new SuffixMapper(), SEPARATOR);
     }
 
     /**
@@ -88,7 +86,7 @@ public final class SuffixSet extends CanonicalStringSet {
      * @param suffixes A list of suffixes.
      */
     public SuffixSet(final @NonNull String suffixes) {
-        super(SEPARATOR);
+        super(new SuffixMapper(), SEPARATOR);
         super.addAll(suffixes);
     }
 
@@ -99,26 +97,25 @@ public final class SuffixSet extends CanonicalStringSet {
      * @param  c A collection of suffix lists.
      */
     public SuffixSet(final @NonNull Collection<String> c) {
-        super(SEPARATOR);
+        super(new SuffixMapper(), SEPARATOR);
         super.addAll(c);
     }
 
-    /**
-     * Returns the canonical form of {@code suffix} or {@code null}
-     * if the given suffix does not have a canonical form.
-     * An example of the latter case is the empty string.
-     * <p>
-     * <b>WARNING:</b> This method may get called from the constructor of this
-     * class!
-     */
-    @Override
-    protected String canonicalize(String suffix) {
-        assert 0 > suffix.indexOf(SEPARATOR) : "illegal separator position in suffix";
-        if (suffix.length() > 0 && suffix.charAt(0) == PREFIX)
-            suffix = suffix.substring(1);
-        return suffix.length() > 0
-                ? suffix.toLowerCase(Locale.ENGLISH)
-                : null;
+    private static class SuffixMapper implements Mapper {
+        /**
+         * Returns the canonical form of {@code suffix} or {@code null}
+         * if the given suffix does not have a canonical form.
+         * An example of the latter case is the empty string.
+         */
+        @Override
+        public String canonicalize(String suffix) {
+            assert 0 > suffix.indexOf(SEPARATOR) : "illegal separator position in suffix";
+            if (suffix.length() > 0 && suffix.charAt(0) == PREFIX)
+                suffix = suffix.substring(1);
+            return suffix.length() > 0
+                    ? suffix.toLowerCase(Locale.ENGLISH)
+                    : null;
+        }
     }
 
     /**
