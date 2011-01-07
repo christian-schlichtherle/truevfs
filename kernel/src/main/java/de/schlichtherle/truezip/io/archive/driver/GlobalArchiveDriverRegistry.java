@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.driver;
 
-import de.schlichtherle.truezip.io.SuffixSet;
+import de.schlichtherle.truezip.util.ServiceLocator;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,7 +28,6 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static de.schlichtherle.truezip.util.ClassLoaders.getResources;
 
 /**
  * A global registry for mappings from archive file suffixes [{@link String}]
@@ -142,7 +141,8 @@ implements Serializable {
 
         final Enumeration<URL> urls;
         try {
-            urls = getResources(service, GlobalArchiveDriverRegistry.class);
+            urls = new ServiceLocator(GlobalArchiveDriverRegistry.class.getClassLoader())
+                    .getResources(service);
         } catch (IOException ex) {
             logger.log(Level.WARNING, "lookup.ex", ex); // NOI18N
             return;

@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.io.archive.driver;
 
 import de.schlichtherle.truezip.io.SuffixSet;
+import de.schlichtherle.truezip.util.ServiceLocator;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
@@ -27,7 +28,6 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static de.schlichtherle.truezip.util.ClassLoaders.loadClass;
 
 /**
  * The head of a chain of registries for archive file suffixes and archive
@@ -232,7 +232,8 @@ public class ArchiveDriverRegistry implements Serializable {
     private static @Nullable ArchiveDriver<?> newArchiveDriver(@CheckForNull Object driver) {
         try {
             if (driver instanceof String)
-                driver = loadClass((String) driver, ArchiveDriverRegistry.class);
+                driver = new ServiceLocator(ArchiveDriverRegistry.class.getClassLoader())
+                        .getClass((String) driver);
             if (driver instanceof Class<?>)
                 driver = ((Class<? extends ArchiveDriver<?>>) driver).newInstance();
             return (ArchiveDriver<?>) driver; // may throw ClassCastException
