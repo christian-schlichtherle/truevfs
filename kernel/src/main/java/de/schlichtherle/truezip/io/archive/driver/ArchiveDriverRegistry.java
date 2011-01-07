@@ -59,7 +59,6 @@ public class ArchiveDriverRegistry implements Serializable {
             = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 
     static final String KWD_DRIVER = "DRIVER";      // NOI18N
-    static final String KWD_DEFAULT = "DEFAULT";    // NOI18N
 
     final Map<String, Object> drivers = new HashMap<String, Object>();
 
@@ -132,18 +131,7 @@ public class ArchiveDriverRegistry implements Serializable {
                 throw new IllegalArgumentException(
                         getString("keyword", KWD_DRIVER)); // NOI18N
             final Object value = entry.getValue();
-            if (KWD_DEFAULT.equals(key)) {
-                if (eager)
-                    throw new IllegalArgumentException(
-                            getString("keyword", KWD_DEFAULT)); // NOI18N
-                final SuffixSet set = (SuffixSet) drivers.get(key);
-                if (null != set)
-                    set.addAll((String) value);
-                else
-                    drivers.put(key, new SuffixSet((String) value));
-            } else {
-                registerArchiveDriver(key, value, eager);
-            }
+            registerArchiveDriver(key, value, eager);
         }
     }
 

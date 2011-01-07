@@ -23,7 +23,6 @@ import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import net.jcip.annotations.Immutable;
-import net.jcip.annotations.ThreadSafe;
 
 /**
  * Detects archive files solely by scanning file paths -
@@ -72,33 +71,15 @@ public interface ArchiveDetector {
     DefaultArchiveDetector NULL = new DefaultArchiveDetector("");
 
     /**
-     * Recognizes the archive file suffixes registered in the global archive
-     * driver registry which have been defined by the key {@code DEFAULT}
-     * in the configuration file(s).
-     * <p>
-     * If only TrueZIP's original configuration file is used, then this is
-     * defined so that no additional JARs are required on the runtime class
-     * path.
-     * Please check the <a href="{@docRoot}/overview.html#defaults">Overview</a>
-     * to see which archive file suffixes are detected by default.
-     *
-     * @see GlobalArchiveDriverRegistry
-     */
-    @Deprecated
-    DefaultArchiveDetector DEFAULT = new DefaultArchiveDetector(
-            GlobalArchiveDriverRegistry.INSTANCE.DEFAULT_SUFFIXES);
-
-    /**
      * Recognizes all archive file suffixes registered in the global archive
      * driver registry by the configuration file(s).
      * <p>
      * This requires <a href="{@docRoot}/overview.html#defaults">additional JARs</a>
-     * on the runtime class path.
+     * on the run time class path.
      *
      * @see GlobalArchiveDriverRegistry
      */
-    DefaultArchiveDetector ALL = new DefaultArchiveDetector(
-            GlobalArchiveDriverRegistry.INSTANCE.ALL_SUFFIXES);
+    DefaultArchiveDetector ALL = new DefaultArchiveDetector();
 
     /**
      * Detects whether the given {@code path} identifies a prospective

@@ -36,7 +36,7 @@
             <version>${project.version}</version>
         </dependency>
 
-        <!-- A TrueZIP application typically has a runtime dependency on one
+        <!-- A TrueZIP application typically has a run time dependency on one
              or more archive drivers.
              When found on the class path, an archive driver is automatically
              registered for use by the File* API. -->
@@ -45,7 +45,7 @@
             <artifactId>truezip-driver-tar</artifactId>
             <version>${project.version}</version>
             <!-- Note that TrueZIP applications would typically only have a
-                 runtime dependency.
+                 run time dependency.
                  However, these sample applications differ. -->
             <scope>compile</scope>
         </dependency>
@@ -54,7 +54,7 @@
             <artifactId>truezip-driver-tzp</artifactId>
             <version>${project.version}</version>
             <!-- Note that TrueZIP applications would typically only have a
-                 runtime dependency.
+                 run time dependency.
                  However, these sample applications differ. -->
             <scope>compile</scope>
         </dependency>
@@ -63,7 +63,7 @@
             <artifactId>truezip-driver-zip</artifactId>
             <version>${project.version}</version>
             <!-- Note that TrueZIP applications would typically only have a
-                 runtime dependency.
+                 run time dependency.
                  However, these sample applications differ. -->
             <scope>compile</scope>
         </dependency>

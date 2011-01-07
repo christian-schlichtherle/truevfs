@@ -231,7 +231,7 @@ public class Files extends Paths {
      *
      * @param file The file instance which's path is to be normalized.
      * @return {@code file} if it was already in normalized form.
-     *         Otherwise, an object which's runtime class is guaranteed to
+     *         Otherwise, an object which's run time class is guaranteed to
      *         be {@code File}.
      */
     public static File normalize(File file) {

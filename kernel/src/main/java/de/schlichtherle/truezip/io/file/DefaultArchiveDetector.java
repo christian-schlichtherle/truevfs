@@ -105,6 +105,13 @@ implements ArchiveDetector, Serializable {
      */
     private transient @NonNull ThreadLocalMatcher matcher; // never transmit this over the wire!
 
+    public DefaultArchiveDetector() {
+        this.registry = GlobalArchiveDriverRegistry.INSTANCE;
+        final SuffixSet set = registry.getSuffixes();
+        this.suffixes = set.toString();
+        this.matcher = new ThreadLocalMatcher(set.toPattern());
+    }
+
     /**
      * Creates a new {@code DefaultArchiveDetector} by filtering the
      * {@link GlobalArchiveDriverRegistry} for all canonicalized suffixes in
