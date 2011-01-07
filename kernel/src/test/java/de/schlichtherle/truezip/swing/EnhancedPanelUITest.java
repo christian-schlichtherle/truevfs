@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.swing;
 
 import de.schlichtherle.truezip.swing.event.PanelEvent;
@@ -28,40 +27,35 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
 import org.netbeans.jemmy.JemmyProperties;
 import org.netbeans.jemmy.TestOut;
 import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JDialogOperator;
 
+import static org.junit.Assert.*;
+
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class EnhancedPanelUITest extends TestCase {
+public final class EnhancedPanelUITest {
     static {
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput()); // shut up!
     }
 
     private EnhancedPanel instance;
 
-    public EnhancedPanelUITest(String testName) {
-        super(testName);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() {
         instance = new EnhancedPanel();
         instance.add(new JLabel("Hello world!"));
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    /**
-     * Test of getAncestorWindow method, of class de.schlichtherle.truezip.swing.EnhancedPanel.
-     */
-    public void testGetAncestorWindow() throws Exception {
+    @Test
+    public void testGetAncestorWindow()
+    throws InterruptedException, InvocationTargetException {
         assertNull(new EnhancedPanel().getAncestorWindow());
 
         JFrame frame = showInNewFrame(instance);
@@ -103,10 +97,8 @@ public class EnhancedPanelUITest extends TestCase {
         });
     }
 
-    /**
-     * Test of getPanelListeners method, of class de.schlichtherle.truezip.swing.EnhancedPanel.
-     */
-    public void testPanelListeners1() {
+    @Test
+    public void testPanelListeners0() {
         PanelListener listener;
         EventListener[] listeners;
 
@@ -168,10 +160,8 @@ public class EnhancedPanelUITest extends TestCase {
         }
     }
 
-    /**
-     * Test of getListeners method, of class de.schlichtherle.truezip.swing.EnhancedPanel.
-     */
-    public void testPanelListeners2() {
+    @Test
+    public void testPanelListeners1() {
         PanelListener listener;
         EventListener[] listeners;
 
@@ -219,9 +209,7 @@ public class EnhancedPanelUITest extends TestCase {
         assertEquals(0, listeners.length);
     }
 
-    /**
-     * Test of fireAncestorWindowShown method, of class de.schlichtherle.truezip.swing.EnhancedPanel.
-     */
+    @Test
     public void testFireAncestorWindowShown() {
         final CountingPanelListener l = new CountingPanelListener();
         instance.addPanelListener(l);
@@ -233,9 +221,7 @@ public class EnhancedPanelUITest extends TestCase {
         assertEquals(2, l.shown);
     }
 
-    /**
-     * Test of fireAncestorWindowHidden method, of class de.schlichtherle.truezip.swing.EnhancedPanel.
-     */
+    @Test
     public void testFireAncestorWindowHidden() {
         final CountingPanelListener l = new CountingPanelListener();
         instance.addPanelListener(l);
@@ -253,6 +239,7 @@ public class EnhancedPanelUITest extends TestCase {
      * Then puts the same EnhancedPanel instance into a second frame and repeats
      * the test.
      */
+    @Test
     public void testEvents4JFrame() throws Exception {
         final CountingPanelListener l = new CountingPanelListener();
         instance.addPanelListener(l);
@@ -318,15 +305,15 @@ public class EnhancedPanelUITest extends TestCase {
         // Test in first frame.
         final JFrame frame1 = new JFrame();
         invokeAndWait(new SetupFrame(frame1));
-        testEvents(new MakeFrameVisible(frame1), new MakeFrameInvisible(frame1), l);
+        events(new MakeFrameVisible(frame1), new MakeFrameInvisible(frame1), l);
 
         // Test in second frame.
         final JFrame frame2 = new JFrame();
         invokeAndWait(new SetupFrame(frame2));
-        testEvents(new MakeFrameVisible(frame2), new MakeFrameInvisible(frame2), l);
+        events(new MakeFrameVisible(frame2), new MakeFrameInvisible(frame2), l);
     }
 
-    private void testEvents(
+    private void events(
             final Runnable makeVisible,
             final Runnable makeInvisible,
             final CountingPanelListener l)
@@ -380,6 +367,7 @@ public class EnhancedPanelUITest extends TestCase {
      * Shows and hides the EnhancedPanel instance several times in a
      * JOptionPane and counts these events.
      */
+    @Test
     public void testEvents4JOptionPane() throws Exception {
         final CountingPanelListener l = new CountingPanelListener();
         instance.addPanelListener(l);
