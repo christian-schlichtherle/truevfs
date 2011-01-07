@@ -25,7 +25,7 @@ import de.schlichtherle.truezip.io.archive.driver.tar.TarGZipDriver;
 import de.schlichtherle.truezip.io.archive.driver.zip.CheckedJarDriver;
 import de.schlichtherle.truezip.io.archive.driver.zip.CheckedReadOnlySfxDriver;
 import de.schlichtherle.truezip.io.archive.driver.zip.CheckedZipDriver;
-import de.schlichtherle.truezip.io.swing.tree.FileTreeModel;
+import de.schlichtherle.truezip.io.swing.FileTreeModel;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;

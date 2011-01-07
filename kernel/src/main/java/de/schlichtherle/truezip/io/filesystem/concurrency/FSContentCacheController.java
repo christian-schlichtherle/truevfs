@@ -185,7 +185,7 @@ extends FSDecoratorController<  FSConcurrencyModel,
                     // So if this is really required, change the caching
                     // strategy to WRITE_THROUGH and bear the performance
                     // impact.
-                    assert WRITE_THROUGH == STRATEGY; // FIXME: Check and fix this!
+                    assert WRITE_THROUGH == STRATEGY; // TODO: Check and fix this!
                     cache.flush();
                 }
             }

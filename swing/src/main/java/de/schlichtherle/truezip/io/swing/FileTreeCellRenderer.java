@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.swing.tree;
+package de.schlichtherle.truezip.io.swing;
 
-import de.schlichtherle.truezip.io.swing.JFileTree;
 import java.awt.Component;
 import javax.swing.Icon;
 import javax.swing.JTree;
