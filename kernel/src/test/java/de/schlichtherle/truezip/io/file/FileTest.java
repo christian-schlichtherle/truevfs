@@ -451,73 +451,12 @@ public class FileTest {
         testNormalizedAbsoluteFile("../a/c", "../a/b/../c/.");
         testNormalizedAbsoluteFile("../a",   "../a/b/../c/..");
     }
-    
+
     void testNormalizedAbsoluteFile(final String result, final String path)
     throws IOException {
         java.io.File resultFile = new java.io.File(result).getCanonicalFile();
         java.io.File pathFile = new java.io.File(new File(path).getNormalizedAbsoluteFile().getPath());
         assertEquals(resultFile, pathFile);
-    }
-
-    /**
-     * Test of equals method, of class de.schlichtherle.truezip.io.File.
-     */
-    @Test
-    public void testEqualsAndHashCode() {
-        final boolean win = separatorChar == '\\'; // Windoze?
-        
-        assertFalse(new File("dir/test.txt").equals(new File("dir" + suffix + "/test.txt")));
-        assertFalse(new File("dir" + suffix + "/test.txt").equals(new File("dir/test.txt")));
-        assertEquals(new File("dir" + suffix + "/test.txt", NULL), new File("dir" + suffix + "/test.txt"));
-        assertEquals(new File("dir" + suffix + "/test.txt"), new File("dir" + suffix + "/test.txt", NULL));
-        testEqualsAndHashCode(
-                new File(win ? "c:\\any.txt" : "/any.txt"),
-                new File(win ? "C:\\ANY.TXT" : "/ANY.TXT"));
-        testEqualsAndHashCode(
-                new File(win ? "c:\\any" + suffix + "\\test.txt" : "/any" + suffix + "/test.txt"),
-                new File(win ? "C:\\ANY" + suffix.toUpperCase(Locale.ENGLISH) + "\\test.txt" : "/ANY" + suffix.toUpperCase(Locale.ENGLISH) + "/test.txt"));
-        testEqualsAndHashCode(
-                new File(win ? "c:/any" + suffix + "/test.txt" : "/any" + suffix + "/test.txt"),
-                new File(win ? "C:\\ANY" + suffix.toUpperCase(Locale.ENGLISH) + "\\test.txt" : "/ANY" + suffix.toUpperCase(Locale.ENGLISH) + "/test.txt"));
-        testEqualsAndHashCode(
-                new File(win ? "c:\\any" + suffix + "\\test.txt" : "/any" + suffix + "/test.txt"),
-                new File(win ? "C:/ANY" + suffix.toUpperCase(Locale.ENGLISH) + "/test.txt" : "/ANY" + suffix.toUpperCase(Locale.ENGLISH) + "/test.txt"));
-        testEqualsAndHashCode(
-                new File(win ? "c:/any" + suffix + "/test.txt" : "/any" + suffix + "/test.txt"),
-                new File(win ? "C:/ANY" + suffix.toUpperCase(Locale.ENGLISH) + "/test.txt" : "/ANY" + suffix.toUpperCase(Locale.ENGLISH) + "/test.txt"));
-        if (win) {
-            // These tests may take very long, depending on the network
-            // configuration of the local system.
-            testEqualsAndHashCode(
-                    new File("\\\\localhost\\any" + suffix + "\\test.txt"),
-                    new File("\\\\LOCALHOST\\ANY" + suffix.toUpperCase(Locale.ENGLISH) + "\\test.txt"));
-            testEqualsAndHashCode(
-                    new File("//localhost/any" + suffix + "/test.txt"),
-                    new File("\\\\LOCALHOST\\ANY" + suffix.toUpperCase(Locale.ENGLISH) + "\\test.txt"));
-            testEqualsAndHashCode(
-                    new File("\\\\localhost\\any" + suffix + "\\test.txt"),
-                    new File("//LOCALHOST/ANY" + suffix.toUpperCase(Locale.ENGLISH) + "/test.txt"));
-            testEqualsAndHashCode(
-                    new File("//localhost/any" + suffix + "/test.txt"),
-                    new File("//LOCALHOST/ANY" + suffix.toUpperCase(Locale.ENGLISH) + "/test.txt"));
-        }
-        final File l = new File(win ? "c:\\any" + suffix + "\\test.txt" : "/any" + suffix + "/test.txt");
-        final File u = new File(win ? "c:\\any" + suffix + "\\TEST.TXT" : "/any" + suffix + "/TEST.TXT");
-        assertFalse(l.equals(u));
-        assertFalse(u.equals(l));
-    }
-
-    void testEqualsAndHashCode(File a, File b) {
-        if (separatorChar == '\\') {
-            assertTrue(a.equals(b));
-            assertTrue(b.equals(a));
-            assertEquals(a.hashCode(), b.hashCode());
-        } else {
-            assertFalse(a.equals(b));
-            assertFalse(b.equals(a));
-        }
-        assertEquals(a.hashCode(), a.hashCode()); // multiple calls need to yield the same value
-        assertEquals(b.hashCode(), b.hashCode());
     }
 
     @Test
