@@ -69,8 +69,14 @@ implements EntryFactory<E>, FSDriver, Serializable {
     /**
      * {@inheritDoc}
      * <p>
-     * Note that an archive file system is always federated and therefore its
-     * parent file system controller is never {@code null}.
+     * Note that an archive file system is always federated and therefore
+     * its parent file system controller is never {@code null}.
+     * <p>
+     * Furthermore, an archive driver implementation is <em>not</em> expected
+     * to consider the scheme of the given mount point to determine the class
+     * of the returned file system controller.
+     * Consequently, it is an error to call this method with a mount point
+     * which has a scheme which is not supported by this archive driver.
      */
     @Override
     public @NonNull FSController<?>
