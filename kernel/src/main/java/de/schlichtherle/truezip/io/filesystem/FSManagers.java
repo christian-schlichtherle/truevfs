@@ -17,13 +17,11 @@ package de.schlichtherle.truezip.io.filesystem;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.ServiceLoader;
 import net.jcip.annotations.ThreadSafe;
 
-import static de.schlichtherle.truezip.util.ClassLoaders.loadClass;
 import static de.schlichtherle.truezip.io.filesystem.FSController.*;
 
 /**
