@@ -23,6 +23,7 @@ import java.net.URISyntaxException;
 import net.jcip.annotations.Immutable;
 
 import static de.schlichtherle.truezip.io.fs.FsEntryName.SEPARATOR;
+import static de.schlichtherle.truezip.io.fs.FsUriModifier.*;
 import static de.schlichtherle.truezip.io.fs.FsUriModifier.PostFix.*;
 
 /**
@@ -76,11 +77,11 @@ public final class FsEntryName extends EntryName {
             = FsEntryName.create(URI.create(""));
 
     /**
-     * Equivalent to {@link #create(String, FsUriModifier) create(uri, FsUriModifier.NONE)}.
+     * Equivalent to {@link #create(String, FsUriModifier) create(uri, FsUriModifier.NULL)}.
      */
     public static @NonNull FsEntryName
     create(@NonNull String uri) {
-        return create(uri, FsUriModifier.NONE);
+        return create(uri, NULL);
     }
 
     /**
@@ -107,11 +108,11 @@ public final class FsEntryName extends EntryName {
     }
 
     /**
-     * Equivalent to {@link #create(String, String, FsUriModifier) create(path, query, FsUriModifier.NONE)}.
+     * Equivalent to {@link #create(String, String, FsUriModifier) create(path, query, FsUriModifier.NULL)}.
      */
     public static @NonNull FsEntryName
     create(@NonNull String path, @CheckForNull String query) {
-        return create(path, query, FsUriModifier.NONE);
+        return create(path, query, NULL);
     }
 
     /**
@@ -138,10 +139,10 @@ public final class FsEntryName extends EntryName {
         }
     }
 
-    /** Equivalent to {@link #create(URI, FsUriModifier) create(uri, FsUriModifier.NONE)}. */
+    /** Equivalent to {@link #create(URI, FsUriModifier) create(uri, FsUriModifier.NULL)}. */
     public static @NonNull FsEntryName
     create(@NonNull URI uri) {
-        return create(uri, FsUriModifier.NONE);
+        return create(uri, NULL);
     }
 
     /**
@@ -167,10 +168,10 @@ public final class FsEntryName extends EntryName {
     }
 
     /**
-     * Equivalent to {@link #FsEntryName(String, FsUriModifier) new FsEntryName(uri, FsUriModifier.NONE)}.
+     * Equivalent to {@link #FsEntryName(String, FsUriModifier) new FsEntryName(uri, FsUriModifier.NULL)}.
      */
     public FsEntryName(@NonNull String uri) throws URISyntaxException {
-        this(uri, FsUriModifier.NONE);
+        this(uri, NULL);
     }
 
     /**
@@ -188,10 +189,10 @@ public final class FsEntryName extends EntryName {
     }
 
     /**
-     * Equivalent to {@link #FsEntryName(URI, FsUriModifier) new FsEntryName(uri, FsUriModifier.NONE)}.
+     * Equivalent to {@link #FsEntryName(URI, FsUriModifier) new FsEntryName(uri, FsUriModifier.NULL)}.
      */
     public FsEntryName(@NonNull URI uri) throws URISyntaxException {
-        this(uri, FsUriModifier.NONE);
+        this(uri, NULL);
     }
 
     /**
