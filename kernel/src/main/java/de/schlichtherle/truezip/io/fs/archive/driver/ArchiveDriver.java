@@ -50,7 +50,7 @@ import net.jcip.annotations.ThreadSafe;
  * <p>
  * The following requirements must be met by any implementation:
  * <ul>
- * <li>The implementation must be immutable with respect to its public state.
+ * <li>The implementation must be thread-safe.
  * <li>The implementation must be serializable.
  * <li>Hence it would be an error to assume that it's a singleton.
  * <li>If the implementation shall get supported by the
@@ -62,7 +62,7 @@ import net.jcip.annotations.ThreadSafe;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@Immutable
+@ThreadSafe
 public abstract class ArchiveDriver<E extends ArchiveEntry>
 implements EntryFactory<E>, FSDriver, Serializable {
 
