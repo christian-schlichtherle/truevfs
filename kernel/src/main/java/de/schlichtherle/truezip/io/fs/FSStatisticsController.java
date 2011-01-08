@@ -39,7 +39,7 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 class FSStatisticsController
-extends FSDecoratorController<FSModel, FSController<?>> {
+extends FsDecoratorController<FSModel, FsController<?>> {
 
     private final FSStatisticsManager manager;
 
@@ -50,7 +50,7 @@ extends FSDecoratorController<FSModel, FSController<?>> {
      * @param manager the statistics file system manager.
      */
     FSStatisticsController(
-            @NonNull FSController<?> controller,
+            @NonNull FsController<?> controller,
             @NonNull FSStatisticsManager manager) {
         super(controller);
         assert null != manager;

@@ -26,7 +26,7 @@ import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
 import de.schlichtherle.truezip.io.fs.FSFalsePositiveException;
-import de.schlichtherle.truezip.io.fs.FSController;
+import de.schlichtherle.truezip.io.fs.FsController;
 import de.schlichtherle.truezip.io.fs.FSEntryName;
 import de.schlichtherle.truezip.io.fs.FSException;
 import de.schlichtherle.truezip.io.fs.FSSyncException;
@@ -60,7 +60,7 @@ import static de.schlichtherle.truezip.io.fs.FSOutputOption.*;
  * (the <i>target file</i>) in order to allow random access to it as if it
  * were a regular directory in the real file system.
  * <p>
- * In terms of software patterns, an {@code FSController} is
+ * In terms of software patterns, an {@code FsController} is
  * similar to a Director in a Builder pattern, with the {@link ArchiveDriver}
  * interface as its Builder or Abstract Factory.
  * However, an archive controller does not necessarily build a new archive.
@@ -82,7 +82,7 @@ import static de.schlichtherle.truezip.io.fs.FSOutputOption.*;
  * recognized to be <i>prospective archive files</i>.
  * <p>
  * To ensure that for each archive file there is at most one
- * {code FSController}, the path path of the archive file (called
+ * {code FsController}, the path path of the archive file (called
  * <i>target</i>) must be canonicalized, so it doesn't matter whether a target
  * archive file is addressed as {@code "archive.zip"} or
  * {@code "/dir/archive.zip"} if {@code "/dir"} is the client application's
@@ -106,7 +106,7 @@ import static de.schlichtherle.truezip.io.fs.FSOutputOption.*;
  */
 @NotThreadSafe
 abstract class BasicArchiveController<E extends ArchiveEntry>
-extends FSController<FSConcurrencyModel> {
+extends FsController<FSConcurrencyModel> {
 
     private static final String CLASS_NAME
             = BasicArchiveController.class.getName();
@@ -402,7 +402,7 @@ extends FSController<FSConcurrencyModel> {
      * @param  name the non-{@code null} entry name.
      * @param  intention the intended operation on the entry. If {@code null},
      *         a pure file system operation with no I/O is intended.
-     * @see    FSController#sync
+     * @see    FsController#sync
      * @throws IOException if any exceptional condition occurs
      *         throughout the synchronization of the target archive file.
      * @throws FSNotWriteLockedException

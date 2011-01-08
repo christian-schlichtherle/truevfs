@@ -27,8 +27,8 @@ final class FSDummyDriver implements FSDriver {
     private static final FSScheme FILE = FSScheme.create("file");
 
     @Override
-    public FSController<?> newController(   final FSMountPoint mountPoint,
-                                            final FSController<?> parent) {
+    public FsController<?> newController(   final FSMountPoint mountPoint,
+                                            final FsController<?> parent) {
         assert null == mountPoint.getParent()
                 ? null == parent
                 : mountPoint.getParent().equals(parent.getModel().getMountPoint());

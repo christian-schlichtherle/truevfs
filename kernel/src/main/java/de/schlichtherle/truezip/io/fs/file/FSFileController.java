@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.io.fs.file;
 
 import de.schlichtherle.truezip.io.fs.FSEntryName;
-import de.schlichtherle.truezip.io.fs.FSController;
+import de.schlichtherle.truezip.io.fs.FsController;
 import java.net.URI;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.file.FileOutputStream;
@@ -50,7 +50,7 @@ import static java.io.File.separatorChar;
  * @version $Id$
  */
 @ThreadSafe
-final class FSFileController extends FSController<FSModel>  {
+final class FSFileController extends FsController<FSModel>  {
 
     private final FSModel model;
     private final File target;
@@ -79,7 +79,7 @@ final class FSFileController extends FSController<FSModel>  {
     }
 
     @Override
-    public FSController<?> getParent() {
+    public FsController<?> getParent() {
         return null;
     }
 

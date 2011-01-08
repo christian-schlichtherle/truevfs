@@ -19,10 +19,10 @@ import de.schlichtherle.truezip.io.socket.IOCache.Strategy;
 import de.schlichtherle.truezip.io.fs.FSEntry;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.entry.Entry;
-import de.schlichtherle.truezip.io.fs.FSDecoratorController;
+import de.schlichtherle.truezip.io.fs.FsDecoratorController;
 import de.schlichtherle.truezip.io.fs.FSDecoratorEntry;
 import de.schlichtherle.truezip.io.fs.FSFalsePositiveException;
-import de.schlichtherle.truezip.io.fs.FSController;
+import de.schlichtherle.truezip.io.fs.FsController;
 import de.schlichtherle.truezip.io.fs.FSEntryName;
 import de.schlichtherle.truezip.io.fs.FSException;
 import de.schlichtherle.truezip.io.fs.FSInputOption;
@@ -83,8 +83,8 @@ import static de.schlichtherle.truezip.io.fs.FSSyncOption.*;
  */
 @NotThreadSafe
 public final class FSContentCacheController
-extends FSDecoratorController<  FSConcurrencyModel,
-                                FSController<? extends FSConcurrencyModel>> {
+extends FsDecoratorController<  FSConcurrencyModel,
+                                FsController<? extends FSConcurrencyModel>> {
 
     private static final Strategy STRATEGY = WRITE_BACK;
 
@@ -99,7 +99,7 @@ extends FSDecoratorController<  FSConcurrencyModel,
      * @param pool the pool of temporary entries to hold the copied entry data.
      */
     public FSContentCacheController(
-            final @NonNull FSController<? extends FSConcurrencyModel> controller,
+            final @NonNull FsController<? extends FSConcurrencyModel> controller,
             final @NonNull IOPool<?> pool) {
         super(controller);
         if (null == pool)

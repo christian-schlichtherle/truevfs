@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.io.fs.archive;
 
 import de.schlichtherle.truezip.io.fs.archive.driver.ArchiveDriver;
-import de.schlichtherle.truezip.io.fs.FSController;
+import de.schlichtherle.truezip.io.fs.FsController;
 import de.schlichtherle.truezip.io.fs.FSEntryName;
 import de.schlichtherle.truezip.io.InputBusyException;
 import de.schlichtherle.truezip.io.InputException;
@@ -169,7 +169,7 @@ extends FileSystemArchiveController<E> {
     }
 
     private final ArchiveDriver<E> driver;
-    private final FSController<?> parent;
+    private final FsController<?> parent;
     private final boolean useRootTemplate;
 
     /**
@@ -190,7 +190,7 @@ extends FileSystemArchiveController<E> {
     public DefaultArchiveController(
             final FSConcurrencyModel model,
             final ArchiveDriver<E> driver,
-            final FSController<?> parent,
+            final FsController<?> parent,
             final boolean useRootTemplate) {
         super(model);
         if (null == driver)
@@ -203,7 +203,7 @@ extends FileSystemArchiveController<E> {
     }
 
     @Override
-    public FSController<?> getParent() {
+    public FsController<?> getParent() {
         return parent;
     }
 
@@ -224,7 +224,7 @@ extends FileSystemArchiveController<E> {
     throws IOException {
         options = options.and(MOUNT_MASK);
         try {
-            final FSController<?> parent = getParent();
+            final FsController<?> parent = getParent();
             final FSEntryName parentName = getModel()
                     .getMountPoint()
                     .getPath()

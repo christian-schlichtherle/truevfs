@@ -59,16 +59,16 @@ public final class FSFederationManager extends FSManager {
     }
 
     @Override
-    @NonNull public synchronized FSController<?>
+    @NonNull public synchronized FsController<?>
     getController(  @NonNull FSMountPoint mountPoint,
                     @NonNull FSDriver driver) {
         return getController(mountPoint, driver, null);
     }
 
-    private FSController<?>
+    private FsController<?>
     getController(  final FSMountPoint mountPoint,
                     final FSDriver driver,
-                    FSController<?> parent) {
+                    FsController<?> parent) {
         if (null == mountPoint.getParent()) {
             if (null != parent)
                 throw new IllegalArgumentException("Parent/member mismatch!");
@@ -87,7 +87,7 @@ public final class FSFederationManager extends FSManager {
 
         final FSFederationController controller;
 
-        Scheduler(final FSController<?> prospect) {
+        Scheduler(final FsController<?> prospect) {
             controller = new FSFederationController(prospect);
             controller.getModel().addFileSystemTouchedListener(this);
             touchedChanged(null); // setup schedule
@@ -115,13 +115,13 @@ public final class FSFederationManager extends FSManager {
     }
 
     @Override
-    public synchronized Iterator<FSController<?>> iterator() {
+    public synchronized Iterator<FsController<?>> iterator() {
         return getControllers().iterator();
     }
 
-    private Set<FSController<?>> getControllers() {
-        final Set<FSController<?>> snapshot
-                = new TreeSet<FSController<?>>(BOTTOM_UP_COMPARATOR);
+    private Set<FsController<?>> getControllers() {
+        final Set<FsController<?>> snapshot
+                = new TreeSet<FsController<?>>(BOTTOM_UP_COMPARATOR);
         for (final Link<Scheduler> link : schedulers.values()) {
             final Scheduler scheduler = Links.getTarget(link);
             final FSFederationController controller
@@ -136,11 +136,11 @@ public final class FSFederationManager extends FSManager {
      * Orders file system controllers so that all file systems appear before
      * any of their parent file systems.
      */
-    private static final Comparator<FSController<?>> BOTTOM_UP_COMPARATOR
-            = new Comparator<FSController<?>>() {
+    private static final Comparator<FsController<?>> BOTTOM_UP_COMPARATOR
+            = new Comparator<FsController<?>>() {
         @Override
-        public int compare( FSController<?> l,
-                            FSController<?> r) {
+        public int compare( FsController<?> l,
+                            FsController<?> r) {
             return r.getModel().getMountPoint().hierarchicalize()
                     .compareTo(l.getModel().getMountPoint().hierarchicalize());
         }

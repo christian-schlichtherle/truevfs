@@ -34,7 +34,7 @@ import static de.schlichtherle.truezip.io.fs.FSSyncOption.*;
  */
 @ThreadSafe
 public abstract class FSManager
-implements Iterable<FSController<?>> {
+implements Iterable<FsController<?>> {
 
     /**
      * Returns a file system controller for the given mount point.
@@ -48,7 +48,7 @@ implements Iterable<FSController<?>> {
      *         new file system controller if required.
      * @return A file system controller.
      */
-    public abstract @NonNull FSController<?>
+    public abstract @NonNull FsController<?>
     getController(  @NonNull FSMountPoint mountPoint,
                     @NonNull FSDriver driver);
 
@@ -70,7 +70,7 @@ implements Iterable<FSController<?>> {
      * @return An iterator for the controller of all federated file systems
      *         managed by this instance.
      */
-    @Override public abstract Iterator<FSController<?>>
+    @Override public abstract Iterator<FsController<?>>
     iterator();
 
     /**
@@ -99,7 +99,7 @@ implements Iterable<FSController<?>> {
 
         class Sync implements Visitor {
             @Override public void
-            visit(FSController<?> controller) throws IOException {
+            visit(FsController<?> controller) throws IOException {
                 controller.sync(options, handler);
             }
         } // class Sync
@@ -122,7 +122,7 @@ implements Iterable<FSController<?>> {
     visit(  @NonNull Visitor visitor,
             @NonNull ExceptionHandler<? super IOException, X> handler)
     throws X {
-        for (FSController<?> controller : this) {
+        for (FsController<?> controller : this) {
             try {
                 visitor.visit(controller);
             } catch (IOException ex) {
@@ -137,7 +137,7 @@ implements Iterable<FSController<?>> {
      * @see #visit(Visitor, ExceptionHandler)
      */
     private interface Visitor {
-        void visit(@NonNull FSController<?> controller)
+        void visit(@NonNull FsController<?> controller)
         throws IOException;
     }
 

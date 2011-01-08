@@ -55,7 +55,7 @@ import static de.schlichtherle.truezip.io.fs.FSSyncOption.*;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class FSController<M extends FSModel> {
+public abstract class FsController<M extends FSModel> {
 
     /** Returns the file system model. */
     public abstract @NonNull M
@@ -66,7 +66,7 @@ public abstract class FSController<M extends FSModel> {
      * and only if this file system is not federated, i.e. not a member of
      * another file system.
      */
-    public abstract @Nullable FSController<?>
+    public abstract @Nullable FsController<?>
     getParent();
 
     public abstract @Nullable Icon
