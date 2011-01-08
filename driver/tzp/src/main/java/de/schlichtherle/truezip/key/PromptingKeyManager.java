@@ -79,7 +79,7 @@ public class PromptingKeyManager extends KeyManager {
      * </table>
      */
     @SuppressWarnings("unchecked")
-	public PromptingKeyManager() {
+    public PromptingKeyManager() {
         mapKeyProviderType(KeyProvider.class, PromptingKeyProvider.class);
         mapKeyProviderType(AesKeyProvider.class, PromptingAesKeyProvider.class);
     }
@@ -267,9 +267,8 @@ public class PromptingKeyManager extends KeyManager {
     }
 
     @SuppressWarnings("unchecked")
-	private synchronized
-    PromptingKeyProviderUI<?, ? super PromptingKeyProvider<?>> getUI(
-            final Class<? extends PromptingKeyProvider<?>> forType) {
+    private synchronized PromptingKeyProviderUI<?, ? super PromptingKeyProvider<?>>
+    getUI(final Class<? extends PromptingKeyProvider<?>> forType) {
         final Object value = uis.get(forType);
         final PromptingKeyProviderUI<?, ? super PromptingKeyProvider<?>> ui;
         if (value instanceof Class<?>) {
@@ -281,10 +280,10 @@ public class PromptingKeyManager extends KeyManager {
                 throw new UndeclaredThrowableException(failure);
             }
             uis.put(forType, ui);
-        } else if (value != null) {
+        } else if (null != value) {
             ui = (PromptingKeyProviderUI<?, ? super PromptingKeyProvider<?>>) value;
         } else { // value == null
-            throw new IllegalArgumentException(forType +
+            throw new NullPointerException(forType +
                     " (unknown user interface for PromptingKeyProvider)");
         }
         return ui;

@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.key;
+
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * A general purpose interface used by client applications to retrieve a
@@ -100,6 +101,7 @@ package de.schlichtherle.truezip.key;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 public interface KeyProvider<K extends Cloneable> {
 
     /**
@@ -182,5 +184,7 @@ public interface KeyProvider<K extends Cloneable> {
      * to {@link #getOpenKey} is at the discretion of the provider's
      * implementation and its instance's state.
      */
+    // TODO: Couldn't we add a boolean parameter to getOpenKey() instead?
+    // See PromptingKeyProviderUI.promptOpenKey(*).
     void invalidOpenKey();
 }

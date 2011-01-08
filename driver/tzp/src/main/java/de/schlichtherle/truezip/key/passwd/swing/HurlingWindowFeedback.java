@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.key.passwd.swing;
 
+import de.schlichtherle.truezip.key.KeyProvider;
+import de.schlichtherle.truezip.key.passwd.swing.BasicInvalidKeyFeedback;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.awt.Point;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.JPanel;
 
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -38,71 +41,63 @@ import javax.swing.Timer;
  */
 public class HurlingWindowFeedback extends BasicInvalidKeyFeedback {
 
-    private static final double PI = Math.PI;
+    private static final double PI      = Math.PI;
     private static final double TWO_PI  = 2.0 * PI;
     
-    public static final int DISTANCE = 25;
-    public static final int CYCLE    = 150;
-    public static final int DURATION = 1500;
-    public static final int FPS      = 75;
+    public static final int AMPLITUDE = 25;
+    public static final int CYCLE     = 150;
+    public static final int DURATION  = 1500;
+    public static final int FPS       = 75;
 
-    private final double distance;
+    private final double amplitude;
     private final double cycle;
     private final int    duration;
     private final int    fps;
     
     public HurlingWindowFeedback() {
-        this(DISTANCE, CYCLE, DURATION, FPS);
+        this(AMPLITUDE, CYCLE, DURATION, FPS);
     }
 
     /**
      * Constructs a new {@code HurlingWindowFeedback}.
      * 
-     * @param distance The maximum distance for quaking the window.
-     * @param cycle Milliseconds required for one cycle.
-     * @param duration Millisecons of duration of quake.
-     * @param fps Frames per second for animation.
+     * @param amplitude the amplitude of pixels for offsetting the window.
+     * @param cycle milliseconds required for one cycle.
+     * @param duration millisecons of duration of quake.
+     * @param fps frames per second for animation.
      */
-    protected HurlingWindowFeedback(
-            final int distance,
-            final int cycle,
-            final int duration,
-            final int fps) {
-        this.distance = distance;
-        this.cycle    = cycle;
-        this.duration = duration;
-        this.fps      = fps;
-
-        if (duration > getDelay())
-            setDelay(duration);
+    protected HurlingWindowFeedback(  final int amplitude,
+                                                final int cycle,
+                                                final int duration,
+                                                final int fps) {
+        super(duration > KeyProvider.MIN_KEY_RETRY_DELAY
+                ? duration
+                : KeyProvider.MIN_KEY_RETRY_DELAY);
+        this.amplitude = amplitude;
+        this.cycle     = cycle;
+        this.duration  = duration;
+        this.fps       = fps;
     }
 
     @Override
-    protected void startAnimation() {
-        super.startAnimation(); // temporarily disable default button
-        
-        final Window window = SwingUtilities.getWindowAncestor(getPanel());
-        if (window == null)
+    public void feedback(@NonNull JPanel panel) {
+        final Window window = SwingUtilities.getWindowAncestor(panel);
+        super.feedback(panel); // temporarily disable default button
+        if (null == window)
             return;
-
         final Point origin = window.getLocation();
-        final long startTime = System.currentTimeMillis();
+        final long start = System.currentTimeMillis();
         final Timer timer = new Timer(1000 / fps, new ActionListener() {
             @Override
-			public void actionPerformed(ActionEvent e) {
-                // Calculate elapsed time.
-                final long elapsed = System.currentTimeMillis() - startTime;
-
+            public void actionPerformed(ActionEvent e) {
+                final long elapsed = System.currentTimeMillis() - start;
                 if (elapsed < duration && window.isShowing()) {
-                    final double amplitude
-                            = Math.sin(PI * elapsed / duration) * distance;
                     final double angle = TWO_PI * elapsed / cycle;
-                    final int quakingX
-                            = (int) (Math.cos(angle) * amplitude + origin.x);
-                    final int quakingY
-                            = (int) (Math.sin(angle) * amplitude + origin.y);
-
-                    window.setLocation(quakingX, quakingY);
+                    final double offset
+                            = Math.sin(PI * elapsed / duration) * amplitude;
+                    final int x = (int) (Math.cos(angle) * offset + origin.x);
+                    final int y = (int) (Math.sin(angle) * offset + origin.y);
+                    window.setLocation(x, y);
                     window.repaint();
                 } else {
                     ((Timer) e.getSource()).stop();

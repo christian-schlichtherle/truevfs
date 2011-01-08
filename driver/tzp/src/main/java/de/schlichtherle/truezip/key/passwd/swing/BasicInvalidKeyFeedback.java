@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.key.passwd.swing;
 
 import de.schlichtherle.truezip.key.KeyProvider;
@@ -21,70 +20,52 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.JRootPane;
 import javax.swing.Timer;
 
 /**
  * Provides feedback by beeping using the default toolkit and disabling the
- * default button in the root pane for three seconds
- * when prompting for a key
- * and the last input was invalid.
+ * default button in the root pane for {@link KeyProvider#MIN_KEY_RETRY_DELAY}
+ * milliseconds when prompting for a key and the last input was invalid.
  * <p>
  * Note that the root pane is normally the root pane of a parent
  * JOptionPane which has the OK button set as its default button.
  * This is to inhibit the use of a GUI robot for exhaustive password searching.
- * <p>
- * If you would like to play a nice sound for feedback, you need to override
- * the {@link #startSound} method.
- * <p>
- * <b>Warning:</b> Playing a {@code java.applet.AudioClip} on J2SE
- * 1.4.2_12 causes a client application not to terminate until System.exit(0)
- * is called explicitly - hence this feature is currently not implemented in
- * this class!
- * This issue is fixed in JSE 1.5.0_07 (and probably earlier versions).
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class BasicInvalidKeyFeedback extends BasicFeedback {
+public class BasicInvalidKeyFeedback
+extends BasicFeedback
+implements InvalidKeyFeedback {
 
-    private int delay = KeyProvider.MIN_KEY_RETRY_DELAY;
+    private final int duration;
 
-    /**
-     * Returns the delay for reenabling the default button in the root pane.
-     *
-     * @return The delay in milliseconds.
-     *         Defaults to {@link KeyProvider#MIN_KEY_RETRY_DELAY}.
-     */
-    public int getDelay() {
-        return delay;
+    public BasicInvalidKeyFeedback() {
+        this(KeyProvider.MIN_KEY_RETRY_DELAY);
     }
 
     /**
-     * Sets the delay for reenabling the default button in the root pane.
+     * Constructs a new feedback.
      *
-     * @param delay The delay in milliseconds.
+     * @param duration the duration for disabling the default button in the
+     *        root pane in milliseconds.
      */
-    public void setDelay(final int delay) {
-        this.delay = delay;
+    protected BasicInvalidKeyFeedback(int duration) {
+        if (0 >= duration)
+            throw new IllegalArgumentException();
+        this.duration = duration;
     }
 
     @Override
-    protected void startAnimation() {
-        startAnimation(getPanel(), getDelay());
-    }
-
-    static void startAnimation(final JPanel panel, final int delay) {
-        final JRootPane rp = panel.getRootPane();
-        final JButton b = rp.getDefaultButton();
-        if (b == null)
+    public void feedback(JPanel panel) {
+        final JButton b = panel.getRootPane().getDefaultButton();
+        super.feedback(panel);
+        if (null == b)
             return;
-
         b.setEnabled(false);
-
-        final Timer t = new Timer(delay, new ActionListener() {
+        final Timer t = new Timer(duration, new ActionListener() {
             @Override
-			public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent e) {
                 b.setEnabled(true);
             }
         });

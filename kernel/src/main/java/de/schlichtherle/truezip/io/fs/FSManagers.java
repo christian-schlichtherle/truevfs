@@ -75,11 +75,8 @@ public class FSManagers {
             synchronized (FSManagers.class) { // DCL does work in combination with volatile in JSE 5!
                 manager = instance;
                 if (null == manager) {
-                    // TODO: Check compatibility with OSGi.
-                    manager
-                            = new ServiceLocator(FSManagers.class.getClassLoader())
-                                .getServices(FSManager.class)
-                                .next();
+                    manager = new ServiceLocator(FSManagers.class.getClassLoader())
+                            .getService(FSManager.class, FSFederationManager.class);
                     setInstance(manager);
                 }
             }

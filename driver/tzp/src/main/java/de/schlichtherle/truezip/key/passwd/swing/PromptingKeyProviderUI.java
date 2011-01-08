@@ -33,15 +33,12 @@ import java.net.URI;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.WeakHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
-
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * A Swing based user interface to prompt for passwords or key files.
- * This class is thread safe.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -51,12 +48,9 @@ implements de.schlichtherle.truezip.key.PromptingKeyProviderUI<Cloneable, P> {
 
     private static final String CLASS_NAME
             = PromptingKeyProviderUI.class.getName();
-    private static final Logger logger = Logger.getLogger(CLASS_NAME);
     private static final ResourceBundle resources
             = ResourceBundle.getBundle(CLASS_NAME);
-    private static final String PACKAGE_NAME
-            = PromptingKeyProviderUI.class.getPackage().getName();
-    static final URI INITIAL_RESOURCE = URI.create("null:/");
+    static final URI INITIAL_RESOURCE = URI.create(""); // NOI18N
 
     /**
      * The timeout for the EDT to <em>start</em> prompting for a key in
@@ -77,16 +71,17 @@ implements de.schlichtherle.truezip.key.PromptingKeyProviderUI<Cloneable, P> {
     private static final Map<PromptingKeyProvider<?>, OpenKeyPanel> openKeyPanels
             = new WeakHashMap<PromptingKeyProvider<?>, OpenKeyPanel>();
 
+    private static final ServiceLocator serviceLocator
+            = new ServiceLocator(PromptingKeyProviderUI.class.getClassLoader());
+
     /**
      * The last resource ID used when prompting.
      * Initialized to the empty string.
      */
-    static URI lastResource = INITIAL_RESOURCE; // NOI18N
+    static volatile URI lastResource = INITIAL_RESOURCE;
 
-    private Feedback unknownCreateKeyFeedback;
-    private Feedback invalidCreateKeyFeedback;
-    private Feedback unknownOpenKeyFeedback;
-    private Feedback invalidOpenKeyFeedback;
+    private volatile UnknownKeyFeedback unknownKeyFeedback;
+    private volatile InvalidKeyFeedback invalidKeyFeedback;
 
     /**
      * Reads the encryption key as a byte sequence from the given pathname
@@ -124,71 +119,36 @@ implements de.schlichtherle.truezip.key.PromptingKeyProviderUI<Cloneable, P> {
         return new OpenKeyPanel();
     }
 
-    protected Feedback getUnknownCreateKeyFeedback() {
-        if (unknownCreateKeyFeedback == null)
-            unknownCreateKeyFeedback = newFeedback("UnknownCreateKeyFeedback");
-        return unknownCreateKeyFeedback;
+    protected UnknownKeyFeedback getUnknownKeyFeedback() {
+        if (unknownKeyFeedback == null)
+            unknownKeyFeedback = serviceLocator.getService(
+                    UnknownKeyFeedback.class,
+                    BasicUnknownKeyFeedback.class);
+        return unknownKeyFeedback;
     }
 
-    protected void setUnkownCreateKeyFeedback(final Feedback uckf) {
-        this.unknownCreateKeyFeedback = uckf;
+    protected void setUnkownKeyFeedback(final UnknownKeyFeedback uckf) {
+        this.unknownKeyFeedback = uckf;
     }
 
-    protected Feedback getInvalidCreateKeyFeedback() {
-        if (invalidCreateKeyFeedback == null)
-            invalidCreateKeyFeedback = newFeedback("InvalidCreateKeyFeedback");
-        return invalidCreateKeyFeedback;
+    protected InvalidKeyFeedback getInvalidKeyFeedback() {
+        if (invalidKeyFeedback == null)
+            invalidKeyFeedback = serviceLocator.getService(
+                    InvalidKeyFeedback.class,
+                    BasicInvalidKeyFeedback.class);
+        return invalidKeyFeedback;
     }
 
-    protected void setInvalidCreateKeyFeedback(final Feedback ickf) {
-        this.invalidCreateKeyFeedback = ickf;
-    }
-
-    protected Feedback getUnknownOpenKeyFeedback() {
-        if (unknownOpenKeyFeedback == null)
-            unknownOpenKeyFeedback = newFeedback("UnknownOpenKeyFeedback");
-        return unknownOpenKeyFeedback;
-    }
-
-    protected void setUnknownOpenKeyFeedback(final Feedback uokf) {
-        this.unknownOpenKeyFeedback = uokf;
-    }
-
-    protected Feedback getInvalidOpenKeyFeedback() {
-        if (invalidOpenKeyFeedback == null)
-            invalidOpenKeyFeedback = newFeedback("InvalidOpenKeyFeedback");
-        return invalidOpenKeyFeedback;
-    }
-
-    protected void setInvalidOpenKeyFeedback(final Feedback iokf) {
-        this.invalidOpenKeyFeedback = iokf;
-    }
-
-    private static Feedback newFeedback(final String type) {
-        try {
-            String n = System.getProperty(
-                    PACKAGE_NAME + "." + type,
-                    PACKAGE_NAME + ".Basic" + type);
-            Class<?> c = new ServiceLocator(PromptingKeyProviderUI.class.getClassLoader())
-                    .getClass(n);
-            Feedback f = (Feedback) c.newInstance();
-            return f;
-        } catch (ClassNotFoundException ex) {
-            logger.log(Level.WARNING, "", ex);
-        } catch (IllegalAccessException ex) {
-            logger.log(Level.WARNING, "", ex);
-        } catch (InstantiationException ex) {
-            logger.log(Level.WARNING, "", ex);
-        }
-        return null;
+    protected void setInvalidKeyFeedback(final InvalidKeyFeedback ickf) {
+        this.invalidKeyFeedback = ickf;
     }
 
     @Override
-	public void promptCreateKey(final P provider)
+    public void promptCreateKey(final P provider)
     throws UnknownKeyException {
         final Runnable task = new Runnable() {
             @Override
-			public void run() {
+            public void run() {
                 promptCreateKey(provider, null);
             }
         };
@@ -196,25 +156,12 @@ implements de.schlichtherle.truezip.key.PromptingKeyProviderUI<Cloneable, P> {
     }
 
     @Override
-	public boolean promptUnknownOpenKey(final P provider)
+    public boolean promptOpenKey(final P provider, final boolean invalid)
     throws UnknownKeyException {
         final BooleanRunnable task = new BooleanRunnable() {
             @Override
-			public void run() {
-                result = promptOpenKey(provider, false, null);
-            }
-        };
-        multiplexOnEDT(task); // synchronized on class instance!
-        return task.result;
-    }
-
-    @Override
-	public boolean promptInvalidOpenKey(final P provider)
-    throws UnknownKeyException {
-        final BooleanRunnable task = new BooleanRunnable() {
-            @Override
-			public void run() {
-                result = promptOpenKey(provider, true, null);
+            public void run() {
+                result = promptOpenKey(provider, invalid, null);
             }
         };
         multiplexOnEDT(task); // synchronized on class instance!
@@ -248,24 +195,15 @@ implements de.schlichtherle.truezip.key.PromptingKeyProviderUI<Cloneable, P> {
                 assert resource != null : "violation of contract for PromptingKeyProviderUI";
                 createKeyPanel.setResource(resource);
                 createKeyPanel.setFeedback(createKeyPanel.getError() != null
-                        ? getInvalidCreateKeyFeedback()
-                        : getUnknownCreateKeyFeedback());
+                        ? getInvalidKeyFeedback()
+                        : getUnknownKeyFeedback());
 
-                final int result;
-                try {
-                    result = JOptionPane.showConfirmDialog(
-                            parent,
-                            createKeyPanel,
-                            resources.getString("newPasswdDialog.title"),
-                            JOptionPane.OK_CANCEL_OPTION,
-                            JOptionPane.QUESTION_MESSAGE);
-                } catch (StackOverflowError failure) {
-                    // Workaround for bug ID #6471418 - should be fixed in
-                    // JSE 1.5.0_11
-                    boolean interrupted = Thread.interrupted(); // test and clear status!
-                    assert interrupted;
-                    break;
-                }
+                final int result = JOptionPane.showConfirmDialog(
+                        parent,
+                        createKeyPanel,
+                        resources.getString("newPasswdDialog.title"),
+                        JOptionPane.OK_CANCEL_OPTION,
+                        JOptionPane.QUESTION_MESSAGE);
                 if (Thread.interrupted()) // test and clear status!
                     break;
 
@@ -324,9 +262,9 @@ implements de.schlichtherle.truezip.key.PromptingKeyProviderUI<Cloneable, P> {
                 final URI resource = provider.getResource();
                 assert resource != null : "violation of contract for PromptingKeyProviderUI";
                 openKeyPanel.setResource(resource);
-                openKeyPanel.setFeedback(openKeyPanel.getError() != null
-                        ? getInvalidOpenKeyFeedback()
-                        : getUnknownOpenKeyFeedback());
+                openKeyPanel.setFeedback(null != openKeyPanel.getError()
+                        ? getInvalidKeyFeedback()
+                        : getUnknownKeyFeedback());
 
                 final int result;
                 try {
