@@ -75,7 +75,6 @@ import java.util.regex.Matcher;
  * @author Christian Schlichtherle
  * @version $Id$
  * @see ArchiveDetector#NULL
- * @see ArchiveDetector#DEFAULT
  * @see ArchiveDetector#ALL
  */
 public final class DefaultArchiveDetector

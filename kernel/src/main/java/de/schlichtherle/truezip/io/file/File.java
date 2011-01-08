@@ -825,7 +825,6 @@ public final class File extends java.io.File {
                                 enclEntryNameBuf.insert(0, ancestor.enclEntryName.getPath());
                             } else { // TODO: Simplify this!
                                 // Example: new File(new File(new File("archive.zip"), "entry"), ".")
-                                // with ArchiveDetector.DEFAULT.
                                 assert enclArchive == ancestor.enclArchive;
                                 enclEntryNameBuf.append(ancestor.enclEntryName.getPath());
                             }
@@ -835,7 +834,6 @@ public final class File extends java.io.File {
                         }
                     } else if (enclEntryNameBuf.length() <= 0) { // TODO: Simplify this!
                         // Example: new File(new File("archive.zip"), ".")
-                        // with ArchiveDetector.DEFAULT.
                         assert enclArchive == ancestor;
                         innerArchive = this;
                         enclArchive = ancestor.enclArchive;
@@ -2847,7 +2845,7 @@ public final class File extends java.io.File {
      * destination, this method can be used to do advanced stuff like
      * unzipping any archive file in the source tree to a plain directory
      * in the destination tree (where {@code srcDetector} could be
-     * {@link ArchiveDetector#DEFAULT} and {@code dstDetector} must be
+     * {@link ArchiveDetector#ALL} and {@code dstDetector} must be
      * {@link ArchiveDetector#NULL}) or changing the charset by configuring
      * a custom {@link DefaultArchiveDetector}.
      * <p>
@@ -3165,7 +3163,7 @@ public final class File extends java.io.File {
      * destination, this method can be used to do advanced stuff like
      * unzipping any archive file in the source tree to a plain directory
      * in the destination tree (where {@code srcDetector} could be
-     * {@link ArchiveDetector#DEFAULT} and {@code dstDetector} must be
+     * {@link ArchiveDetector#ALL} and {@code dstDetector} must be
      * {@link ArchiveDetector#NULL}) or changing the charset by configuring
      * a custom {@link DefaultArchiveDetector}.
      * <p>
@@ -3442,7 +3440,7 @@ public final class File extends java.io.File {
      * destination, this method can be used to do advanced stuff like
      * unzipping any archive file in the source tree to a plain directory
      * in the destination tree (where {@code srcDetector} could be
-     * {@link ArchiveDetector#DEFAULT} and {@code dstDetector} must be
+     * {@link ArchiveDetector#ALL} and {@code dstDetector} must be
      * {@link ArchiveDetector#NULL}) or changing the charset by configuring
      * a custom {@link DefaultArchiveDetector}.
      * <p>
@@ -3722,7 +3720,7 @@ public final class File extends java.io.File {
      * destination, this method can be used to do advanced stuff like
      * unzipping any archive file in the source tree to a plain directory
      * in the destination tree (where {@code srcDetector} could be
-     * {@link ArchiveDetector#DEFAULT} and {@code dstDetector} must be
+     * {@link ArchiveDetector#ALL} and {@code dstDetector} must be
      * {@link ArchiveDetector#NULL}) or changing the charset by configuring
      * a custom {@link DefaultArchiveDetector}.
      * <p>

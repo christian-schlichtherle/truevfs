@@ -18,7 +18,6 @@ package de.schlichtherle.truezip.io.fs.archive.driver;
 
 import de.schlichtherle.truezip.io.TabuFileException;
 import de.schlichtherle.truezip.io.fs.archive.DefaultArchiveController;
-import de.schlichtherle.truezip.io.fs.archive.DefaultArchiveController;
 import de.schlichtherle.truezip.io.fs.concurrency.FSConcurrencyModel;
 import de.schlichtherle.truezip.io.fs.archive.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.OutputShop;
@@ -39,7 +38,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import javax.swing.Icon;
-import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -164,9 +162,8 @@ implements EntryFactory<E>, FSDriver, Serializable {
     throws IOException;
 
     /**
-     * Returns the icon that
-     * {@link de.schlichtherle.truezip.io.swing.tree.FileTreeCellRenderer}
-     * should display for the given archive file.
+     * Returns the icon that should be displayed for the given archive file
+     * if it's open/expanded in the view.
      * <p>
      * The implementation in the abstract class {@code ArchiveDriver} simply
      * returns {@code null}.
@@ -182,11 +179,8 @@ implements EntryFactory<E>, FSDriver, Serializable {
     }
 
     /**
-     * Returns the icon that
-     * {@link de.schlichtherle.truezip.io.swing.FileSystemView}
-     * and
-     * {@link de.schlichtherle.truezip.io.swing.tree.FileTreeCellRenderer}
-     * should display for the given archive file.
+     * Returns the icon that should be displayed for the given archive file
+     * if it's closed/collapsed in the view.
      * <p>
      * The implementation in the abstract class {@code ArchiveDriver} simply
      * returns {@code null}.

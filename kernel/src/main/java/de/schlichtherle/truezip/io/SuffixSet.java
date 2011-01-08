@@ -101,7 +101,7 @@ public final class SuffixSet extends CanonicalStringSet {
         super.addAll(c);
     }
 
-    private static class SuffixMapper implements Mapper {
+    private static class SuffixMapper implements Canonicalizer {
         /**
          * Returns the canonical form of {@code suffix} or {@code null}
          * if the given suffix does not have a canonical form.

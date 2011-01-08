@@ -102,7 +102,7 @@ public final class ServiceLocator {
     }
 
     /**
-     * @param  name The service to locate.
+     * @param  service The service to locate.
      * @return A concatenated iteration for the service on the class path.
      * @throws ServiceConfigurationError If an exception occurs.
      */

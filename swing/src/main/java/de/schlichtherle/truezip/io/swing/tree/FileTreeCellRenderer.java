@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.swing;
+package de.schlichtherle.truezip.io.swing.tree;
 
+import de.schlichtherle.truezip.io.swing.JFileTree;
 import java.awt.Component;
 import javax.swing.Icon;
 import javax.swing.JTree;
@@ -23,7 +24,7 @@ import javax.swing.filechooser.FileSystemView;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 /**
- * A {@link javax.swing.tree.TreeCellRenderer} which uses an instance of
+ * A tree cell renderer which uses an instance of
  * {@link de.schlichtherle.truezip.io.swing.FileSystemView} to display the
  * system icon for each node in a {@link JFileTree} wherever possible.
  *

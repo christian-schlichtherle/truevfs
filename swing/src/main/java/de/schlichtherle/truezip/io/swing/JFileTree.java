@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.io.swing;
 
+import de.schlichtherle.truezip.io.swing.tree.FileTreeModel;
+import de.schlichtherle.truezip.io.swing.tree.FileTreeCellRenderer;
 import java.awt.Toolkit;
 import java.io.IOException;
 import java.io.InputStream;
@@ -694,6 +696,7 @@ public final class JFileTree extends JTree {
         private static final long serialVersionUID = 6027634928673290123L;
 
         @Override
+        @SuppressWarnings("deprecation")
         public void treeCollapsed(TreeExpansionEvent evt) {
             getModel().forget((java.io.File) evt.getPath().getLastPathComponent());
         }
