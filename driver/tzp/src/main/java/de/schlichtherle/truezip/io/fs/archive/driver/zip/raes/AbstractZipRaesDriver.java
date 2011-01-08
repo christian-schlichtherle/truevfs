@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.fs.archive.driver.zip.raes;
 
-import de.schlichtherle.truezip.io.fs.FSController;
+import de.schlichtherle.truezip.io.fs.FsController;
 import de.schlichtherle.truezip.io.fs.FSMountPoint;
 import de.schlichtherle.truezip.io.fs.concurrency.FSConcurrencyModel;
 import de.schlichtherle.truezip.io.socket.LazyOutputSocket;
@@ -92,9 +92,9 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
     }
 
     @Override
-    @NonNull public FSController<?>
+    @NonNull public FsController<?>
     newController(  @NonNull FSMountPoint mountPoint,
-                    @NonNull FSController<?> parent) {
+                    @NonNull FsController<?> parent) {
         return new KeyManagerArchiveController(
                 super.newController(mountPoint, parent), this);
     }
