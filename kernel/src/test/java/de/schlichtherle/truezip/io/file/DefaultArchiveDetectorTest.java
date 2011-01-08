@@ -17,7 +17,7 @@ package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.fs.archive.driver.DummyArchiveDriver;
 import de.schlichtherle.truezip.io.fs.archive.driver.ArchiveDriver;
-import de.schlichtherle.truezip.io.fs.FSScheme1;
+import de.schlichtherle.truezip.io.fs.FsScheme;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -447,7 +447,7 @@ public class DefaultArchiveDetectorTest {
         driver = detector.getArchiveDriver(upath);
         assertThat(driver, sameInstance((Object) result));
 
-        final FSScheme1 scheme = detector.getScheme(lpath);
+        final FsScheme scheme = detector.getScheme(lpath);
         if (null != driver) {
             assertThat(scheme, notNullValue());
             assertThat(scheme, equalTo(detector.getScheme(upath)));

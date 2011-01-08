@@ -19,14 +19,14 @@ import de.schlichtherle.truezip.io.fs.FsDecoratorEntry;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import de.schlichtherle.truezip.io.fs.FSEntry1;
-import de.schlichtherle.truezip.io.fs.FSEntryName1;
+import de.schlichtherle.truezip.io.fs.FsEntry;
+import de.schlichtherle.truezip.io.fs.FsEntryName;
 import edu.umd.cs.findbugs.annotations.NonNull;
 
 import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
 
 /**
- * Adapts an {@link ArchiveEntry} to a {@link FSEntry1}.
+ * Adapts an {@link ArchiveEntry} to a {@link FsEntry}.
  * 
  * @param   <E> The type of the decorated archive entries.
  * @author  Christian Schlichtherle
@@ -41,7 +41,7 @@ extends FsDecoratorEntry<E> {
      */
     @NonNull
     public static <E extends ArchiveEntry>
-    ArchiveFileSystemEntry<E> create(   final @NonNull FSEntryName1 name,
+    ArchiveFileSystemEntry<E> create(   final @NonNull FsEntryName name,
                                         final @NonNull Type        type,
                                         final @NonNull E           entry) {
         return create(name.getPath(), type, entry);

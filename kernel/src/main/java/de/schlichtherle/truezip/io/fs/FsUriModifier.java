@@ -42,4 +42,6 @@ public enum FsUriModifier {
     };
 
     abstract @NonNull URI modify(@NonNull URI uri) throws URISyntaxException;
+
+    FsUriModifier next() { return this; }
 }

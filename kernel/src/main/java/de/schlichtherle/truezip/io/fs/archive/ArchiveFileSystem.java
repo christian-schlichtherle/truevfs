@@ -20,8 +20,8 @@ import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.EntryContainer;
 import de.schlichtherle.truezip.io.entry.EntryFactory;
-import de.schlichtherle.truezip.io.fs.FSEntryName1;
-import de.schlichtherle.truezip.io.fs.FSOutputOption1;
+import de.schlichtherle.truezip.io.fs.FsEntryName;
+import de.schlichtherle.truezip.io.fs.FsOutputOption;
 import de.schlichtherle.truezip.io.fs.FsUriModifier;
 import de.schlichtherle.truezip.util.Link;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -42,8 +42,8 @@ import net.jcip.annotations.NotThreadSafe;
 import static de.schlichtherle.truezip.io.entry.Entry.*;
 import static de.schlichtherle.truezip.io.entry.Entry.Access.*;
 import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
-import static de.schlichtherle.truezip.io.fs.FSEntryName1.*;
-import static de.schlichtherle.truezip.io.fs.FSOutputOption1.*;
+import static de.schlichtherle.truezip.io.fs.FsEntryName.*;
+import static de.schlichtherle.truezip.io.fs.FsOutputOption.*;
 import static de.schlichtherle.truezip.io.Paths.*;
 
 /**
@@ -184,7 +184,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         for (final Iterator<String> i = paths.iterator(); i.hasNext(); i.remove()) {
             final String path = i.next();
             try {
-                fsck.fix(new FSEntryName1(
+                fsck.fix(new FsEntryName(
                         new URI(null, null, path, null, null),
                         FsUriModifier.NORMALIZE).getPath());
             } catch (URISyntaxException dontFix) {
@@ -354,7 +354,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
 
     @Nullable
     public final ArchiveFileSystemEntry<E> getEntry(
-            @NonNull FSEntryName1 name) {
+            @NonNull FsEntryName name) {
         return getEntry(name.getPath());
     }
 
@@ -458,7 +458,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      *             supported by the file system.
      *         <li>TODO: type is not {@code FILE} or {@code DIRECTORY}.
      *         <li>The entry already exists and either the option
-     *             {@link FSOutputOption1#EXCLUSIVE} is set or the entry is a
+     *             {@link FsOutputOption#EXCLUSIVE} is set or the entry is a
      *             directory.
      *         <li>The entry exists as a different type.
      *         <li>A parent entry exists but is not a directory.
@@ -472,9 +472,9 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      */
     @NonNull
     public ArchiveFileSystemOperation<E> mknod(
-            @NonNull final FSEntryName1 name,
+            @NonNull final FsEntryName name,
             @NonNull final Entry.Type type,
-            @NonNull final BitField<FSOutputOption1> options,
+            @NonNull final BitField<FsOutputOption> options,
             @CheckForNull Entry template)
     throws ArchiveFileSystemException {
         final String path = name.getPath();
@@ -633,7 +633,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      * @throws ArchiveFileSystemException If the operation fails for some other
      *         reason.
      */
-    public void unlink(@NonNull final FSEntryName1 name) throws ArchiveFileSystemException {
+    public void unlink(@NonNull final FsEntryName name) throws ArchiveFileSystemException {
         final String path = name.getPath();
         if (name.isRoot())
             throw new ArchiveFileSystemException(path,
@@ -665,7 +665,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
     }
 
     public boolean setTime(
-            @NonNull final FSEntryName1 name,
+            @NonNull final FsEntryName name,
             @NonNull final BitField<Access> types,
             final long value)
     throws ArchiveFileSystemException {
@@ -685,11 +685,11 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         return ok;
     }
 
-    public boolean isWritable(@NonNull FSEntryName1 name) {
+    public boolean isWritable(@NonNull FsEntryName name) {
         return !isReadOnly();
     }
 
-    public void setReadOnly(@NonNull FSEntryName1 name)
+    public void setReadOnly(@NonNull FsEntryName name)
     throws ArchiveFileSystemException {
         if (!isReadOnly())
             throw new ArchiveFileSystemException(name.getPath(),

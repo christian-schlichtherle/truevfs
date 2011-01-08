@@ -26,7 +26,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * @version $Id$
  */
 public abstract class FsDecoratorEntry<E extends Entry>
-extends FSEntry1 {
+extends FsEntry {
 
     /** The decorated entry. */
     @NonNull

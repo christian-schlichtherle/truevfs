@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.io.fs.archive.driver.zip;
 
 import de.schlichtherle.truezip.io.fs.concurrency.FSConcurrencyModel;
-import de.schlichtherle.truezip.io.fs.FSModel1;
+import de.schlichtherle.truezip.io.fs.FsModel;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.IOException;
 

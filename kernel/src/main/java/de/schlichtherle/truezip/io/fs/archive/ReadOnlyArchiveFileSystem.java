@@ -20,8 +20,8 @@ import de.schlichtherle.truezip.io.entry.EntryContainer;
 import de.schlichtherle.truezip.io.entry.EntryFactory;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
-import de.schlichtherle.truezip.io.fs.FSEntryName1;
-import de.schlichtherle.truezip.io.fs.FSOutputOption1;
+import de.schlichtherle.truezip.io.fs.FsEntryName;
+import de.schlichtherle.truezip.io.fs.FsOutputOption;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -59,22 +59,22 @@ extends ArchiveFileSystem<E> {
     @Override
     @NonNull
     public ArchiveFileSystemOperation<E> mknod(
-            @NonNull FSEntryName1 name,
+            @NonNull FsEntryName name,
             @NonNull Type type,
-            @NonNull BitField<FSOutputOption1> options,
+            @NonNull BitField<FsOutputOption> options,
             @CheckForNull Entry template)
     throws ArchiveFileSystemException {
         throw new ReadOnlyArchiveFileSystemException();
     }
 
     @Override
-    public void unlink(FSEntryName1 path)
+    public void unlink(FsEntryName path)
     throws ArchiveFileSystemException {
         throw new ReadOnlyArchiveFileSystemException();
     }
 
     @Override
-    public boolean setTime(FSEntryName1 path, BitField<Access> types, long value)
+    public boolean setTime(FsEntryName path, BitField<Access> types, long value)
     throws ArchiveFileSystemException {
         throw new ReadOnlyArchiveFileSystemException();
     }

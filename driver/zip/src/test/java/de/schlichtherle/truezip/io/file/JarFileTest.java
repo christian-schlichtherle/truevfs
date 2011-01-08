@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.fs.archive.driver.zip.JarDriver;
-import de.schlichtherle.truezip.io.fs.FSScheme1;
+import de.schlichtherle.truezip.io.fs.FsScheme;
 
 /**
  * @author Christian Schlichtherle
@@ -25,6 +25,6 @@ import de.schlichtherle.truezip.io.fs.FSScheme1;
 public final class JarFileTest extends FileTestCase {
     
     public JarFileTest() {
-        super(FSScheme1.create("jar"), new JarDriver());
+        super(FsScheme.create("jar"), new JarDriver());
     }
 }

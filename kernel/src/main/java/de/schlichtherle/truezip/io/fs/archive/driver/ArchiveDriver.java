@@ -24,11 +24,11 @@ import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.socket.InputShop;
 import de.schlichtherle.truezip.io.entry.EntryFactory;
 import de.schlichtherle.truezip.io.fs.FsController;
-import de.schlichtherle.truezip.io.fs.FSDriver1;
-import de.schlichtherle.truezip.io.fs.FSMountPoint1;
+import de.schlichtherle.truezip.io.fs.FsDriver;
+import de.schlichtherle.truezip.io.fs.FsMountPoint;
 import de.schlichtherle.truezip.io.fs.concurrency.FSConcurrencyController;
 import de.schlichtherle.truezip.io.fs.concurrency.FSContentCacheController;
-import de.schlichtherle.truezip.io.fs.file.FSFilePool;
+import de.schlichtherle.truezip.io.fs.file.FilePool;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -62,7 +62,7 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 public abstract class ArchiveDriver<E extends ArchiveEntry>
-implements EntryFactory<E>, FSDriver1, Serializable {
+implements EntryFactory<E>, FsDriver, Serializable {
 
     /**
      * {@inheritDoc}
@@ -78,14 +78,14 @@ implements EntryFactory<E>, FSDriver1, Serializable {
      */
     @Override
     public @NonNull FsController<?>
-    newController(  @NonNull FSMountPoint1 mountPoint,
+    newController(  @NonNull FsMountPoint mountPoint,
                     @NonNull FsController<?> parent) {
         return  new FSConcurrencyController(
                     new FSContentCacheController(
                         new DefaultArchiveController<E>(
                             new FSConcurrencyModel(mountPoint, parent.getModel()),
                             this, parent, false),
-                        FSFilePool.get()));
+                        FilePool.get()));
     }
 
     /**

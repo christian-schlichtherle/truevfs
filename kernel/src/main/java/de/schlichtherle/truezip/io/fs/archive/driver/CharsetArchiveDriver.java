@@ -28,7 +28,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import net.jcip.annotations.Immutable;
 
-import static de.schlichtherle.truezip.io.fs.FSEntryName1.*;
+import static de.schlichtherle.truezip.io.fs.FsEntryName.*;
 import static de.schlichtherle.truezip.io.Paths.*;
 
 /**

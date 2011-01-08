@@ -39,7 +39,7 @@ import javax.swing.Icon;
  * @version $Id$
  */
 public abstract class FsDecoratorController<
-        M extends FSModel1,
+        M extends FsModel,
         C extends FsController<? extends M>>
 extends FsController<M> {
 
@@ -85,68 +85,68 @@ extends FsController<M> {
     }
 
     @Override
-    public FSEntry1 getEntry(FSEntryName1 name)
+    public FsEntry getEntry(FsEntryName name)
     throws IOException {
         return delegate.getEntry(name);
     }
 
     @Override
-    public boolean isReadable(FSEntryName1 name) throws IOException {
+    public boolean isReadable(FsEntryName name) throws IOException {
         return delegate.isReadable(name);
     }
 
     @Override
-    public boolean isWritable(FSEntryName1 name) throws IOException {
+    public boolean isWritable(FsEntryName name) throws IOException {
         return delegate.isWritable(name);
     }
 
     @Override
-    public void setReadOnly(FSEntryName1 name) throws IOException {
+    public void setReadOnly(FsEntryName name) throws IOException {
         delegate.setReadOnly(name);
     }
 
     @Override
-    public boolean setTime(FSEntryName1 name, BitField<Access> types, long value)
+    public boolean setTime(FsEntryName name, BitField<Access> types, long value)
     throws IOException {
         return delegate.setTime(name, types, value);
     }
 
     @Override
     public InputSocket<?> getInputSocket(
-            FSEntryName1 name,
-            BitField<FSInputOption1> options) {
+            FsEntryName name,
+            BitField<FsInputOption> options) {
         return delegate.getInputSocket(name, options);
     }
 
     @Override
     public OutputSocket<?> getOutputSocket(
-            FSEntryName1 name,
-            BitField<FSOutputOption1> options,
+            FsEntryName name,
+            BitField<FsOutputOption> options,
             Entry template) {
         return delegate.getOutputSocket(name, options, template);
     }
 
     @Override
     public void mknod(
-            @NonNull FSEntryName1 name,
+            @NonNull FsEntryName name,
             @NonNull Type type,
-            @NonNull BitField<FSOutputOption1> options,
+            @NonNull BitField<FsOutputOption> options,
             @CheckForNull Entry template)
     throws IOException {
         delegate.mknod(name, type, options, template);
     }
 
     @Override
-    public void unlink(FSEntryName1 name) throws IOException {
+    public void unlink(FsEntryName name) throws IOException {
         delegate.unlink(name);
     }
 
     @Override
     public <X extends IOException>
     void sync(
-            @NonNull BitField<FSSyncOption1> options,
-            @NonNull ExceptionHandler<? super FSSyncException1, X> handler)
-    throws X, FSException1 {
+            @NonNull BitField<FsSyncOption> options,
+            @NonNull ExceptionHandler<? super FsSyncException, X> handler)
+    throws X, FsException {
         delegate.sync(options, handler);
     }
 }

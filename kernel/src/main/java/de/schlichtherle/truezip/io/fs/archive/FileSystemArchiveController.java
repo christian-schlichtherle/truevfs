@@ -16,8 +16,8 @@
 package de.schlichtherle.truezip.io.fs.archive;
 
 import de.schlichtherle.truezip.io.fs.concurrency.FSConcurrencyModel;
-import de.schlichtherle.truezip.io.fs.FSFalsePositiveException1;
-import de.schlichtherle.truezip.io.fs.FSOutputOption1;
+import de.schlichtherle.truezip.io.fs.FsFalsePositiveException;
+import de.schlichtherle.truezip.io.fs.FsOutputOption;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -49,7 +49,7 @@ extends BasicArchiveController<E> {
     @Override
     final ArchiveFileSystem<E> autoMount(
             final boolean autoCreate,
-            final BitField<FSOutputOption1> options)
+            final BitField<FsOutputOption> options)
     throws IOException {
         return mountState.autoMount(autoCreate, options);
     }
@@ -79,7 +79,7 @@ extends BasicArchiveController<E> {
      *        directory is created with its last modification time set to the
      *        system's current time.
      */
-    abstract void mount(boolean autoCreate, BitField<FSOutputOption1> options)
+    abstract void mount(boolean autoCreate, BitField<FsOutputOption> options)
     throws IOException;
 
     /**
@@ -88,7 +88,7 @@ extends BasicArchiveController<E> {
      */
     private static abstract class MountState<E extends ArchiveEntry> {
         abstract ArchiveFileSystem<E> autoMount(boolean autoCreate,
-                                                BitField<FSOutputOption1> options)
+                                                BitField<FsOutputOption> options)
         throws IOException;
 
         ArchiveFileSystem<E> getFileSystem() {
@@ -101,12 +101,12 @@ extends BasicArchiveController<E> {
     private class ResetFileSystem extends MountState<E> {
         @Override
         ArchiveFileSystem<E> autoMount( final boolean autoCreate,
-                                        final BitField<FSOutputOption1> options)
+                                        final BitField<FsOutputOption> options)
         throws IOException {
             getModel().assertWriteLockedByCurrentThread();
             try {
                 mount(autoCreate, options);
-            } catch (FSFalsePositiveException1 ex) {
+            } catch (FsFalsePositiveException ex) {
                 // Catch and cache exceptions for false positive archive files.
                 // The state is reset when unlink() is called on the false
                 // positive archive file or sync().
@@ -147,7 +147,7 @@ extends BasicArchiveController<E> {
 
         @Override
         ArchiveFileSystem<E> autoMount(boolean autoCreate,
-                                        BitField<FSOutputOption1> options) {
+                                        BitField<FsOutputOption> options) {
             return fileSystem;
         }
 
@@ -165,9 +165,9 @@ extends BasicArchiveController<E> {
     } // class MountedFileSystem
 
     private class FalsePositiveFileSystem extends MountState<E> {
-        private FSFalsePositiveException1 exception;
+        private FsFalsePositiveException exception;
 
-        private FalsePositiveFileSystem(final FSFalsePositiveException1 exception) {
+        private FalsePositiveFileSystem(final FsFalsePositiveException exception) {
             if (exception == null)
                 throw new NullPointerException();
             this.exception = exception;
@@ -175,8 +175,8 @@ extends BasicArchiveController<E> {
 
         @Override
         ArchiveFileSystem<E> autoMount( boolean autoCreate,
-                                        BitField<FSOutputOption1> options)
-        throws FSFalsePositiveException1 {
+                                        BitField<FsOutputOption> options)
+        throws FsFalsePositiveException {
             throw exception;
         }
 

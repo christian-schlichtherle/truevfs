@@ -1,0 +1,44 @@
+/*
+ * Copyright (C) 2010 Schlichtherle IT Services
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.schlichtherle.truezip.io.fs;
+
+import de.schlichtherle.truezip.io.fs.archive.driver.DummyArchiveDriver;
+import de.schlichtherle.truezip.io.fs.file.FileDriver;
+
+/**
+ * @author Christian Schlichtherle
+ * @version $Id$
+ */
+final class FsDummyDriver implements FsDriver {
+
+    private static final FsScheme FILE = FsScheme.create("file");
+
+    @Override
+    public FsController<?> newController(   final FsMountPoint mountPoint,
+                                            final FsController<?> parent) {
+        assert null == mountPoint.getParent()
+                ? null == parent
+                : mountPoint.getParent().equals(parent.getModel().getMountPoint());
+        final FsScheme scheme = mountPoint.getScheme();
+        if (FILE.equals(scheme)) {
+            return new FileDriver().newController(mountPoint);
+        } else if (FsScheme.create("zip").equals(scheme)) {
+            return new DummyArchiveDriver().newController(mountPoint, parent);
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+}
