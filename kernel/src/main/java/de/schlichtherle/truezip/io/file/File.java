@@ -27,6 +27,7 @@ import de.schlichtherle.truezip.io.fs.FSEntry;
 import de.schlichtherle.truezip.io.fs.FSFilterManager;
 import de.schlichtherle.truezip.io.fs.FSSyncExceptionBuilder;
 import de.schlichtherle.truezip.io.fs.FSSyncOption;
+import de.schlichtherle.truezip.io.fs.FsUriModifier;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -612,7 +613,7 @@ public final class File extends java.io.File {
      *         parameter {@code uri} does not hold.
      */
     public File(URI uri) {
-        this(   FSPath.create(fix(uri), true),
+        this(   FSPath.create(fix(uri), FsUriModifier.NORMALIZE),
                 new ArchiveDetectorFSDriver(defaultDetector));
     }
 
@@ -725,7 +726,7 @@ public final class File extends java.io.File {
                         path.substring(innerArchivePathLength + 1) // cut off leading separatorChar
                             .replace(separatorChar, SEPARATOR_CHAR),
                         null,
-                        true);
+                        FsUriModifier.NORMALIZE);
             }
         } else {
             this.detector = detector;
@@ -772,7 +773,7 @@ public final class File extends java.io.File {
         final StringBuilder enclEntryNameBuf = new StringBuilder(path.length());
         init(ancestor, detector, 0, path, enclEntryNameBuf, new Splitter(separatorChar));
         enclEntryName = 0 < enclEntryNameBuf.length()
-                ? FSEntryName.create(enclEntryNameBuf.toString(), null, true)
+                ? FSEntryName.create(enclEntryNameBuf.toString(), null, FsUriModifier.NORMALIZE)
                 : null;
 
         if (innerArchive == this) {
@@ -1876,22 +1877,22 @@ public final class File extends java.io.File {
                             new FSMountPoint(
                                 scheme,
                                 new FSPath(
-                                    new FSMountPoint(fix(enclArchive.toURI()), true),
+                                    new FSMountPoint(fix(enclArchive.toURI()), FsUriModifier.NORMALIZE),
                                     enclEntryName)),
                             ROOT);
                 } else {
                     return new FSPath(
                             new FSMountPoint(
                                 scheme,
-                                new FSPath(fix(delegate.toURI()), true)),
+                                new FSPath(fix(delegate.toURI()), FsUriModifier.NORMALIZE)),
                             ROOT);
                 }
             } else if (null != enclArchive) {
                 return new FSPath(
-                        new FSMountPoint(fix(enclArchive.toURI()), true),
+                        new FSMountPoint(fix(enclArchive.toURI()), FsUriModifier.NORMALIZE),
                         enclEntryName);
             } else {
-                return new FSPath(fix(delegate.toURI()), true);
+                return new FSPath(fix(delegate.toURI()), FsUriModifier.NORMALIZE);
             }
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
@@ -1908,16 +1909,16 @@ public final class File extends java.io.File {
                     return new FSMountPoint(
                             scheme,
                             new FSPath(
-                                new FSMountPoint(fix(enclArchive.toURI()), true),
+                                new FSMountPoint(fix(enclArchive.toURI()), FsUriModifier.NORMALIZE),
                                 enclEntryName)).getUri();
                 } else {
                     return new FSMountPoint(
                             scheme,
-                            new FSPath(fix(delegate.toURI()), true)).getUri();
+                            new FSPath(fix(delegate.toURI()), FsUriModifier.NORMALIZE)).getUri();
                 }
             } else if (null != enclArchive) {
                 return new FSPath(
-                        new FSMountPoint(fix(enclArchive.toURI()), true),
+                        new FSMountPoint(fix(enclArchive.toURI()), FsUriModifier.NORMALIZE),
                         enclEntryName).getUri();
             } else {
                 return delegate.toURI();

@@ -79,7 +79,7 @@ public final class FSEntryName extends EntryName {
      */
     public static @NonNull FSEntryName
     create(@NonNull String uri) {
-        return create(uri, false);
+        return create(uri, FsUriModifier.NONE);
     }
 
     /**
@@ -98,9 +98,9 @@ public final class FSEntryName extends EntryName {
      * @return A new file system entry name.
      */
     public static @NonNull FSEntryName
-    create(@NonNull String uri, boolean normalize) {
+    create(@NonNull String uri, @NonNull FsUriModifier modifier) {
         try {
-            return new FSEntryName(uri, normalize);
+            return new FSEntryName(uri, modifier);
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
@@ -111,7 +111,7 @@ public final class FSEntryName extends EntryName {
      */
     public static @NonNull FSEntryName
     create(@NonNull String path, @CheckForNull String query) {
-        return create(path, query, false);
+        return create(path, query, FsUriModifier.NONE);
     }
 
     /**
@@ -131,9 +131,9 @@ public final class FSEntryName extends EntryName {
      * @return A new file system entry name.
      */
     public static @NonNull FSEntryName
-    create(@NonNull String path, @CheckForNull String query, boolean normalize) {
+    create(@NonNull String path, @CheckForNull String query, @NonNull FsUriModifier modifier) {
         try {
-            return new FSEntryName(new URI(null, null, path, query, null), normalize);
+            return new FSEntryName(new URI(null, null, path, query, null), modifier);
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
@@ -142,7 +142,7 @@ public final class FSEntryName extends EntryName {
     /** Equivalent to {@link #create(URI, boolean) create(uri, false)}. */
     public static @NonNull FSEntryName
     create(@NonNull URI uri) {
-        return create(uri, false);
+        return create(uri, FsUriModifier.NONE);
     }
 
     /**
@@ -160,9 +160,9 @@ public final class FSEntryName extends EntryName {
      * @return A new file system entry name.
      */
     public static @NonNull FSEntryName
-    create(@NonNull URI uri, boolean normalize) {
+    create(@NonNull URI uri, @NonNull FsUriModifier modifier) {
         try {
-            return new FSEntryName(uri, normalize);
+            return new FSEntryName(uri, modifier);
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
@@ -172,7 +172,7 @@ public final class FSEntryName extends EntryName {
      * Equivalent to {@link #FSEntryName(String, boolean) new FSEntryName(uri, false)}.
      */
     public FSEntryName(@NonNull String uri) throws URISyntaxException {
-        this(uri, false);
+        this(uri, FsUriModifier.NONE);
     }
 
     /**
@@ -185,16 +185,16 @@ public final class FSEntryName extends EntryName {
      * @throws URISyntaxException if {@code uri} does not conform to the
      *         syntax constraints for entry names.
      */
-    public FSEntryName(@NonNull String uri, boolean normalize)
+    public FSEntryName(@NonNull String uri, @NonNull FsUriModifier modifier)
     throws URISyntaxException {
-        this(new URI(uri), normalize);
+        this(new URI(uri), modifier);
     }
 
     /**
      * Equivalent to {@link #FSEntryName(URI, boolean) new FSEntryName(uri, false)}.
      */
     public FSEntryName(@NonNull URI uri) throws URISyntaxException {
-        this(uri, false);
+        this(uri, FsUriModifier.NONE);
     }
 
     /**
@@ -207,12 +207,10 @@ public final class FSEntryName extends EntryName {
      * @throws URISyntaxException if {@code uri} does not conform to the
      *         syntax constraints for file system entry names.
      */
-    public FSEntryName(@NonNull URI uri, final boolean normalize)
+    public FSEntryName(@NonNull URI uri, final @NonNull FsUriModifier modifier)
     throws URISyntaxException {
-        super(normalize ? (uri = uri.normalize()) : uri);
+        super(uri = modifier.modify(uri));
 
-        if (!normalize && uri.normalize() != uri)
-            throw new URISyntaxException(quote(uri), "URI path not in normal form");
         final String p = uri.getRawPath();
         if (       "..".equals(p)
                 || p.startsWith(SEPARATOR)
@@ -227,7 +225,7 @@ public final class FSEntryName extends EntryName {
         assert invariants();
     }
 
-    private static String quote(Object s) {
+    private static @NonNull String quote(@NonNull Object s) {
         return "\"" + s + "\"";
     }
 

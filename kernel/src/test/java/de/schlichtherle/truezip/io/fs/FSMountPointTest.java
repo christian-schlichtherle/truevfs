@@ -127,61 +127,61 @@ public class FSMountPointTest {
         }
 
         try {
-            FSMountPoint.create((String) null, false);
+            FSMountPoint.create((String) null, FsUriModifier.NONE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FSMountPoint((String) null, false);
+            new FSMountPoint((String) null, FsUriModifier.NONE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            FSMountPoint.create((URI) null, false);
+            FSMountPoint.create((URI) null, FsUriModifier.NONE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FSMountPoint((URI) null, false);
+            new FSMountPoint((URI) null, FsUriModifier.NONE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            FSMountPoint.create((String) null, true);
+            FSMountPoint.create((String) null, FsUriModifier.NORMALIZE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FSMountPoint((String) null, true);
+            new FSMountPoint((String) null, FsUriModifier.NORMALIZE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            FSMountPoint.create((URI) null, true);
+            FSMountPoint.create((URI) null, FsUriModifier.NORMALIZE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FSMountPoint((URI) null, true);
+            new FSMountPoint((URI) null, FsUriModifier.NORMALIZE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            FSMountPoint.create(null, null);
+            FSMountPoint.create((FSScheme) null, null);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FSMountPoint(null, null);
+            new FSMountPoint((FSScheme) null, null);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -276,7 +276,7 @@ public class FSMountPointTest {
             { "foo:bar:/baz?bang!/", "foo", "bar:/baz?bang" },
             { "foo:bar:/baz!/", "foo", "bar:/baz" },
         }) {
-            final FSMountPoint mountPoint = FSMountPoint.create(params[0], true);
+            final FSMountPoint mountPoint = FSMountPoint.create(params[0], FsUriModifier.NORMALIZE);
             final FSScheme scheme = FSScheme.create(params[1]);
             final FSPath path = FSPath.create(params[2]);
 

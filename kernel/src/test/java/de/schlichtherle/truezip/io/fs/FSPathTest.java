@@ -134,55 +134,55 @@ public class FSPathTest {
         }
 
         try {
-            FSPath.create((String) null, false);
+            FSPath.create((String) null, FsUriModifier.NONE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FSPath((String) null, false);
+            new FSPath((String) null, FsUriModifier.NONE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            FSPath.create((URI) null, false);
+            FSPath.create((URI) null, FsUriModifier.NONE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FSPath((URI) null, false);
+            new FSPath((URI) null, FsUriModifier.NONE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            FSPath.create((String) null, true);
+            FSPath.create((String) null, FsUriModifier.NORMALIZE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FSPath((String) null, true);
+            new FSPath((String) null, FsUriModifier.NORMALIZE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            FSPath.create((URI) null, true);
+            FSPath.create((URI) null, FsUriModifier.NORMALIZE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FSPath((URI) null, true);
+            new FSPath((URI) null, FsUriModifier.NORMALIZE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FSPath(null, null);
+            new FSPath((FSMountPoint) null, null);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -330,7 +330,7 @@ public class FSPathTest {
             { "foo:/bar/baz/", "foo:/bar/baz/", "" },
             { "foo:/bar/baz/?bang", "foo:/bar/baz/", "?bang" },
         }) {
-            FSPath path = FSPath.create(params[0], true);
+            FSPath path = FSPath.create(params[0], FsUriModifier.NORMALIZE);
             final FSMountPoint mountPoint = null == params[1] ? null : FSMountPoint.create(params[1]);
             final FSEntryName entryName = FSEntryName.create(params[2]);
             testPath(path, mountPoint, entryName);

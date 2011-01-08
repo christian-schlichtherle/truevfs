@@ -26,6 +26,7 @@ import de.schlichtherle.truezip.io.fs.FSInputOption;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.IOSocket;
 import de.schlichtherle.truezip.io.fs.FSOutputOption;
+import de.schlichtherle.truezip.io.fs.FsUriModifier;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -250,7 +251,7 @@ class Files {
                 return archive.getController()
                         .getInputSocket(file.getInnerEntryName0(), options);
         }
-        final FSPath path = FSPath.create(fix(getRealFile(src).toURI()), true);
+        final FSPath path = FSPath.create(fix(getRealFile(src).toURI()), FsUriModifier.NORMALIZE);
         return FSManagers
                 .getInstance()
                 .getController( path.getMountPoint(), new ArchiveDetectorFSDriver())
@@ -269,7 +270,7 @@ class Files {
                 return archive.getController()
                         .getOutputSocket(file.getInnerEntryName0(), options, template);
         }
-        final FSPath path = FSPath.create(fix(getRealFile(dst).toURI()), true);
+        final FSPath path = FSPath.create(fix(getRealFile(dst).toURI()), FsUriModifier.NORMALIZE);
         return FSManagers
                 .getInstance()
                 .getController(  path.getMountPoint(), new ArchiveDetectorFSDriver())
