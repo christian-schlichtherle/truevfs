@@ -57,16 +57,10 @@
                     <p>Canonical Suffixes<sup>0</sup></p>
                 </th>
                 <th>
-                    <p>DEFAULT<sup>1</sup></p>
+                    <p>Charset<sup>1</sup></p>
                 </th>
                 <th>
-                    <p>ALL<sup>2</sup></p>
-                </th>
-                <th>
-                    <p>Charset<sup>3</sup></p>
-                </th>
-                <th>
-                    <p>Dependencies<sup>4</sup></p>
+                    <p>Dependencies<sup>1</sup></p>
                 </th>
                 <th>
                     <p>Description</p>
@@ -80,13 +74,7 @@
                     <p>zip</p>
                 </td>
                 <td>
-                    <p><b>Yes</b></p>
-                </td>
-                <td>
-                    <p><b>Yes</b></p>
-                </td>
-                <td>
-                    <p>IBM437<sup>5</sup></p>
+                    <p>IBM437<sup>3</sup></p>
                 </td>
                 <td>
                     <p>&nbsp;</p>
@@ -103,12 +91,6 @@
                     <p>ear|jar|war</p>
                 </td>
                 <td>
-                    <p><b>Yes</b></p>
-                </td>
-                <td>
-                    <p><b>Yes</b></p>
-                </td>
-                <td>
                     <p>UTF-8</p>
                 </td>
                 <td>
@@ -121,8 +103,6 @@
             <tr>
                 <td>ODF</td>
                 <td>odb|odf|odg|odm|odp|ods|odt|otg|oth|otp|ots|ott</td>
-                <td>No</td>
-                <td><b>Yes</b></td>
                 <td>UTF-8</td>
                 <td>&nbsp;</td>
                 <td>OpenDocument Format: If present, the <i>mimetype</i> entry is written
@@ -134,19 +114,13 @@
                     <p>tzp|zip.rae|zip.raes</p>
                 </td>
                 <td>
-                    <p>No</p>
-                </td>
-                <td>
-                    <p><b>Yes</b></p>
-                </td>
-                <td>
                     <p>UTF-8</p>
                 </td>
                 <td>
-                    <p><i>lcrypto.jar</i><sup>6</sup></p>
+                    <p><i>lcrypto.jar</i><sup>4</sup></p>
                 </td>
                 <td>
-                    <p>{@linkplain de.schlichtherle.truezip.io.archive.driver.zip.raes RAES encrypted ZIP file}.</p>
+                    <p>{@linkplain de.schlichtherle.truezip.io.fs.archive.driver.zip.raes RAES encrypted ZIP file}.</p>
                 </td>
             </tr>
             <tr>
@@ -155,12 +129,6 @@
                 </td>
                 <td>
                     <p>exe</p>
-                </td>
-                <td>
-                    <p>No</p>
-                </td>
-                <td>
-                    <p><b>Yes</b></p>
                 </td>
                 <td>
                     <p>system specific</p>
@@ -181,12 +149,6 @@
                     <p>tar</p>
                 </td>
                 <td>
-                    <p>No</p>
-                </td>
-                <td>
-                    <p><b>Yes</b></p>
-                </td>
-                <td>
                     <p>US-ASCII<sup>7</sup></p>
                 </td>
                 <td>
@@ -202,12 +164,6 @@
                 </td>
                 <td>
                     <p>tbz2|tar.bz2</p>
-                </td>
-                <td>
-                    <p>No</p>
-                </td>
-                <td>
-                    <p><b>Yes</b></p>
                 </td>
                 <td>
                     <p>US-ASCII<sup>7</sup></p>
@@ -227,16 +183,10 @@
                     <p>tar.gz|tgz</p>
                 </td>
                 <td>
-                    <p>No</p>
+                    <p>US-ASCII<sup>5</sup></p>
                 </td>
                 <td>
-                    <p><b>Yes</b></p>
-                </td>
-                <td>
-                    <p>US-ASCII<sup>7</sup></p>
-                </td>
-                <td>
-                    <p><i>ant.jar</i><sup>8</sup></p>
+                    <p><i>ant.jar</i><sup>6</sup></p>
                 </td>
                 <td>
                     <p>TAR file wrapped in GZIP compression format.</p>
@@ -245,24 +195,20 @@
         </table>
         <p><sup>0</sup> Suffix recognition is case insensitive with the {@link de.schlichtherle.truezip.io.file.DefaultArchiveDetector}
             class.<br/>
-            <sup>1</sup> Recognized by the predefined instance {@link de.schlichtherle.truezip.io.file.ArchiveDetector#DEFAULT}?
-            Note that this may be extended (but not restricted) in future releases.<br/>
-            <sup>2</sup> Recognized by the predefined instance {@link de.schlichtherle.truezip.io.file.ArchiveDetector#ALL}?
-            Note that this may be extended (but not restricted) in future releases.<br/>
-            <sup>3</sup> The code page to use for entry names and other entry meta data. This
+            <sup>1</sup> The code page to use for entry names and other entry meta data. This
             access parameter is determined by the archive driver (not the archive detector)
             and can be customized by subclassing it.<br/>
-            <sup>4</sup> This needs to be on the runtime class path.<br/>
-            <sup>5</sup> The charset for ZIP files is not specified. This is a heuristic value
+            <sup>2</sup> This needs to be on the runtime class path.<br/>
+            <sup>3</sup> The charset for ZIP files is not specified. This is a heuristic value
             which is based on the fact that IBM437 is the original PC character set for the
             USA and the ZIP file format has been invented there. <b>Do not rely on this!<br/>
-            </b><sup>6</sup> Bouncy Castle&#39;s Lightweight Crypto API for JDK 1.5, version 1.45
+            </b><sup>4</sup> Bouncy Castle&#39;s Lightweight Crypto API for JDK 1.5, version 1.45
             or higher. Available at
             <a href="http://www.bouncycastle.org/latest_releases.html">http://www.bouncycastle.org/latest_releases.html</a>.<br/>
-            <sup>7</sup> The charset for TAR files is not specified. This is a heuristic value
+            <sup>5</sup> The charset for TAR files is not specified. This is a heuristic value
             which is based on the fact that the TAR file format stems from UNIX implementations
             of the seventies.<br/>
-            <sup>8</sup> Apache&#39;s Ant, version 1.8.1 or higher.
+            <sup>6</sup> Apache&#39;s Ant, version 1.8.1 or higher.
             Available at <a href="http://ant.apache.org/">http://ant.apache.org</a>.</p>
     </body>
 </html>
