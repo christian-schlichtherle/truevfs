@@ -319,30 +319,30 @@ public class FsPathTest {
             //{ "foo/bar/", null, "foo/bar/" },
             { "foo:/", "foo:/", "" },
             { "foo:/bar", "foo:/", "bar" },
-            { "foo:/bar/", "foo:/bar/", "" },
-            { "foo:/bar//", "foo:/bar/", "" },
-            { "foo:/bar/.", "foo:/bar/", "" },
-            { "foo:/bar/./", "foo:/bar/", "" },
+            { "foo:/bar/", "foo:/", "bar" },
+            { "foo:/bar//", "foo:/", "bar" },
+            { "foo:/bar/.", "foo:/", "bar" },
+            { "foo:/bar/./", "foo:/", "bar" },
             { "foo:/bar/..", "foo:/", "" },
             { "foo:/bar/../", "foo:/", "" },
             { "foo:/bar/baz", "foo:/bar/", "baz" },
             { "foo:/bar/baz?bang", "foo:/bar/", "baz?bang" },
-            { "foo:/bar/baz/", "foo:/bar/baz/", "" },
-            { "foo:/bar/baz/?bang", "foo:/bar/baz/", "?bang" },
+            { "foo:/bar/baz/", "foo:/bar/", "baz" },
+            { "foo:/bar/baz/?bang", "foo:/bar/", "baz?bang" },
         }) {
             FsPath path = FsPath.create(params[0], FsUriModifier.NORMALIZE);
             final FsMountPoint mountPoint = null == params[1] ? null : FsMountPoint.create(params[1]);
             final FsEntryName entryName = FsEntryName.create(params[2]);
-            testPath(path, mountPoint, entryName);
+            assertPath(path, mountPoint, entryName);
 
             path = new FsPath(mountPoint, entryName);
-            testPath(path, mountPoint, entryName);
+            assertPath(path, mountPoint, entryName);
         }
     }
 
-    private void testPath(final FsPath path,
-                          final FsMountPoint mountPoint,
-                          final FsEntryName entryName) {
+    private void assertPath(final FsPath path,
+                            final FsMountPoint mountPoint,
+                            final FsEntryName entryName) {
         if (null != mountPoint) {
             assertThat(path.getUri(), equalTo(URI.create(
                     mountPoint.toString() + entryName)));

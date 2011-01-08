@@ -26,17 +26,12 @@ import de.schlichtherle.truezip.io.fs.FsInputOption;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.IOSocket;
 import de.schlichtherle.truezip.io.fs.FsOutputOption;
-import de.schlichtherle.truezip.io.fs.FsUriModifier;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 
-import static de.schlichtherle.truezip.io.fs.FsEntryName.*;
 import static de.schlichtherle.truezip.io.fs.FsOutputOption.*;
 import static de.schlichtherle.truezip.io.Files.*;
 
@@ -251,7 +246,7 @@ class Files {
                 return archive.getController()
                         .getInputSocket(file.getInnerEntryName0(), options);
         }
-        final FsPath path = FsPath.create(fix(getRealFile(src).toURI()), FsUriModifier.NORMALIZE);
+        final FsPath path = FsPath.create(getRealFile(src));
         return FsManagers
                 .getInstance()
                 .getController( path.getMountPoint(), new ArchiveDetectorFSDriver())
@@ -270,48 +265,11 @@ class Files {
                 return archive.getController()
                         .getOutputSocket(file.getInnerEntryName0(), options, template);
         }
-        final FsPath path = FsPath.create(fix(getRealFile(dst).toURI()), FsUriModifier.NORMALIZE);
+        final FsPath path = FsPath.create(getRealFile(dst));
         return FsManagers
                 .getInstance()
                 .getController(  path.getMountPoint(), new ArchiveDetectorFSDriver())
                 .getOutputSocket(path.getEntryName(), options, template);
-    }
-
-    static @NonNull URI fix(@NonNull URI uri) {
-        if (uri.isOpaque())
-            return uri;
-        try {
-            // Note that we do not limit these fixes to Windows only in order
-            // to make this function work identically on all platforms!
-
-            // Move Windows-like UNC host from path to authority.
-            if (uri.getRawPath().startsWith(SEPARATOR + SEPARATOR)) {
-                final String s = uri.getPath();
-                final int i = s.indexOf(SEPARATOR_CHAR, 2);
-                if (0 <= i) {
-                    uri = new URI(  uri.getScheme(),
-                                    s.substring(2, i),
-                                    s.substring(i),
-                                    uri.getQuery(),
-                                    uri.getFragment());
-                }
-            }
-
-            // Delete trailing slash separator from directory URI.
-            for (String s; (s = uri.getPath()).endsWith(SEPARATOR)
-                    && 2 <= s.length()
-                    && (':' != s.charAt(s.length() - 2));) {
-                uri = new URI(  uri.getScheme(),
-                                uri.getAuthority(),
-                                s.substring(0, s.length() - 1),
-                                uri.getQuery(),
-                                uri.getFragment());
-            }
-
-            return uri;
-        } catch (URISyntaxException ex) {
-            throw new AssertionError(ex);
-        }
     }
 
     /**

@@ -23,6 +23,7 @@ import java.net.URISyntaxException;
 import net.jcip.annotations.Immutable;
 
 import static de.schlichtherle.truezip.io.fs.FsEntryName.SEPARATOR;
+import static de.schlichtherle.truezip.io.fs.FsUriModifier.PostFix.*;
 
 /**
  * Addresses an entry in a file system relative to its mount point.
@@ -204,7 +205,7 @@ public final class FsEntryName extends EntryName {
      */
     public FsEntryName(@NonNull URI uri, final @NonNull FsUriModifier modifier)
     throws URISyntaxException {
-        super(uri = modifier.modify(uri));
+        super(uri = modifier.modify(uri, ENTRY_NAME));
 
         final String p = uri.getRawPath();
         if (       "..".equals(p)
