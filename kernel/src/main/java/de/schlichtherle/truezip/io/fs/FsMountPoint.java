@@ -276,7 +276,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
             if (!pathUri.isAbsolute())
                 throw new URISyntaxException(quote(uri), "Path not absolute");
             if (0 == path.getEntryName().getPath().length())
-                throw new URISyntaxException(quote(uri), "Empty entry name");
+                throw new URISyntaxException(quote(uri), "Empty URI path of entry name of path");
             if (NONE != modifier) {
                 final URI nuri = new URI(new StringBuilder(uri.getScheme())
                         .append(':')
@@ -285,9 +285,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
                         .toString());
                 if (!uri.equals(nuri))
                     uri = nuri;
-            } else if (pathUri.normalize() != pathUri)
-                throw new URISyntaxException(quote(uri),
-                        "URI path not in normal form");
+            }
         } else {
             uri = modifier.modify(uri, MOUNT_POINT);
             if (!uri.isAbsolute())
