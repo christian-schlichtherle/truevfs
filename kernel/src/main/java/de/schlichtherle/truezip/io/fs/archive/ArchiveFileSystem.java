@@ -22,6 +22,7 @@ import de.schlichtherle.truezip.io.entry.EntryContainer;
 import de.schlichtherle.truezip.io.entry.EntryFactory;
 import de.schlichtherle.truezip.io.fs.FSEntryName;
 import de.schlichtherle.truezip.io.fs.FSOutputOption;
+import de.schlichtherle.truezip.io.fs.FsUriModifier;
 import de.schlichtherle.truezip.util.Link;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -185,7 +186,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
             try {
                 fsck.fix(new FSEntryName(
                         new URI(null, null, path, null, null),
-                        true).getPath());
+                        FsUriModifier.NORMALIZE).getPath());
             } catch (URISyntaxException dontFix) {
             }
         }

@@ -101,7 +101,7 @@ public final class FSPath implements Serializable, Comparable<FSPath> {
      */
     public static @NonNull FSPath
     create(@NonNull String uri) {
-        return create(uri, false);
+        return create(uri, FsUriModifier.NONE);
     }
 
     /**
@@ -120,9 +120,9 @@ public final class FSPath implements Serializable, Comparable<FSPath> {
      * @return A new path.
      */
     public static @NonNull FSPath
-    create(@NonNull String uri, boolean normalize) {
+    create(@NonNull String uri, @NonNull FsUriModifier modifier) {
         try {
-            return new FSPath(uri, normalize);
+            return new FSPath(uri, modifier);
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
@@ -133,7 +133,7 @@ public final class FSPath implements Serializable, Comparable<FSPath> {
      */
     public static @NonNull FSPath
     create(@NonNull URI uri) {
-        return create(uri, false);
+        return create(uri, FsUriModifier.NONE);
     }
 
     /**
@@ -151,9 +151,9 @@ public final class FSPath implements Serializable, Comparable<FSPath> {
      * @return A new path.
      */
     public static @NonNull FSPath
-    create(@NonNull URI uri, boolean normalize) {
+    create(@NonNull URI uri, @NonNull FsUriModifier modifier) {
         try {
-            return new FSPath(uri, normalize);
+            return new FSPath(uri, modifier);
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
@@ -163,7 +163,7 @@ public final class FSPath implements Serializable, Comparable<FSPath> {
      * Equivalent to {@link #FSPath(String, boolean) new FSPath(uri, false)}.
      */
     public FSPath(@NonNull String uri) throws URISyntaxException {
-        parse(uri, false);
+        parse(uri, FsUriModifier.NONE);
     }
 
     /**
@@ -176,15 +176,15 @@ public final class FSPath implements Serializable, Comparable<FSPath> {
      * @throws URISyntaxException if {@code uri} does not conform to the
      *         syntax constraints for paths.
      */
-    public FSPath(@NonNull String uri, boolean normalize) throws URISyntaxException {
-        parse(uri, normalize);
+    public FSPath(@NonNull String uri, @NonNull FsUriModifier modifier) throws URISyntaxException {
+        parse(uri, modifier);
     }
 
     /**
      * Equivalent to {@link #FSPath(URI, boolean) new FSPath(uri, false)}.
      */
     public FSPath(@NonNull URI uri) throws URISyntaxException {
-        parse(uri, false);
+        parse(uri, FsUriModifier.NONE);
     }
 
     /**
@@ -196,9 +196,9 @@ public final class FSPath implements Serializable, Comparable<FSPath> {
      * @throws URISyntaxException if {@code uri} does not conform to the
      *         syntax constraints for paths.
      */
-    public FSPath(@NonNull URI uri, boolean normalize)
+    public FSPath(@NonNull URI uri, @NonNull FsUriModifier modifier)
     throws URISyntaxException {
-        parse(uri, normalize);
+        parse(uri, modifier);
     }
 
     /**
@@ -237,19 +237,19 @@ public final class FSPath implements Serializable, Comparable<FSPath> {
     private void readObject(@NonNull ObjectInputStream in)
     throws IOException, ClassNotFoundException {
         try {
-            parse(in.readObject().toString(), false);
+            parse(in.readObject().toString(), FsUriModifier.NONE);
         } catch (URISyntaxException ex) {
             throw (InvalidObjectException) new InvalidObjectException(ex.toString())
                     .initCause(ex);
         }
     }
 
-    private void parse(@NonNull String uri, boolean normalize)
+    private void parse(@NonNull String uri, @NonNull FsUriModifier modifier)
     throws URISyntaxException {
-        parse(new URI(uri), normalize);
+        parse(new URI(uri), modifier);
     }
 
-    private void parse(@NonNull URI uri, final boolean normalize)
+    private void parse(@NonNull URI uri, final @NonNull FsUriModifier modifier)
     throws URISyntaxException {
         if (null != uri.getRawFragment())
             throw new URISyntaxException(quote(uri), "Fragment not allowed");
@@ -261,29 +261,24 @@ public final class FSPath implements Serializable, Comparable<FSPath> {
                         "Missing mount point separator \"" + MOUNT_POINT_SEPARATOR + '"');
             mountPoint = new FSMountPoint(
                     new URI(uri.getScheme(), ssp.substring(0, i + 2), null),
-                    normalize);
+                    modifier);
             entryName = new FSEntryName(
                     new URI(null, ssp.substring(i + 2), uri.getFragment()),
-                    normalize);
-            if (normalize) {
+                    modifier);
+            if (FsUriModifier.NONE != modifier) {
                 final URI nuri = new URI(   mountPoint.toString()
                                             + entryName.toString());
                 if (!uri.equals(nuri))
                     uri = nuri;
             }
         } else if (uri.isAbsolute()) {
-            if (normalize)
-                uri = uri.normalize();
-            else if (uri.normalize() != uri)
-                throw new URISyntaxException(quote(uri),
-                        "URI path not in normal form");
-            mountPoint = new FSMountPoint(uri.resolve("."), false);
-            entryName = new FSEntryName(mountPoint.getUri().relativize(uri), false);
+            uri = modifier.modify(uri);
+            mountPoint = new FSMountPoint(uri.resolve("."), FsUriModifier.NONE);
+            entryName = new FSEntryName(mountPoint.getUri().relativize(uri), FsUriModifier.NONE);
         } else {
             mountPoint = null;
-            entryName = new FSEntryName(uri, normalize);
-            if (normalize)
-                uri = entryName.getUri();
+            entryName = new FSEntryName(uri, modifier);
+            uri = entryName.getUri();
         }
         this.uri = uri;
 

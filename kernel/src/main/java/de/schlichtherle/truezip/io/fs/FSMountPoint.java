@@ -90,7 +90,7 @@ public final class FSMountPoint implements Serializable, Comparable<FSMountPoint
      */
     public static @NonNull FSMountPoint
     create(@NonNull String uri) {
-        return create(uri, false);
+        return create(uri, FsUriModifier.NONE);
     }
 
     /**
@@ -109,9 +109,9 @@ public final class FSMountPoint implements Serializable, Comparable<FSMountPoint
      * @return A new mount point.
      */
     public static @NonNull FSMountPoint
-    create(@NonNull String uri, boolean normalize) {
+    create(@NonNull String uri, @NonNull FsUriModifier modifier) {
         try {
-            return new FSMountPoint(uri, normalize);
+            return new FSMountPoint(uri, modifier);
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
@@ -122,7 +122,7 @@ public final class FSMountPoint implements Serializable, Comparable<FSMountPoint
      */
     public static @NonNull FSMountPoint
     create(@NonNull URI uri) {
-        return create(uri, false);
+        return create(uri, FsUriModifier.NONE);
     }
 
     /**
@@ -140,9 +140,9 @@ public final class FSMountPoint implements Serializable, Comparable<FSMountPoint
      * @return A new mount point.
      */
     public static @NonNull FSMountPoint
-    create(@NonNull URI uri, boolean normalize) {
+    create(@NonNull URI uri, @NonNull FsUriModifier modifier) {
         try {
-            return new FSMountPoint(uri, normalize);
+            return new FSMountPoint(uri, modifier);
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
@@ -175,7 +175,7 @@ public final class FSMountPoint implements Serializable, Comparable<FSMountPoint
      * Equivalent to {@link #FSMountPoint(String, boolean) new FSMountPoint(uri, false)}.
      */
     public FSMountPoint(@NonNull String uri) throws URISyntaxException {
-        parse(uri, false);
+        parse(uri, FsUriModifier.NONE);
     }
 
     /**
@@ -188,16 +188,16 @@ public final class FSMountPoint implements Serializable, Comparable<FSMountPoint
      * @throws URISyntaxException if {@code uri} does not conform to the
      *         syntax constraints for mount points.
      */
-    public FSMountPoint(@NonNull String uri, boolean normalize)
+    public FSMountPoint(@NonNull String uri, @NonNull FsUriModifier modifier)
     throws URISyntaxException {
-        parse(uri, normalize);
+        parse(uri, modifier);
     }
 
     /**
      * Equivalent to {@link #FSMountPoint(URI, boolean) new FSMountPoint(uri, false)}.
      */
     public FSMountPoint(@NonNull URI uri) throws URISyntaxException {
-        parse(uri, false);
+        parse(uri, FsUriModifier.NONE);
     }
 
     /**
@@ -209,9 +209,9 @@ public final class FSMountPoint implements Serializable, Comparable<FSMountPoint
      * @throws URISyntaxException if {@code uri} does not conform to the
      *         syntax constraints for mount points.
      */
-    public FSMountPoint(@NonNull URI uri, boolean normalize)
+    public FSMountPoint(@NonNull URI uri, @NonNull FsUriModifier modifier)
     throws URISyntaxException {
-        parse(uri, normalize);
+        parse(uri, modifier);
     }
 
     /**
@@ -251,19 +251,19 @@ public final class FSMountPoint implements Serializable, Comparable<FSMountPoint
     private void readObject(@NonNull ObjectInputStream in)
     throws IOException, ClassNotFoundException {
         try {
-            parse(in.readObject().toString(), false);
+            parse(in.readObject().toString(), FsUriModifier.NONE);
         } catch (URISyntaxException ex) {
             throw (InvalidObjectException) new InvalidObjectException(ex.toString())
                     .initCause(ex);
         }
     }
 
-    private void parse(@NonNull String uri, final boolean normalize)
+    private void parse(@NonNull String uri, @NonNull FsUriModifier modifier)
     throws URISyntaxException {
-        parse(new URI(uri), normalize);
+        parse(new URI(uri), modifier);
     }
 
-    private void parse(@NonNull URI uri, final boolean normalize)
+    private void parse(@NonNull URI uri, final @NonNull FsUriModifier modifier)
     throws URISyntaxException {
         if (null != uri.getRawFragment())
             throw new URISyntaxException(quote(uri), "Fragment not allowed");
@@ -273,13 +273,13 @@ public final class FSMountPoint implements Serializable, Comparable<FSMountPoint
             if (ssp.length() - 2 != i)
                 throw new URISyntaxException(quote(uri),
                         "Doesn't end with mount point separator \"" + MOUNT_POINT_SEPARATOR + '"');
-            path = new FSPath(ssp.substring(0, i), normalize);
+            path = new FSPath(ssp.substring(0, i), modifier);
             final URI pathUri = path.getUri();
             if (!pathUri.isAbsolute())
                 throw new URISyntaxException(quote(uri), "Path not absolute");
             if (0 == path.getEntryName().getPath().length())
                 throw new URISyntaxException(quote(uri), "Empty entry name");
-            if (normalize) {
+            if (FsUriModifier.NONE != modifier) {
                 final URI nuri = new URI(new StringBuilder(uri.getScheme())
                         .append(':')
                         .append(pathUri.toString())
@@ -291,13 +291,9 @@ public final class FSMountPoint implements Serializable, Comparable<FSMountPoint
                 throw new URISyntaxException(quote(uri),
                         "URI path not in normal form");
         } else {
+            uri = modifier.modify(uri);
             if (!uri.isAbsolute())
                 throw new URISyntaxException(quote(uri), "Not absolute");
-            if (normalize)
-                uri = uri.normalize();
-            else if (uri.normalize() != uri)
-                throw new URISyntaxException(quote(uri),
-                        "URI path not in normal form");
             if (!uri.getRawPath().endsWith(SEPARATOR))
                 throw new URISyntaxException(quote(uri),
                         "URI path doesn't end with separator \"" + SEPARATOR + '"');
