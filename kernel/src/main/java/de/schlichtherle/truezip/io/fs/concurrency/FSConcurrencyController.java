@@ -22,11 +22,11 @@ import de.schlichtherle.truezip.io.fs.FSInputOption;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
-import de.schlichtherle.truezip.io.fs.FSController;
+import de.schlichtherle.truezip.io.fs.FsController;
 import de.schlichtherle.truezip.io.fs.FSEntry;
 import de.schlichtherle.truezip.io.fs.FSEntryName;
 import de.schlichtherle.truezip.io.fs.FSException;
-import de.schlichtherle.truezip.io.fs.FSDecoratorController;
+import de.schlichtherle.truezip.io.fs.FsDecoratorController;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
@@ -53,8 +53,8 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 public final class FSConcurrencyController
-extends FSDecoratorController<  FSConcurrencyModel,
-                                FSController<? extends FSConcurrencyModel>> {
+extends FsDecoratorController<  FSConcurrencyModel,
+                                FsController<? extends FSConcurrencyModel>> {
 
     private volatile ReadLock readLock;
     private volatile WriteLock writeLock;
@@ -65,7 +65,7 @@ extends FSDecoratorController<  FSConcurrencyModel,
      * @param controller the decorated file system controller.
      */
     public FSConcurrencyController(
-            @NonNull FSController<? extends FSConcurrencyModel> controller) {
+            @NonNull FsController<? extends FSConcurrencyModel> controller) {
         super(controller);
     }
 

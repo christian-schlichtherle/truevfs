@@ -48,7 +48,7 @@ public interface FSDriver {
      * @return A new file system controller for the given mount point and
      *         parent file system controller.
      */
-    @NonNull FSController<?>
+    @NonNull FsController<?>
     newController(  @NonNull FSMountPoint mountPoint,
-                    @Nullable FSController<?> parent);
+                    @Nullable FsController<?> parent);
 }

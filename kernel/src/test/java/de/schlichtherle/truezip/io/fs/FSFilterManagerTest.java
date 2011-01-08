@@ -60,7 +60,7 @@ public class FSFilterManagerTest extends FSManagerTestCase {
             final FSManager filter = new FSFilterManager(
                     manager, FSMountPoint.create(params[0][0]));
             assertThat(filter.getSize(), is(params[2].length));
-            for (final FSController<?> controller : filter)
+            for (final FsController<?> controller : filter)
                 assertTrue(set.contains(controller.getModel().getMountPoint()));
         }
     }

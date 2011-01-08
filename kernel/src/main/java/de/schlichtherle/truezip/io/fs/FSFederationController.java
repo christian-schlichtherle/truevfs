@@ -49,7 +49,7 @@ import javax.swing.Icon;
  * @version $Id$
  */
 final class FSFederationController
-extends FSDecoratorController<FSModel, FSController<?>> {
+extends FsDecoratorController<FSModel, FsController<?>> {
 
     private volatile FSPath path;
 
@@ -58,7 +58,7 @@ extends FSDecoratorController<FSModel, FSController<?>> {
      *
      * @param controller the decorated file system controller.
      */
-    FSFederationController(final @NonNull FSController<?> controller) {
+    FSFederationController(final @NonNull FsController<?> controller) {
         super(controller);
         assert null != getParent();
     }

@@ -17,7 +17,7 @@ package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.fs.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.fs.archive.driver.DummyArchiveDriver;
-import de.schlichtherle.truezip.io.fs.FSController;
+import de.schlichtherle.truezip.io.fs.FsController;
 import de.schlichtherle.truezip.io.fs.FSPath;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -504,11 +504,11 @@ public class FileTest {
         assertNotSame(innerDriver, inner2Driver);
 
         // Assert that the controllers haven't been persistet.
-        final FSController<?> archiveController = archive.getController();
-        final FSController<?> archive2Controller = archive2.getController();
+        final FsController<?> archiveController = archive.getController();
+        final FsController<?> archive2Controller = archive2.getController();
         assertSame(archiveController, archive2Controller);
-        final FSController<?> innerController = inner.getController();
-        final FSController<?> inner2Controller = inner2.getController();
+        final FsController<?> innerController = inner.getController();
+        final FsController<?> inner2Controller = inner2.getController();
         assertSame(innerController, inner2Controller);
     }
 

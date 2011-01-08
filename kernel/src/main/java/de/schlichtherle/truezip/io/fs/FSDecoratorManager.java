@@ -42,7 +42,7 @@ extends FSManager {
     }
 
     @Override
-    public FSController<?>
+    public FsController<?>
     getController(  FSMountPoint mountPoint,
                     FSDriver driver) {
         return delegate.getController(mountPoint, driver);
@@ -54,7 +54,7 @@ extends FSManager {
     }
 
     @Override
-    public Iterator<FSController<?>> iterator() {
+    public Iterator<FsController<?>> iterator() {
         return delegate.iterator();
     }
 }

@@ -58,15 +58,15 @@ extends FSDecoratorManager<FSManager> {
     }
 
     @Override
-    public Iterator<FSController<?>> iterator() {
+    public Iterator<FsController<?>> iterator() {
         return getControllers().iterator();
     }
 
-    private Collection<FSController<?>> getControllers() {
-        final List<FSController<?>> snapshot
-                = new ArrayList<FSController<?>>(
+    private Collection<FsController<?>> getControllers() {
+        final List<FsController<?>> snapshot
+                = new ArrayList<FsController<?>>(
                     (int) (delegate.getSize() / .75f) + 1);
-        for (FSController<?> controller : delegate) {
+        for (FsController<?> controller : delegate) {
             final FSMountPoint mountPoint
                     = controller.getModel().getMountPoint().hierarchicalize();
             if (mountPoint.getScheme().equals(prefix.getScheme())

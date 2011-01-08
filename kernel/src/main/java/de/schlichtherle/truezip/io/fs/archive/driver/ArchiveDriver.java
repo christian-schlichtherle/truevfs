@@ -23,7 +23,7 @@ import de.schlichtherle.truezip.io.fs.archive.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.socket.InputShop;
 import de.schlichtherle.truezip.io.entry.EntryFactory;
-import de.schlichtherle.truezip.io.fs.FSController;
+import de.schlichtherle.truezip.io.fs.FsController;
 import de.schlichtherle.truezip.io.fs.FSDriver;
 import de.schlichtherle.truezip.io.fs.FSMountPoint;
 import de.schlichtherle.truezip.io.fs.concurrency.FSConcurrencyController;
@@ -77,9 +77,9 @@ implements EntryFactory<E>, FSDriver, Serializable {
      * which has a scheme which is not supported by this archive driver.
      */
     @Override
-    public @NonNull FSController<?>
+    public @NonNull FsController<?>
     newController(  @NonNull FSMountPoint mountPoint,
-                    @NonNull FSController<?> parent) {
+                    @NonNull FsController<?> parent) {
         return  new FSConcurrencyController(
                     new FSContentCacheController(
                         new DefaultArchiveController<E>(

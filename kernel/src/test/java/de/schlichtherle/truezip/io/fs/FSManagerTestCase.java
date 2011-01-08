@@ -73,11 +73,11 @@ public abstract class FSManagerTestCase {
                 "zip:zip:zip:file:/föo.zip!/bär.zip!/bäz.zip!/",
             },
         }) {
-            FSController<?> parent = null;
+            FsController<?> parent = null;
             for (final String param : params) {
                 final FSMountPoint mountPoint
                         = FSMountPoint.create(URI.create(param));
-                final FSController<?> controller
+                final FsController<?> controller
                         = manager.getController(mountPoint, driver);
                 if (null != parent && null != parent.getParent())
                     assertThat(controller.getParent(), sameInstance((Object) parent));
@@ -107,18 +107,18 @@ public abstract class FSManagerTestCase {
                 //"file:/", // does NOT get mapped!
             },
         }) {
-            FSController<?> member = null;
+            FsController<?> member = null;
             for (final String param : params) {
                 final FSMountPoint mountPoint
                         = FSMountPoint.create(URI.create(param));
-                final FSController<?> controller
+                final FsController<?> controller
                         = manager.getController(mountPoint, driver);
                 if (null != member && null != controller.getParent())
                     assertThat(controller, sameInstance((Object) member.getParent()));
                 member = controller;
             }
 
-            Iterator<FSController<?>> i = manager.iterator();
+            Iterator<FsController<?>> i = manager.iterator();
             for (final String param : params) {
                 final FSMountPoint mountPoint
                         = FSMountPoint.create(URI.create(param));

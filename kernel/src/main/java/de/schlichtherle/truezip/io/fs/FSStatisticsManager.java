@@ -45,16 +45,16 @@ extends FSDecoratorManager<FSManager> {
     }
 
     @Override
-    public FSController<?> getController(
+    public FsController<?> getController(
             final FSMountPoint mountPoint,
             final FSDriver driver) {
 
         class StatisticsDriver implements FSDriver {
             @Override
-            public FSController<?> newController(
+            public FsController<?> newController(
                     FSMountPoint mountPoint,
-                    FSController<?> parent) {
-                final FSController<?> controller
+                    FsController<?> parent) {
+                final FsController<?> controller
                         = driver.newController(mountPoint, parent);
                 return null != parent && null == parent.getParent() // controller is top level federated file system?
                         ? new FSStatisticsController(controller, FSStatisticsManager.this)

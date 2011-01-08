@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.file;
 
-import de.schlichtherle.truezip.io.fs.FSController;
+import de.schlichtherle.truezip.io.fs.FsController;
 import de.schlichtherle.truezip.io.fs.FSDriver;
 import de.schlichtherle.truezip.io.fs.FSMountPoint;
 import de.schlichtherle.truezip.io.fs.FSScheme;
@@ -58,8 +58,8 @@ final class ArchiveDetectorFSDriver implements FSDriver {
      *         point.
      */
     @Override
-    public FSController<?>
-    newController(FSMountPoint mountPoint, FSController<?> parent) {
+    public FsController<?>
+    newController(FSMountPoint mountPoint, FsController<?> parent) {
         FSScheme scheme = mountPoint.getScheme();
         return FILE_SCHEME.equals(scheme)
                 ? FILE_DRIVER.newController(mountPoint, parent)

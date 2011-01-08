@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.InputException;
-import de.schlichtherle.truezip.io.fs.FSController;
+import de.schlichtherle.truezip.io.fs.FsController;
 import de.schlichtherle.truezip.io.fs.FSManagers;
 import de.schlichtherle.truezip.io.fs.FSEntryName;
 import de.schlichtherle.truezip.io.fs.FSScheme;
@@ -53,7 +53,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.Icon;
 
-import static de.schlichtherle.truezip.io.fs.FSController.*;
+import static de.schlichtherle.truezip.io.fs.FsController.*;
 import static de.schlichtherle.truezip.io.fs.FSEntry.*;
 import static de.schlichtherle.truezip.io.fs.FSEntryName.*;
 import static de.schlichtherle.truezip.io.fs.FSSyncOption.*;
@@ -412,7 +412,7 @@ public final class File extends java.io.File {
      *
      * @see #readObject
      */
-    private @Nullable transient FSController<?> controller;
+    private @Nullable transient FsController<?> controller;
 
     //
     // Constructor and helper methods:
@@ -778,7 +778,7 @@ public final class File extends java.io.File {
 
         if (innerArchive == this) {
             // controller initialization has been deferred until now in
-            // order to provide the FSController with an otherwise fully
+            // order to provide the FsController with an otherwise fully
             // initialized object.
             initController();
         }
@@ -1024,7 +1024,7 @@ public final class File extends java.io.File {
     }
 
     /**
-     * Equivalent to {@code sync(FSController.UMOUNT)}.
+     * Equivalent to {@code sync(FsController.UMOUNT)}.
      *
      * @see #sync(BitField)
      */
@@ -1073,7 +1073,7 @@ public final class File extends java.io.File {
 
     /**
      * Equivalent to {@code
-        sync(archive, BitField.of(FSController.UMOUNT))
+        sync(archive, BitField.of(FsController.UMOUNT))
      * }.
      *
      * @see #sync(File, BitField)
@@ -1126,7 +1126,7 @@ public final class File extends java.io.File {
     }
 
     /**
-     * Equivalent to {@code sync(FSController.UPDATE)}.
+     * Equivalent to {@code sync(FsController.UPDATE)}.
      *
      * @see #sync(BitField)
      */
@@ -1666,7 +1666,7 @@ public final class File extends java.io.File {
      * Returns an archive controller if and only if the path denotes an
      * archive file, or {@code null} otherwise.
      */
-    @Nullable FSController<?> getController() {
+    @Nullable FsController<?> getController() {
         assert (null != controller) == isArchive();
         return controller;
     }
@@ -2446,7 +2446,7 @@ public final class File extends java.io.File {
     @Override
     public boolean createNewFile() throws IOException {
         if (null != innerArchive) {
-            final FSController<?> controller
+            final FsController<?> controller
                     = innerArchive.getController();
             final FSEntryName entryName = getInnerEntryName0();
             // This is not really atomic, but should be OK in this case.

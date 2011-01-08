@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.lang.reflect.UndeclaredThrowableException;
 import net.jcip.annotations.ThreadSafe;
 
-import static de.schlichtherle.truezip.io.fs.FSController.*;
+import static de.schlichtherle.truezip.io.fs.FsController.*;
 
 /**
  * A static service locator and container for a default file system manager
