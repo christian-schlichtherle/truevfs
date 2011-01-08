@@ -88,11 +88,11 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
     private transient volatile @Nullable FsMountPoint hierarchical;
 
     /**
-     * Equivalent to {@link #create(URI, FsUriModifier) create(uri, FsUriModifier.NONE)}.
+     * Equivalent to {@link #create(URI, FsUriModifier) create(uri, FsUriModifier.NULL)}.
      */
     public static @NonNull FsMountPoint
     create(@NonNull String uri) {
-        return create(uri, NONE);
+        return create(uri, NULL);
     }
 
     /**
@@ -119,11 +119,11 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
     }
 
     /**
-     * Equivalent to {@link #create(URI, FsUriModifier) create(uri, FsUriModifier.NONE)}.
+     * Equivalent to {@link #create(URI, FsUriModifier) create(uri, FsUriModifier.NULL)}.
      */
     public static @NonNull FsMountPoint
     create(@NonNull URI uri) {
-        return create(uri, NONE);
+        return create(uri, NULL);
     }
 
     /**
@@ -172,10 +172,10 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
     }
 
     /**
-     * Equivalent to {@link #FsMountPoint(String, FsUriModifier) new FsMountPoint(uri, FsUriModifier.NONE)}.
+     * Equivalent to {@link #FsMountPoint(String, FsUriModifier) new FsMountPoint(uri, FsUriModifier.NULL)}.
      */
     public FsMountPoint(@NonNull String uri) throws URISyntaxException {
-        parse(uri, NONE);
+        parse(uri, NULL);
     }
 
     /**
@@ -193,10 +193,10 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
     }
 
     /**
-     * Equivalent to {@link #FsMountPoint(URI, FsUriModifier) new FsMountPoint(uri, FsUriModifier.NONE)}.
+     * Equivalent to {@link #FsMountPoint(URI, FsUriModifier) new FsMountPoint(uri, FsUriModifier.NULL)}.
      */
     public FsMountPoint(@NonNull URI uri) throws URISyntaxException {
-        parse(uri, NONE);
+        parse(uri, NULL);
     }
 
     /**
@@ -235,8 +235,8 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
                 .append(path.toString())
                 .append(MOUNT_POINT_SEPARATOR)
                 .toString());
-        this.path = path;
         this.scheme = scheme;
+        this.path = path;
 
         assert invariants();
     }
@@ -249,7 +249,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
     private void readObject(@NonNull ObjectInputStream in)
     throws IOException, ClassNotFoundException {
         try {
-            parse(in.readObject().toString(), NONE);
+            parse(in.readObject().toString(), NULL);
         } catch (URISyntaxException ex) {
             throw (InvalidObjectException) new InvalidObjectException(ex.toString())
                     .initCause(ex);
@@ -277,8 +277,8 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
                 throw new URISyntaxException(quote(uri), "Path not absolute");
             if (0 == path.getEntryName().getPath().length())
                 throw new URISyntaxException(quote(uri), "Empty URI path of entry name of path");
-            if (NONE != modifier) {
-                final URI nuri = new URI(new StringBuilder(uri.getScheme())
+            if (NULL != modifier) {
+                URI nuri = new URI(new StringBuilder(uri.getScheme())
                         .append(':')
                         .append(pathUri.toString())
                         .append(MOUNT_POINT_SEPARATOR)

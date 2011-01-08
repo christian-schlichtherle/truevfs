@@ -127,49 +127,49 @@ public class FsMountPointTest {
         }
 
         try {
-            FsMountPoint.create((String) null, FsUriModifier.NONE);
+            FsMountPoint.create((String) null, FsUriModifier.NULL);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FsMountPoint((String) null, FsUriModifier.NONE);
+            new FsMountPoint((String) null, FsUriModifier.NULL);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            FsMountPoint.create((URI) null, FsUriModifier.NONE);
+            FsMountPoint.create((URI) null, FsUriModifier.NULL);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FsMountPoint((URI) null, FsUriModifier.NONE);
+            new FsMountPoint((URI) null, FsUriModifier.NULL);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            FsMountPoint.create((String) null, FsUriModifier.NORMALIZE);
+            FsMountPoint.create((String) null, FsUriModifier.CANONICALIZE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FsMountPoint((String) null, FsUriModifier.NORMALIZE);
+            new FsMountPoint((String) null, FsUriModifier.CANONICALIZE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            FsMountPoint.create((URI) null, FsUriModifier.NORMALIZE);
+            FsMountPoint.create((URI) null, FsUriModifier.CANONICALIZE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FsMountPoint((URI) null, FsUriModifier.NORMALIZE);
+            new FsMountPoint((URI) null, FsUriModifier.CANONICALIZE);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -278,7 +278,7 @@ public class FsMountPointTest {
             { "foo:bar:/baz?bang!/", "foo", "bar:/baz?bang" },
             { "foo:bar:/baz!/", "foo", "bar:/baz" },
         }) {
-            final FsMountPoint mountPoint = FsMountPoint.create(params[0], FsUriModifier.NORMALIZE);
+            final FsMountPoint mountPoint = FsMountPoint.create(params[0], FsUriModifier.CANONICALIZE);
             final FsScheme scheme = FsScheme.create(params[1]);
             final FsPath path = FsPath.create(params[2]);
 

@@ -134,49 +134,49 @@ public class FsPathTest {
         }
 
         try {
-            FsPath.create((String) null, FsUriModifier.NONE);
+            FsPath.create((String) null, FsUriModifier.NULL);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FsPath((String) null, FsUriModifier.NONE);
+            new FsPath((String) null, FsUriModifier.NULL);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            FsPath.create((URI) null, FsUriModifier.NONE);
+            FsPath.create((URI) null, FsUriModifier.NULL);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FsPath((URI) null, FsUriModifier.NONE);
+            new FsPath((URI) null, FsUriModifier.NULL);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            FsPath.create((String) null, FsUriModifier.NORMALIZE);
+            FsPath.create((String) null, FsUriModifier.CANONICALIZE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FsPath((String) null, FsUriModifier.NORMALIZE);
+            new FsPath((String) null, FsUriModifier.CANONICALIZE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            FsPath.create((URI) null, FsUriModifier.NORMALIZE);
+            FsPath.create((URI) null, FsUriModifier.CANONICALIZE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FsPath((URI) null, FsUriModifier.NORMALIZE);
+            new FsPath((URI) null, FsUriModifier.CANONICALIZE);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -330,7 +330,7 @@ public class FsPathTest {
             { "foo:/bar/baz/", "foo:/bar/", "baz" },
             { "foo:/bar/baz/?bang", "foo:/bar/", "baz?bang" },
         }) {
-            FsPath path = FsPath.create(params[0], FsUriModifier.NORMALIZE);
+            FsPath path = FsPath.create(params[0], FsUriModifier.CANONICALIZE);
             final FsMountPoint mountPoint = null == params[1] ? null : FsMountPoint.create(params[1]);
             final FsEntryName entryName = FsEntryName.create(params[2]);
             assertPath(path, mountPoint, entryName);

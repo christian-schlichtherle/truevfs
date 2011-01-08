@@ -102,7 +102,7 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
     public static @NonNull FsPath
     create(@NonNull File file) {
         try {
-            return new FsPath(file.toURI(), NORMALIZE);
+            return new FsPath(file.toURI(), CANONICALIZE);
         } catch (URISyntaxException ex) {
             assert false : ex; // broken contract in File implementation!
             throw new IllegalArgumentException(ex);
@@ -110,11 +110,11 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
     }
 
     /**
-     * Equivalent to {@link #create(String, FsUriModifier) create(uri, FsUriModifier.NONE)}.
+     * Equivalent to {@link #create(String, FsUriModifier) create(uri, FsUriModifier.NULL)}.
      */
     public static @NonNull FsPath
     create(@NonNull String uri) {
-        return create(uri, NONE);
+        return create(uri, NULL);
     }
 
     /**
@@ -141,11 +141,11 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
     }
 
     /**
-     * Equivalent to {@link #create(URI, FsUriModifier) create(uri, FsUriModifier.NONE)}.
+     * Equivalent to {@link #create(URI, FsUriModifier) create(uri, FsUriModifier.NULL)}.
      */
     public static @NonNull FsPath
     create(@NonNull URI uri) {
-        return create(uri, NONE);
+        return create(uri, NULL);
     }
 
     /**
@@ -171,10 +171,10 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
     }
 
     /**
-     * Equivalent to {@link #FsPath(String, FsUriModifier) new FsPath(uri, FsUriModifier.NONE)}.
+     * Equivalent to {@link #FsPath(String, FsUriModifier) new FsPath(uri, FsUriModifier.NULL)}.
      */
     public FsPath(@NonNull String uri) throws URISyntaxException {
-        parse(uri, NONE);
+        parse(uri, NULL);
     }
 
     /**
@@ -192,10 +192,10 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
     }
 
     /**
-     * Equivalent to {@link #FsPath(URI, FsUriModifier) new FsPath(uri, FsUriModifier.NONE)}.
+     * Equivalent to {@link #FsPath(URI, FsUriModifier) new FsPath(uri, FsUriModifier.NULL)}.
      */
     public FsPath(@NonNull URI uri) throws URISyntaxException {
-        parse(uri, NONE);
+        parse(uri, NULL);
     }
 
     /**
@@ -247,7 +247,7 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
     private void readObject(@NonNull ObjectInputStream in)
     throws IOException, ClassNotFoundException {
         try {
-            parse(in.readObject().toString(), NONE);
+            parse(in.readObject().toString(), NULL);
         } catch (URISyntaxException ex) {
             throw (InvalidObjectException) new InvalidObjectException(ex.toString())
                     .initCause(ex);
@@ -275,15 +275,15 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
             entryName = new FsEntryName(
                     new URI(null, ssp.substring(i + 2), uri.getFragment()),
                     modifier);
-            if (NONE != modifier) {
-                final URI nuri = new URI(mountPoint.toString() + entryName);
+            if (NULL != modifier) {
+                URI nuri = new URI(mountPoint.toString() + entryName);
                 if (!uri.equals(nuri))
                     uri = nuri;
             }
         } else if (uri.isAbsolute()) {
             uri = modifier.modify(uri, PATH);
-            mountPoint = new FsMountPoint(uri.resolve("."), NONE);
-            entryName = new FsEntryName(mountPoint.getUri().relativize(uri), NONE);
+            mountPoint = new FsMountPoint(uri.resolve("."), NULL);
+            entryName = new FsEntryName(mountPoint.getUri().relativize(uri), NULL);
         } else {
             mountPoint = null;
             entryName = new FsEntryName(uri, modifier);

@@ -612,7 +612,7 @@ public final class File extends java.io.File {
      *         parameter {@code uri} does not hold.
      */
     public File(URI uri) {
-        this(   FsPath.create(uri, NORMALIZE),
+        this(   FsPath.create(uri, CANONICALIZE),
                 new ArchiveDetectorFSDriver(defaultDetector));
     }
 
@@ -725,7 +725,7 @@ public final class File extends java.io.File {
                         path.substring(innerArchivePathLength + 1) // cut off leading separatorChar
                             .replace(separatorChar, SEPARATOR_CHAR),
                         null,
-                        NORMALIZE);
+                        CANONICALIZE);
             }
         } else {
             this.detector = detector;
@@ -772,7 +772,7 @@ public final class File extends java.io.File {
         final StringBuilder enclEntryNameBuf = new StringBuilder(path.length());
         init(ancestor, detector, 0, path, enclEntryNameBuf, new Splitter(separatorChar));
         enclEntryName = 0 < enclEntryNameBuf.length()
-                ? FsEntryName.create(enclEntryNameBuf.toString(), null, NORMALIZE)
+                ? FsEntryName.create(enclEntryNameBuf.toString(), null, CANONICALIZE)
                 : null;
 
         if (innerArchive == this) {
@@ -905,7 +905,7 @@ public final class File extends java.io.File {
                                     enclEntryName));
             } else {
                 mountPoint = new FsMountPoint(scheme,
-                        new FsPath(target.toURI(), NORMALIZE));
+                        new FsPath(target.toURI(), CANONICALIZE));
             }
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
@@ -1876,22 +1876,22 @@ public final class File extends java.io.File {
                             new FsMountPoint(
                                 scheme,
                                 new FsPath(
-                                    new FsMountPoint(enclArchive.toURI(), NORMALIZE),
+                                    new FsMountPoint(enclArchive.toURI(), CANONICALIZE),
                                     enclEntryName)),
                             ROOT);
                 } else {
                     return new FsPath(
                             new FsMountPoint(
                                 scheme,
-                                new FsPath(delegate.toURI(), NORMALIZE)),
+                                new FsPath(delegate.toURI(), CANONICALIZE)),
                             ROOT);
                 }
             } else if (null != enclArchive) {
                 return new FsPath(
-                        new FsMountPoint(enclArchive.toURI(), NORMALIZE),
+                        new FsMountPoint(enclArchive.toURI(), CANONICALIZE),
                         enclEntryName);
             } else {
-                return new FsPath(delegate.toURI(), NORMALIZE);
+                return new FsPath(delegate.toURI(), CANONICALIZE);
             }
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
@@ -1908,16 +1908,16 @@ public final class File extends java.io.File {
                     return new FsMountPoint(
                             scheme,
                             new FsPath(
-                                new FsMountPoint(enclArchive.toURI(), NORMALIZE),
+                                new FsMountPoint(enclArchive.toURI(), CANONICALIZE),
                                 enclEntryName)).getUri();
                 } else {
                     return new FsMountPoint(
                             scheme,
-                            new FsPath(delegate.toURI(), NORMALIZE)).getUri();
+                            new FsPath(delegate.toURI(), CANONICALIZE)).getUri();
                 }
             } else if (null != enclArchive) {
                 return new FsPath(
-                        new FsMountPoint(enclArchive.toURI(), NORMALIZE),
+                        new FsMountPoint(enclArchive.toURI(), CANONICALIZE),
                         enclEntryName).getUri();
             } else {
                 return delegate.toURI();

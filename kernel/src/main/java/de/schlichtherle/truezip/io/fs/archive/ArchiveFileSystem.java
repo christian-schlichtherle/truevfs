@@ -186,7 +186,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
             try {
                 fsck.fix(new FsEntryName(
                         new URI(null, null, path, null, null),
-                        FsUriModifier.NORMALIZE).getPath());
+                        FsUriModifier.CANONICALIZE).getPath());
             } catch (URISyntaxException dontFix) {
             }
         }

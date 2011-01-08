@@ -22,12 +22,16 @@ import java.net.URISyntaxException;
 import static de.schlichtherle.truezip.io.entry.EntryName.*;
 
 /**
+ * Modifies a URI when parsing an {@link FsPath}, an {@link FsMountPoint} or an
+ * {@link FsEntryName}.
+ * 
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 public enum FsUriModifier {
 
-    NONE {
+    /** The null modifier just ensures that the URI is normalized. */
+    NULL {
         @Override
         URI modify(URI uri, PostFix fix) throws URISyntaxException {
             if (uri.normalize() != uri)
@@ -36,7 +40,12 @@ public enum FsUriModifier {
         }
     },
 
-    NORMALIZE {
+    /**
+     * The canonicalize modifier normalizes the URI and applies a post-fix
+     * which depends on the entity to parse, i.e. an {@link FsPath}, an
+     * {@link FsMountPoint} or an {@link FsEntryName}.
+     */
+    CANONICALIZE {
         @Override
         URI modify(URI uri, PostFix fix) throws URISyntaxException {
             return fix.modify(uri.normalize());
@@ -47,19 +56,6 @@ public enum FsUriModifier {
     throws URISyntaxException;
 
     enum PostFix {
-        ENTRY_NAME {
-            @Override
-            URI modify(URI uri) {
-                return uri;
-            }
-        },
-
-        MOUNT_POINT {
-            @Override
-            URI modify(URI uri) {
-                return uri;
-            }
-        },
 
         PATH {
             @Override
@@ -94,6 +90,20 @@ public enum FsUriModifier {
                                     uri.getFragment());
                 }
 
+                return uri;
+            }
+        },
+
+        MOUNT_POINT {
+            @Override
+            URI modify(URI uri) {
+                return uri;
+            }
+        },
+
+        ENTRY_NAME {
+            @Override
+            URI modify(URI uri) {
                 return uri;
             }
         };
