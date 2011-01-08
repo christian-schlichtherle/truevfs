@@ -27,7 +27,6 @@ import de.schlichtherle.truezip.io.fs.FsEntry;
 import de.schlichtherle.truezip.io.fs.FsFilterManager;
 import de.schlichtherle.truezip.io.fs.FsSyncExceptionBuilder;
 import de.schlichtherle.truezip.io.fs.FsSyncOption;
-import de.schlichtherle.truezip.io.fs.FsUriModifier;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -57,9 +56,9 @@ import static de.schlichtherle.truezip.io.fs.FsController.*;
 import static de.schlichtherle.truezip.io.fs.FsEntry.*;
 import static de.schlichtherle.truezip.io.fs.FsEntryName.*;
 import static de.schlichtherle.truezip.io.fs.FsSyncOption.*;
+import static de.schlichtherle.truezip.io.fs.FsUriModifier.*;
 import static de.schlichtherle.truezip.io.entry.Entry.Size.*;
 import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
-import static de.schlichtherle.truezip.io.file.Files.*;
 import static de.schlichtherle.truezip.io.Files.*;
 import static de.schlichtherle.truezip.io.fs.FsOutputOption.*;
 
@@ -613,7 +612,7 @@ public final class File extends java.io.File {
      *         parameter {@code uri} does not hold.
      */
     public File(URI uri) {
-        this(   FsPath.create(fix(uri), FsUriModifier.NORMALIZE),
+        this(   FsPath.create(uri, NORMALIZE),
                 new ArchiveDetectorFSDriver(defaultDetector));
     }
 
@@ -726,7 +725,7 @@ public final class File extends java.io.File {
                         path.substring(innerArchivePathLength + 1) // cut off leading separatorChar
                             .replace(separatorChar, SEPARATOR_CHAR),
                         null,
-                        FsUriModifier.NORMALIZE);
+                        NORMALIZE);
             }
         } else {
             this.detector = detector;
@@ -773,7 +772,7 @@ public final class File extends java.io.File {
         final StringBuilder enclEntryNameBuf = new StringBuilder(path.length());
         init(ancestor, detector, 0, path, enclEntryNameBuf, new Splitter(separatorChar));
         enclEntryName = 0 < enclEntryNameBuf.length()
-                ? FsEntryName.create(enclEntryNameBuf.toString(), null, FsUriModifier.NORMALIZE)
+                ? FsEntryName.create(enclEntryNameBuf.toString(), null, NORMALIZE)
                 : null;
 
         if (innerArchive == this) {
@@ -899,14 +898,14 @@ public final class File extends java.io.File {
         try {
             if (null != enclArchive) {
                 mountPoint = new FsMountPoint(scheme,
-                        new FsPath(   enclArchive
+                        new FsPath( enclArchive
                                         .getController()
                                         .getModel()
                                         .getMountPoint(),
                                     enclEntryName));
             } else {
                 mountPoint = new FsMountPoint(scheme,
-                        new FsPath(fix(target.toURI())));
+                        new FsPath(target.toURI(), NORMALIZE));
             }
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
@@ -1877,22 +1876,22 @@ public final class File extends java.io.File {
                             new FsMountPoint(
                                 scheme,
                                 new FsPath(
-                                    new FsMountPoint(fix(enclArchive.toURI()), FsUriModifier.NORMALIZE),
+                                    new FsMountPoint(enclArchive.toURI(), NORMALIZE),
                                     enclEntryName)),
                             ROOT);
                 } else {
                     return new FsPath(
                             new FsMountPoint(
                                 scheme,
-                                new FsPath(fix(delegate.toURI()), FsUriModifier.NORMALIZE)),
+                                new FsPath(delegate.toURI(), NORMALIZE)),
                             ROOT);
                 }
             } else if (null != enclArchive) {
                 return new FsPath(
-                        new FsMountPoint(fix(enclArchive.toURI()), FsUriModifier.NORMALIZE),
+                        new FsMountPoint(enclArchive.toURI(), NORMALIZE),
                         enclEntryName);
             } else {
-                return new FsPath(fix(delegate.toURI()), FsUriModifier.NORMALIZE);
+                return new FsPath(delegate.toURI(), NORMALIZE);
             }
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
@@ -1909,16 +1908,16 @@ public final class File extends java.io.File {
                     return new FsMountPoint(
                             scheme,
                             new FsPath(
-                                new FsMountPoint(fix(enclArchive.toURI()), FsUriModifier.NORMALIZE),
+                                new FsMountPoint(enclArchive.toURI(), NORMALIZE),
                                 enclEntryName)).getUri();
                 } else {
                     return new FsMountPoint(
                             scheme,
-                            new FsPath(fix(delegate.toURI()), FsUriModifier.NORMALIZE)).getUri();
+                            new FsPath(delegate.toURI(), NORMALIZE)).getUri();
                 }
             } else if (null != enclArchive) {
                 return new FsPath(
-                        new FsMountPoint(fix(enclArchive.toURI()), FsUriModifier.NORMALIZE),
+                        new FsMountPoint(enclArchive.toURI(), NORMALIZE),
                         enclEntryName).getUri();
             } else {
                 return delegate.toURI();
@@ -1967,7 +1966,7 @@ public final class File extends java.io.File {
         if (null != innerArchive) {
             try {
                 final FsEntry entry = innerArchive.getController().getEntry(getInnerEntryName0());
-                return null != entry && entry.getType() == FILE;
+                return null != entry && FILE == entry.getType();
             } catch (IOException ex) {
                 return false;
             }

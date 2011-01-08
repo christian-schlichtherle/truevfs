@@ -19,6 +19,8 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import static de.schlichtherle.truezip.io.entry.EntryName.*;
+
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -27,7 +29,7 @@ public enum FsUriModifier {
 
     NONE {
         @Override
-        URI modify(URI uri) throws URISyntaxException {
+        URI modify(URI uri, PostFix fix) throws URISyntaxException {
             if (uri.normalize() != uri)
                 throw new URISyntaxException("\"" + uri + "\"", "URI path not in normal form");
             return uri;
@@ -36,12 +38,67 @@ public enum FsUriModifier {
 
     NORMALIZE {
         @Override
-        URI modify(URI uri) {
-            return uri.normalize();
+        URI modify(URI uri, PostFix fix) throws URISyntaxException {
+            return fix.modify(uri.normalize());
         }
     };
 
-    abstract @NonNull URI modify(@NonNull URI uri) throws URISyntaxException;
+    abstract @NonNull URI modify(@NonNull URI uri, @NonNull PostFix fix)
+    throws URISyntaxException;
 
-    FsUriModifier next() { return this; }
+    enum PostFix {
+        ENTRY_NAME {
+            @Override
+            URI modify(URI uri) {
+                return uri;
+            }
+        },
+
+        MOUNT_POINT {
+            @Override
+            URI modify(URI uri) {
+                return uri;
+            }
+        },
+
+        PATH {
+            @Override
+            URI modify(URI uri) throws URISyntaxException {
+                if (uri.isOpaque())
+                    return uri;
+
+                // Note that we do not limit these fixes to Windows only in order
+                // to make this function work identically on all platforms!
+
+                // Move Windows-like UNC host from path to authority.
+                if (uri.getRawPath().startsWith(SEPARATOR + SEPARATOR)) {
+                    final String s = uri.getPath();
+                    final int i = s.indexOf(SEPARATOR_CHAR, 2);
+                    if (0 <= i) {
+                        uri = new URI(  uri.getScheme(),
+                                        s.substring(2, i),
+                                        s.substring(i),
+                                        uri.getQuery(),
+                                        uri.getFragment());
+                    }
+                }
+
+                // Delete trailing slash separator from directory URI.
+                for (String s; (s = uri.getPath()).endsWith(SEPARATOR)
+                        && 2 <= s.length()
+                        && (':' != s.charAt(s.length() - 2));) {
+                    uri = new URI(  uri.getScheme(),
+                                    uri.getAuthority(),
+                                    s.substring(0, s.length() - 1),
+                                    uri.getQuery(),
+                                    uri.getFragment());
+                }
+
+                return uri;
+            }
+        };
+
+        abstract @NonNull URI modify(@NonNull URI uri)
+        throws URISyntaxException;
+    }
 }

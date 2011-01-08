@@ -28,7 +28,9 @@ import java.net.URISyntaxException;
 import net.jcip.annotations.Immutable;
 
 import static de.schlichtherle.truezip.io.fs.FsEntryName.*;
-import static de.schlichtherle.truezip.io.fs.FsPath.MOUNT_POINT_SEPARATOR;
+import static de.schlichtherle.truezip.io.fs.FsPath.*;
+import static de.schlichtherle.truezip.io.fs.FsUriModifier.*;
+import static de.schlichtherle.truezip.io.fs.FsUriModifier.PostFix.*;
 
 /**
  * Addresses the mount point of a file system.
@@ -90,7 +92,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
      */
     public static @NonNull FsMountPoint
     create(@NonNull String uri) {
-        return create(uri, FsUriModifier.NONE);
+        return create(uri, NONE);
     }
 
     /**
@@ -121,7 +123,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
      */
     public static @NonNull FsMountPoint
     create(@NonNull URI uri) {
-        return create(uri, FsUriModifier.NONE);
+        return create(uri, NONE);
     }
 
     /**
@@ -173,7 +175,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
      * Equivalent to {@link #FsMountPoint(String, FsUriModifier) new FsMountPoint(uri, FsUriModifier.NONE)}.
      */
     public FsMountPoint(@NonNull String uri) throws URISyntaxException {
-        parse(uri, FsUriModifier.NONE);
+        parse(uri, NONE);
     }
 
     /**
@@ -194,7 +196,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
      * Equivalent to {@link #FsMountPoint(URI, FsUriModifier) new FsMountPoint(uri, FsUriModifier.NONE)}.
      */
     public FsMountPoint(@NonNull URI uri) throws URISyntaxException {
-        parse(uri, FsUriModifier.NONE);
+        parse(uri, NONE);
     }
 
     /**
@@ -247,7 +249,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
     private void readObject(@NonNull ObjectInputStream in)
     throws IOException, ClassNotFoundException {
         try {
-            parse(in.readObject().toString(), FsUriModifier.NONE);
+            parse(in.readObject().toString(), NONE);
         } catch (URISyntaxException ex) {
             throw (InvalidObjectException) new InvalidObjectException(ex.toString())
                     .initCause(ex);
@@ -275,7 +277,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
                 throw new URISyntaxException(quote(uri), "Path not absolute");
             if (0 == path.getEntryName().getPath().length())
                 throw new URISyntaxException(quote(uri), "Empty entry name");
-            if (FsUriModifier.NONE != modifier) {
+            if (NONE != modifier) {
                 final URI nuri = new URI(new StringBuilder(uri.getScheme())
                         .append(':')
                         .append(pathUri.toString())
@@ -287,7 +289,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
                 throw new URISyntaxException(quote(uri),
                         "URI path not in normal form");
         } else {
-            uri = modifier.modify(uri);
+            uri = modifier.modify(uri, MOUNT_POINT);
             if (!uri.isAbsolute())
                 throw new URISyntaxException(quote(uri), "Not absolute");
             if (!uri.getRawPath().endsWith(SEPARATOR))

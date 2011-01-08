@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.fs;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -29,6 +30,8 @@ import java.net.URISyntaxException;
 import net.jcip.annotations.Immutable;
 
 import static de.schlichtherle.truezip.io.fs.FsEntryName.*;
+import static de.schlichtherle.truezip.io.fs.FsUriModifier.*;
+import static de.schlichtherle.truezip.io.fs.FsUriModifier.PostFix.*;
 
 /**
  * Addresses an entry in a file system.
@@ -96,12 +99,22 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
 
     private transient volatile @Nullable FsPath hierarchical;
 
+    public static @NonNull FsPath
+    create(@NonNull File file) {
+        try {
+            return new FsPath(file.toURI(), NORMALIZE);
+        } catch (URISyntaxException ex) {
+            assert false : ex; // broken contract in File implementation!
+            throw new IllegalArgumentException(ex);
+        }
+    }
+
     /**
      * Equivalent to {@link #create(String, FsUriModifier) create(uri, FsUriModifier.NONE)}.
      */
     public static @NonNull FsPath
     create(@NonNull String uri) {
-        return create(uri, FsUriModifier.NONE);
+        return create(uri, NONE);
     }
 
     /**
@@ -132,7 +145,7 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
      */
     public static @NonNull FsPath
     create(@NonNull URI uri) {
-        return create(uri, FsUriModifier.NONE);
+        return create(uri, NONE);
     }
 
     /**
@@ -161,7 +174,7 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
      * Equivalent to {@link #FsPath(String, FsUriModifier) new FsPath(uri, FsUriModifier.NONE)}.
      */
     public FsPath(@NonNull String uri) throws URISyntaxException {
-        parse(uri, FsUriModifier.NONE);
+        parse(uri, NONE);
     }
 
     /**
@@ -182,7 +195,7 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
      * Equivalent to {@link #FsPath(URI, FsUriModifier) new FsPath(uri, FsUriModifier.NONE)}.
      */
     public FsPath(@NonNull URI uri) throws URISyntaxException {
-        parse(uri, FsUriModifier.NONE);
+        parse(uri, NONE);
     }
 
     /**
@@ -213,7 +226,7 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
             this.uri = entryName.getUri();
         } else if (mountPoint.getUri().isOpaque()) {
             try {
-                this.uri = new URI(mountPoint.toString() + entryName.toString());
+                this.uri = new URI(mountPoint.toString() + entryName);
             } catch (URISyntaxException ex) {
                 throw new AssertionError(ex);
             }
@@ -234,7 +247,7 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
     private void readObject(@NonNull ObjectInputStream in)
     throws IOException, ClassNotFoundException {
         try {
-            parse(in.readObject().toString(), FsUriModifier.NONE);
+            parse(in.readObject().toString(), NONE);
         } catch (URISyntaxException ex) {
             throw (InvalidObjectException) new InvalidObjectException(ex.toString())
                     .initCause(ex);
@@ -262,16 +275,15 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
             entryName = new FsEntryName(
                     new URI(null, ssp.substring(i + 2), uri.getFragment()),
                     modifier);
-            if (FsUriModifier.NONE != modifier) {
-                final URI nuri = new URI(   mountPoint.toString()
-                                            + entryName.toString());
+            if (NONE != modifier) {
+                final URI nuri = new URI(mountPoint.toString() + entryName);
                 if (!uri.equals(nuri))
                     uri = nuri;
             }
         } else if (uri.isAbsolute()) {
-            uri = modifier.modify(uri);
-            mountPoint = new FsMountPoint(uri.resolve("."), FsUriModifier.NONE);
-            entryName = new FsEntryName(mountPoint.getUri().relativize(uri), FsUriModifier.NONE);
+            uri = modifier.modify(uri, PATH);
+            mountPoint = new FsMountPoint(uri.resolve("."), NONE);
+            entryName = new FsEntryName(mountPoint.getUri().relativize(uri), NONE);
         } else {
             mountPoint = null;
             entryName = new FsEntryName(uri, modifier);
