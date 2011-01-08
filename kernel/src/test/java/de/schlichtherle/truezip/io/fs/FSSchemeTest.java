@@ -58,7 +58,7 @@ public class FSSchemeTest {
             { "foo.bar", },
             { "tar.bz2", },
         }) {
-            final FSScheme original = FSScheme.create(params[0]);
+            final FSScheme1 original = FSScheme1.create(params[0]);
             assertThat(original.toString(), equalTo(params[0]));
 
             {
@@ -104,13 +104,13 @@ public class FSSchemeTest {
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testConstructorWithInvalidUri() throws URISyntaxException {
         try {
-            FSScheme.create(null);
+            FSScheme1.create(null);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FSScheme(null);
+            new FSScheme1(null);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -122,13 +122,13 @@ public class FSSchemeTest {
             ".",
         }) {
             try {
-                FSScheme.create(param);
+                FSScheme1.create(param);
                 fail(param);
             } catch (IllegalArgumentException expected) {
             }
 
             try {
-                new FSScheme(param);
+                new FSScheme1(param);
                 fail(param);
             } catch (URISyntaxException expected) {
             }
@@ -144,8 +144,8 @@ public class FSSchemeTest {
             { "foo.bar", },
             { "tar.bz2", },
         }) {
-            final FSScheme original = FSScheme.create(params[0]);
-            final FSScheme copy = FSScheme.create(params[0].toUpperCase(Locale.ENGLISH));
+            final FSScheme1 original = FSScheme1.create(params[0]);
+            final FSScheme1 copy = FSScheme1.create(params[0].toUpperCase(Locale.ENGLISH));
             assertThat(original.toString(), equalTo(params[0]));
             assertThat(copy.toString(), not(equalTo(params[0])));
             assertThat(copy, equalTo(original));

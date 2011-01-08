@@ -15,25 +15,25 @@
  */
 package de.schlichtherle.truezip.io.fs.archive;
 
-import de.schlichtherle.truezip.io.fs.FSDecoratorEntry;
+import de.schlichtherle.truezip.io.fs.FsDecoratorEntry;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import de.schlichtherle.truezip.io.fs.FSEntry;
-import de.schlichtherle.truezip.io.fs.FSEntryName;
+import de.schlichtherle.truezip.io.fs.FSEntry1;
+import de.schlichtherle.truezip.io.fs.FSEntryName1;
 import edu.umd.cs.findbugs.annotations.NonNull;
 
 import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
 
 /**
- * Adapts an {@link ArchiveEntry} to a {@link FSEntry}.
+ * Adapts an {@link ArchiveEntry} to a {@link FSEntry1}.
  * 
  * @param   <E> The type of the decorated archive entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 public abstract class ArchiveFileSystemEntry<E extends ArchiveEntry>
-extends FSDecoratorEntry<E> {
+extends FsDecoratorEntry<E> {
 
     /**
      * Constructs a new archive file system entry which decorates the given
@@ -41,7 +41,7 @@ extends FSDecoratorEntry<E> {
      */
     @NonNull
     public static <E extends ArchiveEntry>
-    ArchiveFileSystemEntry<E> create(   final @NonNull FSEntryName name,
+    ArchiveFileSystemEntry<E> create(   final @NonNull FSEntryName1 name,
                                         final @NonNull Type        type,
                                         final @NonNull E           entry) {
         return create(name.getPath(), type, entry);

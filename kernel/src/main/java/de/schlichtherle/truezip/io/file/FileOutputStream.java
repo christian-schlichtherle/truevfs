@@ -18,8 +18,8 @@ package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.DecoratorOutputStream;
-import de.schlichtherle.truezip.io.fs.FSSyncException;
-import de.schlichtherle.truezip.io.fs.FSOutputOption;
+import de.schlichtherle.truezip.io.fs.FSSyncException1;
+import de.schlichtherle.truezip.io.fs.FSOutputOption1;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.FileDescriptor;
@@ -27,8 +27,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import static de.schlichtherle.truezip.io.fs.FSOutputOption.APPEND;
-import static de.schlichtherle.truezip.io.fs.FSOutputOption.CREATE_PARENTS;
+import static de.schlichtherle.truezip.io.fs.FSOutputOption1.APPEND;
+import static de.schlichtherle.truezip.io.fs.FSOutputOption1.CREATE_PARENTS;
 
 /**
  * A drop-in replacement for {@link java.io.FileOutputStream} which
@@ -149,7 +149,7 @@ public final class FileOutputStream extends DecoratorOutputStream {
     throws FileNotFoundException {
         final OutputSocket<?> output = Files.getOutputSocket(
                 dst,
-                BitField.noneOf(FSOutputOption.class)
+                BitField.noneOf(FSOutputOption1.class)
                     .set(APPEND, append)
                     .set(CREATE_PARENTS, File.isLenient()),
                 null);
@@ -157,7 +157,7 @@ public final class FileOutputStream extends DecoratorOutputStream {
             return output.newOutputStream();
         } catch (FileNotFoundException ex) {
             throw ex;
-        } catch (FSSyncException ex) {
+        } catch (FSSyncException1 ex) {
             throw ex.getCause() instanceof FileBusyException
                     ? (FileBusyException) ex.getCause()
                     : (FileNotFoundException) new FileNotFoundException(

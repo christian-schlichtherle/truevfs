@@ -16,9 +16,9 @@
 package de.schlichtherle.truezip.io.fs.file;
 
 import de.schlichtherle.truezip.io.fs.FsController;
-import de.schlichtherle.truezip.io.fs.FSDriver;
-import de.schlichtherle.truezip.io.fs.FSModel;
-import de.schlichtherle.truezip.io.fs.FSMountPoint;
+import de.schlichtherle.truezip.io.fs.FSDriver1;
+import de.schlichtherle.truezip.io.fs.FSModel1;
+import de.schlichtherle.truezip.io.fs.FSMountPoint1;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 
@@ -26,20 +26,20 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class FSFileDriver implements FSDriver {
+public final class FSFileDriver implements FSDriver1 {
 
     public FsController<?> newController(
-            FSMountPoint mountPoint) {
-        return new FSFileController(new FSModel(mountPoint));
+            FSMountPoint1 mountPoint) {
+        return new FSFileController(new FSModel1(mountPoint));
     }
 
     @Override
     @NonNull
     public FsController<?> newController(
-            @NonNull FSMountPoint mountPoint,
+            @NonNull FSMountPoint1 mountPoint,
             @CheckForNull FsController<?> parent) {
         if (null != parent)
             throw new IllegalArgumentException();
-        return new FSFileController(new FSModel(mountPoint));
+        return new FSFileController(new FSModel1(mountPoint));
     }
 }

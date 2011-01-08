@@ -17,9 +17,9 @@ package de.schlichtherle.truezip.samples;
 
 import de.schlichtherle.truezip.key.passwd.swing.HurlingWindowFeedback;
 import de.schlichtherle.truezip.io.file.File;
-import de.schlichtherle.truezip.io.fs.FSManagers;
-import de.schlichtherle.truezip.io.fs.FSStatistics;
-import de.schlichtherle.truezip.io.fs.FSStatisticsManager;
+import de.schlichtherle.truezip.io.fs.FSManagers1;
+import de.schlichtherle.truezip.io.fs.FSStatistics1;
+import de.schlichtherle.truezip.io.fs.FSStatisticsManager1;
 import de.schlichtherle.truezip.key.passwd.swing.InvalidKeyFeedback;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -149,17 +149,17 @@ abstract class CommandLineUtility {
     protected static final class ProgressMonitor extends Thread {
         private final PrintStream err;
         private final Long[] args = new Long[2];
-        private final FSStatistics stats;
+        private final FSStatistics1 stats;
 
         ProgressMonitor(final PrintStream err) {
             setDaemon(true);
             setPriority(Thread.MAX_PRIORITY);
             this.err = err;
-            final FSStatisticsManager manager
-                    = new FSStatisticsManager(
-                        FSManagers.getInstance());
+            final FSStatisticsManager1 manager
+                    = new FSStatisticsManager1(
+                        FSManagers1.getInstance());
             this.stats = manager.getStatistics();
-            FSManagers.setInstance(manager);
+            FSManagers1.setInstance(manager);
         }
 
         @Override

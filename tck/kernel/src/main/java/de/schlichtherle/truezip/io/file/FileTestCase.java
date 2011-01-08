@@ -20,7 +20,7 @@ import java.lang.ref.WeakReference;
 import de.schlichtherle.truezip.io.fs.FsController;
 import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.fs.archive.driver.ArchiveDriver;
-import de.schlichtherle.truezip.io.fs.FSScheme;
+import de.schlichtherle.truezip.io.fs.FSScheme1;
 import de.schlichtherle.truezip.io.socket.OutputClosedException;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.ByteArrayInputStream;
@@ -68,14 +68,14 @@ public abstract class FileTestCase {
         return ((value - 1 + 1024 * 1024) / (1024 * 1024)) + " MB"; // round up
     }
     
-    private final FSScheme scheme;
+    private final FSScheme1 scheme;
     private final ArchiveDriver<?> driver;
 
     private java.io.File temp;
     private File archive;
     private byte[] data;
 
-    protected FileTestCase( final @NonNull FSScheme scheme,
+    protected FileTestCase( final @NonNull FSScheme1 scheme,
                             final @NonNull ArchiveDriver<?> driver) {
         if (null == scheme || null == driver)
             throw new NullPointerException();

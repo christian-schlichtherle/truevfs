@@ -29,10 +29,10 @@ import static org.junit.Assert.*;
 public class FSFilterManagerTest extends FSManagerTestCase {
 
     @Override
-    protected FSManager newManager() {
-        return new FSFilterManager(
-                new FSFederationManager(),
-                FSMountPoint.create("file:/"));
+    protected FSManager1 newManager() {
+        return new FSFilterManager1(
+                new FSFederationManager1(),
+                FSMountPoint1.create("file:/"));
     }
 
     @Test
@@ -47,18 +47,18 @@ public class FSFilterManagerTest extends FSManagerTestCase {
         }) {
             assert params[0].length == 1;
 
-            final FSManager manager = new FSFederationManager(
+            final FSManager1 manager = new FSFederationManager1(
                     STRONG);
             for (final String param : params[1])
-                manager.getController(FSMountPoint.create(param), new FSDummyDriver());
+                manager.getController(FSMountPoint1.create(param), new FSDummyDriver());
             assertThat(manager.getSize(), is(params[1].length));
 
-            final Set<FSMountPoint> set = new HashSet<FSMountPoint>();
+            final Set<FSMountPoint1> set = new HashSet<FSMountPoint1>();
             for (final String param : params[2])
-                set.add(FSMountPoint.create(param));
+                set.add(FSMountPoint1.create(param));
 
-            final FSManager filter = new FSFilterManager(
-                    manager, FSMountPoint.create(params[0][0]));
+            final FSManager1 filter = new FSFilterManager1(
+                    manager, FSMountPoint1.create(params[0][0]));
             assertThat(filter.getSize(), is(params[2].length));
             for (final FsController<?> controller : filter)
                 assertTrue(set.contains(controller.getModel().getMountPoint()));

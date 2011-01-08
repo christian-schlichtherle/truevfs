@@ -19,7 +19,7 @@ import de.schlichtherle.truezip.io.fs.archive.driver.GlobalArchiveDriverRegistry
 import de.schlichtherle.truezip.io.fs.archive.driver.ArchiveDriverRegistry;
 import de.schlichtherle.truezip.io.fs.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.SuffixSet;
-import de.schlichtherle.truezip.io.fs.FSScheme;
+import de.schlichtherle.truezip.io.fs.FSScheme1;
 import de.schlichtherle.truezip.util.regex.ThreadLocalMatcher;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -255,10 +255,10 @@ implements ArchiveDetector, Serializable {
     }
 
     @Override
-    public FSScheme getScheme(final String path) {
+    public FSScheme1 getScheme(final String path) {
         final Matcher m = matcher.reset(path);
         return m.matches()
-                ? FSScheme.create(m.group(1).toLowerCase(Locale.ENGLISH))
+                ? FSScheme1.create(m.group(1).toLowerCase(Locale.ENGLISH))
                 : null;
     }
 
@@ -280,13 +280,13 @@ implements ArchiveDetector, Serializable {
      * </ol>
      */
     @Override
-    public ArchiveDriver<?> getDriver(FSScheme type) {
+    public ArchiveDriver<?> getDriver(FSScheme1 type) {
         return registry.getArchiveDriver(type.toString());
     }
 
     /**
      * Equivalent to {@code
-        FSScheme scheme = getScheme(path);
+        FSScheme1 scheme = getScheme(path);
         return null == scheme ? null : getDriver(scheme);
      * }
      * 
@@ -296,7 +296,7 @@ implements ArchiveDetector, Serializable {
      */
     @Deprecated
     public @CheckForNull ArchiveDriver<?> getArchiveDriver(@NonNull String path) {
-        FSScheme scheme = getScheme(path);
+        FSScheme1 scheme = getScheme(path);
         return null == scheme ? null : getDriver(scheme);
     }
 

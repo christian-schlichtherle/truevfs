@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.fs.archive.driver.zip.OdfDriver;
-import de.schlichtherle.truezip.io.fs.FSScheme;
+import de.schlichtherle.truezip.io.fs.FSScheme1;
 
 /**
  * @author Christian Schlichtherle
@@ -25,6 +25,6 @@ import de.schlichtherle.truezip.io.fs.FSScheme;
 public class OdfFileTest extends FileTestCase {
     
     public OdfFileTest() {
-        super(FSScheme.create("odf"), new OdfDriver());
+        super(FSScheme1.create("odf"), new OdfDriver());
     }
 }

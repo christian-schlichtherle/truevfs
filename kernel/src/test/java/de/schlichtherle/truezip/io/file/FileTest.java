@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.io.file;
 import de.schlichtherle.truezip.io.fs.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.fs.archive.driver.DummyArchiveDriver;
 import de.schlichtherle.truezip.io.fs.FsController;
-import de.schlichtherle.truezip.io.fs.FSPath;
+import de.schlichtherle.truezip.io.fs.FSPath1;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -31,7 +31,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static de.schlichtherle.truezip.io.file.ArchiveDetector.NULL;
-import static de.schlichtherle.truezip.io.fs.FSEntryName.*;
+import static de.schlichtherle.truezip.io.fs.FSEntryName1.*;
 import static java.io.File.*;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
@@ -76,7 +76,7 @@ public class FileTest {
             { "file:/foo", "/foo", null, null, null, },
             { "file:/", "/", null, null, null, },
         }) {
-            final File file = new File(FSPath.create(params[0]));
+            final File file = new File(FSPath1.create(params[0]));
             assertThat(file.getPath(), equalTo(params[1].replace('/', separatorChar)));
             if (null != params[2]) {
                 assertThat(file.getInnerArchive().getPath(), equalTo(params[2].replace('/', separatorChar)));

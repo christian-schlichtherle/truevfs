@@ -30,19 +30,19 @@ public class FSManagersTest {
     public void testInstance() {
         FSManagerTestCase.gc();
 
-        final FSManager inst1 = FSManagers.getInstance();
+        final FSManager1 inst1 = FSManagers1.getInstance();
         assertNotNull(inst1);
         assertThat(inst1.getSize(), is(0));
 
-        FSManagers.setInstance(null);
-        final FSManager inst2 = FSManagers.getInstance();
+        FSManagers1.setInstance(null);
+        final FSManager1 inst2 = FSManagers1.getInstance();
         assertNotNull(inst2);
         assertNotSame(inst1, inst2);
 
-        final FSManager inst3 = new FSFederationManager();
+        final FSManager1 inst3 = new FSFederationManager1();
 
-        FSManagers.setInstance(inst3);
-        final FSManager inst4 = FSManagers.getInstance();
+        FSManagers1.setInstance(inst3);
+        final FSManager1 inst4 = FSManagers1.getInstance();
         assertNotNull(inst4);
         assertSame(inst3, inst4);
     }

@@ -24,7 +24,7 @@ import de.schlichtherle.truezip.io.fs.FSManagerTestCase;
 public class FSFederationManagerTest extends FSManagerTestCase {
 
     @Override
-    protected FSManager newManager() {
-        return new FSFederationManager();
+    protected FSManager1 newManager() {
+        return new FSFederationManager1();
     }
 }

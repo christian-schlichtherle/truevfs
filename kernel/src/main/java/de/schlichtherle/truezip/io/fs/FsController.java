@@ -29,18 +29,18 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import javax.swing.Icon;
 
-import static de.schlichtherle.truezip.io.fs.FSSyncOption.*;
+import static de.schlichtherle.truezip.io.fs.FSSyncOption1.*;
 
 /**
  * Provides read/write access to one or more file systems which are organized
  * in a chain of responsibility for file system federation.
- * The {@link FSModel#getMountPoint() mount point} of the
+ * The {@link FSModel1#getMountPoint() mount point} of the
  * {@link #getModel() file system model} addresses the file system at the head
  * of this chain of federated file systems.
  * <p>
  * Where the methods of this abstract class accept a
- * {@link FSEntryName file system entry name} as a parameter, this will get
- * resolved against the {@link FSModel#getMountPoint() mount point} URI of this
+ * {@link FSEntryName1 file system entry name} as a parameter, this will get
+ * resolved against the {@link FSModel1#getMountPoint() mount point} URI of this
  * controller's {@link #getModel() file system model}.
  * <p>
  * All method implementations of this abstract class must be reentrant on
@@ -55,7 +55,7 @@ import static de.schlichtherle.truezip.io.fs.FSSyncOption.*;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class FsController<M extends FSModel> {
+public abstract class FsController<M extends FSModel1> {
 
     /** Returns the file system model. */
     public abstract @NonNull M
@@ -81,24 +81,24 @@ public abstract class FsController<M extends FSModel> {
     isReadOnly()
     throws IOException;
 
-    public abstract @CheckForNull FSEntry
-    getEntry(@NonNull FSEntryName name)
+    public abstract @CheckForNull FSEntry1
+    getEntry(@NonNull FSEntryName1 name)
     throws IOException;
 
     public abstract boolean
-    isReadable(@NonNull FSEntryName name)
+    isReadable(@NonNull FSEntryName1 name)
     throws IOException;
 
     public abstract boolean
-    isWritable(@NonNull FSEntryName name)
+    isWritable(@NonNull FSEntryName1 name)
     throws IOException;
 
     public abstract void
-    setReadOnly(@NonNull FSEntryName name)
+    setReadOnly(@NonNull FSEntryName1 name)
     throws IOException;
 
     public abstract boolean
-    setTime(@NonNull FSEntryName name,
+    setTime(@NonNull FSEntryName1 name,
             @NonNull BitField<Access> types,
             long value)
     throws IOException;
@@ -111,8 +111,8 @@ public abstract class FsController<M extends FSModel> {
      * @return An {@code InputSocket}.
      */
     public abstract @NonNull InputSocket<?>
-    getInputSocket( @NonNull FSEntryName name,
-                    @NonNull BitField<FSInputOption> options);
+    getInputSocket( @NonNull FSEntryName1 name,
+                    @NonNull BitField<FSInputOption1> options);
 
     /**
      * Returns an output socket for writing the contents of the entry addressed
@@ -122,8 +122,8 @@ public abstract class FsController<M extends FSModel> {
      * @return An {@code OutputSocket}.
      */
     public abstract @NonNull OutputSocket<?>
-    getOutputSocket(@NonNull FSEntryName name,
-                    @NonNull BitField<FSOutputOption> options,
+    getOutputSocket(@NonNull FSEntryName1 name,
+                    @NonNull BitField<FSOutputOption1> options,
                     @CheckForNull Entry template);
 
     /**
@@ -147,7 +147,7 @@ public abstract class FsController<M extends FSModel> {
      *             supported by the file system.
      *         <li>TODO: type is not {@code FILE} or {@code DIRECTORY}.
      *         <li>The entry already exists and either the option
-     *             {@link FSOutputOption#EXCLUSIVE} is set or the entry is a
+     *             {@link FSOutputOption1#EXCLUSIVE} is set or the entry is a
      *             directory.
      *         <li>The entry exists as a different type.
      *         <li>A parent entry exists but is not a directory.
@@ -156,14 +156,14 @@ public abstract class FsController<M extends FSModel> {
      *         </ul>
      */
     public abstract void
-    mknod(  @NonNull FSEntryName name,
+    mknod(  @NonNull FSEntryName1 name,
             @NonNull Type type,
-            @NonNull BitField<FSOutputOption> options,
+            @NonNull BitField<FSOutputOption1> options,
             @CheckForNull Entry template)
     throws IOException;
 
     public abstract void
-    unlink(@NonNull FSEntryName name)
+    unlink(@NonNull FSEntryName1 name)
     throws IOException;
 
     /**
@@ -172,7 +172,7 @@ public abstract class FsController<M extends FSModel> {
      *
      * @param  options the synchronization options.
      * @param  handler the exception handling strategy for dealing with one or
-     *         more input {@code FSSyncException}s which may trigger an {@code X}.
+     *         more input {@code FSSyncException1}s which may trigger an {@code X}.
      * @param  <X> the type of the {@code IOException} to throw at the
      *         discretion of the exception {@code handler}.
      * @throws IOException at the discretion of the exception {@code handler}.
@@ -183,21 +183,21 @@ public abstract class FsController<M extends FSModel> {
      * @see    #UMOUNT
      */
     public abstract <X extends IOException> void
-    sync(   @NonNull BitField<FSSyncOption> options,
-            @NonNull ExceptionHandler<? super FSSyncException, X> handler)
-    throws X, FSException;
+    sync(   @NonNull BitField<FSSyncOption1> options,
+            @NonNull ExceptionHandler<? super FSSyncException1, X> handler)
+    throws X, FSException1;
 
     /**
      * Equivalent to
-     * {@code BitField.of(FSSyncOption.FORCE_CLOSE_INPUT, FSSyncOption.FORCE_CLOSE_OUTPUT)}.
+     * {@code BitField.of(FSSyncOption1.FORCE_CLOSE_INPUT, FSSyncOption1.FORCE_CLOSE_OUTPUT)}.
      */
-    public static final BitField<FSSyncOption> UPDATE
+    public static final BitField<FSSyncOption1> UPDATE
             = BitField.of(FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT);
 
     /**
-     * Equivalent to {@code UPDATE.set(FSSyncOption.CLEAR_CACHE)}.
+     * Equivalent to {@code UPDATE.set(FSSyncOption1.CLEAR_CACHE)}.
      */
-    public static final BitField<FSSyncOption> UMOUNT = UPDATE.set(CLEAR_CACHE);
+    public static final BitField<FSSyncOption1> UMOUNT = UPDATE.set(CLEAR_CACHE);
 
     /**
      * Two file system controllers are considered equal if and only if they

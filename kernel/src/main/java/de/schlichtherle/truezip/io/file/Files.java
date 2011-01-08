@@ -15,17 +15,17 @@
  */
 package de.schlichtherle.truezip.io.file;
 
-import de.schlichtherle.truezip.io.fs.FSManagers;
-import de.schlichtherle.truezip.io.fs.FSPath;
+import de.schlichtherle.truezip.io.fs.FSManagers1;
+import de.schlichtherle.truezip.io.fs.FSPath1;
 import de.schlichtherle.truezip.io.fs.archive.ArchiveFileSystemException;
 import de.schlichtherle.truezip.io.entry.Entry;
-import de.schlichtherle.truezip.io.fs.FSSyncException;
+import de.schlichtherle.truezip.io.fs.FSSyncException1;
 import de.schlichtherle.truezip.io.InputBusyException;
 import de.schlichtherle.truezip.io.OutputBusyException;
-import de.schlichtherle.truezip.io.fs.FSInputOption;
+import de.schlichtherle.truezip.io.fs.FSInputOption1;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.IOSocket;
-import de.schlichtherle.truezip.io.fs.FSOutputOption;
+import de.schlichtherle.truezip.io.fs.FSOutputOption1;
 import de.schlichtherle.truezip.io.fs.FsUriModifier;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
@@ -36,8 +36,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 
-import static de.schlichtherle.truezip.io.fs.FSEntryName.*;
-import static de.schlichtherle.truezip.io.fs.FSOutputOption.*;
+import static de.schlichtherle.truezip.io.fs.FSEntryName1.*;
+import static de.schlichtherle.truezip.io.fs.FSOutputOption1.*;
 import static de.schlichtherle.truezip.io.Files.*;
 
 /**
@@ -217,16 +217,16 @@ class Files {
             final java.io.File dst)
     throws IOException {
         final InputSocket<?> input = getInputSocket(src,
-                BitField.noneOf(FSInputOption.class));
+                BitField.noneOf(FSInputOption1.class));
         final OutputSocket<?> output = getOutputSocket(dst,
-                BitField.noneOf(FSOutputOption.class)
+                BitField.noneOf(FSOutputOption1.class)
                     .set(CREATE_PARENTS, File.isLenient()),
                 preserve ? input.getLocalTarget() : null);
         try {
             IOSocket.copy(input, output);
         } catch (FileNotFoundException ex) {
             throw ex;
-        } catch (FSSyncException ex) {
+        } catch (FSSyncException1 ex) {
             if (ex.getCause() instanceof InputBusyException)
                 throw (InputBusyException) ex.getCause();
             else if (ex.getCause() instanceof OutputBusyException)
@@ -242,7 +242,7 @@ class Files {
 
     static InputSocket<?> getInputSocket(
             final java.io.File src,
-            final BitField<FSInputOption> options) {
+            final BitField<FSInputOption1> options) {
         if (src instanceof File) {
             // TODO: Consider removing this block and using the more general pattern below!
             final File file = (File) src;
@@ -251,8 +251,8 @@ class Files {
                 return archive.getController()
                         .getInputSocket(file.getInnerEntryName0(), options);
         }
-        final FSPath path = FSPath.create(fix(getRealFile(src).toURI()), FsUriModifier.NORMALIZE);
-        return FSManagers
+        final FSPath1 path = FSPath1.create(fix(getRealFile(src).toURI()), FsUriModifier.NORMALIZE);
+        return FSManagers1
                 .getInstance()
                 .getController( path.getMountPoint(), new ArchiveDetectorFSDriver())
                 .getInputSocket(path.getEntryName(), options);
@@ -260,7 +260,7 @@ class Files {
 
     static OutputSocket<?> getOutputSocket(
             final java.io.File dst,
-            final BitField<FSOutputOption> options,
+            final BitField<FSOutputOption1> options,
             final Entry template) {
         if (dst instanceof File) {
             // TODO: Consider removing this block and using the more general pattern below!
@@ -270,8 +270,8 @@ class Files {
                 return archive.getController()
                         .getOutputSocket(file.getInnerEntryName0(), options, template);
         }
-        final FSPath path = FSPath.create(fix(getRealFile(dst).toURI()), FsUriModifier.NORMALIZE);
-        return FSManagers
+        final FSPath1 path = FSPath1.create(fix(getRealFile(dst).toURI()), FsUriModifier.NORMALIZE);
+        return FSManagers1
                 .getInstance()
                 .getController(  path.getMountPoint(), new ArchiveDetectorFSDriver())
                 .getOutputSocket(path.getEntryName(), options, template);

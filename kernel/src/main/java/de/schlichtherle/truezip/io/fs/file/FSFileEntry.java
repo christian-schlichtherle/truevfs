@@ -16,13 +16,13 @@
 package de.schlichtherle.truezip.io.fs.file;
 
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.io.fs.FSOutputOption;
+import de.schlichtherle.truezip.io.fs.FSOutputOption1;
 import de.schlichtherle.truezip.io.socket.IOEntry;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.EntryName;
-import de.schlichtherle.truezip.io.fs.FSEntry;
+import de.schlichtherle.truezip.io.fs.FSEntry1;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Collections;
@@ -34,15 +34,15 @@ import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
 import static de.schlichtherle.truezip.io.entry.Entry.Access.*;
 
 /**
- * Adapts a {@link File} instance to a {@link FSEntry}.
+ * Adapts a {@link File} instance to a {@link FSEntry1}.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class FSFileEntry extends FSEntry implements IOEntry<FSFileEntry> {
+public class FSFileEntry extends FSEntry1 implements IOEntry<FSFileEntry> {
 
-    private static final BitField<FSOutputOption> NO_OUTPUT_OPTIONS
-            = BitField.noneOf(FSOutputOption.class);
+    private static final BitField<FSOutputOption1> NO_OUTPUT_OPTIONS
+            = BitField.noneOf(FSOutputOption1.class);
 
     private final @NonNull File file;
     private final @NonNull EntryName name;
@@ -117,7 +117,7 @@ public class FSFileEntry extends FSEntry implements IOEntry<FSFileEntry> {
     }
 
     public final OutputSocket<FSFileEntry> getOutputSocket(
-            @NonNull BitField<FSOutputOption> options,
+            @NonNull BitField<FSOutputOption1> options,
             @CheckForNull Entry template) {
         return new FSFileOutputSocket(this, options, template);
     }
