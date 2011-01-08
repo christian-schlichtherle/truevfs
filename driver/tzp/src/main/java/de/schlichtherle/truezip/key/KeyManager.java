@@ -88,11 +88,11 @@ public abstract class KeyManager {
             synchronized (KeyManager.class) { // DCL does work in combination with volatile in JSE 5!
                 manager = instance;
                 if (null == manager) {
-                    // TODO: Check compatibility with OSGi.
                     instance = manager
                             = new ServiceLocator(KeyManager.class.getClassLoader())
-                                .getServices(KeyManager.class)
-                                .next();
+                            .getService(
+                                KeyManager.class,
+                                de.schlichtherle.truezip.key.passwd.swing.PromptingKeyManager.class);
                 }
             }
         }

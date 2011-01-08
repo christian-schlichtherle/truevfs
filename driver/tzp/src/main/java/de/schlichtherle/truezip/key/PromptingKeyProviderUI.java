@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.key;
+
+import edu.umd.cs.findbugs.annotations.NonNull;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * Used by {@link PromptingKeyProvider}s for the actual prompting of the user
@@ -33,7 +35,9 @@ package de.schlichtherle.truezip.key;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface PromptingKeyProviderUI<K extends Cloneable, P extends PromptingKeyProvider<K>> {
+@ThreadSafe
+public interface PromptingKeyProviderUI<K extends Cloneable,
+                                        P extends PromptingKeyProvider<K>> {
 
     /**
      * Prompts the user for the key which may be used to create a new
@@ -57,30 +61,22 @@ public interface PromptingKeyProviderUI<K extends Cloneable, P extends Prompting
      * This causes the old key to be reused and allows the client to
      * continue its operation as if the user would not have requested to
      * change the key.
-     * <p>
-     * Since TrueZIP 7, an implementation may also throw an
-     * {@link UnknownKeyException}.
-     * This will trigger the calling method in the
-     * {@code PromptingKeyProvider} class to pass on this exception
-     * without changing its state.
-     * This may be useful if prompting was interrupted by a call to
-     * {@link Thread#interrupt} while waiting on the Event Dispatch Thread.
-     * In this case, another try to prompt the user should have the chance to
-     * succeed instead of being cancelled without actually prompting the user
-     * again.
-     * To trigger this behaviour, the implementation should simply throw a
-     * {@link KeyPromptingInterruptedException}.
      *
-     * @param provider The key provider to store the result in.
-     *        The property {@code resourceID} must be
-     *        non-{@code null}.
+     * @param  provider The key provider to store the result in.
+     *         The property {@code resourceID} must be
+     *         non-{@code null}.
+     * @throws NullPointerException if either {@code provider} or its property
+     *         {@code resourceID} is {@code null}.
      * @throws UnknownKeyException if the implementation does not want the
      *         key provider's state to be changed.
-     * @throws RuntimeException An instance of a subclass if
-     *         {@code provider} or its property {@code resourceID}
-     *         is {@code null}.
+     *         This may be useful if prompting was interrupted by a call to
+     *         {@link Thread#interrupt} while waiting on user input.
+     *         In this case, another attempt to prompt the user should have
+     *         the chance to succeed instead of being cancelled without
+     *         actually prompting the user again.
+     * @see    KeyPromptingInterruptedException
      */
-    void promptCreateKey(P provider) throws UnknownKeyException;
+    void promptCreateKey(@NonNull P provider) throws UnknownKeyException;
 
     /**
      * Prompts the user for the key which may be used to open an existing
@@ -97,74 +93,25 @@ public interface PromptingKeyProviderUI<K extends Cloneable, P extends Prompting
      * {@link KeyManager}.
      * Otherwise, the key is used as the common key, a clone of which is
      * provided to the client upon request.
-     * <p>
-     * Since TrueZIP 7, an implementation may also throw an
-     * {@link UnknownKeyException}.
-     * This will trigger the calling method in the
-     * {@code PromptingKeyProvider} class to pass on this exception
-     * without changing its state.
-     * This may be useful if prompting was interrupted by a call to
-     * {@link Thread#interrupt} while waiting on the Event Dispatch Thread.
-     * In this case, another try to prompt the user should have the chance to
-     * succeed instead of being cancelled without actually prompting the user
-     * again.
-     * To trigger this behaviour, the implementation should simply throw a
-     * {@link KeyPromptingInterruptedException}.
      *
-     * @return {@code true} if the user has requested to change the
-     *         provided key.
-     * @param provider The key provider to store the result in.
-     *        The property {@code resourceID} must be
-     *        non-{@code null}.
+     * @param  provider The key provider to store the result in.
+     *         The property {@code resourceID} must be
+     *         non-{@code null}.
+     * @param  invalid {@code true} iff a previous call to this method resulted
+     *         in an invalid key.
+     * @return {@code true} if the user has requested to change the provided
+     *         key.
+     * @throws NullPointerException if either {@code provider} or its property
+     *         {@code resourceID} is {@code null}.
      * @throws UnknownKeyException if the implementation does not want the
      *         key provider's state to be changed.
-     * @throws RuntimeException An instance of a subclass if
-     *         {@code provider} or its property {@code resourceID}
-     *         is {@code null}.
+     *         This may be useful if prompting was interrupted by a call to
+     *         {@link Thread#interrupt} while waiting on user input.
+     *         In this case, another attempt to prompt the user should have
+     *         the chance to succeed instead of being cancelled without
+     *         actually prompting the user again.
+     * @see    KeyPromptingInterruptedException
      */
-    boolean promptUnknownOpenKey(P provider) throws UnknownKeyException;
-
-    /**
-     * Prompts the user for the key which may be used to open an existing
-     * protected resource in order to access its contents.
-     * This is called if the key returned by a previous call to
-     * {@link #promptUnknownOpenKey} is invalid.
-     * <p>
-     * Upon return, the implementation is expected to update the common key
-     * in {@code provider}.
-     * Upon return, if {@code provider.getKey()} returns {@code null},
-     * prompting for the key is assumed to have been cancelled by the user.
-     * In this case, the current and each subsequent call to
-     * {@link KeyProvider#getOpenKey} or {@link KeyProvider#getCreateKey}
-     * by the client results in an {@link UnknownKeyException} and the user
-     * is not prompted anymore until the provider is reset by the
-     * {@link KeyManager}.
-     * Otherwise, the key is used as the common key, a clone of which is
-     * provided to the client upon request.
-     * <p>
-     * Since TrueZIP 7, an implementation may also throw an
-     * {@link UnknownKeyException}.
-     * This will trigger the calling method in the
-     * {@code PromptingKeyProvider} class to pass on this exception
-     * without changing its state.
-     * This may be useful if prompting was interrupted by a call to
-     * {@link Thread#interrupt} while waiting on the Event Dispatch Thread.
-     * In this case, another try to prompt the user should have the chance to
-     * succeed instead of being cancelled without actually prompting the user
-     * again.
-     * To trigger this behaviour, the implementation should simply throw a
-     * {@link KeyPromptingInterruptedException}.
-     *
-     * @return {@code true} if the user has requested to change the
-     *         provided key.
-     * @param provider The key provider to store the result in.
-     *        The property {@code resourceID} must be
-     *        non-{@code null}.
-     * @throws UnknownKeyException if the implementation does not want the
-     *         key provider's state to be changed.
-     * @throws RuntimeException An instance of a subclass if
-     *         {@code provider} or its property {@code resourceID}
-     *         is {@code null}.
-     */
-    boolean promptInvalidOpenKey(P provider) throws UnknownKeyException;
+    boolean promptOpenKey(@NonNull P provider, boolean invalid)
+    throws UnknownKeyException;
 }

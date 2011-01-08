@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.key.passwd.console;
 
 import de.schlichtherle.truezip.key.PromptingKeyProvider;
@@ -56,10 +55,10 @@ implements de.schlichtherle.truezip.key.PromptingKeyProviderUI<char[], P> {
      * The last resource ID used when prompting.
      * Initialized to the empty string.
      */
-    private static URI lastResource = URI.create("null:/"); // NOI18N
+    private static URI lastResource = URI.create(""); // NOI18N
 
     @Override
-	public final void promptCreateKey(final P provider) {
+    public final void promptCreateKey(final P provider) {
         synchronized (lock) {
             final URI resource = provider.getResource();
             assert resource != null : "violation of contract for PromptingKeyProviderUI";
@@ -101,47 +100,36 @@ implements de.schlichtherle.truezip.key.PromptingKeyProviderUI<char[], P> {
     }
 
     @Override
-	public final boolean promptUnknownOpenKey(P provider) {
+    public boolean promptOpenKey(final P provider, final boolean invalid) {
         synchronized (lock) {
-            return promptOpenKey(provider, false);
-        }
-    }
+            if (invalid)
+                con.printf(resources.getString("openKey.invalid"));
 
-    @Override
-	public final boolean promptInvalidOpenKey(P provider) {
-        synchronized (lock) {
-            return promptOpenKey(provider, true);
-        }
-    }
+            final URI resource = provider.getResource();
+            assert resource != null : "violation of contract for PromptingKeyProviderUI";
+            if (!resource.equals(lastResource))
+                con.printf(resources.getString("openKey.banner"),
+                        provider.getResource());
+            lastResource = resource;
 
-    private boolean promptOpenKey(final P provider, final boolean invalid) {
-        if (invalid)
-            con.printf(resources.getString("openKey.invalid"));
-
-        final URI resource = provider.getResource();
-        assert resource != null : "violation of contract for PromptingKeyProviderUI";
-        if (!resource.equals(lastResource))
-            con.printf(resources.getString("openKey.banner"),
-                    provider.getResource());
-        lastResource = resource;
-
-        char[] passwd = con.readPassword(resources.getString("openKey.passwd"));
-        if (passwd == null || passwd.length <= 0) {
-            provider.setKey(null);
-            return false;
-        }
-
-        provider.setKey(passwd);
-
-        while (true) {
-            String changeKey = con.readLine(resources.getString("openKey.change"));
-            if (changeKey == null)
+            char[] passwd = con.readPassword(resources.getString("openKey.passwd"));
+            if (passwd == null || passwd.length <= 0) {
+                provider.setKey(null);
                 return false;
-            changeKey = changeKey.toLowerCase();
-            if (changeKey.length() <= 0 || changeKey.equals(resources.getString("no")))
-                return false;
-            else if (changeKey.equals(resources.getString("yes")))
-                return true;
+            }
+
+            provider.setKey(passwd);
+
+            while (true) {
+                String changeKey = con.readLine(resources.getString("openKey.change"));
+                if (changeKey == null)
+                    return false;
+                changeKey = changeKey.toLowerCase();
+                if (changeKey.length() <= 0 || changeKey.equals(resources.getString("no")))
+                    return false;
+                else if (changeKey.equals(resources.getString("yes")))
+                    return true;
+            }
         }
     }
 

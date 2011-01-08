@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.key;
 
 import java.lang.reflect.Array;
@@ -45,7 +44,7 @@ import java.net.URI;
  * @version $Id$
  */
 public abstract class AbstractKeyProvider<K extends Cloneable>
-        implements KeyProvider<K> {
+implements KeyProvider<K> {
 
     private final ThreadLocal<Long> invalidated = new ThreadLocal<Long>() {
         @Override
@@ -68,7 +67,7 @@ public abstract class AbstractKeyProvider<K extends Cloneable>
     @Override
 	public final K getCreateKey() throws UnknownKeyException {
         final K key = getCreateKeyImpl();
-        if (key == null)
+        if (null == key)
             throw new UnknownKeyException();
         return clone(key);
     }
@@ -108,7 +107,7 @@ public abstract class AbstractKeyProvider<K extends Cloneable>
 	public final K getOpenKey() throws UnknownKeyException {
         try {
             final K key = getOpenKeyImpl();
-            if (key == null)
+            if (null == key)
                 throw new UnknownKeyException();
             return clone(key);
         } finally {

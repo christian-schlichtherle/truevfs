@@ -351,10 +351,8 @@ public class OpenKeyPanel extends EnhancedPanel {
 
     private void formAncestorWindowShown(de.schlichtherle.truezip.swing.event.PanelEvent evt) {//GEN-FIRST:event_formAncestorWindowShown
         final Feedback feedback = getFeedback();
-        if (feedback != null) {
-            feedback.setPanel(this);
-            feedback.run();
-        }
+        if (null != feedback)
+            feedback.feedback(this);
     }//GEN-LAST:event_formAncestorWindowShown
 
     private void passwdPanelAncestorWindowShown(de.schlichtherle.truezip.swing.event.PanelEvent evt) {//GEN-FIRST:event_passwdPanelAncestorWindowShown

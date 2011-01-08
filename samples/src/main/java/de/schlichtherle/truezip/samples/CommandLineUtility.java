@@ -15,10 +15,12 @@
  */
 package de.schlichtherle.truezip.samples;
 
+import de.schlichtherle.truezip.key.passwd.swing.HurlingWindowFeedback;
 import de.schlichtherle.truezip.io.file.File;
 import de.schlichtherle.truezip.io.fs.FSManagers;
 import de.schlichtherle.truezip.io.fs.FSStatistics;
 import de.schlichtherle.truezip.io.fs.FSStatisticsManager;
+import de.schlichtherle.truezip.key.passwd.swing.InvalidKeyFeedback;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -78,24 +80,19 @@ abstract class CommandLineUtility {
                 ? (PrintStream) err
                 : new PrintStream(err, autoFlush);
         this.monitor = new ProgressMonitor(this.err);
-        configureKeyManager();
+        configureFeedback();
     }
 
     /**
-     * Configure the key manager to use when prompting the user for keys for
-     * RAES encrypted ZIP files.
+     * Configure the type of the feedback when prompting the user for keys for
+     * RAES encrypted ZIP files using the Swing based prompting key manager.
+     * If this JVM is running in headless mode, then the configuration is
+     * ignored.
      */
-    private static void configureKeyManager() {
-        String feedback;
-        feedback = "de.schlichtherle.truezip.key.passwd.swing.InvalidOpenKeyFeedback";
-        System.setProperty(feedback,
-                System.getProperty(feedback,
-                    "de.schlichtherle.truezip.key.passwd.swing.HurlingWindowFeedback"));
-
-        feedback = "de.schlichtherle.truezip.key.passwd.swing.InvalidCreateKeyFeedback";
-        System.setProperty(feedback,
-                System.getProperty(feedback,
-                    "de.schlichtherle.truezip.key.passwd.swing.HurlingWindowFeedback"));
+    private static void configureFeedback() {
+        String spec = InvalidKeyFeedback.class.getName();
+        String impl = HurlingWindowFeedback.class.getName();
+        System.setProperty(spec, System.getProperty(spec, impl));
     }
 
     /**

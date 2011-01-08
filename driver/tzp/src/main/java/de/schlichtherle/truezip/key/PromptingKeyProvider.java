@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.key;
 
 import java.net.URI;
@@ -223,9 +222,7 @@ extends AbstractKeyProvider<K> {
         PromptingKeyManager.assertPrompting();
 
         final K oldKey = getKey();
-        final boolean changeKey = invalid
-                ? getUI().promptInvalidOpenKey(this)
-                : getUI().promptUnknownOpenKey(this);
+        final boolean changeKey = getUI().promptOpenKey(this, invalid);
         wipe(oldKey);
 
         final K newKey = getKey();

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.key.passwd.swing;
 
 import de.schlichtherle.truezip.key.KeyManager;
@@ -34,18 +33,6 @@ import org.netbeans.jemmy.operators.JDialogOperator;
 public class PromptingKeyManagerTest extends TestCase {
     static {
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput()); // shut up!
-
-        // Who says you can't have fun with automated GUI testing? :-)
-        String feedback;
-        feedback = "de.schlichtherle.truezip.key.passwd.swing.InvalidOpenKeyFeedback";
-        System.setProperty(feedback,
-                System.getProperty(feedback,
-                    "de.schlichtherle.truezip.key.passwd.swing.HurlingWindowFeedback"));
-
-        feedback = "de.schlichtherle.truezip.key.passwd.swing.InvalidCreateKeyFeedback";
-        System.setProperty(feedback,
-                System.getProperty(feedback,
-                    "de.schlichtherle.truezip.key.passwd.swing.HurlingWindowFeedback"));
     }
 
     public PromptingKeyManagerTest(String testName) {
@@ -74,7 +61,7 @@ public class PromptingKeyManagerTest extends TestCase {
         // would get closed on any input by its remote control.
         EventQueue.invokeLater(new Runnable() {
             @Override
-			public void run() {
+            public void run() {
                 JOptionPane.showMessageDialog(null, "Hello World!");
             }
         });

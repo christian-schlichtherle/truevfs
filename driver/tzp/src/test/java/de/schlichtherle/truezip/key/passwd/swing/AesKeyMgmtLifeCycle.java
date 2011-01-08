@@ -40,14 +40,14 @@ public class AesKeyMgmtLifeCycle extends KeyMgmtLifeCycle {
     }
 
     @Override
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     protected KeyProvider<?> getKeyProvider(KeyManager manager, URI id) {
         return manager.getKeyProvider(id, (Class) AesKeyProvider.class);
     }
 
     @Override
     protected void createResourceHook(KeyProvider<?> provider) {
-        // In a real world application, you should never blindly cast
-        // a key provider.
+        // In a real application, you should never blindly cast a key provider.
         this.keyStrength = ((AesKeyProvider<?>) provider).getKeyStrength();
 
         printKeyStrength(provider);
