@@ -65,7 +65,6 @@ import static de.schlichtherle.truezip.io.fs.FSEntryName.SEPARATOR;
  */
 @Immutable
 public final class FSEntryName extends EntryName {
-
     private static final long serialVersionUID = 2212342253466752478L;
 
     /**
@@ -214,9 +213,8 @@ public final class FSEntryName extends EntryName {
 
         if (!normalize && uri.normalize() != uri)
             throw new URISyntaxException(quote(uri), "URI path not in normal form");
-        uri = getUri();
         final String p = uri.getRawPath();
-        if (    "..".equals(p)
+        if (       "..".equals(p)
                 || p.startsWith(SEPARATOR)
                 || p.startsWith("." + SEPARATOR)
                 || p.startsWith(".." + SEPARATOR))
@@ -246,8 +244,8 @@ public final class FSEntryName extends EntryName {
      * @param  parent an entry name for the parent.
      * @param  member an entry name for the member.
      */
-    FSEntryName(@NonNull final FSEntryName parent,
-                        @NonNull final FSEntryName member) {
+    FSEntryName(final @NonNull FSEntryName parent,
+                final @NonNull FSEntryName member) {
         super(parent, member);
 
         assert invariants();
