@@ -17,7 +17,7 @@ package de.schlichtherle.truezip.io.file;
 
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
-import de.schlichtherle.truezip.io.fs.FSController;
+import de.schlichtherle.truezip.io.fs.FsController;
 import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.fs.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.fs.FSScheme;
@@ -152,7 +152,7 @@ public abstract class FileTestCase {
         assertTrue(new File(path).createNewFile());
         File.umount();
         InputStream in = new FileInputStream(path);
-        Reference<FSController<?>> ref = new WeakReference<FSController<?>>(new File(path).getInnerArchive().getController());
+        Reference<FsController<?>> ref = new WeakReference<FsController<?>>(new File(path).getInnerArchive().getController());
         gc();
         assertNotNull(ref.get());
         in.close();
@@ -173,7 +173,7 @@ public abstract class FileTestCase {
         assertTrue(new File(path).createNewFile());
         File.umount();
         OutputStream out = new FileOutputStream(path);
-        Reference<FSController<?>> ref = new WeakReference<FSController<?>>(new File(path).getInnerArchive().getController());
+        Reference<FsController<?>> ref = new WeakReference<FsController<?>>(new File(path).getInnerArchive().getController());
         gc();
         assertNotNull(ref.get());
         out.close();
