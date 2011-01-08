@@ -27,11 +27,11 @@ import java.io.IOException;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class FsSyncWarningException extends FSSyncException1 {
+public class FsSyncWarningException extends FsSyncException {
 
     private static final long serialVersionUID = 2302357394858347366L;
 
-    public FsSyncWarningException(FSModel1 model, IOException cause) {
+    public FsSyncWarningException(FsModel model, IOException cause) {
         super(model, cause, -1);
     }
 }

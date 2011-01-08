@@ -16,19 +16,19 @@
 package de.schlichtherle.truezip.io.fs.concurrency;
 
 import de.schlichtherle.truezip.io.socket.IOCache.Strategy;
-import de.schlichtherle.truezip.io.fs.FSEntry1;
+import de.schlichtherle.truezip.io.fs.FsEntry;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.fs.FsDecoratorController;
 import de.schlichtherle.truezip.io.fs.FsDecoratorEntry;
-import de.schlichtherle.truezip.io.fs.FSFalsePositiveException1;
+import de.schlichtherle.truezip.io.fs.FsFalsePositiveException;
 import de.schlichtherle.truezip.io.fs.FsController;
-import de.schlichtherle.truezip.io.fs.FSEntryName1;
-import de.schlichtherle.truezip.io.fs.FSException1;
-import de.schlichtherle.truezip.io.fs.FSInputOption1;
-import de.schlichtherle.truezip.io.fs.FSOutputOption1;
-import de.schlichtherle.truezip.io.fs.FSSyncException1;
-import de.schlichtherle.truezip.io.fs.FSSyncOption1;
+import de.schlichtherle.truezip.io.fs.FsEntryName;
+import de.schlichtherle.truezip.io.fs.FsException;
+import de.schlichtherle.truezip.io.fs.FsInputOption;
+import de.schlichtherle.truezip.io.fs.FsOutputOption;
+import de.schlichtherle.truezip.io.fs.FsSyncException;
+import de.schlichtherle.truezip.io.fs.FsSyncOption;
 import de.schlichtherle.truezip.io.fs.FsSyncWarningException;
 import de.schlichtherle.truezip.io.socket.DecoratorInputSocket;
 import de.schlichtherle.truezip.io.socket.DecoratorOutputSocket;
@@ -51,8 +51,8 @@ import net.jcip.annotations.NotThreadSafe;
 
 import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
 import static de.schlichtherle.truezip.io.socket.IOCache.Strategy.*;
-import static de.schlichtherle.truezip.io.fs.FSOutputOption1.*;
-import static de.schlichtherle.truezip.io.fs.FSSyncOption1.*;
+import static de.schlichtherle.truezip.io.fs.FsOutputOption.*;
+import static de.schlichtherle.truezip.io.fs.FsSyncOption.*;
 
 /**
  * A content caching file system controller implements a combined caching and
@@ -61,9 +61,9 @@ import static de.schlichtherle.truezip.io.fs.FSSyncOption1.*;
  * <ul>
  * <li>Caching and buffering needs to be activated by using the method
  *     {@link #getInputSocket input socket} with the input option
- *     {@link FSInputOption1#CACHE} or the method
+ *     {@link FsInputOption#CACHE} or the method
  *     {@link #getOutputSocket output socket} with the output option
- *     {@link FSOutputOption1#CACHE}.
+ *     {@link FsOutputOption#CACHE}.
  * <li>Unless a write operation succeeds, upon each read operation the entry
  *     data gets copied from the backing store for buffering purposes only.
  * <li>Upon a successful write operation, the entry data gets cached for
@@ -89,8 +89,8 @@ extends FsDecoratorController<  FSConcurrencyModel,
     private static final Strategy STRATEGY = WRITE_BACK;
 
     private final IOPool<?> pool;
-    private final Map<FSEntryName1, Cache> caches
-            = new HashMap<FSEntryName1, Cache>();
+    private final Map<FsEntryName, Cache> caches
+            = new HashMap<FsEntryName, Cache>();
 
     /**
      * Constructs a new content caching file system controller.
@@ -108,9 +108,9 @@ extends FsDecoratorController<  FSConcurrencyModel,
     }
 
     @Override
-    public FSEntry1 getEntry(final FSEntryName1 name)
+    public FsEntry getEntry(final FsEntryName name)
     throws IOException {
-        final FSEntry1 entry;
+        final FsEntry entry;
         final Cache cache = caches.get(name);
         return null != cache && null != (entry = cache.getEntry())
                 ? entry
@@ -119,16 +119,16 @@ extends FsDecoratorController<  FSConcurrencyModel,
 
     @Override
     public InputSocket<?> getInputSocket(
-            FSEntryName1 name,
-            BitField<FSInputOption1> options) {
+            FsEntryName name,
+            BitField<FsInputOption> options) {
         return new Input(name, options);
     }
 
     private class Input extends DecoratorInputSocket<Entry> {
-        final FSEntryName1 name;
-        final BitField<FSInputOption1> options;
+        final FsEntryName name;
+        final BitField<FsInputOption> options;
 
-        Input(final FSEntryName1 name, final BitField<FSInputOption1> options) {
+        Input(final FsEntryName name, final BitField<FsInputOption> options) {
             super(delegate.getInputSocket(name, options));
             this.name = name;
             this.options = options;
@@ -138,7 +138,7 @@ extends FsDecoratorController<  FSConcurrencyModel,
         public InputSocket<?> getBoundSocket() throws IOException {
             Cache cache = caches.get(name);
             if (null == cache) {
-                if (!options.get(FSInputOption1.CACHE))
+                if (!options.get(FsInputOption.CACHE))
                     return super.getBoundSocket(); // don't cache
                 cache = new Cache(name);
             }
@@ -148,19 +148,19 @@ extends FsDecoratorController<  FSConcurrencyModel,
 
     @Override
     public OutputSocket<?> getOutputSocket(
-            FSEntryName1 name,
-            BitField<FSOutputOption1> options,
+            FsEntryName name,
+            BitField<FsOutputOption> options,
             Entry template) {
         return new Output(name, options, template);
     }
 
     private class Output extends DecoratorOutputSocket<Entry> {
-        final FSEntryName1 name;
-        final BitField<FSOutputOption1> options;
+        final FsEntryName name;
+        final BitField<FsOutputOption> options;
         final Entry template;
 
-        Output( final FSEntryName1 name,
-                final BitField<FSOutputOption1> options,
+        Output( final FsEntryName name,
+                final BitField<FsOutputOption> options,
                 final Entry template) {
             super(delegate.getOutputSocket(name, options, template));
             this.name = name;
@@ -172,7 +172,7 @@ extends FsDecoratorController<  FSConcurrencyModel,
         public OutputSocket<?> getBoundSocket() throws IOException {
             Cache cache = caches.get(name);
             if (null == cache) {
-                if (!options.get(FSOutputOption1.CACHE))
+                if (!options.get(FsOutputOption.CACHE))
                     return super.getBoundSocket(); // don't cache
                 cache = new Cache(name);
             } else {
@@ -195,9 +195,9 @@ extends FsDecoratorController<  FSConcurrencyModel,
 
     @Override
     public void mknod(
-            @NonNull final FSEntryName1 name,
+            @NonNull final FsEntryName name,
             @NonNull final Type type,
-            @NonNull final BitField<FSOutputOption1> options,
+            @NonNull final BitField<FsOutputOption> options,
             @CheckForNull final Entry template)
     throws IOException {
         assert getModel().writeLock().isHeldByCurrentThread();
@@ -214,7 +214,7 @@ extends FsDecoratorController<  FSConcurrencyModel,
     }
 
     @Override
-    public void unlink(@NonNull final FSEntryName1 name)
+    public void unlink(@NonNull final FsEntryName name)
     throws IOException {
         assert getModel().writeLock().isHeldByCurrentThread();
 
@@ -231,17 +231,17 @@ extends FsDecoratorController<  FSConcurrencyModel,
 
     @Override
     public <X extends IOException> void sync(
-            @NonNull final BitField<FSSyncOption1> options,
-            @NonNull final ExceptionHandler<? super FSSyncException1, X> handler)
-    throws X, FSException1 {
+            @NonNull final BitField<FsSyncOption> options,
+            @NonNull final ExceptionHandler<? super FsSyncException, X> handler)
+    throws X, FsException {
         beforeSync(options, handler);
         delegate.sync(options.clear(CLEAR_CACHE), handler);
     }
 
     private <X extends IOException> void beforeSync(
-            @NonNull final BitField<FSSyncOption1> options,
-            @NonNull final ExceptionHandler<? super FSSyncException1, X> handler)
-    throws X, FSException1 {
+            @NonNull final BitField<FsSyncOption> options,
+            @NonNull final ExceptionHandler<? super FsSyncException, X> handler)
+    throws X, FsException {
         assert getModel().writeLock().isHeldByCurrentThread();
 
         if (0 >= caches.size())
@@ -255,7 +255,7 @@ extends FsDecoratorController<  FSConcurrencyModel,
                 if (flush)
                     cache.flush();
             } catch (IOException ex) {
-                throw handler.fail(new FSSyncException1(getModel(), ex));
+                throw handler.fail(new FsSyncException(getModel(), ex));
             } finally  {
                 try {
                     if (clear) {
@@ -270,23 +270,23 @@ extends FsDecoratorController<  FSConcurrencyModel,
     }
 
     private final class Cache {
-        private final FSEntryName1 name;
+        private final FsEntryName name;
         private final IOCache cache;
         private volatile InputSocket<?> input;
         private volatile OutputSocket<?> output;
-        private volatile BitField<FSOutputOption1> outputOptions;
+        private volatile BitField<FsOutputOption> outputOptions;
         private volatile Entry template;
 
-        Cache(@NonNull final FSEntryName1 name) {
+        Cache(@NonNull final FsEntryName name) {
             this.name = name;
             this.cache = STRATEGY.newCache(pool);
         }
 
         @NonNull
-        public Cache configure(@NonNull BitField<FSInputOption1> options) {
+        public Cache configure(@NonNull BitField<FsInputOption> options) {
             cache.configure(/*new ProxyInputSocket(*/delegate.getInputSocket(
                     name,
-                    options.clear(FSInputOption1.CACHE)));
+                    options.clear(FsInputOption.CACHE)));
             input = null;
             return this;
         }
@@ -317,11 +317,11 @@ extends FsDecoratorController<  FSConcurrencyModel,
         } // class ProxyInputSocket*/
 
         @NonNull
-        public Cache configure( @NonNull BitField<FSOutputOption1> options,
+        public Cache configure( @NonNull BitField<FsOutputOption> options,
                                 @Nullable Entry template) {
             cache.configure(delegate.getOutputSocket(
                     name,
-                    this.outputOptions = options.clear(FSOutputOption1.CACHE),
+                    this.outputOptions = options.clear(FsOutputOption.CACHE),
                     this.template = template));
             output = null;
             return this;
@@ -336,7 +336,7 @@ extends FsDecoratorController<  FSConcurrencyModel,
         }
 
         @CheckForNull
-        public FSEntry1 getEntry() {
+        public FsEntry getEntry() {
             final Entry entry = cache.getEntry();
             return null == entry ? null : new ProxyFileSystemEntry(
                     null == template ? entry : template);
@@ -372,9 +372,9 @@ extends FsDecoratorController<  FSConcurrencyModel,
                 boolean mknod = null != template;
                 if (!mknod) {
                     try {
-                        final FSEntry1 entry = delegate.getEntry(name);
+                        final FsEntry entry = delegate.getEntry(name);
                         mknod = null == entry || entry.getType() != FILE;
-                    } catch (FSFalsePositiveException1 ex) {
+                    } catch (FsFalsePositiveException ex) {
                         mknod = true;
                     }
                 }

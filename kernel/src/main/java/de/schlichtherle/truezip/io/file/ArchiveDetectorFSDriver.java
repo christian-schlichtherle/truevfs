@@ -16,23 +16,23 @@
 package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.fs.FsController;
-import de.schlichtherle.truezip.io.fs.FSDriver1;
-import de.schlichtherle.truezip.io.fs.FSMountPoint1;
-import de.schlichtherle.truezip.io.fs.FSScheme1;
-import de.schlichtherle.truezip.io.fs.file.FSFileDriver;
+import de.schlichtherle.truezip.io.fs.FsDriver;
+import de.schlichtherle.truezip.io.fs.FsMountPoint;
+import de.schlichtherle.truezip.io.fs.FsScheme;
+import de.schlichtherle.truezip.io.fs.file.FileDriver;
 import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
- * Adapts the {@link ArchiveDetector} interface to the {@link FSDriver1}
+ * Adapts the {@link ArchiveDetector} interface to the {@link FsDriver}
  * interface for use with the {@link File} class.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class ArchiveDetectorFSDriver implements FSDriver1 {
+final class ArchiveDetectorFSDriver implements FsDriver {
 
-    private static final FSScheme1 FILE_SCHEME = FSScheme1.create("file");
-    private static final FSDriver1 FILE_DRIVER = new FSFileDriver();
+    private static final FsScheme FILE_SCHEME = FsScheme.create("file");
+    private static final FsDriver FILE_DRIVER = new FileDriver();
 
     private final ArchiveDetector detector;
 
@@ -59,8 +59,8 @@ final class ArchiveDetectorFSDriver implements FSDriver1 {
      */
     @Override
     public FsController<?>
-    newController(FSMountPoint1 mountPoint, FsController<?> parent) {
-        FSScheme1 scheme = mountPoint.getScheme();
+    newController(FsMountPoint mountPoint, FsController<?> parent) {
+        FsScheme scheme = mountPoint.getScheme();
         return FILE_SCHEME.equals(scheme)
                 ? FILE_DRIVER.newController(mountPoint, parent)
                 : detector.getDriver(scheme).newController(mountPoint, parent);

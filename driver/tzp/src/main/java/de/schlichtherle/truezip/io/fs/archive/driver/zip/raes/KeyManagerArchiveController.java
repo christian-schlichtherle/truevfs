@@ -20,17 +20,17 @@ import de.schlichtherle.truezip.io.fs.archive.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.fs.FsDecoratorController;
 import de.schlichtherle.truezip.io.fs.FsController;
-import de.schlichtherle.truezip.io.fs.FSEntry1;
-import de.schlichtherle.truezip.io.fs.FSEntryName1;
-import de.schlichtherle.truezip.io.fs.FSException1;
-import de.schlichtherle.truezip.io.fs.FSModel1;
+import de.schlichtherle.truezip.io.fs.FsEntry;
+import de.schlichtherle.truezip.io.fs.FsEntryName;
+import de.schlichtherle.truezip.io.fs.FsException;
+import de.schlichtherle.truezip.io.fs.FsModel;
 import de.schlichtherle.truezip.key.KeyManager;
 import java.io.CharConversionException;
 import java.io.IOException;
 import net.jcip.annotations.ThreadSafe;
 
 import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
-import static de.schlichtherle.truezip.io.fs.FSEntryName1.*;
+import static de.schlichtherle.truezip.io.fs.FsEntryName.*;
 
 /**
  * This archive controller resets the key provider in the key manager if the
@@ -42,8 +42,8 @@ import static de.schlichtherle.truezip.io.fs.FSEntryName1.*;
 @ThreadSafe
 final class KeyManagerArchiveController
 extends FsDecoratorController<
-        FSModel1,
-        FsController<? extends FSModel1>> {
+        FsModel,
+        FsController<? extends FsModel>> {
 
     private final ArchiveDriver<?> driver;
 
@@ -59,11 +59,11 @@ extends FsDecoratorController<
     }
 
     @Override
-    public final FSEntry1 getEntry(final FSEntryName1 name)
+    public final FsEntry getEntry(final FsEntryName name)
     throws IOException {
         try {
             return delegate.getEntry(name);
-        } catch (FSException1 ex) {
+        } catch (FsException ex) {
             throw ex;
         } catch (IOException ex) {
             if (!name.isRoot())
@@ -91,7 +91,7 @@ extends FsDecoratorController<
     }
 
     @Override
-    public void unlink(FSEntryName1 name) throws IOException {
+    public void unlink(FsEntryName name) throws IOException {
         delegate.unlink(name);
         if (name.isRoot())
             KeyManager.resetKeyProvider(getModel().getMountPoint().getUri());
