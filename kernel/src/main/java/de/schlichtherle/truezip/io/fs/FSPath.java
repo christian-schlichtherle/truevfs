@@ -210,8 +210,8 @@ public final class FSPath implements Serializable, Comparable<FSPath> {
      * @throws URISyntaxException if the synthesized path URI
      *         would not conform to the syntax constraints for paths.
      */
-    public FSPath(@CheckForNull final FSMountPoint mountPoint,
-                @NonNull final FSEntryName entryName) {
+    public FSPath(  final @CheckForNull FSMountPoint mountPoint,
+                    final @NonNull FSEntryName entryName) {
         if (null == mountPoint) {
             this.uri = entryName.getUri();
         } else if (mountPoint.getUri().isOpaque()) {
@@ -277,8 +277,8 @@ public final class FSPath implements Serializable, Comparable<FSPath> {
             else if (uri.normalize() != uri)
                 throw new URISyntaxException(quote(uri),
                         "URI path not in normal form");
-            mountPoint = new FSMountPoint(uri.resolve("."));
-            entryName = new FSEntryName(mountPoint.getUri().relativize(uri));
+            mountPoint = new FSMountPoint(uri.resolve("."), false);
+            entryName = new FSEntryName(mountPoint.getUri().relativize(uri), false);
         } else {
             mountPoint = null;
             entryName = new FSEntryName(uri, normalize);

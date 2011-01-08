@@ -38,7 +38,6 @@ import java.util.Arrays;
 import static de.schlichtherle.truezip.io.fs.FSEntryName.*;
 import static de.schlichtherle.truezip.io.fs.FSOutputOption.*;
 import static de.schlichtherle.truezip.io.Files.*;
-import static java.io.File.*;
 
 /**
  * Provides static utility methods for {@link File}s.
@@ -281,9 +280,11 @@ class Files {
         if (uri.isOpaque())
             return uri;
         try {
-            // Postfix: Move Windows UNC host from path to authority.
-            if ('\\' == separatorChar
-                    && uri.getRawPath().startsWith(SEPARATOR + SEPARATOR)) {
+            // Note that we do not limit these fixes to Windows only in order
+            // to make this function work identically on all platforms!
+
+            // Move Windows-like UNC host from path to authority.
+            if (uri.getRawPath().startsWith(SEPARATOR + SEPARATOR)) {
                 final String s = uri.getPath();
                 final int i = s.indexOf(SEPARATOR_CHAR, 2);
                 if (0 <= i) {
@@ -294,16 +295,18 @@ class Files {
                                     uri.getFragment());
                 }
             }
-            // Postfix: Delete trailing slash separator from directory URI.
+
+            // Delete trailing slash separator from directory URI.
             for (String s; (s = uri.getPath()).endsWith(SEPARATOR)
                     && 2 <= s.length()
-                    && ('\\' != separatorChar || ':' != s.charAt(s.length() - 2));) {
+                    && (':' != s.charAt(s.length() - 2));) {
                 uri = new URI(  uri.getScheme(),
                                 uri.getAuthority(),
                                 s.substring(0, s.length() - 1),
                                 uri.getQuery(),
                                 uri.getFragment());
             }
+
             return uri;
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
