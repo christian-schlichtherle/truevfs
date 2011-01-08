@@ -503,7 +503,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      * call to the {@link #run} method, which may render the operation illegal
      * and corrupt the file system.
      * As long as only the ArchiveControllers in the package
-     * de.schlichtherle.truezip.io.archive.controller are used, this should not
+     * de.schlichtherle.truezip.io.fs.archive.controller are used, this should not
      * happen, however.
      */
     private final class PathLink implements ArchiveFileSystemOperation<E> {

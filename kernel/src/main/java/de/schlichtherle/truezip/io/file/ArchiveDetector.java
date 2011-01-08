@@ -16,7 +16,6 @@
 
 package de.schlichtherle.truezip.io.file;
 
-import de.schlichtherle.truezip.io.fs.archive.driver.GlobalArchiveDriverRegistry;
 import de.schlichtherle.truezip.io.fs.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.fs.FSScheme;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -76,8 +75,6 @@ public interface ArchiveDetector {
      * <p>
      * This requires <a href="{@docRoot}/overview.html#defaults">additional JARs</a>
      * on the run time class path.
-     *
-     * @see GlobalArchiveDriverRegistry
      */
     DefaultArchiveDetector ALL = new DefaultArchiveDetector();
 

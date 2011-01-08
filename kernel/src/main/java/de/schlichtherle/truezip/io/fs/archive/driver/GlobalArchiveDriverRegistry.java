@@ -37,7 +37,7 @@ import java.util.logging.Logger;
  * in a {@link ArchiveDriverRegistry registry chain}.
  * <p>
  * When this class is instantiated, it enumerate all instances of the relative
- * path {@code META-INF/services/de.schlichtherle.truezip.io.archive.registry.properties}
+ * path {@code META-INF/services/de.schlichtherle.truezip.io.fs.archive.driver.properties}
  * on the class path (this ensures that TrueZIP is compatible with JNLP as used
  * by Java Web Start and can be safely added to the Extension Class Path).
  * <p>

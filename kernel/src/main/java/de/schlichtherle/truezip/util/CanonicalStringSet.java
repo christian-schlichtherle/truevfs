@@ -26,8 +26,7 @@ import java.util.TreeMap;
 
 /**
  * A set of canonicalized strings in natural sort order.
- * A string is canonicalized by the template method {@link #canonicalize},
- * which should get overridden by subclasses.
+ * A string is canonicalized by the function {@link Canonicalizer#canonicalize}.
  * <p>
  * String sets can be converted from and to string lists by using
  * {@link #addAll(String)} and {@link #toString()}.
@@ -53,7 +52,8 @@ import java.util.TreeMap;
  */
 public class CanonicalStringSet extends AbstractSet<String> {
 
-    public interface Mapper {
+    /** Maps a string to its canonical form. */
+    public interface Canonicalizer {
         /**
          * Returns the canonical form of {@code s} or {@code null} if the
          * given string does not have a canonical form.
@@ -63,9 +63,9 @@ public class CanonicalStringSet extends AbstractSet<String> {
          *         {@code s} does not have a canonical form.
          */
         @CheckForNull String canonicalize(@NonNull String s);
-    } // interface Mapper
+    } // interface Canonicalizer
 
-    private final Mapper mapper;
+    private final Canonicalizer canonicalizer;
 
     /** The separator for string lists. */
     private final char separator;
@@ -78,10 +78,10 @@ public class CanonicalStringSet extends AbstractSet<String> {
      *
      * @param separator The separator character to use in string lists.
      */
-    public CanonicalStringSet(final @NonNull Mapper mapper, final char separator) {
+    public CanonicalStringSet(final @NonNull Canonicalizer mapper, final char separator) {
         if (null == mapper)
             throw new NullPointerException();
-        this.mapper = mapper;
+        this.canonicalizer = mapper;
         this.separator = separator;
     }
 
@@ -92,12 +92,12 @@ public class CanonicalStringSet extends AbstractSet<String> {
      * @param separator The separator character to use in string lists.
      * @param set A set of canonical strings to canonicalize and add to this set.
      */
-    public CanonicalStringSet(  final @NonNull Mapper mapper,
+    public CanonicalStringSet(  final @NonNull Canonicalizer mapper,
                                 final char separator,
                                 final @NonNull CanonicalStringSet set) {
         if (null == mapper)
             throw new NullPointerException();
-        this.mapper = mapper;
+        this.canonicalizer = mapper;
         this.separator = separator;
         addAll(set);
     }
@@ -265,7 +265,7 @@ public class CanonicalStringSet extends AbstractSet<String> {
         boolean changed = false;
         for (final Iterator<String> i = new StringIterator(list); i.hasNext(); ) {
             final String element = i.next();
-            final String canonical = mapper.canonicalize(element);
+            final String canonical = canonicalizer.canonicalize(element);
             if (null != canonical)
                 changed |= null == map.put(canonical, element);
         }
@@ -292,7 +292,7 @@ public class CanonicalStringSet extends AbstractSet<String> {
      * @throws NullPointerException If {@code list} is {@code null}.
      */
     public final boolean retainAll(final String list) {
-        final CanonicalStringSet set = new CanonicalStringSet(mapper, separator);
+        final CanonicalStringSet set = new CanonicalStringSet(canonicalizer, separator);
         set.addAll(list);
         return map.keySet().retainAll(set);
     }
@@ -383,8 +383,8 @@ public class CanonicalStringSet extends AbstractSet<String> {
 
         private void advance() {
             while (i.hasNext()) {
-                canonical = mapper.canonicalize(i.next());
-                if (canonical != null)
+                canonical = canonicalizer.canonicalize(i.next());
+                if (null != canonical)
                     return;
             }
             canonical = null; // no such element

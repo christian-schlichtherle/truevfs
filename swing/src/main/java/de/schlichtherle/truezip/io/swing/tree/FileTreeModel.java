@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.swing;
+package de.schlichtherle.truezip.io.swing.tree;
 
 import java.io.FileFilter;
 import java.io.IOException;
@@ -550,7 +550,7 @@ public class FileTreeModel implements TreeModel {
     public void structureChanged(final java.io.File node) {
         if (node == null)
             throw new NullPointerException();
-        forget(node);
+        forget(node, true);
         fireTreeStructureChanged(
                 new TreeModelEvent(this, newTreePath(node), null, null));
     }
@@ -558,8 +558,10 @@ public class FileTreeModel implements TreeModel {
     /**
      * Clears the internal cache associated with {@code node} and all
      * of its children.
+     *
+     * @deprecated This method is <em>not</em> intended for public use!
      */
-    final void forget(java.io.File node) {
+    public final void forget(java.io.File node) {
         forget(node, true);
     }
 
