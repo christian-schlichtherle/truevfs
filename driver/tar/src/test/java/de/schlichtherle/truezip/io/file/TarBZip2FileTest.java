@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.fs.archive.driver.tar.TarBZip2Driver;
-import de.schlichtherle.truezip.io.fs.FSScheme;
+import de.schlichtherle.truezip.io.fs.FSScheme1;
 
 /**
  * @author Christian Schlichtherle
@@ -25,6 +25,6 @@ import de.schlichtherle.truezip.io.fs.FSScheme;
 public final class TarBZip2FileTest extends FileTestCase {
 
     public TarBZip2FileTest() {
-        super(FSScheme.create("tar.bz2"), new TarBZip2Driver(1));
+        super(FSScheme1.create("tar.bz2"), new TarBZip2Driver(1));
     }
 }

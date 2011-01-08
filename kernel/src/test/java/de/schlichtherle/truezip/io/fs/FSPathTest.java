@@ -64,7 +64,7 @@ public class FSPathTest {
             { "föö?bär", },
             { "", },
         }) {
-            final FSPath original = FSPath.create(params[0]);
+            final FSPath1 original = FSPath1.create(params[0]);
             assertThat(original.toString(), equalTo(params[0]));
 
             {
@@ -110,79 +110,79 @@ public class FSPathTest {
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testConstructorWithInvalidUri() throws URISyntaxException {
         try {
-            FSPath.create((String) null);
+            FSPath1.create((String) null);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FSPath((String) null);
+            new FSPath1((String) null);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            FSPath.create((URI) null);
+            FSPath1.create((URI) null);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FSPath((URI) null);
+            new FSPath1((URI) null);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            FSPath.create((String) null, FsUriModifier.NONE);
+            FSPath1.create((String) null, FsUriModifier.NONE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FSPath((String) null, FsUriModifier.NONE);
+            new FSPath1((String) null, FsUriModifier.NONE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            FSPath.create((URI) null, FsUriModifier.NONE);
+            FSPath1.create((URI) null, FsUriModifier.NONE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FSPath((URI) null, FsUriModifier.NONE);
+            new FSPath1((URI) null, FsUriModifier.NONE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            FSPath.create((String) null, FsUriModifier.NORMALIZE);
+            FSPath1.create((String) null, FsUriModifier.NORMALIZE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FSPath((String) null, FsUriModifier.NORMALIZE);
+            new FSPath1((String) null, FsUriModifier.NORMALIZE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            FSPath.create((URI) null, FsUriModifier.NORMALIZE);
+            FSPath1.create((URI) null, FsUriModifier.NORMALIZE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FSPath((URI) null, FsUriModifier.NORMALIZE);
+            new FSPath1((URI) null, FsUriModifier.NORMALIZE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FSPath((FSMountPoint) null, null);
+            new FSPath1((FSMountPoint1) null, null);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -266,13 +266,13 @@ public class FSPathTest {
             final URI uri = URI.create(param);
 
             try {
-                FSPath.create(uri);
+                FSPath1.create(uri);
                 fail(param);
             } catch (IllegalArgumentException expected) {
             }
 
             try {
-                new FSPath(uri);
+                new FSPath1(uri);
                 fail(param);
             } catch (URISyntaxException expected) {
             }
@@ -330,19 +330,19 @@ public class FSPathTest {
             { "foo:/bar/baz/", "foo:/bar/baz/", "" },
             { "foo:/bar/baz/?bang", "foo:/bar/baz/", "?bang" },
         }) {
-            FSPath path = FSPath.create(params[0], FsUriModifier.NORMALIZE);
-            final FSMountPoint mountPoint = null == params[1] ? null : FSMountPoint.create(params[1]);
-            final FSEntryName entryName = FSEntryName.create(params[2]);
+            FSPath1 path = FSPath1.create(params[0], FsUriModifier.NORMALIZE);
+            final FSMountPoint1 mountPoint = null == params[1] ? null : FSMountPoint1.create(params[1]);
+            final FSEntryName1 entryName = FSEntryName1.create(params[2]);
             testPath(path, mountPoint, entryName);
 
-            path = new FSPath(mountPoint, entryName);
+            path = new FSPath1(mountPoint, entryName);
             testPath(path, mountPoint, entryName);
         }
     }
 
-    private void testPath(final FSPath path,
-                          final FSMountPoint mountPoint,
-                          final FSEntryName entryName) {
+    private void testPath(final FSPath1 path,
+                          final FSMountPoint1 mountPoint,
+                          final FSEntryName1 entryName) {
         if (null != mountPoint) {
             assertThat(path.getUri(), equalTo(URI.create(
                     mountPoint.toString() + entryName)));
@@ -353,8 +353,8 @@ public class FSPathTest {
         }
         assertThat(path.getEntryName().getUri(), equalTo(entryName.getUri()));
         assertThat(path.toString(), equalTo(path.getUri().toString()));
-        assertThat(FSPath.create(path.getUri().toString()), equalTo(path));
-        assertThat(FSPath.create(path.getUri().toString()).hashCode(), equalTo(path.hashCode()));
+        assertThat(FSPath1.create(path.getUri().toString()), equalTo(path));
+        assertThat(FSPath1.create(path.getUri().toString()).hashCode(), equalTo(path.hashCode()));
     }
 
     @Test
@@ -363,7 +363,7 @@ public class FSPathTest {
             { "foo:bar:baz:/%20!/%20/%20!/%20/%20", " ", " / ", " / ", },
             { "foo:bar:baz:/%20a%20!/%20b%20!/%20c%20", " a ", " b ", " c ", },
         }) {
-            FSPath path = FSPath.create(params[0]);
+            FSPath1 path = FSPath1.create(params[0]);
             for (int i = params.length; 0 < --i; ) {
                 assertThat(path.getEntryName().getPath(), equalTo(params[i]));
                 path = path.getMountPoint().getPath();
@@ -395,8 +395,8 @@ public class FSPathTest {
             { "foo:/bar/", "foo:/bar/" },
             { "bar", "bar" },
         }) {
-            final FSPath path = FSPath.create(params[0]);
-            final FSPath hierarchical = path.hierarchicalize();
+            final FSPath1 path = FSPath1.create(params[0]);
+            final FSPath1 hierarchical = path.hierarchicalize();
             assertThat(hierarchical.getUri(), equalTo(URI.create(params[1])));
             assertThat(hierarchical.hierarchicalize(), sameInstance(hierarchical));
         }

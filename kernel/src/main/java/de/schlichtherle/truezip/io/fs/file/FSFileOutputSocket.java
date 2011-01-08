@@ -17,7 +17,7 @@ package de.schlichtherle.truezip.io.fs.file;
 
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.DecoratorOutputStream;
-import de.schlichtherle.truezip.io.fs.FSOutputOption;
+import de.schlichtherle.truezip.io.fs.FSOutputOption1;
 import de.schlichtherle.truezip.io.socket.IOPool;
 import de.schlichtherle.truezip.io.socket.IOSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
@@ -30,9 +30,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import static de.schlichtherle.truezip.io.fs.FSOutputOption.APPEND;
-import static de.schlichtherle.truezip.io.fs.FSOutputOption.CACHE;
-import static de.schlichtherle.truezip.io.fs.FSOutputOption.CREATE_PARENTS;
+import static de.schlichtherle.truezip.io.fs.FSOutputOption1.APPEND;
+import static de.schlichtherle.truezip.io.fs.FSOutputOption1.CACHE;
+import static de.schlichtherle.truezip.io.fs.FSOutputOption1.CREATE_PARENTS;
 import static de.schlichtherle.truezip.io.entry.Entry.Access.WRITE;
 import static de.schlichtherle.truezip.io.entry.Entry.UNKNOWN;
 
@@ -46,12 +46,12 @@ final class FSFileOutputSocket extends OutputSocket<FSFileEntry> {
     private static final String FILE_POOL_PREFIX = ".tzp";
 
     private final    @NonNull      FSFileEntry              entry;
-    private final    @NonNull      BitField<FSOutputOption> options;
+    private final    @NonNull      BitField<FSOutputOption1> options;
     private final    @CheckForNull Entry                    template;
     private volatile @CheckForNull FSFilePool               pool;
 
     FSFileOutputSocket( final @NonNull      FSFileEntry              entry,
-                        final @NonNull      BitField<FSOutputOption> options,
+                        final @NonNull      BitField<FSOutputOption1> options,
                         final @CheckForNull Entry                    template) {
         this.entry    = entry;
         this.options  = options;

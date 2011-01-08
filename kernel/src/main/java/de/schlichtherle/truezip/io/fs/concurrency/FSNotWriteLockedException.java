@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.fs.concurrency;
 
-import de.schlichtherle.truezip.io.fs.FSException;
+import de.schlichtherle.truezip.io.fs.FSException1;
 
 /**
  * Indicates that a controller is not write locked and the lock cannot get
@@ -26,7 +26,7 @@ import de.schlichtherle.truezip.io.fs.FSException;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class FSNotWriteLockedException extends FSException {
+public final class FSNotWriteLockedException extends FSException1 {
 
     private static final long serialVersionUID = 2345952581284762637L;
 

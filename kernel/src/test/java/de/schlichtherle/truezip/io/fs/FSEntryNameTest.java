@@ -59,9 +59,9 @@ public class FSEntryNameTest {
             { "föö?bär", },
             { "", },
         }) {
-            final FSEntryName original = 1 < params.length
-                    ? FSEntryName.create(params[0], params[1])
-                    : FSEntryName.create(params[0]);
+            final FSEntryName1 original = 1 < params.length
+                    ? FSEntryName1.create(params[0], params[1])
+                    : FSEntryName1.create(params[0]);
 
             {
                 final ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -182,13 +182,13 @@ public class FSEntryNameTest {
             final URI uri = URI.create(param);
 
             try {
-                FSEntryName.create(uri);
+                FSEntryName1.create(uri);
                 fail(param);
             } catch (IllegalArgumentException ex) {
             }
 
             try {
-                new FSEntryName(uri);
+                new FSEntryName1(uri);
                 fail(param);
             } catch (URISyntaxException ex) {
             }
@@ -205,11 +205,11 @@ public class FSEntryNameTest {
             { "", "föö", "föö" },
             { "föö", "bär", "föö/bär" },
         }) {
-            final FSEntryName parent = FSEntryName.create(URI.create(params[0]));
-            final FSEntryName member = FSEntryName.create(URI.create(params[1]));
-            final FSEntryName result = new FSEntryName(parent, member);
+            final FSEntryName1 parent = FSEntryName1.create(URI.create(params[0]));
+            final FSEntryName1 member = FSEntryName1.create(URI.create(params[1]));
+            final FSEntryName1 result = new FSEntryName1(parent, member);
             assertThat(result.getUri(), equalTo(URI.create(params[2])));
-            assertThat(FSEntryName.create(result.getUri()), equalTo(result));
+            assertThat(FSEntryName1.create(result.getUri()), equalTo(result));
         }
     }
 }

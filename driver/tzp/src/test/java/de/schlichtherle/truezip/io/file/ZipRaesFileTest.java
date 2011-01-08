@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.fs.archive.driver.zip.raes.SafeZipRaesDriver;
-import de.schlichtherle.truezip.io.fs.FSScheme;
+import de.schlichtherle.truezip.io.fs.FSScheme1;
 import de.schlichtherle.truezip.key.AesKeyProvider;
 import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.key.KeyPromptingCancelledException;
@@ -40,7 +40,7 @@ public final class ZipRaesFileTest extends FileTestCase {
     private static boolean cancelling;
 
     public ZipRaesFileTest() {
-        super(FSScheme.create("tzp"), new SafeZipRaesDriver());
+        super(FSScheme1.create("tzp"), new SafeZipRaesDriver());
     }
 
     @Override

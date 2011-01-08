@@ -30,7 +30,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import org.junit.Test;
 
-import static de.schlichtherle.truezip.io.fs.FSEntryName.*;
+import static de.schlichtherle.truezip.io.fs.FSEntryName1.*;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
@@ -41,7 +41,7 @@ import static org.junit.Assert.*;
 public class FSMountPointTest {
 
     private static final Logger logger
-            = Logger.getLogger(FSMountPoint.class.getName());
+            = Logger.getLogger(FSMountPoint1.class.getName());
 
     @Test
     public void testSerialization() throws IOException, ClassNotFoundException {
@@ -57,7 +57,7 @@ public class FSMountPointTest {
             { "zip:file:/föö%20bär!/", },
             { "file:/föö%20bär/", },
         }) {
-            final FSMountPoint original = FSMountPoint.create(params[0]);
+            final FSMountPoint1 original = FSMountPoint1.create(params[0]);
             assertThat(original.toString(), equalTo(params[0]));
 
             {
@@ -103,85 +103,85 @@ public class FSMountPointTest {
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testConstructorWithInvalidUri() throws URISyntaxException {
         try {
-            FSMountPoint.create((String) null);
+            FSMountPoint1.create((String) null);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FSMountPoint((String) null);
+            new FSMountPoint1((String) null);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            FSMountPoint.create((URI) null);
+            FSMountPoint1.create((URI) null);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FSMountPoint((URI) null);
+            new FSMountPoint1((URI) null);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            FSMountPoint.create((String) null, FsUriModifier.NONE);
+            FSMountPoint1.create((String) null, FsUriModifier.NONE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FSMountPoint((String) null, FsUriModifier.NONE);
+            new FSMountPoint1((String) null, FsUriModifier.NONE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            FSMountPoint.create((URI) null, FsUriModifier.NONE);
+            FSMountPoint1.create((URI) null, FsUriModifier.NONE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FSMountPoint((URI) null, FsUriModifier.NONE);
+            new FSMountPoint1((URI) null, FsUriModifier.NONE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            FSMountPoint.create((String) null, FsUriModifier.NORMALIZE);
+            FSMountPoint1.create((String) null, FsUriModifier.NORMALIZE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FSMountPoint((String) null, FsUriModifier.NORMALIZE);
+            new FSMountPoint1((String) null, FsUriModifier.NORMALIZE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            FSMountPoint.create((URI) null, FsUriModifier.NORMALIZE);
+            FSMountPoint1.create((URI) null, FsUriModifier.NORMALIZE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FSMountPoint((URI) null, FsUriModifier.NORMALIZE);
+            new FSMountPoint1((URI) null, FsUriModifier.NORMALIZE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            FSMountPoint.create((FSScheme) null, null);
+            FSMountPoint1.create((FSScheme1) null, null);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FSMountPoint((FSScheme) null, null);
+            new FSMountPoint1((FSScheme1) null, null);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -218,13 +218,13 @@ public class FSMountPointTest {
             final URI uri = URI.create(param);
 
             try {
-                FSMountPoint.create(uri);
+                FSMountPoint1.create(uri);
                 fail(param);
             } catch (IllegalArgumentException expected) {
             }
 
             try {
-                new FSMountPoint(uri);
+                new FSMountPoint1(uri);
                 fail(param);
             } catch (URISyntaxException expected) {
             }
@@ -235,10 +235,10 @@ public class FSMountPointTest {
             { "foo", "bar:baz:/bang!/" },
             { "foo", "bar:/baz/" },
         }) {
-            final FSScheme scheme = FSScheme.create(params[0]);
-            final FSPath path = FSPath.create(params[1]);
+            final FSScheme1 scheme = FSScheme1.create(params[0]);
+            final FSPath1 path = FSPath1.create(params[1]);
             try {
-                new FSMountPoint(scheme, path);
+                new FSMountPoint1(scheme, path);
                 fail(params[0] + ":" + params[1] + "!/");
             } catch (URISyntaxException expected) {
             }
@@ -257,12 +257,12 @@ public class FSMountPointTest {
             "foo:/?bäng",
         }) {
             final URI uri = URI.create(param);
-            final FSMountPoint mountPoint = FSMountPoint.create(uri);
+            final FSMountPoint1 mountPoint = FSMountPoint1.create(uri);
             assertThat(mountPoint.getUri(), sameInstance(uri));
             assertThat(mountPoint.getPath(), nullValue());
             assertThat(mountPoint.toString(), equalTo(mountPoint.getUri().toString()));
-            assertThat(mountPoint, equalTo(FSMountPoint.create(mountPoint.getUri().toString())));
-            assertThat(mountPoint.hashCode(), equalTo(FSMountPoint.create(mountPoint.getUri().toString()).hashCode()));
+            assertThat(mountPoint, equalTo(FSMountPoint1.create(mountPoint.getUri().toString())));
+            assertThat(mountPoint.hashCode(), equalTo(FSMountPoint1.create(mountPoint.getUri().toString()).hashCode()));
         }
 
         for (final String[] params : new String[][] {
@@ -276,20 +276,20 @@ public class FSMountPointTest {
             { "foo:bar:/baz?bang!/", "foo", "bar:/baz?bang" },
             { "foo:bar:/baz!/", "foo", "bar:/baz" },
         }) {
-            final FSMountPoint mountPoint = FSMountPoint.create(params[0], FsUriModifier.NORMALIZE);
-            final FSScheme scheme = FSScheme.create(params[1]);
-            final FSPath path = FSPath.create(params[2]);
+            final FSMountPoint1 mountPoint = FSMountPoint1.create(params[0], FsUriModifier.NORMALIZE);
+            final FSScheme1 scheme = FSScheme1.create(params[1]);
+            final FSPath1 path = FSPath1.create(params[2]);
 
             assertThat(mountPoint.getScheme(), equalTo(scheme));
             assertThat(mountPoint.getPath(), equalTo(path));
             assertThat(mountPoint.toString(), equalTo(mountPoint.getUri().toString()));
-            assertThat(FSMountPoint.create(mountPoint.toString()), equalTo(mountPoint));
-            assertThat(FSMountPoint.create(mountPoint.getUri().getScheme() + ":" + mountPoint.getPath() + "!/"), equalTo(mountPoint));
-            assertThat(FSMountPoint.create(mountPoint.getScheme(), mountPoint.getPath()), equalTo(mountPoint));
-            assertThat(FSMountPoint.create(mountPoint.getUri().toString()), equalTo(mountPoint));
-            assertThat(FSMountPoint.create(mountPoint.getUri().toString()).hashCode(), equalTo(mountPoint.hashCode()));
-            //assertThat(FSMountPoint.create(mountPoint.getScheme(), new FSPath(mountPoint.getParent(), mountPoint.resolveParentEntryName(ROOT))), equalTo(mountPoint));
-            assertThat(FSMountPoint.create(mountPoint.resolve(ROOT).getUri()), equalTo(mountPoint));
+            assertThat(FSMountPoint1.create(mountPoint.toString()), equalTo(mountPoint));
+            assertThat(FSMountPoint1.create(mountPoint.getUri().getScheme() + ":" + mountPoint.getPath() + "!/"), equalTo(mountPoint));
+            assertThat(FSMountPoint1.create(mountPoint.getScheme(), mountPoint.getPath()), equalTo(mountPoint));
+            assertThat(FSMountPoint1.create(mountPoint.getUri().toString()), equalTo(mountPoint));
+            assertThat(FSMountPoint1.create(mountPoint.getUri().toString()).hashCode(), equalTo(mountPoint.hashCode()));
+            //assertThat(FSMountPoint1.create(mountPoint.getScheme(), new FSPath1(mountPoint.getParent(), mountPoint.resolveParentEntryName(ROOT))), equalTo(mountPoint));
+            assertThat(FSMountPoint1.create(mountPoint.resolve(ROOT).getUri()), equalTo(mountPoint));
         }
     }
 
@@ -308,10 +308,10 @@ public class FSMountPointTest {
             { "foo:/bar/?boom", "", null, "foo:/bar/" },
             { "foo:/bar/", "baz", null, "foo:/bar/baz" },
         }) {
-            final FSMountPoint mountPoint = FSMountPoint.create(params[0]);
-            final FSEntryName entryName = FSEntryName.create(params[1]);
-            final FSEntryName parentEntryName = null == params[2] ? null : FSEntryName.create(params[2]);
-            final FSPath path = FSPath.create(params[3]);
+            final FSMountPoint1 mountPoint = FSMountPoint1.create(params[0]);
+            final FSEntryName1 entryName = FSEntryName1.create(params[1]);
+            final FSEntryName1 parentEntryName = null == params[2] ? null : FSEntryName1.create(params[2]);
+            final FSPath1 path = FSPath1.create(params[3]);
             if (null != parentEntryName)
                 assertThat(mountPoint.getPath().resolve(entryName).getEntryName(), equalTo(parentEntryName));
             assertThat(mountPoint.resolve(entryName), equalTo(path));
@@ -331,10 +331,10 @@ public class FSMountPointTest {
             { "foo:/bar/?boom", "foo:/bar/?boom" },
             { "foo:/bar/", "foo:/bar/" },
         }) {
-            final FSMountPoint mp = FSMountPoint.create(params[0]);
-            final FSMountPoint hmp = mp.hierarchicalize();
-            final FSPath p = FSPath.create(params[0]);
-            final FSPath hp = p.hierarchicalize();
+            final FSMountPoint1 mp = FSMountPoint1.create(params[0]);
+            final FSMountPoint1 hmp = mp.hierarchicalize();
+            final FSPath1 p = FSPath1.create(params[0]);
+            final FSPath1 hp = p.hierarchicalize();
             assertThat(hmp.hierarchicalize(), sameInstance(hmp));
             assertThat(hmp.getUri(), equalTo(URI.create(params[1])));
             assertThat(hmp.getUri(), equalTo(hp.getUri()));

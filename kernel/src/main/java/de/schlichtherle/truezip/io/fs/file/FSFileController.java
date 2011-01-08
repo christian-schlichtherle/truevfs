@@ -15,17 +15,17 @@
  */
 package de.schlichtherle.truezip.io.fs.file;
 
-import de.schlichtherle.truezip.io.fs.FSEntryName;
+import de.schlichtherle.truezip.io.fs.FSEntryName1;
 import de.schlichtherle.truezip.io.fs.FsController;
 import java.net.URI;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.file.FileOutputStream;
-import de.schlichtherle.truezip.io.fs.FSException;
-import de.schlichtherle.truezip.io.fs.FSModel;
-import de.schlichtherle.truezip.io.fs.FSInputOption;
-import de.schlichtherle.truezip.io.fs.FSOutputOption;
-import de.schlichtherle.truezip.io.fs.FSSyncException;
-import de.schlichtherle.truezip.io.fs.FSSyncOption;
+import de.schlichtherle.truezip.io.fs.FSException1;
+import de.schlichtherle.truezip.io.fs.FSModel1;
+import de.schlichtherle.truezip.io.fs.FSInputOption1;
+import de.schlichtherle.truezip.io.fs.FSOutputOption1;
+import de.schlichtherle.truezip.io.fs.FSSyncException1;
+import de.schlichtherle.truezip.io.fs.FSSyncOption1;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
@@ -41,8 +41,8 @@ import net.jcip.annotations.ThreadSafe;
 import static de.schlichtherle.truezip.io.Files.*;
 import static de.schlichtherle.truezip.io.entry.Entry.*;
 import static de.schlichtherle.truezip.io.entry.Entry.Access.*;
-import static de.schlichtherle.truezip.io.fs.FSEntryName.*;
-import static de.schlichtherle.truezip.io.fs.FSOutputOption.*;
+import static de.schlichtherle.truezip.io.fs.FSEntryName1.*;
+import static de.schlichtherle.truezip.io.fs.FSOutputOption1.*;
 import static java.io.File.separatorChar;
 
 /**
@@ -50,12 +50,12 @@ import static java.io.File.separatorChar;
  * @version $Id$
  */
 @ThreadSafe
-final class FSFileController extends FsController<FSModel>  {
+final class FSFileController extends FsController<FSModel1>  {
 
-    private final FSModel model;
+    private final FSModel1 model;
     private final File target;
 
-    FSFileController(final FSModel model) {
+    FSFileController(final FSModel1 model) {
         if (null != model.getParent())
             throw new IllegalArgumentException();
         URI uri = model.getMountPoint().getUri();
@@ -74,7 +74,7 @@ final class FSFileController extends FsController<FSModel>  {
     }
 
     @Override
-    public FSModel getModel() {
+    public FSModel1 getModel() {
         return model;
     }
 
@@ -99,32 +99,32 @@ final class FSFileController extends FsController<FSModel>  {
     }
 
     @Override
-    public FSFileEntry getEntry(FSEntryName name) throws IOException {
+    public FSFileEntry getEntry(FSEntryName1 name) throws IOException {
         final FSFileEntry entry = new FSFileEntry(target, name);
         return entry.getFile().exists() ? entry : null;
     }
 
     @Override
-    public boolean isReadable(FSEntryName name) throws IOException {
+    public boolean isReadable(FSEntryName1 name) throws IOException {
         final File file = new File(target, name.getPath());
         return file.canRead();
     }
 
     @Override
-    public boolean isWritable(FSEntryName name) throws IOException {
+    public boolean isWritable(FSEntryName1 name) throws IOException {
         final File file = new File(target, name.getPath());
         return isCreatableOrWritable(file);
     }
 
     @Override
-    public void setReadOnly(FSEntryName name) throws IOException {
+    public void setReadOnly(FSEntryName1 name) throws IOException {
         final File file = new File(target, name.getPath());
         if (!file.setReadOnly())
             throw new IOException();
     }
 
     @Override
-    public boolean setTime(FSEntryName name, BitField<Access> types, long value)
+    public boolean setTime(FSEntryName1 name, BitField<Access> types, long value)
     throws IOException {
         final File file = new File(target, name.getPath());
         boolean ok = true;
@@ -135,23 +135,23 @@ final class FSFileController extends FsController<FSModel>  {
 
     @Override
     public InputSocket<?> getInputSocket(
-            FSEntryName name,
-            BitField<FSInputOption> options) {
+            FSEntryName1 name,
+            BitField<FSInputOption1> options) {
         return new FSFileEntry(target, name).getInputSocket();
     }
 
     @Override
     public OutputSocket<?> getOutputSocket(
-            FSEntryName name,
-            BitField<FSOutputOption> options,
+            FSEntryName1 name,
+            BitField<FSOutputOption1> options,
             Entry template) {
         return new FSFileEntry(target, name).getOutputSocket(options, template);
     }
 
     @Override
-    public void mknod(  final @NonNull FSEntryName name,
+    public void mknod(  final @NonNull FSEntryName1 name,
                         final @NonNull Type type,
-                        final @NonNull BitField<FSOutputOption> options,
+                        final @NonNull BitField<FSOutputOption1> options,
                         final @Nullable Entry template)
     throws IOException {
         final File file = new File(target, name.getPath());
@@ -181,7 +181,7 @@ final class FSFileController extends FsController<FSModel>  {
     }
 
     @Override
-    public void unlink(FSEntryName name)
+    public void unlink(FSEntryName1 name)
     throws IOException {
         final File file = new File(target, name.getPath());
         if (!file.delete())
@@ -190,8 +190,8 @@ final class FSFileController extends FsController<FSModel>  {
 
     @Override
     public <X extends IOException>
-    void sync(  @NonNull BitField<FSSyncOption> options,
-                @NonNull ExceptionHandler<? super FSSyncException, X> handler)
-    throws X, FSException {
+    void sync(  @NonNull BitField<FSSyncOption1> options,
+                @NonNull ExceptionHandler<? super FSSyncException1, X> handler)
+    throws X, FSException1 {
     }
 }

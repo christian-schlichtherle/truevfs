@@ -33,15 +33,15 @@ import static org.junit.Assert.*;
  */
 public abstract class FSManagerTestCase {
 
-    private final FSDriver driver = new FSDummyDriver();
-    private FSManager manager;
+    private final FSDriver1 driver = new FSDummyDriver();
+    private FSManager1 manager;
 
     @Before
     public void setUp() {
         manager = newManager();
     }
 
-    protected abstract @NonNull FSManager newManager();
+    protected abstract @NonNull FSManager1 newManager();
 
     @After
     public final void tearDown() {
@@ -75,8 +75,8 @@ public abstract class FSManagerTestCase {
         }) {
             FsController<?> parent = null;
             for (final String param : params) {
-                final FSMountPoint mountPoint
-                        = FSMountPoint.create(URI.create(param));
+                final FSMountPoint1 mountPoint
+                        = FSMountPoint1.create(URI.create(param));
                 final FsController<?> controller
                         = manager.getController(mountPoint, driver);
                 if (null != parent && null != parent.getParent())
@@ -109,8 +109,8 @@ public abstract class FSManagerTestCase {
         }) {
             FsController<?> member = null;
             for (final String param : params) {
-                final FSMountPoint mountPoint
-                        = FSMountPoint.create(URI.create(param));
+                final FSMountPoint1 mountPoint
+                        = FSMountPoint1.create(URI.create(param));
                 final FsController<?> controller
                         = manager.getController(mountPoint, driver);
                 if (null != member && null != controller.getParent())
@@ -120,8 +120,8 @@ public abstract class FSManagerTestCase {
 
             Iterator<FsController<?>> i = manager.iterator();
             for (final String param : params) {
-                final FSMountPoint mountPoint
-                        = FSMountPoint.create(URI.create(param));
+                final FSMountPoint1 mountPoint
+                        = FSMountPoint1.create(URI.create(param));
                 assertThat(i.next().getModel().getMountPoint(), equalTo(mountPoint));
             }
             assertThat(i.hasNext(), is(false));

@@ -31,7 +31,7 @@ public class FSModelTest {
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testConstructorWithNull() {
         try {
-            new FSModel(null, null);
+            new FSModel1(null, null);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -43,8 +43,8 @@ public class FSModelTest {
         for (final String[] params : new String[][] {
             { "foo:/bar/" },
         }) {
-            final FSMountPoint mountPoint = FSMountPoint.create(URI.create(params[0]));
-            final FSModel model = new FSModel(mountPoint);
+            final FSMountPoint1 mountPoint = FSMountPoint1.create(URI.create(params[0]));
+            final FSModel1 model = new FSModel1(mountPoint);
             assertThat(model.getMountPoint(), sameInstance(mountPoint));
             assertThat(model.getMountPoint().getPath(), nullValue());
             assertThat(model.getParent(), nullValue());
@@ -59,11 +59,11 @@ public class FSModelTest {
             { "foo:/bar/baz/", "foo:/bar/" },
             { "foo:/bar/", "foo:/baz/" },
         }) {
-            final FSMountPoint mountPoint = FSMountPoint.create(URI.create(params[0]));
-            final FSMountPoint parentMountPoint = FSMountPoint.create(URI.create(params[1]));
-            final FSModel parent = new FSModel(parentMountPoint);
+            final FSMountPoint1 mountPoint = FSMountPoint1.create(URI.create(params[0]));
+            final FSMountPoint1 parentMountPoint = FSMountPoint1.create(URI.create(params[1]));
+            final FSModel1 parent = new FSModel1(parentMountPoint);
             try {
-                new FSModel(mountPoint, parent);
+                new FSModel1(mountPoint, parent);
                 fail(params[0]);
             } catch (RuntimeException expected) {
             }
@@ -75,13 +75,13 @@ public class FSModelTest {
             //{ "foo:bar:/baz!/", "bar:/", "boom/", "baz/boom/", "foo:bar:/baz!/boom/" },
             { "foo:bar:/baz!/", "bar:/", "boom", "baz/boom", "foo:bar:/baz!/boom" },
         }) {
-            final FSMountPoint mountPoint = FSMountPoint.create(URI.create(params[0]));
-            final FSMountPoint parentMountPoint = FSMountPoint.create(URI.create(params[1]));
-            final FSEntryName entryName = FSEntryName.create(URI.create(params[2]));
-            final FSEntryName parentEntryName = FSEntryName.create(URI.create(params[3]));
-            final FSPath path = FSPath.create(URI.create(params[4]));
-            FSModel parent = newModel(parentMountPoint);
-            FSModel model = new FSModel(mountPoint, parent);
+            final FSMountPoint1 mountPoint = FSMountPoint1.create(URI.create(params[0]));
+            final FSMountPoint1 parentMountPoint = FSMountPoint1.create(URI.create(params[1]));
+            final FSEntryName1 entryName = FSEntryName1.create(URI.create(params[2]));
+            final FSEntryName1 parentEntryName = FSEntryName1.create(URI.create(params[3]));
+            final FSPath1 path = FSPath1.create(URI.create(params[4]));
+            FSModel1 parent = newModel(parentMountPoint);
+            FSModel1 model = new FSModel1(mountPoint, parent);
 
             assertThat(model.getMountPoint(), sameInstance(mountPoint));
             assertThat(model.getParent(), sameInstance(parent));
@@ -91,8 +91,8 @@ public class FSModelTest {
         }
     }
 
-    private static FSModel newModel(final FSMountPoint mountPoint) {
-        return new FSModel( mountPoint,
+    private static FSModel1 newModel(final FSMountPoint1 mountPoint) {
+        return new FSModel1( mountPoint,
                                     null == mountPoint.getParent()
                                         ? null
                                         : newModel(mountPoint.getParent()));
@@ -100,7 +100,7 @@ public class FSModelTest {
 
     @Test
     public void testAddRemoveFileSystemListeners() {
-        final FSModel model = new FSModel(FSMountPoint.create(URI.create("foo:/")));
+        final FSModel1 model = new FSModel1(FSMountPoint1.create(URI.create("foo:/")));
 
         try {
             model.addFileSystemTouchedListener(null);
@@ -137,7 +137,7 @@ public class FSModelTest {
 
     @Test
     public void testNotifyFileSystemListeners() {
-        final FSModel model = new FSModel(FSMountPoint.create(URI.create("foo:/")));
+        final FSModel1 model = new FSModel1(FSMountPoint1.create(URI.create("foo:/")));
         final Listener listener1 = new Listener(model);
         final Listener listener2 = new Listener(model);
 
@@ -158,18 +158,18 @@ public class FSModelTest {
         assertThat(listener2.changes, is(2));
     }
 
-    private static class Listener implements FSTouchedListener {
-        final FSModel model;
+    private static class Listener implements FsTouchedListener {
+        final FSModel1 model;
         int changes;
 
         @SuppressWarnings("LeakingThisInConstructor")
-        Listener(final FSModel model) {
+        Listener(final FSModel1 model) {
             this.model = model;
             model.addFileSystemTouchedListener(this);
         }
 
         @Override
-        public void touchedChanged(FSEvent event) {
+        public void touchedChanged(FSEvent1 event) {
             assertThat(event, notNullValue());
             assertThat(event.getSource(), sameInstance(model));
             changes++;

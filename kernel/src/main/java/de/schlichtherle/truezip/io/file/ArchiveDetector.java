@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.fs.archive.driver.ArchiveDriver;
-import de.schlichtherle.truezip.io.fs.FSScheme;
+import de.schlichtherle.truezip.io.fs.FSScheme1;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
@@ -28,9 +28,9 @@ import net.jcip.annotations.Immutable;
  * usually by testing for file name suffixes like <i>.zip</i> or the
  * like.
  * If the method {@link #getScheme(String)} detects an archive file, it
- * returns a {@link FSScheme} for accessing files of this type.
+ * returns a {@link FSScheme1} for accessing files of this type.
  * Next, for any scheme returned by this method, the method
- * {@link #getDriver(FSScheme)} returns an {@link ArchiveDriver} for accessing
+ * {@link #getDriver(FSScheme1)} returns an {@link ArchiveDriver} for accessing
  * files of this scheme type.
  * <p>
  * An archive file which has been recognized by an {@code ArchiveDetector} is
@@ -101,7 +101,7 @@ public interface ArchiveDetector {
      *         not have a known suffix) or an appropriate {@code scheme} is
      *         unknown.
      */
-    @CheckForNull FSScheme getScheme(@NonNull String path);
+    @CheckForNull FSScheme1 getScheme(@NonNull String path);
 
     /**
      * Returns an archive driver for accessing archive files of the
@@ -119,5 +119,5 @@ public interface ArchiveDetector {
      * @throws RuntimeException A subclass is thrown if loading or
      *         instantiating an archive driver class fails.
      */
-    @Nullable ArchiveDriver<?> getDriver(@NonNull FSScheme type);
+    @Nullable ArchiveDriver<?> getDriver(@NonNull FSScheme1 type);
 }

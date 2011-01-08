@@ -22,7 +22,7 @@ package de.schlichtherle.truezip.io.fs;
 public class FSStatisticsManagerTest extends FSManagerTestCase {
 
     @Override
-    protected FSManager newManager() {
-        return new FSStatisticsManager(new FSFederationManager());
+    protected FSManager1 newManager() {
+        return new FSStatisticsManager1(new FSFederationManager1());
     }
 }

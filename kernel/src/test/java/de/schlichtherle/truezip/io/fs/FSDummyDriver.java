@@ -22,20 +22,20 @@ import de.schlichtherle.truezip.io.fs.file.FSFileDriver;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class FSDummyDriver implements FSDriver {
+final class FSDummyDriver implements FSDriver1 {
 
-    private static final FSScheme FILE = FSScheme.create("file");
+    private static final FSScheme1 FILE = FSScheme1.create("file");
 
     @Override
-    public FsController<?> newController(   final FSMountPoint mountPoint,
+    public FsController<?> newController(   final FSMountPoint1 mountPoint,
                                             final FsController<?> parent) {
         assert null == mountPoint.getParent()
                 ? null == parent
                 : mountPoint.getParent().equals(parent.getModel().getMountPoint());
-        final FSScheme scheme = mountPoint.getScheme();
+        final FSScheme1 scheme = mountPoint.getScheme();
         if (FILE.equals(scheme)) {
             return new FSFileDriver().newController(mountPoint);
-        } else if (FSScheme.create("zip").equals(scheme)) {
+        } else if (FSScheme1.create("zip").equals(scheme)) {
             return new DummyArchiveDriver().newController(mountPoint, parent);
         } else {
             throw new IllegalArgumentException();

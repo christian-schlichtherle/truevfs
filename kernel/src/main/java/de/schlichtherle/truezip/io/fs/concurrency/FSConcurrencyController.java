@@ -15,17 +15,17 @@
  */
 package de.schlichtherle.truezip.io.fs.concurrency;
 
-import de.schlichtherle.truezip.io.fs.FSSyncException;
-import de.schlichtherle.truezip.io.fs.FSSyncOption;
-import de.schlichtherle.truezip.io.fs.FSOutputOption;
-import de.schlichtherle.truezip.io.fs.FSInputOption;
+import de.schlichtherle.truezip.io.fs.FSSyncException1;
+import de.schlichtherle.truezip.io.fs.FSSyncOption1;
+import de.schlichtherle.truezip.io.fs.FSOutputOption1;
+import de.schlichtherle.truezip.io.fs.FSInputOption1;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
 import de.schlichtherle.truezip.io.fs.FsController;
-import de.schlichtherle.truezip.io.fs.FSEntry;
-import de.schlichtherle.truezip.io.fs.FSEntryName;
-import de.schlichtherle.truezip.io.fs.FSException;
+import de.schlichtherle.truezip.io.fs.FSEntry1;
+import de.schlichtherle.truezip.io.fs.FSEntryName1;
+import de.schlichtherle.truezip.io.fs.FSException1;
 import de.schlichtherle.truezip.io.fs.FsDecoratorController;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
@@ -143,7 +143,7 @@ extends FsDecoratorController<  FSConcurrencyModel,
     }
 
     @Override
-    public FSEntry getEntry(FSEntryName name)
+    public FSEntry1 getEntry(FSEntryName1 name)
     throws IOException {
         try {
             readLock().lock();
@@ -164,7 +164,7 @@ extends FsDecoratorController<  FSConcurrencyModel,
     }
 
     @Override
-    public boolean isReadable(FSEntryName name) throws IOException {
+    public boolean isReadable(FSEntryName1 name) throws IOException {
         try {
             readLock().lock();
             try {
@@ -184,7 +184,7 @@ extends FsDecoratorController<  FSConcurrencyModel,
     }
 
     @Override
-    public boolean isWritable(FSEntryName name) throws IOException {
+    public boolean isWritable(FSEntryName1 name) throws IOException {
         try {
             readLock().lock();
             try {
@@ -204,7 +204,7 @@ extends FsDecoratorController<  FSConcurrencyModel,
     }
 
     @Override
-    public void setReadOnly(FSEntryName name) throws IOException {
+    public void setReadOnly(FSEntryName1 name) throws IOException {
         assertNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
@@ -215,7 +215,7 @@ extends FsDecoratorController<  FSConcurrencyModel,
     }
 
     @Override
-    public boolean setTime(FSEntryName name, BitField<Access> types, long value)
+    public boolean setTime(FSEntryName1 name, BitField<Access> types, long value)
     throws IOException {
         assertNotReadLockedByCurrentThread(null);
         writeLock().lock();
@@ -227,8 +227,8 @@ extends FsDecoratorController<  FSConcurrencyModel,
     }
 
     @Override
-    public InputSocket<?> getInputSocket(   FSEntryName name,
-                                            BitField<FSInputOption> options) {
+    public InputSocket<?> getInputSocket(   FSEntryName1 name,
+                                            BitField<FSInputOption1> options) {
         return new Input(delegate.getInputSocket(name, options));
     }
 
@@ -299,8 +299,8 @@ extends FsDecoratorController<  FSConcurrencyModel,
     } // class Input
 
     @Override
-    public OutputSocket<?> getOutputSocket( FSEntryName name,
-                                            BitField<FSOutputOption> options,
+    public OutputSocket<?> getOutputSocket( FSEntryName1 name,
+                                            BitField<FSOutputOption1> options,
                                             Entry template) {
         return new Output(delegate.getOutputSocket(name, options, template));
     }
@@ -335,9 +335,9 @@ extends FsDecoratorController<  FSConcurrencyModel,
 
     @Override
     public void mknod(
-            @NonNull FSEntryName name,
+            @NonNull FSEntryName1 name,
             @NonNull Type type,
-            @NonNull BitField<FSOutputOption> options,
+            @NonNull BitField<FSOutputOption1> options,
             @CheckForNull Entry template)
     throws IOException {
         assertNotReadLockedByCurrentThread(null);
@@ -350,7 +350,7 @@ extends FsDecoratorController<  FSConcurrencyModel,
     }
 
     @Override
-    public void unlink(FSEntryName name)
+    public void unlink(FSEntryName1 name)
     throws IOException {
         assertNotReadLockedByCurrentThread(null);
         writeLock().lock();
@@ -364,9 +364,9 @@ extends FsDecoratorController<  FSConcurrencyModel,
     @Override
     public <X extends IOException>
     void sync(
-            @NonNull final BitField<FSSyncOption> options,
-            @NonNull final ExceptionHandler<? super FSSyncException, X> handler)
-    throws X, FSException {
+            @NonNull final BitField<FSSyncOption1> options,
+            @NonNull final ExceptionHandler<? super FSSyncException1, X> handler)
+    throws X, FSException1 {
         assertNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {

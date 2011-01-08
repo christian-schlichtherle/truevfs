@@ -15,8 +15,8 @@
  */
 package de.schlichtherle.truezip.io.fs.archive;
 
-import de.schlichtherle.truezip.io.fs.FSEntryNotFoundException;
-import de.schlichtherle.truezip.io.fs.FSEntry;
+import de.schlichtherle.truezip.io.fs.FSEntryNotFoundException1;
+import de.schlichtherle.truezip.io.fs.FSEntry1;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.fs.archive.driver.ArchiveDriver;
@@ -25,18 +25,18 @@ import de.schlichtherle.truezip.io.fs.concurrency.FSConcurrencyModel;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
-import de.schlichtherle.truezip.io.fs.FSFalsePositiveException;
+import de.schlichtherle.truezip.io.fs.FSFalsePositiveException1;
 import de.schlichtherle.truezip.io.fs.FsController;
-import de.schlichtherle.truezip.io.fs.FSEntryName;
-import de.schlichtherle.truezip.io.fs.FSException;
-import de.schlichtherle.truezip.io.fs.FSSyncException;
-import de.schlichtherle.truezip.io.fs.FSSyncExceptionBuilder;
+import de.schlichtherle.truezip.io.fs.FSEntryName1;
+import de.schlichtherle.truezip.io.fs.FSException1;
+import de.schlichtherle.truezip.io.fs.FSSyncException1;
+import de.schlichtherle.truezip.io.fs.FSSyncExceptionBuilder1;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.InputSocket;
-import de.schlichtherle.truezip.io.fs.FSInputOption;
+import de.schlichtherle.truezip.io.fs.FSInputOption1;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
-import de.schlichtherle.truezip.io.fs.FSOutputOption;
-import de.schlichtherle.truezip.io.fs.FSSyncOption;
+import de.schlichtherle.truezip.io.fs.FSOutputOption1;
+import de.schlichtherle.truezip.io.fs.FSSyncOption1;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -49,9 +49,9 @@ import net.jcip.annotations.NotThreadSafe;
 
 import static de.schlichtherle.truezip.io.entry.Entry.Access.*;
 import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
-import static de.schlichtherle.truezip.io.fs.FSEntryName.*;
-import static de.schlichtherle.truezip.io.fs.FSSyncOption.*;
-import static de.schlichtherle.truezip.io.fs.FSOutputOption.*;
+import static de.schlichtherle.truezip.io.fs.FSEntryName1.*;
+import static de.schlichtherle.truezip.io.fs.FSSyncOption1.*;
+import static de.schlichtherle.truezip.io.fs.FSOutputOption1.*;
 
 /**
  * This is the base class for any archive controller, providing all the
@@ -114,10 +114,10 @@ extends FsController<FSConcurrencyModel> {
     private static final Logger logger
             = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 
-    private static final BitField<FSOutputOption> AUTO_MOUNT_OPTIONS
-            = BitField.noneOf(FSOutputOption.class);
+    private static final BitField<FSOutputOption1> AUTO_MOUNT_OPTIONS
+            = BitField.noneOf(FSOutputOption1.class);
 
-    private static final BitField<FSSyncOption> UNLINK_SYNC_OPTIONS
+    private static final BitField<FSSyncOption1> UNLINK_SYNC_OPTIONS
             = BitField.of(ABORT_CHANGES);
 
     private final FSConcurrencyModel model;
@@ -160,10 +160,10 @@ extends FsController<FSConcurrencyModel> {
      *        directory is created with its last modification time set to the
      *        system's current time.
      * @return A valid archive file system - {@code null} is never returned.
-     * @throws FSFalsePositiveException
+     * @throws FSFalsePositiveException1
      */
     abstract ArchiveFileSystem<E> autoMount(boolean autoCreate,
-                                            BitField<FSOutputOption> options)
+                                            BitField<FSOutputOption1> options)
     throws IOException;
 
     @Override
@@ -172,28 +172,28 @@ extends FsController<FSConcurrencyModel> {
     }
 
     @Override
-    public final FSEntry getEntry(FSEntryName name)
+    public final FSEntry1 getEntry(FSEntryName1 name)
     throws IOException {
         return autoMount().getEntry(name);
     }
 
     @Override
-    public final boolean isReadable(FSEntryName name) throws IOException {
+    public final boolean isReadable(FSEntryName1 name) throws IOException {
         return autoMount().getEntry(name) != null;
     }
 
     @Override
-    public final boolean isWritable(FSEntryName name) throws IOException {
+    public final boolean isWritable(FSEntryName1 name) throws IOException {
         return autoMount().isWritable(name);
     }
 
     @Override
-    public final void setReadOnly(FSEntryName name) throws IOException {
+    public final void setReadOnly(FSEntryName1 name) throws IOException {
         autoMount().setReadOnly(name);
     }
 
     @Override
-    public final boolean setTime(   FSEntryName name,
+    public final boolean setTime(   FSEntryName1 name,
                                     BitField<Access> types,
                                     long value)
     throws IOException {
@@ -203,17 +203,17 @@ extends FsController<FSConcurrencyModel> {
 
     @Override
     public final InputSocket<?> getInputSocket(
-            FSEntryName name,
-            BitField<FSInputOption> options) {
+            FSEntryName1 name,
+            BitField<FSInputOption1> options) {
         return new Input(name, options);
     }
 
     private class Input extends InputSocket<E> {
-        final FSEntryName name;
-        final BitField<FSInputOption> options;
+        final FSEntryName1 name;
+        final BitField<FSInputOption1> options;
 
-        Input(  final FSEntryName name,
-                final BitField<FSInputOption> options) {
+        Input(  final FSEntryName1 name,
+                final BitField<FSInputOption1> options) {
             this.name = name;
             this.options = options;
         }
@@ -226,7 +226,7 @@ extends FsController<FSConcurrencyModel> {
             }
             final ArchiveFileSystemEntry<E> entry = autoMount().getEntry(name);
             if (null == entry)
-                throw new FSEntryNotFoundException(getModel(),
+                throw new FSEntryNotFoundException1(getModel(),
                         name, "no such file or directory");
             return entry.getEntry();
         }
@@ -234,7 +234,7 @@ extends FsController<FSConcurrencyModel> {
         InputSocket<?> getBoundSocket() throws IOException {
             final E entry = getLocalTarget();
             if (DIRECTORY == entry.getType())
-                throw new FSEntryNotFoundException(getModel(),
+                throw new FSEntryNotFoundException1(getModel(),
                         name, "cannot read directories");
             return BasicArchiveController
                     .this
@@ -257,19 +257,19 @@ extends FsController<FSConcurrencyModel> {
 
     @Override
     public final OutputSocket<?> getOutputSocket(
-            FSEntryName name,
-            BitField<FSOutputOption> options,
+            FSEntryName1 name,
+            BitField<FSOutputOption1> options,
             Entry template) {
         return new Output(name, options, template);
     }
 
     private class Output extends OutputSocket<E> {
-        final FSEntryName name;
-        final BitField<FSOutputOption> options;
+        final FSEntryName1 name;
+        final BitField<FSOutputOption1> options;
         final Entry template;
 
-        Output( final FSEntryName name,
-                final BitField<FSOutputOption> options,
+        Output( final FSEntryName1 name,
+                final BitField<FSOutputOption1> options,
                 final Entry template) {
             this.name = name;
             this.options = options;
@@ -332,21 +332,21 @@ extends FsController<FSConcurrencyModel> {
 
     @Override
     public final void mknod(
-            @NonNull final FSEntryName name,
+            @NonNull final FSEntryName1 name,
             @NonNull final Type type,
-            @NonNull final BitField<FSOutputOption> options,
+            @NonNull final BitField<FSOutputOption1> options,
             @CheckForNull final Entry template)
     throws IOException {
         if (name.isRoot()) {
             try {
                 autoMount(); // detect false positives!
-            } catch (FSFalsePositiveException ex) {
+            } catch (FSFalsePositiveException1 ex) {
                 if (DIRECTORY != type)
                     throw ex;
                 autoMount(true, options);
                 return;
             }
-            throw new FSEntryNotFoundException(getModel(),
+            throw new FSEntryNotFoundException1(getModel(),
                     name, "directory exists already");
         } else {
             autoMount(options.get(CREATE_PARENTS), options)
@@ -356,13 +356,13 @@ extends FsController<FSConcurrencyModel> {
     }
 
     @Override
-    public void unlink(final FSEntryName name) throws IOException {
+    public void unlink(final FSEntryName1 name) throws IOException {
         autoSync(name, null);
         if (name.isRoot()) {
             final ArchiveFileSystem<E> fileSystem;
             try {
                 fileSystem = autoMount();
-            } catch (FSFalsePositiveException ex) {
+            } catch (FSFalsePositiveException1 ex) {
                 try {
                     // The parent archive controller will unlink our target
                     // archive file next, so we need to reset anyway.
@@ -371,7 +371,7 @@ extends FsController<FSConcurrencyModel> {
                     // that the file system can be successfully mounted again
                     // if the target archive file is subsequently modified to
                     // be a regular archive file.
-                    sync(UNLINK_SYNC_OPTIONS, new FSSyncExceptionBuilder());
+                    sync(UNLINK_SYNC_OPTIONS, new FSSyncExceptionBuilder1());
                 } catch (IOException cannotHappen) {
                     throw new AssertionError(cannotHappen);
                 }
@@ -385,7 +385,7 @@ extends FsController<FSConcurrencyModel> {
                 logger.log(Level.WARNING, "unlink.absolute",
                         new Object[] {  fileSystem.getSize() - 1,
                                         getModel().getMountPoint() });
-            sync(UNLINK_SYNC_OPTIONS, new FSSyncExceptionBuilder());
+            sync(UNLINK_SYNC_OPTIONS, new FSSyncExceptionBuilder1());
         } else { // !isRoot(path)
             autoMount().unlink(name);
         }
@@ -408,7 +408,7 @@ extends FsController<FSConcurrencyModel> {
      * @throws FSNotWriteLockedException
      * @return Whether or not a synchronization has been performed.
      */
-    abstract boolean autoSync(  @NonNull FSEntryName name,
+    abstract boolean autoSync(  @NonNull FSEntryName1 name,
                                 @CheckForNull Access intention)
-    throws FSSyncException, FSException;
+    throws FSSyncException1, FSException1;
 }

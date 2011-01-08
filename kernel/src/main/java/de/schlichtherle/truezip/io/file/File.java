@@ -17,16 +17,16 @@ package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.fs.FsController;
-import de.schlichtherle.truezip.io.fs.FSManagers;
-import de.schlichtherle.truezip.io.fs.FSEntryName;
-import de.schlichtherle.truezip.io.fs.FSScheme;
-import de.schlichtherle.truezip.io.fs.FSPath;
-import de.schlichtherle.truezip.io.fs.FSMountPoint;
+import de.schlichtherle.truezip.io.fs.FSManagers1;
+import de.schlichtherle.truezip.io.fs.FSEntryName1;
+import de.schlichtherle.truezip.io.fs.FSScheme1;
+import de.schlichtherle.truezip.io.fs.FSPath1;
+import de.schlichtherle.truezip.io.fs.FSMountPoint1;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.io.fs.FSEntry;
-import de.schlichtherle.truezip.io.fs.FSFilterManager;
-import de.schlichtherle.truezip.io.fs.FSSyncExceptionBuilder;
-import de.schlichtherle.truezip.io.fs.FSSyncOption;
+import de.schlichtherle.truezip.io.fs.FSEntry1;
+import de.schlichtherle.truezip.io.fs.FSFilterManager1;
+import de.schlichtherle.truezip.io.fs.FSSyncExceptionBuilder1;
+import de.schlichtherle.truezip.io.fs.FSSyncOption1;
 import de.schlichtherle.truezip.io.fs.FsUriModifier;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
@@ -54,14 +54,14 @@ import java.util.TreeSet;
 import javax.swing.Icon;
 
 import static de.schlichtherle.truezip.io.fs.FsController.*;
-import static de.schlichtherle.truezip.io.fs.FSEntry.*;
-import static de.schlichtherle.truezip.io.fs.FSEntryName.*;
-import static de.schlichtherle.truezip.io.fs.FSSyncOption.*;
+import static de.schlichtherle.truezip.io.fs.FSEntry1.*;
+import static de.schlichtherle.truezip.io.fs.FSEntryName1.*;
+import static de.schlichtherle.truezip.io.fs.FSSyncOption1.*;
 import static de.schlichtherle.truezip.io.entry.Entry.Size.*;
 import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
 import static de.schlichtherle.truezip.io.file.Files.*;
 import static de.schlichtherle.truezip.io.Files.*;
-import static de.schlichtherle.truezip.io.fs.FSOutputOption.*;
+import static de.schlichtherle.truezip.io.fs.FSOutputOption1.*;
 
 /**
  * A drop-in replacement for its subclass which provides transparent
@@ -145,7 +145,7 @@ import static de.schlichtherle.truezip.io.fs.FSOutputOption.*;
  * <p>
  * <table border="2" cellpadding="4">
  * <tr>
- *   <th>FSPath</th>
+ *   <th>FSPath1</th>
  *   <th>True State</th>
  *   <th>{@code isArchive()}<sup>1</sup></th>
  *   <th>{@code isDirectory()}</th>
@@ -403,7 +403,7 @@ public final class File extends java.io.File {
      *
      * @see #getEnclEntryName
      */
-    private @Nullable FSEntryName enclEntryName;
+    private @Nullable FSEntryName1 enclEntryName;
 
     /**
      * This refers to the file system controller if and only if this file
@@ -613,25 +613,25 @@ public final class File extends java.io.File {
      *         parameter {@code uri} does not hold.
      */
     public File(URI uri) {
-        this(   FSPath.create(fix(uri), FsUriModifier.NORMALIZE),
+        this(   FSPath1.create(fix(uri), FsUriModifier.NORMALIZE),
                 new ArchiveDetectorFSDriver(defaultDetector));
     }
 
-    public File(final @NonNull FSPath path) {
+    public File(final @NonNull FSPath1 path) {
         this(path, new ArchiveDetectorFSDriver(defaultDetector));
     }
 
     @SuppressWarnings("LeakingThisInConstructor")
-    private File(   final @NonNull FSPath path,
+    private File(   final @NonNull FSPath1 path,
                     final @NonNull ArchiveDetectorFSDriver driver) {
         super(path.hierarchicalize().getUri());
 
         this.delegate = new java.io.File(super.getPath());
         this.detector = driver.getDetector();
 
-        final FSMountPoint mountPoint = path.getMountPoint();
-        final FSPath mountPointPath = mountPoint.getPath();
-        final FSEntryName entryName;
+        final FSMountPoint1 mountPoint = path.getMountPoint();
+        final FSPath1 mountPointPath = mountPoint.getPath();
+        final FSEntryName1 entryName;
 
         if (null == mountPointPath) {
             assert !path.getUri().isOpaque();
@@ -650,7 +650,7 @@ public final class File extends java.io.File {
                 this.enclEntryName = null;
             }
             this.innerArchive = this;
-            this.controller = FSManagers
+            this.controller = FSManagers1
                     .getInstance()
                     .getController(mountPoint, driver);
         } else {
@@ -665,14 +665,14 @@ public final class File extends java.io.File {
     }
 
     @SuppressWarnings("LeakingThisInConstructor")
-    private File(   final @NonNull FSMountPoint mountPoint,
+    private File(   final @NonNull FSMountPoint1 mountPoint,
                     final @NonNull ArchiveDetectorFSDriver driver) {
         super(mountPoint.hierarchicalize().getUri());
 
         this.delegate = new java.io.File(super.getPath());
         this.detector = driver.getDetector();
 
-        final FSPath mountPointPath = mountPoint.getPath();
+        final FSPath1 mountPointPath = mountPoint.getPath();
 
         if (null == mountPointPath) {
             assert !mountPoint.getUri().isOpaque();
@@ -691,7 +691,7 @@ public final class File extends java.io.File {
                 this.enclEntryName = null;
             }
             this.innerArchive = this;
-            this.controller = FSManagers
+            this.controller = FSManagers1
                     .getInstance()
                     .getController(mountPoint, driver);
         }
@@ -722,7 +722,7 @@ public final class File extends java.io.File {
             } else {
                 this.detector = detector;
                 this.innerArchive = this.enclArchive = innerArchive;
-                this.enclEntryName = FSEntryName.create(
+                this.enclEntryName = FSEntryName1.create(
                         path.substring(innerArchivePathLength + 1) // cut off leading separatorChar
                             .replace(separatorChar, SEPARATOR_CHAR),
                         null,
@@ -773,7 +773,7 @@ public final class File extends java.io.File {
         final StringBuilder enclEntryNameBuf = new StringBuilder(path.length());
         init(ancestor, detector, 0, path, enclEntryNameBuf, new Splitter(separatorChar));
         enclEntryName = 0 < enclEntryNameBuf.length()
-                ? FSEntryName.create(enclEntryNameBuf.toString(), null, FsUriModifier.NORMALIZE)
+                ? FSEntryName1.create(enclEntryNameBuf.toString(), null, FsUriModifier.NORMALIZE)
                 : null;
 
         if (innerArchive == this) {
@@ -893,25 +893,25 @@ public final class File extends java.io.File {
 
     private void initController() {
         final java.io.File target = getRealFile(delegate);
-        final FSScheme scheme = detector.getScheme(target.getPath());
+        final FSScheme1 scheme = detector.getScheme(target.getPath());
         assert null != scheme; // make FindBugs happy
-        final FSMountPoint mountPoint;
+        final FSMountPoint1 mountPoint;
         try {
             if (null != enclArchive) {
-                mountPoint = new FSMountPoint(scheme,
-                        new FSPath(   enclArchive
+                mountPoint = new FSMountPoint1(scheme,
+                        new FSPath1(   enclArchive
                                         .getController()
                                         .getModel()
                                         .getMountPoint(),
                                     enclEntryName));
             } else {
-                mountPoint = new FSMountPoint(scheme,
-                        new FSPath(fix(target.toURI())));
+                mountPoint = new FSMountPoint1(scheme,
+                        new FSPath1(fix(target.toURI())));
             }
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
         }
-        this.controller = FSManagers
+        this.controller = FSManagers1
                 .getInstance()
                 .getController(mountPoint, new ArchiveDetectorFSDriver(detector));
     }
@@ -962,24 +962,24 @@ public final class File extends java.io.File {
      * This method is thread-safe.
      *
      * @throws ArchiveWarningException If the configuration uses the
-     *         {@link FSSyncExceptionBuilder} and <em>only</em>
+     *         {@link FSSyncExceptionBuilder1} and <em>only</em>
      *         warning conditions occured throughout the course of this method.
      *         This implies that the respective archive file has been updated
      *         with constraints, such as a failure to map the last modification
      *         time of the archive file to the last modification time of its
      *         implicit root directory.
      * @throws ArchiveException If the configuration uses the
-     *         {@link FSSyncExceptionBuilder} and any error
+     *         {@link FSSyncExceptionBuilder1} and any error
      *         condition occured throughout the course of this method.
      *         This implies loss of data!
      * @throws IllegalArgumentException If the combination of options is
      *         illegal.
      * @see <a href="package-summary.html#state">Managing Archive File State</a>
      */
-    public static void sync(@NonNull BitField<FSSyncOption> options)
+    public static void sync(@NonNull BitField<FSSyncOption1> options)
     throws ArchiveException {
         ArchiveExceptionBuilder builder = new ArchiveExceptionBuilder();
-        FSManagers.getInstance().sync(options, builder);
+        FSManagers1.getInstance().sync(options, builder);
         builder.check();
     }
 
@@ -1006,7 +1006,7 @@ public final class File extends java.io.File {
      */
     public static void sync(
             @NonNull final File archive,
-            @NonNull final BitField<FSSyncOption> options)
+            @NonNull final BitField<FSSyncOption1> options)
     throws ArchiveException {
         if (!archive.isArchive())
             throw new IllegalArgumentException(archive.getPath() + " (not a federated file system)");
@@ -1014,8 +1014,8 @@ public final class File extends java.io.File {
             throw new IllegalArgumentException(archive.getPath() + " (not a top level federated file system)");
         final ExceptionBuilder<IOException, ArchiveException> builder
                 = new ArchiveExceptionBuilder();
-        new FSFilterManager(
-                FSManagers.getInstance(),
+        new FSFilterManager1(
+                FSManagers1.getInstance(),
                 archive .getController()
                         .getModel()
                         .getMountPoint())
@@ -1035,9 +1035,9 @@ public final class File extends java.io.File {
 
     /**
      * Equivalent to {@code
-        sync(   BitField.of(FSSyncOption.CLEAR_CACHE)
-                .set(FSSyncOption.FORCE_CLOSE_INPUT, closeStreams)
-                .set(FSSyncOption.FORCE_CLOSE_OUTPUT, closeStreams))
+        sync(   BitField.of(FSSyncOption1.CLEAR_CACHE)
+                .set(FSSyncOption1.FORCE_CLOSE_INPUT, closeStreams)
+                .set(FSSyncOption1.FORCE_CLOSE_OUTPUT, closeStreams))
      * }.
      *
      * @see #sync(BitField)
@@ -1051,11 +1051,11 @@ public final class File extends java.io.File {
 
     /**
      * Equivalent to {@code
-        sync(   BitField.of(FSSyncOption.CLEAR_CACHE)
-                .set(FSSyncOption.WAIT_CLOSE_INPUT, waitForInputStreams)
-                .set(FSSyncOption.FORCE_CLOSE_INPUT, closeInputStreams)
-                .set(FSSyncOption.WAIT_CLOSE_OUTPUT, waitForOutputStreams)
-                .set(FSSyncOption.FORCE_CLOSE_OUTPUT, closeOutputStreams))
+        sync(   BitField.of(FSSyncOption1.CLEAR_CACHE)
+                .set(FSSyncOption1.WAIT_CLOSE_INPUT, waitForInputStreams)
+                .set(FSSyncOption1.FORCE_CLOSE_INPUT, closeInputStreams)
+                .set(FSSyncOption1.WAIT_CLOSE_OUTPUT, waitForOutputStreams)
+                .set(FSSyncOption1.FORCE_CLOSE_OUTPUT, closeOutputStreams))
      * }.
      *
      * @see #sync(BitField)
@@ -1086,9 +1086,9 @@ public final class File extends java.io.File {
     /**
      * Equivalent to {@code
         sync(   archive,
-                BitField.of(FSSyncOption.CLEAR_CACHE)
-                .set(FSSyncOption.FORCE_CLOSE_INPUT, closeStreams)
-                .set(FSSyncOption.FORCE_CLOSE_OUTPUT, closeStreams))
+                BitField.of(FSSyncOption1.CLEAR_CACHE)
+                .set(FSSyncOption1.FORCE_CLOSE_INPUT, closeStreams)
+                .set(FSSyncOption1.FORCE_CLOSE_OUTPUT, closeStreams))
      * }.
      *
      * @see #sync(File, BitField)
@@ -1104,11 +1104,11 @@ public final class File extends java.io.File {
     /**
      * Equivalent to {@code
         sync(   archive,
-                BitField.of(FSSyncOption.CLEAR_CACHE)
-                .set(FSSyncOption.WAIT_CLOSE_INPUT, waitForInputStreams)
-                .set(FSSyncOption.FORCE_CLOSE_INPUT, closeInputStreams)
-                .set(FSSyncOption.WAIT_CLOSE_OUTPUT, waitForOutputStreams)
-                .set(FSSyncOption.FORCE_CLOSE_OUTPUT, closeOutputStreams))
+                BitField.of(FSSyncOption1.CLEAR_CACHE)
+                .set(FSSyncOption1.WAIT_CLOSE_INPUT, waitForInputStreams)
+                .set(FSSyncOption1.FORCE_CLOSE_INPUT, closeInputStreams)
+                .set(FSSyncOption1.WAIT_CLOSE_OUTPUT, waitForOutputStreams)
+                .set(FSSyncOption1.FORCE_CLOSE_OUTPUT, closeOutputStreams))
      * }.
      *
      * @see #sync(File, BitField)
@@ -1137,27 +1137,27 @@ public final class File extends java.io.File {
 
     /**
      * Equivalent to {@code
-        sync(   BitField.noneOf(FSSyncOption.class)
-                .set(FSSyncOption.FORCE_CLOSE_INPUT, closeStreams)
-                .set(FSSyncOption.FORCE_CLOSE_OUTPUT, closeStreams))
+        sync(   BitField.noneOf(FSSyncOption1.class)
+                .set(FSSyncOption1.FORCE_CLOSE_INPUT, closeStreams)
+                .set(FSSyncOption1.FORCE_CLOSE_OUTPUT, closeStreams))
      * }.
      *
      * @see #sync(BitField)
      */
     public static void update(boolean closeStreams)
     throws ArchiveException {
-        sync(   BitField.noneOf(FSSyncOption.class)
+        sync(   BitField.noneOf(FSSyncOption1.class)
                 .set(FORCE_CLOSE_INPUT, closeStreams)
                 .set(FORCE_CLOSE_OUTPUT, closeStreams));
     }
 
     /**
      * Equivalent to {@code
-        sync(   BitField.noneOf(FSSyncOption.class)
-                .set(FSSyncOption.WAIT_CLOSE_INPUT, waitForInputStreams)
-                .set(FSSyncOption.FORCE_CLOSE_INPUT, closeInputStreams)
-                .set(FSSyncOption.WAIT_CLOSE_OUTPUT, waitForOutputStreams)
-                .set(FSSyncOption.FORCE_CLOSE_OUTPUT, closeOutputStreams))
+        sync(   BitField.noneOf(FSSyncOption1.class)
+                .set(FSSyncOption1.WAIT_CLOSE_INPUT, waitForInputStreams)
+                .set(FSSyncOption1.FORCE_CLOSE_INPUT, closeInputStreams)
+                .set(FSSyncOption1.WAIT_CLOSE_OUTPUT, waitForOutputStreams)
+                .set(FSSyncOption1.FORCE_CLOSE_OUTPUT, closeOutputStreams))
      * }.
      *
      * @see #sync(BitField)
@@ -1166,7 +1166,7 @@ public final class File extends java.io.File {
             boolean waitForInputStreams, boolean closeInputStreams,
             boolean waitForOutputStreams, boolean closeOutputStreams)
     throws ArchiveException {
-        sync(   BitField.noneOf(FSSyncOption.class)
+        sync(   BitField.noneOf(FSSyncOption1.class)
                 .set(WAIT_CLOSE_INPUT, waitForInputStreams)
                 .set(FORCE_CLOSE_INPUT, closeInputStreams)
                 .set(WAIT_CLOSE_OUTPUT, waitForOutputStreams)
@@ -1176,8 +1176,8 @@ public final class File extends java.io.File {
     /**
      * Equivalent to {@code
         sync(   archive,
-                BitField.of(FSSyncOption.FORCE_CLOSE_INPUT,
-     *                      FSSyncOption.FORCE_CLOSE_OUTPUT))
+                BitField.of(FSSyncOption1.FORCE_CLOSE_INPUT,
+     *                      FSSyncOption1.FORCE_CLOSE_OUTPUT))
      * }.
      *
      * @see #sync(File, BitField)
@@ -1191,9 +1191,9 @@ public final class File extends java.io.File {
     /**
      * Equivalent to {@code
         sync(   archive,
-                BitField.noneOf(FSSyncOption.class)
-                .set(FSSyncOption.FORCE_CLOSE_INPUT, closeStreams)
-                .set(FSSyncOption.FORCE_CLOSE_OUTPUT, closeStreams))
+                BitField.noneOf(FSSyncOption1.class)
+                .set(FSSyncOption1.FORCE_CLOSE_INPUT, closeStreams)
+                .set(FSSyncOption1.FORCE_CLOSE_OUTPUT, closeStreams))
      * }.
      *
      * @see #sync(File, BitField)
@@ -1201,7 +1201,7 @@ public final class File extends java.io.File {
     public static void update(@NonNull File archive, boolean closeStreams)
     throws ArchiveException {
         sync(   archive,
-                BitField.noneOf(FSSyncOption.class)
+                BitField.noneOf(FSSyncOption1.class)
                 .set(FORCE_CLOSE_INPUT, closeStreams)
                 .set(FORCE_CLOSE_OUTPUT, closeStreams));
     }
@@ -1209,11 +1209,11 @@ public final class File extends java.io.File {
     /**
      * Equivalent to {@code
         sync(   archive,
-                BitField.noneOf(FSSyncOption.class)
-                .set(FSSyncOption.WAIT_CLOSE_INPUT, waitForInputStreams)
-                .set(FSSyncOption.FORCE_CLOSE_INPUT, closeInputStreams)
-                .set(FSSyncOption.WAIT_CLOSE_OUTPUT, waitForOutputStreams)
-                .set(FSSyncOption.FORCE_CLOSE_OUTPUT, closeOutputStreams))
+                BitField.noneOf(FSSyncOption1.class)
+                .set(FSSyncOption1.WAIT_CLOSE_INPUT, waitForInputStreams)
+                .set(FSSyncOption1.FORCE_CLOSE_INPUT, closeInputStreams)
+                .set(FSSyncOption1.WAIT_CLOSE_OUTPUT, waitForOutputStreams)
+                .set(FSSyncOption1.FORCE_CLOSE_OUTPUT, closeOutputStreams))
      * }.
      *
      * @see #sync(File, BitField)
@@ -1224,7 +1224,7 @@ public final class File extends java.io.File {
             boolean waitForOutputStreams, boolean closeOutputStreams)
     throws ArchiveException {
         sync(   archive,
-                BitField.noneOf(FSSyncOption.class)
+                BitField.noneOf(FSSyncOption1.class)
                 .set(WAIT_CLOSE_INPUT, waitForInputStreams)
                 .set(FORCE_CLOSE_INPUT, closeInputStreams)
                 .set(WAIT_CLOSE_OUTPUT, waitForOutputStreams)
@@ -1584,7 +1584,7 @@ public final class File extends java.io.File {
                     : enclEntryName.getPath();
     }
 
-    FSEntryName getInnerEntryName0() {
+    FSEntryName1 getInnerEntryName0() {
         return this == innerArchive ? ROOT : enclEntryName;
     }
 
@@ -1621,7 +1621,7 @@ public final class File extends java.io.File {
         return null == enclEntryName ? null : enclEntryName.getPath();
     }
 
-    final FSEntryName getEnclEntryName0() {
+    final FSEntryName1 getEnclEntryName0() {
         return enclEntryName;
     }
 
@@ -1769,8 +1769,8 @@ public final class File extends java.io.File {
      * The implementation in this class behaves exactly like its superclass.
      * Note that this implies that only the hierarchicalized file system path
      * of this file instance is considered in the comparison.
-     * E.g. {@code new File(FSPath.create("zip:file:/archive!/entry"))} and
-     * {@code new File(FSPath.create("tar:file:/archive!/entry"))} would
+     * E.g. {@code new File(FSPath1.create("zip:file:/archive!/entry"))} and
+     * {@code new File(FSPath1.create("tar:file:/archive!/entry"))} would
      * compare equal because their hierarchicalized file system path is
      * {@code "file:/archive/entry"}.
      * <p>
@@ -1783,7 +1783,7 @@ public final class File extends java.io.File {
      * E.g. on Windows, the expression
      * {@code new File("file").equals(new File("FILE"))} is true, but
      * {@code new File("file").toFSPath().hierarchicalize().equals(new File("FILE").toFSPath().hierarchicalize())}
-     * is false because {@link FSPath#equals(Object)} is case sensitive.
+     * is false because {@link FSPath1#equals(Object)} is case sensitive.
      *
      * @see #compareTo(java.io.File)
      */
@@ -1799,8 +1799,8 @@ public final class File extends java.io.File {
      * The implementation in this class behaves exactly like its superclass.
      * Note that this implies that only the hierarchicalized file system path
      * of this file instance is considered in the comparison.
-     * E.g. {@code new File(FSPath.create("zip:file:/archive!/entry"))} and
-     * {@code new File(FSPath.create("tar:file:/archive!/entry"))} would
+     * E.g. {@code new File(FSPath1.create("zip:file:/archive!/entry"))} and
+     * {@code new File(FSPath1.create("tar:file:/archive!/entry"))} would
      * compare equal because their hierarchicalized file system path is
      * {@code "file:/archive/entry"}.
      * <p>
@@ -1813,7 +1813,7 @@ public final class File extends java.io.File {
      * E.g. on Windows, the expression
      * {@code new File("file").compareTo(new File("FILE")) == 0} is true, but
      * {@code new File("file").toFSPath().hierarchicalize().compareTo(new File("FILE").toFSPath().hierarchicalize()) == 0}
-     * is false because {@link FSPath#equals(Object)} is case sensitive.
+     * is false because {@link FSPath1#equals(Object)} is case sensitive.
      *
      * @see #equals(Object)
      */
@@ -1867,32 +1867,32 @@ public final class File extends java.io.File {
         return delegate.toString();
     }
 
-    public @NonNull FSPath toFSPath() {
+    public @NonNull FSPath1 toFSPath() {
         try {
             if (this == innerArchive) {
-                final FSScheme scheme = detector.getScheme(delegate.getPath());
+                final FSScheme1 scheme = detector.getScheme(delegate.getPath());
                 assert null != scheme; // make FindBugs happy!
                 if (null != enclArchive) {
-                    return new FSPath(
-                            new FSMountPoint(
+                    return new FSPath1(
+                            new FSMountPoint1(
                                 scheme,
-                                new FSPath(
-                                    new FSMountPoint(fix(enclArchive.toURI()), FsUriModifier.NORMALIZE),
+                                new FSPath1(
+                                    new FSMountPoint1(fix(enclArchive.toURI()), FsUriModifier.NORMALIZE),
                                     enclEntryName)),
                             ROOT);
                 } else {
-                    return new FSPath(
-                            new FSMountPoint(
+                    return new FSPath1(
+                            new FSMountPoint1(
                                 scheme,
-                                new FSPath(fix(delegate.toURI()), FsUriModifier.NORMALIZE)),
+                                new FSPath1(fix(delegate.toURI()), FsUriModifier.NORMALIZE)),
                             ROOT);
                 }
             } else if (null != enclArchive) {
-                return new FSPath(
-                        new FSMountPoint(fix(enclArchive.toURI()), FsUriModifier.NORMALIZE),
+                return new FSPath1(
+                        new FSMountPoint1(fix(enclArchive.toURI()), FsUriModifier.NORMALIZE),
                         enclEntryName);
             } else {
-                return new FSPath(fix(delegate.toURI()), FsUriModifier.NORMALIZE);
+                return new FSPath1(fix(delegate.toURI()), FsUriModifier.NORMALIZE);
             }
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
@@ -1903,22 +1903,22 @@ public final class File extends java.io.File {
     public @NonNull URI toURI() {
         try {
             if (this == innerArchive) {
-                final FSScheme scheme = detector.getScheme(delegate.getPath());
+                final FSScheme1 scheme = detector.getScheme(delegate.getPath());
                 assert null != scheme; // make FindBugs happy!
                 if (null != enclArchive) {
-                    return new FSMountPoint(
+                    return new FSMountPoint1(
                             scheme,
-                            new FSPath(
-                                new FSMountPoint(fix(enclArchive.toURI()), FsUriModifier.NORMALIZE),
+                            new FSPath1(
+                                new FSMountPoint1(fix(enclArchive.toURI()), FsUriModifier.NORMALIZE),
                                 enclEntryName)).getUri();
                 } else {
-                    return new FSMountPoint(
+                    return new FSMountPoint1(
                             scheme,
-                            new FSPath(fix(delegate.toURI()), FsUriModifier.NORMALIZE)).getUri();
+                            new FSPath1(fix(delegate.toURI()), FsUriModifier.NORMALIZE)).getUri();
                 }
             } else if (null != enclArchive) {
-                return new FSPath(
-                        new FSMountPoint(fix(enclArchive.toURI()), FsUriModifier.NORMALIZE),
+                return new FSPath1(
+                        new FSMountPoint1(fix(enclArchive.toURI()), FsUriModifier.NORMALIZE),
                         enclEntryName).getUri();
             } else {
                 return delegate.toURI();
@@ -1966,7 +1966,7 @@ public final class File extends java.io.File {
     public boolean isFile() {
         if (null != innerArchive) {
             try {
-                final FSEntry entry = innerArchive.getController().getEntry(getInnerEntryName0());
+                final FSEntry1 entry = innerArchive.getController().getEntry(getInnerEntryName0());
                 return null != entry && entry.getType() == FILE;
             } catch (IOException ex) {
                 return false;
@@ -1995,7 +1995,7 @@ public final class File extends java.io.File {
     public boolean isDirectory() {
         if (null != innerArchive) {
             try {
-                final FSEntry entry = innerArchive.getController().getEntry(getInnerEntryName0());
+                final FSEntry1 entry = innerArchive.getController().getEntry(getInnerEntryName0());
                 return null != entry && entry.getType() == DIRECTORY;
             } catch (IOException ex) {
                 return false;
@@ -2104,7 +2104,7 @@ public final class File extends java.io.File {
     @Override
     public long length() {
         if (null != innerArchive) {
-            final FSEntry entry;
+            final FSEntry1 entry;
             try {
                 entry = innerArchive.getController().getEntry(getInnerEntryName0());
             } catch (IOException ex) {
@@ -2142,7 +2142,7 @@ public final class File extends java.io.File {
     @Override
     public long lastModified() {
         if (null != innerArchive) {
-            final FSEntry entry;
+            final FSEntry1 entry;
             try {
                 entry = innerArchive.getController().getEntry(getInnerEntryName0());
             } catch (IOException ex) {
@@ -2209,7 +2209,7 @@ public final class File extends java.io.File {
     @Override
     public String[] list() {
         if (null != innerArchive) {
-            final FSEntry entry;
+            final FSEntry1 entry;
             try {
                 entry = innerArchive.getController().getEntry(getInnerEntryName0());
             } catch (IOException ex) {
@@ -2239,7 +2239,7 @@ public final class File extends java.io.File {
     @Override
     public String[] list(final FilenameFilter filter) {
         if (null != innerArchive) {
-            final FSEntry entry;
+            final FSEntry1 entry;
             try {
                 entry = innerArchive.getController().getEntry(getInnerEntryName0());
             } catch (IOException ex) {
@@ -2321,7 +2321,7 @@ public final class File extends java.io.File {
             final FilenameFilter filter,
             final ArchiveDetector detector) {
         if (null != innerArchive) {
-            final FSEntry entry;
+            final FSEntry1 entry;
             try {
                 entry = innerArchive.getController().getEntry(getInnerEntryName0());
             } catch (IOException ex) {
@@ -2383,7 +2383,7 @@ public final class File extends java.io.File {
             final FileFilter filter,
             final ArchiveDetector detector) {
         if (null != innerArchive) {
-            final FSEntry entry;
+            final FSEntry1 entry;
             try {
                 entry = innerArchive.getController().getEntry(getInnerEntryName0());
             } catch (IOException ex) {
@@ -2448,7 +2448,7 @@ public final class File extends java.io.File {
         if (null != innerArchive) {
             final FsController<?> controller
                     = innerArchive.getController();
-            final FSEntryName entryName = getInnerEntryName0();
+            final FSEntryName1 entryName = getInnerEntryName0();
             // This is not really atomic, but should be OK in this case.
             if (null != controller.getEntry(entryName))
                 return false;
