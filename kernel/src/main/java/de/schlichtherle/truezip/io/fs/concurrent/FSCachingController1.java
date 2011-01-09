@@ -82,9 +82,9 @@ import static de.schlichtherle.truezip.io.fs.FsSyncOption.*;
  * @version $Id$
  */
 @NotThreadSafe
-public final class FSCachingController
-extends FsDecoratingController<  FSConcurrentModel,
-                                FsController<? extends FSConcurrentModel>> {
+public final class FSCachingController1
+extends FsDecoratingController<  FSConcurrentModel1,
+                                FsController<? extends FSConcurrentModel1>> {
 
     private static final Strategy STRATEGY = WRITE_BACK;
 
@@ -98,8 +98,8 @@ extends FsDecoratingController<  FSConcurrentModel,
      * @param controller the decorated file system controller.
      * @param pool the pool of temporary entries to hold the copied entry data.
      */
-    public FSCachingController(
-            final @NonNull FsController<? extends FSConcurrentModel> controller,
+    public FSCachingController1(
+            final @NonNull FsController<? extends FSConcurrentModel1> controller,
             final @NonNull IOPool<?> pool) {
         super(controller);
         if (null == pool)

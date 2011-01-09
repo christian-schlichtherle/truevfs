@@ -47,14 +47,14 @@ import net.jcip.annotations.ThreadSafe;
 /**
  * Supports multiple concurrent reader threads.
  * 
- * @see     FSConcurrentModel
+ * @see     FSConcurrentModel1
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
-public final class FSConcurrentController
-extends FsDecoratingController<  FSConcurrentModel,
-                                FsController<? extends FSConcurrentModel>> {
+public final class FSConcurrentController1
+extends FsDecoratingController<  FSConcurrentModel1,
+                                FsController<? extends FSConcurrentModel1>> {
 
     private volatile ReadLock readLock;
     private volatile WriteLock writeLock;
@@ -64,8 +64,8 @@ extends FsDecoratingController<  FSConcurrentModel,
      *
      * @param controller the decorated file system controller.
      */
-    public FSConcurrentController(
-            @NonNull FsController<? extends FSConcurrentModel> controller) {
+    public FSConcurrentController1(
+            @NonNull FsController<? extends FSConcurrentModel1> controller) {
         super(controller);
     }
 
@@ -77,8 +77,8 @@ extends FsDecoratingController<  FSConcurrentModel,
         return null != writeLock ? writeLock : (writeLock = getModel().writeLock());
     }
 
-    private void assertNotReadLockedByCurrentThread(FSNotWriteLockedException ex)
-    throws FSNotWriteLockedException {
+    private void assertNotReadLockedByCurrentThread(FSNotWriteLockedException1 ex)
+    throws FSNotWriteLockedException1 {
         getModel().assertNotReadLockedByCurrentThread(ex);
     }
 
@@ -91,7 +91,7 @@ extends FsDecoratingController<  FSConcurrentModel,
             } finally {
                 readLock().unlock();
             }
-        } catch (FSNotWriteLockedException ex) {
+        } catch (FSNotWriteLockedException1 ex) {
             assertNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
@@ -111,7 +111,7 @@ extends FsDecoratingController<  FSConcurrentModel,
             } finally {
                 readLock().unlock();
             }
-        } catch (FSNotWriteLockedException ex) {
+        } catch (FSNotWriteLockedException1 ex) {
             assertNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
@@ -131,7 +131,7 @@ extends FsDecoratingController<  FSConcurrentModel,
             } finally {
                 readLock().unlock();
             }
-        } catch (FSNotWriteLockedException ex) {
+        } catch (FSNotWriteLockedException1 ex) {
             assertNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
@@ -152,7 +152,7 @@ extends FsDecoratingController<  FSConcurrentModel,
             } finally {
                 readLock().unlock();
             }
-        } catch (FSNotWriteLockedException ex) {
+        } catch (FSNotWriteLockedException1 ex) {
             assertNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
@@ -172,7 +172,7 @@ extends FsDecoratingController<  FSConcurrentModel,
             } finally {
                 readLock().unlock();
             }
-        } catch (FSNotWriteLockedException ex) {
+        } catch (FSNotWriteLockedException1 ex) {
             assertNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
@@ -192,7 +192,7 @@ extends FsDecoratingController<  FSConcurrentModel,
             } finally {
                 readLock().unlock();
             }
-        } catch (FSNotWriteLockedException ex) {
+        } catch (FSNotWriteLockedException1 ex) {
             assertNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
@@ -246,7 +246,7 @@ extends FsDecoratingController<  FSConcurrentModel,
                 } finally {
                     readLock().unlock();
                 }
-            } catch (FSNotWriteLockedException ex) {
+            } catch (FSNotWriteLockedException1 ex) {
                 assertNotReadLockedByCurrentThread(ex);
                 writeLock().lock();
                 try {
@@ -266,7 +266,7 @@ extends FsDecoratingController<  FSConcurrentModel,
                 } finally {
                     readLock().unlock();
                 }
-            } catch (FSNotWriteLockedException ex) {
+            } catch (FSNotWriteLockedException1 ex) {
                 assertNotReadLockedByCurrentThread(ex);
                 writeLock().lock();
                 try {
@@ -286,7 +286,7 @@ extends FsDecoratingController<  FSConcurrentModel,
                 } finally {
                     readLock().unlock();
                 }
-            } catch (FSNotWriteLockedException ex) {
+            } catch (FSNotWriteLockedException1 ex) {
                 assertNotReadLockedByCurrentThread(ex);
                 writeLock().lock();
                 try {
