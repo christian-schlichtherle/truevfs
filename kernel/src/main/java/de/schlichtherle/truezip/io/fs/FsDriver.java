@@ -21,8 +21,6 @@ import net.jcip.annotations.ThreadSafe;
 
 /**
  * A factory for file system controllers.
- * The factory may select the type of the created file system controllers
- * depending on the given mount point.
  * 
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -45,8 +43,8 @@ public interface FsDriver {
      *
      * @param  mountPoint the mount point of the file system.
      * @param  parent the parent file system controller.
-     * @return A new file system controller for the given mount point and
-     *         parent file system controller.
+     * @return A new thread-safe file system controller for the given mount
+     *         point and parent file system controller.
      */
     @NonNull FsController<?>
     newController(  @NonNull FsMountPoint mountPoint,
