@@ -34,7 +34,7 @@ final class FsDummyDriver implements FsDriver {
                 : mountPoint.getParent().equals(parent.getModel().getMountPoint());
         final FsScheme scheme = mountPoint.getScheme();
         if (FILE.equals(scheme)) {
-            return new FileDriver().newController(mountPoint);
+            return FileDriver.INSTANCE.newController(mountPoint, null);
         } else if (FsScheme.create("zip").equals(scheme)) {
             return new DummyArchiveDriver().newController(mountPoint, parent);
         } else {
