@@ -65,8 +65,8 @@ public abstract class ArchiveDriver<E extends ArchiveEntry>
 implements EntryFactory<E>, Serializable {
 
     /**
-     * Returns a new file system controller for the given mount point
-     * and parent file system controller.
+     * Returns a new thread-safe file system controller for the given mount
+     * point and parent file system controller.
      * <p>
      * When called, the following expression is a precondition:
      * {@code mountPoint.getParent().equals(parent.getModel().getMountPoint())}
@@ -79,6 +79,8 @@ implements EntryFactory<E>, Serializable {
      * of the returned file system controller.
      * Consequently, it is an error to call this method with a mount point
      * which has a scheme which is not supported by this archive driver.
+     * <p>
+     * Note again that the returned file system controller must be thread-safe!
      *
      * @param  mountPoint the mount point of the file system.
      * @param  parent the parent file system controller.
@@ -89,7 +91,7 @@ implements EntryFactory<E>, Serializable {
     newController(  @NonNull FsMountPoint mountPoint,
                     @NonNull FsController<?> parent) {
         return  new FsConcurrentController(
-                    new FsCachingController(
+                   new FsCachingController(
                         new DefaultArchiveController<E>(
                             new FsConcurrentModel(mountPoint, parent.getModel()),
                             this, parent, false),
