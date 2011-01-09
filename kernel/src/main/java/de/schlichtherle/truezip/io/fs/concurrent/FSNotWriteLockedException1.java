@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.io.fs.concurrent;
 
 import de.schlichtherle.truezip.io.fs.FsException;
+import net.jcip.annotations.Immutable;
 
 /**
  * Indicates that a controller is not write locked and the lock cannot get
@@ -26,15 +27,16 @@ import de.schlichtherle.truezip.io.fs.FsException;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class FSNotWriteLockedException extends FsException {
+@Immutable
+public final class FSNotWriteLockedException1 extends FsException {
 
     private static final long serialVersionUID = 2345952581284762637L;
 
-    FSNotWriteLockedException(FSConcurrentModel model) {
+    FSNotWriteLockedException1(FSConcurrentModel1 model) {
         super(model);
     }
 
-    FSNotWriteLockedException(FSConcurrentModel model, FSNotWriteLockedException ex) {
+    FSNotWriteLockedException1(FSConcurrentModel1 model, FSNotWriteLockedException1 ex) {
         super(model, ex);
     }
 }
