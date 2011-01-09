@@ -22,7 +22,6 @@ import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import javax.swing.Icon;
@@ -106,32 +105,34 @@ extends FsController<M> {
     }
 
     @Override
-    public boolean setTime(FsEntryName name, BitField<Access> types, long value)
+    public boolean
+    setTime(FsEntryName name,
+            BitField<Access> types, long value)
     throws IOException {
         return delegate.setTime(name, types, value);
     }
 
     @Override
-    public InputSocket<?> getInputSocket(
-            FsEntryName name,
-            BitField<FsInputOption> options) {
+    public InputSocket<?>
+    getInputSocket( FsEntryName name,
+                    BitField<FsInputOption> options) {
         return delegate.getInputSocket(name, options);
     }
 
     @Override
-    public OutputSocket<?> getOutputSocket(
-            FsEntryName name,
-            BitField<FsOutputOption> options,
-            Entry template) {
+    public OutputSocket<?>
+    getOutputSocket(    FsEntryName name,
+                        BitField<FsOutputOption> options,
+                        Entry template) {
         return delegate.getOutputSocket(name, options, template);
     }
 
     @Override
-    public void mknod(
-            @NonNull FsEntryName name,
-            @NonNull Type type,
-            @NonNull BitField<FsOutputOption> options,
-            @CheckForNull Entry template)
+    public void
+    mknod(  FsEntryName name,
+            Type type,
+            BitField<FsOutputOption> options,
+            Entry template)
     throws IOException {
         delegate.mknod(name, type, options, template);
     }
@@ -142,9 +143,8 @@ extends FsController<M> {
     }
 
     @Override
-    public <X extends IOException>
-    void sync(
-            @NonNull BitField<FsSyncOption> options,
+    public <X extends IOException> void
+    sync(   @NonNull BitField<FsSyncOption> options,
             @NonNull ExceptionHandler<? super FsSyncException, X> handler)
     throws X, FsException {
         delegate.sync(options, handler);
