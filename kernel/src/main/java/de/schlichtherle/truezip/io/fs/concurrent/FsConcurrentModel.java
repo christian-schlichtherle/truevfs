@@ -27,15 +27,15 @@ import net.jcip.annotations.ThreadSafe;
 /**
  * Supports multiple concurrent reader threads.
  *
- * @see     FSConcurrentController
+ * @see     FsConcurrentController
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
-public class FSConcurrentModel1 extends FsModel {
+public class FsConcurrentModel extends FsModel {
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
-    public FSConcurrentModel1(  @NonNull FsMountPoint mountPoint,
+    public FsConcurrentModel(  @NonNull FsMountPoint mountPoint,
                                 @CheckForNull FsModel parent) {
         super(mountPoint, parent);
     }
@@ -49,22 +49,22 @@ public class FSConcurrentModel1 extends FsModel {
     }
 
     /**
-     * @throws FSNotWriteLockedException1 if the <i>write lock</i> is not
+     * @throws FsNotWriteLockedException if the <i>write lock</i> is not
      *         held by the current thread.
      */
     public final void assertWriteLockedByCurrentThread()
-    throws FSNotWriteLockedException1 {
+    throws FsNotWriteLockedException {
         if (!lock.isWriteLockedByCurrentThread())
-            throw new FSNotWriteLockedException1(this);
+            throw new FsNotWriteLockedException(this);
     }
 
     /**
-     * @throws FSNotWriteLockedException1 if the <i>read lock</i> is
+     * @throws FsNotWriteLockedException if the <i>read lock</i> is
      *         held by the current thread.
      */
-    public final void assertNotReadLockedByCurrentThread(FSNotWriteLockedException1 ex)
-    throws FSNotWriteLockedException1 {
+    public final void assertNotReadLockedByCurrentThread(FsNotWriteLockedException ex)
+    throws FsNotWriteLockedException {
         if (0 < lock.getReadHoldCount())
-            throw new FSNotWriteLockedException1(this, ex);
+            throw new FsNotWriteLockedException(this, ex);
     }
 }

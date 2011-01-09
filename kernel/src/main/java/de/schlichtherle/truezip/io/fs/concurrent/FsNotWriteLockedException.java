@@ -28,15 +28,14 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-public final class FSNotWriteLockedException1 extends FsException {
-
+public final class FsNotWriteLockedException extends FsException {
     private static final long serialVersionUID = 2345952581284762637L;
 
-    FSNotWriteLockedException1(FSConcurrentModel1 model) {
+    FsNotWriteLockedException(FsConcurrentModel model) {
         super(model);
     }
 
-    FSNotWriteLockedException1(FSConcurrentModel1 model, FSNotWriteLockedException1 ex) {
+    FsNotWriteLockedException(FsConcurrentModel model, FsNotWriteLockedException ex) {
         super(model, ex);
     }
 }
