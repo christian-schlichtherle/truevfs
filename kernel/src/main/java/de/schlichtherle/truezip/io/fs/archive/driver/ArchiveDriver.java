@@ -84,8 +84,8 @@ implements EntryFactory<E>, Serializable {
      *
      * @param  mountPoint the mount point of the file system.
      * @param  parent the parent file system controller.
-     * @return A new file system controller for the given mount point and
-     *         parent file system controller.
+     * @return A new thread-safe file system controller for the given mount
+     *         point and parent file system controller.
      */
     public @NonNull FsController<?>
     newController(  @NonNull FsMountPoint mountPoint,
