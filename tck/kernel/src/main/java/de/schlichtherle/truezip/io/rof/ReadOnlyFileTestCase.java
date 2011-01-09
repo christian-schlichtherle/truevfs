@@ -199,11 +199,11 @@ public abstract class ReadOnlyFileTestCase {
 
     @Test
     public final void testForwardReadBytes() throws IOException {
-        testForwardReadBytes(rrof);
-        testForwardReadBytes(trof);
+        assertForwardReadBytes(rrof);
+        assertForwardReadBytes(trof);
     }
 
-    private void testForwardReadBytes(final ReadOnlyFile rof) throws IOException {
+    private void assertForwardReadBytes(final ReadOnlyFile rof) throws IOException {
         final long length = rof.length();
         for (int off = 0; off < length; off++)
             assertEquals(data[off] & 0xff, rof.read());
@@ -212,21 +212,21 @@ public abstract class ReadOnlyFileTestCase {
 
     @Test
     public final void testRandomReadBytes() throws IOException {
-        testRandomReadBytes(rrof);
-        testRandomReadBytes(trof);
+        assertRandomReadBytes(rrof);
+        assertRandomReadBytes(trof);
     }
 
-    private void testRandomReadBytes(final ReadOnlyFile rof)
+    private void assertRandomReadBytes(final ReadOnlyFile rof)
     throws IOException {
         assertEquals(0, rof.getFilePointer());
 
-        testRandomReadByte(rof, 0);
+        assertRandomReadByte(rof, 0);
 
         final int length = (int) rof.length();
         for (int i = length; --i >= 0; ) {
             final int tooSmall = rnd.nextInt() | Integer.MIN_VALUE;
             try {
-                testRandomReadByte(rof, tooSmall);
+                assertRandomReadByte(rof, tooSmall);
                 fail("Expected IOException!");
             } catch (IOException ex) {
             }
@@ -237,16 +237,16 @@ public abstract class ReadOnlyFileTestCase {
             final int tooLarge = Math.max(
                     length + 1, rnd.nextInt() & Integer.MAX_VALUE);
             try {
-                testRandomReadByte(rof, tooLarge);
+                assertRandomReadByte(rof, tooLarge);
             } catch (IOException mayHappen) {
             }
 
             final int justRight = rnd.nextInt(length);
-            testRandomReadByte(rof, justRight);
+            assertRandomReadByte(rof, justRight);
         }
     }
 
-    private void testRandomReadByte(
+    private void assertRandomReadByte(
             final ReadOnlyFile rof,
             final int off)
     throws IOException {
@@ -263,15 +263,15 @@ public abstract class ReadOnlyFileTestCase {
 
     @Test
     public final void testBackwardReadBytes() throws IOException {
-        testBackwardReadBytes(rrof);
-        testBackwardReadBytes(trof);
+        assertBackwardReadBytes(rrof);
+        assertBackwardReadBytes(trof);
     }
 
-    private void testBackwardReadBytes(final ReadOnlyFile rof)
+    private void assertBackwardReadBytes(final ReadOnlyFile rof)
     throws IOException {
         final int length = (int) rof.length();
         for (int off = length; --off >= 0; )
-            testRandomReadByte(rof, off);
+            assertRandomReadByte(rof, off);
     }
 
     /** Las Vegas algorithm. */
@@ -310,8 +310,8 @@ public abstract class ReadOnlyFileTestCase {
         final int length = (int) rrof.length();
         for (int i = 100; --i >= 0; ) {
             int off = rnd.nextInt(length);
-            testRandomReadByte(rrof, off);
-            testRandomReadByte(trof, off);
+            assertRandomReadByte(rrof, off);
+            assertRandomReadByte(trof, off);
             off++;
             final byte[] buf = new byte[rnd.nextInt(length / 100)];
             int read = rrof.read(buf);

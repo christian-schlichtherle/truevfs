@@ -73,7 +73,7 @@ public class EntryName implements Serializable, Comparable<EntryName> {
     private static final long serialVersionUID = 2927354934726235478L;
 
     /**
-     * The separator string for base names in an entry name,
+     * The separator string for file names in an entry name,
      * which is {@value}.
      *
      * @see #SEPARATOR_CHAR
@@ -81,7 +81,7 @@ public class EntryName implements Serializable, Comparable<EntryName> {
     public static final String SEPARATOR = "/";
 
     /**
-     * The separator character for base names in an entry name,
+     * The separator character for file names in an entry name,
      * which is {@value}.
      *
      * @see #SEPARATOR

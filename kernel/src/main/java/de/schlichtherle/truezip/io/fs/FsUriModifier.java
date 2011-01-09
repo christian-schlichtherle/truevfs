@@ -30,7 +30,7 @@ import static de.schlichtherle.truezip.io.entry.EntryName.*;
  */
 public enum FsUriModifier {
 
-    /** The null modifier just ensures that the URI is normalized. */
+    /** The null modifier does nothing but ensure that the URI is normalized. */
     NULL {
         @Override
         URI modify(URI uri, PostFix fix) throws URISyntaxException {
@@ -41,9 +41,8 @@ public enum FsUriModifier {
     },
 
     /**
-     * The canonicalize modifier normalizes the URI and applies a post-fix
-     * which depends on the entity to parse, i.e. an {@link FsPath}, an
-     * {@link FsMountPoint} or an {@link FsEntryName}.
+     * The canonicalize modifier normalizes a URI and applies a
+     * {@link PostFix post-fix} which depends on the class to parse.
      */
     CANONICALIZE {
         @Override
@@ -55,8 +54,25 @@ public enum FsUriModifier {
     abstract @NonNull URI modify(@NonNull URI uri, @NonNull PostFix fix)
     throws URISyntaxException;
 
-    enum PostFix {
+    /**
+     * Post-fixes a URI when it gets
+     * {@link FsUriModifier#CANONICALIZE canonicalized}.
+     */
+    public enum PostFix {
 
+        /**
+         * The post-fix for an {@link FsPath} depends on the URI type.
+         * For an opaque URI, nothing is modified.
+         * For a hierarchical URI, its path is truncated so that it does not
+         * end with a
+         * {@value de.schlichtherle.truezip.io.entry.EntryName#SEPARATOR}
+         * separator.
+         * In addition, if the path starts with two separators, the substring
+         * following until the next separator is moved to the authority part
+         * of the URI.
+         * This behavior is intended to fix URIs returned by
+         * {@link java.io.File#toURI()}.
+         */
         PATH {
             @Override
             URI modify(URI uri) throws URISyntaxException {
@@ -94,6 +110,7 @@ public enum FsUriModifier {
             }
         },
 
+        /** The post-fix for an {@link FsMountPoint} does nothing. */
         MOUNT_POINT {
             @Override
             URI modify(URI uri) {
@@ -101,6 +118,7 @@ public enum FsUriModifier {
             }
         },
 
+        /** The post-fix for an {@link FsEntryName} does nothing. */
         ENTRY_NAME {
             @Override
             URI modify(URI uri) {
