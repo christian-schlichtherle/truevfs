@@ -96,8 +96,7 @@ implements DataOutput {
      * @throws IOException If an I/O error occurs.
      */
     @Override
-    public void write(byte b[], int off, int len)
-    throws IOException {
+    public void write(byte b[], int off, int len) throws IOException {
 	delegate.write(b, off, len);
 	incCount(len);
     }
@@ -114,7 +113,7 @@ implements DataOutput {
      * @throws IOException If an I/O error occurs.
      */
     @Override
-	public final void writeBoolean(boolean b) throws IOException {
+    public final void writeBoolean(boolean b) throws IOException {
 	delegate.write(b ? 1 : 0);
 	incCount(1);
     }
@@ -129,7 +128,7 @@ implements DataOutput {
      * @throws IOException If an I/O error occurs.
      */
     @Override
-	public final void writeByte(int b) throws IOException {
+    public final void writeByte(int b) throws IOException {
 	delegate.write(b);
         incCount(1);
     }
@@ -144,7 +143,7 @@ implements DataOutput {
      * @throws IOException If an I/O error occurs.
      */
     @Override
-	public final void writeChar(int c) throws IOException {
+    public final void writeChar(int c) throws IOException {
         writeShort(c);
     }
 
@@ -158,7 +157,7 @@ implements DataOutput {
      * @throws IOException If an I/O error occurs.
      */
     @Override
-	public final void writeShort(int s) throws IOException {
+    public final void writeShort(int s) throws IOException {
         buf[0] = (byte) s;
         s >>= 8;
         buf[1] = (byte) s;
@@ -176,7 +175,7 @@ implements DataOutput {
      * @throws IOException If an I/O error occurs.
      */
     @Override
-	public final void writeInt(int i) throws IOException {
+    public final void writeInt(int i) throws IOException {
         buf[0] = (byte) i;
         i >>= 8;
         buf[1] = (byte) i;
@@ -198,7 +197,7 @@ implements DataOutput {
      * @throws IOException If an I/O error occurs.
      */
     @Override
-	public final void writeLong(long l) throws IOException {
+    public final void writeLong(long l) throws IOException {
         buf[0] = (byte) l;
         l >>= 8;
         buf[1] = (byte) l;
@@ -231,7 +230,7 @@ implements DataOutput {
      * @see java.lang.Float#floatToIntBits(float)
      */
     @Override
-	public final void writeFloat(float f) throws IOException {
+    public final void writeFloat(float f) throws IOException {
 	writeInt(Float.floatToIntBits(f));
     }
 
@@ -248,7 +247,7 @@ implements DataOutput {
      * @see java.lang.Double#doubleToLongBits(double)
      */
     @Override
-	public final void writeDouble(double d) throws IOException {
+    public final void writeDouble(double d) throws IOException {
 	writeLong(Double.doubleToLongBits(d));
     }
 
@@ -263,7 +262,7 @@ implements DataOutput {
      * @throws IOException If an I/O error occurs.
      */
     @Override
-	public final void writeBytes(String s) throws IOException {
+    public final void writeBytes(String s) throws IOException {
 	final int len = s.length();
 	for (int i = 0 ; i < len ; i++)
 	    writeByte(s.charAt(i));
@@ -281,7 +280,7 @@ implements DataOutput {
      * @see java.io.DataOutputStream#writeChar(int)
      */
     @Override
-	public final void writeChars(String s) throws IOException {
+    public final void writeChars(String s) throws IOException {
         final int len = s.length();
         for (int i = 0 ; i < len ; i++)
             writeShort(s.charAt(i));
@@ -293,7 +292,7 @@ implements DataOutput {
      * @throws UnsupportedOperationException Always.
      */
     @Override
-	public void writeUTF(String str) throws IOException {
+    public void writeUTF(String str) throws IOException {
         throw new UnsupportedOperationException();
     }
 
