@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.io.socket;
 import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.entry.Entry;
-import de.schlichtherle.truezip.io.fs.FsDecoratingEntry;
+import de.schlichtherle.truezip.io.entry.DecoratingEntry;
 import de.schlichtherle.truezip.io.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.util.Pool;
@@ -27,7 +27,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Set;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -226,14 +225,9 @@ public final class IOCache {
         return null == buffer ? null : new CacheEntry(buffer.data);
     }
 
-    private static final class CacheEntry extends FsDecoratingEntry<Entry> {
+    private static final class CacheEntry extends DecoratingEntry<Entry> {
         private CacheEntry(Entry entry) {
             super(entry);
-        }
-
-        @Override
-        public Set<String> getMembers() {
-            throw new UnsupportedOperationException("Not supported yet.");
         }
     } // class ProxyEntry
 

@@ -15,8 +15,8 @@
  */
 package de.schlichtherle.truezip.io.file;
 
-import de.schlichtherle.truezip.io.fs.archive.driver.GlobalArchiveDriverRegistry;
-import de.schlichtherle.truezip.io.fs.archive.driver.ArchiveDriverRegistry;
+import de.schlichtherle.truezip.io.fs.archive.GlobalArchiveDriverRegistry;
+import de.schlichtherle.truezip.io.fs.archive.ArchiveDriverRegistry;
 import de.schlichtherle.truezip.io.fs.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.SuffixSet;
 import de.schlichtherle.truezip.io.fs.FsScheme;
