@@ -37,7 +37,7 @@ public abstract class FsManager
 implements Iterable<FsController<?>> {
 
     /**
-     * Returns a file system controller for the given mount point.
+     * Returns a thread-safe file system controller for the given mount point.
      * If and only if the given mount point addresses a federated file system,
      * the returned file system controller is remembered for life cycle
      * management, i.e. future lookup and {@link #sync synchronization}

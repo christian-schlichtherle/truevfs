@@ -18,7 +18,6 @@ package de.schlichtherle.truezip.io.fs;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
-import de.schlichtherle.truezip.io.fs.concurrent.FsConcurrentController;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
@@ -45,11 +44,6 @@ import static de.schlichtherle.truezip.io.fs.FsSyncOption.*;
  * <p>
  * All method implementations of this abstract class must be reentrant on
  * exceptions - so client applications may repeatedly call them.
- * <p>
- * Though not strictly required, it is recommended that a subclass
- * implementation is thread safe.
- * Otherwise, it's instances must be decorated by a synchronization guard such
- * as {@link FsConcurrentController}.
  *
  * @param   <M> The type of the file system model.
  * @author  Christian Schlichtherle

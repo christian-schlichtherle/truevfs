@@ -30,7 +30,7 @@ import javax.swing.Icon;
  * A decorator for a file system controller.
  * <p>
  * This class is thread-safe if and only if the decorated file system
- * controller and its parent file system controller are thread-safe.
+ * controller is thread-safe.
  *
  * @param   <M> The type of the file system model.
  * @param   <C> The type of the decorated file system controller.
