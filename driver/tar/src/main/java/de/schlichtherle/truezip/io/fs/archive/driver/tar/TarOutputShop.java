@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.fs.archive.driver.tar;
 
-import de.schlichtherle.truezip.io.DecoratorOutputStream;
+import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.Streams;
@@ -24,7 +24,6 @@ import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.OutputBusyException;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
@@ -35,7 +34,6 @@ import java.util.Map;
 import org.apache.tools.tar.TarOutputStream;
 
 import static de.schlichtherle.truezip.io.fs.archive.driver.tar.TarDriver.TEMP_FILE_PREFIX;
-import static de.schlichtherle.truezip.io.Files.createTempFile;
 import static de.schlichtherle.truezip.io.entry.Entry.Size.DATA;
 import static de.schlichtherle.truezip.io.entry.Entry.UNKNOWN;
 
@@ -117,10 +115,11 @@ implements OutputShop<TarEntry> {
                 }
                 // The source entry does not exist or cannot support DDC
                 // to the destination entry.
-                // So we need to buffer the output in a temporary file and write
-                // it upon close().
+                // So we need to buffer the output in a temporary file and
+                // write it upon close().
                 return new TempEntryOutputStream(
-                        createTempFile(TEMP_FILE_PREFIX), entry);
+                        File.createTempFile(TEMP_FILE_PREFIX, null), // TODO: Use FilePool!
+                        entry);
             }
         } // class Output
 
@@ -142,7 +141,7 @@ implements OutputShop<TarEntry> {
      * write the entry header.
      * These preconditions are checked by {@link #getOutputSocket(TarEntry)}.
      */
-    private class EntryOutputStream extends DecoratorOutputStream {
+    private class EntryOutputStream extends DecoratingOutputStream {
         private boolean closed;
 
         EntryOutputStream(final TarEntry entry)
@@ -175,7 +174,7 @@ implements OutputShop<TarEntry> {
      * When the stream is closed, the temporary file is then copied to this
      * output stream and finally deleted.
      */
-    private class TempEntryOutputStream extends DecoratorOutputStream {
+    private class TempEntryOutputStream extends DecoratingOutputStream {
         private final File temp;
         private final TarEntry entry;
         private boolean closed;

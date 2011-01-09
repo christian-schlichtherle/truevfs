@@ -20,17 +20,19 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * @see     DecoratorInputSocket
+ * A decorator for an output socket.
+ * 
+ * @see     DecoratingInputSocket
  * @param   <E> The type of the {@link #getLocalTarget() local target}.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class DecoratorOutputSocket<E extends Entry>
+public abstract class DecoratingOutputSocket<E extends Entry>
 extends OutputSocket<E> {
 
     private final OutputSocket<? extends E> delegate;
 
-    protected DecoratorOutputSocket(final OutputSocket<? extends E> output) {
+    protected DecoratingOutputSocket(final OutputSocket<? extends E> output) {
         if (null == output)
             throw new NullPointerException();
         this.delegate = output;

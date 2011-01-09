@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.io.fs.archive.driver.zip.raes;
 import de.schlichtherle.truezip.io.fs.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.fs.archive.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.entry.Entry;
-import de.schlichtherle.truezip.io.fs.FsDecoratorController;
+import de.schlichtherle.truezip.io.fs.FsDecoratingController;
 import de.schlichtherle.truezip.io.fs.FsController;
 import de.schlichtherle.truezip.io.fs.FsEntry;
 import de.schlichtherle.truezip.io.fs.FsEntryName;
@@ -41,7 +41,7 @@ import static de.schlichtherle.truezip.io.fs.FsEntryName.*;
  */
 @ThreadSafe
 final class KeyManagerArchiveController
-extends FsDecoratorController<
+extends FsDecoratingController<
         FsModel,
         FsController<? extends FsModel>> {
 

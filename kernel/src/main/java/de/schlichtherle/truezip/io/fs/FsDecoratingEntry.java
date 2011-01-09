@@ -19,13 +19,13 @@ import de.schlichtherle.truezip.io.entry.Entry;
 import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
- * A decorator for file system entries.
+ * A decorator for an entry.
  *
  * @param   <E> The type of the decorated entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class FsDecoratorEntry<E extends Entry>
+public abstract class FsDecoratingEntry<E extends Entry>
 extends FsEntry {
 
     /** The decorated entry. */
@@ -37,7 +37,7 @@ extends FsEntry {
      *
      * @param entry the decorated entry.
      */
-    protected FsDecoratorEntry(@NonNull final E entry) {
+    protected FsDecoratingEntry(@NonNull final E entry) {
         if (null == entry)
             throw new NullPointerException();
         this.delegate = entry;

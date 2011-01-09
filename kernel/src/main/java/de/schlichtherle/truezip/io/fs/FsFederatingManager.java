@@ -37,7 +37,7 @@ import static de.schlichtherle.truezip.util.Link.Type.WEAK;
  * @version $Id$
  */
 @ThreadSafe
-public final class FsFederationManager extends FsManager {
+public final class FsFederatingManager extends FsManager {
 
     /**
      * The map of all schedulers for composite file system controllers,
@@ -49,11 +49,11 @@ public final class FsFederationManager extends FsManager {
 
     private final Type optionalScheduleType;
 
-    public FsFederationManager() {
+    public FsFederatingManager() {
         this(WEAK);
     }
 
-    FsFederationManager(final Type optionalScheduleType) {
+    FsFederatingManager(final Type optionalScheduleType) {
         assert null != optionalScheduleType;
         this.optionalScheduleType = optionalScheduleType;
     }
@@ -85,10 +85,10 @@ public final class FsFederationManager extends FsManager {
 
     private final class Scheduler implements FsTouchedListener {
 
-        final FsFederationController controller;
+        final FsFederatingController controller;
 
         Scheduler(final FsController<?> prospect) {
-            controller = new FsFederationController(prospect);
+            controller = new FsFederatingController(prospect);
             controller.getModel().addFileSystemTouchedListener(this);
             touchedChanged(null); // setup schedule
         }
@@ -101,7 +101,7 @@ public final class FsFederationManager extends FsManager {
         public void touchedChanged(final FsEvent event) {
             final FsModel model = controller.getModel();
             assert null == event || event.getSource() == model;
-            synchronized (FsFederationManager.this) {
+            synchronized (FsFederatingManager.this) {
                 schedulers.put(model.getMountPoint(),
                         (model.isTouched() ? STRONG : optionalScheduleType)
                             .newLink(this));
@@ -124,7 +124,7 @@ public final class FsFederationManager extends FsManager {
                 = new TreeSet<FsController<?>>(BOTTOM_UP_COMPARATOR);
         for (final Link<Scheduler> link : schedulers.values()) {
             final Scheduler scheduler = Links.getTarget(link);
-            final FsFederationController controller
+            final FsFederatingController controller
                     = null == scheduler ? null : scheduler.controller;
             if (null != controller)
                 snapshot.add(controller);

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.fs.concurrency;
+package de.schlichtherle.truezip.io.fs.concurrent;
 
 import de.schlichtherle.truezip.io.fs.FsModel;
 import de.schlichtherle.truezip.io.fs.FsMountPoint;
@@ -27,15 +27,15 @@ import net.jcip.annotations.ThreadSafe;
 /**
  * Supports multiple concurrent reader threads.
  *
- * @see     FSConcurrencyController
+ * @see     FSConcurrentController
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
-public class FSConcurrencyModel extends FsModel {
+public class FSConcurrentModel extends FsModel {
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
-    public FSConcurrencyModel(  @NonNull FsMountPoint mountPoint,
+    public FSConcurrentModel(  @NonNull FsMountPoint mountPoint,
                                 @CheckForNull FsModel parent) {
         super(mountPoint, parent);
     }

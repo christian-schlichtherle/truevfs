@@ -41,7 +41,6 @@ import org.apache.tools.tar.TarInputStream;
 import org.apache.tools.tar.TarUtils;
 
 import static de.schlichtherle.truezip.io.fs.archive.driver.tar.TarDriver.TEMP_FILE_PREFIX;
-import static de.schlichtherle.truezip.io.Files.createTempFile;
 import static org.apache.tools.tar.TarConstants.GIDLEN;
 import static org.apache.tools.tar.TarConstants.MODELEN;
 import static org.apache.tools.tar.TarConstants.MODTIMELEN;
@@ -102,7 +101,7 @@ implements InputShop<TarEntry> {
                         entry = entries.get(name);
                         tmp = entry != null
                                 ? entry.getFile()
-                                : createTempFile(TEMP_FILE_PREFIX);
+                                : File.createTempFile(TEMP_FILE_PREFIX, null); // TODO: Use FilePool!
                         try {
                             final OutputStream out = new FileOutputStream(tmp);
                             try {

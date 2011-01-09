@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.io.fs.archive.driver;
 
 import de.schlichtherle.truezip.io.TabuFileException;
 import de.schlichtherle.truezip.io.fs.archive.DefaultArchiveController;
-import de.schlichtherle.truezip.io.fs.concurrency.FSConcurrencyModel;
+import de.schlichtherle.truezip.io.fs.concurrent.FSConcurrentModel;
 import de.schlichtherle.truezip.io.fs.archive.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.socket.InputShop;
@@ -26,9 +26,9 @@ import de.schlichtherle.truezip.io.entry.EntryFactory;
 import de.schlichtherle.truezip.io.fs.FsController;
 import de.schlichtherle.truezip.io.fs.FsDriver;
 import de.schlichtherle.truezip.io.fs.FsMountPoint;
-import de.schlichtherle.truezip.io.fs.concurrency.FSConcurrencyController;
-import de.schlichtherle.truezip.io.fs.concurrency.FSContentCacheController;
-import de.schlichtherle.truezip.io.fs.file.FilePool;
+import de.schlichtherle.truezip.io.fs.concurrent.FSConcurrentController;
+import de.schlichtherle.truezip.io.fs.concurrent.FSCachingController;
+import de.schlichtherle.truezip.io.fs.file.TempFilePool;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -80,12 +80,12 @@ implements EntryFactory<E>, FsDriver, Serializable {
     public @NonNull FsController<?>
     newController(  @NonNull FsMountPoint mountPoint,
                     @NonNull FsController<?> parent) {
-        return  new FSConcurrencyController(
-                    new FSContentCacheController(
+        return  new FSConcurrentController(
+                    new FSCachingController(
                         new DefaultArchiveController<E>(
-                            new FSConcurrencyModel(mountPoint, parent.getModel()),
+                            new FSConcurrentModel(mountPoint, parent.getModel()),
                             this, parent, false),
-                        FilePool.get()));
+                        TempFilePool.get()));
     }
 
     /**
@@ -116,7 +116,7 @@ implements EntryFactory<E>, FsDriver, Serializable {
      *         synchronized with its parent file system.
      */
     public abstract @NonNull InputShop<E>
-    newInputShop(   @NonNull FSConcurrencyModel model,
+    newInputShop(   @NonNull FSConcurrentModel model,
                     @NonNull InputSocket<?> input)
     throws IOException;
 
@@ -156,7 +156,7 @@ implements EntryFactory<E>, FsDriver, Serializable {
      *         synchronized with its parent file system.
      */
     public abstract @NonNull OutputShop<E>
-    newOutputShop(  @NonNull FSConcurrencyModel model,
+    newOutputShop(  @NonNull FSConcurrentModel model,
                     @NonNull OutputSocket<?> output,
                     @Nullable InputShop<E> source)
     throws IOException;
@@ -174,7 +174,7 @@ implements EntryFactory<E>, FsDriver, Serializable {
      *         If {@code null} is returned, a default icon should be displayed.
      */
     public @CheckForNull Icon
-    getOpenIcon(@NonNull FSConcurrencyModel model) {
+    getOpenIcon(@NonNull FSConcurrentModel model) {
         return null;
     }
 
@@ -191,7 +191,7 @@ implements EntryFactory<E>, FsDriver, Serializable {
      *         If {@code null} is returned, a default icon should be displayed.
      */
     public @CheckForNull Icon
-    getClosedIcon(@NonNull FSConcurrencyModel model) {
+    getClosedIcon(@NonNull FSConcurrentModel model) {
         return null;
     }
 }

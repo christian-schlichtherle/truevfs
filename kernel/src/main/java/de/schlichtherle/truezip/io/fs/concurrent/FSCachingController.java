@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.fs.concurrency;
+package de.schlichtherle.truezip.io.fs.concurrent;
 
 import de.schlichtherle.truezip.io.socket.IOCache.Strategy;
 import de.schlichtherle.truezip.io.fs.FsEntry;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.entry.Entry;
-import de.schlichtherle.truezip.io.fs.FsDecoratorController;
-import de.schlichtherle.truezip.io.fs.FsDecoratorEntry;
+import de.schlichtherle.truezip.io.fs.FsDecoratingController;
+import de.schlichtherle.truezip.io.fs.FsDecoratingEntry;
 import de.schlichtherle.truezip.io.fs.FsFalsePositiveException;
 import de.schlichtherle.truezip.io.fs.FsController;
 import de.schlichtherle.truezip.io.fs.FsEntryName;
@@ -30,8 +30,8 @@ import de.schlichtherle.truezip.io.fs.FsOutputOption;
 import de.schlichtherle.truezip.io.fs.FsSyncException;
 import de.schlichtherle.truezip.io.fs.FsSyncOption;
 import de.schlichtherle.truezip.io.fs.FsSyncWarningException;
-import de.schlichtherle.truezip.io.socket.DecoratorInputSocket;
-import de.schlichtherle.truezip.io.socket.DecoratorOutputSocket;
+import de.schlichtherle.truezip.io.socket.DecoratingInputSocket;
+import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.io.socket.IOCache;
 import de.schlichtherle.truezip.io.socket.IOPool;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
@@ -82,9 +82,9 @@ import static de.schlichtherle.truezip.io.fs.FsSyncOption.*;
  * @version $Id$
  */
 @NotThreadSafe
-public final class FSContentCacheController
-extends FsDecoratorController<  FSConcurrencyModel,
-                                FsController<? extends FSConcurrencyModel>> {
+public final class FSCachingController
+extends FsDecoratingController<  FSConcurrentModel,
+                                FsController<? extends FSConcurrentModel>> {
 
     private static final Strategy STRATEGY = WRITE_BACK;
 
@@ -98,8 +98,8 @@ extends FsDecoratorController<  FSConcurrencyModel,
      * @param controller the decorated file system controller.
      * @param pool the pool of temporary entries to hold the copied entry data.
      */
-    public FSContentCacheController(
-            final @NonNull FsController<? extends FSConcurrencyModel> controller,
+    public FSCachingController(
+            final @NonNull FsController<? extends FSConcurrentModel> controller,
             final @NonNull IOPool<?> pool) {
         super(controller);
         if (null == pool)
@@ -124,7 +124,7 @@ extends FsDecoratorController<  FSConcurrencyModel,
         return new Input(name, options);
     }
 
-    private class Input extends DecoratorInputSocket<Entry> {
+    private class Input extends DecoratingInputSocket<Entry> {
         final FsEntryName name;
         final BitField<FsInputOption> options;
 
@@ -154,7 +154,7 @@ extends FsDecoratorController<  FSConcurrencyModel,
         return new Output(name, options, template);
     }
 
-    private class Output extends DecoratorOutputSocket<Entry> {
+    private class Output extends DecoratingOutputSocket<Entry> {
         final FsEntryName name;
         final BitField<FsOutputOption> options;
         final Entry template;
@@ -292,7 +292,7 @@ extends FsDecoratorController<  FSConcurrencyModel,
         }
 
         /*private final class ProxyInputSocket
-        extends DecoratorInputSocket<Entry> {
+        extends DecoratingInputSocket<Entry> {
             private ProxyInputSocket(InputSocket <?> input) {
                 super(input);
             }
@@ -352,7 +352,7 @@ extends FsDecoratorController<  FSConcurrencyModel,
         }
 
         private final class ProxyOutputSocket
-        extends DecoratorOutputSocket<Entry> {
+        extends DecoratingOutputSocket<Entry> {
             private ProxyOutputSocket(OutputSocket <?> output) {
                 super(output);
             }
@@ -388,7 +388,7 @@ extends FsDecoratorController<  FSConcurrencyModel,
     } // class Cache
 
     private static final class ProxyFileSystemEntry
-    extends FsDecoratorEntry<Entry> {
+    extends FsDecoratingEntry<Entry> {
         private ProxyFileSystemEntry(Entry entry) {
             super(entry);
             assert DIRECTORY != entry.getType();

@@ -17,11 +17,11 @@ package de.schlichtherle.truezip.io.fs.archive.driver.zip.raes;
 
 import de.schlichtherle.truezip.io.fs.FsController;
 import de.schlichtherle.truezip.io.fs.FsMountPoint;
-import de.schlichtherle.truezip.io.fs.concurrency.FSConcurrencyModel;
+import de.schlichtherle.truezip.io.fs.concurrent.FSConcurrentModel;
 import de.schlichtherle.truezip.io.socket.LazyOutputSocket;
-import de.schlichtherle.truezip.io.socket.DecoratorOutputSocket;
+import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
-import de.schlichtherle.truezip.io.socket.DecoratorInputSocket;
+import de.schlichtherle.truezip.io.socket.DecoratingInputSocket;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.InputShop;
@@ -118,10 +118,10 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      */
     @Override
     public ZipInputShop newInputShop(
-            final FSConcurrencyModel model,
+            final FSConcurrentModel model,
             final InputSocket<?> target)
     throws IOException {
-        class Input extends DecoratorInputSocket<Entry> {
+        class Input extends DecoratingInputSocket<Entry> {
             Input() {
                 super(target);
             }
@@ -183,11 +183,11 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      */
     @Override
     public OutputShop<ZipEntry> newOutputShop(
-            final FSConcurrencyModel model,
+            final FSConcurrentModel model,
             final OutputSocket<?> target,
             final InputShop<ZipEntry> source)
     throws IOException {
-        class Output extends DecoratorOutputSocket<Entry> {
+        class Output extends DecoratingOutputSocket<Entry> {
             Output() {
                 super(target);
             }
@@ -227,7 +227,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      * @return The {@link RaesParameters} to use for accessing the
      *         prospective RAES encrypted ZIP file.
      */
-    protected RaesParameters getRaesParameters(FSConcurrencyModel model) {
+    protected RaesParameters getRaesParameters(FSConcurrentModel model) {
         return new KeyManagerRaesParameters(model.getMountPoint().getUri());
     }
 }

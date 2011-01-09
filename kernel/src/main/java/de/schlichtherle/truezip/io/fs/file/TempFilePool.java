@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.io.fs.file;
 
-import de.schlichtherle.truezip.io.Files;
 import de.schlichtherle.truezip.io.socket.IOPool;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
@@ -34,7 +33,7 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-public final class FilePool
+public final class TempFilePool
 implements IOPool<FileEntry> {
 
     // Declared package private for unit testing purposes.
@@ -42,20 +41,20 @@ implements IOPool<FileEntry> {
     static final String DEFAULT_SUFFIX = null;
     static final File   DEFAULT_DIR    = null;
 
-    private static final FilePool INSTANCE
-            = new FilePool(DEFAULT_PREFIX, DEFAULT_SUFFIX, DEFAULT_DIR);
+    private static final TempFilePool INSTANCE
+            = new TempFilePool(DEFAULT_PREFIX, DEFAULT_SUFFIX, DEFAULT_DIR);
 
     private final @NonNull  String prefix;
     private final @Nullable String suffix;
     private final @Nullable File   dir;
 
     /** Returns the default instance of this temp file pool. */
-    public static FilePool get() {
+    public static TempFilePool get() {
         return INSTANCE;
     }
 
     /** Constructs a new temp file pool. */
-    public FilePool(  final @NonNull  String prefix,
+    public TempFilePool(  final @NonNull  String prefix,
                         final @Nullable String suffix,
                         final @Nullable File dir) {
         if (null == prefix)
@@ -67,7 +66,7 @@ implements IOPool<FileEntry> {
 
     @Override
     public Entry allocate() throws IOException {
-        return new Entry(this, Files.createTempFile(prefix, suffix, dir));
+        return new Entry(this, File.createTempFile(prefix, suffix, dir));
     }
 
     @Override
@@ -80,9 +79,9 @@ implements IOPool<FileEntry> {
     extends FileEntry
     implements IOPool.Entry<FileEntry> {
 
-        private FilePool pool;
+        private TempFilePool pool;
 
-        private Entry(FilePool pool, File file) {
+        private Entry(TempFilePool pool, File file) {
             super(file);
             assert null != pool;
             this.pool = pool;
@@ -95,8 +94,8 @@ implements IOPool<FileEntry> {
             pool(null);
         }
 
-        private FilePool pool(final FilePool newPool) throws IOException {
-            final FilePool oldPool = pool;
+        private TempFilePool pool(final TempFilePool newPool) throws IOException {
+            final TempFilePool oldPool = pool;
             this.pool = newPool;
             if (oldPool != newPool) {
                 final File file = getFile();

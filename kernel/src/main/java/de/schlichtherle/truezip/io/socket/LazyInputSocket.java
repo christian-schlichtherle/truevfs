@@ -15,9 +15,9 @@
  */
 package de.schlichtherle.truezip.io.socket;
 
-import de.schlichtherle.truezip.io.DecoratorInputStream;
+import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.io.entry.Entry;
-import de.schlichtherle.truezip.io.rof.DecoratorReadOnlyFile;
+import de.schlichtherle.truezip.io.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,7 +29,7 @@ import java.io.InputStream;
  * @version $Id$
  */
 public final class LazyInputSocket<E extends Entry>
-extends DecoratorInputSocket<E> {
+extends DecoratingInputSocket<E> {
 
     public LazyInputSocket(final InputSocket<? extends E> input) {
         super(input);
@@ -40,7 +40,7 @@ extends DecoratorInputSocket<E> {
         return new LazyReadOnlyFile();
     }
 
-    private class LazyReadOnlyFile extends DecoratorReadOnlyFile {
+    private class LazyReadOnlyFile extends DecoratingReadOnlyFile {
         LazyReadOnlyFile() {
             super(null);
         }
@@ -86,7 +86,7 @@ extends DecoratorInputSocket<E> {
         return new LazyInputStream();
     }
 
-    private class LazyInputStream extends DecoratorInputStream {
+    private class LazyInputStream extends DecoratingInputStream {
         LazyInputStream() {
             super(null);
         }

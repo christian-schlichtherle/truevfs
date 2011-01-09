@@ -24,11 +24,11 @@ import java.io.OutputStream;
  * in the JSE, but optimized for performance and <em>without</em>
  * multithreading support.
  *
- * @see     DecoratorInputStream
+ * @see     DecoratingInputStream
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class DecoratorOutputStream extends OutputStream {
+public abstract class DecoratingOutputStream extends OutputStream {
 
     /** The nullable decorated output stream. */
     @Nullable
@@ -40,7 +40,7 @@ public abstract class DecoratorOutputStream extends OutputStream {
      *
      * @param out the output stream to wrap in this decorator.
      */
-    protected DecoratorOutputStream(final OutputStream out) {
+    protected DecoratingOutputStream(final OutputStream out) {
         this.delegate = out;
     }
 

@@ -26,7 +26,7 @@ import java.io.IOException;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class SynchronizedReadOnlyFile extends DecoratorReadOnlyFile {
+public class SynchronizedReadOnlyFile extends DecoratingReadOnlyFile {
 
     /** The object to synchronize on - never {@code null}. */
     protected final Object lock;

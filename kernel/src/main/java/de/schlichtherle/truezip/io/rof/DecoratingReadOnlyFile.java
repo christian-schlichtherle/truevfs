@@ -19,14 +19,14 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 
 /**
- * A base class for any class which wants to decorate a {@link ReadOnlyFile}.
+ * A decorator for a read only file.
  * <p>
- * Note that subclasses of this class often implement their own virtual file
+ * Note that subclasses of this class may implement their own virtual file
  * pointer.
  * Thus, if you would like to access the underlying {@code ReadOnlyFile}
  * again after you have finished working with the
- * {@code FilteredReadOnlyFile}, you should synchronize their file
- * pointers a'la:
+ * {@code FilteredReadOnlyFile}, you should synchronize its file pointer like
+ * this:
  * <pre>
  *     ReadOnlyFile rof = new SimpleReadOnlyFile(new File("HelloWorld.java"));
  *     try {
@@ -54,23 +54,23 @@ import java.io.IOException;
  * Thus, if you would like to access the underlying {@code ReadOnlyFile}
  * again after you have finished working with an instance of this class,
  * you should synchronize their file pointers using the pattern as described
- * in {@link DecoratorReadOnlyFile}.
+ * in {@link DecoratingReadOnlyFile}.
  * </blockquote>
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class DecoratorReadOnlyFile extends AbstractReadOnlyFile {
+public abstract class DecoratingReadOnlyFile extends AbstractReadOnlyFile {
 
     /** The nullable decorated read only file. */
     @Nullable
     protected ReadOnlyFile delegate;
 
     /**
-     * Creates a new instance of {@code DecoratorReadOnlyFile},
+     * Creates a new instance of {@code DecoratingReadOnlyFile},
      * which filters the given read only file.
      */
-    protected DecoratorReadOnlyFile(ReadOnlyFile rof) {
+    protected DecoratingReadOnlyFile(ReadOnlyFile rof) {
         this.delegate = rof;
     }
 

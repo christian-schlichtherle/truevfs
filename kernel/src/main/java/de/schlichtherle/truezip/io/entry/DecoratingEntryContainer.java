@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.io.entry;
 import java.util.Iterator;
 
 /*
- * Decorates a {@code EntryContainer}.
+ * A decorator for an entry container.
  * <p>
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client applications.
@@ -27,7 +27,7 @@ import java.util.Iterator;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class DecoratorEntryContainer<
+public abstract class DecoratingEntryContainer<
         E extends Entry,
         C extends EntryContainer<E>>
 implements EntryContainer<E> {
@@ -41,7 +41,7 @@ implements EntryContainer<E> {
      * @param  container the non-{@code null} container to be decorated.
      * @throws NullPointerException iff {@code container} is {@code null}.
      */
-    protected DecoratorEntryContainer(final C container) {
+    protected DecoratingEntryContainer(final C container) {
         if (null == container)
             throw new NullPointerException();
         this.delegate = container;

@@ -15,9 +15,9 @@
  */
 package de.schlichtherle.truezip.io.fs;
 
-import de.schlichtherle.truezip.io.DecoratorInputStream;
-import de.schlichtherle.truezip.io.DecoratorOutputStream;
-import de.schlichtherle.truezip.io.rof.DecoratorReadOnlyFile;
+import de.schlichtherle.truezip.io.DecoratingInputStream;
+import de.schlichtherle.truezip.io.DecoratingOutputStream;
+import de.schlichtherle.truezip.io.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.IOException;
 import java.io.InputStream;
@@ -97,7 +97,7 @@ public final class FsStatistics {
         return new CountingReadOnlyFile(rof);
     }
 
-    private final class CountingReadOnlyFile extends DecoratorReadOnlyFile {
+    private final class CountingReadOnlyFile extends DecoratingReadOnlyFile {
         CountingReadOnlyFile(ReadOnlyFile rof) {
             super(rof);
         }
@@ -124,7 +124,7 @@ public final class FsStatistics {
         return new CountingInputStream(in);
     }
 
-    private final class CountingInputStream extends DecoratorInputStream {
+    private final class CountingInputStream extends DecoratingInputStream {
         CountingInputStream(InputStream in) {
             super(in);
         }
@@ -164,7 +164,7 @@ public final class FsStatistics {
         return new CountingOutputStream(out);
     }
 
-    private final class CountingOutputStream extends DecoratorOutputStream {
+    private final class CountingOutputStream extends DecoratingOutputStream {
         CountingOutputStream(OutputStream out) {
             super(out);
         }

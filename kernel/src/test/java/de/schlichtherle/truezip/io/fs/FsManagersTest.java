@@ -39,7 +39,7 @@ public class FsManagersTest {
         assertNotNull(inst2);
         assertNotSame(inst1, inst2);
 
-        final FsManager inst3 = new FsFederationManager();
+        final FsManager inst3 = new FsFederatingManager();
 
         FsManagers.setInstance(inst3);
         final FsManager inst4 = FsManagers.getInstance();

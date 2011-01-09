@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.fs.archive;
 
-import de.schlichtherle.truezip.io.fs.FsDecoratorEntry;
+import de.schlichtherle.truezip.io.fs.FsDecoratingEntry;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -33,7 +33,7 @@ import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
  * @version $Id$
  */
 public abstract class ArchiveFileSystemEntry<E extends ArchiveEntry>
-extends FsDecoratorEntry<E> {
+extends FsDecoratingEntry<E> {
 
     /**
      * Constructs a new archive file system entry which decorates the given

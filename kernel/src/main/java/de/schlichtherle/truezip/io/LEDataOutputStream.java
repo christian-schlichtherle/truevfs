@@ -35,7 +35,7 @@ import java.io.OutputStream;
  * @version $Id$
  */
 public class LEDataOutputStream
-extends DecoratorOutputStream
+extends DecoratingOutputStream
 implements DataOutput {
 
     /** This buffer is used for writing data. */

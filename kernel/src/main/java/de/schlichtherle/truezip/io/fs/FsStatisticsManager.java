@@ -30,7 +30,7 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 public final class FsStatisticsManager
-extends FsDecoratorManager<FsManager> {
+extends FsDecoratingManager<FsManager> {
 
     private volatile FsStatistics statistics
             = new FsStatistics(this);
