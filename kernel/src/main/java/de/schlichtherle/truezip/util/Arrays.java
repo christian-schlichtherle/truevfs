@@ -18,14 +18,13 @@ package de.schlichtherle.truezip.util;
 
 /**
  * Provides static utility methods for arrays.
- * This class cannot get instantiated outside its package.
  * 
  * @author Christian Schlichtherle
  * @version $Id$
  */
 public class Arrays {
 
-    Arrays() {
+    private Arrays() {
     }
 
     /**

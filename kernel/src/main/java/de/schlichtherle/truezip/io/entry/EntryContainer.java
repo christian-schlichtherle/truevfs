@@ -19,6 +19,7 @@ package de.schlichtherle.truezip.io.entry;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Iterator;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * An iterable container for entries.
@@ -30,6 +31,7 @@ import java.util.Iterator;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 public interface EntryContainer<E extends Entry>
 extends Iterable<E> {
 

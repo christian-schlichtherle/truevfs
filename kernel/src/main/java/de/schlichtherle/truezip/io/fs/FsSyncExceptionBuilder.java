@@ -17,11 +17,13 @@ package de.schlichtherle.truezip.io.fs;
 
 import de.schlichtherle.truezip.io.ChainableIOExceptionBuilder;
 import java.io.IOException;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 public final class FsSyncExceptionBuilder
 extends ChainableIOExceptionBuilder<IOException, FsSyncException> {
     public FsSyncExceptionBuilder() {

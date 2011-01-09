@@ -24,6 +24,7 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * Creates input streams and read only files for reading bytes from its
@@ -42,6 +43,7 @@ import java.io.InputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 public abstract class InputSocket<E extends Entry>
 extends IOSocket<E, Entry> {
 

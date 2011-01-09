@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.fs.archive;
 
-import de.schlichtherle.truezip.io.fs.concurrent.FSConcurrentModel;
+import de.schlichtherle.truezip.io.fs.concurrent.FsConcurrentModel;
 import de.schlichtherle.truezip.io.fs.FsFalsePositiveException;
 import de.schlichtherle.truezip.io.fs.FsOutputOption;
 import de.schlichtherle.truezip.util.BitField;
@@ -42,7 +42,7 @@ extends BasicArchiveController<E> {
     /**
      * Creates a new instance of FileSystemArchiveController
      */
-    FileSystemArchiveController(FSConcurrentModel model) {
+    FileSystemArchiveController(FsConcurrentModel model) {
         super(model);
     }
 

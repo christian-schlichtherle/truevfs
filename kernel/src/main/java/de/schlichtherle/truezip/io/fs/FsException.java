@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.io.fs;
 
 import java.io.IOException;
+import net.jcip.annotations.Immutable;
 
 /**
  * Indicates an exceptional condition which is specific to a file system.
@@ -24,6 +25,7 @@ import java.io.IOException;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@Immutable
 public abstract class FsException extends IOException {
 
     private static final long serialVersionUID = 2947623946725372554L;

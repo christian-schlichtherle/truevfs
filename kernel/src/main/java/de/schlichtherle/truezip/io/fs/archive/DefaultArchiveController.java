@@ -22,7 +22,7 @@ import de.schlichtherle.truezip.io.InputBusyException;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.io.TabuFileException;
-import de.schlichtherle.truezip.io.fs.concurrent.FSConcurrentModel;
+import de.schlichtherle.truezip.io.fs.concurrent.FsConcurrentModel;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.fs.FsFalsePositiveException;
 import de.schlichtherle.truezip.io.fs.FsException;
@@ -188,7 +188,7 @@ extends FileSystemArchiveController<E> {
             = new TouchListener();
 
     public DefaultArchiveController(
-            final FSConcurrentModel model,
+            final FsConcurrentModel model,
             final ArchiveDriver<E> driver,
             final FsController<?> parent,
             final boolean useRootTemplate) {

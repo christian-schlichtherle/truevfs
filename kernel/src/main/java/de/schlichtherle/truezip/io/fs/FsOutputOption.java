@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.io.fs;
 
 import java.io.IOException;
+import net.jcip.annotations.Immutable;
 
 /**
  * Defines the potential options for data output operations.
@@ -30,6 +31,7 @@ import java.io.IOException;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@Immutable
 public enum FsOutputOption {
 
     /**

@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.fs.archive.driver.zip;
 
-import de.schlichtherle.truezip.io.fs.concurrent.FSConcurrentModel;
+import de.schlichtherle.truezip.io.fs.concurrent.FsConcurrentModel;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputShop;
@@ -201,7 +201,7 @@ implements ZipEntryFactory<ZipEntry> {
      * {@link #newZipInputShop}.
      */
     @Override
-    public ZipInputShop newInputShop(FSConcurrentModel model, InputSocket<?> input)
+    public ZipInputShop newInputShop(FsConcurrentModel model, InputSocket<?> input)
     throws IOException {
         final ReadOnlyFile rof = input.newReadOnlyFile();
         try {
@@ -212,7 +212,7 @@ implements ZipEntryFactory<ZipEntry> {
         }
     }
 
-    protected ZipInputShop newZipInputShop(FSConcurrentModel model, ReadOnlyFile rof)
+    protected ZipInputShop newZipInputShop(FsConcurrentModel model, ReadOnlyFile rof)
     throws IOException {
         return new ZipInputShop(
                 rof, getCharset(), getPreambled(), getPostambled(), this);
@@ -227,7 +227,7 @@ implements ZipEntryFactory<ZipEntry> {
      */
     @Override
     public OutputShop<ZipEntry> newOutputShop(
-            FSConcurrentModel model,
+            FsConcurrentModel model,
             OutputSocket<?> output,
             InputShop<ZipEntry> source)
     throws IOException {
@@ -242,7 +242,7 @@ implements ZipEntryFactory<ZipEntry> {
     }
 
     protected ZipOutputShop newZipOutputShop(
-            FSConcurrentModel model, OutputStream out, ZipInputShop source)
+            FsConcurrentModel model, OutputStream out, ZipInputShop source)
     throws IOException {
         return new ZipOutputShop(out, getCharset(), level, source); // TODO: Support append strategy!
     }

@@ -19,6 +19,7 @@ import de.schlichtherle.truezip.io.entry.Entry;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Set;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * A file system entry is an entry which can list directory members.
@@ -28,6 +29,7 @@ import java.util.Set;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 public abstract class FsEntry implements Entry {
 
     /**

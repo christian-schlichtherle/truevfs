@@ -22,9 +22,6 @@ import java.io.IOException;
 
 /**
  * A decorator for an output shop.
- * <p>
- * Implementations do <em>not</em> need to be thread-safe:
- * Multithreading needs to be addressed by client applications.
  *
  * @param   <E> The type of the entries.
  * @see     DecoratingInputShop

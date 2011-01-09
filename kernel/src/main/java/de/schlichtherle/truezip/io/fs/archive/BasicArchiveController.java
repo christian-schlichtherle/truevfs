@@ -20,8 +20,8 @@ import de.schlichtherle.truezip.io.fs.FsEntry;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.fs.archive.driver.ArchiveDriver;
-import de.schlichtherle.truezip.io.fs.concurrent.FSNotWriteLockedException;
-import de.schlichtherle.truezip.io.fs.concurrent.FSConcurrentModel;
+import de.schlichtherle.truezip.io.fs.concurrent.FsNotWriteLockedException;
+import de.schlichtherle.truezip.io.fs.concurrent.FsConcurrentModel;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
@@ -106,7 +106,7 @@ import static de.schlichtherle.truezip.io.fs.FsOutputOption.*;
  */
 @NotThreadSafe
 abstract class BasicArchiveController<E extends ArchiveEntry>
-extends FsController<FSConcurrentModel> {
+extends FsController<FsConcurrentModel> {
 
     private static final String CLASS_NAME
             = BasicArchiveController.class.getName();
@@ -120,14 +120,14 @@ extends FsController<FSConcurrentModel> {
     private static final BitField<FsSyncOption> UNLINK_SYNC_OPTIONS
             = BitField.of(ABORT_CHANGES);
 
-    private final FSConcurrentModel model;
+    private final FsConcurrentModel model;
 
     /**
      * Constructs a new basic archive controller.
      *
      * @param model the non-{@code null} archive model.
      */
-    BasicArchiveController(final FSConcurrentModel model) {
+    BasicArchiveController(final FsConcurrentModel model) {
         if (null == model)
             throw new NullPointerException();
         if (null == model.getParent())
@@ -136,7 +136,7 @@ extends FsController<FSConcurrentModel> {
     }
 
     @Override
-    public final FSConcurrentModel getModel() {
+    public final FsConcurrentModel getModel() {
         return model;
     }
 
@@ -405,7 +405,7 @@ extends FsController<FSConcurrentModel> {
      * @see    FsController#sync
      * @throws IOException if any exceptional condition occurs
      *         throughout the synchronization of the target archive file.
-     * @throws FSNotWriteLockedException
+     * @throws FsNotWriteLockedException
      * @return Whether or not a synchronization has been performed.
      */
     abstract boolean autoSync(  @NonNull FsEntryName name,

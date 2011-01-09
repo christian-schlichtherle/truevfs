@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.io.socket;
 
 import de.schlichtherle.truezip.io.entry.Entry;
 import java.io.Closeable;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * A closable input service.
@@ -29,6 +30,7 @@ import java.io.Closeable;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 public interface InputShop<E extends Entry>
 extends Closeable, InputService<E> {
 }

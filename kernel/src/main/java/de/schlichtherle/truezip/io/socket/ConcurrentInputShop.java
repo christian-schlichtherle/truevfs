@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * Decorates an {@code InputShop} to add accounting and multithreading
@@ -42,6 +43,7 @@ import java.util.logging.Logger;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 public class ConcurrentInputShop<E extends Entry>
 extends DecoratingInputShop<E, InputShop<E>> {
 

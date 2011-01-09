@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.io.socket;
 
 import de.schlichtherle.truezip.io.entry.Entry;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * An entry which provides input sockets.
@@ -28,6 +29,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 public interface InputEntry<E extends InputEntry<E>>
 extends Entry {
 

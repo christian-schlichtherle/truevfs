@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.io.fs;
 
 import de.schlichtherle.truezip.io.entry.Entry;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * A decorator for an entry.
@@ -25,6 +26,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 public abstract class FsDecoratingEntry<E extends Entry>
 extends FsEntry {
 
