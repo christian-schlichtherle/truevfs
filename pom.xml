@@ -106,7 +106,7 @@
                                 <splitindex>${javadoc.splitindex}</splitindex>
                                 <version>true</version>
                                 <links>
-                                    <link>http://www.bouncycastle.org/docs/docs1.5/</link>
+                                    <link>http://www.bouncycastle.org/docs/docs1.6/</link>
                                 </links>
                             </configuration>
                         </plugin>

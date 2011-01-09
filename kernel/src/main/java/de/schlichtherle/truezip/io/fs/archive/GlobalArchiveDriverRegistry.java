@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.fs.archive.driver;
+package de.schlichtherle.truezip.io.fs.archive;
 
+import de.schlichtherle.truezip.io.fs.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.util.ServiceLocator;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -69,9 +69,6 @@ implements Serializable {
             = GlobalArchiveDriverRegistry.class.getName();
     private static final Logger logger
             = Logger.getLogger(CLASS_NAME, CLASS_NAME);
-    private static final String PACKAGE_NAME
-            = GlobalArchiveDriverRegistry.class.getPackage().getName();
-    private static final String PROP_KEY_REGISTRY = PACKAGE_NAME;
 
     static final String KWD_NULL = "NULL";  // NOI18N
     static final String KWD_ALL = "ALL";    // NOI18N
@@ -102,22 +99,12 @@ implements Serializable {
         registerArchiveDrivers();
     }
 
-    /**
-     * Returns the ordered list of relative path names for configuration files.
-     * Prior elements take precedence.
-     */
-    private static String[] getServices() {
-        return System.getProperty(PROP_KEY_REGISTRY,
-                "META-INF/services/" + PACKAGE_NAME + ".properties") // NOI18N
-                .split("\\" + File.pathSeparator); // NOI18N
-    }
-
     private void registerArchiveDrivers() {
-        final ArchiveDriverRegistry clientRegistry
-                = new ArchiveDriverRegistry();
-        final String[] services = getServices();
-        for (int i = services.length; --i >= 0; )
-            registerArchiveDrivers(services[i], this, clientRegistry);
+        final ArchiveDriverRegistry clientRegistry = new ArchiveDriverRegistry();
+        registerArchiveDrivers(
+                "META-INF/services/" + ArchiveDriver.class.getPackage().getName() + ".properties",
+                this,
+                clientRegistry);
         drivers.putAll(clientRegistry.drivers);
     }
 
