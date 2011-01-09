@@ -19,7 +19,7 @@ import de.schlichtherle.truezip.io.fs.archive.ArchiveEntry;
 import de.schlichtherle.truezip.io.fs.archive.DummyArchiveEntry;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
-import de.schlichtherle.truezip.io.fs.concurrent.FSConcurrentModel;
+import de.schlichtherle.truezip.io.fs.concurrent.FsConcurrentModel;
 import de.schlichtherle.truezip.io.socket.InputShop;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputShop;
@@ -36,7 +36,7 @@ public final class DummyArchiveDriver extends ArchiveDriver<ArchiveEntry> {
 
     @Override
     public InputShop<ArchiveEntry> newInputShop(
-            FSConcurrentModel model,
+            FsConcurrentModel model,
             InputSocket<?> input)
     throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -44,7 +44,7 @@ public final class DummyArchiveDriver extends ArchiveDriver<ArchiveEntry> {
 
     @Override
     public OutputShop<ArchiveEntry> newOutputShop(
-            FSConcurrentModel model,
+            FsConcurrentModel model,
             OutputSocket<?> output,
             InputShop<ArchiveEntry> source)
     throws IOException {

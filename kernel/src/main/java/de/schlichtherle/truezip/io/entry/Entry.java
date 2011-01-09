@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.io.entry;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * Represents an entry in an entry container, e.g. an archive file or a file
@@ -30,6 +31,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 public interface Entry {
 
     /**

@@ -22,6 +22,7 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * Creates output streams for writing bytes to its <i>local target</i>.
@@ -39,6 +40,7 @@ import java.io.OutputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 public abstract class OutputSocket<E extends Entry>
 extends IOSocket<E, Entry> {
 

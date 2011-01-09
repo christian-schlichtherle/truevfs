@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.io.socket;
 
 import de.schlichtherle.truezip.io.entry.EntryContainer;
 import de.schlichtherle.truezip.io.entry.Entry;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * A container and output socket factory for entries.
@@ -33,6 +34,7 @@ import de.schlichtherle.truezip.io.entry.Entry;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 public interface OutputService<E extends Entry>
 extends EntryContainer<E> {
 

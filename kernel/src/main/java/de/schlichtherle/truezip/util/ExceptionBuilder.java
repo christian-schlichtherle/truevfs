@@ -17,6 +17,7 @@
 package de.schlichtherle.truezip.util;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * An exception builder is an exception handler which assembles an exception
@@ -34,6 +35,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 public interface ExceptionBuilder<C extends Exception, E extends Exception>
 extends ExceptionHandler<C, E> {
 

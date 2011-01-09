@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.io.socket;
 
+import net.jcip.annotations.NotThreadSafe;
+
 /**
  * An entry which provides I/O sockets.
  * <p>
@@ -24,6 +26,7 @@ package de.schlichtherle.truezip.io.socket;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 public interface IOEntry<E extends IOEntry<E>>
 extends InputEntry<E>, OutputEntry<E> {
 }

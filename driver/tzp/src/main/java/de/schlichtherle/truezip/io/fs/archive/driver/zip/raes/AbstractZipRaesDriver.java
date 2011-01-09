@@ -17,7 +17,7 @@ package de.schlichtherle.truezip.io.fs.archive.driver.zip.raes;
 
 import de.schlichtherle.truezip.io.fs.FsController;
 import de.schlichtherle.truezip.io.fs.FsMountPoint;
-import de.schlichtherle.truezip.io.fs.concurrent.FSConcurrentModel;
+import de.schlichtherle.truezip.io.fs.concurrent.FsConcurrentModel;
 import de.schlichtherle.truezip.io.socket.LazyOutputSocket;
 import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
@@ -118,7 +118,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      */
     @Override
     public ZipInputShop newInputShop(
-            final FSConcurrentModel model,
+            final FsConcurrentModel model,
             final InputSocket<?> target)
     throws IOException {
         class Input extends DecoratingInputSocket<Entry> {
@@ -183,7 +183,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      */
     @Override
     public OutputShop<ZipEntry> newOutputShop(
-            final FSConcurrentModel model,
+            final FsConcurrentModel model,
             final OutputSocket<?> target,
             final InputShop<ZipEntry> source)
     throws IOException {
@@ -227,7 +227,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      * @return The {@link RaesParameters} to use for accessing the
      *         prospective RAES encrypted ZIP file.
      */
-    protected RaesParameters getRaesParameters(FSConcurrentModel model) {
+    protected RaesParameters getRaesParameters(FsConcurrentModel model) {
         return new KeyManagerRaesParameters(model.getMountPoint().getUri());
     }
 }

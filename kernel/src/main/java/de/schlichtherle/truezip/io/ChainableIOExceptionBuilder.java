@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.io;
 
 import de.schlichtherle.truezip.util.AbstractExceptionBuilder;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * Assembles chainable I/O exceptions by
@@ -29,6 +30,7 @@ import de.schlichtherle.truezip.util.AbstractExceptionBuilder;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 public class ChainableIOExceptionBuilder<   C extends Exception,
                                             E extends ChainableIOException>
 extends AbstractExceptionBuilder<C, E> {

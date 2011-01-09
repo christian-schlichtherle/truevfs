@@ -20,6 +20,7 @@ import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.io.socket.InputClosedException;
 import de.schlichtherle.truezip.io.socket.OutputClosedException;
 import java.io.IOException;
+import net.jcip.annotations.Immutable;
 
 /**
  * Defines the available options for the synchronization of federated file
@@ -29,6 +30,7 @@ import java.io.IOException;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@Immutable
 public enum FsSyncOption {
 
     /**

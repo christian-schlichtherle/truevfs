@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.io.fs;
 
 import de.schlichtherle.truezip.io.ChainableIOException;
 import java.io.IOException;
+import net.jcip.annotations.Immutable;
 
 /**
  * Indicates an exceptional condition when synchronizing the changes in a
@@ -28,6 +29,7 @@ import java.io.IOException;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@Immutable
 public class FsSyncException extends ChainableIOException {
 
     private static final long serialVersionUID = 4893219420357369739L;
