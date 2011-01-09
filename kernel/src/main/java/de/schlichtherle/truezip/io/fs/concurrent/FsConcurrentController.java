@@ -53,7 +53,7 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 public final class FsConcurrentController
-extends FsDecoratingController<  FsConcurrentModel,
+extends FsDecoratingController< FsConcurrentModel,
                                 FsController<? extends FsConcurrentModel>> {
 
     private volatile ReadLock readLock;
