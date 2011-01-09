@@ -31,8 +31,8 @@ import net.jcip.annotations.ThreadSafe;
 public interface FsDriver {
 
     /**
-     * Returns a new file system controller for the given mount point
-     * and parent file system controller.
+     * Returns a new thread-safe file system controller for the given mount
+     * point and parent file system controller.
      * <p>
      * When called, the following expression is a precondition:
      * {@code
@@ -41,7 +41,7 @@ public interface FsDriver {
                     : mountPoint.getParent().equals(parent.getModel().getMountPoint())
      * }
      * <p>
-     * Note that the returned file system controller must be thread-safe!
+     * Note again that the returned file system controller must be thread-safe!
      *
      * @param  mountPoint the mount point of the file system.
      * @param  parent the parent file system controller.
