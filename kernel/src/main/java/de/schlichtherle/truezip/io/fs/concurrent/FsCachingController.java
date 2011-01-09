@@ -83,7 +83,7 @@ import static de.schlichtherle.truezip.io.fs.FsSyncOption.*;
  */
 @NotThreadSafe
 public final class FsCachingController
-extends FsDecoratingController<  FsConcurrentModel,
+extends FsDecoratingController< FsConcurrentModel,
                                 FsController<? extends FsConcurrentModel>> {
 
     private static final Strategy STRATEGY = WRITE_BACK;
