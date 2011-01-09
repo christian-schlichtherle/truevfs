@@ -20,12 +20,14 @@ import java.util.Iterator;
 import net.jcip.annotations.ThreadSafe;
 
 /**
+ * A decorator for a file system manager.
+ * 
  * @param   <M> The type of the file system model.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
-public abstract class FsDecoratorManager<M extends FsManager>
+public abstract class FsDecoratingManager<M extends FsManager>
 extends FsManager {
 
     protected final M delegate;
@@ -35,7 +37,7 @@ extends FsManager {
      *
      * @param manager the decorated file system manager.
      */
-    protected FsDecoratorManager(@NonNull final M manager) {
+    protected FsDecoratingManager(@NonNull final M manager) {
         if (null == manager)
             throw new NullPointerException();
         this.delegate = manager;

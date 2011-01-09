@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.FileBusyException;
-import de.schlichtherle.truezip.io.DecoratorInputStream;
+import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.io.fs.FsSyncException;
 import de.schlichtherle.truezip.io.fs.FsInputOption;
 import de.schlichtherle.truezip.io.socket.InputSocket;
@@ -79,7 +79,7 @@ import java.io.InputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class FileInputStream extends DecoratorInputStream {
+public final class FileInputStream extends DecoratingInputStream {
 
     /**
      * Creates a new {@code FileInputStream} for accessing regular files or

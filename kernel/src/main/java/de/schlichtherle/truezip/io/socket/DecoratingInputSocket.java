@@ -21,17 +21,19 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * @see     DecoratorOutputSocket
+ * A decorator for an input socket.
+ * 
+ * @see     DecoratingOutputSocket
  * @param   <E> The type of the {@link #getLocalTarget() local target}.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class DecoratorInputSocket<E extends Entry>
+public abstract class DecoratingInputSocket<E extends Entry>
 extends InputSocket<E> {
 
     private final InputSocket<? extends E> delegate;
 
-    protected DecoratorInputSocket(final InputSocket<? extends E> input) {
+    protected DecoratingInputSocket(final InputSocket<? extends E> input) {
         if (null == input)
             throw new NullPointerException();
         this.delegate = input;

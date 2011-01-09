@@ -20,8 +20,8 @@ import de.schlichtherle.truezip.io.fs.FsEntry;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.fs.archive.driver.ArchiveDriver;
-import de.schlichtherle.truezip.io.fs.concurrency.FSNotWriteLockedException;
-import de.schlichtherle.truezip.io.fs.concurrency.FSConcurrencyModel;
+import de.schlichtherle.truezip.io.fs.concurrent.FSNotWriteLockedException;
+import de.schlichtherle.truezip.io.fs.concurrent.FSConcurrentModel;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
@@ -106,7 +106,7 @@ import static de.schlichtherle.truezip.io.fs.FsOutputOption.*;
  */
 @NotThreadSafe
 abstract class BasicArchiveController<E extends ArchiveEntry>
-extends FsController<FSConcurrencyModel> {
+extends FsController<FSConcurrentModel> {
 
     private static final String CLASS_NAME
             = BasicArchiveController.class.getName();
@@ -120,14 +120,14 @@ extends FsController<FSConcurrencyModel> {
     private static final BitField<FsSyncOption> UNLINK_SYNC_OPTIONS
             = BitField.of(ABORT_CHANGES);
 
-    private final FSConcurrencyModel model;
+    private final FSConcurrentModel model;
 
     /**
      * Constructs a new basic archive controller.
      *
      * @param model the non-{@code null} archive model.
      */
-    BasicArchiveController(final FSConcurrencyModel model) {
+    BasicArchiveController(final FSConcurrentModel model) {
         if (null == model)
             throw new NullPointerException();
         if (null == model.getParent())
@@ -136,7 +136,7 @@ extends FsController<FSConcurrencyModel> {
     }
 
     @Override
-    public final FSConcurrencyModel getModel() {
+    public final FSConcurrentModel getModel() {
         return model;
     }
 

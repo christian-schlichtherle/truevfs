@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.io.fs;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
-import de.schlichtherle.truezip.io.fs.concurrency.FSConcurrencyController;
+import de.schlichtherle.truezip.io.fs.concurrent.FSConcurrentController;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
@@ -49,7 +49,7 @@ import static de.schlichtherle.truezip.io.fs.FsSyncOption.*;
  * Though not strictly required, it is recommended that a subclass
  * implementation is thread safe.
  * Otherwise, it's instances must be decorated by a synchronization guard such
- * as {@link FSConcurrencyController}.
+ * as {@link FSConcurrentController}.
  *
  * @param   <M> The type of the file system model.
  * @author  Christian Schlichtherle

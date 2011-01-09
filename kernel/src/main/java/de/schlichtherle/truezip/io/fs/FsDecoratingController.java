@@ -28,7 +28,7 @@ import java.io.IOException;
 import javax.swing.Icon;
 
 /**
- * Decorates another file system controller.
+ * A decorator for a file system controller.
  * <p>
  * This class is thread-safe if and only if the decorated file system
  * controller and its parent file system controller are thread-safe.
@@ -38,7 +38,7 @@ import javax.swing.Icon;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class FsDecoratorController<
+public abstract class FsDecoratingController<
         M extends FsModel,
         C extends FsController<? extends M>>
 extends FsController<M> {
@@ -53,7 +53,7 @@ extends FsController<M> {
      *
      * @param controller the decorated file system controller.
      */
-    protected FsDecoratorController(@NonNull final C controller) {
+    protected FsDecoratingController(@NonNull final C controller) {
         if (null == controller)
             throw new NullPointerException();
         this.delegate = controller;

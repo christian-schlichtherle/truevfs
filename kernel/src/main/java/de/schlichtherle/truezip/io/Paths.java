@@ -21,14 +21,13 @@ import java.util.Locale;
 
 /**
  * Provides static utility methods for path names.
- * This class cannot get instantiated outside its package.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
 public class Paths {
 
-    Paths() {
+    private Paths() {
     }
 
     /**

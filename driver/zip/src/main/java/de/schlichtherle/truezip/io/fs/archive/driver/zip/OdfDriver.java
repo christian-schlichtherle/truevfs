@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.fs.archive.driver.zip;
 
-import de.schlichtherle.truezip.io.fs.concurrency.FSConcurrencyModel;
+import de.schlichtherle.truezip.io.fs.concurrent.FSConcurrentModel;
 import java.io.OutputStream;
 import de.schlichtherle.truezip.io.socket.InputShop;
 import de.schlichtherle.truezip.io.socket.OutputShop;
@@ -78,7 +78,7 @@ public class OdfDriver extends JarDriver {
 
     @Override
     public OutputShop<ZipEntry> newOutputShop(
-            FSConcurrencyModel model,
+            FSConcurrentModel model,
             OutputSocket<?> output,
             InputShop<ZipEntry> source)
     throws IOException {

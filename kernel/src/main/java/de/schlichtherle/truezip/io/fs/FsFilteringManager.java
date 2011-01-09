@@ -26,14 +26,14 @@ import net.jcip.annotations.ThreadSafe;
 /**
  * Filters the list of federated file systems managed by the decorated file
  * system manager so that their mount point starts with the prefix provided
- * to the {@link #FsFilterManager constructor}.
+ * to the {@link #FsFilteringManager constructor}.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
-public final class FsFilterManager
-extends FsDecoratorManager<FsManager> {
+public final class FsFilteringManager
+extends FsDecoratingManager<FsManager> {
 
     private final FsMountPoint prefix;
 
@@ -45,7 +45,7 @@ extends FsDecoratorManager<FsManager> {
      * @param prefix the prefix of the mount point used to filter all federated
      *        file systems of the decorated file system manager.
      */
-    public FsFilterManager(
+    public FsFilteringManager(
             @NonNull final FsManager manager,
             @NonNull final FsMountPoint prefix) {
         super(manager);

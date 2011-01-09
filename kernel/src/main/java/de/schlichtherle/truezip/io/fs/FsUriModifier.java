@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.io.fs;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URI;
 import java.net.URISyntaxException;
+import net.jcip.annotations.Immutable;
 
 import static de.schlichtherle.truezip.io.entry.EntryName.*;
 
@@ -28,6 +29,7 @@ import static de.schlichtherle.truezip.io.entry.EntryName.*;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@Immutable
 public enum FsUriModifier {
 
     /** The null modifier does nothing but ensure that the URI is normalized. */
@@ -58,6 +60,7 @@ public enum FsUriModifier {
      * Post-fixes a URI when it gets
      * {@link FsUriModifier#CANONICALIZE canonicalized}.
      */
+    @Immutable
     public enum PostFix {
 
         /**

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.fs.concurrency;
+package de.schlichtherle.truezip.io.fs.concurrent;
 
 import de.schlichtherle.truezip.io.fs.FsException;
 
@@ -30,11 +30,11 @@ public final class FSNotWriteLockedException extends FsException {
 
     private static final long serialVersionUID = 2345952581284762637L;
 
-    FSNotWriteLockedException(FSConcurrencyModel model) {
+    FSNotWriteLockedException(FSConcurrentModel model) {
         super(model);
     }
 
-    FSNotWriteLockedException(FSConcurrencyModel model, FSNotWriteLockedException ex) {
+    FSNotWriteLockedException(FSConcurrentModel model, FSNotWriteLockedException ex) {
         super(model, ex);
     }
 }

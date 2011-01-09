@@ -16,22 +16,22 @@
 package de.schlichtherle.truezip.io.fs.archive;
 
 import de.schlichtherle.truezip.io.socket.IOPool;
-import de.schlichtherle.truezip.io.socket.DecoratorInputSocket;
-import de.schlichtherle.truezip.io.DecoratorOutputStream;
+import de.schlichtherle.truezip.io.socket.DecoratingInputSocket;
+import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.entry.Entry.Size;
-import de.schlichtherle.truezip.io.socket.DecoratorOutputSocket;
+import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
 import de.schlichtherle.truezip.io.socket.OutputShop;
-import de.schlichtherle.truezip.io.socket.DecoratorOutputShop;
+import de.schlichtherle.truezip.io.socket.DecoratingOutputShop;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.socket.IOSocket;
 import de.schlichtherle.truezip.io.ChainableIOException;
 import de.schlichtherle.truezip.io.ChainableIOExceptionBuilder;
 import de.schlichtherle.truezip.io.InputException;
-import de.schlichtherle.truezip.io.fs.file.FilePool;
+import de.schlichtherle.truezip.io.fs.file.TempFilePool;
 import de.schlichtherle.truezip.util.JointIterator;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
@@ -61,7 +61,7 @@ import static de.schlichtherle.truezip.io.fs.archive.ArchiveEntry.UNKNOWN;
  * @version $Id$
  */
 public class MultiplexedArchiveOutputShop<AE extends ArchiveEntry>
-extends DecoratorOutputShop<AE, OutputShop<AE>> {
+extends DecoratingOutputShop<AE, OutputShop<AE>> {
 
     /**
      * The map of temporary archive entries which have not yet been written
@@ -127,7 +127,7 @@ extends DecoratorOutputShop<AE, OutputShop<AE>> {
         if (null == entry)
             throw new NullPointerException();
 
-        class Output extends DecoratorOutputSocket<AE> {
+        class Output extends DecoratingOutputSocket<AE> {
             Output() {
                 super(MultiplexedArchiveOutputShop.super.getOutputSocket(entry));
             }
@@ -136,7 +136,7 @@ extends DecoratorOutputShop<AE, OutputShop<AE>> {
             public OutputStream newOutputStream()
             throws IOException {
                 if (isBusy()) {
-                    final IOPool.Entry<?> temp = FilePool.get().allocate();
+                    final IOPool.Entry<?> temp = TempFilePool.get().allocate();
                     IOException cause = null;
                     try {
                         return new TempEntryOutputStream(getBoundSocket(), temp);
@@ -169,7 +169,7 @@ extends DecoratorOutputShop<AE, OutputShop<AE>> {
     }
 
     /** This entry output stream writes directly to the output archive. */
-    private class EntryOutputStream extends DecoratorOutputStream {
+    private class EntryOutputStream extends DecoratingOutputStream {
         private boolean closed;
 
         EntryOutputStream(final OutputStream out) {
@@ -198,7 +198,7 @@ extends DecoratorOutputShop<AE, OutputShop<AE>> {
      * archive is still busy.
      */
     private class TempEntryOutputStream
-    extends DecoratorOutputStream {
+    extends DecoratingOutputStream {
         private final IOPool.Entry<?> temp;
         private final OutputSocket<? extends AE> output;
         private final AE local;
@@ -214,7 +214,7 @@ extends DecoratorOutputShop<AE, OutputShop<AE>> {
             this.output = output;
             this.local = output.getLocalTarget();
             this.peer = output.getPeerTarget();
-            class ProxyInput extends DecoratorInputSocket<Entry> {
+            class ProxyInput extends DecoratingInputSocket<Entry> {
                 private final Entry target = null != peer ? peer : temp;
 
                 ProxyInput() {

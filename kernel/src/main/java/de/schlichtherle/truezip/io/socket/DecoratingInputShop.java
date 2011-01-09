@@ -16,25 +16,25 @@
 package de.schlichtherle.truezip.io.socket;
 
 import de.schlichtherle.truezip.io.entry.Entry;
-import de.schlichtherle.truezip.io.entry.DecoratorEntryContainer;
+import de.schlichtherle.truezip.io.entry.DecoratingEntryContainer;
 import java.io.IOException;
 
 /**
- * Decorates an {@code InputShop}.
+ * A decorator for an input shop.
  * <p>
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client applications.
  *
  * @param   <E> The type of the entries.
- * @see     DecoratorOutputShop
+ * @see     DecoratingOutputShop
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class DecoratorInputShop<E extends Entry, I extends InputShop<E>>
-extends DecoratorEntryContainer<E, I>
+public abstract class DecoratingInputShop<E extends Entry, I extends InputShop<E>>
+extends DecoratingEntryContainer<E, I>
 implements InputShop<E> {
 
-    protected DecoratorInputShop(final I input) {
+    protected DecoratingInputShop(final I input) {
         super(input);
     }
 

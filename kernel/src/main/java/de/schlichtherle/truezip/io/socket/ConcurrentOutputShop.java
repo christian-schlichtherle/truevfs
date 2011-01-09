@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.socket;
 
-import de.schlichtherle.truezip.io.DecoratorOutputStream;
+import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.io.SynchronizedOutputStream;
@@ -39,7 +39,7 @@ import java.util.logging.Logger;
  * @version $Id$
  */
 public class ConcurrentOutputShop<E extends Entry>
-extends DecoratorOutputShop<E, OutputShop<E>> {
+extends DecoratingOutputShop<E, OutputShop<E>> {
 
     private static final String CLASS_NAME
             = ConcurrentOutputShop.class.getName();
@@ -173,7 +173,7 @@ extends DecoratorOutputShop<E, OutputShop<E>> {
         if (null == entry)
             throw new NullPointerException();
 
-        class Output extends DecoratorOutputSocket<E> {
+        class Output extends DecoratingOutputSocket<E> {
             Output() {
                 super(ConcurrentOutputShop.super.getOutputSocket(entry));
             }
@@ -220,7 +220,7 @@ extends DecoratorOutputShop<E, OutputShop<E>> {
         }
     } // class SynchronizedConcurrentOutputStream
 
-    private final class ConcurrentOutputStream extends DecoratorOutputStream {
+    private final class ConcurrentOutputStream extends DecoratingOutputStream {
         private ConcurrentOutputStream(OutputStream out) {
             super(out);
         }

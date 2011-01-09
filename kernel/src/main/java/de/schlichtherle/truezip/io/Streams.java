@@ -35,14 +35,13 @@ import java.util.concurrent.ThreadFactory;
 /**
  * Provides static utility methods for {@link InputStream}s and
  * {@link OutputStream}s.
- * This class cannot get instantiated outside its package.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
 public class Streams {
 
-    Streams() {
+    private Streams() {
     }
 
     private static final ExecutorService executor

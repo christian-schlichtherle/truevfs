@@ -24,11 +24,11 @@ import java.io.InputStream;
  * in the JSE, but optimized for performance and <em>without</em>
  * multithreading support.
  *
- * @see     DecoratorOutputStream
+ * @see     DecoratingOutputStream
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class DecoratorInputStream extends InputStream {
+public abstract class DecoratingInputStream extends InputStream {
 
     /** The nullable decorated input stream. */
     @Nullable
@@ -39,7 +39,7 @@ public abstract class DecoratorInputStream extends InputStream {
      *
      * @param in the input stream to wrap in this decorator.
      */
-    protected DecoratorInputStream(final InputStream in) {
+    protected DecoratingInputStream(final InputStream in) {
         this.delegate = in;
     }
 

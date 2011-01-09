@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.fs.concurrency;
+package de.schlichtherle.truezip.io.fs.concurrent;
 
 import de.schlichtherle.truezip.io.fs.FsSyncException;
 import de.schlichtherle.truezip.io.fs.FsSyncOption;
@@ -26,12 +26,12 @@ import de.schlichtherle.truezip.io.fs.FsController;
 import de.schlichtherle.truezip.io.fs.FsEntry;
 import de.schlichtherle.truezip.io.fs.FsEntryName;
 import de.schlichtherle.truezip.io.fs.FsException;
-import de.schlichtherle.truezip.io.fs.FsDecoratorController;
+import de.schlichtherle.truezip.io.fs.FsDecoratingController;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.io.socket.DecoratorInputSocket;
-import de.schlichtherle.truezip.io.socket.DecoratorOutputSocket;
+import de.schlichtherle.truezip.io.socket.DecoratingInputSocket;
+import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -47,14 +47,14 @@ import net.jcip.annotations.ThreadSafe;
 /**
  * Supports multiple concurrent reader threads.
  * 
- * @see     FSConcurrencyModel
+ * @see     FSConcurrentModel
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
-public final class FSConcurrencyController
-extends FsDecoratorController<  FSConcurrencyModel,
-                                FsController<? extends FSConcurrencyModel>> {
+public final class FSConcurrentController
+extends FsDecoratingController<  FSConcurrentModel,
+                                FsController<? extends FSConcurrentModel>> {
 
     private volatile ReadLock readLock;
     private volatile WriteLock writeLock;
@@ -64,8 +64,8 @@ extends FsDecoratorController<  FSConcurrencyModel,
      *
      * @param controller the decorated file system controller.
      */
-    public FSConcurrencyController(
-            @NonNull FsController<? extends FSConcurrencyModel> controller) {
+    public FSConcurrentController(
+            @NonNull FsController<? extends FSConcurrentModel> controller) {
         super(controller);
     }
 
@@ -232,7 +232,7 @@ extends FsDecoratorController<  FSConcurrencyModel,
         return new Input(delegate.getInputSocket(name, options));
     }
 
-    private class Input extends DecoratorInputSocket<Entry> {
+    private class Input extends DecoratingInputSocket<Entry> {
         Input(InputSocket<?> input) {
             super(input);
         }
@@ -305,7 +305,7 @@ extends FsDecoratorController<  FSConcurrencyModel,
         return new Output(delegate.getOutputSocket(name, options, template));
     }
 
-    private class Output extends DecoratorOutputSocket<Entry> {
+    private class Output extends DecoratingOutputSocket<Entry> {
         Output(OutputSocket<?> output) {
             super(output);
         }

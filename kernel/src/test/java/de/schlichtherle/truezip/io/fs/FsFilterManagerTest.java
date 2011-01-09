@@ -30,8 +30,8 @@ public class FsFilterManagerTest extends FsManagerTestCase {
 
     @Override
     protected FsManager newManager() {
-        return new FsFilterManager(
-                new FsFederationManager(),
+        return new FsFilteringManager(
+                new FsFederatingManager(),
                 FsMountPoint.create("file:/"));
     }
 
@@ -47,7 +47,7 @@ public class FsFilterManagerTest extends FsManagerTestCase {
         }) {
             assert params[0].length == 1;
 
-            final FsManager manager = new FsFederationManager(
+            final FsManager manager = new FsFederatingManager(
                     STRONG);
             for (final String param : params[1])
                 manager.getController(FsMountPoint.create(param), new FsDummyDriver());
@@ -57,7 +57,7 @@ public class FsFilterManagerTest extends FsManagerTestCase {
             for (final String param : params[2])
                 set.add(FsMountPoint.create(param));
 
-            final FsManager filter = new FsFilterManager(
+            final FsManager filter = new FsFilteringManager(
                     manager, FsMountPoint.create(params[0][0]));
             assertThat(filter.getSize(), is(params[2].length));
             for (final FsController<?> controller : filter)

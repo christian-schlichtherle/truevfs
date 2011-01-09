@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.crypto.io;
 
-import de.schlichtherle.truezip.io.DecoratorOutputStream;
+import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import org.bouncycastle.crypto.BufferedBlockCipher;
@@ -40,7 +40,7 @@ import org.bouncycastle.crypto.InvalidCipherTextException;
  *
  * @author Christian Schlichtherle
  */
-public class CipherOutputStream extends DecoratorOutputStream {
+public class CipherOutputStream extends DecoratingOutputStream {
 
     /** The buffered block cipher used for preprocessing the output. */
     protected BufferedBlockCipher cipher;

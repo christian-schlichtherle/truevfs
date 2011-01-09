@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.fs.archive.driver.zip;
 
-import de.schlichtherle.truezip.io.socket.DecoratorOutputSocket;
+import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.fs.archive.MultiplexedArchiveOutputShop;
 import java.io.IOException;
@@ -50,7 +50,7 @@ public class OdfOutputShop extends MultiplexedArchiveOutputShop<ZipEntry> {
         if (null == entry)
             throw new NullPointerException();
 
-        class Output extends DecoratorOutputSocket<ZipEntry> {
+        class Output extends DecoratingOutputSocket<ZipEntry> {
             Output() {
                 super(OdfOutputShop.super.getOutputSocket(entry));
             }

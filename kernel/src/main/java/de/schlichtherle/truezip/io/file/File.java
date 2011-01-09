@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.io.file;
 
+import de.schlichtherle.truezip.io.Paths.Splitter;
+import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.fs.FsController;
 import de.schlichtherle.truezip.io.fs.FsManagers;
@@ -24,7 +26,7 @@ import de.schlichtherle.truezip.io.fs.FsPath;
 import de.schlichtherle.truezip.io.fs.FsMountPoint;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.fs.FsEntry;
-import de.schlichtherle.truezip.io.fs.FsFilterManager;
+import de.schlichtherle.truezip.io.fs.FsFilteringManager;
 import de.schlichtherle.truezip.io.fs.FsSyncExceptionBuilder;
 import de.schlichtherle.truezip.io.fs.FsSyncOption;
 import de.schlichtherle.truezip.util.BitField;
@@ -59,7 +61,7 @@ import static de.schlichtherle.truezip.io.fs.FsSyncOption.*;
 import static de.schlichtherle.truezip.io.fs.FsUriModifier.*;
 import static de.schlichtherle.truezip.io.entry.Entry.Size.*;
 import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
-import static de.schlichtherle.truezip.io.Files.*;
+import static de.schlichtherle.truezip.io.file.Files.*;
 import static de.schlichtherle.truezip.io.fs.FsOutputOption.*;
 
 /**
@@ -749,7 +751,9 @@ public final class File extends java.io.File {
         assert !(delegate instanceof File);
         if (innerArchive != null) {
             assert innerArchive.isArchive();
-            assert de.schlichtherle.truezip.io.Files.contains(innerArchive.getPath(), delegate.getPath());
+            assert Paths.contains(  innerArchive.getPath(),
+                                    delegate.getPath(),
+                                    separatorChar);
         }
         assert detector != null;
 
@@ -945,8 +949,9 @@ public final class File extends java.io.File {
         assert (this == innerArchive && null != controller)
                 ^ (innerArchive == enclArchive && null == controller);
         assert null == enclArchive
-                || de.schlichtherle.truezip.io.Files.contains(enclArchive.getPath(),
-                            delegate.getParentFile().getPath())
+                || Paths.contains(  enclArchive.getPath(),
+                                    delegate.getParentFile().getPath(),
+                                    separatorChar)
                     && 0 < enclEntryName.toString().length();
         return true;
     }
@@ -1013,7 +1018,7 @@ public final class File extends java.io.File {
             throw new IllegalArgumentException(archive.getPath() + " (not a top level federated file system)");
         final ExceptionBuilder<IOException, ArchiveException> builder
                 = new ArchiveExceptionBuilder();
-        new FsFilterManager(
+        new FsFilteringManager(
                 FsManagers.getInstance(),
                 archive .getController()
                         .getModel()
@@ -1365,6 +1370,17 @@ public final class File extends java.io.File {
         File.defaultDetector = detector;
     }
 
+    /**
+     * Returns the first parent directory (starting from this file) which is
+     * <em>not</em> an archive file or a file located in an archive file.
+     */
+    public File getNonArchivedParentFile() {
+        final File enclArchive = this.enclArchive;
+        return null != enclArchive
+                ? enclArchive.getNonArchivedParentFile()
+                : getParentFile();
+    }
+
     @Override
     public File getParentFile() {
         final java.io.File parent = delegate.getParentFile();
@@ -1385,41 +1401,15 @@ public final class File extends java.io.File {
         return new File(parent, enclArchive, detector);
     }
 
-    /**
-     * Returns the first parent directory (starting from this file) which is
-     * <em>not</em> an archive file or a file located in an archive file.
-     */
-    public File getNonArchivedParentFile() {
-        final File enclArchive = this.enclArchive;
-        return null != enclArchive
-                ? enclArchive.getNonArchivedParentFile()
-                : getParentFile();
-    }
-
-    @Override
-    public String getAbsolutePath() {
-        return delegate.getAbsolutePath();
-    }
-
     @Override
     public File getAbsoluteFile() {
         String p = getAbsolutePath();
         return p.equals(getPath()) ? this : new File(p, detector);
     }
 
-    /**
-     * Similar to {@link #getAbsolutePath()}, but removes any redundant
-     * {@code "."} and {@code ".."} directories from the path name.
-     * The result is similar to {@link #getCanonicalPath()}, but symbolic
-     * links are not resolved.
-     * This may be useful if {@code getCanonicalPath()} throws an
-     * IOException.
-     *
-     * @see #getCanonicalPath()
-     * @see #getNormalizedPath()
-     */
-    public String getNormalizedAbsolutePath() {
-        return normalize(getAbsolutePath());
+    @Override
+    public String getAbsolutePath() {
+        return delegate.getAbsolutePath();
     }
 
     /**
@@ -1440,13 +1430,18 @@ public final class File extends java.io.File {
     }
 
     /**
-     * Removes any redundant {@code "."}, {@code ".."} directories from the
-     * path name.
+     * Similar to {@link #getAbsolutePath()}, but removes any redundant
+     * {@code "."} and {@code ".."} directories from the path name.
+     * The result is similar to {@link #getCanonicalPath()}, but symbolic
+     * links are not resolved.
+     * This may be useful if {@code getCanonicalPath()} throws an
+     * IOException.
      *
-     * @return The normalized path of this file as a {@link String}.
+     * @see #getCanonicalPath()
+     * @see #getNormalizedPath()
      */
-    public String getNormalizedPath() {
-        return normalize(getPath());
+    public String getNormalizedAbsolutePath() {
+        return Paths.normalize(getAbsolutePath(), separatorChar);
     }
 
     /**
@@ -1461,9 +1456,14 @@ public final class File extends java.io.File {
         return p.equals(getPath()) ? this : new File(p, detector);
     }
 
-    @Override
-    public String getCanonicalPath() throws IOException {
-        return delegate.getCanonicalPath();
+    /**
+     * Removes any redundant {@code "."}, {@code ".."} directories from the
+     * path name.
+     *
+     * @return The normalized path of this file as a {@link String}.
+     */
+    public String getNormalizedPath() {
+        return Paths.normalize(getPath(), separatorChar);
     }
 
     @Override
@@ -1472,16 +1472,9 @@ public final class File extends java.io.File {
         return p.equals(getPath()) ? this : new File(p, detector);
     }
 
-    /**
-     * This convenience method simply returns the canonical form of this
-     * abstract path or the normalized absolute form if resolving the
-     * prior fails.
-     *
-     * @return The canonical or absolute path of this file as a
-     *         {@code String} instance.
-     */
-    public String getCanOrAbsPath() {
-        return getRealPath(delegate);
+    @Override
+    public String getCanonicalPath() throws IOException {
+        return delegate.getCanonicalPath();
     }
 
     /**
@@ -1495,6 +1488,18 @@ public final class File extends java.io.File {
     public final File getCanOrAbsFile() {
         String p = getCanOrAbsPath();
         return p.equals(getPath()) ? this : new File(p, detector);
+    }
+
+    /**
+     * This convenience method simply returns the canonical form of this
+     * abstract path or the normalized absolute form if resolving the
+     * prior fails.
+     *
+     * @return The canonical or absolute path of this file as a
+     *         {@code String} instance.
+     */
+    public String getCanOrAbsPath() {
+        return getRealPath(delegate);
     }
 
     /**
@@ -1689,7 +1694,7 @@ public final class File extends java.io.File {
      * @throws NullPointerException If the parameter is {@code null}.
      */
     public boolean isParentOf(final java.io.File file) {
-        return de.schlichtherle.truezip.io.Files.contains(this, file);
+        return Files.contains(this, file);
     }
 
     /**
@@ -1736,7 +1741,7 @@ public final class File extends java.io.File {
      * @throws NullPointerException If any parameter is {@code null}.
      */
     public static boolean contains(java.io.File a, java.io.File b) {
-        return de.schlichtherle.truezip.io.Files.contains(a, b);
+        return Files.contains(a, b);
     }
 
     /**
@@ -1745,7 +1750,7 @@ public final class File extends java.io.File {
      */
     public boolean isFileSystemRoot() {
         File canOrAbsFile = getCanOrAbsFile();
-        return roots.contains(canOrAbsFile) || de.schlichtherle.truezip.io.Files.isUNC(canOrAbsFile.getPath());
+        return roots.contains(canOrAbsFile) || isUNC(canOrAbsFile.getPath());
     }
 
     /**
@@ -1753,7 +1758,18 @@ public final class File extends java.io.File {
      * Note that this should be relevant on the Windows platform only.
      */
     public boolean isUNC() {
-        return de.schlichtherle.truezip.io.Files.isUNC(this);
+        return isUNC(getCanOrAbsPath());
+    }
+
+    /** The prefix of a UNC (a Windows concept). */
+    private static final String UNC_PREFIX = separator + separator;
+
+    /**
+     * Returns {@code true} iff the given path is a UNC.
+     * Note that this may be only relevant on the Windows platform.
+     */
+    private static boolean isUNC(String path) {
+        return path.startsWith(UNC_PREFIX) && path.indexOf(separatorChar, 2) > 2;
     }
 
     // Make static code analysis shut up about missing hashCode().

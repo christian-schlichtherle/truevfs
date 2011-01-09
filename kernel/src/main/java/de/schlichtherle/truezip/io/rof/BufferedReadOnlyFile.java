@@ -28,14 +28,14 @@ import java.io.IOException;
  * Thus, if you would like to access the underlying {@code ReadOnlyFile}
  * again after you have finished working with an instance of this class,
  * you should synchronize their file pointers using the pattern as described
- * in {@link DecoratorReadOnlyFile}.
+ * in {@link DecoratingReadOnlyFile}.
  * <p>
  * This class is <em>not</em> thread-safe.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class BufferedReadOnlyFile extends DecoratorReadOnlyFile {
+public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
 
     /** The default buffer length of the window to the file. */
     public static final int WINDOW_LEN = 4096;

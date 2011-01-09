@@ -25,12 +25,10 @@ import net.jcip.annotations.ThreadSafe;
 import static de.schlichtherle.truezip.io.fs.FsController.*;
 
 /**
- * A static service locator and container for a default file system manager
- * instance.
- * utility methods to access file system managers.
+ * A static service locator and container for a file system manager instance.
  * If you want to use this package with dependency injection, then you should
- * avoid using this class if possible because it uses static fields for
- * storing stateful objects.
+ * avoid using this class if possible because it uses a static field for
+ * storing the stateful file system manager instance.
  * <p>
  * This class is thread-safe.
  *
@@ -76,7 +74,7 @@ public class FsManagers {
                 manager = instance;
                 if (null == manager) {
                     manager = new ServiceLocator(FsManagers.class.getClassLoader())
-                            .getService(FsManager.class, FsFederationManager.class);
+                            .getService(FsManager.class, FsFederatingManager.class);
                     setInstance(manager);
                 }
             }

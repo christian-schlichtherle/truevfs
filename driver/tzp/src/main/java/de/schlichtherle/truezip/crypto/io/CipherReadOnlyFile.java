@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.crypto.io;
 
 import de.schlichtherle.truezip.crypto.SeekableBlockCipher;
-import de.schlichtherle.truezip.io.rof.DecoratorReadOnlyFile;
+import de.schlichtherle.truezip.io.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.IOException;
 import org.bouncycastle.crypto.Mac;
@@ -32,7 +32,7 @@ import org.bouncycastle.crypto.Mac;
  * Thus, if you would like to access the underlying {@code ReadOnlyFile}
  * again after you have finished working with an instance of this class,
  * you should synchronize their file pointers using the pattern as described
- * in the base class {@link DecoratorReadOnlyFile}.
+ * in the base class {@link DecoratingReadOnlyFile}.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -56,7 +56,7 @@ import org.bouncycastle.crypto.Mac;
 // have to provide another buffer to copy the data into before we could
 // actually decrypt it, which is redundant.
 //
-public abstract class CipherReadOnlyFile extends DecoratorReadOnlyFile {
+public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
 
     /**
      * The maximum buffer length of the window to the encrypted file.

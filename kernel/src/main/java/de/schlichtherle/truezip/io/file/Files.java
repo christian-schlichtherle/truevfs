@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.io.file;
 
+import de.schlichtherle.truezip.io.Paths;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import de.schlichtherle.truezip.io.fs.FsManagers;
 import de.schlichtherle.truezip.io.fs.FsPath;
 import de.schlichtherle.truezip.io.fs.archive.ArchiveFileSystemException;
@@ -33,11 +35,9 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import static de.schlichtherle.truezip.io.fs.FsOutputOption.*;
-import static de.schlichtherle.truezip.io.Files.*;
 
 /**
  * Provides static utility methods for {@link File}s.
- * This class cannot get instantiated outside its package.
  * <p>
  * Note that in contrast to the {@link File} class, the methods in this
  * class accept and return plain {@code java.io.File} instances.
@@ -49,7 +49,7 @@ import static de.schlichtherle.truezip.io.Files.*;
  */
 class Files {
 
-    Files() {
+    private Files() {
     }
 
     /**
@@ -239,7 +239,8 @@ class Files {
             final java.io.File src,
             final BitField<FsInputOption> options) {
         if (src instanceof File) {
-            // TODO: Consider removing this block and using the more general pattern below!
+            // TODO: Consider removing this block and using the more general pattern below it!
+            // FIXME: Removing this block yields a concurrency issue in the Kernel TCK!
             final File file = (File) src;
             final File archive = file.getInnerArchive();
             if (null != archive)
@@ -258,7 +259,8 @@ class Files {
             final BitField<FsOutputOption> options,
             final Entry template) {
         if (dst instanceof File) {
-            // TODO: Consider removing this block and using the more general pattern below!
+            // TODO: Consider removing this block and using the more general pattern below it!
+            // FIXME: Removing this block yields a concurrency issue in the Kernel TCK!
             final File file = (File) dst;
             final File archive = file.getInnerArchive();
             if (null != archive)
@@ -296,5 +298,57 @@ class Files {
                 ok &= deleteAll(members[i]);
         }
         return ok && file.delete();
+    }
+
+    /**
+     * Returns {@code true} if and only if the path represented
+     * by {@code a} contains the path represented by {@code b},
+     * where a path is said to contain another path if and only
+     * if it is equal or a parent of the other path.
+     * <p>
+     * <b>Note:</b>
+     * <ul>
+     * <li>This method uses the canonical path name of the given files or,
+     *     if failing to canonicalize the path names, the normalized absolute
+     *     path names in order to compute reliable results.
+     * <li>This method does <em>not</em> access the file system.
+     *     It just tests the path names.
+     * </ul>
+     *
+     * @param a A non-{@code null} {@link File} reference.
+     * @param b A non-{@code null} {@link File} reference.
+     * @throws NullPointerException If any parameter is {@code null}.
+     */
+    static boolean contains(java.io.File a, java.io.File b) {
+        return Paths.contains(  getRealPath(a),
+                                getRealPath(b),
+                                File.separatorChar);
+    }
+
+    /**
+     * Returns the canonical path of the given file or the normalized absolute
+     * path if canonicalizing the path fails due to an {@code IOException}.
+     *
+     * @param  file the file.
+     * @return The canonical or absolute path of this file as a
+     *         {@code File} instance.
+     */
+    static @NonNull java.io.File getRealFile(@NonNull java.io.File file) {
+        String p = getRealPath(file);
+        return p.equals(file.getPath()) ? file : newFile(p, file);
+    }
+
+    static @NonNull String getRealPath(@NonNull java.io.File file) {
+        try {
+            return file.getCanonicalPath();
+        } catch (IOException ex) {
+            return Paths.normalize(file.getAbsolutePath(), File.separatorChar);
+        }
+    }
+
+    private static java.io.File newFile(String path, java.io.File template) {
+        return template instanceof File
+                ? new File(path, ((File) template).getArchiveDetector())
+                : new java.io.File(path);
     }
 }

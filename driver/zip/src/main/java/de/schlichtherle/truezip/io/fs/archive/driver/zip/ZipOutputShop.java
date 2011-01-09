@@ -17,14 +17,14 @@ package de.schlichtherle.truezip.io.fs.archive.driver.zip;
 
 import de.schlichtherle.truezip.io.socket.IOPool;
 import de.schlichtherle.truezip.io.socket.InputSocket;
-import de.schlichtherle.truezip.io.DecoratorOutputStream;
+import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.fs.archive.MultiplexedArchiveOutputShop;
 import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.io.fs.file.FilePool;
+import de.schlichtherle.truezip.io.fs.file.TempFilePool;
 import de.schlichtherle.truezip.io.zip.RawZipOutputStream;
 import de.schlichtherle.truezip.util.JointIterator;
 import java.io.File;
@@ -40,7 +40,6 @@ import java.util.zip.CRC32;
 import java.util.zip.CheckedOutputStream;
 
 import static de.schlichtherle.truezip.io.fs.archive.driver.zip.ZipDriver.TEMP_FILE_PREFIX;
-import static de.schlichtherle.truezip.io.Files.createTempFile;
 import static de.schlichtherle.truezip.io.entry.Entry.Size.DATA;
 import static de.schlichtherle.truezip.io.zip.ZipEntry.DEFLATED;
 import static de.schlichtherle.truezip.io.zip.ZipEntry.STORED;
@@ -98,7 +97,7 @@ implements OutputShop<ZipEntry> {
                 }
             }
             if (0 < source.getPostambleLength()) {
-                postamble = FilePool.get().allocate();
+                postamble = TempFilePool.get().allocate();
                 Streams.copy(   source.getPostambleInputStream(),
                                 postamble.getOutputSocket().newOutputStream());
             } else {
@@ -184,7 +183,8 @@ implements OutputShop<ZipEntry> {
                                 || entry.getCompressedSize() == UNKNOWN
                                 || entry.getSize() == UNKNOWN)
                             return new TempEntryOutputStream(
-                                    createTempFile(TEMP_FILE_PREFIX), entry);
+                                    File.createTempFile(TEMP_FILE_PREFIX, null), // TODO: Use TempFilePool!
+                                    entry);
                         break;
 
                     case DEFLATED:
@@ -216,7 +216,7 @@ implements OutputShop<ZipEntry> {
      * write the entry header.
      * These preconditions are checked by {@link #getOutputSocket(ZipEntry) t}.
      */
-    private class EntryOutputStream extends DecoratorOutputStream {
+    private class EntryOutputStream extends DecoratingOutputStream {
         EntryOutputStream(ZipEntry entry) throws IOException {
             this(entry, true);
         }

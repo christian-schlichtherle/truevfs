@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.io.fs.file;
 
 import de.schlichtherle.truezip.io.entry.Entry;
-import de.schlichtherle.truezip.io.DecoratorOutputStream;
+import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.fs.FsOutputOption;
 import de.schlichtherle.truezip.io.socket.IOPool;
 import de.schlichtherle.truezip.io.socket.IOSocket;
@@ -48,7 +48,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
     private final    @NonNull      FileEntry              entry;
     private final    @NonNull      BitField<FsOutputOption> options;
     private final    @CheckForNull Entry                    template;
-    private volatile @CheckForNull FilePool               pool;
+    private volatile @CheckForNull TempFilePool               pool;
 
     FileOutputSocket( final @NonNull      FileEntry              entry,
                         final @NonNull      BitField<FsOutputOption> options,
@@ -58,10 +58,10 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
         this.template = template;
     }
 
-    private FilePool getTempFilePool() {
+    private TempFilePool getTempFilePool() {
         return null != pool
                 ? pool
-                : (pool = new FilePool(   FILE_POOL_PREFIX, null,
+                : (pool = new TempFilePool(   FILE_POOL_PREFIX, null,
                                             entry.getFile().getParentFile()));
     }
 
@@ -82,7 +82,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
         final File tempFile = temp.getFile();
 
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE") // False positive with org.codehaus.mojo:findbugs-maven-plugin:2.3.1
-        class OutputStream extends DecoratorOutputStream {
+        class OutputStream extends DecoratingOutputStream {
             boolean closed;
 
             OutputStream() throws FileNotFoundException {

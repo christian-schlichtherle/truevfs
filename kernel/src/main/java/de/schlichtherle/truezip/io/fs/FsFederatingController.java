@@ -19,8 +19,8 @@ import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.io.socket.DecoratorInputSocket;
-import de.schlichtherle.truezip.io.socket.DecoratorOutputSocket;
+import de.schlichtherle.truezip.io.socket.DecoratingInputSocket;
+import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
@@ -36,7 +36,7 @@ import javax.swing.Icon;
 /**
  * Implements a chain of responsibility in order to resolve
  * {@link FsFalsePositiveException}s thrown by the prospective file system
- * provided to its {@link #FsFederationController constructor}.
+ * provided to its {@link #FsFederatingController constructor}.
  * Whenever the controller for the prospective file system throws a
  * {@link FsFalsePositiveException}, the method call is delegated to the
  * controller for its parent file system in order to resolve the requested
@@ -48,8 +48,8 @@ import javax.swing.Icon;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-final class FsFederationController
-extends FsDecoratorController<FsModel, FsController<?>> {
+final class FsFederatingController
+extends FsDecoratingController<FsModel, FsController<?>> {
 
     private volatile FsPath path;
 
@@ -58,7 +58,7 @@ extends FsDecoratorController<FsModel, FsController<?>> {
      *
      * @param controller the decorated file system controller.
      */
-    FsFederationController(final @NonNull FsController<?> controller) {
+    FsFederatingController(final @NonNull FsController<?> controller) {
         super(controller);
         assert null != getParent();
     }
@@ -151,7 +151,7 @@ extends FsDecoratorController<FsModel, FsController<?>> {
         return new Input(name, options);
     }
 
-    private class Input extends DecoratorInputSocket<Entry> {
+    private class Input extends DecoratingInputSocket<Entry> {
         final FsEntryName name;
         final BitField<FsInputOption> options;
 
@@ -206,7 +206,7 @@ extends FsDecoratorController<FsModel, FsController<?>> {
         return new Output(name, options, template);
     }
 
-    private class Output extends DecoratorOutputSocket<Entry> {
+    private class Output extends DecoratingOutputSocket<Entry> {
         final FsEntryName name;
         final BitField<FsOutputOption> options;
         final Entry template;

@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.fs.archive.driver.tar;
 
-import de.schlichtherle.truezip.io.fs.concurrency.FSConcurrencyModel;
+import de.schlichtherle.truezip.io.fs.concurrent.FSConcurrentModel;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -115,7 +115,7 @@ public class TarBZip2Driver extends TarDriver {
      */
     @Override
     protected TarInputShop newTarInputShop(
-            final FSConcurrencyModel model, final InputStream in)
+            final FSConcurrentModel model, final InputStream in)
     throws IOException {
         // Consume and check the first two magic bytes. This is required for
         // the CBZip2InputStream class.
@@ -132,7 +132,7 @@ public class TarBZip2Driver extends TarDriver {
 
     @Override
     protected TarOutputShop newTarOutputShop(
-            final FSConcurrencyModel model,
+            final FSConcurrentModel model,
             final OutputStream out,
             final TarInputShop source)
     throws IOException {
