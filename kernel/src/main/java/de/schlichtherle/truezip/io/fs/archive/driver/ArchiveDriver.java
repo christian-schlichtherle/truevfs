@@ -24,8 +24,8 @@ import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.socket.InputShop;
 import de.schlichtherle.truezip.io.entry.EntryFactory;
 import de.schlichtherle.truezip.io.fs.FsController;
-import de.schlichtherle.truezip.io.fs.FsDriver;
 import de.schlichtherle.truezip.io.fs.FsMountPoint;
+import de.schlichtherle.truezip.io.fs.archive.ArchiveDriverRegistry;
 import de.schlichtherle.truezip.io.fs.concurrent.FsConcurrentController;
 import de.schlichtherle.truezip.io.fs.concurrent.FsCachingController;
 import de.schlichtherle.truezip.io.fs.file.TempFilePool;
@@ -62,10 +62,14 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 public abstract class ArchiveDriver<E extends ArchiveEntry>
-implements EntryFactory<E>, FsDriver, Serializable {
+implements EntryFactory<E>, Serializable {
 
     /**
-     * {@inheritDoc}
+     * Returns a new file system controller for the given mount point
+     * and parent file system controller.
+     * <p>
+     * When called, the following expression is a precondition:
+     * {@code mountPoint.getParent().equals(parent.getModel().getMountPoint())}
      * <p>
      * Note that an archive file system is always federated and therefore
      * its parent file system controller is never {@code null}.
@@ -75,8 +79,12 @@ implements EntryFactory<E>, FsDriver, Serializable {
      * of the returned file system controller.
      * Consequently, it is an error to call this method with a mount point
      * which has a scheme which is not supported by this archive driver.
+     *
+     * @param  mountPoint the mount point of the file system.
+     * @param  parent the parent file system controller.
+     * @return A new file system controller for the given mount point and
+     *         parent file system controller.
      */
-    @Override
     public @NonNull FsController<?>
     newController(  @NonNull FsMountPoint mountPoint,
                     @NonNull FsController<?> parent) {
