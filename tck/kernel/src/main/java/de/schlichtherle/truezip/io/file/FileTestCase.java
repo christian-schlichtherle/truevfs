@@ -197,22 +197,22 @@ public abstract class FileTestCase {
 
     @Test
     public final void testFalsePositives() throws IOException {
-        falsePositive(archive);
+        assertFalsePositive(archive);
 
         // Dito for entry.
         final File entry = new File(archive, "entry" + getSuffix());
 
         assertTrue(archive.mkdir());
-        falsePositive(entry);
+        assertFalsePositive(entry);
         assertTrue(archive.delete());
 
         assertTrue(newNonArchiveFile(archive).mkdir());
-        falsePositive(entry);
+        assertFalsePositive(entry);
         assertTrue(archive.delete());
     }
 
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    private void falsePositive(final File file) throws IOException {
+    private void assertFalsePositive(final File file) throws IOException {
         assert file.isArchive();
 
         // Note that file's parent directory may be a directory in the host file system!
@@ -253,7 +253,7 @@ public abstract class FileTestCase {
                 in.close();
             }
         }
-        delete(file);
+        assertDelete(file);
 
         // Create directory false positive.
 
@@ -276,7 +276,7 @@ public abstract class FileTestCase {
         } catch (FileNotFoundException expected) {
         }
 
-        delete(file);
+        assertDelete(file);
 
         // Create regular archive file.
 
@@ -300,10 +300,10 @@ public abstract class FileTestCase {
         } catch (FileNotFoundException expected) {
         }
 
-        delete(file);
+        assertDelete(file);
     }
 
-    private void delete(final File file) throws IOException {
+    private void assertDelete(final File file) throws IOException {
         assertTrue(file.delete());
         assertFalse(file.exists());
         assertFalse(file.isDirectory());
@@ -314,12 +314,12 @@ public abstract class FileTestCase {
 
     @Test
     public final void testCreateNewFile() throws IOException{
-        createNewPlainFile();
-        createNewEnhancedFile();
+        assertCreateNewPlainFile();
+        assertCreateNewEnhancedFile();
     }
     
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
-    private void createNewPlainFile() throws IOException {
+    private void assertCreateNewPlainFile() throws IOException {
         final java.io.File archive = createTempFile();
         assertTrue(archive.delete());
         final java.io.File file1 = new java.io.File(archive, "test.txt");
@@ -329,11 +329,11 @@ public abstract class FileTestCase {
             fail("Creating a file in a non-existent directory should throw an IOException!");
         } catch (IOException expected) {
         }
-        createNewFile(archive, file1, file2);
+        assertCreateNewFile(archive, file1, file2);
     }
 
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
-    private void createNewEnhancedFile() throws IOException {
+    private void assertCreateNewEnhancedFile() throws IOException {
         final java.io.File file1 = new File(archive, "test.txt");
         final java.io.File file2 = new File(file1, "test.txt");
 
@@ -344,16 +344,16 @@ public abstract class FileTestCase {
         } catch (IOException ok) {
             // This is exactly what we expect here!
         }
-        createNewFile(archive, file1, file2);
+        assertCreateNewFile(archive, file1, file2);
 
         File.setLenient(true);
-        createNewFile(archive, file1, file2);
+        assertCreateNewFile(archive, file1, file2);
     }
 
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
-    private void createNewFile( final java.io.File dir,
-                                final java.io.File file1,
-                                final java.io.File file2)
+    private void assertCreateNewFile(   final java.io.File dir,
+                                        final java.io.File file1,
+                                        final java.io.File file2)
     throws IOException {
         assertFalse(dir.exists());
         
@@ -399,10 +399,10 @@ public abstract class FileTestCase {
         for (int i = 0; i <= names.length; i++) {
             final File file2 = newNonArchiveFile(file);
             assertTrue(file2.mkdir());
-            illegalDirectoryOperations(file2);
+            assertIllegalDirectoryOperations(file2);
             assertTrue(file2.delete());
             assertTrue(file.mkdir());
-            illegalDirectoryOperations(file);
+            assertIllegalDirectoryOperations(file);
             if (i < names.length)
                 file = new File(file, names[i]);
         }
@@ -410,7 +410,7 @@ public abstract class FileTestCase {
     }
 
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    private void illegalDirectoryOperations(final File dir)
+    private void assertIllegalDirectoryOperations(final File dir)
     throws IOException {
         assert dir.isDirectory();
         try {
@@ -447,13 +447,13 @@ public abstract class FileTestCase {
 
         File.setLenient(false);
         try {
-            fileOutputStream(file);
+            assertFileOutputStream(file);
             fail("Creating ghost directories should not be allowed when File.isLenient() is false!");
         } catch (FileNotFoundException expected) {
         }
 
         assertTrue(archive.mkdir());
-        fileOutputStream(file);
+        assertFileOutputStream(file);
         assertTrue(archive.delete());
     }
     
@@ -461,7 +461,7 @@ public abstract class FileTestCase {
     public final void testLenientFileOutputStream() throws IOException {
         File file = new File(archive, "dir/inner" + getSuffix() + "/dir/test.txt");
 
-        fileOutputStream(file);
+        assertFileOutputStream(file);
 
         assertFalse(archive.delete()); // directory not empty!
         File.umount(); // allow external modifications!
@@ -472,7 +472,7 @@ public abstract class FileTestCase {
         assertEquals(0, archive.length());
     }
 
-    private void fileOutputStream(File file) throws IOException {
+    private void assertFileOutputStream(File file) throws IOException {
         final byte[] message = "Hello World!\r\n".getBytes();
         
         final FileOutputStream fos = new FileOutputStream(file);
@@ -688,18 +688,18 @@ public abstract class FileTestCase {
     
     @Test
     public final void testDirectoryTree() throws IOException {
-        directoryTree(
+        assertDirectoryTree(
                 new File(System.getProperty("java.io.tmpdir")), // base directory
                 new File("dir/inner" + getSuffix() + "/dir/outer" + getSuffix() + "/" + archive.getName())); // this path is reversed!!!
     }
 
-    private void directoryTree(File basePath, File reversePath)
+    private void assertDirectoryTree(File basePath, File reversePath)
     throws IOException {
         if (reversePath == null) {
             // We're at the leaf of the directory tree.
             final File test = new File(basePath, "test.txt");
             //testCreateNewFile(basePath, test);
-            fileOutputStream(test);
+            assertFileOutputStream(test);
             return;
         }
         assertFalse(".".equals(reversePath.getPath()));
@@ -708,8 +708,8 @@ public abstract class FileTestCase {
         final File member = new File(basePath, reversePath.getName());
         final boolean created = member.mkdir();
         final File children = reversePath.getParentFile();
-        directoryTree(member, children);
-        listFiles(basePath, member.getName());
+        assertDirectoryTree(member, children);
+        assertListFiles(basePath, member.getName());
         assertTrue(member.exists());
         assertTrue(member.isDirectory());
         assertFalse(member.isFile());
@@ -724,7 +724,7 @@ public abstract class FileTestCase {
         }
     }
 
-    private void listFiles(File dir, String entry) {
+    private void assertListFiles(File dir, String entry) {
         final File[] files = dir.listFiles();
         boolean found = false;
         for (int i = 0, l = files.length; i < l; i++) {
@@ -738,25 +738,25 @@ public abstract class FileTestCase {
 
     @Test
     public final void testCat() throws IOException {
-        cat(archive);
+        assertCat(archive);
         
         final File archiveTest = new File(archive, "test");
-        cat(archiveTest);
+        assertCat(archiveTest);
         
         final File archive2 = new File(archive, "inner" + getSuffix());
         final File archive2Test = new File(archive2, "test");
-        cat(archive2Test);
+        assertCat(archive2Test);
         assertTrue(archive2.delete());
         assertTrue(archive.delete());
     }
     
-    private void cat(final File file) throws IOException {
-        catFrom(file);
-        catTo(file);
+    private void assertCat(final File file) throws IOException {
+        assertCatFrom(file);
+        assertCatTo(file);
         assertTrue(file.delete());
     }
     
-    private void catFrom(final File file) throws IOException {
+    private void assertCatFrom(final File file) throws IOException {
         final InputStream in = new ByteArrayInputStream(data);
         try {
             assertTrue(file.catFrom(in));
@@ -766,7 +766,7 @@ public abstract class FileTestCase {
         assertEquals(data.length, file.length());
     }
     
-    private void catTo(final File file) throws IOException {
+    private void assertCatTo(final File file) throws IOException {
         final ByteArrayOutputStream out = new ByteArrayOutputStream(data.length);
         try {
             assertTrue(file.catTo(out));
@@ -784,26 +784,26 @@ public abstract class FileTestCase {
         assertNotNull(dir);
         final File entry = new File(archive, "entry");
         
-        copyContainingOrSameFiles0(dir, archive);
-        copyContainingOrSameFiles0(archive, entry);
+        assertCopyContainingOrSameFiles0(dir, archive);
+        assertCopyContainingOrSameFiles0(archive, entry);
         
         assertTrue(entry.catFrom(new ByteArrayInputStream(data)));
         
-        copyContainingOrSameFiles0(dir, archive);
-        copyContainingOrSameFiles0(archive, entry);
+        assertCopyContainingOrSameFiles0(dir, archive);
+        assertCopyContainingOrSameFiles0(archive, entry);
         
         assertTrue(archive.deleteAll());
     }
     
-    private void copyContainingOrSameFiles0(final File a, final File b)
+    private void assertCopyContainingOrSameFiles0(final File a, final File b)
     throws IOException {
-        copyContainingOrSameFiles1(a, b);
-        copyContainingOrSameFiles1(a.getCanOrAbsFile(), b);
-        copyContainingOrSameFiles1(a, b.getCanOrAbsFile());
-        copyContainingOrSameFiles1(a.getCanOrAbsFile(), b.getCanOrAbsFile());
+        assertCopyContainingOrSameFiles1(a, b);
+        assertCopyContainingOrSameFiles1(a.getCanOrAbsFile(), b);
+        assertCopyContainingOrSameFiles1(a, b.getCanOrAbsFile());
+        assertCopyContainingOrSameFiles1(a.getCanOrAbsFile(), b.getCanOrAbsFile());
     }
     
-    private void copyContainingOrSameFiles1(final File a, final File b)
+    private void assertCopyContainingOrSameFiles1(final File a, final File b)
     throws IOException {
         try {
             File.cp(a, a);
@@ -836,15 +836,15 @@ public abstract class FileTestCase {
         };
 
         assertTrue(archive.mkdir());
-        copyDelete(archive, names, 0);
+        assertCopyDelete(archive, names, 0);
         assertTrue(archive.delete());
 
         assertTrue(newNonArchiveFile(archive).mkdir());
-        copyDelete(archive, names, 0);
+        assertCopyDelete(archive, names, 0);
         assertTrue(archive.delete());
     }
 
-    private void copyDelete(final File parent, String[] names, int off)
+    private void assertCopyDelete(final File parent, String[] names, int off)
     throws IOException {
         if (off >= names.length)
             return;
@@ -852,40 +852,40 @@ public abstract class FileTestCase {
         final File dir = new File(parent, names[off]);
 
         assertTrue(dir.mkdir()); // create valid archive file
-        copyDelete(parent, dir);
-        copyDelete(dir, names, off + 1); // continue recursion
+        assertCopyDelete(parent, dir);
+        assertCopyDelete(dir, names, off + 1); // continue recursion
         assertTrue(dir.delete());
 
         assertTrue(newNonArchiveFile(dir).mkdir()); // create false positive archive file
-        copyDelete(parent, dir);
-        copyDelete(dir, names, off + 1); // continue recursion
+        assertCopyDelete(parent, dir);
+        assertCopyDelete(dir, names, off + 1); // continue recursion
         assertTrue(dir.delete());
     }
 
-    private void copyDelete(final File parent, final File dir)
+    private void assertCopyDelete(final File parent, final File dir)
     throws IOException {
         final File parentA = new File(parent, "a");
         final File parentB = new File(parent, "b" + getSuffix());
         final File dirA = new File(dir, "a");
         final File dirB = new File(dir, "b" + getSuffix());
 
-        copyDelete0(dirA, dirB);
-        copyDelete0(dirA, parentA);
-        copyDelete0(dirA, parentB);
-        copyDelete0(parentA, dirA);
-        copyDelete0(parentA, dirB);
-        copyDelete0(parentB, dirA);
-        copyDelete0(parentB, dirB);
-        copyDelete0(dirB, dirA);
-        copyDelete0(dirB, parentA);
-        copyDelete0(dirB, parentB);
+        assertCopyDelete0(dirA, dirB);
+        assertCopyDelete0(dirA, parentA);
+        assertCopyDelete0(dirA, parentB);
+        assertCopyDelete0(parentA, dirA);
+        assertCopyDelete0(parentA, dirB);
+        assertCopyDelete0(parentB, dirA);
+        assertCopyDelete0(parentB, dirB);
+        assertCopyDelete0(dirB, dirA);
+        assertCopyDelete0(dirB, parentA);
+        assertCopyDelete0(dirB, parentB);
     }
 
-    private void copyDelete0(File a, File b) throws IOException {
-        copyDelete0(a, b, 2000); // works in all archive types currently supported
+    private void assertCopyDelete0(File a, File b) throws IOException {
+        assertCopyDelete0(a, b, 2000); // works in all archive types currently supported
     }
 
-    private void copyDelete0(   final File a,
+    private void assertCopyDelete0(   final File a,
                                 final File b,
                                 final long granularity)
     throws IOException {
@@ -1091,7 +1091,7 @@ public abstract class FileTestCase {
             out.close(); // ALWAYS close streams!
         }
         
-        renameArchiveToTemp(archive);
+        assertRenameArchiveToTemp(archive);
     }
     
     @Test
@@ -1112,10 +1112,10 @@ public abstract class FileTestCase {
             in.close(); // ALWAYS close streams!
         }
         
-        renameArchiveToTemp(archive);
+        assertRenameArchiveToTemp(archive);
     }
     
-    private void renameArchiveToTemp(final File archive) throws IOException {
+    private void assertRenameArchiveToTemp(final File archive) throws IOException {
         assert archive.isArchive(); // regular archive or false positive
         assert !archive.isEntry(); // not contained in another archive file
 
@@ -1153,31 +1153,31 @@ public abstract class FileTestCase {
         
         assertTrue(temp.delete());
         
-        catFrom(archive1a);
+        assertCatFrom(archive1a);
         
         for (int i = 2; i >= 1; i--) {
-            renameTo(archive1a, archive1b);
-            renameTo(archive1b, archive2a);
-            renameTo(archive2a, archive2b);
-            renameTo(archive2b, archive3a);
-            renameTo(archive3a, archive3b);
-            renameTo(archive3b, archive3a);
-            renameTo(archive3a, archive2b);
-            renameTo(archive2b, archive2a);
-            renameTo(archive2a, archive1b);
-            renameTo(archive1b, archive1a);
+            assertRenameTo(archive1a, archive1b);
+            assertRenameTo(archive1b, archive2a);
+            assertRenameTo(archive2a, archive2b);
+            assertRenameTo(archive2b, archive3a);
+            assertRenameTo(archive3a, archive3b);
+            assertRenameTo(archive3b, archive3a);
+            assertRenameTo(archive3a, archive2b);
+            assertRenameTo(archive2b, archive2a);
+            assertRenameTo(archive2a, archive1b);
+            assertRenameTo(archive1b, archive1a);
         }
         
-        renameTo(archive, temp);
-        renameTo(temp, archive);
+        assertRenameTo(archive, temp);
+        assertRenameTo(temp, archive);
         assertTrue(archive3.delete());
         assertTrue(archive2.delete());
-        catTo(archive1a);
+        assertCatTo(archive1a);
         assertTrue(archive1a.delete());
         assertTrue(archive.delete());
     }
     
-    private void renameTo(File src, File dst) {
+    private void assertRenameTo(File src, File dst) {
         assertTrue(src.exists());
         if (!src.isEntry())
             assertTrue(newPlainFile(src).exists());
@@ -1216,18 +1216,18 @@ public abstract class FileTestCase {
             assertTrue(new java.io.File(dir, MEMBERS[i]).createNewFile());
         java.io.File[] files = dir.listFiles();
         Arrays.sort(files);
-        list(files, dir2);
+        assertList(files, dir2);
         assertTrue(dir2.deleteAll());
 
         // Repeat test with regular archive file.
         assertTrue(dir2.mkdir());
         for (int i = MEMBERS.length; --i >= 0; )
             assertTrue(new File(dir2, MEMBERS[i]).createNewFile());
-        list(files, dir2);
+        assertList(files, dir2);
         assertTrue(dir2.deleteAll());
     }
 
-    private void list(final java.io.File[] refs, final File dir) {
+    private void assertList(final java.io.File[] refs, final File dir) {
         final File[] files = dir.listFiles();
         Arrays.sort(files);
         assertEquals(refs.length, files.length);
@@ -1250,7 +1250,7 @@ public abstract class FileTestCase {
     @Test
     public final void testMultithreadedSingleArchiveMultipleEntriesReading()
     throws Exception {
-        multithreadedSingleArchiveMultipleEntriesReading(20, 20);
+        assertMultithreadedSingleArchiveMultipleEntriesReading(20, 20);
     }
     
     /**
@@ -1261,7 +1261,7 @@ public abstract class FileTestCase {
      * @param nEntries The number of archive file entries to be created.
      * @param nThreads The number of threads to be created.
      */
-    private void multithreadedSingleArchiveMultipleEntriesReading(
+    private void assertMultithreadedSingleArchiveMultipleEntriesReading(
             final int nEntries,
             final int nThreads)
     throws Exception {
@@ -1279,7 +1279,7 @@ public abstract class FileTestCase {
             @Override
             public void run() {
                 try {
-                    checkArchiveEntries(archive, nEntries);
+                    assertArchiveEntries(archive, nEntries);
                 } catch (Throwable t) {
                     failure = t;
                 }
@@ -1317,7 +1317,7 @@ public abstract class FileTestCase {
         }
     }
     
-    private void checkArchiveEntries(final File archive, int nEntries)
+    private void assertArchiveEntries(final File archive, int nEntries)
     throws IOException {
         final java.io.File[] entries = archive.listFiles();
         assertEquals(nEntries, entries.length);
@@ -1350,11 +1350,11 @@ public abstract class FileTestCase {
     @Test
     public final void testMultithreadedSingleArchiveMultipleEntriesWriting()
     throws Exception {
-        multithreadedSingleArchiveMultipleEntriesWriting(archive, 20, false);
-        multithreadedSingleArchiveMultipleEntriesWriting(archive, 20, true);
+        assertMultithreadedSingleArchiveMultipleEntriesWriting(archive, 20, false);
+        assertMultithreadedSingleArchiveMultipleEntriesWriting(archive, 20, true);
     }
     
-    private void multithreadedSingleArchiveMultipleEntriesWriting(
+    private void assertMultithreadedSingleArchiveMultipleEntriesWriting(
             final File archive,
             final int nThreads,
             final boolean wait)
@@ -1426,18 +1426,18 @@ public abstract class FileTestCase {
                 throw new Exception(thread.failure);
         }
         
-        checkArchiveEntries(archive, nThreads);
+        assertArchiveEntries(archive, nThreads);
         assertTrue(archive.deleteAll());
     }
     
     @Test
     public final void testMultithreadedMultipleArchivesSingleEntryWriting()
     throws Exception {
-        multithreadedMultipleArchivesSingleEntryWriting(20, false);
-        multithreadedMultipleArchivesSingleEntryWriting(20, true);
+        assertMultithreadedMultipleArchivesSingleEntryWriting(20, false);
+        assertMultithreadedMultipleArchivesSingleEntryWriting(20, true);
     }
     
-    private void multithreadedMultipleArchivesSingleEntryWriting(
+    private void assertMultithreadedMultipleArchivesSingleEntryWriting(
             final int nThreads,
             final boolean updateIndividually)
     throws Exception {

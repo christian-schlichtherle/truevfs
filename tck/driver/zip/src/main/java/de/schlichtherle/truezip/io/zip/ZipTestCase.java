@@ -355,7 +355,7 @@ public abstract class ZipTestCase {
     @Test
     public final void testMultithreading()
     throws Exception {
-        multithreading(20, 40);
+        assertMultithreading(20, 40);
     }
 
     /**
@@ -366,9 +366,9 @@ public abstract class ZipTestCase {
      * @param nEntries The number of ZIP file entries to be created.
      * @param nThreads The number of threads to be created.
      */
-    private void multithreading(final int nEntries, final int nThreads)
+    private void assertMultithreading(final int nEntries, final int nThreads)
     throws Exception {
-        createTestZipFile(nEntries);
+        assertCreateTestZipFile(nEntries);
 
         final ZipFile zipIn = newZipFile(zip);
 
@@ -455,7 +455,7 @@ public abstract class ZipTestCase {
      * entry names in a set.
      * The field {@code zip} is used to determine the ZIP file.
      */
-    private void createTestZipFile(final int nEntries) throws IOException {
+    private void assertCreateTestZipFile(final int nEntries) throws IOException {
         final HashSet<String> set = new HashSet<String>();
 
         ZipOutputStream zipOut
