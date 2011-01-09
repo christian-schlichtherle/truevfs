@@ -118,8 +118,9 @@ public final class ServiceLocator {
     @SuppressWarnings("unchecked")
     public @NonNull <S> S
     getService( @NonNull Class<S> service,
-                @Nullable Class<? extends S> def) {
-        String name = System.getProperty(service.getName(), def.getName());
+                @CheckForNull Class<? extends S> def) {
+        String name = System.getProperty(   service.getName(),
+                                            null == def ? null : def.getName());
         try {
             return ((Class<S>) getClass(name)).newInstance();
         } catch (RuntimeException ex) {
