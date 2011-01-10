@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Schlichtherle IT Services
+ * Copyright 2011 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,8 +50,7 @@ public class FsFederatingDriver implements FsDriver {
      * <p>
      * The implementation in the class {@link FsFederatingDriver} queries the
      * {@link FsDriverProvider} provided to its constructor for the appropriate
-     * file system driver for the request by using the scheme of the given
-     * mount point.
+     * {@link FsDriver} for the {@link FsScheme} of the given mount point.
      *
      * @throws NullPointerException if no appropriate driver is found for the
      *         scheme of the given mount point.
