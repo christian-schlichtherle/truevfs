@@ -16,8 +16,8 @@
 package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.util.SuffixSet;
-import de.schlichtherle.truezip.fs.FsClassPathDriverProvider;
 import de.schlichtherle.truezip.fs.FsDriver;
+import de.schlichtherle.truezip.fs.FsFederatingDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.util.ServiceLocator;
 import de.schlichtherle.truezip.util.regex.ThreadLocalMatcher;
@@ -89,7 +89,7 @@ implements ArchiveDetector {
     private final @NonNull ThreadLocalMatcher matcher;
 
     public DefaultArchiveDetector() {
-        this.drivers = FsClassPathDriverProvider.INSTANCE.getDrivers();
+        this.drivers = FsFederatingDriver.ALL.getDrivers();
         final SuffixSet set = getSuffixes(drivers);
         this.suffixes = set.toString();
         this.matcher = new ThreadLocalMatcher(set.toPattern());
@@ -115,7 +115,7 @@ implements ArchiveDetector {
      *         configured in the global map.
      */
     public DefaultArchiveDetector(final @NonNull String suffixes) {
-        this.drivers = FsClassPathDriverProvider.INSTANCE.getDrivers();
+        this.drivers = FsFederatingDriver.ALL.getDrivers();
         final SuffixSet set = new SuffixSet(suffixes);
         final SuffixSet all = getSuffixes(drivers);
         if (set.retainAll(all)) {
@@ -284,20 +284,9 @@ implements ArchiveDetector {
     }
 
     /**
-     * Equivalent to {@code
-        FsScheme scheme = getScheme(path);
-        return null == scheme ? null : getDriver(scheme);
-     * }
-     */
-    public @CheckForNull FsDriver getDriver(@NonNull String path) {
-        FsScheme scheme = getScheme(path);
-        return null == scheme ? null : drivers.get(scheme);
-    }
-
-    /**
      * Returns the <i>canonical suffix list</i> detected by this
      * {@code DefaultArchiveDetector}.
-     * 
+     *
      * @return Either {@code ""} to indicate an empty set or
      *         a string of the form {@code "suffix[|suffix]*"},
      *         where {@code suffix} is a combination of lower case
@@ -307,11 +296,6 @@ implements ArchiveDetector {
      * @see #DefaultArchiveDetector(String)
      * @see SuffixSet Syntax definition for canonical suffix lists.
      */
-    public @NonNull String getSuffixes() {
-        return suffixes; // canonical form
-    }
-
-    /** Equivalent to {@link #getSuffixes()}. */
     @Override
     public String toString() {
         return suffixes;

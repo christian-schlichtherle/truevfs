@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.file;
 
-import de.schlichtherle.truezip.file.DefaultArchiveDetector;
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.archive.DummyArchiveDriver;
 import de.schlichtherle.truezip.fs.archive.ArchiveDriver;
@@ -275,11 +274,11 @@ public class DefaultArchiveDetectorTest {
             final String suffixes = args[i];
             DefaultArchiveDetector
             detector = new DefaultArchiveDetector(suffixes, DRIVER);
-            assertEquals(result, detector.getSuffixes());
+            assertEquals(result, detector.toString());
             detector = new DefaultArchiveDetector(NULL, suffixes, DRIVER);
-            assertEquals(result, detector.getSuffixes());
+            assertEquals(result, detector.toString());
             detector = new DefaultArchiveDetector(NULL, new Object[] { suffixes, DRIVER });
-            assertEquals(result, detector.getSuffixes());
+            assertEquals(result, detector.toString());
         }
     }
 
@@ -287,10 +286,10 @@ public class DefaultArchiveDetectorTest {
     public void testGetSuffixesForNullDrivers() {
         DefaultArchiveDetector detector = new DefaultArchiveDetector(
                 NULL, "zip", null); // remove zip suffix
-        assertEquals("", detector.getSuffixes());
+        assertEquals("", detector.toString());
         detector = new DefaultArchiveDetector(
                 NULL, ".ZIP", null); // remove zip suffix
-        assertEquals("", detector.getSuffixes());
+        assertEquals("", detector.toString());
     }
 
     @Test
@@ -389,12 +388,6 @@ public class DefaultArchiveDetectorTest {
         }
 
         try {
-            detector.getDriver((String) null);
-            fail("Expected NullPointerException!");
-        } catch (NullPointerException expected) {
-        }
-
-        try {
             detector = new DefaultArchiveDetector(detector, new Object[] {
                 "foo", "java.lang.Object",
                 "bar", "java.io.FilterInputStream",
@@ -422,20 +415,15 @@ public class DefaultArchiveDetectorTest {
         final String lpath = path.toLowerCase(Locale.ENGLISH);
         final String upath = path.toUpperCase(Locale.ENGLISH);
 
-        FsDriver driver;
-        driver = detector.getDriver(lpath);
-        assertThat(driver, sameInstance(result));
-
-        driver = detector.getDriver(upath);
-        assertThat(driver, sameInstance(result));
-
-        final FsScheme scheme = detector.getScheme(lpath);
-        if (null != driver) {
-            assertThat(scheme, notNullValue());
-            assertThat(scheme, equalTo(detector.getScheme(upath)));
-            assertThat(detector.getDrivers().get(scheme), sameInstance(result));
+        if (null != result) {
+            assertThat(detector.getScheme(lpath), equalTo(detector.getScheme(upath)));
+            assertThat(detector.getDrivers().get(detector.getScheme(lpath)),
+                    sameInstance(result));
+            assertThat(detector.getDrivers().get(detector.getScheme(upath)),
+                    sameInstance(result));
         } else {
-            assertThat(scheme, nullValue());
+            assertThat(detector.getScheme(lpath), nullValue());
+            assertThat(detector.getScheme(upath), nullValue());
         }
     }
 }
