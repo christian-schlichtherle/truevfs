@@ -15,9 +15,9 @@
  */
 package de.schlichtherle.truezip.io.fs.file;
 
-import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
-import de.schlichtherle.truezip.io.socket.InputSocket;
+import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.rof.SimpleReadOnlyFile;
+import de.schlichtherle.truezip.socket.InputSocket;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.FileInputStream;
 import java.io.IOException;

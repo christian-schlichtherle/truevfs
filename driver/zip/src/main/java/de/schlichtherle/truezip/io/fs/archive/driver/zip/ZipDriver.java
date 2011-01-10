@@ -17,15 +17,15 @@
 package de.schlichtherle.truezip.io.fs.archive.driver.zip;
 
 import de.schlichtherle.truezip.io.fs.concurrent.FsConcurrentModel;
-import de.schlichtherle.truezip.io.socket.InputSocket;
-import de.schlichtherle.truezip.io.socket.OutputSocket;
-import de.schlichtherle.truezip.io.socket.InputShop;
+import de.schlichtherle.truezip.socket.InputSocket;
+import de.schlichtherle.truezip.socket.OutputSocket;
+import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.io.fs.archive.driver.CharsetArchiveDriver;
 import de.schlichtherle.truezip.io.fs.archive.MultiplexedArchiveOutputShop;
-import de.schlichtherle.truezip.io.socket.OutputShop;
-import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.socket.OutputShop;
+import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.zip.ZipEntryFactory;
 import java.io.CharConversionException;
 import java.io.IOException;

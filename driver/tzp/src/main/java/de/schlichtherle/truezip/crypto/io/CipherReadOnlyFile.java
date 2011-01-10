@@ -17,8 +17,8 @@
 package de.schlichtherle.truezip.crypto.io;
 
 import de.schlichtherle.truezip.crypto.SeekableBlockCipher;
-import de.schlichtherle.truezip.io.rof.DecoratingReadOnlyFile;
-import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
+import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import java.io.IOException;
 import org.bouncycastle.crypto.Mac;
 

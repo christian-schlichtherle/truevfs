@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.fs.file;
 
-import de.schlichtherle.truezip.io.socket.IOPool;
+import de.schlichtherle.truezip.socket.IOPool;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.File;

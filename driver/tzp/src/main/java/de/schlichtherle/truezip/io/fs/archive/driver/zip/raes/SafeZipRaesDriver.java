@@ -19,7 +19,7 @@ package de.schlichtherle.truezip.io.fs.archive.driver.zip.raes;
 import de.schlichtherle.truezip.io.fs.concurrent.FsConcurrentModel;
 import de.schlichtherle.truezip.io.fs.archive.driver.zip.CheckedZipInputShop;
 import de.schlichtherle.truezip.io.fs.archive.driver.zip.ZipInputShop;
-import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import java.io.IOException;
 
 import static java.util.zip.Deflater.BEST_COMPRESSION;

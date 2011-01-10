@@ -17,8 +17,8 @@ package de.schlichtherle.truezip.io.fs;
 
 import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
-import de.schlichtherle.truezip.io.rof.DecoratingReadOnlyFile;
-import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
+import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;

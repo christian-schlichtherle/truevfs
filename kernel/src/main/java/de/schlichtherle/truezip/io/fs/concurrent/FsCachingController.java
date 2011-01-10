@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.fs.concurrent;
 
-import de.schlichtherle.truezip.io.socket.IOCache.Strategy;
+import de.schlichtherle.truezip.socket.IOCache.Strategy;
 import de.schlichtherle.truezip.io.fs.FsEntry;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.entry.Entry;
@@ -30,12 +30,12 @@ import de.schlichtherle.truezip.io.fs.FsOutputOption;
 import de.schlichtherle.truezip.io.fs.FsSyncException;
 import de.schlichtherle.truezip.io.fs.FsSyncOption;
 import de.schlichtherle.truezip.io.fs.FsSyncWarningException;
-import de.schlichtherle.truezip.io.socket.DecoratingInputSocket;
-import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
-import de.schlichtherle.truezip.io.socket.IOCache;
-import de.schlichtherle.truezip.io.socket.IOPool;
-import de.schlichtherle.truezip.io.socket.OutputSocket;
-import de.schlichtherle.truezip.io.socket.InputSocket;
+import de.schlichtherle.truezip.socket.DecoratingInputSocket;
+import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
+import de.schlichtherle.truezip.socket.IOCache;
+import de.schlichtherle.truezip.socket.IOPool;
+import de.schlichtherle.truezip.socket.OutputSocket;
+import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -50,7 +50,7 @@ import java.util.Set;
 import net.jcip.annotations.NotThreadSafe;
 
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
-import static de.schlichtherle.truezip.io.socket.IOCache.Strategy.*;
+import static de.schlichtherle.truezip.socket.IOCache.Strategy.*;
 import static de.schlichtherle.truezip.io.fs.FsOutputOption.*;
 import static de.schlichtherle.truezip.io.fs.FsSyncOption.*;
 

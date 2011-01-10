@@ -16,11 +16,11 @@
 package de.schlichtherle.truezip.io.fs;
 
 import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.io.socket.DecoratingInputSocket;
-import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
-import de.schlichtherle.truezip.io.socket.InputSocket;
-import de.schlichtherle.truezip.io.socket.OutputSocket;
+import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.socket.DecoratingInputSocket;
+import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
+import de.schlichtherle.truezip.socket.InputSocket;
+import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;

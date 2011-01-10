@@ -15,19 +15,19 @@
  */
 package de.schlichtherle.truezip.io.fs.archive;
 
-import de.schlichtherle.truezip.io.socket.IOPool;
-import de.schlichtherle.truezip.io.socket.DecoratingInputSocket;
+import de.schlichtherle.truezip.socket.IOPool;
+import de.schlichtherle.truezip.socket.DecoratingInputSocket;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.entry.Entry.Size;
-import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
-import de.schlichtherle.truezip.io.socket.InputSocket;
+import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
+import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.entry.Entry.Access;
-import de.schlichtherle.truezip.io.socket.OutputShop;
-import de.schlichtherle.truezip.io.socket.DecoratingOutputShop;
-import de.schlichtherle.truezip.io.socket.OutputSocket;
+import de.schlichtherle.truezip.socket.OutputShop;
+import de.schlichtherle.truezip.socket.DecoratingOutputShop;
+import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.io.socket.IOSocket;
+import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.io.ChainableIOException;
 import de.schlichtherle.truezip.io.ChainableIOExceptionBuilder;
 import de.schlichtherle.truezip.io.InputException;

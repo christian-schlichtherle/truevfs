@@ -16,9 +16,9 @@
 package de.schlichtherle.truezip.crypto.io.raes;
 
 import de.schlichtherle.truezip.crypto.io.CipherReadOnlyFile;
-import de.schlichtherle.truezip.io.rof.DecoratingReadOnlyFile;
-import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
+import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
+import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.rof.SimpleReadOnlyFile;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;

@@ -17,17 +17,17 @@
 package de.schlichtherle.truezip.io.fs.archive.driver.zip.raes;
 
 import de.schlichtherle.truezip.io.fs.concurrent.FsConcurrentModel;
-import de.schlichtherle.truezip.io.socket.OutputSocket;
+import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.io.fs.archive.driver.zip.ZipEntry;
-import de.schlichtherle.truezip.io.socket.InputShop;
+import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.crypto.io.raes.RaesKeyException;
 import de.schlichtherle.truezip.crypto.io.raes.RaesOutputStream;
-import de.schlichtherle.truezip.io.socket.OutputShop;
+import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.io.TabuFileException;
 import de.schlichtherle.truezip.io.fs.archive.driver.zip.ZipDriver;
 import de.schlichtherle.truezip.io.fs.archive.driver.zip.ZipInputShop;
 import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.io.socket.LazyOutputSocket;
+import de.schlichtherle.truezip.socket.LazyOutputSocket;
 import java.io.IOException;
 import java.io.OutputStream;
 

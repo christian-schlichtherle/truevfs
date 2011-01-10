@@ -408,7 +408,7 @@ public final class JFileTree extends JTree {
      * and scrolls the tree so that the newly created file
      * is selected and visible.
      * If you would like to create a new file with initial content, please
-     * check {@link #copyFrom(de.schlichtherle.truezip.io.file.File, InputStream)}.
+     * check {@link #copyFrom(de.schlichtherle.truezip.file.File, InputStream)}.
      */
     public boolean createNewFile(final java.io.File node) throws IOException {
         final FileTreeModel ftm = getModel();

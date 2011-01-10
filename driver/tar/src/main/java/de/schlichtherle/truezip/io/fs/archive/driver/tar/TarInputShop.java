@@ -15,11 +15,11 @@
  */
 package de.schlichtherle.truezip.io.fs.archive.driver.tar;
 
-import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
-import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.io.socket.InputSocket;
+import de.schlichtherle.truezip.rof.SimpleReadOnlyFile;
+import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.io.InputException;
-import de.schlichtherle.truezip.io.socket.InputShop;
+import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.io.TabuFileException;
 import de.schlichtherle.truezip.io.Streams;
 import java.io.OutputStream;

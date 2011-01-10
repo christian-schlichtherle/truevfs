@@ -20,7 +20,7 @@ import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.fs.FsSyncException;
 import de.schlichtherle.truezip.io.fs.FsOutputOption;
-import de.schlichtherle.truezip.io.socket.OutputSocket;
+import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;

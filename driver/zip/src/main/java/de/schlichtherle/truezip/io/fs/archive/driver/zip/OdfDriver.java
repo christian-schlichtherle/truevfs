@@ -18,9 +18,9 @@ package de.schlichtherle.truezip.io.fs.archive.driver.zip;
 
 import de.schlichtherle.truezip.io.fs.concurrent.FsConcurrentModel;
 import java.io.OutputStream;
-import de.schlichtherle.truezip.io.socket.InputShop;
-import de.schlichtherle.truezip.io.socket.OutputShop;
-import de.schlichtherle.truezip.io.socket.OutputSocket;
+import de.schlichtherle.truezip.socket.InputShop;
+import de.schlichtherle.truezip.socket.OutputShop;
+import de.schlichtherle.truezip.socket.OutputSocket;
 import java.io.IOException;
 
 import static java.util.zip.Deflater.BEST_COMPRESSION;

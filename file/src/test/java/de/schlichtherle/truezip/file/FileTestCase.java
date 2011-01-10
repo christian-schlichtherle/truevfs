@@ -28,7 +28,7 @@ import de.schlichtherle.truezip.file.FileInputStream;
 import de.schlichtherle.truezip.file.FileOutputStream;
 import de.schlichtherle.truezip.io.fs.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.fs.FsScheme;
-import de.schlichtherle.truezip.io.socket.OutputClosedException;
+import de.schlichtherle.truezip.socket.OutputClosedException;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

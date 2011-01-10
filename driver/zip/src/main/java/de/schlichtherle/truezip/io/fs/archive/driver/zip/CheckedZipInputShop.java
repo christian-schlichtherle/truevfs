@@ -16,8 +16,8 @@
 
 package de.schlichtherle.truezip.io.fs.archive.driver.zip;
 
-import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.io.socket.InputSocket;
+import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.io.zip.CRC32Exception;
 import de.schlichtherle.truezip.io.zip.ZipEntryFactory;
 import java.io.FileNotFoundException;
