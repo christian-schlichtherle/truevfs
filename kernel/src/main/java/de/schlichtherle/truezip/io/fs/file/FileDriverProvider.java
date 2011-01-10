@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.fs.file;
 
+import de.schlichtherle.truezip.io.fs.FsDriver;
 import de.schlichtherle.truezip.io.fs.FsDriverProvider;
 import de.schlichtherle.truezip.io.fs.FsScheme;
 import java.util.Collections;
@@ -31,7 +32,7 @@ public final class FileDriverProvider implements FsDriverProvider {
                                         new FileDriver());
 
     @Override
-    public Map<FsScheme, FileDriver> getDrivers() {
+    public Map<FsScheme, ? extends FsDriver> getDrivers() {
         return DRIVERS;
     }
 }
