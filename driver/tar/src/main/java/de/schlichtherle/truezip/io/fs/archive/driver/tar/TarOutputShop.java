@@ -17,10 +17,10 @@ package de.schlichtherle.truezip.io.fs.archive.driver.tar;
 
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.io.socket.OutputSocket;
+import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.fs.archive.MultiplexedArchiveOutputShop;
-import de.schlichtherle.truezip.io.socket.OutputShop;
+import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.io.OutputBusyException;
 import java.io.File;
 import java.io.FileInputStream;

@@ -17,9 +17,9 @@ package de.schlichtherle.truezip.io.fs.file;
 
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.io.fs.FsOutputOption;
-import de.schlichtherle.truezip.io.socket.IOEntry;
-import de.schlichtherle.truezip.io.socket.InputSocket;
-import de.schlichtherle.truezip.io.socket.OutputSocket;
+import de.schlichtherle.truezip.socket.IOEntry;
+import de.schlichtherle.truezip.socket.InputSocket;
+import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.EntryName;
 import de.schlichtherle.truezip.io.fs.FsEntry;

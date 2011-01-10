@@ -20,10 +20,10 @@ import de.schlichtherle.truezip.io.fs.archive.DummyArchiveEntry;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.io.fs.concurrent.FsConcurrentModel;
-import de.schlichtherle.truezip.io.socket.InputShop;
-import de.schlichtherle.truezip.io.socket.InputSocket;
-import de.schlichtherle.truezip.io.socket.OutputShop;
-import de.schlichtherle.truezip.io.socket.OutputSocket;
+import de.schlichtherle.truezip.socket.InputShop;
+import de.schlichtherle.truezip.socket.InputSocket;
+import de.schlichtherle.truezip.socket.OutputShop;
+import de.schlichtherle.truezip.socket.OutputSocket;
 import java.io.CharConversionException;
 import java.io.IOException;
 

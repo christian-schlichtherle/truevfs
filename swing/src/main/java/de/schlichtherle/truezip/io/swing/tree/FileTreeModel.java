@@ -290,7 +290,7 @@ public class FileTreeModel implements TreeModel {
      * and updates the tree accordingly.
      * However, the current selection may get lost.
      * If you would like to create a new file with initial content, please
-     * use {@link #copyFrom(de.schlichtherle.truezip.io.file.File, InputStream)}.
+     * use {@link #copyFrom(de.schlichtherle.truezip.file.File, InputStream)}.
      *
      * @return Whether or not the file has been newly created.
      * @throws IOException If an I/O error occurs.

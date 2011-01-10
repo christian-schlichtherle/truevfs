@@ -15,13 +15,13 @@
  */
 package de.schlichtherle.truezip.io.fs.archive.driver.zip;
 
-import de.schlichtherle.truezip.io.socket.IOPool;
-import de.schlichtherle.truezip.io.socket.InputSocket;
+import de.schlichtherle.truezip.socket.IOPool;
+import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.io.socket.OutputSocket;
+import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.io.fs.archive.MultiplexedArchiveOutputShop;
-import de.schlichtherle.truezip.io.socket.OutputShop;
+import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.fs.file.TempFilePool;

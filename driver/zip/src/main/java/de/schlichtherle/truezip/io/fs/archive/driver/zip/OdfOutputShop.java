@@ -16,8 +16,8 @@
 
 package de.schlichtherle.truezip.io.fs.archive.driver.zip;
 
-import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
-import de.schlichtherle.truezip.io.socket.OutputSocket;
+import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
+import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.io.fs.archive.MultiplexedArchiveOutputShop;
 import java.io.IOException;
 import java.io.OutputStream;

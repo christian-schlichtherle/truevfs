@@ -16,8 +16,8 @@
 package de.schlichtherle.truezip.crypto.io.raes;
 
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.io.rof.ReadOnlyFileTestCase;
+import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.rof.ReadOnlyFileTestCase;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

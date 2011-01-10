@@ -19,7 +19,7 @@ import de.schlichtherle.truezip.crypto.io.raes.RaesOutputStream;
 import de.schlichtherle.truezip.crypto.io.raes.RaesParameters;
 import de.schlichtherle.truezip.crypto.io.raes.Type0RaesParameters;
 import de.schlichtherle.truezip.crypto.io.raes.RaesReadOnlyFile;
-import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.zip.ZipFile;
 import de.schlichtherle.truezip.io.zip.ZipOutputStream;
 
