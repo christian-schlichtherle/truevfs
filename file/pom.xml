@@ -23,20 +23,21 @@
         <version>7.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>truezip-swing</artifactId>
-    <name>TrueZIP Swing</name>
-    <description>Provides Swing classes which use the File* API.</description>
+    <artifactId>truezip-file</artifactId>
+    <name>TrueZIP File*</name>
+    <description>The File* API allows convenient access to archive files by means of the File, FileInputStream and FileOutputStream classes.</description>
 
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truezip-file</artifactId>
+            <artifactId>truezip-kernel</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.netbeans</groupId>
-            <artifactId>jemmy</artifactId>
-            <version>2.2.7.5</version>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truezip-kernel</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
             <scope>test</scope>
         </dependency>
     </dependencies>

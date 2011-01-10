@@ -69,11 +69,11 @@ import java.util.regex.Pattern;
  */
 public final class SuffixSet extends CanonicalStringSet {
 
-    /** The separator for suffixes in lists. */
+    /** The separator for suffixes in lists, which is {@value}. */
     public static final char SEPARATOR = '|';
 
-    /** The optional prefix for suffixes. */
-    private static final char PREFIX = '.';
+    /** The optional prefix for suffixes, which is {@value}. */
+    public static final char PREFIX = '.';
 
     /** Constructs a new, empty suffix set. */
     public SuffixSet() {
@@ -110,12 +110,9 @@ public final class SuffixSet extends CanonicalStringSet {
         @Override
         public String toString(Object o) {
             String suffix = o.toString();
-            assert 0 > suffix.indexOf(SEPARATOR) : "illegal separator position in suffix";
-            if (suffix.length() > 0 && suffix.charAt(0) == PREFIX)
+            while (0 < suffix.length() && suffix.charAt(0) == PREFIX)
                 suffix = suffix.substring(1);
-            return suffix.length() > 0
-                    ? suffix.toLowerCase(Locale.ENGLISH)
-                    : null;
+            return 0 == suffix.length() ? null : suffix.toLowerCase(Locale.ENGLISH);
         }
     }
 

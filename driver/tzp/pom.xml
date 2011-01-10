@@ -28,10 +28,16 @@
     <description>The RAES encrypted ZIP driver family. Add this artifact to the run time class path in order to make the File* API recognize this archive type.</description>
 
     <dependencies>
+        <!-- TODO: Spin off truezip-driver-tzp-console and truezip-driver-tzp-swing -->
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk16</artifactId>
             <version>1.45</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truezip-file</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -45,8 +51,9 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truezip-tck-driver-zip</artifactId>
+            <artifactId>truezip-driver-zip</artifactId>
             <version>${project.version}</version>
+            <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -65,6 +72,14 @@
                     <excludes>
                         <exclude>**/PromptingKeyManagerTest.java</exclude> <!-- FIXME: Make this test work again! -->
                     </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <links>
+                        <link>http://www.bouncycastle.org/docs/docs1.6/</link>
+                    </links>
                 </configuration>
             </plugin>
         </plugins>
