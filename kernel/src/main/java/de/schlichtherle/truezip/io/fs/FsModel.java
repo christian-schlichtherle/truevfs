@@ -38,12 +38,12 @@ public class FsModel {
     private Set<FsTouchedListener> touchedListeners
             = new LinkedHashSet<FsTouchedListener>();
 
-    public FsModel( FsMountPoint mountPoint) {
+    public FsModel(@NonNull FsMountPoint mountPoint) {
         this(mountPoint, null);
     }
 
-    public FsModel( @NonNull final FsMountPoint mountPoint,
-                            @CheckForNull final FsModel parent) {
+    public FsModel( final @NonNull FsMountPoint mountPoint,
+                    final @CheckForNull FsModel parent) {
         if (!equals(mountPoint.getParent(),
                     (null == parent ? null : parent.getMountPoint())))
             throw new IllegalArgumentException("Parent/Member mismatch!");

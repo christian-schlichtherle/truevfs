@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 
@@ -37,7 +38,8 @@ import static de.schlichtherle.truezip.io.Paths.*;
  * @version $Id$
  */
 public abstract class CharsetArchiveDriver<E extends ArchiveEntry>
-extends ArchiveDriver<E> {
+extends ArchiveDriver<E>
+implements Serializable {
 
     /**
      * This field should be considered to be {@code final}!

@@ -15,6 +15,9 @@
  */
 package de.schlichtherle.truezip.io.fs;
 
+import java.io.IOException;
+import java.io.InvalidObjectException;
+import java.io.ObjectInputStream;
 import de.schlichtherle.truezip.io.entry.EntryName;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -207,7 +210,21 @@ public final class FsEntryName extends EntryName {
     public FsEntryName(@NonNull URI uri, final @NonNull FsUriModifier modifier)
     throws URISyntaxException {
         super(uri = modifier.modify(uri, ENTRY_NAME));
+        parse(uri);
+    }
 
+    private void readObject(@NonNull ObjectInputStream in)
+    throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        try {
+            parse(getUri()); // protect against manipulation
+        } catch (URISyntaxException ex) {
+            throw (InvalidObjectException) new InvalidObjectException(ex.toString())
+                    .initCause(ex);
+        }
+    }
+
+    private void parse(final @NonNull URI uri) throws URISyntaxException {
         final String p = uri.getRawPath();
         if (       "..".equals(p)
                 || p.startsWith(SEPARATOR)

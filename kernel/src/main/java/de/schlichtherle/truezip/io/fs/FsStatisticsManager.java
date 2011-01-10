@@ -51,9 +51,11 @@ extends FsDecoratingManager<FsManager> {
 
         class StatisticsDriver implements FsDriver {
             @Override
-            public FsController<?> newController(
-                    FsMountPoint mountPoint,
-                    FsController<?> parent) {
+            public FsController<?>
+            newController(FsMountPoint mountPoint, FsController<?> parent) {
+                assert null == mountPoint.getParent()
+                        ? null == parent
+                        : mountPoint.getParent().equals(parent.getModel().getMountPoint());
                 final FsController<?> controller
                         = driver.newController(mountPoint, parent);
                 return null != parent && null == parent.getParent() // controller is top level federated file system?

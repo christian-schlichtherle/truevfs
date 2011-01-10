@@ -236,8 +236,7 @@ public class EntryName implements Serializable, Comparable<EntryName> {
         parse(new URI(uri));
     }
 
-    private void parse(final @NonNull URI uri)
-    throws URISyntaxException {
+    private void parse(final @NonNull URI uri) throws URISyntaxException {
         if (uri.isAbsolute())
             throw new URISyntaxException(quote(uri), "Scheme not allowed");
         if (uri.getRawAuthority() != null)

@@ -70,7 +70,7 @@ import java.util.regex.Pattern;
 public final class SuffixSet extends CanonicalStringSet {
 
     /** The separator for suffixes in lists. */
-    private static final char SEPARATOR = '|';
+    public static final char SEPARATOR = '|';
 
     /** The optional prefix for suffixes. */
     private static final char PREFIX = '.';
@@ -108,7 +108,8 @@ public final class SuffixSet extends CanonicalStringSet {
          * An example of the latter case is the empty string.
          */
         @Override
-        public String canonicalize(String suffix) {
+        public String toString(Object o) {
+            String suffix = o.toString();
             assert 0 > suffix.indexOf(SEPARATOR) : "illegal separator position in suffix";
             if (suffix.length() > 0 && suffix.charAt(0) == PREFIX)
                 suffix = suffix.substring(1);

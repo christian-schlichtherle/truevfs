@@ -15,17 +15,17 @@
  */
 package de.schlichtherle.truezip.io.file;
 
-import de.schlichtherle.truezip.io.fs.archive.GlobalArchiveDriverRegistry;
-import de.schlichtherle.truezip.io.fs.archive.ArchiveDriverRegistry;
 import de.schlichtherle.truezip.io.fs.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.SuffixSet;
+import de.schlichtherle.truezip.io.fs.FsDriver;
+import de.schlichtherle.truezip.io.fs.FsDriverProvider;
 import de.schlichtherle.truezip.io.fs.FsScheme;
+import de.schlichtherle.truezip.util.ServiceLocator;
 import de.schlichtherle.truezip.util.regex.ThreadLocalMatcher;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.Serializable;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -34,27 +34,24 @@ import java.util.regex.Matcher;
 /**
  * An {@link ArchiveDetector} which matches file paths against a pattern of
  * archive file suffixes in order to detect prospective archive files and
- * look up their corresponding {@link ArchiveDriver} in its <i>registry</i>.
+ * look up their corresponding {@link ArchiveDriver} in its map.
  * <p>
  * Constructors are provided which allow an instance to:
  * <ol>
- * <li>Filter the set of archive file suffixes in the
- *     {@link GlobalArchiveDriverRegistry}.
+ * <li>Filter the set of archive file suffixes in the global map.
  *     For example, {@code "tar|zip"} could be accepted by the filter in order
  *     to recognize only the TAR and ZIP file formats.</li>
- * <li>Add custom archive file suffixes
- *     to a local {@link ArchiveDriverRegistry} in order to support
+ * <li>Add custom archive file suffixes to a local map in order to support
  *     <i>pseudo archive types</i>.
  *     For example, {@code "mysuffix"} could be added as an custom archive file
  *     suffix for the JAR file format.</li>
- * <li>Add custom archive file suffixes and archive drivers
- *     to a local {@link ArchiveDriverRegistry} in order to support
- *     custom archive types.
+ * <li>Add custom archive file suffixes and archive drivers to a local map in
+ *     order to support custom archive types.
  *     For example, the suffix {@code "7z"} could be associated to a custom
  *     archive driver which supports the 7z file format.</li>
  * <li>Put together multiple instances to build a chain of responsibility:
  *     The first instance which holds a mapping for any given archive file
- *     suffix in its registry determines the archive driver to be used.</li>
+ *     suffix in its map determines the archive driver to be used.</li>
  * </ol>
  * <p>
  * Where a constructor expects a suffix list as a parameter,
@@ -63,14 +60,6 @@ import java.util.regex.Matcher;
  * the archive detector to recognize ZIP and JAR files in a path.
  * The same would be true for {@code "||.ZIP||.JAR||ZIP||JAR||"},
  * but this notation is discouraged because it's not in canonical form.
- * <p>
- * This implementation is (virtually) immutable and thread safe.
- * <p>
- * This class is serializable in order to meet the requirements of some client
- * classes.
- * However, it's not recommended to serialize instances of this class:
- * Together with the instance, all associated archive drivers are serialized
- * too, which is pretty inefficient.
  * 
  * @author Christian Schlichtherle
  * @version $Id$
@@ -78,23 +67,15 @@ import java.util.regex.Matcher;
  * @see ArchiveDetector#ALL
  */
 public final class DefaultArchiveDetector
-implements ArchiveDetector, Serializable {
+implements ArchiveDetector {
 
-    private static final long serialVersionUID = 848158760183179884L;
-
-    /**
-     * The local registry for archive file suffixes and archive drivers.
-     * This could actually be the global registry
-     * ({@link GlobalArchiveDriverRegistry#INSTANCE}), filtered by a custom
-     * {@link #suffixes}.
-     */
-    private final @NonNull ArchiveDriverRegistry registry;
+    private final @NonNull Map<FsScheme, ? extends FsDriver> map;
 
     /**
      * The canonical string respresentation of the set of suffixes recognized
      * by this archive detector.
      * This set is used to filter the registered archive file suffixes in
-     * {@link #registry}.
+     * {@link #map}.
      */
     private final @NonNull String suffixes;
 
@@ -102,31 +83,38 @@ implements ArchiveDetector, Serializable {
      * The thread local matcher used to match archive file suffixes.
      * This field should be considered final.
      */
-    private transient @NonNull ThreadLocalMatcher matcher; // never transmit this over the wire!
+    private final @NonNull ThreadLocalMatcher matcher;
 
     public DefaultArchiveDetector() {
-        this.registry = GlobalArchiveDriverRegistry.INSTANCE;
-        final SuffixSet set = registry.getSuffixes();
+        this.map = FsDriverProvider.ALL.getDrivers();
+        final SuffixSet set = getSuffixes(map);
         this.suffixes = set.toString();
         this.matcher = new ThreadLocalMatcher(set.toPattern());
     }
 
+    private static @NonNull SuffixSet getSuffixes(final Map<FsScheme, ? extends FsDriver> map) {
+        SuffixSet set = new SuffixSet();
+        for (Map.Entry<FsScheme, ? extends FsDriver> entry : map.entrySet())
+            if (null != entry.getValue())
+                set.add(entry.getKey().toString());
+        return set;
+    }
+
     /**
-     * Creates a new {@code DefaultArchiveDetector} by filtering the
-     * {@link GlobalArchiveDriverRegistry} for all canonicalized suffixes in
-     * the {@code suffixes} list.
+     * Creates a new {@code DefaultArchiveDetector} by filtering the global map
+     * for all canonicalized suffixes in the {@code suffixes} list.
      * 
      * @param suffixes A list of suffixes which shall identify prospective
      *        archive files.
      * @see SuffixSet Syntax definition for suffix lists.
      * @throws IllegalArgumentException If any of the suffixes in the suffix
      *         list names a suffix for which no {@link ArchiveDriver} is
-     *         configured in the {@link GlobalArchiveDriverRegistry}.
+     *         configured in the global map.
      */
     public DefaultArchiveDetector(final @NonNull String suffixes) {
-        this.registry = GlobalArchiveDriverRegistry.INSTANCE;
+        this.map = FsDriverProvider.ALL.getDrivers();
         final SuffixSet set = new SuffixSet(suffixes);
-        final SuffixSet all = registry.getSuffixes();
+        final SuffixSet all = getSuffixes(map);
         if (set.retainAll(all)) {
             final SuffixSet unknown = new SuffixSet(suffixes);
             unknown.removeAll(all);
@@ -242,16 +230,41 @@ implements ArchiveDetector, Serializable {
     public DefaultArchiveDetector(
             final @NonNull DefaultArchiveDetector delegate,
             final @NonNull Map<String, Object> config) {
-        this.registry = new ArchiveDriverRegistry(delegate.registry, config);
-        final SuffixSet set = registry.decorate(new SuffixSet(delegate.suffixes)); // may be a subset of delegate.registry.decorate(new SuffixSet())!
+        final Map<FsScheme, FsDriver> map
+                = new HashMap<FsScheme, FsDriver>(delegate.map);
+        final SuffixSet set = new SuffixSet(delegate.suffixes);
+        for (final Map.Entry<String, Object> entry : config.entrySet()) {
+            final SuffixSet keySet = new SuffixSet(entry.getKey());
+            if (keySet.isEmpty())
+                throw new IllegalArgumentException("No archive file suffixes!");
+            for (final String suffix : keySet) {
+                final FsDriver driver = newDriver(entry.getValue());
+                if (null != driver) {
+                    set.add(suffix);
+                    map.put(FsScheme.create(suffix), driver);
+                } else {
+                    set.remove(suffix);
+                    map.remove(FsScheme.create(suffix));
+                }
+            }
+        }
+        this.map = Collections.unmodifiableMap(map);
         this.suffixes = set.toString();
         this.matcher = new ThreadLocalMatcher(set.toPattern());
     }
 
-    private void readObject(final ObjectInputStream in)
-    throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        matcher = new ThreadLocalMatcher(new SuffixSet(suffixes).toPattern());
+    @SuppressWarnings("unchecked")
+    private static @CheckForNull FsDriver newDriver(@CheckForNull Object driver) {
+        try {
+            if (driver instanceof String)
+                driver = new ServiceLocator(DefaultArchiveDetector.class.getClassLoader())
+                        .getClass((String) driver);
+            if (driver instanceof Class<?>)
+                driver = ((Class<? extends FsDriver>) driver).newInstance();
+            return (FsDriver) driver; // may throw ClassCastException
+        } catch (Exception ex) {
+            throw new IllegalArgumentException(ex); // NOI18N
+        }
     }
 
     @Override
@@ -262,26 +275,11 @@ implements ArchiveDetector, Serializable {
                 : null;
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * An archive driver is looked up in the {@link ArchiveDriverRegistry}
-     * as follows:
-     * <ol>
-     * <li>If the registry holds a string, it's supposed to be the fully
-     *     qualified class name of an {@code ArchiveDriver}
-     *     implementation. The class will be loaded and stored in the registry.
-     * <li>If the registry then holds a class instance, it's instantiated
-     *     with its no-arguments constructor, cast to the
-     *     {@code ArchiveDriver} type and stored in the registry.
-     * <li>If the registry then holds an instance of an
-     *     {@code ArchiveDriver} implementation, it's returned.
-     * <li>Otherwise, {@code null} is returned.
-     * </ol>
-     */
     @Override
-    public ArchiveDriver<?> getDriver(FsScheme type) {
-        return registry.getArchiveDriver(type.toString());
+    public FsDriver getDriver(FsScheme type) {
+        if (null == type)
+            throw new NullPointerException();
+        return map.get(type);
     }
 
     /**
@@ -289,13 +287,8 @@ implements ArchiveDetector, Serializable {
         FsScheme scheme = getScheme(path);
         return null == scheme ? null : getDriver(scheme);
      * }
-     * 
-     * @deprecated This method is not part of the {@link ArchiveDetector}
-     *             interface anymore and is only kept for backwards
-     *             compatibility.
      */
-    @Deprecated
-    public @CheckForNull ArchiveDriver<?> getArchiveDriver(@NonNull String path) {
+    public @CheckForNull FsDriver getDriver(@NonNull String path) {
         FsScheme scheme = getScheme(path);
         return null == scheme ? null : getDriver(scheme);
     }

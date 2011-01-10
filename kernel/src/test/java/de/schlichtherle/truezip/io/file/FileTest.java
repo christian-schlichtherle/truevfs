@@ -15,9 +15,14 @@
  */
 package de.schlichtherle.truezip.io.file;
 
-import de.schlichtherle.truezip.io.fs.archive.driver.ArchiveDriver;
+import de.schlichtherle.truezip.io.fs.FsPathTest;
+import java.util.logging.Logger;
+import java.beans.ExceptionListener;
+import java.beans.XMLDecoder;
+import java.beans.XMLEncoder;
+import java.lang.reflect.UndeclaredThrowableException;
+import java.util.logging.Level;
 import de.schlichtherle.truezip.io.fs.archive.driver.DummyArchiveDriver;
-import de.schlichtherle.truezip.io.fs.FsController;
 import de.schlichtherle.truezip.io.fs.FsPath;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -25,7 +30,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.URI;
-import java.util.Locale;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,6 +47,9 @@ import static org.junit.Assert.*;
  * @version $Id$
  */
 public class FileTest {
+
+    private static final Logger logger
+            = Logger.getLogger(FileTest.class.getName());
 
     private static final DefaultArchiveDetector DETECTOR
             = new DefaultArchiveDetector(
@@ -67,9 +74,9 @@ public class FileTest {
     @Test
     public void testValidPathConstructor() {
         for (final String[] params : new String[][] {
-            //{ "jar:tar.gz:file:/app.tar.gz!/app.jar!/META-INF/MANIFEST.MF", "/app.tar.gz/app.jar/META-INF/MANIFEST.MF", "/app.tar.gz/app.jar", "/app.tar.gz/app.jar", "META-INF/MANIFEST.MF", },
-            //{ "jar:tar.gz:file:/app.tar.gz!/app.jar!/", "/app.tar.gz/app.jar", "/app.tar.gz/app.jar", "/app.tar.gz", "app.jar", },
-            //{ "tar.gz:file:/archive.tar.gz!/META-INF/MANIFEST.MF", "/archive.tar.gz/META-INF/MANIFEST.MF", "/archive.tar.gz", "/archive.tar.gz", "META-INF/MANIFEST.MF", },
+            { "jar:tar.gz:file:/app.tar.gz!/app.jar!/META-INF/MANIFEST.MF", "/app.tar.gz/app.jar/META-INF/MANIFEST.MF", "/app.tar.gz/app.jar", "/app.tar.gz/app.jar", "META-INF/MANIFEST.MF", },
+            { "jar:tar.gz:file:/app.tar.gz!/app.jar!/", "/app.tar.gz/app.jar", "/app.tar.gz/app.jar", "/app.tar.gz", "app.jar", },
+            { "tar.gz:file:/archive.tar.gz!/META-INF/MANIFEST.MF", "/archive.tar.gz/META-INF/MANIFEST.MF", "/archive.tar.gz", "/archive.tar.gz", "META-INF/MANIFEST.MF", },
             { "tar.gz:file:/archive.tar.gz!/", "/archive.tar.gz", "/archive.tar.gz", null, null, },
             { "zip:file:/archive.zip!/META-INF/MANIFEST.MF", "/archive.zip/META-INF/MANIFEST.MF", "/archive.zip", "/archive.zip", "META-INF/MANIFEST.MF", },
             { "zip:file:/archive.zip!/", "/archive.zip", "/archive.zip", null, null, },
@@ -90,7 +97,7 @@ public class FileTest {
                 assertThat(file.getEnclArchive(), nullValue());
                 assertThat(file.getEnclEntryName(), nullValue());
             }
-            assertThat(new File(file.toFSPath()), equalTo(file.getNormalizedAbsoluteFile()));
+            assertThat(new File(file.toFsPath()), equalTo(file.getNormalizedAbsoluteFile()));
             assertThat(new File(file.toURI()), equalTo(file.getAbsoluteFile()));
         }
     }
@@ -128,18 +135,6 @@ public class FileTest {
         assertSame(ROOT, file.getInnerEntryName0());
         assertNull(file.getEnclArchive());
         assertNull(file.getEnclEntryName());
-
-        /*file = new File(new URI("jar", "file:/a " + suffix + "/b " + suffix + "!", null));
-        assertSame(file, file.getInnerArchive());
-        assertSame(ROOT, file.getInnerEntryName0());
-        assertNull(file.getEnclArchive());
-        assertNull(file.getEnclEntryName());*/
-
-        /*file = new File(new URI("jar", "file:/a " + suffix + "!/b " + suffix + "/", null));
-        assertSame(file.getInnerArchive(), file.getEnclArchive());
-        assertSame(file.getInnerEntryName(), file.getEnclEntryName());
-        assertEquals(fs + "a " + suffix + "", file.getEnclArchive().getPath());
-        assertEquals("b " + suffix + "", file.getEnclEntryName());*/
 
         file = new File(new URI("jar", "file:/a " + suffix + "!/b " + suffix + "", null));
         assertSame(file.getInnerArchive(), file.getEnclArchive());
@@ -207,12 +202,6 @@ public class FileTest {
         assertEquals(fs + "a " + suffix + "", file.getEnclArchive().getPath());
         assertEquals("b " + suffix + "", file.getEnclEntryName());
 
-        /*file = new File(new URI("jar", "jar:file:/a " + suffix + "!/b " + suffix + "!", null));
-        assertSame(file, file.getInnerArchive());
-        assertSame(ROOT, file.getInnerEntryName0());
-        assertEquals(fs + "a " + suffix + "", file.getEnclArchive().getPath());
-        assertEquals("b " + suffix + "", file.getEnclEntryName());*/
-
         // One ZIP file in path with one misleading '!' in path.
 
         file = new File(new URI("jar", "file:/a " + suffix + "!/b " + suffix + "!/", null));
@@ -220,26 +209,6 @@ public class FileTest {
         assertSame(ROOT, file.getInnerEntryName0());
         assertNull(file.getEnclArchive());
         assertNull(file.getEnclEntryName());
-
-        /*file = new File(new URI("jar", "file:/a " + suffix + "!/b " + suffix + "!", null));
-        assertSame(file, file.getInnerArchive());
-        assertSame(ROOT, file.getInnerEntryName0());
-        assertNull(file.getEnclArchive());
-        assertNull(file.getEnclEntryName());*/
-
-        // Three ZIP files in path with one ZIP file removed by normalization.
-
-        /*file = new File(new URI("jar", "jar:file:/a " + suffix + "!/b " + suffix + "!/../c " + suffix + "!/", null));
-        assertSame(file, file.getInnerArchive());
-        assertSame(ROOT, file.getInnerEntryName0());
-        assertEquals(fs + "a " + suffix + "", file.getEnclArchive().getPath());
-        assertEquals("c " + suffix + "", file.getEnclEntryName());*/
-
-        /*file = new File(new URI("jar", "jar:file:/a " + suffix + "!/b " + suffix + "!/../c " + suffix + "!", null));
-        assertSame(file, file.getInnerArchive());
-        assertSame(ROOT, file.getInnerEntryName0());
-        assertEquals(fs + "a " + suffix + "", file.getEnclArchive().getPath());
-        assertEquals("c " + suffix + "", file.getEnclEntryName());*/
 
         // Three ZIP files in path with one ZIP file removed by normalization
         // and hence one redundant jar: scheme.
@@ -460,72 +429,100 @@ public class FileTest {
     }
 
     @Test
-    public void testSerialization() throws IOException, ClassNotFoundException {
-        // Preamble.
-        final File inner = new File(archive, "inner" + suffix);
-        assertTrue(archive.isArchive());
-        assertTrue(inner.isArchive());
-
-        // Serialize.
-        final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        final ObjectOutputStream out = new ObjectOutputStream(bos);
-        out.writeObject(inner);
-        out.close();
-
-        // Deserialize.
-        final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
-        final ObjectInputStream in = new ObjectInputStream(bis);
-        final File inner2 = (File) in.readObject();
-        final File archive2 = inner2.getParentFile();
-        in.close();
-
-        assertNotSame(inner, inner2);
-        assertNotSame(archive, archive2);
-
-        //
-        // Test details of the persistet object graph - part of this is
-        // repeated in the tests for DefaultArchiveDetector.
-        //
-
-        // Assert that detectors have been persistet.
-        final ArchiveDetector archiveDetector = archive.getArchiveDetector();
-        final ArchiveDetector archive2Detector = archive2.getArchiveDetector();
-        assertNotSame(archiveDetector, archive2Detector);
-        final ArchiveDetector innerDetector = inner.getArchiveDetector();
-        final ArchiveDetector inner2Detector = inner2.getArchiveDetector();
-        assertNotSame(innerDetector, inner2Detector);
-
-        // Assert that drivers have been persistet.
-        final ArchiveDriver<?> archiveDriver = archiveDetector.getDriver(archiveDetector.getScheme(archive.getPath()));
-        final ArchiveDriver<?> archive2Driver = archive2Detector.getDriver(archive2Detector.getScheme(archive2.getPath()));
-        assertNotSame(archiveDriver, archive2Driver);
-        final ArchiveDriver<?> innerDriver = innerDetector.getDriver(innerDetector.getScheme(inner.getPath()));
-        final ArchiveDriver<?> inner2Driver = inner2Detector.getDriver(inner2Detector.getScheme(inner2.getPath()));
-        assertNotSame(innerDriver, inner2Driver);
-
-        // Assert that the controllers haven't been persistet.
-        final FsController<?> archiveController = archive.getController();
-        final FsController<?> archive2Controller = archive2.getController();
-        assertSame(archiveController, archive2Controller);
-        final FsController<?> innerController = inner.getController();
-        final FsController<?> inner2Controller = inner2.getController();
-        assertSame(innerController, inner2Controller);
-    }
-
-    @Test
     public void testGetTopLevelArchive() {
         File file = new File("abc/def" + suffix + "/efg" + suffix + "/hij" + suffix + "/test.txt");
         assertEquals(new java.io.File("abc/def" + suffix), file.getTopLevelArchive());
     }
 
-    /*@Test
-    public void testURIandURL() {
+    @Test
+    public void testURIandFsPath() {
         for (final String[] params : new String[][] {
-            { "/C:/archive.zip", "zip:file:/C:/archive.zip!/" },
+            { "/file", "file:/file" },
+            { "/archive.zip", "zip:file:/archive.zip!/" },
+            { "/archive.zip/entry", "zip:file:/archive.zip!/entry" },
+            { "/app.tar.gz/app.jar", "jar:tar.gz:file:/app.tar.gz!/app.jar!/" },
+            { "/app.tar.gz/app.jar/META-INF/MANIFEST.MF", "jar:tar.gz:file:/app.tar.gz!/app.jar!/META-INF/MANIFEST.MF" },
         }) {
-            final File file = new File(params[0]);
+            final String name = params[0];
             final URI uri = URI.create(params[1]);
-            assertThat(file.toURI(), equalTo(uri));
+            final FsPath path = FsPath.create(params[1]);
+            final File file = new File(name);
+            assertThat(new File(name), equalTo(file));
+            assertThat(new File(uri), equalTo(file));
+            assertThat(new File(path), equalTo(file));
+            assertThat(new File(name).toURI(), equalTo(file.toURI()));
+            assertThat(new File(uri).toURI(), equalTo(file.toURI()));
+            assertThat(new File(path).toURI(), equalTo(file.toURI()));
+            assertThat(new File(name).toFsPath(), equalTo(file.toFsPath()));
+            assertThat(new File(uri).toFsPath(), equalTo(file.toFsPath()));
+            assertThat(new File(path).toFsPath(), equalTo(file.toFsPath()));
+            assertThat(new File(new File(name).toURI()), equalTo(file.getAbsoluteFile()));
+            assertThat(new File(new File(uri).toURI()), equalTo(file.getAbsoluteFile()));
+            assertThat(new File(new File(path).toURI()), equalTo(file.getAbsoluteFile()));
+            assertThat(new File(new File(name).toFsPath()), equalTo(file.getAbsoluteFile()));
+            assertThat(new File(new File(uri).toFsPath()), equalTo(file.getAbsoluteFile()));
+            assertThat(new File(new File(path).toFsPath()), equalTo(file.getAbsoluteFile()));
         }
-    }*/
+    }
+
+    @Test
+    public void testSerialization() throws IOException, ClassNotFoundException {
+        final ExceptionListener listener = new ExceptionListener() {
+            @Override
+            public void exceptionThrown(Exception ex) {
+                throw new UndeclaredThrowableException(ex);
+            }
+        };
+
+        for (final String[] params : new String[][] {
+            { "file:/file" },
+            { "zip:file:/archive.zip!/" },
+            { "zip:file:/archive.zip!/entry" },
+            { "jar:tar.gz:file:/app.tar.gz!/app.jar!/" },
+            { "jar:tar.gz:file:/app.tar.gz!/app.jar!/META-INF/MANIFEST.MF" },
+            { "zip:zip:file:/föö%20bär.zip!/föö%20bär.zip!/föö%20bär" },
+            { "zip:file:/föö%20bär.zip!/föö%20bär" },
+            { "file:/föö%20bär/föö%20bär" },
+            { "zip:file:/foo.zip!/bar" },
+            { "file:/foo/bar" },
+            { "file:/foo/bar" },
+        }) {
+            final File original = new File(URI.create(params[0]));
+
+            {
+                final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                final ObjectOutputStream oos = new ObjectOutputStream(bos);
+                oos.writeObject(original);
+                oos.close();
+
+                logger.log(Level.FINE, "Number of serialized bytes: {0}", bos.size());
+
+                final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+                final ObjectInputStream ois = new ObjectInputStream(bis);
+                final File clone = (File) ois.readObject();
+                ois.close();
+
+                assertThat(clone, not(sameInstance(original)));
+                assertThat(clone, equalTo(original.getAbsoluteFile()));
+            }
+
+            {
+                final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                final XMLEncoder enc = new XMLEncoder(bos);
+                enc.setExceptionListener(listener);
+                enc.writeObject(original);
+                enc.close();
+
+                logger.log(Level.FINE, bos.toString("UTF-8"));
+
+                final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+                final XMLDecoder dec = new XMLDecoder(bis);
+                final File clone = (File) dec.readObject();
+                dec.close();
+
+                assertThat(clone, not(sameInstance(original)));
+                assertThat(clone, equalTo(original.getAbsoluteFile()));
+            }
+        }
+    }
 }

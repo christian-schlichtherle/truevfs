@@ -50,7 +50,7 @@ public class FsFilterManagerTest extends FsManagerTestCase {
             final FsManager manager = new FsFederatingManager(
                     STRONG);
             for (final String param : params[1])
-                manager.getController(FsMountPoint.create(param), new FsDummyDriver());
+                manager.getController(FsMountPoint.create(param), new DummyDriver());
             assertThat(manager.getSize(), is(params[1].length));
 
             final Set<FsMountPoint> set = new HashSet<FsMountPoint>();

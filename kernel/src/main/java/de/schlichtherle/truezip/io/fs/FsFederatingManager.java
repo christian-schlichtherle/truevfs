@@ -62,13 +62,13 @@ public final class FsFederatingManager extends FsManager {
     @NonNull public synchronized FsController<?>
     getController(  @NonNull FsMountPoint mountPoint,
                     @NonNull FsDriver driver) {
-        return getController(mountPoint, driver, null);
+        return getController(mountPoint, null, driver);
     }
 
     private FsController<?>
     getController(  final FsMountPoint mountPoint,
-                    final FsDriver driver,
-                    FsController<?> parent) {
+                    FsController<?> parent,
+                    final FsDriver driver) {
         if (null == mountPoint.getParent()) {
             if (null != parent)
                 throw new IllegalArgumentException("Parent/member mismatch!");
@@ -77,7 +77,7 @@ public final class FsFederatingManager extends FsManager {
         Scheduler scheduler = Links.getTarget(schedulers.get(mountPoint));
         if (null == scheduler) {
             if (null == parent)
-                parent = getController(mountPoint.getParent(), driver, null);
+                parent = getController(mountPoint.getParent(), null, driver);
             scheduler = new Scheduler(driver.newController(mountPoint, parent));
         }
         return scheduler.controller;
@@ -87,6 +87,7 @@ public final class FsFederatingManager extends FsManager {
 
         final FsFederatingController controller;
 
+        @SuppressWarnings("LeakingThisInConstructor")
         Scheduler(final FsController<?> prospect) {
             controller = new FsFederatingController(prospect);
             controller.getModel().addFileSystemTouchedListener(this);

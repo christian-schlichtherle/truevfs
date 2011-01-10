@@ -24,8 +24,8 @@ import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.socket.InputShop;
 import de.schlichtherle.truezip.io.entry.EntryFactory;
 import de.schlichtherle.truezip.io.fs.FsController;
+import de.schlichtherle.truezip.io.fs.FsDriver;
 import de.schlichtherle.truezip.io.fs.FsMountPoint;
-import de.schlichtherle.truezip.io.fs.archive.ArchiveDriverRegistry;
 import de.schlichtherle.truezip.io.fs.concurrent.FsConcurrentController;
 import de.schlichtherle.truezip.io.fs.concurrent.FsCachingController;
 import de.schlichtherle.truezip.io.fs.file.TempFilePool;
@@ -36,33 +36,18 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.Serializable;
 import javax.swing.Icon;
-import net.jcip.annotations.ThreadSafe;
 
 /**
- * This "driver" interface is used as an abstract factory which reads and
- * writes archives of a particular type, e.g. ZIP, TZP, JAR, TAR, TAR.GZ,
- * TAR.BZ2 or any other.
- * FileSystemModel drivers may be shared by their client applications.
- * <p>
- * The following requirements must be met by any implementation:
- * <ul>
- * <li>The implementation must be thread-safe.
- * <li>The implementation must be serializable.
- * <li>Hence it would be an error to assume that it's a singleton.
- * <li>If the implementation shall get supported by the
- *     {@link ArchiveDriverRegistry}, a no-arguments constructor must be
- *     provided.
- * </ul>
+ * This file system driver interface is used to access archives of a
+ * particular type, e.g. ZIP, TZP, JAR, TAR, TAR.GZ, TAR.BZ2 or any other.
  *
  * @param   <E> The type of the archive entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@ThreadSafe
 public abstract class ArchiveDriver<E extends ArchiveEntry>
-implements EntryFactory<E>, Serializable {
+implements FsDriver, EntryFactory<E> {
 
     /**
      * Returns a new thread-safe file system controller for the given mount
@@ -87,6 +72,7 @@ implements EntryFactory<E>, Serializable {
      * @return A new thread-safe file system controller for the given mount
      *         point and parent file system controller.
      */
+    @Override
     public @NonNull FsController<?>
     newController(  @NonNull FsMountPoint mountPoint,
                     @NonNull FsController<?> parent) {
