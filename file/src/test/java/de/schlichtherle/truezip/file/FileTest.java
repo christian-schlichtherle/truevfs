@@ -23,7 +23,7 @@ import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.logging.Level;
-import de.schlichtherle.truezip.fs.archive.driver.DummyArchiveDriver;
+import de.schlichtherle.truezip.fs.archive.DummyArchiveDriver;
 import de.schlichtherle.truezip.fs.FsPath;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

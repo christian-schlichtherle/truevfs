@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.file;
 
-import de.schlichtherle.truezip.fs.archive.driver.zip.OdfDriver;
+import de.schlichtherle.truezip.fs.archive.zip.OdfDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
 
 /**

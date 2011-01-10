@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.key.passwd.swing;
 
 import de.schlichtherle.truezip.file.ArchiveDetector;
 import de.schlichtherle.truezip.file.File;
-import de.schlichtherle.truezip.io.swing.FileComboBoxBrowser;
+import de.schlichtherle.truezip.file.swing.FileComboBoxBrowser;
 import java.awt.EventQueue;
 import java.awt.Window;
 import java.awt.event.WindowEvent;

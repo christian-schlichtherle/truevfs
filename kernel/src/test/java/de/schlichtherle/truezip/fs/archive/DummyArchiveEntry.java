@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.fs.archive;
 
-import de.schlichtherle.truezip.fs.archive.ArchiveEntry;
 import de.schlichtherle.truezip.entry.Entry;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;

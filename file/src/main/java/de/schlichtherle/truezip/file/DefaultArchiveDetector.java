@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.file;
 
-import de.schlichtherle.truezip.io.SuffixSet;
+import de.schlichtherle.truezip.util.SuffixSet;
 import de.schlichtherle.truezip.fs.FsClassPathDriverProvider;
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsScheme;

@@ -15,9 +15,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.fs.FsDriverProvider;
-import de.schlichtherle.truezip.fs.FsScheme;
-import de.schlichtherle.truezip.io.SuffixSet;
+import de.schlichtherle.truezip.util.SuffixSet;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
