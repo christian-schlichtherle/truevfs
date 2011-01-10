@@ -98,22 +98,4 @@ public interface ArchiveDetector extends FsDriverProvider {
      *         unknown.
      */
     @CheckForNull FsScheme getScheme(@NonNull String path);
-
-    /**
-     * Returns an archive driver for accessing archive files of the
-     * given {@code type} or {@code null} if an appropriate archive driver
-     * is unknown.
-     * If the given {@code type} has been returned by {@link #getScheme},
-     * then the return value is never {@code null}. In other words, if an
-     * archive detector names a scheme for a given path, it must also provide
-     * an appropriate archive driver for this scheme.
-     *
-     * @param  type the scheme to look up an appropriate archive driver for.
-     * @return Returns an archive driver for accessing archive files of the
-     *         given {@code type} or {@code null} if an appropriate archive
-     *         driver is unknown.
-     * @throws RuntimeException A subclass is thrown if loading or
-     *         instantiating an archive driver class fails.
-     */
-    @Nullable FsDriver getDriver(@NonNull FsScheme type);
 }

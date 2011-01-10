@@ -283,13 +283,6 @@ implements ArchiveDetector {
                 : null;
     }
 
-    @Override
-    public FsDriver getDriver(FsScheme type) {
-        if (null == type)
-            throw new NullPointerException();
-        return drivers.get(type);
-    }
-
     /**
      * Equivalent to {@code
         FsScheme scheme = getScheme(path);
@@ -298,7 +291,7 @@ implements ArchiveDetector {
      */
     public @CheckForNull FsDriver getDriver(@NonNull String path) {
         FsScheme scheme = getScheme(path);
-        return null == scheme ? null : getDriver(scheme);
+        return null == scheme ? null : drivers.get(scheme);
     }
 
     /**

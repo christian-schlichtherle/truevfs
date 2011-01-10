@@ -393,12 +393,6 @@ public class DefaultArchiveDetectorTest {
         }
 
         try {
-            detector.getDriver((FsScheme) null);
-            fail("Expected NullPointerException!");
-        } catch (NullPointerException expected) {
-        }
-
-        try {
             detector.getDriver((String) null);
             fail("Expected NullPointerException!");
         } catch (NullPointerException expected) {
@@ -434,16 +428,16 @@ public class DefaultArchiveDetectorTest {
 
         FsDriver driver;
         driver = detector.getDriver(lpath);
-        assertThat(driver, sameInstance((Object) result));
+        assertThat(driver, sameInstance(result));
 
         driver = detector.getDriver(upath);
-        assertThat(driver, sameInstance((Object) result));
+        assertThat(driver, sameInstance(result));
 
         final FsScheme scheme = detector.getScheme(lpath);
         if (null != driver) {
             assertThat(scheme, notNullValue());
             assertThat(scheme, equalTo(detector.getScheme(upath)));
-            assertThat(detector.getDriver(scheme), sameInstance((Object) result));
+            assertThat(detector.getDrivers().get(scheme), sameInstance(result));
         } else {
             assertThat(scheme, nullValue());
         }
