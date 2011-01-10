@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  - Copyright (C) 2005-2010 Schlichtherle IT Services
+  - Copyright (C) 2005-2011 Schlichtherle IT Services
   -
   - Licensed under the Apache License, Version 2.0 (the "License");
   - you may not use this file except in compliance with the License.
@@ -18,11 +18,15 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
     <head/>
     <body>
-        <p>
-            Provides a completely generic I/O
-            {@link de.schlichtherle.truezip.socket.IOSocket#copy data copying}
-            operation via input/output socket interfaces for accessing their
-            respective input/output target.
+        <p>Provides I/O sockets to address and resolve targets for I/O
+            operations.
+            Similar to network sockets, I/O sockets are a very powerfuly
+            concept: They support input, output, copying, caching, proxying
+            etc. of the contents of a generic <i>local target</i> and an
+            optional <i>peer target</i>.
+            By using I/O sockets, you'll never have to write a fast
+            {@link de.schlichtherle.truezip.socket.IOSocket#copy copy} routine
+            again.
         </p>
     </body>
 </html>
