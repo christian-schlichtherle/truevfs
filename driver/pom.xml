@@ -48,7 +48,7 @@
             <scope>test</scope>
         </dependency>
         <!-- TODO: Write a pure file system test case as a substitute for
-             de.schlichtherle.truezip.io.file.FileTestCase and remove this
+             de.schlichtherle.truezip.file.FileTestCase and remove this
              dependency. -->
         <dependency>
             <groupId>${project.groupId}</groupId>

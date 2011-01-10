@@ -45,7 +45,7 @@ public class JFileChooser extends javax.swing.JFileChooser {
     }
 
     /**
-     * Returns a {@link de.schlichtherle.truezip.io.file.File de.schlichtherle.truezip.io.file.File}
+     * Returns a {@link de.schlichtherle.truezip.file.File de.schlichtherle.truezip.file.File}
      * instead of {@link java.io.File java.io.File}.
      *
      * @see javax.swing.JFileChooser#getSelectedFile()
@@ -58,7 +58,7 @@ public class JFileChooser extends javax.swing.JFileChooser {
 
     /**
      * Returns an array of
-     * {@link de.schlichtherle.truezip.io.file.File de.schlichtherle.truezip.io.file.File}
+     * {@link de.schlichtherle.truezip.file.File de.schlichtherle.truezip.file.File}
      * objects instead of {@link java.io.File java.io.File} objects.
      *
      * @see javax.swing.JFileChooser#getSelectedFiles()

@@ -83,8 +83,8 @@ public final class JFileTree extends JTree {
      * The ZipDetector of the given file is used to detect and configure any
      * ZIP compatible files in this directory tree.
      *
-     * @see de.schlichtherle.truezip.io.file.File#getDefaultArchiveDetector()
-     * @see de.schlichtherle.truezip.io.file.File#setDefaultArchiveDetector(ArchiveDetector)
+     * @see de.schlichtherle.truezip.file.File#getDefaultArchiveDetector()
+     * @see de.schlichtherle.truezip.file.File#setDefaultArchiveDetector(ArchiveDetector)
      */
     public JFileTree(java.io.File root) {
         this(new FileTreeModel(root));

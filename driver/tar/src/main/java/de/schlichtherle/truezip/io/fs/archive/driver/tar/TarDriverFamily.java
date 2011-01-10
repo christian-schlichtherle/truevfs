@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A provider for the family of TAR drivers.
+ * A provider for the family of TAR file drivers.
  *
  * @author  Christian Schlichtherle
  * @version $Id$

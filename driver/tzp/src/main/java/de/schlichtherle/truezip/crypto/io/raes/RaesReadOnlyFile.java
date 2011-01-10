@@ -26,7 +26,7 @@ import java.io.IOException;
 import static de.schlichtherle.truezip.crypto.io.raes.RaesConstants.*;
 
 /**
- * This class implements a {@link de.schlichtherle.truezip.io.rof.ReadOnlyFile}
+ * This class implements a {@link de.schlichtherle.truezip.rof.ReadOnlyFile}
  * in order to provide transparent random read only access to the plain text
  * data which has been encrypted and stored in a file according to the
  * Random Access Encryption Specification (RAES).

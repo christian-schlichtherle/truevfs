@@ -47,19 +47,19 @@
         <hr/>
         <h3><a name="basics">Basic Operations</a></h3>
         <p>In order to create a new archive file, the client application can simply use
-            {@link de.schlichtherle.truezip.io.file.File#mkdir()}.</p>
-        <p>In order to delete it, {@link de.schlichtherle.truezip.io.file.File#delete()} can be used.
+            {@link de.schlichtherle.truezip.file.File#mkdir()}.</p>
+        <p>In order to delete it, {@link de.schlichtherle.truezip.file.File#delete()} can be used.
             Similar to a regular directory this is only possible if the archive file is empty.
-            Alternatively, the client application could use {@link de.schlichtherle.truezip.io.file.File#deleteAll()}
+            Alternatively, the client application could use {@link de.schlichtherle.truezip.file.File#deleteAll()}
             in order to delete the virtual directory in one go, regardless of its contents.</p>
-        <p>To read an archive entry, the client application can simply create a {@link de.schlichtherle.truezip.io.file.FileInputStream}
-            or a {@link de.schlichtherle.truezip.io.file.FileReader} with the path or a {@link de.schlichtherle.truezip.io.file.File}
+        <p>To read an archive entry, the client application can simply create a {@link de.schlichtherle.truezip.file.FileInputStream}
+            or a {@link de.schlichtherle.truezip.file.FileReader} with the path or a {@link de.schlichtherle.truezip.file.File}
             instance as its constructor parameter. Note that you cannot create a {@code FileInputStream}
             or a {@code FileReader} to read an archive file itself (unless it&#39;s a false
             positive, i.e. a regular file or directory with an archive file suffix).</p>
         <p>Likewise, to write an archive entry, the client application can simply create
-            a {@link de.schlichtherle.truezip.io.file.FileOutputStream} or a {@link de.schlichtherle.truezip.io.file.FileWriter}
-            with the path or a {@link de.schlichtherle.truezip.io.file.File} instance as its constructor
+            a {@link de.schlichtherle.truezip.file.FileOutputStream} or a {@link de.schlichtherle.truezip.file.FileWriter}
+            with the path or a {@link de.schlichtherle.truezip.file.File} instance as its constructor
             parameter. Note that you cannot create a {@code FileOutputStream} or a
             {@code FileWriter} to write an archive file itself (unless it&#39;s a false positive,
             i.e. a regular file or directory with an archive file suffix).</p>
@@ -116,14 +116,14 @@
             <li>When unmounting an archive file (see <a href="#updating">below</a>), depending
 	on the parameters, TrueZIP may choose to force the closing of any open entry 
 	streams or not. If the entry streams are <em>not</em> forced to close, the archive 
-	file cannot get unmounted and an {@link de.schlichtherle.truezip.io.file.ArchiveException}
+	file cannot get unmounted and an {@link de.schlichtherle.truezip.file.ArchiveException}
 	is thrown. If the entry streams are forced to close however, the archive file 
-	is unmounted and an {@link de.schlichtherle.truezip.io.file.ArchiveWarningException}
+	is unmounted and an {@link de.schlichtherle.truezip.file.ArchiveWarningException}
 	is thrown to indicate that subsequent I/O operations on these entry streams 
 	(other than {@code close()}) will fail with an
-    {@link de.schlichtherle.truezip.io.socket.InputClosedException}
+    {@link de.schlichtherle.truezip.socket.InputClosedException}
     or
-    {@link de.schlichtherle.truezip.io.socket.OutputClosedException}
+    {@link de.schlichtherle.truezip.socket.OutputClosedException}
 	Neither solution is optimal.</li>
         </ul>
         <p>In order to prevent these exceptions, TrueZIP automatically closes entry streams
@@ -184,7 +184,7 @@
         <p>Archive file unmounting is performed semi-automatic:</p>
         <ul>
             <li><i>Explicit unmounting</i> happens when the client application calls {@link
-	de.schlichtherle.truezip.io.file.File#umount} or {@link de.schlichtherle.truezip.io.file.File#update}.</li>
+	de.schlichtherle.truezip.file.File#umount} or {@link de.schlichtherle.truezip.file.File#update}.</li>
             <li><i>Implicit unmounting</i> happens when the JVM terminates (by a JVM shutdown
 	hook) or when the client application modifies an archive entry more than once. 
 	The latter case is also called <i>implicit remounting</i>, because the VFS is 
@@ -194,7 +194,7 @@
             (see <a href="#third_parties">below</a>) or to monitor progress (see
             <a href="#monitoring">below</a>). It also allows some control over any exceptions
             thrown: Both {@code umount()} and {@code update()} may throw an {@link
-            de.schlichtherle.truezip.io.file.ArchiveWarningException} or an {@link de.schlichtherle.truezip.io.file.ArchiveException}.
+            de.schlichtherle.truezip.file.ArchiveWarningException} or an {@link de.schlichtherle.truezip.file.ArchiveException}.
             The client application may catch these exceptions and act on them individually (see
             <a href="#ArchiveException">below</a>).</p>
         <p>However, calling {@code umount()} or {@code update()} too often may
@@ -237,17 +237,17 @@
         <p>In this context, third parties are:</p>
         <ol>
             <li>Instances of the class {@code java.io.File} which are not instances
-	of the class {@code de.schlichtherle.truezip.io.file.File}.</li>
-            <li>Instances of the class {@code de.schlichtherle.truezip.io.file.File} which do not
+	of the class {@code de.schlichtherle.truezip.file.File}.</li>
+            <li>Instances of the class {@code de.schlichtherle.truezip.file.File} which do not
 	recognize the same set of archive files in the path due to the use of a differently 
-	working {@link de.schlichtherle.truezip.io.file.ArchiveDetector}.</li>
+	working {@link de.schlichtherle.truezip.file.ArchiveDetector}.</li>
             <li>Other definitions of the classes in this package which have been loaded
 	by different class loaders.</li>
             <li>Other system processes.</li>
         </ol>
         <p>As a rule of thumb, the same archive file or entry within an archive file should
             not be accessed by different {@code File} classes ({@code java.io.File}
-            versus {@code de.schlichtherle.truezip.io.file.File}) or {@code File} instances with
+            versus {@code de.schlichtherle.truezip.file.File}) or {@code File} instances with
             different {@code ArchiveDetector} parameters. This ensures that the state associated
             to an archive file is not shadowed or bypassed.</p>
         <p>To ensure that all {@code File} instances recognize the same set of archive
@@ -258,8 +258,8 @@
             in this package, it&#39;s recommended to add TrueZIP&#39;s JAR to the boot class path or
             the extension class path.</p>
         <p>If the prerequisites for these recommendations don&#39;t apply or if the recommendations
-            can&#39;t be followed, the client application may call {@link de.schlichtherle.truezip.io.file.File#umount}
-            ({@link de.schlichtherle.truezip.io.file.File#update} will <i>not</i> work) to perform an explicit
+            can&#39;t be followed, the client application may call {@link de.schlichtherle.truezip.file.File#umount}
+            ({@link de.schlichtherle.truezip.file.File#update} will <i>not</i> work) to perform an explicit
             unmount. This clears all state information so that the third party can then safely
             access any archive file. In addition, the client application must make sure not
             to access the same archive file or any of its entries in any way while the third
@@ -281,12 +281,12 @@
             {@code IOException}s).</p>
         <p>Archive exceptions fall into two categories:</p>
         <ol>
-            <li>The class {@link de.schlichtherle.truezip.io.file.ArchiveWarningException} is the root
+            <li>The class {@link de.schlichtherle.truezip.file.ArchiveWarningException} is the root
 	of all warning exception types. These exceptions are thrown if an archive file 
 	has been completely updated, but some warning conditions apply. No data has 
 	been lost.</li>
-            <li>Its super class {@link de.schlichtherle.truezip.io.file.ArchiveException} is the root
-	of all other exception types (unless it&#39;s an {@link de.schlichtherle.truezip.io.file.ArchiveWarningException}
+            <li>Its super class {@link de.schlichtherle.truezip.file.ArchiveException} is the root
+	of all other exception types (unless it&#39;s an {@link de.schlichtherle.truezip.file.ArchiveWarningException}
 	again). These exceptions are thrown if an archive file could not get updated 
 	completely. This implies loss of some or all data in the respective archive 
 	file.</li>
@@ -296,8 +296,8 @@
             or loss of data when processing another archive file.</p>
         <p>When the archive exception chain is thrown by this method, it&#39;s first sorted
             according to (1) descending order of priority and (2) ascending order of appearance,
-            and the resulting head exception is then thrown. Since {@link de.schlichtherle.truezip.io.file.ArchiveWarningException}s
-            have a lower priority than {@link de.schlichtherle.truezip.io.file.ArchiveException}s, they are always pushed
+            and the resulting head exception is then thrown. Since {@link de.schlichtherle.truezip.file.ArchiveWarningException}s
+            have a lower priority than {@link de.schlichtherle.truezip.file.ArchiveException}s, they are always pushed
             back to the end of the chain, so that an application can use the following simple
             idiom to detect if only some warnings or at least one severe error has occured:</p>
         <blockquote>
@@ -423,8 +423,8 @@ String[] names = { <font color="#800080">&quot;a&quot;</font>, <font color="#800
             root directory is never written to the output when an archive file is modified.</p>
         <p>To the client application, the root directory behaves like any other directory
             and is addressed by naming the archive file in a path: For example, the client application
-            may list its contents by calling {@link de.schlichtherle.truezip.io.file.File#list()} or {@link
-            de.schlichtherle.truezip.io.file.File#listFiles()}. </p>
+            may list its contents by calling {@link de.schlichtherle.truezip.file.File#list()} or {@link
+            de.schlichtherle.truezip.file.File#listFiles()}. </p>
         <p>The root directory receives its last modification time from the archive file
             whenever it&#39;s read. Likewise, the archive file will receive the root directory&#39;s
             last modification time whenever it&#39;s written. </p>
@@ -434,24 +434,24 @@ String[] names = { <font color="#800080">&quot;a&quot;</font>, <font color="#800
             modification time of the root directory is not updated and hence the archive file&#39;s
             last modification time will not reflect the changes in the deeper directory levels.
         </p>
-        <p>As a workaround, the client application can use the idiom {@code {@link de.schlichtherle.truezip.io.file.File#isArchive()}
-            &amp;&amp; {@link de.schlichtherle.truezip.io.file.File#isDirectory()}} to detect an archive file
+        <p>As a workaround, the client application can use the idiom {@code {@link de.schlichtherle.truezip.file.File#isArchive()}
+            &amp;&amp; {@link de.schlichtherle.truezip.file.File#isDirectory()}} to detect an archive file
             and explicitly change the last modification time of its root directory by calling
-            {@link de.schlichtherle.truezip.io.file.File#setLastModified(long)}. </p>
+            {@link de.schlichtherle.truezip.file.File#setLastModified(long)}. </p>
         <p>An archive may contain directories for which no entry is present in the file
             although they contain at least one member in their directory tree for which an entry
-            is actually present in the file. Similarly, if {@link de.schlichtherle.truezip.io.file.File#isLenient}
+            is actually present in the file. Similarly, if {@link de.schlichtherle.truezip.file.File#isLenient}
             returns {@code true} (which is the default), an archive entry may be created
             in an archive file although its parent directory hasn&#39;t been explicitly created
-            by calling {@link de.schlichtherle.truezip.io.file.File#mkdir} before. </p>
+            by calling {@link de.schlichtherle.truezip.file.File#mkdir} before. </p>
         <p>Such a directory is called a <i>ghost directory</i>: Like the root directory,
             a ghost directory is not written to the output whenever an archive file is modified.
             This is to mimic the behavior of most archive utilities which do not create archive
             entries for directories. </p>
         <p>To the client application, a ghost directory behaves like a regular directory
-            with the exception that its last modification time returned by {@link de.schlichtherle.truezip.io.file.File#lastModified()}
+            with the exception that its last modification time returned by {@link de.schlichtherle.truezip.file.File#lastModified()}
             is {@code 0L}. If the client application sets the last modification time explicitly
-            using {@link de.schlichtherle.truezip.io.file.File#setLastModified(long)}, then the ghost directory
+            using {@link de.schlichtherle.truezip.file.File#setLastModified(long)}, then the ghost directory
             reincarnates as a regular directory and will be output to the archive file. </p>
         <p>Mind that a ghost directory can only exist within an archive file, but not every
             directory within an archive file is actually a ghost directory. </p>
@@ -486,8 +486,8 @@ String[] names = { <font color="#800080">&quot;a&quot;</font>, <font color="#800
             aware of any recent tools which would allow to create these. </p>
         <p>If an archive file contains both a file and a directory entry with the same name
             it&#39;s up to the individual methods how they behave in this case. This could happen
-            with archive files created by external tools only. Both {@link de.schlichtherle.truezip.io.file.File#isDirectory()}
-            and {@link de.schlichtherle.truezip.io.file.File#isFile()} will return {@code true} in this
+            with archive files created by external tools only. Both {@link de.schlichtherle.truezip.file.File#isDirectory()}
+            and {@link de.schlichtherle.truezip.file.File#isFile()} will return {@code true} in this
             case and in fact they are the only methods the client application can rely upon
             to act properly in this situation: Many other methods use a combination of {@code
             isDirectory()} and {@code isFile()} calls and will show an undefined
