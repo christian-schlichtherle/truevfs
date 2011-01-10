@@ -282,7 +282,7 @@ public final class JFileTree extends JTree {
                     base += suffix;
             }
         }
-        final java.io.File node = new de.schlichtherle.truezip.io.file.File(parent, base);
+        final java.io.File node = new de.schlichtherle.truezip.file.File(parent, base);
 
         if (!renameTo(oldNode, node))
             Toolkit.getDefaultToolkit().beep();
@@ -470,7 +470,7 @@ public final class JFileTree extends JTree {
      * and scrolls the tree so that the copied node
      * is selected and visible.
      */
-    public boolean copyFrom(final de.schlichtherle.truezip.io.file.File node, final InputStream in) {
+    public boolean copyFrom(final de.schlichtherle.truezip.file.File node, final InputStream in) {
         final FileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
         if (path == null)
@@ -490,7 +490,7 @@ public final class JFileTree extends JTree {
      * and scrolls the tree so that the copied node
      * is selected and visible.
      */
-    public boolean copyTo(final de.schlichtherle.truezip.io.file.File oldNode, final java.io.File node) {
+    public boolean copyTo(final de.schlichtherle.truezip.file.File oldNode, final java.io.File node) {
         final FileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
         if (path == null)
@@ -510,7 +510,7 @@ public final class JFileTree extends JTree {
      * and scrolls the tree so that the recursively copied node
      * is selected and visible.
      */
-    public boolean copyAllTo(final de.schlichtherle.truezip.io.file.File oldNode, final java.io.File node) {
+    public boolean copyAllTo(final de.schlichtherle.truezip.file.File oldNode, final java.io.File node) {
         final FileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
         if (path == null)
@@ -530,7 +530,7 @@ public final class JFileTree extends JTree {
      * and scrolls the tree so that the copied node
      * is selected and visible.
      */
-    public boolean archiveCopyTo(final de.schlichtherle.truezip.io.file.File oldNode, final java.io.File node) {
+    public boolean archiveCopyTo(final de.schlichtherle.truezip.file.File oldNode, final java.io.File node) {
         final FileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
         if (path == null)
@@ -550,7 +550,7 @@ public final class JFileTree extends JTree {
      * and scrolls the tree so that the recursively copied node
      * is selected and visible.
      */
-    public boolean archiveCopyAllTo(final de.schlichtherle.truezip.io.file.File oldNode, final java.io.File node) {
+    public boolean archiveCopyAllTo(final de.schlichtherle.truezip.file.File oldNode, final java.io.File node) {
         final FileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
         if (path == null)
@@ -607,7 +607,7 @@ public final class JFileTree extends JTree {
         } else {
             final TreePath parent = substPath(tp.getParentPath(), oldPath, path);
             return parent.pathByAddingChild(
-                    new de.schlichtherle.truezip.io.file.File((java.io.File) parent.getLastPathComponent(),
+                    new de.schlichtherle.truezip.file.File((java.io.File) parent.getLastPathComponent(),
                              file.getName()));
         }
     }
@@ -638,7 +638,7 @@ public final class JFileTree extends JTree {
      * and scrolls the tree so that the successor to the deleted node
      * is selected and visible.
      */
-    public boolean deleteAll(final de.schlichtherle.truezip.io.file.File node) {
+    public boolean deleteAll(final de.schlichtherle.truezip.file.File node) {
         final FileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
         if (path == null)

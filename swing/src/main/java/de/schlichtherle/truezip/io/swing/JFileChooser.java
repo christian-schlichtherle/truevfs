@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.swing;
 
-import de.schlichtherle.truezip.io.file.ArchiveDetector;
+import de.schlichtherle.truezip.file.ArchiveDetector;
 import java.awt.Graphics;
 import javax.swing.Icon;
 

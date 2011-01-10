@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.swing;
 
-import de.schlichtherle.truezip.io.file.File;
+import de.schlichtherle.truezip.file.File;
 import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;

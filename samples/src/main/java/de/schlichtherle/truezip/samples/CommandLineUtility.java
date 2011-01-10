@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.samples;
 
 import de.schlichtherle.truezip.key.passwd.swing.HurlingWindowFeedback;
-import de.schlichtherle.truezip.io.file.File;
+import de.schlichtherle.truezip.file.File;
 import de.schlichtherle.truezip.io.fs.FsManagers;
 import de.schlichtherle.truezip.io.fs.FsStatistics;
 import de.schlichtherle.truezip.io.fs.FsStatisticsManager;
