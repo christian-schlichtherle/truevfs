@@ -15,10 +15,10 @@
  */
 package de.schlichtherle.truezip.samples;
 
-import de.schlichtherle.truezip.io.file.ArchiveDetector;
-import de.schlichtherle.truezip.io.file.DefaultArchiveDetector;
-import de.schlichtherle.truezip.io.file.File;
-import de.schlichtherle.truezip.io.file.FileInputStream;
+import de.schlichtherle.truezip.file.ArchiveDetector;
+import de.schlichtherle.truezip.file.DefaultArchiveDetector;
+import de.schlichtherle.truezip.file.File;
+import de.schlichtherle.truezip.file.FileInputStream;
 import de.schlichtherle.truezip.io.fs.archive.driver.tar.TarBZip2Driver;
 import de.schlichtherle.truezip.io.fs.archive.driver.tar.TarDriver;
 import de.schlichtherle.truezip.io.fs.archive.driver.tar.TarGZipDriver;
