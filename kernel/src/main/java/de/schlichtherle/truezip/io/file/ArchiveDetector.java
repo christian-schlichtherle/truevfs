@@ -16,25 +16,17 @@
 
 package de.schlichtherle.truezip.io.file;
 
-import de.schlichtherle.truezip.io.fs.FsDriver;
 import de.schlichtherle.truezip.io.fs.FsDriverProvider;
 import de.schlichtherle.truezip.io.fs.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.fs.FsScheme;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
-import java.io.Serializable;
 import net.jcip.annotations.Immutable;
 
 /**
  * Detects archive files solely by scanning file paths -
  * usually by testing for file name suffixes like <i>.zip</i> or the
  * like.
- * If the method {@link #getScheme(String)} detects an archive file, it
- * returns a {@link FsScheme} for accessing files of this type.
- * Next, for any scheme returned by this method, the method
- * {@link #getDriver(FsScheme)} returns an {@link ArchiveDriver} for accessing
- * files of this scheme type.
  * <p>
  * An archive file which has been recognized by an {@code ArchiveDetector} is
  * said to be a <i>prospective archive file</i>.

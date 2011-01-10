@@ -99,16 +99,6 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
 
     private transient volatile @Nullable FsPath hierarchical;
 
-    public static @NonNull FsPath
-    create(@NonNull File file) {
-        try {
-            return new FsPath(file.toURI(), CANONICALIZE);
-        } catch (URISyntaxException ex) {
-            assert false : ex; // broken contract in File implementation!
-            throw new IllegalArgumentException(ex);
-        }
-    }
-
     /**
      * Equivalent to {@link #create(String, FsUriModifier) create(uri, FsUriModifier.NULL)}.
      */
@@ -189,6 +179,14 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
     public FsPath(@NonNull String uri, @NonNull FsUriModifier modifier)
     throws URISyntaxException {
         parse(uri, modifier);
+    }
+
+    public FsPath(@NonNull File file) {
+        try {
+            parse(file.toURI(), CANONICALIZE);
+        } catch (URISyntaxException ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     /**
