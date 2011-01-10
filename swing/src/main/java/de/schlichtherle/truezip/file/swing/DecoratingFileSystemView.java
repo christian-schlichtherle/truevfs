@@ -32,7 +32,7 @@ import javax.swing.Icon;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-abstract class DecoratorFileSystemView extends FileSystemView {
+abstract class DecoratingFileSystemView extends FileSystemView {
 
     /** The decorated file system view. */
     @NonNull
@@ -43,7 +43,7 @@ abstract class DecoratorFileSystemView extends FileSystemView {
      *
      * @param delegate The file view to be decorated - may be {@code null}.
      */
-    protected DecoratorFileSystemView(final FileSystemView delegate) {
+    protected DecoratingFileSystemView(final FileSystemView delegate) {
         if (delegate == null)
             throw new NullPointerException();
         this.delegate = delegate;
@@ -174,8 +174,8 @@ abstract class DecoratorFileSystemView extends FileSystemView {
      * is called.
      */
     public File createFileSystemRootImpl(File f) {
-        return (delegate instanceof DecoratorFileSystemView)
-                ? ((DecoratorFileSystemView) delegate).createFileSystemRootImpl(f)
+        return (delegate instanceof DecoratingFileSystemView)
+                ? ((DecoratingFileSystemView) delegate).createFileSystemRootImpl(f)
                 : super.createFileSystemRoot(f);
     }
 }
