@@ -18,8 +18,8 @@ package de.schlichtherle.truezip.key;
 /**
  * Thrown to indicate that prompting for a key to open or create a
  * protected resource has been interrupted.
- * As an example, if {@link de.schlichtherle.truezip.io.swing.JFileChooser} is
- * used to browse RAES encrypted ZIP files, then this may be thrown in the
+ * As an example, if {@link de.schlichtherle.truezip.file.swing.JFileChooser}
+ * is used to browse RAES encrypted ZIP files, then this may be thrown in the
  * Basic L&F File Loader Threads if they have been interrupted by the
  * {@link javax.swing.JFileChooser} code running in AWT's Event Dispatch
  * Thread (EDT).

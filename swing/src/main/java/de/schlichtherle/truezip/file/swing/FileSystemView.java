@@ -27,9 +27,9 @@ import javax.swing.UIManager;
  * A custom file system view required to browse archive files like (virtual)
  * directories with a JFileChooser.
  * This class is used by
- * {@link de.schlichtherle.truezip.io.swing.tree.FileTreeCellRenderer}
+ * {@link de.schlichtherle.truezip.file.swing.tree.FileTreeCellRenderer}
  * to render files and directories in a
- * {@link de.schlichtherle.truezip.io.swing.JFileTree}.
+ * {@link de.schlichtherle.truezip.file.swing.JFileTree}.
  *
  * @author  Christian Schlichtherle
  * @version $Id$

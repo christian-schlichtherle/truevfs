@@ -26,6 +26,7 @@ import de.schlichtherle.truezip.fs.archive.zip.CheckedJarDriver;
 import de.schlichtherle.truezip.fs.archive.zip.CheckedReadOnlySfxDriver;
 import de.schlichtherle.truezip.fs.archive.zip.CheckedZipDriver;
 import de.schlichtherle.truezip.file.swing.tree.FileTreeModel;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -82,43 +83,31 @@ public class NZip extends CommandLineUtility {
     }
 
     /**
-     * May be overridden by subclasses to create the {@link ArchiveDetector}
-     * which shall be used as the
-     * {@link File#getDefaultArchiveDetector default archive detector} while
-     * a command is running.
-     * The {@link de.schlichtherle.truezip.fs.archive.driver.ArchiveDriver}s returned
-     * by the archive detector should use their default charsets.
+     * May be overridden by subclasses to create the
+     * {@link DefaultArchiveDetector} which provides file system drivers which
+     * should use the specified charset if supported.
      * <p>
      * Note that the archive detector which is returned by the implementation
      * in this class uses some archive drivers which may be pretty slow due to
      * some extra compatibility tests which they perform on every archive.
      */
-    protected DefaultArchiveDetector newDefaultArchiveDetector() {
+    protected ArchiveDetector newArchiveDetector() {
         return new DefaultArchiveDetector(ArchiveDetector.ALL,
             new Object[] {
-                "ear|jar|war", new CheckedJarDriver(), // check CRC-32
-                "zip", new CheckedZipDriver(), // check CRC-32
-                "exe", new CheckedReadOnlySfxDriver(), // check CRC-32
+                "ear|jar|war", new CheckedJarDriver(),  // check CRC-32
+                "zip", new CheckedZipDriver(),          // check CRC-32
+                "exe", new CheckedReadOnlySfxDriver(),  // check CRC-32
             });
     }
 
-    /**
-     * May be overridden by subclasses to create the {@link ArchiveDetector}
-     * which returns {@link de.schlichtherle.truezip.fs.archive.driver.ArchiveDriver}s
-     * which should use the specified charset if supported.
-     * This is used by selected commands in this class.
-     * <p>
-     * Note that the archive detector which is returned by the implementation
-     * in this class uses some archive drivers which may be pretty slow due to
-     * some extra compatibility tests which they perform on every archive.
-     */
-    protected DefaultArchiveDetector newDefaultArchiveDetector(
-            final Charset charset) {
+    /** @see #newArchiveDetector() */
+    protected ArchiveDetector newArchiveDetector(
+            final @NonNull Charset charset) {
         assert charset != null;
         return new DefaultArchiveDetector(ArchiveDetector.ALL,
                 new Object[] {
-                    "ear|jar|war|zip", new CheckedZipDriver(charset), // check CRC-32
-                    "exe", new CheckedReadOnlySfxDriver(charset), // check CRC-32
+                    "ear|jar|war|zip", new CheckedZipDriver(charset),   // check CRC-32
+                    "exe", new CheckedReadOnlySfxDriver(charset),       // check CRC-32
                     "tar", new TarDriver(charset),
                     "tgz|tar.gz", new TarGZipDriver(charset),
                     "tbz|tar.bz2", new TarBZip2Driver(charset),
@@ -153,21 +142,8 @@ public class NZip extends CommandLineUtility {
 
         final ArchiveDetector oldDetector = File.getDefaultArchiveDetector();
         try {
-            // Let this utility recognize all archive types for which an
-            // archive driver is installed.
-            // Note that this may be pretty slow if there are SFX EXE files or
-            // TAR(.GZ|.BZ2) archives to ls.
-            // In addition, for access to RAES encrypted ZIP archives (".tzp",
-            // ".zip.rae", ".zip.raes" suffix) Bouncy Castle's Lightweight
-            // Crypto API for JDK 1.4, version 1.30 or higher needs to be on
-            // the run time class path.
-            // Furthermore, for access to TAR, TAR.GZ and TAR.BZ2 archives,
-            // "ant.jar" from Apache's Ant, version 1.6.5 or higher needs to
-            // be on the run time class path (version 1.7 or higher is
-            // recommended).
-            // Finally, for regular ZIP files we want to check the CRC32 value
-            // when an entry input stream is closed.
-            File.setDefaultArchiveDetector(newDefaultArchiveDetector());
+            // Install custom archive detector.
+            File.setDefaultArchiveDetector(newArchiveDetector());
 
             if ("ls".equals(cmd)) {
                 ls(args, false, false);
@@ -358,9 +334,9 @@ public class NZip extends CommandLineUtility {
 
         final ArchiveDetector srcDetector;
         if (cp437in)
-            srcDetector = newDefaultArchiveDetector(Charset.forName("IBM437"));
+            srcDetector = newArchiveDetector(Charset.forName("IBM437"));
         else if (utf8in)
-            srcDetector = newDefaultArchiveDetector(Charset.forName("UTF-8"));
+            srcDetector = newArchiveDetector(Charset.forName("UTF-8"));
         else
             srcDetector = File.getDefaultArchiveDetector();
 
@@ -368,9 +344,9 @@ public class NZip extends CommandLineUtility {
         if (unzip)
             dstDetector = ArchiveDetector.NULL;
         else if (cp437out)
-            dstDetector = newDefaultArchiveDetector(Charset.forName("IBM437"));
+            dstDetector = newArchiveDetector(Charset.forName("IBM437"));
         else if (utf8out)
-            dstDetector = newDefaultArchiveDetector(Charset.forName("UTF-8"));
+            dstDetector = newArchiveDetector(Charset.forName("UTF-8"));
         else
             dstDetector = File.getDefaultArchiveDetector();
 

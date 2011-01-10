@@ -31,7 +31,7 @@ import static java.util.zip.Deflater.BEST_COMPRESSION;
  * If there is a mismatch of the CRC-32 values for a ZIP entry in an input
  * archive, the {@link java.io.InputStream#close} method of the corresponding
  * stream for the archive entry will throw a
- * {@link de.schlichtherle.truezip.io.zip.CRC32Exception}.
+ * {@link de.schlichtherle.truezip.zip.CRC32Exception}.
  * Other than this, the archive entry will be processed normally.
  * So if just the CRC-32 value for the entry in the archive file has been
  * modified, you can still read its entire contents.
