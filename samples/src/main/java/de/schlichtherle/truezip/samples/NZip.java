@@ -48,7 +48,7 @@ import java.util.ResourceBundle;
  * However, this utility features some optional archive drivers which
  * provide additional safety or otherwise unavailable features.
  * Some of these drivers are not used in their default configuration -
- * see {@link de.schlichtherle.truezip.io.file.DefaultArchiveDetector} for more
+ * see {@link de.schlichtherle.truezip.file.DefaultArchiveDetector} for more
  * information.
  * For example, the ZIP drivers used in this utility <em>always</em> check
  * the CRC-32 values provided in the ZIP file.

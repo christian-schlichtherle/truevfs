@@ -35,7 +35,7 @@ import javax.swing.tree.TreePath;
  * A {@link TreeModel} which traverses {@link java.io.File java.io.File}
  * instances.
  * If the root of this tree model is actually an instance of
- * {@link de.schlichtherle.truezip.io.file.File de.schlichtherle.truezip.io.file.File},
+ * {@link de.schlichtherle.truezip.file.File de.schlichtherle.truezip.file.File},
  * its archive detector is used to detect any archive files in the directory
  * tree.
  * This allows you to traverse archive files just like directories.
@@ -122,7 +122,7 @@ public class FileTreeModel implements TreeModel {
     /**
      * Creates a new {@code FileTreeModel} which browses the specified
      * {@code root} file.
-     * If {@code file} is an instance of {@link de.schlichtherle.truezip.io.file.File},
+     * If {@code file} is an instance of {@link de.schlichtherle.truezip.file.File},
      * its archive detector is used to detect any archive files in the
      * directory tree.
      *
@@ -164,7 +164,7 @@ public class FileTreeModel implements TreeModel {
      * Returns the root of this tree model.
      * This is actually an instance of {@link java.io.File java.io.File} or
      * a subclass, like
-     * {@link de.schlichtherle.truezip.io.file.File de.schlichtherle.truezip.io.file.File}.
+     * {@link de.schlichtherle.truezip.file.File de.schlichtherle.truezip.file.File}.
      *
      * @return A {@code File} object or {@code null} if this tree
      *         model has not been created with a {@code File} object.
@@ -255,7 +255,7 @@ public class FileTreeModel implements TreeModel {
      *         {@code null}.
      */
     private java.io.File[] newPath(final java.io.File node) {
-        if (root == null /*|| !de.schlichtherle.truezip.io.file.File.contains(root, node)*/)
+        if (root == null /*|| !de.schlichtherle.truezip.file.File.contains(root, node)*/)
             return null;
         // Do not apply the filter here! The filter could depend on the file's
         // state and this method may get called before the node is initialized

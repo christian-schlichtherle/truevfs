@@ -26,7 +26,7 @@
         <p>TrueZIP&#39;s design strategy is to &quot;make simple things easy and
             complex things possible&quot;.
             For example, when using the default configuration, the instance
-            {@link de.schlichtherle.truezip.io.file.File#File(java.lang.String) new File("app.ear/web.war/WEB-INF/lib/lib.jar/META-INF/MANIFEST.MF")}
+            {@link de.schlichtherle.truezip.file.File#File(java.lang.String) new File("app.ear/web.war/WEB-INF/lib/lib.jar/META-INF/MANIFEST.MF")}
             would refer to the text file entry <i>META-INF/MANIFEST.MF</i> within the JAR file
             entry <i>WEB-INF/lib/lib.jar</i> within the WAR file entry <i>web.war</i> within
             the EAR file <i>app.ear</i>. The same applies for any other supported and configured
@@ -193,7 +193,7 @@
                 </td>
             </tr>
         </table>
-        <p><sup>0</sup> Suffix recognition is case insensitive with the {@link de.schlichtherle.truezip.io.file.DefaultArchiveDetector}
+        <p><sup>0</sup> Suffix recognition is case insensitive with the {@link de.schlichtherle.truezip.file.DefaultArchiveDetector}
             class.<br/>
             <sup>1</sup> The code page to use for entry names and other entry meta data. This
             access parameter is determined by the archive driver (not the archive detector)

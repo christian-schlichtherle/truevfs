@@ -93,7 +93,7 @@ public class FileSystemView extends DecoratorFileSystemView {
      * Returns a valid archive detector to use with this class.
      * If no archive detector has been explicitly set for this file system
      * view or the archive detector has been set to {@code null},
-     * then {@link de.schlichtherle.truezip.io.file.File#getDefaultArchiveDetector} is
+     * then {@link de.schlichtherle.truezip.file.File#getDefaultArchiveDetector} is
      * returned.
      */
     public ArchiveDetector getArchiveDetector() {
@@ -107,7 +107,7 @@ public class FileSystemView extends DecoratorFileSystemView {
      *
      * @param archiveDetector The archive detector to use.
      *        May be {@code null} to indicate that
-     *        {@link de.schlichtherle.truezip.io.file.File#getDefaultArchiveDetector}
+     *        {@link de.schlichtherle.truezip.file.File#getDefaultArchiveDetector}
      *        should be used.
      */
     public void setArchiveDetector(ArchiveDetector archiveDetector) {

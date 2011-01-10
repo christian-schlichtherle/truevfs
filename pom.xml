@@ -90,46 +90,40 @@
                         </execution>
                     </executions>
                 </plugin>
+                <plugin>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <configuration>
+                        <reportPlugins>
+                            <plugin>
+                                <artifactId>maven-project-info-reports-plugin</artifactId>
+                                <version>2.2</version>
+                            </plugin>
+                            <plugin>
+                                <artifactId>maven-javadoc-plugin</artifactId>
+                                <version>2.7</version>
+                                <configuration>
+                                    <author>true</author>
+                                    <encoding>${project.build.sourceEncoding}</encoding>
+                                    <header>&lt;b&gt;${project.name} ${project.version}&lt;/b&gt;</header>
+                                    <quiet>true</quiet>
+                                    <splitindex>${javadoc.splitindex}</splitindex>
+                                    <version>true</version>
+                                </configuration>
+                            </plugin>
+                            <plugin>
+                                <groupId>org.codehaus.mojo</groupId>
+                                <artifactId>findbugs-maven-plugin</artifactId>
+                                <version>2.3.1</version>
+                            </plugin>
+                            <plugin>
+                                <groupId>org.codehaus.mojo</groupId>
+                                <artifactId>jdepend-maven-plugin</artifactId>
+                                <version>2.0-beta-2</version>
+                            </plugin>
+                        </reportPlugins>
+                    </configuration>
+                </plugin>
             </plugins>
         </pluginManagement>
-
-        <plugins>
-            <plugin>
-                <artifactId>maven-site-plugin</artifactId>
-                <configuration>
-                    <reportPlugins>
-                        <plugin>
-                            <artifactId>maven-project-info-reports-plugin</artifactId>
-                            <version>2.2</version>
-                        </plugin>
-                        <plugin>
-                            <artifactId>maven-javadoc-plugin</artifactId>
-                            <version>2.7</version>
-                            <configuration>
-                                <author>true</author>
-                                <encoding>${project.build.sourceEncoding}</encoding>
-                                <header>&lt;b&gt;${project.name} ${project.version}&lt;/b&gt;</header>
-                                <quiet>true</quiet>
-                                <splitindex>${javadoc.splitindex}</splitindex>
-                                <version>true</version>
-                                <links>
-                                    <link>http://www.bouncycastle.org/docs/docs1.6/</link>
-                                </links>
-                            </configuration>
-                        </plugin>
-                        <plugin>
-                            <groupId>org.codehaus.mojo</groupId>
-                            <artifactId>findbugs-maven-plugin</artifactId>
-                            <version>2.3.1</version>
-                        </plugin>
-                        <plugin>
-                            <groupId>org.codehaus.mojo</groupId>
-                            <artifactId>jdepend-maven-plugin</artifactId>
-                            <version>2.0-beta-2</version>
-                        </plugin>
-                    </reportPlugins>
-                </configuration>
-            </plugin>
-        </plugins>
     </build>
 </project>

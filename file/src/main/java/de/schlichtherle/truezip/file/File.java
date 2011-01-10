@@ -1232,9 +1232,9 @@ public final class File extends java.io.File {
     /**
      * Returns the value of the class property {@code lenient}.
      * By default, this is the inverse of the boolean system property
-     * {@code de.schlichtherle.truezip.io.file.strict}.
+     * {@code de.schlichtherle.truezip.file.strict}.
      * In other words, this returns {@code true} unless you map the
-     * system property {@code de.schlichtherle.truezip.io.file.strict}
+     * system property {@code de.schlichtherle.truezip.file.strict}
      * to {@code true} or call {@link #setLenient(boolean) setLenient(false)}.
      *
      * @see #setLenient
