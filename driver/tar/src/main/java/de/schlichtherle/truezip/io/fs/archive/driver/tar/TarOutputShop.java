@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.io.fs.archive.driver.tar;
 
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
-import de.schlichtherle.truezip.io.entry.Entry;
+import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.fs.archive.MultiplexedArchiveOutputShop;
@@ -34,8 +34,8 @@ import java.util.Map;
 import org.apache.tools.tar.TarOutputStream;
 
 import static de.schlichtherle.truezip.io.fs.archive.driver.tar.TarDriver.TEMP_FILE_PREFIX;
-import static de.schlichtherle.truezip.io.entry.Entry.Size.DATA;
-import static de.schlichtherle.truezip.io.entry.Entry.UNKNOWN;
+import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
+import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
 
 /**
  * An implementation of {@link OutputShop} to write TAR archives.

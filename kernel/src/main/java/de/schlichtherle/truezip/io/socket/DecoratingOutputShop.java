@@ -16,8 +16,8 @@
 
 package de.schlichtherle.truezip.io.socket;
 
-import de.schlichtherle.truezip.io.entry.Entry;
-import de.schlichtherle.truezip.io.entry.DecoratingEntryContainer;
+import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.entry.DecoratingEntryContainer;
 import java.io.IOException;
 
 /**

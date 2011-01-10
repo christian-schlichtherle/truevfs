@@ -20,8 +20,8 @@ import de.schlichtherle.truezip.io.fs.FsOutputOption;
 import de.schlichtherle.truezip.io.socket.IOEntry;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
-import de.schlichtherle.truezip.io.entry.Entry;
-import de.schlichtherle.truezip.io.entry.EntryName;
+import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.entry.EntryName;
 import de.schlichtherle.truezip.io.fs.FsEntry;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -30,8 +30,8 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
-import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
-import static de.schlichtherle.truezip.io.entry.Entry.Access.*;
+import static de.schlichtherle.truezip.entry.Entry.Type.*;
+import static de.schlichtherle.truezip.entry.Entry.Access.*;
 
 /**
  * Adapts a {@link File} instance to a {@link FsEntry}.

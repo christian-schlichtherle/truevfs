@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.entry;
 
+import de.schlichtherle.truezip.entry.EntryName;
 import java.beans.ExceptionListener;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;

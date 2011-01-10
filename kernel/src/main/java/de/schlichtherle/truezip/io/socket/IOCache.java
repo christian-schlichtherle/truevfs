@@ -17,8 +17,8 @@ package de.schlichtherle.truezip.io.socket;
 
 import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
-import de.schlichtherle.truezip.io.entry.Entry;
-import de.schlichtherle.truezip.io.entry.DecoratingEntry;
+import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.entry.DecoratingEntry;
 import de.schlichtherle.truezip.io.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.util.Pool;

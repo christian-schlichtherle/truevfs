@@ -17,9 +17,9 @@ package de.schlichtherle.truezip.io.fs.archive;
 
 import java.util.List;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.io.entry.Entry;
-import de.schlichtherle.truezip.io.entry.EntryContainer;
-import de.schlichtherle.truezip.io.entry.EntryFactory;
+import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.entry.EntryContainer;
+import de.schlichtherle.truezip.entry.EntryFactory;
 import de.schlichtherle.truezip.io.fs.FsEntryName;
 import de.schlichtherle.truezip.io.fs.FsOutputOption;
 import de.schlichtherle.truezip.io.fs.FsUriModifier;
@@ -39,9 +39,9 @@ import java.util.Map;
 import java.util.Set;
 import net.jcip.annotations.NotThreadSafe;
 
-import static de.schlichtherle.truezip.io.entry.Entry.*;
-import static de.schlichtherle.truezip.io.entry.Entry.Access.*;
-import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
+import static de.schlichtherle.truezip.entry.Entry.*;
+import static de.schlichtherle.truezip.entry.Entry.Access.*;
+import static de.schlichtherle.truezip.entry.Entry.Type.*;
 import static de.schlichtherle.truezip.io.fs.FsEntryName.*;
 import static de.schlichtherle.truezip.io.fs.FsOutputOption.*;
 import static de.schlichtherle.truezip.io.Paths.*;

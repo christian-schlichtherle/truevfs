@@ -18,10 +18,10 @@ package de.schlichtherle.truezip.io.fs.archive.driver.tar;
 import de.schlichtherle.truezip.io.fs.archive.ArchiveEntry;
 import java.io.File;
 
-import static de.schlichtherle.truezip.io.entry.Entry.Access.WRITE;
-import static de.schlichtherle.truezip.io.entry.Entry.Size.DATA;
-import static de.schlichtherle.truezip.io.entry.Entry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.io.entry.Entry.Type.FILE;
+import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
+import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
+import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
 
 /**
  * An entry in a TAR archive which implements the {@code ArchiveEntry}

@@ -15,8 +15,8 @@
  */
 package de.schlichtherle.truezip.io.socket;
 
-import de.schlichtherle.truezip.io.entry.EntryContainer;
-import de.schlichtherle.truezip.io.entry.Entry;
+import de.schlichtherle.truezip.entry.EntryContainer;
+import de.schlichtherle.truezip.entry.Entry;
 import net.jcip.annotations.NotThreadSafe;
 
 /**

@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.fs.file;
 
-import de.schlichtherle.truezip.io.entry.Entry;
+import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.fs.FsOutputOption;
 import de.schlichtherle.truezip.io.socket.IOPool;
@@ -33,8 +33,8 @@ import java.io.OutputStream;
 import static de.schlichtherle.truezip.io.fs.FsOutputOption.APPEND;
 import static de.schlichtherle.truezip.io.fs.FsOutputOption.CACHE;
 import static de.schlichtherle.truezip.io.fs.FsOutputOption.CREATE_PARENTS;
-import static de.schlichtherle.truezip.io.entry.Entry.Access.WRITE;
-import static de.schlichtherle.truezip.io.entry.Entry.UNKNOWN;
+import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
+import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
 
 /**
  * @see     FileInputSocket

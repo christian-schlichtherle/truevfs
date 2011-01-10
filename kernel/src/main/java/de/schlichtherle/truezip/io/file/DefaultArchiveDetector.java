@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.io.file;
 
-import de.schlichtherle.truezip.io.fs.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.SuffixSet;
 import de.schlichtherle.truezip.io.fs.FsClassPathDriverProvider;
 import de.schlichtherle.truezip.io.fs.FsDriver;
@@ -33,8 +32,9 @@ import java.util.regex.Matcher;
 
 /**
  * An {@link ArchiveDetector} which matches file paths against a pattern of
- * archive file suffixes in order to detect prospective archive files and
- * look up their corresponding {@link ArchiveDriver} in its map.
+ * file suffixes in order to detect prospective federated virtual file systems
+ * (i.e. archive files) and look up their corresponding file system driver in
+ * its map.
  * <p>
  * Constructors are provided which allow an instance to:
  * <ol>
@@ -111,7 +111,7 @@ implements ArchiveDetector {
      *        archive files.
      * @see SuffixSet Syntax definition for suffix lists.
      * @throws IllegalArgumentException If any of the suffixes in the suffix
-     *         list names a suffix for which no {@link ArchiveDriver} is
+     *         list names a suffix for which no file system driver is
      *         configured in the global map.
      */
     public DefaultArchiveDetector(final @NonNull String suffixes) {
@@ -129,11 +129,11 @@ implements ArchiveDetector {
 
     /**
      * Equivalent to
-     * {@link #DefaultArchiveDetector(DefaultArchiveDetector, String, ArchiveDriver)
+     * {@link #DefaultArchiveDetector(DefaultArchiveDetector, String, FsDriver)
      * DefaultArchiveDetector(ArchiveDetector.NULL, suffixes, driver)}.
      */
     public DefaultArchiveDetector(  @NonNull String suffixes,
-                                    @CheckForNull ArchiveDriver<?> driver) {
+                                    @CheckForNull FsDriver driver) {
         this(NULL, suffixes, driver);
     }
 
@@ -161,7 +161,7 @@ implements ArchiveDetector {
      */
     public DefaultArchiveDetector(  @NonNull DefaultArchiveDetector delegate,
                                     @NonNull String suffixes,
-                                    @CheckForNull ArchiveDriver<?> driver) {
+                                    @CheckForNull FsDriver driver) {
         this(delegate, new Object[] { suffixes, driver });
     }
 
@@ -188,7 +188,7 @@ implements ArchiveDetector {
      *         configuration.
      * @throws ClassCastException if the keys are not {@link String}s or the
      * 		   values are not {@link String}s, {@link Class}es or
-     *         {@link ArchiveDriver}s.
+     *         {@link FsDriver}s.
      * @see    SuffixSet Syntax definition for suffix lists.
      */
     public DefaultArchiveDetector(
@@ -227,7 +227,7 @@ implements ArchiveDetector {
      *         does not hold or an illegal keyword is found in the
      *         configuration.
      * @throws ClassCastException if the values are not {@link String}s,
-     *         {@link Class}es or {@link ArchiveDriver}s.
+     *         {@link Class}es or {@link FsDriver}s.
      * @see SuffixSet Syntax definition for suffix lists.
      */
     public DefaultArchiveDetector(

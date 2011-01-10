@@ -26,7 +26,7 @@ import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.TabuFileException;
 import de.schlichtherle.truezip.io.fs.archive.driver.zip.ZipDriver;
 import de.schlichtherle.truezip.io.fs.archive.driver.zip.ZipInputShop;
-import de.schlichtherle.truezip.io.entry.Entry;
+import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.io.socket.LazyOutputSocket;
 import java.io.IOException;
 import java.io.OutputStream;

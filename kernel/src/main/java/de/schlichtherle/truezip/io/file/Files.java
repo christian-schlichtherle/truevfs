@@ -19,7 +19,7 @@ import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.io.fs.FsManagers;
 import de.schlichtherle.truezip.io.fs.FsPath;
 import de.schlichtherle.truezip.io.fs.archive.ArchiveFileSystemException;
-import de.schlichtherle.truezip.io.entry.Entry;
+import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.io.fs.FsSyncException;
 import de.schlichtherle.truezip.io.InputBusyException;
 import de.schlichtherle.truezip.io.OutputBusyException;

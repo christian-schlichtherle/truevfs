@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.entry;
+package de.schlichtherle.truezip.entry;
 
 import java.beans.*;
 
@@ -24,7 +24,7 @@ import java.beans.*;
 public class EntryNameBeanInfo extends SimpleBeanInfo {
 
     // Bean descriptor//GEN-FIRST:BeanDescriptor
-    private static BeanDescriptor beanDescriptor = new BeanDescriptor  ( de.schlichtherle.truezip.io.entry.EntryName.class , null ); // NOI18N
+    private static BeanDescriptor beanDescriptor = new BeanDescriptor  ( de.schlichtherle.truezip.entry.EntryName.class , null ); // NOI18N
 
     private static BeanDescriptor getBdescriptor(){
         return beanDescriptor;

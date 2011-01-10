@@ -15,11 +15,11 @@
  */
 package de.schlichtherle.truezip.io.fs.archive;
 
-import de.schlichtherle.truezip.io.entry.Entry.Type;
-import de.schlichtherle.truezip.io.entry.EntryContainer;
-import de.schlichtherle.truezip.io.entry.EntryFactory;
-import de.schlichtherle.truezip.io.entry.Entry;
-import de.schlichtherle.truezip.io.entry.Entry.Access;
+import de.schlichtherle.truezip.entry.Entry.Type;
+import de.schlichtherle.truezip.entry.EntryContainer;
+import de.schlichtherle.truezip.entry.EntryFactory;
+import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.entry.Entry.Access;
 import de.schlichtherle.truezip.io.fs.FsEntryName;
 import de.schlichtherle.truezip.io.fs.FsOutputOption;
 import de.schlichtherle.truezip.util.BitField;

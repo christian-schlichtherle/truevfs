@@ -16,8 +16,8 @@
 package de.schlichtherle.truezip.io.fs.archive.driver;
 
 import de.schlichtherle.truezip.io.fs.archive.ArchiveEntry;
-import de.schlichtherle.truezip.io.entry.Entry.Type;
-import de.schlichtherle.truezip.io.entry.EntryFactory;
+import de.schlichtherle.truezip.entry.Entry.Type;
+import de.schlichtherle.truezip.entry.EntryFactory;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.CharConversionException;
 import java.io.IOException;
