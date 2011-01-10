@@ -13,36 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.fs.archive.driver.zip.raes;
+package de.schlichtherle.truezip.io.fs;
 
 import de.schlichtherle.truezip.io.SuffixSet;
-import de.schlichtherle.truezip.io.fs.FsDriver;
-import de.schlichtherle.truezip.io.fs.FsDriverProvider;
-import de.schlichtherle.truezip.io.fs.FsScheme;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A provider for the family of TAR drivers.
+ * A provider for the dummy driver.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class TzpDriverFamily implements FsDriverProvider {
+public final class DummyDriverProvider implements FsDriverProvider {
 
-    private final Map<FsScheme, FsDriver> drivers;
+    private final Map<FsScheme, DummyDriver> drivers;
 
-    public TzpDriverFamily() {
-        final Map<FsScheme, FsDriver> drivers = new HashMap<FsScheme, FsDriver>();
-        FsDriver driver = new SafeZipRaesDriver();
-        for (String suffix : new SuffixSet("tzp|zip.rae|zip.raes"))
+    public DummyDriverProvider(String suffixes) {
+        final Map<FsScheme, DummyDriver> drivers = new HashMap<FsScheme, DummyDriver>();
+        DummyDriver driver = new DummyDriver();
+        for (String suffix : new SuffixSet(suffixes))
             drivers.put(FsScheme.create(suffix), driver);
         this.drivers = Collections.unmodifiableMap(drivers);
     }
 
     @Override
-    public Map<FsScheme, FsDriver> getDrivers() {
+    public Map<FsScheme, DummyDriver> getDrivers() {
         return drivers;
     }
 }

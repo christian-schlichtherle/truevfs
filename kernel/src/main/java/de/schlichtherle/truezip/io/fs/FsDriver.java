@@ -30,8 +30,6 @@ import net.jcip.annotations.ThreadSafe;
 @Immutable
 public interface FsDriver {
 
-    FsDriver ALL = new FsFederatingDriver(FsDriverProvider.ALL);
-
     /**
      * Returns a new thread-safe file system controller for the given mount
      * point and parent file system controller.

@@ -45,8 +45,7 @@ extends FsManager {
 
     @Override
     public FsController<?>
-    getController(  FsMountPoint mountPoint,
-                    FsDriver driver) {
+    getController(FsMountPoint mountPoint, FsFederatingDriver driver) {
         return delegate.getController(mountPoint, driver);
     }
 

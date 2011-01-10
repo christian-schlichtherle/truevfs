@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.fs.archive.driver.tar;
 
+import de.schlichtherle.truezip.io.SuffixSet;
 import de.schlichtherle.truezip.io.fs.FsDriver;
 import de.schlichtherle.truezip.io.fs.FsDriverProvider;
 import de.schlichtherle.truezip.io.fs.FsScheme;
@@ -35,10 +36,12 @@ public final class TarDriverFamily implements FsDriverProvider {
     public TarDriverFamily() {
         final Map<FsScheme, FsDriver> drivers = new HashMap<FsScheme, FsDriver>();
         drivers.put(FsScheme.create("tar"), new TarDriver());
-        drivers.put(FsScheme.create("tgz"), new TarGZipDriver());
-        drivers.put(FsScheme.create("tar.gz"), new TarGZipDriver());
-        drivers.put(FsScheme.create("tbz2"), new TarBZip2Driver());
-        drivers.put(FsScheme.create("tar.bz2"), new TarBZip2Driver());
+        FsDriver driver = new TarGZipDriver();
+        for (String suffix : new SuffixSet("tgz|tar.gz"))
+            drivers.put(FsScheme.create(suffix), driver);
+        driver = new TarBZip2Driver();
+        for (String suffix : new SuffixSet("tbz2|tar.bz2"))
+            drivers.put(FsScheme.create(suffix), driver);
         this.drivers = Collections.unmodifiableMap(drivers);
     }
 

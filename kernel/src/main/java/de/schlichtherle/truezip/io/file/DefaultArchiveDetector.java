@@ -17,8 +17,8 @@ package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.fs.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.SuffixSet;
+import de.schlichtherle.truezip.io.fs.FsClassPathDriverProvider;
 import de.schlichtherle.truezip.io.fs.FsDriver;
-import de.schlichtherle.truezip.io.fs.FsDriverProvider;
 import de.schlichtherle.truezip.io.fs.FsScheme;
 import de.schlichtherle.truezip.util.ServiceLocator;
 import de.schlichtherle.truezip.util.regex.ThreadLocalMatcher;
@@ -69,13 +69,16 @@ import java.util.regex.Matcher;
 public final class DefaultArchiveDetector
 implements ArchiveDetector {
 
-    private final @NonNull Map<FsScheme, ? extends FsDriver> map;
+    private static final ServiceLocator serviceLocator
+            = new ServiceLocator(DefaultArchiveDetector.class.getClassLoader());
+
+    private final @NonNull Map<FsScheme, ? extends FsDriver> drivers;
 
     /**
      * The canonical string respresentation of the set of suffixes recognized
      * by this archive detector.
      * This set is used to filter the registered archive file suffixes in
-     * {@link #map}.
+     * {@link #drivers}.
      */
     private final @NonNull String suffixes;
 
@@ -86,8 +89,8 @@ implements ArchiveDetector {
     private final @NonNull ThreadLocalMatcher matcher;
 
     public DefaultArchiveDetector() {
-        this.map = FsDriverProvider.ALL.getDrivers();
-        final SuffixSet set = getSuffixes(map);
+        this.drivers = FsClassPathDriverProvider.INSTANCE.getDrivers();
+        final SuffixSet set = getSuffixes(drivers);
         this.suffixes = set.toString();
         this.matcher = new ThreadLocalMatcher(set.toPattern());
     }
@@ -112,9 +115,9 @@ implements ArchiveDetector {
      *         configured in the global map.
      */
     public DefaultArchiveDetector(final @NonNull String suffixes) {
-        this.map = FsDriverProvider.ALL.getDrivers();
+        this.drivers = FsClassPathDriverProvider.INSTANCE.getDrivers();
         final SuffixSet set = new SuffixSet(suffixes);
-        final SuffixSet all = getSuffixes(map);
+        final SuffixSet all = getSuffixes(drivers);
         if (set.retainAll(all)) {
             final SuffixSet unknown = new SuffixSet(suffixes);
             unknown.removeAll(all);
@@ -230,25 +233,26 @@ implements ArchiveDetector {
     public DefaultArchiveDetector(
             final @NonNull DefaultArchiveDetector delegate,
             final @NonNull Map<String, Object> config) {
-        final Map<FsScheme, FsDriver> map
-                = new HashMap<FsScheme, FsDriver>(delegate.map);
+        final Map<FsScheme, FsDriver> drivers
+                = new HashMap<FsScheme, FsDriver>(delegate.drivers);
         final SuffixSet set = new SuffixSet(delegate.suffixes);
         for (final Map.Entry<String, Object> entry : config.entrySet()) {
             final SuffixSet keySet = new SuffixSet(entry.getKey());
             if (keySet.isEmpty())
                 throw new IllegalArgumentException("No archive file suffixes!");
             for (final String suffix : keySet) {
+                final FsScheme scheme = FsScheme.create(suffix);
                 final FsDriver driver = newDriver(entry.getValue());
                 if (null != driver) {
                     set.add(suffix);
-                    map.put(FsScheme.create(suffix), driver);
+                    drivers.put(scheme, driver);
                 } else {
                     set.remove(suffix);
-                    map.remove(FsScheme.create(suffix));
+                    drivers.remove(scheme);
                 }
             }
         }
-        this.map = Collections.unmodifiableMap(map);
+        this.drivers = Collections.unmodifiableMap(drivers);
         this.suffixes = set.toString();
         this.matcher = new ThreadLocalMatcher(set.toPattern());
     }
@@ -257,14 +261,18 @@ implements ArchiveDetector {
     private static @CheckForNull FsDriver newDriver(@CheckForNull Object driver) {
         try {
             if (driver instanceof String)
-                driver = new ServiceLocator(DefaultArchiveDetector.class.getClassLoader())
-                        .getClass((String) driver);
+                driver = serviceLocator.getClass((String) driver);
             if (driver instanceof Class<?>)
                 driver = ((Class<? extends FsDriver>) driver).newInstance();
             return (FsDriver) driver; // may throw ClassCastException
         } catch (Exception ex) {
             throw new IllegalArgumentException(ex); // NOI18N
         }
+    }
+
+    @Override
+    public Map<FsScheme, ? extends FsDriver> getDrivers() {
+        return drivers;
     }
 
     @Override
@@ -279,7 +287,7 @@ implements ArchiveDetector {
     public FsDriver getDriver(FsScheme type) {
         if (null == type)
             throw new NullPointerException();
-        return map.get(type);
+        return drivers.get(type);
     }
 
     /**

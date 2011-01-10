@@ -27,9 +27,9 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-final class FsClassPathDriverProvider implements FsDriverProvider {
+public final class FsClassPathDriverProvider implements FsDriverProvider {
 
-    static final FsClassPathDriverProvider INSTANCE
+    public static final FsClassPathDriverProvider INSTANCE
             = new FsClassPathDriverProvider();
 
     private final Map<FsScheme, FsDriver> drivers;
