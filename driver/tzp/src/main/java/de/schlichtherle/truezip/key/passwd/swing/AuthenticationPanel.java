@@ -103,7 +103,7 @@ public class AuthenticationPanel extends JPanel {
 
     private void setKeyFilePath(final String path) {
         final String oldPath = (String) keyFile.getSelectedItem();
-        if (path == oldPath || path != null && path.equals(oldPath))
+        if (null != path && path.equals(oldPath))
             return;
 
         keyFile.setSelectedItem(path);

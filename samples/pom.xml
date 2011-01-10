@@ -28,8 +28,14 @@
     <description>TrueZIP sample applications. Some of them use advanced/exotic features.</description>
 
     <dependencies>
-        <!-- Any TrueZIP application has a compile time dependency on the
-             kernel. -->
+        <!-- A TrueZIP application typically has a compile time dependency on
+             either only the File* API or only the Kernel API.
+             However, the sample applications use both APIs. -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truezip-file</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truezip-kernel</artifactId>
@@ -45,33 +51,27 @@
 
         <!-- A TrueZIP application typically has a run time dependency on one
              or more archive drivers.
-             When found on the class path, an archive driver is automatically
-             registered for use by the File* API. -->
+             When found on the class path at run time, an archive driver is
+             automatically registered for use by the File* or Kernel APIs.
+             However, the sample applications have a compile time dependency
+             because they configure some drivers directly.
+             -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truezip-driver-tar</artifactId>
             <version>${project.version}</version>
-            <!-- Note that TrueZIP applications would typically only have a
-                 run time dependency.
-                 However, these sample applications differ. -->
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truezip-driver-tzp</artifactId>
             <version>${project.version}</version>
-            <!-- Note that TrueZIP applications would typically only have a
-                 run time dependency.
-                 However, these sample applications differ. -->
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truezip-driver-zip</artifactId>
             <version>${project.version}</version>
-            <!-- Note that TrueZIP applications would typically only have a
-                 run time dependency.
-                 However, these sample applications differ. -->
             <scope>compile</scope>
         </dependency>
     </dependencies>

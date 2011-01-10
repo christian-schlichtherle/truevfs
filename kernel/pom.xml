@@ -25,5 +25,5 @@
 
     <artifactId>truezip-kernel</artifactId>
     <name>TrueZIP Kernel</name>
-    <description>The TrueZIP kernel. Any TrueZIP application needs this artifact in its compile time class path.</description>
+    <description>The TrueZIP kernel.</description>
 </project>

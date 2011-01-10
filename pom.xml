@@ -20,7 +20,7 @@
     <parent>
         <groupId>de.schlichtherle</groupId>
         <artifactId>asl20-oss-parent</artifactId>
-        <version>4</version>
+        <version>5</version>
     </parent>
 
     <groupId>de.schlichtherle.truezip</groupId>
@@ -56,10 +56,10 @@
 
     <modules>
         <module>driver</module>
+        <module>file</module>
         <module>kernel</module>
         <module>samples</module>
         <module>swing</module>
-        <module>tck</module>
     </modules>
 
     <dependencies>
@@ -78,15 +78,22 @@
     </dependencies>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>test-jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
         <plugins>
-            <plugin>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <links>
-                        <link>http://www.bouncycastle.org/docs/docs1.5/</link>
-                    </links>
-                </configuration>
-            </plugin>
             <plugin>
                 <artifactId>maven-site-plugin</artifactId>
                 <configuration>
@@ -125,9 +132,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <properties>
-        <compiler.source>1.6</compiler.source>
-        <compiler.target>1.6</compiler.target>
-    </properties>
 </project>
