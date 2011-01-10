@@ -19,13 +19,14 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Map;
 
 /**
- * A file system driver which uses a file system driver provider to lookup the
- * appropriate driver for a given mount point scheme.
+ * A federating file system driver is a composite of a file system driver and
+ * a file system driver provider which uses its map of file system drivers to
+ * lookup the appropriate driver for the scheme of a given mount point.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class FsFederatingDriver implements FsDriver {
+public class FsFederatingDriver implements FsDriver, FsDriverProvider {
 
     public static final FsFederatingDriver ALL
             = new FsFederatingDriver(FsClassPathDriverProvider.INSTANCE);
@@ -62,5 +63,10 @@ public class FsFederatingDriver implements FsDriver {
                 ? null == parent
                 : mountPoint.getParent().equals(parent.getModel().getMountPoint());
         return drivers.get(mountPoint.getScheme()).newController(mountPoint, parent);
+    }
+
+    @Override
+    public Map<FsScheme, ? extends FsDriver> getDrivers() {
+        return drivers;
     }
 }
