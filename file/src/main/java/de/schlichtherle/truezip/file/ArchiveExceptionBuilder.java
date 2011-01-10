@@ -17,8 +17,8 @@
 package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.io.ChainableIOException;
-import de.schlichtherle.truezip.io.fs.FsSyncException;
-import de.schlichtherle.truezip.io.fs.FsSyncWarningException;
+import de.schlichtherle.truezip.fs.FsSyncException;
+import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import de.schlichtherle.truezip.util.AbstractExceptionBuilder;
 import java.io.IOException;
 

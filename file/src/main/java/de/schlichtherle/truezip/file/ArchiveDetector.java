@@ -16,8 +16,8 @@
 
 package de.schlichtherle.truezip.file;
 
-import de.schlichtherle.truezip.io.fs.FsDriverProvider;
-import de.schlichtherle.truezip.io.fs.FsScheme;
+import de.schlichtherle.truezip.fs.FsDriverProvider;
+import de.schlichtherle.truezip.fs.FsScheme;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.Immutable;

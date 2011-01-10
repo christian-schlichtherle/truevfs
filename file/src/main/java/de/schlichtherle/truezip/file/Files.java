@@ -16,20 +16,20 @@
 package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.io.Paths;
-import de.schlichtherle.truezip.io.fs.FsManagers;
-import de.schlichtherle.truezip.io.fs.FsPath;
+import de.schlichtherle.truezip.fs.FsManagers;
+import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.io.fs.FsFederatingDriver;
-import de.schlichtherle.truezip.io.fs.FsInputOption;
+import de.schlichtherle.truezip.fs.FsFederatingDriver;
+import de.schlichtherle.truezip.fs.FsInputOption;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.IOSocket;
-import de.schlichtherle.truezip.io.fs.FsOutputOption;
+import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.IOException;
 import java.util.Arrays;
 
-import static de.schlichtherle.truezip.io.fs.FsOutputOption.*;
+import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 
 /**
  * Provides static utility methods for {@link File}s.
