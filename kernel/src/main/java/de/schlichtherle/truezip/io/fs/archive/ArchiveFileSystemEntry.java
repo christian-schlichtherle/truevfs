@@ -23,7 +23,7 @@ import de.schlichtherle.truezip.io.fs.FsEntry;
 import de.schlichtherle.truezip.io.fs.FsEntryName;
 import edu.umd.cs.findbugs.annotations.NonNull;
 
-import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
+import static de.schlichtherle.truezip.entry.Entry.Type.*;
 
 /**
  * Adapts an {@link ArchiveEntry} to a {@link FsEntry}.

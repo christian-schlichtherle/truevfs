@@ -17,7 +17,7 @@ package de.schlichtherle.truezip.io.fs.archive.driver.zip.raes;
 
 import de.schlichtherle.truezip.io.fs.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.fs.archive.ArchiveFileSystemEntry;
-import de.schlichtherle.truezip.io.entry.Entry;
+import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.io.fs.FsDecoratingController;
 import de.schlichtherle.truezip.io.fs.FsController;
 import de.schlichtherle.truezip.io.fs.FsEntry;
@@ -29,7 +29,7 @@ import java.io.CharConversionException;
 import java.io.IOException;
 import net.jcip.annotations.ThreadSafe;
 
-import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
+import static de.schlichtherle.truezip.entry.Entry.Type.*;
 import static de.schlichtherle.truezip.io.fs.FsEntryName.*;
 
 /**

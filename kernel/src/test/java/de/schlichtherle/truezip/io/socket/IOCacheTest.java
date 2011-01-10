@@ -1,9 +1,9 @@
 package de.schlichtherle.truezip.io.socket;
 
 import de.schlichtherle.truezip.io.socket.IOCache.Strategy;
-import de.schlichtherle.truezip.io.entry.Entry.Access;
-import de.schlichtherle.truezip.io.entry.Entry.Size;
-import de.schlichtherle.truezip.io.entry.Entry.Type;
+import de.schlichtherle.truezip.entry.Entry.Access;
+import de.schlichtherle.truezip.entry.Entry.Size;
+import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -15,8 +15,8 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
-import static de.schlichtherle.truezip.io.entry.Entry.Size.*;
-import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
+import static de.schlichtherle.truezip.entry.Entry.Size.*;
+import static de.schlichtherle.truezip.entry.Entry.Type.*;
 import static de.schlichtherle.truezip.io.socket.IOCache.Strategy.*;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;

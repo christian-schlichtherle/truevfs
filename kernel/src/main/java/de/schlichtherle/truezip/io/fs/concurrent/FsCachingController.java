@@ -17,8 +17,8 @@ package de.schlichtherle.truezip.io.fs.concurrent;
 
 import de.schlichtherle.truezip.io.socket.IOCache.Strategy;
 import de.schlichtherle.truezip.io.fs.FsEntry;
-import de.schlichtherle.truezip.io.entry.Entry.Type;
-import de.schlichtherle.truezip.io.entry.Entry;
+import de.schlichtherle.truezip.entry.Entry.Type;
+import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.io.fs.FsDecoratingController;
 import de.schlichtherle.truezip.io.fs.FsDecoratingEntry;
 import de.schlichtherle.truezip.io.fs.FsFalsePositiveException;
@@ -49,7 +49,7 @@ import java.util.Map;
 import java.util.Set;
 import net.jcip.annotations.NotThreadSafe;
 
-import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
+import static de.schlichtherle.truezip.entry.Entry.Type.*;
 import static de.schlichtherle.truezip.io.socket.IOCache.Strategy.*;
 import static de.schlichtherle.truezip.io.fs.FsOutputOption.*;
 import static de.schlichtherle.truezip.io.fs.FsSyncOption.*;

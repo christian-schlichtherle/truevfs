@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.io.fs;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
-import de.schlichtherle.truezip.io.entry.EntryName;
+import de.schlichtherle.truezip.entry.EntryName;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URI;

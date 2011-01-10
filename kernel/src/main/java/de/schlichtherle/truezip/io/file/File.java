@@ -62,8 +62,8 @@ import static de.schlichtherle.truezip.io.fs.FsEntry.*;
 import static de.schlichtherle.truezip.io.fs.FsEntryName.*;
 import static de.schlichtherle.truezip.io.fs.FsSyncOption.*;
 import static de.schlichtherle.truezip.io.fs.FsUriModifier.*;
-import static de.schlichtherle.truezip.io.entry.Entry.Size.*;
-import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
+import static de.schlichtherle.truezip.entry.Entry.Size.*;
+import static de.schlichtherle.truezip.entry.Entry.Type.*;
 import static de.schlichtherle.truezip.io.file.Files.*;
 import static de.schlichtherle.truezip.io.fs.FsOutputOption.*;
 

@@ -22,7 +22,7 @@ import de.schlichtherle.truezip.io.fs.concurrent.FsConcurrentModel;
 import de.schlichtherle.truezip.io.fs.archive.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.socket.InputShop;
-import de.schlichtherle.truezip.io.entry.EntryFactory;
+import de.schlichtherle.truezip.entry.EntryFactory;
 import de.schlichtherle.truezip.io.fs.FsController;
 import de.schlichtherle.truezip.io.fs.FsDriver;
 import de.schlichtherle.truezip.io.fs.FsMountPoint;

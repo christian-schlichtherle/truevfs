@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.io.socket;
 
 import de.schlichtherle.truezip.io.DecoratingInputStream;
-import de.schlichtherle.truezip.io.entry.Entry;
+import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.io.InputBusyException;
 import de.schlichtherle.truezip.io.SynchronizedInputStream;
 import de.schlichtherle.truezip.io.rof.DecoratingReadOnlyFile;

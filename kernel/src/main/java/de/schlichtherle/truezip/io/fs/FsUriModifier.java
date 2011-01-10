@@ -20,7 +20,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import net.jcip.annotations.Immutable;
 
-import static de.schlichtherle.truezip.io.entry.EntryName.*;
+import static de.schlichtherle.truezip.entry.EntryName.*;
 
 /**
  * Modifies a URI when parsing an {@link FsPath}, an {@link FsMountPoint} or an

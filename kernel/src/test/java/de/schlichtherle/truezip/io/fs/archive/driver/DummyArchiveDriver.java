@@ -17,8 +17,8 @@ package de.schlichtherle.truezip.io.fs.archive.driver;
 
 import de.schlichtherle.truezip.io.fs.archive.ArchiveEntry;
 import de.schlichtherle.truezip.io.fs.archive.DummyArchiveEntry;
-import de.schlichtherle.truezip.io.entry.Entry;
-import de.schlichtherle.truezip.io.entry.Entry.Type;
+import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.io.fs.concurrent.FsConcurrentModel;
 import de.schlichtherle.truezip.io.socket.InputShop;
 import de.schlichtherle.truezip.io.socket.InputSocket;

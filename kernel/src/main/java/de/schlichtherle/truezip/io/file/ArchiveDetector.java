@@ -17,7 +17,6 @@
 package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.fs.FsDriverProvider;
-import de.schlichtherle.truezip.io.fs.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.fs.FsScheme;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -31,7 +30,8 @@ import net.jcip.annotations.Immutable;
  * An archive file which has been recognized by an {@code ArchiveDetector} is
  * said to be a <i>prospective archive file</i>.
  * On the first read or write access to a prospective archive file, TrueZIP
- * checks its <i>true state</i> in cooperation with the {@link ArchiveDriver}.
+ * checks its <i>true state</i> in cooperation with the respective archive
+ * driver .
  * If the true state of the file turns out to be actually a directory or not
  * to be compatible to the archive file format, it's said to be a <i>false
  * positive</i> archive file.
