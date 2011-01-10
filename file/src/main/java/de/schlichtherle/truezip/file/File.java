@@ -36,7 +36,6 @@ import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.FileFilter;
-import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -620,8 +619,8 @@ public final class File extends java.io.File {
     }
 
     @SuppressWarnings("LeakingThisInConstructor")
-    private File(   final @NonNull FsPath path,
-                    final @NonNull ArchiveDetector detector) {
+    private File(   @NonNull FsPath path,
+                    @NonNull ArchiveDetector detector) {
         super(path.hierarchicalize().getUri());
         parse(path, detector);
     }
