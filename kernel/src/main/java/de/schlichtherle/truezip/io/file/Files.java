@@ -24,6 +24,7 @@ import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.fs.FsSyncException;
 import de.schlichtherle.truezip.io.InputBusyException;
 import de.schlichtherle.truezip.io.OutputBusyException;
+import de.schlichtherle.truezip.io.fs.FsFederatingDriver;
 import de.schlichtherle.truezip.io.fs.FsInputOption;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.IOSocket;
@@ -250,8 +251,8 @@ class Files {
         final FsPath path = FsPath.create(getRealFile(src));
         return FsManagers
                 .getInstance()
-                .getController( path.getMountPoint(), ArchiveDetectorFsDriver.ALL)
-                .getInputSocket(path.getEntryName(), options);
+                .getController( path.getMountPoint(), FsFederatingDriver.ALL)
+                .getInputSocket(path.getEntryName(),  options);
     }
 
     static OutputSocket<?> getOutputSocket(
@@ -270,8 +271,8 @@ class Files {
         final FsPath path = FsPath.create(getRealFile(dst));
         return FsManagers
                 .getInstance()
-                .getController(  path.getMountPoint(), ArchiveDetectorFsDriver.ALL)
-                .getOutputSocket(path.getEntryName(), options, template);
+                .getController(  path.getMountPoint(), FsFederatingDriver.ALL)
+                .getOutputSocket(path.getEntryName(),  options, template);
     }
 
     /**

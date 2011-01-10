@@ -50,7 +50,7 @@ implements Iterable<FsController<?>> {
      */
     public abstract @NonNull FsController<?>
     getController(  @NonNull FsMountPoint mountPoint,
-                    @NonNull FsDriver driver);
+                    @NonNull FsFederatingDriver driver);
 
     /**
      * Returns the number of federated file systems managed by this instance.

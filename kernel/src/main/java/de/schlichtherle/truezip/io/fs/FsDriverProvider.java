@@ -29,7 +29,7 @@ import net.jcip.annotations.Immutable;
 @Immutable
 public interface FsDriverProvider {
 
-    FsDriverProvider ALL = FsClassPathDriverProvider.INSTANCE;
+    //FsDriverProvider ALL = FsClassPathDriverProvider.INSTANCE;
 
     /**
      * Returns an immutable map of the supported file system drivers.

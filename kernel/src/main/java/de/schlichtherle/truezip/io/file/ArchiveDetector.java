@@ -17,6 +17,7 @@
 package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.fs.FsDriver;
+import de.schlichtherle.truezip.io.fs.FsDriverProvider;
 import de.schlichtherle.truezip.io.fs.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.fs.FsScheme;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -54,7 +55,7 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-public interface ArchiveDetector {
+public interface ArchiveDetector extends FsDriverProvider {
 
     /**
      * Never recognizes archive files in a path.

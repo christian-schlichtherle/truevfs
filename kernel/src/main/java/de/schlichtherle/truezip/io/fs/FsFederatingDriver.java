@@ -15,21 +15,47 @@
  */
 package de.schlichtherle.truezip.io.fs;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Map;
-import net.jcip.annotations.Immutable;
 
 /**
+ * A file system driver which uses a file system driver provider to lookup the
+ * appropriate driver for a given mount point scheme.
+ *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-final class FsFederatingDriver implements FsDriver {
+public class FsFederatingDriver implements FsDriver {
+
+    public static final FsFederatingDriver ALL
+            = new FsFederatingDriver(FsClassPathDriverProvider.INSTANCE);
 
     private final Map<FsScheme, ? extends FsDriver> drivers;
 
-    FsFederatingDriver(final FsDriverProvider provider) {
-        this.drivers = provider.getDrivers();
+    /** Will query the given provider for drivers. */
+    public FsFederatingDriver(final @NonNull FsDriverProvider provider) {
+        this.drivers = provider.getDrivers(); // immutable map!
+        if (null == drivers)
+            throw new NullPointerException("broken interface contract!");
     }
 
+    /** Copy constructor. */
+    protected FsFederatingDriver(final @NonNull FsFederatingDriver original) {
+        this.drivers = original.drivers; // immutable map!
+        assert null != drivers;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The implementation in the class {@link FsFederatingDriver} queries the
+     * {@link FsDriverProvider} provided to its constructor for the appropriate
+     * file system driver for the request by using the scheme of the given
+     * mount point.
+     *
+     * @throws NullPointerException if no appropriate driver is found for the
+     *         scheme of the given mount point.
+     */
     @Override
     public FsController<?>
     newController(FsMountPoint mountPoint, FsController<?> parent) {

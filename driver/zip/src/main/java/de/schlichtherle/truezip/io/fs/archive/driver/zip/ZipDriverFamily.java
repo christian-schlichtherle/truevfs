@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.fs.archive.driver.zip;
 
+import de.schlichtherle.truezip.io.SuffixSet;
 import de.schlichtherle.truezip.io.fs.FsDriver;
 import de.schlichtherle.truezip.io.fs.FsDriverProvider;
 import de.schlichtherle.truezip.io.fs.FsScheme;
@@ -35,21 +36,12 @@ public final class ZipDriverFamily implements FsDriverProvider {
     public ZipDriverFamily() {
         final Map<FsScheme, FsDriver> drivers = new HashMap<FsScheme, FsDriver>();
         drivers.put(FsScheme.create("zip"), new ZipDriver());
-        drivers.put(FsScheme.create("ear"), new JarDriver());
-        drivers.put(FsScheme.create("jar"), new JarDriver());
-        drivers.put(FsScheme.create("war"), new JarDriver());
-        drivers.put(FsScheme.create("odg"), new OdfDriver());
-        drivers.put(FsScheme.create("odp"), new OdfDriver());
-        drivers.put(FsScheme.create("ods"), new OdfDriver());
-        drivers.put(FsScheme.create("odt"), new OdfDriver());
-        drivers.put(FsScheme.create("otg"), new OdfDriver());
-        drivers.put(FsScheme.create("otp"), new OdfDriver());
-        drivers.put(FsScheme.create("ots"), new OdfDriver());
-        drivers.put(FsScheme.create("ott"), new OdfDriver());
-        drivers.put(FsScheme.create("odb"), new OdfDriver());
-        drivers.put(FsScheme.create("odf"), new OdfDriver());
-        drivers.put(FsScheme.create("odm"), new OdfDriver());
-        drivers.put(FsScheme.create("oth"), new OdfDriver());
+        FsDriver driver = new JarDriver();
+        for (String suffix : new SuffixSet("ear|jar|war"))
+            drivers.put(FsScheme.create(suffix), driver);
+        driver = new OdfDriver();
+        for (String suffix : new SuffixSet("odg|odp|ods|odt|otg|otp|ots|ott|odb|odf|odm|oth"))
+            drivers.put(FsScheme.create(suffix), driver);
         drivers.put(FsScheme.create("exe"), new ReadOnlySfxDriver());
         this.drivers = Collections.unmodifiableMap(drivers);
     }

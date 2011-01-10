@@ -61,7 +61,7 @@ public final class FsFederatingManager extends FsManager {
     @Override
     @NonNull public synchronized FsController<?>
     getController(  @NonNull FsMountPoint mountPoint,
-                    @NonNull FsDriver driver) {
+                    @NonNull FsFederatingDriver driver) {
         return getController(mountPoint, null, driver);
     }
 

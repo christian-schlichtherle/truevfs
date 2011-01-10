@@ -26,10 +26,10 @@ import de.schlichtherle.truezip.io.fs.FsPath;
 import de.schlichtherle.truezip.io.fs.FsMountPoint;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.fs.FsEntry;
+import de.schlichtherle.truezip.io.fs.FsFederatingDriver;
 import de.schlichtherle.truezip.io.fs.FsFilteringManager;
 import de.schlichtherle.truezip.io.fs.FsSyncExceptionBuilder;
 import de.schlichtherle.truezip.io.fs.FsSyncOption;
-import de.schlichtherle.truezip.io.fs.FsUriModifier;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -612,24 +612,24 @@ public final class File extends java.io.File {
      */
     public File(URI uri) {
         this(   FsPath.create(uri, CANONICALIZE),
-                new ArchiveDetectorFsDriver(defaultDetector));
+                defaultDetector);
     }
 
     public File(final @NonNull FsPath path) {
-        this(path, new ArchiveDetectorFsDriver(defaultDetector));
+        this(path, defaultDetector);
     }
 
     @SuppressWarnings("LeakingThisInConstructor")
     private File(   final @NonNull FsPath path,
-                    final @NonNull ArchiveDetectorFsDriver driver) {
+                    final @NonNull ArchiveDetector detector) {
         super(path.hierarchicalize().getUri());
-        parse(path, driver);
+        parse(path, detector);
     }
 
     private void parse( final @NonNull FsPath path,
-                        final @NonNull ArchiveDetectorFsDriver driver) {
+                        final @NonNull ArchiveDetector detector) {
         this.delegate = new java.io.File(super.getPath());
-        this.detector = driver.getDetector();
+        this.detector = detector;
 
         final FsMountPoint mountPoint = path.getMountPoint();
         final FsPath mountPointPath = mountPoint.getPath();
@@ -645,7 +645,7 @@ public final class File extends java.io.File {
             assert path.getUri().isOpaque();
             if (mountPointPath.getUri().isOpaque()) {
                 this.enclArchive
-                        = new File(mountPointPath.getMountPoint(), driver);
+                        = new File(mountPointPath.getMountPoint(), detector);
                 this.enclEntryName = mountPointPath.getEntryName();
             } else {
                 this.enclArchive = null;
@@ -654,10 +654,10 @@ public final class File extends java.io.File {
             this.innerArchive = this;
             this.controller = FsManagers
                     .getInstance()
-                    .getController(mountPoint, driver);
+                    .getController(mountPoint, new FsFederatingDriver(detector));
         } else {
             assert path.getUri().isOpaque();
-            this.enclArchive = new File(mountPoint, driver);
+            this.enclArchive = new File(mountPoint, detector);
             this.enclEntryName = entryName;
             this.innerArchive = this.enclArchive;
             this.controller = null;
@@ -668,11 +668,11 @@ public final class File extends java.io.File {
 
     @SuppressWarnings("LeakingThisInConstructor")
     private File(   final @NonNull FsMountPoint mountPoint,
-                    final @NonNull ArchiveDetectorFsDriver driver) {
+                    final @NonNull ArchiveDetector detector) {
         super(mountPoint.hierarchicalize().getUri());
 
         this.delegate = new java.io.File(super.getPath());
-        this.detector = driver.getDetector();
+        this.detector = detector;
 
         final FsPath mountPointPath = mountPoint.getPath();
 
@@ -686,7 +686,7 @@ public final class File extends java.io.File {
             assert mountPoint.getUri().isOpaque();
             if (mountPointPath.getUri().isOpaque()) {
                 this.enclArchive
-                        = new File(mountPointPath.getMountPoint(), driver);
+                        = new File(mountPointPath.getMountPoint(), detector);
                 this.enclEntryName = mountPointPath.getEntryName();
             } else {
                 this.enclArchive = null;
@@ -695,7 +695,7 @@ public final class File extends java.io.File {
             this.innerArchive = this;
             this.controller = FsManagers
                     .getInstance()
-                    .getController(mountPoint, driver);
+                    .getController(mountPoint, new FsFederatingDriver(detector));
         }
 
         assert invariants();
@@ -896,7 +896,7 @@ public final class File extends java.io.File {
         }
         this.controller = FsManagers
                 .getInstance()
-                .getController(mountPoint, new ArchiveDetectorFsDriver(detector));
+                .getController(mountPoint, new FsFederatingDriver(detector));
     }
 
     private Object writeReplace() throws ObjectStreamException {
@@ -911,7 +911,7 @@ public final class File extends java.io.File {
     private void readObject(ObjectInputStream in)
     throws IOException, ClassNotFoundException {
         parse(  FsPath.create((URI) in.readObject(), CANONICALIZE),
-                new ArchiveDetectorFsDriver(defaultDetector));
+                defaultDetector);
     }
 
     /**

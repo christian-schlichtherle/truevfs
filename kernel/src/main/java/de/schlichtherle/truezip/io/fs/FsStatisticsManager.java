@@ -45,27 +45,30 @@ extends FsDecoratingManager<FsManager> {
     }
 
     @Override
-    public FsController<?> getController(
-            final FsMountPoint mountPoint,
-            final FsDriver driver) {
-
-        class StatisticsDriver implements FsDriver {
-            @Override
-            public FsController<?>
-            newController(FsMountPoint mountPoint, FsController<?> parent) {
-                assert null == mountPoint.getParent()
-                        ? null == parent
-                        : mountPoint.getParent().equals(parent.getModel().getMountPoint());
-                final FsController<?> controller
-                        = driver.newController(mountPoint, parent);
-                return null != parent && null == parent.getParent() // controller is top level federated file system?
-                        ? new FsStatisticsController(controller, FsStatisticsManager.this)
-                        : controller;
-            }
-        } // class Driver
-
-        return delegate.getController(mountPoint, new StatisticsDriver());
+    public FsController<?> getController(   FsMountPoint mountPoint,
+                                            FsFederatingDriver driver) {
+        return delegate.getController(mountPoint, new StatisticsDriver(driver));
     }
+    
+    private class StatisticsDriver extends FsFederatingDriver {
+        StatisticsDriver(FsFederatingDriver driver) {
+            super(driver);
+        }
+
+        @Override
+        public FsController<?>
+        newController(FsMountPoint mountPoint, FsController<?> parent) {
+            assert null == mountPoint.getParent()
+                    ? null == parent
+                    : mountPoint.getParent().equals(parent.getModel().getMountPoint());
+            final FsController<?> controller
+                    = super.newController(mountPoint, parent);
+            return null != parent && null == parent.getParent() // controller is top level federated file system?
+                    ? new FsStatisticsController(   controller,
+                                                    FsStatisticsManager.this)
+                    : controller;
+        }
+    } // class StatisticsDriver
 
     /**
      * Returns statistics about the set of federated file systems managed by
