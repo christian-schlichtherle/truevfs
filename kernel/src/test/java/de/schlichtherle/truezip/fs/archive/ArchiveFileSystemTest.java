@@ -15,11 +15,6 @@
  */
 package de.schlichtherle.truezip.fs.archive;
 
-import de.schlichtherle.truezip.fs.archive.ArchiveEntry;
-import de.schlichtherle.truezip.fs.archive.ArchiveFileSystemEvent;
-import de.schlichtherle.truezip.fs.archive.ArchiveFileSystemTouchListener;
-import de.schlichtherle.truezip.fs.archive.ArchiveFileSystem;
-import de.schlichtherle.truezip.fs.archive.driver.DummyArchiveDriver;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.*;

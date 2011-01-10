@@ -16,10 +16,10 @@
 package de.schlichtherle.truezip.zip;
 
 import de.schlichtherle.truezip.zip.ZipTestCase;
-import de.schlichtherle.truezip.crypto.io.raes.RaesOutputStream;
-import de.schlichtherle.truezip.crypto.io.raes.RaesParameters;
-import de.schlichtherle.truezip.crypto.io.raes.Type0RaesParameters;
-import de.schlichtherle.truezip.crypto.io.raes.RaesReadOnlyFile;
+import de.schlichtherle.truezip.crypto.raes.RaesOutputStream;
+import de.schlichtherle.truezip.crypto.raes.RaesParameters;
+import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters;
+import de.schlichtherle.truezip.crypto.raes.RaesReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.zip.ZipFile;
 import de.schlichtherle.truezip.zip.ZipOutputStream;

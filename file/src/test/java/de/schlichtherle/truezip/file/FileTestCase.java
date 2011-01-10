@@ -26,7 +26,7 @@ import de.schlichtherle.truezip.file.DefaultArchiveDetector;
 import de.schlichtherle.truezip.file.File;
 import de.schlichtherle.truezip.file.FileInputStream;
 import de.schlichtherle.truezip.file.FileOutputStream;
-import de.schlichtherle.truezip.fs.archive.driver.ArchiveDriver;
+import de.schlichtherle.truezip.fs.archive.ArchiveDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.socket.OutputClosedException;
 import edu.umd.cs.findbugs.annotations.NonNull;

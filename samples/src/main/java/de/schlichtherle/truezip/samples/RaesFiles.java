@@ -16,10 +16,10 @@
 
 package de.schlichtherle.truezip.samples;
 
-import de.schlichtherle.truezip.crypto.io.raes.KeyManagerRaesParameters;
-import de.schlichtherle.truezip.crypto.io.raes.RaesOutputStream;
-import de.schlichtherle.truezip.crypto.io.raes.RaesParameters;
-import de.schlichtherle.truezip.crypto.io.raes.RaesReadOnlyFile;
+import de.schlichtherle.truezip.crypto.raes.KeyManagerRaesParameters;
+import de.schlichtherle.truezip.crypto.raes.RaesOutputStream;
+import de.schlichtherle.truezip.crypto.raes.RaesParameters;
+import de.schlichtherle.truezip.crypto.raes.RaesReadOnlyFile;
 import de.schlichtherle.truezip.file.ArchiveDetector;
 import de.schlichtherle.truezip.file.File;
 import de.schlichtherle.truezip.file.FileInputStream;
