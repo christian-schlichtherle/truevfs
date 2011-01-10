@@ -33,7 +33,7 @@ import javax.swing.Icon;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-abstract class DecoratorFileView extends FileView {
+abstract class DecoratingFileView extends FileView {
 
     /** The nullable decorated file view. */
     @Nullable
@@ -44,7 +44,7 @@ abstract class DecoratorFileView extends FileView {
      *
      * @param delegate The file view to be decorated - may be {@code null}.
      */
-    protected DecoratorFileView(final FileView delegate) {
+    protected DecoratingFileView(final FileView delegate) {
         this.delegate = delegate;
     }
 

@@ -37,7 +37,7 @@ import javax.swing.UIManager;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class FileView extends DecoratorFileView {
+final class FileView extends DecoratingFileView {
 
     private static final String CLASS_NAME = FileView.class.getName();
     private static final ResourceBundle resources
