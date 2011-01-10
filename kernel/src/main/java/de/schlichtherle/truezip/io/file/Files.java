@@ -16,7 +16,6 @@
 package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.Paths;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import de.schlichtherle.truezip.io.fs.FsManagers;
 import de.schlichtherle.truezip.io.fs.FsPath;
 import de.schlichtherle.truezip.io.fs.archive.ArchiveFileSystemException;
@@ -248,7 +247,7 @@ class Files {
                 return archive.getController()
                         .getInputSocket(file.getInnerEntryName0(), options);
         }
-        final FsPath path = FsPath.create(getRealFile(src));
+        final FsPath path = new FsPath(src);
         return FsManagers
                 .getInstance()
                 .getController( path.getMountPoint(), FsFederatingDriver.ALL)
@@ -268,7 +267,7 @@ class Files {
                 return archive.getController()
                         .getOutputSocket(file.getInnerEntryName0(), options, template);
         }
-        final FsPath path = FsPath.create(getRealFile(dst));
+        final FsPath path = new FsPath(dst);
         return FsManagers
                 .getInstance()
                 .getController(  path.getMountPoint(), FsFederatingDriver.ALL)
@@ -321,35 +320,8 @@ class Files {
      * @throws NullPointerException If any parameter is {@code null}.
      */
     static boolean contains(java.io.File a, java.io.File b) {
-        return Paths.contains(  getRealPath(a),
-                                getRealPath(b),
+        return Paths.contains(  a.getAbsolutePath(),
+                                b.getAbsolutePath(),
                                 File.separatorChar);
-    }
-
-    /**
-     * Returns the canonical path of the given file or the normalized absolute
-     * path if canonicalizing the path fails due to an {@code IOException}.
-     *
-     * @param  file the file.
-     * @return The canonical or absolute path of this file as a
-     *         {@code File} instance.
-     */
-    static @NonNull java.io.File getRealFile(@NonNull java.io.File file) {
-        String p = getRealPath(file);
-        return p.equals(file.getPath()) ? file : newFile(p, file);
-    }
-
-    static @NonNull String getRealPath(@NonNull java.io.File file) {
-        try {
-            return file.getCanonicalPath();
-        } catch (IOException ex) {
-            return Paths.normalize(file.getAbsolutePath(), File.separatorChar);
-        }
-    }
-
-    private static java.io.File newFile(String path, java.io.File template) {
-        return template instanceof File
-                ? new File(path, ((File) template).getArchiveDetector())
-                : new java.io.File(path);
     }
 }

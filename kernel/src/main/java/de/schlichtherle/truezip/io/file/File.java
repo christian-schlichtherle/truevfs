@@ -875,8 +875,8 @@ public final class File extends java.io.File {
     }
 
     private void initController() {
-        final java.io.File target = getRealFile(delegate);
-        final FsScheme scheme = detector.getScheme(target.getPath());
+        final FsScheme scheme = detector.getScheme(
+                Paths.normalize(delegate.getPath(), separatorChar));
         assert null != scheme; // make FindBugs happy
         final FsMountPoint mountPoint;
         try {
@@ -888,8 +888,7 @@ public final class File extends java.io.File {
                                         .getMountPoint(),
                                     enclEntryName));
             } else {
-                mountPoint = new FsMountPoint(scheme,
-                        new FsPath(target.toURI(), CANONICALIZE));
+                mountPoint = new FsMountPoint(scheme, new FsPath(delegate));
             }
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
@@ -1494,7 +1493,11 @@ public final class File extends java.io.File {
      *         {@code String} instance.
      */
     public String getCanOrAbsPath() {
-        return getRealPath(delegate);
+        try {
+            return getCanonicalPath();
+        } catch (IOException ex) {
+            return Paths.normalize(getAbsolutePath(), separatorChar);
+        }
     }
 
     /**
@@ -1892,9 +1895,7 @@ public final class File extends java.io.File {
                             ROOT);
                 } else {
                     return new FsPath(
-                            new FsMountPoint(
-                                scheme,
-                                new FsPath(delegate.toURI(), CANONICALIZE)),
+                            new FsMountPoint(scheme, new FsPath(delegate)),
                             ROOT);
                 }
             } else if (null != enclArchive) {
@@ -1902,7 +1903,7 @@ public final class File extends java.io.File {
                         new FsMountPoint(enclArchive.toURI(), CANONICALIZE),
                         enclEntryName);
             } else {
-                return new FsPath(delegate.toURI(), CANONICALIZE);
+                return new FsPath(delegate);
             }
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
@@ -1922,9 +1923,7 @@ public final class File extends java.io.File {
                                 new FsMountPoint(enclArchive.toURI(), CANONICALIZE),
                                 enclEntryName)).getUri();
                 } else {
-                    return new FsMountPoint(
-                            scheme,
-                            new FsPath(delegate.toURI(), CANONICALIZE)).getUri();
+                    return new FsMountPoint(scheme, new FsPath(delegate)).getUri();
                 }
             } else if (null != enclArchive) {
                 return new FsPath(
