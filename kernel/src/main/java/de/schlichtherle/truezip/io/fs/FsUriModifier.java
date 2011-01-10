@@ -68,7 +68,7 @@ public enum FsUriModifier {
          * For an opaque URI, nothing is modified.
          * For a hierarchical URI, its path is truncated so that it does not
          * end with a
-         * {@value de.schlichtherle.truezip.io.entry.EntryName#SEPARATOR}
+         * {@value de.schlichtherle.truezip.entry.EntryName#SEPARATOR}
          * separator.
          * In addition, if the path starts with two separators, the substring
          * following until the next separator is moved to the authority part

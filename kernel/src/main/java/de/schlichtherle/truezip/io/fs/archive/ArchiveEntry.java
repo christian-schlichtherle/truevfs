@@ -38,12 +38,12 @@ public interface ArchiveEntry extends Entry {
      * @param  type the size type.
      * @param  value the size of the given size type for this archive entry in
      *         bytes or
-     *         {@value de.schlichtherle.truezip.io.entry.Entry#UNKNOWN}.
+     *         {@value de.schlichtherle.truezip.entry.Entry#UNKNOWN}.
      * @return {@code true} on success, {@code false} otherwise, e.g. if the
      *         type is unsupported.
      * @throws NullPointerException if {@code type} is {@code null}.
      * @throws IllegalArgumentException if {@code value} is negative and not
-     *         {@value de.schlichtherle.truezip.io.entry.Entry#UNKNOWN}.
+     *         {@value de.schlichtherle.truezip.entry.Entry#UNKNOWN}.
      */
     boolean setSize(@NonNull Size type, long value);
 
@@ -53,12 +53,12 @@ public interface ArchiveEntry extends Entry {
      * @param  type the access type.
      * @param  value the last time of the given access type for this archive
      *         entry in milliseconds since the epoch or
-     *         {@value de.schlichtherle.truezip.io.entry.Entry#UNKNOWN}.
+     *         {@value de.schlichtherle.truezip.entry.Entry#UNKNOWN}.
      * @return {@code true} on success, {@code false} otherwise, e.g. if the
      *         given type is unsupported.
      * @throws NullPointerException if {@code type} is {@code null}.
      * @throws IllegalArgumentException if {@code value} is negative and not
-     *         {@value de.schlichtherle.truezip.io.entry.Entry#UNKNOWN}.
+     *         {@value de.schlichtherle.truezip.entry.Entry#UNKNOWN}.
      */
     boolean setTime(@NonNull Access type, long value);
 }

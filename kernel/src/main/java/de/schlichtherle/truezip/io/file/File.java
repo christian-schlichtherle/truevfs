@@ -378,9 +378,9 @@ public final class File extends java.io.File {
      * <p>
      * This enables federation of file system implementations and is essential
      * to enable the broken implementation in
-     * {@code javax.swing.JFileChooser} to browse archive files.
+     * {@link javax.swing.JFileChooser} to browse archive files.
      */
-    private transient @NonNull java.io.File delegate; // TODO: Revision this!
+    private transient @NonNull java.io.File delegate; // TODO: Revision this: Still required?
 
     /**
      * @see #getArchiveDetector
@@ -1641,20 +1641,13 @@ public final class File extends java.io.File {
      * archive file or an entry in an archive file.
      * <p>
      * <b>Warning:</b> This method is <em>not</em> intended for public use!
-     * It's required to support the federation of file system implementations.
-     * For example, {@link javax.swing.JFileChooser javax.swing.JFileChooser}
-     * creates instances of {@code sun.awt.shell.ShellFolder}
-     * which is a subclass of {@link java.io.File java.io.File}, too.
-     * These instances are <i>wrapped</i> as the delegate in instances of this
-     * class when using
-     * {@link de.schlichtherle.truezip.io.swing.JFileChooser de.schlichtherle.truezip.io.swing.JFileChooser}
-     * in order to federate the functionality of these different file system
+     * It's solely required to support the federation of file system
      * implementations.
      * <p>
      * In case you want to convert an instance of this class which recognized
      * the base name of its path as an archive file to a file instance which
      * doesn't recognize this archive file, use the following code instead:
-     * {@code ArchiveDetector.NULL.newFile((File) file.getParentFile(), file.getName())}
+     * {@code new File(file.getParentFile(), file.getName(), ArchiveDetector.NULL)}
      *
      * @return An instance of the {@link java.io.File java.io.File} class or
      *         one of its subclasses, but never an instance of this class or
@@ -2013,8 +2006,7 @@ public final class File extends java.io.File {
 
     /**
      * If this file is a true archive file, its archive driver is asked to
-     * return an icon to be used for
-     * {@link de.schlichtherle.truezip.io.swing.JFileTree}.
+     * return an icon to be displayed for this file.
      * Otherwise, null is returned.
      */
     public Icon getOpenIcon() {
@@ -2029,8 +2021,7 @@ public final class File extends java.io.File {
 
     /**
      * If this file is a true archive file, its archive driver is asked to
-     * return an icon to be used for
-     * {@link de.schlichtherle.truezip.io.swing.JFileTree}.
+     * return an icon to be displayed for this file.
      * Otherwise, null is returned.
      */
     public Icon getClosedIcon() {
@@ -3901,12 +3892,7 @@ public final class File extends java.io.File {
      * @param dst The destination file. Note that although this just needs to
      *        be a plain {@code java.io.File}, archive entries are only
      *        supported for instances of this class.
-     * @throws FileNotFoundException If either the source or the destination
-     *         cannot get accessed.
-     * @throws InputException If copying the data fails because of an
-     *         IOException in the source.
-     * @throws IOException If copying the data fails because of an
-     *         IOException in the destination.
+     * @throws IOException If copying the data fails for some reason.
      * @throws NullPointerException If any parameter is {@code null}.
      * @see <a href="#copy_methods">Copy Methods</a>
      */
@@ -3965,12 +3951,7 @@ public final class File extends java.io.File {
      * @param dst The destination file. Note that although this just needs to
      *        be a plain {@code java.io.File}, archive entries are only
      *        supported for instances of this class.
-     * @throws FileNotFoundException If either the source or the destination
-     *         cannot get accessed.
-     * @throws InputException If copying the data fails because of an
-     *         IOException in the source.
-     * @throws IOException If copying the data fails because of an
-     *         IOException in the destination.
+     * @throws IOException If copying the data fails for some reason.
      * @throws NullPointerException If any parameter is {@code null}.
      * @see <a href="#copy_methods">Copy Methods</a>
      */

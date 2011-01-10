@@ -18,11 +18,7 @@ package de.schlichtherle.truezip.io.file;
 import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.io.fs.FsManagers;
 import de.schlichtherle.truezip.io.fs.FsPath;
-import de.schlichtherle.truezip.io.fs.archive.ArchiveFileSystemException;
 import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.io.fs.FsSyncException;
-import de.schlichtherle.truezip.io.InputBusyException;
-import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.io.fs.FsFederatingDriver;
 import de.schlichtherle.truezip.io.fs.FsInputOption;
 import de.schlichtherle.truezip.io.socket.InputSocket;
@@ -30,7 +26,6 @@ import de.schlichtherle.truezip.io.socket.IOSocket;
 import de.schlichtherle.truezip.io.fs.FsOutputOption;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -206,10 +201,9 @@ class Files {
     }
 
     /** Unchecked parameters version. */
-    private static void copy0(
-            final boolean preserve,
-            final java.io.File src,
-            final java.io.File dst)
+    private static void copy0(  final boolean preserve,
+                                final java.io.File src,
+                                final java.io.File dst)
     throws IOException {
         final InputSocket<?> input = getInputSocket(src,
                 BitField.noneOf(FsInputOption.class));
@@ -217,22 +211,7 @@ class Files {
                 BitField.noneOf(FsOutputOption.class)
                     .set(CREATE_PARENTS, File.isLenient()),
                 preserve ? input.getLocalTarget() : null);
-        try {
-            IOSocket.copy(input, output);
-        } catch (FileNotFoundException ex) {
-            throw ex;
-        } catch (FsSyncException ex) {
-            if (ex.getCause() instanceof InputBusyException)
-                throw (InputBusyException) ex.getCause();
-            else if (ex.getCause() instanceof OutputBusyException)
-                throw (OutputBusyException) ex.getCause();
-            else
-                throw (FileNotFoundException) new FileNotFoundException(ex.toString())
-                        .initCause(ex);
-        } catch (ArchiveFileSystemException ex) {
-            throw (FileNotFoundException) new FileNotFoundException(ex.toString())
-                    .initCause(ex);
-        }
+        IOSocket.copy(input, output);
     }
 
     static InputSocket<?> getInputSocket(
