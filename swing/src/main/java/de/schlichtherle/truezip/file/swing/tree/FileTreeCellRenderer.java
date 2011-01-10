@@ -25,7 +25,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 
 /**
  * A tree cell renderer which uses an instance of
- * {@link de.schlichtherle.truezip.io.swing.FileSystemView} to display the
+ * {@link de.schlichtherle.truezip.file.swing.FileSystemView} to display the
  * system icon for each node in a {@link JFileTree} wherever possible.
  *
  * @author Christian Schlichtherle
