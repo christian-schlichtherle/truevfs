@@ -24,9 +24,7 @@ import de.schlichtherle.truezip.io.fs.FsMountPoint;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class FileDriver implements FsDriver {
-
-    private static final long serialVersionUID = 4085765023564882687L;
+final class FileDriver implements FsDriver {
 
     @Override
     public FsController<?>
