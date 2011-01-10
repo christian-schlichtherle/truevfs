@@ -33,7 +33,7 @@ import static org.junit.Assert.*;
  */
 public abstract class FsManagerTestCase {
 
-    private final FsDriver driver = new FsDummyDriver();
+    private final FsDriver driver = new DummyDriver();
     private FsManager manager;
 
     @Before

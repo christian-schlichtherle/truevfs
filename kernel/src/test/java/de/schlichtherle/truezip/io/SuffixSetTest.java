@@ -15,9 +15,9 @@
  */
 package de.schlichtherle.truezip.io;
 
-import java.util.Iterator;
-import java.util.regex.Pattern;
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  * Tests {@link SuffixSet}.
@@ -25,19 +25,15 @@ import junit.framework.TestCase;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class SuffixSetTest extends TestCase {
+public final class SuffixSetTest {
 
     private SuffixSet empty;
 
-    /** A set of equal canoncical string sets. */
+    /** An array of equal suffix sets. */
     private SuffixSet[] sets;
 
-    public SuffixSetTest(String testName) {
-        super(testName);
-    }
-
-    @Override
-    protected void setUp() {
+    @Before
+    public void setUp() {
         empty = new SuffixSet("");
 
         sets = new SuffixSet[] {
@@ -68,6 +64,7 @@ public class SuffixSetTest extends TestCase {
         };
     }
 
+    @Test
     public void testEqualsAndHashCode() {
         for (int i = 0; i < sets.length; i++) {
             for (int j = 0; j < sets.length ; j++) {
@@ -77,14 +74,16 @@ public class SuffixSetTest extends TestCase {
         }
     }
 
+    @Test
     public void testIsEmpty() {
         assertTrue(empty.isEmpty());
 
-        for (int i = 0; i < sets.length; i++)
-            assertFalse(sets[i].isEmpty());
+        for (final SuffixSet set : sets)
+            assertFalse(set.isEmpty());
     }
 
-    public void testCanonicalIteratorAndContains() {
+    @Test
+    public void testIteratorAndContains() {
         assertFalse(empty.iterator().hasNext());
 
         for (int i = 0; i < sets.length; i++) {
@@ -95,27 +94,21 @@ public class SuffixSetTest extends TestCase {
         }
     }
 
-    public void testOriginalIteratorAndContains() {
-        assertFalse(empty.originalIterator().hasNext());
-
-        for (int i = 0; i < sets.length; i++)
-            for (int j = 0; j < sets.length ; j++)
-                for (final Iterator<String> it = sets[i].originalIterator(); it.hasNext();)
-                    assertTrue(sets[j].contains(it.next()));
-    }
-
+    @Test
     public void testAddAll() {
         for (int i = 0; i < sets.length; i++)
             for (int j = 0; j < sets.length ; j++)
                 assertFalse(sets[i].addAll(sets[j]));
     }
 
+    @Test
     public void testRetainAll() {
         for (int i = 0; i < sets.length; i++)
             for (int j = 0; j < sets.length ; j++)
                 assertFalse(sets[i].retainAll(sets[j]));
     }
 
+    @Test
     public void testRemoveAll() {
         for (int i = 0; i < sets.length - 1; i++) {
             final SuffixSet set = sets[i];
@@ -126,23 +119,24 @@ public class SuffixSetTest extends TestCase {
         }
     }
 
+    @Test
     public void testClear() {
-        for (int i = 0; i < sets.length; i++) {
-            final SuffixSet set = sets[i];
+        for (final SuffixSet set : sets) {
             assertFalse(set.isEmpty());
             set.clear();
             assertTrue(set.isEmpty());
         }
     }
 
+    @Test
     public void testToString() {
-        for (int i = 0; i < sets.length; i++) {
-            final SuffixSet set = sets[i];
+        for (final SuffixSet set : sets) {
             assertTrue("suffix1|suffix2".equals(set.toString()));
         }
     }
 
-    public void testToRegex() {
+    @Test
+    public void testToPattern() {
         for (int i = 0; i < sets.length; i++) {
             final SuffixSet set = sets[i];
             assertTrue(set.toPattern().matcher(".suffix1").matches());

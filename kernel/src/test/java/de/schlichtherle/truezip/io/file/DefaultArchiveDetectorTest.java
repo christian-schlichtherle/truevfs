@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.file;
 
+import de.schlichtherle.truezip.io.fs.FsDriver;
 import de.schlichtherle.truezip.io.fs.archive.driver.DummyArchiveDriver;
 import de.schlichtherle.truezip.io.fs.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.fs.FsScheme;
@@ -49,12 +50,6 @@ public class DefaultArchiveDetectorTest {
     }
 
     @Test
-    public void testDefaultConfiguration() {
-        assertTrue(NULL.getSuffixes().isEmpty());
-        //assertTrue(!ALL.getSuffixes().isEmpty()); // depends on run time class path configuration
-    }
-
-    @Test
     public void testIllegalConstructors() {
         testIllegalConstructors(NullPointerException.class,
                 new Object[][] {
@@ -82,7 +77,6 @@ public class DefaultArchiveDetectorTest {
                     { "NULL" },
                     { "ALL" },
                     { "unknownSuffix" },
-                    { "DRIVER", DRIVER }, // illegal keyword
                     { "", DRIVER }, // empty suffix set
                     { ".", DRIVER }, // empty suffix set
                     { "|", DRIVER }, // empty suffix set
@@ -91,7 +85,6 @@ public class DefaultArchiveDetectorTest {
                     { "||.", DRIVER }, // empty suffix set
                     { "|.|", DRIVER }, // empty suffix set
                     { "|.|.", DRIVER }, // empty suffix set
-                    { NULL, "DRIVER", DRIVER }, // illegal keyword
                     { NULL, "", DRIVER }, // empty suffix set
                     { NULL, ".", DRIVER }, // empty suffix set
                     { NULL, "|", DRIVER }, // empty suffix set
@@ -100,7 +93,6 @@ public class DefaultArchiveDetectorTest {
                     { NULL, "||.", DRIVER }, // empty suffix set
                     { NULL, "|.|", DRIVER }, // empty suffix set
                     { NULL, "|.|.", DRIVER }, // empty suffix set
-                    { NULL, new Object[] { "DRIVER", DRIVER } }, // illegal keyword
                     { NULL, new Object[] { "", DRIVER } }, // empty suffix set
                     { NULL, new Object[] { ".", DRIVER } }, // empty suffix set
                     { NULL, new Object[] { "|", DRIVER } }, // empty suffix set
@@ -222,7 +214,7 @@ public class DefaultArchiveDetectorTest {
 
     @Test
     public void testGetSuffixes() {
-        testGetSuffixes(new String[] {
+        assertSuffixes(new String[] {
             "zip", "zip",
             "zip", ".zip",
             "zip", "|zip",
@@ -281,7 +273,7 @@ public class DefaultArchiveDetectorTest {
         });
     }
 
-    private void testGetSuffixes(final String[] args) {
+    private void assertSuffixes(final String[] args) {
         for (int i = 0; i < args.length; i++) {
             final String result = args[i++];
             final String suffixes = args[i];
@@ -307,7 +299,7 @@ public class DefaultArchiveDetectorTest {
 
     @Test
     public void testGetArchiveDriver() {
-        testDefaultArchiveDetector(NULL, new Object[] {
+        assertDefaultArchiveDetector(NULL, new Object[] {
             null, "",
             null, ".",
             null, ".all",
@@ -348,7 +340,7 @@ public class DefaultArchiveDetectorTest {
             null, "test.zip.raes",
         });
 
-        testDefaultArchiveDetector(detector, new Object[] {
+        assertDefaultArchiveDetector(detector, new Object[] {
             null, "",
             null, ".",
             null, ".all",
@@ -391,7 +383,7 @@ public class DefaultArchiveDetectorTest {
     }
 
     @SuppressWarnings("deprecation")
-    private void testDefaultArchiveDetector(
+    private void assertDefaultArchiveDetector(
             DefaultArchiveDetector detector,
             final Object[] args) {
         try {
@@ -401,13 +393,13 @@ public class DefaultArchiveDetectorTest {
         }
 
         try {
-            detector.getDriver(null);
+            detector.getDriver((FsScheme) null);
             fail("Expected NullPointerException!");
         } catch (NullPointerException expected) {
         }
 
         try {
-            detector.getArchiveDriver(null);
+            detector.getDriver((String) null);
             fail("Expected NullPointerException!");
         } catch (NullPointerException expected) {
         }
@@ -424,27 +416,27 @@ public class DefaultArchiveDetectorTest {
         for (int i = 0; i < args.length; i++) {
             final ArchiveDriver<?> result = (ArchiveDriver<?>) args[i++];
             final String path = (String) args[i];
-            testDefaultArchiveDetector(detector, result, path);
+            assertDefaultArchiveDetector(detector, result, path);
 
             // Add level of indirection in order to test caching.
             detector = new DefaultArchiveDetector(detector, new Object[0]);
-            testDefaultArchiveDetector(detector, result, path);
+            assertDefaultArchiveDetector(detector, result, path);
         }
     }
 
     @SuppressWarnings("deprecation")
-    private void testDefaultArchiveDetector(
+    private void assertDefaultArchiveDetector(
             final DefaultArchiveDetector detector,
-            final ArchiveDriver<?> result,
+            final FsDriver result,
             final String path) {
         final String lpath = path.toLowerCase(Locale.ENGLISH);
         final String upath = path.toUpperCase(Locale.ENGLISH);
 
-        ArchiveDriver<?> driver;
-        driver = detector.getArchiveDriver(lpath);
+        FsDriver driver;
+        driver = detector.getDriver(lpath);
         assertThat(driver, sameInstance((Object) result));
 
-        driver = detector.getArchiveDriver(upath);
+        driver = detector.getDriver(upath);
         assertThat(driver, sameInstance((Object) result));
 
         final FsScheme scheme = detector.getScheme(lpath);
@@ -455,31 +447,5 @@ public class DefaultArchiveDetectorTest {
         } else {
             assertThat(scheme, nullValue());
         }
-    }
-
-    @Test
-    public void testSerialization() throws IOException, ClassNotFoundException {
-        // Serialize.
-        final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        final ObjectOutputStream out = new ObjectOutputStream(bos);
-        out.writeObject(detector);
-        out.close();
-
-        // Deserialize.
-        final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
-        final ObjectInputStream in = new ObjectInputStream(bis);
-        final DefaultArchiveDetector detector2 = (DefaultArchiveDetector) in.readObject();
-        in.close();
-
-        // Test result.
-        assertNotSame(detector, detector2);
-        assertNotSame(detector.getSuffixes(), detector2.getSuffixes());
-        final DummyArchiveDriver driver
-                = (DummyArchiveDriver) detector.getDriver(detector.getScheme("foo.zip"));
-        final DummyArchiveDriver driver2
-                = (DummyArchiveDriver) detector2.getDriver(detector.getScheme("bar.zip"));
-        assertNotNull(driver);
-        assertNotNull(driver2);
-        assertNotSame(driver, driver2);
     }
 }

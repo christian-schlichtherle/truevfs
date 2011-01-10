@@ -17,6 +17,8 @@ package de.schlichtherle.truezip.io.fs;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import java.io.Serializable;
+import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -25,8 +27,10 @@ import net.jcip.annotations.ThreadSafe;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@ThreadSafe
+@Immutable
 public interface FsDriver {
+
+    FsDriver ALL = new FsFederatingDriver(FsDriverProvider.ALL);
 
     /**
      * Returns a new thread-safe file system controller for the given mount

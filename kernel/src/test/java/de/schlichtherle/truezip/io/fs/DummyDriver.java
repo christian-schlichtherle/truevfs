@@ -15,30 +15,19 @@
  */
 package de.schlichtherle.truezip.io.fs;
 
-import de.schlichtherle.truezip.io.fs.archive.driver.DummyArchiveDriver;
-import de.schlichtherle.truezip.io.fs.file.FileDriver;
-
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class FsDummyDriver implements FsDriver {
-
-    private static final FsScheme FILE = FsScheme.create("file");
+public class DummyDriver implements FsDriver {
 
     @Override
-    public FsController<?> newController(   final FsMountPoint mountPoint,
-                                            final FsController<?> parent) {
+    public FsController<?>
+    newController(FsMountPoint mountPoint, FsController<?> parent) {
         assert null == mountPoint.getParent()
                 ? null == parent
                 : mountPoint.getParent().equals(parent.getModel().getMountPoint());
-        final FsScheme scheme = mountPoint.getScheme();
-        if (FILE.equals(scheme)) {
-            return FileDriver.INSTANCE.newController(mountPoint, null);
-        } else if (FsScheme.create("zip").equals(scheme)) {
-            return new DummyArchiveDriver().newController(mountPoint, parent);
-        } else {
-            throw new IllegalArgumentException();
-        }
+        return new DummyController<FsModel>(
+                new FsModel(mountPoint, null == parent ? null : parent.getModel()), parent);
     }
 }

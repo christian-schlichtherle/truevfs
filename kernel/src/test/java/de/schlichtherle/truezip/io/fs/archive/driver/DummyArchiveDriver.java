@@ -31,7 +31,7 @@ import java.io.IOException;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class DummyArchiveDriver extends ArchiveDriver<ArchiveEntry> {
+public class DummyArchiveDriver extends ArchiveDriver<ArchiveEntry> {
     private static final long serialVersionUID = 1L;
 
     @Override

@@ -16,11 +16,13 @@
 
 package de.schlichtherle.truezip.io.file;
 
+import de.schlichtherle.truezip.io.fs.FsDriver;
 import de.schlichtherle.truezip.io.fs.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.fs.FsScheme;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import java.io.Serializable;
 import net.jcip.annotations.Immutable;
 
 /**
@@ -44,16 +46,9 @@ import net.jcip.annotations.Immutable;
  * operations according to the true state, so it handles all kinds of false
  * positives correctly.
  * <p>
- * Implementations must be (virtually) immutable and hence thread safe.
- * <p>
  * Rather than implementing {@code ArchiveDetector} directly, it's easier
  * to instantiate or subclass the {@link DefaultArchiveDetector} class.
- * This class provides a registry for archive file suffixes and archive drivers
- * which can be easily customized via configuration files or Java code.
- * <p>
- * Although not strictly required, it's recommended for implementations to
- * implement the {@link java.io.Serializable} interface too, so that
- * {@link File} instances which use it can be serialized.
+ * This class provides a map for archive file suffixes and archive drivers.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -119,5 +114,5 @@ public interface ArchiveDetector {
      * @throws RuntimeException A subclass is thrown if loading or
      *         instantiating an archive driver class fails.
      */
-    @Nullable ArchiveDriver<?> getDriver(@NonNull FsScheme type);
+    @Nullable FsDriver getDriver(@NonNull FsScheme type);
 }

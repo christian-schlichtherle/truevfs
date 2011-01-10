@@ -31,6 +31,8 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  */
 final class ArchiveDetectorFsDriver implements FsDriver {
 
+    private static final long serialVersionUID = 4085765023564882687L;
+
     private static final FsScheme FILE_SCHEME = FsScheme.create("file");
     private static final FsDriver FILE_DRIVER = new FileDriver();
 
@@ -59,9 +61,22 @@ final class ArchiveDetectorFsDriver implements FsDriver {
     @Override
     public FsController<?>
     newController(FsMountPoint mountPoint, FsController<?> parent) {
+        assert null == mountPoint.getParent()
+                ? null == parent
+                : mountPoint.getParent().equals(parent.getModel().getMountPoint());
         FsScheme scheme = mountPoint.getScheme();
+        // Sanity check: If the scheme is not the file scheme, then do NOT use
+        // the declared scheme from the path, but use the detector to look up
+        // the scheme from the URI path of the entry name of the file system
+        // path of the mount point instead.
+        // This ensures that it's possible to synthesize the URI scheme when
+        // calling File.toURI() or File.toFsPath() solely by using the archive
+        // detector and the URI path.
         return FILE_SCHEME.equals(scheme)
                 ? FILE_DRIVER.newController(mountPoint, parent)
-                : detector.getDriver(scheme).newController(mountPoint, parent);
+                : detector
+                    .getDriver(detector.getScheme(
+                        mountPoint.getPath().getEntryName().getUri().getPath()))
+                    .newController(mountPoint, parent);
     }
 }

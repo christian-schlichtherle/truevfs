@@ -25,10 +25,11 @@ import java.util.StringTokenizer;
 import java.util.TreeMap;
 
 /**
- * A set of canonicalized strings in natural sort order.
- * A string is canonicalized by the function {@link Canonicalizer#canonicalize}.
+ * A set of the canonical string representation of objects in natural sort
+ * order.
+ * An object is canonicalized by the function {@link Canonicalizer#toString}.
  * <p>
- * String sets can be converted from and to string lists by using
+ * Canonical string sets can be converted from and to string lists by using
  * {@link #addAll(String)} and {@link #toString()}.
  * A <i>string list</i> is a string which consists of zero or more elements
  * which are separated by the <i>separator character</i> provided to the
@@ -52,17 +53,18 @@ import java.util.TreeMap;
  */
 public class CanonicalStringSet extends AbstractSet<String> {
 
-    /** Maps a string to its canonical form. */
+    /** Maps an object to its canonical string representation. */
     public interface Canonicalizer {
         /**
-         * Returns the canonical form of {@code s} or {@code null} if the
-         * given string does not have a canonical form.
+         * Returns the canonical string representation of {@code o} or
+         * {@code null} if the canonical string representation is undefined.
          *
-         * @param s The string to get canonicalized.
-         * @return The canonical form of {@code s} or {@code null} if
-         *         {@code s} does not have a canonical form.
+         * @param  o The Object to map to its canonical string representation.
+         * @return The canonical string representation of {@code o} or
+         *         {@code null} if the canonical string representation is
+         *         undefined.
          */
-        @CheckForNull String canonicalize(@NonNull String s);
+        @CheckForNull String toString(@NonNull Object o);
     } // interface Canonicalizer
 
     private final Canonicalizer canonicalizer;
@@ -90,7 +92,7 @@ public class CanonicalStringSet extends AbstractSet<String> {
      * canonical strings.
      *
      * @param separator The separator character to use in string lists.
-     * @param set A set of canonical strings to canonicalize and add to this set.
+     * @param set A set of canonical strings to toString and add to this set.
      */
     public CanonicalStringSet(  final @NonNull Canonicalizer mapper,
                                 final char separator,
@@ -140,17 +142,6 @@ public class CanonicalStringSet extends AbstractSet<String> {
     @Override
     public final Iterator<String> iterator() {
         return map.keySet().iterator();
-    }
-
-    /**
-     * Returns a new iterator for all original string elements in this set.
-     * Note that strings which don't have a canonical form cannot get added
-     * to this class and hence cannot get returned by the iterator.
-     *
-     * @return A new iterator for all original string elements.
-     */
-    public final Iterator<String> originalIterator() {
-        return map.values().iterator();
     }
 
     @Override
@@ -265,7 +256,7 @@ public class CanonicalStringSet extends AbstractSet<String> {
         boolean changed = false;
         for (final Iterator<String> i = new StringIterator(list); i.hasNext(); ) {
             final String element = i.next();
-            final String canonical = canonicalizer.canonicalize(element);
+            final String canonical = canonicalizer.toString(element);
             if (null != canonical)
                 changed |= null == map.put(canonical, element);
         }
@@ -383,7 +374,7 @@ public class CanonicalStringSet extends AbstractSet<String> {
 
         private void advance() {
             while (i.hasNext()) {
-                canonical = canonicalizer.canonicalize(i.next());
+                canonical = canonicalizer.toString(i.next());
                 if (null != canonical)
                     return;
             }

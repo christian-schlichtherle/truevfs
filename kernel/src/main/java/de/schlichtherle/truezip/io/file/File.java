@@ -29,6 +29,7 @@ import de.schlichtherle.truezip.io.fs.FsEntry;
 import de.schlichtherle.truezip.io.fs.FsFilteringManager;
 import de.schlichtherle.truezip.io.fs.FsSyncExceptionBuilder;
 import de.schlichtherle.truezip.io.fs.FsSyncOption;
+import de.schlichtherle.truezip.io.fs.FsUriModifier;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -41,6 +42,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.ObjectStreamException;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -377,34 +380,28 @@ public final class File extends java.io.File {
      * to enable the broken implementation in
      * {@code javax.swing.JFileChooser} to browse archive files.
      */
-    private final @NonNull java.io.File delegate;
+    private transient @NonNull java.io.File delegate; // TODO: Revision this!
 
     /**
      * @see #getArchiveDetector
      */
-    private final @NonNull ArchiveDetector detector;
+    private transient @NonNull ArchiveDetector detector;
 
     /**
-     * This field should be considered final!
-     *
      * @see #getInnerArchive
      * @see #readObject
      */
-    private @CheckForNull File innerArchive;
+    private transient @CheckForNull File innerArchive;
 
     /**
-     * This field should be considered final!
-     *
      * @see #getEnclArchive
      */
-    private @CheckForNull File enclArchive;
+    private transient @CheckForNull File enclArchive;
 
     /**
-     * This field should be considered final!
-     *
      * @see #getEnclEntryName
      */
-    private @Nullable FsEntryName enclEntryName;
+    private transient @Nullable FsEntryName enclEntryName;
 
     /**
      * This refers to the file system controller if and only if this file
@@ -413,7 +410,7 @@ public final class File extends java.io.File {
      *
      * @see #readObject
      */
-    private @Nullable transient FsController<?> controller;
+    private transient @Nullable FsController<?> controller;
 
     //
     // Constructor and helper methods:
@@ -459,7 +456,7 @@ public final class File extends java.io.File {
         } else {
             this.delegate = template;
             this.detector = detector;
-            init((File) null);
+            scan((File) null);
         }
 
         assert invariants();
@@ -489,7 +486,7 @@ public final class File extends java.io.File {
 
         this.delegate = new java.io.File(path);
         this.detector = detector;
-        init((File) null);
+        scan((File) null);
 
         assert invariants();
     }
@@ -518,9 +515,9 @@ public final class File extends java.io.File {
             final ArchiveDetector detector) {
         super(parent, member);
 
-        delegate = new java.io.File(parent, member);
+        this.delegate = new java.io.File(parent, member);
         this.detector = detector;
-        init((File) null);
+        scan((File) null);
 
         assert invariants();
     }
@@ -567,14 +564,14 @@ public final class File extends java.io.File {
             final ArchiveDetector detector) {
         super(parent, member);
 
-        delegate = new java.io.File(parent, member);
+        this.delegate = new java.io.File(parent, member);
         if (parent instanceof File) {
             final File smartParent = (File) parent;
             this.detector = detector != null ? detector : smartParent.detector;
-            init(smartParent);
+            scan(smartParent);
         } else {
             this.detector = detector != null ? detector : defaultDetector;
-            init((File) null);
+            scan((File) null);
         }
 
         assert invariants();
@@ -626,7 +623,11 @@ public final class File extends java.io.File {
     private File(   final @NonNull FsPath path,
                     final @NonNull ArchiveDetectorFsDriver driver) {
         super(path.hierarchicalize().getUri());
+        parse(path, driver);
+    }
 
+    private void parse( final @NonNull FsPath path,
+                        final @NonNull ArchiveDetectorFsDriver driver) {
         this.delegate = new java.io.File(super.getPath());
         this.detector = driver.getDetector();
 
@@ -767,14 +768,14 @@ public final class File extends java.io.File {
      * {@code delegate} and {@code detector} must already be initialized!
      * Must not be called to re-initialize this object!
      */
-    private void init(final File ancestor) {
+    private void scan(final File ancestor) {
         final String path = super.getPath();
         assert ancestor == null || path.startsWith(ancestor.getPath());
         assert delegate.getPath().equals(path);
         assert detector != null;
 
         final StringBuilder enclEntryNameBuf = new StringBuilder(path.length());
-        init(ancestor, detector, 0, path, enclEntryNameBuf, new Splitter(separatorChar));
+        scan(ancestor, detector, 0, path, enclEntryNameBuf, new Splitter(separatorChar));
         enclEntryName = 0 < enclEntryNameBuf.length()
                 ? FsEntryName.create(enclEntryNameBuf.toString(), null, CANONICALIZE)
                 : null;
@@ -787,7 +788,7 @@ public final class File extends java.io.File {
         }
     }
 
-    private void init(
+    private void scan(
             File ancestor,
             ArchiveDetector detector,
             int skip,
@@ -870,28 +871,7 @@ public final class File extends java.io.File {
             }
         }
 
-        init(ancestor, detector, skip, parent, enclEntryNameBuf, splitter);
-    }
-
-    /**
-     * Postfixes the instance after its default deserialization.
-     *
-     * @throws InvalidObjectException If the instance invariants are not met.
-     */
-    private void readObject(final ObjectInputStream in)
-    throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
-
-        if (innerArchive == this) {
-            assert controller == null;      // transient!
-            initController();               // fix!
-        }
-
-        try {
-            invariants();
-        } catch (AssertionError ex) {
-            throw (InvalidObjectException) new InvalidObjectException(ex.toString()).initCause(ex);
-        }
+        scan(ancestor, detector, skip, parent, enclEntryNameBuf, splitter);
     }
 
     private void initController() {
@@ -917,6 +897,21 @@ public final class File extends java.io.File {
         this.controller = FsManagers
                 .getInstance()
                 .getController(mountPoint, new ArchiveDetectorFsDriver(detector));
+    }
+
+    private Object writeReplace() throws ObjectStreamException {
+        return getAbsoluteFile();
+    }
+
+    private void writeObject(ObjectOutputStream out)
+    throws IOException {
+        out.writeObject(toURI());
+    }
+
+    private void readObject(ObjectInputStream in)
+    throws IOException, ClassNotFoundException {
+        parse(  FsPath.create((URI) in.readObject(), CANONICALIZE),
+                new ArchiveDetectorFsDriver(defaultDetector));
     }
 
     /**
@@ -1791,13 +1786,13 @@ public final class File extends java.io.File {
      * <p>
      * More formally, let {@code a} and {@code b} be two File objects.
      * Then if the expression
-     * {@code a.toFSPath().hierarchicalize().equals(b.toFSPath().hierarchicalize())}
+     * {@code a.toFsPath().hierarchicalize().equals(b.toFsPath().hierarchicalize())}
      * is true, the expression {@code a.equals(b)} is also true.
      * <p>
      * Note that this does <em>not</em> work vice versa:
      * E.g. on Windows, the expression
      * {@code new File("file").equals(new File("FILE"))} is true, but
-     * {@code new File("file").toFSPath().hierarchicalize().equals(new File("FILE").toFSPath().hierarchicalize())}
+     * {@code new File("file").toFsPath().hierarchicalize().equals(new File("FILE").toFsPath().hierarchicalize())}
      * is false because {@link FsPath#equals(Object)} is case sensitive.
      *
      * @see #compareTo(java.io.File)
@@ -1821,13 +1816,13 @@ public final class File extends java.io.File {
      * <p>
      * More formally, let {@code a} and {@code b} be two File objects.
      * Then if the expression
-     * {@code a.toFSPath().hierarchicalize().compareTo(b.toFSPath().hierarchicalize()) == 0}
+     * {@code a.toFsPath().hierarchicalize().compareTo(b.toFsPath().hierarchicalize()) == 0}
      * is true, the expression {@code a.compareTo(b) == 0} is also true.
      * <p>
      * Note that this does <em>not</em> work vice versa:
      * E.g. on Windows, the expression
      * {@code new File("file").compareTo(new File("FILE")) == 0} is true, but
-     * {@code new File("file").toFSPath().hierarchicalize().compareTo(new File("FILE").toFSPath().hierarchicalize()) == 0}
+     * {@code new File("file").toFsPath().hierarchicalize().compareTo(new File("FILE").toFsPath().hierarchicalize()) == 0}
      * is false because {@link FsPath#equals(Object)} is case sensitive.
      *
      * @see #equals(Object)
@@ -1882,7 +1877,7 @@ public final class File extends java.io.File {
         return delegate.toString();
     }
 
-    public @NonNull FsPath toFSPath() {
+    public @NonNull FsPath toFsPath() {
         try {
             if (this == innerArchive) {
                 final FsScheme scheme = detector.getScheme(delegate.getPath());
@@ -1946,9 +1941,7 @@ public final class File extends java.io.File {
     @Deprecated
     @Override
     public URL toURL() throws MalformedURLException {
-        return null != innerArchive
-                ? toURI().toURL()
-                : delegate.toURL();
+        return null != innerArchive ? toURI().toURL() : delegate.toURL();
     }
 
     /**
