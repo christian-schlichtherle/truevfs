@@ -427,13 +427,13 @@ public abstract class FileTestCase {
         try {
             try {
                 File.cp(tmp, dir);
-                fail("Expected FileNotFoundException!");
-            } catch (FileNotFoundException expected) {
+                fail("Expected IOException!");
+            } catch (IOException expected) {
             }
             try {
                 File.cp(dir, tmp);
-                fail("Expected FileNotFoundException!");
-            } catch (FileNotFoundException expected) {
+                fail("Expected IOException!");
+            } catch (IOException expected) {
             }
         } finally {
             if (!tmp.delete())
@@ -807,23 +807,23 @@ public abstract class FileTestCase {
     throws IOException {
         try {
             File.cp(a, a);
-            fail("Expected ContainsFileException");
-        } catch (ContainsFileException sfe) {
+            fail("Expected IOException");
+        } catch (IOException sfe) {
         }
         try {
             File.cp(a, b);
-            fail("Expected FileNotFoundException");
-        } catch (FileNotFoundException fnfe) {
+            fail("Expected IOException");
+        } catch (IOException sfe) {
         }
         try {
             File.cp(b, a);
-            fail("Expected FileNotFoundException");
-        } catch (FileNotFoundException fnfe) {
+            fail("Expected IOException");
+        } catch (IOException sfe) {
         }
         try {
             File.cp(b, b);
-            fail("Expected SameFileException");
-        } catch (ContainsFileException sfe) {
+            fail("Expected IOException");
+        } catch (IOException sfe) {
         }
     }
 
