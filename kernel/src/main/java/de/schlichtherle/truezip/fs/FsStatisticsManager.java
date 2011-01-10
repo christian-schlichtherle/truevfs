@@ -61,11 +61,9 @@ extends FsDecoratingManager<FsManager> {
             assert null == mountPoint.getParent()
                     ? null == parent
                     : mountPoint.getParent().equals(parent.getModel().getMountPoint());
-            final FsController<?> controller
-                    = super.newController(mountPoint, parent);
+            FsController<?> controller = super.newController(mountPoint, parent);
             return null != parent && null == parent.getParent() // controller is top level federated file system?
-                    ? new FsStatisticsController(   controller,
-                                                    FsStatisticsManager.this)
+                    ? new FsStatisticsController(controller, FsStatisticsManager.this)
                     : controller;
         }
     } // class StatisticsDriver
