@@ -16,9 +16,9 @@
 package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.io.SuffixSet;
-import de.schlichtherle.truezip.io.fs.FsClassPathDriverProvider;
-import de.schlichtherle.truezip.io.fs.FsDriver;
-import de.schlichtherle.truezip.io.fs.FsScheme;
+import de.schlichtherle.truezip.fs.FsClassPathDriverProvider;
+import de.schlichtherle.truezip.fs.FsDriver;
+import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.util.ServiceLocator;
 import de.schlichtherle.truezip.util.regex.ThreadLocalMatcher;
 import edu.umd.cs.findbugs.annotations.CheckForNull;

@@ -18,8 +18,8 @@ package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
-import de.schlichtherle.truezip.io.fs.FsSyncException;
-import de.schlichtherle.truezip.io.fs.FsOutputOption;
+import de.schlichtherle.truezip.fs.FsSyncException;
+import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.FileDescriptor;
@@ -27,8 +27,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import static de.schlichtherle.truezip.io.fs.FsOutputOption.APPEND;
-import static de.schlichtherle.truezip.io.fs.FsOutputOption.CREATE_PARENTS;
+import static de.schlichtherle.truezip.fs.FsOutputOption.APPEND;
+import static de.schlichtherle.truezip.fs.FsOutputOption.CREATE_PARENTS;
 
 /**
  * A drop-in replacement for {@link java.io.FileOutputStream} which

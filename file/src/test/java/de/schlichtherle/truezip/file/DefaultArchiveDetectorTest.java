@@ -16,10 +16,10 @@
 package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.file.DefaultArchiveDetector;
-import de.schlichtherle.truezip.io.fs.FsDriver;
-import de.schlichtherle.truezip.io.fs.archive.driver.DummyArchiveDriver;
-import de.schlichtherle.truezip.io.fs.archive.driver.ArchiveDriver;
-import de.schlichtherle.truezip.io.fs.FsScheme;
+import de.schlichtherle.truezip.fs.FsDriver;
+import de.schlichtherle.truezip.fs.archive.driver.DummyArchiveDriver;
+import de.schlichtherle.truezip.fs.archive.driver.ArchiveDriver;
+import de.schlichtherle.truezip.fs.FsScheme;
 import java.util.Locale;
 import java.util.Map;
 import org.junit.Before;
