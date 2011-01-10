@@ -324,7 +324,7 @@ public class ZipEntry implements Cloneable {
      * @param csize The Compressed Size.
      * @throws IllegalArgumentException If {@code csize} is not in the
      *         range from {@code 0} to {@link ULong#MAX_VALUE}
-     *         ({@value de.schlichtherle.truezip.io.zip.ULong#MAX_VALUE}).
+     *         ({@value de.schlichtherle.truezip.zip.ULong#MAX_VALUE}).
      * @see #getCompressedSize
      */
     public void setCompressedSize(final long csize) {
@@ -364,7 +364,7 @@ public class ZipEntry implements Cloneable {
      * @param size The (Uncompressed) Size.
      * @throws IllegalArgumentException If {@code size} is not in the
      *         range from {@code 0} to {@link ULong#MAX_VALUE}
-     *         ({@value de.schlichtherle.truezip.io.zip.ULong#MAX_VALUE}).
+     *         ({@value de.schlichtherle.truezip.zip.ULong#MAX_VALUE}).
      * @see #getCompressedSize
      */
     public void setSize(final long size) {
