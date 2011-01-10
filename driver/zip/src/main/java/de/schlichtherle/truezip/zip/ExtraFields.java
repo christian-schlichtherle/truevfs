@@ -66,7 +66,7 @@ final class ExtraFields implements Cloneable {
      *         if no such Extra Field exists.
      * @throws IllegalArgumentException If {@code headerID} is not in
      *         the range of {@code 0} to {@link UShort#MAX_VALUE}
-     *         ({@value de.schlichtherle.truezip.io.zip.UShort#MAX_VALUE}).
+     *         ({@value de.schlichtherle.truezip.zip.UShort#MAX_VALUE}).
      */
     public ExtraField get(final int headerID) {
         UShort.check(headerID);
@@ -86,7 +86,7 @@ final class ExtraFields implements Cloneable {
      * @throws IllegalArgumentException If the Header ID of the given Extra
      *         Field is not in the range of {@code 0} to
      *         {@link UShort#MAX_VALUE}
-     *         ({@value de.schlichtherle.truezip.io.zip.UShort#MAX_VALUE}).
+     *         ({@value de.schlichtherle.truezip.zip.UShort#MAX_VALUE}).
      */
     public ExtraField put(final ExtraField ef) {
         if (ef == null)
@@ -104,7 +104,7 @@ final class ExtraFields implements Cloneable {
      *         if no such Extra Field exists.
      * @throws IllegalArgumentException If {@code headerID} is not in
      *         the range of {@code 0} to {@link UShort#MAX_VALUE}
-     *         ({@value de.schlichtherle.truezip.io.zip.UShort#MAX_VALUE}).
+     *         ({@value de.schlichtherle.truezip.zip.UShort#MAX_VALUE}).
      */
     public ExtraField remove(final int headerID) {
         UShort.check(headerID);
