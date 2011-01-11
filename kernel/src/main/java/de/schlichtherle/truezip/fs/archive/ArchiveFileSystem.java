@@ -124,8 +124,8 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      * Note that the entries in the file system are shared with the given
      * archive entry {@code container}.
      *
-     * @param  container The archive entry container to read the entries for
-     *         the population of the file system.
+     * @param  archive The archive entry container to read the entries for
+     *         the population of the archive file system.
      * @param  factory the archive entry factory to use.
      * @param  rootTemplate The last modification time of the root of the populated
      *         file system in milliseconds since the epoch.
@@ -139,16 +139,16 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      */
     static @NonNull <E extends ArchiveEntry> ArchiveFileSystem<E>
     newArchiveFileSystem(   @NonNull EntryFactory<E> factory,
-                            @NonNull EntryContainer<E> container,
+                            @NonNull EntryContainer<E> archive,
                             @CheckForNull Entry rootTemplate,
                             boolean readOnly) {
         return readOnly
-            ? new ReadOnlyArchiveFileSystem<E>(container, factory, rootTemplate)
-            : new ArchiveFileSystem<E>(factory, container, rootTemplate);
+            ? new ReadOnlyArchiveFileSystem<E>(archive, factory, rootTemplate)
+            : new ArchiveFileSystem<E>(factory, archive, rootTemplate);
     }
 
     ArchiveFileSystem(  final @NonNull EntryFactory<E> factory,
-                        final @NonNull EntryContainer<E> container,
+                        final @NonNull EntryContainer<E> archive,
                         final @CheckForNull Entry rootTemplate) {
         if (null == rootTemplate)
             throw new NullPointerException();
@@ -157,12 +157,12 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
 
         this.factory = factory;
         master = new LinkedHashMap<String, ArchiveFileSystemEntry<E>>(
-                (int) (container.getSize() / .7f) + 1); // allow overhead to create missing parent directories
+                (int) (archive.getSize() / .7f) + 1); // allow overhead to create missing parent directories
 
         // Load entries from input archive.
         final List<String> paths = new LinkedList<String>();
         final Normalizer normalizer = new Normalizer(SEPARATOR_CHAR);
-        for (final E entry : container) {
+        for (final E entry : archive) {
             // Fix issue #42 - see https://truezip.dev.java.net/issues/show_bug.cgi?id=42
             final String path = cutTrailingSeparators(
                 normalizer.normalize(entry.getName().replace('\\', SEPARATOR_CHAR)),
