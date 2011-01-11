@@ -60,9 +60,8 @@ extends Iterable<E> {
      * {@code null} if no entry with this name exists in this container.
      *
      * @param  name an entry name.
-     * @return The entry for the given name or {@code null} if no entry with
-     *         this name exists in this container.
+     * @return The entry for the given {@link Entry#getName() name} or
+     *         {@code null} if no entry with this name exists in this container.
      */
-    @CheckForNull
-    E getEntry(@NonNull String name);
+    @CheckForNull E getEntry(@NonNull String name);
 }
