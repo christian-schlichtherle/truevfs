@@ -41,16 +41,16 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
  * <ol>
  * <li>The URI must not have a fragment.
  * <li>If the URI is opaque, its scheme specific part must contain at least
- *     one mount point separator {@code "!/"}.
+ *     one mount point separator {@value FsPath#MOUNT_POINT_SEPARATOR}.
  *     The part <em>up to</em> the last mount point separator is parsed
- *     according to the syntax constraints for a {@link FsMountPoint} and set as
- *     the value of the property {@link #getMountPoint() mount point}.
+ *     according to the syntax constraints for a {@link FsMountPoint} and set
+ *     as the value of the property {@link #getMountPoint() mount point}.
  *     The part <em>after</em> the last mount point separator is parsed
  *     according to the syntax constraints for an {@link FsEntryName} and set as
  *     the value of the property {@link #getEntryName() entry name}.
- * <li>If the URI is absolute, it's resolved with ".", parsed according to
- *     the syntax constraints for a {@link FsMountPoint} and set as the value of
- *     the property {@link #getMountPoint() mount point}.
+ * <li>If the URI is absolute, it's resolved with {@code "."}, parsed according
+ *     to the syntax constraints for a {@link FsMountPoint} and set as the
+ *     value of the property {@link #getMountPoint() mount point}.
  *     The value of the property {@link #getEntryName() entry name} is then set
  *     to the URI relativized to this {@link #getMountPoint() mount point}.
  * <li>Otherwise, the value of the property
