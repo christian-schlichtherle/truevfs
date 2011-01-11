@@ -49,7 +49,7 @@ public class FileEntry extends FsEntry implements IOEntry<FileEntry> {
 
     FileEntry(final @NonNull File file) {
         this.file = file;
-        this.name = EntryName.create(file.getName()); // Path.create(file.toURI()).getEntryName();
+        this.name = EntryName.create(file.getName());
     }
 
     FileEntry(final @NonNull File file, final @NonNull EntryName name) {

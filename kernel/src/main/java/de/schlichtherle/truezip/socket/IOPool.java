@@ -22,7 +22,7 @@ import net.jcip.annotations.NotThreadSafe;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * A pool for I/O entries.
+ * A pool of I/O entries.
  * <p>
  * Note that any pool implementation is expected to be thread-safe!
  * However, this does not necessarily apply to the implementation of its

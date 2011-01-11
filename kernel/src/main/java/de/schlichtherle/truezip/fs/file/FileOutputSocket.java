@@ -43,12 +43,12 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
 
     private static final String FILE_POOL_PREFIX = ".tzp";
 
-    private final    @NonNull      FileEntry              entry;
+    private final    @NonNull      FileEntry                entry;
     private final    @NonNull      BitField<FsOutputOption> options;
     private final    @CheckForNull Entry                    template;
-    private volatile @CheckForNull TempFilePool               pool;
+    private volatile @CheckForNull TempFilePool             pool;
 
-    FileOutputSocket( final @NonNull      FileEntry              entry,
+    FileOutputSocket(   final @NonNull      FileEntry                entry,
                         final @NonNull      BitField<FsOutputOption> options,
                         final @CheckForNull Entry                    template) {
         this.entry    = entry;
@@ -59,7 +59,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
     private TempFilePool getTempFilePool() {
         return null != pool
                 ? pool
-                : (pool = new TempFilePool(   FILE_POOL_PREFIX, null,
+                : (pool = new TempFilePool( FILE_POOL_PREFIX, null,
                                             entry.getFile().getParentFile()));
     }
 

@@ -68,19 +68,23 @@ public abstract class KeyManager {
     private static volatile KeyManager instance; // volatile required for DCL in JSE 5!
 
     /**
-     * Returns the non-{@code null} key manager class property instance.
+     * Returns the default key manager.
      * <p>
-     * If the class property has been explicitly set using
-     * {@link #setInstance}, then this instance is returned.
-     * Otherwise, the service is located by loading the class name from the
-     * resource file {@code /META-INF/services/de.schlichtherle.truezip.key.KeyManager}.
+     * If the default key manager has been explicitly set to
+     * non-{@code null} by calling {@link #setInstance}, then this instance is
+     * returned.
      * <p>
+     * Otherwise, the service is located by loading the class name from any
+     * resource file with the name
+     * {@code "META-INF/services/de.schlichtherle.truezip.key.KeyManager"}.
+     * on the class path and instantiating it using its no-arg constructor.
      * In order to support this plug-in architecture, you should <em>not</em>
      * cache the instance returned by this method!
      *
-     * @throws ServiceConfigurationError If any other precondition on the
-     *         value of the system property does not hold.
-     * @return The non-{@code null} key manager class property instance.
+     * @return The default key manager.
+     * @throws RuntimeException at the discretion of the {@link ServiceLocator}.
+     * @throws ServiceConfigurationError at the discretion of the
+     *         {@link ServiceLocator}.
      */
     public static KeyManager getInstance() {
         KeyManager manager = instance;
@@ -88,11 +92,10 @@ public abstract class KeyManager {
             synchronized (KeyManager.class) { // DCL does work in combination with volatile in JSE 5!
                 manager = instance;
                 if (null == manager) {
-                    instance = manager
-                            = new ServiceLocator(KeyManager.class.getClassLoader())
-                            .getService(
-                                KeyManager.class,
-                                de.schlichtherle.truezip.key.passwd.swing.PromptingKeyManager.class);
+                    manager = new ServiceLocator(KeyManager.class.getClassLoader())
+                            .getServices(KeyManager.class)
+                            .next();
+                    setInstance(manager);
                 }
             }
         }
@@ -100,14 +103,18 @@ public abstract class KeyManager {
     }
 
     /**
-     * Sets the key manager class property instance.
+     * Sets the default key manager.
+     * <p>
      * If the current key manager has any key providers,
      * an {@link IllegalStateException} is thrown.
      * Call {@link #resetAndRemoveKeyProviders} to prevent this.
+     * <p>
+     * If the given default key manager is {@code null},
+     * a new instance will be created on the next call to {@link #getInstance}.
      *
-     * @param  manager The key manager instance to use as the class property.
-     *         If this is {@code null}, a new instance will be created on the
-     *         next call to {@link #getInstance}.
+     * @param manager the nullable default key manager.
+     * @throws IllegalStateException if the current key manager has any
+     *         key providers.
      */
     public static synchronized void setInstance(final KeyManager manager) {
         final int count = providers.size();
@@ -248,6 +255,7 @@ public abstract class KeyManager {
      * It is safe to call any method of this class within the command,
      * even if it modifies the map of key providers.
      */
+    @SuppressWarnings("rawtypes")
     protected static synchronized void forEachKeyProvider(
             final KeyProviderCommand command) {
         // We can't use an iterator because the command may modify the map.
