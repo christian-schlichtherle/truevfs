@@ -16,6 +16,9 @@
 package de.schlichtherle.truezip.key.passwd.swing;
 
 /**
+ * Behaves exactly like its base class, but implements the unknown key feedback
+ * interface, too.
+ *
  * @author Christian Schlichtherle
  * @version $Id$
  */

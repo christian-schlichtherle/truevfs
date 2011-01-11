@@ -20,6 +20,8 @@ import java.util.EventObject;
 import net.jcip.annotations.Immutable;
 
 /**
+ * A file system event.
+ * 
  * @author Christian Schlichtherle
  * @version $Id$
  */
@@ -31,22 +33,19 @@ public class FsEvent extends EventObject {
     /**
      * Constructs a new file system event.
      *
-     * @param source the file system model source which caused this event.
+     * @param source the file system model which caused this event.
      */
     public FsEvent(@NonNull FsModel source) {
         super(source);
     }
 
     /**
-     * Returns the non-{@code null} file system model source which caused
-     * this event.
+     * Returns the file system model which caused this event.
      *
-     * @return The non-{@code null} file system model source which caused
-     *         this event.
+     * @return The file system model which caused this event.
      */
     @Override
-    @NonNull
-    public final FsModel getSource() {
+    public final @NonNull FsModel getSource() {
         return (FsModel) source;
     }
 }

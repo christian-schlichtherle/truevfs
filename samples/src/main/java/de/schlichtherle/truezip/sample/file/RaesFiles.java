@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.samples;
+package de.schlichtherle.truezip.sample.file;
 
 import de.schlichtherle.truezip.crypto.raes.KeyManagerRaesParameters;
 import de.schlichtherle.truezip.crypto.raes.RaesOutputStream;
 import de.schlichtherle.truezip.crypto.raes.RaesParameters;
 import de.schlichtherle.truezip.crypto.raes.RaesReadOnlyFile;
 import de.schlichtherle.truezip.file.ArchiveDetector;
+import de.schlichtherle.truezip.file.DefaultArchiveDetector;
 import de.schlichtherle.truezip.file.File;
 import de.schlichtherle.truezip.file.FileInputStream;
 import de.schlichtherle.truezip.file.FileOutputStream;
@@ -130,8 +131,7 @@ public class RaesFiles {
             if (strongAuthentication)
                 rrof.authenticate();
             final InputStream in = new ReadOnlyFileInputStream(rrof);
-            final OutputStream out
-                    = new FileOutputStream(plainFile, false);
+            final OutputStream out = new FileOutputStream(plainFile, false);
             File.cp(in, out);
         } finally {
             rof.close();
@@ -148,6 +148,6 @@ public class RaesFiles {
             final String path,
             final ArchiveDetector detector) {
         final File file = new File(path, detector);
-        return new File(file.getParentFile(), file.getName(), ArchiveDetector.NULL);
+        return new File(file.getParentFile(), file.getName(), DefaultArchiveDetector.NULL);
     }
 }

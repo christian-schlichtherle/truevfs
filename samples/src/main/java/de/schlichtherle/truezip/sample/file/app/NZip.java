@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.samples;
+package de.schlichtherle.truezip.sample.file.app;
 
 import de.schlichtherle.truezip.file.ArchiveDetector;
 import de.schlichtherle.truezip.file.DefaultArchiveDetector;
@@ -92,7 +92,7 @@ public class NZip extends CommandLineUtility {
      * some extra compatibility tests which they perform on every archive.
      */
     protected ArchiveDetector newArchiveDetector() {
-        return new DefaultArchiveDetector(ArchiveDetector.ALL,
+        return new DefaultArchiveDetector(DefaultArchiveDetector.ALL,
             new Object[] {
                 "ear|jar|war", new CheckedJarDriver(),  // check CRC-32
                 "zip", new CheckedZipDriver(),          // check CRC-32
@@ -104,7 +104,7 @@ public class NZip extends CommandLineUtility {
     protected ArchiveDetector newArchiveDetector(
             final @NonNull Charset charset) {
         assert charset != null;
-        return new DefaultArchiveDetector(ArchiveDetector.ALL,
+        return new DefaultArchiveDetector(DefaultArchiveDetector.ALL,
                 new Object[] {
                     "ear|jar|war|zip", new CheckedZipDriver(charset),   // check CRC-32
                     "exe", new CheckedReadOnlySfxDriver(charset),       // check CRC-32
@@ -342,7 +342,7 @@ public class NZip extends CommandLineUtility {
 
         final ArchiveDetector dstDetector;
         if (unzip)
-            dstDetector = ArchiveDetector.NULL;
+            dstDetector = DefaultArchiveDetector.NULL;
         else if (cp437out)
             dstDetector = newArchiveDetector(Charset.forName("IBM437"));
         else if (utf8out)

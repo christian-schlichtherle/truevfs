@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.samples;
+package de.schlichtherle.truezip.sample.file.app;
 
+import de.schlichtherle.truezip.sample.file.RaesFiles;
 import de.schlichtherle.truezip.file.File;
 import java.io.IOException;
 import java.io.OutputStream;

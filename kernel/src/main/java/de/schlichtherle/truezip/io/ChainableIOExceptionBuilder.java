@@ -19,7 +19,7 @@ import de.schlichtherle.truezip.util.AbstractExceptionBuilder;
 import net.jcip.annotations.NotThreadSafe;
 
 /**
- * Assembles chainable I/O exceptions by
+ * Assembles a {@link ChainableIOException} from one or more {@link Exception}s by
  * {@link ChainableIOException#initPredecessor(ChainableIOException) chaining}
  * them.
  * When the assembly is thrown or returned later, it is sorted by
@@ -37,8 +37,11 @@ extends AbstractExceptionBuilder<C, E> {
 
     private final Class<E> clazz;
 
-    /** Static constructor provided for comforting the most prominent use case. */
-    public static ChainableIOExceptionBuilder<ChainableIOException, ChainableIOException> newInstance() {
+    /**
+     * Static constructor provided for comforting the most prominent use case.
+     */
+    public static ChainableIOExceptionBuilder<ChainableIOException, ChainableIOException>
+    create() {
         return new ChainableIOExceptionBuilder<ChainableIOException, ChainableIOException>(ChainableIOException.class, ChainableIOException.class);
     }
 
@@ -61,7 +64,7 @@ extends AbstractExceptionBuilder<C, E> {
      *         {@link ChainableIOException#initPredecessor(ChainableIOException)}.
      */
     @SuppressWarnings("unchecked")
-	@Override
+    @Override
     protected final E update(C cause, E previous) {
         final E next;
         try {
@@ -92,7 +95,7 @@ extends AbstractExceptionBuilder<C, E> {
      * and returns the result.
      */
     @SuppressWarnings("unchecked")
-	@Override
+    @Override
     protected final E post(E assembly) {
         return null == assembly ? null : (E) assembly.sortPriority();
     }

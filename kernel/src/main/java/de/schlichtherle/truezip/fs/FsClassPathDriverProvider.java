@@ -23,14 +23,23 @@ import java.util.Map;
 import net.jcip.annotations.Immutable;
 
 /**
+ * Provides all file system drivers found on the class path.
+ * Its map of file system drivers is populated by instantiating all classes
+ * which are named in the resource files with the name
+ * {@code "META-INF/services/de.schlichtherle.truezip.fs.FsDriverProvider"}
+ * on the class path.
+ * Note that the named classes must implement the interface
+ * {@link FsDriverProvider} and provide a public available no-arg constructor.
+ *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @Immutable
-final class FsClassPathDriverProvider implements FsDriverProvider {
+public final class FsClassPathDriverProvider implements FsDriverProvider {
 
-    static final FsClassPathDriverProvider INSTANCE
-            = new FsClassPathDriverProvider();
+    /** The singleton instance of this class. */
+    public static final FsClassPathDriverProvider
+            INSTANCE = new FsClassPathDriverProvider();
 
     private final Map<FsScheme, FsDriver> drivers;
 

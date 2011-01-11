@@ -15,12 +15,6 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.fs.FsEntryName;
-import de.schlichtherle.truezip.fs.FsMountPoint;
-import de.schlichtherle.truezip.fs.FsTouchedListener;
-import de.schlichtherle.truezip.fs.FsEvent;
-import de.schlichtherle.truezip.fs.FsPath;
-import de.schlichtherle.truezip.fs.FsModel;
 import java.net.URI;
 import org.junit.Test;
 

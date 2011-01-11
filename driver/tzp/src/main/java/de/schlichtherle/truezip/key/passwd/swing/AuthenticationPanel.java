@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.key.passwd.swing;
 
-import de.schlichtherle.truezip.file.ArchiveDetector;
+import de.schlichtherle.truezip.file.DefaultArchiveDetector;
 import de.schlichtherle.truezip.file.File;
 import de.schlichtherle.truezip.file.swing.FileComboBoxBrowser;
 import java.awt.EventQueue;
@@ -44,7 +44,7 @@ public class AuthenticationPanel extends JPanel {
     private static final String CLASS_NAME = AuthenticationPanel.class.getName();
     private static final ResourceBundle resources
             = ResourceBundle.getBundle(CLASS_NAME);
-    private static final File BASE_DIR = new File(".", ArchiveDetector.NULL);
+    private static final File BASE_DIR = new File(".", DefaultArchiveDetector.NULL);
 
     private static SoftReference<javax.swing.JFileChooser> fileChooser;
 
@@ -226,7 +226,7 @@ public class AuthenticationPanel extends JPanel {
     private void keyFileChooserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_keyFileChooserActionPerformed
         final javax.swing.JFileChooser fc = getFileChooser();
         if (fc.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
-            final File file = new File(fc.getSelectedFile(), ArchiveDetector.NULL);
+            final File file = new File(fc.getSelectedFile(), DefaultArchiveDetector.NULL);
             final String baseDirPath = BASE_DIR.getCanOrAbsPath();
             String keyFilePath = file.getCanOrAbsPath();
             if (keyFilePath.startsWith(baseDirPath)) {

@@ -162,7 +162,7 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      *         syntax constraints for entry names.
      */
     public EntryName(@NonNull String uri) throws URISyntaxException {
-        parse(uri);
+        parse(new URI(uri));
     }
 
     /**
@@ -224,16 +224,11 @@ public class EntryName implements Serializable, Comparable<EntryName> {
     private void readObject(@NonNull ObjectInputStream in)
     throws IOException, ClassNotFoundException {
         try {
-            parse(in.readObject().toString());
+            parse(new URI(in.readObject().toString()));
         } catch (URISyntaxException ex) {
             throw (InvalidObjectException) new InvalidObjectException(ex.toString())
                     .initCause(ex);
         }
-    }
-
-    private void parse(@NonNull String uri)
-    throws URISyntaxException {
-        parse(new URI(uri));
     }
 
     private void parse(final @NonNull URI uri) throws URISyntaxException {

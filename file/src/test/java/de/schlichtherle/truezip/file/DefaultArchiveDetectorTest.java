@@ -18,7 +18,6 @@ package de.schlichtherle.truezip.file;
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.archive.DummyArchiveDriver;
 import de.schlichtherle.truezip.fs.archive.ArchiveDriver;
-import de.schlichtherle.truezip.fs.FsScheme;
 import java.util.Locale;
 import java.util.Map;
 import org.junit.Before;
@@ -26,7 +25,7 @@ import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
-import static de.schlichtherle.truezip.file.ArchiveDetector.NULL;
+import static de.schlichtherle.truezip.file.DefaultArchiveDetector.NULL;
 
 /**
  * @author Christian Schlichtherle
@@ -57,12 +56,12 @@ public class DefaultArchiveDetectorTest {
                     { null, "xyz", DRIVER },
                     { NULL, null, null },
                     { NULL, null, DRIVER },
-                    //{ ArchiveDetector.NULL, "xyz", null },
+                    //{ DefaultArchiveDetector.NULL, "xyz", null },
                     { null, new Object[] { "xyz", DummyArchiveDriver.class } },
                     { NULL, null },
                     { NULL, new Object[] { null, null } },
                     { NULL, new Object[] { null, "xyz" } },
-                    //{ ArchiveDetector.NULL, new Object[] { "xyz", null } },
+                    //{ DefaultArchiveDetector.NULL, new Object[] { "xyz", null } },
         });
 
         testIllegalConstructors(IllegalArgumentException.class,
@@ -417,9 +416,9 @@ public class DefaultArchiveDetectorTest {
 
         if (null != result) {
             assertThat(detector.getScheme(lpath), equalTo(detector.getScheme(upath)));
-            assertThat(detector.getDrivers().get(detector.getScheme(lpath)),
+            assertThat(detector.getDriver(detector.getScheme(lpath)),
                     sameInstance(result));
-            assertThat(detector.getDrivers().get(detector.getScheme(upath)),
+            assertThat(detector.getDriver(detector.getScheme(upath)),
                     sameInstance(result));
         } else {
             assertThat(detector.getScheme(lpath), nullValue());

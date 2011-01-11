@@ -15,10 +15,6 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.fs.FsManager;
-import de.schlichtherle.truezip.fs.FsFederatingManager;
-import de.schlichtherle.truezip.fs.FsStatisticsManager;
-
 /**
  * @author Christian Schlichtherle
  * @version $Id$

@@ -22,7 +22,7 @@ import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * A factory for file system controllers.
+ * An immutable factory for thread-safe file system controllers.
  * 
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -40,8 +40,6 @@ public interface FsDriver {
                     ? null == parent
                     : mountPoint.getParent().equals(parent.getModel().getMountPoint())
      * }
-     * <p>
-     * Note again that the returned file system controller must be thread-safe!
      *
      * @param  mountPoint the mount point of the file system.
      * @param  parent the parent file system controller.

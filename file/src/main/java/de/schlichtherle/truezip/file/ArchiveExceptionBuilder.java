@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.io.ChainableIOException;
@@ -23,6 +22,12 @@ import de.schlichtherle.truezip.util.AbstractExceptionBuilder;
 import java.io.IOException;
 
 /**
+ * Assembles an {@link ArchiveException} from one or more {@link IOException}s by
+ * {@link ChainableIOException#initPredecessor(ChainableIOException) chaining}
+ * them.
+ * When the assembly is thrown or returned later, it is sorted by
+ * {@link ChainableIOException#sortPriority() priority}.
+ *
  * @author  Christian Schlichtherle
  * @version $Id$
  */

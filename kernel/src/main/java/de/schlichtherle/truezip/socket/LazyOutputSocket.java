@@ -17,10 +17,14 @@ package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.entry.Entry;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.OutputStream;
 
 /**
+ * A lazy output socket provides proxy output streams which acquire their
+ * underlying local target upon the first read access.
+ *
  * @param   <E> The type of the {@link #getLocalTarget() local target}.
  * @see     LazyInputSocket
  * @author  Christian Schlichtherle
@@ -29,17 +33,24 @@ import java.io.OutputStream;
 public final class LazyOutputSocket<E extends Entry>
 extends DecoratingOutputSocket<E> {
 
-    public LazyOutputSocket(final OutputSocket<? extends E> output) {
+    public LazyOutputSocket(@NonNull OutputSocket<? extends E> output) {
         super(output);
     }
 
     @Override
     public final OutputStream newOutputStream() throws IOException {
-        return new LazyOutputStream();
+        return new ProxyOutputStream();
     }
 
-    private class LazyOutputStream extends DecoratingOutputStream {
-        LazyOutputStream() {
+    /**
+     * Returns a proxy output stream which acquires its underlying output
+     * stream upon the first read access.
+     *
+     * @return A proxy output stream which acquires its underlying output
+     *         stream upon the first write access.
+     */
+    private class ProxyOutputStream extends DecoratingOutputStream {
+        ProxyOutputStream() {
             super(null);
         }
 
@@ -67,5 +78,5 @@ extends DecoratingOutputSocket<E> {
             if (null != delegate)
                 delegate.close();
         }
-    } // class LazyOutputStream
+    } // class ProxyOutputStream
 }

@@ -227,10 +227,9 @@ class Files {
                         .getInputSocket(file.getInnerEntryName0(), options);
         }
         final FsPath path = new FsPath(src);
-        return FsManagers
-                .getInstance()
-                .getController( path.getMountPoint(), FsFederatingDriver.ALL)
-                .getInputSocket(path.getEntryName(),  options);
+        return FsManagers   .getInstance()
+                            .getController(path.getMountPoint())
+                            .getInputSocket(path.getEntryName(), options);
     }
 
     static OutputSocket<?> getOutputSocket(
@@ -247,10 +246,9 @@ class Files {
                         .getOutputSocket(file.getInnerEntryName0(), options, template);
         }
         final FsPath path = new FsPath(dst);
-        return FsManagers
-                .getInstance()
-                .getController(  path.getMountPoint(), FsFederatingDriver.ALL)
-                .getOutputSocket(path.getEntryName(),  options, template);
+        return FsManagers   .getInstance()
+                            .getController(path.getMountPoint())
+                            .getOutputSocket(path.getEntryName(), options, template);
     }
 
     /**

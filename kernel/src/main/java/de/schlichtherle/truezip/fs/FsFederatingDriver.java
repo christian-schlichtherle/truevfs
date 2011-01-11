@@ -15,58 +15,32 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Map;
 
 /**
- * A federating file system driver is a composite of a file system driver and
- * a file system driver provider which uses its map of file system drivers to
- * lookup the appropriate driver for the scheme of a given mount point.
+ * A federating file system driver queries the scheme of the given mount point
+ * in order to lookup the appropriate file system driver which is then used to
+ * create the requested file system controller.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class FsFederatingDriver implements FsDriver, FsDriverProvider {
-
-    public static final FsFederatingDriver ALL
-            = new FsFederatingDriver(FsClassPathDriverProvider.INSTANCE);
-
-    private final Map<FsScheme, ? extends FsDriver> drivers;
-
-    /** Will query the given provider for drivers. */
-    public FsFederatingDriver(final @NonNull FsDriverProvider provider) {
-        this.drivers = provider.getDrivers(); // immutable map!
-        if (null == drivers)
-            throw new NullPointerException("broken interface contract!");
-    }
-
-    /** Copy constructor. */
-    protected FsFederatingDriver(final @NonNull FsFederatingDriver original) {
-        this.drivers = original.drivers; // immutable map!
-        assert null != drivers;
-    }
+public interface FsFederatingDriver extends FsDriver {
 
     /**
      * {@inheritDoc}
      * <p>
-     * The implementation in the class {@link FsFederatingDriver} queries the
-     * {@link FsDriverProvider} provided to its constructor for the appropriate
-     * {@link FsDriver} for the {@link FsScheme} of the given mount point.
+     * The file system controller is created by using a file system driver
+     * which is looked up by querying the scheme of the given mount point.
      *
-     * @throws NullPointerException if no appropriate driver is found for the
-     *         scheme of the given mount point.
+     * @throws NullPointerException if no appropriate file system driver is
+     *         found for the scheme of the given mount point.
      */
     @Override
-    public FsController<?>
-    newController(FsMountPoint mountPoint, FsController<?> parent) {
-        assert null == mountPoint.getParent()
-                ? null == parent
-                : mountPoint.getParent().equals(parent.getModel().getMountPoint());
-        return drivers.get(mountPoint.getScheme()).newController(mountPoint, parent);
-    }
-
-    @Override
-    public Map<FsScheme, ? extends FsDriver> getDrivers() {
-        return drivers;
-    }
+    @NonNull FsController<?>
+    newController(  @NonNull FsMountPoint mountPoint,
+                    @CheckForNull FsController<?> parent);
 }

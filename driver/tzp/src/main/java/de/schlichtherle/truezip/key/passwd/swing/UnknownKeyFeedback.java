@@ -16,6 +16,9 @@
 package de.schlichtherle.truezip.key.passwd.swing;
 
 /**
+ * Provides visual and/or audible feedback to the user when prompting
+ * for an unknown key for the first time.
+ *
  * @author Christian Schlichtherle
  * @version $Id$
  */

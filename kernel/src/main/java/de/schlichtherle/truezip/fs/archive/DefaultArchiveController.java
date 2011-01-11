@@ -169,6 +169,7 @@ extends FileSystemArchiveController<E> {
 
     private final ArchiveDriver<E> driver;
     private final FsController<?> parent;
+    private final FsEntryName parentName;
     private final boolean useRootTemplate;
 
     /**
@@ -198,6 +199,8 @@ extends FileSystemArchiveController<E> {
             throw new IllegalArgumentException("Parent/member mismatch!");
         this.driver = driver;
         this.parent = parent;
+        this.parentName = getModel().getMountPoint().getPath().resolve(ROOT)
+                .getEntryName();
         this.useRootTemplate = useRootTemplate;
     }
 
@@ -223,12 +226,6 @@ extends FileSystemArchiveController<E> {
     throws IOException {
         options = options.and(MOUNT_MASK);
         try {
-            final FsController<?> parent = getParent();
-            final FsEntryName parentName = getModel()
-                    .getMountPoint()
-                    .getPath()
-                    .resolve(ROOT)
-                    .getEntryName();
             // readOnly must be set first because the parent archive controller
             // could be a FileController and on Windows this property turns to
             // TRUE once a file is opened for reading!
@@ -243,7 +240,7 @@ extends FileSystemArchiveController<E> {
         } catch (TabuFileException ex) {
             throw ex;
         } catch (IOException ex) {
-            if (!autoCreate)
+            if (!autoCreate || null != parent.getEntry(parentName))
                 throw new FsFalsePositiveException(getModel(), ex);
             // The entry does NOT exist in the parent archive
             // file, but we may create it automatically.
@@ -274,12 +271,7 @@ extends FileSystemArchiveController<E> {
     throws IOException {
         if (null != output)
             return;
-        final FsEntryName parentName = getModel()
-                .getMountPoint()
-                .getPath()
-                .resolve(ROOT)
-                .getEntryName();
-        final OutputSocket<?> socket = getParent().getOutputSocket(
+        final OutputSocket<?> socket = parent.getOutputSocket(
                 parentName, options.set(FsOutputOption.CACHE),
                 useRootTemplate ? rootTemplate : null);
         output = new Output(driver.newOutputShop(getModel(), socket,
