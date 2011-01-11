@@ -25,7 +25,18 @@
 
     <artifactId>truezip-samples</artifactId>
     <name>TrueZIP Samples</name>
-    <description>TrueZIP sample applications. Some of them use advanced/exotic features.</description>
+    <description>
+        The sample applications demonstrate the use of the various TrueZIP
+        module APIs.
+        Some of them use rather advanced or exotic features which makes them
+        more complex than would be expected from a typical application.
+        As by design, the sample applications can use all file system drivers
+        which can be loaded from the class path at runtime.
+        Enumeration of the available file system drivers is performed by
+        scanning the class path for files with the name
+        "META-INF/services/de.schlichtherle.truezip.fs.FsDriverProvider"
+        and instantiating any class named in them.
+    </description>
 
     <dependencies>
         <!-- A TrueZIP application typically has a compile time dependency on
@@ -60,19 +71,16 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>truezip-driver-tar</artifactId>
             <version>${project.version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truezip-driver-tzp</artifactId>
             <version>${project.version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truezip-driver-zip</artifactId>
             <version>${project.version}</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>

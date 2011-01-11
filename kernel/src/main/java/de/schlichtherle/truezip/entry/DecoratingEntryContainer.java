@@ -17,7 +17,7 @@ package de.schlichtherle.truezip.entry;
 
 import java.util.Iterator;
 
-/*
+/**
  * A decorator for an entry container.
  *
  * @param   <E> The type of the entries.

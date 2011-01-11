@@ -30,11 +30,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import static de.schlichtherle.truezip.fs.FsOutputOption.APPEND;
-import static de.schlichtherle.truezip.fs.FsOutputOption.CACHE;
-import static de.schlichtherle.truezip.fs.FsOutputOption.CREATE_PARENTS;
-import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
-import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
+import static de.schlichtherle.truezip.fs.FsOutputOption.*;
+import static de.schlichtherle.truezip.entry.Entry.Access.*;
+import static de.schlichtherle.truezip.entry.Entry.*;
 
 /**
  * @see     FileInputSocket
@@ -74,6 +72,8 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
     public OutputStream newOutputStream() throws IOException {
         final File entryFile = entry.getFile();
+        if (options.get(EXCLUSIVE) && entryFile.exists())
+            throw new IOException(entryFile.getPath() + " (file exists already)"); // this is obviously not atomic
         if (options.get(CREATE_PARENTS))
             entryFile.getParentFile().mkdirs();
         final FileEntry temp = options.get(CACHE) && !entryFile.createNewFile()

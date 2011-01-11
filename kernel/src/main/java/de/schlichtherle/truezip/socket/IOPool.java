@@ -28,6 +28,7 @@ import net.jcip.annotations.ThreadSafe;
  * However, this does not necessarily apply to the implementation of its
  * managed resources.
  *
+ * @param <E> the type of the I/O entries.
  * @author Christian Schlichtherle
  * @version $Id$
  */
@@ -35,6 +36,11 @@ import net.jcip.annotations.ThreadSafe;
 public interface IOPool<E extends IOEntry<E>>
 extends Pool<Entry<E>, IOException> {
 
+    /**
+     * A releasable I/O entry.
+     * 
+     * @param <E> the type of the I/O entries.
+     */
     @NotThreadSafe
     interface Entry<E extends IOEntry<E>>
     extends IOEntry<E>, Pool.Releasable<IOException> {

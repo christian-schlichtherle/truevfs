@@ -19,13 +19,6 @@ import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.io.FileBusyException;
-import de.schlichtherle.truezip.file.ArchiveDetector;
-import de.schlichtherle.truezip.file.ArchiveException;
-import de.schlichtherle.truezip.file.ArchiveWarningException;
-import de.schlichtherle.truezip.file.DefaultArchiveDetector;
-import de.schlichtherle.truezip.file.File;
-import de.schlichtherle.truezip.file.FileInputStream;
-import de.schlichtherle.truezip.file.FileOutputStream;
 import de.schlichtherle.truezip.fs.archive.ArchiveDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.socket.OutputClosedException;
@@ -141,14 +134,14 @@ public abstract class FileTestCase {
         if (temp.exists() && !temp.delete())
             logger.log(Level.WARNING, "{0} (could not delete)", temp);
 
-        File.setDefaultArchiveDetector(ArchiveDetector.ALL); // restore default
+        File.setDefaultArchiveDetector(DefaultArchiveDetector.ALL); // restore default
         File.setLenient(true); // Restore default
     }
 
     private static File newNonArchiveFile(File file) {
         return new File(file.getParentFile(),
                         file.getName(),
-                        ArchiveDetector.NULL);
+                        DefaultArchiveDetector.NULL);
     }
 
     @Test
@@ -1111,7 +1104,7 @@ public abstract class FileTestCase {
         // - not a regular archive.
         // So upon completion of this step, the object "archive" refers to a
         // false positive.
-        final File tmp = new File(archive.getPath(), ArchiveDetector.NULL);
+        final File tmp = new File(archive.getPath(), DefaultArchiveDetector.NULL);
         final InputStream in = new ByteArrayInputStream(data);
         try {
             assertTrue(tmp.copyFrom(in));

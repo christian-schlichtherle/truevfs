@@ -15,9 +15,13 @@
  */
 package de.schlichtherle.truezip.file;
 
+import de.schlichtherle.truezip.fs.FsClassPathDriverProvider;
+import de.schlichtherle.truezip.fs.FsController;
+import de.schlichtherle.truezip.fs.FsDefaultDriver;
+import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.util.SuffixSet;
 import de.schlichtherle.truezip.fs.FsDriver;
-import de.schlichtherle.truezip.fs.FsDriverProvider;
+import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.util.ServiceLocator;
 import de.schlichtherle.truezip.util.regex.ThreadLocalMatcher;
@@ -63,14 +67,32 @@ import java.util.regex.Matcher;
  * 
  * @author Christian Schlichtherle
  * @version $Id$
- * @see ArchiveDetector#NULL
- * @see ArchiveDetector#ALL
+ * @see DefaultArchiveDetector#NULL
+ * @see DefaultArchiveDetector#ALL
  */
-public final class DefaultArchiveDetector
-implements ArchiveDetector {
+public final class DefaultArchiveDetector implements ArchiveDetector {
 
     private static final ServiceLocator serviceLocator
             = new ServiceLocator(DefaultArchiveDetector.class.getClassLoader());
+
+    /**
+     * Never recognizes archive files in a path.
+     * This can be used as the end of a chain of
+     * {@code DefaultArchiveDetector} instances or if archive files
+     * shall be treated like ordinary files rather than (virtual) directories.
+     */
+    public static final DefaultArchiveDetector
+            NULL = new DefaultArchiveDetector("");
+
+    /**
+     * Recognizes all archive file suffixes registered in the global archive
+     * driver registry by the configuration file(s).
+     * <p>
+     * This requires <a href="{@docRoot}/overview.html#defaults">additional JARs</a>
+     * on the run time class path.
+     */
+    public static final DefaultArchiveDetector
+            ALL = new DefaultArchiveDetector();
 
     private final @NonNull Map<FsScheme, ? extends FsDriver> drivers;
 
@@ -89,7 +111,7 @@ implements ArchiveDetector {
     private final @NonNull ThreadLocalMatcher matcher;
 
     public DefaultArchiveDetector() {
-        this.drivers = FsDriverProvider.ALL.getDrivers();
+        this.drivers = FsClassPathDriverProvider.INSTANCE.getDrivers();
         final SuffixSet set = getSuffixes(drivers);
         this.suffixes = set.toString();
         this.matcher = new ThreadLocalMatcher(set.toPattern());
@@ -115,7 +137,7 @@ implements ArchiveDetector {
      *         configured in the global map.
      */
     public DefaultArchiveDetector(final @NonNull String suffixes) {
-        this.drivers = FsDriverProvider.ALL.getDrivers();
+        this.drivers = FsClassPathDriverProvider.INSTANCE.getDrivers();
         final SuffixSet set = new SuffixSet(suffixes);
         final SuffixSet all = getSuffixes(drivers);
         if (set.retainAll(all)) {
@@ -130,7 +152,7 @@ implements ArchiveDetector {
     /**
      * Equivalent to
      * {@link #DefaultArchiveDetector(DefaultArchiveDetector, String, FsDriver)
-     * DefaultArchiveDetector(ArchiveDetector.NULL, suffixes, driver)}.
+     * DefaultArchiveDetector(DefaultArchiveDetector.NULL, suffixes, driver)}.
      */
     public DefaultArchiveDetector(  @NonNull String suffixes,
                                     @CheckForNull FsDriver driver) {
@@ -271,16 +293,38 @@ implements ArchiveDetector {
     }
 
     @Override
-    public Map<FsScheme, ? extends FsDriver> getDrivers() {
-        return drivers;
-    }
-
-    @Override
     public FsScheme getScheme(final String path) {
         final Matcher m = matcher.reset(path);
         return m.matches()
                 ? FsScheme.create(m.group(1).toLowerCase(Locale.ENGLISH))
                 : null;
+    }
+
+    /** For unit testing only. */
+    FsDriver getDriver(FsScheme scheme) {
+        return drivers.get(scheme);
+    }
+
+    @Override
+    public FsController<?>
+    newController(final FsMountPoint mountPoint, final FsController<?> parent) {
+        assert null == mountPoint.getParent()
+                ? null == parent
+                : mountPoint.getParent().equals(parent.getModel().getMountPoint());
+        final FsScheme declaredScheme = mountPoint.getScheme();
+        final FsPath path = mountPoint.getPath();
+        final FsDriver driver;
+        if (null != path) {
+            final FsScheme detectedScheme = getScheme(path.getEntryName().getPath()); // may be null!
+            if (!declaredScheme.equals(detectedScheme))
+                throw new IllegalArgumentException(mountPoint.toString() + " (declared/detected scheme mismatch)");
+            driver = drivers.get(declaredScheme);
+            assert null != driver;
+        } else {
+            assert "file".equalsIgnoreCase(declaredScheme.toString());
+            driver = FsDefaultDriver.ALL;
+        }
+        return driver.newController(mountPoint, parent); // throwing NPE is OK!
     }
 
     /**

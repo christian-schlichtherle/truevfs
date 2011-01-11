@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.file.swing;
 
-import de.schlichtherle.truezip.file.ArchiveDetector;
+import de.schlichtherle.truezip.file.DefaultArchiveDetector;
 import de.schlichtherle.truezip.file.File;
 import java.util.ResourceBundle;
 import javax.swing.Icon;
@@ -119,7 +119,7 @@ final class FileView extends DecoratingFileView {
     private static File newNonArchiveFile(File file) {
         return new File(file.getParentFile(),
                         file.getName(),
-                        ArchiveDetector.NULL);
+                        DefaultArchiveDetector.NULL);
     }
 
     private static boolean isEntryInValidArchive(File file) {
@@ -130,7 +130,7 @@ final class FileView extends DecoratingFileView {
         java.io.File parent = file.getParentFile();
         assert parent != null : "An archive entry must always name a parent!";
         return parent.isDirectory()
-                && !new File(parent.getPath(), ArchiveDetector.NULL)
+                && !new File(parent.getPath(), DefaultArchiveDetector.NULL)
                     .isDirectory();
     }
 }

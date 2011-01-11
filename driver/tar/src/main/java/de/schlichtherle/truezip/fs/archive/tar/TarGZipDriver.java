@@ -113,20 +113,8 @@ public class TarGZipDriver extends TarDriver {
                 source);
     }
 
-    public static class GZIPOutputStream
-            extends java.util.zip.GZIPOutputStream {
-        /**
-         * Constructs a new {@code GZIPOutputStream} with the specified
-         * output stream, buffer size and compression level.
-         *
-         * @param level The compression level for the {@link Deflater}
-         *        ({@value java.util.zip.Deflater#BEST_SPEED}..{@value java.util.zip.Deflater#BEST_COMPRESSION}).
-         * @throws IOException If an I/O error occurs.
-         * @throws IllegalArgumentException if {@code size} is <= 0.
-         * @throws IllegalArgumentException If {@code level} is not in the
-         *         range [{@value java.util.zip.Deflater#BEST_SPEED}..{@value java.util.zip.Deflater#BEST_COMPRESSION}]
-         *         and is not {@value java.util.zip.Deflater#DEFAULT_COMPRESSION}.
-         */
+    private static class GZIPOutputStream
+    extends java.util.zip.GZIPOutputStream {
         public GZIPOutputStream(OutputStream out, int size, int level)
         throws IOException {
             super(out, size);

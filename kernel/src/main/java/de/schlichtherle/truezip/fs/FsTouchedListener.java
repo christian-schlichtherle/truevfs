@@ -18,7 +18,8 @@ package de.schlichtherle.truezip.fs;
 import java.util.EventListener;
 
 /**
- * Used to notify implementations of an event in a {@link FsModel}.
+ * Used to notify implementations that a {@link FsModel file system model} has
+ * changed its property {@link FsModel#isTouched() touched}.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -28,7 +29,7 @@ public interface FsTouchedListener extends EventListener {
     /**
      * Called whenever the value of the property
      * {@link FsModel#isTouched() touched} has changed
-     * in the source file system model.
+     * in the {@link FsEvent#getSource() source} file system model.
      */
     void touchedChanged(FsEvent event);
 }

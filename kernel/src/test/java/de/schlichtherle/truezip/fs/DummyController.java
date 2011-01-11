@@ -15,15 +15,6 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.fs.FsEntry;
-import de.schlichtherle.truezip.fs.FsInputOption;
-import de.schlichtherle.truezip.fs.FsEntryName;
-import de.schlichtherle.truezip.fs.FsSyncOption;
-import de.schlichtherle.truezip.fs.FsException;
-import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.FsModel;
-import de.schlichtherle.truezip.fs.FsOutputOption;
-import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Access;
 import de.schlichtherle.truezip.entry.Entry.Type;

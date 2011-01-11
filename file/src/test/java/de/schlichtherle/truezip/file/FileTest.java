@@ -15,8 +15,6 @@
  */
 package de.schlichtherle.truezip.file;
 
-import de.schlichtherle.truezip.file.DefaultArchiveDetector;
-import de.schlichtherle.truezip.file.File;
 import java.util.logging.Logger;
 import java.beans.ExceptionListener;
 import java.beans.XMLDecoder;
@@ -35,7 +33,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static de.schlichtherle.truezip.file.ArchiveDetector.NULL;
+import static de.schlichtherle.truezip.file.DefaultArchiveDetector.NULL;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import static java.io.File.*;
 import static org.hamcrest.CoreMatchers.*;
@@ -58,12 +56,12 @@ public class FileTest {
                 new DummyArchiveDriver());
 
     private File archive;
-    private String suffix;
+    private String scheme;
 
     @Before
     public void setUp() {
         File.setDefaultArchiveDetector(DETECTOR);
-        suffix = ".zip";
+        scheme = "zip";
         archive = new File("archive.zip");
     }
 
@@ -118,53 +116,53 @@ public class FileTest {
 
         // No ZIP file in path.
 
-        file = new File(new URI("file", "/a " + suffix + "/b " + suffix + "/", null));
+        file = new File(new URI("file", "/a ." + scheme + "/b ." + scheme + "/", null));
         assertNull(file.getInnerArchive());
         assertNull(file.getInnerEntryName());
         assertNull(file.getEnclArchive());
         assertNull(file.getEnclEntryName());
 
-        file = new File(new URI("file", "/a " + suffix + "/b " + suffix + "", null));
+        file = new File(new URI("file", "/a ." + scheme + "/b ." + scheme + "", null));
         assertNull(file.getInnerArchive());
         assertNull(file.getInnerEntryName());
         assertNull(file.getEnclArchive());
         assertNull(file.getEnclEntryName());
 
         // One ZIP file in path.
-        file = new File(new URI("jar", "file:/a " + suffix + "/b " + suffix + "!/", null));
+        file = new File(new URI(scheme, "file:/a ." + scheme + "/b ." + scheme + "!/", null));
         assertSame(file, file.getInnerArchive());
         assertSame(ROOT, file.getInnerEntryName0());
         assertNull(file.getEnclArchive());
         assertNull(file.getEnclEntryName());
 
-        file = new File(new URI("jar", "file:/a " + suffix + "!/b " + suffix + "", null));
+        file = new File(new URI(scheme, "file:/a ." + scheme + "!/b ." + scheme + "", null));
         assertSame(file.getInnerArchive(), file.getEnclArchive());
         assertSame(file.getInnerEntryName(), file.getEnclEntryName());
-        assertEquals(fs + "a " + suffix + "", file.getEnclArchive().getPath());
-        assertEquals("b " + suffix + "", file.getEnclEntryName());
+        assertEquals(fs + "a ." + scheme + "", file.getEnclArchive().getPath());
+        assertEquals("b ." + scheme + "", file.getEnclEntryName());
 
         // One ZIP file in path with one redundant jar: scheme.
 
         try {
-            file = new File(new URI("jar", "jar:file:/a " + suffix + "/b " + suffix + "!/", null));
+            file = new File(new URI(scheme, scheme + ":file:/a ." + scheme + "/b ." + scheme + "!/", null));
             fail();
         } catch (IllegalArgumentException ex) {
         }
 
         try {
-            file = new File(new URI("jar", "jar:file:/a " + suffix + "/b " + suffix + "!", null));
+            file = new File(new URI(scheme, scheme + ":file:/a ." + scheme + "/b ." + scheme + "!", null));
             fail();
         } catch (IllegalArgumentException ex) {
         }
 
         try {
-            file = new File(new URI("jar", "jar:file:/a " + suffix + "!/b " + suffix + "/", null));
+            file = new File(new URI(scheme, scheme + ":file:/a ." + scheme + "!/b ." + scheme + "/", null));
             fail();
         } catch (IllegalArgumentException ex) {
         }
 
         try {
-            file = new File(new URI("jar", "jar:file:/a " + suffix + "!/b " + suffix + "", null));
+            file = new File(new URI(scheme, scheme + ":file:/a ." + scheme + "!/b ." + scheme + "", null));
             fail();
         } catch (IllegalArgumentException ex) {
         }
@@ -172,40 +170,40 @@ public class FileTest {
         // One ZIP file in path with two redundant jar: schemes.
 
         try {
-            file = new File(new URI("jar", "jar:jar:file:/a " + suffix + "/b " + suffix + "!/", null));
+            file = new File(new URI(scheme, scheme + ":" + scheme + ":file:/a ." + scheme + "/b ." + scheme + "!/", null));
             fail();
         } catch (IllegalArgumentException ex) {
         }
 
         try {
-            file = new File(new URI("jar", "jar:jar:file:/a " + suffix + "/b " + suffix + "!", null));
+            file = new File(new URI(scheme, scheme + ":" + scheme + ":file:/a ." + scheme + "/b ." + scheme + "!", null));
             fail();
         } catch (IllegalArgumentException ex) {
         }
 
         try {
-            file = new File(new URI("jar", "jar:jar:file:/a " + suffix + "!/b " + suffix + "/", null));
+            file = new File(new URI(scheme, scheme + ":" + scheme + ":file:/a ." + scheme + "!/b ." + scheme + "/", null));
             fail();
         } catch (IllegalArgumentException ex) {
         }
 
         try {
-            file = new File(new URI("jar", "jar:jar:file:/a " + suffix + "!/b " + suffix + "", null));
+            file = new File(new URI(scheme, scheme + ":" + scheme + ":file:/a ." + scheme + "!/b ." + scheme + "", null));
             fail();
         } catch (IllegalArgumentException ex) {
         }
 
         // Two ZIP files in path.
 
-        file = new File(new URI("jar", "jar:file:/a " + suffix + "!/b " + suffix + "!/", null));
+        file = new File(new URI(scheme, scheme + ":file:/a ." + scheme + "!/b ." + scheme + "!/", null));
         assertSame(file, file.getInnerArchive());
         assertSame(ROOT, file.getInnerEntryName0());
-        assertEquals(fs + "a " + suffix + "", file.getEnclArchive().getPath());
-        assertEquals("b " + suffix + "", file.getEnclEntryName());
+        assertEquals(fs + "a ." + scheme + "", file.getEnclArchive().getPath());
+        assertEquals("b ." + scheme + "", file.getEnclEntryName());
 
         // One ZIP file in path with one misleading '!' in path.
 
-        file = new File(new URI("jar", "file:/a " + suffix + "!/b " + suffix + "!/", null));
+        file = new File(new URI(scheme, "file:/a ." + scheme + "!/b ." + scheme + "!/", null));
         assertSame(file, file.getInnerArchive());
         assertSame(ROOT, file.getInnerEntryName0());
         assertNull(file.getEnclArchive());
@@ -215,13 +213,13 @@ public class FileTest {
         // and hence one redundant jar: scheme.
 
         try {
-            file = new File(new URI("jar", "jar:jar:file:/a " + suffix + "!/b " + suffix + "!/../c " + suffix + "!/", null));
+            file = new File(new URI(scheme, scheme + ":" + scheme + ":file:/a ." + scheme + "!/b ." + scheme + "!/../c ." + scheme + "!/", null));
             fail();
         } catch (IllegalArgumentException ex) {
         }
 
         try {
-            file = new File(new URI("jar", "jar:jar:file:/a " + suffix + "!/b " + suffix + "!/../c " + suffix + "!", null));
+            file = new File(new URI(scheme, scheme + ":" + scheme + ":file:/a ." + scheme + "!/b ." + scheme + "!/../c ." + scheme + "!", null));
             fail();
         } catch (IllegalArgumentException ex) {
         }
@@ -229,13 +227,13 @@ public class FileTest {
         // One ZIP file in path which is removed by normalization.
 
         try {
-            file = new File(new URI("jar", "file:/a " + suffix + "!/../b " + suffix + "/", null));
+            file = new File(new URI(scheme, "file:/a ." + scheme + "!/../b ." + scheme + "/", null));
             fail();
         } catch (IllegalArgumentException ex) {
         }
 
         try {
-            file = new File(new URI("jar", "file:/a " + suffix + "!/../b " + suffix + "", null));
+            file = new File(new URI(scheme, "file:/a ." + scheme + "!/../b ." + scheme + "", null));
             fail();
         } catch (IllegalArgumentException ex) {
         }
@@ -282,7 +280,7 @@ public class FileTest {
         }
 
         {
-            final String innerName = "inner" + suffix;
+            final String innerName = "inner." + scheme;
             final File inner = new File(archive, innerName);
             final File[] files = {
                 new File(inner, ""),
@@ -321,43 +319,43 @@ public class FileTest {
             }
         }
 
-        final File a = new File("outer" + suffix + "/removed" + suffix);
+        final File a = new File("outer." + scheme + "/removed." + scheme);
         File b, c;
 
-        b = new File("../removed.dir/removed.dir/../../dir/./inner" + suffix);
+        b = new File("../removed.dir/removed.dir/../../dir/./inner." + scheme);
         c = new File(a, b.getPath());
         assertTrue(c.isArchive());
         assertTrue(c.isEntry());
-        assertEquals("outer" + suffix,
+        assertEquals("outer." + scheme,
                 c.getEnclArchive().getPath());
-        assertEquals("dir/inner" + suffix,
+        assertEquals("dir/inner." + scheme,
                 c.getEnclEntryName());
 
-        b = new File("../removed.dir/removed.dir/../../dir/./inner" + suffix);
+        b = new File("../removed.dir/removed.dir/../../dir/./inner." + scheme);
         c = new File(a, b.getPath(), NULL);
         assertFalse(c.isArchive());
         assertTrue(c.isEntry());
-        assertEquals("outer" + suffix,
+        assertEquals("outer." + scheme,
                 c.getInnerArchive().getPath());
-        assertEquals("dir/inner" + suffix,
+        assertEquals("dir/inner." + scheme,
                 c.getInnerEntryName());
 
-        b = new File("../removed.dir/removed.dir/../../dir/./inner"
-                + suffix + "/removed.dir/removed.dir/../../dir/./test.txt");
+        b = new File("../removed.dir/removed.dir/../../dir/./inner."
+                + scheme + "/removed.dir/removed.dir/../../dir/./test.txt");
         c = new File(a, b.getPath());
         assertFalse(c.isArchive());
         assertTrue(c.isEntry());
-        assertEquals("outer" + suffix + fs + "removed" + suffix + fs + ".."
+        assertEquals("outer." + scheme + fs + "removed." + scheme + fs + ".."
                 + fs + "removed.dir" + fs + "removed.dir" + fs + ".." + fs
-                + ".." + fs + "dir" + fs + "." + fs + "inner" + suffix,
+                + ".." + fs + "dir" + fs + "." + fs + "inner." + scheme,
                 c.getInnerArchive().getPath());
-        assertEquals("dir/inner" + suffix,
+        assertEquals("dir/inner." + scheme,
                 c.getInnerArchive().getEnclEntryName());
     }
-    
+
     @Test
     public void testGetParentFile() {
-        File abcdefgh = new File("a/b" + suffix + "/c/d/e" + suffix + "/f" + suffix + "/g/h" + suffix + "");
+        File abcdefgh = new File("a/b." + scheme + "/c/d/e." + scheme + "/f." + scheme + "/g/h." + scheme + "");
         File abcdefg  = abcdefgh.getParentFile();
         File abcdef   = abcdefg .getParentFile();
         File abcde    = abcdef  .getParentFile();
@@ -431,8 +429,8 @@ public class FileTest {
 
     @Test
     public void testGetTopLevelArchive() {
-        File file = new File("abc/def" + suffix + "/efg" + suffix + "/hij" + suffix + "/test.txt");
-        assertEquals(new java.io.File("abc/def" + suffix), file.getTopLevelArchive());
+        File file = new File("abc/def." + scheme + "/efg." + scheme + "/hij." + scheme + "/test.txt");
+        assertEquals(new java.io.File("abc/def." + scheme), file.getTopLevelArchive());
     }
 
     @Test

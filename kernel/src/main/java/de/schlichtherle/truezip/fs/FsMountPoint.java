@@ -41,14 +41,14 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
  * <li>The URI must be absolute.
  * <li>The URI must not have a fragment.
  * <li>If the URI is opaque, its scheme specific part must end with the mount
- *     point separator {@value FsPath#MOUNT_POINT_SEPARATOR}.
+ *     point separator {@value de.schlichtherle.truezip.fs.FsPath#MOUNT_POINT_SEPARATOR}.
  *     The scheme specific part <em>before</em> this mount point separator is
  *     parsed according the syntax constraints for a {@link FsPath} and the
  *     following additional syntax constraints:
  *     The path must be absolute.
  *     If its opaque, it's entry name must not be empty.
  * <li>If the URI is hierarchical, its path must be in normal form and end with
- *     a {@value FsEntryName#SEPARATOR}.
+ *     a {@value de.schlichtherle.truezip.entry.EntryName#SEPARATOR}.
  * </ol>
  * <p>
  * Examples for valid mount point URIs are:
@@ -175,7 +175,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
      * Equivalent to {@link #FsMountPoint(String, FsUriModifier) new FsMountPoint(uri, FsUriModifier.NULL)}.
      */
     public FsMountPoint(@NonNull String uri) throws URISyntaxException {
-        parse(uri, NULL);
+        parse(new URI(uri), NULL);
     }
 
     /**
@@ -189,7 +189,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
      */
     public FsMountPoint(@NonNull String uri, @NonNull FsUriModifier modifier)
     throws URISyntaxException {
-        parse(uri, modifier);
+        parse(new URI(uri), modifier);
     }
 
     /**
@@ -249,16 +249,11 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
     private void readObject(@NonNull ObjectInputStream in)
     throws IOException, ClassNotFoundException {
         try {
-            parse(in.readObject().toString(), NULL);
+            parse(new URI(in.readObject().toString()), NULL);
         } catch (URISyntaxException ex) {
             throw (InvalidObjectException) new InvalidObjectException(ex.toString())
                     .initCause(ex);
         }
-    }
-
-    private void parse(@NonNull String uri, @NonNull FsUriModifier modifier)
-    throws URISyntaxException {
-        parse(new URI(uri), modifier);
     }
 
     private void parse(@NonNull URI uri, final @NonNull FsUriModifier modifier)

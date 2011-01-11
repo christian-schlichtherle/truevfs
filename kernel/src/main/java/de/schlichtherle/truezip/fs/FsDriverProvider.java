@@ -17,19 +17,17 @@ package de.schlichtherle.truezip.fs;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Map;
+import java.util.ServiceLoader;
 import net.jcip.annotations.Immutable;
 
 /**
- * A provider for an immutable map of file system schemes to file system
- * drivers.
+ * An immutable provider for file system drivers.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @Immutable
 public interface FsDriverProvider {
-
-    FsDriverProvider ALL = FsClassPathDriverProvider.INSTANCE;
 
     /**
      * Returns an immutable map of the supported file system drivers.

@@ -20,7 +20,7 @@
     <parent>
         <groupId>de.schlichtherle</groupId>
         <artifactId>asl20-oss-parent</artifactId>
-        <version>5</version>
+        <version>6</version>
     </parent>
 
     <groupId>de.schlichtherle.truezip</groupId>
@@ -30,17 +30,17 @@
 
     <name>TrueZIP (POM)</name>
     <description>
-        TrueZIP is a library and a framework for accessing federated virtual
+        TrueZIP is a framework and a library for accessing federated virtual
         file systems.
+        As a framework, TrueZIP provides the interfaces and classes to write
+        archive drivers which seamlessly plug-in to the federated virtual file
+        system space.
         As a library, TrueZIP provides easy-to-use APIs for multi-threaded
         read/write access to federated virtual file systems.
         TrueZIP ships with file system driver families for ZIP, TAR and TZP
         file formats and their derivatives (JAR, TGZ etc.)
-        The TZP file format is a custom AES/SHA/CTR encrypted ZIP file format
-        which supports random read access.
-        As a framework, TrueZIP provides the interfaces and classes to write
-        archive drivers which seamlessly plug-in to the federated virtual file
-        system space.
+        The TZP file format is a custom JAR file format which is transparently
+        wrapped in an AES-256/CTR/SHA-256 envelope.
     </description>
     <url>http://kenai.com/projects/truezip</url>
     <inceptionYear>2005</inceptionYear>

@@ -41,7 +41,7 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
  * <ol>
  * <li>The URI must not have a fragment.
  * <li>If the URI is opaque, its scheme specific part must contain at least
- *     one mount point separator {@value FsPath#MOUNT_POINT_SEPARATOR}.
+ *     one mount point separator {@value de.schlichtherle.truezip.fs.FsPath#MOUNT_POINT_SEPARATOR}.
  *     The part <em>up to</em> the last mount point separator is parsed
  *     according to the syntax constraints for a {@link FsMountPoint} and set
  *     as the value of the property {@link #getMountPoint() mount point}.
@@ -164,7 +164,7 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
      * Equivalent to {@link #FsPath(String, FsUriModifier) new FsPath(uri, FsUriModifier.NULL)}.
      */
     public FsPath(@NonNull String uri) throws URISyntaxException {
-        parse(uri, NULL);
+        parse(new URI(uri), NULL);
     }
 
     /**
@@ -178,7 +178,7 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
      */
     public FsPath(@NonNull String uri, @NonNull FsUriModifier modifier)
     throws URISyntaxException {
-        parse(uri, modifier);
+        parse(new URI(uri), modifier);
     }
 
     public FsPath(@NonNull File file) {
@@ -245,16 +245,11 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
     private void readObject(@NonNull ObjectInputStream in)
     throws IOException, ClassNotFoundException {
         try {
-            parse(in.readObject().toString(), NULL);
+            parse(new URI(in.readObject().toString()), NULL);
         } catch (URISyntaxException ex) {
             throw (InvalidObjectException) new InvalidObjectException(ex.toString())
                     .initCause(ex);
         }
-    }
-
-    private void parse(@NonNull String uri, @NonNull FsUriModifier modifier)
-    throws URISyntaxException {
-        parse(new URI(uri), modifier);
     }
 
     private void parse(@NonNull URI uri, final @NonNull FsUriModifier modifier)

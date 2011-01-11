@@ -58,6 +58,8 @@ public enum FsOutputOption {
 
     /**
      * Whether or not an entry must be exclusively created.
+     * Not that this is not necessarily atomic, so it can't get used for file
+     * locking.
      */
     EXCLUSIVE,
 }

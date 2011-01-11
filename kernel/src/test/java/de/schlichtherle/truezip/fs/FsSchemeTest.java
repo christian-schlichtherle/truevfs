@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.fs.FsScheme;
 import java.beans.ExceptionListener;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;

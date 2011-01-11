@@ -17,6 +17,7 @@
 package de.schlichtherle.truezip.file.swing;
 
 import de.schlichtherle.truezip.file.ArchiveDetector;
+import de.schlichtherle.truezip.file.DefaultArchiveDetector;
 import de.schlichtherle.truezip.file.File;
 import de.schlichtherle.truezip.swing.AbstractComboBoxBrowser;
 import java.io.FilenameFilter;
@@ -136,7 +137,7 @@ public class FileComboBoxBrowser extends AbstractComboBoxBrowser {
             if (dir instanceof File)
                 detector = ((File) dir).getArchiveDetector();
             else
-                detector = ArchiveDetector.NULL;
+                detector = DefaultArchiveDetector.NULL;
             File node = new File(initials, detector);
             if (node.isAbsolute()) {
                 final boolean dirPath = node.getPath().length() < initials.length();

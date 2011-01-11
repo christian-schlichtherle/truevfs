@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.fs.FsScheme;
 import org.junit.Test;
 import static org.junit.Assert.*;
 

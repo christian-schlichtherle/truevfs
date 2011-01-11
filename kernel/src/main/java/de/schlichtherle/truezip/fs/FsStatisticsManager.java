@@ -46,27 +46,23 @@ extends FsDecoratingManager<FsManager> {
 
     @Override
     public FsController<?> getController(   FsMountPoint mountPoint,
-                                            FsFederatingDriver driver) {
-        return delegate.getController(mountPoint, new StatisticsDriver(driver));
-    }
-    
-    private class StatisticsDriver extends FsFederatingDriver {
-        StatisticsDriver(FsFederatingDriver driver) {
-            super(driver);
-        }
+                                            final FsFederatingDriver driver) {
+        class StatisticsDriver implements FsFederatingDriver {
+            @Override
+            public FsController<?>
+            newController(FsMountPoint mountPoint, FsController<?> parent) {
+                assert null == mountPoint.getParent()
+                        ? null == parent
+                        : mountPoint.getParent().equals(parent.getModel().getMountPoint());
+                FsController<?> controller = driver.newController(mountPoint, parent);
+                return null != parent && null == parent.getParent() // controller is top level federated file system?
+                        ? new FsStatisticsController(controller, FsStatisticsManager.this)
+                        : controller;
+            }
+        } // class StatisticsDriver
 
-        @Override
-        public FsController<?>
-        newController(FsMountPoint mountPoint, FsController<?> parent) {
-            assert null == mountPoint.getParent()
-                    ? null == parent
-                    : mountPoint.getParent().equals(parent.getModel().getMountPoint());
-            FsController<?> controller = super.newController(mountPoint, parent);
-            return null != parent && null == parent.getParent() // controller is top level federated file system?
-                    ? new FsStatisticsController(controller, FsStatisticsManager.this)
-                    : controller;
-        }
-    } // class StatisticsDriver
+        return delegate.getController(mountPoint, new StatisticsDriver());
+    }
 
     /**
      * Returns statistics about the set of federated file systems managed by

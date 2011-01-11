@@ -19,10 +19,14 @@ import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
 
 /**
+ * A lazy input socket provides proxy read only files and input streams which
+ * acquire their underlying local target upon the first read access.
+ *
  * @param   <E> The type of the {@link #getLocalTarget() local target}.
  * @see     LazyOutputSocket
  * @author  Christian Schlichtherle
@@ -31,17 +35,24 @@ import java.io.InputStream;
 public final class LazyInputSocket<E extends Entry>
 extends DecoratingInputSocket<E> {
 
-    public LazyInputSocket(final InputSocket<? extends E> input) {
+    public LazyInputSocket(@NonNull InputSocket<? extends E> input) {
         super(input);
     }
 
+    /**
+     * Returns a proxy read only file which acquires its underlying read only
+     * file upon the first read access.
+     *
+     * @return A proxy read only file which acquires its underlying read only
+     *         file upon the first read access.
+     */
     @Override
-    public final ReadOnlyFile newReadOnlyFile() throws IOException {
-        return new LazyReadOnlyFile();
+    public final ReadOnlyFile newReadOnlyFile() {
+        return new ProxyReadOnlyFile();
     }
 
-    private class LazyReadOnlyFile extends DecoratingReadOnlyFile {
-        LazyReadOnlyFile() {
+    private class ProxyReadOnlyFile extends DecoratingReadOnlyFile {
+        ProxyReadOnlyFile() {
             super(null);
         }
 
@@ -79,15 +90,22 @@ extends DecoratingInputSocket<E> {
             if (null != delegate)
                 delegate.close();
         }
-    } // class LazyReadOnlyFile
+    } // class ProxyReadOnlyFile
 
+    /**
+     * Returns a proxy input stream which acquires its underlying input
+     * stream upon the first read access.
+     *
+     * @return A proxy input stream which acquires its underlying input
+     *         stream upon the first read access.
+     */
     @Override
-    public final InputStream newInputStream() throws IOException {
-        return new LazyInputStream();
+    public final InputStream newInputStream() {
+        return new ProxyInputStream();
     }
 
-    private class LazyInputStream extends DecoratingInputStream {
-        LazyInputStream() {
+    private class ProxyInputStream extends DecoratingInputStream {
+        ProxyInputStream() {
             super(null);
         }
 
@@ -148,5 +166,5 @@ extends DecoratingInputSocket<E> {
                 return false;
             }
         }
-    } // class LazyInputStream
+    } // class ProxyInputStream
 }

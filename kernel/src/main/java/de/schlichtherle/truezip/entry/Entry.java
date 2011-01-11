@@ -103,16 +103,18 @@ public interface Entry {
         /**
          * Special file.
          * A special file is a byte or block oriented interface to an arbitrary
-         * resource, e.g. a hard disk or a network service.
+         * I/O device, e.g. a hard disk or a network service.
          */
         SPECIAL
     }
 
+    /** Defines the types of size information for an entry. */
     enum Size {
         DATA,
         STORAGE
     }
 
+    /** Defines the types of access information for an entry. */
     enum Access {
         WRITE,
         READ, // TODO: This is not yet fully supported!

@@ -26,7 +26,6 @@ import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.fs.FsEntry;
-import de.schlichtherle.truezip.fs.FsFederatingDriver;
 import de.schlichtherle.truezip.fs.FsFilteringManager;
 import de.schlichtherle.truezip.fs.FsSyncExceptionBuilder;
 import de.schlichtherle.truezip.fs.FsSyncOption;
@@ -361,8 +360,8 @@ public final class File extends java.io.File {
     private static boolean lenient
             = !Boolean.getBoolean(File.class.getPackage().getName() + ".strict");
 
-    private static @NonNull ArchiveDetector defaultDetector
-            = ArchiveDetector.ALL;
+    private static @NonNull ArchiveDetector
+            defaultDetector = DefaultArchiveDetector.ALL;
 
     //
     // Instance fields:
@@ -651,9 +650,8 @@ public final class File extends java.io.File {
                 this.enclEntryName = null;
             }
             this.innerArchive = this;
-            this.controller = FsManagers
-                    .getInstance()
-                    .getController(mountPoint, new FsFederatingDriver(detector));
+            this.controller = FsManagers.getInstance()
+                                        .getController(mountPoint, detector);
         } else {
             assert path.getUri().isOpaque();
             this.enclArchive = new File(mountPoint, detector);
@@ -692,9 +690,8 @@ public final class File extends java.io.File {
                 this.enclEntryName = null;
             }
             this.innerArchive = this;
-            this.controller = FsManagers
-                    .getInstance()
-                    .getController(mountPoint, new FsFederatingDriver(detector));
+            this.controller = FsManagers.getInstance()
+                                        .getController(mountPoint, detector);
         }
 
         assert invariants();
@@ -892,9 +889,8 @@ public final class File extends java.io.File {
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
         }
-        this.controller = FsManagers
-                .getInstance()
-                .getController(mountPoint, new FsFederatingDriver(detector));
+        this.controller = FsManagers.getInstance()
+                                    .getController(mountPoint, detector);
     }
 
     private Object writeReplace() throws ObjectStreamException {
@@ -1336,7 +1332,7 @@ public final class File extends java.io.File {
      * {@code File} instance.
      * <p>
      * This class property is initially set to
-     * {@link ArchiveDetector#ALL}
+     * {@link DefaultArchiveDetector#ALL}
      *
      * @see #setDefaultArchiveDetector
      */
@@ -1646,7 +1642,7 @@ public final class File extends java.io.File {
      * In case you want to convert an instance of this class which recognized
      * the base name of its path as an archive file to a file instance which
      * doesn't recognize this archive file, use the following code instead:
-     * {@code new File(file.getParentFile(), file.getName(), ArchiveDetector.NULL)}
+     * {@code new File(file.getParentFile(), file.getName(), DefaultArchiveDetector.NULL)}
      *
      * @return An instance of the {@link java.io.File java.io.File} class or
      *         one of its subclasses, but never an instance of this class or
@@ -2843,8 +2839,8 @@ public final class File extends java.io.File {
      * destination, this method can be used to do advanced stuff like
      * unzipping any archive file in the source tree to a plain directory
      * in the destination tree (where {@code srcDetector} could be
-     * {@link ArchiveDetector#ALL} and {@code dstDetector} must be
-     * {@link ArchiveDetector#NULL}) or changing the charset by configuring
+     * {@link DefaultArchiveDetector#ALL} and {@code dstDetector} must be
+     * {@link DefaultArchiveDetector#NULL}) or changing the charset by configuring
      * a custom {@link DefaultArchiveDetector}.
      * <p>
      * <table border="2" cellpadding="4">
@@ -3161,8 +3157,8 @@ public final class File extends java.io.File {
      * destination, this method can be used to do advanced stuff like
      * unzipping any archive file in the source tree to a plain directory
      * in the destination tree (where {@code srcDetector} could be
-     * {@link ArchiveDetector#ALL} and {@code dstDetector} must be
-     * {@link ArchiveDetector#NULL}) or changing the charset by configuring
+     * {@link DefaultArchiveDetector#ALL} and {@code dstDetector} must be
+     * {@link DefaultArchiveDetector#NULL}) or changing the charset by configuring
      * a custom {@link DefaultArchiveDetector}.
      * <p>
      * <table border="2" cellpadding="4">
@@ -3438,8 +3434,8 @@ public final class File extends java.io.File {
      * destination, this method can be used to do advanced stuff like
      * unzipping any archive file in the source tree to a plain directory
      * in the destination tree (where {@code srcDetector} could be
-     * {@link ArchiveDetector#ALL} and {@code dstDetector} must be
-     * {@link ArchiveDetector#NULL}) or changing the charset by configuring
+     * {@link DefaultArchiveDetector#ALL} and {@code dstDetector} must be
+     * {@link DefaultArchiveDetector#NULL}) or changing the charset by configuring
      * a custom {@link DefaultArchiveDetector}.
      * <p>
      * <table border="2" cellpadding="4">
@@ -3718,8 +3714,8 @@ public final class File extends java.io.File {
      * destination, this method can be used to do advanced stuff like
      * unzipping any archive file in the source tree to a plain directory
      * in the destination tree (where {@code srcDetector} could be
-     * {@link ArchiveDetector#ALL} and {@code dstDetector} must be
-     * {@link ArchiveDetector#NULL}) or changing the charset by configuring
+     * {@link DefaultArchiveDetector#ALL} and {@code dstDetector} must be
+     * {@link DefaultArchiveDetector#NULL}) or changing the charset by configuring
      * a custom {@link DefaultArchiveDetector}.
      * <p>
      * <table border="2" cellpadding="4">

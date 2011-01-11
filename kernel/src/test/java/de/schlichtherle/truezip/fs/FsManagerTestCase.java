@@ -15,10 +15,6 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.fs.FsManager;
-import de.schlichtherle.truezip.fs.FsMountPoint;
-import de.schlichtherle.truezip.fs.FsFederatingDriver;
-import de.schlichtherle.truezip.fs.FsController;
 import java.util.Iterator;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URI;
@@ -38,7 +34,7 @@ import static org.junit.Assert.*;
 public abstract class FsManagerTestCase {
 
     private final FsFederatingDriver driver
-            = new FsFederatingDriver(new DummyDriverProvider("file|zip"));
+            = new FsDefaultDriver(new DummyDriverProvider("file|zip"));
     private FsManager manager;
 
     @Before

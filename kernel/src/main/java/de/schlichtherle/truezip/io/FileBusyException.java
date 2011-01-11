@@ -18,11 +18,11 @@ package de.schlichtherle.truezip.io;
 import java.io.FileNotFoundException;
 
 /**
- * Indicates that a file system entry could not get read or written because
- * the entry or its container is busy.
+ * Indicates that a file system entry could not get read or written
+ * because the entry or its container is busy.
  * This exception is recoverable, meaning it should be possible to repeat the
  * operation successfully as soon as the entry or its container is not busy
- * anymore and unless another exceptional condition applies.
+ * anymore and unless no other exceptional condition applies.
  *
  * @author Christian Schlichtherle
  * @version $Id$

@@ -22,6 +22,8 @@ import java.util.Collections;
 import java.util.Map;
 
 /**
+ * A provider for a driver for the {@code file} scheme.
+ *
  * @author  Christian Schlichtherle
  * @version $Id$
  */

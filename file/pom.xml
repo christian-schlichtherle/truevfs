@@ -25,7 +25,11 @@
 
     <artifactId>truezip-file</artifactId>
     <name>TrueZIP File*</name>
-    <description>The File* API allows convenient access to archive files by means of the File, FileInputStream and FileOutputStream classes.</description>
+    <description>
+        The File* API allows convenient access to archive files and
+        their entries by means of the File, FileInputStream and
+        FileOutputStream classes.
+    </description>
 
     <dependencies>
         <dependency>

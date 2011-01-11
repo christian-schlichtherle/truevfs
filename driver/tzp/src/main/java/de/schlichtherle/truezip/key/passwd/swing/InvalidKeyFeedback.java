@@ -16,6 +16,9 @@
 package de.schlichtherle.truezip.key.passwd.swing;
 
 /**
+ * Provides visual and/or audible feedback to the user when prompting
+ * for a key again after an invalid key has been provided before.
+ *
  * @author Christian Schlichtherle
  * @version $Id$
  */

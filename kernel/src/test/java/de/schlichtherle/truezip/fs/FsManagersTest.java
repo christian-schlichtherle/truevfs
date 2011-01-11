@@ -15,9 +15,6 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.fs.FsManager;
-import de.schlichtherle.truezip.fs.FsManagers;
-import de.schlichtherle.truezip.fs.FsFederatingManager;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.*;

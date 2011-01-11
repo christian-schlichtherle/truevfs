@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.file;
 
-import de.schlichtherle.truezip.fs.FsDriverProvider;
+import de.schlichtherle.truezip.fs.FsFederatingDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -47,24 +47,7 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-public interface ArchiveDetector extends FsDriverProvider {
-
-    /**
-     * Never recognizes archive files in a path.
-     * This can be used as the end of a chain of
-     * {@code DefaultArchiveDetector} instances or if archive files
-     * shall be treated like ordinary files rather than (virtual) directories.
-     */
-    DefaultArchiveDetector NULL = new DefaultArchiveDetector("");
-
-    /**
-     * Recognizes all archive file suffixes registered in the global archive
-     * driver registry by the configuration file(s).
-     * <p>
-     * This requires <a href="{@docRoot}/overview.html#defaults">additional JARs</a>
-     * on the run time class path.
-     */
-    DefaultArchiveDetector ALL = new DefaultArchiveDetector();
+public interface ArchiveDetector extends FsFederatingDriver {
 
     /**
      * Detects whether the given {@code path} identifies a prospective

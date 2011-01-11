@@ -37,6 +37,15 @@ public abstract class FsManager
 implements Iterable<FsController<?>> {
 
     /**
+     * Equivalent to
+     * {@link #getController(FsMountPoint, FsFederatingDriver) getController(mountPoint, FsDefaultDriver.ALL)}.
+     */
+    public final @NonNull FsController<?>
+    getController(@NonNull FsMountPoint mountPoint) {
+        return getController(mountPoint, FsDefaultDriver.ALL);
+    }
+
+    /**
      * Returns a thread-safe file system controller for the given mount point.
      * If and only if the given mount point addresses a federated file system,
      * the returned file system controller is remembered for life cycle

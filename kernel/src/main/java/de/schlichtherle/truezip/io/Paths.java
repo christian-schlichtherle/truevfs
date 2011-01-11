@@ -39,6 +39,7 @@ public class Paths {
         return new Normalizer(separatorChar).normalize(path);
     }
 
+    /** A normalizer for path names. */
     public static class Normalizer {
         private final char separatorChar;
         private String path;
@@ -180,6 +181,7 @@ public class Paths {
         return new Splitter(separatorChar).split(path);
     }
 
+    /** A splitter for path names. */
     public static class Splitter {
         private final char separatorChar;
         private String parentPath, memberName;
@@ -238,7 +240,7 @@ public class Paths {
         public String getMemberName() {
             return memberName;
         }
-    }
+    } // class Splitter
 
     @SuppressWarnings("empty-statement")
     private static int lastIndexNot(@NonNull String path, char separatorChar, int last) {

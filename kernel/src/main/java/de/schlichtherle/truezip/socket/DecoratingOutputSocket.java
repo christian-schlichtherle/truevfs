@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.entry.Entry;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -32,7 +33,8 @@ extends OutputSocket<E> {
 
     private final OutputSocket<? extends E> delegate;
 
-    protected DecoratingOutputSocket(final OutputSocket<? extends E> output) {
+    protected DecoratingOutputSocket(
+            final @NonNull OutputSocket<? extends E> output) {
         if (null == output)
             throw new NullPointerException();
         this.delegate = output;

@@ -74,6 +74,7 @@ implements IOPool<FileEntry> {
         resource.release();
     }
 
+    /** A temp file pool entry. */
     @NotThreadSafe
     public static final class Entry
     extends FileEntry
