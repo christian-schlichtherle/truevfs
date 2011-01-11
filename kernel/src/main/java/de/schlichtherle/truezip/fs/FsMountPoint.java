@@ -41,14 +41,14 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
  * <li>The URI must be absolute.
  * <li>The URI must not have a fragment.
  * <li>If the URI is opaque, its scheme specific part must end with the mount
- *     point separator {@code "!/"}.
+ *     point separator {@value FsPath#MOUNT_POINT_SEPARATOR}.
  *     The scheme specific part <em>before</em> this mount point separator is
  *     parsed according the syntax constraints for a {@link FsPath} and the
  *     following additional syntax constraints:
  *     The path must be absolute.
  *     If its opaque, it's entry name must not be empty.
  * <li>If the URI is hierarchical, its path must be in normal form and end with
- *     a {@link FsEntryName#SEPARATOR}.
+ *     a {@value FsEntryName#SEPARATOR}.
  * </ol>
  * <p>
  * Examples for valid mount point URIs are:
