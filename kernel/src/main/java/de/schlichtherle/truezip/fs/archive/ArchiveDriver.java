@@ -17,9 +17,7 @@
 package de.schlichtherle.truezip.fs.archive;
 
 import de.schlichtherle.truezip.io.TabuFileException;
-import de.schlichtherle.truezip.fs.archive.DefaultArchiveController;
 import de.schlichtherle.truezip.fs.FsConcurrentModel;
-import de.schlichtherle.truezip.fs.archive.ArchiveEntry;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.entry.EntryFactory;
@@ -28,7 +26,7 @@ import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsConcurrentController;
 import de.schlichtherle.truezip.fs.FsCachingController;
-import de.schlichtherle.truezip.fs.file.TempFilePool;
+import de.schlichtherle.truezip.socket.IOPools;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -81,7 +79,7 @@ implements FsDriver, EntryFactory<E> {
                         new DefaultArchiveController<E>(
                             new FsConcurrentModel(mountPoint, parent.getModel()),
                             this, parent, false),
-                        TempFilePool.get()));
+                        IOPools.getInstance()));
     }
 
     /**

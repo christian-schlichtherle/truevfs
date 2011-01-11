@@ -31,18 +31,18 @@ import java.util.Map;
  */
 public final class TzpDriverFamily implements FsDriverProvider {
 
-    private final Map<FsScheme, FsDriver> drivers;
+    private static final Map<FsScheme, FsDriver> DRIVERS;
 
-    public TzpDriverFamily() {
+    static {
         final Map<FsScheme, FsDriver> drivers = new HashMap<FsScheme, FsDriver>();
         FsDriver driver = new SafeZipRaesDriver();
         for (String suffix : new SuffixSet("tzp|zip.rae|zip.raes"))
             drivers.put(FsScheme.create(suffix), driver);
-        this.drivers = Collections.unmodifiableMap(drivers);
+        DRIVERS = Collections.unmodifiableMap(drivers);
     }
 
     @Override
     public Map<FsScheme, FsDriver> getDrivers() {
-        return drivers;
+        return DRIVERS;
     }
 }

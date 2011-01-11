@@ -37,11 +37,6 @@ extends DecoratingOutputSocket<E> {
         super(output);
     }
 
-    @Override
-    public final OutputStream newOutputStream() throws IOException {
-        return new ProxyOutputStream();
-    }
-
     /**
      * Returns a proxy output stream which acquires its underlying output
      * stream upon the first read access.
@@ -49,6 +44,11 @@ extends DecoratingOutputSocket<E> {
      * @return A proxy output stream which acquires its underlying output
      *         stream upon the first write access.
      */
+    @Override
+    public OutputStream newOutputStream() throws IOException {
+        return new ProxyOutputStream();
+    }
+
     private class ProxyOutputStream extends DecoratingOutputStream {
         ProxyOutputStream() {
             super(null);

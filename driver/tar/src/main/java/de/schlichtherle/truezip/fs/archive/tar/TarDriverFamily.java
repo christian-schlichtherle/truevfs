@@ -31,9 +31,9 @@ import java.util.Map;
  */
 public final class TarDriverFamily implements FsDriverProvider {
 
-    private final Map<FsScheme, FsDriver> drivers;
+    private static final Map<FsScheme, FsDriver> DRIVERS;
 
-    public TarDriverFamily() {
+    static {
         final Map<FsScheme, FsDriver> drivers = new HashMap<FsScheme, FsDriver>();
         drivers.put(FsScheme.create("tar"), new TarDriver());
         FsDriver driver = new TarGZipDriver();
@@ -42,11 +42,11 @@ public final class TarDriverFamily implements FsDriverProvider {
         driver = new TarBZip2Driver();
         for (String suffix : new SuffixSet("tbz2|tar.bz2"))
             drivers.put(FsScheme.create(suffix), driver);
-        this.drivers = Collections.unmodifiableMap(drivers);
+        DRIVERS = Collections.unmodifiableMap(drivers);
     }
 
     @Override
     public Map<FsScheme, FsDriver> getDrivers() {
-        return drivers;
+        return DRIVERS;
     }
 }

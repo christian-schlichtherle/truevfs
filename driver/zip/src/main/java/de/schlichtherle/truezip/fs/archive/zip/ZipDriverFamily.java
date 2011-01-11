@@ -31,9 +31,9 @@ import java.util.Map;
  */
 public final class ZipDriverFamily implements FsDriverProvider {
 
-    private final Map<FsScheme, FsDriver> drivers;
+    private static final Map<FsScheme, FsDriver> DRIVERS;
 
-    public ZipDriverFamily() {
+    static {
         final Map<FsScheme, FsDriver> drivers = new HashMap<FsScheme, FsDriver>();
         drivers.put(FsScheme.create("zip"), new ZipDriver());
         FsDriver driver = new JarDriver();
@@ -43,11 +43,11 @@ public final class ZipDriverFamily implements FsDriverProvider {
         for (String suffix : new SuffixSet("odg|odp|ods|odt|otg|otp|ots|ott|odb|odf|odm|oth"))
             drivers.put(FsScheme.create(suffix), driver);
         drivers.put(FsScheme.create("exe"), new ReadOnlySfxDriver());
-        this.drivers = Collections.unmodifiableMap(drivers);
+        DRIVERS = Collections.unmodifiableMap(drivers);
     }
 
     @Override
     public Map<FsScheme, FsDriver> getDrivers() {
-        return drivers;
+        return DRIVERS;
     }
 }

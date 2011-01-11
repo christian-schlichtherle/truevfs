@@ -47,7 +47,7 @@ extends DecoratingInputSocket<E> {
      *         file upon the first read access.
      */
     @Override
-    public final ReadOnlyFile newReadOnlyFile() {
+    public ReadOnlyFile newReadOnlyFile() {
         return new ProxyReadOnlyFile();
     }
 
@@ -100,7 +100,7 @@ extends DecoratingInputSocket<E> {
      *         stream upon the first read access.
      */
     @Override
-    public final InputStream newInputStream() {
+    public InputStream newInputStream() {
         return new ProxyInputStream();
     }
 

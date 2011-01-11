@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.nio.charset;
 
 import java.nio.charset.Charset;
@@ -35,15 +34,15 @@ public class CharsetProvider extends java.nio.charset.spi.CharsetProvider {
     private static final Map<String, Charset> CHARSETS;
 
     static {
-        final Map<String, Charset> map = new HashMap<String, Charset>();
+        final Map<String, Charset> charsets = new HashMap<String, Charset>();
         for (final Charset charset : new Charset[] {
             new IBM437Charset(),
         }) {
-            map.put(lowerCase(charset.name()), charset);
+            charsets.put(lowerCase(charset.name()), charset);
             for (final String alias : charset.aliases())
-                map.put(lowerCase(alias), charset);
+                charsets.put(lowerCase(alias), charset);
         }
-        CHARSETS = Collections.unmodifiableMap(map);
+        CHARSETS = Collections.unmodifiableMap(charsets);
     }
 
     private static String lowerCase(String s) {

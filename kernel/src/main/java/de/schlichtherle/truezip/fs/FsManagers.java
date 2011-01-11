@@ -38,20 +38,28 @@ import static de.schlichtherle.truezip.fs.FsController.*;
 @ThreadSafe
 public class FsManagers {
 
+    private static volatile FsManager instance; // volatile required for DCL in JSE 5!
+    private static ShutdownThread shutdownThread; // lazily initialized
+
     /** You cannot instantiate this class. */
     private FsManagers() {
     }
 
-    private static volatile FsManager instance; // volatile required for DCL in JSE 5!
-    private static ShutdownThread shutdownThread; // lazily initialized
-
     /**
-     * Returns the file system manager value of this class property.
+     * Returns the default file system manager.
      * <p>
-     * If the class property has been explicitly set using
-     * {@link #setInstance}, then this instance is returned.
-     * Otherwise, the service is located by loading the class name from the
-     * resource file {@code /META-INF/services/de.schlichtherle.truezip.io.filesystem.FsManager}.
+     * If the default file system manager has been explicitly set to
+     * non-{@code null} by calling {@link #setInstance}, then this instance is
+     * returned.
+     * <p>
+     * Otherwise, the class name of the default file system manager is resolved
+     * by using the value of the {@link System#getProperty system property}
+     * with the class name {@code "de.schlichtherle.truezip.fs.FsManager"}
+     * as the key and the class name
+     * {@code "de.schlichtherle.truezip.fs.FsFederatingManager"} as the default
+     * value.
+     * The class is then loaded and instantiated by calling its no-arg
+     * constructor.
      * In order to support this plug-in architecture, you should <em>not</em>
      * cache the instance returned by this method!
      * <p>
@@ -59,15 +67,12 @@ public class FsManagers {
      * {@link FsManager#sync} method when the JVM terminates by means
      * of a shutdown hook.
      *
-     * @throws ClassCastException If the class name in the system property
-     *         does not denote a subclass of this class.
-     * @throws UndeclaredThrowableException If any other precondition on the
-     *         value of the system property does not hold.
-     * @return The non-{@code null} file system manager value of this class
-     *         property.
+     * @return The default file system manager
+     * @throws RuntimeException at the discretion of the {@link ServiceLocator}.
+     * @throws ServiceConfigurationError at the discretion of the
+     *         {@link ServiceLocator}.
      */
-    @NonNull
-    public static FsManager getInstance() {
+    public static @NonNull FsManager getInstance() {
         FsManager manager = instance;
         if (null == manager) {
             synchronized (FsManagers.class) { // DCL does work in combination with volatile in JSE 5!
@@ -77,36 +82,35 @@ public class FsManagers {
                             .getService(FsManager.class, FsFederatingManager.class);
                     setInstance(manager);
                 }
+                assert invariants();
             }
         }
-        assert invariants();
         return manager;
     }
 
     /**
-     * Sets the file system manager value of this class property.
+     * Sets the default file system manager.
      * <p>
-     * If the current file system manager manages any federated file systems,
-     * an {@link IllegalStateException} is thrown.
+     * If the current default file system manager manages any federated file
+     * systems, an {@link IllegalStateException} is thrown.
      * To avoid this, call its {@link FsManager#sync} method and make
      * sure to purge all references to the file system controllers which are
      * returned by its {@link FsManager#getController} method prior to
      * calling this method.
      * <p>
-     * If the given file system manager is {@code null}, a new instance will
-     * be created on the next call to {@link #getInstance}.
+     * If the given default file system manager is {@code null},
+     * a new instance will be created on the next call to {@link #getInstance}.
      * <p>
      * If the given file system manager is not {@code null}, this instance is
      * instrumented to run its {@link FsManager#sync} method when the
      * JVM terminates by means of a shutdown hook.
      *
-     * @param  manager the nullable file system manager value of this class
-     *         property.
+     * @param  manager the nullable default file system manager.
      * @throws IllegalStateException if the current file system manager has any
      *         managed file systems.
      */
     public static synchronized void setInstance(
-            @CheckForNull final FsManager manager) {
+            final @CheckForNull FsManager manager) {
         final int count = null == instance ? 0 : instance.getSize();
         if (0 < count)
             throw new IllegalStateException("There are still " + count + " managed federated file systems!");

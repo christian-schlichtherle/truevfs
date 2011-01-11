@@ -17,7 +17,6 @@ package de.schlichtherle.truezip.util;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
@@ -98,22 +97,24 @@ public final class ServiceLocator {
      * Returns a new service provider implementation instance.
      * The class name of the service provider implementation is resolved by
      * using the value of the {@link System#getProperty system property} with
-     * the service provider interface class name as the key with the given
-     * default service provider implementation class name.
+     * the service provider interface class name as the key and the given
+     * service provider implementation class name as the default value.
      * The service provider implementation class is then loaded using
-     * {@link #getClass} and final finally instantiated by calling its nullary
+     * {@link #getClass} and finally instantiated by calling its no-arg
      * constructor.
      * <p>
-     * This method should be preferred over {@link #getServices} if <em>only
-     * one</em> meaningful implementation of a service provider interface
-     * is expected at run time.
+     * This method should be preferred over {@link #getServices} if
+     * <em>only one</em> meaningful implementation of a service provider
+     * interface is expected at run time and if it's acceptable that the
+     * caller has a dependency on the given default service provider
+     * implementation.
      *
      * @param  <S> The type of the service provider specification.
      * @param  service the service provider specification.
      * @param  def the default service provider implementation.
      * @return A new service provider implementation instance.
      * @throws RuntimeException if a {@link RuntimeException} occurs.
-     * @throws ServiceConfigurationError if an {@link Exception} occurs.
+     * @throws ServiceConfigurationError if any other {@link Exception} occurs.
      */
     @SuppressWarnings("unchecked")
     public @NonNull <S> S
