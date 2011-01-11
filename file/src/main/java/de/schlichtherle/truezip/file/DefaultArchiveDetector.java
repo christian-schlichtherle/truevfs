@@ -17,7 +17,7 @@ package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.util.SuffixSet;
 import de.schlichtherle.truezip.fs.FsDriver;
-import de.schlichtherle.truezip.fs.FsFederatingDriver;
+import de.schlichtherle.truezip.fs.FsDriverProvider;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.util.ServiceLocator;
 import de.schlichtherle.truezip.util.regex.ThreadLocalMatcher;
@@ -89,7 +89,7 @@ implements ArchiveDetector {
     private final @NonNull ThreadLocalMatcher matcher;
 
     public DefaultArchiveDetector() {
-        this.drivers = FsFederatingDriver.ALL.getDrivers();
+        this.drivers = FsDriverProvider.ALL.getDrivers();
         final SuffixSet set = getSuffixes(drivers);
         this.suffixes = set.toString();
         this.matcher = new ThreadLocalMatcher(set.toPattern());
@@ -115,7 +115,7 @@ implements ArchiveDetector {
      *         configured in the global map.
      */
     public DefaultArchiveDetector(final @NonNull String suffixes) {
-        this.drivers = FsFederatingDriver.ALL.getDrivers();
+        this.drivers = FsDriverProvider.ALL.getDrivers();
         final SuffixSet set = new SuffixSet(suffixes);
         final SuffixSet all = getSuffixes(drivers);
         if (set.retainAll(all)) {
