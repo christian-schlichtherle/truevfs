@@ -26,9 +26,9 @@ import java.util.logging.Logger;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class IBM437Charset extends OctetCharset {
+final class Ibm437Charset extends OctetCharset {
 
-    private static final String CLASS_NAME = IBM437Charset.class.getName();
+    private static final String CLASS_NAME = Ibm437Charset.class.getName();
     private static final Logger logger = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 
     private static final String NAME = "IBM437";
@@ -61,7 +61,7 @@ public final class IBM437Charset extends OctetCharset {
         /*0xF0*/ 0x2261, 0x00B1, 0x2265, 0x2264, 0x2320, 0x2321, 0x00F7, 0x2248, 0x00B0, 0x2219, 0x00B7, 0x221A, 0x207F, 0x00B2, 0x25A0, 0x00A0,
     };
 
-    public IBM437Charset() {
+    Ibm437Charset() {
         super(NAME, ALIASES, BYTE2CHAR);
         logger.log(Level.FINE, "instantiated",
                 new String[] { displayName(), aliases().toString() });
