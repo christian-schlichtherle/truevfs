@@ -73,7 +73,7 @@ public class KeyMgmtLifeCycle implements Runnable {
         createResource();
 
         // Forget the key stored in the key manager.
-        KeyManager.resetKeyProvider(id);
+        KeyManagers.getManager().resetKeyProvider(id);
 
         // Prompt for the key again to open the resource.
         openResource();

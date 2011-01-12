@@ -16,7 +16,6 @@
 
 package de.schlichtherle.truezip.key.passwd.console;
 
-import de.schlichtherle.truezip.key.KeyPromptingDisabledException;
 import de.schlichtherle.truezip.key.PromptingAesKeyProvider;
 import de.schlichtherle.truezip.key.PromptingKeyProvider;
 
@@ -64,33 +63,17 @@ public class PromptingKeyManager extends de.schlichtherle.truezip.key.PromptingK
      * </table>
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-	public PromptingKeyManager() {
+    public PromptingKeyManager() {
         mapPromptingKeyProviderUIType(
                 (Class) PromptingKeyProvider.class,
                 (Class) PromptingKeyProviderUI.class);
         mapPromptingKeyProviderUIType(
-        		(Class) PromptingAesKeyProvider.class,
-        		(Class) PromptingAesKeyProviderUI.class);
+                (Class) PromptingAesKeyProvider.class,
+        	(Class) PromptingAesKeyProviderUI.class);
     }
 
-    //
-    // Instance stuff:
-    //
-
     @Override
-    protected boolean isPromptingImpl() {
-        return super.isPromptingImpl() && System.console() != null;
-    }
-
-    /**
-     * If no console is attached to this JVM, then this method throws a
-     * {@link KeyPromptingDisabledException}.
-     */
-    @Override
-    protected void assertPromptingImpl()
-    throws KeyPromptingDisabledException {
-        if (System.console() == null)
-            throw new KeyPromptingDisabledException();
-        super.assertPromptingImpl();
+    public boolean isPrompting() {
+        return super.isPrompting() && System.console() != null;
     }
 }

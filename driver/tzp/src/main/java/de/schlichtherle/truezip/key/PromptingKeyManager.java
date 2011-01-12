@@ -56,8 +56,8 @@ public class PromptingKeyManager extends KeyManager {
      * Values may be instances of {@link PromptingKeyProviderUI} or
      * {@link Class}.
      */
-    private final Map<Class<? extends PromptingKeyProvider<?>>, Object> uis
-            = new HashMap<Class<? extends PromptingKeyProvider<?>>, Object>();
+    private final Map<Class<? extends PromptingKeyProvider>, Object> uis
+            = new HashMap<Class<? extends PromptingKeyProvider>, Object>();
 
     /**
      * Constructs a new {@code PromptingKeyManager}.
@@ -104,22 +104,7 @@ public class PromptingKeyManager extends KeyManager {
      *
      * @see #setPrompting
      */
-    public static boolean isPrompting() {
-        KeyManager manager = KeyManagers.getManager();
-        return manager instanceof PromptingKeyManager
-                && ((PromptingKeyManager) manager).isPromptingImpl();
-    }
-
-    /**
-     * Called by {@link #isPrompting} on the default key manager instance in
-     * order to implement its behaviour and allow subclasses to override it.
-     * Subclasses should call the implementation in this class when
-     * overriding this method.
-     *
-     * @see #setPromptingImpl
-     * @see KeyManagers#getManager
-     */
-    protected boolean isPromptingImpl() {
+    public boolean isPrompting() {
         return prompting;
     }
 
@@ -131,8 +116,6 @@ public class PromptingKeyManager extends KeyManager {
      * If prompting mode is disabled, all attempts to prompt the user will
      * result in an {@link UnknownKeyException} until prompting mode is
      * enabled again.
-     * <p>
-     * This is a class property.
      * <p>
      * Note that subclasses might add additional behaviour to both
      * {@link #isPrompting} and {@link #setPrompting} through the default
@@ -146,48 +129,8 @@ public class PromptingKeyManager extends KeyManager {
      *
      * @see #isPrompting
      */
-    public static void setPrompting(boolean prompting) {
-        KeyManager manager = KeyManagers.getManager();
-        if (manager instanceof PromptingKeyManager)
-                ((PromptingKeyManager) manager).setPromptingImpl(prompting);
-    }
-
-    /**
-     * Called by {@link #isPrompting} on the default key manager instance in
-     * order to implement its behaviour and allow subclasses to override it.
-     * Subclasses should call the implementation in this class when
-     * overriding this method.
-     *
-     * @see #isPromptingImpl
-     * @see KeyManagers#getManager
-     */
-    protected void setPromptingImpl(boolean prompting) {
+    public void setPrompting(final boolean prompting) {
         this.prompting = prompting;
-    }
-
-    static void assertPrompting()
-    throws KeyPromptingDisabledException {
-        KeyManager manager = KeyManagers.getManager();
-        if (manager instanceof PromptingKeyManager)
-                ((PromptingKeyManager) manager).assertPromptingImpl();
-    }
-
-    /**
-     * Called by some methods in the {@link PromptingKeyProvider} class in
-     * order to assert that prompting mode is enabled.
-     * This method may be overridden by subclasses in order to throw a more
-     * detailed exception.
-     * <p>
-     * The implementation in this class is equivalent to:
-     * <pre>
-        if (!isPromptingImpl())
-            throw new KeyPromptingDisabledException();
-     * </pre>
-     */
-    protected void assertPromptingImpl()
-    throws KeyPromptingDisabledException {
-        if (!isPromptingImpl())
-            throw new KeyPromptingDisabledException();
     }
 
     /**
@@ -197,10 +140,10 @@ public class PromptingKeyManager extends KeyManager {
      * Of course, this call only affects instances of
      * {@link PromptingKeyProvider}.
      */
-    public static void resetCancelledPrompts() {
+    public void resetCancelledPrompts() {
         forEachKeyProvider(new KeyProviderCommand() {
             @Override
-			public void run(URI resource, KeyProvider<?> provider) {
+            public void run(URI resource, KeyProvider<?> provider) {
                 if (provider instanceof PromptingKeyProvider)
                     ((PromptingKeyProvider<?>) provider).resetCancelledPrompt();
             }
@@ -266,9 +209,8 @@ public class PromptingKeyManager extends KeyManager {
         return kp;
     }
 
-    @SuppressWarnings("unchecked")
     private synchronized PromptingKeyProviderUI<?, ? super PromptingKeyProvider<?>>
-    getUI(final Class<? extends PromptingKeyProvider<?>> forType) {
+    getUI(final Class<? extends PromptingKeyProvider> forType) {
         final Object value = uis.get(forType);
         final PromptingKeyProviderUI<?, ? super PromptingKeyProvider<?>> ui;
         if (value instanceof Class<?>) {

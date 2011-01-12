@@ -30,17 +30,18 @@
 
     <name>TrueZIP (POM)</name>
     <description>
-        TrueZIP is a framework and a library for accessing federated virtual
-        file systems.
+        TrueZIP is a framework for implementing federated virtual file systems
+        and a library for accessing archive files as if they were just plain
+        old directories.
         As a framework, TrueZIP provides the interfaces and classes to write
-        archive drivers which seamlessly plug-in to the federated virtual file
-        system space.
-        As a library, TrueZIP provides easy-to-use APIs for multi-threaded
+        file system drivers which seamlessly plug-in to the federated virtual
+        file system space.
+        As a library, TrueZIP provides convenient APIs for multi-threaded
         read/write access to federated virtual file systems.
         TrueZIP ships with file system driver families for ZIP, TAR and TZP
-        file formats and their derivatives (JAR, TGZ etc.)
+        archive file formats and their derivatives (JAR, TGZ etc.)
         The TZP file format is a custom JAR file format which is transparently
-        wrapped in an AES-256/CTR/SHA-256 envelope.
+        wrapped in an AES-256/CTR/SHA-256 envelope for safe encryption.
     </description>
     <url>http://kenai.com/projects/truezip</url>
     <inceptionYear>2005</inceptionYear>

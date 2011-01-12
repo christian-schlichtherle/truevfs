@@ -639,7 +639,6 @@ public final class File extends java.io.File {
             this.enclArchive = null;
             this.enclEntryName = null;
             this.innerArchive = null;
-            //this.controller = null;
         } else if ((entryName = path.getEntryName()).isRoot()) {
             assert path.getUri().isOpaque();
             if (mountPointPath.getUri().isOpaque()) {
@@ -651,14 +650,11 @@ public final class File extends java.io.File {
                 this.enclEntryName = null;
             }
             this.innerArchive = this;
-            /*this.controller = FsManagers.getManager()
-                                        .getController(mountPoint, detector);*/
         } else {
             assert path.getUri().isOpaque();
             this.enclArchive = new File(mountPoint, detector);
             this.enclEntryName = entryName;
             this.innerArchive = this.enclArchive;
-            //this.controller = null;
         }
 
         assert invariants();
@@ -679,7 +675,6 @@ public final class File extends java.io.File {
             this.enclArchive = null;
             this.enclEntryName = null;
             this.innerArchive = null;
-            //this.controller = null;
         } else {
             assert mountPoint.getUri().isOpaque();
             if (mountPointPath.getUri().isOpaque()) {
@@ -691,8 +686,6 @@ public final class File extends java.io.File {
                 this.enclEntryName = null;
             }
             this.innerArchive = this;
-            /*this.controller = FsManagers.getManager()
-                                        .getController(mountPoint, detector);*/
         }
 
         assert invariants();
@@ -717,7 +710,6 @@ public final class File extends java.io.File {
                 this.innerArchive = this;
                 this.enclArchive = innerArchive.enclArchive;
                 this.enclEntryName = innerArchive.enclEntryName;
-                //initController();
             } else {
                 this.detector = detector;
                 this.innerArchive = this.enclArchive = innerArchive;
@@ -776,13 +768,6 @@ public final class File extends java.io.File {
         enclEntryName = 0 < enclEntryNameBuf.length()
                 ? FsEntryName.create(enclEntryNameBuf.toString(), null, CANONICALIZE)
                 : null;
-
-        if (innerArchive == this) {
-            // controller initialization has been deferred until now in
-            // order to provide the FsController with an otherwise fully
-            // initialized object.
-            //initController();
-        }
     }
 
     private void scan(
@@ -871,33 +856,6 @@ public final class File extends java.io.File {
         scan(ancestor, detector, skip, parent, enclEntryNameBuf, splitter);
     }
 
-    private void initController() {
-        assert this == innerArchive;
-        final String path = Paths.normalize(delegate.getPath(), separatorChar);
-        final FsScheme scheme = detector.getScheme(path);
-        if (null == scheme)
-            throw new ServiceConfigurationError(
-                    "unknown file system scheme for path \""
-                    + path
-                    + "\"! Check run-time class path configuration.");
-        final FsMountPoint mountPoint;
-        try {
-            if (null != enclArchive) {
-                mountPoint = new FsMountPoint(scheme,
-                        new FsPath( enclArchive
-                                        .getController()
-                                        .getModel()
-                                        .getMountPoint(),
-                                    enclEntryName));
-            } else {
-                mountPoint = new FsMountPoint(scheme, new FsPath(delegate));
-            }
-        } catch (URISyntaxException ex) {
-            throw new AssertionError(ex);
-        }
-        controller = FsManagers.getManager().getController(mountPoint, detector);
-    }
-
     private Object writeReplace() throws ObjectStreamException {
         return getAbsoluteFile();
     }
@@ -940,7 +898,7 @@ public final class File extends java.io.File {
         assert (innerArchive != null) == (getInnerEntryName() != null);
         assert (enclArchive != null) == (enclEntryName != null);
         assert this != enclArchive;
-        assert (this == innerArchive /*&& null != controller*/)
+        assert (this == innerArchive)
                 ^ (innerArchive == enclArchive && null == controller);
         assert null == enclArchive
                 || Paths.contains(  enclArchive.getPath(),
@@ -1662,9 +1620,29 @@ public final class File extends java.io.File {
      * archive file, or {@code null} otherwise.
      */
     @Nullable FsController<?> getController() {
-        if (this == innerArchive && null == controller)
-            initController();
-        return controller;
+        if (this != innerArchive || null != controller)
+            return controller;
+        assert this == innerArchive;
+        final String path = Paths.normalize(delegate.getPath(), separatorChar);
+        final FsScheme scheme = detector.getScheme(path);
+        if (null == scheme)
+            throw new ServiceConfigurationError(
+                    "unknown file system scheme for path \""
+                    + path
+                    + "\"! Check run-time class path configuration.");
+        final FsMountPoint mountPoint;
+        try {
+            mountPoint = new FsMountPoint(scheme, null == enclArchive
+                    ? new FsPath(   delegate)
+                    : new FsPath(   enclArchive .getController()
+                                                .getModel()
+                                                .getMountPoint(),
+                                    enclEntryName));
+        } catch (URISyntaxException ex) {
+            throw new AssertionError(ex);
+        }
+        return controller
+                = FsManagers.getManager().getController(mountPoint, detector);
     }
 
     /**

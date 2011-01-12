@@ -55,7 +55,6 @@ public final class ZipRaesFileTest extends FileTestCase {
     public void tearDown() throws IOException {
         //cancelling = false;
         super.tearDown();
-        KeyManager.resetAndRemoveKeyProviders();
         KeyManagers.setManager(null);
     }
 

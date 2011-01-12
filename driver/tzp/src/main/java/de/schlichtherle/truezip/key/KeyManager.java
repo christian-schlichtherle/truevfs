@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.key;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,8 +48,8 @@ import java.util.Set;
 public abstract class KeyManager {
 
     /** Maps resource IDs to providers. */
-    private static final Map<URI, KeyProvider<?>> providers
-            = new HashMap<URI, KeyProvider<?>>();
+    private final Map<URI, KeyProvider<?>>
+            providers = new HashMap<URI, KeyProvider<?>>();
 
     int getSize() {
         return providers.size();
@@ -65,7 +66,7 @@ public abstract class KeyManager {
      *         or {@code null} if no key provider was mapped.
      * @throws NullPointerException if {@code resource} is {@code null}.
      */
-    static synchronized KeyProvider<?> mapKeyProvider(
+    synchronized KeyProvider<?> mapKeyProvider(
             final URI resource,
             final KeyProvider<?> provider) {
         if (resource == null)
@@ -86,7 +87,7 @@ public abstract class KeyManager {
      * @return Whether or not an instance of {@link AbstractKeyProvider}
      *         is mapped for the resource identifier and has been reset.
      */
-    public static synchronized boolean resetKeyProvider(final URI resource) {
+    public synchronized boolean resetKeyProvider(final URI resource) {
         final KeyProvider<?> provider = providers.get(resource);
         if (provider instanceof AbstractKeyProvider<?>) {
             final AbstractKeyProvider<?> akp = (AbstractKeyProvider<?>) provider;
@@ -107,7 +108,7 @@ public abstract class KeyManager {
      * @return Whether or not a key provider was mapped for the resource
      *         identifier and has been removed.
      */
-    public static synchronized boolean resetAndRemoveKeyProvider(
+    public synchronized boolean resetAndRemoveKeyProvider(
             final URI resource) {
         final KeyProvider<?> provider = providers.get(resource);
         if (provider instanceof AbstractKeyProvider<?>) {
@@ -130,10 +131,10 @@ public abstract class KeyManager {
      * If a mapped key provider is not an instance of {@link AbstractKeyProvider},
      * nothing happens.
      */
-    public static void resetKeyProviders() {
+    public void resetKeyProviders() {
         forEachKeyProvider(new KeyProviderCommand() {
             @Override
-			public void run(URI resource, KeyProvider<?> provider) {
+            public void run(URI resource, KeyProvider<?> provider) {
                 if (provider instanceof AbstractKeyProvider) {
                     ((AbstractKeyProvider<?>) provider).reset();
                 }
@@ -142,53 +143,13 @@ public abstract class KeyManager {
     }
 
     /**
-     * Resets all key providers, causing them to forget their key, and removes
-     * them from the map.
-     *
-     * @throws IllegalStateException If resetting or unmapping one or more
-     *         key providers is prohibited by a constraint in a subclass of
-     *         {@link AbstractKeyProvider}, in which case the respective key
-     *         provider(s) are reset but remain mapped.
-     *         The operation is continued normally for all other key providers.
-     *         Please refer to the respective subclass documentation for
-     *         more information about its constraint(s).
-     */
-    public static synchronized void resetAndRemoveKeyProviders() {
-        class ResetAndRemoveKeyProvider implements KeyProviderCommand {
-            IllegalStateException ise = null;
-
-            @Override
-			public void run(URI resource, KeyProvider<?> provider) {
-                if (provider instanceof AbstractKeyProvider<?>) {
-                    final AbstractKeyProvider<?> akp
-                            = (AbstractKeyProvider<?>) provider;
-                    akp.reset();
-                    try {
-                        akp.removeFromKeyManager(resource); // support proper clean up!
-                    } catch (IllegalStateException exc) {
-                        ise = exc; // mark and forget any previous exception
-                    }
-                } else {
-                    final KeyProvider<?> previous = mapKeyProvider(resource, null);
-                    assert provider == previous;
-                }
-            }
-        }
-
-        final ResetAndRemoveKeyProvider cmd = new ResetAndRemoveKeyProvider();
-        forEachKeyProvider(cmd);
-        if (cmd.ise != null)
-            throw cmd.ise;
-    }
-
-    /**
      * Executes a {@link KeyProviderCommand} for each mapped key provider.
      * It is safe to call any method of this class within the command,
      * even if it modifies the map of key providers.
      */
     @SuppressWarnings("rawtypes")
-    protected static synchronized void forEachKeyProvider(
-            final KeyProviderCommand command) {
+    synchronized void forEachKeyProvider(
+            final @NonNull KeyProviderCommand command) {
         // We can't use an iterator because the command may modify the map.
         // Otherwise, resetAndClearKeyProviders() would fail with a
         // ConcurrentModificationException.
@@ -235,7 +196,7 @@ public abstract class KeyManager {
      *         Please refer to the respective subclass documentation for
      *         more information about its constraint(s).
      */
-    public static synchronized boolean moveKeyProvider(
+    public synchronized boolean moveKeyProvider(
             final URI oldResource,
             final URI newResource)
     throws NullPointerException, IllegalStateException {
@@ -296,10 +257,8 @@ public abstract class KeyManager {
      *         {@code forType}, or if {@code useType} does not
      *         provide a public constructor with no parameters.
      */
-    protected final synchronized <K extends Cloneable, P extends KeyProvider<? extends K>>
-    void mapKeyProviderType(
-            final Class<P> forType,
-            final Class<? extends P> useType) {
+    protected final synchronized <K extends Cloneable, P extends KeyProvider<? extends K>> void
+    mapKeyProviderType( final Class<P> forType, final Class<? extends P> useType) {
         if (useType == forType)
             throw new IllegalArgumentException(
                     useType.getName()
@@ -380,23 +339,21 @@ public abstract class KeyManager {
     throws NullPointerException, ClassCastException, IllegalArgumentException {
         if (resource == null)
             throw new NullPointerException();
-        synchronized (KeyManager.class) {
-            KeyProvider<?> kp = providers.get(resource);
-            if (kp == null) {
-                final Class<? extends KeyProvider<?>> subst = types.get(type);
-                if (subst != null)
-                    type = subst;
-                try {
-                    kp = type.newInstance();
-                } catch (InstantiationException ex) {
-                    throw new IllegalArgumentException(type.getName(), ex);
-                } catch (IllegalAccessException ex) {
-                    throw new IllegalArgumentException(type.getName(), ex);
-                }
-                setKeyProvider(resource, kp);
+        KeyProvider<?> kp = providers.get(resource);
+        if (kp == null) {
+            final Class<? extends KeyProvider<?>> subst = types.get(type);
+            if (subst != null)
+                type = subst;
+            try {
+                kp = type.newInstance();
+            } catch (InstantiationException ex) {
+                throw new IllegalArgumentException(type.getName(), ex);
+            } catch (IllegalAccessException ex) {
+                throw new IllegalArgumentException(type.getName(), ex);
             }
-            return kp;
+            setKeyProvider(resource, kp);
         }
+        return kp;
     }
 
     /**
@@ -425,7 +382,7 @@ public abstract class KeyManager {
      *         Please refer to the respective subclass documentation for
      *         more information about its constraint(s).
      */
-    public void setKeyProvider(
+    void setKeyProvider(
             final URI resource,
             final KeyProvider<?> provider)
     throws NullPointerException, IllegalStateException {
