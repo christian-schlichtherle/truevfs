@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.zip.DateTimeConverter;
@@ -25,13 +24,13 @@ import de.schlichtherle.truezip.zip.DateTimeConverter;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class JarEntry extends ZipEntry {
+public class JarArchiveEntry extends ZipArchiveEntry {
 
-    JarEntry(String name) {
+    JarArchiveEntry(String name) {
         super(name);
     }
 
-    JarEntry(String name, ZipEntry template) {
+    JarArchiveEntry(String name, ZipArchiveEntry template) {
         super(name, template);
     }
 

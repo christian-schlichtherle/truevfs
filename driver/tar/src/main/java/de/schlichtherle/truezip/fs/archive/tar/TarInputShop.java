@@ -63,16 +63,16 @@ import static org.apache.tools.tar.TarConstants.UIDLEN;
  * @version $Id$
  */
 public class TarInputShop
-implements InputShop<TarEntry> {
+implements InputShop<TarArchiveEntry> {
 
     private static final byte[] NULL_RECORD = new byte[TarBuffer.DEFAULT_RCDSIZE];
 
     private static final int CHECKSUM_OFFSET
             = NAMELEN + MODELEN + UIDLEN + GIDLEN + SIZELEN + MODTIMELEN;
 
-    /** Maps entry names to tar entries [String -> TarEntry]. */
-    private final Map<String, TarEntry> entries
-            = new LinkedHashMap<String, TarEntry>();
+    /** Maps entry names to tar entries [String -> TarArchiveEntry]. */
+    private final Map<String, TarArchiveEntry> entries
+            = new LinkedHashMap<String, TarArchiveEntry>();
 
     /**
      * Extracts the entire TAR input stream into a temporary directory in order
@@ -92,9 +92,9 @@ implements InputShop<TarEntry> {
             org.apache.tools.tar.TarEntry tinEntry;
             while ((tinEntry = tin.getNextEntry()) != null) {
                 final String name = tinEntry.getName();
-                TarEntry entry;
+                TarArchiveEntry entry;
                 if (tinEntry.isDirectory()) {
-                    entry = new TarEntry(name, tinEntry);
+                    entry = new TarArchiveEntry(name, tinEntry);
                 } else {
                     final File tmp;
                     try {
@@ -120,7 +120,7 @@ implements InputShop<TarEntry> {
                         throw new TabuFileException(
                                 new TempFileException(tinEntry, ex));
                     }
-                    entry = new TarEntry(tinEntry, tmp);
+                    entry = new TarArchiveEntry(tinEntry, tmp);
                 }
                 entry.setName(name); // use normalized name
                 entries.put(name, entry);
@@ -202,24 +202,24 @@ implements InputShop<TarEntry> {
     }
 
     @Override
-    public final Iterator<TarEntry> iterator() {
+    public final Iterator<TarArchiveEntry> iterator() {
         return entries.values().iterator();
     }
 
     @Override
-    public final TarEntry getEntry(String name) {
+    public final TarArchiveEntry getEntry(String name) {
         return entries.get(name);
     }
 
     @Override
-    public InputSocket<TarEntry> getInputSocket(final String name) {
+    public InputSocket<TarArchiveEntry> getInputSocket(final String name) {
         if (null == name)
             throw new NullPointerException();
 
-        class Input extends InputSocket<TarEntry> {
+        class Input extends InputSocket<TarArchiveEntry> {
             @Override
-            public TarEntry getLocalTarget() throws IOException {
-                final TarEntry entry = getEntry(name);
+            public TarArchiveEntry getLocalTarget() throws IOException {
+                final TarArchiveEntry entry = getEntry(name);
                 if (null == entry)
                     throw new FileNotFoundException(name + " (entry not found)");
                 return entry;
@@ -246,9 +246,9 @@ implements InputShop<TarEntry> {
     }
 
     private void close0() throws IOException {
-        final Collection<TarEntry> values = entries.values();
-        for (final Iterator<TarEntry> i = values.iterator(); i.hasNext(); i.remove()) {
-            final TarEntry entry = i.next();
+        final Collection<TarArchiveEntry> values = entries.values();
+        for (final Iterator<TarArchiveEntry> i = values.iterator(); i.hasNext(); i.remove()) {
+            final TarArchiveEntry entry = i.next();
             final File file = entry.getFile();
             if (file == null) {
                 assert entry.isDirectory();

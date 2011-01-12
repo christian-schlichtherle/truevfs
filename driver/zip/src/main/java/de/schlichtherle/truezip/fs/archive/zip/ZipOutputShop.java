@@ -58,11 +58,11 @@ import static de.schlichtherle.truezip.zip.ZipEntry.UNKNOWN;
  * @version $Id$
  */
 public class ZipOutputShop
-extends RawZipOutputStream<ZipEntry>
-implements OutputShop<ZipEntry> {
+extends RawZipOutputStream<ZipArchiveEntry>
+implements OutputShop<ZipArchiveEntry> {
 
     private IOPool.Entry<?> postamble;
-    private ZipEntry tempEntry;
+    private ZipArchiveEntry tempEntry;
 
     /**
      * Creates a new instance which uses the output stream, character set and
@@ -114,17 +114,17 @@ implements OutputShop<ZipEntry> {
     }
 
     @Override
-    public Iterator<ZipEntry> iterator() {
+    public Iterator<ZipArchiveEntry> iterator() {
         if (null == tempEntry)
             return super.iterator();
-        return new JointIterator<ZipEntry>(
+        return new JointIterator<ZipArchiveEntry>(
                 super.iterator(),
                 Collections.singletonList(tempEntry).iterator());
     }
 
     @Override
-    public ZipEntry getEntry(final String name) {
-        ZipEntry entry = super.getEntry(name);
+    public ZipArchiveEntry getEntry(final String name) {
+        ZipArchiveEntry entry = super.getEntry(name);
         if (null != entry)
             return entry;
         entry = tempEntry;
@@ -132,13 +132,13 @@ implements OutputShop<ZipEntry> {
     }
 
     @Override
-    public OutputSocket<ZipEntry> getOutputSocket(final ZipEntry entry) {
+    public OutputSocket<ZipArchiveEntry> getOutputSocket(final ZipArchiveEntry entry) {
         if (null == entry)
             throw new NullPointerException();
 
-        class Output extends OutputSocket<ZipEntry> {
+        class Output extends OutputSocket<ZipArchiveEntry> {
             @Override
-            public ZipEntry getLocalTarget() {
+            public ZipArchiveEntry getLocalTarget() {
                 return entry;
             }
 
@@ -158,12 +158,12 @@ implements OutputShop<ZipEntry> {
                 long size;
                 if (null != peer && UNKNOWN != (size = peer.getSize(DATA))) {
                     entry.setSize(size);
-                    if (peer instanceof ZipEntry) {
+                    if (peer instanceof ZipArchiveEntry) {
                         // Set up entry attributes for Direct Data Copying (DDC).
                         // A preset method in the entry takes priority.
                         // The ZIP.RAES drivers use this feature to enforce
                         // deflation for enhanced authentication security.
-                        final ZipEntry zipPeer = (ZipEntry) peer;
+                        final ZipArchiveEntry zipPeer = (ZipArchiveEntry) peer;
                         if (entry.getMethod() == UNKNOWN)
                             entry.setMethod(zipPeer.getMethod());
                         if (entry.getMethod() == zipPeer.getMethod())
@@ -214,14 +214,14 @@ implements OutputShop<ZipEntry> {
      * It can only be used if this output stream is not currently busy
      * writing another entry and the entry holds enough information to
      * write the entry header.
-     * These preconditions are checked by {@link #getOutputSocket(ZipEntry) t}.
+     * These preconditions are checked by {@link #getOutputSocket(ZipArchiveEntry) t}.
      */
     private class EntryOutputStream extends DecoratingOutputStream {
-        EntryOutputStream(ZipEntry entry) throws IOException {
+        EntryOutputStream(ZipArchiveEntry entry) throws IOException {
             this(entry, true);
         }
 
-        EntryOutputStream(ZipEntry entry, boolean deflate)
+        EntryOutputStream(ZipArchiveEntry entry, boolean deflate)
         throws IOException {
             super(ZipOutputShop.this);
             putNextEntry(entry, deflate);
@@ -247,7 +247,7 @@ implements OutputShop<ZipEntry> {
         private final File temp;
         private boolean closed;
 
-        TempEntryOutputStream(final File temp, final ZipEntry entry)
+        TempEntryOutputStream(final File temp, final ZipArchiveEntry entry)
         throws IOException {
             super(new java.io.FileOutputStream(temp), new CRC32());
             assert entry.getMethod() == STORED;

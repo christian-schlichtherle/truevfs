@@ -32,7 +32,7 @@ import static de.schlichtherle.truezip.zip.ZipEntry.STORED;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class OdfOutputShop extends MultiplexedArchiveOutputShop<ZipEntry> {
+public class OdfOutputShop extends MultiplexedArchiveOutputShop<ZipArchiveEntry> {
 
     /** The name of the entry to receive tender, loving care. */
     private static final String MIMETYPE = "mimetype";
@@ -46,11 +46,11 @@ public class OdfOutputShop extends MultiplexedArchiveOutputShop<ZipEntry> {
     }
 
     @Override
-    public OutputSocket<ZipEntry> getOutputSocket(final ZipEntry entry) {
+    public OutputSocket<ZipArchiveEntry> getOutputSocket(final ZipArchiveEntry entry) {
         if (null == entry)
             throw new NullPointerException();
 
-        class Output extends DecoratingOutputSocket<ZipEntry> {
+        class Output extends DecoratingOutputSocket<ZipArchiveEntry> {
             Output() {
                 super(OdfOutputShop.super.getOutputSocket(entry));
             }

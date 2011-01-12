@@ -50,8 +50,8 @@ import static java.util.zip.Deflater.NO_COMPRESSION;
  * @version $Id$
  */
 public class ZipDriver
-extends CharsetArchiveDriver<ZipEntry>
-implements ZipEntryFactory<ZipEntry> {
+extends CharsetArchiveDriver<ZipArchiveEntry>
+implements ZipEntryFactory<ZipArchiveEntry> {
 
     private static final long serialVersionUID = -7061546656075796996L;
 
@@ -162,17 +162,17 @@ implements ZipEntryFactory<ZipEntry> {
     }
 
     @Override
-    public ZipEntry newEntry(
+    public ZipArchiveEntry newEntry(
             String name,
             final Type type,
             final Entry template)
     throws CharConversionException {
         assertEncodable(name);
         name = toZipOrTarEntryName(name, type);
-        final ZipEntry entry;
+        final ZipArchiveEntry entry;
         if (null != template) {
-            if (template instanceof ZipEntry) {
-                entry = newEntry(name, (ZipEntry) template);
+            if (template instanceof ZipArchiveEntry) {
+                entry = newEntry(name, (ZipArchiveEntry) template);
             } else {
                 entry = newEntry(name);
                 entry.setTime(template.getTime(WRITE));
@@ -185,12 +185,12 @@ implements ZipEntryFactory<ZipEntry> {
     }
 
     @Override
-    public ZipEntry newEntry(String name) {
-        return new ZipEntry(name);
+    public ZipArchiveEntry newEntry(String name) {
+        return new ZipArchiveEntry(name);
     }
 
-    public ZipEntry newEntry(String name, ZipEntry template) {
-        return new ZipEntry(name, template);
+    public ZipArchiveEntry newEntry(String name, ZipArchiveEntry template) {
+        return new ZipArchiveEntry(name, template);
     }
 
     /**
@@ -226,14 +226,14 @@ implements ZipEntryFactory<ZipEntry> {
      * {@link MultiplexedArchiveOutputShop}.
      */
     @Override
-    public OutputShop<ZipEntry> newOutputShop(
+    public OutputShop<ZipArchiveEntry> newOutputShop(
             FsConcurrentModel model,
             OutputSocket<?> output,
-            InputShop<ZipEntry> source)
+            InputShop<ZipArchiveEntry> source)
     throws IOException {
         final OutputStream out = output.newOutputStream();
         try {
-            return new MultiplexedArchiveOutputShop<ZipEntry>(
+            return new MultiplexedArchiveOutputShop<ZipArchiveEntry>(
                     newZipOutputShop(model, out, (ZipInputShop) source));
         } catch (IOException ex) {
             out.close();

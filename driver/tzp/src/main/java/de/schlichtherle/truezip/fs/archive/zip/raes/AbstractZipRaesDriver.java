@@ -35,10 +35,9 @@ import de.schlichtherle.truezip.crypto.raes.RaesReadOnlyFile;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.io.TabuFileException;
 import de.schlichtherle.truezip.fs.archive.zip.JarDriver;
-import de.schlichtherle.truezip.fs.archive.zip.JarEntry;
-import de.schlichtherle.truezip.fs.archive.zip.ZipEntry;
+import de.schlichtherle.truezip.fs.archive.zip.JarArchiveEntry;
+import de.schlichtherle.truezip.fs.archive.zip.ZipArchiveEntry;
 import de.schlichtherle.truezip.fs.archive.zip.ZipInputShop;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -92,9 +91,8 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
     }
 
     @Override
-    @NonNull public FsController<?>
-    newController(  @NonNull FsMountPoint mountPoint,
-                    @NonNull FsController<?> parent) {
+    public FsController<?>
+    newController(FsMountPoint mountPoint, FsController<?> parent) {
         return new KeyManagerArchiveController(
                 super.newController(mountPoint, parent), this);
     }
@@ -156,17 +154,17 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
     }
 
     /**
-     * Creates a new {@link JarEntry}, enforcing that the data gets
+     * Creates a new {@link JarArchiveEntry}, enforcing that the data gets
      * {@code DEFLATED} when written, even if copying data from a
      * {@code STORED} source entry.
      * This feature strengthens the security of the authentication process.
      */
     @Override
-    public JarEntry newEntry(   final String path,
-                                final Type type,
-                                final Entry template)
+    public JarArchiveEntry newEntry(final String path,
+                                    final Type type,
+                                    final Entry template)
     throws CharConversionException {
-        final JarEntry entry = super.newEntry(path, type, template);
+        final JarArchiveEntry entry = super.newEntry(path, type, template);
         if (entry.getMethod() != DEFLATED) {
             // Enforce deflation for enhanced authentication security.
             entry.setMethod(DEFLATED);
@@ -182,10 +180,10 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      * {@link #getRaesParameters} for authentication.
      */
     @Override
-    public OutputShop<ZipEntry> newOutputShop(
+    public OutputShop<ZipArchiveEntry> newOutputShop(
             final FsConcurrentModel model,
             final OutputSocket<?> target,
-            final InputShop<ZipEntry> source)
+            final InputShop<ZipArchiveEntry> source)
     throws IOException {
         class Output extends DecoratingOutputSocket<Entry> {
             Output() {

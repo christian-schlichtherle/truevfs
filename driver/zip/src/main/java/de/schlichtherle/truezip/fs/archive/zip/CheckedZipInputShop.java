@@ -48,21 +48,21 @@ public class CheckedZipInputShop extends ZipInputShop {
             Charset charset,
             boolean preambled,
             boolean postambled,
-            ZipEntryFactory<ZipEntry> factory)
+            ZipEntryFactory<ZipArchiveEntry> factory)
     throws IOException {
         super(rof, charset, preambled, postambled, factory);
     }
 
     /** Overridden to read from a checked input stream. */
     @Override
-    public InputSocket<ZipEntry> getInputSocket(final String name) {
+    public InputSocket<ZipArchiveEntry> getInputSocket(final String name) {
         if (null == name)
             throw new NullPointerException();
 
-        class Input extends InputSocket<ZipEntry> {
+        class Input extends InputSocket<ZipArchiveEntry> {
             @Override
-            public ZipEntry getLocalTarget() throws IOException {
-                final ZipEntry entry = getEntry(name);
+            public ZipArchiveEntry getLocalTarget() throws IOException {
+                final ZipArchiveEntry entry = getEntry(name);
                 if (null == entry)
                     throw new FileNotFoundException(name + " (entry not found)");
                 return entry;
@@ -73,7 +73,7 @@ public class CheckedZipInputShop extends ZipInputShop {
                 return CheckedZipInputShop.this.getInputStream(
                         getLocalTarget().getName(),
                         true,
-                        !(getPeerTarget() instanceof ZipEntry));
+                        !(getPeerTarget() instanceof ZipArchiveEntry));
             }
 
             @Override

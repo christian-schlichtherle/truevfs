@@ -105,7 +105,8 @@ public class SafeZipRaesDriver extends AbstractZipRaesDriver {
      * and CRC-32 authenticated.
      */
     @Override
-    protected ZipInputShop newZipInputShop(FsConcurrentModel model, ReadOnlyFile rof)
+    protected ZipInputShop
+    newZipInputShop(FsConcurrentModel model, ReadOnlyFile rof)
     throws IOException {
         // Optimization: If the read-only file is smaller than the
         // authentication trigger, then its entire cipher text has already
