@@ -111,16 +111,16 @@ public class CreateKeyPanel extends EnhancedPanel {
      * @param resource New value of property {@code resourceID}.
      */
     public void setResource(final URI resource) {
-        final URI lastResource = PromptingKeyProviderUI.lastResource;
+        final URI lastResource = SwingPromptingKeyProviderUI.lastResource;
         assert lastResource != null : "violation of contract in PromptingKeyProvider";
         if (!lastResource.equals(resource)
-                && !lastResource.equals(PromptingKeyProviderUI.INITIAL_RESOURCE)) {
+                && !lastResource.equals(SwingPromptingKeyProviderUI.INITIAL_RESOURCE)) {
             this.resource.setForeground(Color.RED);
         } else {
             this.resource.setForeground(defaultForeground);
         }
         this.resource.setText(resource.toString());
-        PromptingKeyProviderUI.lastResource = resource;
+        SwingPromptingKeyProviderUI.lastResource = resource;
     }
     
     /**
@@ -158,7 +158,7 @@ public class CreateKeyPanel extends EnhancedPanel {
 
                     final byte[] key;
                     try {
-                        key = PromptingKeyProviderUI.readKeyFile(keyFilePathname);
+                        key = SwingPromptingKeyProviderUI.readKeyFile(keyFilePathname);
                     } catch (EOFException failure) {
                         setError(resources.getString("keyFile.eofException"));
                         return null;

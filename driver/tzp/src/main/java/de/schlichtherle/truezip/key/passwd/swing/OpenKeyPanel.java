@@ -104,15 +104,15 @@ public class OpenKeyPanel extends EnhancedPanel {
      * @param resource New value of property {@code resourceID}.
      */
     public void setResource(final URI resource) {
-        final URI lastResource = PromptingKeyProviderUI.lastResource;
+        final URI lastResource = SwingPromptingKeyProviderUI.lastResource;
         if (!lastResource.equals(resource)
-                && !lastResource.equals(PromptingKeyProviderUI.INITIAL_RESOURCE)) {
+                && !lastResource.equals(SwingPromptingKeyProviderUI.INITIAL_RESOURCE)) {
             this.resource.setForeground(Color.RED);
         } else {
             this.resource.setForeground(defaultForeground);
         }
         this.resource.setText(resource.toString());
-        PromptingKeyProviderUI.lastResource = resource;
+        SwingPromptingKeyProviderUI.lastResource = resource;
     }
 
     /**
@@ -153,7 +153,7 @@ public class OpenKeyPanel extends EnhancedPanel {
                 final String keyFilePathname
                         = authenticationPanel.getKeyFilePath();
                 try {
-                    return PromptingKeyProviderUI.readKeyFile(keyFilePathname);
+                    return SwingPromptingKeyProviderUI.readKeyFile(keyFilePathname);
                 } catch (EOFException failure) {
                     setError(resources.getString("keyFile.eofException"));
                     return null;

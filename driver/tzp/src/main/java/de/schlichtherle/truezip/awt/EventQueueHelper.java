@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.awt;
 
+import java.awt.EventQueue;
 import java.lang.reflect.InvocationTargetException;
 
 /**
@@ -24,7 +24,7 @@ import java.lang.reflect.InvocationTargetException;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class EventQueue extends java.awt.EventQueue {
+public class EventQueueHelper {
 
     private static final byte RESET = 0, CANCELLED = 1, STARTED = 2, DONE = 3;
 
@@ -91,7 +91,7 @@ public class EventQueue extends java.awt.EventQueue {
         if (startTimeout < 0)
             throw new IllegalArgumentException("Timeout must not be negative!");
 
-        if (isDispatchThread()) {
+        if (EventQueue.isDispatchThread()) {
             try {
                 task.run();
             } catch (Throwable throwable) {
@@ -105,7 +105,7 @@ public class EventQueue extends java.awt.EventQueue {
 
                 @Override
 				public void run() {
-                    assert isDispatchThread();
+                    assert EventQueue.isDispatchThread();
                     if (start()) {
                         try {
                             task.run();
@@ -135,7 +135,7 @@ public class EventQueue extends java.awt.EventQueue {
             }
 
             final MonitoredAction action = new MonitoredAction();
-            invokeLater(action);
+            EventQueue.invokeLater(action);
             synchronized (action) {
                 InterruptedException interrupted = null;
                 while (action.status < DONE) {

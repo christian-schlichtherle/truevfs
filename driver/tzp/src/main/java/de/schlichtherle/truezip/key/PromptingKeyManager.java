@@ -30,8 +30,8 @@ import java.util.Map;
  * key manager. This enables the subclass to determine which user interface
  * technology should actually be used to prompt the user for a key.
  * For example, the implementation in the class
- * {@link de.schlichtherle.truezip.key.passwd.swing.PromptingKeyManager} uses Swing
- * to prompt the user for either a password or a key file.
+ * {@link de.schlichtherle.truezip.key.passwd.swing.SwingPromptingKeyManager}
+ * uses Swing to prompt the user for either a password or a key file.
  * <p>
  * Subclasses must use the method {@link #mapPromptingKeyProviderUIType} to
  * register a user interface class for a particular user interface class
