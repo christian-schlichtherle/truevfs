@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.key.passwd.swing;
 
-import de.schlichtherle.truezip.file.swing.FileComboBoxBrowser;
+import de.schlichtherle.truezip.file.swing.TFileComboBoxBrowser;
 import java.awt.EventQueue;
 import java.awt.Window;
 import java.awt.event.WindowEvent;
@@ -66,7 +66,7 @@ public class AuthenticationPanel extends JPanel {
 
         // Order is important here: The file combo box browser installs its
         // own editor, so we have to adjust the columns last.
-        new FileComboBoxBrowser(keyFile).setDirectory(BASE_DIR);
+        new TFileComboBoxBrowser(keyFile).setDirectory(BASE_DIR);
         ((JTextField) keyFile.getEditor().getEditorComponent()).setColumns(30);
     }
 
@@ -302,7 +302,7 @@ public class AuthenticationPanel extends JPanel {
     // End of variables declaration//GEN-END:variables
 
     private static class CustomFileChooser extends javax.swing.JFileChooser {
-        private static java.io.File lastCurrentDir = BASE_DIR;
+        private static File lastCurrentDir = BASE_DIR;
         private static final long serialVersionUID = 2361832976537648223L;
         
         public CustomFileChooser() {
@@ -313,13 +313,13 @@ public class AuthenticationPanel extends JPanel {
         }
 
         @Override
-        public void setCurrentDirectory(java.io.File dir) {
+        public void setCurrentDirectory(File dir) {
             super.setCurrentDirectory(dir);
             lastCurrentDir = dir;
         }
 
         @Override
-        public java.io.File getCurrentDirectory() {
+        public File getCurrentDirectory() {
             return lastCurrentDir = super.getCurrentDirectory();
         }
     }

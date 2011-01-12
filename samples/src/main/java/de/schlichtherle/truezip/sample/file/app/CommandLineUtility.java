@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.sample.file.app;
 
 import de.schlichtherle.truezip.key.passwd.swing.HurlingWindowFeedback;
-import de.schlichtherle.truezip.file.File;
+import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.fs.FsManagers;
 import de.schlichtherle.truezip.fs.FsStatistics;
 import de.schlichtherle.truezip.fs.FsStatisticsManager;
@@ -111,7 +111,7 @@ abstract class CommandLineUtility {
                 return runChecked(args);
             } finally {
                 try {
-                    File.umount();
+                    TFile.umount();
                 } finally {
                     monitor.shutdown();
                 }
@@ -189,7 +189,7 @@ abstract class CommandLineUtility {
 
         /**
          * Prints statistics about the amount of data read and written by
-         * {@link File#update()} or {@link File#umount()} on standard output.
+         * {@link TFile#update()} or {@link TFile#umount()} on standard output.
          */
         private void showProgress() {
             // Round up to kilobytes.

@@ -20,11 +20,11 @@ import de.schlichtherle.truezip.crypto.raes.KeyManagerRaesParameters;
 import de.schlichtherle.truezip.crypto.raes.RaesOutputStream;
 import de.schlichtherle.truezip.crypto.raes.RaesParameters;
 import de.schlichtherle.truezip.crypto.raes.RaesReadOnlyFile;
-import de.schlichtherle.truezip.file.ArchiveDetector;
-import de.schlichtherle.truezip.file.DefaultArchiveDetector;
-import de.schlichtherle.truezip.file.File;
-import de.schlichtherle.truezip.file.FileInputStream;
-import de.schlichtherle.truezip.file.FileOutputStream;
+import de.schlichtherle.truezip.file.TArchiveDetector;
+import de.schlichtherle.truezip.file.TDefaultArchiveDetector;
+import de.schlichtherle.truezip.file.TFile;
+import de.schlichtherle.truezip.file.TFileInputStream;
+import de.schlichtherle.truezip.file.TFileOutputStream;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFileInputStream;
 import de.schlichtherle.truezip.rof.SimpleReadOnlyFile;
@@ -38,7 +38,7 @@ import java.io.OutputStream;
  * This class cannot get instantiated outside its package.
  * <p>
  * Note that this class is not intended to access RAES encrypted ZIP files -
- * use the {@link File} class for this task instead.
+ * use the {@link TFile} class for this task instead.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -50,7 +50,7 @@ public class RaesFiles {
 
     /**
      * Encrypts the given plain file to the given RAES file.
-     * This version uses the default ArchiveDetector to detect any archive
+     * This version uses the default TArchiveDetector to detect any archive
      * files in its parent directory path except the files themselves, which
      * are not recognized as archive files.
      */
@@ -58,30 +58,30 @@ public class RaesFiles {
             final String plainFilePath,
             final String raesFilePath)
     throws IOException {
-        encrypt(plainFilePath, raesFilePath, File.getDefaultArchiveDetector());
+        encrypt(plainFilePath, raesFilePath, TFile.getDefaultArchiveDetector());
     }
 
     /**
      * Encrypts the given plain file to the given RAES file,
-     * using the provided ArchiveDetector to detect any archive files in its
+     * using the provided TArchiveDetector to detect any archive files in its
      * parent directory path except the files themselves, which are not
      * recognized as archive files.
      */
     public static void encrypt(
             final String plainFilePath,
             final String raesFilePath,
-            final ArchiveDetector detector)
+            final TArchiveDetector detector)
     throws IOException {
-        final File plainFile = newNonArchiveFile(plainFilePath, detector);
-        final File raesFile = newNonArchiveFile(raesFilePath, detector);
+        final TFile plainFile = newNonArchiveFile(plainFilePath, detector);
+        final TFile raesFile = newNonArchiveFile(raesFilePath, detector);
         final RaesParameters params = new KeyManagerRaesParameters(
                 raesFile.getCanonicalFile().toURI());
-        final InputStream in = new FileInputStream(plainFile);
+        final InputStream in = new TFileInputStream(plainFile);
         try {
             final RaesOutputStream out = RaesOutputStream.getInstance(
-                    new FileOutputStream(raesFile, false),
+                    new TFileOutputStream(raesFile, false),
                     params);
-            File.cp(in, out);
+            TFile.cp(in, out);
         } finally {
             in.close();
         }
@@ -89,7 +89,7 @@ public class RaesFiles {
 
     /**
      * Decrypts the given RAES file to the given plain file.
-     * This version uses the default ArchiveDetector to detect any archive
+     * This version uses the default TArchiveDetector to detect any archive
      * files in its parent directory path except the files themselves, which
      * are not recognized as archive files.
      */
@@ -99,12 +99,12 @@ public class RaesFiles {
             final boolean strongAuthentication)
     throws IOException {
         decrypt(raesFilePath, plainFilePath, strongAuthentication,
-                File.getDefaultArchiveDetector());
+                TFile.getDefaultArchiveDetector());
     }
 
     /**
      * Decrypts the given RAES file to the given plain file,
-     * using the provided ArchiveDetector to detect any archvie files in its
+     * using the provided TArchiveDetector to detect any archvie files in its
      * parent directory path except the files themselves, which are not
      * recognized as archive files.
      * 
@@ -118,10 +118,10 @@ public class RaesFiles {
             final String raesFilePath,
             final String plainFilePath,
             final boolean strongAuthentication,
-            final ArchiveDetector detector)
+            final TArchiveDetector detector)
     throws IOException {
-        final File raesFile = newNonArchiveFile(raesFilePath, detector);
-        final File plainFile = newNonArchiveFile(plainFilePath, detector);
+        final TFile raesFile = newNonArchiveFile(raesFilePath, detector);
+        final TFile plainFile = newNonArchiveFile(plainFilePath, detector);
         final RaesParameters params = new KeyManagerRaesParameters(
                 raesFile.getCanonicalFile().toURI());
         final ReadOnlyFile rof = new SimpleReadOnlyFile(raesFile);
@@ -131,23 +131,23 @@ public class RaesFiles {
             if (strongAuthentication)
                 rrof.authenticate();
             final InputStream in = new ReadOnlyFileInputStream(rrof);
-            final OutputStream out = new FileOutputStream(plainFile, false);
-            File.cp(in, out);
+            final OutputStream out = new TFileOutputStream(plainFile, false);
+            TFile.cp(in, out);
         } finally {
             rof.close();
         }
     }
 
     /**
-     * Creates a file object which uses the provided ArchiveDetector,
+     * Creates a file object which uses the provided TArchiveDetector,
      * but does not recognize its own pathname as an archive file.
      * Please note that this method just creates a file object,
      * and does not actually operate on the file system.
      */
-    private static File newNonArchiveFile(
+    private static TFile newNonArchiveFile(
             final String path,
-            final ArchiveDetector detector) {
-        final File file = new File(path, detector);
-        return new File(file.getParentFile(), file.getName(), DefaultArchiveDetector.NULL);
+            final TArchiveDetector detector) {
+        final TFile file = new TFile(path, detector);
+        return new TFile(file.getParentFile(), file.getName(), TDefaultArchiveDetector.NULL);
     }
 }

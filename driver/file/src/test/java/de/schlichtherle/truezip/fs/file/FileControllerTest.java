@@ -41,7 +41,7 @@ public class FileControllerTest {
      */
     @Test
     public void testIsWritableOrCreatable() throws IOException {
-        final java.io.File file = File.createTempFile("tzp-test", null);
+        final File file = File.createTempFile("tzp-test", null);
 
         boolean result = isCreatableOrWritable(file);
         assertTrue(result);

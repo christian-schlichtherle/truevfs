@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.sample.file.app;
 
 import de.schlichtherle.truezip.sample.file.RaesFiles;
-import de.schlichtherle.truezip.file.File;
+import de.schlichtherle.truezip.file.TFile;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ResourceBundle;
@@ -63,7 +63,7 @@ public class Encrypt extends CommandLineUtility {
         if (args.length != 2)
             throw new IllegalUsageException(resources.getString("usage"));
 
-        if (new File(args[1]).isEntry())
+        if (new TFile(args[1]).isEntry())
             monitor.start();
 
         RaesFiles.encrypt(args[0], args[1]);
