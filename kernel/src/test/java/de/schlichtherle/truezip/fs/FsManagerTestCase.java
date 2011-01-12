@@ -44,11 +44,6 @@ public abstract class FsManagerTestCase {
 
     protected abstract @NonNull FsManager newManager();
 
-    @After
-    public final void tearDown() {
-        manager = null;
-    }
-
     @Test
     public void testGetControllerWithNull() {
         try {

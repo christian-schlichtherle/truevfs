@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.key;
 
 import java.net.URI;
@@ -32,18 +31,18 @@ public class KeyManagerTest {
 
     @Before
     public void setUp() {
+        KeyManagers.setManager(null);
         instance = KeyManagers.getManager();
     }
 
     @After
     public void tearDown() {
-        KeyManager.resetAndRemoveKeyProviders();
         KeyManagers.setManager(null);
     }
 
     @Test
     public void testInstance() {
-        final KeyManager inst1 = KeyManagers.getManager();
+        final KeyManager inst1 = instance;
         assertNotNull(inst1);
 
         KeyManagers.setManager(null);
@@ -76,18 +75,18 @@ public class KeyManagerTest {
         final KeyProvider resA4 = new SucceedingKeyProvider();
         try {
             instance.setKeyProvider(null, resA4);
-            fail("A NullPointerException is expected from the previous call!");
-        } catch (NullPointerException exc) {
+            fail();
+        } catch (NullPointerException expected) {
         }
         try {
             instance.setKeyProvider(idA, null);
-            fail("A NullPointerException is expected from the previous call!");
-        } catch (NullPointerException exc) {
+            fail();
+        } catch (NullPointerException expected) {
         }
         try {
             instance.setKeyProvider(null, null);
-            fail("A NullPointerException is expected from the previous call!");
-        } catch (NullPointerException exc) {
+            fail();
+        } catch (NullPointerException expected) {
         }
         instance.setKeyProvider(idA, resA4);
 
@@ -106,8 +105,8 @@ public class KeyManagerTest {
 
         try {
             instance.getKeyProvider(idC, (Class) FailingKeyProvider.class);
-            fail("An IllegalArgumentException is expected from the previous call!");
-        } catch (IllegalArgumentException exc) {
+            fail();
+        } catch (IllegalArgumentException expected) {
         }
     }
 
@@ -119,7 +118,7 @@ public class KeyManagerTest {
                 = (SmartKeyProvider) instance.getKeyProvider(
                     id, SmartKeyProvider.class);
         provider.reset = false;
-        boolean result = KeyManager.resetKeyProvider(id);
+        boolean result = instance.resetKeyProvider(id);
         assertTrue(result);
         assertTrue(provider.reset);
 
@@ -135,7 +134,7 @@ public class KeyManagerTest {
                 = (SmartKeyProvider) instance.getKeyProvider(
                     idA, SmartKeyProvider.class);
         provA1.reset = false;
-        boolean okA = KeyManager.resetAndRemoveKeyProvider(idA);
+        boolean okA = instance.resetAndRemoveKeyProvider(idA);
         assertTrue(okA);
         assertTrue(provA1.reset);
 
@@ -146,7 +145,7 @@ public class KeyManagerTest {
         final SimpleKeyProvider provB1
                 = (SimpleKeyProvider) instance.getKeyProvider(
                     idB, SimpleKeyProvider.class);
-        boolean okB = KeyManager.resetAndRemoveKeyProvider(idB);
+        boolean okB = instance.resetAndRemoveKeyProvider(idB);
         assertTrue(okB);
 
         final KeyProvider provB2 = instance.getKeyProvider(idB, (Class) KeyProvider.class);
@@ -169,36 +168,10 @@ public class KeyManagerTest {
                     idB, SmartKeyProvider.class);
         provB.reset = false;
 
-        KeyManager.resetKeyProviders();
+        instance.resetKeyProviders();
 
         assertTrue(provA.reset);
         assertTrue(provB.reset);
-    }
-
-    @Test
-    public void testResetAndRemoveKeyProviders() {
-        final URI idA = URI.create("resetAndRemoveKeyProvidersA");
-        final URI idB = URI.create("resetAndRemoveKeyProvidersB");
-
-        final SmartKeyProvider provA1
-                = (SmartKeyProvider) instance.getKeyProvider(
-                    idA, SmartKeyProvider.class);
-        provA1.reset = false;
-
-        final SimpleKeyProvider provB1
-                = (SimpleKeyProvider) instance.getKeyProvider(
-                    idB, SimpleKeyProvider.class);
-
-        KeyManager.resetAndRemoveKeyProviders();
-        assertTrue(provA1.reset);
-
-        final KeyProvider provA2 = instance.getKeyProvider(idA, (Class) KeyProvider.class);
-        assertNotNull(provA2);
-        assertNotSame(provA1, provA2);
-
-        final KeyProvider provB2 = instance.getKeyProvider(idB, (Class) KeyProvider.class);
-        assertNotNull(provB2);
-        assertNotSame(provB1, provB2);
     }
 
     @Test
@@ -207,21 +180,21 @@ public class KeyManagerTest {
         final URI newID = URI.create("moveKeyProviderB");
 
         try {
-            KeyManager.moveKeyProvider(null, null);
+            instance.moveKeyProvider(null, null);
             fail("A NullPointerException is expected from the previous call!");
         } catch (NullPointerException expected) {
         }
         try {
-            KeyManager.moveKeyProvider(oldID, null);
+            instance.moveKeyProvider(oldID, null);
             fail("A NullPointerException is expected from the previous call!");
         } catch (NullPointerException expected) {
         }
         try {
-            KeyManager.moveKeyProvider(null, newID);
+            instance.moveKeyProvider(null, newID);
             fail("A NullPointerException is expected from the previous call!");
         } catch (NullPointerException expected) {
         }
-        boolean result = KeyManager.moveKeyProvider(oldID, newID);
+        boolean result = instance.moveKeyProvider(oldID, newID);
         assertEquals(false, result); // no provider mapped yet
 
         final PromptingKeyProvider provA1
@@ -229,7 +202,7 @@ public class KeyManagerTest {
         assertNotNull(provA1);
         assertSame(oldID, provA1.getResource());
 
-        result = KeyManager.moveKeyProvider(oldID, newID);
+        result = instance.moveKeyProvider(oldID, newID);
         assertEquals(true, result);
 
         final KeyProvider provA2 = instance.getKeyProvider(oldID, (Class) KeyProvider.class);
@@ -251,17 +224,17 @@ public class KeyManagerTest {
 
     static class SimpleKeyProvider implements KeyProvider<char[]> {
         @Override
-		public char[] getCreateKey() {
+        public char[] getCreateKey() {
             return "secret".toCharArray();
         }
 
         @Override
-		public char[] getOpenKey() {
+        public char[] getOpenKey() {
             return "secret".toCharArray();
         }
 
         @Override
-		public void invalidOpenKey() {
+        public void invalidOpenKey() {
         }
     }
 

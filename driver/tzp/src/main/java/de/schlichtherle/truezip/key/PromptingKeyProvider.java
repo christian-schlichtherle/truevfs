@@ -133,9 +133,8 @@ extends AbstractKeyProvider<K> {
      * The implementation in this class simply returns its class object,
      * {@code PromptingKeyProvider.class}.
      */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-	protected Class<? extends PromptingKeyProvider<?>> getUITypeKey() {
-        return (Class) PromptingKeyProvider.class;
+    protected Class<? extends PromptingKeyProvider> getUITypeKey() {
+        return PromptingKeyProvider.class;
     }
 
     private synchronized
@@ -181,7 +180,7 @@ extends AbstractKeyProvider<K> {
      * protected resource.
      */
     private K promptCreateKey() throws UnknownKeyException {
-        PromptingKeyManager.assertPrompting();
+        assertPrompting();
 
         final K oldKey = getKey();
         getUI().promptCreateKey(this);
@@ -195,6 +194,18 @@ extends AbstractKeyProvider<K> {
             setState(State.CANCELLED);
             throw new KeyPromptingCancelledException();
         }
+    }
+
+    /**
+     * Asserts that the default key manager has its prompting mode enabled if
+     * it's supported.
+     */
+    private static void assertPrompting()
+    throws KeyPromptingDisabledException {
+        KeyManager manager = KeyManagers.getManager();
+        if (manager instanceof PromptingKeyManager)
+            if (!((PromptingKeyManager) manager).isPrompting())
+                throw new KeyPromptingDisabledException();
     }
 
     /**
@@ -219,7 +230,7 @@ extends AbstractKeyProvider<K> {
      * resource in order to access its contents.
      */
     private K promptOpenKey(final boolean invalid) throws UnknownKeyException {
-        PromptingKeyManager.assertPrompting();
+        assertPrompting();
 
         final K oldKey = getKey();
         final boolean changeKey = getUI().promptOpenKey(this, invalid);
@@ -318,10 +329,10 @@ extends AbstractKeyProvider<K> {
      * @throws IllegalStateException If this instance is already mapped for
      *         another resource identifier or mapping is prohibited
      *         by a constraint in a subclass.
-     * @deprecated TODO: This method is not failsafe and will be removed!
+     * @deprecated TODO: This method is not failsafe and should be removed!
      */
     @Deprecated
-	@Override
+    @Override
     protected synchronized KeyProvider<?> addToKeyManager(final URI resource)
     throws NullPointerException, IllegalStateException {
         final URI oldResource = getResource();
@@ -344,19 +355,18 @@ extends AbstractKeyProvider<K> {
      * @throws IllegalStateException If this instance is already mapped for
      *         another resource identifier or mapping is prohibited
      *         by a constraint in a subclass.
-     * @deprecated TODO: This method is not failsafe and will be removed!
+     * @deprecated TODO: This method is not failsafe and should be removed!
      */
     @Deprecated
-	@Override
-    protected synchronized KeyProvider<?> removeFromKeyManager(
-            final URI resource)
+    @Override
+    protected synchronized KeyProvider<?> removeFromKeyManager(final URI resource)
     throws NullPointerException, IllegalStateException {
         final URI oldResource = getResource();
         if (!resource.equals(oldResource))
             throw new IllegalStateException(
                     "this provider is used for resource ID \"" + oldResource + "\"");
         final KeyProvider<?> provider = super.removeFromKeyManager(resource);
-        assert provider == null || provider == this : "";
+        assert null == provider || this == provider;
         setResource(null);
         return provider;
     }

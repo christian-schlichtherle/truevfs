@@ -22,6 +22,7 @@
         <!-- NOT truezip-driver: Introduces cyclic dependency! -->
         <artifactId>truezip</artifactId>
         <version>7.0-SNAPSHOT</version>
+        <relativePath>../..</relativePath>
     </parent>
 
     <artifactId>truezip-driver-file</artifactId>

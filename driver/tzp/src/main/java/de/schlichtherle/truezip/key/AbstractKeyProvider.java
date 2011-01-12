@@ -230,7 +230,7 @@ implements KeyProvider<K> {
      *         more information about its constraint(s).
      */
     protected KeyProvider<?> addToKeyManager(URI resource) {
-        return KeyManager.mapKeyProvider(resource, this);
+        return KeyManagers.getManager().mapKeyProvider(resource, this);
     }
 
     /**
@@ -253,6 +253,6 @@ implements KeyProvider<K> {
      *         more information about its constraint(s).
      */
     protected KeyProvider<?> removeFromKeyManager(URI resource) {
-        return KeyManager.mapKeyProvider(resource, null);
+        return KeyManagers.getManager().mapKeyProvider(resource, null);
     }
 }

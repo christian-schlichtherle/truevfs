@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.key.passwd.swing;
 
-import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.key.KeyManagers;
 import java.awt.EventQueue;
 import java.net.URI;
@@ -47,7 +46,6 @@ public class PromptingKeyManagerTest extends TestCase {
 
     @Override
     protected void tearDown() {
-        KeyManager.resetAndRemoveKeyProviders();
         KeyManagers.setManager(null);
     }
 

@@ -16,11 +16,9 @@
 
 package de.schlichtherle.truezip.key.passwd.swing;
 
-import de.schlichtherle.truezip.key.KeyPromptingDisabledException;
 import de.schlichtherle.truezip.key.PromptingAesKeyProvider;
 import de.schlichtherle.truezip.key.PromptingKeyProvider;
 import java.awt.GraphicsEnvironment;
-import java.awt.HeadlessException;
 
 /**
  * A key manager which enables users to enter passwords or select key files
@@ -69,28 +67,15 @@ extends de.schlichtherle.truezip.key.PromptingKeyManager {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public PromptingKeyManager() {
         mapPromptingKeyProviderUIType(
-        		(Class) PromptingKeyProvider.class,
-        		(Class) PromptingKeyProviderUI.class);
+                (Class) PromptingKeyProvider.class,
+        	(Class) PromptingKeyProviderUI.class);
         mapPromptingKeyProviderUIType(
-        		(Class) PromptingAesKeyProvider.class,
-        		(Class) PromptingAesKeyProviderUI.class);
+        	(Class) PromptingAesKeyProvider.class,
+        	(Class) PromptingAesKeyProviderUI.class);
     }
 
     @Override
-    protected boolean isPromptingImpl() {
-        return super.isPromptingImpl() && !GraphicsEnvironment.isHeadless();
-    }
-
-    /**
-     * If this JVM is running in headless mode, then this method throws
-     * a {@link KeyPromptingDisabledException} with a {@link HeadlessException}
-     * as its cause.
-     */
-    @Override
-    protected void assertPromptingImpl()
-    throws KeyPromptingDisabledException {
-        if (GraphicsEnvironment.isHeadless())
-            throw new KeyPromptingDisabledException(new HeadlessException());
-        super.assertPromptingImpl();
+    public boolean isPrompting() {
+        return super.isPrompting() && !GraphicsEnvironment.isHeadless();
     }
 }

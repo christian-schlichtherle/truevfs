@@ -155,9 +155,10 @@ abstract class CommandLineUtility {
             setDaemon(true);
             setPriority(Thread.MAX_PRIORITY);
             this.err = err;
+            // Reset the manager and instrument it in order to obtain statistics.
+            FsManagers.setManager(null);
             final FsStatisticsManager manager
-                    = new FsStatisticsManager(
-                        FsManagers.getManager());
+                    = new FsStatisticsManager(FsManagers.getManager());
             this.stats = manager.getStatistics();
             FsManagers.setManager(manager);
         }

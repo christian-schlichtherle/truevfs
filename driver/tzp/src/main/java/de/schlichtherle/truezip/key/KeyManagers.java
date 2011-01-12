@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.key;
 import de.schlichtherle.truezip.util.ServiceLocator;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.ServiceConfigurationError;
 import net.jcip.annotations.ThreadSafe;
 
@@ -66,10 +67,10 @@ public abstract class KeyManagers {
             synchronized (KeyManagers.class) { // DCL does work in combination with volatile in JSE 5!
                 manager = instance;
                 if (null == manager) {
-                    manager = new ServiceLocator(KeyManagers.class.getClassLoader())
+                    instance = manager
+                            = new ServiceLocator(KeyManagers.class.getClassLoader())
                             .getServices(KeyManager.class)
                             .next();
-                    setManager(manager);
                 }
             }
         }
@@ -79,10 +80,6 @@ public abstract class KeyManagers {
     /**
      * Sets the default key manager.
      * <p>
-     * If the current key manager has any key providers,
-     * an {@link IllegalStateException} is thrown.
-     * Call {@link #resetAndRemoveKeyProviders} to prevent this.
-     * <p>
      * If the given default key manager is {@code null},
      * a new instance will be created on the next call to {@link #getManager}.
      *
@@ -90,11 +87,7 @@ public abstract class KeyManagers {
      * @throws IllegalStateException if the current key manager has any
      *         key providers.
      */
-    public static synchronized void setManager(
-            final @CheckForNull KeyManager manager) {
-        final int count = null == instance ? 0 : instance.getSize();
-        if (0 < count)
-            throw new IllegalStateException("There are " + count + " key providers!");
+    public static synchronized void setManager(final @Nullable KeyManager manager) {
         instance = manager;
     }
 }

@@ -25,6 +25,7 @@ import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsException;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.key.KeyManager;
+import de.schlichtherle.truezip.key.KeyManagers;
 import java.io.CharConversionException;
 import java.io.IOException;
 import net.jcip.annotations.ThreadSafe;
@@ -94,6 +95,7 @@ extends FsDecoratingController<
     public void unlink(FsEntryName name) throws IOException {
         delegate.unlink(name);
         if (name.isRoot())
-            KeyManager.resetKeyProvider(getModel().getMountPoint().getUri());
+            KeyManagers .getManager()
+                        .resetKeyProvider(getModel().getMountPoint().getUri());
     }
 }
