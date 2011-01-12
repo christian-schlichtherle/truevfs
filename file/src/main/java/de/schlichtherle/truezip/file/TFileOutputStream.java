@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.file;
 
-import java.io.File;
 import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
+import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -32,9 +32,8 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.APPEND;
 import static de.schlichtherle.truezip.fs.FsOutputOption.CREATE_PARENTS;
 
 /**
- * A drop-in replacement for {@link java.io.TFileOutputStream} which
- * provides transparent write access to archive entries as if they were
- * (virtual) files.
+ * A replacement for {@link FileOutputStream} which provides transparent write
+ * access to archive entries as if they were (virtual) files.
  * All file system operations in this class are
  * <a href="package-summary.html#atomicity">virtually atomic</a>.
  * <p>
@@ -142,7 +141,7 @@ public final class TFileOutputStream extends DecoratingOutputStream {
     }
 
     public TFileOutputStream(FileDescriptor fd) {
-        super(new java.io.FileOutputStream(fd));
+        super(new FileOutputStream(fd));
     }
 
     private static OutputStream newOutputStream(    final File dst,

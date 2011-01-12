@@ -58,6 +58,9 @@ public class CanonicalStringSet extends AbstractSet<String> {
         /**
          * Returns the canonical string representation of {@code o} or
          * {@code null} if the canonical string representation is undefined.
+         * As the name implies, this is expected to be an idempotent function,
+         * i.e. it has no side effects and calling it again on its result
+         * yields a result which at least compares {@link Object#equals equal}.
          *
          * @param  o The Object to map to its canonical string representation.
          * @return The canonical string representation of {@code o} or

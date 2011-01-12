@@ -17,11 +17,12 @@ package de.schlichtherle.truezip.file;
 
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.InputStreamReader;
 
 /**
- * A drop-in replacement for {@link java.io.TFileReader} which provides
- * transparent read access to archive entries as if they were (virtual) files.
+ * A replacement for {@link FileReader} which provides transparent read access
+ * to archive entries as if they were (virtual) files.
  * All file system operations in this class are
  * <a href="package-summary.html#atomicity">virtually atomic</a>.
  *

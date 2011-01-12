@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.io.FileBusyException;
@@ -24,14 +23,14 @@ import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.File;
 import java.io.FileDescriptor;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * A drop-in replacement for {@link java.io.TFileInputStream} which
- * provides transparent read access to archive entries as if they were
- * (virtual) files.
+ * A replacement for {@link FileInputStream} which provides transparent read
+ * access to archive entries as if they were (virtual) files.
  * All file system operations in this class are
  * <a href="package-summary.html#atomicity">virtually atomic</a>.
  * <p>
@@ -111,7 +110,7 @@ public final class TFileInputStream extends DecoratingInputStream {
     }
 
     public TFileInputStream(FileDescriptor fd) {
-        super(new java.io.FileInputStream(fd));
+        super(new FileInputStream(fd));
     }
 
     private static InputStream newInputStream(final File src)

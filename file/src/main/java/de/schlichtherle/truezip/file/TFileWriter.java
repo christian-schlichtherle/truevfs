@@ -16,12 +16,13 @@
 package de.schlichtherle.truezip.file;
 
 import java.io.FileDescriptor;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
 /**
- * A drop-in replacement for {@link java.io.TFileWriter} which provides
- * transparent write access to archive entries as if they were (virtual) files.
+ * A replacement for {@link FileWriter} which provides transparent write access
+ * to archive entries as if they were (virtual) files.
  * All file system operations in this class are
  * <a href="package-summary.html#atomicity">virtually atomic</a>.
  *

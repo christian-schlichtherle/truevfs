@@ -68,9 +68,9 @@ import static de.schlichtherle.truezip.file.TFiles.*;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 
 /**
- * A drop-in replacement for its subclass which provides transparent
- * read/write access to archive files and their entries as if they were
- * (virtual) directories and files.
+ * A replacement for its subclass which provides transparent read/write access
+ * to archive files and their entries as if they were (virtual) directories and
+ * files.
  * <p>
  * <b>Warning:</b>The classes in this package access and manipulate archive
  * files as external resources and may cache some of their state in memory
