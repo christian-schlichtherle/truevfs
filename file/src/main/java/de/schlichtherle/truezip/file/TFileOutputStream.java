@@ -15,6 +15,9 @@
  */
 package de.schlichtherle.truezip.file;
 
+import net.jcip.annotations.Immutable;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.fs.FsSyncException;
@@ -82,6 +85,8 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.CREATE_PARENTS;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
+@Immutable
 public final class TFileOutputStream extends DecoratingOutputStream {
 
     /**

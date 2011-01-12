@@ -34,6 +34,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ServiceConfigurationError;
 import java.util.regex.Matcher;
+import net.jcip.annotations.Immutable;
 
 /**
  * An {@link TArchiveDetector} which matches file paths against a pattern of
@@ -71,6 +72,7 @@ import java.util.regex.Matcher;
  * @see TDefaultArchiveDetector#NULL
  * @see TDefaultArchiveDetector#ALL
  */
+@Immutable
 public final class TDefaultArchiveDetector implements TArchiveDetector {
 
     private static final ServiceLocator serviceLocator

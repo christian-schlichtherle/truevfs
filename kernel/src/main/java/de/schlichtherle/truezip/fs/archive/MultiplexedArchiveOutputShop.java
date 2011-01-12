@@ -39,6 +39,7 @@ import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import net.jcip.annotations.NotThreadSafe;
 
 import static de.schlichtherle.truezip.fs.archive.ArchiveEntry.UNKNOWN;
 
@@ -52,14 +53,12 @@ import static de.schlichtherle.truezip.fs.archive.ArchiveEntry.UNKNOWN;
  * output archive upon a call to their {@link OutputStream#close()} method.
  * Note that this implies that the {@code close()} method may fail with
  * an {@link IOException}.
- * <p>
- * Implementations do <em>not</em> need to be thread-safe:
- * Multithreading needs to be addressed by client applications.
  *
  * @param   <AE> The type of the archive entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 public class MultiplexedArchiveOutputShop<AE extends ArchiveEntry>
 extends DecoratingOutputShop<AE, OutputShop<AE>> {
 

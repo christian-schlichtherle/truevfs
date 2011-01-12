@@ -17,21 +17,20 @@ package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.io.ChainableIOException;
 import java.io.IOException;
-import net.jcip.annotations.Immutable;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * Indicates an exceptional condition when synchronizing the changes in a
- * virtual file system with its parent file system.
- * Unless this is an instance of the sub class {@link FsSyncWarningException},
- * an exception of this class implies that some or all of the data in the
- * file system has been lost.
+ * federated file system to its parent file system.
+ * Unless this is an instance of the sub-class {@link FsSyncWarningException},
+ * an exception of this class implies that some or all
+ * of the data of the federated file system have been lost.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-@Immutable
+@ThreadSafe
 public class FsSyncException extends ChainableIOException {
-
     private static final long serialVersionUID = 4893219420357369739L;
 
     /**

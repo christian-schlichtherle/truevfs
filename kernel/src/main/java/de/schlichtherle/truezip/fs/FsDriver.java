@@ -22,12 +22,13 @@ import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * An immutable factory for thread-safe file system controllers.
+ * An factory for thread-safe file system controllers.
+ * <p>
+ * Implementations must be immutable.
  * 
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@Immutable
 public interface FsDriver {
 
     /**

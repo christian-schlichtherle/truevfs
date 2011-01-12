@@ -412,7 +412,7 @@ public abstract class ZipTestCase {
                                 if (read < 0)
                                     break;
                                 assertTrue(read > 0);
-                                assertTrue(de.schlichtherle.truezip.util.Arrays.equals(
+                                assertTrue(de.schlichtherle.truezip.util.ArrayHelper.equals(
                                         data, off, buf, 0, read));
                                 off += read;
                             } while (true);

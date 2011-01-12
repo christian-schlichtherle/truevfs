@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.util;
 
 import java.util.*;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * Concatenates two enumerations.
@@ -23,6 +24,7 @@ import java.util.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 public final class JointEnumeration<E> implements Enumeration<E> {
     private Enumeration<? extends E> e1;
     private final Enumeration<? extends E> e2;

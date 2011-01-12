@@ -25,6 +25,7 @@ import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * A read-only archive file system.
@@ -35,6 +36,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 final class ReadOnlyArchiveFileSystem<E extends ArchiveEntry>
 extends ArchiveFileSystem<E> {
 

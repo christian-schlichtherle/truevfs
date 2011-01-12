@@ -23,6 +23,7 @@ import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
@@ -42,17 +43,18 @@ import static de.schlichtherle.truezip.fs.FsSyncOption.*;
  * resolved against the {@link FsModel#getMountPoint() mount point} URI of this
  * controller's {@link #getModel() file system model}.
  * <p>
- * All method implementations of this abstract class must be reentrant on
- * exceptions - so client applications may repeatedly call them.
+ * Sub-classes must be reentrant on exceptions - so users may repeatedly
+ * call their methods.
  *
  * @param   <M> The type of the file system model.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public abstract class FsController<M extends FsModel> {
 
     /** Returns the file system model. */
-    public abstract @NonNull M
+    public abstract M
     getModel();
 
     /**
@@ -76,24 +78,24 @@ public abstract class FsController<M extends FsModel> {
     throws IOException;
 
     public abstract @CheckForNull FsEntry
-    getEntry(@NonNull FsEntryName name)
+    getEntry(FsEntryName name)
     throws IOException;
 
     public abstract boolean
-    isReadable(@NonNull FsEntryName name)
+    isReadable(FsEntryName name)
     throws IOException;
 
     public abstract boolean
-    isWritable(@NonNull FsEntryName name)
+    isWritable(FsEntryName name)
     throws IOException;
 
     public abstract void
-    setReadOnly(@NonNull FsEntryName name)
+    setReadOnly(FsEntryName name)
     throws IOException;
 
     public abstract boolean
-    setTime(@NonNull FsEntryName name,
-            @NonNull BitField<Access> types,
+    setTime(FsEntryName name,
+            BitField<Access> types,
             long value)
     throws IOException;
 
@@ -104,9 +106,9 @@ public abstract class FsController<M extends FsModel> {
      * @param  name a file system entry name.
      * @return An {@code InputSocket}.
      */
-    public abstract @NonNull InputSocket<?>
-    getInputSocket( @NonNull FsEntryName name,
-                    @NonNull BitField<FsInputOption> options);
+    public abstract InputSocket<?>
+    getInputSocket( FsEntryName name,
+                    BitField<FsInputOption> options);
 
     /**
      * Returns an output socket for writing the contents of the entry addressed
@@ -115,9 +117,9 @@ public abstract class FsController<M extends FsModel> {
      * @param  name a file system entry name.
      * @return An {@code OutputSocket}.
      */
-    public abstract @NonNull OutputSocket<?>
-    getOutputSocket(@NonNull FsEntryName name,
-                    @NonNull BitField<FsOutputOption> options,
+    public abstract OutputSocket<?>
+    getOutputSocket(FsEntryName name,
+                    BitField<FsOutputOption> options,
                     @CheckForNull Entry template);
 
     /**
@@ -150,14 +152,14 @@ public abstract class FsController<M extends FsModel> {
      *         </ul>
      */
     public abstract void
-    mknod(  @NonNull FsEntryName name,
-            @NonNull Type type,
-            @NonNull BitField<FsOutputOption> options,
+    mknod(  FsEntryName name,
+            Type type,
+            BitField<FsOutputOption> options,
             @CheckForNull Entry template)
     throws IOException;
 
     public abstract void
-    unlink(@NonNull FsEntryName name)
+    unlink(FsEntryName name)
     throws IOException;
 
     /**
@@ -177,8 +179,8 @@ public abstract class FsController<M extends FsModel> {
      * @see    #UMOUNT
      */
     public abstract <X extends IOException> void
-    sync(   @NonNull BitField<FsSyncOption> options,
-            @NonNull ExceptionHandler<? super FsSyncException, X> handler)
+    sync(   BitField<FsSyncOption> options,
+            ExceptionHandler<? super FsSyncException, X> handler)
     throws X, FsException;
 
     /**
@@ -200,7 +202,7 @@ public abstract class FsController<M extends FsModel> {
      */
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     @Override public final boolean
-    equals(Object that) {
+    equals(@CheckForNull Object that) {
         return this == that;
     }
 

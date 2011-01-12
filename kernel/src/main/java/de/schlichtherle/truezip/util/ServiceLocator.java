@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.util;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.net.URL;
@@ -23,6 +24,7 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * Provides utility methods for convenient class, resource and service location
@@ -46,9 +48,11 @@ import java.util.ServiceLoader;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
+@DefaultAnnotation(NonNull.class)
 public final class ServiceLocator {
 
-    private final @NonNull ClassLoader l1;
+    private final ClassLoader l1;
 
     /**
      * Equivalent to
@@ -85,7 +89,7 @@ public final class ServiceLocator {
      *         instances.
      * @throws ServiceConfigurationError if an exception occurs.
      */
-    public @NonNull <S> Iterator<S> getServices(@NonNull Class<S> service) {
+    public <S> Iterator<S> getServices(Class<S> service) {
         ClassLoader l2 = Thread.currentThread().getContextClassLoader();
         return l1 == l2
                 ? ServiceLoader.load(service, l1).iterator()
@@ -117,9 +121,8 @@ public final class ServiceLocator {
      * @throws ServiceConfigurationError if any other {@link Exception} occurs.
      */
     @SuppressWarnings("unchecked")
-    public @NonNull <S> S
-    getService( @NonNull Class<S> service,
-                @CheckForNull Class<? extends S> def) {
+    public <S> S
+    getService(Class<S> service, @CheckForNull Class<? extends S> def) {
         String name = System.getProperty(   service.getName(),
                                             null == def ? null : def.getName());
         try {
@@ -139,7 +142,7 @@ public final class ServiceLocator {
      * @throws ClassNotFoundException if loading the class failed for some
      *         reason.
      */
-    public @NonNull Class<?> getClass(@NonNull String name)
+    public Class<?> getClass(String name)
     throws ClassNotFoundException {
         try {
             return l1.loadClass(name);
@@ -159,7 +162,7 @@ public final class ServiceLocator {
      * @return A concatenated enumeration for the resource on the class path.
      * @throws IOException If an I/O exception occurs.
      */
-    public @NonNull Enumeration<URL> getResources(@NonNull String name)
+    public Enumeration<URL> getResources(String name)
     throws IOException {
         ClassLoader l2 = Thread.currentThread().getContextClassLoader();
         return l1 == l2

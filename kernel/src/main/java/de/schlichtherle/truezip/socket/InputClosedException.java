@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.socket;
 
 import java.io.IOException;
-import net.jcip.annotations.Immutable;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * Indicates that an input stream or read only file for an entry has been
@@ -27,7 +27,7 @@ import net.jcip.annotations.Immutable;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-@Immutable
+@ThreadSafe
 public class InputClosedException extends IOException {
     private static final long serialVersionUID = 4563928734723923649L;
     

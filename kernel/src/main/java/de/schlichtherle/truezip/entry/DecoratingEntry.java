@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.entry;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.NotThreadSafe;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * A decorator for an entry.
@@ -25,7 +26,7 @@ import net.jcip.annotations.NotThreadSafe;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@NotThreadSafe
+@ThreadSafe
 public abstract class DecoratingEntry<E extends Entry>
 implements Entry {
 

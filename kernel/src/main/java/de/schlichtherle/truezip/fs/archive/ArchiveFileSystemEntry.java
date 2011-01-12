@@ -22,6 +22,7 @@ import java.util.Set;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import net.jcip.annotations.NotThreadSafe;
 
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
 
@@ -32,6 +33,7 @@ import static de.schlichtherle.truezip.entry.Entry.Type.*;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 public abstract class ArchiveFileSystemEntry<E extends ArchiveEntry>
 extends FsDecoratingEntry<E> {
 

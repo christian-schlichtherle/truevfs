@@ -24,7 +24,7 @@ import net.jcip.annotations.ThreadSafe;
 /**
  * A pool of I/O entries.
  * <p>
- * Note that any pool implementation is expected to be thread-safe!
+ * Implementation must be thread-safe.
  * However, this does not necessarily apply to the implementation of its
  * managed resources.
  *
@@ -32,7 +32,6 @@ import net.jcip.annotations.ThreadSafe;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-@ThreadSafe
 public interface IOPool<E extends IOEntry<E>>
 extends Pool<Entry<E>, IOException> {
 
@@ -41,7 +40,6 @@ extends Pool<Entry<E>, IOException> {
      * 
      * @param <E> the type of the I/O entries.
      */
-    @NotThreadSafe
     interface Entry<E extends IOEntry<E>>
     extends IOEntry<E>, Pool.Releasable<IOException> {
     }

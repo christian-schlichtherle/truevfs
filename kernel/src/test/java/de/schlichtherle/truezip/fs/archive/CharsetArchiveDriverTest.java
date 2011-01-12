@@ -86,28 +86,6 @@ public class CharsetArchiveDriverTest extends TestCase {
         }
     }
 
-    public void testSerialization() throws IOException, ClassNotFoundException {
-        // Serialize.
-        final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        final ObjectOutputStream out = new ObjectOutputStream(bos);
-        out.writeObject(driver);
-        out.close();
-
-        // Deserialize.
-        final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
-        final ObjectInputStream in = new ObjectInputStream(bis);
-        @SuppressWarnings("unchecked")
-        final CharsetArchiveDriver<ArchiveEntry> driver2
-                = (CharsetArchiveDriver<ArchiveEntry>) in.readObject();
-        in.close();
-        
-        assertNotSame(driver, driver2);
-        assertSame(driver.getCharset(), driver2.getCharset());
-        assertSame(driver.getOpenIcon(null), driver2.getOpenIcon(null)); // static property!
-        assertSame(driver.getClosedIcon(null), driver2.getClosedIcon(null)); // static property!
-        driver2.assertEncodable("foo/bar");
-    }
-
     public void testMultithreading() throws Throwable {
         final Object ready = new Object();
         final Object go = new Object();

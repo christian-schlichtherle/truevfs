@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.fs.archive;
 
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.entry.EntryFactory;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.CharConversionException;
 import java.io.IOException;
@@ -26,31 +27,32 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
+import net.jcip.annotations.Immutable;
 
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import static de.schlichtherle.truezip.io.Paths.*;
 
 /**
- * Provides convenience methods for dealing with a character set.
+ * A partial implementation of an archive driver which provides convenient
+ * methods for dealing with the character set supported by the respective
+ * archive type.
+ * <p>
+ * This class is only useful for archive types with a defined character set,
+ * e.g. the ZIP file format with its IBM437 character set or the TAR file
+ * format with its US-ASCII character set.
+ * <p>
+ * Implementations must be immutable.
  * 
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@Immutable
+@DefaultAnnotation(NonNull.class)
 public abstract class CharsetArchiveDriver<E extends ArchiveEntry>
-extends ArchiveDriver<E>
-implements Serializable {
+extends ArchiveDriver<E> {
 
-    /**
-     * This field should be considered to be {@code final}!
-     */
-    private transient @NonNull Charset charset;
-
-    /**
-     * This field should be considered to be {@code final}!
-     *
-     * @see #assertEncodable
-     */
-    private transient @NonNull ThreadLocalEncoder encoder;
+    private final Charset charset;
+    private final ThreadLocalEncoder encoder;
 
     /**
      * Constructs a new abstract archive driver.
@@ -59,49 +61,11 @@ implements Serializable {
      *         entry names and probably other meta data when reading or writing
      *         archive files.
      */
-    protected CharsetArchiveDriver(@NonNull final Charset charset) {
+    protected CharsetArchiveDriver(final Charset charset) {
         if (null == charset)
             throw new NullPointerException();
         this.charset = charset;
         this.encoder = new ThreadLocalEncoder();
-
-        assert invariants();
-    }
-
-    private boolean invariants() {
-        assert null != charset;
-        try {
-            assertEncodable("");
-        } catch (CharConversionException ex) {
-            throw new AssertionError(ex);
-        }
-        return true;
-    }
-
-    private void writeObject(final ObjectOutputStream out)
-    throws IOException {
-        out.defaultWriteObject();
-        out.writeUTF(charset.name());
-    }
-
-    /**
-     * Postfixes the instance after its default deserialization.
-     *
-     * @throws InvalidObjectException If the instance invariants are not met.
-     */
-    private void readObject(final ObjectInputStream in)
-    throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        assert charset == null;
-        charset = Charset.forName(in.readUTF());
-        assert encoder == null;
-        encoder = new ThreadLocalEncoder();
-        try {
-            invariants();
-        } catch (AssertionError ex) {
-            throw (InvalidObjectException) new InvalidObjectException(ex.toString())
-                    .initCause(ex);
-        }
     }
 
     /**
@@ -114,9 +78,7 @@ implements Serializable {
      * @param  type an entry type.
      * @return The fixed entry name.
      */
-    protected static @NonNull String
-    toZipOrTarEntryName(final @NonNull String name,
-                        final @NonNull Type type) {
+    protected static String toZipOrTarEntryName(String name, Type type) {
         switch (type) {
             case DIRECTORY:
                 return name.endsWith(SEPARATOR) ? name : name + SEPARATOR_CHAR;
@@ -136,7 +98,7 @@ implements Serializable {
      * @throws CharConversionException If the path name contains characters
      *         which cannot get encoded.
      */
-    protected final void assertEncodable(@NonNull String name)
+    protected final void assertEncodable(String name)
     throws CharConversionException {
         if (!encoder.canEncode(name))
             throw new CharConversionException(name +
@@ -158,7 +120,7 @@ implements Serializable {
      * Returns the value of the property {@code charset} which was
      * provided to the constructor.
      */
-    public final @NonNull Charset getCharset() {
+    public final Charset getCharset() {
         return charset;
     }
 }

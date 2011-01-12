@@ -15,8 +15,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.fs.FsException;
-import net.jcip.annotations.Immutable;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * Indicates that a controller is not write locked and the lock cannot get
@@ -27,7 +26,7 @@ import net.jcip.annotations.Immutable;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@Immutable
+@ThreadSafe
 public final class FsNotWriteLockedException extends FsException {
     private static final long serialVersionUID = 2345952581284762637L;
 

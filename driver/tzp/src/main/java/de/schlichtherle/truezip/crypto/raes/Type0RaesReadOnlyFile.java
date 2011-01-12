@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.crypto.raes;
 import de.schlichtherle.truezip.crypto.SeekableBlockCipher;
 import de.schlichtherle.truezip.crypto.mode.SICSeekableBlockCipher;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.util.Arrays;
+import de.schlichtherle.truezip.util.ArrayHelper;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import org.bouncycastle.crypto.CipherParameters;
@@ -158,7 +158,7 @@ class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
 
             lastTry = enforceSuspensionPenalty(lastTry);
 
-            if (Arrays.equals(footer, 0, buf, 0, buf.length / 2)) {
+            if (ArrayHelper.equals(footer, 0, buf, 0, buf.length / 2)) {
                 parameters.setKeyStrength(keyStrength);
                 break;
             }
@@ -204,7 +204,7 @@ class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
 
         final byte[] buf = computeMac(mac);
 
-        if (!Arrays.equals(footer, footer.length / 2, buf, 0, buf.length / 2))
+        if (!ArrayHelper.equals(footer, footer.length / 2, buf, 0, buf.length / 2))
             throw new RaesAuthenticationException();
     }
 }

@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.fs.archive;
 
-import de.schlichtherle.truezip.fs.archive.ArchiveEntry;
 import de.schlichtherle.truezip.util.Link;
 
 /**
@@ -26,6 +25,8 @@ import de.schlichtherle.truezip.util.Link;
  * <p>
  * Note that the state of the archive file system will not change until
  * the {@link #run} method is called!
+ * <p>
+ * Implementations do <em>not</em> need to be thread-safe.
  *
  * @param   <E> The type of the archive entries.
  * @see ArchiveFileSystem#mknod

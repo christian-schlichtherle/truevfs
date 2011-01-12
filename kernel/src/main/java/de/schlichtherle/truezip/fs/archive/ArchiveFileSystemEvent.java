@@ -16,16 +16,18 @@
 package de.schlichtherle.truezip.fs.archive;
 
 import java.util.EventObject;
+import net.jcip.annotations.Immutable;
 
 /**
+ * An archive file system event.
+ * 
  * @param   <E> The type of the archive entries.
  * @see     ArchiveFileSystemTouchListener
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-class ArchiveFileSystemEvent<E extends ArchiveEntry>
-extends EventObject {
-
+@Immutable
+class ArchiveFileSystemEvent<E extends ArchiveEntry> extends EventObject {
     private static final long serialVersionUID = 7205624082374036401L;
 
     /**

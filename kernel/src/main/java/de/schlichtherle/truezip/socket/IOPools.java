@@ -23,8 +23,6 @@ import net.jcip.annotations.ThreadSafe;
 
 /**
  * A static service locator and container for a pool of I/O entries.
- * <p>
- * This class is thread-safe.
  *
  * @author Christian Schlichtherle
  * @version $Id$

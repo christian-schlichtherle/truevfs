@@ -17,16 +17,21 @@ package de.schlichtherle.truezip.awt;
 
 import java.awt.EventQueue;
 import java.lang.reflect.InvocationTargetException;
+import net.jcip.annotations.ThreadSafe;
 
 /**
- * Provide static utility methods for dealing with the AWT Event Queue.
+ * Provide static utility methods for the AWT Event Queue.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 public class EventQueueHelper {
 
     private static final byte RESET = 0, CANCELLED = 1, STARTED = 2, DONE = 3;
+
+    private EventQueueHelper() {
+    }
 
     /**
      * Equivalent to {@link #invokeAndWaitUninterruptibly(Runnable, long)

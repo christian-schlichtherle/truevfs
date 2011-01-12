@@ -25,18 +25,13 @@ import net.jcip.annotations.NotThreadSafe;
  * All methods of this interface must reflect all entries, including those
  * which have only been partially written yet, i.e. which have not already
  * received a call to their {@code close()} method.
- * <p>
- * Implementations do <em>not</em> need to be thread-safe:
- * Multithreading needs to be addressed by client classes.
  *
  * @param   <E> The type of the entries.
  * @see     InputService
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@NotThreadSafe
-public interface OutputService<E extends Entry>
-extends EntryContainer<E> {
+public interface OutputService<E extends Entry> extends EntryContainer<E> {
 
     /**
      * Returns a non-{@code null} output socket for write access to the given

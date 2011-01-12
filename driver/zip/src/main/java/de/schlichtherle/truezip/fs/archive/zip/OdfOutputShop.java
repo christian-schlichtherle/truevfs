@@ -21,6 +21,7 @@ import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.fs.archive.MultiplexedArchiveOutputShop;
 import java.io.IOException;
 import java.io.OutputStream;
+import net.jcip.annotations.NotThreadSafe;
 
 import static de.schlichtherle.truezip.fs.archive.ArchiveEntry.UNKNOWN;
 import static de.schlichtherle.truezip.zip.ZipEntry.STORED;
@@ -32,6 +33,7 @@ import static de.schlichtherle.truezip.zip.ZipEntry.STORED;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 public class OdfOutputShop extends MultiplexedArchiveOutputShop<ZipArchiveEntry> {
 
     /** The name of the entry to receive tender, loving care. */

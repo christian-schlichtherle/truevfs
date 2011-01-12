@@ -21,16 +21,11 @@ import net.jcip.annotations.NotThreadSafe;
 
 /**
  * A closable input service.
- * <p>
- * Implementations do <em>not</em> need to be thread-safe:
- * Multithreading needs to be addressed by client classes.
  *
  * @param   <E> The type of the entries.
  * @see     OutputShop
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@NotThreadSafe
-public interface InputShop<E extends Entry>
-extends Closeable, InputService<E> {
+public interface InputShop<E extends Entry> extends Closeable, InputService<E> {
 }

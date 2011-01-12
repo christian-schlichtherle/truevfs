@@ -15,10 +15,13 @@
  */
 package de.schlichtherle.truezip.fs.archive;
 
+import net.jcip.annotations.ThreadSafe;
+
 /**
  * Thrown to indicate that an operation was trying to modify a read-only
  * {@link ArchiveFileSystem}.
  */
+@ThreadSafe
 public class ReadOnlyArchiveFileSystemException
 extends ArchiveFileSystemException {
 

@@ -29,8 +29,6 @@ import static de.schlichtherle.truezip.fs.FsController.*;
  * If you want to use this package with dependency injection, then you should
  * avoid using this class if possible because it uses a static field for
  * storing the stateful file system manager instance.
- * <p>
- * This class is thread-safe.
  *
  * @author Christian Schlichtherle
  * @version $Id$

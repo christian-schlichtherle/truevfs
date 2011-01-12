@@ -21,18 +21,13 @@ import net.jcip.annotations.NotThreadSafe;
 
 /**
  * A container and input socket factory for entries.
- * <p>
- * Implementations do <em>not</em> need to be thread-safe:
- * Multithreading needs to be addressed by client classes.
  *
  * @param   <E> The type of the entries.
  * @see     OutputService
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@NotThreadSafe
-public interface InputService<E extends Entry>
-extends EntryContainer<E> {
+public interface InputService<E extends Entry> extends EntryContainer<E> {
 
     /**
      * Returns a non-{@code null} input socket for read access to the given

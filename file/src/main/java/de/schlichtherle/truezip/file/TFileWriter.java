@@ -15,10 +15,13 @@
  */
 package de.schlichtherle.truezip.file;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.FileDescriptor;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import net.jcip.annotations.Immutable;
 
 /**
  * A replacement for {@link FileWriter} which provides transparent write access
@@ -34,7 +37,8 @@ import java.io.OutputStreamWriter;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-
+@DefaultAnnotation(NonNull.class)
+@Immutable
 public final class TFileWriter extends OutputStreamWriter {
 
     public TFileWriter(String path) throws IOException {
