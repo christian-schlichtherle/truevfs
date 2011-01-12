@@ -58,16 +58,15 @@ public class TFileTreeModel implements TreeModel {
     }
 
     /** A comparator which sorts directory entries to the beginning. */
-    public static final Comparator<File> FILE_NAME_COMPARATOR
-            = new Comparator<File>() {
+    public static final Comparator<File>
+            FILE_NAME_COMPARATOR = new Comparator<File>() {
         @Override
-		public int compare(File f1, File f2) {
-            if (f1.isDirectory())
-                return f2.isDirectory()
+        public int compare(File f1, File f2) {
+            return f1.isDirectory()
+                ? f2.isDirectory()
                         ? collator.compare(f1.getName(), f2.getName())
-                        : -1;
-            else
-                return f2.isDirectory()
+                        : -1
+                : f2.isDirectory()
                         ? 1
                         : collator.compare(f1.getName(), f2.getName());
         }
@@ -280,7 +279,7 @@ public class TFileTreeModel implements TreeModel {
     }
 
     //
-    // TFile system operations.
+    // File system operations.
     //
 
     /**
