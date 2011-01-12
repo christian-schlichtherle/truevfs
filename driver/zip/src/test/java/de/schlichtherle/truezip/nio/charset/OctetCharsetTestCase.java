@@ -23,29 +23,27 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.util.Arrays;
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class OctetCharsetTestCase extends TestCase {
+public abstract class OctetCharsetTestCase {
 
-    protected Charset charset;
-    
-    protected OctetCharsetTestCase(String testName) {
-        super(testName);
+    private Charset charset;
+
+    @Before
+    public void setUp() throws Exception {
+        charset = newCharset();
     }
 
-    /** Must set charset. */
-    @Override
-    protected abstract void setUp() throws Exception;
+    protected abstract Charset newCharset();
 
-    @Override
-    protected void tearDown() throws Exception {
-        charset = null;
-    }
-
+    @Test
     public void testRoundTrip() throws CharacterCodingException {
         final CharsetDecoder dec = charset.newDecoder();
         final CharsetEncoder enc = charset.newEncoder();

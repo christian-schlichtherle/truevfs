@@ -15,7 +15,9 @@
  */
 package de.schlichtherle.truezip.nio.charset;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.nio.charset.Charset;
+import java.nio.charset.spi.CharsetProvider;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -29,23 +31,22 @@ import java.util.Map;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class CharsetProvider extends java.nio.charset.spi.CharsetProvider {
+public final class ZipCharsetProvider extends CharsetProvider {
 
-    private static final Map<String, Charset> CHARSETS;
-
+    private static final @NonNull Map<String, Charset> CHARSETS;
     static {
-        final Map<String, Charset> charsets = new HashMap<String, Charset>();
-        for (final Charset charset : new Charset[] {
-            new IBM437Charset(),
+        Map<String, Charset> charsets = new HashMap<String, Charset>();
+        for (Charset charset : new Charset[] {
+            new Ibm437Charset(),
         }) {
             charsets.put(lowerCase(charset.name()), charset);
-            for (final String alias : charset.aliases())
+            for (String alias : charset.aliases())
                 charsets.put(lowerCase(alias), charset);
         }
         CHARSETS = Collections.unmodifiableMap(charsets);
     }
 
-    private static String lowerCase(String s) {
+    private static @NonNull String lowerCase(@NonNull String s) {
         return s.toLowerCase(Locale.ENGLISH);
     }
 
