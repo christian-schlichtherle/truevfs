@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.crypto.raes;
 
 import de.schlichtherle.truezip.key.AesKeyProvider;
 import de.schlichtherle.truezip.key.KeyManager;
+import de.schlichtherle.truezip.key.KeyManagers;
 import de.schlichtherle.truezip.key.KeyProvider;
 import de.schlichtherle.truezip.key.UnknownKeyException;
 import java.net.URI;
@@ -61,7 +62,7 @@ public final class KeyManagerRaesParameters implements RaesParametersAgent {
     public KeyManagerRaesParameters(URI resource) {
         if (!resource.isAbsolute())
             throw new IllegalArgumentException();
-        this.manager = KeyManager.getInstance();
+        this.manager = KeyManagers.getManager();
         this.resource = resource;
     }
 

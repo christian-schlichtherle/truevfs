@@ -29,7 +29,7 @@ import java.util.Map;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class TzpDriverFamily implements FsDriverProvider {
+public final class ZipRaesDriverFamily implements FsDriverProvider {
 
     private static final Map<FsScheme, FsDriver> DRIVERS;
 
@@ -42,7 +42,7 @@ public final class TzpDriverFamily implements FsDriverProvider {
     }
 
     @Override
-    public Map<FsScheme, FsDriver> getDrivers() {
+    public Map<FsScheme, ? extends FsDriver> getDrivers() {
         return DRIVERS;
     }
 }

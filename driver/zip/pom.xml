@@ -28,6 +28,6 @@
     <description>
         The ZIP driver family.
         Add this artifact to the run time class path in order to make the
-        Kernel recognize this archive type.
+        Kernel support this archive type.
     </description>
 </project>

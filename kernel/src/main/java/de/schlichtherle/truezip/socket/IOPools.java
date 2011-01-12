@@ -42,7 +42,7 @@ public class IOPools {
      * Returns the default I/O pool.
      * <p>
      * If the default I/O pool has been explicitly set to non-{@code null}
-     * by calling {@link #setInstance}, then this instance is returned.
+     * by calling {@link #setPool}, then this instance is returned.
      * <p>
      * Otherwise, the service is located by loading the class name from any
      * resource file with the name
@@ -56,7 +56,7 @@ public class IOPools {
      * @throws ServiceConfigurationError at the discretion of the
      *         {@link ServiceLocator}.
      */
-    public static @NonNull IOPool<?> getInstance() {
+    public static @NonNull IOPool<?> getPool() {
         IOPool<?> pool = instance;
         if (null == pool) {
             synchronized (IOPools.class) { // DCL does work in combination with volatile in JSE 5!
@@ -76,11 +76,11 @@ public class IOPools {
      * Sets the default I/O pool.
      * <p>
      * If the given default I/O pool is {@code null},
-     * a new instance will be created on the next call to {@link #getInstance}.
+     * a new instance will be created on the next call to {@link #getPool}.
      *
      * @param pool the nullable default I/O pool.
      */
-    public static synchronized void setInstance(@Nullable IOPool<?> pool) {
+    public static synchronized void setPool(@Nullable IOPool<?> pool) {
         instance = pool;
     }
 }

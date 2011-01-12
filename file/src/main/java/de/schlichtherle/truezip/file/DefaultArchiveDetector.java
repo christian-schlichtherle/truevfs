@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.ServiceConfigurationError;
 import java.util.regex.Matcher;
 
 /**
@@ -311,20 +312,22 @@ public final class DefaultArchiveDetector implements ArchiveDetector {
         assert null == mountPoint.getParent()
                 ? null == parent
                 : mountPoint.getParent().equals(parent.getModel().getMountPoint());
-        final FsScheme declaredScheme = mountPoint.getScheme();
+        final FsScheme scheme = mountPoint.getScheme();
         final FsPath path = mountPoint.getPath();
         final FsDriver driver;
         if (null != path) {
             final FsScheme detectedScheme = getScheme(path.getEntryName().getPath()); // may be null!
-            if (!declaredScheme.equals(detectedScheme))
+            if (!scheme.equals(detectedScheme))
                 throw new IllegalArgumentException(mountPoint.toString() + " (declared/detected scheme mismatch)");
-            driver = drivers.get(declaredScheme);
-            assert null != driver;
+            driver = drivers.get(scheme);
         } else {
-            assert "file".equalsIgnoreCase(declaredScheme.toString());
+            assert "file".equalsIgnoreCase(scheme.toString());
             driver = FsDefaultDriver.ALL;
         }
-        return driver.newController(mountPoint, parent); // throwing NPE is OK!
+        if (null == driver)
+            throw new ServiceConfigurationError(scheme
+                    + "(unknown file system scheme - check run-time class path configuration)");
+        return driver.newController(mountPoint, parent);
     }
 
     /**

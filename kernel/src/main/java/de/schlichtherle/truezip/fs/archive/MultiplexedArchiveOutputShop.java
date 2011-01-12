@@ -136,7 +136,7 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
             public OutputStream newOutputStream()
             throws IOException {
                 if (isBusy()) {
-                    final IOPool.Entry<?> temp = IOPools.getInstance().allocate();
+                    final IOPool.Entry<?> temp = IOPools.getPool().allocate();
                     IOException cause = null;
                     try {
                         return new TempEntryOutputStream(getBoundSocket(), temp);

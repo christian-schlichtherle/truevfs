@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.key.passwd.swing;
 
 import de.schlichtherle.truezip.key.KeyManager;
+import de.schlichtherle.truezip.key.KeyManagers;
 import java.awt.EventQueue;
 import java.net.URI;
 import java.util.Random;
@@ -41,13 +42,13 @@ public class PromptingKeyManagerTest extends TestCase {
 
     @Override
     protected void setUp() {
-        KeyManager.setInstance(new PromptingKeyManager());
+        KeyManagers.setManager(new PromptingKeyManager());
     }
 
     @Override
     protected void tearDown() {
         KeyManager.resetAndRemoveKeyProviders();
-        KeyManager.setInstance(null);
+        KeyManagers.setManager(null);
     }
 
     /**

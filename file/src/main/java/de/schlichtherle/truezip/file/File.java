@@ -51,6 +51,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.ServiceConfigurationError;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.Icon;
@@ -408,7 +409,7 @@ public final class File extends java.io.File {
      *
      * @see #readObject
      */
-    private transient @Nullable FsController<?> controller;
+    private transient volatile @Nullable FsController<?> controller;
 
     //
     // Constructor and helper methods:
@@ -638,7 +639,7 @@ public final class File extends java.io.File {
             this.enclArchive = null;
             this.enclEntryName = null;
             this.innerArchive = null;
-            this.controller = null;
+            //this.controller = null;
         } else if ((entryName = path.getEntryName()).isRoot()) {
             assert path.getUri().isOpaque();
             if (mountPointPath.getUri().isOpaque()) {
@@ -650,14 +651,14 @@ public final class File extends java.io.File {
                 this.enclEntryName = null;
             }
             this.innerArchive = this;
-            this.controller = FsManagers.getInstance()
-                                        .getController(mountPoint, detector);
+            /*this.controller = FsManagers.getManager()
+                                        .getController(mountPoint, detector);*/
         } else {
             assert path.getUri().isOpaque();
             this.enclArchive = new File(mountPoint, detector);
             this.enclEntryName = entryName;
             this.innerArchive = this.enclArchive;
-            this.controller = null;
+            //this.controller = null;
         }
 
         assert invariants();
@@ -678,7 +679,7 @@ public final class File extends java.io.File {
             this.enclArchive = null;
             this.enclEntryName = null;
             this.innerArchive = null;
-            this.controller = null;
+            //this.controller = null;
         } else {
             assert mountPoint.getUri().isOpaque();
             if (mountPointPath.getUri().isOpaque()) {
@@ -690,8 +691,8 @@ public final class File extends java.io.File {
                 this.enclEntryName = null;
             }
             this.innerArchive = this;
-            this.controller = FsManagers.getInstance()
-                                        .getController(mountPoint, detector);
+            /*this.controller = FsManagers.getManager()
+                                        .getController(mountPoint, detector);*/
         }
 
         assert invariants();
@@ -716,7 +717,7 @@ public final class File extends java.io.File {
                 this.innerArchive = this;
                 this.enclArchive = innerArchive.enclArchive;
                 this.enclEntryName = innerArchive.enclEntryName;
-                initController();
+                //initController();
             } else {
                 this.detector = detector;
                 this.innerArchive = this.enclArchive = innerArchive;
@@ -780,7 +781,7 @@ public final class File extends java.io.File {
             // controller initialization has been deferred until now in
             // order to provide the FsController with an otherwise fully
             // initialized object.
-            initController();
+            //initController();
         }
     }
 
@@ -871,9 +872,14 @@ public final class File extends java.io.File {
     }
 
     private void initController() {
-        final FsScheme scheme = detector.getScheme(
-                Paths.normalize(delegate.getPath(), separatorChar));
-        assert null != scheme; // make FindBugs happy
+        assert this == innerArchive;
+        final String path = Paths.normalize(delegate.getPath(), separatorChar);
+        final FsScheme scheme = detector.getScheme(path);
+        if (null == scheme)
+            throw new ServiceConfigurationError(
+                    "unknown file system scheme for path \""
+                    + path
+                    + "\"! Check run-time class path configuration.");
         final FsMountPoint mountPoint;
         try {
             if (null != enclArchive) {
@@ -889,8 +895,7 @@ public final class File extends java.io.File {
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
         }
-        this.controller = FsManagers.getInstance()
-                                    .getController(mountPoint, detector);
+        controller = FsManagers.getManager().getController(mountPoint, detector);
     }
 
     private Object writeReplace() throws ObjectStreamException {
@@ -935,7 +940,7 @@ public final class File extends java.io.File {
         assert (innerArchive != null) == (getInnerEntryName() != null);
         assert (enclArchive != null) == (enclEntryName != null);
         assert this != enclArchive;
-        assert (this == innerArchive && null != controller)
+        assert (this == innerArchive /*&& null != controller*/)
                 ^ (innerArchive == enclArchive && null == controller);
         assert null == enclArchive
                 || Paths.contains(  enclArchive.getPath(),
@@ -972,7 +977,7 @@ public final class File extends java.io.File {
     public static void sync(@NonNull BitField<FsSyncOption> options)
     throws ArchiveException {
         ArchiveExceptionBuilder builder = new ArchiveExceptionBuilder();
-        FsManagers.getInstance().sync(options, builder);
+        FsManagers.getManager().sync(options, builder);
         builder.check();
     }
 
@@ -1008,7 +1013,7 @@ public final class File extends java.io.File {
         final ExceptionBuilder<IOException, ArchiveException> builder
                 = new ArchiveExceptionBuilder();
         new FsFilteringManager(
-                FsManagers.getInstance(),
+                FsManagers.getManager(),
                 archive .getController()
                         .getModel()
                         .getMountPoint())
@@ -1386,7 +1391,7 @@ public final class File extends java.io.File {
         // This is not only called for performance reasons, but also in order
         // to prevent the parent path from being rescanned for archive files
         // with a different detector, which could trigger an update and
-        // reconfiguration of the respective archive controller!
+        // reconfiguration of the respective file system controller!
         return new File(parent, enclArchive, detector);
     }
 
@@ -1515,7 +1520,7 @@ public final class File extends java.io.File {
      * @see #isEntry
      */
     public boolean isArchive() {
-        return innerArchive == this;
+        return this == innerArchive;
     }
 
     /**
@@ -1653,11 +1658,12 @@ public final class File extends java.io.File {
     }
 
     /**
-     * Returns an archive controller if and only if the path denotes an
+     * Returns a file system controller if and only if the path denotes an
      * archive file, or {@code null} otherwise.
      */
     @Nullable FsController<?> getController() {
-        assert (null != controller) == isArchive();
+        if (this == innerArchive && null == controller)
+            initController();
         return controller;
     }
 
@@ -2439,8 +2445,7 @@ public final class File extends java.io.File {
     @Override
     public boolean createNewFile() throws IOException {
         if (null != innerArchive) {
-            final FsController<?> controller
-                    = innerArchive.getController();
+            final FsController<?> controller = innerArchive.getController();
             final FsEntryName entryName = getInnerEntryName0();
             // This is not really atomic, but should be OK in this case.
             if (null != controller.getEntry(entryName))

@@ -16,15 +16,17 @@
 
 package de.schlichtherle.truezip.key.passwd.swing;
 
-import de.schlichtherle.truezip.file.DefaultArchiveDetector;
-import de.schlichtherle.truezip.file.File;
 import de.schlichtherle.truezip.file.swing.FileComboBoxBrowser;
 import java.awt.EventQueue;
 import java.awt.Window;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
+import java.io.File;
+import java.io.IOException;
 import java.lang.ref.SoftReference;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -44,7 +46,7 @@ public class AuthenticationPanel extends JPanel {
     private static final String CLASS_NAME = AuthenticationPanel.class.getName();
     private static final ResourceBundle resources
             = ResourceBundle.getBundle(CLASS_NAME);
-    private static final File BASE_DIR = new File(".", DefaultArchiveDetector.NULL);
+    private static final File BASE_DIR = new File(".");
 
     private static SoftReference<javax.swing.JFileChooser> fileChooser;
 
@@ -137,9 +139,9 @@ public class AuthenticationPanel extends JPanel {
     /**
      * Return a {@code JFileChooser} to use within this panel.
      * The file chooser is stored in a cache for subsequent use.
-     * If the JVM gets short of storage, the cache is emptied and a new
-     * file chooser is instantiated on the next call to this method again.
-     * In any way, the file chooser will always remember its current directory.
+     * If the JVM gets short of storage, the cache is cleared and a new
+     * file chooser is instantiated again on the next call to this method.
+     * In any case, the file chooser will always remember its current directory.
      * In addition, the returned file chooser has file hiding disabled.
      * Note that the file chooser is a plain javax.swing.FileChooser which
      * does <em>not</em> support archive browsing to prevent illegal recursion.
@@ -226,14 +228,18 @@ public class AuthenticationPanel extends JPanel {
     private void keyFileChooserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_keyFileChooserActionPerformed
         final javax.swing.JFileChooser fc = getFileChooser();
         if (fc.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
-            final File file = new File(fc.getSelectedFile(), DefaultArchiveDetector.NULL);
-            final String baseDirPath = BASE_DIR.getCanOrAbsPath();
-            String keyFilePath = file.getCanOrAbsPath();
-            if (keyFilePath.startsWith(baseDirPath)) {
-                assert keyFilePath.charAt(baseDirPath.length()) == File.separatorChar;
-                keyFilePath = keyFilePath.substring(baseDirPath.length() + 1); // skip file separator
+            try {
+                final File file = fc.getSelectedFile();
+                final String baseDirPath = BASE_DIR.getCanonicalPath();
+                String keyFilePath = file.getCanonicalPath();
+                if (keyFilePath.startsWith(baseDirPath)) {
+                    assert keyFilePath.charAt(baseDirPath.length()) == File.separatorChar;
+                    keyFilePath = keyFilePath.substring(baseDirPath.length() + 1); // skip file separator
+                }
+                setKeyFilePath(keyFilePath);
+            } catch (IOException ex) {
+                Logger.getLogger(AuthenticationPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
-            setKeyFilePath(keyFilePath);
         }
     }//GEN-LAST:event_keyFileChooserActionPerformed
 

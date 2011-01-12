@@ -97,7 +97,7 @@ implements OutputShop<ZipEntry> {
                 }
             }
             if (0 < source.getPostambleLength()) {
-                postamble = IOPools.getInstance().allocate();
+                postamble = IOPools.getPool().allocate();
                 Streams.copy(   source.getPostambleInputStream(),
                                 postamble.getOutputSocket().newOutputStream());
             } else {
@@ -179,11 +179,11 @@ implements OutputShop<ZipEntry> {
                         break;
 
                     case STORED:
-                        if (entry.getCrc() == UNKNOWN
-                                || entry.getCompressedSize() == UNKNOWN
-                                || entry.getSize() == UNKNOWN)
+                        if (       UNKNOWN == entry.getCrc()
+                                || UNKNOWN == entry.getCompressedSize()
+                                || UNKNOWN == entry.getSize())
                             return new TempEntryOutputStream(
-                                    File.createTempFile(TEMP_FILE_PREFIX, null), // TODO: Use TempFilePool!
+                                    File.createTempFile(TEMP_FILE_PREFIX, null), // TODO: Use IOPool or IOCache!
                                     entry);
                         break;
 

@@ -19,6 +19,7 @@ import de.schlichtherle.truezip.fs.archive.zip.raes.SafeZipRaesDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.key.AesKeyProvider;
 import de.schlichtherle.truezip.key.KeyManager;
+import de.schlichtherle.truezip.key.KeyManagers;
 import de.schlichtherle.truezip.key.KeyPromptingCancelledException;
 import de.schlichtherle.truezip.key.UnknownKeyException;
 import java.io.IOException;
@@ -45,7 +46,7 @@ public final class ZipRaesFileTest extends FileTestCase {
 
     @Override
     public void setUp() throws IOException {
-        KeyManager.setInstance(new CustomKeyManager());
+        KeyManagers.setManager(new CustomKeyManager());
         cancelling = false;
         super.setUp();
     }
@@ -55,7 +56,7 @@ public final class ZipRaesFileTest extends FileTestCase {
         //cancelling = false;
         super.tearDown();
         KeyManager.resetAndRemoveKeyProviders();
-        KeyManager.setInstance(null);
+        KeyManagers.setManager(null);
     }
 
     @Test

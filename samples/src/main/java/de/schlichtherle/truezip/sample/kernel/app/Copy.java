@@ -40,7 +40,7 @@ public class Copy {
     public static void main(String[] args)
     throws IOException, URISyntaxException {
         // Call a manager for file system controller life cycle management.
-        FsManager manager = FsManagers.getInstance();
+        FsManager manager = FsManagers.getManager();
 
         // Resolve the source socket.
         // Note that we need an absolute URI, but we do not want to be
