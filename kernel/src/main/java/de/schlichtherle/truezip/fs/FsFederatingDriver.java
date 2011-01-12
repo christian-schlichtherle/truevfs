@@ -36,8 +36,8 @@ public interface FsFederatingDriver extends FsDriver {
      * The file system controller is created by using a file system driver
      * which is looked up by querying the scheme of the given mount point.
      *
-     * @throws NullPointerException if no appropriate file system driver is
-     *         found for the scheme of the given mount point.
+     * @throws ServiceConfigurationError if no appropriate file system driver
+     *         is found for the scheme of the given mount point.
      */
     @Override
     @NonNull FsController<?>

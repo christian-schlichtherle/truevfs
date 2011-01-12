@@ -13,22 +13,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.fs;
+package de.schlichtherle.truezip.fs.file;
 
+import de.schlichtherle.truezip.fs.FsDriverProvider;
+import de.schlichtherle.truezip.fs.FsScheme;
+import de.schlichtherle.truezip.util.SuffixSet;
+import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-import static de.schlichtherle.truezip.fs.FsClassPathDriverProvider.*;
 import static org.hamcrest.CoreMatchers.*;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class FsClassPathDriverProviderTest {
+public class FileDriverProviderTest {
+
+    public static final String DRIVER_LIST = "file";
+
+    private FsDriverProvider instance;
+
+    @Before
+    public void setUp() {
+        instance = new FileDriverProvider();
+    }
 
     @Test
     public void testGetDrivers() {
-        assertThat(INSTANCE.getDrivers().get(FsScheme.create("file")), notNullValue());
+        for (String suffix : new SuffixSet(DRIVER_LIST))
+            assertThat(instance.getDrivers().get(FsScheme.create(suffix)), notNullValue());
+    }
+
+    @Test
+    public void testImmutability() {
+        try {
+            instance.getDrivers().remove(FsScheme.create("file"));
+            fail("put");
+        } catch (UnsupportedOperationException ex) {
+        }
     }
 }

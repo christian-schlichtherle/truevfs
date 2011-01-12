@@ -45,6 +45,7 @@ import de.schlichtherle.truezip.util.ExceptionBuilder;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Iterator;
@@ -240,8 +241,13 @@ extends FileSystemArchiveController<E> {
         } catch (TabuFileException ex) {
             throw ex;
         } catch (IOException ex) {
-            if (!autoCreate || null != parent.getEntry(parentName))
-                throw new FsFalsePositiveException(getModel(), ex);
+            if (!autoCreate)
+                if (ex instanceof FileNotFoundException)
+                    throw new FsFalsePositiveException(getModel(), ex);
+                else
+                    throw new CacheableFalsePositiveException(getModel(), ex);
+            if (null != parent.getEntry(parentName))
+                throw new CacheableFalsePositiveException(getModel(), ex);
             // The entry does NOT exist in the parent archive
             // file, but we may create it automatically.
             final ArchiveFileSystem<E> fileSystem

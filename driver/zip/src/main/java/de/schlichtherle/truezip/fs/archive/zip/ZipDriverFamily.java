@@ -47,7 +47,7 @@ public final class ZipDriverFamily implements FsDriverProvider {
     }
 
     @Override
-    public Map<FsScheme, FsDriver> getDrivers() {
+    public Map<FsScheme, ? extends FsDriver> getDrivers() {
         return DRIVERS;
     }
 }

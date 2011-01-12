@@ -94,7 +94,7 @@ public class PromptingKeyManager extends KeyManager {
      * <p>
      * Note that subclasses might add additional behaviour to both
      * {@link #isPrompting} and {@link #setPrompting} through the default
-     * key manager instance (see {@link #getInstance}).
+     * key manager instance (see {@link #getManager}).
      * Regardless, an application may safely assume that
      * {@code isPrompting()} reflects the actual behaviour of the API
      * in this package although it may not reflect the parameter value of
@@ -105,7 +105,7 @@ public class PromptingKeyManager extends KeyManager {
      * @see #setPrompting
      */
     public static boolean isPrompting() {
-        KeyManager manager = getInstance();
+        KeyManager manager = KeyManagers.getManager();
         return manager instanceof PromptingKeyManager
                 && ((PromptingKeyManager) manager).isPromptingImpl();
     }
@@ -117,7 +117,7 @@ public class PromptingKeyManager extends KeyManager {
      * overriding this method.
      *
      * @see #setPromptingImpl
-     * @see #getInstance
+     * @see #getManager
      */
     protected boolean isPromptingImpl() {
         return prompting;
@@ -136,7 +136,7 @@ public class PromptingKeyManager extends KeyManager {
      * <p>
      * Note that subclasses might add additional behaviour to both
      * {@link #isPrompting} and {@link #setPrompting} through the default
-     * key manager instance (see {@link #getInstance}).
+     * key manager instance (see {@link #getManager}).
      * Regardless, an application may safely assume that
      * {@code isPrompting()} reflects the actual behaviour of the API
      * in this package although it may not reflect the parameter value of
@@ -147,7 +147,7 @@ public class PromptingKeyManager extends KeyManager {
      * @see #isPrompting
      */
     public static void setPrompting(boolean prompting) {
-        KeyManager manager = getInstance();
+        KeyManager manager = KeyManagers.getManager();
         if (manager instanceof PromptingKeyManager)
                 ((PromptingKeyManager) manager).setPromptingImpl(prompting);
     }
@@ -159,7 +159,7 @@ public class PromptingKeyManager extends KeyManager {
      * overriding this method.
      *
      * @see #isPromptingImpl
-     * @see #getInstance
+     * @see #getManager
      */
     protected void setPromptingImpl(boolean prompting) {
         this.prompting = prompting;
@@ -167,7 +167,7 @@ public class PromptingKeyManager extends KeyManager {
 
     static void assertPrompting()
     throws KeyPromptingDisabledException {
-        KeyManager manager = getInstance();
+        KeyManager manager = KeyManagers.getManager();
         if (manager instanceof PromptingKeyManager)
                 ((PromptingKeyManager) manager).assertPromptingImpl();
     }

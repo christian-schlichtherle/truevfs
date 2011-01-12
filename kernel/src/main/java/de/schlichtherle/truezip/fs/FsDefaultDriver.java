@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.fs;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Map;
+import java.util.ServiceConfigurationError;
 
 /**
  * Uses a given file system driver provider to lookup the appropriate driver
@@ -52,6 +53,11 @@ public final class FsDefaultDriver implements FsFederatingDriver {
         assert null == mountPoint.getParent()
                 ? null == parent
                 : mountPoint.getParent().equals(parent.getModel().getMountPoint());
-        return drivers.get(mountPoint.getScheme()).newController(mountPoint, parent);
+        final FsScheme scheme = mountPoint.getScheme();
+        final FsDriver driver = drivers.get(scheme);
+        if (null == driver)
+            throw new ServiceConfigurationError(scheme
+                    + "(unknown file system scheme - check run-time class path configuration)");
+        return driver.newController(mountPoint, parent);
     }
 }

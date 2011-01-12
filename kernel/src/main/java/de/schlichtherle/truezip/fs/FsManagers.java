@@ -49,7 +49,7 @@ public class FsManagers {
      * Returns the default file system manager.
      * <p>
      * If the default file system manager has been explicitly set to
-     * non-{@code null} by calling {@link #setInstance}, then this instance is
+     * non-{@code null} by calling {@link #setManager}, then this instance is
      * returned.
      * <p>
      * Otherwise, the class name of the default file system manager is resolved
@@ -72,7 +72,7 @@ public class FsManagers {
      * @throws ServiceConfigurationError at the discretion of the
      *         {@link ServiceLocator}.
      */
-    public static @NonNull FsManager getInstance() {
+    public static @NonNull FsManager getManager() {
         FsManager manager = instance;
         if (null == manager) {
             synchronized (FsManagers.class) { // DCL does work in combination with volatile in JSE 5!
@@ -80,7 +80,7 @@ public class FsManagers {
                 if (null == manager) {
                     manager = new ServiceLocator(FsManagers.class.getClassLoader())
                             .getService(FsManager.class, FsFederatingManager.class);
-                    setInstance(manager);
+                    setManager(manager);
                 }
                 assert invariants();
             }
@@ -99,7 +99,7 @@ public class FsManagers {
      * calling this method.
      * <p>
      * If the given default file system manager is {@code null},
-     * a new instance will be created on the next call to {@link #getInstance}.
+     * a new instance will be created on the next call to {@link #getManager}.
      * <p>
      * If the given file system manager is not {@code null}, this instance is
      * instrumented to run its {@link FsManager#sync} method when the
@@ -109,7 +109,7 @@ public class FsManagers {
      * @throws IllegalStateException if the current file system manager has any
      *         managed file systems.
      */
-    public static synchronized void setInstance(
+    public static synchronized void setManager(
             final @CheckForNull FsManager manager) {
         final int count = null == instance ? 0 : instance.getSize();
         if (0 < count)

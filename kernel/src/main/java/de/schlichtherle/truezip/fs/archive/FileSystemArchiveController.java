@@ -17,8 +17,10 @@ package de.schlichtherle.truezip.fs.archive;
 
 import de.schlichtherle.truezip.fs.FsConcurrentModel;
 import de.schlichtherle.truezip.fs.FsFalsePositiveException;
+import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.util.BitField;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import net.jcip.annotations.NotThreadSafe;
@@ -106,18 +108,17 @@ extends BasicArchiveController<E> {
             getModel().assertWriteLockedByCurrentThread();
             try {
                 mount(autoCreate, options);
-            } catch (FsFalsePositiveException ex) {
-                // Catch and cache exceptions for false positive archive files.
-                // The state is reset when unlink() is called on the false
-                // positive archive file or sync().
+            } catch (CacheableFalsePositiveException ex) {
+                // Cache exception for false positive file system.
+                //   The state is reset when unlink() is called on the false
+                // positive file system or sync().
                 //   This is an important optimization: When accessing a false
                 // positive archive file, a client application might perform
                 // a lot of tests on it (isDirectory(), isFile(), isExisting(),
                 // getLength(), etc). If the exception were not cached, each call
                 // would run the file system initialization again, only to
                 // result in another instance of the same exception type again.
-                if (!(ex.getCause() instanceof FileNotFoundException))
-                    mountState = new FalsePositiveFileSystem(ex);
+                mountState = new FalsePositiveFileSystem(ex);
                 throw ex;
             }
 
@@ -135,6 +136,15 @@ extends BasicArchiveController<E> {
                 mountState = new MountedFileSystem(fileSystem);
         }
     } // class ResetFileSystem
+
+    @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
+    static class CacheableFalsePositiveException
+    extends FsFalsePositiveException {
+        CacheableFalsePositiveException(@NonNull FsModel model,
+                                        @NonNull IOException cause) {
+            super(model, cause);
+        }
+    }
 
     private class MountedFileSystem extends MountState<E> {
         private final ArchiveFileSystem<E> fileSystem;

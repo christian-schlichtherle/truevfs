@@ -26,7 +26,7 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
-public final class FsFalsePositiveException extends FsException {
+public class FsFalsePositiveException extends FsException {
 
     public FsFalsePositiveException(FsModel model, IOException cause) {
         super(model, cause);

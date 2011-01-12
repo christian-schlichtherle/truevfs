@@ -157,9 +157,9 @@ abstract class CommandLineUtility {
             this.err = err;
             final FsStatisticsManager manager
                     = new FsStatisticsManager(
-                        FsManagers.getInstance());
+                        FsManagers.getManager());
             this.stats = manager.getStatistics();
-            FsManagers.setInstance(manager);
+            FsManagers.setManager(manager);
         }
 
         @Override

@@ -79,7 +79,7 @@ implements FsDriver, EntryFactory<E> {
                         new DefaultArchiveController<E>(
                             new FsConcurrentModel(mountPoint, parent.getModel()),
                             this, parent, false),
-                        IOPools.getInstance()));
+                        IOPools.getPool()));
     }
 
     /**

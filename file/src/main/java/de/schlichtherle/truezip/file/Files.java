@@ -227,7 +227,7 @@ class Files {
                         .getInputSocket(file.getInnerEntryName0(), options);
         }
         final FsPath path = new FsPath(src);
-        return FsManagers   .getInstance()
+        return FsManagers   .getManager()
                             .getController(path.getMountPoint())
                             .getInputSocket(path.getEntryName(), options);
     }
@@ -246,7 +246,7 @@ class Files {
                         .getOutputSocket(file.getInnerEntryName0(), options, template);
         }
         final FsPath path = new FsPath(dst);
-        return FsManagers   .getInstance()
+        return FsManagers   .getManager()
                             .getController(path.getMountPoint())
                             .getOutputSocket(path.getEntryName(), options, template);
     }

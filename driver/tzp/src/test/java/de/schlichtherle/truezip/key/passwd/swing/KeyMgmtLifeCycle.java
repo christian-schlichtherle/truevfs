@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.key.passwd.swing;
 
 import de.schlichtherle.truezip.key.KeyManager;
+import de.schlichtherle.truezip.key.KeyManagers;
 import de.schlichtherle.truezip.key.KeyProvider;
 import de.schlichtherle.truezip.key.UnknownKeyException;
 import java.net.URI;
@@ -87,7 +88,7 @@ public class KeyMgmtLifeCycle implements Runnable {
     }
 
     private void createResource() throws UnknownKeyException {
-        final KeyManager manager = KeyManager.getInstance();
+        final KeyManager manager = KeyManagers.getManager();
         final KeyProvider<?> provider = getKeyProvider(manager, id);
 
         // Store the key, so we can later check the key stored in the
@@ -105,7 +106,7 @@ public class KeyMgmtLifeCycle implements Runnable {
     }
 
     private void openResource() throws UnknownKeyException {
-        final KeyManager manager = KeyManager.getInstance();
+        final KeyManager manager = KeyManagers.getManager();
         final KeyProvider<?> provider = getKeyProvider(manager, id);
 
         boolean correct = false;

@@ -31,6 +31,7 @@
     </description>
 
     <modules>
+        <module>file</module>
         <module>tar</module>
         <module>tzp</module>
         <module>zip</module>

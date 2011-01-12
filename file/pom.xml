@@ -44,5 +44,13 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
+        <!-- Without this run-time dependency an application can't resolve
+            the file scheme in URIs like "zip:file:/archive.zip!/entry" etc. -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truezip-driver-file</artifactId>
+            <version>${project.version}</version>
+            <scope>runtime</scope>
+        </dependency>
     </dependencies>
 </project>

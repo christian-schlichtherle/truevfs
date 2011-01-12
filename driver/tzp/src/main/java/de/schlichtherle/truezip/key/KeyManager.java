@@ -15,13 +15,10 @@
  */
 package de.schlichtherle.truezip.key;
 
-import de.schlichtherle.truezip.util.ServiceLocator;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.ServiceConfigurationError;
 import java.util.Set;
-
 
 /**
  * An abstract class which maintains a map of {@link KeyProvider} instances for
@@ -65,62 +62,8 @@ public abstract class KeyManager {
     private static final Map<URI, KeyProvider<?>> providers
             = new HashMap<URI, KeyProvider<?>>();
 
-    private static volatile KeyManager instance; // volatile required for DCL in JSE 5!
-
-    /**
-     * Returns the default key manager.
-     * <p>
-     * If the default key manager has been explicitly set to
-     * non-{@code null} by calling {@link #setInstance}, then this instance is
-     * returned.
-     * <p>
-     * Otherwise, the service is located by loading the class name from any
-     * resource file with the name
-     * {@code "META-INF/services/de.schlichtherle.truezip.key.KeyManager"}.
-     * on the class path and instantiating it using its no-arg constructor.
-     * In order to support this plug-in architecture, you should <em>not</em>
-     * cache the instance returned by this method!
-     *
-     * @return The default key manager.
-     * @throws RuntimeException at the discretion of the {@link ServiceLocator}.
-     * @throws ServiceConfigurationError at the discretion of the
-     *         {@link ServiceLocator}.
-     */
-    public static KeyManager getInstance() {
-        KeyManager manager = instance;
-        if (null == manager) {
-            synchronized (KeyManager.class) { // DCL does work in combination with volatile in JSE 5!
-                manager = instance;
-                if (null == manager) {
-                    manager = new ServiceLocator(KeyManager.class.getClassLoader())
-                            .getServices(KeyManager.class)
-                            .next();
-                    setInstance(manager);
-                }
-            }
-        }
-        return manager;
-    }
-
-    /**
-     * Sets the default key manager.
-     * <p>
-     * If the current key manager has any key providers,
-     * an {@link IllegalStateException} is thrown.
-     * Call {@link #resetAndRemoveKeyProviders} to prevent this.
-     * <p>
-     * If the given default key manager is {@code null},
-     * a new instance will be created on the next call to {@link #getInstance}.
-     *
-     * @param manager the nullable default key manager.
-     * @throws IllegalStateException if the current key manager has any
-     *         key providers.
-     */
-    public static synchronized void setInstance(final KeyManager manager) {
-        final int count = providers.size();
-        if (0 < count)
-            throw new IllegalStateException("There are " + count + " key providers!");
-        KeyManager.instance = manager;
+    int getSize() {
+        return providers.size();
     }
 
     /**
