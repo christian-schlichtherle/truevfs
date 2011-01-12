@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.fs.archive.ArchiveEntry;
 import de.schlichtherle.truezip.zip.DateTimeConverter;
+import de.schlichtherle.truezip.zip.ZipEntry;
 
 import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
 import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
@@ -32,20 +32,16 @@ import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ZipEntry
-extends de.schlichtherle.truezip.zip.ZipEntry
-implements ArchiveEntry {
-
+public class ZipArchiveEntry extends ZipEntry implements ArchiveEntry {
     static {
-        assert de.schlichtherle.truezip.zip.ZipEntry.UNKNOWN
-                == ArchiveEntry.UNKNOWN;
+        assert ZipEntry.UNKNOWN == ArchiveEntry.UNKNOWN;
     }
 
-    ZipEntry(String name) {
+    ZipArchiveEntry(String name) {
         super(name);
     }
 
-    ZipEntry(String name, ZipEntry template) {
+    ZipArchiveEntry(String name, ZipEntry template) {
         super(name, template);
     }
 

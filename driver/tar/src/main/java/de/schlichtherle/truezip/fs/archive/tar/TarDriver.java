@@ -42,7 +42,7 @@ import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
  * @version $Id$
  */
 public class TarDriver
-extends CharsetArchiveDriver<TarEntry> {
+extends CharsetArchiveDriver<TarArchiveEntry> {
 
     private static final long serialVersionUID = 6622746562629104174L;
 
@@ -78,17 +78,17 @@ extends CharsetArchiveDriver<TarEntry> {
     }
 
     @Override
-    public TarEntry newEntry(
+    public TarArchiveEntry newEntry(
             String name,
             final Type type,
             final Entry template)
     throws CharConversionException {
         assertEncodable(name);
         name = toZipOrTarEntryName(name, type);
-        final TarEntry entry;
+        final TarArchiveEntry entry;
         if (null != template) {
-            if (template instanceof TarEntry) {
-                entry = newEntry(name, (TarEntry) template);
+            if (template instanceof TarArchiveEntry) {
+                entry = newEntry(name, (TarArchiveEntry) template);
                 entry.setName(name);
             } else {
                 entry = newEntry(name);
@@ -101,12 +101,12 @@ extends CharsetArchiveDriver<TarEntry> {
         return entry;
     }
 
-    public TarEntry newEntry(String name) {
-        return new TarEntry(name);
+    public TarArchiveEntry newEntry(String name) {
+        return new TarArchiveEntry(name);
     }
 
-    public TarEntry newEntry(String name, TarEntry template) {
-        return new TarEntry(name, template);
+    public TarArchiveEntry newEntry(String name, TarArchiveEntry template) {
+        return new TarArchiveEntry(name, template);
     }
 
     /**
@@ -139,14 +139,14 @@ extends CharsetArchiveDriver<TarEntry> {
      * and wraps the result in a new {@link MultiplexedArchiveOutputShop}.
      */
     @Override
-    public OutputShop<TarEntry> newOutputShop(
+    public OutputShop<TarArchiveEntry> newOutputShop(
             FsConcurrentModel model,
             OutputSocket<?> output,
-            InputShop<TarEntry> source)
+            InputShop<TarArchiveEntry> source)
     throws IOException {
         final OutputStream out = output.newOutputStream();
         try {
-            return new MultiplexedArchiveOutputShop<TarEntry>(
+            return new MultiplexedArchiveOutputShop<TarArchiveEntry>(
                     newTarOutputShop(model, out, (TarInputShop) source));
         } catch (IOException ex) {
             out.close();

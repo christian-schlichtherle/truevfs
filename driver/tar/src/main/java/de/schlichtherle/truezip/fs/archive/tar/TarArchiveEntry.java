@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.fs.archive.tar;
 
 import de.schlichtherle.truezip.fs.archive.ArchiveEntry;
 import java.io.File;
+import org.apache.tools.tar.TarEntry;
 
 import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
 import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
@@ -30,11 +31,9 @@ import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class TarEntry
-extends      org.apache.tools.tar.TarEntry
-implements   ArchiveEntry {
+public class TarArchiveEntry extends TarEntry implements ArchiveEntry {
 
-    public TarEntry(final String entryName) {
+    public TarArchiveEntry(final String entryName) {
         super(entryName, true);
         // Fix super class constructor.
         super.setModTime(Long.MIN_VALUE);
@@ -42,9 +41,9 @@ implements   ArchiveEntry {
         super.setUserName(System.getProperty("user.name", ""));
     }
 
-    public TarEntry(
+    public TarArchiveEntry(
             final String name,
-            final org.apache.tools.tar.TarEntry template) {
+            final TarEntry template) {
         super(name, true);
         super.setMode(template.getMode());
         super.setModTime(template.getModTime());
@@ -55,8 +54,8 @@ implements   ArchiveEntry {
         super.setGroupName(template.getGroupName());
     }
 
-    public TarEntry(
-            final org.apache.tools.tar.TarEntry template,
+    public TarArchiveEntry(
+            final TarEntry template,
             final File file) {
         super(file);
         super.setName(template.getName());

@@ -37,15 +37,15 @@ import static de.schlichtherle.truezip.zip.ZipEntry.*;
  * @version $Id$
  */
 public class ZipInputShop
-extends RawZipFile<ZipEntry>
-implements InputShop<ZipEntry> {
+extends RawZipFile<ZipArchiveEntry>
+implements InputShop<ZipArchiveEntry> {
 
     public ZipInputShop(
             ReadOnlyFile rof,
             Charset charset,
             boolean preambled,
             boolean postambled,
-            ZipEntryFactory<ZipEntry> factory)
+            ZipEntryFactory<ZipArchiveEntry> factory)
     throws IOException {
         super(rof, charset, preambled, postambled, factory);
     }
@@ -56,14 +56,14 @@ implements InputShop<ZipEntry> {
     }
 
     @Override
-    public InputSocket<ZipEntry> getInputSocket(final String name) {
+    public InputSocket<ZipArchiveEntry> getInputSocket(final String name) {
         if (null == name)
             throw new NullPointerException();
 
-        class Input extends InputSocket<ZipEntry> {
+        class Input extends InputSocket<ZipArchiveEntry> {
             @Override
-            public ZipEntry getLocalTarget() throws IOException {
-                final ZipEntry entry = getEntry(name);
+            public ZipArchiveEntry getLocalTarget() throws IOException {
+                final ZipArchiveEntry entry = getEntry(name);
                 if (null == entry)
                     throw new FileNotFoundException(name + " (entry not found)");
                 return entry;
@@ -75,8 +75,8 @@ implements InputShop<ZipEntry> {
                 return ZipInputShop.this.getInputStream(
                         getLocalTarget().getName(),
                         false,
-                        !(entry instanceof ZipEntry)
-                            || ((ZipEntry) entry).getMethod() != DEFLATED);
+                        !(entry instanceof ZipArchiveEntry)
+                            || ((ZipArchiveEntry) entry).getMethod() != DEFLATED);
             }
 
             @Override

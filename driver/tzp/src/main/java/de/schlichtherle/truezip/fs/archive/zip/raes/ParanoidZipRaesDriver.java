@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.fs.archive.zip.raes;
 
 import de.schlichtherle.truezip.fs.FsConcurrentModel;
 import de.schlichtherle.truezip.socket.OutputSocket;
-import de.schlichtherle.truezip.fs.archive.zip.ZipEntry;
+import de.schlichtherle.truezip.fs.archive.zip.ZipArchiveEntry;
 import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.crypto.raes.RaesKeyException;
 import de.schlichtherle.truezip.crypto.raes.RaesOutputStream;
@@ -90,10 +90,10 @@ public class ParanoidZipRaesDriver extends AbstractZipRaesDriver {
      * buffering the written entries.
      */
     @Override
-    public OutputShop<ZipEntry> newOutputShop(
-            final FsConcurrentModel model,
-            final OutputSocket<?> output,
-            final InputShop<ZipEntry> source)
+    public OutputShop<ZipArchiveEntry>
+    newOutputShop(  final FsConcurrentModel model,
+                    final OutputSocket<?> output,
+                    final InputShop<ZipArchiveEntry> source)
     throws IOException {
         final OutputStream out = new LazyOutputSocket<Entry>(output)
                 .newOutputStream();

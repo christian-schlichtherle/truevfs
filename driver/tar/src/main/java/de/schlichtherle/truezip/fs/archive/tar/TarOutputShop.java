@@ -60,11 +60,11 @@ import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
  */
 public class TarOutputShop
 extends TarOutputStream
-implements OutputShop<TarEntry> {
+implements OutputShop<TarArchiveEntry> {
 
-    /** Maps entry names to tar entries [String -> TarEntry]. */
-    private final Map<String, TarEntry> entries
-            = new LinkedHashMap<String, TarEntry>();
+    /** Maps entry names to tar entries [String -> TarArchiveEntry]. */
+    private final Map<String, TarArchiveEntry> entries
+            = new LinkedHashMap<String, TarArchiveEntry>();
 
     private boolean busy;
 
@@ -79,23 +79,23 @@ implements OutputShop<TarEntry> {
     }
 
     @Override
-    public Iterator<TarEntry> iterator() {
+    public Iterator<TarArchiveEntry> iterator() {
         return entries.values().iterator();
     }
 
     @Override
-    public TarEntry getEntry(String name) {
+    public TarArchiveEntry getEntry(String name) {
         return entries.get(name);
     }
 
     @Override
-    public OutputSocket<TarEntry> getOutputSocket(final TarEntry entry) {
+    public OutputSocket<TarArchiveEntry> getOutputSocket(final TarArchiveEntry entry) {
         if (null == entry)
             throw new NullPointerException();
 
-        class Output extends OutputSocket<TarEntry> {
+        class Output extends OutputSocket<TarArchiveEntry> {
             @Override
-            public TarEntry getLocalTarget() {
+            public TarArchiveEntry getLocalTarget() {
                 return entry;
             }
 
@@ -139,12 +139,12 @@ implements OutputShop<TarEntry> {
      * It can only be used if this output stream is not currently busy
      * writing another entry and the entry holds enough information to
      * write the entry header.
-     * These preconditions are checked by {@link #getOutputSocket(TarEntry)}.
+     * These preconditions are checked by {@link #getOutputSocket(TarArchiveEntry)}.
      */
     private class EntryOutputStream extends DecoratingOutputStream {
         private boolean closed;
 
-        EntryOutputStream(final TarEntry entry)
+        EntryOutputStream(final TarArchiveEntry entry)
         throws IOException {
             super(TarOutputShop.this);
             putNextEntry(entry);
@@ -176,10 +176,10 @@ implements OutputShop<TarEntry> {
      */
     private class TempEntryOutputStream extends DecoratingOutputStream {
         private final File temp;
-        private final TarEntry entry;
+        private final TarArchiveEntry entry;
         private boolean closed;
 
-        TempEntryOutputStream(final File temp, final TarEntry entry)
+        TempEntryOutputStream(final File temp, final TarArchiveEntry entry)
         throws IOException {
             super(new FileOutputStream(temp)); // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
             this.temp = temp;

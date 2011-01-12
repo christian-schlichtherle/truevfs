@@ -77,10 +77,10 @@ public class OdfDriver extends JarDriver {
     }
 
     @Override
-    public OutputShop<ZipEntry> newOutputShop(
+    public OutputShop<ZipArchiveEntry> newOutputShop(
             FsConcurrentModel model,
             OutputSocket<?> output,
-            InputShop<ZipEntry> source)
+            InputShop<ZipArchiveEntry> source)
     throws IOException {
         final OutputStream out = output.newOutputStream();
         try {

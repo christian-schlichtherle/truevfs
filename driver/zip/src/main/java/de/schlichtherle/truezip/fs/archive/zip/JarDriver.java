@@ -69,18 +69,18 @@ public class JarDriver extends ZipDriver {
     }
 
     @Override
-    public JarEntry newEntry(String path, Type type, Entry template)
+    public JarArchiveEntry newEntry(String path, Type type, Entry template)
     throws CharConversionException {
-        return (JarEntry) super.newEntry(path, type, template);
+        return (JarArchiveEntry) super.newEntry(path, type, template);
     }
 
     @Override
-    public JarEntry newEntry(String name) {
-        return new JarEntry(name);
+    public JarArchiveEntry newEntry(String name) {
+        return new JarArchiveEntry(name);
     }
 
     @Override
-    public JarEntry newEntry(String name, ZipEntry template) {
-        return new JarEntry(name, template);
+    public JarArchiveEntry newEntry(String name, ZipArchiveEntry template) {
+        return new JarArchiveEntry(name, template);
     }
 }

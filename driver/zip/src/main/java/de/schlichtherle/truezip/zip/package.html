@@ -20,7 +20,7 @@
     <body>
         <p>
             A drop-in replacement for the classes in the package
-            {@link java.util.zip} which read and write ZIP files.
+            {@link java.util.zip} for reading and writing ZIP files.
         </p>
         <p>
             The classes in this package read and write ZIP files according to
@@ -44,7 +44,7 @@
                 Note that using any other character set except CP437 or UTF-8
                 is strongly discouraged because it will result in
                 interoperability issues with third party tools, especially
-                when interchanging archive files between different locales!
+                when sharing archive files between different locales!
             </li>
             <li>
                 Support for reading and writing ZIP64 extensions with the
@@ -73,7 +73,7 @@
                 interface {@link de.schlichtherle.truezip.rof.ReadOnlyFile},
                 which allows to read archive data from composite data sources
                 like e.g. RAES encrypted ZIP files directly without the need
-                to decrypt these to a temporary file first.
+                to decrypt them to a temporary file first.
             </li>
         </ul>
     </body>
