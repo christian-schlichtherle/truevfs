@@ -28,11 +28,11 @@ import java.util.ResourceBundle;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class PromptingKeyProviderUI<P extends PromptingKeyProvider<char[]>>
+public class ConsolePromptingKeyProviderUI<P extends PromptingKeyProvider<char[]>>
 implements de.schlichtherle.truezip.key.PromptingKeyProviderUI<char[], P> {
 
     private static final String CLASS_NAME
-            = PromptingKeyProviderUI.class.getName();
+            = ConsolePromptingKeyProviderUI.class.getName();
     protected static final ResourceBundle resources
             = ResourceBundle.getBundle(CLASS_NAME);
 

@@ -13,25 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package de.schlichtherle.truezip.key.passwd.swing;
+package de.schlichtherle.truezip.key.passwd.console;
 
 import de.schlichtherle.truezip.key.PromptingAesKeyProvider;
 import de.schlichtherle.truezip.key.PromptingKeyProvider;
-import java.awt.GraphicsEnvironment;
 
 /**
- * A key manager which enables users to enter passwords or select key files
- * as keys using a Swing GUI.
- * This key manager is used by default unless the JVM is running in headless
- * mode!
+ * A simple key manager which enables users to enter passwords as keys using
+ * console I/O.
+ * This key manager is used by default if the JVM is running in headless mode
+ * and the API complies to JSE6 (i.e. the class {@code java.io.Console}
+ * is available)!
+ * To request it explicitly, set the system property
+ * {@code de.schlichtherle.truezip.key.KeyManager} to
+ * [@code de.schlichtherle.truezip.key.passwd.console.ConsolePromptingKeyManager}.
  * <p>
- * If a password is entered, then the run time type of the key is a char array,
- * holding each password character.
- * If a key file is selected, the file size must be 512 bytes or more, of
- * which only the first 512 bytes are used as a byte array.
- * <p>
- * If this JVM is run in headless mode, all prompting is disabled.
+ * This key manager does not support key files and disables prompting if no
+ * console is attached to the JVM.
  * <p>
  * Note that class loading and instantiation may happen in a JVM shutdown hook,
  * so class initializers and constructors must behave accordingly.
@@ -42,11 +40,10 @@ import java.awt.GraphicsEnvironment;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class PromptingKeyManager
-extends de.schlichtherle.truezip.key.PromptingKeyManager {
+public class ConsolePromptingKeyManager extends de.schlichtherle.truezip.key.PromptingKeyManager {
 
     /**
-     * Constructs a new {@code PromptingKeyManager}.
+     * Constructs a new {@code ConsolePromptingKeyManager}.
      * This instance maps the following key provider UI types using
      * {@link de.schlichtherle.truezip.key.PromptingKeyManager#mapPromptingKeyProviderUIType}:
      * <table border="2" cellpadding="4">
@@ -56,26 +53,26 @@ extends de.schlichtherle.truezip.key.PromptingKeyManager {
      * </tr>
      * <tr>
      *   <td>"PromptingKeyProvider"</td>
-     *   <td>PromptingKeyProviderUI.class</td>
+     *   <td>ConsolePromptingKeyProviderUI.class</td>
      * </tr>
      * <tr>
      *   <td>"PromptingAesKeyProvider"</td>
-     *   <td>PromptingAesKeyProviderUI.class</td>
+     *   <td>ConsolePromptingAesKeyProviderUI.class</td>
      * </tr>
      * </table>
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public PromptingKeyManager() {
+    public ConsolePromptingKeyManager() {
         mapPromptingKeyProviderUIType(
                 (Class) PromptingKeyProvider.class,
-        	(Class) PromptingKeyProviderUI.class);
+                (Class) ConsolePromptingKeyProviderUI.class);
         mapPromptingKeyProviderUIType(
-        	(Class) PromptingAesKeyProvider.class,
-        	(Class) PromptingAesKeyProviderUI.class);
+                (Class) PromptingAesKeyProvider.class,
+        	(Class) ConsolePromptingAesKeyProviderUI.class);
     }
 
     @Override
     public boolean isPrompting() {
-        return super.isPrompting() && !GraphicsEnvironment.isHeadless();
+        return super.isPrompting() && System.console() != null;
     }
 }

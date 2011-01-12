@@ -16,13 +16,14 @@
 package de.schlichtherle.truezip.key.passwd.swing;
 
 import de.schlichtherle.truezip.awt.EventDispatchTimeoutException;
-import de.schlichtherle.truezip.awt.EventQueue;
+import de.schlichtherle.truezip.awt.EventQueueHelper;
 import de.schlichtherle.truezip.awt.Windows;
 import de.schlichtherle.truezip.key.KeyPromptingInterruptedException;
 import de.schlichtherle.truezip.key.KeyPromptingTimeoutException;
 import de.schlichtherle.truezip.key.PromptingKeyProvider;
 import de.schlichtherle.truezip.key.UnknownKeyException;
 import de.schlichtherle.truezip.util.ServiceLocator;
+import java.awt.EventQueue;
 import java.awt.Window;
 import java.io.EOFException;
 import java.io.IOException;
@@ -43,11 +44,11 @@ import net.jcip.annotations.ThreadSafe;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class PromptingKeyProviderUI<P extends PromptingKeyProvider<Cloneable>>
+public class SwingPromptingKeyProviderUI<P extends PromptingKeyProvider<Cloneable>>
 implements de.schlichtherle.truezip.key.PromptingKeyProviderUI<Cloneable, P> {
 
     private static final String CLASS_NAME
-            = PromptingKeyProviderUI.class.getName();
+            = SwingPromptingKeyProviderUI.class.getName();
     private static final ResourceBundle resources
             = ResourceBundle.getBundle(CLASS_NAME);
     static final URI INITIAL_RESOURCE = URI.create(""); // NOI18N
@@ -72,7 +73,7 @@ implements de.schlichtherle.truezip.key.PromptingKeyProviderUI<Cloneable, P> {
             = new WeakHashMap<PromptingKeyProvider<?>, OpenKeyPanel>();
 
     private static final ServiceLocator serviceLocator
-            = new ServiceLocator(PromptingKeyProviderUI.class.getClassLoader());
+            = new ServiceLocator(SwingPromptingKeyProviderUI.class.getClassLoader());
 
     /**
      * The last resource ID used when prompting.
@@ -361,9 +362,9 @@ implements de.schlichtherle.truezip.key.PromptingKeyProviderUI<Cloneable, P> {
         if (EventQueue.isDispatchThread()) {
             task.run();
         } else {
-            synchronized (PromptingKeyProviderUI.class) {
+            synchronized (SwingPromptingKeyProviderUI.class) {
                 try {
-                    EventQueue.invokeAndWaitUninterruptibly(
+                    EventQueueHelper.invokeAndWaitUninterruptibly(
                             task, START_PROMPTING_TIMEOUT);
                 } catch (EventDispatchTimeoutException ex) {
                     // Timeout while waiting for the EDT to start the task.

@@ -41,7 +41,7 @@ public class PromptingKeyManagerTest extends TestCase {
 
     @Override
     protected void setUp() {
-        KeyManagers.setManager(new PromptingKeyManager());
+        KeyManagers.setManager(new SwingPromptingKeyManager());
     }
 
     @Override

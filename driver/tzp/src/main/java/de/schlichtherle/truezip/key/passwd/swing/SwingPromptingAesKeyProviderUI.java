@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.key.passwd.swing;
 
 import de.schlichtherle.truezip.key.PromptingAesKeyProvider;
@@ -28,8 +27,8 @@ import javax.swing.JComponent;
  * @author Christian Schlichtherle
  * @version @version@
  */
-public class PromptingAesKeyProviderUI
-        extends PromptingKeyProviderUI<PromptingAesKeyProvider<Cloneable>> {
+public class SwingPromptingAesKeyProviderUI
+        extends SwingPromptingKeyProviderUI<PromptingAesKeyProvider<Cloneable>> {
 
     /**
      * A factory method to create the AES Key Strength Panel.

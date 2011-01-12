@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.awt;
 
+import java.awt.EventQueue;
 import java.awt.Window;
 import java.lang.reflect.InvocationTargetException;
 import javax.swing.JDialog;

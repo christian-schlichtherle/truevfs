@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.key.passwd.console;
 
 import de.schlichtherle.truezip.key.PromptingAesKeyProvider;
@@ -30,8 +29,8 @@ import static de.schlichtherle.truezip.key.AesKeyProvider.KEY_STRENGTH_256;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class PromptingAesKeyProviderUI<P extends PromptingAesKeyProvider<char[]>>
-extends PromptingKeyProviderUI<P> {
+public class ConsolePromptingAesKeyProviderUI<P extends PromptingAesKeyProvider<char[]>>
+extends ConsolePromptingKeyProviderUI<P> {
 
     @Override
     protected void promptExtraData(final P provider) {
