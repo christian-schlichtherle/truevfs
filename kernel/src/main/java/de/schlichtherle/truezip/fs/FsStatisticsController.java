@@ -38,7 +38,7 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-class FsStatisticsController
+final class FsStatisticsController
 extends FsDecoratingController<FsModel, FsController<?>> {
 
     private final FsStatisticsManager manager;

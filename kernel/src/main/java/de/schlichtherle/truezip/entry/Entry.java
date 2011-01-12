@@ -16,7 +16,6 @@
 package de.schlichtherle.truezip.entry;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
-import net.jcip.annotations.NotThreadSafe;
 
 /**
  * Represents an entry in an entry container, e.g. an archive file or a file
@@ -24,14 +23,10 @@ import net.jcip.annotations.NotThreadSafe;
  * <p>
  * In general, if a property has an unknown value, its getter method must
  * return the value {@link #UNKNOWN} or {@code null} respectively.
- * <p>
- * Implementations do <em>not</em> need to be thread-safe:
- * Multithreading needs to be addressed by client applications.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-@NotThreadSafe
 public interface Entry {
 
     /**

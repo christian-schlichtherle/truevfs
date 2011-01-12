@@ -13,24 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.fs;
 
 import java.io.IOException;
 import net.jcip.annotations.Immutable;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * Indicates an exceptional condition when synchronizing the changes in a
- * virtual file system with its parent file system.
- * An exception of this class implies that no or only insignificant parts of
- * the data in the file system have been lost.
+ * federated file system to its parent file system.
+ * An exception of this class implies that no or only insignificant parts
+ * of the data of the federated file system have been lost.
  * 
  * @author Christian Schlichtherle
  * @version $Id$
  */
-@Immutable
+@ThreadSafe
 public class FsSyncWarningException extends FsSyncException {
-
     private static final long serialVersionUID = 2302357394858347366L;
 
     public FsSyncWarningException(FsModel model, IOException cause) {

@@ -19,16 +19,16 @@ import de.schlichtherle.truezip.entry.Entry.Type;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.CharConversionException;
-import net.jcip.annotations.ThreadSafe;
 
 /**
  * A factory for entries.
+ * <p>
+ * Implementations must be immutable.
  *
  * @param   <E> The type of the created entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@ThreadSafe
 public interface EntryFactory<E extends Entry> {
 
     /**

@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.zip;
 import de.schlichtherle.truezip.zip.ZipEntry;
 import de.schlichtherle.truezip.zip.ZipFile;
 import de.schlichtherle.truezip.zip.ZipOutputStream;
-import de.schlichtherle.truezip.util.Arrays;
+import de.schlichtherle.truezip.util.ArrayHelper;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -111,7 +111,7 @@ public class ManySmallEntriesTest extends TestCase {
                     if (read < 0)
                         break;
                     assertTrue(read > 0);
-                    assertTrue(Arrays.equals(data, off, buf, 0, read));
+                    assertTrue(ArrayHelper.equals(data, off, buf, 0, read));
                     off += read;
                 } while (true);
                 assertEquals(-1, read);

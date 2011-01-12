@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.util;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * An iterator which concatenates the elements of two other iterators.
@@ -24,6 +25,7 @@ import java.util.NoSuchElementException;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 public final class JointIterator<E> implements Iterator<E> {
     private Iterator<? extends E> i1, i2;
 

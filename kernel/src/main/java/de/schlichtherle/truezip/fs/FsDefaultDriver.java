@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.fs;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Map;
 import java.util.ServiceConfigurationError;
+import net.jcip.annotations.Immutable;
 
 /**
  * Uses a given file system driver provider to lookup the appropriate driver
@@ -26,6 +27,7 @@ import java.util.ServiceConfigurationError;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@Immutable
 public final class FsDefaultDriver implements FsFederatingDriver {
 
     /**

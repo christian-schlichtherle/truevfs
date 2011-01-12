@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.fs;
 
 import java.io.IOException;
 import net.jcip.annotations.Immutable;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * Indicates that a file system is a false positive file system.
@@ -24,7 +25,7 @@ import net.jcip.annotations.Immutable;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@Immutable
+@ThreadSafe
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
 public class FsFalsePositiveException extends FsException {
 

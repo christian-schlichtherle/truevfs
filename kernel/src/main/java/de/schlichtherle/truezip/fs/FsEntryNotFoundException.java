@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.fs;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import net.jcip.annotations.Immutable;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * Indicates that a file system entry does not exist or is not accessible.
@@ -25,9 +26,8 @@ import net.jcip.annotations.Immutable;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-@Immutable
+@ThreadSafe
 public final class FsEntryNotFoundException extends FileNotFoundException {
-
     private static final long serialVersionUID = 2972350932856838564L;
 
     private final FsPath path;

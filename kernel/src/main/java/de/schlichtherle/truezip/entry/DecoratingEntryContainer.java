@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.entry;
 
 import java.util.Iterator;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * A decorator for an entry container.
@@ -24,6 +25,7 @@ import java.util.Iterator;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 public abstract class DecoratingEntryContainer<
         E extends Entry,
         C extends EntryContainer<E>>

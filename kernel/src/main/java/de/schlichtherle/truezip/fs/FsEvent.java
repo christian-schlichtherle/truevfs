@@ -27,7 +27,6 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 public class FsEvent extends EventObject {
-
     private static final long serialVersionUID = 7656343146323435361L;
 
     /**

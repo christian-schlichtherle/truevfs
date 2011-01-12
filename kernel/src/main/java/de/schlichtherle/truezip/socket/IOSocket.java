@@ -22,7 +22,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import net.jcip.annotations.NotThreadSafe;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * Addresses a target for I/O operations provided by sub class implementations.
@@ -37,7 +37,7 @@ import net.jcip.annotations.NotThreadSafe;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@NotThreadSafe
+@ThreadSafe
 public abstract class IOSocket<LT, PT> {
 
     /** You cannot instantiate this class outside its package. */

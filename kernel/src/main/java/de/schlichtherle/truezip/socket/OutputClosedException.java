@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.socket;
 
 import java.io.IOException;
-import net.jcip.annotations.Immutable;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * Indicates that an output stream for an entry has been forced to close.
@@ -26,7 +26,7 @@ import net.jcip.annotations.Immutable;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-@Immutable
+@ThreadSafe
 public class OutputClosedException extends IOException {
     private static final long serialVersionUID = 4563928734723923649L;
     

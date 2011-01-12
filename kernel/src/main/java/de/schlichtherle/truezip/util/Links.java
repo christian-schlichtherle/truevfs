@@ -19,17 +19,18 @@ package de.schlichtherle.truezip.util;
 import de.schlichtherle.truezip.util.Link.Type;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * Provides static utility methods for links.
- * This class cannot get instantiated outside its package.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 public class Links {
 
-    Links() {
+    private Links() {
     }
 
     /**

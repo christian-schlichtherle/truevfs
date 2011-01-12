@@ -26,9 +26,12 @@ import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.util.Arrays;
+import net.jcip.annotations.Immutable;
 
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 
@@ -43,6 +46,8 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
+@Immutable
 class TFiles {
 
     private TFiles() {
@@ -66,19 +71,17 @@ class TFiles {
      *         subset of the source before this operation.
      *         However, each file has either been completely moved or not.
      * @see    TFile#renameTo(File, TArchiveDetector)
-     * @see    <a href="package-summary.html#third_parties">Third Party
-     *         Access using different Archive Detectors</a>
      */
-    static boolean move(
-            final File src,
+    static boolean
+    move(   final File src,
             final File dst,
             final TArchiveDetector detector) {
         return !contains(src, dst) && move0(src, dst, detector);
     }
 
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
-    private static boolean move0(
-            final File src,
+    private static boolean
+    move0(  final File src,
             final File dst,
             final TArchiveDetector detector) {
         boolean ok = true;
@@ -123,11 +126,9 @@ class TFiles {
      *
      * @see TFile#copyAllTo(File, TArchiveDetector, TArchiveDetector)
      * @see TFile#archiveCopyAllTo(File, TArchiveDetector, TArchiveDetector)
-     * @see <a href="package-summary.html#third_parties">Third Party
-     *      Access using different Archive Detectors</a>
      */
-    static void copyAll(
-            final boolean preserve,
+    static void
+    copyAll(final boolean preserve,
             final File src,
             final File dst,
             final TArchiveDetector srcDetector,
@@ -139,12 +140,12 @@ class TFiles {
     }
 
     /** Unchecked parameters version. */
-    private static void copyAll0(
-            final boolean preserve,
-            final File src,
-            final File dst,
-            final TArchiveDetector srcDetector,
-            final TArchiveDetector dstDetector)
+    private static void
+    copyAll0(   final boolean preserve,
+                final File src,
+                final File dst,
+                final TArchiveDetector srcDetector,
+                final TArchiveDetector dstDetector)
     throws IOException {
         if (src.isDirectory()) {
             final long srcLastModified = src.lastModified();
@@ -186,11 +187,9 @@ class TFiles {
      *
      * @see TFile#cp(File, File)
      * @see TFile#cp_p(File, File)
-     * @see <a href="package-summary.html#third_parties">Third Party
-     *      Access using different Archive Detectors</a>
      */
-    static void copy(
-            final boolean preserve,
+    static void
+    copy(   final boolean preserve,
             final File src,
             final File dst)
     throws IOException {
@@ -200,9 +199,10 @@ class TFiles {
     }
 
     /** Unchecked parameters version. */
-    private static void copy0(  final boolean preserve,
-                                final File src,
-                                final File dst)
+    private static void
+    copy0(  final boolean preserve,
+            final File src,
+            final File dst)
     throws IOException {
         final InputSocket<?> input = getInputSocket(src,
                 BitField.noneOf(FsInputOption.class));
@@ -213,9 +213,9 @@ class TFiles {
         IOSocket.copy(input, output);
     }
 
-    static InputSocket<?> getInputSocket(
-            final File src,
-            final BitField<FsInputOption> options) {
+    static InputSocket<?>
+    getInputSocket( final File src,
+                    final BitField<FsInputOption> options) {
         if (src instanceof TFile) {
             // TODO: Consider removing this block and using the more general pattern below it!
             // FIXME: Removing this block yields a concurrency issue in the Kernel TCK!
@@ -231,10 +231,10 @@ class TFiles {
                             .getInputSocket(path.getEntryName(), options);
     }
 
-    static OutputSocket<?> getOutputSocket(
-            final File dst,
-            final BitField<FsOutputOption> options,
-            final Entry template) {
+    static OutputSocket<?>
+    getOutputSocket(final File dst,
+                    final BitField<FsOutputOption> options,
+                    final @CheckForNull Entry template) {
         if (dst instanceof TFile) {
             // TODO: Consider removing this block and using the more general pattern below it!
             // FIXME: Removing this block yields a concurrency issue in the Kernel TCK!
@@ -294,7 +294,7 @@ class TFiles {
      * @param a a file.
      * @param b another file.
      */
-    static boolean contains(@NonNull File a, @NonNull File b) {
+    static boolean contains(File a, File b) {
         return Paths.contains(  a.getAbsolutePath(),
                                 b.getAbsolutePath(),
                                 TFile.separatorChar);

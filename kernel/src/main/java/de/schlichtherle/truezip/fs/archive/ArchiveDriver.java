@@ -30,6 +30,7 @@ import de.schlichtherle.truezip.socket.IOPools;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.FileNotFoundException;
@@ -39,11 +40,14 @@ import javax.swing.Icon;
 /**
  * This file system driver interface is used to access archives of a
  * particular type, e.g. ZIP, TZP, JAR, TAR, TAR.GZ, TAR.BZ2 or any other.
+ * <p>
+ * Implementations must be immutable.
  *
  * @param   <E> The type of the archive entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public abstract class ArchiveDriver<E extends ArchiveEntry>
 implements FsDriver, EntryFactory<E> {
 
@@ -71,9 +75,9 @@ implements FsDriver, EntryFactory<E> {
      *         point and parent file system controller.
      */
     @Override
-    public @NonNull FsController<?>
-    newController(  @NonNull FsMountPoint mountPoint,
-                    @NonNull FsController<?> parent) {
+    public FsController<?>
+    newController(  FsMountPoint mountPoint,
+                    FsController<?> parent) {
         return  new FsConcurrentController(
                    new FsCachingController(
                         new DefaultArchiveController<E>(
@@ -109,9 +113,9 @@ implements FsDriver, EntryFactory<E> {
      *         as a <i>regular file</i> until the archive file system is
      *         synchronized with its parent file system.
      */
-    public abstract @NonNull InputShop<E>
-    newInputShop(   @NonNull FsConcurrentModel model,
-                    @NonNull InputSocket<?> input)
+    public abstract InputShop<E>
+    newInputShop(   FsConcurrentModel model,
+                    InputSocket<?> input)
     throws IOException;
 
     /**
@@ -149,10 +153,10 @@ implements FsDriver, EntryFactory<E> {
      *         as a <i>regular file</i> until the archive file system is
      *         synchronized with its parent file system.
      */
-    public abstract @NonNull OutputShop<E>
-    newOutputShop(  @NonNull FsConcurrentModel model,
-                    @NonNull OutputSocket<?> output,
-                    @Nullable InputShop<E> source)
+    public abstract OutputShop<E>
+    newOutputShop(  FsConcurrentModel model,
+                    OutputSocket<?> output,
+                    @CheckForNull InputShop<E> source)
     throws IOException;
 
     /**
@@ -167,8 +171,7 @@ implements FsDriver, EntryFactory<E> {
      *         if it's open/expanded in the view.
      *         If {@code null} is returned, a default icon should be displayed.
      */
-    public @CheckForNull Icon
-    getOpenIcon(@NonNull FsConcurrentModel model) {
+    public @CheckForNull Icon getOpenIcon(FsConcurrentModel model) {
         return null;
     }
 
@@ -184,8 +187,7 @@ implements FsDriver, EntryFactory<E> {
      *         if it's closed/collapsed in the view.
      *         If {@code null} is returned, a default icon should be displayed.
      */
-    public @CheckForNull Icon
-    getClosedIcon(@NonNull FsConcurrentModel model) {
+    public @CheckForNull Icon getClosedIcon(FsConcurrentModel model) {
         return null;
     }
 }

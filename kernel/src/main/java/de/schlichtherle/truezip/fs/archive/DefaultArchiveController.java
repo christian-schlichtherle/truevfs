@@ -245,9 +245,9 @@ extends FileSystemArchiveController<E> {
                 if (ex instanceof FileNotFoundException)
                     throw new FsFalsePositiveException(getModel(), ex);
                 else
-                    throw new CacheableFalsePositiveException(getModel(), ex);
+                    throw new FsCacheableFalsePositiveException(getModel(), ex);
             if (null != parent.getEntry(parentName))
-                throw new CacheableFalsePositiveException(getModel(), ex);
+                throw new FsCacheableFalsePositiveException(getModel(), ex);
             // The entry does NOT exist in the parent archive
             // file, but we may create it automatically.
             final ArchiveFileSystem<E> fileSystem

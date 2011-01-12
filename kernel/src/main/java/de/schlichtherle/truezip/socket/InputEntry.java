@@ -17,21 +17,15 @@ package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.entry.Entry;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import net.jcip.annotations.NotThreadSafe;
 
 /**
  * An entry which provides input sockets.
- * <p>
- * Implementations do <em>not</em> need to be thread-safe:
- * Multithreading needs to be addressed by client applications.
  *
  * @see     OutputEntry
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@NotThreadSafe
-public interface InputEntry<E extends InputEntry<E>>
-extends Entry {
+public interface InputEntry<E extends InputEntry<E>> extends Entry {
 
     /**
      * Returns an input socket for reading this entry.

@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.rof;
 
+import de.schlichtherle.truezip.util.ArrayHelper;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -287,10 +288,10 @@ public abstract class ReadOnlyFileTestCase {
                 break;
             if (buf.length > 0) {
                 assertTrue(read > 0);
-                assertTrue(de.schlichtherle.truezip.util.Arrays.equals(data, off, buf, 0, read));
+                assertTrue(ArrayHelper.equals(data, off, buf, 0, read));
                 java.util.Arrays.fill(buf, (byte) 0);
                 trof.readFully(buf, 0, read);
-                assertTrue(de.schlichtherle.truezip.util.Arrays.equals(data, off, buf, 0, read));
+                assertTrue(ArrayHelper.equals(data, off, buf, 0, read));
             } else {
                 assertTrue(read == 0);
                 assertEquals(0, trof.read(buf));
@@ -319,10 +320,10 @@ public abstract class ReadOnlyFileTestCase {
                 continue;
             if (buf.length > 0) {
                 assertTrue(read > 0);
-                assertTrue(de.schlichtherle.truezip.util.Arrays.equals(data, off, buf, 0, read));
+                assertTrue(ArrayHelper.equals(data, off, buf, 0, read));
                 java.util.Arrays.fill(buf, (byte) 0);
                 trof.readFully(buf, 0, read);
-                assertTrue(de.schlichtherle.truezip.util.Arrays.equals(data, off, buf, 0, read));
+                assertTrue(ArrayHelper.equals(data, off, buf, 0, read));
             } else {
                 assertTrue(read == 0);
                 assertEquals(0, trof.read(buf));

@@ -19,11 +19,14 @@ import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Map;
+import net.jcip.annotations.Immutable;
 
 /**
  * A federating file system driver queries the scheme of the given mount point
  * in order to lookup the appropriate file system driver which is then used to
  * create the requested file system controller.
+ * <p>
+ * Implementations must be thread-safe.
  *
  * @author  Christian Schlichtherle
  * @version $Id$

@@ -30,9 +30,6 @@ import net.jcip.annotations.NotThreadSafe;
  * Note that the entity relationship between output sockets and input sockets
  * is n:1, i.e. any output socket can have at most one peer input socket, but
  * it may be the peer of many other input sockets.
- * <p>
- * In general, implementations do <em>not</em> need to be thread-safe:
- * Multithreading needs to be addressed by client classes.
  *
  * @param   <E> the type of the {@link #getLocalTarget() local target}
  *          for I/O operations.

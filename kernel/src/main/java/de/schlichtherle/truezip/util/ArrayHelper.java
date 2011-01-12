@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.util;
+
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * Provides static utility methods for arrays.
@@ -22,9 +23,10 @@ package de.schlichtherle.truezip.util;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class Arrays {
+@ThreadSafe
+public class ArrayHelper {
 
-    private Arrays() {
+    private ArrayHelper() {
     }
 
     /**

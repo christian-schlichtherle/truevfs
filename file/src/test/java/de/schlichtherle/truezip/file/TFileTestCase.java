@@ -15,6 +15,9 @@
  */
 package de.schlichtherle.truezip.file;
 
+import de.schlichtherle.truezip.util.ArrayHelper;
+import de.schlichtherle.truezip.fs.FsSyncException;
+import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import java.io.File;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
@@ -124,7 +127,7 @@ public abstract class TFileTestCase {
         // clean sheet of paper with subsequent tests.
         try {
             TFile.umount();
-        } catch (TArchiveException ignored) {
+        } catch (FsSyncException ignored) {
             // Normally, you should NOT ignore all exceptions thrown by this
             // method.
             // The reason we do it here is that they are usually after effects
@@ -249,7 +252,7 @@ public abstract class TFileTestCase {
             InputStream in = new TFileInputStream(file);
             try {
                 byte[] buf = new byte[data.length];
-                assertTrue(de.schlichtherle.truezip.util.Arrays.equals(data, 0, buf, 0, in.read(buf)));
+                assertTrue(ArrayHelper.equals(data, 0, buf, 0, in.read(buf)));
             } finally {
                 in.close();
             }
@@ -527,7 +530,7 @@ public abstract class TFileTestCase {
         try {
             TFile.update(); // forces closing of fisA
             fail("ArchiveFileBusyWarningException expected!");
-        } catch (TArchiveWarningException ex) {
+        } catch (FsSyncWarningException ex) {
             // Warning about fisA still being used.
             if (!(ex.getCause() instanceof FileBusyException))
                 throw ex;
@@ -544,7 +547,7 @@ public abstract class TFileTestCase {
         // collector did his job.
         try {
             TFile.umount(); // allow external modifications!
-        } catch (TArchiveWarningException ex) {
+        } catch (FsSyncWarningException ex) {
             fail("The garbage collector hasn't been collecting an open stream. If this is only happening occasionally, you can safely ignore it.");
         }
 
@@ -602,7 +605,7 @@ public abstract class TFileTestCase {
         try {
             TFile.update(); // forces closing of all streams
             fail("Output stream should have been forced to close!");
-        } catch (TArchiveWarningException ex) {
+        } catch (FsSyncWarningException ex) {
             if (!(ex.getCause() instanceof FileBusyException))
                 throw ex;
         }
@@ -626,7 +629,7 @@ public abstract class TFileTestCase {
         // collector did his job.
         try {
             TFile.update();
-        } catch (TArchiveWarningException ex) {
+        } catch (FsSyncWarningException ex) {
             fail("The garbage collector hasn't been collecting an open stream. If this is only happening occasionally, you can safely ignore it.");
         }
         
@@ -1335,7 +1338,7 @@ public abstract class TFileTestCase {
                     if (read < 0)
                         break;
                     assertTrue(read > 0);
-                    assertTrue(de.schlichtherle.truezip.util.Arrays.equals(
+                    assertTrue(ArrayHelper.equals(
                             data, off, buf, 0, read));
                     off += read;
                 } while (true);
@@ -1391,7 +1394,7 @@ public abstract class TFileTestCase {
                     }
                     try {
                         TFile.update(wait, false, wait, false);
-                    } catch (TArchiveException ex) {
+                    } catch (FsSyncException ex) {
                         if (!(ex.getCause() instanceof FileBusyException))
                             throw ex;
                         // Some other thread is busy updating an archive.
@@ -1469,7 +1472,7 @@ public abstract class TFileTestCase {
                                 TFile.update(archive);
                             else
                                 TFile.update(false);
-                        } catch (TArchiveException ex) {
+                        } catch (FsSyncException ex) {
                             if (!(ex.getCause() instanceof FileBusyException))
                                 throw ex;
                             // Some other thread is busy updating an archive.

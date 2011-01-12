@@ -15,10 +15,13 @@
  */
 package de.schlichtherle.truezip.file;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.InputStreamReader;
+import net.jcip.annotations.Immutable;
 
 /**
  * A replacement for {@link FileReader} which provides transparent read access
@@ -33,6 +36,8 @@ import java.io.InputStreamReader;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
+@Immutable
 public final class TFileReader extends InputStreamReader {
 
     public TFileReader(String path) throws FileNotFoundException {

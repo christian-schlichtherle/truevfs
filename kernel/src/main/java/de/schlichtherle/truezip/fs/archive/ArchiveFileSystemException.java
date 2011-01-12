@@ -16,10 +16,12 @@
 package de.schlichtherle.truezip.fs.archive;
 
 import java.io.IOException;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * Thrown to indicate an exceptional condition in an {@link ArchiveFileSystem}.
  */
+@ThreadSafe
 public class ArchiveFileSystemException extends IOException {
 
     private static final long serialVersionUID = 4652084652223428651L;

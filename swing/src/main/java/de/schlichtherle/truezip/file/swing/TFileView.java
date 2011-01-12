@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.file.swing;
 
 import de.schlichtherle.truezip.file.TDefaultArchiveDetector;
 import de.schlichtherle.truezip.file.TFile;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.File;
 import java.util.ResourceBundle;
 import javax.swing.Icon;
@@ -118,10 +119,10 @@ final class TFileView extends TDecoratingFileView {
                 && !newNonArchiveFile(file).isDirectory();
     }
 
-    private static TFile newNonArchiveFile(TFile file) {
-        return new TFile(file.getParentFile(),
-                        file.getName(),
-                        TDefaultArchiveDetector.NULL);
+    private static TFile newNonArchiveFile(@NonNull TFile file) {
+        final TFile parent = file.getParentFile();
+        assert null != parent : "expected non-null from context!";
+        return new TFile(parent, file.getName(), TDefaultArchiveDetector.NULL);
     }
 
     private static boolean isEntryInValidArchive(TFile file) {

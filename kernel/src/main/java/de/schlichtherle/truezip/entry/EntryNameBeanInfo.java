@@ -18,6 +18,9 @@ package de.schlichtherle.truezip.entry;
 import java.beans.*;
 
 /**
+ * Provides a persistence delegate to support
+ * {@link XMLEncoder}/{@link XMLDecoder}.
+ *
  * @author  Christian Schlichtherle
  * @version $Id$
  */

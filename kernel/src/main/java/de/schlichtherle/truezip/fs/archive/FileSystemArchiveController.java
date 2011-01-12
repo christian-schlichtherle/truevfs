@@ -108,7 +108,7 @@ extends BasicArchiveController<E> {
             getModel().assertWriteLockedByCurrentThread();
             try {
                 mount(autoCreate, options);
-            } catch (CacheableFalsePositiveException ex) {
+            } catch (FsCacheableFalsePositiveException ex) {
                 // Cache exception for false positive file system.
                 //   The state is reset when unlink() is called on the false
                 // positive file system or sync().
@@ -136,15 +136,6 @@ extends BasicArchiveController<E> {
                 mountState = new MountedFileSystem(fileSystem);
         }
     } // class ResetFileSystem
-
-    @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
-    static class CacheableFalsePositiveException
-    extends FsFalsePositiveException {
-        CacheableFalsePositiveException(@NonNull FsModel model,
-                                        @NonNull IOException cause) {
-            super(model, cause);
-        }
-    }
 
     private class MountedFileSystem extends MountState<E> {
         private final ArchiveFileSystem<E> fileSystem;
@@ -197,4 +188,12 @@ extends BasicArchiveController<E> {
                     : new ResetFileSystem();
         }
     } // class FalsePositiveFileSystem
+}
+
+@SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
+class FsCacheableFalsePositiveException extends FsFalsePositiveException {
+    FsCacheableFalsePositiveException(@NonNull FsModel model,
+                                    @NonNull IOException cause) {
+        super(model, cause);
+    }
 }

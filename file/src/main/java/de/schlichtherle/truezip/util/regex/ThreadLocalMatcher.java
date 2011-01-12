@@ -19,6 +19,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * A thread local {@link Matcher}.
@@ -28,6 +29,7 @@ import java.util.regex.PatternSyntaxException;
  * @see #reset(CharSequence)
  * @version $Id$
  */
+@ThreadSafe
 public class ThreadLocalMatcher extends ThreadLocal<Matcher> {
     private final @NonNull Pattern pattern;
 

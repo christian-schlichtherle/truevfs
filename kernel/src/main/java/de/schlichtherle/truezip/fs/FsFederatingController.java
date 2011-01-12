@@ -42,13 +42,11 @@ import net.jcip.annotations.ThreadSafe;
  * {@link FsFalsePositiveException}, the method call is delegated to the
  * controller for its parent file system in order to resolve the requested
  * operation.
- * <p>
- * This class is thread-safe if and only if the decorated file system
- * controller and its parent file system controller are thread-safe.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 final class FsFederatingController
 extends FsDecoratingController<FsModel, FsController<?>> {
 

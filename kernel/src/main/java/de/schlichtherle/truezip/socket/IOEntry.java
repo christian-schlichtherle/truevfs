@@ -15,18 +15,12 @@
  */
 package de.schlichtherle.truezip.socket;
 
-import net.jcip.annotations.NotThreadSafe;
-
 /**
  * An entry which provides I/O sockets.
- * <p>
- * Implementations do <em>not</em> need to be thread-safe:
- * Multithreading needs to be addressed by client applications.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-@NotThreadSafe
 public interface IOEntry<E extends IOEntry<E>>
 extends InputEntry<E>, OutputEntry<E> {
 }

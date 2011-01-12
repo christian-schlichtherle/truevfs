@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.file;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * Thrown to indicate that two paths are referring to the same file or contain
@@ -26,6 +26,7 @@ import java.io.FileNotFoundException;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 public class TContainsFileException extends FileNotFoundException {
     private static final long serialVersionUID = 1237683475282761476L;
 
