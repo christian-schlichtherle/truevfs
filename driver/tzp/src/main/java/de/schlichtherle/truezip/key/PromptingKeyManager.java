@@ -94,7 +94,7 @@ public class PromptingKeyManager extends KeyManager {
      * <p>
      * Note that subclasses might add additional behaviour to both
      * {@link #isPrompting} and {@link #setPrompting} through the default
-     * key manager instance (see {@link #getManager}).
+     * key manager instance (see {@link KeyManagers#getManager}).
      * Regardless, an application may safely assume that
      * {@code isPrompting()} reflects the actual behaviour of the API
      * in this package although it may not reflect the parameter value of
@@ -117,7 +117,7 @@ public class PromptingKeyManager extends KeyManager {
      * overriding this method.
      *
      * @see #setPromptingImpl
-     * @see #getManager
+     * @see KeyManagers#getManager
      */
     protected boolean isPromptingImpl() {
         return prompting;
@@ -136,7 +136,7 @@ public class PromptingKeyManager extends KeyManager {
      * <p>
      * Note that subclasses might add additional behaviour to both
      * {@link #isPrompting} and {@link #setPrompting} through the default
-     * key manager instance (see {@link #getManager}).
+     * key manager instance (see {@link KeyManagers#getManager}).
      * Regardless, an application may safely assume that
      * {@code isPrompting()} reflects the actual behaviour of the API
      * in this package although it may not reflect the parameter value of
@@ -159,7 +159,7 @@ public class PromptingKeyManager extends KeyManager {
      * overriding this method.
      *
      * @see #isPromptingImpl
-     * @see #getManager
+     * @see KeyManagers#getManager
      */
     protected void setPromptingImpl(boolean prompting) {
         this.prompting = prompting;
