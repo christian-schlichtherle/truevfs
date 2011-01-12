@@ -27,10 +27,8 @@ import javax.swing.UIManager;
 /**
  * A custom file system view required to browse archive files like (virtual)
  * directories with a JFileChooser.
- * This class is used by
- * {@link de.schlichtherle.truezip.file.swing.tree.FileTreeCellRenderer}
- * to render files and directories in a
- * {@link de.schlichtherle.truezip.file.swing.JFileTree}.
+ * This class is used by {@link de.schlichtherle.truezip.file.swing.tree.TFileTreeCellRenderer}
+ * to render files and directories in a {@link TFileTree}.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -98,9 +96,9 @@ public class TFileSystemView extends TDecoratingFileSystemView {
      * returned.
      */
     public TArchiveDetector getArchiveDetector() {
-        return archiveDetector != null
-            ? archiveDetector
-            : TFile.getDefaultArchiveDetector();
+        return null != archiveDetector
+                ? archiveDetector
+                : TFile.getDefaultArchiveDetector();
     }
 
     /**
