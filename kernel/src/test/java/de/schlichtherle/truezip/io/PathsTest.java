@@ -127,7 +127,7 @@ public class PathsTest {
     }
 
     private void assertSplit(final String path) {
-        final java.io.File file = new java.io.File(path);
+        final File file = new File(path);
         final String parent = file.getParent();
         final String base = file.getName();
 

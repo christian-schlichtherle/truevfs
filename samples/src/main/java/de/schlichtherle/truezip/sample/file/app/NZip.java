@@ -15,17 +15,17 @@
  */
 package de.schlichtherle.truezip.sample.file.app;
 
-import de.schlichtherle.truezip.file.ArchiveDetector;
-import de.schlichtherle.truezip.file.DefaultArchiveDetector;
-import de.schlichtherle.truezip.file.File;
-import de.schlichtherle.truezip.file.FileInputStream;
+import de.schlichtherle.truezip.file.TArchiveDetector;
+import de.schlichtherle.truezip.file.TDefaultArchiveDetector;
+import de.schlichtherle.truezip.file.TFile;
+import de.schlichtherle.truezip.file.TFileInputStream;
 import de.schlichtherle.truezip.fs.archive.tar.TarBZip2Driver;
 import de.schlichtherle.truezip.fs.archive.tar.TarDriver;
 import de.schlichtherle.truezip.fs.archive.tar.TarGZipDriver;
 import de.schlichtherle.truezip.fs.archive.zip.CheckedJarDriver;
 import de.schlichtherle.truezip.fs.archive.zip.CheckedReadOnlySfxDriver;
 import de.schlichtherle.truezip.fs.archive.zip.CheckedZipDriver;
-import de.schlichtherle.truezip.file.swing.tree.FileTreeModel;
+import de.schlichtherle.truezip.file.swing.tree.TFileTreeModel;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,7 +49,7 @@ import java.util.ResourceBundle;
  * However, this utility features some optional archive drivers which
  * provide additional safety or otherwise unavailable features.
  * Some of these drivers are not used in their default configuration -
- * see {@link de.schlichtherle.truezip.file.DefaultArchiveDetector} for more
+ * see {@link de.schlichtherle.truezip.file.TDefaultArchiveDetector} for more
  * information.
  * For example, the ZIP drivers used in this utility <em>always</em> check
  * the CRC-32 values provided in the ZIP file.
@@ -84,15 +84,15 @@ public class NZip extends CommandLineUtility {
 
     /**
      * May be overridden by subclasses to create the
-     * {@link DefaultArchiveDetector} which provides file system drivers which
+     * {@link TDefaultArchiveDetector} which provides file system drivers which
      * should use the specified charset if supported.
      * <p>
      * Note that the archive detector which is returned by the implementation
      * in this class uses some archive drivers which may be pretty slow due to
      * some extra compatibility tests which they perform on every archive.
      */
-    protected ArchiveDetector newArchiveDetector() {
-        return new DefaultArchiveDetector(DefaultArchiveDetector.ALL,
+    protected TArchiveDetector newArchiveDetector() {
+        return new TDefaultArchiveDetector(TDefaultArchiveDetector.ALL,
             new Object[] {
                 "ear|jar|war", new CheckedJarDriver(),  // check CRC-32
                 "zip", new CheckedZipDriver(),          // check CRC-32
@@ -101,10 +101,10 @@ public class NZip extends CommandLineUtility {
     }
 
     /** @see #newArchiveDetector() */
-    protected ArchiveDetector newArchiveDetector(
+    protected TArchiveDetector newArchiveDetector(
             final @NonNull Charset charset) {
         assert charset != null;
-        return new DefaultArchiveDetector(DefaultArchiveDetector.ALL,
+        return new TDefaultArchiveDetector(TDefaultArchiveDetector.ALL,
                 new Object[] {
                     "ear|jar|war|zip", new CheckedZipDriver(charset),   // check CRC-32
                     "exe", new CheckedReadOnlySfxDriver(charset),       // check CRC-32
@@ -140,10 +140,10 @@ public class NZip extends CommandLineUtility {
         final String cmd = args[0].toLowerCase(Locale.ENGLISH);
         args = lshift(args);
 
-        final ArchiveDetector oldDetector = File.getDefaultArchiveDetector();
+        final TArchiveDetector oldDetector = TFile.getDefaultArchiveDetector();
         try {
             // Install custom archive detector.
-            File.setDefaultArchiveDetector(newArchiveDetector());
+            TFile.setDefaultArchiveDetector(newArchiveDetector());
 
             if ("ls".equals(cmd)) {
                 ls(args, false, false);
@@ -181,7 +181,7 @@ public class NZip extends CommandLineUtility {
                 throw new IllegalUsageException();
             }
         } finally {
-            File.setDefaultArchiveDetector(oldDetector);
+            TFile.setDefaultArchiveDetector(oldDetector);
         }
 
         return 0;
@@ -208,7 +208,7 @@ public class NZip extends CommandLineUtility {
         if (args.length <= 0)
             args = new String[] { "." };
         for (int i = 0; i < args.length; i++) {
-            final File file = new File(args[i]);
+            final TFile file = new TFile(args[i]);
             if (args.length > 1)
                 out.println(args[i] + ":");
             if (file.isDirectory())
@@ -222,21 +222,21 @@ public class NZip extends CommandLineUtility {
      * Lists the given file with the given display path.
      */
     private void ls(
-            final java.io.File file,
+            final TFile file,
             final String path,
             final boolean detailed,
             final boolean recursive)
     throws IOException {
         if (file.isDirectory()) {
-            final java.io.File[] entries = file.listFiles();
+            final TFile[] entries = file.listFiles();
             if (entries == null)
                 throw new IOException(path + " (" + resources.getString("ls.dia") + ")");
             // Sort directories to the start.
-            Arrays.sort(entries, FileTreeModel.FILE_NAME_COMPARATOR);
+            Arrays.sort(entries, TFileTreeModel.FILE_NAME_COMPARATOR);
             for (int i = 0; i < entries.length; i++) {
-                final java.io.File entry = entries[i];
+                final TFile entry = entries[i];
                 final String entryPath = path.length() > 0
-                        ? path + File.separator + entry.getName()
+                        ? path + TFile.separator + entry.getName()
                         : entry.getName();
                 ls(entry, entryPath, detailed);
                 if (recursive && entry.isDirectory())
@@ -250,7 +250,7 @@ public class NZip extends CommandLineUtility {
     }
 
     private void ls(
-            final java.io.File file,
+            final TFile file,
             final String path,
             final boolean detailed) {
         final StringBuffer buf = new StringBuffer();
@@ -263,7 +263,7 @@ public class NZip extends CommandLineUtility {
         buf.append(path);
         if (detailed)
             buf.append(file.isDirectory()
-                    ? File.separator
+                    ? TFile.separator
                     : file.isFile()
                         ? ""
                         : file.exists()
@@ -285,9 +285,9 @@ public class NZip extends CommandLineUtility {
             throw new IllegalUsageException();
 
         for (int i = 0; i < args.length; i++) {
-            final InputStream in = new FileInputStream(args[i]);
+            final InputStream in = new TFileInputStream(args[i]);
             try {
-                File.cat(in, out);
+                TFile.cat(in, out);
             } finally {
                 in.close();
             }
@@ -332,26 +332,26 @@ public class NZip extends CommandLineUtility {
         if (in > 1 || out > 1)
             throw new IllegalUsageException();
 
-        final ArchiveDetector srcDetector;
+        final TArchiveDetector srcDetector;
         if (cp437in)
             srcDetector = newArchiveDetector(Charset.forName("IBM437"));
         else if (utf8in)
             srcDetector = newArchiveDetector(Charset.forName("UTF-8"));
         else
-            srcDetector = File.getDefaultArchiveDetector();
+            srcDetector = TFile.getDefaultArchiveDetector();
 
-        final ArchiveDetector dstDetector;
+        final TArchiveDetector dstDetector;
         if (unzip)
-            dstDetector = DefaultArchiveDetector.NULL;
+            dstDetector = TDefaultArchiveDetector.NULL;
         else if (cp437out)
             dstDetector = newArchiveDetector(Charset.forName("IBM437"));
         else if (utf8out)
             dstDetector = newArchiveDetector(Charset.forName("UTF-8"));
         else
-            dstDetector = File.getDefaultArchiveDetector();
+            dstDetector = TFile.getDefaultArchiveDetector();
 
         final int dstI = args.length - 1;
-        final File dst = new File(args[dstI], dstDetector);
+        final TFile dst = new TFile(args[dstI], dstDetector);
         if (dstI - srcI < 1 || (dstI - srcI > 1
                 && !dst.isArchive() && !dst.isDirectory()))
             throw new IllegalUsageException();
@@ -360,10 +360,10 @@ public class NZip extends CommandLineUtility {
             monitor.start();
 
         for (int i = srcI; i < dstI; i++) {
-            final File src = new File(args[i], srcDetector);
-            final File tmp;
+            final TFile src = new TFile(args[i], srcDetector);
+            final TFile tmp;
             if (dstI - srcI > 1 || dst.isDirectory())
-                tmp = new File(dst, src.getName(), dstDetector);
+                tmp = new TFile(dst, src.getName(), dstDetector);
             else
                 tmp = dst;
             if (mv) {
@@ -382,7 +382,7 @@ public class NZip extends CommandLineUtility {
             throw new IllegalUsageException();
 
         for (int i = 0; i < args.length; i++) {
-            final File file = new File(args[i]);
+            final TFile file = new TFile(args[i]);
             final boolean ok;
             if (!file.exists())
                 ok = file.createNewFile();
@@ -409,7 +409,7 @@ public class NZip extends CommandLineUtility {
             throw new IllegalUsageException();
 
         for (int i = 0; i < args.length; i++) {
-            final File file = new File(args[i]);
+            final TFile file = new TFile(args[i]);
             final boolean ok = recursive ? file.mkdirs() : file.mkdir();
             if (!ok) {
                 final String msg;
@@ -432,7 +432,7 @@ public class NZip extends CommandLineUtility {
             throw new IllegalUsageException();
 
         for (int i = 0; i < args.length; i++) {
-            final File file = new File(args[i]);
+            final TFile file = new TFile(args[i]);
             final boolean ok = recursive
                     ? file.deleteAll()
                     : file.delete();
@@ -459,7 +459,7 @@ public class NZip extends CommandLineUtility {
         if (args.length != 1)
             throw new IllegalUsageException();
 
-        final boolean success = new File(args[0]).isArchive();
+        final boolean success = new TFile(args[0]).isArchive();
         out.println(success);
         return success;
     }
@@ -469,7 +469,7 @@ public class NZip extends CommandLineUtility {
         if (args.length != 1)
             throw new IllegalUsageException();
 
-        final boolean success = new File(args[0]).isDirectory();
+        final boolean success = new TFile(args[0]).isDirectory();
         out.println(success);
         return success;
     }
@@ -479,7 +479,7 @@ public class NZip extends CommandLineUtility {
         if (args.length != 1)
             throw new IllegalUsageException();
 
-        final boolean success = new File(args[0]).isFile();
+        final boolean success = new TFile(args[0]).isFile();
         out.println(success);
         return success;
     }
@@ -489,7 +489,7 @@ public class NZip extends CommandLineUtility {
         if (args.length != 1)
             throw new IllegalUsageException();
 
-        final boolean success = new File(args[0]).exists();
+        final boolean success = new TFile(args[0]).exists();
         out.println(success);
         return success;
     }
@@ -499,7 +499,7 @@ public class NZip extends CommandLineUtility {
         if (args.length != 1)
             throw new IllegalUsageException();
 
-        final long length = new File(args[0]).length();
+        final long length = new TFile(args[0]).length();
         out.println(length);
         return true;
     }

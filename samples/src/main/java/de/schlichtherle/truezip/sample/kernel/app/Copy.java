@@ -25,6 +25,7 @@ import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -46,7 +47,7 @@ public class Copy {
         // Note that we need an absolute URI, but we do not want to be
         // restricted to the "file" scheme, so we try and check first.
         URI srcUri = new URI(args[0]);
-        srcUri = srcUri.isAbsolute() ? srcUri : new java.io.File(args[0]).toURI();
+        srcUri = srcUri.isAbsolute() ? srcUri : new File(args[0]).toURI();
         FsPath srcPath = new FsPath(srcUri, FsUriModifier.CANONICALIZE);
         InputSocket<?> srcSocket = manager
                 .getController(     srcPath.getMountPoint())
@@ -55,7 +56,7 @@ public class Copy {
 
         // Resolve the destination socket. Again, we need an absolute URI.
         URI dstUri = new URI(args[1]);
-        dstUri = dstUri.isAbsolute() ? dstUri : new java.io.File(args[1]).toURI();
+        dstUri = dstUri.isAbsolute() ? dstUri : new File(args[1]).toURI();
         FsPath dstPath = new FsPath(dstUri, FsUriModifier.CANONICALIZE);
         OutputSocket<?> dstSocket = manager
                 .getController(     dstPath.getMountPoint())

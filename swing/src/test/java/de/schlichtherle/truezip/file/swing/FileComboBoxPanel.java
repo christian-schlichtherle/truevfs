@@ -13,19 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.file.swing;
 
-import de.schlichtherle.truezip.file.File;
+import de.schlichtherle.truezip.file.TFile;
 import java.awt.EventQueue;
+import java.io.File;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class FileComboBoxPanel extends javax.swing.JPanel implements Runnable {
+public class FileComboBoxPanel extends JPanel implements Runnable {
     private static final long serialVersionUID = 1065812374938719922L;
 
     /** Creates new form FileComboBoxPanel */
@@ -34,7 +35,7 @@ public class FileComboBoxPanel extends javax.swing.JPanel implements Runnable {
     }
 
     /** Creates new form FileComboBoxPanel */
-    public FileComboBoxPanel(java.io.File directory) {
+    public FileComboBoxPanel(File directory) {
         initComponents();
         setDirectoryImpl(directory);
     }
@@ -86,7 +87,7 @@ public class FileComboBoxPanel extends javax.swing.JPanel implements Runnable {
      * Getter for property directory.
      * @return Value of property directory.
      */
-    public java.io.File getDirectory() {
+    public File getDirectory() {
         return browser1.getDirectory();
     }
 
@@ -94,24 +95,24 @@ public class FileComboBoxPanel extends javax.swing.JPanel implements Runnable {
      * Setter for property directory.
      * @param directory New value of property directory.
      */
-    public void setDirectory(java.io.File directory) {
+    public void setDirectory(File directory) {
         setDirectoryImpl(directory);
     }
 
-    private void setDirectoryImpl(java.io.File directory) {
+    private void setDirectoryImpl(File directory) {
         browser1.setDirectory(directory);
         browser2.setDirectory(directory);
     }
 
     public static void main(String[] args) {
-        EventQueue.invokeLater(new FileComboBoxPanel(new File(args[0])));
+        EventQueue.invokeLater(new FileComboBoxPanel(new TFile(args[0])));
     }
 
     @Override
 	public void run() {
         EventQueue.invokeLater(new Runnable() {
             @Override
-			public void run() {
+            public void run() {
                 final JFrame frame = new JFrame("File name auto completion fun");
                 frame.getContentPane().add(FileComboBoxPanel.this);
                 frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -123,7 +124,7 @@ public class FileComboBoxPanel extends javax.swing.JPanel implements Runnable {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private final de.schlichtherle.truezip.file.swing.FileComboBoxBrowser browser1 = new de.schlichtherle.truezip.file.swing.FileComboBoxBrowser();
-    private final de.schlichtherle.truezip.file.swing.FileComboBoxBrowser browser2 = new de.schlichtherle.truezip.file.swing.FileComboBoxBrowser();
+    private final de.schlichtherle.truezip.file.swing.TFileComboBoxBrowser browser1 = new de.schlichtherle.truezip.file.swing.TFileComboBoxBrowser();
+    private final de.schlichtherle.truezip.file.swing.TFileComboBoxBrowser browser2 = new de.schlichtherle.truezip.file.swing.TFileComboBoxBrowser();
     // End of variables declaration//GEN-END:variables
 }
