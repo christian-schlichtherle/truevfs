@@ -29,23 +29,11 @@ import java.util.Set;
  * For each resource ID, a key provider may be associated to it which handles
  * the actual retrieval of the key.
  * <p>
- * Clients need to call {@link #getInstance} to get the default instance.
- * Because the map of key providers and some associated methods are static
- * members of this class, the default instance of this class may be changed
- * dynamically (using {@link #setInstance}) without affecting already mapped
- * key providers.
- * This allows to change other aspects of the implementation dynamically
- * (the user interface for example) without affecting the key providers and hence the
- * keys.
+ * Clients need to call {@link KeyManagers#getManager} to get the default
+ * key manager instance.
  * <p>
  * Implementations need to subclass this class and provide a public
  * no-arguments constructor.
- * Finally, an instance of the implementation must be installed either by
- * calling {@link #setInstance(KeyManager)} or by setting the system property
- * {@code de.schlichtherle.truezip.key.KeyManager} to the fully qualified class
- * name of the implementation before this class is ever used.
- * In the latter case, the class will be loaded using the context class loader
- * of the current thread.
  * <p>
  * Note that class loading and instantiation may happen in a JVM shutdown hook,
  * so class initializers and constructors must behave accordingly.
@@ -347,7 +335,7 @@ public abstract class KeyManager {
      * for a protected resource.
      * <pre>
      * URI resource = file.getCanonicalFile().toURI();
-     * KeyManager km = KeyManager.getInstance();
+     * KeyManager km = KeyManagers.getManager();
      * KeyProvider kp = km.getKeyProvider(resource, AesKeyProvider.class);
      * Object key = kp.getCreateKey(); // may prompt the user
      * int ks;
@@ -384,7 +372,7 @@ public abstract class KeyManager {
      *         of the {@code KeyProvider} interface.
      * @throws IllegalArgumentException if any other precondition on the
      *         parameter {@code type} does not hold.
-     * @see    #getInstance
+     * @see    KeyManagers#getManager
      */
     public synchronized KeyProvider<?> getKeyProvider(
             final URI resource,
