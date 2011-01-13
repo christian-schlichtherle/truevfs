@@ -13,30 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.fs.archive.zip.raes;
+package de.schlichtherle.truezip.fs.archive.tar;
 
-import de.schlichtherle.truezip.fs.FsDriverProvider;
+import org.junit.Before;
+import de.schlichtherle.truezip.fs.FsDriver;
+import de.schlichtherle.truezip.fs.FsDriverContainer;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.util.SuffixSet;
-import org.junit.Before;
+import java.util.Map;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+import static de.schlichtherle.truezip.fs.FsDefaultDriverContainer.*;
 import static org.hamcrest.CoreMatchers.*;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class ZipRaesDriverFamilyTest {
+public class TarDriverContainerTest {
 
-    public static final String DRIVER_LIST = "tzp|zip.rae|zip.raes";
+    public static final String DRIVER_LIST = "tar|tar.bz2|tar.gz|tbz2|tgz";
 
-    private FsDriverProvider instance;
+    private FsDriverContainer instance;
 
     @Before
     public void setUp() {
-        instance = new ZipRaesDriverFamily();
+        instance = new TarDriverContainer();
     }
 
     @Test
@@ -48,7 +51,7 @@ public class ZipRaesDriverFamilyTest {
     @Test
     public void testImmutability() {
         try {
-            instance.getDrivers().remove(FsScheme.create("tzp"));
+            instance.getDrivers().remove(FsScheme.create("tar"));
             fail("put");
         } catch (UnsupportedOperationException ex) {
         }

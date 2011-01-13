@@ -23,31 +23,31 @@ import java.util.Map;
 import net.jcip.annotations.Immutable;
 
 /**
- * Provides all file system drivers found on the class path.
+ * Contains all file system drivers found on the class path.
  * Its map of file system drivers is populated by instantiating all classes
  * which are named in the resource files with the name
- * {@code "META-INF/services/de.schlichtherle.truezip.fs.FsDriverProvider"}
+ * {@code "META-INF/services/de.schlichtherle.truezip.fs.FsDriverContainer"}
  * on the class path.
  * Note that all named classes must implement the interface
- * {@link FsDriverProvider} and provide a public available no-arg constructor.
+ * {@link FsDriverContainer} and provide a public available no-arg constructor.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @Immutable
-public final class FsDefaultDriverProvider implements FsDriverProvider {
+public final class FsDefaultDriverContainer implements FsDriverContainer {
 
     /** The singleton instance of this class. */
-    public static final FsDefaultDriverProvider
-            INSTANCE = new FsDefaultDriverProvider();
+    public static final FsDefaultDriverContainer
+            INSTANCE = new FsDefaultDriverContainer();
 
     private final Map<FsScheme, FsDriver> drivers;
 
     /** You cannot instantiate this class. */
-    private FsDefaultDriverProvider() {
-        final Iterator<FsDriverProvider> i
-                = new ServiceLocator(FsDefaultDriverProvider.class.getClassLoader())
-                    .getServices(FsDriverProvider.class);
+    private FsDefaultDriverContainer() {
+        final Iterator<FsDriverContainer> i
+                = new ServiceLocator(FsDefaultDriverContainer.class.getClassLoader())
+                    .getServices(FsDriverContainer.class);
         final Map<FsScheme, FsDriver> drivers = new HashMap<FsScheme, FsDriver>();
         while (i.hasNext())
             drivers.putAll(i.next().getDrivers());

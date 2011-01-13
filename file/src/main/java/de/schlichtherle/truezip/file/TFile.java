@@ -19,7 +19,7 @@ import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.FsManagers;
+import de.schlichtherle.truezip.fs.FsDefaultManagerContainer;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.fs.FsPath;
@@ -900,7 +900,7 @@ public final class TFile extends File {
     public static void sync(BitField<FsSyncOption> options)
     throws FsSyncException {
         FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
-        FsManagers.getManager().sync(options, builder);
+        FsDefaultManagerContainer.INSTANCE.getManager().sync(options, builder);
         builder.check();
     }
 
@@ -934,7 +934,7 @@ public final class TFile extends File {
             throw new IllegalArgumentException(archive.getPath() + " (not a top level federated file system)");
         final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
         new FsFilteringManager(
-                FsManagers.getManager(),
+                FsDefaultManagerContainer.INSTANCE.getManager(),
                 archive .getController()
                         .getModel()
                         .getMountPoint())
@@ -1604,8 +1604,10 @@ public final class TFile extends File {
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
         }
-        return controller
-                = FsManagers.getManager().getController(mountPoint, detector);
+        return controller = FsDefaultManagerContainer
+                .INSTANCE
+                .getManager()
+                .getController(mountPoint, detector);
     }
 
     /**

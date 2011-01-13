@@ -17,9 +17,8 @@ package de.schlichtherle.truezip.sample.file.app;
 
 import de.schlichtherle.truezip.key.passwd.swing.HurlingWindowFeedback;
 import de.schlichtherle.truezip.file.TFile;
-import de.schlichtherle.truezip.fs.FsManagers;
+import de.schlichtherle.truezip.fs.FsManagerContainer;
 import de.schlichtherle.truezip.fs.FsStatistics;
-import de.schlichtherle.truezip.fs.FsStatisticsManager;
 import de.schlichtherle.truezip.key.passwd.swing.InvalidKeyFeedback;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -81,6 +80,7 @@ abstract class CommandLineUtility {
                 : new PrintStream(err, autoFlush);
         this.monitor = new ProgressMonitor(this.err);
         configureFeedback();
+        configureManagerContainer();
     }
 
     /**
@@ -92,6 +92,12 @@ abstract class CommandLineUtility {
     private static void configureFeedback() {
         String spec = InvalidKeyFeedback.class.getName();
         String impl = HurlingWindowFeedback.class.getName();
+        System.setProperty(spec, System.getProperty(spec, impl));
+    }
+
+    private static void configureManagerContainer() {
+        String spec = FsManagerContainer.class.getName();
+        String impl = SampleManagerContainer.class.getName();
         System.setProperty(spec, System.getProperty(spec, impl));
     }
 
@@ -155,12 +161,7 @@ abstract class CommandLineUtility {
             setDaemon(true);
             setPriority(Thread.MAX_PRIORITY);
             this.err = err;
-            // Reset the manager and instrument it in order to obtain statistics.
-            FsManagers.setManager(null);
-            final FsStatisticsManager manager
-                    = new FsStatisticsManager(FsManagers.getManager());
-            this.stats = manager.getStatistics();
-            FsManagers.setManager(manager);
+            this.stats = SampleManagerContainer.manager.getStatistics();
         }
 
         @Override

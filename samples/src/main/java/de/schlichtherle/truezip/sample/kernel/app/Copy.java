@@ -15,9 +15,9 @@
  */
 package de.schlichtherle.truezip.sample.kernel.app;
 
+import de.schlichtherle.truezip.fs.FsDefaultManagerContainer;
 import de.schlichtherle.truezip.fs.FsInputOption;
 import de.schlichtherle.truezip.fs.FsManager;
-import de.schlichtherle.truezip.fs.FsManagers;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.fs.FsUriModifier;
@@ -41,7 +41,7 @@ public class Copy {
     public static void main(String[] args)
     throws IOException, URISyntaxException {
         // Call a manager for file system controller life cycle management.
-        FsManager manager = FsManagers.getManager();
+        FsManager manager = FsDefaultManagerContainer.INSTANCE.getManager();
 
         // Resolve the source socket.
         // Note that we need an absolute URI, but we do not want to be
