@@ -59,9 +59,9 @@ import java.util.TreeSet;
 import javax.swing.Icon;
 import net.jcip.annotations.Immutable;
 
-import static de.schlichtherle.truezip.fs.FsController.*;
 import static de.schlichtherle.truezip.fs.FsEntry.*;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
+import static de.schlichtherle.truezip.fs.FsManager.*;
 import static de.schlichtherle.truezip.fs.FsSyncOption.*;
 import static de.schlichtherle.truezip.fs.FsUriModifier.*;
 import static de.schlichtherle.truezip.entry.Entry.Size.*;
@@ -882,7 +882,7 @@ public final class TFile extends File {
     //
 
     /**
-     * Writes all changes to the contents of all federated file systems
+     * Commits all changes of the contents of all federated file systems
      * (i.e. archive files) to their respective parent file system.
      *
      * @throws TArchiveWarningException if <em>only</em> warning conditions
@@ -897,7 +897,7 @@ public final class TFile extends File {
      * @throws IllegalArgumentException if the combination of options is
      *         illegal.
      */
-    public static void sync(BitField<FsSyncOption> options)
+    private static void sync(BitField<FsSyncOption> options)
     throws FsSyncException {
         FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
         FsDefaultManagerContainer.INSTANCE.getManager().sync(options, builder);
@@ -924,7 +924,7 @@ public final class TFile extends File {
      *         federated file system or the combination of options is illegal.
      * @see    #sync(BitField)
      */
-    public static void sync(
+    private static void sync(
             final TFile archive,
             final BitField<FsSyncOption> options)
     throws FsSyncException {
@@ -1045,112 +1045,6 @@ public final class TFile extends File {
     }
 
     /**
-     * Equivalent to {@code sync(FsController.UPDATE)}.
-     *
-     * @see #sync(BitField)
-     */
-    public static void update()
-    throws FsSyncException {
-        sync(UPDATE);
-    }
-
-    /**
-     * Equivalent to {@code
-        sync(   BitField.noneOf(FsSyncOption.class)
-                .set(FsSyncOption.FORCE_CLOSE_INPUT, closeStreams)
-                .set(FsSyncOption.FORCE_CLOSE_OUTPUT, closeStreams))
-     * }.
-     *
-     * @see #sync(BitField)
-     */
-    public static void update(boolean closeStreams)
-    throws FsSyncException {
-        sync(   BitField.noneOf(FsSyncOption.class)
-                .set(FORCE_CLOSE_INPUT, closeStreams)
-                .set(FORCE_CLOSE_OUTPUT, closeStreams));
-    }
-
-    /**
-     * Equivalent to {@code
-        sync(   BitField.noneOf(FsSyncOption.class)
-                .set(FsSyncOption.WAIT_CLOSE_INPUT, waitForInputStreams)
-                .set(FsSyncOption.FORCE_CLOSE_INPUT, closeInputStreams)
-                .set(FsSyncOption.WAIT_CLOSE_OUTPUT, waitForOutputStreams)
-                .set(FsSyncOption.FORCE_CLOSE_OUTPUT, closeOutputStreams))
-     * }.
-     *
-     * @see #sync(BitField)
-     */
-    public static void update(
-            boolean waitForInputStreams, boolean closeInputStreams,
-            boolean waitForOutputStreams, boolean closeOutputStreams)
-    throws FsSyncException {
-        sync(   BitField.noneOf(FsSyncOption.class)
-                .set(WAIT_CLOSE_INPUT, waitForInputStreams)
-                .set(FORCE_CLOSE_INPUT, closeInputStreams)
-                .set(WAIT_CLOSE_OUTPUT, waitForOutputStreams)
-                .set(FORCE_CLOSE_OUTPUT, closeOutputStreams));
-    }
-
-    /**
-     * Equivalent to {@code
-        sync(   archive,
-                BitField.of(FsSyncOption.FORCE_CLOSE_INPUT,
-     *                      FsSyncOption.FORCE_CLOSE_OUTPUT))
-     * }.
-     *
-     * @see #sync(TFile, BitField)
-     */
-    public static void update(TFile archive)
-    throws FsSyncException {
-        sync(   archive,
-                BitField.of(FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT));
-    }
-
-    /**
-     * Equivalent to {@code
-        sync(   archive,
-                BitField.noneOf(FsSyncOption.class)
-                .set(FsSyncOption.FORCE_CLOSE_INPUT, closeStreams)
-                .set(FsSyncOption.FORCE_CLOSE_OUTPUT, closeStreams))
-     * }.
-     *
-     * @see #sync(TFile, BitField)
-     */
-    public static void update(TFile archive, boolean closeStreams)
-    throws FsSyncException {
-        sync(   archive,
-                BitField.noneOf(FsSyncOption.class)
-                .set(FORCE_CLOSE_INPUT, closeStreams)
-                .set(FORCE_CLOSE_OUTPUT, closeStreams));
-    }
-
-    /**
-     * Equivalent to {@code
-        sync(   archive,
-                BitField.noneOf(FsSyncOption.class)
-                .set(FsSyncOption.WAIT_CLOSE_INPUT, waitForInputStreams)
-                .set(FsSyncOption.FORCE_CLOSE_INPUT, closeInputStreams)
-                .set(FsSyncOption.WAIT_CLOSE_OUTPUT, waitForOutputStreams)
-                .set(FsSyncOption.FORCE_CLOSE_OUTPUT, closeOutputStreams))
-     * }.
-     *
-     * @see #sync(TFile, BitField)
-     */
-    public static void update(
-            TFile archive,
-            boolean waitForInputStreams, boolean closeInputStreams,
-            boolean waitForOutputStreams, boolean closeOutputStreams)
-    throws FsSyncException {
-        sync(   archive,
-                BitField.noneOf(FsSyncOption.class)
-                .set(WAIT_CLOSE_INPUT, waitForInputStreams)
-                .set(FORCE_CLOSE_INPUT, closeInputStreams)
-                .set(WAIT_CLOSE_OUTPUT, waitForOutputStreams)
-                .set(FORCE_CLOSE_OUTPUT, closeOutputStreams));
-    }
-
-    /**
      * Returns the value of the class property {@code lenient}.
      * By default, this is the inverse of the boolean system property
      * {@code de.schlichtherle.truezip.file.strict}.
@@ -1213,14 +1107,14 @@ public final class TFile extends File {
      * <p>
      * Likewise, in TrueZIP an unclosed archive entry stream may result in an
      * {@code ArchiveFileBusy(Warning)?Exception} to be thrown when
-     * {@link #umount} or {@link #update} is called.
+     * {@link #umount} is called.
      * In order to prevent this, TrueZIP's archive entry streams have a
      * {@link Object#finalize()} method which closes an archive entry stream
      * if its garbage collected.
      * <p>
      * Now if this class property is map to {@code false}, then
      * TrueZIP maintains a hard reference to all archive entry streams
-     * until {@link #umount} or {@link #update} is called, which will deal
+     * until {@link #umount} is called, which will deal
      * with them: If they are not closed, an
      * {@code ArchiveFileBusy(Warning)?Exception} is thrown, depending on
      * the boolean parameters to these methods.
@@ -1231,18 +1125,18 @@ public final class TFile extends File {
      * If this class property is map to {@code true} however, then
      * TrueZIP maintains only a weak reference to all archive entry streams.
      * This allows the garbage collector to finalize them before
-     * {@link #umount} or {@link #update} is called.
+     * {@link #umount} is called.
      * The finalize() method will then close these archive entry streams,
      * which exempts them, from triggering an
      * {@code ArchiveBusy(Warning)?Exception} on the next call to
-     * {@link #umount} or {@link #update}.
+     * {@link #umount}.
      * However, closing an archive entry output stream this way may result
      * in loss of buffered data, so it's only a workaround for this issue.
      * <p>
      * Note that for the setting of this class property to take effect, any
      * change must be made before an archive is first accessed.
      * The setting will then persist until the archive is reset by the next
-     * call to {@link #umount} or {@link #update}.
+     * call to {@link #umount}.
      * </li>
      * </ol>
      *

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -92,7 +91,8 @@ public class Streams {
      * thread to fill a FIFO of data buffers which is concurrently flushed by
      * the current thread.
      * The name of this method is inspired by the Unix command line utility
-     * {@code cat}.
+     * {@code cat} because you could use it to con<i>cat</i>enate the contents
+     * of multiple streams.
      *
      * @param  in the input stream.
      * @param  out the output stream.
@@ -144,7 +144,7 @@ public class Streams {
             volatile InputException exception;
 
             @Override
-			public void run() {
+            public void run() {
                 // Cache some data for better performance.
                 final InputStream _in = in;
                 final Buffer[] _buffers = buffers;

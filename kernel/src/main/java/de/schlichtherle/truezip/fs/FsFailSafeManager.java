@@ -21,8 +21,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import net.jcip.annotations.ThreadSafe;
 
-import static de.schlichtherle.truezip.fs.FsController.*;
-
 /**
  * Uses a JVM shutdown hook to call {@link FsManager#sync} on the decorated
  * file system manager when the JVM terminates.
@@ -77,8 +75,8 @@ public final class FsFailSafeManager extends FsDecoratingManager<FsManager> {
      */
     @Override
     public <X extends IOException> void
-    sync(   @NonNull BitField<FsSyncOption> options,
-            @NonNull ExceptionHandler<? super IOException, X> handler)
+    sync(   BitField<FsSyncOption> options,
+            ExceptionHandler<? super IOException, X> handler)
     throws X {
         if (null != this.shutdown) {
             synchronized (this) {

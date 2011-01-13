@@ -15,11 +15,13 @@
  */
 package de.schlichtherle.truezip.sample.kernel.app;
 
-import de.schlichtherle.truezip.fs.FsDefaultManagerContainer;
+import de.schlichtherle.truezip.fs.FsDefaultDriver;
+import de.schlichtherle.truezip.fs.FsFederatingManager;
 import de.schlichtherle.truezip.fs.FsInputOption;
 import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.fs.FsPath;
+import de.schlichtherle.truezip.fs.FsSyncExceptionBuilder;
 import de.schlichtherle.truezip.fs.FsUriModifier;
 import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
@@ -40,17 +42,17 @@ public class Copy {
 
     public static void main(String[] args)
     throws IOException, URISyntaxException {
-        // Call a manager for file system controller life cycle management.
-        FsManager manager = FsDefaultManagerContainer.INSTANCE.getManager();
+        // Obtain a manager for file system controller life cycle management.
+        FsManager manager = new FsFederatingManager();
 
         // Resolve the source socket.
         // Note that we need an absolute URI, but we do not want to be
-        // restricted to the "file" scheme, so we try and check first.
+        // restricted to the "file" scheme, so we check args[0] first.
         URI srcUri = new URI(args[0]);
         srcUri = srcUri.isAbsolute() ? srcUri : new File(args[0]).toURI();
         FsPath srcPath = new FsPath(srcUri, FsUriModifier.CANONICALIZE);
         InputSocket<?> srcSocket = manager
-                .getController(     srcPath.getMountPoint())
+                .getController(     srcPath.getMountPoint(), FsDefaultDriver.ALL)
                 .getInputSocket(    srcPath.getEntryName(),
                                     BitField.noneOf(FsInputOption.class));
 
@@ -59,13 +61,16 @@ public class Copy {
         dstUri = dstUri.isAbsolute() ? dstUri : new File(args[1]).toURI();
         FsPath dstPath = new FsPath(dstUri, FsUriModifier.CANONICALIZE);
         OutputSocket<?> dstSocket = manager
-                .getController(     dstPath.getMountPoint())
+                .getController(     dstPath.getMountPoint(), FsDefaultDriver.ALL)
                 .getOutputSocket(   dstPath.getEntryName(),
                                     BitField.of(FsOutputOption.CREATE_PARENTS,
                                                 FsOutputOption.EXCLUSIVE),
-                                    null);
+                                    srcSocket.getLocalTarget());
 
         // Copy the data.
         IOSocket.copy(srcSocket, dstSocket);
+
+        // Commit all changes to federated file systems, if any were accessed.
+        manager.umount();
     }
 }

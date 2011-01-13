@@ -39,15 +39,6 @@ public abstract class FsManager
 implements Iterable<FsController<?>> {
 
     /**
-     * Equivalent to
-     * {@link #getController(FsMountPoint, FsFederatingDriver) getController(mountPoint, FsDefaultDriver.ALL)}.
-     */
-    public final @NonNull FsController<?>
-    getController(@NonNull FsMountPoint mountPoint) {
-        return getController(mountPoint, FsDefaultDriver.ALL);
-    }
-
-    /**
      * Returns a thread-safe file system controller for the given mount point.
      * If and only if the given mount point addresses a federated file system,
      * the returned file system controller is remembered for life cycle
@@ -85,8 +76,35 @@ implements Iterable<FsController<?>> {
     iterator();
 
     /**
-     * Writes all changes to the contents of the federated file systems managed
-     * by this instance to their respective parent file system.
+     * Commits all changes of the contents of the federated file systems
+     * managed by this instance to their respective parent file system.
+     * This will reset the state of the respective file system controllers.
+     * <p>
+     * This method calls {@link #sync sync(UMOUNT, builder)}, where builder is
+     * an instance of {@link FsSyncExceptionBuilder}.
+     * If the call succeeds, the builder's {@link FsSyncExceptionBuilder#check}
+     * method is called to check out any {@link FsSyncWarningException}, too.
+     *
+     * @throws FsSyncException if committing the changes fails for any reason.
+     */
+    public final void umount() throws FsSyncException {
+        FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
+        sync(UMOUNT, builder);
+        builder.check(); // check out any warning exceptions, too.
+    }
+
+    /**
+     * Equivalent to
+     * {@code BitField.of(FsSyncOption.FORCE_CLOSE_INPUT, FsSyncOption.FORCE_CLOSE_OUTPUT, FsSyncOption.CLEAR_CACHE)}.
+     */
+    public static final BitField<FsSyncOption>
+            UMOUNT = BitField.of(   FORCE_CLOSE_INPUT,
+                                    FORCE_CLOSE_OUTPUT,
+                                    CLEAR_CACHE);
+
+    /**
+     * Commits all changes of the contents of the federated file systems
+     * managed by this instance to their respective parent file system.
      * This will reset the state of the respective file system controllers.
      *
      * @param  options the synchronization options.
@@ -148,8 +166,7 @@ implements Iterable<FsController<?>> {
      * @see #visit(Visitor, ExceptionHandler)
      */
     private interface Visitor {
-        void visit(@NonNull FsController<?> controller)
-        throws IOException;
+        void visit(@NonNull FsController<?> controller) throws IOException;
     }
 
     /**
@@ -157,8 +174,8 @@ implements Iterable<FsController<?>> {
      * identical. This can't get overriden.
      */
     @SuppressWarnings(value = "EqualsWhichDoesntCheckParameterClass")
-    @Override public final boolean
-    equals(Object that) {
+    @Override
+    public final boolean equals(Object that) {
         return this == that;
     }
 
@@ -166,8 +183,8 @@ implements Iterable<FsController<?>> {
      * Returns a hash code which is consistent with {@link #equals}.
      * This can't get overriden.
      */
-    @Override public final int
-    hashCode() {
+    @Override
+    public final int hashCode() {
         return super.hashCode();
     }
 }

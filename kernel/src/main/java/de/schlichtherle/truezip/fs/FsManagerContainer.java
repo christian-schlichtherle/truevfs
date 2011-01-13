@@ -19,9 +19,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 
 /**
- * A container for a {@link FsManager file system manager}.
- * <p>
- * Implementations must be thread-safe.
+ * A container for a file system manager.
  *
  * @author Christian Schlichtherle
  * @version $Id: FsManagers$
@@ -30,8 +28,12 @@ public abstract class FsManagerContainer {
 
     /**
      * Returns the file system manager.
-     * Calling this method multiple times will return the same file system
-     * manager.
+     * <p>
+     * Calling this method multiple times must return the same file system
+     * manager in order to ensure consistency of the federated virtual file
+     * system space.
+     * <p>
+     * This method must be safe for multithreading.
      *
      * @return The file system manager.
      */

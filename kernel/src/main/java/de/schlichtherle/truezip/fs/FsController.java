@@ -113,8 +113,13 @@ public abstract class FsController<M extends FsModel> {
     /**
      * Returns an output socket for writing the contents of the entry addressed
      * by the given name to the file system.
+     * If {@code template} is not {@code null}, then the output entry shall
+     * have as many of its properties copied as reasonable, e.g. the last
+     * modification time.
      *
      * @param  name a file system entry name.
+     * @param  template a nullable template for the properties of the output
+     *         entry.
      * @return An {@code OutputSocket}.
      */
     public abstract OutputSocket<?>
@@ -182,18 +187,6 @@ public abstract class FsController<M extends FsModel> {
     sync(   BitField<FsSyncOption> options,
             ExceptionHandler<? super FsSyncException, X> handler)
     throws X, FsException;
-
-    /**
-     * Equivalent to
-     * {@code BitField.of(FsSyncOption.FORCE_CLOSE_INPUT, FsSyncOption.FORCE_CLOSE_OUTPUT)}.
-     */
-    public static final BitField<FsSyncOption> UPDATE
-            = BitField.of(FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT);
-
-    /**
-     * Equivalent to {@code UPDATE.set(FsSyncOption.CLEAR_CACHE)}.
-     */
-    public static final BitField<FsSyncOption> UMOUNT = UPDATE.set(CLEAR_CACHE);
 
     /**
      * Two file system controllers are considered equal if and only if they

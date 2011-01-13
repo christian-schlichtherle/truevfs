@@ -28,13 +28,13 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-final class FsDefaultDriver implements FsFederatingDriver {
+public final class FsDefaultDriver implements FsFederatingDriver {
 
     /**
      * Equivalent to
      * {@code new FsDefaultDriver(FsDefaultDriverContainer.INSTANCE)}.
      */
-    static final FsDefaultDriver
+    public static final FsDefaultDriver
             ALL = new FsDefaultDriver(FsDefaultDriverContainer.INSTANCE);
 
     private final Map<FsScheme, ? extends FsDriver> drivers;

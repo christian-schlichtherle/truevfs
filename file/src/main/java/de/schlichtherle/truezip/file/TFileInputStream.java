@@ -78,6 +78,7 @@ import net.jcip.annotations.Immutable;
  * and require less space in the temp file folder.
  *
  * @see     <a href="package-summary.html#streams">Using Archive Entry Streams</a>
+ * @see     TFile#cat
  * @see     TFileOutputStream
  * @author  Christian Schlichtherle
  * @version $Id$

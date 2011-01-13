@@ -24,32 +24,32 @@ import net.jcip.annotations.Immutable;
  * <p>
  * The I/O pool provider is located by instantiating one of the classes
  * which are named in the resource files with the name
- * {@code "META-INF/services/de.schlichtherle.truezip.socket.IOPoolProvider"}
+ * {@code "META-INF/services/de.schlichtherle.truezip.socket.IOPoolContainer"}
  * on the class path.
  * Note that all named classes must implement the interface
- * {@link IOPoolProvider} and provide a public available no-arg constructor.
+ * {@link IOPoolContainer} and provide a public available no-arg constructor.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
 @Immutable
-public class DefaultIOPoolProvider implements IOPoolProvider {
+public class DefaultIOPoolContainer implements IOPoolContainer {
 
-    public static final DefaultIOPoolProvider
-            INSTANCE = new DefaultIOPoolProvider();
+    public static final DefaultIOPoolContainer
+            INSTANCE = new DefaultIOPoolContainer();
 
-    private final IOPoolProvider provider;
+    private final IOPoolContainer container;
 
     /** You cannot instantiate this class. */
-    private DefaultIOPoolProvider() {
-        provider = new ServiceLocator(
-                    DefaultIOPoolProvider.class.getClassLoader())
-                .getServices(IOPoolProvider.class)
+    private DefaultIOPoolContainer() {
+        container = new ServiceLocator(
+                    DefaultIOPoolContainer.class.getClassLoader())
+                .getServices(IOPoolContainer.class)
                 .next();
     }
 
     @Override
     public IOPool<?> getPool() {
-        return provider.getPool();
+        return container.getPool();
     }
 }

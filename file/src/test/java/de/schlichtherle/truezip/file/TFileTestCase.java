@@ -516,7 +516,7 @@ public abstract class TFileTestCase {
 
         // Test open output streams.
         assertTrue(file1.createNewFile());
-        TFile.update(); // ensure file1 is really present in the archive file
+        TFile.umount(); // ensure file1 is really present in the archive file
         assertTrue(file2.createNewFile());
         TFileInputStream fis1 = new TFileInputStream(file1);
         try {
@@ -528,7 +528,7 @@ public abstract class TFileTestCase {
 
         // fis1 is still open!
         try {
-            TFile.update(); // forces closing of fisA
+            TFile.umount(); // forces closing of fisA
             fail("ArchiveFileBusyWarningException expected!");
         } catch (FsSyncWarningException ex) {
             // Warning about fisA still being used.
@@ -581,7 +581,7 @@ public abstract class TFileTestCase {
         TFile.cat(new ByteArrayInputStream(data), fos1);
         fos1.close();
         
-        TFile.update(); // ensure two entries in the archive
+        TFile.umount(); // ensure two entries in the archive
         
         fos1 = new TFileOutputStream(file1);
         TFile.cat(new ByteArrayInputStream(data), fos1);
@@ -603,7 +603,7 @@ public abstract class TFileTestCase {
         TFile.cat(new ByteArrayInputStream(data), fos1); // write again
         
         try {
-            TFile.update(); // forces closing of all streams
+            TFile.umount(); // forces closing of all streams
             fail("Output stream should have been forced to close!");
         } catch (FsSyncWarningException ex) {
             if (!(ex.getCause() instanceof FileBusyException))
@@ -628,7 +628,7 @@ public abstract class TFileTestCase {
         // This update should complete without any exception if the garbage
         // collector did his job.
         try {
-            TFile.update();
+            TFile.umount();
         } catch (FsSyncWarningException ex) {
             fail("The garbage collector hasn't been collecting an open stream. If this is only happening occasionally, you can safely ignore it.");
         }
@@ -1393,7 +1393,7 @@ public abstract class TFileTestCase {
                         out.close();
                     }
                     try {
-                        TFile.update(wait, false, wait, false);
+                        TFile.umount(wait, false, wait, false);
                     } catch (FsSyncException ex) {
                         if (!(ex.getCause() instanceof FileBusyException))
                             throw ex;
@@ -1469,9 +1469,9 @@ public abstract class TFileTestCase {
                         }
                         try {
                             if (updateIndividually)
-                                TFile.update(archive);
+                                TFile.umount(archive);
                             else
-                                TFile.update(false);
+                                TFile.umount(false);
                         } catch (FsSyncException ex) {
                             if (!(ex.getCause() instanceof FileBusyException))
                                 throw ex;

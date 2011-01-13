@@ -30,10 +30,8 @@ import net.jcip.annotations.Immutable;
  * <a href="package-summary.html#atomicity">virtually atomic</a>.
  *
  * @see     <a href="package-summary.html#streams">Using Archive Entry Streams</a>
- * @see     TFile#cat
- * @see     TFile#umount
- * @see     TFile#update
  * @see     TFile#setLenient
+ * @see     TFileReader
  * @author  Christian Schlichtherle
  * @version $Id$
  */
