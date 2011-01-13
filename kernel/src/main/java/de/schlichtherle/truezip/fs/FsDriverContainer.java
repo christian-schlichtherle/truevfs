@@ -21,7 +21,7 @@ import java.util.ServiceLoader;
 import net.jcip.annotations.Immutable;
 
 /**
- * An immutable container of file system drivers.
+ * A container for a map of file system schemes and drivers.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -32,8 +32,14 @@ public interface FsDriverContainer {
      * Returns an immutable map of the supported file system drivers.
      * While the key of the returned map need not be {@code null},
      * its values must be nullable.
+     * <p>
+     * Calling this method multiple times should return the same map in order
+     * to ensure a consistent file system implementation scheme.
+     * <p>
+     * This method must be safe for multithreading.
      *
-     * @return An immutable map of the supported file system drivers.
+     * @return An immutable map of the supported file system schemes and
+     *         drivers.
      */
     @NonNull Map<FsScheme, ? extends FsDriver> getDrivers();
 }

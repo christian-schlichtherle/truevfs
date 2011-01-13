@@ -184,7 +184,7 @@
         <p>Archive file unmounting is performed semi-automatic:</p>
         <ul>
             <li><i>Explicit unmounting</i> happens when the client application calls {@link
-	de.schlichtherle.truezip.file.TFile#umount} or {@link de.schlichtherle.truezip.file.TFile#update}.</li>
+	de.schlichtherle.truezip.file.TFile#umount}.</li>
             <li><i>Implicit unmounting</i> happens when the JVM terminates (by a JVM shutdown
 	hook) or when the client application modifies an archive entry more than once. 
 	The latter case is also called <i>implicit remounting</i>, because the VFS is 
@@ -259,8 +259,8 @@
             the extension class path.</p>
         <p>If the prerequisites for these recommendations don&#39;t apply or if the recommendations
             can&#39;t be followed, the client application may call {@link de.schlichtherle.truezip.file.TFile#umount}
-            ({@link de.schlichtherle.truezip.file.TFile#update} will <i>not</i> work) to perform an explicit
-            unmount. This clears all state information so that the third party can then safely
+            to perform an explicit unmount.
+            This clears all state information so that the third party can then safely
             access any archive file. In addition, the client application must make sure not
             to access the same archive file or any of its entries in any way while the third
             party is still accessing it.</p>

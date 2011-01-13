@@ -190,7 +190,7 @@ abstract class CommandLineUtility {
 
         /**
          * Prints statistics about the amount of data read and written by
-         * {@link TFile#update()} or {@link TFile#umount()} on standard output.
+         * {@link TFile#umount()} on standard output.
          */
         private void showProgress() {
             // Round up to kilobytes.

@@ -89,12 +89,12 @@ extends FsDecoratingManager<FsManager> {
      * object to be returned by a subsequent call to {@link #getStatistics}.
      */
     @Override
-    public <E extends IOException>
-    void sync(  BitField<FsSyncOption> options,
-                ExceptionHandler<? super IOException, E> handler)
-    throws E {
+    public <X extends IOException> void
+    sync(   BitField<FsSyncOption> options,
+            ExceptionHandler<? super IOException, X> handler)
+    throws X {
         try {
-            super.sync(options, handler);
+            delegate.sync(options, handler);
         } finally {
             statistics = new FsStatistics(this);
         }

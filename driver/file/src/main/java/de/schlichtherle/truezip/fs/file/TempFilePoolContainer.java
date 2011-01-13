@@ -13,24 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.socket;
+package de.schlichtherle.truezip.fs.file;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
+import de.schlichtherle.truezip.socket.IOPool;
+import de.schlichtherle.truezip.socket.IOPoolContainer;
+import net.jcip.annotations.Immutable;
 
 /**
- * A provider for I/O pools.
- * <p>
- * Implementations must be immutable.
+ * Contains a {@link TempFilePool}.
  *
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface IOPoolProvider {
+@Immutable
+public class TempFilePoolContainer implements IOPoolContainer {
 
-    /**
-     * Returns an I/O pool.
-     *
-     * @return An I/O pool.
-     */
-    @NonNull IOPool<?> getPool();
+    @Override
+    public IOPool<?> getPool() {
+        return TempFilePool.INSTANCE;
+    }
 }
