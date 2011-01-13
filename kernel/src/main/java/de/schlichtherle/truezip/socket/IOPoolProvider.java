@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Schlichtherle IT Services
+ * Copyright (C) 2011 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,29 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.fs;
+package de.schlichtherle.truezip.socket;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
-import java.util.Map;
-import java.util.ServiceLoader;
 import net.jcip.annotations.Immutable;
 
 /**
- * A provider for file system drivers.
- * <p>
- * Implementations must be immutable.
+ * An immutable provider for I/O pools.
  *
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface FsDriverProvider {
+@Immutable
+public interface IOPoolProvider {
 
     /**
-     * Returns an immutable map of the supported file system drivers.
-     * While the key of the returned map need not be {@code null},
-     * its values must be nullable.
+     * Returns an I/O pool.
      *
-     * @return An immutable map of the supported file system drivers.
+     * @return An I/O pool.
      */
-    @NonNull Map<FsScheme, ? extends FsDriver> getDrivers();
+    @NonNull IOPool<?> getPool();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Schlichtherle IT Services
+ * Copyright (C) 2011 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,28 +15,21 @@
  */
 package de.schlichtherle.truezip.fs.file;
 
-import de.schlichtherle.truezip.fs.FsDriver;
-import de.schlichtherle.truezip.fs.FsDriverProvider;
-import de.schlichtherle.truezip.fs.FsScheme;
-import java.util.Collections;
-import java.util.Map;
+import de.schlichtherle.truezip.socket.IOPool;
+import de.schlichtherle.truezip.socket.IOPoolProvider;
 import net.jcip.annotations.Immutable;
 
 /**
- * A provider for a driver for the {@code file} scheme.
+ * Provides a {@link TempFilePool}.
  *
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  * @version $Id$
  */
 @Immutable
-public final class FileDriverProvider implements FsDriverProvider {
-
-    private static final Map<FsScheme, FileDriver>
-    DRIVERS = Collections.singletonMap( FsScheme.create("file"),
-                                        new FileDriver());
+public class TempFilePoolProvider implements IOPoolProvider {
 
     @Override
-    public Map<FsScheme, ? extends FsDriver> getDrivers() {
-        return DRIVERS;
+    public IOPool<?> getPool() {
+        return TempFilePool.INSTANCE;
     }
 }

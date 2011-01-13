@@ -28,7 +28,7 @@ import net.jcip.annotations.Immutable;
  * which are named in the resource files with the name
  * {@code "META-INF/services/de.schlichtherle.truezip.fs.FsDriverProvider"}
  * on the class path.
- * Note that the named classes must implement the interface
+ * Note that all named classes must implement the interface
  * {@link FsDriverProvider} and provide a public available no-arg constructor.
  *
  * @author  Christian Schlichtherle
@@ -43,6 +43,7 @@ public final class FsClassPathDriverProvider implements FsDriverProvider {
 
     private final Map<FsScheme, FsDriver> drivers;
 
+    /** You cannot instantiate this class. */
     private FsClassPathDriverProvider() {
         final Iterator<FsDriverProvider> i
                 = new ServiceLocator(FsClassPathDriverProvider.class.getClassLoader())

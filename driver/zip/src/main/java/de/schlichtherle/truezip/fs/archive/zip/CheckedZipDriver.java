@@ -20,6 +20,7 @@ import de.schlichtherle.truezip.fs.FsConcurrentModel;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import net.jcip.annotations.Immutable;
 
 import static java.util.zip.Deflater.BEST_COMPRESSION;
 
@@ -36,13 +37,12 @@ import static java.util.zip.Deflater.BEST_COMPRESSION;
  * Other than this, the archive entry will be processed normally.
  * So if just the CRC-32 value for the entry in the archive file has been
  * modified, you can still read its entire contents.
- * <p>
- * Instances of this class are immutable.
  * 
  * @author Christian Schlichtherle
  * @version $Id$
  * @see CheckedZipInputShop
  */
+@Immutable
 public class CheckedZipDriver extends ZipDriver {
     private static final long serialVersionUID = -4645615422084918979L;
 

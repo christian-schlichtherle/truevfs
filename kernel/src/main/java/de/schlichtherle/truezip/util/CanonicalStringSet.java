@@ -27,7 +27,7 @@ import java.util.TreeMap;
 /**
  * A set of the canonical string representation of objects in natural sort
  * order.
- * An object is canonicalized by the function {@link Canonicalizer#toString}.
+ * An object is canonicalized by the function {@link Canonicalizer#map}.
  * <p>
  * Canonical string sets can be converted from and to string lists by using
  * {@link #addAll(String)} and {@link #toString()}.
@@ -54,20 +54,19 @@ import java.util.TreeMap;
 public class CanonicalStringSet extends AbstractSet<String> {
 
     /** Maps an object to its canonical string representation. */
-    public interface Canonicalizer {
+    public interface Canonicalizer extends IdemPotence<String> {
+
         /**
          * Returns the canonical string representation of {@code o} or
          * {@code null} if the canonical string representation is undefined.
-         * As the name implies, this is expected to be an idempotent function,
-         * i.e. it has no side effects and calling it again on its result
-         * yields a result which at least compares {@link Object#equals equal}.
          *
          * @param  o The Object to map to its canonical string representation.
          * @return The canonical string representation of {@code o} or
          *         {@code null} if the canonical string representation is
          *         undefined.
          */
-        @CheckForNull String toString(@NonNull Object o);
+        @Override
+        @CheckForNull String map(@NonNull Object o);
     } // interface Canonicalizer
 
     private final Canonicalizer canonicalizer;
@@ -95,7 +94,7 @@ public class CanonicalStringSet extends AbstractSet<String> {
      * canonical strings.
      *
      * @param separator The separator character to use in string lists.
-     * @param set A set of canonical strings to toString and add to this set.
+     * @param set A set of canonical strings to map and add to this set.
      */
     public CanonicalStringSet(  final @NonNull Canonicalizer mapper,
                                 final char separator,
@@ -259,7 +258,7 @@ public class CanonicalStringSet extends AbstractSet<String> {
         boolean changed = false;
         for (final Iterator<String> i = new StringIterator(list); i.hasNext(); ) {
             final String element = i.next();
-            final String canonical = canonicalizer.toString(element);
+            final String canonical = canonicalizer.map(element);
             if (null != canonical)
                 changed |= null == map.put(canonical, element);
         }
@@ -377,7 +376,7 @@ public class CanonicalStringSet extends AbstractSet<String> {
 
         private void advance() {
             while (i.hasNext()) {
-                canonical = canonicalizer.toString(i.next());
+                canonical = canonicalizer.map(i.next());
                 if (null != canonical)
                     return;
             }

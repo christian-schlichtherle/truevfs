@@ -29,6 +29,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import net.jcip.annotations.ThreadSafe;
 
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import static de.schlichtherle.truezip.entry.Entry.Access.*;
@@ -39,6 +40,7 @@ import static de.schlichtherle.truezip.entry.Entry.*;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 final class FileOutputSocket extends OutputSocket<FileEntry> {
 
     private static final String FILE_POOL_PREFIX = ".tzp";

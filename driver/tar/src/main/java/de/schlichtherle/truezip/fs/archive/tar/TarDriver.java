@@ -29,20 +29,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import net.jcip.annotations.Immutable;
 
 import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
 import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 
 /**
  * An archive driver which builds TAR files.
- * <p>
- * Instances of this class are immutable.
  * 
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class TarDriver
-extends CharsetArchiveDriver<TarArchiveEntry> {
+@Immutable
+public class TarDriver extends CharsetArchiveDriver<TarArchiveEntry> {
 
     private static final long serialVersionUID = 6622746562629104174L;
 

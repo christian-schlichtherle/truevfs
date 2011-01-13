@@ -145,9 +145,11 @@ public class RaesFiles {
      * and does not actually operate on the file system.
      */
     private static TFile newNonArchiveFile(
-            final String path,
-            final TArchiveDetector detector) {
-        final TFile file = new TFile(path, detector);
-        return new TFile(file.getParentFile(), file.getName(), TDefaultArchiveDetector.NULL);
+            String path,
+            TArchiveDetector detector) {
+        TFile file = new TFile(path, detector);
+        TFile parent = file.getParentFile();
+        assert null != parent : "expected non-null from context!";
+        return new TFile(parent, file.getName(), TDefaultArchiveDetector.NULL);
     }
 }

@@ -2147,7 +2147,7 @@ public final class TFile extends File {
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      */
     @Override
-    public @CheckForNull String[] list() {
+    public @Nullable String[] list() {
         if (null != innerArchive) {
             final FsEntry entry;
             try {
@@ -2177,8 +2177,7 @@ public final class TFile extends File {
      *         a valid (but maybe empty) array otherwise.
      */
     @Override
-    public @CheckForNull String[] list(
-            final @CheckForNull FilenameFilter filter) {
+    public @Nullable String[] list(final @CheckForNull FilenameFilter filter) {
         if (null != innerArchive) {
             final FsEntry entry;
             try {
@@ -2208,7 +2207,7 @@ public final class TFile extends File {
      * listFiles((FilenameFilter) null, getArchiveDetector())}.
      */
     @Override
-    public @CheckForNull TFile[] listFiles() {
+    public @Nullable TFile[] listFiles() {
         return listFiles((FilenameFilter) null, detector);
     }
 
@@ -2227,7 +2226,7 @@ public final class TFile extends File {
      * @return {@code null} if this is not a directory or an archive file,
      *         a valid (but maybe empty) array otherwise.
      */
-    public @CheckForNull TFile[] listFiles(TArchiveDetector detector) {
+    public @Nullable TFile[] listFiles(TArchiveDetector detector) {
         return listFiles((FilenameFilter) null, detector);
     }
 
@@ -2236,7 +2235,7 @@ public final class TFile extends File {
      * listFiles(filenameFilter, getArchiveDetector())}.
      */
     @Override
-    public @CheckForNull TFile[] listFiles(
+    public @Nullable TFile[] listFiles(
             @CheckForNull FilenameFilter filenameFilter) {
         return listFiles(filenameFilter, detector);
     }
@@ -2257,7 +2256,7 @@ public final class TFile extends File {
      * @return {@code null} if this is not a directory or an archive file,
      *         a valid (but maybe empty) array otherwise.
      */
-    public @CheckForNull TFile[] listFiles(
+    public @Nullable TFile[] listFiles(
             final @CheckForNull FilenameFilter filter,
             final TArchiveDetector detector) {
         if (null != innerArchive) {
@@ -2282,7 +2281,7 @@ public final class TFile extends File {
         return convert(delegate.listFiles(filter), detector);
     }
 
-    private static @CheckForNull TFile[] convert(
+    private static @Nullable TFile[] convert(
             final File[] files,
             final TArchiveDetector detector) {
         if (null == files)
@@ -2298,7 +2297,7 @@ public final class TFile extends File {
      * listFiles(fileFilter, getArchiveDetector())}.
      */
     @Override
-    public @CheckForNull TFile[] listFiles(@CheckForNull FileFilter fileFilter) {
+    public @Nullable TFile[] listFiles(@CheckForNull FileFilter fileFilter) {
         return listFiles(fileFilter, detector);
     }
 
@@ -2317,7 +2316,7 @@ public final class TFile extends File {
      * @return {@code null} if this is not a directory or an archive file,
      *         a valid (but maybe empty) array otherwise.
      */
-    public @CheckForNull TFile[] listFiles(
+    public @Nullable TFile[] listFiles(
             final @CheckForNull FileFilter filter,
             final TArchiveDetector detector) {
         if (null != innerArchive) {
@@ -2344,7 +2343,7 @@ public final class TFile extends File {
         return delegateListFiles(filter, detector);
     }
 
-    private @CheckForNull TFile[] delegateListFiles(
+    private @Nullable TFile[] delegateListFiles(
             final @CheckForNull FileFilter filter,
             final TArchiveDetector detector) {
         // When filtering, we want to pass in {@code de.schlichtherle.truezip.io.TFile}

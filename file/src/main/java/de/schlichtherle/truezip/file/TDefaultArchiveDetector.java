@@ -26,6 +26,7 @@ import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.util.ServiceLocator;
 import de.schlichtherle.truezip.util.regex.ThreadLocalMatcher;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Collections;
 import java.util.HashMap;
@@ -73,6 +74,7 @@ import net.jcip.annotations.Immutable;
  * @see TDefaultArchiveDetector#ALL
  */
 @Immutable
+@DefaultAnnotation(NonNull.class)
 public final class TDefaultArchiveDetector implements TArchiveDetector {
 
     private static final ServiceLocator serviceLocator
@@ -97,7 +99,7 @@ public final class TDefaultArchiveDetector implements TArchiveDetector {
     public static final TDefaultArchiveDetector
             ALL = new TDefaultArchiveDetector();
 
-    private final @NonNull Map<FsScheme, ? extends FsDriver> drivers;
+    private final Map<FsScheme, ? extends FsDriver> drivers;
 
     /**
      * The canonical string respresentation of the set of suffixes recognized
@@ -105,13 +107,13 @@ public final class TDefaultArchiveDetector implements TArchiveDetector {
      * This set is used to filter the registered archive file suffixes in
      * {@link #drivers}.
      */
-    private final @NonNull String suffixes;
+    private final String suffixes;
 
     /**
      * The thread local matcher used to match archive file suffixes.
      * This field should be considered final.
      */
-    private final @NonNull ThreadLocalMatcher matcher;
+    private final ThreadLocalMatcher matcher;
 
     public TDefaultArchiveDetector() {
         this.drivers = FsClassPathDriverProvider.INSTANCE.getDrivers();
@@ -120,7 +122,8 @@ public final class TDefaultArchiveDetector implements TArchiveDetector {
         this.matcher = new ThreadLocalMatcher(set.toPattern());
     }
 
-    private static @NonNull SuffixSet getSuffixes(final Map<FsScheme, ? extends FsDriver> map) {
+    private static SuffixSet getSuffixes(
+            final Map<FsScheme, ? extends FsDriver> map) {
         SuffixSet set = new SuffixSet();
         for (Map.Entry<FsScheme, ? extends FsDriver> entry : map.entrySet())
             if (null != entry.getValue())
@@ -139,7 +142,7 @@ public final class TDefaultArchiveDetector implements TArchiveDetector {
      *         list names a suffix for which no file system driver is
      *         configured in the global map.
      */
-    public TDefaultArchiveDetector(final @NonNull String suffixes) {
+    public TDefaultArchiveDetector(final String suffixes) {
         this.drivers = FsClassPathDriverProvider.INSTANCE.getDrivers();
         final SuffixSet set = new SuffixSet(suffixes);
         final SuffixSet all = getSuffixes(drivers);
@@ -157,7 +160,7 @@ public final class TDefaultArchiveDetector implements TArchiveDetector {
      * {@link #TDefaultArchiveDetector(TDefaultArchiveDetector, String, FsDriver)
      * TDefaultArchiveDetector(TDefaultArchiveDetector.NULL, suffixes, driver)}.
      */
-    public TDefaultArchiveDetector(  @NonNull String suffixes,
+    public TDefaultArchiveDetector(  String suffixes,
                                     @CheckForNull FsDriver driver) {
         this(NULL, suffixes, driver);
     }
@@ -184,8 +187,8 @@ public final class TDefaultArchiveDetector implements TArchiveDetector {
      *         does not hold or an illegal keyword is found in the
      *         suffix list.
      */
-    public TDefaultArchiveDetector(  @NonNull TDefaultArchiveDetector delegate,
-                                    @NonNull String suffixes,
+    public TDefaultArchiveDetector(  TDefaultArchiveDetector delegate,
+                                    String suffixes,
                                     @CheckForNull FsDriver driver) {
         this(delegate, new Object[] { suffixes, driver });
     }
@@ -217,12 +220,12 @@ public final class TDefaultArchiveDetector implements TArchiveDetector {
      * @see    SuffixSet Syntax definition for suffix lists.
      */
     public TDefaultArchiveDetector(
-            @NonNull TDefaultArchiveDetector delegate,
-            @NonNull Object[] config) {
+            TDefaultArchiveDetector delegate,
+            Object[] config) {
         this(delegate, toMap(config));
     }
 
-    private static @NonNull Map<String, Object> toMap(final @NonNull Object[] config) {
+    private static Map<String, Object> toMap(final Object[] config) {
         final Map<String, Object> map
                 = new LinkedHashMap<String, Object>((int) (config.length / .75f) + 1); // order may be important!
         for (int i = 0, l = config.length; i < l; i++)
@@ -256,8 +259,8 @@ public final class TDefaultArchiveDetector implements TArchiveDetector {
      * @see SuffixSet Syntax definition for suffix lists.
      */
     public TDefaultArchiveDetector(
-            final @NonNull TDefaultArchiveDetector delegate,
-            final @NonNull Map<String, Object> config) {
+            final TDefaultArchiveDetector delegate,
+            final Map<String, Object> config) {
         final Map<FsScheme, FsDriver> drivers
                 = new HashMap<FsScheme, FsDriver>(delegate.drivers);
         final SuffixSet set = new SuffixSet(delegate.suffixes);
@@ -296,7 +299,7 @@ public final class TDefaultArchiveDetector implements TArchiveDetector {
     }
 
     @Override
-    public FsScheme getScheme(final String path) {
+    public @CheckForNull FsScheme getScheme(final String path) {
         final Matcher m = matcher.reset(path);
         return m.matches()
                 ? FsScheme.create(m.group(1).toLowerCase(Locale.ENGLISH))
@@ -304,13 +307,14 @@ public final class TDefaultArchiveDetector implements TArchiveDetector {
     }
 
     /** For unit testing only. */
-    FsDriver getDriver(FsScheme scheme) {
+    @CheckForNull FsDriver getDriver(FsScheme scheme) {
         return drivers.get(scheme);
     }
 
     @Override
     public FsController<?>
-    newController(final FsMountPoint mountPoint, final FsController<?> parent) {
+    newController(  final FsMountPoint mountPoint,
+                    final @CheckForNull FsController<?> parent) {
         assert null == mountPoint.getParent()
                 ? null == parent
                 : mountPoint.getParent().equals(parent.getModel().getMountPoint());

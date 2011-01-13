@@ -22,12 +22,14 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * @see     FileOutputSocket
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 final class FileInputSocket extends InputSocket<FileEntry> {
 
     private final @NonNull FileEntry entry;

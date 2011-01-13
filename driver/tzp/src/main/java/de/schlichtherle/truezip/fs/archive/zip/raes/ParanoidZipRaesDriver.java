@@ -30,6 +30,7 @@ import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.socket.LazyOutputSocket;
 import java.io.IOException;
 import java.io.OutputStream;
+import net.jcip.annotations.Immutable;
 
 import static java.util.zip.Deflater.BEST_COMPRESSION;
 
@@ -45,14 +46,13 @@ import static java.util.zip.Deflater.BEST_COMPRESSION;
  * <p>
  * In addition, this driver limits the number of concurrent entry output
  * streams to one, so that writing unencrypted temporary files is inhibited.
- * <p>
- * Instances of this class are immutable.
  * 
  * @author Christian Schlichtherle
  * @version $Id$
  * @see SafeZipRaesDriver
  */
-public class ParanoidZipRaesDriver extends AbstractZipRaesDriver {
+@Immutable
+public final class ParanoidZipRaesDriver extends AbstractZipRaesDriver {
 
     private static final long serialVersionUID = 6373537182537867796L;
 

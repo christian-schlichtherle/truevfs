@@ -22,6 +22,7 @@ import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import java.io.IOException;
+import net.jcip.annotations.Immutable;
 
 import static java.util.zip.Deflater.BEST_COMPRESSION;
 
@@ -42,13 +43,12 @@ import static java.util.zip.Deflater.BEST_COMPRESSION;
  * When using this driver to create or modify an ODF file, then in order to
  * achieve best performance, the <i>mimetype</i> entry should be created or
  * modified first in order to avoid temp file buffering of any other entries.
- * <p>
- * Instances of this class are immutable.
  *
  * @see OdfOutputShop
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@Immutable
 public class OdfDriver extends JarDriver {
     private static final long serialVersionUID = 1586715698610542033L;
 

@@ -31,6 +31,7 @@ import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import net.jcip.annotations.Immutable;
 
 import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
 import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
@@ -42,13 +43,12 @@ import static java.util.zip.Deflater.NO_COMPRESSION;
  * An archive driver which builds ZIP files.
  * Note that this driver does not check the CRC value of any entries in
  * existing archives.
- * <p>
- * Instances of this class are immutable.
  *
  * @see CheckedZipDriver
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@Immutable
 public class ZipDriver
 extends CharsetArchiveDriver<ZipArchiveEntry>
 implements ZipEntryFactory<ZipArchiveEntry> {

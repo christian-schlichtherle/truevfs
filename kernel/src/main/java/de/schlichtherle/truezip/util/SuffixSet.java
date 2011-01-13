@@ -56,7 +56,7 @@ import java.util.regex.Pattern;
  * order and does not contain any duplicates (so it's actually a set).
  * <p>
  * A suffix list can be canonicalized using this class by calling
- * {@code new {@link #SuffixSet(String) SuffixSet(list)}.{@link #toString()}}.
+ * {@link #SuffixSet(String) new SuffixSet(list)}.{@link #toString toString()}.
  * <p>
  * Unless otherwise documented, all {@link java.util.Set} methods work on the
  * canonical form of the suffixes in this set.
@@ -107,13 +107,13 @@ public final class SuffixSet extends CanonicalStringSet {
          * An example of the latter case is the empty string.
          */
         @Override
-        public String toString(Object o) {
+        public String map(Object o) {
             String suffix = o.toString();
             while (0 < suffix.length() && suffix.charAt(0) == PREFIX)
                 suffix = suffix.substring(1);
             return 0 == suffix.length() ? null : suffix.toLowerCase(Locale.ENGLISH);
         }
-    }
+    } // class SuffixMapper
 
     /**
      * Returns a case insensitive regular expression to match (file) paths

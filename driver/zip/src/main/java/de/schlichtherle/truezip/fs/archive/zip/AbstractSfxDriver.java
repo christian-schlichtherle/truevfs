@@ -19,15 +19,15 @@ package de.schlichtherle.truezip.fs.archive.zip;
 import java.nio.charset.Charset;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.jcip.annotations.Immutable;
 
 /**
  * An archive driver which builds Self Executable (SFX/EXE) ZIP files.
- * <p>
- * Instances of this class are immutable.
  * 
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@Immutable
 abstract public class AbstractSfxDriver extends ZipDriver {
     private static final long serialVersionUID = -656184651651654635L;
 

@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
+import net.jcip.annotations.Immutable;
 
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
 import static de.schlichtherle.truezip.entry.Entry.Access.*;
@@ -39,6 +40,7 @@ import static de.schlichtherle.truezip.entry.Entry.Access.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@Immutable
 public class FileEntry extends FsEntry implements IOEntry<FileEntry> {
 
     private static final BitField<FsOutputOption> NO_OUTPUT_OPTIONS

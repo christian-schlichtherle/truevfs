@@ -35,18 +35,11 @@ import net.jcip.annotations.ThreadSafe;
 @ThreadSafe
 public final class TempFilePool implements IOPool<FileEntry> {
 
-    // Declared package private for unit testing purposes.
-    public static final String DEFAULT_PREFIX = "tzp-pool";
-    public static final String DEFAULT_SUFFIX = null;
-    public static final File   DEFAULT_DIR    = null;
+    static final TempFilePool INSTANCE = new TempFilePool("tzp", null, null);
 
     private final @NonNull  String prefix;
     private final @Nullable String suffix;
     private final @Nullable File   dir;
-
-    public TempFilePool() {
-        this(DEFAULT_PREFIX, DEFAULT_SUFFIX, DEFAULT_DIR);
-    }
 
     /** Constructs a new temp file pool. */
     public TempFilePool(final @NonNull  String prefix,

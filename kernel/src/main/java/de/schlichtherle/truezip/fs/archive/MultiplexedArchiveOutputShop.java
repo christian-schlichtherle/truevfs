@@ -31,7 +31,7 @@ import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.io.ChainableIOException;
 import de.schlichtherle.truezip.io.ChainableIOExceptionBuilder;
 import de.schlichtherle.truezip.io.InputException;
-import de.schlichtherle.truezip.socket.IOPools;
+import de.schlichtherle.truezip.socket.ClassPathIOPoolProvider;
 import de.schlichtherle.truezip.util.JointIterator;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
@@ -135,7 +135,7 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
             public OutputStream newOutputStream()
             throws IOException {
                 if (isBusy()) {
-                    final IOPool.Entry<?> temp = IOPools.getPool().allocate();
+                    final IOPool.Entry<?> temp = ClassPathIOPoolProvider.INSTANCE.getPool().allocate();
                     IOException cause = null;
                     try {
                         return new TempEntryOutputStream(getBoundSocket(), temp);

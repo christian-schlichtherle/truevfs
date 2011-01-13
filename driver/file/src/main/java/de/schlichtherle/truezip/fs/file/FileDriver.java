@@ -19,11 +19,13 @@ import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.FsMountPoint;
+import net.jcip.annotations.Immutable;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@Immutable
 final class FileDriver implements FsDriver {
 
     @Override

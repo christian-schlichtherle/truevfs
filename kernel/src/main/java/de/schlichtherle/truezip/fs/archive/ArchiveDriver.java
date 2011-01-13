@@ -26,16 +26,16 @@ import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsConcurrentController;
 import de.schlichtherle.truezip.fs.FsCachingController;
-import de.schlichtherle.truezip.socket.IOPools;
+import de.schlichtherle.truezip.socket.ClassPathIOPoolProvider;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import javax.swing.Icon;
+import net.jcip.annotations.Immutable;
 
 /**
  * This file system driver interface is used to access archives of a
@@ -48,6 +48,7 @@ import javax.swing.Icon;
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
+@Immutable
 public abstract class ArchiveDriver<E extends ArchiveEntry>
 implements FsDriver, EntryFactory<E> {
 
@@ -83,7 +84,7 @@ implements FsDriver, EntryFactory<E> {
                         new DefaultArchiveController<E>(
                             new FsConcurrentModel(mountPoint, parent.getModel()),
                             this, parent, false),
-                        IOPools.getPool()));
+                        ClassPathIOPoolProvider.INSTANCE.getPool()));
     }
 
     /**
