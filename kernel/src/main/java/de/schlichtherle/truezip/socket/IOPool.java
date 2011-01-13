@@ -18,8 +18,6 @@ package de.schlichtherle.truezip.socket;
 import de.schlichtherle.truezip.socket.IOPool.Entry;
 import de.schlichtherle.truezip.util.Pool;
 import java.io.IOException;
-import net.jcip.annotations.NotThreadSafe;
-import net.jcip.annotations.ThreadSafe;
 
 /**
  * A pool of I/O entries.
@@ -28,8 +26,8 @@ import net.jcip.annotations.ThreadSafe;
  * However, this does not necessarily apply to the implementation of its
  * managed resources.
  *
- * @param <E> the type of the I/O entries.
- * @author Christian Schlichtherle
+ * @param   <E> the type of the I/O entries.
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public interface IOPool<E extends IOEntry<E>>

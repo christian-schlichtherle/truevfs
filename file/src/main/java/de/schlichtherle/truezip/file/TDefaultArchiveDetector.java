@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.file;
 
-import de.schlichtherle.truezip.fs.FsClassPathDriverProvider;
+import de.schlichtherle.truezip.fs.FsDefaultDriverProvider;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsDefaultDriver;
 import de.schlichtherle.truezip.fs.FsMountPoint;
@@ -116,7 +116,7 @@ public final class TDefaultArchiveDetector implements TArchiveDetector {
     private final ThreadLocalMatcher matcher;
 
     public TDefaultArchiveDetector() {
-        this.drivers = FsClassPathDriverProvider.INSTANCE.getDrivers();
+        this.drivers = FsDefaultDriverProvider.INSTANCE.getDrivers();
         final SuffixSet set = getSuffixes(drivers);
         this.suffixes = set.toString();
         this.matcher = new ThreadLocalMatcher(set.toPattern());
@@ -143,7 +143,7 @@ public final class TDefaultArchiveDetector implements TArchiveDetector {
      *         configured in the global map.
      */
     public TDefaultArchiveDetector(final String suffixes) {
-        this.drivers = FsClassPathDriverProvider.INSTANCE.getDrivers();
+        this.drivers = FsDefaultDriverProvider.INSTANCE.getDrivers();
         final SuffixSet set = new SuffixSet(suffixes);
         final SuffixSet all = getSuffixes(drivers);
         if (set.retainAll(all)) {

@@ -16,8 +16,6 @@
 package de.schlichtherle.truezip.util;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
-import net.jcip.annotations.NotThreadSafe;
-import net.jcip.annotations.ThreadSafe;
 
 /**
  * An interface for pooling strategies.

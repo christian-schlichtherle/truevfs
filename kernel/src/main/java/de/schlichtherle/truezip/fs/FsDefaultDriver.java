@@ -32,10 +32,10 @@ public final class FsDefaultDriver implements FsFederatingDriver {
 
     /**
      * Equivalent to
-     * {@code new FsDefaultDriver(FsClassPathDriverProvider.INSTANCE)}.
+     * {@code new FsDefaultDriver(FsDefaultDriverProvider.INSTANCE)}.
      */
     public static final FsDefaultDriver
-            ALL = new FsDefaultDriver(FsClassPathDriverProvider.INSTANCE);
+            ALL = new FsDefaultDriver(FsDefaultDriverProvider.INSTANCE);
 
     private final Map<FsScheme, ? extends FsDriver> drivers;
 

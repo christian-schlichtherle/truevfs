@@ -15,11 +15,11 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import java.util.ServiceConfigurationError;
 import de.schlichtherle.truezip.util.ServiceLocator;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
-import java.lang.reflect.UndeclaredThrowableException;
 import net.jcip.annotations.ThreadSafe;
 
 import static de.schlichtherle.truezip.fs.FsController.*;

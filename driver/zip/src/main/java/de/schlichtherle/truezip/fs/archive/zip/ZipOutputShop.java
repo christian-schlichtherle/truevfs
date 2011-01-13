@@ -24,7 +24,7 @@ import de.schlichtherle.truezip.fs.archive.MultiplexedArchiveOutputShop;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.socket.ClassPathIOPoolProvider;
+import de.schlichtherle.truezip.socket.DefaultIOPoolProvider;
 import de.schlichtherle.truezip.zip.RawZipOutputStream;
 import de.schlichtherle.truezip.util.JointIterator;
 import java.io.File;
@@ -97,7 +97,7 @@ implements OutputShop<ZipArchiveEntry> {
                 }
             }
             if (0 < source.getPostambleLength()) {
-                postamble = ClassPathIOPoolProvider.INSTANCE.getPool().allocate();
+                postamble = DefaultIOPoolProvider.INSTANCE.getPool().allocate();
                 Streams.copy(   source.getPostambleInputStream(),
                                 postamble.getOutputSocket().newOutputStream());
             } else {

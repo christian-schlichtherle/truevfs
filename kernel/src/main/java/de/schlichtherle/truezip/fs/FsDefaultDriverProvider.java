@@ -35,18 +35,18 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-public final class FsClassPathDriverProvider implements FsDriverProvider {
+public final class FsDefaultDriverProvider implements FsDriverProvider {
 
     /** The singleton instance of this class. */
-    public static final FsClassPathDriverProvider
-            INSTANCE = new FsClassPathDriverProvider();
+    public static final FsDefaultDriverProvider
+            INSTANCE = new FsDefaultDriverProvider();
 
     private final Map<FsScheme, FsDriver> drivers;
 
     /** You cannot instantiate this class. */
-    private FsClassPathDriverProvider() {
+    private FsDefaultDriverProvider() {
         final Iterator<FsDriverProvider> i
-                = new ServiceLocator(FsClassPathDriverProvider.class.getClassLoader())
+                = new ServiceLocator(FsDefaultDriverProvider.class.getClassLoader())
                     .getServices(FsDriverProvider.class);
         final Map<FsScheme, FsDriver> drivers = new HashMap<FsScheme, FsDriver>();
         while (i.hasNext())
