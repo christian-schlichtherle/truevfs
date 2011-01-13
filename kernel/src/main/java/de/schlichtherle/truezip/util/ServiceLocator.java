@@ -125,6 +125,9 @@ public final class ServiceLocator {
     getService(Class<S> service, @CheckForNull Class<? extends S> def) {
         String name = System.getProperty(   service.getName(),
                                             null == def ? null : def.getName());
+        if (null == name)
+            throw new ServiceConfigurationError(
+                    "No service provider found for " + service);
         try {
             return ((Class<S>) getClass(name)).newInstance();
         } catch (RuntimeException ex) {

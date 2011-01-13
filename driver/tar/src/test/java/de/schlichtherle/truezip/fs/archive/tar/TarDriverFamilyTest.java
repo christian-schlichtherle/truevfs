@@ -24,7 +24,7 @@ import java.util.Map;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-import static de.schlichtherle.truezip.fs.FsClassPathDriverProvider.*;
+import static de.schlichtherle.truezip.fs.FsDefaultDriverProvider.*;
 import static org.hamcrest.CoreMatchers.*;
 
 /**

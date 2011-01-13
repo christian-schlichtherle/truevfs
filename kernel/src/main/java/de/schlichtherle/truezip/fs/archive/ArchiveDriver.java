@@ -26,7 +26,7 @@ import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsConcurrentController;
 import de.schlichtherle.truezip.fs.FsCachingController;
-import de.schlichtherle.truezip.socket.ClassPathIOPoolProvider;
+import de.schlichtherle.truezip.socket.DefaultIOPoolProvider;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -84,7 +84,7 @@ implements FsDriver, EntryFactory<E> {
                         new DefaultArchiveController<E>(
                             new FsConcurrentModel(mountPoint, parent.getModel()),
                             this, parent, false),
-                        ClassPathIOPoolProvider.INSTANCE.getPool()));
+                        DefaultIOPoolProvider.INSTANCE.getPool()));
     }
 
     /**

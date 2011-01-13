@@ -16,15 +16,15 @@
 package de.schlichtherle.truezip.socket;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
-import net.jcip.annotations.Immutable;
 
 /**
- * An immutable provider for I/O pools.
+ * A provider for I/O pools.
+ * <p>
+ * Implementations must be immutable.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-@Immutable
 public interface IOPoolProvider {
 
     /**

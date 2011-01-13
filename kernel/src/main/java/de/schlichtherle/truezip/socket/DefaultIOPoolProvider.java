@@ -33,17 +33,17 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-public class ClassPathIOPoolProvider implements IOPoolProvider {
+public class DefaultIOPoolProvider implements IOPoolProvider {
 
-    public static final ClassPathIOPoolProvider
-            INSTANCE = new ClassPathIOPoolProvider();
+    public static final DefaultIOPoolProvider
+            INSTANCE = new DefaultIOPoolProvider();
 
     private final IOPoolProvider provider;
 
     /** You cannot instantiate this class. */
-    private ClassPathIOPoolProvider() {
+    private DefaultIOPoolProvider() {
         provider = new ServiceLocator(
-                    ClassPathIOPoolProvider.class.getClassLoader())
+                    DefaultIOPoolProvider.class.getClassLoader())
                 .getServices(IOPoolProvider.class)
                 .next();
     }
