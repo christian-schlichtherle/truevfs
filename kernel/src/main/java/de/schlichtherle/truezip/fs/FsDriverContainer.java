@@ -21,14 +21,12 @@ import java.util.ServiceLoader;
 import net.jcip.annotations.Immutable;
 
 /**
- * A provider for file system drivers.
- * <p>
- * Implementations must be immutable.
+ * An immutable container of file system drivers.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface FsDriverProvider {
+public interface FsDriverContainer {
 
     /**
      * Returns an immutable map of the supported file system drivers.

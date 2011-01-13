@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
-import de.schlichtherle.truezip.fs.FsDriverProvider;
+import de.schlichtherle.truezip.fs.FsDriverContainer;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.util.SuffixSet;
 import org.junit.Before;
@@ -32,11 +32,11 @@ public class ZipDriverFamilyTest {
 
     public static final String DRIVER_LIST = "zip|ear|jar|war|odg|odp|ods|odt|otg|otp|ots|ott|odb|odf|odm|oth|exe";
 
-    private FsDriverProvider instance;
+    private FsDriverContainer instance;
 
     @Before
     public void setUp() {
-        instance = new ZipDriverFamily();
+        instance = new ZipDriverContainer();
     }
 
     @Test

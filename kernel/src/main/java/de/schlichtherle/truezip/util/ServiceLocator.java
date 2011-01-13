@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.util;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
@@ -79,9 +80,9 @@ public final class ServiceLocator {
      * The service provider implementations are resolved as if by calling
      * {@link ServiceLoader#load(java.lang.Class, java.lang.ClassLoader)}.
      * <p>
-     * This method should be preferred over {@link #getService} if <em>more
-     * than one</em> meaningful implementation of a service provider interface
-     * is expected at run time.
+     * This method should be preferred over {@link #getService} if more than
+     * one meaningful implementation of a service provider interface is
+     * expected at run time.
      * 
      * @param  <S> The type of the service provider specification.
      * @param  service the service provider specification.
@@ -108,26 +109,30 @@ public final class ServiceLocator {
      * constructor.
      * <p>
      * This method should be preferred over {@link #getServices} if
-     * <em>only one</em> meaningful implementation of a service provider
-     * interface is expected at run time and if it's acceptable that the
-     * caller has a dependency on the given default service provider
-     * implementation.
+     * <ol>
+     * <li>only one meaningful implementation of a service provider interface
+     *     is expected at run time, and
+     * <li>creating a new service provider implementation instance on each call
+     *     is acceptable, and
+     * <li>either getting {@code null} as the result or providing a default
+     *     service provider implementation is acceptable.
+     * </ol>
      *
      * @param  <S> The type of the service provider specification.
      * @param  service the service provider specification.
      * @param  def the default service provider implementation.
-     * @return A new service provider implementation instance.
+     * @return A new service provider implementation instance or {@code null}
+     *         if no service provider implementation is known.
      * @throws RuntimeException if a {@link RuntimeException} occurs.
      * @throws ServiceConfigurationError if any other {@link Exception} occurs.
      */
     @SuppressWarnings("unchecked")
-    public <S> S
+    public @Nullable <S> S
     getService(Class<S> service, @CheckForNull Class<? extends S> def) {
         String name = System.getProperty(   service.getName(),
                                             null == def ? null : def.getName());
         if (null == name)
-            throw new ServiceConfigurationError(
-                    "No service provider found for " + service);
+            return null;
         try {
             return ((Class<S>) getClass(name)).newInstance();
         } catch (RuntimeException ex) {

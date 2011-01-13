@@ -26,7 +26,7 @@ import java.util.Map;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class DummyDriverProvider implements FsDriverProvider {
+public final class DummyDriverProvider implements FsDriverContainer {
 
     private final Map<FsScheme, DummyDriver> drivers;
 

@@ -13,34 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.fs.archive.tar;
+package de.schlichtherle.truezip.fs.archive.zip.raes;
 
 import de.schlichtherle.truezip.util.SuffixSet;
 import de.schlichtherle.truezip.fs.FsDriver;
-import de.schlichtherle.truezip.fs.FsDriverProvider;
+import de.schlichtherle.truezip.fs.FsDriverContainer;
 import de.schlichtherle.truezip.fs.FsScheme;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import net.jcip.annotations.Immutable;
 
 /**
- * A provider for the family of TAR file drivers.
+ * An immutable container of a driver for the RAES encrypted ZIP file format.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class TarDriverFamily implements FsDriverProvider {
+@Immutable
+public final class ZipRaesDriverContainer implements FsDriverContainer {
 
     private static final Map<FsScheme, FsDriver> DRIVERS;
 
     static {
         final Map<FsScheme, FsDriver> drivers = new HashMap<FsScheme, FsDriver>();
-        drivers.put(FsScheme.create("tar"), new TarDriver());
-        FsDriver driver = new TarGZipDriver();
-        for (String suffix : new SuffixSet("tgz|tar.gz"))
-            drivers.put(FsScheme.create(suffix), driver);
-        driver = new TarBZip2Driver();
-        for (String suffix : new SuffixSet("tbz2|tar.bz2"))
+        FsDriver driver = new SafeZipRaesDriver();
+        for (String suffix : new SuffixSet("tzp|zip.rae|zip.raes"))
             drivers.put(FsScheme.create(suffix), driver);
         DRIVERS = Collections.unmodifiableMap(drivers);
     }

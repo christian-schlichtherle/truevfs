@@ -17,19 +17,21 @@ package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.util.SuffixSet;
 import de.schlichtherle.truezip.fs.FsDriver;
-import de.schlichtherle.truezip.fs.FsDriverProvider;
+import de.schlichtherle.truezip.fs.FsDriverContainer;
 import de.schlichtherle.truezip.fs.FsScheme;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import net.jcip.annotations.Immutable;
 
 /**
- * A provider for the family of ZIP file drivers.
+ * An immutable container of drivers for the ZIP file format.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class ZipDriverFamily implements FsDriverProvider {
+@Immutable
+public final class ZipDriverContainer implements FsDriverContainer {
 
     private static final Map<FsScheme, FsDriver> DRIVERS;
 

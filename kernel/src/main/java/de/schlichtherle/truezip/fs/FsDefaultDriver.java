@@ -28,14 +28,14 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-public final class FsDefaultDriver implements FsFederatingDriver {
+final class FsDefaultDriver implements FsFederatingDriver {
 
     /**
      * Equivalent to
-     * {@code new FsDefaultDriver(FsDefaultDriverProvider.INSTANCE)}.
+     * {@code new FsDefaultDriver(FsDefaultDriverContainer.INSTANCE)}.
      */
-    public static final FsDefaultDriver
-            ALL = new FsDefaultDriver(FsDefaultDriverProvider.INSTANCE);
+    static final FsDefaultDriver
+            ALL = new FsDefaultDriver(FsDefaultDriverContainer.INSTANCE);
 
     private final Map<FsScheme, ? extends FsDriver> drivers;
 
@@ -43,7 +43,7 @@ public final class FsDefaultDriver implements FsFederatingDriver {
      * Constructs a new file system meta driver which qill query the given
      * file system provider for an appropriate file system driver.
      */
-    public FsDefaultDriver(final @NonNull FsDriverProvider provider) {
+    FsDefaultDriver(final @NonNull FsDriverContainer provider) {
         this.drivers = provider.getDrivers(); // immutable map!
         if (null == drivers)
             throw new NullPointerException("broken interface contract!");
