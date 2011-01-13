@@ -22,18 +22,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import net.jcip.annotations.Immutable;
 import org.apache.tools.bzip2.CBZip2InputStream;
 import org.apache.tools.bzip2.CBZip2OutputStream;
 
 /**
  * An archive driver which builds TAR files compressed with BZIP2.
- * <p>
- * Instances of this class are immutable.
  * 
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class TarBZip2Driver extends TarDriver {
+@Immutable
+public final class TarBZip2Driver extends TarDriver {
 
     private static final long serialVersionUID = 4966248471134003932L;
 

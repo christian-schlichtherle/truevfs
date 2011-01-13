@@ -22,6 +22,7 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
+import net.jcip.annotations.Immutable;
 
 import static java.util.zip.Deflater.BEST_COMPRESSION;
 import static java.util.zip.Deflater.DEFAULT_COMPRESSION;
@@ -29,12 +30,12 @@ import static java.util.zip.Deflater.NO_COMPRESSION;
 
 /**
  * An archive driver which builds TAR files compressed with GZIP.
- * Instances of this class are immutable.
  * 
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class TarGZipDriver extends TarDriver {
+@Immutable
+public final class TarGZipDriver extends TarDriver {
 
     private static final long serialVersionUID = 7736164529936091928L;
 

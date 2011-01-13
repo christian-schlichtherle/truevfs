@@ -41,6 +41,7 @@ import de.schlichtherle.truezip.fs.archive.zip.ZipInputShop;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.OutputStream;
+import net.jcip.annotations.Immutable;
 
 import static de.schlichtherle.truezip.zip.ZipEntry.*;
 
@@ -53,12 +54,11 @@ import static de.schlichtherle.truezip.zip.ZipEntry.*;
  * can be used by subclasses to fine tune the authentication process.
  * When omitted, the RAES Message Authentication Code (MAC) is <em>always</em>
  * validated for the cipher text of input archive files.
- * <p>
- * Instances of this base class are immutable.
  * 
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@Immutable
 public abstract class AbstractZipRaesDriver extends JarDriver {
     private static final long serialVersionUID = 8191673749851616843L;
 

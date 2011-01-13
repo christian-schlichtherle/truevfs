@@ -21,6 +21,7 @@ import de.schlichtherle.truezip.fs.archive.zip.CheckedZipInputShop;
 import de.schlichtherle.truezip.fs.archive.zip.ZipInputShop;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import java.io.IOException;
+import net.jcip.annotations.Immutable;
 
 import static java.util.zip.Deflater.BEST_COMPRESSION;
 
@@ -43,14 +44,13 @@ import static java.util.zip.Deflater.BEST_COMPRESSION;
  * hash function because of its frequent collisions, its linear output and
  * small output size.
  * It's the ZIP inflation algorithm which actually comes to our rescue!
- * <p>
- * Instances of this class are immutable.
  * 
  * @author Christian Schlichtherle
  * @version $Id$
  * @see ParanoidZipRaesDriver
  */
-public class SafeZipRaesDriver extends AbstractZipRaesDriver {
+@Immutable
+public final class SafeZipRaesDriver extends AbstractZipRaesDriver {
 
     private static final long serialVersionUID = 7701862504670759996L;
 

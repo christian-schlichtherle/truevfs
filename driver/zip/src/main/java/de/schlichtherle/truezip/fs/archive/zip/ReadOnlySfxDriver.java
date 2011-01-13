@@ -21,21 +21,19 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import net.jcip.annotations.Immutable;
 
 import static java.util.zip.Deflater.BEST_COMPRESSION;
 
 /**
  * An archive driver which reads Self Executable (SFX/EXE) ZIP files,
- * but doesn't support to create or update them.
- * <p>
- * Instances of this class are immutable.
+ * but doesn't support to create or update them because this would spoil the
+ * SFX code in its preamble.
  * 
- * @see CheckedReadOnlySfxDriver
- *
  * @author Christian Schlichtherle
  * @version $Id$
- * @see ReadWriteSfxDriver
  */
+@Immutable
 public class ReadOnlySfxDriver extends AbstractSfxDriver {
     private static final long serialVersionUID = -993451557140046215L;
 

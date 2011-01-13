@@ -20,6 +20,7 @@ import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.entry.Entry;
 import java.io.CharConversionException;
 import java.nio.charset.Charset;
+import net.jcip.annotations.Immutable;
 
 import static java.util.zip.Deflater.BEST_COMPRESSION;
 
@@ -31,12 +32,11 @@ import static java.util.zip.Deflater.BEST_COMPRESSION;
  * Other than this, JAR files are treated like regular ZIP files.
  * In particular, this class does <em>not</em> check a JAR file for the
  * existance of the <i>META-INF/MANIFEST.MF</i> entry or any other entry.
- * <p>
- * Instances of this class are immutable.
  * 
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@Immutable
 public class JarDriver extends ZipDriver {
     private static final long serialVersionUID = 3333659381918211087L;
 
