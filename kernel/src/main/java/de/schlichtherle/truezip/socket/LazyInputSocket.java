@@ -22,6 +22,7 @@ import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * A lazy input socket provides proxy read only files and input streams which
@@ -32,6 +33,7 @@ import java.io.InputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 public final class LazyInputSocket<E extends Entry>
 extends DecoratingInputSocket<E> {
 
@@ -51,6 +53,7 @@ extends DecoratingInputSocket<E> {
         return new ProxyReadOnlyFile();
     }
 
+    @NotThreadSafe
     private class ProxyReadOnlyFile extends DecoratingReadOnlyFile {
         ProxyReadOnlyFile() {
             super(null);
@@ -104,6 +107,7 @@ extends DecoratingInputSocket<E> {
         return new ProxyInputStream();
     }
 
+    @NotThreadSafe
     private class ProxyInputStream extends DecoratingInputStream {
         ProxyInputStream() {
             super(null);

@@ -21,6 +21,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * A {@link ReadOnlyFile} implementation using channels to map the underlying
@@ -40,12 +41,11 @@ import java.nio.channels.FileChannel;
  * http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4715154</a>.
  * Applications may safely use this class if subsequent access to the file
  * is not required during the life time of the application however.
- * <p>
- * This class is <em>not</em> thread-safe.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 public final class MemoryMappedReadOnlyFile extends AbstractReadOnlyFile {
 
     /** The length of the mapped window. */

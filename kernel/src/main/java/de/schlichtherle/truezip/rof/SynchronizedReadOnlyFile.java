@@ -16,16 +16,16 @@
 package de.schlichtherle.truezip.rof;
 
 import java.io.IOException;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * A decorator which synchronizes all access to a {@link ReadOnlyFile}
  * via an object provided to its constructor.
- * <p>
- * This class <em>is</em> thread-safe.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 public class SynchronizedReadOnlyFile extends DecoratingReadOnlyFile {
 
     /** The object to synchronize on - never {@code null}. */
@@ -88,12 +88,12 @@ public class SynchronizedReadOnlyFile extends DecoratingReadOnlyFile {
         }
     }
 
-    @Override
+    /*@Override
     public void readFully(byte[] b, int off, int len) throws IOException {
         synchronized (lock) {
             super.readFully(b, off, len);
         }
-    }
+    }*/
 
     @Override
     public void close() throws IOException {

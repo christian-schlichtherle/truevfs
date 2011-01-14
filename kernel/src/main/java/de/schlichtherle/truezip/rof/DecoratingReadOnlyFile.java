@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.rof;
 
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * A decorator for a read only file.
@@ -60,6 +61,7 @@ import java.io.IOException;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 public abstract class DecoratingReadOnlyFile extends AbstractReadOnlyFile {
 
     /** The nullable decorated read only file. */

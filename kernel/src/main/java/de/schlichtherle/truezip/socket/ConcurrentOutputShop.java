@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.jcip.annotations.NotThreadSafe;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -194,6 +195,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
         return new Output();
     }
 
+    @ThreadSafe
     private final class SynchronizedConcurrentOutputStream
     extends SynchronizedOutputStream {
         @SuppressWarnings("LeakingThisInConstructor")
@@ -222,6 +224,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
         }
     } // class SynchronizedConcurrentOutputStream
 
+    @NotThreadSafe
     private final class ConcurrentOutputStream extends DecoratingOutputStream {
         private ConcurrentOutputStream(OutputStream out) {
             super(out);

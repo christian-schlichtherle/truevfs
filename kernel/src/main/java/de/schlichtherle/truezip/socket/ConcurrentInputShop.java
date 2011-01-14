@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.jcip.annotations.NotThreadSafe;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -207,6 +208,7 @@ extends DecoratingInputShop<E, InputShop<E>> {
         return new Input();
     }
 
+    @ThreadSafe
     private final class SynchronizedConcurrentInputStream
     extends SynchronizedInputStream {
         @SuppressWarnings("LeakingThisInConstructor")
@@ -231,6 +233,7 @@ extends DecoratingInputShop<E, InputShop<E>> {
         }
     } // class SynchronizedConcurrentInputStream
 
+    @ThreadSafe
     private final class SynchronizedConcurrentReadOnlyFile
     extends SynchronizedReadOnlyFile {
         @SuppressWarnings("LeakingThisInConstructor")
@@ -255,6 +258,7 @@ extends DecoratingInputShop<E, InputShop<E>> {
         }
     } // class SynchronizedConcurrentReadOnlyFile
 
+    @NotThreadSafe
     private final class ConcurrentInputStream extends DecoratingInputStream {
         ConcurrentInputStream(final InputStream in) {
             super(in);
@@ -323,6 +327,7 @@ extends DecoratingInputShop<E, InputShop<E>> {
         }
     } // class ConcurrentInputStream
 
+    @NotThreadSafe
     private final class ConcurrentReadOnlyFile extends DecoratingReadOnlyFile {
         ConcurrentReadOnlyFile(ReadOnlyFile rof) {
             super(rof);
@@ -358,11 +363,11 @@ extends DecoratingInputShop<E, InputShop<E>> {
             return delegate.read(b, off, len);
         }
 
-        @Override
+        /*@Override
         public void readFully(byte[] b, int off, int len) throws IOException {
             assertNotShopClosed();
             delegate.readFully(b, off, len);
-        }
+        }*/
 
         @Override
         public void close() throws IOException {

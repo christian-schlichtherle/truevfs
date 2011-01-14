@@ -20,6 +20,7 @@ import de.schlichtherle.truezip.entry.Entry;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.OutputStream;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * A lazy output socket provides proxy output streams which acquire their
@@ -30,6 +31,7 @@ import java.io.OutputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 public final class LazyOutputSocket<E extends Entry>
 extends DecoratingOutputSocket<E> {
 
@@ -49,6 +51,7 @@ extends DecoratingOutputSocket<E> {
         return new ProxyOutputStream();
     }
 
+    @NotThreadSafe
     private class ProxyOutputStream extends DecoratingOutputStream {
         ProxyOutputStream() {
             super(null);

@@ -19,6 +19,7 @@ package de.schlichtherle.truezip.rof;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * A {@link ReadOnlyFile} implementation which provides buffered random read
@@ -29,12 +30,11 @@ import java.io.IOException;
  * again after you have finished working with an instance of this class,
  * you should synchronize their file pointers using the pattern as described
  * in {@link DecoratingReadOnlyFile}.
- * <p>
- * This class is <em>not</em> thread-safe.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
 
     /** The default buffer length of the window to the file. */
@@ -224,10 +224,7 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
             return -1;
 
         // Check parameters.
-        if (buf == null)
-            throw new NullPointerException("buf");
-        final int offPlusLen = off + len;
-        if ((off | len | offPlusLen | buf.length - offPlusLen) < 0)
+        if (0 > (off | len | buf.length - off - len))
 	    throw new IndexOutOfBoundsException();
 
         // Setup.

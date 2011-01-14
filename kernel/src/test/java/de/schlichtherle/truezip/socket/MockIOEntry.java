@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.socket;
 import de.schlichtherle.truezip.entry.Entry.Access;
 import de.schlichtherle.truezip.entry.Entry.Size;
 import de.schlichtherle.truezip.entry.Entry.Type;
+import de.schlichtherle.truezip.rof.ByteArrayReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -25,34 +26,37 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
-
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class MockIOEntry implements IOPool.Entry<MockIOEntry> {
+public class MockIOEntry implements IOEntry<MockIOEntry> {
 
-    static final String MOCK_ENTRY_NAME = "mock";
-
-    byte[] data;
+    private final String name;
+    private byte[] data;
     int reads;
     int writes;
+    int initialCapacity = 32;
 
-    MockIOEntry() {
-        this(null);
-    }
-
-    MockIOEntry(final String data) {
-        if (null != data) {
-            this.data = data.getBytes();
-        }
+    public MockIOEntry(final String name) {
+        this.name = name;
     }
 
     @Override
     public String getName() {
-        return MOCK_ENTRY_NAME;
+        return name;
+    }
+
+    public byte[] getData() {
+        return data;
+    }
+
+    public void setData(final byte[] data) {
+        this.data = data;
+    }
+
+    public void setInitialCapacity(final int initialCapacity) {
+        this.initialCapacity = initialCapacity;
     }
 
     @Override
@@ -62,7 +66,7 @@ public class MockIOEntry implements IOPool.Entry<MockIOEntry> {
 
     @Override
     public long getSize(Size type) {
-        return data.length;
+        return null == data ? UNKNOWN : data.length;
     }
 
     @Override
@@ -72,9 +76,8 @@ public class MockIOEntry implements IOPool.Entry<MockIOEntry> {
 
     @Override
     public InputSocket<MockIOEntry> getInputSocket() {
-        if (null == data) {
+        if (null == data)
             throw new IllegalStateException();
-        }
         return new MockInputSocket();
     }
 
@@ -93,12 +96,7 @@ public class MockIOEntry implements IOPool.Entry<MockIOEntry> {
 
     @Override
     public String toString() {
-        return null == data ? null : new String(data);
-    }
-
-    @Override
-    public void release() {
-        data = null;
+        return name;
     }
 
     private final class MockInputSocket extends InputSocket<MockIOEntry> {
@@ -110,19 +108,41 @@ public class MockIOEntry implements IOPool.Entry<MockIOEntry> {
 
         @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
-            assertThat(getPeerTarget(), notNullValue());
-            throw new UnsupportedOperationException();
+            reads++;
+            return new ByteArrayReadOnlyFile(data);
         }
 
         @Override
         public InputStream newInputStream() throws IOException {
-            assertThat(getPeerTarget(), notNullValue());
             reads++;
             return new ByteArrayInputStream(data);
         }
     } // class MockInputSocket
 
-    private final class BrokenInputSocket extends InputSocket<MockIOEntry> {
+    private class MockOutputSocket extends OutputSocket<MockIOEntry> {
+
+        @Override
+        public MockIOEntry getLocalTarget() throws IOException {
+            return MockIOEntry.this;
+        }
+
+        @Override
+        public OutputStream newOutputStream() throws IOException {
+            writes++;
+            return new MockOutputStream();
+        }
+    } // class MockOutputSocket
+
+    private class MockOutputStream extends ByteArrayOutputStream {
+
+        @Override
+        public void close() throws IOException {
+            super.close();
+            data = toByteArray();
+        }
+    } // class MockOutputStream
+
+    private class BrokenInputSocket extends InputSocket<MockIOEntry> {
 
         @Override
         public MockIOEntry getLocalTarget() throws IOException {
@@ -131,18 +151,24 @@ public class MockIOEntry implements IOPool.Entry<MockIOEntry> {
 
         @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
-            assertThat(getPeerTarget(), notNullValue());
             throw new UnsupportedOperationException();
         }
 
         @Override
         public InputStream newInputStream() throws IOException {
-            assertThat(getPeerTarget(), notNullValue());
             return new BrokenInputStream();
         }
     } // class MockInputSocket
 
-    private final class MockOutputSocket extends OutputSocket<MockIOEntry> {
+    private static class BrokenInputStream extends InputStream {
+
+        @Override
+        public int read() throws IOException {
+            throw new IOException();
+        }
+    } // class BrokenInputStream
+
+    private class BrokenOutputSocket extends OutputSocket<MockIOEntry> {
 
         @Override
         public MockIOEntry getLocalTarget() throws IOException {
@@ -151,32 +177,15 @@ public class MockIOEntry implements IOPool.Entry<MockIOEntry> {
 
         @Override
         public OutputStream newOutputStream() throws IOException {
-            assertThat(getPeerTarget(), notNullValue());
-            writes++;
-            return new MockOutputStream();
-        }
-    } // class MockOutputSocket
-
-    private final class BrokenOutputSocket extends OutputSocket<MockIOEntry> {
-
-        @Override
-        public MockIOEntry getLocalTarget() throws IOException {
-            return MockIOEntry.this;
-        }
-
-        @Override
-        public OutputStream newOutputStream() throws IOException {
-            assertThat(getPeerTarget(), notNullValue());
             return new BrokenOutputStream();
         }
     } // class MockOutputSocket
 
-    private final class MockOutputStream extends ByteArrayOutputStream {
+    private static class BrokenOutputStream extends OutputStream {
 
         @Override
-        public void close() throws IOException {
-            super.close();
-            data = toByteArray();
+        public void write(int b) throws IOException {
+            throw new IOException();
         }
-    } // class MockOutputStream
+    } // class BrokenOutputStream
 }

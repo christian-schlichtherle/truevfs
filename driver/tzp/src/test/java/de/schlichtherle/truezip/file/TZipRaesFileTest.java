@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.file;
 
-import de.schlichtherle.truezip.socket.IOPoolContainer;
+import de.schlichtherle.truezip.socket.MockIOPool;
 import java.io.File;
 import de.schlichtherle.truezip.fs.archive.zip.raes.SafeZipRaesDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
@@ -43,7 +43,7 @@ public final class TZipRaesFileTest extends TFileTestCase {
     private static boolean cancelling;
 
     public TZipRaesFileTest() {
-        super(FsScheme.create("tzp"), new SafeZipRaesDriver(IOPoolContainer.INSTANCE.getPool()));
+        super(FsScheme.create("tzp"), new SafeZipRaesDriver(new MockIOPool()));
     }
 
     @Override
