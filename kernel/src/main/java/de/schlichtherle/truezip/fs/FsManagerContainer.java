@@ -26,7 +26,7 @@ import net.jcip.annotations.Immutable;
  * result first.
  * <p>
  * First, the value of the {@link System#getProperty system property}
- * with the class name {@code "de.schlichtherle.truezip.fs.FsManager"}
+ * with the class name {@code "de.schlichtherle.truezip.fs.FsManagerService"}
  * as the key is queried.
  * If this yields a value, the class with that name is then loaded and
  * instantiated by calling its no-arg constructor.

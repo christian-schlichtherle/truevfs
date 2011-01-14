@@ -19,21 +19,26 @@ import de.schlichtherle.truezip.util.ServiceLocator;
 import net.jcip.annotations.Immutable;
 
 /**
- * Loads an I/O pool provider from the class path and delegates any call to
- * {@link #getPool()} to it.
+ * Contains an I/O pool service of a class with a name which is resolved by
+ * querying a system property or searching the class path, whatever yields a
+ * result first.
  * <p>
- * The I/O pool provider is located by instantiating one of the classes
- * which are named in the resource files with the name
- * {@code "META-INF/services/de.schlichtherle.truezip.socket.IOPoolService"}
- * on the class path.
- * Note that all named classes must implement the interface
- * {@link IOPoolService} and provide a public available no-arg constructor.
+ * First, the value of the {@link System#getProperty system property}
+ * with the class name {@code "de.schlichtherle.truezip.socket.IOPoolService"}
+ * as the key is queried.
+ * If this yields a value, the class with that name is then loaded and
+ * instantiated by calling its no-arg constructor.
+ * <p>
+ * Otherwise, the class path is searched for any resource file with the name
+ * {@code "META-INF/services/de.schlichtherle.truezip.socket.IOPoolService"}.
+ * If this yields a result, the class with the name in this file is then loaded
+ * and instantiated by calling its no-arg constructor.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
 @Immutable
-public class IOPoolContainer implements IOPoolService {
+public final class IOPoolContainer implements IOPoolService {
 
     public static final IOPoolContainer INSTANCE = new IOPoolContainer();
 
@@ -41,12 +46,21 @@ public class IOPoolContainer implements IOPoolService {
 
     /** You cannot instantiate this class. */
     private IOPoolContainer() {
-        container = new ServiceLocator(
-                    IOPoolContainer.class.getClassLoader())
-                .getServices(IOPoolService.class)
-                .next();
+        final ServiceLocator locator = new ServiceLocator(
+                IOPoolContainer.class.getClassLoader());
+        final IOPoolService
+                container = locator.getService(IOPoolService.class, null);
+        this.container = null != container
+                ? container
+                : locator.getServices(IOPoolService.class).next();
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The implementation in the class {@link IOPoolContainer} delegates the
+     * call to the container loaded by the constructor.
+     */
     @Override
     public IOPool<?> getPool() {
         return container.getPool();
