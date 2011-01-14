@@ -22,6 +22,7 @@ import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import net.jcip.annotations.NotThreadSafe;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -97,6 +98,7 @@ public final class FsStatistics {
         return new CountingReadOnlyFile(rof);
     }
 
+    @NotThreadSafe
     private final class CountingReadOnlyFile extends DecoratingReadOnlyFile {
         CountingReadOnlyFile(ReadOnlyFile rof) {
             super(rof);
@@ -124,6 +126,7 @@ public final class FsStatistics {
         return new CountingInputStream(in);
     }
 
+    @NotThreadSafe
     private final class CountingInputStream extends DecoratingInputStream {
         CountingInputStream(InputStream in) {
             super(in);
@@ -164,6 +167,7 @@ public final class FsStatistics {
         return new CountingOutputStream(out);
     }
 
+    @NotThreadSafe
     private final class CountingOutputStream extends DecoratingOutputStream {
         CountingOutputStream(OutputStream out) {
             super(out);

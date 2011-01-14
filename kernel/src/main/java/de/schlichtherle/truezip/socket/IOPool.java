@@ -22,7 +22,7 @@ import java.io.IOException;
 /**
  * A pool of I/O entries.
  * <p>
- * Implementation must be thread-safe.
+ * Implementations must be thread-safe.
  * However, this does not necessarily apply to the implementation of its
  * managed resources.
  *

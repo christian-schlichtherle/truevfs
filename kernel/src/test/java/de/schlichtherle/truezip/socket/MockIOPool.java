@@ -16,29 +16,26 @@
 package de.schlichtherle.truezip.socket;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 public final class MockIOPool implements IOPool<MockIOEntry> {
 
-    final Set<IOPool.Entry<MockIOEntry>> entries = new HashSet<IOPool.Entry<MockIOEntry>>();
+    private static final String MOCK_ENTRY_NAME = "mock";
+
+    final Set<Entry> entries = Collections.synchronizedSet(new HashSet<Entry>());
+    volatile int i;
 
     @Override
-    public IOPool.Entry<MockIOEntry> allocate() throws IOException {
-        final IOPool.Entry<MockIOEntry>
-                entry = new MockIOEntry(MockIOEntry.MOCK_ENTRY_NAME) {
-            @Override
-            public void release() {
-                if (!entries.remove(this)) {
-                    throw new IllegalArgumentException();
-                }
-                super.release();
-            }
-        };
+    public Entry allocate() throws IOException {
+        Entry entry = new Entry();
         entries.add(entry);
         return entry;
     }
@@ -47,5 +44,20 @@ public final class MockIOPool implements IOPool<MockIOEntry> {
     public void release(IOPool.Entry<MockIOEntry> entry) throws IOException {
         assert false;
         entry.release();
+    }
+
+    public final class Entry extends MockIOEntry implements IOPool.Entry<MockIOEntry> {
+
+        Entry() {
+            super(MOCK_ENTRY_NAME + i++);
+            setInitialCapacity(4096);
+        }
+
+        @Override
+        public void release() {
+            if (!entries.remove(this))
+                throw new IllegalArgumentException();
+            setData(null);
+        }
     }
 }

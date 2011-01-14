@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.fs.archive.CharsetArchiveDriverTestCase;
-import de.schlichtherle.truezip.socket.IOPoolContainer;
+import de.schlichtherle.truezip.socket.MockIOPool;
 
 /**
  * @author Christian Schlichtherle
@@ -27,6 +27,6 @@ extends CharsetArchiveDriverTestCase {
 
     @Override
     protected JarDriver newArchiveDriver() {
-        return new JarDriver(IOPoolContainer.INSTANCE.getPool());
+        return new JarDriver(new MockIOPool());
     }
 }

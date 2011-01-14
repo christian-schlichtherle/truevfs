@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.file;
 import de.schlichtherle.truezip.fs.archive.tar.TarBZip2Driver;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.socket.IOPoolContainer;
+import de.schlichtherle.truezip.socket.MockIOPool;
 import org.apache.tools.bzip2.CBZip2OutputStream;
 
 /**
@@ -27,7 +28,7 @@ import org.apache.tools.bzip2.CBZip2OutputStream;
 public final class TTarBZip2FileTest extends TFileTestCase {
 
     public TTarBZip2FileTest() {
-        super(FsScheme.create("tar.bz2"), new TarBZip2Driver(IOPoolContainer.INSTANCE.getPool()) {
+        super(FsScheme.create("tar.bz2"), new TarBZip2Driver(new MockIOPool()) {
             @Override
             public int getLevel() {
                 return CBZip2OutputStream.MIN_BLOCKSIZE;

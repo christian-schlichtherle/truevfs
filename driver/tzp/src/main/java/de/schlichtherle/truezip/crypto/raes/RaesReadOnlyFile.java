@@ -22,6 +22,7 @@ import de.schlichtherle.truezip.rof.SimpleReadOnlyFile;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import net.jcip.annotations.NotThreadSafe;
 
 import static de.schlichtherle.truezip.crypto.raes.RaesConstants.*;
 
@@ -65,6 +66,7 @@ import static de.schlichtherle.truezip.crypto.raes.RaesConstants.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
 
     static short readUByte(final byte[] b, final int off) {

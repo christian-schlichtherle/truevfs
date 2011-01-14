@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.rof;
 
 import java.io.EOFException;
 import java.io.IOException;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * A base class for {@code ReadOnlyFile} implementations which implements the
@@ -25,6 +26,7 @@ import java.io.IOException;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 public abstract class AbstractReadOnlyFile implements ReadOnlyFile {
 
     @Override
@@ -38,7 +40,7 @@ public abstract class AbstractReadOnlyFile implements ReadOnlyFile {
     }
 
     @Override
-    public void readFully(final byte[] buf, final int off, final int len)
+    public final void readFully(final byte[] buf, final int off, final int len)
     throws IOException {
         int total = 0, read;
         do {

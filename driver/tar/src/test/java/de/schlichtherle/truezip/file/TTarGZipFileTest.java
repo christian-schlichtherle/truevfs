@@ -17,7 +17,7 @@ package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.fs.archive.tar.TarGZipDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
-import de.schlichtherle.truezip.socket.IOPoolContainer;
+import de.schlichtherle.truezip.socket.MockIOPool;
 
 /**
  * @author Christian Schlichtherle
@@ -26,6 +26,6 @@ import de.schlichtherle.truezip.socket.IOPoolContainer;
 public final class TTarGZipFileTest extends TFileTestCase {
 
     public TTarGZipFileTest() {
-        super(FsScheme.create("tar.gz"), new TarGZipDriver(IOPoolContainer.INSTANCE.getPool()));
+        super(FsScheme.create("tar.gz"), new TarGZipDriver(new MockIOPool()));
     }
 }

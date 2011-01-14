@@ -19,15 +19,15 @@ package de.schlichtherle.truezip.rof;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.RandomAccessFile;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * A {@link ReadOnlyFile} implementation derived from {@link RandomAccessFile}.
- * <p>
- * This class <em>is</em> thread-safe.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 public class SimpleReadOnlyFile
 extends RandomAccessFile
 implements ReadOnlyFile {

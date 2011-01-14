@@ -16,10 +16,10 @@
 
 package de.schlichtherle.truezip.crypto;
 
-import de.schlichtherle.truezip.crypto.SeekableBlockCipher;
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import java.io.IOException;
+import net.jcip.annotations.NotThreadSafe;
 import org.bouncycastle.crypto.Mac;
 
 /**
@@ -56,6 +56,7 @@ import org.bouncycastle.crypto.Mac;
 // have to provide another buffer to copy the data into before we could
 // actually decrypt it, which is redundant.
 //
+@NotThreadSafe
 public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
 
     /**

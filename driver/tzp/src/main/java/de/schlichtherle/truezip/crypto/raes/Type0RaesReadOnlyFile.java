@@ -21,6 +21,7 @@ import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.util.ArrayHelper;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import net.jcip.annotations.NotThreadSafe;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.Mac;
@@ -40,6 +41,7 @@ import static de.schlichtherle.truezip.crypto.raes.RaesConstants.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
 
     /**
