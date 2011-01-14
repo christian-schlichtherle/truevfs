@@ -69,12 +69,12 @@ public abstract class OctetCharset extends Charset {
     }
 
     @Override
-	public boolean contains(Charset cs) {
+    public boolean contains(Charset cs) {
         return this.getClass().isInstance(cs);
     }
 
     @Override
-	public CharsetEncoder newEncoder() {
+    public CharsetEncoder newEncoder() {
         return new Encoder();
     }
 
@@ -84,7 +84,7 @@ public abstract class OctetCharset extends Charset {
         }
 
         @Override
-		protected CoderResult encodeLoop(
+        protected CoderResult encodeLoop(
                 final CharBuffer in,
                 final ByteBuffer out) {
             final char[][] c2b = char2byte;

@@ -20,11 +20,6 @@ import de.schlichtherle.truezip.entry.EntryFactory;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.CharConversionException;
-import java.io.IOException;
-import java.io.InvalidObjectException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import net.jcip.annotations.Immutable;
@@ -51,22 +46,16 @@ import static de.schlichtherle.truezip.io.Paths.*;
 public abstract class CharsetArchiveDriver<E extends ArchiveEntry>
 extends ArchiveDriver<E> {
 
-    private final Charset charset;
-    private final ThreadLocalEncoder encoder;
-
     /**
-     * Constructs a new abstract archive driver.
+     * Returns the value of the property {@code charset} which is used to
+     * encode entry names and probably other meta data when reading or writing
+     * an archive file.
+     * Multiple invocations must return objects which at least compare
+     * {@link Charset#equals}.
      *
-     * @param  charset The name of a character set to use by default for all
-     *         entry names and probably other meta data when reading or writing
-     *         archive files.
+     * @return A character set.
      */
-    protected CharsetArchiveDriver(final Charset charset) {
-        if (null == charset)
-            throw new NullPointerException();
-        this.charset = charset;
-        this.encoder = new ThreadLocalEncoder();
-    }
+    public abstract Charset getCharset();
 
     /**
      * Fixes the given <i>entry name</i> so that it forms a valid entry name
@@ -105,22 +94,16 @@ extends ArchiveDriver<E> {
                     " (illegal characters in entry name)");
     }
 
+    private final ThreadLocalEncoder encoder = new ThreadLocalEncoder();
+
     private final class ThreadLocalEncoder extends ThreadLocal<CharsetEncoder> {
         @Override
         protected CharsetEncoder initialValue() {
-            return charset.newEncoder();
+            return getCharset().newEncoder();
         }
 
         boolean canEncode(CharSequence cs) {
             return get().canEncode(cs);
         }
-    }
-
-    /**
-     * Returns the value of the property {@code charset} which was
-     * provided to the constructor.
-     */
-    public final Charset getCharset() {
-        return charset;
     }
 }

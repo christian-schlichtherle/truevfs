@@ -106,11 +106,36 @@ public class NZip extends CommandLineUtility {
         assert charset != null;
         return new TDefaultArchiveDetector(TDefaultArchiveDetector.ALL,
                 new Object[] {
-                    "ear|jar|war|zip", new CheckedZipDriver(charset),   // check CRC-32
-                    "exe", new CheckedReadOnlySfxDriver(charset),       // check CRC-32
-                    "tar", new TarDriver(charset),
-                    "tgz|tar.gz", new TarGZipDriver(charset),
-                    "tbz|tar.bz2", new TarBZip2Driver(charset),
+                    "ear|jar|war|zip", new CheckedZipDriver() { // check CRC-32
+                        @Override
+                        public Charset getCharset() {
+                            return charset;
+                        }
+                    },
+                    "exe", new CheckedReadOnlySfxDriver() { // check CRC-32
+                        @Override
+                        public Charset getCharset() {
+                            return charset;
+                        }
+                    },
+                    "tar", new TarDriver(){
+                        @Override
+                        public Charset getCharset() {
+                            return charset;
+                        }
+                    },
+                    "tgz|tar.gz", new TarGZipDriver(){
+                        @Override
+                        public Charset getCharset() {
+                            return charset;
+                        }
+                    },
+                    "tbz|tar.bz2", new TarBZip2Driver(){
+                        @Override
+                        public Charset getCharset() {
+                            return charset;
+                        }
+                    },
                 });
     }
 

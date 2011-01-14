@@ -24,7 +24,6 @@ import de.schlichtherle.truezip.socket.OutputSocket;
 import java.io.IOException;
 import net.jcip.annotations.Immutable;
 
-import static java.util.zip.Deflater.BEST_COMPRESSION;
 
 /**
  * An archive driver which supports building archive files according to
@@ -50,31 +49,6 @@ import static java.util.zip.Deflater.BEST_COMPRESSION;
  */
 @Immutable
 public class OdfDriver extends JarDriver {
-    private static final long serialVersionUID = 1586715698610542033L;
-
-    /**
-     * Equivalent to {@link #OdfDriver(boolean, boolean, int)
-     * this(false, false, Deflater.BEST_COMPRESSION)}.
-     */
-    public OdfDriver() {
-        this(false, false, BEST_COMPRESSION);
-    }
-
-    /**
-     * Equivalent to {@link #OdfDriver(boolean, boolean, int)
-     * this(false, false, level)}.
-     */
-    public OdfDriver(int level) {
-        this(false, false, level);
-    }
-
-    /** Constructs a new ODF driver. */
-    public OdfDriver(
-            boolean preambled,
-            boolean postambled,
-            final int level) {
-        super(preambled, postambled, level);
-    }
 
     @Override
     public OutputShop<ZipArchiveEntry> newOutputShop(

@@ -19,10 +19,8 @@ package de.schlichtherle.truezip.fs.archive.zip;
 import de.schlichtherle.truezip.fs.FsConcurrentModel;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import net.jcip.annotations.Immutable;
 
-import static java.util.zip.Deflater.BEST_COMPRESSION;
 
 /**
  * An archive driver for ZIP files which checks the CRC-32 values for all
@@ -44,45 +42,10 @@ import static java.util.zip.Deflater.BEST_COMPRESSION;
  */
 @Immutable
 public class CheckedZipDriver extends ZipDriver {
-    private static final long serialVersionUID = -4645615422084918979L;
-
-    /**
-     * Equivalent to {@link #CheckedZipDriver(Charset, boolean, boolean, int)
-     * this(ZIP_CHARSET, false, false, Deflater.BEST_COMPRESSION)}.
-     */
-    public CheckedZipDriver() {
-        this(ZIP_CHARSET, false, false, BEST_COMPRESSION);
-    }
-
-    /**
-     * Equivalent to {@link #CheckedZipDriver(Charset, boolean, boolean, int)
-     * this(charset, false, false, Deflater.BEST_COMPRESSION)}.
-     */
-    public CheckedZipDriver(Charset charset) {
-        this(charset, false, false, BEST_COMPRESSION);
-    }
-
-    /**
-     * Equivalent to {@link #CheckedZipDriver(Charset, boolean, boolean, int)
-     * this(charset, false, false, level)}.
-     */
-    public CheckedZipDriver(int level) {
-        this(ZIP_CHARSET, false, false, level);
-    }
-
-    /** Constructs a new checked ZIP driver. */
-    public CheckedZipDriver(
-            Charset charset,
-            boolean preambled,
-            boolean postambled,
-            final int level) {
-        super(charset, preambled, postambled, level);
-    }
     
     @Override
     protected ZipInputShop newZipInputShop(FsConcurrentModel model, ReadOnlyFile rof)
     throws IOException {
-        return new CheckedZipInputShop(
-                rof, getCharset(), getPreambled(), getPostambled(), this);
+        return new CheckedZipInputShop(rof, this);
     }
 }

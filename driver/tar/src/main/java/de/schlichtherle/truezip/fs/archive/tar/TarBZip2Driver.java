@@ -21,7 +21,6 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.Charset;
 import net.jcip.annotations.Immutable;
 import org.apache.tools.bzip2.CBZip2InputStream;
 import org.apache.tools.bzip2.CBZip2OutputStream;
@@ -33,77 +32,30 @@ import org.apache.tools.bzip2.CBZip2OutputStream;
  * @version $Id$
  */
 @Immutable
-public final class TarBZip2Driver extends TarDriver {
+public class TarBZip2Driver extends TarDriver {
 
-    private static final long serialVersionUID = 4966248471134003932L;
-
-    private static final int BUFSIZE = 4096;
+    public static final int BUFFER_SIZE = 4096;
 
     /**
-     * The minimum block size to use when writing a BZIP2 output stream,
-     * which is {@value}.
-     */
-    public static final int MIN_BLOCKSIZE = 1;
-
-    /**
-     * The maximum block size to use when writing a BZIP2 output stream,
-     * which is {@value}.
-     */
-    public static final int MAX_BLOCKSIZE = 9;
-
-    /**
-     * The default block size to use when writing a BZIP2 output stream,
-     * which is {@value}.
-     */
-    public static final int DEFAULT_BLOCKSIZE = MAX_BLOCKSIZE;
-
-    private final int inBlockSize;
-
-    /**
-     * Equivalent to {@link #TarBZip2Driver(Charset, int)
-     * this(TAR_CHARSET, DEFAULT_BLOCKSIZE)}.
-     */
-    public TarBZip2Driver() {
-        this(TAR_CHARSET, DEFAULT_BLOCKSIZE);
-    }
-
-    /**
-     * Equivalent to {@link #TarBZip2Driver(Charset, int)
-     * this(charset, DEFAULT_BLOCKSIZE)}.
-     */
-    public TarBZip2Driver(Charset charset) {
-        this(charset, DEFAULT_BLOCKSIZE);
-    }
-
-    /**
-     * Equivalent to {@link #TarBZip2Driver(Charset, int)
-     * this(TAR_CHARSET, inBlockSize)}.
-     */
-    public TarBZip2Driver(int inBlockSize) {
-        this(TAR_CHARSET,  inBlockSize);
-    }
-
-    /**
-     * Constructs a new TAR.BZ2 driver.
+     * Returns the size of the I/O buffer.
+     * <p>
+     * The implementation in the class {@link TarBZip2Driver} returns
+     * {@link #BUFFER_SIZE}.
      *
-     * @param inBlockSize The compression block getSize to use when writing
-     *        a BZIP2 output stream.
-     * @throws IllegalArgumentException If {@code inBlockSize} is not
-     *         in the range [1..9].
+     * @return The size of the I/O buffer.
      */
-    public TarBZip2Driver(final Charset charset, final int inBlockSize) {
-        super(charset);
-        if (inBlockSize < MIN_BLOCKSIZE || MAX_BLOCKSIZE < inBlockSize)
-            throw new IllegalArgumentException(inBlockSize + "");
-        this.inBlockSize = inBlockSize;
+    public int getBufferSize() {
+        return BUFFER_SIZE;
     }
 
     /**
-     * Returns the value of the property {@code inBlockSize} which was
-     * provided to the constructor.
+     * Returns the compression level to use when writing a BZIP2 output stream.
+     * <p>
+     * The implementation in the class {@link TarBZip2Driver} returns
+     * {@link CBZip2OutputStream#MAX_BLOCKSIZE}.
      */
-    public final int getLevel() {
-        return inBlockSize;
+    public int getLevel() {
+        return CBZip2OutputStream.MAX_BLOCKSIZE;
     }
 
     /**
@@ -127,7 +79,7 @@ public final class TarBZip2Driver extends TarDriver {
             throw new IOException("Not a BZIP2 compressed input stream!");
         return new TarInputShop(
                 new CBZip2InputStream(
-                    new BufferedInputStream(vin, BUFSIZE)));
+                    new BufferedInputStream(vin, getBufferSize())));
     }
 
     @Override
@@ -142,8 +94,8 @@ public final class TarBZip2Driver extends TarDriver {
         return super.newTarOutputShop(
                 model,
                 new CBZip2OutputStream(
-                    new BufferedOutputStream(out, BUFSIZE),
-                    inBlockSize),
+                    new BufferedOutputStream(out, getBufferSize()),
+                    getLevel()),
                 source);
     }
 }

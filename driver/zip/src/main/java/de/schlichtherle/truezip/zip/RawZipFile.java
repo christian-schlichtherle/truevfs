@@ -22,6 +22,7 @@ import de.schlichtherle.truezip.io.DecoratingInputStream;
 import java.util.Iterator;
 import de.schlichtherle.truezip.rof.BufferedReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.Closeable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -146,30 +147,30 @@ implements Iterable<E>, Closeable {
      * @throws IOException on any other I/O related issue.
      */
     protected RawZipFile(
-            ReadOnlyFile archive,
-            Charset charset,
+            @NonNull ReadOnlyFile archive,
+            @NonNull Charset charset,
             boolean preambled,
             boolean postambled,
-            ZipEntryFactory<E> factory)
+            @NonNull ZipEntryFactory<E> factory)
     throws IOException {
         this(   new SingletonReadOnlyFilePool(archive),
-                charset, factory, preambled, postambled);
+                charset, preambled, postambled, factory);
     }
 
     RawZipFile(
-            final Pool<ReadOnlyFile, IOException> source,
-            final Charset charset,
-            final ZipEntryFactory<E> zipEntryFactory,
+            final @NonNull Pool<ReadOnlyFile, IOException> source,
+            final @NonNull Charset charset,
             final boolean preambled,
-            final boolean postambled)
+            final boolean postambled,
+            final @NonNull ZipEntryFactory<E> factory)
     throws IOException {
-        if (charset == null || zipEntryFactory == null)
+        if (charset == null || factory == null)
             throw new NullPointerException();
         final ReadOnlyFile rof = source.allocate();
         try {
             this.archive = rof;
             this.charset = charset;
-            this.factory = zipEntryFactory;
+            this.factory = factory;
 
             final BufferedReadOnlyFile brof;
             if (rof instanceof BufferedReadOnlyFile)

@@ -21,11 +21,9 @@ import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.zip.RawZipFile;
-import de.schlichtherle.truezip.zip.ZipEntryFactory;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 
 import static de.schlichtherle.truezip.zip.ZipEntry.*;
 
@@ -40,14 +38,9 @@ public class ZipInputShop
 extends RawZipFile<ZipArchiveEntry>
 implements InputShop<ZipArchiveEntry> {
 
-    public ZipInputShop(
-            ReadOnlyFile rof,
-            Charset charset,
-            boolean preambled,
-            boolean postambled,
-            ZipEntryFactory<ZipArchiveEntry> factory)
+    public ZipInputShop(ZipDriver driver, ReadOnlyFile rof)
     throws IOException {
-        super(rof, charset, preambled, postambled, factory);
+        super(rof, driver.getCharset(), driver.getPreambled(), driver.getPostambled(), driver);
     }
 
     @Override

@@ -953,21 +953,21 @@ public abstract class TFileTestCase {
             assertTrue(file.createNewFile());
         }
         time = System.currentTimeMillis() - time;
-        logger.log(Level.FINER, "Time required to create {0} archive file entries: {1}ms", new Object[]{i, time});
+        logger.log(Level.FINER, "Time required to create {0} archive file entries: {1}ms", new Object[]{ i, time });
         
         time = System.currentTimeMillis();
         for (j = 0; j < 100; j++) {
             archive.listFiles((FilenameFilter) null);
         }
         time = System.currentTimeMillis() - time;
-        logger.log(Level.FINER, "Time required to list these entries {0} times using a nullary FilenameFilter: {1}ms", new Object[]{j, time});
+        logger.log(Level.FINER, "Time required to list these entries {0} times using a nullary FilenameFilter: {1}ms", new Object[]{ j, time });
         
         time = System.currentTimeMillis();
         for (j = 0; j < 100; j++) {
             archive.listFiles((FileFilter) null);
         }
         time = System.currentTimeMillis() - time;
-        logger.log(Level.FINER, "Time required to list these entries {0} times using a nullary FileFilter: {1}ms", new Object[]{j, time});
+        logger.log(Level.FINER, "Time required to list these entries {0} times using a nullary FileFilter: {1}ms", new Object[]{ j, time });
         
         assertFalse(archive.delete()); // directory not empty!
         TFile.umount(); // allow external modifications!

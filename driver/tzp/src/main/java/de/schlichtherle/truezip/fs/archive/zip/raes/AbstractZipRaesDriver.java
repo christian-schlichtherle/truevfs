@@ -49,46 +49,37 @@ import static de.schlichtherle.truezip.zip.ZipEntry.*;
  * An abstract archive driver which builds RAES encrypted ZIP files
  * and optionally authenticates the cipher data of the input archive files
  * presented to it.
- * <p>
- * The constructor takes an optional authentication trigger parameter which
- * can be used by subclasses to fine tune the authentication process.
- * When omitted, the RAES Message Authentication Code (MAC) is <em>always</em>
- * validated for the cipher text of input archive files.
  * 
  * @author Christian Schlichtherle
  * @version $Id$
  */
 @Immutable
 public abstract class AbstractZipRaesDriver extends JarDriver {
-    private static final long serialVersionUID = 8191673749851616843L;
-
-    private final long authenticationTrigger;
 
     /**
-     * Constructs a new abstract ZIP.RAES driver which uses the given byte
+     * Constructs a new abstract ZIP.RAES driver which
+     * uses the given byte
      * size to trigger verification of the Message Authentication Code (MAC).
      * Note that the given parameter only affects the authentication of the
      * <em>cipher text</em> in input archives - the <em>cipher key</em> and
      * <em>file length</em> are always authenticated with RAES.
      *
-     * @param authenticationTrigger The trigger 
-     *        If set to a negative value, the MAC of input
-     *        archive files gets <em>never</em> verified.
-     *        If set to {@link Long#MAX_VALUE}, the MAC of input
-     *        archive files gets <em>always</em> authenticated.
-     *        Otherwise, the MAC of input archive files up to this size in
-     *        bytes (including the overhead for the RAES wrapper data) only
-     *        gets authenticated.
-     *        
+     * Returns the value of the property {@code authenticationTrigger}.
+     * If the size of an input file is smaller than or equal to this value,
+     * the Message Authentication Code (MAC) for the entire
+     * <em>cipher text</em> is computed and verified in order to authenticate
+     * the file.
+     * Otherwise, only the <em>cipher key</em> and the <em>file length</em>
+     * get authenticated.
+     * <p>
+     * Consequently, if the value of this property is set to a negative value,
+     * the cipher text gets <em>never</em> verified, and if set to
+     * {@link Long#MAX_VALUE}, the cipher text gets <em>always</em>
+     * authenticated.
+     *
+     * @return The value of the property {@code authenticationTrigger}.
      */
-    protected AbstractZipRaesDriver(
-            boolean preambled,
-            boolean postambled,
-            final int level,
-            final long authenticationTrigger) {
-        super(preambled, postambled, level);
-        this.authenticationTrigger = authenticationTrigger;
-    }
+    public abstract long getAuthenticationTrigger();
 
     @Override
     public FsController<?>
@@ -98,11 +89,23 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
     }
 
     /**
-     * Returns the authentication trigger provided to the constructor.
-     * Note that this method is final for security reasons.
+     * Creates a new {@link JarArchiveEntry}, enforcing that the data gets
+     * {@code DEFLATED} when written, even if copying data from a
+     * {@code STORED} source entry.
+     * This feature strengthens the security of the authentication process.
      */
-    public final long getAuthenticationTrigger() {
-        return authenticationTrigger;
+    @Override
+    public JarArchiveEntry newEntry(final String path,
+                                    final Type type,
+                                    final Entry template)
+    throws CharConversionException {
+        final JarArchiveEntry entry = super.newEntry(path, type, template);
+        if (DEFLATED != entry.getMethod()) {
+            // Enforce deflation for enhanced authentication security.
+            entry.setMethod(DEFLATED);
+            entry.setCompressedSize(UNKNOWN);
+        }
+        return entry;
     }
 
     /**
@@ -151,26 +154,6 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
         } // class Input
 
         return super.newInputShop(model, new Input());
-    }
-
-    /**
-     * Creates a new {@link JarArchiveEntry}, enforcing that the data gets
-     * {@code DEFLATED} when written, even if copying data from a
-     * {@code STORED} source entry.
-     * This feature strengthens the security of the authentication process.
-     */
-    @Override
-    public JarArchiveEntry newEntry(final String path,
-                                    final Type type,
-                                    final Entry template)
-    throws CharConversionException {
-        final JarArchiveEntry entry = super.newEntry(path, type, template);
-        if (entry.getMethod() != DEFLATED) {
-            // Enforce deflation for enhanced authentication security.
-            entry.setMethod(DEFLATED);
-            entry.setCompressedSize(UNKNOWN);
-        }
-        return entry;
     }
 
     /**

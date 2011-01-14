@@ -15,11 +15,13 @@
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
+import de.schlichtherle.truezip.socket.DefaultIOPoolContainer;
 import de.schlichtherle.truezip.fs.FsConcurrentModel;
 import de.schlichtherle.truezip.fs.archive.CharsetArchiveDriver;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.fs.archive.MultiplexedArchiveOutputShop;
+import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.socket.InputSocket;
@@ -43,10 +45,8 @@ import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 @Immutable
 public class TarDriver extends CharsetArchiveDriver<TarArchiveEntry> {
 
-    private static final long serialVersionUID = 6622746562629104174L;
-
     /** Prefix for temporary files created by this driver. */
-    static final String TEMP_FILE_PREFIX = "tzp-tar";
+    static final String TEMP_FILE_PREFIX = "tzp-tar"; // FIXME!
 
     /**
      * The character set to use for entry names, which is {@code "US-ASCII"}.
@@ -54,26 +54,20 @@ public class TarDriver extends CharsetArchiveDriver<TarArchiveEntry> {
      * set charset. However, the low level TAR code as of Ant 1.6.5 doesn't
      * support that, hence this constraint.
      */
-    public static final Charset TAR_CHARSET = Charset.forName("US-ASCII");
+    private static final Charset TAR_CHARSET = Charset.forName("US-ASCII");
 
-    /**
-     * Equivalent to {@link #TarDriver(Charset)
-     * this(TAR_CHARSET)}.
-     */
-    public TarDriver() {
-        this(TAR_CHARSET);
+    @Override
+    public IOPool<?> getPool() {
+        return DefaultIOPoolContainer.INSTANCE.getPool(); // FIXME!
     }
 
     /**
-     * Constructs a new TAR driver.
-     *
-     * @param charset The name of a character set to use for all entry names
-     *        when reading or writing TAR files.
-     *        <b>Warning:</b> Due to limitations in Apache's Ant code, using
-     *        anything else than {@code "US-ASCII"} is currently not supported!
+     * Returns the character set to use for TAR entry names,
+     * which is {@code "US-ASCII"}.
      */
-    public TarDriver(Charset charset) {
-        super(charset);
+    @Override
+    public Charset getCharset() {
+        return TAR_CHARSET;
     }
 
     @Override

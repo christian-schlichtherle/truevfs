@@ -18,20 +18,35 @@ package de.schlichtherle.truezip.fs.archive;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.fs.FsConcurrentModel;
+import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.socket.InputSocket;
+import de.schlichtherle.truezip.socket.MockIOPool;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import java.io.CharConversionException;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class DummyArchiveDriver extends ArchiveDriver<ArchiveEntry> {
-    private static final long serialVersionUID = 1L;
+public class DummyArchiveDriver extends CharsetArchiveDriver<ArchiveEntry> {
 
+    private static final IOPool<?> pool = new MockIOPool();
+    private static final Charset charset = Charset.forName("UTF-8");
+
+    @Override
+    public IOPool<?> getPool() {
+        return pool;
+    }
+
+    @Override
+    public Charset getCharset() {
+        return charset;
+    }
+    
     @Override
     public InputShop<ArchiveEntry> newInputShop(
             FsConcurrentModel model,

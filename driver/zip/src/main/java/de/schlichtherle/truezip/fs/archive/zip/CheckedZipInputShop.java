@@ -19,11 +19,9 @@ package de.schlichtherle.truezip.fs.archive.zip;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.zip.CRC32Exception;
-import de.schlichtherle.truezip.zip.ZipEntryFactory;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 
 /**
  * A {@link ZipInputShop} which checks the CRC-32 value for all ZIP entries.
@@ -43,14 +41,9 @@ import java.nio.charset.Charset;
  */
 public class CheckedZipInputShop extends ZipInputShop {
     
-    public CheckedZipInputShop(
-            ReadOnlyFile rof,
-            Charset charset,
-            boolean preambled,
-            boolean postambled,
-            ZipEntryFactory<ZipArchiveEntry> factory)
+    public CheckedZipInputShop(ReadOnlyFile rof, ZipDriver driver)
     throws IOException {
-        super(rof, charset, preambled, postambled, factory);
+        super(driver, rof);
     }
 
     /** Overridden to read from a checked input stream. */

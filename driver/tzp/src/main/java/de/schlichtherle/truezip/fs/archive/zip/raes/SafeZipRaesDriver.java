@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.fs.archive.zip.raes;
 
 import de.schlichtherle.truezip.fs.FsConcurrentModel;
@@ -50,9 +49,7 @@ import static java.util.zip.Deflater.BEST_COMPRESSION;
  * @see ParanoidZipRaesDriver
  */
 @Immutable
-public final class SafeZipRaesDriver extends AbstractZipRaesDriver {
-
-    private static final long serialVersionUID = 7701862504670759996L;
+public class SafeZipRaesDriver extends AbstractZipRaesDriver {
 
     /**
      * The default trigger for authentication in bytes ({@value}).
@@ -60,31 +57,11 @@ public final class SafeZipRaesDriver extends AbstractZipRaesDriver {
      * using the RAES Message Authentication Code (MAC) before they are
      * accessed.
      */
-    public static final long DEFAULT_AUTHENTICATION_TRIGGER = 512 * 1024;
+    private static final long AUTHENTICATION_TRIGGER = 512 * 1024;
 
-    /**
-     * Equivalent to {@link #SafeZipRaesDriver(boolean, boolean, int, long)
-     * this(false, false, Deflater.BEST_COMPRESSION, DEFAULT_AUTHENTICATION_TRIGGER)}.
-     */
-    public SafeZipRaesDriver() {
-        this(false, false, BEST_COMPRESSION, DEFAULT_AUTHENTICATION_TRIGGER);
-    }
-
-    /**
-     * Equivalent to {@link #SafeZipRaesDriver(boolean, boolean, int, long)
-     * this(null, null, false, false, level, DEFAULT_AUTHENTICATION_TRIGGER)}.
-     */
-    public SafeZipRaesDriver(int level) {
-        this(false, false, level, DEFAULT_AUTHENTICATION_TRIGGER);
-    }
-
-    /** Constructs a new safe ZIP.RAES driver. */
-    public SafeZipRaesDriver(
-            boolean preambled,
-            boolean postambled,
-            final int level,
-            final long authenticationTrigger) {
-        super(preambled, postambled, level, authenticationTrigger);
+    @Override
+    public long getAuthenticationTrigger() {
+        return AUTHENTICATION_TRIGGER;
     }
 
     /**
@@ -115,8 +92,7 @@ public final class SafeZipRaesDriver extends AbstractZipRaesDriver {
         // Hence, checking the CRC-32 value of the plain text ZIP file is
         // redundant.
         return rof.length() > getAuthenticationTrigger()
-                ? new CheckedZipInputShop(
-                    rof, getCharset(), getPreambled(), getPostambled(), this)
+                ? new CheckedZipInputShop(rof, this)
                 : super.newZipInputShop(model, rof);
     }
 }

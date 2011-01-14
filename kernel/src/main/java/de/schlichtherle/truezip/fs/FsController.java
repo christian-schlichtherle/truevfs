@@ -180,8 +180,6 @@ public abstract class FsController<M extends FsModel> {
      * @throws IllegalArgumentException if the combination of synchronization
      *         options is illegal, e.g. if {@code FORCE_CLOSE_INPUT} is cleared
      *         and {@code FORCE_CLOSE_OUTPUT} is set.
-     * @see    #UPDATE
-     * @see    #UMOUNT
      */
     public abstract <X extends IOException> void
     sync(   BitField<FsSyncOption> options,

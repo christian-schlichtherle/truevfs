@@ -15,18 +15,13 @@
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
+import java.util.zip.Deflater;
 import de.schlichtherle.truezip.fs.FsConcurrentModel;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.Charset;
-import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
 import net.jcip.annotations.Immutable;
-
-import static java.util.zip.Deflater.BEST_COMPRESSION;
-import static java.util.zip.Deflater.DEFAULT_COMPRESSION;
-import static java.util.zip.Deflater.NO_COMPRESSION;
 
 /**
  * An archive driver which builds TAR files compressed with GZIP.
@@ -35,71 +30,36 @@ import static java.util.zip.Deflater.NO_COMPRESSION;
  * @version $Id$
  */
 @Immutable
-public final class TarGZipDriver extends TarDriver {
+public class TarGZipDriver extends TarDriver {
 
-    private static final long serialVersionUID = 7736164529936091928L;
-
-    private static final int BUFSIZE = 4096;
-
-    private final int level;
+    public static final int BUFFER_SIZE = 4096;
 
     /**
-     * Equivalent to {@link #TarGZipDriver(Charset, int)
-     * this(TAR_CHARSET, Deflater.BEST_COMPRESSION)}.
-     */
-    public TarGZipDriver() {
-        this(TAR_CHARSET, BEST_COMPRESSION);
-    }
-
-    /**
-     * Equivalent to {@link #TarGZipDriver(Charset, int)
-     * this(charset, Deflater.BEST_COMPRESSION)}.
-     */
-    public TarGZipDriver(Charset charset) {
-        this(charset, BEST_COMPRESSION);
-    }
-
-    /**
-     * Equivalent to {@link #TarGZipDriver(Charset, int)
-     * this(TAR_CHARSET, level)}.
-     */
-    public TarGZipDriver(int level) {
-        this(TAR_CHARSET, level);
-    }
-
-    /**
-     * Constructs a new TAR.GZ driver.
+     * Returns the size of the I/O buffer.
+     * <p>
+     * The implementation in the class {@link TarGZipDriver} returns
+     * {@link #BUFFER_SIZE}.
      *
-     * @param level The compression level to use when writing a GZIP output
-     *        stream.
-     * @throws IllegalArgumentException If {@code level} is not in the
-     *         range [{@value java.util.zip.Deflater#NO_COMPRESSION},
-     *         {@value java.util.zip.Deflater#BEST_COMPRESSION}]
-     *         and is not {@value java.util.zip.Deflater#DEFAULT_COMPRESSION}.
+     * @return The size of the I/O buffer.
      */
-    public TarGZipDriver(
-            final Charset charset,
-            final int level) {
-        super(charset);
-        if (    (   level < NO_COMPRESSION
-                 || level > BEST_COMPRESSION)
-                && level != DEFAULT_COMPRESSION)
-            throw new IllegalArgumentException();
-        this.level = level;
+    public int getBufferSize() {
+        return BUFFER_SIZE;
     }
 
     /**
-     * Returns the value of the property {@code preambled} which was 
-     * provided to the constructor.
+     * Returns the compression level to use when writing a GZIP output stream.
+     * <p>
+     * The implementation in the class {@link TarBZip2Driver} returns
+     * {@link Deflater#BEST_COMPRESSION}.
      */
     public final int getLevel() {
-        return level;
+        return Deflater.BEST_COMPRESSION;
     }
 
     @Override
     protected TarInputShop newTarInputShop(FsConcurrentModel model, InputStream in)
     throws IOException {
-        return new TarInputShop(new GZIPInputStream(in, BUFSIZE));
+        return new TarInputShop(new GZIPInputStream(in, getBufferSize()));
     }
 
     @Override
@@ -110,7 +70,7 @@ public final class TarGZipDriver extends TarDriver {
     throws IOException {
         return super.newTarOutputShop(
                 model,
-                new GZIPOutputStream(out, BUFSIZE, level),
+                new GZIPOutputStream(out, getBufferSize(), getLevel()),
                 source);
     }
 

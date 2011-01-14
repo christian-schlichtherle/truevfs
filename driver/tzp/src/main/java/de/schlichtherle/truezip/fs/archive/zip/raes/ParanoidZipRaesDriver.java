@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.fs.archive.zip.raes;
 
 import de.schlichtherle.truezip.fs.FsConcurrentModel;
@@ -52,32 +51,11 @@ import static java.util.zip.Deflater.BEST_COMPRESSION;
  * @see SafeZipRaesDriver
  */
 @Immutable
-public final class ParanoidZipRaesDriver extends AbstractZipRaesDriver {
+public class ParanoidZipRaesDriver extends AbstractZipRaesDriver {
 
-    private static final long serialVersionUID = 6373537182537867796L;
-
-    /**
-     * Equivalent to {@link #ParanoidZipRaesDriver(boolean, boolean, int)
-     * this(false, false, Deflater.BEST_COMPRESSION)}.
-     */
-    public ParanoidZipRaesDriver() {
-        this(false, false, BEST_COMPRESSION);
-    }
-
-    /**
-     * Equivalent to {@link #ParanoidZipRaesDriver(boolean, boolean, int)
-     * this(false, false, level)}.
-     */
-    public ParanoidZipRaesDriver(int level) {
-        this(false, false, level);
-    }
-
-    /** Constructs a new paranoid ZIP.RAES driver. */
-    public ParanoidZipRaesDriver(
-            boolean preambled,
-            boolean postambled,
-            final int level) {
-        super(preambled, postambled, level, Long.MAX_VALUE);
+    @Override
+    public long getAuthenticationTrigger() {
+        return Long.MAX_VALUE;
     }
 
     /**
