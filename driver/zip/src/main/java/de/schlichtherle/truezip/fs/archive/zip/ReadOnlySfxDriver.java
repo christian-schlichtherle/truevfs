@@ -17,6 +17,7 @@
 package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.fs.FsConcurrentModel;
+import de.schlichtherle.truezip.socket.IOPool;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -36,6 +37,10 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 public class ReadOnlySfxDriver extends ZipDriver {
+
+    public ReadOnlySfxDriver(IOPool<?> pool) {
+        super(pool);
+    }
 
     private static final String CLASS_NAME = ReadOnlySfxDriver.class.getName();
 

@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.fs.archive.zip.ZipDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
+import de.schlichtherle.truezip.socket.DefaultIOPoolContainer;
 
 /**
  * @author Christian Schlichtherle
@@ -25,6 +26,6 @@ import de.schlichtherle.truezip.fs.FsScheme;
 public final class TZipFileTest extends TFileTestCase {
 
     public TZipFileTest() {
-        super(FsScheme.create("zip"), new ZipDriver());
+        super(FsScheme.create("zip"), new ZipDriver(DefaultIOPoolContainer.INSTANCE.getPool()));
     }
 }

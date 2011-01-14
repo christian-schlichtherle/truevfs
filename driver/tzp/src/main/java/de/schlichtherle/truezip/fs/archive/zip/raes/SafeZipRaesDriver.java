@@ -19,6 +19,7 @@ import de.schlichtherle.truezip.fs.FsConcurrentModel;
 import de.schlichtherle.truezip.fs.archive.zip.CheckedZipInputShop;
 import de.schlichtherle.truezip.fs.archive.zip.ZipInputShop;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.socket.IOPool;
 import java.io.IOException;
 import net.jcip.annotations.Immutable;
 
@@ -50,6 +51,10 @@ import static java.util.zip.Deflater.BEST_COMPRESSION;
  */
 @Immutable
 public class SafeZipRaesDriver extends AbstractZipRaesDriver {
+
+    public SafeZipRaesDriver(IOPool<?> pool) {
+        super(pool);
+    }
 
     /**
      * The default trigger for authentication in bytes ({@value}).

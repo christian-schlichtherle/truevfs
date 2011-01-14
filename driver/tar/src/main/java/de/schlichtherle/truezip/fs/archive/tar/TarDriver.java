@@ -15,18 +15,17 @@
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import de.schlichtherle.truezip.fs.FsConcurrentModel;
 import de.schlichtherle.truezip.fs.archive.CharsetArchiveDriver;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.fs.archive.MultiplexedArchiveOutputShop;
-import de.schlichtherle.truezip.socket.DefaultIOPoolContainer;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.CharConversionException;
 import java.io.IOException;
@@ -45,30 +44,23 @@ import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
  * @version $Id$
  */
 @Immutable
+@DefaultAnnotation(NonNull.class)
 public class TarDriver extends CharsetArchiveDriver<TarArchiveEntry> {
 
-    /**
-     * The character set to use for entry names, which is {@code "US-ASCII"}.
-     * TAR files should actually be able to use the system's native character
-     * set charset. However, the low level TAR code as of Ant 1.6.5 doesn't
-     * support that, hence this constraint.
-     */
-    private static final Charset TAR_CHARSET = Charset.forName("US-ASCII");
+    private final IOPool<?> pool;
 
-    private IOPool<?> pool = DefaultIOPoolContainer.INSTANCE.getPool(); // FIXME!
+    public TarDriver(final IOPool<?> pool) {
+        if (null == pool)
+            throw new NullPointerException();
+        this.pool = pool;
+    }
 
     @Override
     public @NonNull IOPool<?> getPool() {
-        if (null == pool)
-            throw new IllegalStateException("I/O pool is not configured!");
         return pool;
     }
 
-    public void setPool(final @CheckForNull IOPool<?> pool) {
-        if (null != this.pool && this.pool != pool && pool != null)
-            throw new IllegalStateException("I/O pool has already been configured!");
-        this.pool = pool;
-    }
+    private static final Charset TAR_CHARSET = Charset.forName("US-ASCII");
 
     /**
      * Returns the character set to use for TAR entry names,

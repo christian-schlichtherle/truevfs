@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.fs.FsConcurrentModel;
 import de.schlichtherle.truezip.socket.InputSocket;
@@ -26,8 +28,8 @@ import de.schlichtherle.truezip.fs.archive.CharsetArchiveDriver;
 import de.schlichtherle.truezip.fs.archive.MultiplexedArchiveOutputShop;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.socket.DefaultIOPoolContainer;
 import de.schlichtherle.truezip.zip.ZipEntryFactory;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -49,16 +51,25 @@ import static java.util.zip.Deflater.BEST_COMPRESSION;
  * @version $Id$
  */
 @Immutable
+@DefaultAnnotation(NonNull.class)
 public class ZipDriver
 extends CharsetArchiveDriver<ZipArchiveEntry>
 implements ZipEntryFactory<ZipArchiveEntry> {
 
-    private static final Charset ZIP_CHARSET = Charset.forName("IBM437");
+    private final IOPool<?> pool;
+
+    public ZipDriver(final IOPool<?> pool) {
+        if (null == pool)
+            throw new NullPointerException();
+        this.pool = pool;
+    }
 
     @Override
     public IOPool<?> getPool() {
-        return DefaultIOPoolContainer.INSTANCE.getPool(); // FIXME!
+        return pool;
     }
+
+    private static final Charset ZIP_CHARSET = Charset.forName("IBM437");
 
     /**
      * Returns the character set to use for ZIP entry names and comments,
@@ -130,7 +141,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
     public ZipArchiveEntry newEntry(
             String name,
             final Type type,
-            final Entry template)
+            final @CheckForNull Entry template)
     throws CharConversionException {
         assertEncodable(name);
         name = toZipOrTarEntryName(name, type);
@@ -193,7 +204,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
     public OutputShop<ZipArchiveEntry> newOutputShop(
             FsConcurrentModel model,
             OutputSocket<?> output,
-            InputShop<ZipArchiveEntry> source)
+            @CheckForNull InputShop<ZipArchiveEntry> source)
     throws IOException {
         final OutputStream out = output.newOutputStream();
         try {
@@ -206,7 +217,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
     }
 
     protected ZipOutputShop newZipOutputShop(
-            FsConcurrentModel model, OutputStream out, ZipInputShop source)
+            FsConcurrentModel model, OutputStream out, @CheckForNull ZipInputShop source)
     throws IOException {
         return new ZipOutputShop(this, out, source);
     }

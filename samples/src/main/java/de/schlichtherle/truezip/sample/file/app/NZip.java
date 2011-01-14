@@ -26,6 +26,8 @@ import de.schlichtherle.truezip.fs.archive.zip.CheckedJarDriver;
 import de.schlichtherle.truezip.fs.archive.zip.CheckedReadOnlySfxDriver;
 import de.schlichtherle.truezip.fs.archive.zip.CheckedZipDriver;
 import de.schlichtherle.truezip.file.swing.tree.TFileTreeModel;
+import de.schlichtherle.truezip.socket.DefaultIOPoolContainer;
+import de.schlichtherle.truezip.socket.IOPool;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
@@ -70,6 +72,7 @@ public class NZip extends CommandLineUtility {
     private static final String CLASS_NAME = NZip.class.getName();
     private static final ResourceBundle resources
             = ResourceBundle.getBundle(CLASS_NAME);
+    private static final IOPool<?> POOL = DefaultIOPoolContainer.INSTANCE.getPool();
 
     private final NumberFormat numberFormat = NumberFormat.getNumberInstance();
     private final DateFormat dateFormat = DateFormat.getDateTimeInstance();
@@ -94,9 +97,9 @@ public class NZip extends CommandLineUtility {
     protected TArchiveDetector newArchiveDetector() {
         return new TDefaultArchiveDetector(TDefaultArchiveDetector.ALL,
             new Object[] {
-                "ear|jar|war", new CheckedJarDriver(),  // check CRC-32
-                "zip", new CheckedZipDriver(),          // check CRC-32
-                "exe", new CheckedReadOnlySfxDriver(),  // check CRC-32
+                "ear|jar|war", new CheckedJarDriver(POOL),  // check CRC-32
+                "zip", new CheckedZipDriver(POOL),          // check CRC-32
+                "exe", new CheckedReadOnlySfxDriver(POOL),  // check CRC-32
             });
     }
 
@@ -106,31 +109,31 @@ public class NZip extends CommandLineUtility {
         assert charset != null;
         return new TDefaultArchiveDetector(TDefaultArchiveDetector.ALL,
                 new Object[] {
-                    "ear|jar|war|zip", new CheckedZipDriver() { // check CRC-32
+                    "ear|jar|war|zip", new CheckedZipDriver(POOL) { // check CRC-32
                         @Override
                         public Charset getCharset() {
                             return charset;
                         }
                     },
-                    "exe", new CheckedReadOnlySfxDriver() { // check CRC-32
+                    "exe", new CheckedReadOnlySfxDriver(POOL) { // check CRC-32
                         @Override
                         public Charset getCharset() {
                             return charset;
                         }
                     },
-                    "tar", new TarDriver(){
+                    "tar", new TarDriver(POOL){
                         @Override
                         public Charset getCharset() {
                             return charset;
                         }
                     },
-                    "tgz|tar.gz", new TarGZipDriver(){
+                    "tgz|tar.gz", new TarGZipDriver(POOL) {
                         @Override
                         public Charset getCharset() {
                             return charset;
                         }
                     },
-                    "tbz|tar.bz2", new TarBZip2Driver(){
+                    "tbz|tar.bz2", new TarBZip2Driver(POOL){
                         @Override
                         public Charset getCharset() {
                             return charset;

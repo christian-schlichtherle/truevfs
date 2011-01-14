@@ -19,6 +19,8 @@ import de.schlichtherle.truezip.util.SuffixSet;
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsDriverContainer;
 import de.schlichtherle.truezip.fs.FsScheme;
+import de.schlichtherle.truezip.socket.DefaultIOPoolContainer;
+import de.schlichtherle.truezip.socket.IOPool;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,18 +35,19 @@ import net.jcip.annotations.Immutable;
 @Immutable
 public final class ZipDriverContainer implements FsDriverContainer {
 
+    private static final IOPool<?> POOL = DefaultIOPoolContainer.INSTANCE.getPool();
     private static final Map<FsScheme, FsDriver> DRIVERS;
 
     static {
         final Map<FsScheme, FsDriver> drivers = new HashMap<FsScheme, FsDriver>();
-        drivers.put(FsScheme.create("zip"), new ZipDriver());
-        FsDriver driver = new JarDriver();
+        drivers.put(FsScheme.create("zip"), new ZipDriver(POOL));
+        FsDriver driver = new JarDriver(POOL);
         for (String suffix : new SuffixSet("ear|jar|war"))
             drivers.put(FsScheme.create(suffix), driver);
-        driver = new OdfDriver();
+        driver = new OdfDriver(POOL);
         for (String suffix : new SuffixSet("odg|odp|ods|odt|otg|otp|ots|ott|odb|odf|odm|oth"))
             drivers.put(FsScheme.create(suffix), driver);
-        drivers.put(FsScheme.create("exe"), new ReadOnlySfxDriver());
+        drivers.put(FsScheme.create("exe"), new ReadOnlySfxDriver(POOL));
         DRIVERS = Collections.unmodifiableMap(drivers);
     }
 

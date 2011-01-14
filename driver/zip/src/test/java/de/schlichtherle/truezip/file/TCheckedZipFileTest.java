@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.fs.archive.zip.CheckedZipDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
+import de.schlichtherle.truezip.socket.DefaultIOPoolContainer;
 
 /**
  * @author Christian Schlichtherle
@@ -25,6 +26,6 @@ import de.schlichtherle.truezip.fs.FsScheme;
 public final class TCheckedZipFileTest extends TFileTestCase {
     
     public TCheckedZipFileTest() {
-        super(FsScheme.create("zip"), new CheckedZipDriver());
+        super(FsScheme.create("zip"), new CheckedZipDriver(DefaultIOPoolContainer.INSTANCE.getPool()));
     }
 }

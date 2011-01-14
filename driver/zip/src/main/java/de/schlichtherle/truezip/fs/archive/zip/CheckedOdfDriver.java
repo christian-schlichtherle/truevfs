@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.fs.FsConcurrentModel;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.socket.IOPool;
 import java.io.IOException;
 import net.jcip.annotations.Immutable;
 
@@ -42,6 +43,10 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 public class CheckedOdfDriver extends OdfDriver {
+
+    public CheckedOdfDriver(IOPool<?> pool) {
+        super(pool);
+    }
 
     @Override
     protected ZipInputShop newZipInputShop(FsConcurrentModel model, ReadOnlyFile rof)

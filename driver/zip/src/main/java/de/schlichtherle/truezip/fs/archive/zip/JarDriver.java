@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.socket.IOPool;
 import java.io.CharConversionException;
 import java.nio.charset.Charset;
 import net.jcip.annotations.Immutable;
@@ -37,6 +38,10 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 public class JarDriver extends ZipDriver {
+
+    public JarDriver(IOPool<?> pool) {
+        super(pool);
+    }
 
     /**
      * The default character set for entry names and comments, which is

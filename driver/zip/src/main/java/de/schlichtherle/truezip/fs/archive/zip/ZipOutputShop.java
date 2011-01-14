@@ -26,6 +26,10 @@ import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.zip.RawZipOutputStream;
 import de.schlichtherle.truezip.util.JointIterator;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -47,21 +51,22 @@ import static de.schlichtherle.truezip.zip.ZipEntry.UNKNOWN;
  * {@link MultiplexedArchiveOutputShop}
  * to overcome this limitation.
  * 
- * @see ZipDriver
- * @author Christian Schlichtherle
+ * @see     ZipInputShop
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public class ZipOutputShop
 extends RawZipOutputStream<ZipArchiveEntry>
 implements OutputShop<ZipArchiveEntry> {
 
     private final IOPool<?> pool;
-    private IOPool.Entry<?> postamble;
-    private ZipArchiveEntry tempEntry;
+    private @CheckForNull IOPool.Entry<?> postamble;
+    private @Nullable ZipArchiveEntry tempEntry;
 
     public ZipOutputShop(   final ZipDriver driver,
                             final OutputStream out,
-                            final ZipInputShop source)
+                            final @CheckForNull ZipInputShop source)
     throws IOException {
         super(out, driver.getCharset());
         super.setLevel(driver.getLevel());
@@ -104,7 +109,7 @@ implements OutputShop<ZipArchiveEntry> {
     }
 
     @Override
-    public ZipArchiveEntry getEntry(final String name) {
+    public @CheckForNull ZipArchiveEntry getEntry(final String name) {
         ZipArchiveEntry entry = super.getEntry(name);
         if (null != entry)
             return entry;

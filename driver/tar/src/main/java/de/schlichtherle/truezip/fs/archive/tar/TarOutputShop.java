@@ -23,6 +23,7 @@ import de.schlichtherle.truezip.fs.archive.MultiplexedArchiveOutputShop;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.socket.IOPool;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.InputStream;
 import java.io.IOException;
@@ -51,10 +52,12 @@ import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
  * This output archive can only write one entry concurrently.
  * Archive drivers may wrap this class in a {@link MultiplexedArchiveOutputShop}
  * to overcome this limitation.
- * 
- * @author Christian Schlichtherle
+ *
+ * @see     TarInputShop
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public class TarOutputShop
 extends TarOutputStream
 implements OutputShop<TarArchiveEntry> {
@@ -66,7 +69,7 @@ implements OutputShop<TarArchiveEntry> {
     private final IOPool<?> pool;
     private boolean busy;
 
-    public TarOutputShop(final @NonNull TarDriver driver, @NonNull OutputStream out) {
+    public TarOutputShop(final TarDriver driver, OutputStream out) {
         super(out);
         super.setLongFileMode(LONGFILE_GNU);
         this.pool = driver.getPool();

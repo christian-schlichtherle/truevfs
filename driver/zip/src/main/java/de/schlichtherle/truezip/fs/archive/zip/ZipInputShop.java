@@ -20,6 +20,8 @@ import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.zip.RawZipFile;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,10 +31,11 @@ import static de.schlichtherle.truezip.zip.ZipEntry.*;
 /**
  * An implementation of {@link InputShop} to read ZIP archives.
  *
- * @see ZipDriver
- * @author Christian Schlichtherle
+ * @see     ZipOutputShop
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public class ZipInputShop
 extends RawZipFile<ZipArchiveEntry>
 implements InputShop<ZipArchiveEntry> {
