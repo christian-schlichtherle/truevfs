@@ -26,8 +26,6 @@ import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.zip.RawZipOutputStream;
 import de.schlichtherle.truezip.util.JointIterator;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -36,7 +34,6 @@ import java.util.Iterator;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedOutputStream;
 
-import static de.schlichtherle.truezip.fs.archive.zip.ZipDriver.TEMP_FILE_PREFIX;
 import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 import static de.schlichtherle.truezip.zip.ZipEntry.DEFLATED;
 import static de.schlichtherle.truezip.zip.ZipEntry.STORED;
@@ -58,6 +55,7 @@ public class ZipOutputShop
 extends RawZipOutputStream<ZipArchiveEntry>
 implements OutputShop<ZipArchiveEntry> {
 
+    private final IOPool<?> pool;
     private IOPool.Entry<?> postamble;
     private ZipArchiveEntry tempEntry;
 
@@ -67,7 +65,7 @@ implements OutputShop<ZipArchiveEntry> {
     throws IOException {
         super(out, driver.getCharset());
         super.setLevel(driver.getLevel());
-
+        this.pool = driver.getPool();
         if (null != source) {
             // Retain comment and preamble of input ZIP archive.
             super.setComment(source.getComment());
@@ -166,7 +164,7 @@ implements OutputShop<ZipArchiveEntry> {
                                 || UNKNOWN == entry.getCompressedSize()
                                 || UNKNOWN == entry.getSize())
                             return new TempEntryOutputStream(
-                                    File.createTempFile(TEMP_FILE_PREFIX, null), // TODO: Use IOPool or IOCache!
+                                    pool.allocate(),
                                     entry);
                         break;
 
@@ -227,12 +225,12 @@ implements OutputShop<ZipArchiveEntry> {
      * output stream and finally deleted.
      */
     private class TempEntryOutputStream extends CheckedOutputStream {
-        private final File temp;
+        private final IOPool.Entry<?> temp;
         private boolean closed;
 
-        TempEntryOutputStream(final File temp, final ZipArchiveEntry entry)
+        TempEntryOutputStream(final IOPool.Entry<?> temp, final ZipArchiveEntry entry)
         throws IOException {
-            super(new java.io.FileOutputStream(temp), new CRC32());
+            super(temp.getOutputSocket().newOutputStream(), new CRC32());
             assert entry.getMethod() == STORED;
             this.temp = temp;
             tempEntry = entry;
@@ -249,7 +247,7 @@ implements OutputShop<ZipArchiveEntry> {
                 try {
                     super.close();
                 } finally {
-                    final long length = temp.length();
+                    final long length = temp.getSize(DATA);
                     if (length > Integer.MAX_VALUE)
                         throw new IOException("file too large");
                     tempEntry.setCrc(getChecksum().getValue());
@@ -262,19 +260,18 @@ implements OutputShop<ZipArchiveEntry> {
             }
         }
 
-        void store()
-        throws IOException {
+        void store() throws IOException {
             assert tempEntry.getMethod() == STORED;
             assert tempEntry.getCrc() != UNKNOWN;
             assert tempEntry.getCompressedSize() != UNKNOWN;
             assert tempEntry.getSize() != UNKNOWN;
 
             try {
-                final InputStream in = new FileInputStream(temp);
+                final InputStream in = temp.getInputSocket().newInputStream();
                 try {
                     putNextEntry(tempEntry);
                     try {
-                        Streams.cat(in, this);
+                        Streams.cat(in, ZipOutputShop.this);
                     } finally {
                         closeEntry();
                     }
@@ -282,10 +279,7 @@ implements OutputShop<ZipArchiveEntry> {
                     in.close();
                 }
             } finally {
-                if (!temp.delete()) {
-                    // Windoze: Most probably in.close() failed.
-                    throw new IOException(temp + " (could not delete)");
-                }
+                temp.release();
             }
         }
     } // class TempEntryOutputStream
