@@ -19,6 +19,8 @@ package de.schlichtherle.truezip.fs.archive.zip;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.zip.CRC32Exception;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,6 +41,7 @@ import java.io.InputStream;
  * @version $Id$
  * @see CheckedZipDriver
  */
+@DefaultAnnotation(NonNull.class)
 public class CheckedZipInputShop extends ZipInputShop {
     
     public CheckedZipInputShop(ReadOnlyFile rof, ZipDriver driver)

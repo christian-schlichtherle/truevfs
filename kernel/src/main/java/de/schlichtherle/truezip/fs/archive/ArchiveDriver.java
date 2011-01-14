@@ -48,6 +48,11 @@ import net.jcip.annotations.Immutable;
 public abstract class ArchiveDriver<E extends ArchiveEntry>
 implements FsDriver, EntryFactory<E> {
 
+    /**
+     * Returns the I/O pool to use for allocating temporary I/O entries.
+     *
+     * @return The I/O pool to use for allocating temporary I/O entries.
+     */
     public abstract IOPool<?> getPool();
 
     /**

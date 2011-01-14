@@ -19,6 +19,7 @@ import de.schlichtherle.truezip.util.SuffixSet;
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsDriverContainer;
 import de.schlichtherle.truezip.fs.FsScheme;
+import de.schlichtherle.truezip.socket.DefaultIOPoolContainer;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +38,7 @@ public final class ZipRaesDriverContainer implements FsDriverContainer {
 
     static {
         final Map<FsScheme, FsDriver> drivers = new HashMap<FsScheme, FsDriver>();
-        FsDriver driver = new SafeZipRaesDriver();
+        FsDriver driver = new SafeZipRaesDriver(DefaultIOPoolContainer.INSTANCE.getPool());
         for (String suffix : new SuffixSet("tzp|zip.rae|zip.raes"))
             drivers.put(FsScheme.create(suffix), driver);
         DRIVERS = Collections.unmodifiableMap(drivers);

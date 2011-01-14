@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import de.schlichtherle.truezip.socket.IOPool.Entry;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.InputSocket;
@@ -57,9 +59,11 @@ import static org.apache.tools.tar.TarConstants.UIDLEN;
  * is no way the archive driver could predict the client application's
  * behaviour.
  *
- * @author Christian Schlichtherle
+ * @see     TarOutputShop
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public class TarInputShop
 implements InputShop<TarArchiveEntry> {
 

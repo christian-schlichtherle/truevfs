@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.fs.archive.tar;
 
 import de.schlichtherle.truezip.fs.FsConcurrentModel;
+import de.schlichtherle.truezip.socket.IOPool;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -33,6 +34,10 @@ import org.apache.tools.bzip2.CBZip2OutputStream;
  */
 @Immutable
 public class TarBZip2Driver extends TarDriver {
+
+    public TarBZip2Driver(IOPool<?> pool) {
+        super(pool);
+    }
 
     public static final int BUFFER_SIZE = 4096;
 

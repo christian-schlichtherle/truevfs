@@ -38,6 +38,7 @@ import de.schlichtherle.truezip.fs.archive.zip.JarDriver;
 import de.schlichtherle.truezip.fs.archive.zip.JarArchiveEntry;
 import de.schlichtherle.truezip.fs.archive.zip.ZipArchiveEntry;
 import de.schlichtherle.truezip.fs.archive.zip.ZipInputShop;
+import de.schlichtherle.truezip.socket.IOPool;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -55,6 +56,10 @@ import static de.schlichtherle.truezip.zip.ZipEntry.*;
  */
 @Immutable
 public abstract class AbstractZipRaesDriver extends JarDriver {
+
+    public AbstractZipRaesDriver(IOPool<?> pool) {
+        super(pool);
+    }
 
     /**
      * Constructs a new abstract ZIP.RAES driver which

@@ -17,6 +17,7 @@
 package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.fs.FsConcurrentModel;
+import de.schlichtherle.truezip.socket.IOPool;
 import java.io.OutputStream;
 import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.socket.OutputShop;
@@ -49,6 +50,10 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 public class OdfDriver extends JarDriver {
+
+    public OdfDriver(IOPool<?> pool) {
+        super(pool);
+    }
 
     @Override
     public OutputShop<ZipArchiveEntry> newOutputShop(

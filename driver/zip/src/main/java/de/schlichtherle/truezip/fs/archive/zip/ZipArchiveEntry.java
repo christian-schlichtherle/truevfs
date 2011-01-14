@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.fs.archive.zip;
 import de.schlichtherle.truezip.fs.archive.ArchiveEntry;
 import de.schlichtherle.truezip.zip.DateTimeConverter;
 import de.schlichtherle.truezip.zip.ZipEntry;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
 import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
@@ -41,7 +42,7 @@ public class ZipArchiveEntry extends ZipEntry implements ArchiveEntry {
         super(name);
     }
 
-    ZipArchiveEntry(String name, ZipEntry template) {
+    ZipArchiveEntry(String name, @NonNull ZipEntry template) {
         super(name, template);
     }
 

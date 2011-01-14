@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.fs.archive.tar;
 
 import java.util.zip.Deflater;
 import de.schlichtherle.truezip.fs.FsConcurrentModel;
+import de.schlichtherle.truezip.socket.IOPool;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -31,6 +32,10 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 public class TarGZipDriver extends TarDriver {
+
+    public TarGZipDriver(IOPool<?> pool) {
+        super(pool);
+    }
 
     public static final int BUFFER_SIZE = 4096;
 

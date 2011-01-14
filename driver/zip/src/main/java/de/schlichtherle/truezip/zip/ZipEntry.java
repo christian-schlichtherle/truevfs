@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.zip;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.nio.charset.Charset;
 
 import static de.schlichtherle.truezip.zip.ZipConstants.*;
@@ -105,7 +106,7 @@ public class ZipEntry implements Cloneable {
      * Constructs a new ZIP entry with the given name which has all other
      * properties copied from the given template.
      */
-    public ZipEntry(final String name, final ZipEntry template) {
+    public ZipEntry(final String name, final @NonNull ZipEntry template) {
         this.init = template.init;
         this.name = name;
         this.platform = template.platform;

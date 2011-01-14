@@ -26,6 +26,7 @@ import de.schlichtherle.truezip.io.TabuFileException;
 import de.schlichtherle.truezip.fs.archive.zip.ZipDriver;
 import de.schlichtherle.truezip.fs.archive.zip.ZipInputShop;
 import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.LazyOutputSocket;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -52,6 +53,10 @@ import static java.util.zip.Deflater.BEST_COMPRESSION;
  */
 @Immutable
 public class ParanoidZipRaesDriver extends AbstractZipRaesDriver {
+
+    public ParanoidZipRaesDriver(IOPool<?> pool) {
+        super(pool);
+    }
 
     @Override
     public long getAuthenticationTrigger() {
