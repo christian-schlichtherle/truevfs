@@ -24,7 +24,6 @@ import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsException;
 import de.schlichtherle.truezip.fs.FsModel;
-import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.key.KeyManagers;
 import java.io.CharConversionException;
 import java.io.IOException;

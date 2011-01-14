@@ -20,6 +20,7 @@ import java.nio.charset.Charset;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import java.util.Iterator;
 import de.schlichtherle.truezip.io.LEDataOutputStream;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collections;
@@ -110,8 +111,8 @@ implements Iterable<E> {
      *         by this JVM.
      */
     protected RawZipOutputStream(
-            final OutputStream out,
-            final Charset charset) {
+            final @NonNull OutputStream out,
+            final @NonNull Charset charset) {
         super(toLEDataOutputStream(out));
         if (null == out || null == charset)
             throw new NullPointerException();
@@ -132,8 +133,8 @@ implements Iterable<E> {
      *         after its central directory and before its end.
      */
     protected RawZipOutputStream(
-            final OutputStream out,
-            final RawZipFile<E> appendee)
+            final @NonNull OutputStream out,
+            final @NonNull RawZipFile<E> appendee)
     throws ZipException {
         super(new CustomLEDataOutputStream(out, appendee));
         if (null == out)

@@ -19,10 +19,8 @@ package de.schlichtherle.truezip.fs.archive.zip;
 import de.schlichtherle.truezip.fs.FsConcurrentModel;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import net.jcip.annotations.Immutable;
 
-import static java.util.zip.Deflater.BEST_COMPRESSION;
 
 /**
  * An archive driver for SFX/EXE files which checks the CRC-32 value for all
@@ -43,45 +41,11 @@ import static java.util.zip.Deflater.BEST_COMPRESSION;
  * @see CheckedZipInputShop
  */
 @Immutable
-public final class CheckedReadOnlySfxDriver extends ReadOnlySfxDriver {
-    private static final long serialVersionUID = -940108057195872802L;
-
-    /**
-     * Equivalent to {@link #CheckedReadOnlySfxDriver(Charset, boolean, int)
-     * this(DEFAULT_CHARSET, false, Deflater.BEST_COMPRESSION)}.
-     */
-    public CheckedReadOnlySfxDriver() {
-        this(DEFAULT_CHARSET, false, BEST_COMPRESSION);
-    }
-
-    /**
-     * Equivalent to {@link #CheckedReadOnlySfxDriver(Charset, boolean, int)
-     * this(charset, false, Deflater.BEST_COMPRESSION)}.
-     */
-    public CheckedReadOnlySfxDriver(Charset charset) {
-        this(charset, false, BEST_COMPRESSION);
-    }
-
-    /**
-     * Equivalent to {@link #CheckedReadOnlySfxDriver(Charset, boolean, int)
-     * this(DEFAULT_CHARSET, false, level)}.
-     */
-    public CheckedReadOnlySfxDriver(int level) {
-        this(DEFAULT_CHARSET, false, level);
-    }
-
-    /** Constructs a new checked read-only SFX/EXE driver. */
-    public CheckedReadOnlySfxDriver(
-            Charset charset,
-            boolean postambled,
-            final int level) {
-        super(charset, postambled, level);
-    }
+public class CheckedReadOnlySfxDriver extends ReadOnlySfxDriver {
     
     @Override
     protected ZipInputShop newZipInputShop(FsConcurrentModel model, ReadOnlyFile rof)
     throws IOException {
-        return new CheckedZipInputShop(
-                rof, getCharset(), getPreambled(), getPostambled(), this);
+        return new CheckedZipInputShop(rof, this);
     }
 }

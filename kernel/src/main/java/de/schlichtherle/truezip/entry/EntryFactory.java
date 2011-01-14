@@ -22,8 +22,6 @@ import java.io.CharConversionException;
 
 /**
  * A factory for entries.
- * <p>
- * Implementations must be immutable.
  *
  * @param   <E> The type of the created entries.
  * @author  Christian Schlichtherle

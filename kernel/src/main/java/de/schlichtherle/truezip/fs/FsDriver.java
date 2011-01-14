@@ -23,8 +23,6 @@ import net.jcip.annotations.ThreadSafe;
 
 /**
  * An factory for thread-safe file system controllers.
- * <p>
- * Implementations must be immutable.
  * 
  * @author  Christian Schlichtherle
  * @version $Id$

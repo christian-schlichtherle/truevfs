@@ -16,7 +16,6 @@
 
 package de.schlichtherle.truezip.fs.archive;
 
-import de.schlichtherle.truezip.io.TabuFileException;
 import de.schlichtherle.truezip.fs.FsConcurrentModel;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.InputShop;
@@ -26,13 +25,12 @@ import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsConcurrentController;
 import de.schlichtherle.truezip.fs.FsCachingController;
-import de.schlichtherle.truezip.socket.DefaultIOPoolContainer;
+import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import javax.swing.Icon;
 import net.jcip.annotations.Immutable;
@@ -40,8 +38,6 @@ import net.jcip.annotations.Immutable;
 /**
  * This file system driver interface is used to access archives of a
  * particular type, e.g. ZIP, TZP, JAR, TAR, TAR.GZ, TAR.BZ2 or any other.
- * <p>
- * Implementations must be immutable.
  *
  * @param   <E> The type of the archive entries.
  * @author  Christian Schlichtherle
@@ -51,6 +47,8 @@ import net.jcip.annotations.Immutable;
 @Immutable
 public abstract class ArchiveDriver<E extends ArchiveEntry>
 implements FsDriver, EntryFactory<E> {
+
+    public abstract IOPool<?> getPool();
 
     /**
      * Returns a new thread-safe file system controller for the given mount
@@ -84,7 +82,7 @@ implements FsDriver, EntryFactory<E> {
                         new DefaultArchiveController<E>(
                             new FsConcurrentModel(mountPoint, parent.getModel()),
                             this, parent, false),
-                        DefaultIOPoolContainer.INSTANCE.getPool()));
+                        getPool()));
     }
 
     /**

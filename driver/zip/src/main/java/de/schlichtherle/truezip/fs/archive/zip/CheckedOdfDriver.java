@@ -17,12 +17,10 @@
 package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.fs.FsConcurrentModel;
-import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import java.io.IOException;
 import net.jcip.annotations.Immutable;
 
-import static java.util.zip.Deflater.BEST_COMPRESSION;
 
 /**
  * An archive driver for ODF files which checks the CRC-32 value for all ZIP
@@ -43,37 +41,11 @@ import static java.util.zip.Deflater.BEST_COMPRESSION;
  * @see CheckedZipInputShop
  */
 @Immutable
-public final class CheckedOdfDriver extends OdfDriver {
-    private static final long serialVersionUID = -6546216832168462491L;
-
-    /**
-     * Equivalent to {@link #CheckedOdfDriver(boolean, boolean, int)
-     * this(false, false, Deflater.BEST_COMPRESSION)}.
-     */
-    public CheckedOdfDriver() {
-        this(false, false, BEST_COMPRESSION);
-    }
-
-    /**
-     * Equivalent to {@link #CheckedOdfDriver(boolean, boolean, int)
-     * this(null, null, false, false, level)}.
-     */
-    public CheckedOdfDriver(int level) {
-        this(false, false, level);
-    }
-
-    /** Constructs a new checked ODF driver. */
-    public CheckedOdfDriver(
-            boolean preambled,
-            boolean postambled,
-            final int level) {
-        super(preambled, postambled, level);
-    }
+public class CheckedOdfDriver extends OdfDriver {
 
     @Override
     protected ZipInputShop newZipInputShop(FsConcurrentModel model, ReadOnlyFile rof)
     throws IOException {
-        return new CheckedZipInputShop(
-                rof, getCharset(), getPreambled(), getPostambled(), this);
+        return new CheckedZipInputShop(rof, this);
     }
 }

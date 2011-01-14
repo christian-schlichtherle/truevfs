@@ -21,9 +21,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.jcip.annotations.Immutable;
 
-import static java.util.zip.Deflater.BEST_COMPRESSION;
 
 /**
  * An archive driver which reads Self Executable (SFX/EXE) ZIP files,
@@ -34,39 +35,30 @@ import static java.util.zip.Deflater.BEST_COMPRESSION;
  * @version $Id$
  */
 @Immutable
-public class ReadOnlySfxDriver extends AbstractSfxDriver {
-    private static final long serialVersionUID = -993451557140046215L;
+public class ReadOnlySfxDriver extends ZipDriver {
+
+    private static final String CLASS_NAME = ReadOnlySfxDriver.class.getName();
 
     /**
-     * Equivalent to {@link #ReadOnlySfxDriver(Charset, boolean, int)
-     * this(DEFAULT_CHARSET, false, Deflater.BEST_COMPRESSION)}.
+     * The character set used in SFX archives by default, which is determined
+     * by calling {@code System.getProperty("file.encoding")}.
      */
-    public ReadOnlySfxDriver() {
-        this(DEFAULT_CHARSET, false, BEST_COMPRESSION);
+    private static final Charset SFX_CHARSET
+            = Charset.forName(System.getProperty("file.encoding"));
+
+    static {
+        Logger  .getLogger(CLASS_NAME, CLASS_NAME)
+                .log(Level.CONFIG, "charset", SFX_CHARSET);
     }
 
-    /**
-     * Equivalent to {@link #ReadOnlySfxDriver(Charset, boolean, int)
-     * this(charset, false, Deflater.BEST_COMPRESSION)}.
-     */
-    public ReadOnlySfxDriver(Charset charset) {
-        this(charset, false, BEST_COMPRESSION);
+    @Override
+    public Charset getCharset() {
+        return SFX_CHARSET;
     }
 
-    /**
-     * Equivalent to {@link #ReadOnlySfxDriver(Charset, boolean, int)
-     * this(DEFAULT_CHARSET, false, level)}.
-     */
-    public ReadOnlySfxDriver(int level) {
-        this(DEFAULT_CHARSET, false, level);
-    }
-
-    /** Constructs a new read-only SFX/EXE driver. */
-    public ReadOnlySfxDriver(
-            Charset charset,
-            boolean postambled,
-            final int level) {
-        super(charset, postambled, level);
+    @Override
+    public final boolean getPreambled() {
+        return true;
     }
 
     @Override

@@ -22,7 +22,6 @@ import java.io.CharConversionException;
 import java.nio.charset.Charset;
 import net.jcip.annotations.Immutable;
 
-import static java.util.zip.Deflater.BEST_COMPRESSION;
 
 /**
  * An archive driver which builds JAR files.
@@ -38,34 +37,16 @@ import static java.util.zip.Deflater.BEST_COMPRESSION;
  */
 @Immutable
 public class JarDriver extends ZipDriver {
-    private static final long serialVersionUID = 3333659381918211087L;
 
     /**
      * The default character set for entry names and comments, which is
      * {@code "UTF-8"}.
      */
-    @SuppressWarnings("FieldNameHidesFieldInSuperclass")
-    public static final Charset JAR_CHARSET = Charset.forName("UTF-8");
+    private static final Charset JAR_CHARSET = Charset.forName("UTF-8");
 
-    /**
-     * Equivalent to {@link #JarDriver(boolean, boolean, int)
-     * this(null, null, false, false, Deflater.BEST_COMPRESSION)}.
-     */
-    public JarDriver() {
-        this(false, false, BEST_COMPRESSION);
-    }
-
-    /**
-     * Equivalent to {@link #JarDriver(boolean, boolean, int)
-     * this(false, false, level)}.
-     */
-    public JarDriver(int level) {
-        this(false, false, level);
-    }
-
-    /** Constructs a new JAR driver. */
-    public JarDriver(boolean preambled, boolean postambled, final int level) {
-        super(JAR_CHARSET, preambled, postambled, level);
+    @Override
+    public final Charset getCharset() {
+        return JAR_CHARSET;
     }
 
     @Override

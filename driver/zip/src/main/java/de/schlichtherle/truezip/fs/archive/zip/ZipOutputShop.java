@@ -24,7 +24,6 @@ import de.schlichtherle.truezip.fs.archive.MultiplexedArchiveOutputShop;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.socket.DefaultIOPoolContainer;
 import de.schlichtherle.truezip.zip.RawZipOutputStream;
 import de.schlichtherle.truezip.util.JointIterator;
 import java.io.File;
@@ -32,8 +31,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.zip.CRC32;
@@ -64,26 +61,12 @@ implements OutputShop<ZipArchiveEntry> {
     private IOPool.Entry<?> postamble;
     private ZipArchiveEntry tempEntry;
 
-    /**
-     * Creates a new instance which uses the output stream, character set and
-     * compression level.
-     *
-     * @param level The compression level to use.
-     * @throws IllegalArgumentException If {@code level} is not in the
-     *         range [{@value java.util.zip.Deflater#BEST_SPEED}..{@value java.util.zip.Deflater#BEST_COMPRESSION}]
-     *         and is not {@value java.util.zip.Deflater#DEFAULT_COMPRESSION}.
-     */
-    public ZipOutputShop(
-            final OutputStream out,
-            final Charset charset,
-            final int level,
-            final ZipInputShop source)
-    throws  NullPointerException,
-            UnsupportedEncodingException,
-            IOException {
-        // super(out, source); // TODO: Support append strategy!
-        super(out, charset);
-        super.setLevel(level);
+    public ZipOutputShop(   final ZipDriver driver,
+                            final OutputStream out,
+                            final ZipInputShop source)
+    throws IOException {
+        super(out, driver.getCharset());
+        super.setLevel(driver.getLevel());
 
         if (null != source) {
             // Retain comment and preamble of input ZIP archive.
@@ -97,7 +80,7 @@ implements OutputShop<ZipArchiveEntry> {
                 }
             }
             if (0 < source.getPostambleLength()) {
-                postamble = DefaultIOPoolContainer.INSTANCE.getPool().allocate();
+                postamble = driver.getPool().allocate();
                 Streams.copy(   source.getPostambleInputStream(),
                                 postamble.getOutputSocket().newOutputStream());
             } else {

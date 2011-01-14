@@ -21,7 +21,6 @@ import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import java.io.IOException;
 import net.jcip.annotations.Immutable;
 
-import static java.util.zip.Deflater.BEST_COMPRESSION;
 
 /**
  * An archive driver for JAR files which checks the CRC-32 value for all ZIP
@@ -42,37 +41,11 @@ import static java.util.zip.Deflater.BEST_COMPRESSION;
  * @see CheckedZipInputShop
  */
 @Immutable
-public final class CheckedJarDriver extends JarDriver {
-    private static final long serialVersionUID = -2148911260108380591L;
-
-    /**
-     * Equivalent to {@link #CheckedJarDriver(boolean, boolean, int)
-     * this(false, false, Deflater.BEST_COMPRESSION)}.
-     */
-    public CheckedJarDriver() {
-        this(false, false, BEST_COMPRESSION);
-    }
-
-    /**
-     * Equivalent to {@link #CheckedJarDriver(boolean, boolean, int)
-     * this(false, false, level)}.
-     */
-    public CheckedJarDriver(int level) {
-        this(false, false, level);
-    }
-
-    /** Constructs a new checked JAR driver. */
-    public CheckedJarDriver(
-            boolean preambled,
-            boolean postambled,
-            final int level) {
-        super(preambled, postambled, level);
-    }
+public class CheckedJarDriver extends JarDriver {
 
     @Override
     protected ZipInputShop newZipInputShop(FsConcurrentModel model, ReadOnlyFile rof)
     throws IOException {
-        return new CheckedZipInputShop(
-                rof, getCharset(), getPreambled(), getPostambled(), this);
+        return new CheckedZipInputShop(rof, this);
     }
 }
