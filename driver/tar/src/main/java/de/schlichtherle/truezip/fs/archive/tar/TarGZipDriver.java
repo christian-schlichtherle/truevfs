@@ -59,7 +59,7 @@ public class TarGZipDriver extends TarDriver {
     @Override
     protected TarInputShop newTarInputShop(FsConcurrentModel model, InputStream in)
     throws IOException {
-        return new TarInputShop(new GZIPInputStream(in, getBufferSize()));
+        return new TarInputShop(this, new GZIPInputStream(in, getBufferSize()));
     }
 
     @Override

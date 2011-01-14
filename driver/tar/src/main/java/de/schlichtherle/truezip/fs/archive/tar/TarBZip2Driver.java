@@ -77,7 +77,7 @@ public class TarBZip2Driver extends TarDriver {
         final InputStream vin = TarInputShop.readAhead(in, magic);
         if (magic[0] != 'h' || magic[1] < '1' || '9' < magic[1])
             throw new IOException("Not a BZIP2 compressed input stream!");
-        return new TarInputShop(
+        return new TarInputShop(this,
                 new CBZip2InputStream(
                     new BufferedInputStream(vin, getBufferSize())));
     }

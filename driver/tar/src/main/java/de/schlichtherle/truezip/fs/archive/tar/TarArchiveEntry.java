@@ -15,8 +15,11 @@
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
+import de.schlichtherle.truezip.util.Pool.Releasable;
+import de.schlichtherle.truezip.socket.IOPool.Entry;
 import de.schlichtherle.truezip.fs.archive.ArchiveEntry;
 import java.io.File;
+import java.io.IOException;
 import org.apache.tools.tar.TarEntry;
 
 import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
@@ -31,7 +34,11 @@ import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class TarArchiveEntry extends TarEntry implements ArchiveEntry {
+public class TarArchiveEntry
+extends TarEntry
+implements ArchiveEntry, Releasable<IOException> {
+
+    private Entry<?> temp;
 
     public TarArchiveEntry(final String entryName) {
         super(entryName, true);
@@ -39,6 +46,18 @@ public class TarArchiveEntry extends TarEntry implements ArchiveEntry {
         super.setModTime(Long.MIN_VALUE);
         super.setSize(UNKNOWN);
         super.setUserName(System.getProperty("user.name", ""));
+    }
+
+    public TarArchiveEntry(final TarEntry template)
+    throws IOException {
+        super(template.getName(), true);
+        super.setMode(template.getMode());
+        super.setModTime(template.getModTime());
+        super.setSize(template.getSize());
+        super.setUserId(template.getUserId());
+        super.setUserName(template.getUserName());
+        super.setGroupId(template.getGroupId());
+        super.setGroupName(template.getGroupName());
     }
 
     public TarArchiveEntry(
@@ -66,6 +85,20 @@ public class TarArchiveEntry extends TarEntry implements ArchiveEntry {
         super.setUserName(template.getUserName());
         super.setGroupId(template.getGroupId());
         super.setGroupName(template.getGroupName());
+    }
+
+    Entry<?> getTemp() {
+        return temp;
+    }
+
+    void setTemp(Entry<?> temp) {
+        this.temp = temp;
+    }
+
+    @Override
+    public void release() throws IOException {
+        if (null != temp)
+            temp.release();
     }
 
     @Override
@@ -106,6 +139,17 @@ public class TarArchiveEntry extends TarEntry implements ArchiveEntry {
             return false;
         setModTime(time);
         return true;
+    }
+
+    @Override
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+    public boolean equals(Object that) {
+        return super.equals(that); // make FindBugs happy!
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode(); // make FindBugs happy!
     }
 
     /** Returns {@link #getName()}. */

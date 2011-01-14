@@ -19,6 +19,7 @@ import de.schlichtherle.truezip.util.SuffixSet;
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsDriverContainer;
 import de.schlichtherle.truezip.fs.FsScheme;
+import de.schlichtherle.truezip.fs.archive.ArchiveDriver;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,12 +34,13 @@ import net.jcip.annotations.Immutable;
 @Immutable
 public final class TarDriverContainer implements FsDriverContainer {
 
-    private static final Map<FsScheme, FsDriver> DRIVERS;
+    private static final Map<FsScheme, ArchiveDriver<?>> DRIVERS;
 
     static {
-        final Map<FsScheme, FsDriver> drivers = new HashMap<FsScheme, FsDriver>();
+        final Map<FsScheme, ArchiveDriver<?>>
+                drivers = new HashMap<FsScheme, ArchiveDriver<?>>();
         drivers.put(FsScheme.create("tar"), new TarDriver());
-        FsDriver driver = new TarGZipDriver();
+        ArchiveDriver<?> driver = new TarGZipDriver();
         for (String suffix : new SuffixSet("tgz|tar.gz"))
             drivers.put(FsScheme.create(suffix), driver);
         driver = new TarBZip2Driver();
@@ -48,7 +50,7 @@ public final class TarDriverContainer implements FsDriverContainer {
     }
 
     @Override
-    public Map<FsScheme, ? extends FsDriver> getDrivers() {
+    public Map<FsScheme, ArchiveDriver<?>> getDrivers() {
         return DRIVERS;
     }
 }
