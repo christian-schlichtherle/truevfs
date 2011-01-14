@@ -26,11 +26,11 @@ import java.util.Map;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class DummyDriverProvider implements FsDriverContainer {
+public final class DummyDriverContainer implements FsDriverContainer {
 
     private final Map<FsScheme, DummyDriver> drivers;
 
-    public DummyDriverProvider(String suffixes) {
+    public DummyDriverContainer(String suffixes) {
         final Map<FsScheme, DummyDriver> drivers = new HashMap<FsScheme, DummyDriver>();
         DummyDriver driver = new DummyDriver();
         for (String suffix : new SuffixSet(suffixes))
