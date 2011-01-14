@@ -15,27 +15,61 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
-import java.io.IOException;
+import de.schlichtherle.truezip.util.ServiceLocator;
+import java.util.Iterator;
+import java.util.ServiceConfigurationError;
+import net.jcip.annotations.Immutable;
 
 /**
- * A container for a file system manager.
+ * Contains a file system manager of a class with a name which is resolved by
+ * querying a system property or searching the class path, whatever yields a
+ * result first.
+ * <p>
+ * First, the value of the {@link System#getProperty system property}
+ * with the class name {@code "de.schlichtherle.truezip.fs.FsManager"}
+ * as the key is queried.
+ * If this yields a value, the class with that name is then loaded and
+ * instantiated by calling its no-arg constructor.
+ * <p>
+ * Otherwise, the class path is searched for any resource file with the name
+ * {@code "META-INF/services/de.schlichtherle.truezip.fs.FsManagerService"}.
+ * If this yields a result, the class with the name in this file is then loaded
+ * and instantiated by calling its no-arg constructor.
+ * <p>
+ * Otherwise, the expression
+ * {@code new FsFailSafeManager(new FsFederatingManager())} is used to create
+ * the file system manager in this container.
  *
  * @author Christian Schlichtherle
- * @version $Id: FsManagers$
+ * @version $Id$
  */
-public abstract class FsManagerContainer {
+@Immutable
+public final class FsManagerContainer implements FsManagerService {
 
-    /**
-     * Returns the file system manager.
-     * <p>
-     * Calling this method multiple times must return the same file system
-     * manager in order to ensure consistency of the federated virtual file
-     * system space.
-     * <p>
-     * This method must be safe for multithreading.
-     *
-     * @return The file system manager.
-     */
-    public abstract @NonNull FsManager getManager();
+    public static final FsManagerContainer INSTANCE = new FsManagerContainer();
+
+    private final FsManager manager;
+
+    /** You cannot instantiate this class. */
+    @SuppressWarnings("unchecked")
+    private FsManagerContainer() {
+        final ServiceLocator locator = new ServiceLocator(
+                FsManagerContainer.class.getClassLoader());
+        final FsManagerService
+                container = locator.getService(FsManagerService.class, null);
+        if (null != container) {
+            manager = container.getManager();
+        } else {
+            final Iterator<FsManagerService>
+                    i = locator.getServices(FsManagerService.class);
+            manager = i.hasNext()
+                    ? i.next().getManager()
+                    : new FsFailSafeManager(new FsFederatingManager());
+        }
+    }
+
+    @Override
+    public FsManager getManager() {
+        return manager;
+    }
 }

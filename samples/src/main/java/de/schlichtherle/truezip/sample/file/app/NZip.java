@@ -26,7 +26,7 @@ import de.schlichtherle.truezip.fs.archive.zip.CheckedJarDriver;
 import de.schlichtherle.truezip.fs.archive.zip.CheckedReadOnlySfxDriver;
 import de.schlichtherle.truezip.fs.archive.zip.CheckedZipDriver;
 import de.schlichtherle.truezip.file.swing.tree.TFileTreeModel;
-import de.schlichtherle.truezip.socket.DefaultIOPoolContainer;
+import de.schlichtherle.truezip.socket.IOPoolContainer;
 import de.schlichtherle.truezip.socket.IOPool;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
@@ -72,7 +72,7 @@ public class NZip extends CommandLineUtility {
     private static final String CLASS_NAME = NZip.class.getName();
     private static final ResourceBundle resources
             = ResourceBundle.getBundle(CLASS_NAME);
-    private static final IOPool<?> POOL = DefaultIOPoolContainer.INSTANCE.getPool();
+    private static final IOPool<?> POOL = IOPoolContainer.INSTANCE.getPool();
 
     private final NumberFormat numberFormat = NumberFormat.getNumberInstance();
     private final DateFormat dateFormat = DateFormat.getDateTimeInstance();

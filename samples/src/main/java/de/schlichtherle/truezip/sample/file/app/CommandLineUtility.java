@@ -17,7 +17,7 @@ package de.schlichtherle.truezip.sample.file.app;
 
 import de.schlichtherle.truezip.key.passwd.swing.HurlingWindowFeedback;
 import de.schlichtherle.truezip.file.TFile;
-import de.schlichtherle.truezip.fs.FsManagerContainer;
+import de.schlichtherle.truezip.fs.FsManagerService;
 import de.schlichtherle.truezip.fs.FsStatistics;
 import de.schlichtherle.truezip.key.passwd.swing.InvalidKeyFeedback;
 import java.io.IOException;
@@ -96,7 +96,7 @@ abstract class CommandLineUtility {
     }
 
     private static void configureManagerContainer() {
-        String spec = FsManagerContainer.class.getName();
+        String spec = FsManagerService.class.getName();
         String impl = SampleManagerContainer.class.getName();
         System.setProperty(spec, System.getProperty(spec, impl));
     }

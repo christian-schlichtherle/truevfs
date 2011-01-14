@@ -20,8 +20,7 @@ import java.io.File;
 import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.fs.FsDefaultDriverContainer;
-import de.schlichtherle.truezip.fs.FsDefaultManagerContainer;
+import de.schlichtherle.truezip.fs.FsManagerContainer;
 import de.schlichtherle.truezip.fs.FsInputOption;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.IOSocket;
@@ -228,7 +227,7 @@ class TFiles {
                         .getInputSocket(file.getInnerEntryName0(), options);
         }
         final FsPath path = new FsPath(src);
-        return FsDefaultManagerContainer.INSTANCE.getManager()
+        return FsManagerContainer.INSTANCE.getManager()
                 .getController(path.getMountPoint(), FsDefaultDriver.ALL)
                 .getInputSocket(path.getEntryName(), options);
     }
@@ -247,7 +246,7 @@ class TFiles {
                         .getOutputSocket(file.getInnerEntryName0(), options, template);
         }
         final FsPath path = new FsPath(dst);
-        return FsDefaultManagerContainer.INSTANCE.getManager()
+        return FsManagerContainer.INSTANCE.getManager()
                 .getController(path.getMountPoint(), FsDefaultDriver.ALL)
                 .getOutputSocket(path.getEntryName(), options, template);
     }

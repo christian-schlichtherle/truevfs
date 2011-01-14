@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip.raes;
 
-import de.schlichtherle.truezip.fs.FsDriverContainer;
+import de.schlichtherle.truezip.fs.FsDriverService;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.util.SuffixSet;
 import org.junit.Before;
@@ -32,7 +32,7 @@ public class ZipRaesDriverContainerTest {
 
     public static final String DRIVER_LIST = "tzp|zip.rae|zip.raes";
 
-    private FsDriverContainer instance;
+    private FsDriverService instance;
 
     @Before
     public void setUp() {

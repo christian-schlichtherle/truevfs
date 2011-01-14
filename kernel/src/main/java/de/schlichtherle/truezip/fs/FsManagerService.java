@@ -13,23 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.fs.file;
+package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.socket.IOPool;
-import de.schlichtherle.truezip.socket.IOPoolService;
-import net.jcip.annotations.Immutable;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import java.io.IOException;
 
 /**
- * Contains a {@link TempFilePool}.
+ * A service for a file system manager.
  *
  * @author Christian Schlichtherle
- * @version $Id$
+ * @version $Id: FsManagers$
  */
-@Immutable
-public class TempFilePoolContainer implements IOPoolService {
+public interface FsManagerService {
 
-    @Override
-    public IOPool<?> getPool() {
-        return TempFilePool.INSTANCE;
-    }
+    /**
+     * Returns the file system manager.
+     * <p>
+     * Calling this method multiple times must return the same file system
+     * manager in order to ensure consistency of the federated virtual file
+     * system space.
+     * <p>
+     * This method must be safe for multithreading.
+     *
+     * @return The file system manager.
+     */
+    @NonNull FsManager getManager();
 }
