@@ -17,7 +17,7 @@ package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.fs.archive.zip.JarDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
-import de.schlichtherle.truezip.socket.DefaultIOPoolContainer;
+import de.schlichtherle.truezip.socket.IOPoolContainer;
 
 /**
  * @author Christian Schlichtherle
@@ -26,6 +26,6 @@ import de.schlichtherle.truezip.socket.DefaultIOPoolContainer;
 public final class TJarFileTest extends TFileTestCase {
     
     public TJarFileTest() {
-        super(FsScheme.create("jar"), new JarDriver(DefaultIOPoolContainer.INSTANCE.getPool()));
+        super(FsScheme.create("jar"), new JarDriver(IOPoolContainer.INSTANCE.getPool()));
     }
 }

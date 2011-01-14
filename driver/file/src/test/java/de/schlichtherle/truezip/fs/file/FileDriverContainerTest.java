@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.file;
 
-import de.schlichtherle.truezip.fs.FsDriverContainer;
+import de.schlichtherle.truezip.fs.FsDriverService;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.util.SuffixSet;
 import org.junit.Before;
@@ -32,7 +32,7 @@ public class FileDriverContainerTest {
 
     public static final String DRIVER_LIST = "file";
 
-    private FsDriverContainer instance;
+    private FsDriverService instance;
 
     @Before
     public void setUp() {

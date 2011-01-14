@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.fs.archive.tar;
 
 import de.schlichtherle.truezip.fs.archive.CharsetArchiveDriverTestCase;
-import de.schlichtherle.truezip.socket.DefaultIOPoolContainer;
+import de.schlichtherle.truezip.socket.IOPoolContainer;
 
 /**
  * @author Christian Schlichtherle
@@ -27,6 +27,6 @@ extends CharsetArchiveDriverTestCase {
 
     @Override
     protected TarDriver newArchiveDriver() {
-        return new TarDriver(DefaultIOPoolContainer.INSTANCE.getPool());
+        return new TarDriver(IOPoolContainer.INSTANCE.getPool());
     }
 }

@@ -15,31 +15,46 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
+import de.schlichtherle.truezip.util.ServiceLocator;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
-import java.util.ServiceLoader;
 import net.jcip.annotations.Immutable;
 
 /**
- * A container for a map of file system schemes and drivers.
+ * Contains all file system drivers found on the class path.
+ * Its map of file system drivers is populated by instantiating all classes
+ * which are named in the resource files with the name
+ * {@code "META-INF/services/de.schlichtherle.truezip.fs.FsDriverService"}
+ * on the class path.
+ * Note that all named classes must implement the interface
+ * {@link FsDriverService} and provide a public available no-arg constructor.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface FsDriverContainer {
+@Immutable
+public final class FsDriverContainer implements FsDriverService {
 
-    /**
-     * Returns an immutable map of the supported file system drivers.
-     * While the key of the returned map need not be {@code null},
-     * its values must be nullable.
-     * <p>
-     * Calling this method multiple times should return the same map in order
-     * to ensure a consistent file system implementation scheme.
-     * <p>
-     * This method must be safe for multithreading.
-     *
-     * @return An immutable map of the supported file system schemes and
-     *         drivers.
-     */
-    @NonNull Map<FsScheme, ? extends FsDriver> getDrivers();
+    /** The singleton instance of this class. */
+    public static final FsDriverContainer INSTANCE = new FsDriverContainer();
+
+    private final Map<FsScheme, FsDriver> drivers;
+
+    /** You cannot instantiate this class. */
+    private FsDriverContainer() {
+        final Iterator<FsDriverService> i
+                = new ServiceLocator(FsDriverContainer.class.getClassLoader())
+                    .getServices(FsDriverService.class);
+        final Map<FsScheme, FsDriver> drivers = new HashMap<FsScheme, FsDriver>();
+        while (i.hasNext())
+            drivers.putAll(i.next().getDrivers());
+        this.drivers = Collections.unmodifiableMap(drivers);
+    }
+
+    @Override
+    public Map<FsScheme, FsDriver> getDrivers() {
+        return drivers;
+    }
 }

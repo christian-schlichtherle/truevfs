@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.fs.file;
 
 import de.schlichtherle.truezip.fs.FsDriver;
-import de.schlichtherle.truezip.fs.FsDriverContainer;
+import de.schlichtherle.truezip.fs.FsDriverService;
 import de.schlichtherle.truezip.fs.FsScheme;
 import java.util.Collections;
 import java.util.Map;
@@ -29,7 +29,7 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-public final class FileDriverContainer implements FsDriverContainer {
+public final class FileDriverContainer implements FsDriverService {
 
     private static final Map<FsScheme, FileDriver>
     DRIVERS = Collections.singletonMap( FsScheme.create("file"),

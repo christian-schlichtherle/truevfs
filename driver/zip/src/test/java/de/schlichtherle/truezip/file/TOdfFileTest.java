@@ -17,7 +17,7 @@ package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.fs.archive.zip.OdfDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
-import de.schlichtherle.truezip.socket.DefaultIOPoolContainer;
+import de.schlichtherle.truezip.socket.IOPoolContainer;
 
 /**
  * @author Christian Schlichtherle
@@ -26,6 +26,6 @@ import de.schlichtherle.truezip.socket.DefaultIOPoolContainer;
 public class TOdfFileTest extends TFileTestCase {
     
     public TOdfFileTest() {
-        super(FsScheme.create("odf"), new OdfDriver(DefaultIOPoolContainer.INSTANCE.getPool()));
+        super(FsScheme.create("odf"), new OdfDriver(IOPoolContainer.INSTANCE.getPool()));
     }
 }

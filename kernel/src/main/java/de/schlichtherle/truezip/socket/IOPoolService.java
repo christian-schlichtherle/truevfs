@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2011 Schlichtherle IT Services
+ * Copyright (C) 2011 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,20 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.fs.archive.zip;
+package de.schlichtherle.truezip.socket;
 
-import de.schlichtherle.truezip.fs.archive.CharsetArchiveDriverTestCase;
-import de.schlichtherle.truezip.socket.IOPoolContainer;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
- * @author Christian Schlichtherle
+ * A service for an I/O pool.
+ *
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class ZipCharsetArchiveDriverTest
-extends CharsetArchiveDriverTestCase {
+public interface IOPoolService {
 
-    @Override
-    protected ZipDriver newArchiveDriver() {
-        return new ZipDriver(IOPoolContainer.INSTANCE.getPool());
-    }
+    /**
+     * Returns an I/O pool.
+     * <p>
+     * Calling this method multiple times may return different I/O pools,
+     * so callers should cache the result for subsequent use.
+     * <p>
+     * This method must be safe for multithreading.
+     *
+     * @return An I/O pool.
+     */
+    @NonNull IOPool<?> getPool();
 }

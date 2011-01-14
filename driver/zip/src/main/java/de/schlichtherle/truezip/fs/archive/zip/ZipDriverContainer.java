@@ -17,9 +17,9 @@ package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.util.SuffixSet;
 import de.schlichtherle.truezip.fs.FsDriver;
-import de.schlichtherle.truezip.fs.FsDriverContainer;
+import de.schlichtherle.truezip.fs.FsDriverService;
 import de.schlichtherle.truezip.fs.FsScheme;
-import de.schlichtherle.truezip.socket.DefaultIOPoolContainer;
+import de.schlichtherle.truezip.socket.IOPoolContainer;
 import de.schlichtherle.truezip.socket.IOPool;
 import java.util.Collections;
 import java.util.HashMap;
@@ -33,9 +33,9 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-public final class ZipDriverContainer implements FsDriverContainer {
+public final class ZipDriverContainer implements FsDriverService {
 
-    private static final IOPool<?> POOL = DefaultIOPoolContainer.INSTANCE.getPool();
+    private static final IOPool<?> POOL = IOPoolContainer.INSTANCE.getPool();
     private static final Map<FsScheme, FsDriver> DRIVERS;
 
     static {
