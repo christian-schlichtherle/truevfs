@@ -22,9 +22,8 @@ import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.fs.archive.MultiplexedArchiveOutputShop;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.io.OutputBusyException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import de.schlichtherle.truezip.socket.IOPool;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -33,7 +32,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import org.apache.tools.tar.TarOutputStream;
 
-import static de.schlichtherle.truezip.fs.archive.tar.TarDriver.TEMP_FILE_PREFIX;
 import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
 
@@ -41,8 +39,7 @@ import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
  * An implementation of {@link OutputShop} to write TAR archives.
  * <p>
  * Because the TAR file format needs to know each entry's length in advance,
- * entries from an unknown source (such as entries created with
- * {@link FileOutputStream}) are actually written to temp files and copied
+ * entries from an unknown source are actually written to temp files and copied
  * to the underlying {@code TarOutputStream} upon a call to their
  * {@link OutputStream#close} method.
  * Note that this implies that the {@code close()} method may fail with
@@ -66,11 +63,13 @@ implements OutputShop<TarArchiveEntry> {
     private final Map<String, TarArchiveEntry> entries
             = new LinkedHashMap<String, TarArchiveEntry>();
 
+    private final IOPool<?> pool;
     private boolean busy;
 
-    public TarOutputShop(OutputStream out) {
+    public TarOutputShop(final @NonNull TarDriver driver, @NonNull OutputStream out) {
         super(out);
         super.setLongFileMode(LONGFILE_GNU);
+        this.pool = driver.getPool();
     }
 
     @Override
@@ -100,7 +99,7 @@ implements OutputShop<TarArchiveEntry> {
             }
 
             @Override
-			public OutputStream newOutputStream() throws IOException {
+            public OutputStream newOutputStream() throws IOException {
                 if (isBusy())
                     throw new OutputBusyException(entry.getName());
                 if (entry.isDirectory()) {
@@ -118,7 +117,7 @@ implements OutputShop<TarArchiveEntry> {
                 // So we need to buffer the output in a temporary file and
                 // write it upon close().
                 return new TempEntryOutputStream(
-                        File.createTempFile(TEMP_FILE_PREFIX, null), // TODO: Use FilePool!
+                        pool.allocate(), // TODO: Use FilePool!
                         entry);
             }
         } // class Output
@@ -175,13 +174,13 @@ implements OutputShop<TarArchiveEntry> {
      * output stream and finally deleted.
      */
     private class TempEntryOutputStream extends DecoratingOutputStream {
-        private final File temp;
+        private final IOPool.Entry<?> temp;
         private final TarArchiveEntry entry;
         private boolean closed;
 
-        TempEntryOutputStream(final File temp, final TarArchiveEntry entry)
+        TempEntryOutputStream(final IOPool.Entry<?> temp, final TarArchiveEntry entry)
         throws IOException {
-            super(new FileOutputStream(temp)); // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
+            super(temp.getOutputSocket().newOutputStream());
             this.temp = temp;
             this.entry = entry;
             entries.put(entry.getName(), entry);
@@ -199,14 +198,14 @@ implements OutputShop<TarArchiveEntry> {
             try {
                 super.close();
             } finally {
-                entry.setSize(temp.length());
+                entry.setSize(temp.getSize(DATA));
                 store();
             }
         }
 
         void store() throws IOException {
             try {
-                final InputStream in = new FileInputStream(temp);
+                final InputStream in = temp.getInputSocket().newInputStream();
                 try {
                     putNextEntry(entry);
                     try {
@@ -218,10 +217,7 @@ implements OutputShop<TarArchiveEntry> {
                     in.close();
                 }
             } finally {
-                if (!temp.delete()) {
-                    // Windoze: Most probably in.close() failed.
-                    throw new IOException(temp + " (could not delete)");
-                }
+                temp.release();
             }
         }
     } // class TempEntryOutputStream

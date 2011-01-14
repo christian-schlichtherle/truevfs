@@ -15,19 +15,17 @@
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
-import de.schlichtherle.truezip.rof.SimpleReadOnlyFile;
+import de.schlichtherle.truezip.socket.IOPool.Entry;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.io.TabuFileException;
 import de.schlichtherle.truezip.io.Streams;
+import de.schlichtherle.truezip.socket.IOPool;
 import java.io.OutputStream;
 import java.io.EOFException;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
@@ -37,10 +35,10 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.apache.tools.tar.TarBuffer;
+import org.apache.tools.tar.TarEntry;
 import org.apache.tools.tar.TarInputStream;
 import org.apache.tools.tar.TarUtils;
 
-import static de.schlichtherle.truezip.fs.archive.tar.TarDriver.TEMP_FILE_PREFIX;
 import static org.apache.tools.tar.TarConstants.GIDLEN;
 import static org.apache.tools.tar.TarConstants.MODELEN;
 import static org.apache.tools.tar.TarConstants.MODTIMELEN;
@@ -70,9 +68,9 @@ implements InputShop<TarArchiveEntry> {
     private static final int CHECKSUM_OFFSET
             = NAMELEN + MODELEN + UIDLEN + GIDLEN + SIZELEN + MODTIMELEN;
 
-    /** Maps entry names to tar entries [String -> TarArchiveEntry]. */
-    private final Map<String, TarArchiveEntry> entries
-            = new LinkedHashMap<String, TarArchiveEntry>();
+    /** Maps entry names to I/O pool entries. */
+    private final Map<String, TarArchiveEntry>
+            entries = new LinkedHashMap<String, TarArchiveEntry>();
 
     /**
      * Extracts the entire TAR input stream into a temporary directory in order
@@ -85,49 +83,41 @@ implements InputShop<TarArchiveEntry> {
      *        So it is safe and recommended to close it upon termination
      *        of this constructor.
      */
-    public TarInputShop(final InputStream in)
+    public TarInputShop(final TarDriver driver, final InputStream in)
     throws IOException {
         final TarInputStream tin = newValidatedTarInputStream(in);
+        final IOPool<?> pool = driver.getPool();
         try {
-            org.apache.tools.tar.TarEntry tinEntry;
+            TarEntry tinEntry;
             while ((tinEntry = tin.getNextEntry()) != null) {
                 final String name = tinEntry.getName();
-                TarArchiveEntry entry;
-                if (tinEntry.isDirectory()) {
-                    entry = new TarArchiveEntry(name, tinEntry);
-                } else {
-                    final File tmp;
+                TarArchiveEntry entry = entries.get(name);
+                if (null != entry)
+                    entry.release();
+                entry = new TarArchiveEntry(tinEntry);
+                if (!tinEntry.isDirectory()) {
+                    final Entry<?> temp = pool.allocate();
+                    entry.setTemp(temp);
                     try {
-                        entry = entries.get(name);
-                        tmp = entry != null
-                                ? entry.getFile()
-                                : File.createTempFile(TEMP_FILE_PREFIX, null); // TODO: Use FilePool!
+                        final OutputStream out = temp.getOutputSocket().newOutputStream();
                         try {
-                            final OutputStream out = new FileOutputStream(tmp);
-                            try {
-                                Streams.cat(tin, out); // use high performance pump (async I/O)
-                            } finally {
-                                out.close();
-                            }
-                        } catch (IOException ex) {
-                            final boolean ok = tmp.delete();
-                            assert ok;
-                            throw ex;
+                            Streams.cat(tin, out);
+                        } finally {
+                            out.close();
                         }
-                    } catch (InputException ex) {
-                        throw ex;
                     } catch (IOException ex) {
-                        throw new TabuFileException(
-                                new TempFileException(tinEntry, ex));
+                        temp.release();
+                        throw ex;
                     }
-                    entry = new TarArchiveEntry(tinEntry, tmp);
                 }
-                entry.setName(name); // use normalized name
                 entries.put(name, entry);
             }
-        } catch (IOException failure) {
+        } catch (InputException ex) {
             close0();
-            throw failure;
+            throw ex;
+        } catch (IOException ex) {
+            close0();
+            throw new TabuFileException(ex);
         }
     }
 
@@ -222,18 +212,20 @@ implements InputShop<TarArchiveEntry> {
                 final TarArchiveEntry entry = getEntry(name);
                 if (null == entry)
                     throw new FileNotFoundException(name + " (entry not found)");
+                if (entry.isDirectory())
+                    throw new FileNotFoundException(name + " (cannot read directories)");
                 return entry;
+            }
+
+            @Override
+            public ReadOnlyFile newReadOnlyFile() throws IOException {
+                return getLocalTarget().getTemp().getInputSocket().newReadOnlyFile();
             }
 
             @Override
             public InputStream newInputStream()
             throws IOException {
-                return new FileInputStream(getLocalTarget().getFile());
-            }
-
-            @Override
-            public ReadOnlyFile newReadOnlyFile() throws IOException {
-                return new SimpleReadOnlyFile(getLocalTarget().getFile());
+                return getLocalTarget().getTemp().getInputSocket().newInputStream();
             }
         } // class Input
 
@@ -249,32 +241,7 @@ implements InputShop<TarArchiveEntry> {
         final Collection<TarArchiveEntry> values = entries.values();
         for (final Iterator<TarArchiveEntry> i = values.iterator(); i.hasNext(); i.remove()) {
             final TarArchiveEntry entry = i.next();
-            final File file = entry.getFile();
-            if (file == null) {
-                assert entry.isDirectory();
-                continue;
-            }
-            assert file.exists();
-            if (!file.delete()) {
-                // Windoze: The temp file is still open for reading by one
-                // or more entry input streams.
-                throw new IOException(file + " (could not delete)");
-            }
-        }
-    }
-
-    /**
-     * This needs to be a {@link FileNotFoundException} in order to signal that
-     * the TAR is simply not accessible and not necessarily a false positive.
-     */
-    private static final class TempFileException extends FileNotFoundException {
-        private static final long serialVersionUID = 1923814625681036853L;
-
-        private TempFileException(
-                final org.apache.tools.tar.TarEntry entry,
-                final IOException cause) {
-            super(entry.getName() + " (couldn't create temp file for archive entry)");
-            super.initCause(cause);
+            entry.release();
         }
     }
 }

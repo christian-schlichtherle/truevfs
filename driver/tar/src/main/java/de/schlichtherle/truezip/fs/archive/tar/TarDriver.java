@@ -15,17 +15,19 @@
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
-import de.schlichtherle.truezip.socket.DefaultIOPoolContainer;
 import de.schlichtherle.truezip.fs.FsConcurrentModel;
 import de.schlichtherle.truezip.fs.archive.CharsetArchiveDriver;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.fs.archive.MultiplexedArchiveOutputShop;
+import de.schlichtherle.truezip.socket.DefaultIOPoolContainer;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,9 +47,6 @@ import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 @Immutable
 public class TarDriver extends CharsetArchiveDriver<TarArchiveEntry> {
 
-    /** Prefix for temporary files created by this driver. */
-    static final String TEMP_FILE_PREFIX = "tzp-tar"; // FIXME!
-
     /**
      * The character set to use for entry names, which is {@code "US-ASCII"}.
      * TAR files should actually be able to use the system's native character
@@ -56,9 +55,19 @@ public class TarDriver extends CharsetArchiveDriver<TarArchiveEntry> {
      */
     private static final Charset TAR_CHARSET = Charset.forName("US-ASCII");
 
+    private IOPool<?> pool = DefaultIOPoolContainer.INSTANCE.getPool(); // FIXME!
+
     @Override
-    public IOPool<?> getPool() {
-        return DefaultIOPoolContainer.INSTANCE.getPool(); // FIXME!
+    public @NonNull IOPool<?> getPool() {
+        if (null == pool)
+            throw new IllegalStateException("I/O pool is not configured!");
+        return pool;
+    }
+
+    public void setPool(final @CheckForNull IOPool<?> pool) {
+        if (null != this.pool && this.pool != pool && pool != null)
+            throw new IllegalStateException("I/O pool has already been configured!");
+        this.pool = pool;
     }
 
     /**
@@ -122,7 +131,7 @@ public class TarDriver extends CharsetArchiveDriver<TarArchiveEntry> {
 
     protected TarInputShop newTarInputShop(FsConcurrentModel model, InputStream in)
     throws IOException {
-        return new TarInputShop(in);
+        return new TarInputShop(this, in);
     }
 
     /**
@@ -150,6 +159,6 @@ public class TarDriver extends CharsetArchiveDriver<TarArchiveEntry> {
     protected TarOutputShop newTarOutputShop(
             FsConcurrentModel model, OutputStream out, TarInputShop source)
     throws IOException {
-        return new TarOutputShop(out);
+        return new TarOutputShop(this, out);
     }
 }
