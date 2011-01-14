@@ -53,9 +53,6 @@ public class ZipDriver
 extends CharsetArchiveDriver<ZipArchiveEntry>
 implements ZipEntryFactory<ZipArchiveEntry> {
 
-    /** Prefix for temporary files created by this driver. */
-    static final String TEMP_FILE_PREFIX = "tzp-zip"; // FIXME!
-
     private static final Charset ZIP_CHARSET = Charset.forName("IBM437");
 
     @Override
