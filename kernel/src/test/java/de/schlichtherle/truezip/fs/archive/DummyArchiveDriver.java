@@ -37,14 +37,13 @@ public class DummyArchiveDriver extends CharsetArchiveDriver<ArchiveEntry> {
     private static final IOPool<?> pool = new MockIOPool();
     private static final Charset charset = Charset.forName("UTF-8");
 
-    @Override
-    public IOPool<?> getPool() {
-        return pool;
+    public DummyArchiveDriver() {
+        super(charset);
     }
 
     @Override
-    public Charset getCharset() {
-        return charset;
+    public IOPool<?> getPool() {
+        return pool;
     }
     
     @Override

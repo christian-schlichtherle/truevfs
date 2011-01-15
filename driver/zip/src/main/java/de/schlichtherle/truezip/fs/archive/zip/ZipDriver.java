@@ -56,9 +56,30 @@ public class ZipDriver
 extends CharsetArchiveDriver<ZipArchiveEntry>
 implements ZipEntryFactory<ZipArchiveEntry> {
 
+    /**
+     * The default character set for entry names and comments, which is
+     * {@code "IBM437"}.
+     */
+    private static final Charset ZIP_CHARSET = Charset.forName("IBM437");
+
     private final IOPool<?> pool;
 
+    /**
+     * Equivalent to
+     * {@link ZipDriver#ZipDriver(IOPool, Charset) new ZipDriver(pool, ZIP_CHARSET)}.
+     */
     public ZipDriver(final IOPool<?> pool) {
+        this(pool, ZIP_CHARSET);
+    }
+
+    /**
+     * Constructs a new ZIP driver.
+     *
+     * @param pool the I/O pool to use for allocating temporary I/O entries.
+     * @param charset the character set to use for entry names and comments.
+     */
+    protected ZipDriver(final IOPool<?> pool, Charset charset) {
+        super(charset);
         if (null == pool)
             throw new NullPointerException();
         this.pool = pool;
@@ -67,17 +88,6 @@ implements ZipEntryFactory<ZipArchiveEntry> {
     @Override
     public IOPool<?> getPool() {
         return pool;
-    }
-
-    private static final Charset ZIP_CHARSET = Charset.forName("IBM437");
-
-    /**
-     * Returns the character set to use for ZIP entry names and comments,
-     * which is {@code "IBM437"}.
-     */
-    @Override
-    public Charset getCharset() {
-        return ZIP_CHARSET;
     }
 
     /**
@@ -209,7 +219,8 @@ implements ZipEntryFactory<ZipArchiveEntry> {
         final OutputStream out = output.newOutputStream();
         try {
             return new MultiplexedArchiveOutputShop<ZipArchiveEntry>(
-                    newZipOutputShop(model, out, (ZipInputShop) source));
+                    newZipOutputShop(model, out, (ZipInputShop) source),
+                    getPool());
         } catch (IOException ex) {
             out.close();
             throw ex;

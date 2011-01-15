@@ -30,17 +30,10 @@ import net.jcip.annotations.Immutable;
 @Immutable
 public final class FsDefaultDriver implements FsFederatingDriver {
 
-    /**
-     * Equivalent to
-     * {@code new FsDefaultDriver(FsDriverContainer.INSTANCE)}.
-     */
-    public static final FsDefaultDriver
-            ALL = new FsDefaultDriver(FsDriverContainer.INSTANCE);
-
     private final Map<FsScheme, ? extends FsDriver> drivers;
 
     /**
-     * Constructs a new file system meta driver which qill query the given
+     * Constructs a new file system meta driver which will query the given
      * file system provider for an appropriate file system driver.
      */
     public FsDefaultDriver(final @NonNull FsDriverService service) {

@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.fs.archive.zip;
 
+import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.fs.archive.MultiplexedArchiveOutputShop;
@@ -43,8 +44,8 @@ public class OdfOutputShop extends MultiplexedArchiveOutputShop<ZipArchiveEntry>
     private boolean mimetype;
 
     /** Creates a new {@code OdfOutputShop}. */
-    public OdfOutputShop(ZipOutputShop target) {
-        super(target);
+    public OdfOutputShop(ZipOutputShop delegate, IOPool<?> pool) {
+        super(delegate, pool);
     }
 
     @Override

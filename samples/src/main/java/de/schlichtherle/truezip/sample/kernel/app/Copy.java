@@ -16,6 +16,8 @@
 package de.schlichtherle.truezip.sample.kernel.app;
 
 import de.schlichtherle.truezip.fs.FsDefaultDriver;
+import de.schlichtherle.truezip.fs.FsDriverContainer;
+import de.schlichtherle.truezip.fs.FsFederatingDriver;
 import de.schlichtherle.truezip.fs.FsFederatingManager;
 import de.schlichtherle.truezip.fs.FsInputOption;
 import de.schlichtherle.truezip.fs.FsManager;
@@ -45,6 +47,11 @@ public class Copy {
         // Obtain a manager for file system controller life cycle management.
         FsManager manager = new FsFederatingManager();
 
+        // Search the class path for the set of all supported file system
+        // drivers and build a federating file system driver from it.
+        FsFederatingDriver
+                driver = new FsDefaultDriver(FsDriverContainer.INSTANCE);
+
         // Resolve the source socket.
         // Note that we need an absolute URI, but we do not want to be
         // restricted to the "file" scheme, so we check args[0] first.
@@ -52,7 +59,7 @@ public class Copy {
         srcUri = srcUri.isAbsolute() ? srcUri : new File(args[0]).toURI();
         FsPath srcPath = new FsPath(srcUri, FsUriModifier.CANONICALIZE);
         InputSocket<?> srcSocket = manager
-                .getController(     srcPath.getMountPoint(), FsDefaultDriver.ALL)
+                .getController(     srcPath.getMountPoint(), driver)
                 .getInputSocket(    srcPath.getEntryName(),
                                     BitField.noneOf(FsInputOption.class));
 
@@ -61,7 +68,7 @@ public class Copy {
         dstUri = dstUri.isAbsolute() ? dstUri : new File(args[1]).toURI();
         FsPath dstPath = new FsPath(dstUri, FsUriModifier.CANONICALIZE);
         OutputSocket<?> dstSocket = manager
-                .getController(     dstPath.getMountPoint(), FsDefaultDriver.ALL)
+                .getController(     dstPath.getMountPoint(), driver)
                 .getOutputSocket(   dstPath.getEntryName(),
                                     BitField.of(FsOutputOption.CREATE_PARENTS,
                                                 FsOutputOption.EXCLUSIVE),

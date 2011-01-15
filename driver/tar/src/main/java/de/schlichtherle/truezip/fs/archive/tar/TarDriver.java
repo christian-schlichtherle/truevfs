@@ -47,9 +47,16 @@ import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 @DefaultAnnotation(NonNull.class)
 public class TarDriver extends CharsetArchiveDriver<TarArchiveEntry> {
 
+    /**
+     * The default character set for entry names and comments, which is
+     * {@code "US-ASCII"}.
+     */
+    public static final Charset TAR_CHARSET = Charset.forName("US-ASCII");
+
     private final IOPool<?> pool;
 
     public TarDriver(final IOPool<?> pool) {
+        super(TAR_CHARSET);
         if (null == pool)
             throw new NullPointerException();
         this.pool = pool;
@@ -58,17 +65,6 @@ public class TarDriver extends CharsetArchiveDriver<TarArchiveEntry> {
     @Override
     public @NonNull IOPool<?> getPool() {
         return pool;
-    }
-
-    private static final Charset TAR_CHARSET = Charset.forName("US-ASCII");
-
-    /**
-     * Returns the character set to use for TAR entry names,
-     * which is {@code "US-ASCII"}.
-     */
-    @Override
-    public Charset getCharset() {
-        return TAR_CHARSET;
     }
 
     @Override
@@ -141,7 +137,8 @@ public class TarDriver extends CharsetArchiveDriver<TarArchiveEntry> {
         final OutputStream out = output.newOutputStream();
         try {
             return new MultiplexedArchiveOutputShop<TarArchiveEntry>(
-                    newTarOutputShop(model, out, (TarInputShop) source));
+                    newTarOutputShop(model, out, (TarInputShop) source),
+                    getPool());
         } catch (IOException ex) {
             out.close();
             throw ex;

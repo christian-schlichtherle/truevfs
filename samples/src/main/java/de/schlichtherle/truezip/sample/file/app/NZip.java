@@ -28,6 +28,7 @@ import de.schlichtherle.truezip.fs.archive.zip.CheckedZipDriver;
 import de.schlichtherle.truezip.file.swing.tree.TFileTreeModel;
 import de.schlichtherle.truezip.socket.IOPoolContainer;
 import de.schlichtherle.truezip.socket.IOPool;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
@@ -67,6 +68,7 @@ import java.util.ResourceBundle;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public class NZip extends CommandLineUtility {
 
     private static final String CLASS_NAME = NZip.class.getName();
@@ -104,9 +106,8 @@ public class NZip extends CommandLineUtility {
     }
 
     /** @see #newArchiveDetector() */
-    protected TArchiveDetector newArchiveDetector(
-            final @NonNull Charset charset) {
-        assert charset != null;
+    protected TArchiveDetector newArchiveDetector(final Charset charset) {
+        assert null != charset;
         return new TDefaultArchiveDetector(TDefaultArchiveDetector.ALL,
                 new Object[] {
                     "ear|jar|war|zip", new CheckedZipDriver(POOL) { // check CRC-32
@@ -143,7 +144,7 @@ public class NZip extends CommandLineUtility {
     }
 
     /** Equivalent to {@code System.exit(new NZip().run(args));}. */
-    public static void main(final String[] args) {
+    public static void main(String[] args) {
         System.exit(new NZip().run(args));
     }
 
@@ -160,7 +161,7 @@ public class NZip extends CommandLineUtility {
      * @throws IOException On any I/O related exception.
      */
     @Override
-	public int runChecked(String[] args)
+    public int runChecked(String[] args)
     throws IllegalUsageException, IOException {
         if (args.length < 1)
             throw new IllegalUsageException();
