@@ -17,7 +17,7 @@ package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.fs.archive.zip.ZipDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
-import de.schlichtherle.truezip.socket.MockIOPool;
+import de.schlichtherle.truezip.socket.ByteArrayIOPool;
 
 /**
  * @author Christian Schlichtherle
@@ -26,6 +26,6 @@ import de.schlichtherle.truezip.socket.MockIOPool;
 public final class TZipFileTest extends TFileTestCase {
 
     public TZipFileTest() {
-        super(FsScheme.create("zip"), new ZipDriver(new MockIOPool()));
+        super(FsScheme.create("zip"), new ZipDriver(POOL));
     }
 }

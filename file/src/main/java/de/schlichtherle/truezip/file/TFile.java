@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.file;
 
+import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.io.InputException;
@@ -361,11 +362,11 @@ public final class TFile extends File {
     private static final Set<File> roots
     		= new TreeSet<File>(Arrays.asList(listRoots()));
 
-    private static boolean lenient
-            = !Boolean.getBoolean(TFile.class.getPackage().getName() + ".strict");
+    private static boolean lenient = true;
 
-    private static TArchiveDetector
-            defaultDetector = TDefaultArchiveDetector.ALL;
+    private static TArchiveDetector defaultDetector = TDefaultArchiveDetector.ALL;
+
+    private static FsManager manager = FsManagerContainer.SINGLETON.getManager();
 
     //
     // Instance fields:
@@ -885,7 +886,7 @@ public final class TFile extends File {
      * Commits all changes of the contents of all federated file systems
      * (i.e. archive files) to their respective parent file system.
      *
-     * @throws TArchiveWarningException if <em>only</em> warning conditions
+     * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         occured throughout the course of this method.
      *         This implies that the respective parent file system has been
      *         updated with constraints, such as a failure to set the last
@@ -900,7 +901,7 @@ public final class TFile extends File {
     private static void sync(BitField<FsSyncOption> options)
     throws FsSyncException {
         FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
-        FsManagerContainer.INSTANCE.getManager().sync(options, builder);
+        manager.sync(options, builder);
         builder.check();
     }
 
@@ -934,7 +935,7 @@ public final class TFile extends File {
             throw new IllegalArgumentException(archive.getPath() + " (not a top level federated file system)");
         final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
         new FsFilteringManager(
-                FsManagerContainer.INSTANCE.getManager(),
+                manager,
                 archive .getController()
                         .getModel()
                         .getMountPoint())
@@ -1172,11 +1173,37 @@ public final class TFile extends File {
      *        for subsequently constructed {@code TFile} instances.
      * @see   #getDefaultArchiveDetector()
      */
-    public static void setDefaultArchiveDetector(
-            final TArchiveDetector detector) {
+    public static void setDefaultArchiveDetector(TArchiveDetector detector) {
         if (null == detector)
             throw new NullPointerException();
         TFile.defaultDetector = detector;
+    }
+
+    /**
+     * Returns the file system manager.
+     *
+     * @return The file system manager.
+     */
+    public static FsManager getManager() {
+        return manager;
+    }
+
+    /**
+     * Sets the file system manager.
+     *
+     * @param  manager the new file system manager.
+     * @throws FsSyncException if the old file system manager encounters
+     *         any exception during committing the changes of the contents of
+     *         all its federated file systems (i.e. archive files) to their
+     *         respective parent file system.
+     */
+    public static void setManager(FsManager manager) throws FsSyncException {
+        if (null == manager)
+            throw new NullPointerException();
+        if (TFile.manager != manager) {
+            umount();
+            TFile.manager = manager;
+        }
     }
 
     /**
@@ -1498,10 +1525,7 @@ public final class TFile extends File {
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
         }
-        return controller = FsManagerContainer
-                .INSTANCE
-                .getManager()
-                .getController(mountPoint, detector);
+        return controller = manager.getController(mountPoint, detector);
     }
 
     /**

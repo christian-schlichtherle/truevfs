@@ -35,7 +35,7 @@ import net.jcip.annotations.Immutable;
 @Immutable
 public final class ZipDriverContainer implements FsDriverService {
 
-    private static final IOPool<?> POOL = IOPoolContainer.INSTANCE.getPool();
+    private static final IOPool<?> POOL = IOPoolContainer.SINGLETON.getPool();
     private static final Map<FsScheme, FsDriver> DRIVERS;
 
     static {

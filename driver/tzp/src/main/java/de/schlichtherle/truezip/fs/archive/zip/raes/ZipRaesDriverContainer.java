@@ -38,7 +38,7 @@ public final class ZipRaesDriverContainer implements FsDriverService {
 
     static {
         final Map<FsScheme, FsDriver> drivers = new HashMap<FsScheme, FsDriver>();
-        FsDriver driver = new SafeZipRaesDriver(IOPoolContainer.INSTANCE.getPool());
+        FsDriver driver = new SafeZipRaesDriver(IOPoolContainer.SINGLETON.getPool());
         for (String suffix : new SuffixSet("tzp|zip.rae|zip.raes"))
             drivers.put(FsScheme.create(suffix), driver);
         DRIVERS = Collections.unmodifiableMap(drivers);

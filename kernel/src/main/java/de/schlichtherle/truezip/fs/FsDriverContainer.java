@@ -38,7 +38,7 @@ import net.jcip.annotations.Immutable;
 public final class FsDriverContainer implements FsDriverService {
 
     /** The singleton instance of this class. */
-    public static final FsDriverContainer INSTANCE = new FsDriverContainer();
+    public static final FsDriverContainer SINGLETON = new FsDriverContainer();
 
     private final Map<FsScheme, FsDriver> drivers;
 

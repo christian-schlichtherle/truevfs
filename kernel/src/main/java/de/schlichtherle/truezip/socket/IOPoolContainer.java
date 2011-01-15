@@ -40,7 +40,8 @@ import net.jcip.annotations.Immutable;
 @Immutable
 public final class IOPoolContainer implements IOPoolService {
 
-    public static final IOPoolContainer INSTANCE = new IOPoolContainer();
+    /** The singleton instance of this class. */
+    public static final IOPoolContainer SINGLETON = new IOPoolContainer();
 
     private final IOPoolService container;
 

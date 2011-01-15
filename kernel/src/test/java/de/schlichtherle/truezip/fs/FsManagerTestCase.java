@@ -34,7 +34,7 @@ import static org.junit.Assert.*;
 public abstract class FsManagerTestCase {
 
     private final FsFederatingDriver driver
-            = new FsDefaultDriver(new DummyDriverContainer("file|zip"));
+            = new FsDefaultFederatingDriver(new DummyDriverContainer("file|zip"));
     private FsManager manager;
 
     @Before

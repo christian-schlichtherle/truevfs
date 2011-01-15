@@ -25,6 +25,8 @@ import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.fs.archive.ArchiveDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
+import de.schlichtherle.truezip.socket.ByteArrayIOPool;
+import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.OutputClosedException;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.ByteArrayInputStream;
@@ -55,10 +57,12 @@ import static org.junit.Assert.*;
  */
 public abstract class TFileTestCase {
 
+    protected static final IOPool<?> POOL = new ByteArrayIOPool(2048);
+
     private static final Logger logger = Logger.getLogger(
             TFileTestCase.class.getName());
 
-    protected static final String TEMP_FILE_PREFIX = "tzp";
+    private static final String TEMP_FILE_PREFIX = "tzp";
 
     private static final Random rnd = new Random();
 

@@ -36,7 +36,7 @@ import net.jcip.annotations.Immutable;
 @Immutable
 public final class TarDriverContainer implements FsDriverService {
 
-    private static final IOPool<?> POOL = IOPoolContainer.INSTANCE.getPool();
+    private static final IOPool<?> POOL = IOPoolContainer.SINGLETON.getPool();
     private static final Map<FsScheme, ArchiveDriver<?>> DRIVERS;
 
     static {

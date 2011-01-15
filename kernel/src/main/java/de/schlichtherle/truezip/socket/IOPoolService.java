@@ -19,6 +19,8 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * A service for an I/O pool.
+ * <p>
+ * Implementations must be thread-safe.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -30,8 +32,6 @@ public interface IOPoolService {
      * <p>
      * Calling this method multiple times may return different I/O pools,
      * so callers should cache the result for subsequent use.
-     * <p>
-     * This method must be safe for multithreading.
      *
      * @return An I/O pool.
      */

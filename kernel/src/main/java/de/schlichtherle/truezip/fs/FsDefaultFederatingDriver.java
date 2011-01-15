@@ -21,14 +21,14 @@ import java.util.ServiceConfigurationError;
 import net.jcip.annotations.Immutable;
 
 /**
- * Uses a given file system driver provider to lookup the appropriate driver
+ * Uses a given file system driver service to lookup the appropriate driver
  * for the scheme of a given mount point.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @Immutable
-public final class FsDefaultDriver implements FsFederatingDriver {
+public final class FsDefaultFederatingDriver implements FsFederatingDriver {
 
     private final Map<FsScheme, ? extends FsDriver> drivers;
 
@@ -36,10 +36,9 @@ public final class FsDefaultDriver implements FsFederatingDriver {
      * Constructs a new file system meta driver which will query the given
      * file system provider for an appropriate file system driver.
      */
-    public FsDefaultDriver(final @NonNull FsDriverService service) {
+    public FsDefaultFederatingDriver(final @NonNull FsDriverService service) {
         this.drivers = service.getDrivers(); // immutable map!
-        if (null == drivers)
-            throw new NullPointerException("broken interface contract!");
+        assert null != drivers;
     }
 
     @Override
@@ -51,8 +50,7 @@ public final class FsDefaultDriver implements FsFederatingDriver {
         final FsScheme scheme = mountPoint.getScheme();
         final FsDriver driver = drivers.get(scheme);
         if (null == driver)
-            throw new ServiceConfigurationError(scheme
-                    + "(unknown file system scheme - check run-time class path configuration)");
+            throw new ServiceConfigurationError(scheme + "(unknown file system scheme)");
         return driver.newController(mountPoint, parent);
     }
 }

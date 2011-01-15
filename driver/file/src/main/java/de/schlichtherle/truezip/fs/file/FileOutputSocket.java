@@ -83,7 +83,6 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
                 : entry;
         final File tempFile = temp.getFile();
 
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE") // False positive with org.codehaus.mojo:findbugs-maven-plugin:2.3.1
         class OutputStream extends DecoratingOutputStream {
             boolean closed;
 
@@ -118,6 +117,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
                             }
                         }
                     } finally {
+                        final Entry template = FileOutputSocket.this.template;
                         if (null != template) {
                             final long time = template.getTime(WRITE);
                             if (UNKNOWN != time

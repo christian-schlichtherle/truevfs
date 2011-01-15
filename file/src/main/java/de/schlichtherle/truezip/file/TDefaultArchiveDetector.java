@@ -115,7 +115,7 @@ public final class TDefaultArchiveDetector implements TArchiveDetector {
     private final ThreadLocalMatcher matcher;
 
     public TDefaultArchiveDetector() {
-        this.drivers = FsDriverContainer.INSTANCE.getDrivers();
+        this.drivers = FsDriverContainer.SINGLETON.getDrivers();
         final SuffixSet set = getSuffixes(drivers);
         this.suffixes = set.toString();
         this.matcher = new ThreadLocalMatcher(set.toPattern());
@@ -142,7 +142,7 @@ public final class TDefaultArchiveDetector implements TArchiveDetector {
      *         configured in the global map.
      */
     public TDefaultArchiveDetector(final String suffixes) {
-        this.drivers = FsDriverContainer.INSTANCE.getDrivers();
+        this.drivers = FsDriverContainer.SINGLETON.getDrivers();
         final SuffixSet set = new SuffixSet(suffixes);
         final SuffixSet all = getSuffixes(drivers);
         if (set.retainAll(all)) {
@@ -327,7 +327,7 @@ public final class TDefaultArchiveDetector implements TArchiveDetector {
             driver = drivers.get(scheme);
         } else {
             assert "file".equalsIgnoreCase(scheme.toString());
-            driver = FsDriverContainer.INSTANCE.getDrivers().get(scheme);
+            driver = FsDriverContainer.SINGLETON.getDrivers().get(scheme);
         }
         if (null == driver)
             throw new ServiceConfigurationError(scheme

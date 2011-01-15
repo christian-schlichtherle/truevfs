@@ -52,7 +52,7 @@ public class FsFilterManagerTest extends FsManagerTestCase {
             for (final String param : params[1])
                 manager.getController(
                     FsMountPoint.create(param),
-                    new FsDefaultDriver(
+                    new FsDefaultFederatingDriver(
                         new DummyDriverContainer("file|tar|zip")));
             assertThat(manager.getSize(), is(params[1].length));
 
