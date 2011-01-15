@@ -15,12 +15,10 @@
  */
 package de.schlichtherle.truezip.file;
 
-import de.schlichtherle.truezip.fs.FsDefaultDriver;
 import java.io.File;
 import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.fs.FsManagerContainer;
 import de.schlichtherle.truezip.fs.FsInputOption;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.IOSocket;
@@ -219,7 +217,7 @@ class TFiles {
                     final BitField<FsInputOption> options) {
         if (src instanceof TFile) {
             // TODO: Consider removing this block and using the more general pattern below it!
-            // FIXME: Removing this block yields a concurrency issue in the Kernel TCK!
+            // FIXME: Removing this block yields a concurrency issue in the unit tests!
             final TFile file = (TFile) src;
             final TFile archive = file.getInnerArchive();
             if (null != archive)
@@ -227,7 +225,7 @@ class TFiles {
                         .getInputSocket(file.getInnerEntryName0(), options);
         }
         final FsPath path = new FsPath(src);
-        return FsManagerContainer.INSTANCE.getManager()
+        return TFile.getManager()
                 .getController(path.getMountPoint(), TFile.getDefaultArchiveDetector())
                 .getInputSocket(path.getEntryName(), options);
     }
@@ -238,7 +236,7 @@ class TFiles {
                     final @CheckForNull Entry template) {
         if (dst instanceof TFile) {
             // TODO: Consider removing this block and using the more general pattern below it!
-            // FIXME: Removing this block yields a concurrency issue in the Kernel TCK!
+            // FIXME: Removing this block yields a concurrency issue in the unit tests!
             final TFile file = (TFile) dst;
             final TFile archive = file.getInnerArchive();
             if (null != archive)
@@ -246,7 +244,7 @@ class TFiles {
                         .getOutputSocket(file.getInnerEntryName0(), options, template);
         }
         final FsPath path = new FsPath(dst);
-        return FsManagerContainer.INSTANCE.getManager()
+        return TFile.getManager()
                 .getController(path.getMountPoint(), TFile.getDefaultArchiveDetector())
                 .getOutputSocket(path.getEntryName(), options, template);
     }

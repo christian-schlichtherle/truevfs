@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.sample.kernel.app;
 
-import de.schlichtherle.truezip.fs.FsDefaultDriver;
+import de.schlichtherle.truezip.fs.FsDefaultFederatingDriver;
 import de.schlichtherle.truezip.fs.FsDriverContainer;
 import de.schlichtherle.truezip.fs.FsFederatingDriver;
 import de.schlichtherle.truezip.fs.FsFederatingManager;
@@ -49,12 +49,12 @@ public class Copy {
 
         // Search the class path for the set of all supported file system
         // drivers and build a federating file system driver from it.
-        FsFederatingDriver
-                driver = new FsDefaultDriver(FsDriverContainer.INSTANCE);
+        FsFederatingDriver driver = new FsDefaultFederatingDriver(
+                FsDriverContainer.SINGLETON);
 
         // Resolve the source socket.
-        // Note that we need an absolute URI, but we do not want to be
-        // restricted to the "file" scheme, so we check args[0] first.
+        // Note that an absolute URI is required, so we may need to use the
+        // File class as a helper.
         URI srcUri = new URI(args[0]);
         srcUri = srcUri.isAbsolute() ? srcUri : new File(args[0]).toURI();
         FsPath srcPath = new FsPath(srcUri, FsUriModifier.CANONICALIZE);

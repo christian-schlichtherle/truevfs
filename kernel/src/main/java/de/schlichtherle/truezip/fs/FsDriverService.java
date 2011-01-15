@@ -22,6 +22,8 @@ import net.jcip.annotations.Immutable;
 
 /**
  * A service for a map of file system schemes and drivers.
+ * <p>
+ * Implementations must be thread-safe.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -35,8 +37,6 @@ public interface FsDriverService {
      * <p>
      * Calling this method multiple times should return the same map in order
      * to ensure a consistent file system implementation scheme.
-     * <p>
-     * This method must be safe for multithreading.
      *
      * @return An immutable map of the supported file system schemes and
      *         drivers.

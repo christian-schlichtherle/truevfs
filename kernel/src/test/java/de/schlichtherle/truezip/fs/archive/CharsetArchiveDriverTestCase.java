@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.fs.archive;
 
+import de.schlichtherle.truezip.socket.ByteArrayIOPool;
+import de.schlichtherle.truezip.socket.IOPool;
 import java.io.CharConversionException;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,18 +27,21 @@ import org.junit.Test;
  */
 public abstract class CharsetArchiveDriverTestCase {
 
+    private static final String TEXT = "fubar";
+    private static final IOPool<?> POOL = new ByteArrayIOPool(TEXT.length());
+
     private CharsetArchiveDriver<?> driver;
 
     @Before
     public void setUp() {
-        driver = newArchiveDriver();
+        driver = newArchiveDriver(POOL);
     }
 
-    protected abstract CharsetArchiveDriver<?> newArchiveDriver();
+    protected abstract CharsetArchiveDriver<?> newArchiveDriver(IOPool<?> pool);
 
     @Test
     public final void testAssertEncodable() throws CharConversionException {
-        driver.assertEncodable("foo/bar");
+        driver.assertEncodable(TEXT);
     }
 
     @Test
@@ -61,7 +66,7 @@ public abstract class CharsetArchiveDriverTestCase {
                         go.wait(2000);
                     }
                     for (int i = 0; i < 100000; i++)
-                        driver.assertEncodable("foo/bar");
+                        driver.assertEncodable(TEXT);
                 } catch (Throwable t) {
                     throwable = t;
                 }

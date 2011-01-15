@@ -20,6 +20,8 @@ import java.io.IOException;
 
 /**
  * A service for a file system manager.
+ * <p>
+ * Implementations must be thread-safe.
  *
  * @author Christian Schlichtherle
  * @version $Id: FsManagers$
@@ -32,8 +34,6 @@ public interface FsManagerService {
      * Calling this method multiple times must return the same file system
      * manager in order to ensure consistency of the federated virtual file
      * system space.
-     * <p>
-     * This method must be safe for multithreading.
      *
      * @return The file system manager.
      */

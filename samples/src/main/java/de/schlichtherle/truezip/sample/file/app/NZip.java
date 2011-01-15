@@ -74,7 +74,7 @@ public class NZip extends CommandLineUtility {
     private static final String CLASS_NAME = NZip.class.getName();
     private static final ResourceBundle resources
             = ResourceBundle.getBundle(CLASS_NAME);
-    private static final IOPool<?> POOL = IOPoolContainer.INSTANCE.getPool();
+    private static final IOPool<?> POOL = IOPoolContainer.SINGLETON.getPool();
 
     private final NumberFormat numberFormat = NumberFormat.getNumberInstance();
     private final DateFormat dateFormat = DateFormat.getDateTimeInstance();

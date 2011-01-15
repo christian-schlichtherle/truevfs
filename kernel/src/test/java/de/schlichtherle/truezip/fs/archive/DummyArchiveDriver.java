@@ -21,7 +21,7 @@ import de.schlichtherle.truezip.fs.FsConcurrentModel;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.socket.InputSocket;
-import de.schlichtherle.truezip.socket.MockIOPool;
+import de.schlichtherle.truezip.socket.ByteArrayIOPool;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import java.io.CharConversionException;
@@ -34,7 +34,7 @@ import java.nio.charset.Charset;
  */
 public class DummyArchiveDriver extends CharsetArchiveDriver<ArchiveEntry> {
 
-    private static final IOPool<?> pool = new MockIOPool();
+    private static final IOPool<?> pool = new ByteArrayIOPool();
     private static final Charset charset = Charset.forName("UTF-8");
 
     public DummyArchiveDriver() {

@@ -46,7 +46,8 @@ import net.jcip.annotations.Immutable;
 @Immutable
 public final class FsManagerContainer implements FsManagerService {
 
-    public static final FsManagerContainer INSTANCE = new FsManagerContainer();
+    /** The singleton instance of this class. */
+    public static final FsManagerContainer SINGLETON = new FsManagerContainer();
 
     private final FsManager manager;
 
