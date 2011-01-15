@@ -228,7 +228,7 @@ class TFiles {
         }
         final FsPath path = new FsPath(src);
         return FsManagerContainer.INSTANCE.getManager()
-                .getController(path.getMountPoint(), FsDefaultDriver.ALL)
+                .getController(path.getMountPoint(), TFile.getDefaultArchiveDetector())
                 .getInputSocket(path.getEntryName(), options);
     }
 
@@ -247,7 +247,7 @@ class TFiles {
         }
         final FsPath path = new FsPath(dst);
         return FsManagerContainer.INSTANCE.getManager()
-                .getController(path.getMountPoint(), FsDefaultDriver.ALL)
+                .getController(path.getMountPoint(), TFile.getDefaultArchiveDetector())
                 .getOutputSocket(path.getEntryName(), options, template);
     }
 

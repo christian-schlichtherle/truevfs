@@ -22,6 +22,7 @@ import de.schlichtherle.truezip.rof.ByteArrayReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -76,8 +77,6 @@ public class MockIOEntry implements IOEntry<MockIOEntry> {
 
     @Override
     public InputSocket<MockIOEntry> getInputSocket() {
-        if (null == data)
-            throw new IllegalStateException();
         return new MockInputSocket();
     }
 
@@ -108,12 +107,16 @@ public class MockIOEntry implements IOEntry<MockIOEntry> {
 
         @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
+            if (null == data)
+                throw new FileNotFoundException();
             reads++;
             return new ByteArrayReadOnlyFile(data);
         }
 
         @Override
         public InputStream newInputStream() throws IOException {
+            if (null == data)
+                throw new FileNotFoundException();
             reads++;
             return new ByteArrayInputStream(data);
         }

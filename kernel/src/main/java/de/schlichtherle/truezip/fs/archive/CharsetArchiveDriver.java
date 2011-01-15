@@ -46,16 +46,31 @@ import static de.schlichtherle.truezip.io.Paths.*;
 public abstract class CharsetArchiveDriver<E extends ArchiveEntry>
 extends ArchiveDriver<E> {
 
+    private final Charset charset;
+
     /**
-     * Returns the value of the property {@code charset} which is used to
-     * encode entry names and probably other meta data when reading or writing
-     * an archive file.
-     * Multiple invocations must return objects which at least compare
-     * {@link Charset#equals}.
+     * Constructs a new character set archive driver.
      *
-     * @return A character set.
+     * @param charset the character set to use for encoding entry names and
+     *        probably other meta data when reading or writing an archive file.
      */
-    public abstract Charset getCharset();
+    protected CharsetArchiveDriver(Charset charset) {
+        if (null == charset)
+            throw new NullPointerException();
+        this.charset = charset;
+    }
+
+    /**
+     * Returns the character set provided to the constructor.
+     * This can be safely overriden, but must return the same object on every
+     * call.
+     *
+     * @return The character set to use for encoding entry names and probably
+     *         other meta data when reading or writing an archive file.
+     */
+    public Charset getCharset() {
+        return charset;
+    }
 
     /**
      * Fixes the given <i>entry name</i> so that it forms a valid entry name

@@ -39,19 +39,14 @@ import net.jcip.annotations.Immutable;
 @Immutable
 public class JarDriver extends ZipDriver {
 
-    public JarDriver(IOPool<?> pool) {
-        super(pool);
-    }
-
     /**
      * The default character set for entry names and comments, which is
      * {@code "UTF-8"}.
      */
-    private static final Charset JAR_CHARSET = Charset.forName("UTF-8");
+    public static final Charset JAR_CHARSET = Charset.forName("UTF-8");
 
-    @Override
-    public final Charset getCharset() {
-        return JAR_CHARSET;
+    public JarDriver(IOPool<?> pool) {
+        super(pool, JAR_CHARSET);
     }
 
     @Override

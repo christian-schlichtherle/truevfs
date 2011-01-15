@@ -31,8 +31,9 @@ import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.io.ChainableIOException;
 import de.schlichtherle.truezip.io.ChainableIOExceptionBuilder;
 import de.schlichtherle.truezip.io.InputException;
-import de.schlichtherle.truezip.socket.IOPoolContainer;
 import de.schlichtherle.truezip.util.JointIterator;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -59,8 +60,11 @@ import static de.schlichtherle.truezip.fs.archive.ArchiveEntry.UNKNOWN;
  * @version $Id$
  */
 @NotThreadSafe
+@DefaultAnnotation(NonNull.class)
 public class MultiplexedArchiveOutputShop<AE extends ArchiveEntry>
 extends DecoratingOutputShop<AE, OutputShop<AE>> {
+
+    private final IOPool<?> pool;
 
     /**
      * The map of temporary archive entries which have not yet been written
@@ -78,8 +82,9 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
      * @param output the decorated output archive.
      * @throws NullPointerException iff {@code output} is {@code null}.
      */
-    public MultiplexedArchiveOutputShop(final OutputShop<AE> output) {
+    public MultiplexedArchiveOutputShop(OutputShop<AE> output, final IOPool<?> pool) {
         super(output);
+        this.pool = pool;
     }
 
     @Override
@@ -113,7 +118,7 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
     }
 
     @Override
-    public AE getEntry(String name) {
+    public @CheckForNull AE getEntry(String name) {
         final AE entry = delegate.getEntry(name);
         if (null != entry)
             return entry;
@@ -135,7 +140,7 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
             public OutputStream newOutputStream()
             throws IOException {
                 if (isBusy()) {
-                    final IOPool.Entry<?> temp = IOPoolContainer.INSTANCE.getPool().allocate();
+                    final IOPool.Entry<?> temp = pool.allocate();
                     IOException cause = null;
                     try {
                         return new TempEntryOutputStream(getBoundSocket(), temp);
