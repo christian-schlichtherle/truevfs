@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.util;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.File;
 import java.util.Collection;
@@ -66,7 +68,23 @@ import java.util.regex.Pattern;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public final class SuffixSet extends CanonicalStringSet {
+
+    private static class SuffixMapper implements Canonicalizer {
+        /**
+         * Returns the canonical form of {@code suffix} or {@code null}
+         * if the given suffix does not have a canonical form.
+         * An example of the latter case is the empty string.
+         */
+        @Override
+        public @CheckForNull String map(Object o) {
+            String suffix = o.toString();
+            while (0 < suffix.length() && suffix.charAt(0) == PREFIX)
+                suffix = suffix.substring(1);
+            return 0 == suffix.length() ? null : suffix.toLowerCase(Locale.ENGLISH);
+        }
+    } // class SuffixMapper
 
     /** The separator for suffixes in lists, which is {@value}. */
     public static final char SEPARATOR = '|';
@@ -84,7 +102,7 @@ public final class SuffixSet extends CanonicalStringSet {
      *
      * @param suffixes A list of suffixes.
      */
-    public SuffixSet(final @NonNull String suffixes) {
+    public SuffixSet(final String suffixes) {
         super(new SuffixMapper(), SEPARATOR);
         super.addAll(suffixes);
     }
@@ -95,25 +113,10 @@ public final class SuffixSet extends CanonicalStringSet {
      *
      * @param  c A collection of suffix lists.
      */
-    public SuffixSet(final @NonNull Collection<String> c) {
+    public SuffixSet(final Collection<String> c) {
         super(new SuffixMapper(), SEPARATOR);
         super.addAll(c);
     }
-
-    private static class SuffixMapper implements Canonicalizer {
-        /**
-         * Returns the canonical form of {@code suffix} or {@code null}
-         * if the given suffix does not have a canonical form.
-         * An example of the latter case is the empty string.
-         */
-        @Override
-        public String map(Object o) {
-            String suffix = o.toString();
-            while (0 < suffix.length() && suffix.charAt(0) == PREFIX)
-                suffix = suffix.substring(1);
-            return 0 == suffix.length() ? null : suffix.toLowerCase(Locale.ENGLISH);
-        }
-    } // class SuffixMapper
 
     /**
      * Returns a case insensitive regular expression to match (file) paths
