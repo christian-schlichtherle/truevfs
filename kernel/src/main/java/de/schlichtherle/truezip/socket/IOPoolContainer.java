@@ -33,6 +33,9 @@ import net.jcip.annotations.Immutable;
  * {@code "META-INF/services/de.schlichtherle.truezip.socket.IOPoolService"}.
  * If this yields a result, the class with the name in this file is then loaded
  * and instantiated by calling its no-arg constructor.
+ * <p>
+ * Note that the kernel classes have no dependency on this class; so using
+ * this service locator is completely optional for a pure kernel application.
  *
  * @author Christian Schlichtherle
  * @version $Id$
