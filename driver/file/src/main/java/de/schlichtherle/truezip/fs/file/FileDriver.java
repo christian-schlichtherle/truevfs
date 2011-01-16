@@ -28,6 +28,17 @@ import net.jcip.annotations.Immutable;
 @Immutable
 final class FileDriver implements FsDriver {
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The implementation in the class {@link FileDriver} always returns
+     * {@code false}.
+     */
+    @Override
+    public boolean isFederated() {
+        return false;
+    }
+
     @Override
     public FsController<?>
     newController(FsMountPoint mountPoint, FsController<?> parent) {

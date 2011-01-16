@@ -31,7 +31,7 @@ public class FsFilterManagerTest extends FsManagerTestCase {
     @Override
     protected FsManager newManager() {
         return new FsFilteringManager(
-                new FsFederatingManager(),
+                new FsDefaultManager(),
                 FsMountPoint.create("file:/"));
     }
 
@@ -47,12 +47,12 @@ public class FsFilterManagerTest extends FsManagerTestCase {
         }) {
             assert params[0].length == 1;
 
-            final FsManager manager = new FsFederatingManager(
+            final FsManager manager = new FsDefaultManager(
                     STRONG);
             for (final String param : params[1])
                 manager.getController(
                     FsMountPoint.create(param),
-                    new FsDefaultFederatingDriver(
+                    new FsDefaultDriver(
                         new DummyDriverContainer("file|tar|zip")));
             assertThat(manager.getSize(), is(params[1].length));
 

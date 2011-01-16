@@ -22,12 +22,29 @@ import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * An factory for thread-safe file system controllers.
+ * A factory for thread-safe file system controllers.
  * 
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 public interface FsDriver {
+
+    /**
+     * Returns {@code true} iff this driver implements a federated virtual file
+     * system type, i.e. if the type of file system must be a member of a
+     * parent file system.
+     * E.g. the file system drivers for the ZIP or TAR file formats would
+     * return {@code true} because a ZIP or TAR file must be a member of
+     * another file system, e.g. a regular directory.
+     * To the contrary, the driver for the file scheme would return
+     * {@code false} because this file system type cannot be a member of a
+     * parent file system.
+     * 
+     * @return {@code true} iff the type of the file system implemented by this
+     *         driver is federated, i.e. must be a member of a parent file
+     *         system.
+     */
+    boolean isFederated();
 
     /**
      * Returns a new thread-safe file system controller for the given mount
@@ -46,6 +63,6 @@ public interface FsDriver {
      *         point and parent file system controller.
      */
     @NonNull FsController<?>
-    newController(  @NonNull FsMountPoint mountPoint,
+    newController(  @NonNull  FsMountPoint mountPoint,
                     @Nullable FsController<?> parent);
 }

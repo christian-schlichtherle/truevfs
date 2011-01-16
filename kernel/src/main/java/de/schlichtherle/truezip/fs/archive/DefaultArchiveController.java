@@ -196,7 +196,7 @@ extends FileSystemArchiveController<E> {
         super(model);
         if (null == driver)
             throw new NullPointerException();
-        if (parent.getModel() != model.getParent())
+        if (model.getParent() != parent.getModel())
             throw new IllegalArgumentException("Parent/member mismatch!");
         this.driver = driver;
         this.parent = parent;

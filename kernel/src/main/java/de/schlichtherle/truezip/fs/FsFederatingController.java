@@ -53,7 +53,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     private volatile FsPath path;
 
     /**
-     * Constructs a new federated file system controller.
+     * Constructs a new file system federating controller.
      *
      * @param controller the decorated file system controller.
      */

@@ -46,8 +46,8 @@ extends FsDecoratingManager<FsManager> {
 
     @Override
     public FsController<?> getController(   FsMountPoint mountPoint,
-                                            final FsFederatingDriver driver) {
-        class StatisticsDriver implements FsFederatingDriver {
+                                            final FsCompositeDriver driver) {
+        class StatisticsDriver implements FsCompositeDriver {
             @Override
             public FsController<?>
             newController(FsMountPoint mountPoint, FsController<?> parent) {
