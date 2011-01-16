@@ -44,7 +44,7 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-        <!-- Without this run-time dependency an application can't resolve
+        <!-- Without this run-time dependency an application couldn't resolve
             the file scheme in URIs like "zip:file:/archive.zip!/entry" etc. -->
         <dependency>
             <groupId>${project.groupId}</groupId>

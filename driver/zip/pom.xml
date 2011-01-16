@@ -30,4 +30,23 @@
         Add this artifact to the run time class path in order to make the
         Kernel support this archive type.
     </description>
+
+    <dependencies>
+        <!-- TODO: Write a pure file system test case as a substitute for
+             de.schlichtherle.truezip.file.FileTestCase and remove these
+             dependencies. -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truezip-file</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truezip-file</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 </project>
