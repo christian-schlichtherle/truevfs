@@ -39,6 +39,9 @@ import net.jcip.annotations.Immutable;
  * Otherwise, the expression
  * {@code new FsFailSafeManager(new FsFederatingManager())} is used to create
  * the file system manager in this container.
+ * <p>
+ * Note that the kernel classes have no dependency on this class; so using
+ * this service locator is completely optional for a pure kernel application.
  *
  * @author Christian Schlichtherle
  * @version $Id$

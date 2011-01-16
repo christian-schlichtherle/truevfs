@@ -27,9 +27,10 @@ import net.jcip.annotations.Immutable;
  * Its map of file system drivers is populated by instantiating all classes
  * which are named in the resource files with the name
  * {@code "META-INF/services/de.schlichtherle.truezip.fs.FsDriverService"}
- * on the class path.
- * Note that all named classes must implement the interface
- * {@link FsDriverService} and provide a public available no-arg constructor.
+ * on the class path by calling their no-arg constructor.
+ * <p>
+ * Note that the kernel classes have no dependency on this class; so using
+ * this service locator is completely optional for a pure kernel application.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
