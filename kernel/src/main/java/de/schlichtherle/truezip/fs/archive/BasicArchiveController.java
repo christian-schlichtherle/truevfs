@@ -275,7 +275,7 @@ extends FsController<FsConcurrentModel> {
             this.template = template;
         }
 
-        ArchiveFileSystemOperation<E> newLink() throws IOException {
+        ArchiveFileSystemOperation<E> mknod() throws IOException {
             autoSync(name, WRITE);
             // Start creating or overwriting the archive entry.
             // This will fail if the entry already exists as a directory.
@@ -291,13 +291,13 @@ extends FsController<FsConcurrentModel> {
                 throw new UnsupportedOperationException("This feature is not yet implemented!");
                 // return null; // TODO: broken interface contract!
             }
-            return newLink().getTarget().getEntry();
+            return mknod().getTarget().getEntry();
         }
 
         @Override
         public OutputStream newOutputStream() throws IOException {
-            final ArchiveFileSystemOperation<E> link = newLink();
-            final E entry = link.getTarget().getEntry();
+            final ArchiveFileSystemOperation<E> mknod = mknod();
+            final E entry = mknod.getTarget().getEntry();
             final OutputSocket<?> output = getOutputSocket(entry);
             final InputStream in = options.get(APPEND)
                     ? getInputSocket(entry.getName()).newInputStream() // FIXME: Crashes on new entry!
@@ -307,7 +307,7 @@ extends FsController<FsConcurrentModel> {
                         .bind(null == in ? this : null)
                         .newOutputStream();
                 try {
-                    link.run();
+                    mknod.run();
                     if (in != null)
                         Streams.cat(in, out);
                 } catch (IOException ex) {
