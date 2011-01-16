@@ -57,19 +57,31 @@ import java.util.TreeSet;
 @DefaultAnnotation(NonNull.class)
 public class CanonicalStringSet extends AbstractSet<String> {
 
-    /** Maps an object to its canonical string representation. */
-    public interface Canonicalizer extends IdemPotence<String> {
+    /**
+     * An idempotent function which maps an arbitrary object to its canonical
+     * string representation.
+     *
+     * @see <a href="http://en.wikipedia.org/wiki/Idempotence>Idempotence</a>
+     */
+    public interface Canonicalizer {
 
         /**
          * Returns the canonical string representation of {@code o} or
          * {@code null} if the canonical string representation is undefined.
+         * This method is expected to be an idempotent function, i.e. it shall
+         * have no side effects and the result of calling the function for its
+         * result again at least compares {@link Object#equals} to its initial
+         * result.
+         * E.g. the method {@link Object#toString} is a simple implementation
+         * of this method because you could call it several times on its result:
+         * The first call results in a string and each subsequent call would
+         * return the same string again.
          *
          * @param  o The Object to map to its canonical string representation.
          * @return The canonical string representation of {@code o} or
          *         {@code null} if the canonical string representation is
          *         undefined.
          */
-        @Override
         @CheckForNull String map(@Nullable Object o);
     } // interface Canonicalizer
 
