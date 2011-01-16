@@ -20,6 +20,7 @@ import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.util.SuffixSet;
 import de.schlichtherle.truezip.fs.FsDriver;
+import de.schlichtherle.truezip.fs.FsDriverService;
 import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.util.ServiceLocator;
@@ -37,51 +38,50 @@ import java.util.regex.Matcher;
 import net.jcip.annotations.Immutable;
 
 /**
- * An {@link TArchiveDetector} which matches file paths against a pattern of
- * file suffixes in order to detect prospective federated virtual file systems
- * (i.e. archive files) and look up their corresponding file system driver in
- * its map.
+ * An archive detector which matches file paths against a pattern of
+ * file suffixes in order to detect prospective archive files (i.e. prospective
+ * federated virtual file systems) and look up their corresponding file system
+ * driver using a file system driver service.
  * <p>
- * Constructors are provided which allow an instance to:
+ * There are basically two types of constructors available in this class:
  * <ol>
- * <li>Filter the set of archive file suffixes in the global map.
- *     For example, {@code "tar|zip"} could be accepted by the filter in order
- *     to recognize only the TAR and ZIP file formats.</li>
- * <li>Add custom archive file suffixes to a local map in order to support
- *     <i>pseudo archive types</i>.
- *     For example, {@code "mysuffix"} could be added as an custom archive file
- *     suffix for the JAR file format.</li>
- * <li>Add custom archive file suffixes and archive drivers to a local map in
- *     order to support custom archive types.
- *     For example, the suffix {@code "7z"} could be associated to a custom
- *     archive driver which supports the 7z file format.</li>
- * <li>Put together multiple instances to build a chain of responsibility:
- *     The first instance which holds a mapping for any given archive file
- *     suffix in its map determines the archive driver to be used.</li>
+ * <li>Constructors which filter the drivers of a given file system driver
+ *     service by a given list of file suffixes.
+ *     For example, the drivers known by the service
+ *     {@link FsDriverContainer#SINGLETON} could be filtered by the suffix
+ *     list {@code "tar|zip"} in order to recognize only TAR and ZIP files.
+ * <li>Constructors which decorate a given file system driver service with a
+ *     given map of file system schemes to file system drivers - whereby a
+ *     number of options are available to conveniently specify the map.
+ *     This could be used to specify custom archive file suffixes or file
+ *     system schemes, i.e. file system drivers.
+ *     For example, the suffix list {@code "foo|bar"} could be used to
+ *     recognize a custom variant of the JAR file format (you would need to
+ *     provide a custom file system driver then, too).
  * </ol>
  * <p>
  * Where a constructor expects a suffix list as a parameter,
- * it must obeye the syntax definition in {@link SuffixSet}.
+ * it must obeye the syntax constraints for {@link SuffixSet}s.
  * As an example, the parameter {@code "zip|jar"} would cause
  * the archive detector to recognize ZIP and JAR files in a path.
  * The same would be true for {@code "||.ZIP||.JAR||ZIP||JAR||"},
- * but this notation is discouraged because it's not in canonical form.
+ * but this notation is discouraged because it's obviously not in canonical
+ * form.
  * 
  * @author Christian Schlichtherle
  * @version $Id$
- * @see TDefaultArchiveDetector#NULL
- * @see TDefaultArchiveDetector#ALL
  */
 @Immutable
 @DefaultAnnotation(NonNull.class)
-public final class TDefaultArchiveDetector implements TArchiveDetector {
+public final class TDefaultArchiveDetector
+implements TArchiveDetector, FsDriverService {
 
     private static final ServiceLocator serviceLocator
             = new ServiceLocator(TDefaultArchiveDetector.class.getClassLoader());
 
     /**
-     * Never recognizes archive files in a path.
-     * This can be used as the end of a chain of
+     * This instance never recognizes any archive files in a path.
+     * This could be used as the end of a chain of
      * {@code TDefaultArchiveDetector} instances or if archive files
      * shall be treated like ordinary files rather than (virtual) directories.
      */
@@ -89,14 +89,13 @@ public final class TDefaultArchiveDetector implements TArchiveDetector {
             NULL = new TDefaultArchiveDetector("");
 
     /**
-     * Recognizes all archive file suffixes registered in the global archive
-     * driver registry by the configuration file(s).
-     * <p>
-     * This requires <a href="{@docRoot}/overview.html#defaults">additional JARs</a>
-     * on the run time class path.
+     * This instance recognizes all archive files which are known by the file
+     * system driver service {@link FsDriverContainer#SINGLETON}.
+     * The file system schemes are used as the archive file suffixes to
+     * recognize.
      */
     public static final TDefaultArchiveDetector
-            ALL = new TDefaultArchiveDetector();
+            ALL = new TDefaultArchiveDetector(null);
 
     private final Map<FsScheme, ? extends FsDriver> drivers;
 
@@ -114,79 +113,91 @@ public final class TDefaultArchiveDetector implements TArchiveDetector {
      */
     private final ThreadLocalMatcher matcher;
 
-    public TDefaultArchiveDetector() {
-        this.drivers = FsDriverContainer.SINGLETON.getDrivers();
-        final SuffixSet set = getSuffixes(drivers);
-        this.suffixes = set.toString();
-        this.matcher = new ThreadLocalMatcher(set.toPattern());
+    /**
+     * Equivalent to
+     * {@link #TDefaultArchiveDetector(FsDriverService, String) new TDefaultArchiveDetector(FsDriverContainer.SINGLETON, suffixes)}.
+     */
+    public TDefaultArchiveDetector(String suffixes) {
+        this(FsDriverContainer.SINGLETON, suffixes);
+    }
+
+    /**
+     * Constructs a new {@code TDefaultArchiveDetector} by filtering the given
+     * driver service for all canonicalized suffixes in the {@code suffixes}
+     * list.
+     *
+     * @param  service the file system driver service to filter.
+     * @param  suffixes A nullable list of suffixes which shall identify
+     *         prospective archive files.
+     *         If this is {@code null}, all drivers known by the service are
+     *         available for use with this archive detector.
+     * @throws IllegalArgumentException If any of the suffixes in the list
+     *         names a suffix for which no file system driver is known by the
+     *         service.
+     * @see    SuffixSet Syntax constraints for suffix lists.
+     */
+    public TDefaultArchiveDetector( final FsDriverService service,
+                                    final @CheckForNull String suffixes) {
+        final Map<FsScheme, ? extends FsDriver> drivers = service.getDrivers();
+        final SuffixSet known = getSuffixes(service.getDrivers());
+        final SuffixSet given;
+        if (null != suffixes) {
+            given = new SuffixSet(suffixes);
+            if (given.retainAll(known)) {
+                final SuffixSet unknown = new SuffixSet(suffixes);
+                unknown.removeAll(known);
+                throw new IllegalArgumentException("\"" + unknown + "\" (no archive driver installed for these suffixes)");
+            }
+        } else {
+            given = known;
+        }
+        this.drivers = drivers;
+        this.suffixes = given.toString();
+        this.matcher = new ThreadLocalMatcher(given.toPattern());
     }
 
     private static SuffixSet getSuffixes(
-            final Map<FsScheme, ? extends FsDriver> map) {
+            final Map<FsScheme, ? extends FsDriver> drivers) {
         SuffixSet set = new SuffixSet();
-        for (Map.Entry<FsScheme, ? extends FsDriver> entry : map.entrySet())
-            if (null != entry.getValue())
+        for (Map.Entry<FsScheme, ? extends FsDriver> entry : drivers.entrySet()) {
+            FsDriver driver = entry.getValue();
+            if (null != driver && driver.isFederated())
                 set.add(entry.getKey().toString());
+        }
         return set;
     }
 
     /**
-     * Creates a new {@code TDefaultArchiveDetector} by filtering the global map
-     * for all canonicalized suffixes in the {@code suffixes} list.
-     * 
-     * @param suffixes A list of suffixes which shall identify prospective
-     *        archive files.
-     * @see SuffixSet Syntax definition for suffix lists.
-     * @throws IllegalArgumentException If any of the suffixes in the suffix
-     *         list names a suffix for which no file system driver is
-     *         configured in the global map.
-     */
-    public TDefaultArchiveDetector(final String suffixes) {
-        this.drivers = FsDriverContainer.SINGLETON.getDrivers();
-        final SuffixSet set = new SuffixSet(suffixes);
-        final SuffixSet all = getSuffixes(drivers);
-        if (set.retainAll(all)) {
-            final SuffixSet unknown = new SuffixSet(suffixes);
-            unknown.removeAll(all);
-            throw new IllegalArgumentException("\"" + unknown + "\" (no archive driver installed for these suffixes)");
-        }
-        this.suffixes = set.toString();
-        this.matcher = new ThreadLocalMatcher(set.toPattern());
-    }
-
-    /**
      * Equivalent to
-     * {@link #TDefaultArchiveDetector(TDefaultArchiveDetector, String, FsDriver)
+     * {@link #TDefaultArchiveDetector(FsDriverService, String, FsDriver)
      * TDefaultArchiveDetector(TDefaultArchiveDetector.NULL, suffixes, driver)}.
      */
-    public TDefaultArchiveDetector(  String suffixes,
+    public TDefaultArchiveDetector( String suffixes,
                                     @CheckForNull FsDriver driver) {
         this(NULL, suffixes, driver);
     }
 
     /**
-     * Creates a new {@code TDefaultArchiveDetector} by
+     * Constructs a new {@code TDefaultArchiveDetector} by
      * decorating the configuration of {@code delegate} with
      * mappings for all canonicalized suffixes in {@code suffixes} to
      * {@code driver}.
      * 
-     * @param delegate The {@code TDefaultArchiveDetector} which's
-     *        configuration is to be virtually inherited.
-     * @param suffixes A list of suffixes which shall identify prospective
-     *        archive files.
-     *        Must not be {@code null} and must not be empty.
-     * @see SuffixSet Syntax definition for suffix lists.
-     * @param driver The archive driver to map for the suffix list.
-     *        This must either be an archive driver instance or
-     *        {@code null}.
-     *        A {@code null} archive driver may be used to shadow a
-     *        mapping for the same archive driver in {@code delegate},
-     *        effectively removing it.
-     * @throws IllegalArgumentException If any other parameter precondition
-     *         does not hold or an illegal keyword is found in the
-     *         suffix list.
+     * @param  delegate the file system driver service to decorate.
+     * @param  suffixes a list of suffixes which shall identify prospective
+     *         archive files.
+     *         This must not be {@code null} and must not be empty.
+     * @param  driver the archive driver to map for the suffix list.
+     *         This must either be an archive driver instance or
+     *         {@code null}.
+     *         A {@code null} archive driver may be used to shadow a
+     *         mapping for the same archive driver in {@code delegate} which
+     *         effectively removes it.
+     * @throws IllegalArgumentException if any other parameter precondition
+     *         does not hold.
+     * @see    SuffixSet Syntax contraints for suffix lists.
      */
-    public TDefaultArchiveDetector(  TDefaultArchiveDetector delegate,
+    public TDefaultArchiveDetector( FsDriverService delegate,
                                     String suffixes,
                                     @CheckForNull FsDriver driver) {
         this(delegate, new Object[] { suffixes, driver });
@@ -197,11 +208,10 @@ public final class TDefaultArchiveDetector implements TArchiveDetector {
      * decorating the configuration of {@code delegate} with
      * mappings for all entries in {@code config}.
      * 
-     * @param  delegate the {@code TDefaultArchiveDetector} which's
-     *         configuration is to be virtually inherited.
-     * @param  config an array of suffix lists and archive driver IDs.
-     *         Each key in this map must be a non-null, non-empty archive file
-     *         suffix list.
+     * @param  delegate the file system driver service to decorate.
+     * @param  config an array of key-value pairs.
+     *         Each key in this map must be a non-null, non-empty file suffix
+     *         list.
      *         Each value must either be an archive driver instance, an archive
      *         driver class, a string with the fully qualified name name of
      *         an archive driver class, or {@code null}.
@@ -211,16 +221,14 @@ public final class TDefaultArchiveDetector implements TArchiveDetector {
      * @throws NullPointerException if any parameter or configuration element
      *         other than an archive driver is {@code null}.
      * @throws IllegalArgumentException if any other parameter precondition
-     *         does not hold or an illegal keyword is found in the
-     *         configuration.
+     *         does not hold.
      * @throws ClassCastException if the keys are not {@link String}s or the
-     * 		   values are not {@link String}s, {@link Class}es or
+     * 	       values are not {@link String}s, {@link Class}es or
      *         {@link FsDriver}s.
-     * @see    SuffixSet Syntax definition for suffix lists.
+     * @see    SuffixSet Syntax contraints for suffix lists.
      */
-    public TDefaultArchiveDetector(
-            TDefaultArchiveDetector delegate,
-            Object[] config) {
+    public TDefaultArchiveDetector( FsDriverService delegate,
+                                    Object[] config) {
         this(delegate, toMap(config));
     }
 
@@ -233,15 +241,14 @@ public final class TDefaultArchiveDetector implements TArchiveDetector {
     }
 
     /**
-     * Creates a new {@code TDefaultArchiveDetector} by
+     * Constructs a new {@code TDefaultArchiveDetector} by
      * decorating the configuration of {@code delegate} with
      * mappings for all entries in {@code config}.
      * 
-     * @param  delegate the {@code TDefaultArchiveDetector} which's
-     *         configuration is to be virtually inherited.
+     * @param  delegate the file system driver service to decorate.
      * @param  config a map of suffix lists and archive drivers.
-     *         Each key in this map must be a non-null, non-empty archive file
-     *         suffix list.
+     *         Each key in this map must be a non-null, non-empty file suffix
+     *         list.
      *         Each value must either be an archive driver instance, an archive
      *         driver class, a string with the fully qualified name name of
      *         an archive driver class, or {@code null}.
@@ -251,18 +258,18 @@ public final class TDefaultArchiveDetector implements TArchiveDetector {
      * @throws NullPointerException if any parameter or configuration element
      *         other than an archive driver is {@code null}.
      * @throws IllegalArgumentException if any other parameter precondition
-     *         does not hold or an illegal keyword is found in the
-     *         configuration.
+     *         does not hold.
      * @throws ClassCastException if the values are not {@link String}s,
      *         {@link Class}es or {@link FsDriver}s.
-     * @see SuffixSet Syntax definition for suffix lists.
+     * @see    SuffixSet Syntax contraints for suffix lists.
      */
-    public TDefaultArchiveDetector(
-            final TDefaultArchiveDetector delegate,
-            final Map<String, Object> config) {
-        final Map<FsScheme, FsDriver> drivers
-                = new HashMap<FsScheme, FsDriver>(delegate.drivers);
-        final SuffixSet set = new SuffixSet(delegate.suffixes);
+    public TDefaultArchiveDetector( final FsDriverService delegate,
+                                    final Map<String, Object> config) {
+        final Map<FsScheme, ? extends FsDriver>
+                delegateDrivers = delegate.getDrivers();
+        final Map<FsScheme, FsDriver>
+                drivers = new HashMap<FsScheme, FsDriver>(delegateDrivers);
+        final SuffixSet suffixes = getSuffixes(delegateDrivers);
         for (final Map.Entry<String, Object> entry : config.entrySet()) {
             final SuffixSet keySet = new SuffixSet(entry.getKey());
             if (keySet.isEmpty())
@@ -271,17 +278,17 @@ public final class TDefaultArchiveDetector implements TArchiveDetector {
                 final FsScheme scheme = FsScheme.create(suffix);
                 final FsDriver driver = newDriver(entry.getValue());
                 if (null != driver) {
-                    set.add(suffix);
+                    suffixes.add(suffix);
                     drivers.put(scheme, driver);
                 } else {
-                    set.remove(suffix);
+                    suffixes.remove(suffix);
                     drivers.remove(scheme);
                 }
             }
         }
         this.drivers = Collections.unmodifiableMap(drivers);
-        this.suffixes = set.toString();
-        this.matcher = new ThreadLocalMatcher(set.toPattern());
+        this.suffixes = suffixes.toString();
+        this.matcher = new ThreadLocalMatcher(suffixes.toPattern());
     }
 
     @SuppressWarnings("unchecked")
@@ -298,6 +305,11 @@ public final class TDefaultArchiveDetector implements TArchiveDetector {
     }
 
     @Override
+    public Map<FsScheme, ? extends FsDriver> getDrivers() {
+        return drivers;
+    }
+
+    @Override
     public @CheckForNull FsScheme getScheme(final String path) {
         final Matcher m = matcher.reset(path);
         return m.matches()
@@ -305,7 +317,7 @@ public final class TDefaultArchiveDetector implements TArchiveDetector {
                 : null;
     }
 
-    /** For unit testing only. */
+    /** Reserved for unit testing only. */
     @CheckForNull FsDriver getDriver(FsScheme scheme) {
         return drivers.get(scheme);
     }
@@ -317,27 +329,23 @@ public final class TDefaultArchiveDetector implements TArchiveDetector {
         assert null == mountPoint.getParent()
                 ? null == parent
                 : mountPoint.getParent().equals(parent.getModel().getMountPoint());
-        final FsScheme scheme = mountPoint.getScheme();
+        final FsScheme declaredScheme = mountPoint.getScheme();
         final FsPath path = mountPoint.getPath();
-        final FsDriver driver;
         if (null != path) {
             final FsScheme detectedScheme = getScheme(path.getEntryName().getPath()); // may be null!
-            if (!scheme.equals(detectedScheme))
+            if (!declaredScheme.equals(detectedScheme))
                 throw new IllegalArgumentException(mountPoint.toString() + " (declared/detected scheme mismatch)");
-            driver = drivers.get(scheme);
-        } else {
-            assert "file".equalsIgnoreCase(scheme.toString());
-            driver = FsDriverContainer.SINGLETON.getDrivers().get(scheme);
         }
+        final FsDriver driver = drivers.get(declaredScheme);
         if (null == driver)
-            throw new ServiceConfigurationError(scheme
+            throw new ServiceConfigurationError(declaredScheme
                     + "(unknown file system scheme - check run-time class path configuration)");
         return driver.newController(mountPoint, parent);
     }
 
     /**
-     * Returns the <i>canonical suffix list</i> detected by this
-     * {@code TDefaultArchiveDetector}.
+     * Returns the <i>canonical suffix list</i> for all federated file system
+     * types recognized by this {@code TDefaultArchiveDetector}.
      *
      * @return Either {@code ""} to indicate an empty set or
      *         a string of the form {@code "suffix[|suffix]*"},
@@ -345,8 +353,8 @@ public final class TDefaultArchiveDetector implements TArchiveDetector {
      *         letters which does <em>not</em> start with a dot.
      *         The string never contains empty or duplicated suffixes and the
      *         suffixes are sorted in natural sort order.
-     * @see #TDefaultArchiveDetector(String)
-     * @see SuffixSet Syntax definition for canonical suffix lists.
+     * @see    #TDefaultArchiveDetector(String)
+     * @see    SuffixSet Syntax constraints for suffix lists.
      */
     @Override
     public String toString() {

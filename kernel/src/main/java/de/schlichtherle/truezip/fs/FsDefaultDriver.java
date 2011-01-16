@@ -28,7 +28,7 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-public final class FsDefaultFederatingDriver implements FsFederatingDriver {
+public final class FsDefaultDriver implements FsCompositeDriver {
 
     private final Map<FsScheme, ? extends FsDriver> drivers;
 
@@ -36,7 +36,7 @@ public final class FsDefaultFederatingDriver implements FsFederatingDriver {
      * Constructs a new file system meta driver which will query the given
      * file system provider for an appropriate file system driver.
      */
-    public FsDefaultFederatingDriver(final @NonNull FsDriverService service) {
+    public FsDefaultDriver(final @NonNull FsDriverService service) {
         this.drivers = service.getDrivers(); // immutable map!
         assert null != drivers;
     }

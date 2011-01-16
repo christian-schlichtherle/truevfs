@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.sample.file.app;
 
 import de.schlichtherle.truezip.fs.FsFailSafeManager;
-import de.schlichtherle.truezip.fs.FsFederatingManager;
+import de.schlichtherle.truezip.fs.FsDefaultManager;
 import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.FsManagerService;
 import de.schlichtherle.truezip.fs.FsStatisticsManager;
@@ -34,7 +34,7 @@ import de.schlichtherle.truezip.fs.FsStatisticsManager;
 public final class SampleManagerContainer implements FsManagerService {
 
     static final FsStatisticsManager manager = new FsStatisticsManager(
-            new FsFailSafeManager(new FsFederatingManager()));
+            new FsFailSafeManager(new FsDefaultManager()));
 
     @Override
     public FsManager getManager() {

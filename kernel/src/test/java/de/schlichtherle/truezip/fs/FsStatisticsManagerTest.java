@@ -23,6 +23,6 @@ public class FsStatisticsManagerTest extends FsManagerTestCase {
 
     @Override
     protected FsManager newManager() {
-        return new FsStatisticsManager(new FsFederatingManager());
+        return new FsStatisticsManager(new FsDefaultManager());
     }
 }

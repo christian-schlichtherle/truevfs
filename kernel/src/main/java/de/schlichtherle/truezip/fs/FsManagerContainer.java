@@ -37,7 +37,7 @@ import net.jcip.annotations.Immutable;
  * and instantiated by calling its no-arg constructor.
  * <p>
  * Otherwise, the expression
- * {@code new FsFailSafeManager(new FsFederatingManager())} is used to create
+ * {@code new FsFailSafeManager(new FsDefaultManager())} is used to create
  * the file system manager in this container.
  * <p>
  * Note that the kernel classes have no dependency on this class; so using
@@ -68,7 +68,7 @@ public final class FsManagerContainer implements FsManagerService {
                     i = locator.getServices(FsManagerService.class);
             manager = i.hasNext()
                     ? i.next().getManager()
-                    : new FsFailSafeManager(new FsFederatingManager());
+                    : new FsFailSafeManager(new FsDefaultManager());
         }
     }
 

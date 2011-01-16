@@ -21,6 +21,17 @@ package de.schlichtherle.truezip.fs;
  */
 public class DummyDriver implements FsDriver {
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The implementation in the class {@link DummyDriver} always returns
+     * {@code false}.
+     */
+    @Override
+    public boolean isFederated() {
+        return false;
+    }
+
     @Override
     public FsController<?>
     newController(FsMountPoint mountPoint, FsController<?> parent) {

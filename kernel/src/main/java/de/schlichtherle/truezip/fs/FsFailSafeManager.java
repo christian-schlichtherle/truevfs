@@ -27,7 +27,7 @@ import net.jcip.annotations.ThreadSafe;
  * This is to protect an application from loss of data if {@link #sync} isn't
  * called explicitly before the JVM terminates.
  *
- * @see     #getController(FsMountPoint, FsFederatingDriver)
+ * @see     #getController(FsMountPoint, FsCompositeDriver)
  * @see     #sync
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -52,7 +52,7 @@ public final class FsFailSafeManager extends FsDecoratingManager<FsManager> {
      */
     @Override
     public FsController<?>
-    getController(FsMountPoint mountPoint, FsFederatingDriver driver) {
+    getController(FsMountPoint mountPoint, FsCompositeDriver driver) {
         FsController<?> controller = delegate.getController(mountPoint, driver);
         if (null == this.shutdown) {
             synchronized (this) { // DCL does work in combination with volatile in JSE 5!

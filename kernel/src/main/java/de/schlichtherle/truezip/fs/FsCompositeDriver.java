@@ -15,35 +15,44 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
-import java.util.Map;
-import net.jcip.annotations.Immutable;
+import java.util.ServiceConfigurationError;
 
 /**
- * A federating file system driver queries the scheme of the given mount point
- * in order to lookup the appropriate file system driver which is then used to
- * create the requested file system controller.
+ * Queries the scheme of the given mount point in order to lookup the
+ * appropriate file system driver which is then used to create the requested
+ * file system controller.
  * <p>
  * Implementations must be thread-safe.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface FsFederatingDriver extends FsDriver {
+public interface FsCompositeDriver {
 
     /**
-     * {@inheritDoc}
-     * <p>
+     * Returns a new thread-safe file system controller for the given mount
+     * point and parent file system controller.
      * The file system controller is created by using a file system driver
      * which is looked up by querying the scheme of the given mount point.
+     * <p>
+     * When called, the following expression is a precondition:
+     * {@code
+            null == mountPoint.getParent()
+                    ? null == parent
+                    : mountPoint.getParent().equals(parent.getModel().getMountPoint())
+     * }
+     * <p>
      *
+     * @param  mountPoint the mount point of the file system.
+     * @param  parent the parent file system controller.
+     * @return A new thread-safe file system controller for the given mount
+     *         point and parent file system controller.
      * @throws ServiceConfigurationError if no appropriate file system driver
      *         is found for the scheme of the given mount point.
      */
-    @Override
     @NonNull FsController<?>
-    newController(  @NonNull FsMountPoint mountPoint,
-                    @CheckForNull FsController<?> parent);
+    newController(  @NonNull  FsMountPoint mountPoint,
+                    @Nullable FsController<?> parent);
 }

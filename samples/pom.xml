@@ -64,8 +64,8 @@
              or more archive drivers.
              When found on the class path at run time, an archive driver is
              automatically registered for use by the File* or Kernel APIs.
-             However, the sample applications have a compile time dependency
-             because they configure some drivers directly.
+             However, the File* API sample applications have a compile time
+             dependency because they configure some drivers directly.
              -->
         <dependency>
             <groupId>${project.groupId}</groupId>

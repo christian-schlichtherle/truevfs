@@ -37,7 +37,7 @@ import static de.schlichtherle.truezip.util.Link.Type.WEAK;
  * @version $Id$
  */
 @ThreadSafe
-public final class FsFederatingManager extends FsManager {
+public final class FsDefaultManager extends FsManager {
 
     /**
      * The map of all schedulers for composite file system controllers,
@@ -49,11 +49,11 @@ public final class FsFederatingManager extends FsManager {
 
     private final Type optionalScheduleType;
 
-    public FsFederatingManager() {
+    public FsDefaultManager() {
         this(WEAK);
     }
 
-    FsFederatingManager(final Type optionalScheduleType) {
+    FsDefaultManager(final Type optionalScheduleType) {
         assert null != optionalScheduleType;
         this.optionalScheduleType = optionalScheduleType;
     }
@@ -61,14 +61,14 @@ public final class FsFederatingManager extends FsManager {
     @Override
     @NonNull public synchronized FsController<?>
     getController(  @NonNull FsMountPoint mountPoint,
-                    @NonNull FsFederatingDriver driver) {
+                    @NonNull FsCompositeDriver driver) {
         return getController(mountPoint, null, driver);
     }
 
     private FsController<?>
     getController(  final FsMountPoint mountPoint,
                     FsController<?> parent,
-                    final FsDriver driver) {
+                    final FsCompositeDriver driver) {
         if (null == mountPoint.getParent()) {
             if (null != parent)
                 throw new IllegalArgumentException("Parent/member mismatch!");
@@ -102,7 +102,7 @@ public final class FsFederatingManager extends FsManager {
         public void touchedChanged(final FsEvent event) {
             final FsModel model = controller.getModel();
             assert null == event || event.getSource() == model;
-            synchronized (FsFederatingManager.this) {
+            synchronized (FsDefaultManager.this) {
                 schedulers.put(model.getMountPoint(),
                         (model.isTouched() ? STRONG : optionalScheduleType)
                             .newLink(this));

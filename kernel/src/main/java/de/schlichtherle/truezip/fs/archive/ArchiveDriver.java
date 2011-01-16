@@ -49,6 +49,17 @@ public abstract class ArchiveDriver<E extends ArchiveEntry>
 implements FsDriver, EntryFactory<E> {
 
     /**
+     * {@inheritDoc}
+     * <p>
+     * The implementation in the class {@link ArchiveDriver} always returns
+     * {@code true}.
+     */
+    @Override
+    public boolean isFederated() {
+        return true;
+    }
+
+    /**
      * Returns the I/O pool to use for allocating temporary I/O entries.
      *
      * @return The I/O pool to use for allocating temporary I/O entries.

@@ -15,10 +15,10 @@
  */
 package de.schlichtherle.truezip.sample.kernel.app;
 
-import de.schlichtherle.truezip.fs.FsDefaultFederatingDriver;
+import de.schlichtherle.truezip.fs.FsDefaultDriver;
 import de.schlichtherle.truezip.fs.FsDriverContainer;
-import de.schlichtherle.truezip.fs.FsFederatingDriver;
-import de.schlichtherle.truezip.fs.FsFederatingManager;
+import de.schlichtherle.truezip.fs.FsCompositeDriver;
+import de.schlichtherle.truezip.fs.FsDefaultManager;
 import de.schlichtherle.truezip.fs.FsInputOption;
 import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.FsOutputOption;
@@ -45,11 +45,11 @@ public class Copy {
     public static void main(String[] args)
     throws IOException, URISyntaxException {
         // Obtain a manager for file system controller life cycle management.
-        FsManager manager = new FsFederatingManager();
+        FsManager manager = new FsDefaultManager();
 
         // Search the class path for the set of all supported file system
         // drivers and build a federating file system driver from it.
-        FsFederatingDriver driver = new FsDefaultFederatingDriver(
+        FsCompositeDriver driver = new FsDefaultDriver(
                 FsDriverContainer.SINGLETON);
 
         // Resolve the source socket.
