@@ -23,7 +23,6 @@ import de.schlichtherle.truezip.fs.FsInputOption;
 import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.fs.FsPath;
-import de.schlichtherle.truezip.fs.FsSyncExceptionBuilder;
 import de.schlichtherle.truezip.fs.FsUriModifier;
 import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
