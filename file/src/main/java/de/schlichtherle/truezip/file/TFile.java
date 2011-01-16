@@ -1148,9 +1148,8 @@ public final class TFile extends File {
     }
 
     /**
-     * Returns the default {@link TArchiveDetector} to be used if no
-     * archive detector is passed explicitly to the constructor of a
-     * {@code TFile} instance.
+     * Returns the {@link TArchiveDetector} to use if no archive detector is
+     * explicitly passed to the constructor of a {@code TFile} instance.
      * <p>
      * This class property is initially set to
      * {@link TDefaultArchiveDetector#ALL}
@@ -1162,15 +1161,17 @@ public final class TFile extends File {
     }
 
     /**
-     * This class property controls how archive files are recognized.
-     * When a new {@code TFile} instance is constructed, but no archive detector
-     * parameter is provided, then the value of this class property is used.
-     * So changing the value of this class property only affects all
-     * subsequently constructed {@code TFile} instances, but not any existing
-     * ones.
+     * Sets the {@link TArchiveDetector} to use if no archive detector is
+     * explicitly passed to the constructor of a {@code TFile} instance.
+     * When a new {@code TFile} instance is constructed, but no archive
+     * detector parameter is provided, then the value of this class property
+     * is used.
+     * So changing the value of this class property affects only subsequently
+     * constructed {@code TFile} instances - not any existing ones.
      *
-     * @param detector the default {@link TArchiveDetector} to use
-     *        for subsequently constructed {@code TFile} instances.
+     * @param detector the {@link TArchiveDetector} to use for subsequently
+     *        constructed {@code TFile} instances if no archive detector is
+     *        explicitly passed to the constructor
      * @see   #getDefaultArchiveDetector()
      */
     public static void setDefaultArchiveDetector(TArchiveDetector detector) {
