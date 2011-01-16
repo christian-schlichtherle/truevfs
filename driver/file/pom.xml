@@ -19,10 +19,8 @@
 
     <parent>
         <groupId>de.schlichtherle.truezip</groupId>
-        <!-- NOT truezip-driver: Introduces cyclic dependency! -->
-        <artifactId>truezip</artifactId>
+        <artifactId>truezip-driver</artifactId>
         <version>7.0-SNAPSHOT</version>
-        <relativePath>../..</relativePath>
     </parent>
 
     <artifactId>truezip-driver-file</artifactId>
@@ -32,19 +30,4 @@
         Add this artifact to the run time class path in order to make the
         Kernel support this file system type.
     </description>
-
-    <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truezip-kernel</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truezip-kernel</artifactId>
-            <version>${project.version}</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
 </project>
