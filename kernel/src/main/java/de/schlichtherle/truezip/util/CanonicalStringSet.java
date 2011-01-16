@@ -16,18 +16,21 @@
 package de.schlichtherle.truezip.util;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.AbstractSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.SortedMap;
+import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.TreeMap;
+import java.util.TreeSet;
 
 /**
  * A set of the canonical string representation of objects in natural sort
  * order.
- * An object is canonicalized by the function {@link Canonicalizer#map}.
+ * An object is canonicalized by the idempotent function
+ * {@link Canonicalizer#map}.
  * <p>
  * Canonical string sets can be converted from and to string lists by using
  * {@link #addAll(String)} and {@link #toString()}.
@@ -51,6 +54,7 @@ import java.util.TreeMap;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public class CanonicalStringSet extends AbstractSet<String> {
 
     /** Maps an object to its canonical string representation. */
@@ -66,271 +70,64 @@ public class CanonicalStringSet extends AbstractSet<String> {
          *         undefined.
          */
         @Override
-        @CheckForNull String map(@NonNull Object o);
+        @CheckForNull String map(@Nullable Object o);
     } // interface Canonicalizer
 
+    /** The canonicalizer for strings. */
     private final Canonicalizer canonicalizer;
 
     /** The separator for string lists. */
     private final char separator;
 
     /** The sorted map which implements the behaviour of this class. */
-    private final SortedMap<String, String> map = new TreeMap<String, String>();
+    private final Set<String> set = new TreeSet<String>();
 
     /**
      * Constructs a new, empty set of canonical strings.
      *
-     * @param separator The separator character to use in string lists.
+     * @param canonicalizer the idempotent function to use for canonicalizing
+     *        strings.
+     * @param separator The separator character to use for string lists.
      */
-    public CanonicalStringSet(final @NonNull Canonicalizer mapper, final char separator) {
-        if (null == mapper)
+    public CanonicalStringSet(  final Canonicalizer canonicalizer,
+                                final char separator) {
+        if (null == canonicalizer)
             throw new NullPointerException();
-        this.canonicalizer = mapper;
+        this.canonicalizer = canonicalizer;
         this.separator = separator;
     }
 
-    /**
-     * Constructs a new set of canonical strings from the given set of
-     * canonical strings.
-     *
-     * @param separator The separator character to use in string lists.
-     * @param set A set of canonical strings to map and add to this set.
-     */
-    public CanonicalStringSet(  final @NonNull Canonicalizer mapper,
-                                final char separator,
-                                final @NonNull CanonicalStringSet set) {
-        if (null == mapper)
-            throw new NullPointerException();
-        this.canonicalizer = mapper;
-        this.separator = separator;
-        addAll(set);
+    @Override
+    public boolean isEmpty() {
+        return set.isEmpty();
     }
 
     @Override
-    public final boolean isEmpty() {
-        return super.isEmpty();
+    public int size() {
+        return set.size();
     }
 
     @Override
-    public final int size() {
-        return map.size();
-    }
-
-    /**
-     * Tests if the canonical form of all strings in the given string list
-     * is contained in this set.
-     * If a string in the list does not have a canonical form, it's skipped.
-     * This implies that if the list is empty or entirely consists of strings
-     * which do not have a canonical form, {@code true} is returned.
-     * In other words, an empty set is considered to be a true subset of this
-     * set.
-     *
-     * @param list A non-null string list.
-     * @return {@code true} Iff the canonical form of all strings in the
-     *         given string list is contained in this set.
-     * @throws NullPointerException If {@code list} is {@code null}.
-     * @throws ClassCastException If {@code list} is not a {@code String}.
-     */
-    @Override
-    public final boolean contains(Object list) {
-        return containsAll((String) list);
-    }
-
-    /**
-     * Returns a new iterator for all canonical string elements in this set.
-     *
-     * @return A new iterator for all canonical string elements.
-     */
-    @Override
-    public final Iterator<String> iterator() {
-        return map.keySet().iterator();
+    public Iterator<String> iterator() {
+        return set.iterator();
     }
 
     @Override
-    public final Object[] toArray() {
-        return map.keySet().toArray();
+    public Object[] toArray() {
+        return set.toArray();
     }
 
     @Override
-    public final <T> T[] toArray(T[] array) {
-        return map.keySet().toArray(array);
-    }
-
-    //
-    // Modification operations.
-    //
-
-    /**
-     * Adds the canonical form of all strings in the given list to this set.
-     * If a string in the list does not have a canonical form or its canonical
-     * form is already contained in this set, it's ignored.
-     *
-     * @param list A non-null string list.
-     * @return {@code true} Iff this set changed as a result of the call.
-     * @throws NullPointerException If {@code list} is {@code null}.
-     * @throws ClassCastException If {@code list} is not a {@code String}.
-     */
-    @Override
-    public final boolean add(String list) {
-        return addAll(list);
+    public <T> T[] toArray(T[] array) {
+        return set.toArray(array);
     }
 
     /**
-     * Removes the canonical form of all strings in the given list from this set.
-     * If a string in the list does not have a canonical form, it's ignored.
-     *
-     * @param list A non-null string list.
-     * @return {@code true} Iff this set changed as a result of the call.
-     * @throws NullPointerException If {@code list} is {@code null}.
-     * @throws ClassCastException If {@code list} is not a {@code String}.
-     */
-    @Override
-    public final boolean remove(Object list) {
-        return removeAll((String) list);
-    }
-
-    //
-    // Bulk operations.
-    //
-
-    /**
-     * Tests if all canonical strings in the given set are contained in this
-     * set.
-     * An empty set is considered to be a true subset of this set.
-     *
-     * @param set A non-null set of canonical strings.
-     * @return {@code true} Iff all strings in the given set are contained
-     *         in this set.
-     * @throws NullPointerException If {@code set} is {@code null}.
-     */
-    public final boolean containsAll(final CanonicalStringSet set) {
-        return map.keySet().containsAll(set.map.keySet());
-    }
-
-    /**
-     * Tests if the canonical form of all strings in the given string list
-     * is contained in this set.
-     * If a string in the list does not have a canonical form, it's skipped.
-     * This implies that if the list is empty or entirely consists of strings
-     * which do not have a canonical form, {@code true} is returned.
-     * In other words, an empty set is considered to be a true subset of this
-     * set.
-     *
-     * @param list A non-null string list.
-     * @return {@code true} Iff the canonical form of all strings in the
-     *         given string list is contained in this set.
-     * @throws NullPointerException If {@code list} is {@code null}.
-     */
-    public final boolean containsAll(final String list) {
-        final Iterator<String> i = new CanonicalStringIterator(list);
-        while (i.hasNext())
-            if (!map.containsKey(i.next()))
-                return false;
-        return true;
-    }
-
-    /**
-     * Adds all canonical strings in the given set to this set after they have
-     * been canonicalized by this set again.
-     *
-     * @param set A non-null set of canonical strings.
-     * @return {@code true} Iff this set of canonicalized strings has
-     *         changed as a result of the call.
-     * @throws NullPointerException If {@code set} is {@code null}.
-     */
-    public final boolean addAll(final CanonicalStringSet set) {
-        boolean changed = false;
-        for (String s : set.map.values())
-            changed |= add(s);
-        return changed;
-    }
-
-    /**
-     * Adds the canonical form of all strings in the given list to this set.
-     * If a string in the list does not have a canonical form, it's skipped.
-     *
-     * @param list A non-null string list.
-     * @return {@code true} Iff this set of canonicalized strings has
-     *         changed as a result of the call.
-     * @throws NullPointerException If {@code list} is {@code null}.
-     */
-    public final boolean addAll(final String list) {
-        boolean changed = false;
-        for (final Iterator<String> i = new StringIterator(list); i.hasNext(); ) {
-            final String element = i.next();
-            final String canonical = canonicalizer.map(element);
-            if (null != canonical)
-                changed |= null == map.put(canonical, element);
-        }
-        return changed;
-    }
-
-    /**
-     * Retains all canonical strings in the given set in this set.
-     *
-     * @param set A non-null set of canonical strings.
-     * @return {@code true} Iff this set changed as a result of the call.
-     * @throws NullPointerException If {@code set} is {@code null}.
-     */
-    public final boolean retainAll(CanonicalStringSet set) {
-        return map.keySet().retainAll(set.map.keySet());
-    }
-
-    /**
-     * Retains the canonical form of all strings in the given list in this set.
-     * If a string in the list does not have a canonical form, it's skipped.
-     *
-     * @param list A non-null string list.
-     * @return {@code true} Iff this set changed as a result of the call.
-     * @throws NullPointerException If {@code list} is {@code null}.
-     */
-    public final boolean retainAll(final String list) {
-        final CanonicalStringSet set = new CanonicalStringSet(canonicalizer, separator);
-        set.addAll(list);
-        return map.keySet().retainAll(set);
-    }
-
-    /**
-     * Removes all canonical strings in the given set from this set.
-     *
-     * @param set A non-null set of strings.
-     * @return {@code true} Iff this set changed as a result of the call.
-     * @throws NullPointerException If {@code set} is {@code null}.
-     */
-    public final boolean removeAll(CanonicalStringSet set) {
-        return map.keySet().removeAll(set.map.keySet());
-    }
-
-    /**
-     * Removes the canonical form of all strings in the given list from this set.
-     * If a string in the list does not have a canonical form, it's skipped.
-     *
-     * @param list A non-null string list.
-     * @return {@code true} Iff this set changed as a result of the call.
-     * @throws NullPointerException If {@code list} is {@code null}.
-     */
-    public final boolean removeAll(final String list) {
-        boolean changed = false;
-        for (final Iterator<String> i = new CanonicalStringIterator(list); i.hasNext(); )
-            changed |= map.remove(i.next()) != null;
-        return changed;
-    }
-
-    @Override
-    public final void clear() {
-        map.clear();
-    }
-
-    //
-    // Miscellaneous.
-    //
-
-    /**
-     * Returns the string representation of this canonical string set.
+     * Returns the string list in canonical form for this canonical string set.
      * If this canonical string set is empty, an empty string is returned.
      */
     @Override
-    public final String toString() {
+    public String toString() {
         final Iterator<String> i = iterator();
         if (i.hasNext()) {
             final StringBuilder sb = new StringBuilder();
@@ -347,27 +144,174 @@ public class CanonicalStringSet extends AbstractSet<String> {
         }
     }
 
-    //
-    // Inner classes.
-    //
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The implementation in the class {@link CanonicalStringSet} first
+     * canonicalizes the given parameter before the operation is continued.
+     */
+    @Override
+    public boolean contains(@Nullable Object o) {
+        return set.contains(canonicalizer.map(o));
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The implementation in the class {@link CanonicalStringSet} first
+     * canonicalizes the given parameter before the operation is continued.
+     */
+    @Override
+    public boolean add(@Nullable String s) {
+        return set.add(canonicalizer.map(s));
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The implementation in the class {@link CanonicalStringSet} first
+     * canonicalizes the given parameter before the operation is continued.
+     */
+    @Override
+    public boolean remove(@Nullable Object o) {
+        return set.remove(canonicalizer.map(o));
+    }
+
+    @Override
+    public void clear() {
+        set.clear();
+    }
+
+    /**
+     * Tests if all canonical strings in the given set are contained in this
+     * set.
+     * An empty set is considered to be a true subset of this set.
+     *
+     * @param set A non-null set of canonical strings.
+     * @return {@code true} Iff all strings in the given set are contained
+     *         in this set.
+     */
+    public boolean containsAll(final CanonicalStringSet set) {
+        return this.set.containsAll(set.set);
+    }
+
+    /**
+     * Tests if the canonical form of all strings in the given string list
+     * is contained in this set.
+     * If a string in the list does not have a canonical form, it's skipped.
+     * This implies that if the list is empty or entirely consists of strings
+     * which do not have a canonical form, {@code true} is returned.
+     * In other words, an empty set is considered to be a true subset of this
+     * set.
+     *
+     * @param  list a non-null string list.
+     * @return {@code true} Iff the canonical form of all strings in the
+     *         given string list is contained in this set.
+     */
+    public boolean containsAll(final String list) {
+        Iterator<String> i = new CanonicalStringIterator(list);
+        while (i.hasNext())
+            if (!set.contains(i.next()))
+                return false;
+        return true;
+    }
+
+    /**
+     * Adds all canonical strings in the given set to this set after they have
+     * been canonicalized by this set again.
+     *
+     * @param  set a non-null set of canonical strings.
+     * @return {@code true} Iff this set of canonicalized strings has
+     *         changed as a result of the call.
+     */
+    public boolean addAll(final CanonicalStringSet set) {
+        boolean changed = false;
+        for (String s : set.set)
+            changed |= add(s);
+        return changed;
+    }
+
+    /**
+     * Adds the canonical form of all strings in the given list to this set.
+     * If a string in the list does not have a canonical form, it's skipped.
+     *
+     * @param  list a non-null string list.
+     * @return {@code true} Iff this set of canonicalized strings has
+     *         changed as a result of the call.
+     */
+    public boolean addAll(final String list) {
+        boolean changed = false;
+        Iterator<String> i = new CanonicalStringIterator(list);
+        while (i.hasNext())
+            changed |= set.add(i.next());
+        return changed;
+    }
+
+    /**
+     * Retains all canonical strings in the given set in this set.
+     *
+     * @param  set a non-null set of canonical strings.
+     * @return {@code true} Iff this set changed as a result of the call.
+     */
+    public boolean retainAll(CanonicalStringSet set) {
+        return this.set.retainAll(set.set);
+    }
+
+    /**
+     * Retains the canonical form of all strings in the given list in this set.
+     * If a string in the list does not have a canonical form, it's skipped.
+     *
+     * @param  list a non-null string list.
+     * @return {@code true} Iff this set changed as a result of the call.
+     */
+    public boolean retainAll(final String list) {
+        CanonicalStringSet set = new CanonicalStringSet(canonicalizer, separator);
+        set.addAll(list);
+        return set.retainAll(set);
+    }
+
+    /**
+     * Removes all canonical strings in the given set from this set.
+     *
+     * @param  set a non-null set of strings.
+     * @return {@code true} Iff this set changed as a result of the call.
+     */
+    public boolean removeAll(CanonicalStringSet set) {
+        return this.set.removeAll(set.set);
+    }
+
+    /**
+     * Removes the canonical form of all strings in the given list from this set.
+     * If a string in the list does not have a canonical form, it's skipped.
+     *
+     * @param  list a non-null string list.
+     * @return {@code true} Iff this set changed as a result of the call.
+     */
+    public boolean removeAll(final String list) {
+        boolean changed = false;
+        Iterator<String> i = new CanonicalStringIterator(list);
+        while (i.hasNext())
+            changed |= set.remove(i.next());
+        return changed;
+    }
 
     private class CanonicalStringIterator implements Iterator<String> {
-        private final Iterator<String> i;
-        private String canonical;
+        private final StringTokenizer i;
+        private @CheckForNull String canonical;
 
         private CanonicalStringIterator(final String list) {
-            i = new StringIterator(list);
+            i = new StringTokenizer(list, "" + separator); // NOI18N
             advance();
         }
 
         @Override
-		public boolean hasNext() {
+        public boolean hasNext() {
             return canonical != null;
         }
 
         @Override
-		public String next() {
-            if (canonical == null)
+        public String next() {
+            if (null == canonical)
                 throw new NoSuchElementException();
             final String c = canonical;
             advance();
@@ -375,8 +319,8 @@ public class CanonicalStringSet extends AbstractSet<String> {
         }
 
         private void advance() {
-            while (i.hasNext()) {
-                canonical = canonicalizer.map(i.next());
+            while (i.hasMoreTokens()) {
+                canonical = canonicalizer.map(i.nextToken());
                 if (null != canonical)
                     return;
             }
@@ -384,31 +328,8 @@ public class CanonicalStringSet extends AbstractSet<String> {
         }
 
         @Override
-		public void remove() {
+        public void remove() {
             throw new UnsupportedOperationException();
         }
-    } // class CanonicalSuffixIterator
-
-    private class StringIterator implements Iterator<String> {
-        private final StringTokenizer i;
-
-        private StringIterator(final String list) {
-            i = new StringTokenizer(list, "" + separator); // NOI18N
-        }
-
-        @Override
-		public boolean hasNext() {
-            return i.hasMoreTokens();
-        }
-
-        @Override
-		public String next() {
-            return i.nextToken();
-        }
-
-        @Override
-		public void remove() {
-            throw new UnsupportedOperationException();
-        }
-    } // class StringIterator
+    } // class CanonicalStringIterator
 }
