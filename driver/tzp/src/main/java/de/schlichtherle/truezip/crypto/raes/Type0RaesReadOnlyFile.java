@@ -34,6 +34,7 @@ import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 
 import static de.schlichtherle.truezip.crypto.raes.RaesConstants.*;
+import static org.bouncycastle.crypto.PBEParametersGenerator.PKCS12PasswordToBytes;
 
 /**
  * Reads a type 0 RAES file.
@@ -65,7 +66,7 @@ class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
 
     Type0RaesReadOnlyFile(
             final ReadOnlyFile rof,
-            final Type0RaesParameters parameters)
+            final Type0RaesParameters param)
     throws  NullPointerException,
             FileNotFoundException,
             RaesException,
@@ -74,7 +75,7 @@ class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
         super(rof);
 
         assert rof != null;
-        assert parameters != null;
+        assert param != null;
 
         // Load header data.
         final byte[] header = new byte[ENVELOPE_TYPE_0_HEADER_LEN_WO_SALT];
@@ -84,9 +85,7 @@ class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
 
         // Check key size and iteration count
         keyStrength = readUByte(header, 5);
-        if (keyStrength != Type0RaesParameters.KEY_STRENGTH_128
-                && keyStrength != Type0RaesParameters.KEY_STRENGTH_192
-                && keyStrength != Type0RaesParameters.KEY_STRENGTH_256)
+        if (keyStrength < 0 || 2 < keyStrength)
             throw new RaesException(
                     "Unknown index for cipher key strength: "
                     + keyStrength
@@ -94,7 +93,7 @@ class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
         final int keyLen = 16 + keyStrength * 8; // key strength in bytes: 16, 24 or 32
         final int keySize = keyLen * 8; // key strength in bits
         final int iCount = readUShort(header, 6);
-        if (iCount < 1024)
+        if (1024 > iCount)
             throw new RaesException(
                     "Iteration count must be 1024 or greater, but is "
                     + iCount
@@ -115,7 +114,7 @@ class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
         final long end = fileLength - footer.length;
         rof.seek(end);
         rof.readFully(footer);
-        if (this.delegate.read() != -1) {
+        if (-1 != this.delegate.read()) {
             // This should never happen unless someone is writing to the
             // end of the file concurrently!
             throw new RaesException(
@@ -126,33 +125,29 @@ class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
         final long length = fileLength - footer.length - start;
 
         // Init PBE parameters.
-        final PBEParametersGenerator paramGen
-                = new PKCS12ParametersGenerator(digest);
+        final PBEParametersGenerator gen = new PKCS12ParametersGenerator(digest);
         ParametersWithIV cipherParam;
         CipherParameters macParam;
         long lastTry = 0; // don't enforce suspension on first prompt!
-        while (true) {
-            final char[] passwd = parameters.getOpenPasswd();
-            if (passwd == null) // for compatibility to old implementations
+        for (boolean invalid = false; ; invalid = true) {
+            final char[] passwd = param.getOpenPasswd(invalid);
+            if (null == passwd) // safety first!
                 throw new RaesKeyException();
-            final byte[] pass
-                    = PBEParametersGenerator.PKCS12PasswordToBytes(passwd);
+            final byte[] pass = PKCS12PasswordToBytes(passwd);
             for (int i = passwd.length; --i >= 0; ) // nullify password parameter
                 passwd[i] = 0;
 
-            paramGen.init(pass, salt, iCount);
-            cipherParam
-                    = (ParametersWithIV) paramGen.generateDerivedParameters(
-                        keySize, AES_BLOCK_SIZE);
-            macParam = paramGen.generateDerivedMacParameters(keySize);
+            gen.init(pass, salt, iCount);
+            cipherParam = (ParametersWithIV) gen.generateDerivedParameters(
+                    keySize, AES_BLOCK_SIZE);
+            macParam = gen.generateDerivedMacParameters(keySize);
             for (int i = pass.length; --i >= 0; ) // nullify password buffer
                 pass[i] = 0;
 
             // Init and verify KLAC.
             final Mac klac = new HMac(digest);
             klac.init(macParam);
-            final byte[] cipherKey
-                    = ((KeyParameter) cipherParam.getParameters()).getKey();
+            final byte[] cipherKey = ((KeyParameter) cipherParam.getParameters()).getKey();
             klac.update(cipherKey, 0, cipherKey.length);
             final byte[] buf = new byte[klac.getMacSize()];
             RaesOutputStream.klac(klac, length, buf);
@@ -160,12 +155,8 @@ class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
 
             lastTry = enforceSuspensionPenalty(lastTry);
 
-            if (ArrayHelper.equals(footer, 0, buf, 0, buf.length / 2)) {
-                parameters.setKeyStrength(keyStrength);
+            if (ArrayHelper.equals(footer, 0, buf, 0, buf.length / 2))
                 break;
-            }
-
-            parameters.invalidOpenPasswd();
         }
 
         this.macParam = macParam;
@@ -194,13 +185,12 @@ class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
     }
 
     @Override
-	public int getKeySizeBits() {
+    public int getKeySizeBits() {
         return 128 + keyStrength * 64;
     }
 
     @Override
-	public void authenticate()
-    throws RaesAuthenticationException, IOException {
+    public void authenticate() throws RaesAuthenticationException, IOException {
         final Mac mac = new HMac(new SHA256Digest());
         mac.init(macParam);
 

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.awt;
 
 import java.awt.EventQueue;
@@ -21,19 +20,18 @@ import java.awt.Window;
 import java.lang.reflect.InvocationTargetException;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import junit.framework.TestCase;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Christian Schlichtherle
  * @since TrueZIP 6.1
  * @version $Id$
  */
-public class WindowsTest extends TestCase {
-    
-    public WindowsTest(String testName) {
-        super(testName);
-    }
+public class WindowsTest {
 
+    @Test
     public void testParentWindow()
     throws InterruptedException, InvocationTargetException {
         EventQueue.invokeAndWait(new Runnable() {

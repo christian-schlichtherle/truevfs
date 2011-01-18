@@ -15,7 +15,8 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip.raes;
 
-import de.schlichtherle.truezip.fs.archive.ArchiveDriver;
+import de.schlichtherle.truezip.fs.FsSyncException;
+import de.schlichtherle.truezip.fs.FsSyncOption;
 import de.schlichtherle.truezip.fs.archive.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.fs.FsDecoratingController;
@@ -24,7 +25,10 @@ import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsException;
 import de.schlichtherle.truezip.fs.FsModel;
-import de.schlichtherle.truezip.key.KeyManagers;
+import de.schlichtherle.truezip.key.KeyProvider;
+import de.schlichtherle.truezip.key.PromptingKeyProvider;
+import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.CharConversionException;
 import java.io.IOException;
 import net.jcip.annotations.ThreadSafe;
@@ -41,11 +45,10 @@ import static de.schlichtherle.truezip.fs.FsEntryName.*;
  */
 @ThreadSafe
 final class KeyManagerArchiveController
-extends FsDecoratingController<
-        FsModel,
-        FsController<? extends FsModel>> {
+extends FsDecoratingController< FsModel,
+                                FsController<? extends FsModel>> {
 
-    private final ArchiveDriver<?> driver;
+    private final ZipRaesDriver driver;
 
     /**
      * Constructs a new key manager archive controller.
@@ -53,10 +56,11 @@ extends FsDecoratingController<
      * @param controller the non-{@code null} archive controller.
      */
     KeyManagerArchiveController(final FsController<?> controller,
-                                final ArchiveDriver<?> driver) {
+                                final ZipRaesDriver driver) {
         super(controller);
         this.driver = driver;
     }
+
 
     @Override
     public final FsEntry getEntry(final FsEntryName name)
@@ -94,7 +98,22 @@ extends FsDecoratingController<
     public void unlink(FsEntryName name) throws IOException {
         delegate.unlink(name);
         if (name.isRoot())
-            KeyManagers .getManager()
-                        .resetKeyProvider(getModel().getMountPoint().getUri());
+            driver  .getKeyManagerService()
+                    .getManager(Object.class)
+                    .removeKeyProvider(getModel().getMountPoint().getUri());
+    }
+
+    @Override
+    public <X extends IOException> void
+    sync(   BitField<FsSyncOption> options,
+            ExceptionHandler<? super FsSyncException, X> handler)
+    throws X, FsException {
+        delegate.sync(options, handler);
+        driver  .getKeyProviderSyncStrategy()
+                .sync(
+                    driver  .getKeyManagerService()
+                            .getManager(Object.class)
+                            .getKeyProvider(
+                                getModel().getMountPoint().getUri()));
     }
 }

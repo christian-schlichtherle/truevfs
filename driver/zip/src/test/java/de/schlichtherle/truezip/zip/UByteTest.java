@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.zip;
 
-import de.schlichtherle.truezip.zip.UByte;
-import junit.framework.TestCase;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
  * A simple round trip test of the static utility methods for unsigned byte
@@ -26,12 +26,9 @@ import junit.framework.TestCase;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class UByteTest extends TestCase {
+public final class UByteTest {
 
-    public UByteTest(String testName) {
-        super(testName);
-    }
-
+    @Test
     public void testCheck() {
         try {
             UByte.check(UByte.MIN_VALUE - 1);

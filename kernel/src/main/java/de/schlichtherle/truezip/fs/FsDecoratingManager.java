@@ -40,7 +40,7 @@ extends FsManager {
      *
      * @param manager the decorated file system manager.
      */
-    protected FsDecoratingManager(@NonNull final M manager) {
+    protected FsDecoratingManager(final @NonNull M manager) {
         if (null == manager)
             throw new NullPointerException();
         this.delegate = manager;

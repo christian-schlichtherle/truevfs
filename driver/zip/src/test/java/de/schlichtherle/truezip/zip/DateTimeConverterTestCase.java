@@ -13,54 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.zip;
 
-import de.schlichtherle.truezip.zip.DateTimeConverter;
-import de.schlichtherle.truezip.zip.UInt;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 import junit.framework.AssertionFailedError;
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
- *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class DateTimeConverterTestCase extends TestCase {
+public abstract class DateTimeConverterTestCase {
 
     private static final long MIN_DOS_TIME = DateTimeConverter.MIN_DOS_TIME;
 
     private DateTimeConverter instance;
     private Calendar cal;
 
-    public DateTimeConverterTestCase(String testName) {
-        super(testName);
-    }
-
-    @Override
-    protected void setUp()
-    throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() {
         instance = getInstance();
         cal = new GregorianCalendar(instance.newTimeZone());
         cal.set(Calendar.MILLISECOND, 0);
     }
 
-    @Override
-    protected void tearDown()
-    throws Exception {
-        super.tearDown();
-    }
-
     protected abstract DateTimeConverter getInstance();
 
-    /**
-     * Test of toJavaTime method, of class DateTimeConverter.
-     */
-    public void testToJavaTime() {
+    @Test
+    public final void testToJavaTime() {
         try {
             instance.toJavaTime(-1);
             fail("Expected RuntimeException");
@@ -105,10 +90,8 @@ public abstract class DateTimeConverterTestCase extends TestCase {
                 instance.toJavaTime(MIN_DOS_TIME));
     }
 
-    /**
-     * Test of toDosTime method, of class DateTimeConverter.
-     */
-    public void testToDosTime() {
+    @Test
+    public final void testToDosTime() {
         try {
             instance.toDosTime(-1);
             fail("Expected RuntimeException");
@@ -122,10 +105,8 @@ public abstract class DateTimeConverterTestCase extends TestCase {
         assertEquals(MIN_DOS_TIME, instance.toDosTime(cal.getTimeInMillis()));
     }
 
-    /**
-     * Test of newTimeZone method, of class DateTimeConverter.
-     */
-    public void testCreateTimeZone() {
+    @Test
+    public final void testCreateTimeZone() {
         final TimeZone tz1 = instance.newTimeZone();
         assertNotNull(tz1);
         final TimeZone tz2 = instance.newTimeZone();
@@ -134,10 +115,8 @@ public abstract class DateTimeConverterTestCase extends TestCase {
         assertTrue(tz1.hasSameRules(tz2));
     }
 
-    /**
-     * Test of roundUp method, of class DateTimeConverter.
-     */
-    public void testRoundUp() {
+    @Test
+    public final void testRoundUp() {
         instance.roundUp(System.currentTimeMillis()); // check for RuntimeException
     }
 }

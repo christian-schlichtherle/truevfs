@@ -13,48 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.zip;
 
-import de.schlichtherle.truezip.zip.ZipEntry;
-import de.schlichtherle.truezip.zip.DateTimeConverter;
-import de.schlichtherle.truezip.zip.UInt;
 import java.util.Arrays;
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
 
 import static de.schlichtherle.truezip.zip.ZipConstants.*;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ZipEntryTest extends TestCase {
+public final class ZipEntryTest {
     
     private ZipEntry entry;
-    
-    public ZipEntryTest(String testName) {
-        super(testName);
-    }
 
-    @Override
-    protected void setUp()
-            throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() {
         entry = new ZipEntry("test");
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        entry = null;
-        super.tearDown();
-    }
-
+    @Test
     public void testClone() {
         // TODO: Complete this test!
         ZipEntry clone = entry.clone();
         assertNotSame(clone, entry);
     }
 
+    @Test
     public void testPlatform() {
         try {
             entry.setPlatform((short) (ZipEntry.UNKNOWN - 1));
@@ -81,6 +70,7 @@ public class ZipEntryTest extends TestCase {
         assertEquals(ZipEntry.UNKNOWN, entry.getPlatform());
     }
 
+    @Test
     public void testGeneral() {
         try {
             entry.setGeneral(ZipEntry.UNKNOWN - 1);
@@ -107,6 +97,7 @@ public class ZipEntryTest extends TestCase {
         assertEquals(ZipEntry.UNKNOWN, entry.getGeneral());
     }
 
+    @Test
     public void testGeneralBit() {
         for (int i = -1; i < 17; i++) {
             try {
@@ -143,6 +134,7 @@ public class ZipEntryTest extends TestCase {
         }
     }
 
+    @Test
     public void testMethod() {
         try {
             entry.setMethod(ZipEntry.UNKNOWN - 1);
@@ -175,6 +167,7 @@ public class ZipEntryTest extends TestCase {
         assertEquals(ZipEntry.UNKNOWN, entry.getMethod());
     }
 
+    @Test
     public void testRoundTripTimeConversion() {
         // Must start with DOS time due to lesser time granularity.
         long dosTime = ZipEntry.MIN_DOS_TIME;
@@ -184,6 +177,7 @@ public class ZipEntryTest extends TestCase {
         assertEquals(dosTime, DateTimeConverter.JAR.toDosTime(DateTimeConverter.JAR.toJavaTime(dosTime)));
     }
 
+    @Test
     public void testDosTime() {
         try {
             entry.setDosTime(ZipEntry.UNKNOWN - 1);
@@ -212,6 +206,7 @@ public class ZipEntryTest extends TestCase {
         assertEquals(ZipEntry.UNKNOWN, entry.getDosTime());
     }
 
+    @Test
     public void testTime() {
         try {
             entry.setTime(ZipEntry.UNKNOWN - 1);
@@ -227,6 +222,7 @@ public class ZipEntryTest extends TestCase {
         assertEquals(ZipEntry.UNKNOWN, entry.getTime());
     }
 
+    @Test
     public void testCrc() {
         try {
             entry.setCrc(ZipEntry.UNKNOWN - 1);
@@ -249,6 +245,7 @@ public class ZipEntryTest extends TestCase {
         assertEquals(ZipEntry.UNKNOWN, entry.getCrc());
     }
 
+    @Test
     public void testCompressedSize32() {
         try {
             entry.setCompressedSize32(ZipEntry.UNKNOWN - 1);
@@ -271,6 +268,7 @@ public class ZipEntryTest extends TestCase {
         assertEquals(ZipEntry.UNKNOWN, entry.getCompressedSize32());
     }
 
+    @Test
     public void testCompressedSize() {
         try {
             entry.setCompressedSize(ZipEntry.UNKNOWN - 1);
@@ -291,6 +289,7 @@ public class ZipEntryTest extends TestCase {
 
     }
 
+    @Test
     public void testSize32() {
         try {
             entry.setSize32(ZipEntry.UNKNOWN - 1);
@@ -313,6 +312,7 @@ public class ZipEntryTest extends TestCase {
         assertEquals(ZipEntry.UNKNOWN, entry.getSize32());
     }
 
+    @Test
     public void testSize() {
         try {
             entry.setSize(ZipEntry.UNKNOWN - 1);
@@ -331,6 +331,7 @@ public class ZipEntryTest extends TestCase {
         assertEquals(ZipEntry.UNKNOWN, entry.getSize());
     }
 
+    @Test
     public void testOffset32() {
         try {
             entry.setOffset32(ZipEntry.UNKNOWN - 1);
@@ -353,6 +354,7 @@ public class ZipEntryTest extends TestCase {
         assertEquals(ZipEntry.UNKNOWN, entry.getOffset32());
     }
 
+    @Test
     public void testOffset() {
         try {
             entry.setOffset(ZipEntry.UNKNOWN - 1);
@@ -371,6 +373,7 @@ public class ZipEntryTest extends TestCase {
         assertEquals(ZipEntry.UNKNOWN, entry.getOffset());
     }
 
+    @Test
     public void testExtra() {
         assertEquals(0, entry.getExtra().length);
 

@@ -15,6 +15,9 @@
  */
 package de.schlichtherle.truezip.crypto.raes;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
+
 /**
  * The parameters of this interface are used with RAES <i>type 0</i> files.
  * Type 0 RAES files use password based encryption according to the
@@ -25,58 +28,48 @@ package de.schlichtherle.truezip.crypto.raes;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public interface Type0RaesParameters extends RaesParameters {
+
+    public enum KeyStrength {
+        /** Enum identifier for a 128 bit ciphering key. */
+        BITS_128,
+
+        /** Enum identifier for a 192 bit ciphering key. */
+        BITS_192,
+
+        /** Enum identifier for a 256 bit ciphering key. */
+        BITS_256,
+    }
+
+    /**
+     * Returns the key strength to use for creating or overwriting the RAES file.
+     *
+     * @return The key strength to use for creating or overwriting the RAES file.
+     */
+    KeyStrength getKeyStrength();
 
     /**
      * Returns the password required to create or overwrite the RAES type 0 file.
      *
      * @return A clone of the char array holding the password to use for
-     *         creating or overwriting the RAES file - never {@code null}.
+     *         creating or overwriting the RAES file.
      * @throws RaesKeyException If password retrieval has been disabled or
      *         cancelled.
      */
     char[] getCreatePasswd() throws RaesKeyException;
 
-
     /**
      * Returns the password required to open the RAES type 0 file for reading.
-     * Please note that this method is called repeatedly until either the
-     * returned password is correct or an exception has been thrown.
+     * This method is called consecutively until either the returned password
+     * is correct or an exception is thrown.
      *
+     * @param  invalid {@code true} iff a previous call to this method resulted
+     *         in an invalid password.
      * @return A clone of the char array holding the password to open the RAES
-     *         file for reading - never {@code null}.
+     *         file for reading.
      * @throws RaesKeyException If password retrieval has been disabled or
      *         cancelled.
      */
-    char[] getOpenPasswd() throws RaesKeyException;
-
-    /**
-     * Callback to report that the password returned by {@link #getOpenPasswd()}
-     * is wrong.
-     */
-    void invalidOpenPasswd();
-
-    /** Identifier for a 128 bit ciphering key. */
-    int KEY_STRENGTH_128 = 0;
-
-    /** Identifier for a 192 bit ciphering key. */
-    int KEY_STRENGTH_192 = 1;
-
-    /** Identifier for a 256 bit ciphering key. */
-    int KEY_STRENGTH_256 = 2;
-
-    /**
-     * Returns the key strength to use for creating or overwriting the RAES file.
-     *
-     * @see #KEY_STRENGTH_128
-     * @see #KEY_STRENGTH_192
-     * @see #KEY_STRENGTH_256
-     */
-    int getKeyStrength();
-
-    /**
-     * Sets the key strength which was used when creating or overwriting the
-     * RAES file.
-     */
-    void setKeyStrength(int keyStrength);
+    char[] getOpenPasswd(boolean invalid) throws RaesKeyException;
 }

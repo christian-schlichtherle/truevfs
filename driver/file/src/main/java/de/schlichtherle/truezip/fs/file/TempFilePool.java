@@ -35,7 +35,12 @@ import net.jcip.annotations.ThreadSafe;
 @ThreadSafe
 public final class TempFilePool implements IOPool<FileEntry> {
 
-    static final TempFilePool INSTANCE = new TempFilePool("tzp", null, null);
+    /**
+     * A default instance of this pool.
+     * Use this if you don't have special requirements regarding the temp file
+     * prefix, suffix or directory.
+     */
+    public static final TempFilePool INSTANCE = new TempFilePool("tzp", null, null);
 
     private final @NonNull  String prefix;
     private final @Nullable String suffix;

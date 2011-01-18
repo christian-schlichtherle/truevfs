@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.key;
 
 import de.schlichtherle.truezip.file.swing.TFileChooser;
 import javax.swing.JFileChooser;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * Thrown to indicate that prompting for a key to open or create a
@@ -29,6 +30,7 @@ import javax.swing.JFileChooser;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 public class KeyPromptingInterruptedException extends UnknownKeyException  {
     private static final long serialVersionUID = 7656348607356445644L;
 

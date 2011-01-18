@@ -51,7 +51,7 @@ extends FsController<M> {
      *
      * @param controller the decorated file system controller.
      */
-    protected FsDecoratingController(@NonNull final C controller) {
+    protected FsDecoratingController(final @NonNull C controller) {
         if (null == controller)
             throw new NullPointerException();
         this.delegate = controller;

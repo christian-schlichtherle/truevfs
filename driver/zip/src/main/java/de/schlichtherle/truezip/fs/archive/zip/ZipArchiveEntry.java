@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import de.schlichtherle.truezip.fs.archive.ArchiveEntry;
 import de.schlichtherle.truezip.zip.DateTimeConverter;
 import de.schlichtherle.truezip.zip.ZipEntry;
@@ -33,6 +34,7 @@ import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public class ZipArchiveEntry extends ZipEntry implements ArchiveEntry {
     static {
         assert ZipEntry.UNKNOWN == ArchiveEntry.UNKNOWN;
@@ -42,7 +44,7 @@ public class ZipArchiveEntry extends ZipEntry implements ArchiveEntry {
         super(name);
     }
 
-    ZipArchiveEntry(String name, @NonNull ZipEntry template) {
+    ZipArchiveEntry(String name, ZipEntry template) {
         super(name, template);
     }
 

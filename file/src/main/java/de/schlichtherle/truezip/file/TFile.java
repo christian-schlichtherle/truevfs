@@ -362,11 +362,12 @@ public final class TFile extends File {
     private static final Set<File> roots
     		= new TreeSet<File>(Arrays.asList(listRoots()));
 
+    static final FsManager manager = FsManagerContainer.SINGLETON.getManager();
+
     private static boolean lenient = true;
 
-    private static TArchiveDetector defaultDetector = TDefaultArchiveDetector.ALL;
-
-    private static FsManager manager = FsManagerContainer.SINGLETON.getManager();
+    private static TArchiveDetector
+            defaultDetector = TDefaultArchiveDetector.ALL;
 
     //
     // Instance fields:
@@ -1181,33 +1182,6 @@ public final class TFile extends File {
     }
 
     /**
-     * Returns the file system manager.
-     *
-     * @return The file system manager.
-     */
-    public static FsManager getManager() {
-        return manager;
-    }
-
-    /**
-     * Sets the file system manager.
-     *
-     * @param  manager the new file system manager.
-     * @throws FsSyncException if the old file system manager encounters
-     *         any exception during committing the changes of the contents of
-     *         all its federated file systems (i.e. archive files) to their
-     *         respective parent file system.
-     */
-    public static void setManager(FsManager manager) throws FsSyncException {
-        if (null == manager)
-            throw new NullPointerException();
-        if (TFile.manager != manager) {
-            umount();
-            TFile.manager = manager;
-        }
-    }
-
-    /**
      * Returns the first parent directory (starting from this file) which is
      * <em>not</em> an archive file or a file located in an archive file.
      */
@@ -1829,7 +1803,8 @@ public final class TFile extends File {
     public boolean isFile() {
         if (null != innerArchive) {
             try {
-                final FsEntry entry = innerArchive.getController().getEntry(getInnerEntryName0());
+                final FsEntry entry = innerArchive.getController()
+                        .getEntry(getInnerEntryName0());
                 return null != entry && FILE == entry.getType();
             } catch (IOException ex) {
                 return false;
@@ -1858,7 +1833,8 @@ public final class TFile extends File {
     public boolean isDirectory() {
         if (null != innerArchive) {
             try {
-                final FsEntry entry = innerArchive.getController().getEntry(getInnerEntryName0());
+                final FsEntry entry = innerArchive.getController()
+                        .getEntry(getInnerEntryName0());
                 return null != entry && entry.getType() == DIRECTORY;
             } catch (IOException ex) {
                 return false;

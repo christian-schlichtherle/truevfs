@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.sample.file;
 
-import de.schlichtherle.truezip.crypto.raes.KeyManagerRaesParameters;
+import de.schlichtherle.truezip.crypto.raes.param.KeyManagerRaesParameters;
 import de.schlichtherle.truezip.crypto.raes.RaesOutputStream;
 import de.schlichtherle.truezip.crypto.raes.RaesParameters;
 import de.schlichtherle.truezip.crypto.raes.RaesReadOnlyFile;
@@ -25,6 +24,7 @@ import de.schlichtherle.truezip.file.TDefaultArchiveDetector;
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.TFileInputStream;
 import de.schlichtherle.truezip.file.TFileOutputStream;
+import de.schlichtherle.truezip.key.KeyManagerContainer;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFileInputStream;
 import de.schlichtherle.truezip.rof.SimpleReadOnlyFile;
@@ -44,9 +44,6 @@ import java.io.OutputStream;
  * @version $Id$
  */
 public class RaesFiles {
-
-    RaesFiles() {
-    }
 
     /**
      * Encrypts the given plain file to the given RAES file.
@@ -75,6 +72,7 @@ public class RaesFiles {
         final TFile plainFile = newNonArchiveFile(plainFilePath, detector);
         final TFile raesFile = newNonArchiveFile(raesFilePath, detector);
         final RaesParameters params = new KeyManagerRaesParameters(
+                KeyManagerContainer.SINGLETON,
                 raesFile.getCanonicalFile().toURI());
         final InputStream in = new TFileInputStream(plainFile);
         try {
@@ -123,6 +121,7 @@ public class RaesFiles {
         final TFile raesFile = newNonArchiveFile(raesFilePath, detector);
         final TFile plainFile = newNonArchiveFile(plainFilePath, detector);
         final RaesParameters params = new KeyManagerRaesParameters(
+                KeyManagerContainer.SINGLETON,
                 raesFile.getCanonicalFile().toURI());
         final ReadOnlyFile rof = new SimpleReadOnlyFile(raesFile);
         try {

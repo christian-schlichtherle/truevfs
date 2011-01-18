@@ -15,25 +15,26 @@
  */
 package de.schlichtherle.truezip.file;
 
+import de.schlichtherle.truezip.key.PromptingKeyManager;
+import java.util.ServiceConfigurationError;
+import de.schlichtherle.truezip.key.PromptingKeyProvider;
+import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
+import de.schlichtherle.truezip.key.KeyManagerService;
 import java.io.File;
 import de.schlichtherle.truezip.fs.archive.zip.raes.SafeZipRaesDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
-import de.schlichtherle.truezip.key.AesKeyProvider;
+import de.schlichtherle.truezip.fs.archive.ArchiveDriver;
+import de.schlichtherle.truezip.fs.archive.zip.raes.ZipRaesDriver.KeyProviderSyncStrategy;
 import de.schlichtherle.truezip.key.KeyManager;
-import de.schlichtherle.truezip.key.KeyManagers;
 import de.schlichtherle.truezip.key.KeyPromptingCancelledException;
 import de.schlichtherle.truezip.key.UnknownKeyException;
 import java.io.IOException;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 /**
- * Tests the TrueZIP API in the package {@code de.schlichtherle.truezip.io} with the
- * ZIP.RAES (TZP) driver.
- * This test uses a custom key manager in order to automatically provide a
- * constant password without prompting the user.
- *
  * @author Christian Schlichtherle
  * @version $Id$
  */
@@ -42,21 +43,19 @@ public final class TZipRaesFileTest extends TFileTestCase {
     private static boolean cancelling;
 
     public TZipRaesFileTest() {
-        super(FsScheme.create("tzp"), new SafeZipRaesDriver(POOL));
+        super(  FsScheme.create("tzp"),
+                new SafeZipRaesDriver(POOL, new CustomKeyManagerService()) {
+            @Override
+            public KeyProviderSyncStrategy getKeyProviderSyncStrategy() {
+                return KeyProviderSyncStrategy.RESET_UNCONDITIONALLY;
+            }
+        });
     }
 
     @Override
     public void setUp() throws IOException {
-        KeyManagers.setManager(new CustomKeyManager());
         cancelling = false;
         super.setUp();
-    }
-
-    @Override
-    public void tearDown() throws IOException {
-        //cancelling = false;
-        super.tearDown();
-        KeyManagers.setManager(null);
     }
 
     @Test
@@ -127,41 +126,41 @@ public final class TZipRaesFileTest extends TFileTestCase {
         assertTrue(archive.deleteAll());
     }
 
-    public static class CustomKeyManager extends KeyManager {
-        //@SuppressWarnings("unchecked")
-        public CustomKeyManager() {
-            mapKeyProviderType(AesKeyProvider.class, SimpleAesKeyProvider.class);
-        }
-    }
+    private static class CustomKeyManagerService implements KeyManagerService {
 
-    public static class SimpleAesKeyProvider implements AesKeyProvider<char[]> {
+        private static final PromptingKeyManager<AesCipherParameters>
+                manager = new PromptingKeyManager<AesCipherParameters>(
+                    new CustomUI());
+
         @Override
-		public char[] getCreateKey() throws UnknownKeyException {
+        @SuppressWarnings("unchecked")
+        public <K> KeyManager<? extends K, ?> getManager(Class<K> type) {
+            if (type.isAssignableFrom(AesCipherParameters.class))
+                return (KeyManager<? extends K, ?>) manager;
+            throw new ServiceConfigurationError("No service available for " + type);
+        }
+    } // CustomKeyManagerService
+
+    private static class CustomUI implements PromptingKeyProvider.UI<AesCipherParameters> {
+
+        @Override
+        public void promptCreateKey(
+                PromptingKeyProvider<? super AesCipherParameters> provider)
+        throws UnknownKeyException {
             if (cancelling)
                 throw new KeyPromptingCancelledException();
-            return "secret".toCharArray(); // return clone!
+            AesCipherParameters param = new AesCipherParameters();
+            param.setPassword("secret".toCharArray());
+            provider.setKey(param);
         }
 
         @Override
-		public char[] getOpenKey() throws UnknownKeyException {
-            if (cancelling)
-                throw new KeyPromptingCancelledException();
-            return "secret".toCharArray(); // return clone!
+        public boolean promptOpenKey(
+                PromptingKeyProvider<? super AesCipherParameters> provider,
+                boolean invalid)
+        throws UnknownKeyException {
+            promptCreateKey(provider);
+            return false;
         }
-
-        @Override
-		public void invalidOpenKey() {
-            throw new AssertionError(
-                    "Illegal call: Key is constant or password prompting has been cancelled!");
-        }
-
-        @Override
-		public int getKeyStrength() {
-            return KEY_STRENGTH_256;
-        }
-
-        @Override
-		public void setKeyStrength(int keyStrength) {
-        }
-    }
+    } // class UI
 }
