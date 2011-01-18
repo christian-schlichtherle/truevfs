@@ -117,7 +117,7 @@ implements TArchiveDetector, FsDriverService {
      * Equivalent to
      * {@link #TDefaultArchiveDetector(FsDriverService, String) new TDefaultArchiveDetector(FsDriverContainer.SINGLETON, suffixes)}.
      */
-    public TDefaultArchiveDetector(String suffixes) {
+    public TDefaultArchiveDetector(@CheckForNull String suffixes) {
         this(FsDriverContainer.SINGLETON, suffixes);
     }
 
