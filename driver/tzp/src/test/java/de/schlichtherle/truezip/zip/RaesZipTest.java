@@ -15,14 +15,12 @@
  */
 package de.schlichtherle.truezip.zip;
 
-import de.schlichtherle.truezip.zip.ZipTestCase;
 import de.schlichtherle.truezip.crypto.raes.RaesOutputStream;
 import de.schlichtherle.truezip.crypto.raes.RaesParameters;
 import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters;
 import de.schlichtherle.truezip.crypto.raes.RaesReadOnlyFile;
+import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.zip.ZipFile;
-import de.schlichtherle.truezip.zip.ZipOutputStream;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,44 +47,31 @@ public final class RaesZipTest extends ZipTestCase {
     
     private static final String PASSWD = "passwd";
 
-    private static final int[] keyStrengths = {
-        Type0RaesParameters.KEY_STRENGTH_128,
-        Type0RaesParameters.KEY_STRENGTH_192,
-        Type0RaesParameters.KEY_STRENGTH_256,
-    };
+    private static final KeyStrength[] keyStrengths = KeyStrength.values();
 
     private static final Random rnd = new Random();
 
-    private static int createKeyStrength() {
-        final int keyStrength = keyStrengths[rnd.nextInt(keyStrengths.length)];
+    private static KeyStrength createKeyStrength() {
+        final KeyStrength keyStrength = keyStrengths[rnd.nextInt(keyStrengths.length)];
         //final int keyStrength = KEY_STRENGTH_ULTRA;
-        logger.log(Level.FINE, "Using {0} bits cipher key.", (128 + keyStrength * 64));
+        logger.log(Level.FINE, "Using {0} bits cipher key.", (128 + keyStrength.ordinal() * 64));
         return keyStrength;
     }
 
     private static final RaesParameters raesParameters = new Type0RaesParameters() {
         @Override
-		public char[] getOpenPasswd() {
+        public char[] getOpenPasswd(boolean invalid) {
             return PASSWD.toCharArray();
         }
 
         @Override
-		public void invalidOpenPasswd() {
-            throw new AssertionError();
-        }
-
-        @Override
-		public char[] getCreatePasswd() {
+        public char[] getCreatePasswd() {
             return PASSWD.toCharArray();
         }
 
         @Override
-		public int getKeyStrength() {
+        public KeyStrength getKeyStrength() {
             return createKeyStrength();
-        }
-        
-        @Override
-		public void setKeyStrength(int keyStrength) {
         }
     };
 

@@ -19,6 +19,9 @@ package de.schlichtherle.truezip.fs.archive.zip;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.socket.IOPool;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.CharConversionException;
 import java.nio.charset.Charset;
 import net.jcip.annotations.Immutable;
@@ -37,6 +40,7 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
+@DefaultAnnotation(NonNull.class)
 public class JarDriver extends ZipDriver {
 
     /**
@@ -50,7 +54,9 @@ public class JarDriver extends ZipDriver {
     }
 
     @Override
-    public JarArchiveEntry newEntry(String path, Type type, Entry template)
+    public JarArchiveEntry newEntry(String path,
+                                    Type type,
+                                    @CheckForNull Entry template)
     throws CharConversionException {
         return (JarArchiveEntry) super.newEntry(path, type, template);
     }

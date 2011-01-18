@@ -83,7 +83,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <exclude>**/PromptingKeyManagerTest.java</exclude> <!-- FIXME: Make this test work again! -->
+                        <exclude>**/de/schlichtherle/truezip/crypto/raes/param/swing/PromptingKeyManagerTest.java</exclude> <!-- FIXME: Make this test work again! -->
                     </excludes>
                 </configuration>
             </plugin>

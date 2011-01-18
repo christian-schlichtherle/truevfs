@@ -15,44 +15,129 @@
  */
 package de.schlichtherle.truezip.key;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URI;
-import java.util.Arrays;
+import net.jcip.annotations.ThreadSafe;
+
+import static de.schlichtherle.truezip.key.PromptingKeyProvider.State.*;
 
 /**
- * A "friendly" implementation of {@link KeyProvider} which prompts the user
- * for a key for its protected resource, enforcing a three seconds suspension
- * penalty if a wrong key was provided.
- * The user is prompted via an instance of the {@link PromptingKeyProviderUI}
- * user interface which is determined by the default instance of
- * {@link PromptingKeyManager} as returned by {@link KeyManagers#getManager}.
- * <p>
- * Like its base class, this class does not impose a certain run time type
- * of the key.
- * It is actually the user interface implementation which determines the run
- * time type of the key provided by {@link #getCreateKey} and
- * {@link #getOpenKey}.
- * Because the user interface implementation is determined by the singleton
- * {@link PromptingKeyManager}, it is ultimately at the discretion of
- * the key manager which type of keys are actually provided by this class.
- * <p>
- * Unlike its base class, instances of this class cannot get shared
- * among multiple protected resources because each instance has a unique
- * {@link #getResource() resource identifier} associated with it.
- * Each try to share a key provider of this class among multiple protected
- * resources with the singleton {@link KeyManager} will be prosecuted and
- * sentenced with an {@link IllegalStateException} or, at the discretion of
- * this class, some other {@link RuntimeException}.
- * <p>
- * This class is thread safe.
+ * A "safe" key provider which prompts the user for a key for its protected
+ * resource.
+ * The user is prompted via an instance of the {@link UI} user interface which
+ * is {@link #setUI injected} to this instance by a {@link PromptingKeyManager}.
+ * The UI may then display the resource URI by calling {@link #getResource} on
+ * this instance (which is also {@link #setResource injected} by a
+ * {@link PromptingKeyManager}) and finally set the key by calling
+ * {@link #setKey}.
  *
- * @see     PromptingKeyProviderUI
- * @see     KeyProvider
+ * @param   <K> The type of the keys.
  * @see     PromptingKeyManager
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class PromptingKeyProvider<K extends Cloneable>
-extends AbstractKeyProvider<K> {
+@ThreadSafe
+public final class PromptingKeyProvider<K extends SafeKey<K>>
+extends SafeKeyProvider<K> {
+
+    /**
+     * Used for the actual prompting of the user for a key (a password for
+     * example) which is required to access a protected resource.
+     * This interface is not depending on any particular user interface
+     * techology, so prompting could be implemented using Swing, the console,
+     * a web page or any other user interface technology.
+     * <p>
+     * Implementations of this interface are maintained by a
+     * {@link PromptingKeyManager} and injected into the
+     * {@link PromptingKeyProvider} before
+     * {@link PromptingKeyProvider#getCreateKey()} or
+     * {@link PromptingKeyProvider#getOpenKey(boolean)} is called.
+     * <p>
+     * Implementations of this interface <em>must</em> be thread safe
+     * and should have no side effects!
+     */
+    public interface UI<K extends SafeKey<K>> {
+
+        /**
+         * Prompts the user for the key which may be used to create a new
+         * protected resource or entirely replace the contents of an already
+         * existing protected resource.
+         * <p>
+         * Upon return, the implementation is expected to update the common key
+         * in {@code provider}.
+         * Upon return, if {@code provider.getKey()} returns {@code null},
+         * prompting for the key is assumed to have been cancelled by the user.
+         * In this case, the current and each subsequent call to
+         * {@link KeyProvider#getOpenKey} or {@link KeyProvider#getCreateKey}
+         * by the client results in an {@link UnknownKeyException} and the user
+         * is not prompted anymore until the provider is resetUnconditionally by the
+         * {@link KeyManager}.
+         * Otherwise, the key is used as the common key, a clone of which is
+         * provided to the client upon request.
+         * <p>
+         * <b>Hint:</b> If the user cancels the dialog, it is recommended to
+         * leave the provider's {@code key} property simply unmodified.
+         * This causes the old key to be reused and allows the client to
+         * continue its operation as if the user would not have requested to
+         * change the key.
+         *
+         * @param  provider The key provider to store the result in.
+         *         The property {@code resourceID} must be
+         *         non-{@code null}.
+         * @throws NullPointerException if either {@code provider} or its property
+         *         {@code resourceID} is {@code null}.
+         * @throws UnknownKeyException if the implementation does not want the
+         *         key provider's state to be changed.
+         *         This may be useful if prompting was interrupted by a call to
+         *         {@link Thread#interrupt} while waiting on user input.
+         *         In this case, another attempt to prompt the user should have
+         *         the chance to succeed instead of being cancelled without
+         *         actually prompting the user again.
+         * @see    KeyPromptingInterruptedException
+         */
+        void promptCreateKey(@NonNull PromptingKeyProvider<? super K> provider)
+        throws UnknownKeyException;
+
+        /**
+         * Prompts the user for the key which may be used to open an existing
+         * protected resource in order to access its contents.
+         * <p>
+         * Upon return, the implementation is expected to update the common key
+         * in {@code provider}.
+         * Upon return, if {@code provider.getKey()} returns {@code null},
+         * prompting for the key is assumed to have been cancelled by the user.
+         * In this case, the current and each subsequent call to
+         * {@link KeyProvider#getOpenKey} or {@link KeyProvider#getCreateKey}
+         * by the client results in an {@link UnknownKeyException} and the user
+         * is not prompted anymore until the provider is resetUnconditionally by the
+         * {@link KeyManager}.
+         * Otherwise, the key is used as the common key, a clone of which is
+         * provided to the client upon request.
+         *
+         * @param  provider The key provider to store the result in.
+         *         The property {@code resourceID} must be
+         *         non-{@code null}.
+         * @param  invalid {@code true} iff a previous call to this method resulted
+         *         in an invalid key.
+         * @return {@code true} if the user has requested to change the provided
+         *         key.
+         * @throws NullPointerException if either {@code provider} or its property
+         *         {@code resourceID} is {@code null}.
+         * @throws UnknownKeyException if the implementation does not want the
+         *         key provider's state to be changed.
+         *         This may be useful if prompting was interrupted by a call to
+         *         {@link Thread#interrupt} while waiting on user input.
+         *         In this case, another attempt to prompt the user should have
+         *         the chance to succeed instead of being cancelled without
+         *         actually prompting the user again.
+         * @see    KeyPromptingInterruptedException
+         */
+        boolean promptOpenKey(@NonNull PromptingKeyProvider<? super K> provider, boolean invalid)
+        throws UnknownKeyException;
+    } // interface UI
+
+    private static class PromptingLock { }
 
     /**
      * Used to lock out prompting by multiple threads.
@@ -68,23 +153,23 @@ extends AbstractKeyProvider<K> {
     private final PromptingLock lock = new PromptingLock();
 
     /** The resource identifier for the protected resource. */
-    private URI resource;
-
-    private State state = State.RESET;
-
-    private K key;
+    private volatile URI resource;
 
     /**
      * The user interface instance which is used to prompt the user for a key.
      */
-    private PromptingKeyProviderUI<K, ? super PromptingKeyProvider<K>> ui;
+    private volatile UI<? extends K> ui;
+
+    private volatile @NonNull State state = RESET;
+
+    private volatile K key;
 
     /**
      * Returns the unique resource identifier (resource ID) of the protected
      * resource for which this key provider is used.
      * May be {@code null}.
      */
-    public final synchronized URI getResource() {
+    public URI getResource() {
         return resource;
     }
 
@@ -93,8 +178,24 @@ extends AbstractKeyProvider<K> {
      * resource for which this key provider is used.
      * May be {@code null}.
      */
-    final synchronized void setResource(URI resource) {
+    void setResource(final URI resource) {
         this.resource = resource;
+    }
+
+    final UI<? extends K> getUI() {
+        return ui;
+    }
+
+    final void setUI(final UI<? extends K> ui) {
+        this.ui = ui;
+    }
+
+    private @NonNull State getState() {
+        return state;
+    }
+
+    private void setState(final @NonNull State state) {
+        this.state = state;
     }
 
     /**
@@ -105,54 +206,22 @@ extends AbstractKeyProvider<K> {
      *
      * @return The {@code key} property - may be {@code null}.
      */
-    public final synchronized K getKey() {
-        return key;
+    public K getKey() {
+        return clone(key);
     }
 
     /**
      * Sets the {@code key} property maintained by this key provider.
      * Client applications should not call this method directly:
-     * It's intended to be used by subclasses and user interface classes only.
+     * It's intended to be used by user interface classes only.
      *
      * @param key The {@code key} property - may be {@code null}.
      */
-    public final synchronized void setKey(final K key) {
-        this.key = key;
-    }
-
-    /**
-     * Returns the key which is used by the {@link PromptingKeyManager}
-     * to look up an instance of the {@link PromptingKeyProviderUI} user
-     * interface class which is subsequently used to prompt the user for a key.
-     * <p>
-     * Subclasses which want to use a custom key may overwrite this method to
-     * return the name of their respective class as the
-     * identifier and provide a custom {@code PromptingKeyManager} which has
-     * registered a {@code PromptingKeyProviderUI} class for this identifier.
-     * <p>
-     * The implementation in this class simply returns its class object,
-     * {@code PromptingKeyProvider.class}.
-     */
-    protected Class<? extends PromptingKeyProvider> getUITypeKey() {
-        return PromptingKeyProvider.class;
-    }
-
-    private synchronized
-    PromptingKeyProviderUI<K, ? super PromptingKeyProvider<K>> getUI() {
-        return ui;
-    }
-
-    final synchronized void setUI(
-            final PromptingKeyProviderUI<K, ? super PromptingKeyProvider<K>> ui) {
-        this.ui = ui;
-    }
-
-    private synchronized State getState() {
-        return state;
-    }
-
-    private synchronized void setState(final State state) {
-        this.state = state;
+    // FIXME: Make the behaviour depend upon the state - throw
+    // IllegalStateException if not allowed!
+    public void setKey(final K key) {
+        this.key = clone(key);
+        reset(key);
     }
 
     /**
@@ -179,33 +248,19 @@ extends AbstractKeyProvider<K> {
      * resource or entirely replace the contents of an already existing
      * protected resource.
      */
-    private K promptCreateKey() throws UnknownKeyException {
-        assertPrompting();
-
-        final K oldKey = getKey();
+    private @NonNull K promptCreateKey() throws UnknownKeyException {
+        final K oldKey = this.key;
         getUI().promptCreateKey(this);
-        wipe(oldKey);
+        reset(oldKey);
 
         final K newKey = getKey();
         if (newKey != null) {
-            setState(State.KEY_CHANGED);
+            setState(KEY_PROVIDED);
             return newKey;
         } else {
-            setState(State.CANCELLED);
+            setState(CANCELLED);
             throw new KeyPromptingCancelledException();
         }
-    }
-
-    /**
-     * Asserts that the default key manager has its prompting mode enabled if
-     * it's supported.
-     */
-    private static void assertPrompting()
-    throws KeyPromptingDisabledException {
-        KeyManager manager = KeyManagers.getManager();
-        if (manager instanceof PromptingKeyManager)
-            if (!((PromptingKeyManager) manager).isPrompting())
-                throw new KeyPromptingDisabledException();
     }
 
     /**
@@ -219,9 +274,9 @@ extends AbstractKeyProvider<K> {
      * @see KeyProvider#getOpenKey
      */
     @Override
-    protected final K getOpenKeyImpl() throws UnknownKeyException {
+    protected final K getOpenKeyImpl(boolean invalid) throws UnknownKeyException {
         synchronized (lock) {
-            return getState().getOpenKey(this);
+            return getState().getOpenKey(this, invalid);
         }
     }
 
@@ -229,253 +284,136 @@ extends AbstractKeyProvider<K> {
      * Prompts for the key which should be used to open an existing protected
      * resource in order to access its contents.
      */
-    private K promptOpenKey(final boolean invalid) throws UnknownKeyException {
-        assertPrompting();
-
-        final K oldKey = getKey();
+    private @NonNull K promptOpenKey(final boolean invalid) throws UnknownKeyException {
+        final K oldKey = this.key;
         final boolean changeKey = getUI().promptOpenKey(this, invalid);
-        wipe(oldKey);
+        reset(oldKey);
 
         final K newKey = getKey();
         if (newKey != null) {
-            setState(changeKey ? State.KEY_CHANGE_REQUESTED : State.KEY_PROVIDED);
+            setState(changeKey ? KEY_CHANGE_REQUESTED : KEY_PROVIDED);
             return newKey;
         } else {
-            setState(State.CANCELLED);
+            setState(CANCELLED);
             throw new KeyPromptingCancelledException();
         }
     }
 
     /**
-     * Called to indicate that authentication of the key returned by
-     * {@link #getOpenKey()} has failed and to request an entirely different
-     * key.
-     * The user is prompted for a new key on the next call to
-     * {@link #getOpenKey}.
-     * Note that the user may actually not be prompted at the next call to
-     * {@link #getOpenKey} again if prompting has been disabled by the
-     * {@link PromptingKeyManager} or this provider is in a state where
-     * calling this method does not make any sense.
-     *
-     * @see KeyProvider#invalidOpenKey
+     * Resets the state of this key provider and the current key
+     * if and only if prompting for a key has been cancelled.
      */
-    @Override
-	protected final void invalidOpenKeyImpl() {
+    public void resetUnknownKey() {
         synchronized (lock) {
-            getState().invalidOpenKey(this);
+            getState().resetUnknownKey(this);
         }
     }
 
     /**
-     * Resets this key provider if and only if prompting for a key has been
-     * cancelled.
-     * It is safe to call this method while another thread is actually
-     * prompting for a key.
+     * Resets the state of this key provider and the current key
+     * unconditionally.
      */
-    final void resetCancelledPrompt() {
-        getState().resetCancelledPrompt(this);
+    public void resetUnconditionally() {
+        synchronized (lock) {
+            reset();
+        }
     }
 
-    /**
-     * Resets the state of this provider, wipes the key and calls
-     * {@link #onReset()}.
-     */
-    @Override
-    public synchronized final void reset() {
-        setState(State.RESET);
-        wipe(getKey());
-        onReset();
+    private void reset() {
+        setState(RESET);
+        reset(this.key);
     }
 
-    /** If the key is an array, the array is filled with zero values. */
-    private static <K> void wipe(final K key) {
-        if (key instanceof byte[])
-            Arrays.fill((byte[]) key, (byte) 0);
-        else if (key instanceof char[])
-            Arrays.fill((char[]) key, (char) 0);
-        else if (key instanceof short[])
-            Arrays.fill((short[]) key, (short) 0);
-        else if (key instanceof int[])
-            Arrays.fill((int[]) key, 0);
-        else if (key instanceof long[])
-            Arrays.fill((long[]) key, (long) 0);
-        else if (key instanceof float[])
-            Arrays.fill((float[]) key, (float) 0);
-        else if (key instanceof double[])
-            Arrays.fill((double[]) key, (double) 0);
-        else if (key instanceof boolean[])
-            Arrays.fill((boolean[]) key, false);
-        else if (key instanceof Object[])
-            Arrays.fill((Object[]) key, null);
-    }
+    @DefaultAnnotation(NonNull.class)
+    enum State {
+        RESET {
+            @Override
+            <K extends SafeKey<K>> K
+            getCreateKey(PromptingKeyProvider<K> provider)
+            throws UnknownKeyException {
+                return provider.promptCreateKey();
+            }
 
-    /**
-     * This hook is run after {@link #reset()} has been called.
-     * This method is called from the constructor in the class
-     * {@link AbstractKeyProvider}.
-     * The implementation in this class does nothing.
-     * May be overwritten by subclasses.
-     */
-    protected void onReset() {
-    }
+            @Override
+            <K extends SafeKey<K>> K
+            getOpenKey(PromptingKeyProvider<K> provider, boolean invalid)
+            throws UnknownKeyException {
+                return provider.promptOpenKey(invalid);
+            }
+        },
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The implementation in {@code PromptingKeyProider} throws an
-     * {@link IllegalStateException} if this instance is already mapped for
-     * another resource identifier.
-     *
-     * @throws IllegalStateException If this instance is already mapped for
-     *         another resource identifier or mapping is prohibited
-     *         by a constraint in a subclass.
-     * @deprecated TODO: This method is not failsafe and should be removed!
-     */
-    @Deprecated
-    @Override
-    protected synchronized KeyProvider<?> addToKeyManager(final URI resource)
-    throws NullPointerException, IllegalStateException {
-        final URI oldResource = getResource();
-        if (oldResource != null && !resource.equals(oldResource))
-            throw new IllegalStateException(
-                    "this provider is used for resource ID \"" + oldResource + "\"");
-        final KeyProvider<?> provider = super.addToKeyManager(resource);
-        setResource(resource);
+        KEY_PROVIDED {
+            @Override
+            <K extends SafeKey<K>> K
+            getCreateKey(PromptingKeyProvider<K> provider)
+            throws UnknownKeyException {
+                return provider.getKey();
+            }
 
-        return provider;
-    }
+            @Override
+            <K extends SafeKey<K>> K
+            getOpenKey(PromptingKeyProvider<K> provider, boolean invalid)
+            throws UnknownKeyException {
+                if (invalid) {
+                    provider.setState(RESET);
+                    return provider.promptOpenKey(invalid);
+                } else {
+                    return provider.getKey();
+                }
+            }
+        },
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The implementation in {@code PromptingKeyProider} throws an
-     * {@link IllegalStateException} if this instance is already mapped for
-     * another resource identifier.
-     *
-     * @throws IllegalStateException If this instance is already mapped for
-     *         another resource identifier or mapping is prohibited
-     *         by a constraint in a subclass.
-     * @deprecated TODO: This method is not failsafe and should be removed!
-     */
-    @Deprecated
-    @Override
-    protected synchronized KeyProvider<?> removeFromKeyManager(final URI resource)
-    throws NullPointerException, IllegalStateException {
-        final URI oldResource = getResource();
-        if (!resource.equals(oldResource))
-            throw new IllegalStateException(
-                    "this provider is used for resource ID \"" + oldResource + "\"");
-        final KeyProvider<?> provider = super.removeFromKeyManager(resource);
-        assert null == provider || this == provider;
-        setResource(null);
-        return provider;
-    }
+        KEY_CHANGE_REQUESTED {
+            @Override
+            <K extends SafeKey<K>> K getCreateKey(PromptingKeyProvider<K> provider)
+            throws UnknownKeyException {
+                return provider.promptCreateKey();
+            }
 
-    //
-    // Shared (flyweight) state member classes.
-    //
+            @Override
+            <K extends SafeKey<K>> K
+            getOpenKey(PromptingKeyProvider<K> provider, boolean invalid)
+            throws UnknownKeyException {
+                if (invalid) {
+                    provider.setState(RESET);
+                    return provider.promptOpenKey(invalid);
+                } else {
+                    return provider.getKey();
+                }
+            }
+        },
 
-    private abstract static class State {
-        static final State RESET = new Reset();
-        static final State KEY_INVALIDATED = new KeyInvalidated();
-        static final State KEY_PROVIDED = new KeyProvided();
-        static final State KEY_CHANGE_REQUESTED = new KeyChangeRequested();
-        static final State KEY_CHANGED = new KeyChanged();
-        static final State CANCELLED = new Cancelled();
+        CANCELLED {
+            @Override
+            <K extends SafeKey<K>> K
+            getCreateKey(PromptingKeyProvider<K> provider)
+            throws UnknownKeyException {
+                throw new KeyPromptingCancelledException();
+            }
 
-        abstract <K extends Cloneable> K getCreateKey(PromptingKeyProvider<K> provider)
+            @Override
+            <K extends SafeKey<K>> K
+            getOpenKey(PromptingKeyProvider<K> provider, boolean invalid)
+            throws UnknownKeyException {
+                throw new KeyPromptingCancelledException();
+            }
+
+            @Override
+            <K extends SafeKey<K>> void resetUnknownKey(PromptingKeyProvider<K> provider) {
+                provider.reset();
+            }
+        };
+
+        abstract <K extends SafeKey<K>> K
+        getCreateKey(PromptingKeyProvider<K> provider)
         throws UnknownKeyException;
 
-        abstract <K extends Cloneable> K getOpenKey(PromptingKeyProvider<K> provider)
+        abstract <K extends SafeKey<K>> K
+        getOpenKey(PromptingKeyProvider<K> provider, boolean invalid)
         throws UnknownKeyException;
 
-        <K extends Cloneable> void invalidOpenKey(PromptingKeyProvider<K> provider) {
-        }
-
-        <K extends Cloneable> void resetCancelledPrompt(PromptingKeyProvider<K> provider) {
+        <K extends SafeKey<K>> void
+        resetUnknownKey(PromptingKeyProvider<K> provider) {
         }
     }
-
-    private static class Reset extends State {
-        @Override
-		<K extends Cloneable> K getCreateKey(PromptingKeyProvider<K> provider)
-        throws UnknownKeyException {
-            return provider.promptCreateKey();
-        }
-
-        @Override
-		<K extends Cloneable> K getOpenKey(PromptingKeyProvider<K> provider)
-        throws UnknownKeyException {
-            return provider.promptOpenKey(false);
-        }
-
-        @Override
-        <K extends Cloneable> void invalidOpenKey(PromptingKeyProvider<K> provider) {
-        }
-    }
-
-    private static class KeyInvalidated extends Reset {
-        @Override
-        <K extends Cloneable> K getOpenKey(PromptingKeyProvider<K> provider)
-        throws UnknownKeyException {
-            return provider.promptOpenKey(true);
-        }
-    }
-
-    private static class KeyProvided extends State {
-        @Override
-		<K extends Cloneable> K getCreateKey(PromptingKeyProvider<K> provider)
-        throws UnknownKeyException {
-            return provider.getKey();
-        }
-
-        @Override
-		<K extends Cloneable> K getOpenKey(PromptingKeyProvider<K> provider) {
-            return provider.getKey();
-        }
-
-        @Override
-        <K extends Cloneable> void invalidOpenKey(PromptingKeyProvider<K> provider) {
-            provider.setState(KEY_INVALIDATED);
-        }
-    }
-
-    private static class KeyChangeRequested extends KeyProvided {
-        @Override
-        <K extends Cloneable> K getCreateKey(PromptingKeyProvider<K> provider)
-        throws UnknownKeyException {
-            return provider.promptCreateKey();
-        }
-    }
-
-    private static class KeyChanged extends KeyProvided {
-        @Override
-        <K extends Cloneable> void invalidOpenKey(PromptingKeyProvider<K> provider) {
-        }
-    }
-
-    private static class Cancelled extends State {
-        @Override
-		<K extends Cloneable> K getCreateKey(PromptingKeyProvider<K> provider)
-        throws UnknownKeyException {
-            throw new KeyPromptingCancelledException();
-        }
-
-        @Override
-		<K extends Cloneable> K getOpenKey(PromptingKeyProvider<K> provider)
-        throws UnknownKeyException {
-            throw new KeyPromptingCancelledException();
-        }
-
-        @Override
-        <K extends Cloneable> void invalidOpenKey(PromptingKeyProvider<K> provider) {
-        }
-
-        @Override
-        <K extends Cloneable> void resetCancelledPrompt(PromptingKeyProvider<K> provider) {
-            provider.reset();
-        }
-    }
-
-    private static class PromptingLock { }
 }

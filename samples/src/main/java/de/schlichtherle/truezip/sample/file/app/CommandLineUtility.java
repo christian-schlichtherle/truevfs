@@ -15,11 +15,11 @@
  */
 package de.schlichtherle.truezip.sample.file.app;
 
-import de.schlichtherle.truezip.key.passwd.swing.HurlingWindowFeedback;
+import de.schlichtherle.truezip.crypto.raes.param.swing.HurlingWindowFeedback;
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.fs.FsManagerService;
 import de.schlichtherle.truezip.fs.FsStatistics;
-import de.schlichtherle.truezip.key.passwd.swing.InvalidKeyFeedback;
+import de.schlichtherle.truezip.crypto.raes.param.swing.InvalidKeyFeedback;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -80,7 +80,7 @@ abstract class CommandLineUtility {
                 : new PrintStream(err, autoFlush);
         this.monitor = new ProgressMonitor(this.err);
         configureFeedback();
-        configureManagerContainer();
+        configureManagerService();
     }
 
     /**
@@ -95,7 +95,7 @@ abstract class CommandLineUtility {
         System.setProperty(spec, System.getProperty(spec, impl));
     }
 
-    private static void configureManagerContainer() {
+    private static void configureManagerService() {
         String spec = FsManagerService.class.getName();
         String impl = SampleManagerContainer.class.getName();
         System.setProperty(spec, System.getProperty(spec, impl));

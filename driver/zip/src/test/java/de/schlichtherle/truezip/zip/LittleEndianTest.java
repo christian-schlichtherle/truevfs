@@ -15,9 +15,11 @@
  */
 package de.schlichtherle.truezip.zip;
 
-import de.schlichtherle.truezip.zip.LittleEndian;
-import junit.framework.TestCase;
 import java.util.Arrays;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
  * A simple round trip test of the little endian utility methods.
@@ -25,7 +27,7 @@ import java.util.Arrays;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class LittleEndianTest extends TestCase {
+public final class LittleEndianTest {
 
     private static final byte[] DATA = {
         (byte) 0x00, // use an offset of one for testing
@@ -35,17 +37,13 @@ public class LittleEndianTest extends TestCase {
 
     private byte[] read, write;
 
-    public LittleEndianTest(String testName) {
-        super(testName);
-    }            
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() {
         read = DATA.clone();
         write = new byte[read.length];
     }
 
+    @Test
     public void testShort() {
         final short s = LittleEndian.readShort(read, 1);
         assertEquals((short) 0xaa55, s);
@@ -56,6 +54,7 @@ public class LittleEndianTest extends TestCase {
         assertTrue(Arrays.equals(read, write));
     }
 
+    @Test
     public void testUShort() {
         final int s = LittleEndian.readUShort(read, 1);
         assertEquals(0xaa55, s);
@@ -66,6 +65,7 @@ public class LittleEndianTest extends TestCase {
         assertTrue(Arrays.equals(read, write));
     }
 
+    @Test
     public void testInt() {
         final int i = LittleEndian.readInt(read, 1);
         assertEquals(0xaa55aa55, i);
@@ -74,6 +74,7 @@ public class LittleEndianTest extends TestCase {
         assertTrue(Arrays.equals(read, write));
     }
 
+    @Test
     public void testUInt() {
         final long i = LittleEndian.readUInt(read, 1);
         assertEquals(0xaa55aa55L, i);
@@ -82,6 +83,7 @@ public class LittleEndianTest extends TestCase {
         assertTrue(Arrays.equals(read, write));
     }
 
+    @Test
     public void testLong() {
         final long l = LittleEndian.readLong(read, 1);
         assertEquals(0xaa55aa55aa55aa55L, l);

@@ -18,152 +18,29 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
     <head/>
     <body>
-        <p>
-            An extensible, generalized manager for keys of arbitrary type required to
+        <p>A generic, extensible manager for keys of arbitrary type required to
             create or open protected resources.
-            Its primary objective is to decouple:
+            Its primary objective is to decouple...
         </p>
         <ul>
             <li>
-                the process to retrieve keys required to open or create protected
-                resources from
+                the process to retrieve keys required to open or create
+                protected resources from...
             </li>
             <li>
-                the process to use and optionally authenticate these keys.
+                the process to use and verify these keys.
             </li>
         </ul>
-        <p>
-            The process to retrieve keys is executed by the (abstract) classes and
-            interfaces in this package.
-            The sub packages contain default implementations of the key manager and
-            its pluggable user interface.</p>
-        <p>
-            The process to use and optionally authenticate keys is executed by the
-            users of this package, which are called <i>client applications</i>,
-            or <i>clients</i> for short.
-            Clients should never need to use a class in the sub packages directly.
-        </p>
-        <p>
-            A protected resource can be anything: As an example, it could be an AES
-            encrypted file which the client application is going to create or overwrite.
-            The key could be a password or a key file entered or selected by the user.
-            When the client wants to obtain the password in order to encrypt the
-            plain text into cipher text, it would typically call:
-        </p>
-        <pre>
-    String pathname = file.getCanonicalPath();
-    KeyManager km = KeyManager.getInstance();
-    KeyProvider kp = km.getKeyProvider(pathname, AesKeyProvider.class);
-    Object key = kp.getCreateKey(); // may prompt the user
-    int ks;
-    if (kp instanceof AesKeyProvider) {
-        // The run time type of the implementing class is determined
-        // by the key manager.
-        // Anyway, the AES key provider can be safely asked for a cipher
-        // key strength.
-        ks = ((AesKeyProvider) kp).getKeyStrength();
-    } else {
-        // Unfortunately, another key provider was already mapped for the
-        // pathname before - use default key strength.
-        ks = AesKeyProvider.KEY_STRENGTH_256;
-    }
-        </pre>
-        <p>
-            This would cause the following things to happen behind the curtain:
-        </p>
-        <ol>
-            <li>
-                <p>
-                    On the call to {@code getInstance()}, depending on the value of
-                    the system property {@code de.schlichtherle.truezip.key.KeyManager},
-                    a new instance of the KeyManager is created and cached for future reuse.
-                </p>
-                <p>
-                    If the system property is not set, the standard Swing based
-                    implementation is instantiated.
-                    If the system property is set, it must denote the fully qualified class
-                    name which will be loaded and instantiated using the current thread's
-                    context class loader.
-                    In this case, the implementation must be a sub class of this class and
-                    provide a public constructor with no parameters.
-                    Otherwise, an {@code UndeclaredThrowableException} is thrown.
-                </p>
-            </li>
-            <li>
-                <p>
-                    On the call to {@code getKeyProvider()}, a key provider for the
-                    given canonical pathname as the resource identifier is looked up in
-                    the map.
-                </p>
-                <p>
-                    If found, this instance is returned.
-                    If not found, the key manager determines a suitable implementation of
-                    the {@link de.schlichtherle.truezip.key.AesKeyProvider} interface, instantiates
-                    and maps it for future reuse.
-                    With the Swing based default implementation of the key manager,
-                    this would be actually an instance of the class
-                    {@link de.schlichtherle.truezip.key.PromptingAesKeyProvider}.
-                    Because this is actually a subclass of
-                    {@link de.schlichtherle.truezip.key.PromptingKeyProvider}, the key manager also
-                    looks up and installs an instance of the user interface in the key provider.
-                </p>
-            </li>
-            <li>
-                <p>
-                    On the call to {@code getCreateKey()}, the key to create the
-                    protected resource or entirely replace its contents is looked up.
-                </p>
-                <p>
-                    If found, a clone of the key is returned or the key itself if cloning
-                    it fails for some reason.
-                </p>
-                <p>
-                    If not found, the user is prompted to enter a key. If the standard
-                    Swing based user interface is used, this is either a password or a key file.
-                    Because the key provider is actually an instance of
-                    {@code PromptingAesKeyProvider},
-                    the user may also select an AES cipher key strength (128, 192 or 256
-                    bit) with its standard Swing based user interface.
-                    Finally, the user's input is remembered for future reuse and a clone of
-                    the key is returned or the key itself if cloning it fails for some reason.
-                </p>
-                <p>
-                    In both cases, the run time type of the returned key is determined by
-                    the user interface instance, which is the actual "source" of the key.
-                    In the default configuration, the Swing based user interface
-                    implementation allows the user either to enter a password (represented
-                    as a char array), or select a key file (which's first 512 bytes are
-                    returned as a byte array).
-                </p>
-            </li>
-        </ol>
-        <p>
-            As you see, there are a number of dependencies which are determined
-            at run time by the composition of the loosely coupled key manager, the key
-            providers and their user interfaces.
-            This design allows for some flexibility: the key manager and the key providers
-            may be used with any kind of protected resources and keys, and the user
-            interface is selected and may even be switched at run time.
-            So ultimately, a key may be entered by the user via a rich desktop GUI
-            (implemented with Swing, for example), a web page, a text console or any
-            other user interface technology (mind reading for example).
-        </p>
-        <p>
-            With all the light, there is also some shadow: Because of all the caching,
-            clients should not blindly cast the return types of the methods in this call
-            sequence.
-            Of course, the client usually has a dependency on the run time type of the
-            key finally returned by {@code getCreateKey()} in this example.
-            The way to get around with this is to ensure that your application uses an
-            implementation of the singleton key manager which only uses well known user
-            interface implementations.
-            For example, the standard Swing based key manager uses only user interface
-            implementations which are guaranteed to create char arrays for plain
-            passwords or byte arrays for key files only.
-            If you need to create other key types, you can easily provide your own user
-            interface implementations and a custom key manager.
-            Please refer to the Javadoc of the interfaces and classes in this package
-            for more information.
-        </p>
+        <p>The process to retrieve keys is executed by the (abstract) classes
+            and interfaces in this package.</p>
+        <p>The process to use and optionally authenticate keys is executed by
+            the users of this package - called <i>client applications</i> or
+            <i>clients</i> for short.</p>
+        <p>A protected resource can be anything which can be referenced by a
+            {@link java.net.URI}: As an example, it could be a URL to an AES
+            encrypted file which the client application is going to create or
+            overwrite.
+            The key could be a password or a key file entered or selected by
+            the user.</p>
     </body>
 </html>

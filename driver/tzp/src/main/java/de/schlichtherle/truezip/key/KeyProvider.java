@@ -15,7 +15,8 @@
  */
 package de.schlichtherle.truezip.key;
 
-import net.jcip.annotations.ThreadSafe;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * A general purpose interface used by client applications to retrieve a
@@ -45,16 +46,11 @@ import net.jcip.annotations.ThreadSafe;
  *     resource for access to its contents.
  *     This implies that the key needs to be authenticated by the client
  *     application.
- *     For this purpose, client applications call the method {@link #getOpenKey},
- *     followed by a call to {@link #invalidOpenKey} if the authentication of
- *     the returned key failed for some reason.
+ *     For this purpose, client applications call the method {@link #getOpenKey}.
  * </ol>
  * If the same resource is accessed multiple times, these basic operations
- * are guaranteed to return a key which compares {@link Object#equals equal},
+ * are guaranteed to return keys which compare {@link Object#equals equal},
  * but is not necessarily the same.
- * In fact, the standard implementations in this package try to return a
- * clone of the key wherever possible for maximum security.
- * Failing that, the same key is returned.
  * <p>
  * From a client application's perspective, the two basic operations may be
  * executed in no particular order. Following are some typical use cases:
@@ -92,26 +88,28 @@ import net.jcip.annotations.ThreadSafe;
  * In fact, this is the behaviour of the {@link PromptingKeyProvider} in
  * this package and its user interface class(es).
  * <p>
- * Note that provider implementations must be thread safe.
+ * Note that provider implementations must be thread-safe.
  * This allows clients to use the same provider by multiple threads
  * concurrently.
  *
- * @see KeyManager
- *
- * @author Christian Schlichtherle
+ * @param   <K> The type of the keys.
+ * @see     KeyManager
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-@ThreadSafe
-public interface KeyProvider<K extends Cloneable> {
+@DefaultAnnotation(NonNull.class)
+public interface KeyProvider<K> {
 
-    /**
-     * The minimum delay between subsequent attempts to authenticate a key
-     * in milliseconds.
-     * More specifically, this is the minimum delay between the call to
-     * {@link #invalidOpenKey} and a subsequent {@link #getOpenKey} by the
-     * same thread.
-     */
-    int MIN_KEY_RETRY_DELAY = 3 * 1000;
+    /** A factory for key providers. */
+    public interface Factory<K, P extends KeyProvider<K>> {
+
+        /**
+         * Returns a new key provider.
+         *
+         * @return a new key provider.
+         */
+        P newKeyProvider();
+    } // interface Factory
 
     /**
      * Returns the key which should be used to create a new protected
@@ -120,31 +118,27 @@ public interface KeyProvider<K extends Cloneable> {
      * Hence, this key is not going to be used to authenticate an existing
      * resource by the client application.
      * <p>
-     * For each call to this method an object is returned which compares
-     * {@link Object#equals equal} to the previously returned object, but is
-     * not necessarily the same.
+     * Each call to this method returns an object which compares
+     * {@link Object#equals equal} to the previously returned object,
+     * but is not necessarily the same.
      *
-     * @return A clone of the key object.
-     *         If the key does not support cloning or cloning fails for some
-     *         reason, the key object itself is returned.
-     *         {@code null} is never returned.
-     * @throws UnknownKeyException If the required key is unknown.
-     *         At the provider implementation's discretion, this may mean that
-     *         prompting for the key has been disabled or cancelled by the user.
+     * @return the key object.
+     * @throws UnknownKeyException if the required key is unknown for some
+     *         reason, e.g. if prompting for the key has been disabled or
+     *         cancelled by the user.
      */
     K getCreateKey() throws UnknownKeyException;
 
     /**
      * Returns the key which should be used to open an existing protected
      * resource in order to access its contents.
-     * Hence, this key is going to be used to authenticate an existing
-     * resource by the client application.
-     * If the authentication fails, {@link #invalidOpenKey} must be called
-     * immediately to indicate this issue.
+     * This method is expected to be called consecutively until either the
+     * returned key is verified or an exception is thrown.
      * <p>
-     * Unless {@link #invalidOpenKey} is called, on each call to this method
-     * an object is returned which compares {@link Object#equals equal} to
-     * the previously returned object, but is not necessarily the same.
+     * Unless {@code invalid} is {@code true}, each call to this method returns
+     * an object which compares {@link Object#equals equal} to the previously
+     * returned object,
+     * but is not necessarily the same.
      * <p>
      * <b>Important:</b> From a client application's perspective, a
      * {@code KeyProvider} is not trustworthy!
@@ -153,38 +147,18 @@ public interface KeyProvider<K extends Cloneable> {
      * return from a subsequent call to this method if the key is invalid
      * in order to protect the client application from an exhaustive search
      * for the correct key.
-     * As a rule of thumb, at least three seconds should pass between the
-     * immediate call to {@link #invalidOpenKey} and the return from the
-     * subsequent call to this method.
-     * "Friendly" implementations of this interface should duplicate this
+     * As a rule of thumb, at least three seconds should pass between two
+     * consecutive calls to this method by the same thread.
+     * "Safe" implementations of this interface should enforce this
      * behaviour in order to protect client applications which do not obeye
      * these considerations against abuses of the key provider implementation.
-     * Note that {@code invalidOpenKey()} must still be called
-     * immediately by the client application, so that other threads are not
-     * negatively affected by the suspension penalty.
-     * For the same reason, "friendly" implementations should enforce the
-     * suspension penalty for the local thread only.
      *
-     * @return A clone of the key object.
-     *         If the key does not support cloning or cloning fails for some
-     *         reason, the key object itself is returned.
-     *         {@code null} is never returned.
-     * @throws UnknownKeyException If the required key is unknown.
-     *         At the provider implementation's discretion, this may mean that
-     *         prompting for the key has been disabled or cancelled by the user.
-     * @see #MIN_KEY_RETRY_DELAY
+     * @param  invalid {@code true} iff a previous call to this method resulted
+     *         in an invalid key.
+     * @return the key object.
+     * @throws UnknownKeyException if the required key is unknown for some
+     *         reason, e.g. if prompting for the key has been disabled or
+     *         cancelled by the user.
      */
-    K getOpenKey() throws UnknownKeyException;
-
-    /**
-     * Called to indicate that authentication of the key returned by
-     * {@link #getOpenKey()} has failed and to request an entirely different
-     * key.
-     * Whether or not an entirely different key is provided on the next call
-     * to {@link #getOpenKey} is at the discretion of the provider's
-     * implementation and its instance's state.
-     */
-    // TODO: Couldn't we add a boolean parameter to getOpenKey() instead?
-    // See PromptingKeyProviderUI.promptOpenKey(*).
-    void invalidOpenKey();
+    K getOpenKey(boolean invalid) throws UnknownKeyException;
 }

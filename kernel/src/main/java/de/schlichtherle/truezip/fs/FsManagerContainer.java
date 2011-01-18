@@ -17,7 +17,6 @@ package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.util.ServiceLocator;
 import java.util.Iterator;
-import java.util.ServiceConfigurationError;
 import net.jcip.annotations.Immutable;
 
 /**
@@ -37,8 +36,8 @@ import net.jcip.annotations.Immutable;
  * and instantiated by calling its no-arg constructor.
  * <p>
  * Otherwise, the expression
- * {@code new FsFailSafeManager(new FsDefaultManager())} is used to create
- * the file system manager in this container.
+ * {@code new FsFailSafeManager(new FsDefaultManager())} is used to create the
+ * file system manager in this container.
  * <p>
  * Note that the kernel classes have no dependency on this class; so using
  * this service locator is completely optional for a pure kernel application.
@@ -55,7 +54,6 @@ public final class FsManagerContainer implements FsManagerService {
     private final FsManager manager;
 
     /** You cannot instantiate this class. */
-    @SuppressWarnings("unchecked")
     private FsManagerContainer() {
         final ServiceLocator locator = new ServiceLocator(
                 FsManagerContainer.class.getClassLoader());

@@ -16,6 +16,8 @@
 package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.zip.DateTimeConverter;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * Respects the different date/time conversion in JAR files.
@@ -24,6 +26,7 @@ import de.schlichtherle.truezip.zip.DateTimeConverter;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public class JarArchiveEntry extends ZipArchiveEntry {
 
     JarArchiveEntry(String name) {

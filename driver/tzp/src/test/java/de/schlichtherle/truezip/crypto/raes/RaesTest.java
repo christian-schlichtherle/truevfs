@@ -15,10 +15,7 @@
  */
 package de.schlichtherle.truezip.crypto.raes;
 
-import de.schlichtherle.truezip.crypto.raes.RaesOutputStream;
-import de.schlichtherle.truezip.crypto.raes.RaesReadOnlyFile;
-import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters;
-import de.schlichtherle.truezip.crypto.raes.RaesParameters;
+import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFileTestCase;
@@ -32,7 +29,8 @@ import java.util.logging.Logger;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.prng.DigestRandomGenerator;
 import org.bouncycastle.crypto.prng.RandomGenerator;
-import org.junit.After;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Christian Schlichtherle
@@ -52,18 +50,22 @@ public final class RaesTest extends ReadOnlyFileTestCase {
         rng.addSeedMaterial(System.currentTimeMillis());
     }
 
-    private static final int[] keyStrengths = {
-        Type0RaesParameters.KEY_STRENGTH_128,
-        Type0RaesParameters.KEY_STRENGTH_192,
-        Type0RaesParameters.KEY_STRENGTH_256
-    };
+    private static final KeyStrength[] keyStrengths = KeyStrength.values();
 
     private static RaesParameters newRaesParameters() {
         return new Type0RaesParameters() {
             boolean secondTry;
 
             @Override
-            public char[] getOpenPasswd() {
+            public KeyStrength getKeyStrength() {
+                byte[] buf = new byte[1];
+                rng.nextBytes(buf);
+                return keyStrengths[(buf[0] & 0xFF) % keyStrengths.length];
+            }
+
+            @Override
+            public char[] getOpenPasswd(boolean invalid) {
+                assertEquals(secondTry, invalid);
                 if (secondTry) {
                     logger.finer("First returned password was wrong, providing the right one now!");
                     return PASSWD.toCharArray();
@@ -78,25 +80,8 @@ public final class RaesTest extends ReadOnlyFileTestCase {
             }
 
             @Override
-            public void invalidOpenPasswd() {
-                logger.finer("Password wrong!");
-            }
-
-            @Override
             public char[] getCreatePasswd() {
                 return PASSWD.toCharArray();
-            }
-
-            @Override
-            public int getKeyStrength() {
-                byte[] buf = new byte[1];
-                rng.nextBytes(buf);
-                return keyStrengths[(buf[0] & 0xFF) % keyStrengths.length];
-            }
-
-            @Override
-            public void setKeyStrength(int keyStrength) {
-                logger.log(Level.FINER, "Key strength: {0}", keyStrength);
             }
         };
     }

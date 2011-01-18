@@ -40,7 +40,7 @@ extends FsEntry {
      *
      * @param entry the decorated entry.
      */
-    protected FsDecoratingEntry(@NonNull final E entry) {
+    protected FsDecoratingEntry(final @NonNull E entry) {
         if (null == entry)
             throw new NullPointerException();
         this.delegate = entry;

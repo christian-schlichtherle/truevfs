@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.zip;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.HashMap;
 import java.util.Map;
+import net.jcip.annotations.NotThreadSafe;
 
 import static de.schlichtherle.truezip.zip.ZipConstants.*;
 
@@ -26,12 +28,12 @@ import static de.schlichtherle.truezip.zip.ZipConstants.*;
  * ZIP archive.
  * It defines the common properties of all Extra Fields and how to
  * serialize/deserialize them to/from byte arrays.
- * <p>
- * This class is <em>not</em> thread-safe.
  * 
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
+@DefaultAnnotation(NonNull.class)
 abstract class ExtraField {
 
     /** The Header ID of a ZIP64 Extended Information Extra Field. */

@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.key;
+
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * Thrown to indicate that prompting for a key to open or create a
@@ -23,6 +24,7 @@ package de.schlichtherle.truezip.key;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 public class KeyPromptingTimeoutException extends UnknownKeyException {
     private static final long serialVersionUID = 7656348612765052586L;
 

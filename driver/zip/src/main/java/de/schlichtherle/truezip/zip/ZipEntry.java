@@ -15,8 +15,11 @@
  */
 package de.schlichtherle.truezip.zip;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.nio.charset.Charset;
+import net.jcip.annotations.NotThreadSafe;
 
 import static de.schlichtherle.truezip.zip.ZipConstants.*;
 
@@ -38,6 +41,8 @@ import static de.schlichtherle.truezip.zip.ZipConstants.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
+@NotThreadSafe
 public class ZipEntry implements Cloneable {
 
     // Bit indices for initialized fields.
@@ -83,10 +88,10 @@ public class ZipEntry implements Cloneable {
      * Maps from Header ID [Integer] to Extra Field [ExtraField].
      * Should be {@code null} or may be empty if no Extra Fields are used.
      */
-    private ExtraFields fields;
+    private @CheckForNull ExtraFields fields;
 
-    /** {@code null} if no comment field. */
-    private String comment;
+    /** Comment field. */
+    private @CheckForNull String comment;
 
     /** Constructs a new ZIP entry with the specified name. */
     public ZipEntry(final String name) {
@@ -106,7 +111,7 @@ public class ZipEntry implements Cloneable {
      * Constructs a new ZIP entry with the given name which has all other
      * properties copied from the given template.
      */
-    public ZipEntry(final String name, final @NonNull ZipEntry template) {
+    public ZipEntry(final String name, final ZipEntry template) {
         this.init = template.init;
         this.name = name;
         this.platform = template.platform;
@@ -158,9 +163,9 @@ public class ZipEntry implements Cloneable {
 
     private void setName0(final String name) {
         if (isInit(NAME))
-            throw new IllegalStateException("'name' has already been set!");
+            throw new IllegalStateException("'name' is already initialized!");
         if (name == null)
-            throw new NullPointerException("'name' must not be null!");
+            throw new NullPointerException();
         UShort.check(name.length());
         setInit(NAME, true);
         this.name = name;
@@ -430,7 +435,7 @@ public class ZipEntry implements Cloneable {
         return null == fields ? EMPTY : fields.getExtra();
     }
 
-    private ExtraFields getFields(final boolean zip64) {
+    private @CheckForNull ExtraFields getFields(final boolean zip64) {
         ExtraFields fields = this.fields;
 
         if (zip64) {
@@ -465,20 +470,20 @@ public class ZipEntry implements Cloneable {
      * Sets the serialized Extra Fields by making a protective copy.
      *
      * @param data The byte array holding the serialized Extra Fields.
-     *        May be {@code null}.
      */
-    public void setExtra(byte[] data) {
+    public void setExtra(@CheckForNull byte[] data) {
         setExtra0(data);
     }
 
-    private void setExtra0(final byte[] data) {
-        if (data == null || data.length <= 0) {
+    private void setExtra0(final @CheckForNull byte[] data) {
+        if (null == data || data.length <= 0) {
             fields = null;
         } else {
-            if (fields == null)
+            if (null == fields)
                 fields = new ExtraFields();
             fields.readFrom(data, 0, data.length);
             parseZip64ExtraField();
+            assert null != fields;
             fields.remove(ExtraField.ZIP64_HEADER_ID);
             if (fields.size() <= 0) {
                 assert fields.size() == 0;
@@ -493,11 +498,11 @@ public class ZipEntry implements Cloneable {
      * The ZIP64 Extended Information Extra Field is <em>not</em> removed.
      */
     private void parseZip64ExtraField() {
-        if (fields == null)
+        if (null == fields)
             return;
 
         final ExtraField ef = fields.get(ExtraField.ZIP64_HEADER_ID);
-        if (ef == null)
+        if (null == ef)
             return;
 
         final byte[] data = ef.getDataBlock();
@@ -534,7 +539,7 @@ public class ZipEntry implements Cloneable {
      * If no ZIP64 Extended Information Extra Field is required it is removed
      * from the collection of Extra Fields.
      */
-    private ExtraField compileZip64ExtraField() {
+    private @CheckForNull ExtraField compileZip64ExtraField() {
         final byte[] data = new byte[3 * 8]; // maximum size
         int off = 0;
 
@@ -571,7 +576,7 @@ public class ZipEntry implements Cloneable {
         return field;
     }
 
-    public String getComment() {
+    public @CheckForNull String getComment() {
         return comment;
     }
 
@@ -579,8 +584,8 @@ public class ZipEntry implements Cloneable {
         return null == comment ? 0 : charset.encode(comment).limit();
     }
 
-    public void setComment(final String comment) {
-        if (comment != null)
+    public void setComment(final @CheckForNull String comment) {
+        if (null != comment)
             UShort.check(comment.length(), name, "Comment too long");
         this.comment = comment;
     }

@@ -16,7 +16,9 @@
 package de.schlichtherle.truezip.io;
 
 import java.io.File;
-import junit.framework.TestCase;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
  * Tests the class {@link ChainableIOException}.
@@ -24,12 +26,9 @@ import junit.framework.TestCase;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ChainableIOExceptionTest extends TestCase {
-    
-    public ChainableIOExceptionTest(String testName) {
-        super(testName);
-    }
+public final class ChainableIOExceptionTest {
 
+    @Test
     public void testSorting() {
         ChainableIOException exc = null;
         final int max = 9;
@@ -53,11 +52,11 @@ public class ChainableIOExceptionTest extends TestCase {
                 return e1 == e2;
             }
         };
-        testChain(indexCheck, appearance, exc);
+        assertChain(indexCheck, appearance, exc);
 
         final ChainableIOException appearanceExc = exc.sortIndex();
         assertEquals(maxIndex, appearanceExc.maxIndex);
-        testChain(indexCheck, appearance, appearanceExc);
+        assertChain(indexCheck, appearance, appearanceExc);
 
         final Check priorityCheck = new Check() {
             @Override
@@ -68,10 +67,10 @@ public class ChainableIOExceptionTest extends TestCase {
         final ChainableIOException priorityExc = exc.sortPriority();
         assertNotSame(exc, priorityExc);
         assertEquals(maxIndex, priorityExc.maxIndex);
-        testChain(priorityCheck, priority, priorityExc);
+        assertChain(priorityCheck, priority, priorityExc);
     }
 
-    private void testChain(
+    private void assertChain(
             final Check c,
             final ChainableIOException[] expected,
             ChainableIOException exc) {
@@ -86,11 +85,11 @@ public class ChainableIOExceptionTest extends TestCase {
         assertNull(exc);
     }
 
-    interface Check {
+    private interface Check {
         boolean equals(ChainableIOException e1, ChainableIOException e2);
     }
 
-    static class TestException extends ChainableIOException {
+    private static class TestException extends ChainableIOException {
         private static final long serialVersionUID = 4893204620357369739L;
 
         TestException(String message, int priority) {
@@ -98,6 +97,7 @@ public class ChainableIOExceptionTest extends TestCase {
         }
     }
 
+    @Test
     public void testInitPredecessor() {
         ChainableIOException exc1, exc2;
 

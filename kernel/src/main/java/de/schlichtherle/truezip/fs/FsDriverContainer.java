@@ -20,6 +20,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.ServiceConfigurationError;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.jcip.annotations.Immutable;
 
 /**
@@ -28,6 +31,9 @@ import net.jcip.annotations.Immutable;
  * which are named in the resource files with the name
  * {@code "META-INF/services/de.schlichtherle.truezip.fs.FsDriverService"}
  * on the class path by calling their no-arg constructor.
+ * <p>
+ * If no file system drivers are found, a {@link ServiceConfigurationError} is
+ * thrown.
  * <p>
  * Note that the kernel classes have no dependency on this class; so using
  * this service locator is completely optional for a pure kernel application.
@@ -49,6 +55,8 @@ public final class FsDriverContainer implements FsDriverService {
                 = new ServiceLocator(FsDriverContainer.class.getClassLoader())
                     .getServices(FsDriverService.class);
         final Map<FsScheme, FsDriver> drivers = new HashMap<FsScheme, FsDriver>();
+        if (!i.hasNext())
+            throw new ServiceConfigurationError("No services available for " + FsDriverService.class);
         while (i.hasNext())
             drivers.putAll(i.next().getDrivers());
         this.drivers = Collections.unmodifiableMap(drivers);

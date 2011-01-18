@@ -13,13 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.zip;
 
-import de.schlichtherle.truezip.zip.DefaultExtraField;
-import de.schlichtherle.truezip.zip.UShort;
-import de.schlichtherle.truezip.zip.ExtraField;
-import junit.framework.TestCase;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
  * A test case for the {@link ExtraField} class.
@@ -27,12 +25,9 @@ import junit.framework.TestCase;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ExtraFieldTest extends TestCase {
-    
-    public ExtraFieldTest(String testName) {
-        super(testName);
-    }            
+public final class ExtraFieldTest {
 
+    @Test
     public void testRegister() {
         try {
             ExtraField.register(null);
@@ -55,6 +50,7 @@ public class ExtraFieldTest extends TestCase {
         ExtraField.register(NullExtraField.class);
     }
 
+    @Test
     public void testCreate() {
         ExtraField ef;
 
@@ -93,34 +89,34 @@ public class ExtraFieldTest extends TestCase {
         }
 
         @Override
-		public int getHeaderID() {
+        public int getHeaderID() {
             return 0x0000;
         }
 
         @Override
-		int getDataSize() {
+        int getDataSize() {
             return 0;
         }
 
         @Override
-		void readFrom(byte[] data, int off, int size) {
+        void readFrom(byte[] data, int off, int size) {
         }
 
         @Override
-		void writeTo(byte[] data, int off) {
+        void writeTo(byte[] data, int off) {
         }
     }
 
     private static class TooSmallHeaderIDExtraField extends NullExtraField {
         @Override
-		public int getHeaderID() {
+        public int getHeaderID() {
             return UShort.MIN_VALUE - 1; // illegal return value
         }
     }
 
     private static class TooLargeHeaderIDExtraField extends NullExtraField {
         @Override
-		public int getHeaderID() {
+        public int getHeaderID() {
             return UShort.MAX_VALUE + 1; // illegal return value
         }
     }

@@ -15,11 +15,7 @@
  */
 package de.schlichtherle.truezip.zip;
 
-import de.schlichtherle.truezip.zip.ZipEntry;
-import de.schlichtherle.truezip.zip.ZipFile;
-import de.schlichtherle.truezip.zip.ZipOutputStream;
 import de.schlichtherle.truezip.util.ArrayHelper;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -28,16 +24,18 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
  * Tests compression of data.
  *
  * @author Christian Schlichtherle
  */
-public class ManySmallEntriesTest extends TestCase {
+public final class ManySmallEntriesTest {
 
     private static final Logger logger
             = Logger.getLogger(ManySmallEntriesTest.class.getName());
@@ -45,28 +43,19 @@ public class ManySmallEntriesTest extends TestCase {
     private static final byte[] data = "Hello World!".getBytes();
     private static final long dataCrc = 0x1c291ca3;
 
-    public static Test suite() throws Exception {
-        TestSuite suite = new TestSuite(ManySmallEntriesTest.class);
-        
-        return suite;
-    }
-
     private File zip;
 
-    public ManySmallEntriesTest(String testName) {
-        super(testName);
-    }
-
-    @Override
-    protected void setUp() throws IOException {
+    @Before
+    public void setUp() throws IOException {
         zip = File.createTempFile("zip", null);
     }
 
-    @Override
-    protected void tearDown() {
+    @After
+    public void tearDown() {
         assertTrue(zip.delete());
     }
 
+    @Test
     public void testManySmallEntries() throws IOException {
         logger.fine("testManySmallEntries");
         

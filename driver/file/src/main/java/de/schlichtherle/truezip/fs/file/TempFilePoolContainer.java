@@ -20,13 +20,13 @@ import de.schlichtherle.truezip.socket.IOPoolService;
 import net.jcip.annotations.Immutable;
 
 /**
- * Contains a {@link TempFilePool}.
+ * Contains {@link TempFilePool#INSTANCE}.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
 @Immutable
-public class TempFilePoolContainer implements IOPoolService {
+public final class TempFilePoolContainer implements IOPoolService {
 
     @Override
     public IOPool<?> getPool() {

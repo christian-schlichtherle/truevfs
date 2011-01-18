@@ -16,6 +16,8 @@
 package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.util.ServiceLocator;
+import java.util.Iterator;
+import java.util.ServiceConfigurationError;
 import net.jcip.annotations.Immutable;
 
 /**
@@ -34,6 +36,8 @@ import net.jcip.annotations.Immutable;
  * If this yields a result, the class with the name in this file is then loaded
  * and instantiated by calling its no-arg constructor.
  * <p>
+ * Otherwise, a {@link ServiceConfigurationError} is thrown.
+ * <p>
  * Note that the kernel classes have no dependency on this class; so using
  * this service locator is completely optional for a pure kernel application.
  *
@@ -46,17 +50,24 @@ public final class IOPoolContainer implements IOPoolService {
     /** The singleton instance of this class. */
     public static final IOPoolContainer SINGLETON = new IOPoolContainer();
 
-    private final IOPoolService container;
+    private final IOPoolService service;
 
     /** You cannot instantiate this class. */
     private IOPoolContainer() {
         final ServiceLocator locator = new ServiceLocator(
                 IOPoolContainer.class.getClassLoader());
         final IOPoolService
-                container = locator.getService(IOPoolService.class, null);
-        this.container = null != container
-                ? container
-                : locator.getServices(IOPoolService.class).next();
+                service = locator.getService(IOPoolService.class, null);
+        if (null != service) {
+            this.service = service;
+        } else {
+            final Iterator<IOPoolService>
+                    i = locator.getServices(IOPoolService.class);
+            if (i.hasNext())
+                this.service = i.next();
+            else
+                throw new ServiceConfigurationError("No service available for " + IOPoolService.class);
+        }
     }
 
     /**
@@ -67,6 +78,6 @@ public final class IOPoolContainer implements IOPoolService {
      */
     @Override
     public IOPool<?> getPool() {
-        return container.getPool();
+        return service.getPool();
     }
 }

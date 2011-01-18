@@ -83,7 +83,7 @@ public abstract class TFileTestCase {
     private TFile archive;
     private byte[] data;
 
-    protected TFileTestCase( final @NonNull FsScheme scheme,
+    protected TFileTestCase(final @NonNull FsScheme scheme,
                             final @NonNull ArchiveDriver<?> driver) {
         if (null == scheme || null == driver)
             throw new NullPointerException();

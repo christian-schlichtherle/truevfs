@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.zip;
 
-import de.schlichtherle.truezip.zip.DefaultExtraField;
-import de.schlichtherle.truezip.zip.UShort;
 import java.util.*;
+import org.junit.Before;
+import org.junit.Test;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
 
 /**
  * A test case for the {@link DefaultExtraField} class.
@@ -28,20 +27,16 @@ import junit.framework.TestCase;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class DefaultExtraFieldTest extends TestCase {
+public final class DefaultExtraFieldTest {
 
     private DefaultExtraField def;
 
-    public DefaultExtraFieldTest(String testName) {
-        super(testName);
-    }            
-
-    @Override
-	protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() {
         def = new DefaultExtraField(0x0000);
     }
 
+    @Test
     public void testConstructor() {
         try {
             def = new DefaultExtraField(UShort.MIN_VALUE - 1);
@@ -64,14 +59,17 @@ public class DefaultExtraFieldTest extends TestCase {
         assertEquals(0, def.getDataSize());
     }
 
+    @Test
     public void testGetDataSize() {
         assertEquals(0, def.getDataSize());
     }
 
+    @Test
     public void testGetDataBlock() {
         assertEquals(0, def.getDataBlock().length);
     }
 
+    @Test
     public void testReadWrite() {
         final byte[] read = new byte[11];
         

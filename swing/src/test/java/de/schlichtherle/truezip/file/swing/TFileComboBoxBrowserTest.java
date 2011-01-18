@@ -29,16 +29,19 @@ import java.util.logging.Logger;
 import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
 import junit.framework.TestCase;
+import org.junit.Test;
 import org.netbeans.jemmy.JemmyProperties;
 import org.netbeans.jemmy.TestOut;
 import org.netbeans.jemmy.operators.JFrameOperator;
 import org.netbeans.jemmy.operators.JTextComponentOperator;
 
+import static org.junit.Assert.*;
+
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class TFileComboBoxBrowserTest extends TestCase {
+public final class TFileComboBoxBrowserTest {
     static {
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput()); // shut up!
     }
@@ -46,13 +49,7 @@ public class TFileComboBoxBrowserTest extends TestCase {
     private static final Logger logger
             = Logger.getLogger(TFileComboBoxBrowserTest.class.getName());
 
-    public TFileComboBoxBrowserTest(String testName) {
-        super(testName);
-    }
-
-    /**
-     * Test of directory property, of class de.schlichtherle.truezip.io.swing.TFileComboBoxBrowser.
-     */
+    @Test
     public void testDirectory() {
         final TFileComboBoxBrowser browser = new TFileComboBoxBrowser();
         final File cur = new TFile(".");
@@ -70,9 +67,7 @@ public class TFileComboBoxBrowserTest extends TestCase {
         assertEquals(cur, dir);
     }
 
-    /**
-     * Test of update method, of class de.schlichtherle.truezip.io.swing.TFileComboBoxBrowser.
-     */
+    @Test
     public void testState4Update() {
         final TFileComboBoxBrowser browser = new TFileComboBoxBrowser();
         try {
@@ -86,17 +81,18 @@ public class TFileComboBoxBrowserTest extends TestCase {
         browser.update("");
     }
 
+    @Test
     public void testAutoCompletion() throws IOException {
         File dir = new File(".");
-        testAutoCompletion(dir);
-        testAutoCompletion(dir.getCanonicalFile());
+        assertAutoCompletion(dir);
+        assertAutoCompletion(dir.getCanonicalFile());
 
         dir = new TFile(".");
-        testAutoCompletion(dir);
-        testAutoCompletion(dir.getCanonicalFile());
+        assertAutoCompletion(dir);
+        assertAutoCompletion(dir.getCanonicalFile());
     }
 
-    public void testAutoCompletion(final File dir) {
+    private void assertAutoCompletion(final File dir) {
         final String[] entries = dir.list();
         if (entries == null || entries.length == 0) {
             logger.warning("Current directory does not contain any files - skipping test!");
@@ -110,11 +106,11 @@ public class TFileComboBoxBrowserTest extends TestCase {
         for (int i = 0; i < entries.length; i++) {
             final String entry = entries[i];
             for (int j = 0; j < entry.length(); j++)
-                testAutoCompletion(browser, combo, entry.substring(0, j));
+                assertAutoCompletion(browser, combo, entry.substring(0, j));
         }
     }
 
-    private static void testAutoCompletion(
+    private static void assertAutoCompletion(
             final TFileComboBoxBrowser browser,
             final JComboBox combo,
             final String initials) {
@@ -150,6 +146,7 @@ public class TFileComboBoxBrowserTest extends TestCase {
         return list;
     }
 
+    @Test
     // TODO: This is far from being a comprehensive test.
     public void testGUI() throws InterruptedException, InvocationTargetException {
         FileComboBoxPanel.main(new String[] { "." });

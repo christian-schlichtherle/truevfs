@@ -15,11 +15,11 @@
  */
 package de.schlichtherle.truezip.zip;
 
-import de.schlichtherle.truezip.zip.ExtraFields;
-import de.schlichtherle.truezip.zip.DefaultExtraField;
-import de.schlichtherle.truezip.zip.ExtraField;
 import java.util.Arrays;
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
  * Tests the collection of {@link ExtraFields Extra Fields}.
@@ -27,7 +27,7 @@ import junit.framework.TestCase;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ExtraFieldsTest extends TestCase {
+public final class ExtraFieldsTest {
 
     // Serialized Extra Fields in little endian order.
     private final byte[] SERIALIZED = new byte[] {
@@ -49,17 +49,13 @@ public class ExtraFieldsTest extends TestCase {
     private ExtraFields fields;
     private byte[] serialized;
 
-    public ExtraFieldsTest(String testName) {
-        super(testName);
-    }            
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() {
         fields = new ExtraFields();
         serialized = SERIALIZED.clone();
     }
 
+    @Test
     public void testGetSet() {
         assertEquals(0, fields.getExtra().length);
 
@@ -84,7 +80,8 @@ public class ExtraFieldsTest extends TestCase {
         assertTrue(Arrays.equals(serialized, got2));
     }
 
-    public void testCollection1() {
+    @Test
+    public void testCollection0() {
         fields.readFrom(serialized, 0, serialized.length);
         final ExtraField ef = fields.get(ExtraField.ZIP64_HEADER_ID);
         assertNotNull(ef);
@@ -96,7 +93,8 @@ public class ExtraFieldsTest extends TestCase {
         assertTrue(Arrays.equals(serialized, got));
     }
 
-    public void testCollection2() {
+    @Test
+    public void testCollection1() {
         assertEquals(0, fields.getExtra().length);
         final ExtraField ef = new DefaultExtraField(ExtraField.ZIP64_HEADER_ID);
         assertNull(fields.get(ExtraField.ZIP64_HEADER_ID));

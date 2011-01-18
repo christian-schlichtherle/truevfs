@@ -16,7 +16,6 @@
 package de.schlichtherle.truezip.crypto.raes;
 
 import java.security.SecureRandom;
-import java.util.Random;
 import de.schlichtherle.truezip.crypto.mode.SICSeekableBlockCipher;
 import de.schlichtherle.truezip.io.LEDataOutputStream;
 import java.io.IOException;
@@ -76,28 +75,21 @@ class Type0RaesOutputStream extends RaesOutputStream {
 
     Type0RaesOutputStream(
             final OutputStream out,
-            final Type0RaesParameters parameters)
+            final Type0RaesParameters param)
     throws  NullPointerException,
             IllegalArgumentException,
             RaesKeyException,
             IOException{
         super(out, null);
 
-        assert out != null;
-        assert parameters != null;
+        assert null != out;
+        assert null != param;
 
         // Check parameters (fail fast).
-        final char[] passwd = parameters.getCreatePasswd();
-        if (passwd == null)
+        final char[] passwd = param.getCreatePasswd();
+        if (null == passwd)
             throw new RaesKeyException();
-        final int keyStrength = parameters.getKeyStrength();
-        if (keyStrength != Type0RaesParameters.KEY_STRENGTH_128
-                && keyStrength != Type0RaesParameters.KEY_STRENGTH_192
-                && keyStrength != Type0RaesParameters.KEY_STRENGTH_256)
-            throw new IllegalArgumentException(
-                    "Illegal cipher key strength: "
-                    + keyStrength
-                    + "!");
+        final int keyStrength = param.getKeyStrength().ordinal();
 
         // Init digest for salt and key generation and KLAC.
         final Digest digest = new SHA256Digest();
@@ -110,25 +102,25 @@ class Type0RaesOutputStream extends RaesOutputStream {
         generateSalt(digest, salt);
 
         // Init PBE parameters.
-        final PBEParametersGenerator paramGen
-                = new PKCS12ParametersGenerator(digest);
+        final PBEParametersGenerator gen = new PKCS12ParametersGenerator(digest);
         final byte[] pass = PBEParametersGenerator.PKCS12PasswordToBytes(passwd);
         for (int i = passwd.length; --i >= 0; ) // nullify password parameter
             passwd[i] = 0;
 
-        paramGen.init(pass, salt, ITERATION_COUNT);
+        gen.init(pass, salt, ITERATION_COUNT);
         // Order is important here, because paramGen does not properly
         // reset the digest object!
-        final ParametersWithIV cipherParam
-                = (ParametersWithIV) paramGen.generateDerivedParameters(
+        final ParametersWithIV
+                cipherParam = (ParametersWithIV) gen.generateDerivedParameters(
                     keyStrengthBits, AES_BLOCK_SIZE);
-        final CipherParameters macParam
-                = paramGen.generateDerivedMacParameters(keyStrengthBits);
+        final CipherParameters
+                macParam = gen.generateDerivedMacParameters(keyStrengthBits);
         for (int i = pass.length; --i >= 0; ) // nullify password buffer
             pass[i] = 0;
 
         // Init cipher.
-        final BufferedBlockCipher cipher = new BufferedBlockCipher(
+        final BufferedBlockCipher
+                cipher = new BufferedBlockCipher(
                     new SICSeekableBlockCipher(
                         new AESFastEngine()));
         cipher.init(true, cipherParam);
@@ -140,8 +132,8 @@ class Type0RaesOutputStream extends RaesOutputStream {
         // Init KLAC.
         klac = new HMac(digest);
         klac.init(macParam);
-        final byte[] cipherKey
-                = ((KeyParameter) cipherParam.getParameters()).getKey();
+        final byte[] cipherKey = ((KeyParameter) cipherParam.getParameters())
+                .getKey();
         klac.update(cipherKey, 0, cipherKey.length);
 
         // Init stream chain.
@@ -157,9 +149,9 @@ class Type0RaesOutputStream extends RaesOutputStream {
 
         // Init start.
         start = dos.size();
-        assert start == ENVELOPE_TYPE_0_HEADER_LEN_WO_SALT + salt.length;
+        assert ENVELOPE_TYPE_0_HEADER_LEN_WO_SALT + salt.length == start;
 
-        // Now that everything went OK, finally init the super class cipher.
+        // Finally init the super class cipher.
         this.cipher = cipher;
     }
 
@@ -170,7 +162,7 @@ class Type0RaesOutputStream extends RaesOutputStream {
     }
 
     @Override
-	public int getKeySizeBits() {
+    public int getKeySizeBits() {
         return keyStrengthBits;
     }
 

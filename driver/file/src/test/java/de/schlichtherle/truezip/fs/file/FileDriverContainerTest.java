@@ -28,7 +28,7 @@ import static org.hamcrest.CoreMatchers.*;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class FileDriverContainerTest {
+public final class FileDriverContainerTest {
 
     public static final String DRIVER_LIST = "file";
 

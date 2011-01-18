@@ -15,9 +15,6 @@
  */
 package de.schlichtherle.truezip.zip;
 
-import de.schlichtherle.truezip.zip.ZipEntry;
-import de.schlichtherle.truezip.zip.ZipFile;
-import de.schlichtherle.truezip.zip.ZipOutputStream;
 import java.io.File;
 import java.util.Random;
 import java.io.EOFException;

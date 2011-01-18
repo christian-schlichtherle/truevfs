@@ -13,34 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.zip;
 
-import de.schlichtherle.truezip.zip.DateTimeConverter;
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 /**
- *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class JARDateTimeConverterTest extends DateTimeConverterTestCase {
-
-    public static Test suite() throws Exception {
-        TestSuite suite = new TestSuite(JARDateTimeConverterTest.class);
-
-        return suite;
-    }
-
-    public JARDateTimeConverterTest(String testName) {
-        super(testName);
-    }
+public final class JARDateTimeConverterTest extends DateTimeConverterTestCase {
 
     @Override
-	protected DateTimeConverter getInstance() {
+    protected DateTimeConverter getInstance() {
         return DateTimeConverter.JAR;
     }
-
-    // TODO: Add behavioral tests here.
 }

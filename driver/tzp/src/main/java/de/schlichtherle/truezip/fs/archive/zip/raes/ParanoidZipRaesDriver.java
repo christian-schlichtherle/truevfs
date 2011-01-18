@@ -23,16 +23,16 @@ import de.schlichtherle.truezip.crypto.raes.RaesKeyException;
 import de.schlichtherle.truezip.crypto.raes.RaesOutputStream;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.io.TabuFileException;
-import de.schlichtherle.truezip.fs.archive.zip.ZipDriver;
 import de.schlichtherle.truezip.fs.archive.zip.ZipInputShop;
 import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.fs.archive.zip.ZipDriver;
+import de.schlichtherle.truezip.key.KeyManagerService;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.LazyOutputSocket;
 import java.io.IOException;
 import java.io.OutputStream;
 import net.jcip.annotations.Immutable;
 
-import static java.util.zip.Deflater.BEST_COMPRESSION;
 
 /**
  * A paranoid archive driver which builds RAES encrypted ZIP files.
@@ -52,10 +52,10 @@ import static java.util.zip.Deflater.BEST_COMPRESSION;
  * @see SafeZipRaesDriver
  */
 @Immutable
-public class ParanoidZipRaesDriver extends AbstractZipRaesDriver {
+public class ParanoidZipRaesDriver extends ZipRaesDriver {
 
-    public ParanoidZipRaesDriver(IOPool<?> pool) {
-        super(pool);
+    public ParanoidZipRaesDriver(IOPool<?> pool, KeyManagerService service) {
+        super(pool, service);
     }
 
     @Override
