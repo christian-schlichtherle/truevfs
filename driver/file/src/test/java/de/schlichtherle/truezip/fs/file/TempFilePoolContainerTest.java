@@ -36,7 +36,6 @@ public final class TempFilePoolContainerTest {
 
     @Test
     public void testGetPool() {
-        assertNotNull(instance.getPool());
         assertSame(instance.getPool(), TempFilePool.INSTANCE);
     }
 }
