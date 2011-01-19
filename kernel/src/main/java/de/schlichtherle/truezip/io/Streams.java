@@ -30,6 +30,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Provides static utility methods for {@link InputStream}s and
@@ -40,6 +42,7 @@ import java.util.concurrent.ThreadFactory;
  */
 public class Streams {
 
+    /** You cannot instantiate this class. */
     private Streams() {
     }
 
@@ -49,8 +52,8 @@ public class Streams {
     private static class InputStreamReaderThreadFactory
     implements ThreadFactory {
         @Override
-		public Thread newThread(Runnable r) {
-            final Thread t = new Thread(r, "TrueZIP InputStream Reader");
+        public Thread newThread(Runnable r) {
+            Thread t = new Thread(r, "TrueZIP InputStream Reader");
             t.setDaemon(true);
             return t;
         }
@@ -158,7 +161,7 @@ public class Streams {
                 do {
                     // Wait until a buffer is available.
                     final Buffer buffer;
-                    synchronized (this) {
+                    synchronized (Reader.this) {
                         while (len >= _buffersLen) {
                             try {
                                 wait();
@@ -185,7 +188,7 @@ public class Streams {
                     buffer.read = read;
 
                     // Advance head and notify writer.
-                    synchronized (this) {
+                    synchronized (Reader.this) {
                         len++;
                         notify(); // only the writer could be waiting now!
                     }
@@ -241,7 +244,9 @@ public class Streams {
                             break;
                         } catch (ExecutionException readerFailure) {
                             throw new AssertionError(readerFailure);
-                        } catch (InterruptedException ignored) {
+                        } catch (InterruptedException interrupted) {
+                            Logger  .getLogger(Streams.class.getName())
+                                    .log(Level.INFO, "Ignored: ", interrupted);
                         }
                     }
                     throw ex;
