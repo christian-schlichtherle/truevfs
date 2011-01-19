@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.file;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.fs.FsOutputOption;
@@ -41,27 +42,31 @@ import static de.schlichtherle.truezip.entry.Entry.*;
  * @version $Id$
  */
 @ThreadSafe
+@DefaultAnnotation(NonNull.class)
 final class FileOutputSocket extends OutputSocket<FileEntry> {
 
     private static final String FILE_POOL_PREFIX = ".tzp";
 
-    private final    @NonNull      FileEntry                entry;
-    private final    @NonNull      BitField<FsOutputOption> options;
+    private final                  FileEntry                entry;
+    private final                  BitField<FsOutputOption> options;
     private final    @CheckForNull Entry                    template;
     private volatile @CheckForNull TempFilePool             pool;
 
-    FileOutputSocket(   final @NonNull      FileEntry                entry,
-                        final @NonNull      BitField<FsOutputOption> options,
+    FileOutputSocket(   final               FileEntry                entry,
+                        final               BitField<FsOutputOption> options,
                         final @CheckForNull Entry                    template) {
+        assert null != entry;
+        assert null != options;
         this.entry    = entry;
         this.options  = options;
         this.template = template;
     }
 
     private TempFilePool getTempFilePool() {
+        final TempFilePool pool = this.pool;
         return null != pool
                 ? pool
-                : (pool = new TempFilePool( FILE_POOL_PREFIX, null,
+                : (this.pool = new TempFilePool( FILE_POOL_PREFIX, null,
                                             entry.getFile().getParentFile()));
     }
 

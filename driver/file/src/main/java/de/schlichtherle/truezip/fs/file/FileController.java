@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.fs.file;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import java.io.RandomAccessFile;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsController;
@@ -31,7 +33,6 @@ import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -50,6 +51,7 @@ import static java.io.File.separatorChar;
  * @version $Id$
  */
 @ThreadSafe
+@DefaultAnnotation(NonNull.class)
 final class FileController extends FsController<FsModel>  {
 
     private final FsModel model;
@@ -232,15 +234,15 @@ final class FileController extends FsController<FsModel>  {
     public OutputSocket<?> getOutputSocket(
             FsEntryName name,
             BitField<FsOutputOption> options,
-            Entry template) {
+            @CheckForNull Entry template) {
         return new FileEntry(target, name).getOutputSocket(options, template);
     }
 
     @Override
-    public void mknod(  final @NonNull FsEntryName name,
-                        final @NonNull Type type,
-                        final @NonNull BitField<FsOutputOption> options,
-                        final @Nullable Entry template)
+    public void mknod(  final FsEntryName name,
+                        final Type type,
+                        final BitField<FsOutputOption> options,
+                        final @CheckForNull Entry template)
     throws IOException {
         final File file = new File(target, name.getPath());
         switch (type) {
@@ -278,8 +280,8 @@ final class FileController extends FsController<FsModel>  {
 
     @Override
     public <X extends IOException>
-    void sync(  @NonNull BitField<FsSyncOption> options,
-                @NonNull ExceptionHandler<? super FsSyncException, X> handler)
+    void sync(  BitField<FsSyncOption> options,
+                ExceptionHandler<? super FsSyncException, X> handler)
     throws X, FsException {
     }
 }

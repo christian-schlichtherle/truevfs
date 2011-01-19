@@ -19,6 +19,9 @@ import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.FsMountPoint;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.Immutable;
 
 /**
@@ -26,6 +29,7 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
+@DefaultAnnotation(NonNull.class)
 final class FileDriver implements FsDriver {
 
     /**
@@ -41,7 +45,7 @@ final class FileDriver implements FsDriver {
 
     @Override
     public FsController<?>
-    newController(FsMountPoint mountPoint, FsController<?> parent) {
+    newController(FsMountPoint mountPoint, @CheckForNull FsController<?> parent) {
         assert null == mountPoint.getParent()
                 ? null == parent
                 : mountPoint.getParent().equals(parent.getModel().getMountPoint());

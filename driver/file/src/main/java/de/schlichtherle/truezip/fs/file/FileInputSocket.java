@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.fs.file;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.rof.SimpleReadOnlyFile;
 import de.schlichtherle.truezip.socket.InputSocket;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -30,11 +31,13 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
+@DefaultAnnotation(NonNull.class)
 final class FileInputSocket extends InputSocket<FileEntry> {
 
-    private final @NonNull FileEntry entry;
+    private final FileEntry entry;
 
-    FileInputSocket(final @NonNull FileEntry entry) {
+    FileInputSocket(final FileEntry entry) {
+        assert null != entry;
         this.entry = entry;
     }
 
