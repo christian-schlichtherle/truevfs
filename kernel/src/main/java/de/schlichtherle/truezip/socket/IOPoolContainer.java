@@ -66,7 +66,8 @@ public final class IOPoolContainer implements IOPoolService {
             if (i.hasNext())
                 this.service = i.next();
             else
-                throw new ServiceConfigurationError("No service available for " + IOPoolService.class);
+                throw new ServiceConfigurationError(
+                        "No service available for " + IOPoolService.class);
         }
     }
 
