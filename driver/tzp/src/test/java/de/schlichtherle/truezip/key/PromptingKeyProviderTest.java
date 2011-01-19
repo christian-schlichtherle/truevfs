@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.key;
 import org.junit.Before;
 import org.junit.Test;
 
+import static de.schlichtherle.truezip.key.PromptingKeyProvider.State.*;
 import static org.junit.Assert.*;
 
 /**
@@ -35,11 +36,63 @@ public class PromptingKeyProviderTest {
 
     @Test
     public void testKey() {
+        final DummyKey key = new DummyKey();
+
+        assertSame(RESET, instance.getState());
         assertNull(instance.getKey());
-        DummyKey result = new DummyKey();
-        instance.setKey(result);
-        assertEquals(result, instance.getKey());
+
+        instance.setKey(key);
+        assertSame(PROVIDED, instance.getState());
+        assertEquals(key, instance.getKey());
+
+        try {
+            instance.setKey(key);
+            fail();
+        } catch (IllegalStateException expected) {
+        }
+
+        try {
+            instance.setKey(null);
+            fail();
+        } catch (IllegalStateException expected) {
+        }
+
+        instance.resetCancelledKey();
+
+        try {
+            instance.setKey(key);
+            fail();
+        } catch (IllegalStateException expected) {
+        }
+
+        try {
+            instance.setKey(null);
+            fail();
+        } catch (IllegalStateException expected) {
+        }
+
+        instance.resetUnconditionally();
+
         instance.setKey(null);
+        assertSame(CANCELLED, instance.getState());
         assertNull(instance.getKey());
+
+        try {
+            instance.setKey(key);
+            fail();
+        } catch (IllegalStateException expected) {
+        }
+
+        try {
+            instance.setKey(null);
+            fail();
+        } catch (IllegalStateException expected) {
+        }
+
+        instance.resetCancelledKey();
+
+        instance.setKey(key);
+        assertSame(PROVIDED, instance.getState());
+        assertEquals(key, instance.getKey());
     }
 }

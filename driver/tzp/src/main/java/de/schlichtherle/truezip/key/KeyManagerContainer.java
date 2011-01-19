@@ -51,7 +51,8 @@ import net.jcip.annotations.Immutable;
 public final class KeyManagerContainer implements KeyManagerService {
 
     /** The singleton instance of this class. */
-    public static final KeyManagerContainer SINGLETON = new KeyManagerContainer();
+    public static final KeyManagerContainer
+            SINGLETON = new KeyManagerContainer();
 
     private final KeyManagerService service;
 
@@ -68,7 +69,9 @@ public final class KeyManagerContainer implements KeyManagerService {
                     i = locator.getServices(KeyManagerService.class);
             if (i.hasNext())
                 this.service = i.next();
-            throw new ServiceConfigurationError("No service available for " + KeyManagerService.class);
+            else
+                throw new ServiceConfigurationError(
+                        "No service available for " + KeyManagerService.class);
         }
     }
 

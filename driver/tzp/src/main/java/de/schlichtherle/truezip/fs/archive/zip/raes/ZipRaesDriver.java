@@ -72,14 +72,14 @@ public abstract class ZipRaesDriver extends JarDriver {
     public enum KeyProviderSyncStrategy {
 
         /**
-         * Calls {@link PromptingKeyProvider#resetUnconditionally}
+         * Calls {@link PromptingKeyProvider#resetCancelledKey}
          * if and only if the given provider is a {@link PromptingKeyProvider}.
          */
-        RESET_UNKNOWN_KEY {
+        RESET_CANCELLED_KEY {
             @Override
             public void sync(KeyProvider<?> provider) {
                 if (provider instanceof PromptingKeyProvider<?>)
-                    ((PromptingKeyProvider<?>) provider).resetUnknownKey();
+                    ((PromptingKeyProvider<?>) provider).resetCancelledKey();
             }
         },
 
@@ -123,12 +123,12 @@ public abstract class ZipRaesDriver extends JarDriver {
 
     /**
      * Returns the key provider sync strategy,
-     * which is {@link KeyProviderSyncStrategy#RESET_UNKNOWN_KEY}.
+     * which is {@link KeyProviderSyncStrategy#RESET_CANCELLED_KEY}.
      *
      * @return The key provider sync strategy.
      */
     public KeyProviderSyncStrategy getKeyProviderSyncStrategy() {
-        return KeyProviderSyncStrategy.RESET_UNKNOWN_KEY;
+        return KeyProviderSyncStrategy.RESET_CANCELLED_KEY;
     }
 
     /**

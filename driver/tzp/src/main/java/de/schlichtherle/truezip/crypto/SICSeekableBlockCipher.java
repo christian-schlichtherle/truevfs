@@ -13,8 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package de.schlichtherle.truezip.crypto.mode;
+package de.schlichtherle.truezip.crypto;
 
 import de.schlichtherle.truezip.crypto.SeekableBlockCipher;
 import org.bouncycastle.crypto.BlockCipher;
@@ -65,7 +64,7 @@ public class SICSeekableBlockCipher implements SeekableBlockCipher {
     }
 
     @Override
-	public void init(boolean forEncryption, CipherParameters params)
+    public void init(boolean forEncryption, CipherParameters params)
     throws IllegalArgumentException {
         if (params instanceof ParametersWithIV) {
           ParametersWithIV ivParams = (ParametersWithIV) params;
@@ -78,19 +77,19 @@ public class SICSeekableBlockCipher implements SeekableBlockCipher {
     }
 
     @Override
-	public String getAlgorithmName() {
+    public String getAlgorithmName() {
         // Must add "/SIC" in order to make BufferedBlockCipher work correctly.
         return cipher.getAlgorithmName() + "/SIC";
     }
 
     @Override
-	public int getBlockSize() {
+    public int getBlockSize() {
         assert blockSize == cipher.getBlockSize();
         return blockSize;
     }
 
     @Override
-	public int processBlock(
+    public int processBlock(
             final byte[] in,
             final int inOff,
             final byte[] out,
@@ -118,17 +117,17 @@ public class SICSeekableBlockCipher implements SeekableBlockCipher {
     }
 
     @Override
-	public void setBlockCounter(long block) {
+    public void setBlockCounter(long block) {
         blockCounter = block;
     }
 
     @Override
-	public long getBlockCounter() {
+    public long getBlockCounter() {
         return blockCounter;
     }
 
     @Override
-	public void reset() {
+    public void reset() {
         // Effectively the same as setBlockCounter(0).
         //System.arraycopy(IV, 0, counterIn, 0, blockSize);
         blockCounter = 0;
