@@ -80,14 +80,6 @@
     <build>
         <plugins>
             <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>**/de/schlichtherle/truezip/crypto/raes/param/swing/PromptingKeyManagerTest.java</exclude> <!-- FIXME: Make this test work again! -->
-                    </excludes>
-                </configuration>
-            </plugin>
-            <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
                     <links>
