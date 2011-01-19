@@ -17,10 +17,11 @@ package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.entry.EntryContainer;
 import de.schlichtherle.truezip.entry.Entry;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.NotThreadSafe;
 
 /**
- * A container and input socket factory for entries.
+ * A service for input sockets.
  *
  * @param   <E> The type of the entries.
  * @see     OutputService
@@ -30,13 +31,10 @@ import net.jcip.annotations.NotThreadSafe;
 public interface InputService<E extends Entry> extends EntryContainer<E> {
 
     /**
-     * Returns a non-{@code null} input socket for read access to the given
-     * entry.
+     * Returns an input socket for read access to the given entry.
      *
      * @param  name a non-{@code null} {@link Entry#getName() entry name}.
-     * @throws NullPointerException if {@code name} is {@code null}.
-     * @return A non-{@code null} input socket for reading from the local
-     *         target.
+     * @return An input socket for reading from the local target.
      */
-    InputSocket<? extends E> getInputSocket(String name);
+    @NonNull InputSocket<? extends E> getInputSocket(@NonNull String name);
 }

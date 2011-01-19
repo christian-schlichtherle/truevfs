@@ -15,8 +15,10 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
-import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -27,9 +29,10 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
+@DefaultAnnotation(NonNull.class)
 public class FsFalsePositiveException extends FsException {
 
-    public FsFalsePositiveException(FsModel model, IOException cause) {
+    public FsFalsePositiveException(FsModel model, @CheckForNull IOException cause) {
         super(model, cause);
         assert !(cause instanceof FsException);
     }

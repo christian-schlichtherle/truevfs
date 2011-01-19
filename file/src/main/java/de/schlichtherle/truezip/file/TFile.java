@@ -1947,18 +1947,8 @@ public final class TFile extends File {
             } catch (IOException ex) {
                 return 0;
             }
-            if (null == entry || DIRECTORY == entry.getType())
+            if (null == entry || entry.getType() == DIRECTORY)
                 return 0;
-
-            // TODO: Review: Can we avoid this special case?
-            // It's probably ZipDriver specific!
-            // This target is a plain file in the file system.
-            // If target.getLength() returns UNKNOWN, the getLength is yet unknown.
-            // This may happen if e.g. a ZIP target has only been partially
-            // written, i.e. not yet closed by another thread, or if this is a
-            // ghost directory.
-            // As this is not specified in the contract of this class,
-            // return 0 in this case instead.
             final long length = entry.getSize(DATA);
             return length >= 0 ? length : 0;
         }
@@ -1987,12 +1977,6 @@ public final class TFile extends File {
             }
             if (null == entry)
                 return 0;
-            // Depending on the driver type, target.getTime() could return
-            // a negative value. E.g. this is the default value that the
-            // ArchiveDriver uses for newly created entries in order to
-            // indicate an unknown time.
-            // As this is not specified in the contract of this class,
-            // 0 is returned in this case instead.
             final long time = entry.getTime(Access.WRITE);
             return 0 <= time ? time : 0;
         }

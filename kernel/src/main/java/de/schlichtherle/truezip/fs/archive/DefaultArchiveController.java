@@ -44,7 +44,9 @@ import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collections;
@@ -70,6 +72,7 @@ import static de.schlichtherle.truezip.io.Paths.isRoot;
  * @version $Id$
  */
 @NotThreadSafe
+@DefaultAnnotation(NonNull.class)
 public final class DefaultArchiveController<E extends ArchiveEntry>
 extends FileSystemArchiveController<E> {
 
@@ -177,13 +180,13 @@ extends FileSystemArchiveController<E> {
      * An {@link Input} object used to mount the (virtual) archive file system
      * and read the entries from the archive file.
      */
-    private Input input;
+    private @Nullable Input input;
 
     /**
      * The (possibly temporary) {@link Output} we are writing newly
      * created or modified entries to.
      */
-    private Output output;
+    private @Nullable Output output;
 
     private final ArchiveFileSystemTouchListener<E> touchListener
             = new TouchListener();
@@ -272,8 +275,8 @@ extends FileSystemArchiveController<E> {
         getFileSystem().addArchiveFileSystemTouchListener(touchListener);
     }
 
-    void makeOutput(@NonNull final BitField<FsOutputOption> options,
-                    @NonNull final Entry rootTemplate)
+    void makeOutput(final BitField<FsOutputOption> options,
+                    final Entry rootTemplate)
     throws IOException {
         if (null != output)
             return;
@@ -299,8 +302,8 @@ extends FileSystemArchiveController<E> {
     }
 
     @Override
-    boolean autoSync(   @NonNull final FsEntryName name,
-                        @CheckForNull final Access intention)
+    boolean autoSync(   final FsEntryName name,
+                        final @CheckForNull Access intention)
     throws FsSyncException, FsException {
         final ArchiveFileSystem<E> fileSystem;
         final ArchiveFileSystemEntry<E> entry;
@@ -331,8 +334,8 @@ extends FileSystemArchiveController<E> {
 
     @Override
     public <X extends IOException> void sync(
-            @NonNull final BitField<FsSyncOption> options,
-            @NonNull final ExceptionHandler<? super FsSyncException, X> handler)
+            final BitField<FsSyncOption> options,
+            final ExceptionHandler<? super FsSyncException, X> handler)
     throws X, FsException {
         assert !isTouched() || null != output; // file system touched => output archive
         assert getModel().writeLock().isHeldByCurrentThread();
@@ -367,8 +370,8 @@ extends FileSystemArchiveController<E> {
      *         throughout the processing of the container archive file.
      */
     private <X extends IOException> void awaitSync(
-            @NonNull final BitField<FsSyncOption> options,
-            @NonNull final ExceptionHandler<? super FsSyncException, X> handler)
+            final BitField<FsSyncOption> options,
+            final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         // Check output streams first, because FORCE_CLOSE_INPUT may be
         // set and FORCE_CLOSE_OUTPUT may be unset in which case we
@@ -411,7 +414,7 @@ extends FileSystemArchiveController<E> {
      *         throughout the processing of the container archive file.
      */
     private <X extends IOException> void commenceSync(
-            @NonNull final ExceptionHandler<? super FsSyncException, X> handler)
+            final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         class FilterExceptionHandler
         implements ExceptionHandler<IOException, X> {
@@ -444,7 +447,7 @@ extends FileSystemArchiveController<E> {
      *         processing of the container archive file.
      */
     private <X extends IOException> void performSync(
-            @NonNull final ExceptionHandler<? super FsSyncException, X> handler)
+            final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         assert isTouched();
         assert null != output;
@@ -477,10 +480,10 @@ extends FileSystemArchiveController<E> {
     }
 
     private static <E extends ArchiveEntry, X extends IOException> void copy(
-            @NonNull final ArchiveFileSystem<E> fileSystem,
-            @NonNull final InputService<E> input,
-            @NonNull final OutputService<E> output,
-            @NonNull final ExceptionHandler<IOException, X> handler)
+            final ArchiveFileSystem<E> fileSystem,
+            final InputService<E> input,
+            final OutputService<E> output,
+            final ExceptionHandler<IOException, X> handler)
     throws X {
         for (final ArchiveFileSystemEntry<E> fse : fileSystem) {
             final E e = fse.getEntry();
@@ -519,7 +522,7 @@ extends FileSystemArchiveController<E> {
      *         throughout the processing of the container archive file.
      */
     private <X extends IOException> void commitSync(
-            @NonNull final ExceptionHandler<? super FsSyncException, X> handler)
+            final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         setFileSystem(null);
 

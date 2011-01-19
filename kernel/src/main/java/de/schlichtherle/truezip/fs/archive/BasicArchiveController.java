@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.fs.archive;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import de.schlichtherle.truezip.entry.DecoratingEntry;
 import de.schlichtherle.truezip.fs.FsEntryNotFoundException;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.io.InputException;
@@ -39,6 +41,7 @@ import de.schlichtherle.truezip.fs.FsSyncOption;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -104,6 +107,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  * @version $Id$
  */
 @NotThreadSafe
+@DefaultAnnotation(NonNull.class)
 abstract class BasicArchiveController<E extends ArchiveEntry>
 extends FsController<FsConcurrentModel> {
 
@@ -207,7 +211,7 @@ extends FsController<FsConcurrentModel> {
         return new Input(name, options);
     }
 
-    private class Input extends InputSocket<E> {
+    private class Input extends InputSocket<Entry> {
         final FsEntryName name;
         final BitField<FsInputOption> options;
 
@@ -218,7 +222,7 @@ extends FsController<FsConcurrentModel> {
         }
 
         @Override
-        public E getLocalTarget() throws IOException {
+        public Entry getLocalTarget() throws IOException {
             if (!autoSync(name, READ)) {
                 autoMount();        // detect false positives
                 getPeerTarget();    // triggers autoSync() if in same file system
@@ -231,7 +235,7 @@ extends FsController<FsConcurrentModel> {
         }
 
         InputSocket<?> getBoundSocket() throws IOException {
-            final E entry = getLocalTarget();
+            final Entry entry = getLocalTarget();
             if (DIRECTORY == entry.getType())
                 throw new FsEntryNotFoundException(getModel(),
                         name, "cannot read directories");
@@ -258,18 +262,18 @@ extends FsController<FsConcurrentModel> {
     public final OutputSocket<?> getOutputSocket(
             FsEntryName name,
             BitField<FsOutputOption> options,
-            Entry template) {
+            @CheckForNull Entry template) {
         return new Output(name, options, template);
     }
 
-    private class Output extends OutputSocket<E> {
+    private class Output extends OutputSocket<Entry> {
         final FsEntryName name;
         final BitField<FsOutputOption> options;
-        final Entry template;
+        final @CheckForNull Entry template;
 
         Output( final FsEntryName name,
                 final BitField<FsOutputOption> options,
-                final Entry template) {
+                final @CheckForNull Entry template) {
             this.name = name;
             this.options = options;
             this.template = template;
@@ -279,19 +283,22 @@ extends FsController<FsConcurrentModel> {
             autoSync(name, WRITE);
             // Start creating or overwriting the archive entry.
             // This will fail if the entry already exists as a directory.
-            // TODO: Use getPeerTarget() instead of template!
             return autoMount(   !name.isRoot()
                                 && options.get(CREATE_PARENTS), options)
                     .mknod(name, FILE, options, template);
         }
 
         @Override
-        public E getLocalTarget() throws IOException {
+        public Entry getLocalTarget() throws IOException {
+            final Entry entry = mknod().getTarget().getEntry();
             if (options.get(APPEND)) {
-                throw new UnsupportedOperationException("This feature is not yet implemented!");
-                // return null; // TODO: broken interface contract!
+                // A proxy entry must get returned here in order to inhibit
+                // a peer target to recognize the type of this entry and
+                // change the contents of the transferred data accordingly.
+                // This would not work when APPENDing.
+                return new ProxyEntry(entry);
             }
-            return mknod().getTarget().getEntry();
+            return entry;
         }
 
         @Override
@@ -299,9 +306,13 @@ extends FsController<FsConcurrentModel> {
             final ArchiveFileSystemOperation<E> mknod = mknod();
             final E entry = mknod.getTarget().getEntry();
             final OutputSocket<?> output = getOutputSocket(entry);
-            final InputStream in = options.get(APPEND)
-                    ? getInputSocket(entry.getName()).newInputStream() // FIXME: Crashes on new entry!
-                    : null;
+            InputStream in = null;
+            if (options.get(APPEND)) {
+                try {
+                    in = getInputSocket(entry.getName()).newInputStream();
+                } catch (FileNotFoundException ignore) {
+                }
+            }
             try {
                 final OutputStream out = output
                         .bind(null == in ? this : null)
@@ -327,14 +338,20 @@ extends FsController<FsConcurrentModel> {
         }
     } // class Output
 
+    private static class ProxyEntry extends DecoratingEntry<Entry> {
+        ProxyEntry(Entry entry) {
+            super(entry);
+        }
+    } // class ProxyEntry
+
     abstract OutputSocket<?> getOutputSocket(E entry) throws IOException;
 
     @Override
     public final void mknod(
-            @NonNull final FsEntryName name,
-            @NonNull final Type type,
-            @NonNull final BitField<FsOutputOption> options,
-            @CheckForNull final Entry template)
+            final FsEntryName name,
+            final Type type,
+            final BitField<FsOutputOption> options,
+            final @CheckForNull Entry template)
     throws IOException {
         if (name.isRoot()) {
             try {
@@ -407,7 +424,7 @@ extends FsController<FsConcurrentModel> {
      * @throws FsNotWriteLockedException
      * @return Whether or not a synchronization has been performed.
      */
-    abstract boolean autoSync(  @NonNull FsEntryName name,
+    abstract boolean autoSync(  FsEntryName name,
                                 @CheckForNull Access intention)
     throws FsSyncException, FsException;
 }

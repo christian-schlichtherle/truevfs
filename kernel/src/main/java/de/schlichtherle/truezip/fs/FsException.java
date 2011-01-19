@@ -15,6 +15,10 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import net.jcip.annotations.ThreadSafe;
 
@@ -26,6 +30,7 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
+@DefaultAnnotation(NonNull.class)
 public abstract class FsException extends IOException {
 
     private static final long serialVersionUID = 2947623946725372554L;
@@ -34,14 +39,14 @@ public abstract class FsException extends IOException {
         super(model.getMountPoint().toString());
     }
 
-    protected FsException(FsModel model, IOException cause) {
+    protected FsException(FsModel model, @CheckForNull IOException cause) {
         super(model.getMountPoint().toString());
         super.initCause(cause);
     }
 
     /** Returns the nullable cause of this exception. */
     @Override
-    public IOException getCause() {
+    public @Nullable IOException getCause() {
         return (IOException) super.getCause();
     }
 }

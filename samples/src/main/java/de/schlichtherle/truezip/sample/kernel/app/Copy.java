@@ -39,7 +39,7 @@ import java.net.URISyntaxException;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class Copy {
+public final class Copy {
 
     public static void main(String[] args)
     throws IOException, URISyntaxException {
@@ -47,9 +47,9 @@ public class Copy {
         FsManager manager = new FsDefaultManager();
 
         // Search the class path for the set of all supported file system
-        // drivers and build a federating file system driver from it.
-        FsCompositeDriver driver = new FsDefaultDriver(
-                FsDriverContainer.SINGLETON);
+        // drivers and build a composite driver from it.
+        FsCompositeDriver
+                driver = new FsDefaultDriver(FsDriverContainer.SINGLETON);
 
         // Resolve the source socket.
         // Note that an absolute URI is required, so we may need to use the

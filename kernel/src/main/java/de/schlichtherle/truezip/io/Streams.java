@@ -296,7 +296,7 @@ public class Streams {
         static final List<Reference<Buffer[]>> list = new LinkedList<Reference<Buffer[]>>();
 
         /** The byte buffer used for asynchronous reading and writing. */
-        byte[] buf = new byte[64 * 1024]; // TODO: Reuse FLATER_BUF_LENGTH of de.schlichtherle.truezip.util.zip.ZipConstants
+        byte[] buf = new byte[64 * 1024];
 
         /** The actual number of bytes read into the buffer. */
         int read;

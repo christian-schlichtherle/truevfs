@@ -193,7 +193,7 @@ class TFiles {
             final File dst)
     throws IOException {
         if (contains(src, dst))
-            throw new TContainsFileException(src, dst); // TODO: Required anymore?
+            throw new TContainsFileException(src, dst);
         copy0(preserve, src, dst);
     }
 
@@ -217,7 +217,6 @@ class TFiles {
                     final BitField<FsInputOption> options) {
         if (src instanceof TFile) {
             // TODO: Consider removing this block and using the more general pattern below it!
-            // FIXME: Removing this block yields a concurrency issue in the unit tests!
             final TFile file = (TFile) src;
             final TFile archive = file.getInnerArchive();
             if (null != archive)
@@ -236,7 +235,6 @@ class TFiles {
                     final @CheckForNull Entry template) {
         if (dst instanceof TFile) {
             // TODO: Consider removing this block and using the more general pattern below it!
-            // FIXME: Removing this block yields a concurrency issue in the unit tests!
             final TFile file = (TFile) dst;
             final TFile archive = file.getInnerArchive();
             if (null != archive)

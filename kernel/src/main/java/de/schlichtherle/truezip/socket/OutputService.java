@@ -17,10 +17,11 @@ package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.entry.EntryContainer;
 import de.schlichtherle.truezip.entry.Entry;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.NotThreadSafe;
 
 /**
- * A container and output socket factory for entries.
+ * A service for output sockets.
  * <p>
  * All methods of this interface must reflect all entries, including those
  * which have only been partially written yet, i.e. which have not already
@@ -34,13 +35,10 @@ import net.jcip.annotations.NotThreadSafe;
 public interface OutputService<E extends Entry> extends EntryContainer<E> {
 
     /**
-     * Returns a non-{@code null} output socket for write access to the given
-     * entry.
+     * Returns an output socket for write access to the given entry.
      *
      * @param  entry the non-{@code null} local target.
-     * @throws NullPointerException if {@code target} is {@code null}.
-     * @return A non-{@code null} output socket for writing to the local
-     *         target.
+     * @return An output socket for writing to the local target.
      */
-    OutputSocket<? extends E> getOutputSocket(E entry);
+    @NonNull OutputSocket<? extends E> getOutputSocket(@NonNull E entry);
 }

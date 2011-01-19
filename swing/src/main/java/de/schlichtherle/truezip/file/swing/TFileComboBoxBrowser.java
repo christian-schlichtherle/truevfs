@@ -142,7 +142,8 @@ public class TFileComboBoxBrowser extends AbstractComboBoxBrowser {
             TFile node = new TFile(initials, detector);
             if (node.isAbsolute()) {
                 final boolean dirPath = node.getPath().length() < initials.length();
-                // FIXME: Integrate this into truezip-driver-tzp!
+                // TODO: Evaluate why this was needed in TrueZIP 6 and if it's
+                // still required in TrueZIP 7.
                 /*if (dirPath)
                     PromptingKeyManager.resetCancelledPrompts();*/
                 // The test order is important here because isDirectory() may
@@ -172,7 +173,8 @@ public class TFileComboBoxBrowser extends AbstractComboBoxBrowser {
                 node = new TFile(directory, initials); // inherits archive detector from directory
                 final boolean dirPath = node.getPath().length()
                         < (directory.getPath() + TFile.separator + initials).length();
-                // FIXME: Integrate this into truezip-driver-tzp!
+                // TODO: Evaluate why this was needed in TrueZIP 6 and if it's
+                // still required in TrueZIP 7.
                 /*if (dirPath)
                     PromptingKeyManager.resetCancelledPrompts();*/
                 // The test order is important here because isDirectory() may
