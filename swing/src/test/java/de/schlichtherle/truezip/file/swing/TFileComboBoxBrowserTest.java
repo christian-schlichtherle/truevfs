@@ -147,7 +147,7 @@ public final class TFileComboBoxBrowserTest {
     }
 
     @Test
-    // TODO: This is far from being a comprehensive test.
+    // TODO: Complete this test!
     public void testGUI() throws InterruptedException, InvocationTargetException {
         FileComboBoxPanel.main(new String[] { "." });
 

@@ -120,7 +120,7 @@ implements OutputShop<TarArchiveEntry> {
                 // So we need to buffer the output in a temporary file and
                 // write it upon close().
                 return new TempEntryOutputStream(
-                        pool.allocate(), // TODO: Use FilePool!
+                        pool.allocate(),
                         entry);
             }
         } // class Output

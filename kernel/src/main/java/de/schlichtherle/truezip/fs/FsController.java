@@ -146,7 +146,6 @@ public abstract class FsController<M extends FsModel> {
      *         <li>The file system is read only.
      *         <li>{@code name} contains characters which are not
      *             supported by the file system.
-     *         <li>TODO: type is not {@code FILE} or {@code DIRECTORY}.
      *         <li>The entry already exists and either the option
      *             {@link FsOutputOption#EXCLUSIVE} is set or the entry is a
      *             directory.

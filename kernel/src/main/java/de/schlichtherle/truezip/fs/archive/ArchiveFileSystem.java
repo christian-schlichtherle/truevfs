@@ -481,7 +481,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         if (null == type)
             throw new NullPointerException();
         if (FILE != type && DIRECTORY != type)
-            throw new ArchiveFileSystemException(path,
+            throw new ArchiveFileSystemException(path, // TODO: Add support for other types.
                     "only FILE and DIRECTORY entries are currently supported");
         final ArchiveFileSystemEntry<E> oldEntry = master.get(path);
         if (null != oldEntry) {
@@ -499,10 +499,10 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
     }
 
     /**
-     * TODO: This implementation bears one problem: The state of the file
-     * system may be altered between the construction of an instance and the
-     * call to the {@link #run} method, which may render the operation illegal
-     * and corrupt the file system.
+     * TODO: This implementation yields a potential issue: The state of the
+     * file system may be altered between the construction of an instance and
+     * the call to the {@link #run} method, which may render the operation
+     * illegal and corrupt the file system.
      * As long as only the ArchiveControllers in the package
      * de.schlichtherle.truezip.fs.archive.controller are used, this should not
      * happen, however.

@@ -20,7 +20,10 @@ import de.schlichtherle.truezip.fs.FsFalsePositiveException;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.util.BitField;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import net.jcip.annotations.NotThreadSafe;
@@ -35,6 +38,7 @@ import net.jcip.annotations.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
+@DefaultAnnotation(NonNull.class)
 abstract class FileSystemArchiveController<E extends ArchiveEntry>
 extends BasicArchiveController<E> {
 
@@ -56,11 +60,11 @@ extends BasicArchiveController<E> {
         return mountState.autoMount(autoCreate, options);
     }
 
-    final ArchiveFileSystem<E> getFileSystem() {
+    final @Nullable ArchiveFileSystem<E> getFileSystem() {
         return mountState.getFileSystem();
     }
 
-    final void setFileSystem(ArchiveFileSystem<E> fileSystem) {
+    final void setFileSystem(@CheckForNull ArchiveFileSystem<E> fileSystem) {
         mountState.setFileSystem(fileSystem);
     }
 
@@ -93,11 +97,11 @@ extends BasicArchiveController<E> {
                                                 BitField<FsOutputOption> options)
         throws IOException;
 
-        ArchiveFileSystem<E> getFileSystem() {
+        @Nullable ArchiveFileSystem<E> getFileSystem() {
             return null;
         }
 
-        abstract void setFileSystem(ArchiveFileSystem<E> fileSystem);
+        abstract void setFileSystem(@CheckForNull ArchiveFileSystem<E> fileSystem);
     } // class MountState
 
     private class ResetFileSystem extends MountState<E> {
@@ -191,9 +195,10 @@ extends BasicArchiveController<E> {
 }
 
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
+@DefaultAnnotation(NonNull.class)
 class FsCacheableFalsePositiveException extends FsFalsePositiveException {
-    FsCacheableFalsePositiveException(@NonNull FsModel model,
-                                    @NonNull IOException cause) {
+    FsCacheableFalsePositiveException(  FsModel model,
+                                        @CheckForNull IOException cause) {
         super(model, cause);
     }
 }

@@ -181,6 +181,10 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
         parse(new URI(uri), modifier);
     }
 
+    /**
+     * Equivalent to {@link #FsPath(URI, FsUriModifier) new FsPath(file.toURI(), FsUriModifier.CANONICALIZE)}.
+     * Note that this constructor is expected not to throw any exceptions.
+     */
     public FsPath(@NonNull File file) {
         try {
             parse(file.toURI(), CANONICALIZE);

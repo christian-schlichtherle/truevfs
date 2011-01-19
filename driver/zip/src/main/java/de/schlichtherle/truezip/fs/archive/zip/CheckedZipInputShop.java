@@ -74,7 +74,7 @@ public class CheckedZipInputShop extends ZipInputShop {
 
             @Override
             public ReadOnlyFile newReadOnlyFile() throws IOException {
-                throw new FileNotFoundException(name + " (unsupported operation)"); // TODO: Support this for STORED entries.
+                throw new FileNotFoundException(name + " (unsupported operation)"); // TODO: Support this feature for STORED entries.
             }
         } // class Input
 

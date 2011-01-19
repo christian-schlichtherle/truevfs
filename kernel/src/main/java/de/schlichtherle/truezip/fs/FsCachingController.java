@@ -387,9 +387,8 @@ extends FsDecoratingController< FsConcurrentModel,
         } // class ProxyOutputSocket
     } // class Cache
 
-    private static final class ProxyFileSystemEntry
-    extends FsDecoratingEntry<Entry> {
-        private ProxyFileSystemEntry(Entry entry) {
+    private static class ProxyFileSystemEntry extends FsDecoratingEntry<Entry> {
+        ProxyFileSystemEntry(Entry entry) {
             super(entry);
             assert DIRECTORY != entry.getType();
         }

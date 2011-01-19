@@ -225,11 +225,11 @@ public final class IOCache {
         return null == buffer ? null : new CacheEntry(buffer.data);
     }
 
-    private static final class CacheEntry extends DecoratingEntry<Entry> {
-        private CacheEntry(Entry entry) {
+    private static class CacheEntry extends DecoratingEntry<Entry> {
+        CacheEntry(Entry entry) {
             super(entry);
         }
-    } // class ProxyEntry
+    } // class CacheEntry
 
     /**
      * Returns an input socket for reading the cached entry data.
