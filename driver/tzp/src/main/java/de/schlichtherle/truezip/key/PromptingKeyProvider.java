@@ -15,19 +15,10 @@
  */
 package de.schlichtherle.truezip.key;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URI;
-import java.util.concurrent.Future;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import net.jcip.annotations.ThreadSafe;
 
 import static de.schlichtherle.truezip.key.PromptingKeyProvider.State.*;
@@ -128,32 +119,7 @@ extends SafeKeyProvider<K> {
         throws UnknownKeyException;
     } // interface UI
 
-    private static final ExecutorService executor
-            = Executors.newCachedThreadPool(new KeyPromptThreadFactory());
-
-    private static class KeyPromptThreadFactory implements ThreadFactory {
-        @Override
-        public Thread newThread(Runnable r) {
-            Thread t = new Thread(r, "TrueZIP Key Prompt");
-            t.setDaemon(true);
-            return t;
-        }
-    }
-
-    private static class PromptingLock { }
-
-    /**
-     * Used to lock out prompting by multiple threads.
-     * Note that the prompting methods in this class <em>must not</em> be
-     * synchronized on this instance since this would cause the Swing
-     * based default implementation of the key manager to dead lock.
-     * This is because the GUI is run from AWT's Event Dispatching Thread,
-     * which must call some methods of this instance while another thread
-     * is waiting for the key manager to return from prompting.
-     * Instead, the prompting methods use this object to lock out concurrent
-     * prompting by multiple threads.
-     */
-    private final PromptingLock lock = new PromptingLock();
+    private volatile @NonNull State state = RESET;
 
     /** The resource identifier for the protected resource. */
     private volatile URI resource;
@@ -162,8 +128,6 @@ extends SafeKeyProvider<K> {
      * The user interface instance which is used to prompt the user for a key.
      */
     private volatile UI<? extends K> ui;
-
-    private volatile @NonNull State state = RESET;
 
     private volatile K key;
 
@@ -217,51 +181,7 @@ extends SafeKeyProvider<K> {
      */
     @Override
     protected final K getCreateKeyImpl() throws UnknownKeyException {
-        synchronized (lock) {
-            return getState().getCreateKey(this);
-        }
-    }
-
-    private void promptCreateKey()
-    throws UnknownKeyException {
-        class CreateKeyPrompt implements Callable<UnknownKeyException> {
-
-            @Override
-            public UnknownKeyException call() {
-                try {
-                    getUI().promptCreateKey(PromptingKeyProvider.this);
-                    return null;
-                } catch (UnknownKeyException ex) {
-                    return ex;
-                } finally {
-                    synchronized (lock) {
-                        lock.notify();
-                    }
-                }
-            }
-        } // class CreateKeyPrompt
-
-        submit(new CreateKeyPrompt());
-    }
-
-    @SuppressWarnings("WaitWhileNotSynced")
-    private void submit(Callable<UnknownKeyException> prompt)
-    throws UnknownKeyException {
-        for (Future<UnknownKeyException> task = executor.submit(prompt); !task.isDone();) {
-            try {
-                // Temporarily release the lock to allow for concurrent calls
-                // to setKey(*)!
-                lock.wait();
-                UnknownKeyException ex = task.get();
-                if (null != ex)
-                    throw ex;
-            } catch (ExecutionException ex) {
-                throw new UndeclaredThrowableException(ex);
-            } catch (InterruptedException interrupted) {
-                Logger  .getLogger(PromptingKeyProvider.class.getName())
-                        .log(Level.INFO, "Ignored: ", interrupted);
-            }
-        }
+        return getState().getCreateKey(this);
     }
 
     /**
@@ -277,32 +197,7 @@ extends SafeKeyProvider<K> {
     @Override
     protected final K getOpenKeyImpl(boolean invalid)
     throws UnknownKeyException {
-        synchronized (lock) {
-            return getState().getOpenKey(this, invalid);
-        }
-    }
-
-    @SuppressWarnings("WaitWhileNotSynced")
-    private void promptOpenKey(final boolean invalid)
-    throws UnknownKeyException {
-        class OpenKeyPrompt implements Callable<UnknownKeyException> {
-
-            @Override
-            public UnknownKeyException call() {
-                try {
-                    getUI().promptOpenKey(PromptingKeyProvider.this, invalid);
-                    return null;
-                } catch (UnknownKeyException ex) {
-                    return ex;
-                } finally {
-                    synchronized (lock) {
-                        lock.notifyAll();
-                    }
-                }
-            }
-        } // class OpenKeyPrompt
-
-        submit(new OpenKeyPrompt());
+        return getState().getOpenKey(this, invalid);
     }
 
     /**
@@ -327,9 +222,7 @@ extends SafeKeyProvider<K> {
      *         current state.
      */
     public void setKey(@CheckForNull K key) {
-        synchronized (lock) {
-            getState().setKey(this, key);
-        }
+        getState().setKey(this, key);
     }
 
     private void setKeyImpl(final @CheckForNull K newKey) {
@@ -371,9 +264,7 @@ extends SafeKeyProvider<K> {
      * if and only if prompting for a key has been cancelled.
      */
     public void resetCancelledKey() {
-        synchronized (lock) {
-            getState().resetCancelledKey(this);
-        }
+        getState().resetCancelledKey(this);
     }
 
     /**
@@ -381,9 +272,7 @@ extends SafeKeyProvider<K> {
      * unconditionally.
      */
     public void resetUnconditionally() {
-        synchronized (lock) {
-            reset();
-        }
+        reset();
     }
 
     private void reset() {
@@ -400,7 +289,7 @@ extends SafeKeyProvider<K> {
             throws UnknownKeyException {
                 State state;
                 try {
-                    provider.promptCreateKey();
+                    provider.getUI().promptCreateKey(provider);
                 } finally {
                     if ((state = provider.getState()) == this)
                         provider.setState(state = CANCELLED);
@@ -415,7 +304,7 @@ extends SafeKeyProvider<K> {
                 State state;
                 do {
                     try {
-                        provider.promptOpenKey(invalid);
+                        provider.getUI().promptOpenKey(provider, invalid);
                     } catch (KeyPromptingCancelledException ex) {
                         provider.setState(CANCELLED);
                         throw ex;
