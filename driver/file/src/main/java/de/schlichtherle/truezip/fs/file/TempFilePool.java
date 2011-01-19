@@ -16,6 +16,8 @@
 package de.schlichtherle.truezip.fs.file;
 
 import de.schlichtherle.truezip.socket.IOPool;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.File;
@@ -33,6 +35,7 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
+@DefaultAnnotation(NonNull.class)
 public final class TempFilePool implements IOPool<FileEntry> {
 
     /**
@@ -42,12 +45,12 @@ public final class TempFilePool implements IOPool<FileEntry> {
      */
     public static final TempFilePool INSTANCE = new TempFilePool("tzp", null, null);
 
-    private final @NonNull  String prefix;
+    private final           String prefix;
     private final @Nullable String suffix;
     private final @Nullable File   dir;
 
     /** Constructs a new temp file pool. */
-    public TempFilePool(final @NonNull  String prefix,
+    public TempFilePool(final           String prefix,
                         final @Nullable String suffix,
                         final @Nullable File dir) {
         if (null == prefix)
@@ -59,7 +62,7 @@ public final class TempFilePool implements IOPool<FileEntry> {
 
     @Override
     public Entry allocate() throws IOException {
-        return new Entry(this, File.createTempFile(prefix, suffix, dir));
+        return new Entry(File.createTempFile(prefix, suffix, dir), this);
     }
 
     @Override
@@ -69,15 +72,17 @@ public final class TempFilePool implements IOPool<FileEntry> {
 
     /** A temp file pool entry. */
     @NotThreadSafe
+    @DefaultAnnotation(NonNull.class)
     public static final class Entry
     extends FileEntry
     implements IOPool.Entry<FileEntry> {
 
-        private TempFilePool pool;
+        private @CheckForNull TempFilePool pool;
 
-        private Entry(TempFilePool pool, File file) {
+        private Entry(File file, final TempFilePool pool) {
             super(file);
             assert null != pool;
+            assert null != file;
             this.pool = pool;
         }
 
@@ -88,7 +93,8 @@ public final class TempFilePool implements IOPool<FileEntry> {
             pool(null);
         }
 
-        private TempFilePool pool(final TempFilePool newPool) throws IOException {
+        private TempFilePool pool(final @CheckForNull TempFilePool newPool)
+        throws IOException {
             final TempFilePool oldPool = pool;
             this.pool = newPool;
             if (oldPool != newPool) {

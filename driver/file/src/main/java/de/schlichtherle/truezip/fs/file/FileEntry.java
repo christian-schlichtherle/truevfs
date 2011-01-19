@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.file;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.socket.IOEntry;
@@ -25,6 +26,7 @@ import de.schlichtherle.truezip.entry.EntryName;
 import de.schlichtherle.truezip.fs.FsEntry;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Collections;
 import java.io.File;
 import java.util.HashSet;
@@ -41,26 +43,29 @@ import static de.schlichtherle.truezip.entry.Entry.Access.*;
  * @version $Id$
  */
 @Immutable
+@DefaultAnnotation(NonNull.class)
 public class FileEntry extends FsEntry implements IOEntry<FileEntry> {
 
     private static final BitField<FsOutputOption> NO_OUTPUT_OPTIONS
             = BitField.noneOf(FsOutputOption.class);
 
-    private final @NonNull File file;
-    private final @NonNull EntryName name;
+    private final File file;
+    private final EntryName name;
 
-    FileEntry(final @NonNull File file) {
+    FileEntry(final File file) {
+        assert null != file;
         this.file = file;
         this.name = EntryName.create(file.getName());
     }
 
-    FileEntry(final @NonNull File file, final @NonNull EntryName name) {
+    FileEntry(final File file, final EntryName name) {
+        assert null != file;
         this.file = new File(file, name.getPath());
         this.name = name;
     }
 
     /** Returns the decorated file. */
-    public final @NonNull File getFile() {
+    public final File getFile() {
         return file;
     }
 
@@ -97,7 +102,7 @@ public class FileEntry extends FsEntry implements IOEntry<FileEntry> {
 
     @Override
     @SuppressWarnings("ManualArrayToCollectionCopy")
-    public final Set<String> getMembers() {
+    public final @Nullable Set<String> getMembers() {
         final String[] list = file.list();
         if (null == list)
             return null;
@@ -119,7 +124,7 @@ public class FileEntry extends FsEntry implements IOEntry<FileEntry> {
     }
 
     public final OutputSocket<FileEntry> getOutputSocket(
-            @NonNull BitField<FsOutputOption> options,
+            BitField<FsOutputOption> options,
             @CheckForNull Entry template) {
         return new FileOutputSocket(this, options, template);
     }
