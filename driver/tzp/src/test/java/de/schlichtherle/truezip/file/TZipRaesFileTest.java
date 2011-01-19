@@ -104,12 +104,12 @@ public final class TZipRaesFileTest extends TFileTestCase {
         assertTrue(inner.mkdir());
 
         TFile.umount();
-
         cancelling = true;
         assertTrue(archive.exists());
         assertFalse(archive.isDirectory());
         assertFalse(archive.isFile());
 
+        TFile.umount();
         cancelling = false;
         assertTrue(archive.exists());
         assertTrue(archive.isDirectory());
@@ -120,8 +120,10 @@ public final class TZipRaesFileTest extends TFileTestCase {
         assertFalse(inner.isDirectory());
         assertFalse(inner.isFile());
 
+        TFile.umount();
         assertFalse(archive.deleteAll());
 
+        TFile.umount();
         cancelling = false;
         assertTrue(archive.deleteAll());
     }

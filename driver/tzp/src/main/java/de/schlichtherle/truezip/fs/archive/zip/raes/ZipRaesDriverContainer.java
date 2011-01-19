@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip.raes;
 
-import de.schlichtherle.truezip.crypto.raes.param.swing.SwingKeyManagerService;
 import de.schlichtherle.truezip.util.SuffixSet;
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsDriverService;
@@ -40,7 +39,7 @@ public final class ZipRaesDriverContainer implements FsDriverService {
     static {
         final FsDriver driver = new SafeZipRaesDriver(
                 IOPoolContainer.SINGLETON.getPool(),
-                new SwingKeyManagerService());
+                new PromptingKeyManagerContainer());
         final Map<FsScheme, FsDriver> drivers = new HashMap<FsScheme, FsDriver>();
         for (String suffix : new SuffixSet("tzp|zip.rae|zip.raes"))
             drivers.put(FsScheme.create(suffix), driver);

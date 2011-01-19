@@ -44,7 +44,7 @@ extends SafeKeyManager<K, PromptingKeyProvider<K>> {
 
     /**
      * The user interface classes or instances.
-     * Values may be instances of {@link PromptingKeyProviderUI} or
+     * Values may be instances of {@link PromptingKeyProvider.UI} or
      * {@link Class}.
      */
     private final PromptingKeyProvider.UI<? extends K> ui;

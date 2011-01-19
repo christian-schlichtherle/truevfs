@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.crypto.raes;
 
 import java.security.SecureRandom;
-import de.schlichtherle.truezip.crypto.mode.SICSeekableBlockCipher;
+import de.schlichtherle.truezip.crypto.SICSeekableBlockCipher;
 import de.schlichtherle.truezip.io.LEDataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;

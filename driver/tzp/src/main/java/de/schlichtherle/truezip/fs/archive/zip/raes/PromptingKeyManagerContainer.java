@@ -13,26 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.crypto.raes.param.swing;
+package de.schlichtherle.truezip.fs.archive.zip.raes;
 
 import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
 import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.key.KeyManagerService;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
+import java.awt.GraphicsEnvironment;
 import java.util.ServiceConfigurationError;
 
 /**
- * A service for a swing based key manager implementation for
+ * A container for a prompting key manager implementation for
  * {@link AesCipherParameters}.
+ * If this JVM is running {@link GraphicsEnvironment#isHeadless() headless},
+ * then its UI is an instance of
+ * {@link de.schlichtherle.truezip.crypto.raes.param.console.AesCipherParametersUI}.
+ * Otherwise, it's an instance of
+ * {@link de.schlichtherle.truezip.crypto.raes.param.swing.AesCipherParametersUI}.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class SwingKeyManagerService implements KeyManagerService {
+public class PromptingKeyManagerContainer implements KeyManagerService {
 
     private static final PromptingKeyManager<AesCipherParameters>
             manager = new PromptingKeyManager<AesCipherParameters>(
-                new AesCipherParametersUI());
+                GraphicsEnvironment.isHeadless()
+                    ? new de.schlichtherle.truezip.crypto.raes.param.console.AesCipherParametersUI()
+                    : new de.schlichtherle.truezip.crypto.raes.param.swing.AesCipherParametersUI());
 
     @Override
     @SuppressWarnings("unchecked")
