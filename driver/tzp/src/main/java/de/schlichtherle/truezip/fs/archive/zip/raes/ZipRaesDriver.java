@@ -250,8 +250,8 @@ public abstract class ZipRaesDriver extends JarDriver {
 
             @Override
             public OutputStream newOutputStream() throws IOException {
-                final OutputStream out
-                        = new LazyOutputSocket<Entry>(getBoundSocket())
+                final OutputStream
+                        out = new LazyOutputSocket<Entry>(getBoundSocket())
                             .newOutputStream();
                 try {
                     try {

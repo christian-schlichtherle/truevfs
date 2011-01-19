@@ -142,22 +142,17 @@ implements PromptingKeyProvider.UI<AesCipherParameters> {
     }
 
     @Override
-    public boolean promptOpenKey(
+    public void promptOpenKey(
             final PromptingKeyProvider<? super AesCipherParameters> provider,
             final boolean invalid)
     throws UnknownKeyException {
-        final BooleanRunnable task = new BooleanRunnable() {
+        final Runnable task = new Runnable() {
             @Override
             public void run() {
-                result = promptOpenKeyEDT(provider, invalid);
+                promptOpenKeyEDT(provider, invalid);
             }
         };
         multiplexOnEDT(task); // synchronized on class instance!
-        return task.result;
-    }
-
-    private abstract static class BooleanRunnable implements Runnable {
-        public boolean result;
     }
 
     /**
@@ -222,7 +217,7 @@ implements PromptingKeyProvider.UI<AesCipherParameters> {
      * This method is only called by the AWT Event Dispatch Thread,
      * so it doesn't need to be thread safe.
      */
-    private boolean promptOpenKeyEDT(
+    private void promptOpenKeyEDT(
             final PromptingKeyProvider<? super AesCipherParameters> provider,
             final boolean invalid) {
         assert EventQueue.isDispatchThread();
@@ -284,6 +279,7 @@ implements PromptingKeyProvider.UI<AesCipherParameters> {
 
                 if (openKeyPanel.updateOpenKey(param)) { // valid input?
                     provider.setKey(param);
+                    provider.setChangeKeySelected(openKeyPanel.isChangeKeySelected());
                     break;
                 }
 
@@ -295,8 +291,6 @@ implements PromptingKeyProvider.UI<AesCipherParameters> {
             // JOptionPane on repeat.
             eventuallyDispose(parent);
         }
-
-        return openKeyPanel.isKeyChangeRequested();
     }
 
     /**

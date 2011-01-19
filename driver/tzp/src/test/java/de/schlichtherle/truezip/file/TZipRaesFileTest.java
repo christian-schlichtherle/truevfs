@@ -23,13 +23,11 @@ import de.schlichtherle.truezip.key.KeyManagerService;
 import java.io.File;
 import de.schlichtherle.truezip.fs.archive.zip.raes.SafeZipRaesDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
-import de.schlichtherle.truezip.fs.archive.ArchiveDriver;
 import de.schlichtherle.truezip.fs.archive.zip.raes.ZipRaesDriver.KeyProviderSyncStrategy;
 import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.key.KeyPromptingCancelledException;
 import de.schlichtherle.truezip.key.UnknownKeyException;
 import java.io.IOException;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -157,12 +155,11 @@ public final class TZipRaesFileTest extends TFileTestCase {
         }
 
         @Override
-        public boolean promptOpenKey(
+        public void promptOpenKey(
                 PromptingKeyProvider<? super AesCipherParameters> provider,
                 boolean invalid)
         throws UnknownKeyException {
             promptCreateKey(provider);
-            return false;
         }
     } // class UI
 }
