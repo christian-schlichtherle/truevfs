@@ -235,8 +235,8 @@ extends SafeKeyProvider<K> {
 
     /**
      * Returns whether or not the user shall get prompted for a new key upon
-     * the next call to {@link #getCreateKey()}, provided that the key has been
-     * {@link #setKey set} before.
+     * the next call to {@link #getCreateKey()}, provided that the key
+     * has been {@link #setKey set} before.
      *
      * @return Whether or not the user shall get prompted for a new key upon
      *         the next call to {@link #getCreateKey()}, provided that the key
