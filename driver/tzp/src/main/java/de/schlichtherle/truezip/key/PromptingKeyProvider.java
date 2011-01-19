@@ -15,10 +15,19 @@
  */
 package de.schlichtherle.truezip.key;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URI;
+import java.util.concurrent.Future;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.jcip.annotations.ThreadSafe;
 
 import static de.schlichtherle.truezip.key.PromptingKeyProvider.State.*;
@@ -109,17 +118,27 @@ extends SafeKeyProvider<K> {
          * @param  provider The key provider to store the result in.
          * @param  invalid {@code true} iff a previous call to this method
          *         resulted in an invalid key.
-         * @return {@code true} if the user has requested to change the
-         *         provided key subsequently.
          * @throws KeyPromptingCancelledException if key prompting has been
          *         cancelled by the user.
          * @throws UnknownKeyException if key prompting fails for any other
          *         reason.
          */
-        boolean promptOpenKey(  PromptingKeyProvider<? super K> provider,
-                                boolean invalid)
+        void promptOpenKey( PromptingKeyProvider<? super K> provider,
+                            boolean invalid)
         throws UnknownKeyException;
     } // interface UI
+
+    private static final ExecutorService executor
+            = Executors.newCachedThreadPool(new KeyPromptThreadFactory());
+
+    private static class KeyPromptThreadFactory implements ThreadFactory {
+        @Override
+        public Thread newThread(Runnable r) {
+            Thread t = new Thread(r, "TrueZIP Key Prompt");
+            t.setDaemon(true);
+            return t;
+        }
+    }
 
     private static class PromptingLock { }
 
@@ -147,6 +166,8 @@ extends SafeKeyProvider<K> {
     private volatile @NonNull State state = RESET;
 
     private volatile K key;
+
+    private volatile boolean changeKeySelected;
 
     /**
      * Returns the unique resource identifier (resource ID) of the protected
@@ -201,6 +222,48 @@ extends SafeKeyProvider<K> {
         }
     }
 
+    private void promptCreateKey()
+    throws UnknownKeyException {
+        class CreateKeyPrompt implements Callable<UnknownKeyException> {
+
+            @Override
+            public UnknownKeyException call() {
+                try {
+                    getUI().promptCreateKey(PromptingKeyProvider.this);
+                    return null;
+                } catch (UnknownKeyException ex) {
+                    return ex;
+                } finally {
+                    synchronized (lock) {
+                        lock.notify();
+                    }
+                }
+            }
+        } // class CreateKeyPrompt
+
+        submit(new CreateKeyPrompt());
+    }
+
+    @SuppressWarnings("WaitWhileNotSynced")
+    private void submit(Callable<UnknownKeyException> prompt)
+    throws UnknownKeyException {
+        for (Future<UnknownKeyException> task = executor.submit(prompt); !task.isDone();) {
+            try {
+                // Temporarily release the lock to allow for concurrent calls
+                // to setKey(*)!
+                lock.wait();
+                UnknownKeyException ex = task.get();
+                if (null != ex)
+                    throw ex;
+            } catch (ExecutionException ex) {
+                throw new UndeclaredThrowableException(ex);
+            } catch (InterruptedException interrupted) {
+                Logger  .getLogger(PromptingKeyProvider.class.getName())
+                        .log(Level.INFO, "Ignored: ", interrupted);
+            }
+        }
+    }
+
     /**
      * Returns the key which should be used to open an existing protected
      * resource in order to access its contents.
@@ -219,6 +282,29 @@ extends SafeKeyProvider<K> {
         }
     }
 
+    @SuppressWarnings("WaitWhileNotSynced")
+    private void promptOpenKey(final boolean invalid)
+    throws UnknownKeyException {
+        class OpenKeyPrompt implements Callable<UnknownKeyException> {
+
+            @Override
+            public UnknownKeyException call() {
+                try {
+                    getUI().promptOpenKey(PromptingKeyProvider.this, invalid);
+                    return null;
+                } catch (UnknownKeyException ex) {
+                    return ex;
+                } finally {
+                    synchronized (lock) {
+                        lock.notifyAll();
+                    }
+                }
+            }
+        } // class OpenKeyPrompt
+
+        submit(new OpenKeyPrompt());
+    }
+
     /**
      * Returns the {@code key} property maintained by this key provider.
      * Client applications should not call this method directly
@@ -227,7 +313,7 @@ extends SafeKeyProvider<K> {
      *
      * @return The nullable {@code key} property.
      */
-    public K getKey() {
+    K getKey() {
         return clone(key);
     }
 
@@ -240,7 +326,7 @@ extends SafeKeyProvider<K> {
      * @throws IllegalStateException if setting the key is not legal in the
      *         current state.
      */
-    public void setKey(final @CheckForNull K key) {
+    public void setKey(@CheckForNull K key) {
         synchronized (lock) {
             getState().setKey(this, key);
         }
@@ -252,6 +338,32 @@ extends SafeKeyProvider<K> {
         this.key = clone(newKey);
         reset(oldKey);
         reset(newKey);
+    }
+
+    /**
+     * Returns whether or not the user shall get prompted for a new key upon
+     * the next call to {@link #getCreateKey()}, provided that the key has been
+     * {@link #setKey set} before.
+     *
+     * @return Whether or not the user shall get prompted for a new key upon
+     *         the next call to {@link #getCreateKey()}, provided that the key
+     *         has been {@link #setKey set} before.
+     */
+    boolean isChangeKeySelected() {
+        return changeKeySelected;
+    }
+
+    /**
+     * Requests to prompt the user for a new key upon the next call to
+     * {@link #getCreateKey()}, provided that the key has been
+     * {@link #setKey set} before.
+     *
+     * @param changeKeySelected whether or not the user shall get prompted for
+     *        a new key upon the next call to {@link #getCreateKey()}, provided
+     *        that the key has been {@link #setKey set} before.
+     */
+    public void setChangeKeySelected(final boolean changeKeySelected) {
+        this.changeKeySelected = changeKeySelected;
     }
 
     /**
@@ -288,7 +400,7 @@ extends SafeKeyProvider<K> {
             throws UnknownKeyException {
                 State state;
                 try {
-                    provider.getUI().promptCreateKey(provider);
+                    provider.promptCreateKey();
                 } finally {
                     if ((state = provider.getState()) == this)
                         provider.setState(state = CANCELLED);
@@ -303,7 +415,7 @@ extends SafeKeyProvider<K> {
                 State state;
                 do {
                     try {
-                        provider.getUI().promptOpenKey(provider, invalid);
+                        provider.promptOpenKey(invalid);
                     } catch (KeyPromptingCancelledException ex) {
                         provider.setState(CANCELLED);
                         throw ex;
@@ -331,48 +443,30 @@ extends SafeKeyProvider<K> {
             <K extends SafeKey<K>> K
             getCreateKey(PromptingKeyProvider<K> provider)
             throws UnknownKeyException {
-                return provider.getKey();
+                if (provider.isChangeKeySelected()) {
+                    provider.setChangeKeySelected(false);
+                    return RESET.getCreateKey(provider); // DON'T change state!
+                } else {
+                    return provider.getKey();
+                }
             }
 
             @Override
             <K extends SafeKey<K>> K
             getOpenKey(PromptingKeyProvider<K> provider, boolean invalid)
             throws UnknownKeyException {
-                return invalid  ? RESET.getOpenKey(provider, true)
-                                : provider.getKey();
+                if (invalid) {
+                    provider.setState(RESET);
+                    return RESET.getOpenKey(provider, true);
+                } else {
+                    return provider.getKey();
+                }
             }
 
             @Override
             <K extends SafeKey<K>> void
             setKey(PromptingKeyProvider<K> provider, K key) {
-                throw new IllegalStateException();
-            }
-
-            @Override
-            <K extends SafeKey<K>> void
-            resetCancelledKey(PromptingKeyProvider<K> provider) {
-            }
-        },
-
-        CHANGE_REQUESTED {
-            @Override
-            <K extends SafeKey<K>> K
-            getCreateKey(PromptingKeyProvider<K> provider)
-            throws UnknownKeyException {
-                return RESET.getCreateKey(provider);
-            }
-
-            @Override
-            <K extends SafeKey<K>> K
-            getOpenKey(PromptingKeyProvider<K> provider, boolean invalid)
-            throws UnknownKeyException {
-                return PROVIDED.getOpenKey(provider, invalid);
-            }
-
-            @Override
-            <K extends SafeKey<K>> void
-            setKey(PromptingKeyProvider<K> provider, K key) {
-                RESET.setKey(provider, key);
+                throw new IllegalStateException(toString());
             }
 
             @Override
@@ -399,7 +493,7 @@ extends SafeKeyProvider<K> {
             @Override
             <K extends SafeKey<K>> void
             setKey(PromptingKeyProvider<K> provider, K key) {
-                throw new IllegalStateException();
+                throw new IllegalStateException(toString());
             }
 
             @Override

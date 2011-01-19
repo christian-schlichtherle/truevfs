@@ -60,6 +60,9 @@ implements PromptingKeyProvider.UI<AesCipherParameters> {
      * Initialized to the empty string.
      */
     private static URI lastResource = URI.create(""); // NOI18N
+    
+    private static final String YES = resources.getString("yes");
+    private static final String NO = resources.getString("no");
 
     @Override
     public final void promptCreateKey(
@@ -132,7 +135,7 @@ implements PromptingKeyProvider.UI<AesCipherParameters> {
     }
 
     @Override
-    public boolean promptOpenKey(
+    public void promptOpenKey(
             final PromptingKeyProvider<? super AesCipherParameters> provider,
             final boolean invalid) {
         synchronized (lock) {
@@ -145,26 +148,24 @@ implements PromptingKeyProvider.UI<AesCipherParameters> {
                 con.printf(resources.getString("openKey.banner"), resource);
             lastResource = resource;
 
-            final AesCipherParameters param = new AesCipherParameters();
-
-            char[] passwd = con.readPassword(resources.getString("openKey.passwd"));
+            final char[] passwd = con.readPassword(resources.getString("openKey.passwd"));
             if (null == passwd || passwd.length <= 0) {
-                param.setPassword(null);
-                return false;
+                provider.setKey(null);
+                return;
             }
 
+            final AesCipherParameters param = new AesCipherParameters();
             param.setPassword(passwd);
             provider.setKey(param);
 
             while (true) {
                 String changeKey = con.readLine(resources.getString("openKey.change"));
-                if (changeKey == null)
-                    return false;
-                changeKey = changeKey.toLowerCase();
-                if (changeKey.length() <= 0 || changeKey.equals(resources.getString("no")))
-                    return false;
-                else if (changeKey.equals(resources.getString("yes")))
-                    return true;
+                provider.setChangeKeySelected(YES.equalsIgnoreCase(changeKey));
+                if (       null == changeKey
+                        || changeKey.length() <= 0
+                        || YES.equalsIgnoreCase(changeKey)
+                        || NO.equalsIgnoreCase(changeKey))
+                    return;
             }
         }
     }

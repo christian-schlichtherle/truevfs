@@ -174,21 +174,21 @@ final class OpenKeyPanel extends EnhancedPanel {
     }
 
     /**
-     * Getter for property changeKeyRequested.
+     * Getter for property changeKeySelected.
      *
-     * @return Value of property changeKeyRequested.
+     * @return Value of property changeKeySelected.
      */
-    boolean isKeyChangeRequested() {
+    boolean isChangeKeySelected() {
         return changeKey.isSelected();
     }
 
     /**
-     * Setter for property changeKeyRequested.
+     * Setter for property changeKeySelected.
      * 
-     * @param changeKeyRequested New value of property changeKeyRequested.
+     * @param changeKeySelected New value of property changeKeySelected.
      */
-    void setKeyChangeRequested(final boolean changeKeyRequested) {
-        this.changeKey.setSelected(changeKeyRequested);
+    void setChangeKeySelected(boolean changeKeySelected) {
+        this.changeKey.setSelected(changeKeySelected);
     }
     
     /**

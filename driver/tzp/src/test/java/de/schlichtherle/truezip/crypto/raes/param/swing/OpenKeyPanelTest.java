@@ -179,22 +179,22 @@ public final class OpenKeyPanelTest {
 
     @Test
     public void testKeyChangeRequested() {
-        assertFalse(instance.isKeyChangeRequested());
+        assertFalse(instance.isChangeKeySelected());
         assertFalse(new JCheckBoxOperator(frame).isSelected());
 
-        instance.setKeyChangeRequested(true);
-        assertTrue(instance.isKeyChangeRequested());
+        instance.setChangeKeySelected(true);
+        assertTrue(instance.isChangeKeySelected());
         assertTrue(new JCheckBoxOperator(frame).isSelected());
 
-        instance.setKeyChangeRequested(false);
-        assertFalse(instance.isKeyChangeRequested());
+        instance.setChangeKeySelected(false);
+        assertFalse(instance.isChangeKeySelected());
         assertFalse(new JCheckBoxOperator(frame).isSelected());
 
         new JCheckBoxOperator(frame).setSelected(true);
-        assertTrue(instance.isKeyChangeRequested());
+        assertTrue(instance.isChangeKeySelected());
 
         new JCheckBoxOperator(frame).setSelected(false);
-        assertFalse(instance.isKeyChangeRequested());
+        assertFalse(instance.isChangeKeySelected());
     }
 
     @Test
