@@ -43,16 +43,32 @@
         The TZP file format is a custom JAR file format which is transparently
         wrapped in an AES-256/CTR/SHA-256 envelope for safe encryption.
     </description>
-    <url>http://kenai.com/projects/truezip</url>
+    <url>http://java.net/projects/truezip</url>
     <inceptionYear>2005</inceptionYear>
     <issueManagement>
         <system>JIRA</system>
-        <url>http://kenai.com/jira/browse/TRUEZIP</url>
+        <url>http://java.net/jira/browse/TRUEZIP</url>
     </issueManagement>
+    <mailingLists>
+        <mailingList>
+            <name>Announcements Mailing List</name>
+            <subscribe>announce-subscribe@truezip.java.net</subscribe>
+            <post>announce@truezip.java.net</post>
+            <unsubscribe>announce-unsubscribe@truezip.java.net</unsubscribe>
+            <archive>http://java.net/projects/truezip/lists</archive>
+        </mailingList>
+        <mailingList>
+            <name>Users Mailing List</name>
+            <subscribe>users-subscribe@truezip.java.net</subscribe>
+            <post>users@truezip.java.net</post>
+            <unsubscribe>users-unsubscribe@truezip.java.net</unsubscribe>
+            <archive>http://java.net/projects/truezip/lists</archive>
+        </mailingList>
+    </mailingLists>
     <scm>
-        <connection>scm:hg:https://hg.kenai.com/hg/truezip~v7</connection>
-        <developerConnection>scm:hg:ssh://hg.kenai.com/truezip~v7</developerConnection>
-        <url>http://kenai.com/projects/truezip/sources/v7/show</url>
+        <connection>scm:hg:https://hg.java.net/hg/truezip~v7</connection>
+        <developerConnection>scm:hg:ssh://hg.java.net/truezip~v7</developerConnection>
+        <url>http://java.net/projects/truezip/sources/v7/show</url>
     </scm>
 
     <modules>
