@@ -26,6 +26,6 @@ import de.schlichtherle.truezip.socket.ByteArrayIOPool;
 public final class TTarGZipFileTest extends TFileTestCase {
 
     public TTarGZipFileTest() {
-        super(FsScheme.create("tar.gz"), new TarGZipDriver(POOL));
+        super(FsScheme.create("tar.gz"), new TarGZipDriver(POOL_SERVICE));
     }
 }

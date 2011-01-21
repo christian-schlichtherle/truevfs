@@ -22,6 +22,7 @@ import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.fs.archive.MultiplexedArchiveOutputShop;
 import de.schlichtherle.truezip.socket.IOPool;
+import de.schlichtherle.truezip.socket.IOPoolService;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.socket.InputSocket;
@@ -55,11 +56,9 @@ public class TarDriver extends CharsetArchiveDriver<TarArchiveEntry> {
 
     private final IOPool<?> pool;
 
-    public TarDriver(final IOPool<?> pool) {
+    public TarDriver(final IOPoolService service) {
         super(TAR_CHARSET);
-        if (null == pool)
-            throw new NullPointerException();
-        this.pool = pool;
+        this.pool = service.getPool();
     }
 
     @Override

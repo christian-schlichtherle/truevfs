@@ -15,19 +15,20 @@
  */
 package de.schlichtherle.truezip.fs.http;
 
-import de.schlichtherle.truezip.fs.FsCachingController;
-import de.schlichtherle.truezip.fs.FsConcurrentController;
-import de.schlichtherle.truezip.fs.FsConcurrentModel;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsDriver;
+import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.socket.IOPool;
+import de.schlichtherle.truezip.socket.IOPoolService;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.Immutable;
 
 /**
+ * A file system driver for the HTTP(S) schemes.
+ * 
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -37,10 +38,12 @@ final class HttpDriver implements FsDriver {
 
     private final IOPool<?> pool;
 
-    public HttpDriver(final IOPool<?> pool) {
-        if (null == pool)
-            throw new NullPointerException();
-        this.pool = pool;
+    HttpDriver(final IOPoolService service) {
+        this.pool = service.getPool();
+    }
+
+    IOPool<?> getPool() {
+        return pool;
     }
 
     /**
@@ -62,12 +65,6 @@ final class HttpDriver implements FsDriver {
                 : mountPoint.getParent().equals(parent.getModel().getMountPoint());
         if (null != parent)
             throw new IllegalArgumentException();
-        // Using FsCachingController allows to serve ReadOnlyFile objects
-        // although the HttpController serves only InputStream objects.
-        return  new FsConcurrentController(
-                   new FsCachingController(
-                        new HttpController<FsConcurrentModel>(
-                            new FsConcurrentModel(mountPoint)),
-                        pool));
+        return new HttpController(this, new FsModel(mountPoint));
     }
 }

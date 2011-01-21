@@ -26,6 +26,6 @@ import de.schlichtherle.truezip.socket.ByteArrayIOPool;
 public class TOdfFileTest extends TFileTestCase {
     
     public TOdfFileTest() {
-        super(FsScheme.create("odf"), new OdfDriver(POOL));
+        super(FsScheme.create("odf"), new OdfDriver(POOL_SERVICE));
     }
 }

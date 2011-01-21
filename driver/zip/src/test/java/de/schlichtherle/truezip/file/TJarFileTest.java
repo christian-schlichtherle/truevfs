@@ -26,6 +26,6 @@ import de.schlichtherle.truezip.socket.ByteArrayIOPool;
 public final class TJarFileTest extends TFileTestCase {
     
     public TJarFileTest() {
-        super(FsScheme.create("jar"), new JarDriver(POOL));
+        super(FsScheme.create("jar"), new JarDriver(POOL_SERVICE));
     }
 }

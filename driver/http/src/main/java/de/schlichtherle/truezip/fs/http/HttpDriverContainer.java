@@ -18,7 +18,9 @@ package de.schlichtherle.truezip.fs.http;
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsDriverService;
 import de.schlichtherle.truezip.fs.FsScheme;
+import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.IOPoolContainer;
+import de.schlichtherle.truezip.socket.IOPoolService;
 import de.schlichtherle.truezip.util.SuffixSet;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -28,7 +30,7 @@ import java.util.Map;
 import net.jcip.annotations.Immutable;
 
 /**
- * An immutable container of a driver for the {@code http(s)} schemes.
+ * An immutable container of a driver for the HTTP(S) schemes.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -42,8 +44,7 @@ public final class HttpDriverContainer implements FsDriverService {
     static {
         final Map<FsScheme, HttpDriver>
                 drivers = new HashMap<FsScheme, HttpDriver>();
-        final HttpDriver
-                driver = new HttpDriver(IOPoolContainer.SINGLETON.getPool());
+        final HttpDriver driver = new HttpDriver(IOPoolContainer.SINGLETON);
         for (String scheme : new SuffixSet("http|https"))
             drivers.put(FsScheme.create(scheme), driver);
         DRIVERS = Collections.unmodifiableMap(drivers);

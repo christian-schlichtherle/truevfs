@@ -31,7 +31,7 @@ public interface IOPoolService {
      * Returns an I/O pool.
      * <p>
      * Calling this method multiple times may return different I/O pools,
-     * so callers should cache the result for subsequent use.
+     * so callers might need to cache the result for subsequent use.
      *
      * @return An I/O pool.
      */

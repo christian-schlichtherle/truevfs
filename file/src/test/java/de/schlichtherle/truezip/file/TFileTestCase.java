@@ -27,6 +27,7 @@ import de.schlichtherle.truezip.fs.archive.ArchiveDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.socket.ByteArrayIOPool;
 import de.schlichtherle.truezip.socket.IOPool;
+import de.schlichtherle.truezip.socket.IOPoolService;
 import de.schlichtherle.truezip.socket.OutputClosedException;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.ByteArrayInputStream;
@@ -57,7 +58,14 @@ import static org.junit.Assert.*;
  */
 public abstract class TFileTestCase {
 
-    protected static final IOPool<?> POOL = new ByteArrayIOPool(2048);
+    private static class ByteArrayIOPoolService implements IOPoolService {
+        @Override
+        public IOPool<?> getPool() {
+            return new ByteArrayIOPool(2048);
+        }
+    }
+    protected static final IOPoolService
+            POOL_SERVICE = new ByteArrayIOPoolService();
 
     private static final Logger logger = Logger.getLogger(
             TFileTestCase.class.getName());

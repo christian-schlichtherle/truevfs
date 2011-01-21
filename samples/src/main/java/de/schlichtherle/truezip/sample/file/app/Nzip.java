@@ -26,8 +26,8 @@ import de.schlichtherle.truezip.fs.archive.zip.CheckedJarDriver;
 import de.schlichtherle.truezip.fs.archive.zip.CheckedReadOnlySfxDriver;
 import de.schlichtherle.truezip.fs.archive.zip.CheckedZipDriver;
 import de.schlichtherle.truezip.socket.IOPoolContainer;
-import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.file.swing.TFileTree;
+import de.schlichtherle.truezip.socket.IOPoolService;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
@@ -74,7 +74,7 @@ public class Nzip extends CommandLineUtility {
     private static final String CLASS_NAME = Nzip.class.getName();
     private static final ResourceBundle resources
             = ResourceBundle.getBundle(CLASS_NAME);
-    private static final IOPool<?> POOL = IOPoolContainer.SINGLETON.getPool();
+    private static final IOPoolService POOL_SERVICE = IOPoolContainer.SINGLETON;
 
     private final NumberFormat numberFormat = NumberFormat.getNumberInstance();
     private final DateFormat dateFormat = DateFormat.getDateTimeInstance();
@@ -99,9 +99,9 @@ public class Nzip extends CommandLineUtility {
     protected TArchiveDetector newArchiveDetector() {
         return new TDefaultArchiveDetector(TDefaultArchiveDetector.ALL,
             new Object[] {
-                "ear|jar|war", new CheckedJarDriver(POOL),  // check CRC-32
-                "zip", new CheckedZipDriver(POOL),          // check CRC-32
-                "exe", new CheckedReadOnlySfxDriver(POOL),  // check CRC-32
+                "ear|jar|war", new CheckedJarDriver(POOL_SERVICE),  // check CRC-32
+                "zip", new CheckedZipDriver(POOL_SERVICE),          // check CRC-32
+                "exe", new CheckedReadOnlySfxDriver(POOL_SERVICE),  // check CRC-32
             });
     }
 
@@ -110,31 +110,31 @@ public class Nzip extends CommandLineUtility {
         assert null != charset;
         return new TDefaultArchiveDetector(TDefaultArchiveDetector.ALL,
                 new Object[] {
-                    "ear|jar|war|zip", new CheckedZipDriver(POOL) { // check CRC-32
+                    "ear|jar|war|zip", new CheckedZipDriver(POOL_SERVICE) { // check CRC-32
                         @Override
                         public Charset getCharset() {
                             return charset;
                         }
                     },
-                    "exe", new CheckedReadOnlySfxDriver(POOL) { // check CRC-32
+                    "exe", new CheckedReadOnlySfxDriver(POOL_SERVICE) { // check CRC-32
                         @Override
                         public Charset getCharset() {
                             return charset;
                         }
                     },
-                    "tar", new TarDriver(POOL){
+                    "tar", new TarDriver(POOL_SERVICE){
                         @Override
                         public Charset getCharset() {
                             return charset;
                         }
                     },
-                    "tgz|tar.gz", new TarGZipDriver(POOL) {
+                    "tgz|tar.gz", new TarGZipDriver(POOL_SERVICE) {
                         @Override
                         public Charset getCharset() {
                             return charset;
                         }
                     },
-                    "tbz|tar.bz2", new TarBZip2Driver(POOL){
+                    "tbz|tar.bz2", new TarBZip2Driver(POOL_SERVICE){
                         @Override
                         public Charset getCharset() {
                             return charset;
