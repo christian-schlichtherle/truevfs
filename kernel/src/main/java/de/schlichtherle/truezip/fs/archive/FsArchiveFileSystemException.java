@@ -19,28 +19,28 @@ import java.io.IOException;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * Thrown to indicate an exceptional condition in an {@link ArchiveFileSystem}.
+ * Thrown to indicate an exceptional condition in an {@link FsArchiveFileSystem}.
  */
 @ThreadSafe
-public class ArchiveFileSystemException extends IOException {
+public class FsArchiveFileSystemException extends IOException {
 
     private static final long serialVersionUID = 4652084652223428651L;
 
     /** The entry's path name. */
     private final String path;
 
-    ArchiveFileSystemException(String path, String message) {
+    FsArchiveFileSystemException(String path, String message) {
         super(message);
         this.path = path;
     }
 
-    ArchiveFileSystemException(String path, IOException cause) {
+    FsArchiveFileSystemException(String path, IOException cause) {
         super(cause != null ? cause.toString() : null);
         this.path = path;
         super.initCause(cause);
     }
 
-    ArchiveFileSystemException(String path, String message, IOException cause) {
+    FsArchiveFileSystemException(String path, String message, IOException cause) {
         super(message);
         this.path = path;
         super.initCause(cause);

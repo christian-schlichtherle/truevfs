@@ -13,27 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package de.schlichtherle.truezip.fs;
 
-package de.schlichtherle.truezip.io;
-
+import de.schlichtherle.truezip.fs.FsException;
+import de.schlichtherle.truezip.fs.FsModel;
 import java.io.FileNotFoundException;
 
 /**
- * Indicates that a file is temporarily not accessible, e.g. if a key for
- * decryption is currently not available.
+ * Indicates that a file system is temporarily not accessible,
+ * e.g. if a key for decryption is currently not available.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-@SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
-public final class TabuFileException extends FileNotFoundException {
+public final class FsTabuException extends FsException {
+
+    private static final long serialVersionUID = 7623046187612846354L;
 
     /**
      * Constructs a tabu file exception.
      *
      * @param cause The nullable temporary cause of this exception.
      */
-    public TabuFileException(Throwable cause) {
-        super.initCause(cause);
+    public FsTabuException(FsModel model, Throwable cause) {
+        super(model, cause);
     }
 }

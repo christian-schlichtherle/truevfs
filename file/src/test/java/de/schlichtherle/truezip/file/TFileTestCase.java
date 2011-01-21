@@ -23,7 +23,7 @@ import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.io.FileBusyException;
-import de.schlichtherle.truezip.fs.archive.ArchiveDriver;
+import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.socket.ByteArrayIOPool;
 import de.schlichtherle.truezip.socket.IOPool;
@@ -50,7 +50,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- * Performs an integration test of a particular ArchiveDriver by using the
+ * Performs an integration test of a particular FsArchiveDriver by using the
  * TFile* API.
  *
  * @author Christian Schlichtherle
@@ -85,14 +85,14 @@ public abstract class TFileTestCase {
     }
     
     private final FsScheme scheme;
-    private final ArchiveDriver<?> driver;
+    private final FsArchiveDriver<?> driver;
 
     private File temp;
     private TFile archive;
     private byte[] data;
 
     protected TFileTestCase(final @NonNull FsScheme scheme,
-                            final @NonNull ArchiveDriver<?> driver) {
+                            final @NonNull FsArchiveDriver<?> driver) {
         if (null == scheme || null == driver)
             throw new NullPointerException();
         this.scheme = scheme;

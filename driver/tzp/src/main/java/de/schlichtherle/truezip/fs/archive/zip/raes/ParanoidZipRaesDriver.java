@@ -22,12 +22,11 @@ import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.crypto.raes.RaesKeyException;
 import de.schlichtherle.truezip.crypto.raes.RaesOutputStream;
 import de.schlichtherle.truezip.socket.OutputShop;
-import de.schlichtherle.truezip.io.TabuFileException;
+import de.schlichtherle.truezip.fs.FsTabuException;
 import de.schlichtherle.truezip.fs.archive.zip.ZipInputShop;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.fs.archive.zip.ZipDriver;
 import de.schlichtherle.truezip.key.KeyManagerService;
-import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.IOPoolService;
 import de.schlichtherle.truezip.socket.LazyOutputSocket;
 import java.io.IOException;
@@ -88,7 +87,7 @@ public class ParanoidZipRaesDriver extends ZipRaesDriver {
                 ros = RaesOutputStream.getInstance(
                         out, getRaesParameters(model));
             } catch (RaesKeyException ex) {
-                throw new TabuFileException(ex);
+                throw new FsTabuException(model, ex);
             }
             return newZipOutputShop(model, ros, (ZipInputShop) source);
         } catch (IOException cause) {

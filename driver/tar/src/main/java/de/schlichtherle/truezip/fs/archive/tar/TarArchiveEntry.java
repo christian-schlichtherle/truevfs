@@ -17,7 +17,7 @@ package de.schlichtherle.truezip.fs.archive.tar;
 
 import de.schlichtherle.truezip.util.Pool.Releasable;
 import de.schlichtherle.truezip.socket.IOPool.Entry;
-import de.schlichtherle.truezip.fs.archive.ArchiveEntry;
+import de.schlichtherle.truezip.fs.archive.FsArchiveEntry;
 import java.io.File;
 import java.io.IOException;
 import org.apache.tools.tar.TarEntry;
@@ -28,7 +28,7 @@ import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
 
 /**
- * An entry in a TAR archive which implements the {@code ArchiveEntry}
+ * An entry in a TAR archive which implements the {@code FsArchiveEntry}
  * interface.
  *
  * @author Christian Schlichtherle
@@ -36,7 +36,7 @@ import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
  */
 public class TarArchiveEntry
 extends TarEntry
-implements ArchiveEntry, Releasable<IOException> {
+implements FsArchiveEntry, Releasable<IOException> {
 
     private Entry<?> temp;
 

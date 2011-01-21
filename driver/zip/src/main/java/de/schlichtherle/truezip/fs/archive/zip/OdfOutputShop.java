@@ -19,12 +19,12 @@ package de.schlichtherle.truezip.fs.archive.zip;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
-import de.schlichtherle.truezip.fs.archive.MultiplexedArchiveOutputShop;
+import de.schlichtherle.truezip.fs.archive.FsMultiplexedArchiveOutputShop;
 import java.io.IOException;
 import java.io.OutputStream;
 import net.jcip.annotations.NotThreadSafe;
 
-import static de.schlichtherle.truezip.fs.archive.ArchiveEntry.UNKNOWN;
+import static de.schlichtherle.truezip.fs.archive.FsArchiveEntry.UNKNOWN;
 import static de.schlichtherle.truezip.zip.ZipEntry.STORED;
 
 /**
@@ -35,7 +35,7 @@ import static de.schlichtherle.truezip.zip.ZipEntry.STORED;
  * @version $Id$
  */
 @NotThreadSafe
-public class OdfOutputShop extends MultiplexedArchiveOutputShop<ZipArchiveEntry> {
+public class OdfOutputShop extends FsMultiplexedArchiveOutputShop<ZipArchiveEntry> {
 
     /** The name of the entry to receive tender, loving care. */
     private static final String MIMETYPE = "mimetype";

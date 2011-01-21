@@ -27,8 +27,9 @@ import java.util.Locale;
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-public class Paths {
+public final class Paths {
 
+    /** You cannot instantiate this class. */
     private Paths() {
     }
 

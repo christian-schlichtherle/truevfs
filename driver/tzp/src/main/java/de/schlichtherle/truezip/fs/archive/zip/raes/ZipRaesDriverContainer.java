@@ -19,7 +19,7 @@ import de.schlichtherle.truezip.util.SuffixSet;
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsDriverService;
 import de.schlichtherle.truezip.fs.FsScheme;
-import de.schlichtherle.truezip.fs.archive.ArchiveDriver;
+import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
 import de.schlichtherle.truezip.socket.IOPoolContainer;
 import java.util.Collections;
 import java.util.HashMap;
@@ -35,12 +35,12 @@ import net.jcip.annotations.Immutable;
 @Immutable
 public final class ZipRaesDriverContainer implements FsDriverService {
 
-    private static final Map<FsScheme, ArchiveDriver<?>> DRIVERS;
+    private static final Map<FsScheme, FsArchiveDriver<?>> DRIVERS;
 
     static {
-        final Map<FsScheme, ArchiveDriver<?>>
-                drivers = new HashMap<FsScheme, ArchiveDriver<?>>();
-        final ArchiveDriver<?> driver = new SafeZipRaesDriver(
+        final Map<FsScheme, FsArchiveDriver<?>>
+                drivers = new HashMap<FsScheme, FsArchiveDriver<?>>();
+        final FsArchiveDriver<?> driver = new SafeZipRaesDriver(
                 IOPoolContainer.SINGLETON,
                 new PromptingKeyManagerContainer());
         for (String suffix : new SuffixSet("tzp|zip.rae|zip.raes"))
@@ -49,7 +49,7 @@ public final class ZipRaesDriverContainer implements FsDriverService {
     }
 
     @Override
-    public Map<FsScheme, ArchiveDriver<?>> getDrivers() {
+    public Map<FsScheme, FsArchiveDriver<?>> getDrivers() {
         return DRIVERS;
     }
 }

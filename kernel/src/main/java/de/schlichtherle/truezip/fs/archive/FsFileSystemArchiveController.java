@@ -24,7 +24,6 @@ import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import net.jcip.annotations.NotThreadSafe;
 
@@ -39,32 +38,32 @@ import net.jcip.annotations.NotThreadSafe;
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
-abstract class FileSystemArchiveController<E extends ArchiveEntry>
-extends BasicArchiveController<E> {
+abstract class FsFileSystemArchiveController<E extends FsArchiveEntry>
+extends FsBasicArchiveController<E> {
 
     /** The mount state of the archive file system. */
     private MountState<E> mountState = new ResetFileSystem();
 
     /**
-     * Creates a new instance of FileSystemArchiveController
+     * Creates a new instance of FsFileSystemArchiveController
      */
-    FileSystemArchiveController(FsConcurrentModel model) {
+    FsFileSystemArchiveController(FsConcurrentModel model) {
         super(model);
     }
 
     @Override
-    final ArchiveFileSystem<E> autoMount(
+    final FsArchiveFileSystem<E> autoMount(
             final boolean autoCreate,
             final BitField<FsOutputOption> options)
     throws IOException {
         return mountState.autoMount(autoCreate, options);
     }
 
-    final @Nullable ArchiveFileSystem<E> getFileSystem() {
+    final @Nullable FsArchiveFileSystem<E> getFileSystem() {
         return mountState.getFileSystem();
     }
 
-    final void setFileSystem(@CheckForNull ArchiveFileSystem<E> fileSystem) {
+    final void setFileSystem(@CheckForNull FsArchiveFileSystem<E> fileSystem) {
         mountState.setFileSystem(fileSystem);
     }
 
@@ -92,21 +91,21 @@ extends BasicArchiveController<E> {
      * Represents the mount state of the archive file system.
      * This is an abstract class: The state is implemented in the subclasses.
      */
-    private static abstract class MountState<E extends ArchiveEntry> {
-        abstract ArchiveFileSystem<E> autoMount(boolean autoCreate,
+    private static abstract class MountState<E extends FsArchiveEntry> {
+        abstract FsArchiveFileSystem<E> autoMount(boolean autoCreate,
                                                 BitField<FsOutputOption> options)
         throws IOException;
 
-        @Nullable ArchiveFileSystem<E> getFileSystem() {
+        @Nullable FsArchiveFileSystem<E> getFileSystem() {
             return null;
         }
 
-        abstract void setFileSystem(@CheckForNull ArchiveFileSystem<E> fileSystem);
+        abstract void setFileSystem(@CheckForNull FsArchiveFileSystem<E> fileSystem);
     } // class MountState
 
     private class ResetFileSystem extends MountState<E> {
         @Override
-        ArchiveFileSystem<E> autoMount( final boolean autoCreate,
+        FsArchiveFileSystem<E> autoMount( final boolean autoCreate,
                                         final BitField<FsOutputOption> options)
         throws IOException {
             getModel().assertWriteLockedByCurrentThread();
@@ -134,7 +133,7 @@ extends BasicArchiveController<E> {
         }
 
         @Override
-        void setFileSystem(final ArchiveFileSystem<E> fileSystem) {
+        void setFileSystem(final FsArchiveFileSystem<E> fileSystem) {
             // Passing in null may happen by sync(*).
             if (fileSystem != null)
                 mountState = new MountedFileSystem(fileSystem);
@@ -142,27 +141,27 @@ extends BasicArchiveController<E> {
     } // class ResetFileSystem
 
     private class MountedFileSystem extends MountState<E> {
-        private final ArchiveFileSystem<E> fileSystem;
+        private final FsArchiveFileSystem<E> fileSystem;
 
-        MountedFileSystem(final ArchiveFileSystem<E> fileSystem) {
+        MountedFileSystem(final FsArchiveFileSystem<E> fileSystem) {
             if (fileSystem == null)
                 throw new NullPointerException();
             this.fileSystem = fileSystem;
         }
 
         @Override
-        ArchiveFileSystem<E> autoMount(boolean autoCreate,
+        FsArchiveFileSystem<E> autoMount(boolean autoCreate,
                                         BitField<FsOutputOption> options) {
             return fileSystem;
         }
 
         @Override
-        ArchiveFileSystem<E> getFileSystem() {
+        FsArchiveFileSystem<E> getFileSystem() {
             return fileSystem;
         }
 
         @Override
-        void setFileSystem(final ArchiveFileSystem<E> fileSystem) {
+        void setFileSystem(final FsArchiveFileSystem<E> fileSystem) {
             if (fileSystem != null)
                 throw new IllegalArgumentException("File system already mounted!");
             mountState = new ResetFileSystem();
@@ -179,14 +178,14 @@ extends BasicArchiveController<E> {
         }
 
         @Override
-        ArchiveFileSystem<E> autoMount( boolean autoCreate,
+        FsArchiveFileSystem<E> autoMount( boolean autoCreate,
                                         BitField<FsOutputOption> options)
         throws FsFalsePositiveException {
             throw exception;
         }
 
         @Override
-        void setFileSystem(final ArchiveFileSystem<E> fileSystem) {
+        void setFileSystem(final FsArchiveFileSystem<E> fileSystem) {
             mountState = null != fileSystem
                     ? new MountedFileSystem(fileSystem)
                     : new ResetFileSystem();

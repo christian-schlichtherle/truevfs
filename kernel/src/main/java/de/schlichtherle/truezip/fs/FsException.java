@@ -39,14 +39,7 @@ public abstract class FsException extends IOException {
         super(model.getMountPoint().toString());
     }
 
-    protected FsException(FsModel model, @CheckForNull IOException cause) {
-        super(model.getMountPoint().toString());
-        super.initCause(cause);
-    }
-
-    /** Returns the nullable cause of this exception. */
-    @Override
-    public @Nullable IOException getCause() {
-        return (IOException) super.getCause();
+    protected FsException(FsModel model, @CheckForNull Throwable cause) {
+        super(model.getMountPoint().toString(), cause);
     }
 }

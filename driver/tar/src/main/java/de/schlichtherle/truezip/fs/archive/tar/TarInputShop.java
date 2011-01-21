@@ -20,9 +20,7 @@ import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import de.schlichtherle.truezip.socket.IOPool.Entry;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.InputSocket;
-import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.socket.InputShop;
-import de.schlichtherle.truezip.io.TabuFileException;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.socket.IOPool;
 import java.io.OutputStream;
@@ -116,12 +114,9 @@ implements InputShop<TarArchiveEntry> {
                 }
                 entries.put(name, entry);
             }
-        } catch (InputException ex) {
-            close0();
-            throw ex;
         } catch (IOException ex) {
             close0();
-            throw new TabuFileException(ex);
+            throw ex;
         }
     }
 

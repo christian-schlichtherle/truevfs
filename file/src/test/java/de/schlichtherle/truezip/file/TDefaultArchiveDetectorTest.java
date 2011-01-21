@@ -17,7 +17,7 @@ package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.archive.DummyArchiveDriver;
-import de.schlichtherle.truezip.fs.archive.ArchiveDriver;
+import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
 import java.util.Locale;
 import java.util.Map;
 import org.junit.Before;
@@ -33,7 +33,7 @@ import static de.schlichtherle.truezip.file.TDefaultArchiveDetector.NULL;
  */
 public class TDefaultArchiveDetectorTest {
 
-    private static final ArchiveDriver<?> DRIVER = new DummyArchiveDriver();
+    private static final FsArchiveDriver<?> DRIVER = new DummyArchiveDriver();
     private TDefaultArchiveDetector detector;
 
     @Before
@@ -128,7 +128,7 @@ public class TDefaultArchiveDetectorTest {
                         if (arg0 != null) {
                             if (arg1 != null) {
                                 if (arg0 instanceof String)
-                                    new TDefaultArchiveDetector((String) arg0, (ArchiveDriver<?>) arg1);
+                                    new TDefaultArchiveDetector((String) arg0, (FsArchiveDriver<?>) arg1);
                                 else if (arg1 instanceof Object[])
                                     new TDefaultArchiveDetector((TDefaultArchiveDetector) arg0, (Object[]) arg1);
                                 else
@@ -158,8 +158,8 @@ public class TDefaultArchiveDetectorTest {
                         } else {
                             assert arg0 == null;
                             if (arg1 != null) {
-                                if (arg1 instanceof ArchiveDriver<?>)
-                                    new TDefaultArchiveDetector(null, (ArchiveDriver<?>) arg1);
+                                if (arg1 instanceof FsArchiveDriver<?>)
+                                    new TDefaultArchiveDetector(null, (FsArchiveDriver<?>) arg1);
                                 else if (arg1 instanceof Object[])
                                     new TDefaultArchiveDetector(null, (Object[]) arg1);
                                 else
@@ -169,7 +169,7 @@ public class TDefaultArchiveDetectorTest {
                                 assert arg0 == null;
                                 assert arg1 == null;
                                 try {
-                                    new TDefaultArchiveDetector((String) null, (ArchiveDriver<?>) null);
+                                    new TDefaultArchiveDetector((String) null, (FsArchiveDriver<?>) null);
                                     fail("Index " + i);
                                 } catch (Throwable failure) {
                                     assertTrue(expected.isAssignableFrom(failure.getClass()));
@@ -193,7 +193,7 @@ public class TDefaultArchiveDetectorTest {
                     case 3:
                         arg1 = args[1];
                         arg2 = args[2];
-                        new TDefaultArchiveDetector((TDefaultArchiveDetector) arg0, (String) arg1, (ArchiveDriver<?>) arg2);
+                        new TDefaultArchiveDetector((TDefaultArchiveDetector) arg0, (String) arg1, (FsArchiveDriver<?>) arg2);
                         fail("Index " + i);
                         break;
 
@@ -396,7 +396,7 @@ public class TDefaultArchiveDetectorTest {
         }
 
         for (int i = 0; i < args.length; i++) {
-            final ArchiveDriver<?> result = (ArchiveDriver<?>) args[i++];
+            final FsArchiveDriver<?> result = (FsArchiveDriver<?>) args[i++];
             final String path = (String) args[i];
             assertDefaultArchiveDetector(detector, result, path);
 

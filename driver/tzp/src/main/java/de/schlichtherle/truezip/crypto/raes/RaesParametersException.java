@@ -15,20 +15,17 @@
  */
 package de.schlichtherle.truezip.crypto.raes;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 
 /**
  * Thrown to indicate that no suitable RAES parameters have been provided or
  * something is wrong with the parameters.
- * This is a subclass of {@link FileNotFoundException} to indicate that this
- * is considered to be an issue when opening an RAES file rather than accessing
- * it contents (which would usually throw an {@code IOException},
- * but not a {@code FileNotFoundException}).
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class RaesParametersException extends FileNotFoundException {
+public class RaesParametersException extends IOException {
+
     private static final long serialVersionUID = 1605398165986459281L;
 
     /**

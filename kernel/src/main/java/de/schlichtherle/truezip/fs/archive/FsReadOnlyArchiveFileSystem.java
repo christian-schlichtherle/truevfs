@@ -30,17 +30,17 @@ import net.jcip.annotations.NotThreadSafe;
 /**
  * A read-only archive file system.
  * <p>
- * All modifying methods throw a {@link ReadOnlyArchiveFileSystemException}.
+ * All modifying methods throw a {@link FsReadOnlyArchiveFileSystemException}.
  *
  * @param   <E> The type of the archive entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @NotThreadSafe
-final class ReadOnlyArchiveFileSystem<E extends ArchiveEntry>
-extends ArchiveFileSystem<E> {
+final class FsReadOnlyArchiveFileSystem<E extends FsArchiveEntry>
+extends FsArchiveFileSystem<E> {
 
-    ReadOnlyArchiveFileSystem(  final @NonNull EntryContainer<E> archive,
+    FsReadOnlyArchiveFileSystem(  final @NonNull EntryContainer<E> archive,
                                 final @NonNull EntryFactory<E> factory,
                                 final @CheckForNull Entry rootTemplate) {
         super(factory, archive, rootTemplate);
@@ -60,24 +60,24 @@ extends ArchiveFileSystem<E> {
 
     @Override
     @NonNull
-    public ArchiveFileSystemOperation<E> mknod(
+    public FsArchiveFileSystemOperation<E> mknod(
             @NonNull FsEntryName name,
             @NonNull Type type,
             @NonNull BitField<FsOutputOption> options,
             @CheckForNull Entry template)
-    throws ArchiveFileSystemException {
-        throw new ReadOnlyArchiveFileSystemException();
+    throws FsArchiveFileSystemException {
+        throw new FsReadOnlyArchiveFileSystemException();
     }
 
     @Override
     public void unlink(FsEntryName path)
-    throws ArchiveFileSystemException {
-        throw new ReadOnlyArchiveFileSystemException();
+    throws FsArchiveFileSystemException {
+        throw new FsReadOnlyArchiveFileSystemException();
     }
 
     @Override
     public boolean setTime(FsEntryName path, BitField<Access> types, long value)
-    throws ArchiveFileSystemException {
-        throw new ReadOnlyArchiveFileSystemException();
+    throws FsArchiveFileSystemException {
+        throw new FsReadOnlyArchiveFileSystemException();
     }
 }

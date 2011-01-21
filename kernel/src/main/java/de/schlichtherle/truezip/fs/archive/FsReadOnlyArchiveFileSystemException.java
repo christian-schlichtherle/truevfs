@@ -19,15 +19,15 @@ import net.jcip.annotations.ThreadSafe;
 
 /**
  * Thrown to indicate that an operation was trying to modify a read-only
- * {@link ArchiveFileSystem}.
+ * {@link FsArchiveFileSystem}.
  */
 @ThreadSafe
-public class ReadOnlyArchiveFileSystemException
-extends ArchiveFileSystemException {
+public final class FsReadOnlyArchiveFileSystemException
+extends FsArchiveFileSystemException {
 
     private static final long serialVersionUID = 987645923519873262L;
 
-    ReadOnlyArchiveFileSystemException() {
+    FsReadOnlyArchiveFileSystemException() {
         super(null, "This is a read-only archive file system!");
     }
 }

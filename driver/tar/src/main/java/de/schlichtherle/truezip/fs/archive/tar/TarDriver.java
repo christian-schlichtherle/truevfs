@@ -17,10 +17,10 @@ package de.schlichtherle.truezip.fs.archive.tar;
 
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import de.schlichtherle.truezip.fs.FsConcurrentModel;
-import de.schlichtherle.truezip.fs.archive.CharsetArchiveDriver;
+import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriver;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Type;
-import de.schlichtherle.truezip.fs.archive.MultiplexedArchiveOutputShop;
+import de.schlichtherle.truezip.fs.archive.FsMultiplexedArchiveOutputShop;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.IOPoolService;
 import de.schlichtherle.truezip.socket.OutputShop;
@@ -46,7 +46,7 @@ import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
  */
 @Immutable
 @DefaultAnnotation(NonNull.class)
-public class TarDriver extends CharsetArchiveDriver<TarArchiveEntry> {
+public class TarDriver extends FsCharsetArchiveDriver<TarArchiveEntry> {
 
     /**
      * The default character set for entry names and comments, which is
@@ -125,7 +125,7 @@ public class TarDriver extends CharsetArchiveDriver<TarArchiveEntry> {
      * {@inheritDoc}
      * <p>
      * This implementation forwards the call to {@link #newTarOutputShop}
-     * and wraps the result in a new {@link MultiplexedArchiveOutputShop}.
+     * and wraps the result in a new {@link FsMultiplexedArchiveOutputShop}.
      */
     @Override
     public OutputShop<TarArchiveEntry> newOutputShop(
@@ -135,7 +135,7 @@ public class TarDriver extends CharsetArchiveDriver<TarArchiveEntry> {
     throws IOException {
         final OutputStream out = output.newOutputStream();
         try {
-            return new MultiplexedArchiveOutputShop<TarArchiveEntry>(
+            return new FsMultiplexedArchiveOutputShop<TarArchiveEntry>(
                     newTarOutputShop(model, out, (TarInputShop) source),
                     getPool());
         } catch (IOException ex) {

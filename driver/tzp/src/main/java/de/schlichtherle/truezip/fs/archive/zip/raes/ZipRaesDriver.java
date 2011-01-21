@@ -37,13 +37,12 @@ import de.schlichtherle.truezip.crypto.raes.RaesOutputStream;
 import de.schlichtherle.truezip.crypto.raes.RaesParameters;
 import de.schlichtherle.truezip.crypto.raes.RaesReadOnlyFile;
 import de.schlichtherle.truezip.socket.OutputShop;
-import de.schlichtherle.truezip.io.TabuFileException;
+import de.schlichtherle.truezip.fs.FsTabuException;
 import de.schlichtherle.truezip.fs.archive.zip.JarDriver;
 import de.schlichtherle.truezip.fs.archive.zip.JarArchiveEntry;
 import de.schlichtherle.truezip.fs.archive.zip.ZipArchiveEntry;
 import de.schlichtherle.truezip.fs.archive.zip.ZipInputShop;
 import de.schlichtherle.truezip.key.KeyManagerService;
-import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.IOPoolService;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
@@ -186,12 +185,15 @@ public abstract class ZipRaesDriver extends JarDriver {
     }
 
     /**
-     * This implementation calls {@link #getRaesParameters}, with which it
-     * initializes a new {@link RaesReadOnlyFile}.
+     * {@inheritDoc}
+     * <p>
+     * The implementation in {@link ZipRaesDriver} calls
+     * {@link #getRaesParameters}, with which it initializes a new
+     * {@link RaesReadOnlyFile}.
      * Next, if the gross file length of the archive is smaller than or equal
      * to the authentication trigger, the MAC authentication on the cipher
      * text is performed.
-     * Finally, the {@code RaesReadOnlyFile} is passed on to the super
+     * Finally, the {@link RaesReadOnlyFile} is passed on to the super
      * class implementation.
      */
     @Override
@@ -213,7 +215,7 @@ public abstract class ZipRaesDriver extends JarDriver {
                         rrof = RaesReadOnlyFile.getInstance(
                                 rof, getRaesParameters(model));
                     } catch (RaesKeyException ex) {
-                        throw new TabuFileException(ex);
+                        throw new FsTabuException(model, ex);
                     }
                     if (rof.length() <= getAuthenticationTrigger()) { // compare rof, not rrof!
                         // Note: If authentication fails, this is reported through some
@@ -260,7 +262,7 @@ public abstract class ZipRaesDriver extends JarDriver {
                         return RaesOutputStream.getInstance(
                                 out, getRaesParameters(model));
                     } catch (RaesKeyException ex) {
-                        throw new TabuFileException(ex);
+                        throw new FsTabuException(model, ex);
                     }
                 } catch (IOException cause) {
                     try {

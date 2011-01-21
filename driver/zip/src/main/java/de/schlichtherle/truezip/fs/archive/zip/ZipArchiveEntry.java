@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.fs.archive.zip;
 
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import de.schlichtherle.truezip.fs.archive.ArchiveEntry;
+import de.schlichtherle.truezip.fs.archive.FsArchiveEntry;
 import de.schlichtherle.truezip.zip.DateTimeConverter;
 import de.schlichtherle.truezip.zip.ZipEntry;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -28,16 +28,16 @@ import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
 
 /**
  * An adapter class to make the {@link ZipEntry} class implement the
- * {@link ArchiveEntry} interface.
+ * {@link FsArchiveEntry} interface.
  *
  * @see ZipDriver
  * @author Christian Schlichtherle
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-public class ZipArchiveEntry extends ZipEntry implements ArchiveEntry {
+public class ZipArchiveEntry extends ZipEntry implements FsArchiveEntry {
     static {
-        assert ZipEntry.UNKNOWN == ArchiveEntry.UNKNOWN;
+        assert ZipEntry.UNKNOWN == FsArchiveEntry.UNKNOWN;
     }
 
     ZipArchiveEntry(String name) {
@@ -66,7 +66,7 @@ public class ZipArchiveEntry extends ZipEntry implements ArchiveEntry {
             case STORAGE:
                 return getCompressedSize();
             default:
-                return ArchiveEntry.UNKNOWN;
+                return FsArchiveEntry.UNKNOWN;
         }
     }
 
@@ -81,9 +81,9 @@ public class ZipArchiveEntry extends ZipEntry implements ArchiveEntry {
     @Override
     public long getTime(Access type) {
         if (WRITE != type)
-            return ArchiveEntry.UNKNOWN;
+            return FsArchiveEntry.UNKNOWN;
         long time = getTime();
-        return 0 <= time ? time : ArchiveEntry.UNKNOWN;
+        return 0 <= time ? time : FsArchiveEntry.UNKNOWN;
     }
 
     @Override

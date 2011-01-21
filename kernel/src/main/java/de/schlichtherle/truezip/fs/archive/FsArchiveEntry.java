@@ -29,7 +29,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface ArchiveEntry extends Entry {
+public interface FsArchiveEntry extends Entry {
 
     /**
      * Sets the size of this archive entry.

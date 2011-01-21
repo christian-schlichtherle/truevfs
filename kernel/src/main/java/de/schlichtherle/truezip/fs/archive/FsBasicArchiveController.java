@@ -63,7 +63,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  * were a regular directory in the real file system.
  * <p>
  * In terms of software patterns, an {@code FsController} is
- * similar to a Director in a Builder pattern, with the {@link ArchiveDriver}
+ * similar to a Director in a Builder pattern, with the {@link FsArchiveDriver}
  * interface as its Builder or Abstract Factory.
  * However, an archive controller does not necessarily build a new archive.
  * It may also simply be used to access an existing archive for read-only
@@ -108,11 +108,11 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
-abstract class BasicArchiveController<E extends ArchiveEntry>
+abstract class FsBasicArchiveController<E extends FsArchiveEntry>
 extends FsController<FsConcurrentModel> {
 
     private static final String CLASS_NAME
-            = BasicArchiveController.class.getName();
+            = FsBasicArchiveController.class.getName();
 
     private static final Logger logger
             = Logger.getLogger(CLASS_NAME, CLASS_NAME);
@@ -130,7 +130,7 @@ extends FsController<FsConcurrentModel> {
      *
      * @param model the non-{@code null} archive model.
      */
-    BasicArchiveController(final FsConcurrentModel model) {
+    FsBasicArchiveController(final FsConcurrentModel model) {
         if (null == model)
             throw new NullPointerException();
         if (null == model.getParent())
@@ -143,7 +143,7 @@ extends FsController<FsConcurrentModel> {
         return model;
     }
 
-    final ArchiveFileSystem<E> autoMount() throws IOException {
+    final FsArchiveFileSystem<E> autoMount() throws IOException {
         return autoMount(false, AUTO_MOUNT_OPTIONS);
     }
 
@@ -165,7 +165,7 @@ extends FsController<FsConcurrentModel> {
      * @return A valid archive file system - {@code null} is never returned.
      * @throws FsFalsePositiveException
      */
-    abstract ArchiveFileSystem<E> autoMount(boolean autoCreate,
+    abstract FsArchiveFileSystem<E> autoMount(boolean autoCreate,
                                             BitField<FsOutputOption> options)
     throws IOException;
 
@@ -227,7 +227,7 @@ extends FsController<FsConcurrentModel> {
                 autoMount();        // detect false positives
                 getPeerTarget();    // triggers autoSync() if in same file system
             }
-            final ArchiveFileSystemEntry<E> entry = autoMount().getEntry(name);
+            final FsArchiveFileSystemEntry<E> entry = autoMount().getEntry(name);
             if (null == entry)
                 throw new FsEntryNotFoundException(getModel(),
                         name, "no such file or directory");
@@ -239,7 +239,7 @@ extends FsController<FsConcurrentModel> {
             if (DIRECTORY == entry.getType())
                 throw new FsEntryNotFoundException(getModel(),
                         name, "cannot read directories");
-            return BasicArchiveController
+            return FsBasicArchiveController
                     .this
                     .getInputSocket(entry.getName())
                     .bind(this);
@@ -279,7 +279,7 @@ extends FsController<FsConcurrentModel> {
             this.template = template;
         }
 
-        ArchiveFileSystemOperation<E> mknod() throws IOException {
+        FsArchiveFileSystemOperation<E> mknod() throws IOException {
             autoSync(name, WRITE);
             // Start creating or overwriting the archive entry.
             // This will fail if the entry already exists as a directory.
@@ -303,7 +303,7 @@ extends FsController<FsConcurrentModel> {
 
         @Override
         public OutputStream newOutputStream() throws IOException {
-            final ArchiveFileSystemOperation<E> mknod = mknod();
+            final FsArchiveFileSystemOperation<E> mknod = mknod();
             final E entry = mknod.getTarget().getEntry();
             final OutputSocket<?> output = getOutputSocket(entry);
             InputStream in = null;
@@ -375,7 +375,7 @@ extends FsController<FsConcurrentModel> {
     public void unlink(final FsEntryName name) throws IOException {
         autoSync(name, null);
         if (name.isRoot()) {
-            final ArchiveFileSystem<E> fileSystem;
+            final FsArchiveFileSystem<E> fileSystem;
             try {
                 fileSystem = autoMount();
             } catch (FsFalsePositiveException ex) {
