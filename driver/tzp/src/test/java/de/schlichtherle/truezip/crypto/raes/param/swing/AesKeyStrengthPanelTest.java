@@ -47,7 +47,7 @@ public final class AesKeyStrengthPanelTest {
     public void setUp() {
         EventQueue.invokeLater(new Runnable() {
             @Override
-			public void run() {
+            public void run() {
                 instance = new AesKeyStrengthPanel();
                 frame = new JFrame();
                 frame.getContentPane().add(instance);
@@ -87,7 +87,6 @@ public final class AesKeyStrengthPanelTest {
         assertSame(expResult, keyStrength);
         selection = comboBoxOp.getSelectedIndex();
         assertSame(expResult.ordinal(), selection);
-        //sleep();
 
         //
         // Set key strength via API and check API and GUI.
@@ -99,7 +98,6 @@ public final class AesKeyStrengthPanelTest {
         assertSame(expResult, keyStrength);
         selection = comboBoxOp.getSelectedIndex();
         assertSame(expResult.ordinal(), selection);
-        //sleep();
 
         expResult = BITS_192;
         instance.setKeyStrength(expResult);
@@ -107,7 +105,6 @@ public final class AesKeyStrengthPanelTest {
         assertSame(expResult, keyStrength);
         selection = comboBoxOp.getSelectedIndex();
         assertSame(expResult.ordinal(), selection);
-        //sleep();
 
         expResult = BITS_256;
         instance.setKeyStrength(expResult);
@@ -115,7 +112,6 @@ public final class AesKeyStrengthPanelTest {
         assertSame(expResult, keyStrength);
         selection = comboBoxOp.getSelectedIndex();
         assertSame(expResult.ordinal(), selection);
-        //sleep();
 
         try {
             instance.setKeyStrength(null);
@@ -126,7 +122,6 @@ public final class AesKeyStrengthPanelTest {
         assertSame(expResult, keyStrength);
         selection = comboBoxOp.getSelectedIndex();
         assertSame(expResult.ordinal(), selection);
-        //sleep();
 
         //
         // Set key strength via GUI and check API and GUI.
@@ -138,7 +133,6 @@ public final class AesKeyStrengthPanelTest {
         assertSame(expResult, keyStrength);
         selection = comboBoxOp.getSelectedIndex();
         assertSame(expResult.ordinal(), selection);
-        //sleep();
 
         expResult = BITS_192;
         comboBoxOp.setSelectedIndex(expResult.ordinal());
@@ -146,7 +140,6 @@ public final class AesKeyStrengthPanelTest {
         assertSame(expResult, keyStrength);
         selection = comboBoxOp.getSelectedIndex();
         assertSame(expResult.ordinal(), selection);
-        //sleep();
 
         expResult = BITS_256;
         comboBoxOp.setSelectedIndex(expResult.ordinal());
@@ -154,15 +147,5 @@ public final class AesKeyStrengthPanelTest {
         assertSame(expResult, keyStrength);
         selection = comboBoxOp.getSelectedIndex();
         assertSame(expResult.ordinal(), selection);
-        //sleep();
     };
-
-    /*private static void sleep() {
-        //new QueueTool().waitEmpty(500); // doesn't always update the screen!
-        try {
-            Thread.sleep(50);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(AesKeyStrengthPanelTest.class.getName()).log(Level.WARNING, "Current thread was interrupted while waiting!", ex);
-        }
-    }*/
 }
