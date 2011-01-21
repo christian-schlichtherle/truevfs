@@ -66,8 +66,8 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
         final TempFilePool pool = this.pool;
         return null != pool
                 ? pool
-                : (this.pool = new TempFilePool( FILE_POOL_PREFIX, null,
-                                            entry.getFile().getParentFile()));
+                : (this.pool = new TempFilePool(FILE_POOL_PREFIX, null,
+                                                entry.getFile().getParentFile()));
     }
 
     @Override
