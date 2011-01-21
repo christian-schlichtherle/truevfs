@@ -37,7 +37,7 @@ public class WindowsTest {
         EventQueue.invokeAndWait(new Runnable() {
 
             @Override
-			public void run() {
+            public void run() {
                 Window result = Windows.getParentWindow();
                 assertNotNull(result);
                 assertFalse(result.isVisible());
