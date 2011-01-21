@@ -119,24 +119,24 @@ public class TFileSystemView extends TDecoratingFileSystemView {
 
     @Override
     public Boolean isTraversable(File file) {
-        final TFile wFile = wrap(file);
-        return null != wFile
-                ? Boolean.valueOf(wFile.isDirectory())
+        final TFile tfile = wrap(file);
+        return null != tfile
+                ? Boolean.valueOf(tfile.isDirectory())
                 : delegate.isTraversable(unwrap(file));
     }
 
     @Override
     public String getSystemDisplayName(File file) {
-        final TFile wFile = wrap(file);
-        if (wFile.isArchive() || wFile.isEntry())
-            return wFile.getName();
+        final TFile tfile = wrap(file);
+        if (tfile.isArchive() || tfile.isEntry())
+            return tfile.getName();
         return delegate.getSystemDisplayName(unwrap(file));
     }
 
     @Override
     public String getSystemTypeDescription(File file) {
-        final TFile wFile = wrap(file);
-        final String typeDescription = TFileView.typeDescription(wFile);
+        final TFile tfile = wrap(file);
+        final String typeDescription = TFileView.typeDescription(tfile);
         if (typeDescription != null)
             return typeDescription;
         return delegate.getSystemTypeDescription(unwrap(file));
@@ -144,8 +144,8 @@ public class TFileSystemView extends TDecoratingFileSystemView {
 
     @Override
     public Icon getSystemIcon(File file) {
-        final TFile wFile = wrap(file);
-        final Icon icon = TFileView.icon(wFile);
+        final TFile tfile = wrap(file);
+        final Icon icon = TFileView.icon(tfile);
         if (null != icon)
             return icon;
         final File uFile = unwrap(file);
@@ -253,9 +253,9 @@ public class TFileSystemView extends TDecoratingFileSystemView {
     public @Nullable File createFileObject(final @CheckForNull File file) {
         if (null == file)
             return null;
-        final TFile wFile = wrap(file);
-        return wFile.isArchive() || wFile.isEntry()
-                ? wFile
+        final TFile tfile = wrap(file);
+        return tfile.isArchive() || tfile.isEntry()
+                ? tfile
                 : unwrap(file);
     }
 
@@ -283,9 +283,9 @@ public class TFileSystemView extends TDecoratingFileSystemView {
 
     @Override
     public File getParentDirectory(File file) {
-        final TFile wFile = wrap(file);
-        if (wFile.isEntry())
-            return createFileObject(wFile.getParentFile());
+        final TFile tfile = wrap(file);
+        if (tfile.isEntry())
+            return createFileObject(tfile.getParentFile());
         return createFileObject(delegate.getParentDirectory(unwrap(file)));
     }
 }

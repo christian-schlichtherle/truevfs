@@ -45,20 +45,13 @@ public class Encrypt extends CommandLineUtility {
     private static final ResourceBundle resources
             = ResourceBundle.getBundle(CLASS_NAME);
 
-    public Encrypt() {
-    }
-
-    public Encrypt(OutputStream out, OutputStream err, boolean autoFlush) {
-        super(out, err, autoFlush);
-    }
-
     /** Equivalent to {@code System.exit(new Encrypt().run(args));}. */
     public static void main(final String[] args) {
         System.exit(new Encrypt().run(args));
     }
 
     @Override
-	public int runChecked(final String[] args)
+    public int runChecked(final String[] args)
     throws IllegalUsageException, IOException {
         if (args.length != 2)
             throw new IllegalUsageException(resources.getString("usage"));

@@ -64,9 +64,9 @@ abstract class CommandLineUtility {
      *     the contents of archive files.
      * </ul>
      *
-     * @param out The standard output stream.
-     * @param err The error output stream.
-     * @param autoFlush If the output streams are not {@link PrintStream}s,
+     * @param out the standard output stream.
+     * @param err the error output stream.
+     * @param autoFlush if the output streams are not {@link PrintStream}s,
      *        then they are wrapped in a new {@code PrintStream} with
      *        this as the additional constructor parameter.
      */
@@ -74,7 +74,7 @@ abstract class CommandLineUtility {
             final OutputStream out,
             final OutputStream err,
             final boolean autoFlush) {
-        if (out == null || err == null)
+        if (null == out || null == err)
             throw new NullPointerException();
         this.out = out instanceof PrintStream
                 ? (PrintStream) out
