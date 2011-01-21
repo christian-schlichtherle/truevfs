@@ -66,67 +66,61 @@ final class TFiles {
      *             If it does, its contents are overwritten.
      * @param  detector the object used to detect any archive
      *         files in the path and configure their parameters.
-     * @return Whether the operation succeeded or not.
-     *         If it fails, the source and destination may contain only a
-     *         subset of the source before this operation.
-     *         However, each file has either been completely moved or not.
-     * @see    TFile#renameTo(File, TArchiveDetector)
      */
-    static boolean
+    static void
     move(   final File src,
             final File dst,
-            final TArchiveDetector detector) {
-        return !contains(src, dst) && move0(src, dst, detector);
+            final TArchiveDetector detector)
+    throws IOException {
+        if (contains(src, dst))
+            throw new TContainsFileException(src, dst);
+        move0(src, dst, detector);
     }
 
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
-    private static boolean
+    /** Unchecked parameters version. */
+    private static void
     move0(  final File src,
             final File dst,
-            final TArchiveDetector detector) {
-        boolean ok = true;
+            final TArchiveDetector detector)
+    throws IOException {
         if (src.isDirectory()) {
             final long srcLastModified = src.lastModified();
             final boolean srcIsArchived = src instanceof TFile
-                    && ((TFile) src).getInnerArchive() != null;
+                    && null != ((TFile) src).getInnerArchive();
             final boolean dstIsArchived = dst instanceof TFile
-                    && ((TFile) dst).getInnerArchive() != null;
+                    && null != ((TFile) dst).getInnerArchive();
             final boolean srcIsGhost = srcIsArchived
-                    && srcLastModified <= 0;
+                    && 0 >= srcLastModified;
             if (!srcIsGhost || !dstIsArchived || !TFile.isLenient())
-                dst.mkdir();
+                if (!dst.mkdir() && !dst.isDirectory())
+                    throw new IOException(dst + " (not a directory)");
             final String[] members = src.list();
             if (!srcIsArchived && dstIsArchived) {
                 // Create sorted entries if writing a new archive file.
                 // This is courtesy only, so natural order is sufficient.
                 Arrays.sort(members);
             }
-            for (int i = 0, l = members.length; i < l; i++) {
-                final String member = members[i];
-                ok &= move0(new TFile(src, member, detector),
-                            new TFile(dst, member, detector),
-                            detector);
-            }
+            for (final String member : members)
+                move0(  new TFile(src, member, detector),
+                        new TFile(dst, member, detector),
+                        detector);
             if (!srcIsGhost)
-                ok &= dst.setLastModified(srcLastModified);
-        } else if (src.isFile()) { // !isDirectory()
-            try {
-                copy(true, src, dst);
-            } catch (IOException ex) {
-                ok = false;
-            }
+                if (!dst.setLastModified(srcLastModified))
+                    throw new IOException(dst + " (cannot set last modification time)");
+        } else if (src.isFile()) {
+            if (dst.exists() && !dst.isFile())
+                throw new IOException(dst + " (not a file)");
+            copy0(true, src, dst);
+        } else if (src.isFile()) {
+            throw new IOException(src + " (cannot copy special file)");
         } else {
-            ok = false; // don't move special files!
+            throw new IOException(src + " (missing file)");
         }
-        return ok && src.delete(); // only unlink if ok!
+        if (!src.delete())
+            throw new IOException(src + " (cannot delete)");
     }
 
-    /**
-     * Performs a recursive copy operation.
-     *
-     * @see TFile#copyAllTo(File, TArchiveDetector, TArchiveDetector)
-     * @see TFile#archiveCopyAllTo(File, TArchiveDetector, TArchiveDetector)
-     */
+    /** Performs a recursive copy operation. */
     static void
     copyAll(final boolean preserve,
             final File src,
@@ -150,43 +144,42 @@ final class TFiles {
         if (src.isDirectory()) {
             final long srcLastModified = src.lastModified();
             final boolean srcIsArchived = src instanceof TFile
-                    && ((TFile) src).getInnerArchive() != null;
+                    && null != ((TFile) src).getInnerArchive();
             final boolean dstIsArchived = dst instanceof TFile
-                    && ((TFile) dst).getInnerArchive() != null;
+                    && null != ((TFile) dst).getInnerArchive();
             final boolean srcIsGhost = srcIsArchived
-                    && srcLastModified <= 0;
+                    && 0 >= srcLastModified;
             if (!srcIsGhost || !dstIsArchived || !TFile.isLenient())
                 if (!dst.mkdir() && !dst.isDirectory())
-                    throw new IOException("destination is not a directory");
+                    throw new IOException(dst + " (not a directory)");
             final String[] members = src.list();
             if (!srcIsArchived && dstIsArchived) {
                 // Create sorted entries if writing a new archive.
                 // This is a courtesy only, so natural order is sufficient.
                 Arrays.sort(members);
             }
-            for (int i = 0, l = members.length; i < l; i++) {
-                final String member = members[i];
+            for (final String member : members)
                 copyAll0(   preserve,
                             new TFile(src, member, srcDetector),
                             new TFile(dst, member, dstDetector),
                             srcDetector, dstDetector);
-            }
             if (preserve && !srcIsGhost)
                 if (!dst.setLastModified(srcLastModified))
-                    throw new IOException("cannot set last modification time");
-        } else if (src.isFile() && (!dst.exists() || dst.isFile())) {
+                    throw new IOException(dst + " (cannot set last modification time)");
+        } else if (src.isFile()) {
+            if (dst.exists() && !dst.isFile())
+                throw new IOException(dst + " (not a file)");
             copy0(preserve, src, dst);
+        } else if (src.isFile()) {
+            throw new IOException(src + " (cannot copy special file)");
         } else {
-            throw new IOException("cannot copy non-existent or special files");
+            throw new IOException(src + " (missing file)");
         }
     }
 
     /**
      * The name of this method is inspired by the Unix command line utility
      * {@code copy}.
-     *
-     * @see TFile#cp(File, File)
-     * @see TFile#cp_p(File, File)
      */
     static void
     copy(   final boolean preserve,
