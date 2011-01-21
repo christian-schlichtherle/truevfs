@@ -66,20 +66,8 @@ public final class TFileChooser extends JFileChooser {
     }
 
     @Override
-    public File getCurrentDirectory() {
-        return (TFile) super.getCurrentDirectory();
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * @throws ClassCastException If {@code currentDirectory} is not an
-     *         instance of {@link TFile}.
-     */
-    @Override
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("BC_UNCONFIRMED_CAST")
-    public void setCurrentDirectory(@CheckForNull File currentDirectory) {
-        super.setCurrentDirectory((TFile) currentDirectory);
+    public TFile getCurrentDirectory() {
+        return getFileSystemView().wrap(super.getCurrentDirectory());
     }
 
     @Override
@@ -94,7 +82,6 @@ public final class TFileChooser extends JFileChooser {
      *         instance of {@link TFileSystemView}.
      */
     @Override
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("BC_UNCONFIRMED_CAST")
     public void setFileSystemView(FileSystemView fileSystemView) {
         if (null == fileSystemView)
             throw new NullPointerException();
@@ -103,20 +90,7 @@ public final class TFileChooser extends JFileChooser {
 
     @Override
     public @Nullable TFile getSelectedFile() {
-        File file = super.getSelectedFile();
-        return getFileSystemView().wrap(file);
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * @throws ClassCastException If {@code file} is not an
-     *         instance of {@link TFile}.
-     */
-    @Override
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("BC_UNCONFIRMED_CAST")
-    public void setSelectedFile(@CheckForNull File file) {
-        super.setSelectedFile((TFile) file);
+        return getFileSystemView().wrap(super.getSelectedFile());
     }
 
     @Override
@@ -130,68 +104,4 @@ public final class TFileChooser extends JFileChooser {
             results[i] = fsv.wrap(files[i]);
         return results;
     }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * @throws ClassCastException If {@code files} is not an
-     *         instance of {@link TFile}[].
-     */
-    @Override
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("BC_UNCONFIRMED_CAST")
-    public void setSelectedFiles(@CheckForNull File[] files) {
-        super.setSelectedFiles((TFile[]) files);
-    }
-
-    /*@Override
-    public Icon getIcon(final File file) {
-        beginPaintingDisabled();
-        try {
-            return super.getIcon(file);
-        } finally {
-            endPaintingDisabled();
-        }
-    }
-
-    @Override
-    public String getTypeDescription(final File file) {
-        beginPaintingDisabled();
-        try {
-            return super.getTypeDescription(file);
-        } finally {
-            endPaintingDisabled();
-        }
-    }
-
-    @Override
-    public boolean isTraversable(final File file) {
-        beginPaintingDisabled();
-        try {
-            return super.isTraversable(file);
-        } finally {
-            endPaintingDisabled();
-        }
-    }
-
-    @Override
-    public void paint(final Graphics g) {
-        if (0 >= paintingDisabled) {
-            beginPaintingDisabled();
-            try {
-                super.paintChildren(g);
-            } finally {
-                endPaintingDisabled();
-            }
-        }
-    }
-
-    private synchronized void beginPaintingDisabled() {
-        paintingDisabled++;
-    }
-
-    private synchronized void endPaintingDisabled() {
-        paintingDisabled--;
-        if (paintingDisabled <= 0)
-            repaint();
-    }*/
 }
