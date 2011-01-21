@@ -63,7 +63,7 @@ public class TarDriver extends CharsetArchiveDriver<TarArchiveEntry> {
     }
 
     @Override
-    public @NonNull IOPool<?> getPool() {
+    public final IOPool<?> getPool() {
         return pool;
     }
 

@@ -58,6 +58,7 @@ import java.util.ServiceConfigurationError;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.Icon;
+import javax.swing.filechooser.FileSystemView;
 import net.jcip.annotations.Immutable;
 
 import static de.schlichtherle.truezip.fs.FsEntry.*;
@@ -74,6 +75,8 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  * A replacement for its subclass which provides transparent read/write access
  * to archive files and their entries as if they were (virtual) directories and
  * files.
+ * This class extends {@link File} so that it can be used with a
+ * {@link FileSystemView}.
  * <p>
  * <b>Warning:</b>The classes in this package access and manipulate archive
  * files as external resources and may cache some of their state in memory
@@ -409,37 +412,40 @@ public final class TFile extends File {
      * Equivalent to {@link #TFile(File, TArchiveDetector)
      * TFile(template, getDefaultArchiveDetector())}.
      */
-    public TFile(File template) {
-        this(template, defaultDetector);
+    public TFile(File file) {
+        this(file, defaultDetector);
     }
 
     /**
      * Constructs a new {@code TFile} instance which may use the given
      * {@link TArchiveDetector} to detect any archive files in its path.
      * 
-     * @param template The file to use as a template. If this is an instance
+     * @param file The file to decorate. If this is an instance
      *        of this class, its fields are copied and the
      *        {@code detector} parameter is not used to scan the path.
-     * @param detector The object used to detect any archive files in the path.
-     *        This parameter is ignored if {@code template} is an
+     * @param detector The object to use for the detection of any archive files
+     *        in the path if necessary.
+     *        This parameter is ignored if and only if {@code file} is an
      *        instance of this class.
-     *        Otherwise, it must not be {@code null}.
+     *        Otherwise, if it's {@code null}, the
+     *        {@link #getDefaultArchiveDetector() default archive detector} is
+     *        used.
      */
-    public TFile(   final File template,
-                    final TArchiveDetector detector) {
-        super(template.getPath());
+    public TFile(   final File file,
+                    final @CheckForNull TArchiveDetector detector) {
+        super(file.getPath());
 
-        if (template instanceof TFile) {
-            final TFile file = (TFile) template;
-            this.delegate = file.delegate;
-            this.detector = file.detector;
-            this.enclArchive = file.enclArchive;
-            this.enclEntryName = file.enclEntryName;
-            this.innerArchive = file.isArchive() ? this : file.innerArchive;
-            this.controller = file.controller;
+        if (file instanceof TFile) {
+            final TFile tfile = (TFile) file;
+            this.delegate = tfile.delegate;
+            this.detector = tfile.detector;
+            this.enclArchive = tfile.enclArchive;
+            this.enclEntryName = tfile.enclEntryName;
+            this.innerArchive = tfile.isArchive() ? this : tfile.innerArchive;
+            this.controller = tfile.controller;
         } else {
-            this.delegate = template;
-            this.detector = detector;
+            this.delegate = file;
+            this.detector = null != detector ? detector : defaultDetector;
             scan(null);
         }
 
@@ -459,16 +465,19 @@ public final class TFile extends File {
      * {@link TArchiveDetector} to detect any archive files in its path.
      *
      * @param path The path of the file.
-     * @param detector The object used to detect any archive files in the path.
+     * @param detector The object to use for the detection of any archive files
+     *        in the path.
+     *        If this is {@code null}, the
+     *        {@link #getDefaultArchiveDetector() default archive detector} is
+     *        used.
      */
-    public TFile(
-            final String path,
-            final TArchiveDetector detector) {
+    public TFile(   final String path,
+                    final @CheckForNull TArchiveDetector detector) {
         super(path);
 
         this.delegate = new File(path);
-        this.detector = detector;
-        scan((TFile) null);
+        this.detector = null != detector ? detector : defaultDetector;
+        scan(null);
 
         assert invariants();
     }
@@ -486,18 +495,22 @@ public final class TFile extends File {
      * {@link TArchiveDetector} to detect any archive files in its path.
      *
      * @param parent The parent path as a {@link String}.
-     * @param detector The object used to detect any archive files in the path.
      * @param member The child path as a {@link String}.
+     * @param detector The object to use for the detection of any archive files
+     *        in the path.
+     *        If this is {@code null}, the
+     *        {@link #getDefaultArchiveDetector() default archive detector} is
+     *        used.
      */
     public TFile(
             final String parent,
             final String member,
-            final TArchiveDetector detector) {
+            final @CheckForNull TArchiveDetector detector) {
         super(parent, member);
 
         this.delegate = new File(parent, member);
-        this.detector = detector;
-        scan((TFile) null);
+        this.detector = null != detector ? detector : defaultDetector;
+        scan(null);
 
         assert invariants();
     }
@@ -527,10 +540,11 @@ public final class TFile extends File {
      *
      * @param parent The parent directory as a {@code TFile} instance.
      * @param member The child path as a {@link String}.
-     * @param detector The object used to detect any archive files in the path.
+     * @param detector The object to use for the detection of any archive files
+     *        in the path.
      *        If this is {@code null} and {@code parent} is an
-     *        instance of this class, the archive detector is inherited from
-     *        this instance.
+     *        instance of this class, the archive detector is copied from
+     *        {@code parent}.
      *        If this is {@code null} and {@code parent} is
      *        <em>not</em> an instance of this class, the
      *        {@link #getDefaultArchiveDetector() default archive detector}
@@ -544,12 +558,12 @@ public final class TFile extends File {
 
         this.delegate = new File(parent, member);
         if (parent instanceof TFile) {
-            final TFile smartParent = (TFile) parent;
-            this.detector = null != detector ? detector : smartParent.detector;
-            scan(smartParent);
+            final TFile tparent = (TFile) parent;
+            this.detector = null != detector ? detector : tparent.detector;
+            scan(tparent);
         } else {
             this.detector = null != detector ? detector : defaultDetector;
-            scan((TFile) null);
+            scan(null);
         }
 
         assert invariants();
@@ -631,8 +645,8 @@ public final class TFile extends File {
     }
 
     @SuppressWarnings("LeakingThisInConstructor")
-    private TFile(   final FsMountPoint mountPoint,
-                    final TArchiveDetector detector) {
+    private TFile(  final FsMountPoint mountPoint,
+                    TArchiveDetector detector) {
         super(mountPoint.hierarchicalize().getUri());
 
         this.delegate = new File(super.getPath());
@@ -667,8 +681,6 @@ public final class TFile extends File {
                     final TArchiveDetector detector) {
         super(delegate.getPath());
 
-        assert parameters(delegate, innerArchive, detector);
-
         this.delegate = delegate;
 
         final String path = delegate.getPath();
@@ -697,30 +709,6 @@ public final class TFile extends File {
     }
 
     /**
-     * This is called by some private constructors if and only if assertions
-     * are enabled to assert that their parameters are valid.
-     * If assertions are disabled, the call to this method is thrown away by
-     * the HotSpot compiler, so there is no performance penalty.
-     */
-    private static boolean parameters(
-            final File delegate,
-            final @CheckForNull TFile innerArchive,
-            final TArchiveDetector detector)
-    throws AssertionError {
-        assert null != delegate;
-        assert !(delegate instanceof TFile);
-        if (null != innerArchive) {
-            assert innerArchive.isArchive();
-            assert Paths.contains(  innerArchive.getPath(),
-                                    delegate.getPath(),
-                                    separatorChar);
-        }
-        assert null != detector;
-
-        return true;
-    }
-
-    /**
      * Initialize this file object by scanning its path for archive
      * files, using the given {@code ancestor} file (i.e. a direct or
      * indirect parent file) if any.
@@ -731,7 +719,7 @@ public final class TFile extends File {
         final String path = super.getPath();
         assert ancestor == null || path.startsWith(ancestor.getPath());
         assert delegate.getPath().equals(path);
-        assert detector != null;
+        assert null != detector;
 
         final StringBuilder enclEntryNameBuf = new StringBuilder(path.length());
         scan(ancestor, detector, 0, path, enclEntryNameBuf, new Splitter(separatorChar));
@@ -884,8 +872,8 @@ public final class TFile extends File {
     //
 
     /**
-     * Commits all changes of the contents of all federated file systems
-     * (i.e. archive files) to their respective parent file system.
+     * Synchronizes all uncommitted changes to the contents of all federated
+     * file systems (i.e. archive files) to their respective parent file system.
      *
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         occured throughout the course of this method.
@@ -908,18 +896,18 @@ public final class TFile extends File {
 
     /**
      * Similar to {@link #sync(BitField) sync(options)},
-     * but will only update the given {@code archive} and all its member
-     * federated file systems.
+     * but updates only the given {@code archive} and all its member file
+     * systems.
      * <p>
-     * If a client application needs to unmount an individual federated file
+     * If a client application needs to sync an individual federated file
      * system, the following idiom can be used:
      * <pre>{@code
      * if (file.isArchive() && file.getEnclArchive() == null) // filter top level federated file system
      *   if (file.isDirectory()) // ignore false positives
-     *     TFile.umount(TFile); // update federated file system and all its members
+     *     TFile.sync(file); // update federated file system and all its members
      * }</pre>
-     * Again, this will also unmount all federated file systems which are
-     * located within the file system referred to by the {@code file} instance.
+     * Again, this will also sync all federated file systems which are
+     * located within the file system referred to by {@code file}.
      *
      * @param  archive a top level federated file system.
      * @throws IllegalArgumentException If {@code archive} is not a top level
@@ -1185,7 +1173,7 @@ public final class TFile extends File {
      * Returns the first parent directory (starting from this file) which is
      * <em>not</em> an archive file or a file located in an archive file.
      */
-    public @CheckForNull TFile getNonArchivedParentFile() {
+    public @Nullable TFile getNonArchivedParentFile() {
         final TFile enclArchive = this.enclArchive;
         return null != enclArchive
                 ? enclArchive.getNonArchivedParentFile()
@@ -1193,12 +1181,16 @@ public final class TFile extends File {
     }
 
     @Override
-    public @CheckForNull TFile getParentFile() {
+    public @Nullable String getParent() {
+        return delegate.getParent();
+    }
+
+    @Override
+    public @Nullable TFile getParentFile() {
         final File parent = delegate.getParentFile();
         if (parent == null)
             return null;
 
-        assert super.getName().equals(delegate.getName());
         if (null != enclArchive
                 && enclArchive.getPath().length() == parent.getPath().length()) {
             assert enclArchive.getPath().equals(parent.getPath());
@@ -1453,24 +1445,17 @@ public final class TFile extends File {
     }
 
     /**
-     * Returns the legacy {@link File File} object to which
-     * some methods of this class delegate if this object does not represent an
-     * archive file or an entry in an archive file.
+     * Returns the decorated file object.
      * <p>
-     * <b>Warning:</b> This method is <em>not</em> intended for public use!
-     * It's solely required to support the federation of file system
-     * implementations.
-     * <p>
-     * In case you want to convert an instance of this class which recognized
-     * the base name of its path as an archive file to a file instance which
-     * doesn't recognize this archive file, use the following code instead:
-     * {@code new TFile(file.getParentFile(), file.getName(), TDefaultArchiveDetector.NULL)}
+     * If this file instance has been created from a {@link FileSystemView},
+     * the decorated file object may be an instance of a sibling class, i.e.
+     * another sub-class of {@link File}.
      *
-     * @return An instance of the {@link File File} class or
-     *         one of its subclasses, but never an instance of this class or
-     *         its subclasses and never {@code null}.
+     * @return An instance of the {@link File File} class or any of its
+     *         sub-classes, but never an instance of this class and never
+     *         {@code null}.
      */
-    public File getDelegate() {
+    public File getFile() {
         return delegate;
     }
 
@@ -1600,17 +1585,25 @@ public final class TFile extends File {
         return path.startsWith(UNC_PREFIX) && path.indexOf(separatorChar, 2) > 2;
     }
 
-    // Make static code analysis shut up about missing hashCode().
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The implementation in the class {@link TFile} delegates the call to its
+     * {@link #getFile() decorated file}.
+     *
+     * @see #equals(Object)
+     */
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return delegate.hashCode();
     }
 
     /**
      * {@inheritDoc}
      * <p>
-     * The implementation in this class behaves exactly like its superclass.
-     * Note that this implies that only the hierarchicalized file system path
+     * The implementation in the class {@link TFile} delegates the call to its
+     * {@link #getFile() decorated file}.
+     * This implies that only the hierarchicalized file system path
      * of this file instance is considered in the comparison.
      * E.g. {@code new TFile(FsPath.create("zip:file:/archive!/entry"))} and
      * {@code new TFile(FsPath.create("tar:file:/archive!/entry"))} would
@@ -1628,18 +1621,21 @@ public final class TFile extends File {
      * {@code new TFile("file").toFsPath().hierarchicalize().equals(new TFile("FILE").toFsPath().hierarchicalize())}
      * is false because {@link FsPath#equals(Object)} is case sensitive.
      *
+     * @see #hashCode()
      * @see #compareTo(File)
      */
     @Override
     @SuppressWarnings({"EqualsWhichDoesntCheckParameterClass"})
     public boolean equals(Object that) {
-        return super.equals(that);
+        return delegate.equals(that);
     }
 
     /**
      * {@inheritDoc}
      * <p>
-     * The implementation in this class behaves exactly like its superclass.
+     * The implementation in the class {@link TFile} delegates the call to its
+     * {@link #getFile() decorated file}.
+     * This implies that only the hierarchicalized file system path
      * Note that this implies that only the hierarchicalized file system path
      * of this file instance is considered in the comparison.
      * E.g. {@code new TFile(FsPath.create("zip:file:/archive!/entry"))} and
@@ -1662,7 +1658,7 @@ public final class TFile extends File {
      */
     @Override
     public int compareTo(File other) {
-        return super.compareTo(other);
+        return delegate.compareTo(other);
     }
 
     /**
@@ -1681,18 +1677,13 @@ public final class TFile extends File {
     }
 
     @Override
-    public String getName() {
-        return delegate.getName();
-    }
-
-    @Override
-    public @CheckForNull String getParent() {
-        return delegate.getParent();
-    }
-
-    @Override
     public String getPath() {
         return delegate.getPath();
+    }
+
+    @Override
+    public String getName() {
+        return delegate.getName();
     }
 
     @Override

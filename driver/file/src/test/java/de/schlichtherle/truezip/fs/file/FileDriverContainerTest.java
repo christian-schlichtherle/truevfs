@@ -41,8 +41,8 @@ public final class FileDriverContainerTest {
 
     @Test
     public void testGetDrivers() {
-        for (String suffix : new SuffixSet(DRIVER_LIST))
-            assertThat(instance.getDrivers().get(FsScheme.create(suffix)), notNullValue());
+        for (String scheme : new SuffixSet(DRIVER_LIST))
+            assertThat(instance.getDrivers().get(FsScheme.create(scheme)), notNullValue());
     }
 
     @Test

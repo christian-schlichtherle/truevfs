@@ -16,6 +16,10 @@
 
 package de.schlichtherle.truezip.swing;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.awt.Component;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -27,7 +31,6 @@ import javax.swing.JComboBox;
 import javax.swing.MutableComboBoxModel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.plaf.basic.BasicComboBoxEditor;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Caret;
 import javax.swing.text.Document;
@@ -44,30 +47,31 @@ import javax.swing.text.JTextComponent;
  * of {@code JComboBox} and doesn't require a special
  * {@link ComboBoxModel}, although its specific behaviour will only show
  * if the {@code JComboBox} is {@code editable} and uses an
- * instance of a {@link MutableComboBoxModel} (which, apart from the
+ * instance of a {@link MutableComboBoxModel} (which, besides the
  * {@code editable} property being set to {@code true}, is the
  * default for a plain {@code JComboBox}).
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public abstract class AbstractComboBoxBrowser implements Serializable {
     private static final long serialVersionUID = 1065103960246722893L;
 
     private final Listener listener = new Listener();
 
-    private JComboBox comboBox;
+    private @CheckForNull JComboBox comboBox;
 
     /**
      * Used to inhibit mutual recursive event firing.
      */
-    private transient boolean recursion; // = false;
+    private transient boolean recursion;
 
     /**
      * Creates a new combo box auto completion browser.
      * {@link #setComboBox} must be called in order to use this object.
      */
-    public AbstractComboBoxBrowser() {
+    protected AbstractComboBoxBrowser() {
     }
 
     /**
@@ -78,7 +82,7 @@ public abstract class AbstractComboBoxBrowser implements Serializable {
      * @param comboBox The combo box to enable browsing for auto completions.
      *        May be {@code null}.
      */
-    public AbstractComboBoxBrowser(final JComboBox comboBox) {
+    protected AbstractComboBoxBrowser(final @CheckForNull JComboBox comboBox) {
         changeComboBox(null, comboBox, false);
     }
 
@@ -86,7 +90,7 @@ public abstract class AbstractComboBoxBrowser implements Serializable {
      * Returns the combo box which this object is auto completing.
      * The default is {@code null}.
      */
-    public JComboBox getComboBox() {
+    public @Nullable JComboBox getComboBox() {
         return comboBox;
     }
 
@@ -98,30 +102,30 @@ public abstract class AbstractComboBoxBrowser implements Serializable {
      * @param comboBox The combo box to enable browsing for auto completions.
      *        May be {@code null}.
      */
-    public void setComboBox(final JComboBox comboBox) {
+    public void setComboBox(final @CheckForNull JComboBox comboBox) {
         changeComboBox(getComboBox(), comboBox, true);
     }
 
     private void changeComboBox(
-            final JComboBox oldCB,
-            final JComboBox newCB,
+            final @CheckForNull JComboBox oldCB,
+            final @CheckForNull JComboBox newCB,
             final boolean update) {
         if (newCB == oldCB)
             return;
 
         ComboBoxEditor oldCBE = null;
-        if (oldCB != null) {
+        if (null != oldCB) {
             oldCB.removePropertyChangeListener("editor", listener);
             oldCBE = oldCB.getEditor();
-            oldCB.setEditor(((ComboBoxEditorProxy) oldCBE).getEditor());
+            oldCB.setEditor(((DecoratingComboBoxEditor) oldCBE).getEditor());
         }
 
         this.comboBox = newCB;
 
         ComboBoxEditor newCBE = null;
-        if (newCB != null) {
+        if (null != newCB) {
             newCB.updateUI(); // ensure comboBoxEditor is initialized
-            newCBE = new ComboBoxEditorProxy(newCB.getEditor());
+            newCBE = new DecoratingComboBoxEditor(newCB.getEditor());
             newCB.setEditor(newCBE);
             newCB.addPropertyChangeListener("editor", listener);
         }
@@ -130,21 +134,21 @@ public abstract class AbstractComboBoxBrowser implements Serializable {
     }
 
     private void changeEditor(
-            final ComboBoxEditor oldCBE,
-            final ComboBoxEditor newCBE,
+            final @CheckForNull ComboBoxEditor oldCBE,
+            final @CheckForNull ComboBoxEditor newCBE,
             final boolean update) {
         if (newCBE == oldCBE)
             return;
 
         JTextComponent oldText = null;
-        if (oldCBE != null) {
+        if (null != oldCBE) {
             final Component component = oldCBE.getEditorComponent();
             if (component instanceof JTextComponent)
                 oldText = (JTextComponent) component;
         }
 
         JTextComponent newText = null;
-        if (newCBE != null) {
+        if (null != newCBE) {
             final Component component = newCBE.getEditorComponent();
             if (component instanceof JTextComponent)
                 newText = (JTextComponent) component;
@@ -154,20 +158,20 @@ public abstract class AbstractComboBoxBrowser implements Serializable {
     }
 
     private void changeText(
-            final JTextComponent oldTC,
-            final JTextComponent newTC,
+            final @CheckForNull JTextComponent oldTC,
+            final @CheckForNull JTextComponent newTC,
             final boolean update) {
         if (newTC == oldTC)
             return;
 
         Document oldDocument = null;
-        if (oldTC != null) {
+        if (null != oldTC) {
             oldTC.removePropertyChangeListener("document", listener);
             oldDocument = oldTC.getDocument();
         }
 
         Document newDocument = null;
-        if (newTC != null) {
+        if (null != newTC) {
             newDocument = newTC.getDocument();
             newTC.addPropertyChangeListener("document", listener);
         }
@@ -176,16 +180,16 @@ public abstract class AbstractComboBoxBrowser implements Serializable {
     }
 
     private void changeDocument(
-            final Document oldDoc,
-            final Document newDoc,
+            final @CheckForNull Document oldDoc,
+            final @CheckForNull Document newDoc,
             final boolean update) {
         if (newDoc == oldDoc)
             return;
 
-        if (oldDoc != null)
+        if (null != oldDoc)
             oldDoc.removeDocumentListener(listener);
 
-        if (newDoc != null) {
+        if (null != newDoc) {
             if (update) {
                 String txt;
                 try {
@@ -219,7 +223,7 @@ public abstract class AbstractComboBoxBrowser implements Serializable {
         }
     }
 
-    private void updateEditor(final ComboBoxEditor cbe, final Object item) {
+    private void updateEditor(final ComboBoxEditor cbe, final @CheckForNull Object item) {
         if (lock())
             return;
         try {
@@ -258,7 +262,7 @@ public abstract class AbstractComboBoxBrowser implements Serializable {
      * @return Whether or not the combo box should pop up to show the updated
      *         contents of its model.
      */
-    protected abstract boolean update(String initials);
+    protected abstract boolean update(@CheckForNull String initials);
 
     /**
      * Locks out mutual recursive event notification.
@@ -284,24 +288,24 @@ public abstract class AbstractComboBoxBrowser implements Serializable {
     }
 
     private final class Listener
-            implements DocumentListener, PropertyChangeListener {
+    implements DocumentListener, PropertyChangeListener {
         @Override
-		public void insertUpdate(DocumentEvent e) {
+        public void insertUpdate(DocumentEvent e) {
             documentUpdated();
         }
 
         @Override
-		public void removeUpdate(DocumentEvent e) {
+        public void removeUpdate(DocumentEvent e) {
             documentUpdated();
         }
 
         @Override
-		public void changedUpdate(DocumentEvent e) {
+        public void changedUpdate(DocumentEvent e) {
             documentUpdated();
         }
 
         @Override
-		public void propertyChange(final PropertyChangeEvent e) {
+        public void propertyChange(final PropertyChangeEvent e) {
             final String property = e.getPropertyName();
             if ("editor".equals(property))
                 changeEditor(   (ComboBoxEditor) e.getOldValue(),
@@ -321,56 +325,50 @@ public abstract class AbstractComboBoxBrowser implements Serializable {
     /**
      * This proxy controls access to the real {@code ComboBoxEditor}
      * installed by the client application or the pluggable look and feel.
-     * It is used to lock out mutual recursion caused by modifications to
+     * It is used to inhibit mutual recursion caused by modifications to
      * the list model in the {@code JComboBox}.
-     * <p>
-     * Note that there is a slight chance that the introduction of this proxy
-     * breaks the look and feel if it does {@code instanceof} tests for
-     * a particular class, but I'm not aware of any look and feel which is
-     * actually affected.
-     * In order to reduce this risk, this class is extended from
-     * {@link BasicComboBoxEditor}, although it overrides all methods which
-     * are defined in the {@link ComboBoxEditor} interface.
      */
-    private final class ComboBoxEditorProxy extends BasicComboBoxEditor {
-        private final ComboBoxEditor comboBoxEditor;
+    private final class DecoratingComboBoxEditor implements ComboBoxEditor {
+        private final ComboBoxEditor delegate;
 
-        public ComboBoxEditorProxy(ComboBoxEditor comboBoxEditor) {
-            this.comboBoxEditor = comboBoxEditor;
+        DecoratingComboBoxEditor(ComboBoxEditor comboBoxEditor) {
+            assert null != comboBoxEditor;
+            this.delegate = comboBoxEditor;
         }
 
-        public ComboBoxEditor getEditor() {
-            return comboBoxEditor;
+        /** Returns the decorated combo box editor. */
+        ComboBoxEditor getEditor() {
+            return delegate;
         }
 
         @Override
         public Component getEditorComponent() {
-            return comboBoxEditor.getEditorComponent();
+            return delegate.getEditorComponent();
         }
 
         @Override
-        public void setItem(final Object item) {
-            updateEditor(comboBoxEditor, item);
+        public void setItem(final @CheckForNull Object item) {
+            updateEditor(delegate, item);
         }
 
         @Override
-        public Object getItem() {
-            return comboBoxEditor.getItem();
+        public @CheckForNull Object getItem() {
+            return delegate.getItem();
         }
 
         @Override
         public void selectAll() {
-            comboBoxEditor.selectAll();
+            delegate.selectAll();
         }
 
         @Override
         public void addActionListener(ActionListener actionListener) {
-            comboBoxEditor.addActionListener(actionListener);
+            delegate.addActionListener(actionListener);
         }
 
         @Override
         public void removeActionListener(ActionListener actionListener) {
-            comboBoxEditor.removeActionListener(actionListener);
+            delegate.removeActionListener(actionListener);
         }
     }
 }

@@ -4,7 +4,7 @@
   <NonVisualComponents>
     <Container class="de.schlichtherle.truezip.swing.EnhancedPanel" name="passwdPanel">
       <Events>
-        <EventHandler event="ancestorWindowShown" listener="de.schlichtherle.truezip.swing.event.PanelListener" parameters="de.schlichtherle.truezip.swing.event.PanelEvent" handler="passwdPanelAncestorWindowShown"/>
+        <EventHandler event="ancestorWindowShown" listener="de.schlichtherle.truezip.swing.PanelListener" parameters="de.schlichtherle.truezip.swing.PanelEvent" handler="passwdPanelAncestorWindowShown"/>
       </Events>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_SerializeTo" type="java.lang.String" value="PasswdPanel_passwdPanel"/>
@@ -44,7 +44,7 @@
     </Container>
   </NonVisualComponents>
   <Events>
-    <EventHandler event="ancestorWindowShown" listener="de.schlichtherle.truezip.swing.event.PanelListener" parameters="de.schlichtherle.truezip.swing.event.PanelEvent" handler="formAncestorWindowShown"/>
+    <EventHandler event="ancestorWindowShown" listener="de.schlichtherle.truezip.swing.PanelListener" parameters="de.schlichtherle.truezip.swing.PanelEvent" handler="formAncestorWindowShown"/>
   </Events>
   <AuxValues>
     <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>

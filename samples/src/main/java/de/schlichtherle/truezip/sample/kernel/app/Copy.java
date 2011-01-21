@@ -45,38 +45,40 @@ public final class Copy {
     throws IOException, URISyntaxException {
         // Obtain a manager for file system controller life cycle management.
         FsManager manager = new FsDefaultManager();
+        try {
+            // Search the class path for the set of all supported file system
+            // drivers and build a composite driver from it.
+            FsCompositeDriver
+                    driver = new FsDefaultDriver(FsDriverContainer.SINGLETON);
 
-        // Search the class path for the set of all supported file system
-        // drivers and build a composite driver from it.
-        FsCompositeDriver
-                driver = new FsDefaultDriver(FsDriverContainer.SINGLETON);
+            // Resolve the source socket.
+            // Note that an absolute URI is required, so we may need to use the
+            // File class as a helper.
+            URI srcUri = new URI(args[0]);
+            srcUri = srcUri.isAbsolute() ? srcUri : new File(args[0]).toURI();
+            FsPath srcPath = new FsPath(srcUri, FsUriModifier.CANONICALIZE);
+            InputSocket<?> srcSocket = manager
+                    .getController(     srcPath.getMountPoint(), driver)
+                    .getInputSocket(    srcPath.getEntryName(),
+                                        BitField.noneOf(FsInputOption.class));
 
-        // Resolve the source socket.
-        // Note that an absolute URI is required, so we may need to use the
-        // File class as a helper.
-        URI srcUri = new URI(args[0]);
-        srcUri = srcUri.isAbsolute() ? srcUri : new File(args[0]).toURI();
-        FsPath srcPath = new FsPath(srcUri, FsUriModifier.CANONICALIZE);
-        InputSocket<?> srcSocket = manager
-                .getController(     srcPath.getMountPoint(), driver)
-                .getInputSocket(    srcPath.getEntryName(),
-                                    BitField.noneOf(FsInputOption.class));
+            // Resolve the destination socket. Again, we need an absolute URI.
+            URI dstUri = new URI(args[1]);
+            dstUri = dstUri.isAbsolute() ? dstUri : new File(args[1]).toURI();
+            FsPath dstPath = new FsPath(dstUri, FsUriModifier.CANONICALIZE);
+            OutputSocket<?> dstSocket = manager
+                    .getController(     dstPath.getMountPoint(), driver)
+                    .getOutputSocket(   dstPath.getEntryName(),
+                                        BitField.of(FsOutputOption.CREATE_PARENTS,
+                                                    FsOutputOption.EXCLUSIVE),
+                                        srcSocket.getLocalTarget());
 
-        // Resolve the destination socket. Again, we need an absolute URI.
-        URI dstUri = new URI(args[1]);
-        dstUri = dstUri.isAbsolute() ? dstUri : new File(args[1]).toURI();
-        FsPath dstPath = new FsPath(dstUri, FsUriModifier.CANONICALIZE);
-        OutputSocket<?> dstSocket = manager
-                .getController(     dstPath.getMountPoint(), driver)
-                .getOutputSocket(   dstPath.getEntryName(),
-                                    BitField.of(FsOutputOption.CREATE_PARENTS,
-                                                FsOutputOption.EXCLUSIVE),
-                                    srcSocket.getLocalTarget());
-
-        // Copy the data.
-        IOSocket.copy(srcSocket, dstSocket);
-
-        // Commit all changes to federated file systems, if any were accessed.
-        manager.umount();
+            // Copy the data.
+            IOSocket.copy(srcSocket, dstSocket);
+        } finally {
+            // Commit all changes to federated file systems, if any were
+            // accessed, and clean up temporary files used for caching.
+            manager.umount();
+        }
     }
 }

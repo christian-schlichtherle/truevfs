@@ -19,6 +19,7 @@ import de.schlichtherle.truezip.util.SuffixSet;
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsDriverService;
 import de.schlichtherle.truezip.fs.FsScheme;
+import de.schlichtherle.truezip.fs.archive.ArchiveDriver;
 import de.schlichtherle.truezip.socket.IOPoolContainer;
 import de.schlichtherle.truezip.socket.IOPool;
 import java.util.Collections;
@@ -36,12 +37,13 @@ import net.jcip.annotations.Immutable;
 public final class ZipDriverContainer implements FsDriverService {
 
     private static final IOPool<?> POOL = IOPoolContainer.SINGLETON.getPool();
-    private static final Map<FsScheme, FsDriver> DRIVERS;
+    private static final Map<FsScheme, ArchiveDriver<?>> DRIVERS;
 
     static {
-        final Map<FsScheme, FsDriver> drivers = new HashMap<FsScheme, FsDriver>();
+        final Map<FsScheme, ArchiveDriver<?>>
+                drivers = new HashMap<FsScheme, ArchiveDriver<?>>();
         drivers.put(FsScheme.create("zip"), new ZipDriver(POOL));
-        FsDriver driver = new JarDriver(POOL);
+        ArchiveDriver<?> driver = new JarDriver(POOL);
         for (String suffix : new SuffixSet("ear|jar|war"))
             drivers.put(FsScheme.create(suffix), driver);
         driver = new OdfDriver(POOL);
@@ -52,7 +54,7 @@ public final class ZipDriverContainer implements FsDriverService {
     }
 
     @Override
-    public Map<FsScheme, ? extends FsDriver> getDrivers() {
+    public Map<FsScheme, ArchiveDriver<?>> getDrivers() {
         return DRIVERS;
     }
 }

@@ -32,7 +32,6 @@
     </description>
 
     <dependencies>
-        <!-- TODO: Spin off truezip-driver-tzp-console and truezip-driver-tzp-swing -->
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk16</artifactId>

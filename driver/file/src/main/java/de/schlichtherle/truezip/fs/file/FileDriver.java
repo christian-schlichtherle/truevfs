@@ -51,6 +51,6 @@ final class FileDriver implements FsDriver {
                 : mountPoint.getParent().equals(parent.getModel().getMountPoint());
         if (null != parent)
             throw new IllegalArgumentException();
-        return new FileController(new FsModel(mountPoint));
+        return new FileController<FsModel>(new FsModel(mountPoint));
     }
 }

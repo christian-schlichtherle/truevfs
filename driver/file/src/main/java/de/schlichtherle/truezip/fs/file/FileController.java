@@ -52,12 +52,12 @@ import static java.io.File.separatorChar;
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-final class FileController extends FsController<FsModel>  {
+final class FileController<M extends FsModel> extends FsController<M>  {
 
-    private final FsModel model;
+    private final M model;
     private final File target;
 
-    FileController(final FsModel model) {
+    FileController(final M model) {
         if (null != model.getParent())
             throw new IllegalArgumentException();
         URI uri = model.getMountPoint().getUri();
@@ -76,7 +76,7 @@ final class FileController extends FsController<FsModel>  {
     }
 
     @Override
-    public FsModel getModel() {
+    public M getModel() {
         return model;
     }
 
@@ -102,7 +102,7 @@ final class FileController extends FsController<FsModel>  {
 
     @Override
     public FileEntry getEntry(FsEntryName name) throws IOException {
-        final FileEntry entry = new FileEntry(target, name);
+        FileEntry entry = new FileEntry(target, name);
         return entry.getFile().exists() ? entry : null;
     }
 

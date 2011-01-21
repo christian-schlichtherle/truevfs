@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.crypto.raes.param.swing;
 
-import de.schlichtherle.truezip.file.swing.TFileComboBoxBrowser;
+import de.schlichtherle.truezip.io.swing.FileComboBoxBrowser;
 import java.awt.EventQueue;
 import java.awt.Window;
 import java.awt.event.WindowEvent;
@@ -36,7 +35,7 @@ import javax.swing.text.JTextComponent;
 
 /**
  * A panel displaying a password panel or a key file panel in order to let
- * the user select an authentication method and enter the key.
+ * the user select an authentication method and enter a key.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -66,7 +65,7 @@ final class AuthenticationPanel extends JPanel {
 
         // Order is important here: The file combo box browser installs its
         // own editor, so we have to adjust the columns last.
-        new TFileComboBoxBrowser(keyFile).setDirectory(BASE_DIR);
+        new FileComboBoxBrowser(keyFile).setDirectory(BASE_DIR);
         ((JTextField) keyFile.getEditor().getEditorComponent()).setColumns(30);
     }
 
@@ -171,11 +170,11 @@ final class AuthenticationPanel extends JPanel {
         setLayout(new java.awt.GridBagLayout());
 
         keyFilePanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        keyFilePanel.addPanelListener(new de.schlichtherle.truezip.swing.event.PanelListener() {
-            public void ancestorWindowShown(de.schlichtherle.truezip.swing.event.PanelEvent evt) {
+        keyFilePanel.addPanelListener(new de.schlichtherle.truezip.swing.PanelListener() {
+            public void ancestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {
                 keyFilePanelAncestorWindowShown(evt);
             }
-            public void ancestorWindowHidden(de.schlichtherle.truezip.swing.event.PanelEvent evt) {
+            public void ancestorWindowHidden(de.schlichtherle.truezip.swing.PanelEvent evt) {
             }
         });
         keyFilePanel.setLayout(new java.awt.GridBagLayout());
@@ -237,7 +236,7 @@ final class AuthenticationPanel extends JPanel {
         }
     }//GEN-LAST:event_keyFileChooserActionPerformed
 
-    private void keyFilePanelAncestorWindowShown(de.schlichtherle.truezip.swing.event.PanelEvent evt) {//GEN-FIRST:event_keyFilePanelAncestorWindowShown
+    private void keyFilePanelAncestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {//GEN-FIRST:event_keyFilePanelAncestorWindowShown
         // These are the things I hate Swing for: All I want to do here is to
         // set the focus to the passwd field in this panel when it shows.
         // However, this can't be done in the constructor since the panel is
@@ -268,7 +267,7 @@ final class AuthenticationPanel extends JPanel {
         // no guarantee that the focus gets actually transferred...
         // This mess is insane (and I can hardly abstain from writing down
         // all the other insulting scatology which comes to my mind)!
-        final Window window = evt.getAncestorWindow();
+        final Window window = evt.getSource().getAncestorWindow();
         window.addWindowFocusListener(new WindowFocusListener() {
             @Override
 			public void windowGainedFocus(WindowEvent e) {
@@ -296,12 +295,11 @@ final class AuthenticationPanel extends JPanel {
     // End of variables declaration//GEN-END:variables
 
     private static class CustomFileChooser extends javax.swing.JFileChooser {
-        private static File lastCurrentDir = BASE_DIR;
         private static final long serialVersionUID = 2361832976537648223L;
+        private static File lastCurrentDir = BASE_DIR;
         
         public CustomFileChooser() {
             super(lastCurrentDir);
-
             setDialogTitle(resources.getString("fileChooser.title"));
             setFileHidingEnabled(false);
         }

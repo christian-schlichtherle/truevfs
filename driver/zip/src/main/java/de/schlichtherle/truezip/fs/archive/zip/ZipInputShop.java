@@ -65,6 +65,11 @@ implements InputShop<ZipArchiveEntry> {
             }
 
             @Override
+            public ReadOnlyFile newReadOnlyFile() throws IOException {
+                throw new FileNotFoundException(name + " (unsupported operation)"); // TODO: Support this feature for STORED entries.
+            }
+
+            @Override
             public InputStream newInputStream() throws IOException {
                 final Entry entry = getPeerTarget();
                 return ZipInputShop.this.getInputStream(
@@ -72,11 +77,6 @@ implements InputShop<ZipArchiveEntry> {
                         false,
                         !(entry instanceof ZipArchiveEntry)
                             || ((ZipArchiveEntry) entry).getMethod() != DEFLATED);
-            }
-
-            @Override
-            public ReadOnlyFile newReadOnlyFile() throws IOException {
-                throw new IOException(name + " (unsupported operation)"); // TODO: Support this feature for STORED entries.
             }
         } // class Input
 

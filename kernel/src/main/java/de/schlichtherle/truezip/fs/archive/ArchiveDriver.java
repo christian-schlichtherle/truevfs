@@ -53,9 +53,10 @@ implements FsDriver, EntryFactory<E> {
      * <p>
      * The implementation in the class {@link ArchiveDriver} always returns
      * {@code true}.
+     * This can't get overridden.
      */
     @Override
-    public boolean isFederated() {
+    public final boolean isFederated() {
         return true;
     }
 

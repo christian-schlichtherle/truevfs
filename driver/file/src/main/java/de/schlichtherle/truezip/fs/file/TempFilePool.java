@@ -36,7 +36,7 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-public final class TempFilePool implements IOPool<FileEntry> {
+final class TempFilePool implements IOPool<FileEntry> {
 
     /**
      * A default instance of this pool.

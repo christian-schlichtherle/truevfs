@@ -25,6 +25,7 @@ import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.fs.FsUriModifier;
 import de.schlichtherle.truezip.util.Link;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.CharConversionException;
@@ -54,6 +55,7 @@ import static de.schlichtherle.truezip.io.Paths.*;
  * @version $Id$
  */
 @NotThreadSafe
+@DefaultAnnotation(NonNull.class)
 class ArchiveFileSystem<E extends ArchiveEntry>
 implements EntryContainer<ArchiveFileSystemEntry<E>> {
 
@@ -86,12 +88,12 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      * @param  factory the archive entry factory to use.
      * @throws NullPointerException If {@code factory} is {@code null}.
      */
-    static @NonNull <AE extends ArchiveEntry> ArchiveFileSystem<AE>
-    newArchiveFileSystem(@NonNull EntryFactory<AE> factory) {
+    static <AE extends ArchiveEntry> ArchiveFileSystem<AE>
+    newArchiveFileSystem(EntryFactory<AE> factory) {
         return new ArchiveFileSystem<AE>(factory);
     }
 
-    private ArchiveFileSystem(final @NonNull EntryFactory<E> factory) {
+    private ArchiveFileSystem(final EntryFactory<E> factory) {
         this.factory = factory;
         master = new LinkedHashMap<String, ArchiveFileSystemEntry<E>>(64);
 
@@ -137,9 +139,9 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      * @throws IllegalArgumentException If {@code rootTemplate} is an instance
      *         of {@link ArchiveFileSystemEntry}.
      */
-    static @NonNull <E extends ArchiveEntry> ArchiveFileSystem<E>
-    newArchiveFileSystem(   @NonNull EntryFactory<E> factory,
-                            @NonNull EntryContainer<E> archive,
+    static <E extends ArchiveEntry> ArchiveFileSystem<E>
+    newArchiveFileSystem(   EntryFactory<E> factory,
+                            EntryContainer<E> archive,
                             @CheckForNull Entry rootTemplate,
                             boolean readOnly) {
         return readOnly
@@ -147,8 +149,8 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
             : new ArchiveFileSystem<E>(factory, archive, rootTemplate);
     }
 
-    ArchiveFileSystem(  final @NonNull EntryFactory<E> factory,
-                        final @NonNull EntryContainer<E> archive,
+    ArchiveFileSystem(  final EntryFactory<E> factory,
+                        final EntryContainer<E> archive,
                         final @CheckForNull Entry rootTemplate) {
         if (null == rootTemplate)
             throw new NullPointerException();
@@ -204,8 +206,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
          * for {@code null}.
          */
         @Override
-        @NonNull
-        public String getParentPath() {
+        public @NonNull String getParentPath() {
             final String parentPath = super.getParentPath();
             return null != parentPath ? parentPath : ROOT.toString();
         }
@@ -224,7 +225,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
          * If a parent directory does exist, the respective member is added
          * (possibly yet again) and the process is continued.
          */
-        void fix(final @NonNull String path) {
+        void fix(final String path) {
             // When recursing into this method, it may be called with the root
             // directory as its parameter, so we may NOT skip the following test.
             if (isRoot(path))
@@ -234,7 +235,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
             final String parentPath = getParentPath();
             final String memberName = getMemberName();
             ArchiveFileSystemEntry<E> parent = master.get(parentPath);
-            if (parent == null) {
+            if (null == parent) {
                 parent = newEntryUnchecked(parentPath, DIRECTORY, null);
                 master.put(parentPath, parent);
             }
@@ -307,7 +308,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      * @param  listener the listener for archive file system events.
      */
     public final void addArchiveFileSystemTouchListener(
-            @NonNull ArchiveFileSystemTouchListener<? super E> listener) {
+            ArchiveFileSystemTouchListener<? super E> listener) {
         if (null == listener)
             throw new NullPointerException();
         touchListeners.add(listener);
@@ -354,13 +355,13 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
 
     @Nullable
     public final ArchiveFileSystemEntry<E> getEntry(
-            @NonNull FsEntryName name) {
+            FsEntryName name) {
         return getEntry(name.getPath());
     }
 
     @Override
     @Nullable
-    public ArchiveFileSystemEntry<E> getEntry(@NonNull String path) {
+    public ArchiveFileSystemEntry<E> getEntry(String path) {
         if (path == null)
             throw new NullPointerException();
         final ArchiveFileSystemEntry<E> entry = master.get(path);
@@ -375,10 +376,9 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      * @throws AssertionError if a {@link CharConversionException}
      *         occurs. The original exception is wrapped as its cause.
      */
-    @NonNull
     private ArchiveFileSystemEntry<E> newEntryUnchecked(
-            @NonNull final String path,
-            @NonNull final Type type,
+            final String path,
+            final Type type,
             @CheckForNull final Entry template) {
         assert null != type;
         assert !isRoot(path) || DIRECTORY == type;
@@ -400,10 +400,9 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      * @see    #mknod
      * @param  path the path name of the archive file system entry.
      */
-    @NonNull
     private ArchiveFileSystemEntry<E> newEntryChecked(
-            @NonNull final String path,
-            @NonNull final Type type,
+            final String path,
+            final Type type,
             @CheckForNull final Entry template)
     throws ArchiveFileSystemException {
         assert null != type;
@@ -418,7 +417,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         }
     }
 
-    final @NonNull E copy(@NonNull E entry) {
+    final E copy(E entry) {
         try {
             return factory.newEntry(entry.getName(), entry.getType(), entry);
         } catch (CharConversionException ex) {
@@ -470,11 +469,10 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      *         be linked into this archive file system upon a call to its
      *         {@link ArchiveFileSystemOperation#run} method.
      */
-    @NonNull
     public ArchiveFileSystemOperation<E> mknod(
-            @NonNull final FsEntryName name,
-            @NonNull final Entry.Type type,
-            @NonNull final BitField<FsOutputOption> options,
+            final FsEntryName name,
+            final Entry.Type type,
+            final BitField<FsOutputOption> options,
             @CheckForNull Entry template)
     throws ArchiveFileSystemException {
         final String path = name.getPath();
@@ -513,8 +511,8 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         final SegmentLink<E>[] links;
         long time = -1;
 
-        PathLink(   @NonNull final String entryPath,
-                    @NonNull final Entry.Type entryType,
+        PathLink(   final String entryPath,
+                    final Entry.Type entryType,
                     final boolean createParents,
                     @CheckForNull final Entry template)
         throws ArchiveFileSystemException {
@@ -524,8 +522,8 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
 
         @SuppressWarnings({ "unchecked", "rawtypes" })
         private SegmentLink<E>[] newSegmentLinks(
-                @NonNull final String entryPath,
-                @NonNull final Entry.Type entryType,
+                final String entryPath,
+                final Entry.Type entryType,
                 @CheckForNull final Entry template,
                 final int level)
         throws ArchiveFileSystemException {
@@ -585,7 +583,6 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         }
 
         @Override
-        @NonNull
         public ArchiveFileSystemEntry<E> getTarget() {
             return links[links.length - 1].getTarget();
         }
@@ -597,7 +594,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      */
     private static final class SegmentLink<E extends ArchiveEntry>
     implements Link<ArchiveFileSystemEntry<E>> {
-        @NonNull final ArchiveFileSystemEntry<E> entry;
+        final ArchiveFileSystemEntry<E> entry;
         @CheckForNull final String base;
 
         /**
@@ -608,14 +605,13 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
          * @param base The nullable base (segment) path of the path name.
          */
         SegmentLink(
-                @NonNull final ArchiveFileSystemEntry<E> entry,
+                final ArchiveFileSystemEntry<E> entry,
                 @CheckForNull final String base) {
             this.entry = entry;
             this.base = base;
         }
 
         @Override
-        @NonNull
         public ArchiveFileSystemEntry<E> getTarget() {
             return entry;
         }
@@ -633,7 +629,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      * @throws ArchiveFileSystemException If the operation fails for some other
      *         reason.
      */
-    public void unlink(@NonNull final FsEntryName name) throws ArchiveFileSystemException {
+    public void unlink(final FsEntryName name) throws ArchiveFileSystemException {
         final String path = name.getPath();
         if (name.isRoot())
             throw new ArchiveFileSystemException(path,
@@ -643,7 +639,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
             throw new ArchiveFileSystemException(path,
                     "archive entry does not exist");
         assert entry != root;
-        if (entry.getType() == DIRECTORY && 0 < entry.getMembers().size()) {
+        if (DIRECTORY == entry.getType() && 0 < entry.getMembers().size()) {
             throw new ArchiveFileSystemException(path,
                     "directory is not empty");
         }
@@ -665,8 +661,8 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
     }
 
     public boolean setTime(
-            @NonNull final FsEntryName name,
-            @NonNull final BitField<Access> types,
+            final FsEntryName name,
+            final BitField<Access> types,
             final long value)
     throws ArchiveFileSystemException {
         final String path = name.getPath();
@@ -685,11 +681,11 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         return ok;
     }
 
-    public boolean isWritable(@NonNull FsEntryName name) {
+    public boolean isWritable(FsEntryName name) {
         return !isReadOnly();
     }
 
-    public void setReadOnly(@NonNull FsEntryName name)
+    public void setReadOnly(FsEntryName name)
     throws ArchiveFileSystemException {
         if (!isReadOnly())
             throw new ArchiveFileSystemException(name.getPath(),

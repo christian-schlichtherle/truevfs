@@ -15,8 +15,6 @@
  */
 package de.schlichtherle.truezip.swing;
 
-import de.schlichtherle.truezip.swing.event.PanelEvent;
-import de.schlichtherle.truezip.swing.event.PanelListener;
 import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.Toolkit;

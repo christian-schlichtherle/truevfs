@@ -54,17 +54,21 @@ abstract class CommandLineUtility {
     /**
      * Constructs a new command line utility instance.
      * <p>
-     * <b>Warning</b>: This constructor has side effects:
-     * If Swing based prompting is used, the Hurling Window Feedback is set for
-     * feedback on wrong key entry unless the respective system properties
-     * have been explicitly set.
+     * Note that this constructor has side effects:
+     * <ul>
+     * <li>If Swing based prompting is used, the Hurling Window Feedback is
+     *     set for feedback on wrong key entry unless the respective system
+     *     properties have been explicitly set.
+     * <li>Similarly, the {@link SampleManagerContainer} class is set for
+     *     obtaining statistics when synchronizing any uncommitted changes to
+     *     the contents of archive files.
+     * </ul>
      *
      * @param out The standard output stream.
      * @param err The error output stream.
      * @param autoFlush If the output streams are not {@link PrintStream}s,
      *        then they are wrapped in a new {@code PrintStream} with
      *        this as the additional constructor parameter.
-     * @see de.schlichtherle.truezip.key.passwd.swing.PromptingKeyManager
      */
     protected CommandLineUtility(
             final OutputStream out,

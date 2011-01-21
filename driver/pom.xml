@@ -32,6 +32,7 @@
 
     <modules>
         <module>file</module>
+        <module>http</module>
         <module>tar</module>
         <module>tzp</module>
         <module>zip</module>

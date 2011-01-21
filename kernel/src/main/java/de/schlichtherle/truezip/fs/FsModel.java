@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.fs;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Set;
@@ -30,19 +31,20 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
+@DefaultAnnotation(NonNull.class)
 public class FsModel {
 
     private final FsMountPoint mountPoint;
-    private final FsModel parent;
+    private final @CheckForNull FsModel parent;
     private volatile boolean touched;
     private Set<FsTouchedListener> touchedListeners
             = new LinkedHashSet<FsTouchedListener>();
 
-    public FsModel(@NonNull FsMountPoint mountPoint) {
+    public FsModel(FsMountPoint mountPoint) {
         this(mountPoint, null);
     }
 
-    public FsModel( final @NonNull FsMountPoint mountPoint,
+    public FsModel( final FsMountPoint mountPoint,
                     final @CheckForNull FsModel parent) {
         if (!equals(mountPoint.getParent(),
                     (null == parent ? null : parent.getMountPoint())))
@@ -51,7 +53,7 @@ public class FsModel {
         this.parent = parent;
     }
 
-    private static boolean equals(Object o1, Object o2) {
+    private static boolean equals(@CheckForNull Object o1, @CheckForNull Object o2) {
         return o1 == o2 || null != o1 && o1.equals(o2);
     }
 
@@ -64,7 +66,6 @@ public class FsModel {
      *
      * @return The mount point of this file system model.
      */
-    @NonNull
     public final FsMountPoint getMountPoint() {
         return mountPoint;
     }
@@ -111,7 +112,6 @@ public class FsModel {
      *
      * @return A clone of the set of file system touched listeners.
      */
-    @NonNull
     final synchronized Set<FsTouchedListener> getFileSystemTouchedListeners() {
         return new LinkedHashSet<FsTouchedListener>(touchedListeners);
     }
@@ -122,7 +122,7 @@ public class FsModel {
      * @param listener the listener for file system touched events.
      */
     public final synchronized void addFileSystemTouchedListener(
-            @NonNull FsTouchedListener listener) {
+            FsTouchedListener listener) {
         if (null == listener)
             throw new NullPointerException();
         touchedListeners.add(listener);
@@ -134,7 +134,7 @@ public class FsModel {
      * @param listener the listener for file system touched events.
      */
     public final synchronized void removeFileSystemTouchedListener(
-            @Nullable FsTouchedListener listener) {
+            @CheckForNull FsTouchedListener listener) {
         touchedListeners.remove(listener);
     }
 

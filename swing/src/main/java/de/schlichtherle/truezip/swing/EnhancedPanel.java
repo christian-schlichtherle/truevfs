@@ -15,8 +15,10 @@
  */
 package de.schlichtherle.truezip.swing;
 
-import de.schlichtherle.truezip.swing.event.PanelEvent;
-import de.schlichtherle.truezip.swing.event.PanelListener;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.awt.AWTEvent;
 import java.awt.Component;
 import java.awt.LayoutManager;
@@ -44,6 +46,7 @@ import javax.swing.event.EventListenerList;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public class EnhancedPanel extends JPanel  {
 
     private static final long serialVersionUID = 6984576810262891640L;
@@ -100,9 +103,9 @@ public class EnhancedPanel extends JPanel  {
     }
 
     private void init() {
-        addHierarchyListener(new HierarchyListener() {
+        class Listener implements HierarchyListener {
             @Override
-			public void hierarchyChanged(final HierarchyEvent e) {
+            public void hierarchyChanged(final HierarchyEvent e) {
                 if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED)
                         != HierarchyEvent.SHOWING_CHANGED)
                     return;
@@ -118,7 +121,9 @@ public class EnhancedPanel extends JPanel  {
                             ? PanelEvent.ANCESTOR_WINDOW_SHOWN
                             : PanelEvent.ANCESTOR_WINDOW_HIDDEN));
             }
-        });
+        } // class Listener
+
+        addHierarchyListener(new Listener());
     }
 
     /**
@@ -192,12 +197,12 @@ public class EnhancedPanel extends JPanel  {
      * {@code null} if the component is not (yet) placed in a
      * {@code Window}.
      */
-    public Window getAncestorWindow() {
+    public @Nullable Window getAncestorWindow() {
         return getAncestorWindow(this);
     }
 
-    private static Window getAncestorWindow(Component c) {
-        while (c != null && !(c instanceof Window))
+    private static @Nullable Window getAncestorWindow(Component c) {
+        while (null != c && !(c instanceof Window))
             c = c.getParent();
 
         return (Window) c;
@@ -207,7 +212,7 @@ public class EnhancedPanel extends JPanel  {
      * Utility field used by event firing mechanism.
      * Note that the listeners don't get serialized with this component!
      */
-    private transient EventListenerList listenerList;
+    private transient @CheckForNull EventListenerList listenerList;
 
     /**
      * Adds the {@code listener} to the list of receivers for
@@ -219,12 +224,9 @@ public class EnhancedPanel extends JPanel  {
      *        If this method is called {@code n} times with the same
      *        listener, any events generated will be delivered to this
      *        listener {@code n} times.
-     *
-     * @throws NullPointerException If {@code listener} is
-     *         {@code null}.
      */
     public void addPanelListener(final PanelListener listener) {
-        if (listener == null)
+        if (null == listener)
             throw new NullPointerException();
         if (listenerList == null )
             listenerList = new EventListenerList();
@@ -238,12 +240,9 @@ public class EnhancedPanel extends JPanel  {
      * @param listener The listener to remove.
      *        If this listener has been {@link #addPanelListener added}
      *        multiple times, it is removed from the list only once.
-     *
-     * @throws NullPointerException If {@code listener} is
-     *         {@code null}.
      */
     public void removePanelListener(final PanelListener listener) {
-        if (listener == null)
+        if (null == listener)
             throw new NullPointerException();
         if (listenerList == null)
             return;
@@ -261,10 +260,9 @@ public class EnhancedPanel extends JPanel  {
      * @see #removePanelListener
      */
     public PanelListener[] getPanelListeners() {
-        if (listenerList != null)
-            return listenerList.getListeners(PanelListener.class);
-        else
-            return new PanelListener[0];
+        return null != listenerList
+            ? listenerList.getListeners(PanelListener.class)
+            : new PanelListener[0];
     }
 
     @Override
@@ -285,7 +283,7 @@ public class EnhancedPanel extends JPanel  {
      * @param event The event to be fired.
      */
     void fireAncestorWindowShown(final PanelEvent event) {
-        if (listenerList == null)
+        if (null == listenerList)
             return;
         final Object[] listeners = listenerList.getListenerList();
         for (int i = listeners.length - 2; i >= 0; i -= 2) {
@@ -301,7 +299,7 @@ public class EnhancedPanel extends JPanel  {
      * @param event The event to be fired.
      */
     void fireAncestorWindowHidden(final PanelEvent event) {
-        if (listenerList == null)
+        if (null == listenerList)
             return;
         final Object[] listeners = listenerList.getListenerList();
         for (int i = listeners.length - 2; i >= 0; i -= 2) {
