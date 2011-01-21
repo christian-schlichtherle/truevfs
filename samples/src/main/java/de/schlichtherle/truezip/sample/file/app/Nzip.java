@@ -80,13 +80,6 @@ public class Nzip extends CommandLineUtility {
     private final DateFormat dateFormat = DateFormat.getDateTimeInstance();
     private final FieldPosition fpos = new FieldPosition(NumberFormat.INTEGER_FIELD);
 
-    public Nzip() {
-    }
-
-    public Nzip(OutputStream out, OutputStream err, boolean autoFlush) {
-        super(out, err, autoFlush);
-    }
-
     /**
      * May be overridden by subclasses to create the
      * {@link TDefaultArchiveDetector} which provides file system drivers which
