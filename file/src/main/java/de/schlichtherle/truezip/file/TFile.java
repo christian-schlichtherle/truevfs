@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.file;
 
+import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.io.Paths;
@@ -2395,8 +2396,14 @@ public final class TFile extends File {
         if (null == innerArchive)
             if (!(dst instanceof TFile) || null == ((TFile) dst).innerArchive)
                 return delegate.renameTo(dst);
-
-        return !dst.exists() && TFiles.move(this, dst, detector);
+        if (dst.exists())
+            return false;
+        try {
+            TFiles.move(this, dst, detector);
+            return true;
+        } catch (IOException ex) {
+            return false;
+        }
     }
 
     /**
