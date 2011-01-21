@@ -17,7 +17,7 @@ package de.schlichtherle.truezip.fs.archive.zip.raes;
 
 import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.fs.FsSyncOption;
-import de.schlichtherle.truezip.fs.archive.ArchiveFileSystemEntry;
+import de.schlichtherle.truezip.fs.archive.FsArchiveFileSystemEntry;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.fs.FsDecoratingController;
 import de.schlichtherle.truezip.fs.FsController;
@@ -25,6 +25,7 @@ import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsException;
 import de.schlichtherle.truezip.fs.FsModel;
+import de.schlichtherle.truezip.fs.FsTabuException;
 import de.schlichtherle.truezip.key.KeyProvider;
 import de.schlichtherle.truezip.key.PromptingKeyProvider;
 import de.schlichtherle.truezip.util.BitField;
@@ -67,9 +68,7 @@ extends FsDecoratingController< FsModel,
     throws IOException {
         try {
             return delegate.getEntry(name);
-        } catch (FsException ex) {
-            throw ex;
-        } catch (IOException ex) {
+        } catch (FsTabuException ex) {
             if (!name.isRoot())
                 return null;
             Entry entry = getParent().getEntry(
@@ -83,10 +82,10 @@ extends FsDecoratingController< FsModel,
             // The entry exists, but we can't access it for some reason.
             // This may be because the cipher key is not available.
             // Now mask the entry as a special file.
-            while (entry instanceof ArchiveFileSystemEntry<?>)
-                entry = ((ArchiveFileSystemEntry<?>) entry).getEntry();
+            while (entry instanceof FsArchiveFileSystemEntry<?>)
+                entry = ((FsArchiveFileSystemEntry<?>) entry).getEntry();
             try {
-                return ArchiveFileSystemEntry.create(ROOT, SPECIAL,
+                return FsArchiveFileSystemEntry.create(ROOT, SPECIAL,
                         driver.newEntry(ROOT.toString(), SPECIAL, entry));
             } catch (CharConversionException cannotHappen) {
                 throw new AssertionError(cannotHappen);

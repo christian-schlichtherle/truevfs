@@ -45,13 +45,13 @@ import net.jcip.annotations.Immutable;
  */
 @DefaultAnnotation(NonNull.class)
 @Immutable
-public abstract class ArchiveDriver<E extends ArchiveEntry>
+public abstract class FsArchiveDriver<E extends FsArchiveEntry>
 implements FsDriver, EntryFactory<E> {
 
     /**
      * {@inheritDoc}
      * <p>
-     * The implementation in the class {@link ArchiveDriver} always returns
+     * The implementation in the class {@link FsArchiveDriver} always returns
      * {@code true}.
      * This can't get overridden.
      */
@@ -96,7 +96,7 @@ implements FsDriver, EntryFactory<E> {
                     FsController<?> parent) {
         return  new FsConcurrentController(
                    new FsCachingController(
-                        new DefaultArchiveController<E>(
+                        new FsDefaultArchiveController<E>(
                             new FsConcurrentModel(mountPoint, parent.getModel()),
                             this, parent, false),
                         getPool()));
@@ -179,7 +179,7 @@ implements FsDriver, EntryFactory<E> {
      * Returns the icon that should be displayed for the given archive file
      * if it's open/expanded in the view.
      * <p>
-     * The implementation in the abstract class {@code ArchiveDriver} simply
+     * The implementation in the abstract class {@code FsArchiveDriver} simply
      * returns {@code null}.
      *
      * @param  model the concurrent file system model.
@@ -195,7 +195,7 @@ implements FsDriver, EntryFactory<E> {
      * Returns the icon that should be displayed for the given archive file
      * if it's closed/collapsed in the view.
      * <p>
-     * The implementation in the abstract class {@code ArchiveDriver} simply
+     * The implementation in the abstract class {@code FsArchiveDriver} simply
      * returns {@code null}.
      *
      * @param  model the concurrent file system model.

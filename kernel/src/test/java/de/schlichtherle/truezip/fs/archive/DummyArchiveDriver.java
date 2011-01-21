@@ -32,7 +32,7 @@ import java.nio.charset.Charset;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class DummyArchiveDriver extends CharsetArchiveDriver<ArchiveEntry> {
+public class DummyArchiveDriver extends FsCharsetArchiveDriver<FsArchiveEntry> {
 
     private static final IOPool<?> pool = new ByteArrayIOPool();
     private static final Charset charset = Charset.forName("UTF-8");
@@ -47,7 +47,7 @@ public class DummyArchiveDriver extends CharsetArchiveDriver<ArchiveEntry> {
     }
     
     @Override
-    public InputShop<ArchiveEntry> newInputShop(
+    public InputShop<FsArchiveEntry> newInputShop(
             FsConcurrentModel model,
             InputSocket<?> input)
     throws IOException {
@@ -55,16 +55,16 @@ public class DummyArchiveDriver extends CharsetArchiveDriver<ArchiveEntry> {
     }
 
     @Override
-    public OutputShop<ArchiveEntry> newOutputShop(
+    public OutputShop<FsArchiveEntry> newOutputShop(
             FsConcurrentModel model,
             OutputSocket<?> output,
-            InputShop<ArchiveEntry> source)
+            InputShop<FsArchiveEntry> source)
     throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public ArchiveEntry newEntry(String name, Type type, Entry template)
+    public FsArchiveEntry newEntry(String name, Type type, Entry template)
     throws CharConversionException {
         return new DummyArchiveEntry(name, type, template);
     }

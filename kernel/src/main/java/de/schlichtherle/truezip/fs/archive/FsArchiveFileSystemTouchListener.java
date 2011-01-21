@@ -19,13 +19,13 @@ import java.io.IOException;
 import java.util.EventListener;
 
 /**
- * Used to notify implementations of an event in an {@link ArchiveFileSystem}.
+ * Used to notify implementations of an event in an {@link FsArchiveFileSystem}.
  *
  * @param   <E> The type of the archive entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-interface ArchiveFileSystemTouchListener<E extends ArchiveEntry>
+interface FsArchiveFileSystemTouchListener<E extends FsArchiveEntry>
 extends EventListener {
 
     /**
@@ -36,12 +36,12 @@ extends EventListener {
      *
      * @throws IOException at the discretion of the implementation.
      */
-    void beforeTouch(ArchiveFileSystemEvent<? extends E> event)
+    void beforeTouch(FsArchiveFileSystemEvent<? extends E> event)
     throws IOException;
 
     /**
      * Called immediately after the source archive file system has been
      * modified (touched) for the first time.
      */
-    void afterTouch(ArchiveFileSystemEvent<? extends E> event);
+    void afterTouch(FsArchiveFileSystemEvent<? extends E> event);
 }

@@ -20,7 +20,7 @@ import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.socket.OutputSocket;
-import de.schlichtherle.truezip.fs.archive.MultiplexedArchiveOutputShop;
+import de.schlichtherle.truezip.fs.archive.FsMultiplexedArchiveOutputShop;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.io.Streams;
@@ -48,7 +48,7 @@ import static de.schlichtherle.truezip.zip.ZipEntry.UNKNOWN;
  * <p>
  * This output archive can only write one entry at a time.
  * Archive drivers may wrap this class in a
- * {@link MultiplexedArchiveOutputShop}
+ * {@link FsMultiplexedArchiveOutputShop}
  * to overcome this limitation.
  * 
  * @see     ZipInputShop

@@ -25,7 +25,7 @@ import java.util.EnumSet;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class DummyArchiveEntry implements ArchiveEntry {
+public class DummyArchiveEntry implements FsArchiveEntry {
 
     private final String name;
     private final Type type;

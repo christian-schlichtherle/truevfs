@@ -56,8 +56,8 @@ import static de.schlichtherle.truezip.io.Paths.*;
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
-class ArchiveFileSystem<E extends ArchiveEntry>
-implements EntryContainer<ArchiveFileSystemEntry<E>> {
+class FsArchiveFileSystem<E extends FsArchiveEntry>
+implements EntryContainer<FsArchiveFileSystemEntry<E>> {
 
     private final EntryFactory<E> factory;
 
@@ -68,16 +68,16 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      * {@link EntryContainer} object provided to the constructor of
      * this class.
      */
-    private final Map<String, ArchiveFileSystemEntry<E>> master;
+    private final Map<String, FsArchiveFileSystemEntry<E>> master;
 
     /** The file system entry for the (virtual) root of this file system. */
-    private final ArchiveFileSystemEntry<E> root;
+    private final FsArchiveFileSystemEntry<E> root;
 
     /** Whether or not this file system has been modified (touched). */
     private boolean touched;
 
-    private LinkedHashSet<ArchiveFileSystemTouchListener<? super E>> touchListeners
-            = new LinkedHashSet<ArchiveFileSystemTouchListener<? super E>>();
+    private LinkedHashSet<FsArchiveFileSystemTouchListener<? super E>> touchListeners
+            = new LinkedHashSet<FsArchiveFileSystemTouchListener<? super E>>();
 
     /**
      * Returns a new archive file system and ensures its integrity.
@@ -88,14 +88,14 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      * @param  factory the archive entry factory to use.
      * @throws NullPointerException If {@code factory} is {@code null}.
      */
-    static <AE extends ArchiveEntry> ArchiveFileSystem<AE>
+    static <AE extends FsArchiveEntry> FsArchiveFileSystem<AE>
     newArchiveFileSystem(EntryFactory<AE> factory) {
-        return new ArchiveFileSystem<AE>(factory);
+        return new FsArchiveFileSystem<AE>(factory);
     }
 
-    private ArchiveFileSystem(final EntryFactory<E> factory) {
+    private FsArchiveFileSystem(final EntryFactory<E> factory) {
         this.factory = factory;
-        master = new LinkedHashMap<String, ArchiveFileSystemEntry<E>>(64);
+        master = new LinkedHashMap<String, FsArchiveFileSystemEntry<E>>(64);
 
         // Setup root.
         root = newEntryUnchecked(ROOT.toString(), DIRECTORY, null);
@@ -104,7 +104,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         master.put(ROOT.toString(), root);
         try {
             touch();
-        } catch (ArchiveFileSystemException ex) {
+        } catch (FsArchiveFileSystemException ex) {
             throw new AssertionError("veto without a listener!?");
         }
     }
@@ -133,32 +133,32 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      *         file system in milliseconds since the epoch.
      * @param  readOnly If and only if {@code true}, any subsequent
      *         modifying operation on the file system will result in a
-     *         {@link ReadOnlyArchiveFileSystemException}.
+     *         {@link FsReadOnlyArchiveFileSystemException}.
      * @throws NullPointerException If {@code container}, {@code factory} or
      *         {@code rootTemplate} are {@code null}.
      * @throws IllegalArgumentException If {@code rootTemplate} is an instance
-     *         of {@link ArchiveFileSystemEntry}.
+     *         of {@link FsArchiveFileSystemEntry}.
      */
-    static <E extends ArchiveEntry> ArchiveFileSystem<E>
+    static <E extends FsArchiveEntry> FsArchiveFileSystem<E>
     newArchiveFileSystem(   EntryFactory<E> factory,
                             EntryContainer<E> archive,
                             @CheckForNull Entry rootTemplate,
                             boolean readOnly) {
         return readOnly
-            ? new ReadOnlyArchiveFileSystem<E>(archive, factory, rootTemplate)
-            : new ArchiveFileSystem<E>(factory, archive, rootTemplate);
+            ? new FsReadOnlyArchiveFileSystem<E>(archive, factory, rootTemplate)
+            : new FsArchiveFileSystem<E>(factory, archive, rootTemplate);
     }
 
-    ArchiveFileSystem(  final EntryFactory<E> factory,
+    FsArchiveFileSystem(  final EntryFactory<E> factory,
                         final EntryContainer<E> archive,
                         final @CheckForNull Entry rootTemplate) {
         if (null == rootTemplate)
             throw new NullPointerException();
-        if (rootTemplate instanceof ArchiveFileSystemEntry<?>)
+        if (rootTemplate instanceof FsArchiveFileSystemEntry<?>)
             throw new IllegalArgumentException();
 
         this.factory = factory;
-        master = new LinkedHashMap<String, ArchiveFileSystemEntry<E>>(
+        master = new LinkedHashMap<String, FsArchiveFileSystemEntry<E>>(
                 (int) (archive.getSize() / .7f) + 1); // allow overhead to create missing parent directories
 
         // Load entries from input archive.
@@ -169,7 +169,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
             final String path = cutTrailingSeparators(
                 normalizer.normalize(entry.getName().replace('\\', SEPARATOR_CHAR)),
                 SEPARATOR_CHAR);
-            master.put(path, ArchiveFileSystemEntry.create(path, entry.getType(), entry));
+            master.put(path, FsArchiveFileSystemEntry.create(path, entry.getType(), entry));
             paths.add(path);
         }
 
@@ -234,7 +234,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
             split(path);
             final String parentPath = getParentPath();
             final String memberName = getMemberName();
-            ArchiveFileSystemEntry<E> parent = master.get(parentPath);
+            FsArchiveFileSystemEntry<E> parent = master.get(parentPath);
             if (null == parent) {
                 parent = newEntryUnchecked(parentPath, DIRECTORY, null);
                 master.put(parentPath, parent);
@@ -269,25 +269,25 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      *
      * @throws ArchiveReadOnlyExceptionn If this (virtual) archive file system
      *         is read only.
-     * @throws ArchiveFileSystemException If the listener vetoed the beforeTouch
+     * @throws FsArchiveFileSystemException If the listener vetoed the beforeTouch
      *         operation for any reason.
      */
-    private void touch() throws ArchiveFileSystemException {
+    private void touch() throws FsArchiveFileSystemException {
         if (touched)
             return;
         // Order is important here because of veto exceptions!
-        final ArchiveFileSystemEvent<E> event
-                = new ArchiveFileSystemEvent<E>(this);
-        final Iterable<ArchiveFileSystemTouchListener<? super E>> listeners
+        final FsArchiveFileSystemEvent<E> event
+                = new FsArchiveFileSystemEvent<E>(this);
+        final Iterable<FsArchiveFileSystemTouchListener<? super E>> listeners
                 = getArchiveFileSystemTouchListeners();
         try {
-            for (ArchiveFileSystemTouchListener<? super E> listener : listeners)
+            for (FsArchiveFileSystemTouchListener<? super E> listener : listeners)
                 listener.beforeTouch(event);
         } catch (IOException ex) {
-            throw new ArchiveFileSystemException(null, "touch vetoed", ex);
+            throw new FsArchiveFileSystemException(null, "touch vetoed", ex);
         }
         touched = true;
-        for (ArchiveFileSystemTouchListener<? super E> listener : listeners)
+        for (FsArchiveFileSystemTouchListener<? super E> listener : listeners)
             listener.afterTouch(event);
     }
 
@@ -297,9 +297,9 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      * @return A clone of the set of archive file system listeners.
      */
     @SuppressWarnings("unchecked")
-    Set<ArchiveFileSystemTouchListener<? super E>>
+    Set<FsArchiveFileSystemTouchListener<? super E>>
     getArchiveFileSystemTouchListeners() {
-        return (Set<ArchiveFileSystemTouchListener<? super E>>) touchListeners.clone();
+        return (Set<FsArchiveFileSystemTouchListener<? super E>>) touchListeners.clone();
     }
 
     /**
@@ -308,7 +308,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      * @param  listener the listener for archive file system events.
      */
     public final void addArchiveFileSystemTouchListener(
-            ArchiveFileSystemTouchListener<? super E> listener) {
+            FsArchiveFileSystemTouchListener<? super E> listener) {
         if (null == listener)
             throw new NullPointerException();
         touchListeners.add(listener);
@@ -320,7 +320,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      * @param  listener the listener for archive file system events.
      */
     public final void removeArchiveFileSystemTouchListener(
-            @Nullable ArchiveFileSystemTouchListener<? super E> listener) {
+            @Nullable FsArchiveFileSystemTouchListener<? super E> listener) {
         touchListeners.remove(listener);
     }
 
@@ -330,9 +330,9 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
     }
 
     @Override
-    public Iterator<ArchiveFileSystemEntry<E>> iterator() {
-        class ArchiveEntryIterator implements Iterator<ArchiveFileSystemEntry<E>> {
-            final Iterator<ArchiveFileSystemEntry<E>> it = master.values().iterator();
+    public Iterator<FsArchiveFileSystemEntry<E>> iterator() {
+        class ArchiveEntryIterator implements Iterator<FsArchiveFileSystemEntry<E>> {
+            final Iterator<FsArchiveFileSystemEntry<E>> it = master.values().iterator();
 
             @Override
             public boolean hasNext() {
@@ -340,7 +340,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
             }
 
             @Override
-            public ArchiveFileSystemEntry<E> next() {
+            public FsArchiveFileSystemEntry<E> next() {
                 return it.next();
             }
 
@@ -354,17 +354,17 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
     }
 
     @Nullable
-    public final ArchiveFileSystemEntry<E> getEntry(
+    public final FsArchiveFileSystemEntry<E> getEntry(
             FsEntryName name) {
         return getEntry(name.getPath());
     }
 
     @Override
     @Nullable
-    public ArchiveFileSystemEntry<E> getEntry(String path) {
+    public FsArchiveFileSystemEntry<E> getEntry(String path) {
         if (path == null)
             throw new NullPointerException();
-        final ArchiveFileSystemEntry<E> entry = master.get(path);
+        final FsArchiveFileSystemEntry<E> entry = master.get(path);
         return null == entry ? null : entry.clone(this);
     }
 
@@ -376,16 +376,16 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      * @throws AssertionError if a {@link CharConversionException}
      *         occurs. The original exception is wrapped as its cause.
      */
-    private ArchiveFileSystemEntry<E> newEntryUnchecked(
+    private FsArchiveFileSystemEntry<E> newEntryUnchecked(
             final String path,
             final Type type,
             @CheckForNull final Entry template) {
         assert null != type;
         assert !isRoot(path) || DIRECTORY == type;
-        assert !(template instanceof ArchiveFileSystemEntry<?>);
+        assert !(template instanceof FsArchiveFileSystemEntry<?>);
 
         try {
-            return ArchiveFileSystemEntry.create(
+            return FsArchiveFileSystemEntry.create(
                     path, type, factory.newEntry(path, type, template));
         } catch (CharConversionException ex) {
             throw new AssertionError(ex);
@@ -400,20 +400,20 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      * @see    #mknod
      * @param  path the path name of the archive file system entry.
      */
-    private ArchiveFileSystemEntry<E> newEntryChecked(
+    private FsArchiveFileSystemEntry<E> newEntryChecked(
             final String path,
             final Type type,
             @CheckForNull final Entry template)
-    throws ArchiveFileSystemException {
+    throws FsArchiveFileSystemException {
         assert null != type;
         assert !isRoot(path) || DIRECTORY == type;
-        assert !(template instanceof ArchiveFileSystemEntry<?>);
+        assert !(template instanceof FsArchiveFileSystemEntry<?>);
 
         try {
-            return ArchiveFileSystemEntry.create(
+            return FsArchiveFileSystemEntry.create(
                     path, type, factory.newEntry(path, type, template));
         } catch (CharConversionException ex) {
-            throw new ArchiveFileSystemException(path, ex);
+            throw new FsArchiveFileSystemException(path, ex);
         }
     }
 
@@ -431,7 +431,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      * this archive file system.
      * <p>
      * To commit the transaction, you need to call
-     * {@link ArchiveFileSystemOperation#run} on the returned object, which
+     * {@link FsArchiveFileSystemOperation#run} on the returned object, which
      * will mark this archive file system as {@link #isTouched() touched} and
      * set the last modification time of the created and linked archive file
      * system entries to the system's current time at the moment of the call
@@ -450,7 +450,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      *         {@code null}.
      * @throws ArchiveReadOnlyExceptionn If this archive file system is read
      *         only.
-     * @throws ArchiveFileSystemException If one of the following is true:
+     * @throws FsArchiveFileSystemException If one of the following is true:
      *         <ul>
      *         <li>The file system is read only.
      *         <li>{@code name} contains characters which are not
@@ -467,32 +467,32 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      * @return A new archive file system operation on a chain of one or more
      *         archive file system entries for the given path name which will
      *         be linked into this archive file system upon a call to its
-     *         {@link ArchiveFileSystemOperation#run} method.
+     *         {@link FsArchiveFileSystemOperation#run} method.
      */
-    public ArchiveFileSystemOperation<E> mknod(
+    public FsArchiveFileSystemOperation<E> mknod(
             final FsEntryName name,
             final Entry.Type type,
             final BitField<FsOutputOption> options,
             @CheckForNull Entry template)
-    throws ArchiveFileSystemException {
+    throws FsArchiveFileSystemException {
         final String path = name.getPath();
         if (null == type)
             throw new NullPointerException();
         if (FILE != type && DIRECTORY != type)
-            throw new ArchiveFileSystemException(path, // TODO: Add support for other types.
+            throw new FsArchiveFileSystemException(path, // TODO: Add support for other types.
                     "only FILE and DIRECTORY entries are currently supported");
-        final ArchiveFileSystemEntry<E> oldEntry = master.get(path);
+        final FsArchiveFileSystemEntry<E> oldEntry = master.get(path);
         if (null != oldEntry) {
             if (options.get(EXCLUSIVE))
-                throw new ArchiveFileSystemException(path, "entry exists already");
+                throw new FsArchiveFileSystemException(path, "entry exists already");
             final Entry.Type oldEntryType = oldEntry.getType();
             if (oldEntryType == DIRECTORY)
-                throw new ArchiveFileSystemException(path, "directories cannot get replaced");
+                throw new FsArchiveFileSystemException(path, "directories cannot get replaced");
             if (oldEntryType != type)
-                throw new ArchiveFileSystemException(path, "entry exists already as a different type");
+                throw new FsArchiveFileSystemException(path, "entry exists already as a different type");
         }
-        while (template instanceof ArchiveFileSystemEntry<?>)
-            template = ((ArchiveFileSystemEntry<?>) template).getEntry();
+        while (template instanceof FsArchiveFileSystemEntry<?>)
+            template = ((FsArchiveFileSystemEntry<?>) template).getEntry();
         return new PathLink(path, type, options.get(CREATE_PARENTS), template);
     }
 
@@ -505,7 +505,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      * de.schlichtherle.truezip.fs.archive.controller are used, this should not
      * happen, however.
      */
-    private final class PathLink implements ArchiveFileSystemOperation<E> {
+    private final class PathLink implements FsArchiveFileSystemOperation<E> {
         final Splitter splitter = new Splitter();
         final boolean createParents;
         final SegmentLink<E>[] links;
@@ -515,7 +515,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
                     final Entry.Type entryType,
                     final boolean createParents,
                     @CheckForNull final Entry template)
-        throws ArchiveFileSystemException {
+        throws FsArchiveFileSystemException {
             this.createParents = createParents;
             links = newSegmentLinks(entryPath, entryType, template, 1);
         }
@@ -526,18 +526,18 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
                 final Entry.Type entryType,
                 @CheckForNull final Entry template,
                 final int level)
-        throws ArchiveFileSystemException {
+        throws FsArchiveFileSystemException {
             splitter.split(entryPath);
             final String parentPath = splitter.getParentPath(); // could equal ROOT
             final String memberName = splitter.getMemberName();
             final SegmentLink<E>[] elements;
 
             // Lookup parent entry, creating it where necessary and allowed.
-            final ArchiveFileSystemEntry<E> parentEntry = master.get(parentPath);
-            final ArchiveFileSystemEntry<E> newEntry;
+            final FsArchiveFileSystemEntry<E> parentEntry = master.get(parentPath);
+            final FsArchiveFileSystemEntry<E> newEntry;
             if (parentEntry != null) {
                 if (DIRECTORY != parentEntry.getType())
-                    throw new ArchiveFileSystemException(entryPath,
+                    throw new FsArchiveFileSystemException(entryPath,
                             "parent entry must be a directory");
                 elements = new SegmentLink[level + 1];
                 elements[0] = new SegmentLink<E>(parentEntry, null);
@@ -550,22 +550,22 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
                 elements[elements.length - level]
                         = new SegmentLink<E>(newEntry, memberName);
             } else {
-                throw new ArchiveFileSystemException(entryPath,
+                throw new FsArchiveFileSystemException(entryPath,
                         "missing parent directory entry");
             }
             return elements;
         }
 
         @Override
-        public void run() throws ArchiveFileSystemException {
+        public void run() throws FsArchiveFileSystemException {
             assert 2 <= links.length;
 
             touch();
             final int l = links.length;
-            ArchiveFileSystemEntry<E> parent = links[0].entry;
+            FsArchiveFileSystemEntry<E> parent = links[0].entry;
             for (int i = 1; i < l ; i++) {
                 final SegmentLink<E> link = links[i];
-                final ArchiveFileSystemEntry<E> entry = link.entry;
+                final FsArchiveFileSystemEntry<E> entry = link.entry;
                 final String base = link.base;
                 assert DIRECTORY == parent.getType();
                 master.put(entry.getName(), entry);
@@ -583,7 +583,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         }
 
         @Override
-        public ArchiveFileSystemEntry<E> getTarget() {
+        public FsArchiveFileSystemEntry<E> getTarget() {
             return links[links.length - 1].getTarget();
         }
     } // class PathLink
@@ -592,9 +592,9 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      * A data class which represents a segment for use by
      * {@link PathLink}.
      */
-    private static final class SegmentLink<E extends ArchiveEntry>
-    implements Link<ArchiveFileSystemEntry<E>> {
-        final ArchiveFileSystemEntry<E> entry;
+    private static final class SegmentLink<E extends FsArchiveEntry>
+    implements Link<FsArchiveFileSystemEntry<E>> {
+        final FsArchiveFileSystemEntry<E> entry;
         @CheckForNull final String base;
 
         /**
@@ -605,14 +605,14 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
          * @param base The nullable base (segment) path of the path name.
          */
         SegmentLink(
-                final ArchiveFileSystemEntry<E> entry,
+                final FsArchiveFileSystemEntry<E> entry,
                 @CheckForNull final String base) {
             this.entry = entry;
             this.base = base;
         }
 
         @Override
-        public ArchiveFileSystemEntry<E> getTarget() {
+        public FsArchiveFileSystemEntry<E> getTarget() {
             return entry;
         }
     } // class SegmentLink
@@ -626,30 +626,30 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      *
      * @throws ArchiveReadOnlyExceptionn If this (virtual) archive file system
      *         is read-only.
-     * @throws ArchiveFileSystemException If the operation fails for some other
+     * @throws FsArchiveFileSystemException If the operation fails for some other
      *         reason.
      */
-    public void unlink(final FsEntryName name) throws ArchiveFileSystemException {
+    public void unlink(final FsEntryName name) throws FsArchiveFileSystemException {
         final String path = name.getPath();
         if (name.isRoot())
-            throw new ArchiveFileSystemException(path,
+            throw new FsArchiveFileSystemException(path,
                     "(virtual) root directory cannot get unlinked");
-        final ArchiveFileSystemEntry<E> entry = master.get(path);
+        final FsArchiveFileSystemEntry<E> entry = master.get(path);
         if (entry == null)
-            throw new ArchiveFileSystemException(path,
+            throw new FsArchiveFileSystemException(path,
                     "archive entry does not exist");
         assert entry != root;
         if (DIRECTORY == entry.getType() && 0 < entry.getMembers().size()) {
-            throw new ArchiveFileSystemException(path,
+            throw new FsArchiveFileSystemException(path,
                     "directory is not empty");
         }
         touch();
-        final ArchiveFileSystemEntry<E> entry2 = master.remove(path);
+        final FsArchiveFileSystemEntry<E> entry2 = master.remove(path);
         assert entry == entry2;
         final Splitter splitter = new Splitter();
         splitter.split(path);
         final String parentPath = splitter.getParentPath();
-        final ArchiveFileSystemEntry<E> parent = master.get(parentPath);
+        final FsArchiveFileSystemEntry<E> parent = master.get(parentPath);
         assert parent != null : "The parent directory of \"" + path
                     + "\" is missing - archive file system is corrupted!";
         final boolean ok = parent.remove(splitter.getMemberName());
@@ -664,14 +664,14 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
             final FsEntryName name,
             final BitField<Access> types,
             final long value)
-    throws ArchiveFileSystemException {
+    throws FsArchiveFileSystemException {
         final String path = name.getPath();
         if (0 > value)
             throw new IllegalArgumentException(path +
                     " (negative access time)");
-        final ArchiveFileSystemEntry<E> entry = master.get(path);
+        final FsArchiveFileSystemEntry<E> entry = master.get(path);
         if (entry == null)
-            throw new ArchiveFileSystemException(path,
+            throw new FsArchiveFileSystemException(path,
                     "archive entry not found");
         // Order is important here!
         touch();
@@ -686,9 +686,9 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
     }
 
     public void setReadOnly(FsEntryName name)
-    throws ArchiveFileSystemException {
+    throws FsArchiveFileSystemException {
         if (!isReadOnly())
-            throw new ArchiveFileSystemException(name.getPath(),
+            throw new FsArchiveFileSystemException(name.getPath(),
                 "cannot set read-only state");
     }
 }

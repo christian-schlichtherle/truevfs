@@ -28,8 +28,8 @@ public class ArchiveFileSystemTest {
 
     @Test
     public void testAddRemoveArchiveFileSystemListeners() {
-        final ArchiveFileSystem<?> model
-                = ArchiveFileSystem.newArchiveFileSystem(new DummyArchiveDriver());
+        final FsArchiveFileSystem<?> model
+                = FsArchiveFileSystem.newArchiveFileSystem(new DummyArchiveDriver());
 
         try {
             model.addArchiveFileSystemTouchListener(null);
@@ -65,26 +65,26 @@ public class ArchiveFileSystemTest {
     }
 
     private static class Listener
-    implements ArchiveFileSystemTouchListener<ArchiveEntry> {
-        final ArchiveFileSystem<?> model;
+    implements FsArchiveFileSystemTouchListener<FsArchiveEntry> {
+        final FsArchiveFileSystem<?> model;
         int before;
         int after;
 
         @SuppressWarnings("LeakingThisInConstructor")
-        Listener(final ArchiveFileSystem<?> model) {
+        Listener(final FsArchiveFileSystem<?> model) {
             this.model = model;
             model.addArchiveFileSystemTouchListener(this);
         }
 
         @Override
-        public void beforeTouch(ArchiveFileSystemEvent<?> event) {
+        public void beforeTouch(FsArchiveFileSystemEvent<?> event) {
             assertThat(event, notNullValue());
             assertThat(event.getSource(), sameInstance((Object) model));
             before++;
         }
 
         @Override
-        public void afterTouch(ArchiveFileSystemEvent<?> event) {
+        public void afterTouch(FsArchiveFileSystemEvent<?> event) {
             assertThat(event, notNullValue());
             assertThat(event.getSource(), sameInstance((Object) model));
             after++;

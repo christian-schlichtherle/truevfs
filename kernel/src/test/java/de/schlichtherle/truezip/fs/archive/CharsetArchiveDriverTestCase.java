@@ -39,14 +39,14 @@ public abstract class CharsetArchiveDriverTestCase {
 
     private static final String TEXT = "fubar";
 
-    private CharsetArchiveDriver<?> driver;
+    private FsCharsetArchiveDriver<?> driver;
 
     @Before
     public void setUp() {
         driver = newArchiveDriver(POOL_SERVICE);
     }
 
-    protected abstract CharsetArchiveDriver<?> newArchiveDriver(IOPoolService service);
+    protected abstract FsCharsetArchiveDriver<?> newArchiveDriver(IOPoolService service);
 
     @Test
     public final void testAssertEncodable() throws CharConversionException {

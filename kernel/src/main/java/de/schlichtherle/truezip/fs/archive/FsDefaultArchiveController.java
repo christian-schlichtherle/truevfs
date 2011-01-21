@@ -20,7 +20,6 @@ import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.io.InputBusyException;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.OutputBusyException;
-import de.schlichtherle.truezip.io.TabuFileException;
 import de.schlichtherle.truezip.fs.FsConcurrentModel;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.fs.FsFalsePositiveException;
@@ -54,7 +53,7 @@ import java.util.Iterator;
 import javax.swing.Icon;
 import net.jcip.annotations.NotThreadSafe;
 
-import static de.schlichtherle.truezip.fs.archive.ArchiveFileSystem.*;
+import static de.schlichtherle.truezip.fs.archive.FsArchiveFileSystem.*;
 import static de.schlichtherle.truezip.entry.Entry.Access.*;
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
 import static de.schlichtherle.truezip.entry.Entry.*;
@@ -73,8 +72,8 @@ import static de.schlichtherle.truezip.io.Paths.isRoot;
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
-public final class DefaultArchiveController<E extends ArchiveEntry>
-extends FileSystemArchiveController<E> {
+public final class FsDefaultArchiveController<E extends FsArchiveEntry>
+extends FsFileSystemArchiveController<E> {
 
     private static final BitField<FsOutputOption> MOUNT_MASK
             = BitField.of(CREATE_PARENTS);
@@ -156,22 +155,22 @@ extends FileSystemArchiveController<E> {
     }
 
     private final class TouchListener
-    implements ArchiveFileSystemTouchListener<E> {
+    implements FsArchiveFileSystemTouchListener<E> {
         @Override
-        public void beforeTouch(ArchiveFileSystemEvent<? extends E> event)
+        public void beforeTouch(FsArchiveFileSystemEvent<? extends E> event)
         throws IOException {
             assert event.getSource() == getFileSystem();
             makeOutput(MAKE_OUTPUT_OPTIONS, getFileSystem().getEntry(ROOT));
         }
 
         @Override
-        public void afterTouch(ArchiveFileSystemEvent<? extends E> event) {
+        public void afterTouch(FsArchiveFileSystemEvent<? extends E> event) {
             assert event.getSource() == getFileSystem();
             getModel().setTouched(true);
         }
     }
 
-    private final ArchiveDriver<E> driver;
+    private final FsArchiveDriver<E> driver;
     private final FsController<?> parent;
     private final FsEntryName parentName;
     private final boolean useRootTemplate;
@@ -188,12 +187,12 @@ extends FileSystemArchiveController<E> {
      */
     private @Nullable Output output;
 
-    private final ArchiveFileSystemTouchListener<E> touchListener
+    private final FsArchiveFileSystemTouchListener<E> touchListener
             = new TouchListener();
 
-    public DefaultArchiveController(
+    public FsDefaultArchiveController(
             final FsConcurrentModel model,
-            final ArchiveDriver<E> driver,
+            final FsArchiveDriver<E> driver,
             final FsController<?> parent,
             final boolean useRootTemplate) {
         super(model);
@@ -241,8 +240,6 @@ extends FileSystemArchiveController<E> {
                     input.getDelegate(), socket.getLocalTarget(), readOnly));
         } catch (FsException ex) {
             throw ex;
-        } catch (TabuFileException ex) {
-            throw ex;
         } catch (IOException ex) {
             if (!autoCreate)
                 if (ex instanceof FileNotFoundException)
@@ -253,9 +250,9 @@ extends FileSystemArchiveController<E> {
                 throw new FsCacheableFalsePositiveException(getModel(), ex);
             // The entry does NOT exist in the parent archive
             // file, but we may create it automatically.
-            final ArchiveFileSystem<E> fileSystem
+            final FsArchiveFileSystem<E> fileSystem
                     = newArchiveFileSystem(driver);
-            final ArchiveFileSystemEntry<E> root
+            final FsArchiveFileSystemEntry<E> root
                     = fileSystem.getEntry(ROOT);
             // This may fail if e.g. the container file is an RAES
             // encrypted ZIP file and the user cancels password
@@ -263,8 +260,6 @@ extends FileSystemArchiveController<E> {
             try {
                 makeOutput(options, root);
             } catch (FsException ex2) {
-                throw ex2;
-            } catch (TabuFileException ex2) {
                 throw ex2;
             } catch (IOException ex2) {
                 throw new FsFalsePositiveException(getModel(), ex2);
@@ -305,8 +300,8 @@ extends FileSystemArchiveController<E> {
     boolean autoSync(   final FsEntryName name,
                         final @CheckForNull Access intention)
     throws FsSyncException, FsException {
-        final ArchiveFileSystem<E> fileSystem;
-        final ArchiveFileSystemEntry<E> entry;
+        final FsArchiveFileSystem<E> fileSystem;
+        final FsArchiveFileSystemEntry<E> entry;
         if (null == (fileSystem = getFileSystem())
                 || null == (entry = fileSystem.getEntry(name)))
             return false;
@@ -479,13 +474,13 @@ extends FileSystemArchiveController<E> {
                 (ExceptionHandler<IOException, X>) new FilterExceptionHandler());
     }
 
-    private static <E extends ArchiveEntry, X extends IOException> void copy(
-            final ArchiveFileSystem<E> fileSystem,
+    private static <E extends FsArchiveEntry, X extends IOException> void copy(
+            final FsArchiveFileSystem<E> fileSystem,
             final InputService<E> input,
             final OutputService<E> output,
             final ExceptionHandler<IOException, X> handler)
     throws X {
-        for (final ArchiveFileSystemEntry<E> fse : fileSystem) {
+        for (final FsArchiveFileSystemEntry<E> fse : fileSystem) {
             final E e = fse.getEntry();
             final String n = e.getName();
             if (null != output.getEntry(n))
@@ -550,7 +545,7 @@ extends FileSystemArchiveController<E> {
     }
 
     private boolean isTouched() {
-        final ArchiveFileSystem<E> fileSystem = getFileSystem();
+        final FsArchiveFileSystem<E> fileSystem = getFileSystem();
         return null != fileSystem && fileSystem.isTouched();
     }
 

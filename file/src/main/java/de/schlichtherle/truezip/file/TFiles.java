@@ -47,8 +47,9 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  */
 @DefaultAnnotation(NonNull.class)
 @Immutable
-class TFiles {
+final class TFiles {
 
+    /** You cannot instantiate this class. */
     private TFiles() {
     }
 

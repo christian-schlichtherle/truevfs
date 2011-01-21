@@ -29,13 +29,13 @@ import de.schlichtherle.truezip.util.Link;
  * Implementations do <em>not</em> need to be thread-safe.
  *
  * @param   <E> The type of the archive entries.
- * @see ArchiveFileSystem#mknod
+ * @see     FsArchiveFileSystem#mknod
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-interface ArchiveFileSystemOperation<E extends ArchiveEntry>
-extends Link<ArchiveFileSystemEntry<E>> {
+interface FsArchiveFileSystemOperation<E extends FsArchiveEntry>
+extends Link<FsArchiveFileSystemEntry<E>> {
 
     /** Executes this archive file system operation. */
-    void run() throws ArchiveFileSystemException;
+    void run() throws FsArchiveFileSystemException;
 }

@@ -40,7 +40,7 @@ import java.util.logging.Logger;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class Streams {
+public final class Streams {
 
     /** You cannot instantiate this class. */
     private Streams() {

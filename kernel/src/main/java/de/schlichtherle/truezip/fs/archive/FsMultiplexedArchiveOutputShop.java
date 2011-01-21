@@ -42,7 +42,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import net.jcip.annotations.NotThreadSafe;
 
-import static de.schlichtherle.truezip.fs.archive.ArchiveEntry.UNKNOWN;
+import static de.schlichtherle.truezip.fs.archive.FsArchiveEntry.UNKNOWN;
 
 /**
  * Decorates an {@code OutputShop} in order to support a virtually
@@ -61,7 +61,7 @@ import static de.schlichtherle.truezip.fs.archive.ArchiveEntry.UNKNOWN;
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
-public class MultiplexedArchiveOutputShop<AE extends ArchiveEntry>
+public class FsMultiplexedArchiveOutputShop<AE extends FsArchiveEntry>
 extends DecoratingOutputShop<AE, OutputShop<AE>> {
 
     private final IOPool<?> pool;
@@ -77,12 +77,12 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
     private boolean busy;
 
     /**
-     * Constructs a new {@code MultiplexedArchiveOutputShop}.
+     * Constructs a new {@code FsMultiplexedArchiveOutputShop}.
      * 
      * @param output the decorated output archive.
      * @throws NullPointerException iff {@code output} is {@code null}.
      */
-    public MultiplexedArchiveOutputShop(OutputShop<AE> output, final IOPool<?> pool) {
+    public FsMultiplexedArchiveOutputShop(OutputShop<AE> output, final IOPool<?> pool) {
         super(output);
         this.pool = pool;
     }
@@ -133,7 +133,7 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
 
         class Output extends DecoratingOutputSocket<AE> {
             Output() {
-                super(MultiplexedArchiveOutputShop.super.getOutputSocket(entry));
+                super(FsMultiplexedArchiveOutputShop.super.getOutputSocket(entry));
             }
 
             @Override

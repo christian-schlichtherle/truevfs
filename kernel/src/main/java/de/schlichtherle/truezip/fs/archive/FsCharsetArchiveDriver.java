@@ -43,8 +43,8 @@ import static de.schlichtherle.truezip.io.Paths.*;
  */
 @Immutable
 @DefaultAnnotation(NonNull.class)
-public abstract class CharsetArchiveDriver<E extends ArchiveEntry>
-extends ArchiveDriver<E> {
+public abstract class FsCharsetArchiveDriver<E extends FsArchiveEntry>
+extends FsArchiveDriver<E> {
 
     private final Charset charset;
 
@@ -54,7 +54,7 @@ extends ArchiveDriver<E> {
      * @param charset the character set to use for encoding entry names and
      *        probably other meta data when reading or writing an archive file.
      */
-    protected CharsetArchiveDriver(Charset charset) {
+    protected FsCharsetArchiveDriver(Charset charset) {
         if (null == charset)
             throw new NullPointerException();
         this.charset = charset;

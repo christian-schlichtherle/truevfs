@@ -22,12 +22,12 @@ import net.jcip.annotations.Immutable;
  * An archive file system event.
  * 
  * @param   <E> The type of the archive entries.
- * @see     ArchiveFileSystemTouchListener
+ * @see     FsArchiveFileSystemTouchListener
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @Immutable
-class ArchiveFileSystemEvent<E extends ArchiveEntry> extends EventObject {
+class FsArchiveFileSystemEvent<E extends FsArchiveEntry> extends EventObject {
     private static final long serialVersionUID = 7205624082374036401L;
 
     /**
@@ -36,7 +36,7 @@ class ArchiveFileSystemEvent<E extends ArchiveEntry> extends EventObject {
      * @param source the non-{@code null} archive file system source which
      *        caused this event.
      */
-    ArchiveFileSystemEvent(ArchiveFileSystem<E> source) {
+    FsArchiveFileSystemEvent(FsArchiveFileSystem<E> source) {
         super(source);
     }
 
@@ -49,7 +49,7 @@ class ArchiveFileSystemEvent<E extends ArchiveEntry> extends EventObject {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public ArchiveFileSystem<E> getSource() {
-        return (ArchiveFileSystem<E>) source;
+    public FsArchiveFileSystem<E> getSource() {
+        return (FsArchiveFileSystem<E>) source;
     }
 }

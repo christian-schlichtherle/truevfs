@@ -24,8 +24,8 @@ import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Type;
-import de.schlichtherle.truezip.fs.archive.CharsetArchiveDriver;
-import de.schlichtherle.truezip.fs.archive.MultiplexedArchiveOutputShop;
+import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriver;
+import de.schlichtherle.truezip.fs.archive.FsMultiplexedArchiveOutputShop;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.IOPoolService;
@@ -54,7 +54,7 @@ import static java.util.zip.Deflater.BEST_COMPRESSION;
 @Immutable
 @DefaultAnnotation(NonNull.class)
 public class ZipDriver
-extends CharsetArchiveDriver<ZipArchiveEntry>
+extends FsCharsetArchiveDriver<ZipArchiveEntry>
 implements ZipEntryFactory<ZipArchiveEntry> {
 
     /**
@@ -208,7 +208,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
      * <p>
      * The implementation in {@link ZipDriver} simply forwards the call to
      * {@link #newZipOutputShop} and wraps the result in a new
-     * {@link MultiplexedArchiveOutputShop}.
+     * {@link FsMultiplexedArchiveOutputShop}.
      */
     @Override
     public OutputShop<ZipArchiveEntry> newOutputShop(
@@ -218,7 +218,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
     throws IOException {
         final OutputStream out = output.newOutputStream();
         try {
-            return new MultiplexedArchiveOutputShop<ZipArchiveEntry>(
+            return new FsMultiplexedArchiveOutputShop<ZipArchiveEntry>(
                     newZipOutputShop(model, out, (ZipInputShop) source),
                     getPool());
         } catch (IOException ex) {

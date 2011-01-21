@@ -28,7 +28,7 @@ import net.jcip.annotations.NotThreadSafe;
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
 
 /**
- * Adapts an {@link ArchiveEntry} to a {@link FsEntry}.
+ * Adapts an {@link FsArchiveEntry} to a {@link FsEntry}.
  * 
  * @param   <E> The type of the decorated archive entries.
  * @author  Christian Schlichtherle
@@ -36,22 +36,22 @@ import static de.schlichtherle.truezip.entry.Entry.Type.*;
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
-public abstract class ArchiveFileSystemEntry<E extends ArchiveEntry>
+public abstract class FsArchiveFileSystemEntry<E extends FsArchiveEntry>
 extends FsDecoratingEntry<E> {
 
     /**
      * Constructs a new archive file system entry which decorates the given
      * archive entry.
      */
-    public static <E extends ArchiveEntry>
-    ArchiveFileSystemEntry<E> create(   final FsEntryName name,
+    public static <E extends FsArchiveEntry>
+    FsArchiveFileSystemEntry<E> create(   final FsEntryName name,
                                         final Type        type,
                                         final E           entry) {
         return create(name.getPath(), type, entry);
     }
 
-    static <E extends ArchiveEntry>
-    ArchiveFileSystemEntry<E> create(   final String path,
+    static <E extends FsArchiveEntry>
+    FsArchiveFileSystemEntry<E> create(   final String path,
                                         final Type   type,
                                         final E      entry) {
         switch (type) {
@@ -76,7 +76,7 @@ extends FsDecoratingEntry<E> {
     }
 
     /** Constructs a new instance of {@code Entry}. */
-    private ArchiveFileSystemEntry(E entry) {
+    private FsArchiveFileSystemEntry(E entry) {
         super(entry);
     }
 
@@ -91,7 +91,7 @@ extends FsDecoratingEntry<E> {
         return delegate;
     }
 
-    ArchiveFileSystemEntry<E> clone(ArchiveFileSystem<E> fileSystem) {
+    FsArchiveFileSystemEntry<E> clone(FsArchiveFileSystem<E> fileSystem) {
         return create(getName(), getType(), fileSystem.copy(delegate));
     }
 
@@ -126,8 +126,8 @@ extends FsDecoratingEntry<E> {
     }
 
     /** A file entry. */
-    private static class FileEntry<E extends ArchiveEntry>
-    extends ArchiveFileSystemEntry<E> {
+    private static class FileEntry<E extends FsArchiveEntry>
+    extends FsArchiveFileSystemEntry<E> {
         /** Decorates the given archive entry. */
         FileEntry(final E entry) {
             super(entry);
@@ -145,7 +145,7 @@ extends FsDecoratingEntry<E> {
     } // class FileEntry
 
     /** A named file entry. */
-    private static class NamedFileEntry<E extends ArchiveEntry>
+    private static class NamedFileEntry<E extends FsArchiveEntry>
     extends FileEntry<E> {
         final String path;
 
@@ -163,8 +163,8 @@ extends FsDecoratingEntry<E> {
     } // class NamedFileEntry
 
     /** A directory entry. */
-    private static class DirectoryEntry<E extends ArchiveEntry>
-    extends ArchiveFileSystemEntry<E> {
+    private static class DirectoryEntry<E extends FsArchiveEntry>
+    extends FsArchiveFileSystemEntry<E> {
         Set<String> members = new LinkedHashSet<String>();
 
         /** Decorates the given archive entry. */
@@ -173,7 +173,7 @@ extends FsDecoratingEntry<E> {
         }
 
         @Override
-        ArchiveFileSystemEntry<E> clone(final ArchiveFileSystem<E> fileSystem) {
+        FsArchiveFileSystemEntry<E> clone(final FsArchiveFileSystem<E> fileSystem) {
             final DirectoryEntry<E> clone = (DirectoryEntry<E>) super.clone(fileSystem);
             clone.members = Collections.unmodifiableSet(members);
             return clone;
@@ -201,7 +201,7 @@ extends FsDecoratingEntry<E> {
     } // class DirectoryEntry
 
     /** A named directory entry. */
-    private static class NamedDirectoryEntry<E extends ArchiveEntry>
+    private static class NamedDirectoryEntry<E extends FsArchiveEntry>
     extends DirectoryEntry<E> {
         final String path;
 
@@ -219,8 +219,8 @@ extends FsDecoratingEntry<E> {
     } // class NamedDirectoryEntry
 
     /** A named special file entry. */
-    private static class NamedSpecialFileEntry<E extends ArchiveEntry>
-    extends ArchiveFileSystemEntry<E> {
+    private static class NamedSpecialFileEntry<E extends FsArchiveEntry>
+    extends FsArchiveFileSystemEntry<E> {
         final String path;
 
         NamedSpecialFileEntry(final String path, final E entry) {
