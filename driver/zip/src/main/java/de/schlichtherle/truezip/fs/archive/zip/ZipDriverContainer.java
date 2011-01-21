@@ -36,20 +36,21 @@ import net.jcip.annotations.Immutable;
 @Immutable
 public final class ZipDriverContainer implements FsDriverService {
 
-    private static final IOPool<?> POOL = IOPoolContainer.SINGLETON.getPool();
     private static final Map<FsScheme, ArchiveDriver<?>> DRIVERS;
 
     static {
         final Map<FsScheme, ArchiveDriver<?>>
                 drivers = new HashMap<FsScheme, ArchiveDriver<?>>();
-        drivers.put(FsScheme.create("zip"), new ZipDriver(POOL));
-        ArchiveDriver<?> driver = new JarDriver(POOL);
+        drivers.put(FsScheme.create("zip"),
+                    new ZipDriver(IOPoolContainer.SINGLETON));
+        ArchiveDriver<?> driver = new JarDriver(IOPoolContainer.SINGLETON);
         for (String suffix : new SuffixSet("ear|jar|war"))
             drivers.put(FsScheme.create(suffix), driver);
-        driver = new OdfDriver(POOL);
+        driver = new OdfDriver(IOPoolContainer.SINGLETON);
         for (String suffix : new SuffixSet("odg|odp|ods|odt|otg|otp|ots|ott|odb|odf|odm|oth"))
             drivers.put(FsScheme.create(suffix), driver);
-        drivers.put(FsScheme.create("exe"), new ReadOnlySfxDriver(POOL));
+        drivers.put(FsScheme.create("exe"),
+                    new ReadOnlySfxDriver(IOPoolContainer.SINGLETON));
         DRIVERS = Collections.unmodifiableMap(drivers);
     }
 

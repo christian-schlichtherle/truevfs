@@ -37,6 +37,8 @@ import static de.schlichtherle.truezip.entry.Entry.Access.*;
 import static de.schlichtherle.truezip.entry.Entry.*;
 
 /**
+ * An output socket for HTTP entries.
+ * 
  * @see     HttpInputSocket
  * @author  Christian Schlichtherle
  * @version $Id$

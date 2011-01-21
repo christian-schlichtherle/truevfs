@@ -38,23 +38,32 @@ import net.jcip.annotations.ThreadSafe;
 import static de.schlichtherle.truezip.entry.Entry.*;
 
 /**
+ * A file system controller for the HTTP(S) schemes.
+ * 
  * @author Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-final class HttpController<M extends FsModel> extends FsController<M>  {
+final class HttpController extends FsController<FsModel>  {
 
-    private final M model;
+    private final HttpDriver driver;
+    private final FsModel model;
 
-    HttpController(final M model) {
+    HttpController(final HttpDriver driver, final FsModel model) {
         if (null != model.getParent())
             throw new IllegalArgumentException();
+        assert null != driver;
+        this.driver = driver;
         this.model = model;
     }
 
+    HttpDriver getDriver() {
+        return driver;
+    }
+
     @Override
-    public M getModel() {
+    public FsModel getModel() {
         return model;
     }
 
@@ -80,7 +89,7 @@ final class HttpController<M extends FsModel> extends FsController<M>  {
 
     @Override
     public HttpEntry getEntry(FsEntryName name) throws IOException {
-        HttpEntry entry = new HttpEntry(model.getMountPoint(), name);
+        HttpEntry entry = new HttpEntry(this, model.getMountPoint(), name);
         return null != entry.getType() ? entry : null;
     }
 
@@ -108,7 +117,7 @@ final class HttpController<M extends FsModel> extends FsController<M>  {
     public InputSocket<?> getInputSocket(
             FsEntryName name,
             BitField<FsInputOption> options) {
-        return new HttpEntry(model.getMountPoint(), name).getInputSocket();
+        return new HttpEntry(this, model.getMountPoint(), name).getInputSocket();
     }
 
     @Override
@@ -116,7 +125,7 @@ final class HttpController<M extends FsModel> extends FsController<M>  {
             FsEntryName name,
             BitField<FsOutputOption> options,
             @CheckForNull Entry template) {
-        return new HttpEntry(model.getMountPoint(), name).getOutputSocket(options, template);
+        return new HttpEntry(this, model.getMountPoint(), name).getOutputSocket(options, template);
     }
 
     @Override

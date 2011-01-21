@@ -23,7 +23,9 @@ import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.util.Pool;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -56,6 +58,7 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
+@DefaultAnnotation(NonNull.class)
 public final class IOCache {
 
     /** Provides different cache strategies. */
@@ -100,17 +103,17 @@ public final class IOCache {
          * @param  pool the pool of temporary entries to cache the entry data.
          * @return A new cache.
          */
-        @NonNull public IOCache
-        newCache(@NonNull IOPool<?> pool) {
+        public IOCache
+        newCache(IOPool<?> pool) {
             return new IOCache(this, pool);
         }
 
-        @NonNull IOCache.InputBufferPool
+        IOCache.InputBufferPool
         newInputBufferPool(IOCache cache) {
             return cache.new InputBufferPool();
         }
 
-        @NonNull abstract IOCache.OutputBufferPool
+        abstract IOCache.OutputBufferPool
         newOutputBufferPool(IOCache cache);
     } // enum Strategy
 
@@ -119,11 +122,11 @@ public final class IOCache {
     private final Lock lock = new Lock();
     private final Strategy strategy;
     private final IOPool<?> pool;
-    private volatile InputSocket<?> input;
-    private volatile OutputSocket<?> output;
-    private volatile InputBufferPool inputBufferPool;
-    private volatile OutputBufferPool outputBufferPool;
-    private volatile Buffer buffer;
+    private volatile @Nullable InputSocket<?> input;
+    private volatile @Nullable OutputSocket<?> output;
+    private volatile @CheckForNull InputBufferPool inputBufferPool;
+    private volatile @CheckForNull OutputBufferPool outputBufferPool;
+    private volatile @CheckForNull Buffer buffer;
 
     /**
      * Constructs a new cache which applies the given caching strategy
@@ -137,8 +140,8 @@ public final class IOCache {
      * @param strategy the caching strategy.
      * @param pool the pool for allocating and releasing temporary I/O entries.
      */
-    private IOCache(  @NonNull final Strategy strategy,
-                    @NonNull final IOPool<?> pool) {
+    private IOCache(final Strategy strategy,
+                    final IOPool<?> pool) {
         if (null == strategy || null == pool)
             throw new NullPointerException();
         this.strategy = strategy;
@@ -158,8 +161,7 @@ public final class IOCache {
      *        backing store.
      * @return this
      */
-    @NonNull
-    public IOCache configure(@NonNull final InputSocket<?> input) {
+    public IOCache configure(final InputSocket<?> input) {
         if (null == input)
             throw new NullPointerException();
         this.input = input;
@@ -179,8 +181,7 @@ public final class IOCache {
      *        backing store.
      * @return this
      */
-    @NonNull
-    public IOCache configure(@NonNull final OutputSocket<?> output) {
+    public IOCache configure(final OutputSocket<?> output) {
         if (null == output)
             throw new NullPointerException();
         this.output = output;
@@ -219,12 +220,12 @@ public final class IOCache {
         return this;
     }
 
-    @CheckForNull
-    public Entry getEntry() {
-        final Buffer buffer = getBuffer();
+    public @Nullable Entry getEntry() {
+        Buffer buffer = getBuffer();
         return null == buffer ? null : new CacheEntry(buffer.data);
     }
 
+    /** Proxies the decorated entry to hide socket connections. */
     private static class CacheEntry extends DecoratingEntry<Entry> {
         CacheEntry(Entry entry) {
             super(entry);
@@ -236,7 +237,6 @@ public final class IOCache {
      *
      * @return An input socket for reading the cached entry data.
      */
-    @NonNull
     public InputSocket<?> getInputSocket() {
         return new CacheInputSocket();
     }
@@ -247,7 +247,7 @@ public final class IOCache {
 
         @Override
         public Entry getLocalTarget() throws IOException {
-            final Buffer buffer = this.buffer;
+            Buffer buffer = this.buffer;
             return new CacheEntry(null != buffer ? buffer.data : input.getLocalTarget());
         }
 
@@ -261,12 +261,10 @@ public final class IOCache {
             return getBoundSocket().newInputStream();
         }
 
-        @NonNull
         private InputSocket<?> getBoundSocket() throws IOException {
             return getBuffer().getInputSocket().bind(this);
         }
 
-        @NonNull
         private Buffer getBuffer() throws IOException {
             return buffer = getInputBufferPool().allocate();
         }
@@ -277,7 +275,6 @@ public final class IOCache {
      *
      * @return An output socket for writing the cached entry data.
      */
-    @NonNull
     public OutputSocket<?> getOutputSocket() {
         return new CacheOutputSocket();
     }
@@ -288,7 +285,7 @@ public final class IOCache {
 
         @Override
         public Entry getLocalTarget() throws IOException {
-            final Buffer buffer = this.buffer;
+            Buffer buffer = this.buffer;
             return new CacheEntry(null != buffer ? buffer.data : output.getLocalTarget());
         }
 
@@ -297,20 +294,19 @@ public final class IOCache {
             return getBoundSocket().newOutputStream();
         }
 
-        @NonNull
         private OutputSocket<?> getBoundSocket() throws IOException {
             return getBuffer().getOutputSocket().bind(this);
         }
 
-        @NonNull
         private Buffer getBuffer() throws IOException {
             return buffer = getOutputBufferPool().allocate();
         }
     } // class CacheOutputSocket
 
     private InputBufferPool getInputBufferPool() {
-        return null != inputBufferPool
-                ? inputBufferPool
+        InputBufferPool ibp = inputBufferPool;
+        return null != ibp
+                ? ibp
                 : (inputBufferPool = strategy.newInputBufferPool(this));
     }
 
@@ -346,8 +342,9 @@ public final class IOCache {
     } // class InputPool
 
     private OutputBufferPool getOutputBufferPool() {
-        return null != outputBufferPool
-                ? outputBufferPool
+        OutputBufferPool obp = this.outputBufferPool;
+        return null != obp
+                ? obp
                 : (outputBufferPool = strategy.newOutputBufferPool(this));
     }
 
@@ -402,11 +399,12 @@ public final class IOCache {
         }
     } // class WriteBackOutputBufferPool
 
-    private Buffer getBuffer() {
+    private @CheckForNull Buffer getBuffer() {
         return buffer;
     }
 
-    private void setBuffer(final Buffer newBuffer) throws IOException {
+    private void setBuffer(final @CheckForNull Buffer newBuffer)
+    throws IOException {
         final Buffer oldBuffer = this.buffer;
         if (oldBuffer != newBuffer) {
             this.buffer = newBuffer;
@@ -428,7 +426,6 @@ public final class IOCache {
     }
 
     private final class Buffer {
-        @NonNull
         private final IOPool.Entry<?> data;
 
         volatile int readers, writers; // max one writer!

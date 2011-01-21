@@ -44,6 +44,7 @@ import de.schlichtherle.truezip.fs.archive.zip.ZipArchiveEntry;
 import de.schlichtherle.truezip.fs.archive.zip.ZipInputShop;
 import de.schlichtherle.truezip.key.KeyManagerService;
 import de.schlichtherle.truezip.socket.IOPool;
+import de.schlichtherle.truezip.socket.IOPoolService;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import java.io.CharConversionException;
@@ -111,14 +112,15 @@ public abstract class ZipRaesDriver extends JarDriver {
     /**
      * Constructs a new RAES encrypted ZIP file driver.
      *
-     * @param pool the I/O pool to use for temporary data.
-     * @param service the key manager service.
+     * @param ioPoolService the I/O pool service to use for temporary data.
+     * @param keyManagerService the key manager service.
      */
-    public ZipRaesDriver(IOPool<?> pool, final KeyManagerService service) {
-        super(pool);
-        if (null == service)
+    public ZipRaesDriver(   IOPoolService ioPoolService,
+                            final KeyManagerService keyManagerService) {
+        super(ioPoolService);
+        if (null == keyManagerService)
             throw new NullPointerException();
-        this.service = service;
+        this.service = keyManagerService;
     }
 
     /**

@@ -36,17 +36,17 @@ import net.jcip.annotations.Immutable;
 @Immutable
 public final class TarDriverContainer implements FsDriverService {
 
-    private static final IOPool<?> POOL = IOPoolContainer.SINGLETON.getPool();
     private static final Map<FsScheme, ArchiveDriver<?>> DRIVERS;
 
     static {
         final Map<FsScheme, ArchiveDriver<?>>
                 drivers = new HashMap<FsScheme, ArchiveDriver<?>>();
-        drivers.put(FsScheme.create("tar"), new TarDriver(POOL));
-        ArchiveDriver<?> driver = new TarGZipDriver(POOL);
+        drivers.put(FsScheme.create("tar"),
+                    new TarDriver(IOPoolContainer.SINGLETON));
+        ArchiveDriver<?> driver = new TarGZipDriver(IOPoolContainer.SINGLETON);
         for (String suffix : new SuffixSet("tgz|tar.gz"))
             drivers.put(FsScheme.create(suffix), driver);
-        driver = new TarBZip2Driver(POOL);
+        driver = new TarBZip2Driver(IOPoolContainer.SINGLETON);
         for (String suffix : new SuffixSet("tbz2|tar.bz2"))
             drivers.put(FsScheme.create(suffix), driver);
         DRIVERS = Collections.unmodifiableMap(drivers);

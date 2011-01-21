@@ -31,7 +31,6 @@ import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.net.MalformedURLException;
-import java.io.File;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Set;
@@ -42,7 +41,7 @@ import static de.schlichtherle.truezip.entry.Entry.Size.*;
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
 
 /**
- * Adapts a {@link File} instance to a {@link FsEntry}.
+ * An HTTP entry.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -55,17 +54,24 @@ final class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
     private static final BitField<FsOutputOption> NO_OUTPUT_OPTIONS
             = BitField.noneOf(FsOutputOption.class);
 
+    private HttpController controller;
+    private final EntryName name;
     private final URL url;
     private volatile @CheckForNull URLConnection connection;
-    private final EntryName name;
 
-    HttpEntry(final FsMountPoint mountPoint, final FsEntryName name) {
+    HttpEntry(final HttpController controller, final FsMountPoint mountPoint, final FsEntryName name) {
+        assert null != controller;
+        this.controller = controller;
+        this.name = name;
         try {
             this.url = mountPoint.resolve(name).getUri().toURL();
         } catch (MalformedURLException ex) {
             throw new IllegalArgumentException(ex);
         }
-        this.name = name;
+    }
+
+    HttpController getController() {
+        return controller;
     }
 
     /** Returns the decorated URL. */

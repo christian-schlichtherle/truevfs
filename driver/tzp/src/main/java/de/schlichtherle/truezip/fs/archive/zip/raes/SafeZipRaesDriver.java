@@ -21,6 +21,7 @@ import de.schlichtherle.truezip.fs.archive.zip.ZipInputShop;
 import de.schlichtherle.truezip.key.KeyManagerService;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.IOPool;
+import de.schlichtherle.truezip.socket.IOPoolService;
 import java.io.IOException;
 import net.jcip.annotations.Immutable;
 
@@ -52,8 +53,9 @@ import net.jcip.annotations.Immutable;
 @Immutable
 public class SafeZipRaesDriver extends ZipRaesDriver {
 
-    public SafeZipRaesDriver(IOPool<?> pool, KeyManagerService service) {
-        super(pool, service);
+    public SafeZipRaesDriver(   IOPoolService ioPoolService,
+                                KeyManagerService keyManagerService) {
+        super(ioPoolService, keyManagerService);
     }
 
     /**
