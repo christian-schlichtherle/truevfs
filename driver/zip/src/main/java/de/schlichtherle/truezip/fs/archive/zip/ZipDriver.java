@@ -86,7 +86,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
     }
 
     @Override
-    public IOPool<?> getPool() {
+    public final IOPool<?> getPool() {
         return pool;
     }
 

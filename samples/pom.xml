@@ -41,7 +41,7 @@
     <dependencies>
         <!-- A TrueZIP application typically has a compile time dependency on
              either only the File* API or only the Kernel API.
-             However, the sample applications use both APIs. -->
+             However, the sample applications demonstrate using both APIs. -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truezip-file</artifactId>
@@ -54,19 +54,25 @@
         </dependency>
 
         <!-- Provides some nice swing classes which use the File* API. -->
-        <dependency>
+        <!-- <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truezip-swing</artifactId>
             <version>${project.version}</version>
-        </dependency>
+        </dependency> -->
 
         <!-- A TrueZIP application typically has a run time dependency on one
-             or more archive drivers.
-             When found on the class path at run time, an archive driver is
+             or more file system drivers.
+             When found on the class path at run time, a file system driver is
              automatically registered for use by the File* or Kernel APIs.
              However, the File* API sample applications have a compile time
              dependency because they configure some drivers directly.
              -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truezip-driver-http</artifactId>
+            <version>${project.version}</version>
+            <scope>runtime</scope>
+        </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truezip-driver-tar</artifactId>

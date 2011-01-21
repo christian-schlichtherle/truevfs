@@ -32,7 +32,7 @@
             </Property>
           </Properties>
           <Events>
-            <EventHandler event="ancestorWindowShown" listener="de.schlichtherle.truezip.swing.event.PanelListener" parameters="de.schlichtherle.truezip.swing.event.PanelEvent" handler="keyFilePanelAncestorWindowShown"/>
+            <EventHandler event="ancestorWindowShown" listener="de.schlichtherle.truezip.swing.PanelListener" parameters="de.schlichtherle.truezip.swing.PanelEvent" handler="keyFilePanelAncestorWindowShown"/>
           </Events>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="18"/>

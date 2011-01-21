@@ -49,8 +49,10 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truezip-driver-file</artifactId>
-            <version>${project.version}</version>
-            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans</groupId>
+            <artifactId>jemmy</artifactId>
         </dependency>
     </dependencies>
 </project>

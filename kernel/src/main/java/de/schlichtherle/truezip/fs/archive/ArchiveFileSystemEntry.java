@@ -21,6 +21,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.NotThreadSafe;
 
@@ -34,6 +35,7 @@ import static de.schlichtherle.truezip.entry.Entry.Type.*;
  * @version $Id$
  */
 @NotThreadSafe
+@DefaultAnnotation(NonNull.class)
 public abstract class ArchiveFileSystemEntry<E extends ArchiveEntry>
 extends FsDecoratingEntry<E> {
 
@@ -41,19 +43,17 @@ extends FsDecoratingEntry<E> {
      * Constructs a new archive file system entry which decorates the given
      * archive entry.
      */
-    @NonNull
     public static <E extends ArchiveEntry>
-    ArchiveFileSystemEntry<E> create(   final @NonNull FsEntryName name,
-                                        final @NonNull Type        type,
-                                        final @NonNull E           entry) {
+    ArchiveFileSystemEntry<E> create(   final FsEntryName name,
+                                        final Type        type,
+                                        final E           entry) {
         return create(name.getPath(), type, entry);
     }
 
-    @NonNull
     static <E extends ArchiveEntry>
-    ArchiveFileSystemEntry<E> create(   final @NonNull String path,
-                                        final @NonNull Type   type,
-                                        final @NonNull E      entry) {
+    ArchiveFileSystemEntry<E> create(   final String path,
+                                        final Type   type,
+                                        final E      entry) {
         switch (type) {
             case FILE:
                 assert FILE == entry.getType();
@@ -76,7 +76,7 @@ extends FsDecoratingEntry<E> {
     }
 
     /** Constructs a new instance of {@code Entry}. */
-    private ArchiveFileSystemEntry(@NonNull E entry) {
+    private ArchiveFileSystemEntry(E entry) {
         super(entry);
     }
 
@@ -105,7 +105,7 @@ extends FsDecoratingEntry<E> {
      * @throws UnsupportedOperationException if this file system entry is
      *         not a directory.
      */
-    boolean add(@NonNull String member) {
+    boolean add(String member) {
         throw new UnsupportedOperationException();
     }
 
@@ -121,7 +121,7 @@ extends FsDecoratingEntry<E> {
      * @throws UnsupportedOperationException if this file system entry is
      *         not a directory.
      */
-    boolean remove(@NonNull String member) {
+    boolean remove(String member) {
         throw new UnsupportedOperationException();
     }
 

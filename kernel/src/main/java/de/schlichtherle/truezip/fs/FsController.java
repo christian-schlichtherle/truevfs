@@ -167,8 +167,8 @@ public abstract class FsController<M extends FsModel> {
     throws IOException;
 
     /**
-     * Commits all changes to the contents of this file system to its parent
-     * file system.
+     * Synchronizes all uncommitted changes to the contents of this file system
+     * to its parent file system.
      *
      * @param  options the synchronization options.
      * @param  handler the exception handling strategy for dealing with one or

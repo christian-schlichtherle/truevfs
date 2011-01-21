@@ -32,7 +32,7 @@ import java.util.ResourceBundle;
  * as their character set, whereas plain ZIP files use &quot;IBM437&quot;,
  * a.k.a. &quot;CP437&quot;.
  * To encrypt a plain ZIP file to an RAES encrypted ZIP file, use the
- * {@code "cp"} command of the {@link NZip} class instead.
+ * {@code "cp"} command of the {@link Nzip} class instead.
  * This class knows about the correct character sets for the various
  * flavours of ZIP compatible files.
  *

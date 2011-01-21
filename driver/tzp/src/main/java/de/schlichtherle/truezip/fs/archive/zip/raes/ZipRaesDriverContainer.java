@@ -19,6 +19,7 @@ import de.schlichtherle.truezip.util.SuffixSet;
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsDriverService;
 import de.schlichtherle.truezip.fs.FsScheme;
+import de.schlichtherle.truezip.fs.archive.ArchiveDriver;
 import de.schlichtherle.truezip.socket.IOPoolContainer;
 import java.util.Collections;
 import java.util.HashMap;
@@ -34,20 +35,21 @@ import net.jcip.annotations.Immutable;
 @Immutable
 public final class ZipRaesDriverContainer implements FsDriverService {
 
-    private static final Map<FsScheme, FsDriver> DRIVERS;
+    private static final Map<FsScheme, ArchiveDriver<?>> DRIVERS;
 
     static {
-        final FsDriver driver = new SafeZipRaesDriver(
+        final Map<FsScheme, ArchiveDriver<?>>
+                drivers = new HashMap<FsScheme, ArchiveDriver<?>>();
+        final ArchiveDriver<?> driver = new SafeZipRaesDriver(
                 IOPoolContainer.SINGLETON.getPool(),
                 new PromptingKeyManagerContainer());
-        final Map<FsScheme, FsDriver> drivers = new HashMap<FsScheme, FsDriver>();
         for (String suffix : new SuffixSet("tzp|zip.rae|zip.raes"))
             drivers.put(FsScheme.create(suffix), driver);
         DRIVERS = Collections.unmodifiableMap(drivers);
     }
 
     @Override
-    public Map<FsScheme, ? extends FsDriver> getDrivers() {
+    public Map<FsScheme, ArchiveDriver<?>> getDrivers() {
         return DRIVERS;
     }
 }

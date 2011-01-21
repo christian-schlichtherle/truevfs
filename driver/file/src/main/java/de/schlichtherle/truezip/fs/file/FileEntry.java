@@ -24,9 +24,11 @@ import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.EntryName;
 import de.schlichtherle.truezip.fs.FsEntry;
+import de.schlichtherle.truezip.fs.FsEntryName;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import java.util.Arrays;
 import java.util.Collections;
 import java.io.File;
 import java.util.HashSet;
@@ -44,7 +46,7 @@ import static de.schlichtherle.truezip.entry.Entry.Access.*;
  */
 @Immutable
 @DefaultAnnotation(NonNull.class)
-public class FileEntry extends FsEntry implements IOEntry<FileEntry> {
+class FileEntry extends FsEntry implements IOEntry<FileEntry> {
 
     private static final BitField<FsOutputOption> NO_OUTPUT_OPTIONS
             = BitField.noneOf(FsOutputOption.class);
@@ -58,14 +60,14 @@ public class FileEntry extends FsEntry implements IOEntry<FileEntry> {
         this.name = EntryName.create(file.getName());
     }
 
-    FileEntry(final File file, final EntryName name) {
+    FileEntry(final File file, final FsEntryName name) {
         assert null != file;
         this.file = new File(file, name.getPath());
         this.name = name;
     }
 
     /** Returns the decorated file. */
-    public final File getFile() {
+    final File getFile() {
         return file;
     }
 
@@ -74,13 +76,12 @@ public class FileEntry extends FsEntry implements IOEntry<FileEntry> {
         return name.toString();
     }
 
-    /** Returns the type of this file entry. */
     @Override
     public final Entry.Type getType() {
         return file.isDirectory() ? DIRECTORY
                 :   file.isFile() ? FILE
                 :   file.exists() ? SPECIAL
-                :                   Type.NULL;
+                :                   null;
     }
 
     @Override
@@ -94,23 +95,18 @@ public class FileEntry extends FsEntry implements IOEntry<FileEntry> {
         }
     }
 
-    /** Returns the file's last modification time. */
     @Override
     public final long getTime(Access type) {
         return WRITE == type && file.exists() ? file.lastModified() : UNKNOWN;
     }
 
     @Override
-    @SuppressWarnings("ManualArrayToCollectionCopy")
     public final @Nullable Set<String> getMembers() {
         final String[] list = file.list();
-        if (null == list)
-            return null;
-        final Set<String> set
-                = new HashSet<String>((int) (list.length / .75f) + 1);
-        for (String member : list)
-            set.add(member);
-        return Collections.unmodifiableSet(set);
+        return null == list
+                ? null
+                : Collections.unmodifiableSet(
+                    new HashSet<String>(Arrays.asList(list)));
     }
 
     @Override

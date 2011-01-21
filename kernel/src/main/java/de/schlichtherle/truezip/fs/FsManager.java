@@ -103,8 +103,9 @@ implements Iterable<FsController<?>> {
                                     CLEAR_CACHE);
 
     /**
-     * Commits all changes of the contents of the federated file systems
-     * managed by this instance to their respective parent file system.
+     * Synchronizes all uncommitted changes to the contents of all federated
+     * file systems managed by this instance to their respective parent file
+     * system.
      * This will reset the state of the respective file system controllers.
      *
      * @param  options the synchronization options.

@@ -4,7 +4,7 @@
   <NonVisualComponents>
     <Container class="de.schlichtherle.truezip.swing.EnhancedPanel" name="newPasswdPanel">
       <Events>
-        <EventHandler event="ancestorWindowShown" listener="de.schlichtherle.truezip.swing.event.PanelListener" parameters="de.schlichtherle.truezip.swing.event.PanelEvent" handler="newPasswdPanelAncestorWindowShown"/>
+        <EventHandler event="ancestorWindowShown" listener="de.schlichtherle.truezip.swing.PanelListener" parameters="de.schlichtherle.truezip.swing.PanelEvent" handler="newPasswdPanelAncestorWindowShown"/>
       </Events>
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout"/>
@@ -69,7 +69,7 @@
     </Container>
   </NonVisualComponents>
   <Events>
-    <EventHandler event="ancestorWindowShown" listener="de.schlichtherle.truezip.swing.event.PanelListener" parameters="de.schlichtherle.truezip.swing.event.PanelEvent" handler="formAncestorWindowShown"/>
+    <EventHandler event="ancestorWindowShown" listener="de.schlichtherle.truezip.swing.PanelListener" parameters="de.schlichtherle.truezip.swing.PanelEvent" handler="formAncestorWindowShown"/>
   </Events>
   <AuxValues>
     <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>

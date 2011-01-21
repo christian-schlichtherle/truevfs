@@ -16,7 +16,6 @@
 package de.schlichtherle.truezip.entry;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
-import net.jcip.annotations.NotThreadSafe;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -46,13 +45,11 @@ implements Entry {
     }
 
     @Override
-    @NonNull
     public String getName() {
         return delegate.getName();
     }
 
     @Override
-    @NonNull
     public Type getType() {
         return delegate.getType();
     }

@@ -65,16 +65,16 @@ public class CheckedZipInputShop extends ZipInputShop {
             }
 
             @Override
+            public ReadOnlyFile newReadOnlyFile() throws IOException {
+                throw new FileNotFoundException(name + " (unsupported operation)"); // TODO: Support this feature for STORED entries.
+            }
+
+            @Override
             public InputStream newInputStream() throws IOException {
                 return CheckedZipInputShop.this.getInputStream(
                         getLocalTarget().getName(),
                         true,
                         !(getPeerTarget() instanceof ZipArchiveEntry));
-            }
-
-            @Override
-            public ReadOnlyFile newReadOnlyFile() throws IOException {
-                throw new FileNotFoundException(name + " (unsupported operation)"); // TODO: Support this feature for STORED entries.
             }
         } // class Input
 

@@ -30,9 +30,8 @@
 
     <name>TrueZIP (POM)</name>
     <description>
-        TrueZIP is a framework for implementing federated virtual file systems
-        and a library for accessing archive files as if they were just plain
-        old directories.
+        TrueZIP is a framework for federated virtual file systems and a library
+        for accessing archive files as if they were just plain old directories.
         As a framework, TrueZIP provides the interfaces and classes to write
         file system drivers which seamlessly plug-in to the federated virtual
         file system space.
@@ -79,8 +78,15 @@
         <module>swing</module>
     </modules>
 
+
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truezip-driver-file</artifactId>
+                <version>${project.version}</version>
+                <scope>runtime</scope>
+            </dependency>
             <dependency>
                 <groupId>org.netbeans</groupId>
                 <artifactId>jemmy</artifactId>

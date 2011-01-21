@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.entry;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 
 /**
  * Represents an entry in an entry container, e.g. an archive file or a file
@@ -46,7 +47,7 @@ public interface Entry {
 
         @Override
         public Type getType() {
-            return Type.NULL;
+            return null;
         }
 
         @Override
@@ -68,12 +69,6 @@ public interface Entry {
 
     /** Defines the type of archive entry. */
     enum Type {
-
-        /**
-         * Nonexistent entry.
-         * This entry does not exist in the file system.
-         */
-        NULL,
 
         /**
          * Regular file.
@@ -142,11 +137,13 @@ public interface Entry {
     @NonNull String getName();
 
     /**
-     * Returns the type of this entry.
+     * Returns the type of this entry or {@code null} if and only if this entry
+     * does not exist.
      *
-     * @return The type of this entry.
+     * @return The type of this entry or {@code null} if and only if this entry
+     *         does not exist.
      */
-    @NonNull Type getType();
+    @Nullable Type getType();
 
     /**
      * Returns the size of this entry.

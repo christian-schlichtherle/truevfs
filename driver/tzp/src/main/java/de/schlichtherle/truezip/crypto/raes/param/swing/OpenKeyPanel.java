@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.crypto.raes.param.swing;
 
 import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
@@ -265,13 +264,13 @@ final class OpenKeyPanel extends EnhancedPanel {
         authenticationPanel = new de.schlichtherle.truezip.crypto.raes.param.swing.AuthenticationPanel();
         error = new javax.swing.JLabel();
 
-        passwdPanel.addPanelListener(new de.schlichtherle.truezip.swing.event.PanelListener() {
+        passwdPanel.addPanelListener(new de.schlichtherle.truezip.swing.PanelListener() {
             @Override
-			public void ancestorWindowShown(de.schlichtherle.truezip.swing.event.PanelEvent evt) {
+			public void ancestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {
                 passwdPanelAncestorWindowShown(evt);
             }
             @Override
-			public void ancestorWindowHidden(de.schlichtherle.truezip.swing.event.PanelEvent evt) {
+			public void ancestorWindowHidden(de.schlichtherle.truezip.swing.PanelEvent evt) {
             }
         });
         passwdPanel.setLayout(new java.awt.GridBagLayout());
@@ -293,13 +292,13 @@ final class OpenKeyPanel extends EnhancedPanel {
         gridBagConstraints.weightx = 1.0;
         passwdPanel.add(passwd, gridBagConstraints);
 
-        addPanelListener(new de.schlichtherle.truezip.swing.event.PanelListener() {
+        addPanelListener(new de.schlichtherle.truezip.swing.PanelListener() {
             @Override
-			public void ancestorWindowShown(de.schlichtherle.truezip.swing.event.PanelEvent evt) {
+			public void ancestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {
                 formAncestorWindowShown(evt);
             }
             @Override
-			public void ancestorWindowHidden(de.schlichtherle.truezip.swing.event.PanelEvent evt) {
+			public void ancestorWindowHidden(de.schlichtherle.truezip.swing.PanelEvent evt) {
             }
         });
         setLayout(new java.awt.GridBagLayout());
@@ -352,13 +351,13 @@ final class OpenKeyPanel extends EnhancedPanel {
         add(error, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void formAncestorWindowShown(de.schlichtherle.truezip.swing.event.PanelEvent evt) {//GEN-FIRST:event_formAncestorWindowShown
+    private void formAncestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {//GEN-FIRST:event_formAncestorWindowShown
         final Feedback feedback = getFeedback();
         if (null != feedback)
             feedback.feedback(this);
     }//GEN-LAST:event_formAncestorWindowShown
 
-    private void passwdPanelAncestorWindowShown(de.schlichtherle.truezip.swing.event.PanelEvent evt) {//GEN-FIRST:event_passwdPanelAncestorWindowShown
+    private void passwdPanelAncestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {//GEN-FIRST:event_passwdPanelAncestorWindowShown
         // These are the things I hate Swing for: All I want to do here is to
         // set the focus to the passwd field in this panel when it shows.
         // However, this can't be done in the constructor since the panel is
@@ -389,8 +388,8 @@ final class OpenKeyPanel extends EnhancedPanel {
         // no guarantee that the focus gets actually transferred...
         // This mess is insane (and I can hardly abstain from writing down
         // all the other insulting scatology which comes to my mind)!
-        final Window window = evt.getAncestorWindow();
-        assert window != null : "illegal state";
+        final Window window = evt.getSource().getAncestorWindow();
+        assert null != window : "illegal state";
         window.addWindowFocusListener(new WindowFocusListener() {
             @Override
 			public void windowGainedFocus(WindowEvent e) {
