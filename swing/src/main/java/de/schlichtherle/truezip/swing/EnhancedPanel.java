@@ -27,16 +27,7 @@ import java.awt.event.HierarchyListener;
 import javax.swing.JPanel;
 
 /**
- * This class adds methods to fire {@link PanelEvent}s.
- * <p>
- * Note that in TrueZIP 6.1, this class has been refactored to coalesce
- * multiple panel events for the same cause by posting them to the AWT's
- * Event Queue, from which the coalesced event would then be dispatched by
- * AWT's Event Dispatching Thread.
- * <p>
- * However, since TrueZIP 6.4, these events are fired <em>synchronously</em>
- * again, whereby it is ensured that only a single event is fired for each
- * cause.
+ * Provides methods to fire {@link PanelEvent}s.
  * 
  * @author Christian Schlichtherle
  * @version $Id$
