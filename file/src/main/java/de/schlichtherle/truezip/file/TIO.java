@@ -35,53 +35,54 @@ import net.jcip.annotations.Immutable;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 
 /**
- * Provides static utility methods for {@link TFile}s.
+ * Provides fast bulk I/O operations for {@link File}s and {@link TFile}s.
  * <p>
  * Note that in contrast to the {@link TFile} class, the methods in this
- * class accept and return plain {@code java.io.TFile} instances.
- * Full advantage is taken if a parameter is actually an instance of the
- * {@code TFile} class in this package, however.
+ * class accept plain old {@link File} objects.
+ * However, full advantage is taken if a parameter is a {@link TFile} object.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
 @Immutable
-final class TFiles {
+public final class TIO {
 
     /** You cannot instantiate this class. */
-    private TFiles() {
+    private TIO() {
     }
 
     /**
-     * Moves the source to the destination by recursively copying and deleting
-     * its files and directories.
+     * Moves the source directory tree or file to the destination directory
+     * tree or file by recursively applying copy-then-delete.
      * Hence, this file system operation works even with archive files or
      * entries within archive files, but is <em>not</em> atomic.
      *
-     * @param  src the source file or directory.
-     *             This must exist.
-     * @param  dst the destination file or directory.
-     *             This may or may not exist.
-     *             If it does, its contents are overwritten.
-     * @param  detector the object used to detect any archive
-     *         files in the path and configure their parameters.
+     * @param  src the source directory tree or file.
+     *         This file system entity needs to exist.
+     * @param  dst the destination directory tree or file.
+     *         This file systeme entity may or may not exist.
+     *         If it does, its contents are overwritten.
+     * @param  detector the object used to detect any archive files in the
+     *         source and destination paths.
+     * @throws IOException if the source path contains the destination path
+     *         or an elementary operation fails for any reason.
      */
-    static void
-    move(   final File src,
+    public static void
+    moveAll(final File src,
             final File dst,
             final TArchiveDetector detector)
     throws IOException {
         if (contains(src, dst))
             throw new TContainsFileException(src, dst);
-        move0(src, dst, detector);
+        moveAll0(src, dst, detector);
     }
 
     /** Unchecked parameters version. */
     private static void
-    move0(  final File src,
-            final File dst,
-            final TArchiveDetector detector)
+    moveAll0(   final File src,
+                final File dst,
+                final TArchiveDetector detector)
     throws IOException {
         if (src.isDirectory()) {
             final long srcLastModified = src.lastModified();
@@ -101,9 +102,9 @@ final class TFiles {
                 Arrays.sort(members);
             }
             for (final String member : members)
-                move0(  new TFile(src, member, detector),
-                        new TFile(dst, member, detector),
-                        detector);
+                moveAll0(   new TFile(src, member, detector),
+                            new TFile(dst, member, detector),
+                            detector);
             if (!srcIsGhost)
                 if (!dst.setLastModified(srcLastModified))
                     throw new IOException(dst + " (cannot set last modification time)");
@@ -120,8 +121,27 @@ final class TFiles {
             throw new IOException(src + " (cannot delete)");
     }
 
-    /** Performs a recursive copy operation. */
-    static void
+    /**
+     * Recursively copies the source directory tree or file to the destination
+     * directory tree or file.
+     *
+     * @param  preserve if an elementary copy operation shall copy as much
+     *         properties of the source file to the destination file, too.
+     *         Currently, only the last modification time is preserved.
+     *         Note that this property set may get extended over time.
+     * @param  src the source directory tree or file.
+     *         This file system entity needs to exist.
+     * @param  dst the destination directory tree or file.
+     *         This file systeme entity may or may not exist.
+     *         If it does, its contents are overwritten.
+     * @param  srcDetector the object used to detect any archive files in the
+     *         source path.
+     * @param  dstDetector the object used to detect any archive files in the
+     *         destination path.
+     * @throws IOException if the source path contains the destination path
+     *         or an elementary operation fails for any reason.
+     */
+    public static void
     copyAll(final boolean preserve,
             final File src,
             final File dst,
@@ -178,10 +198,23 @@ final class TFiles {
     }
 
     /**
+     * Copies a single source file to a destination file.
      * The name of this method is inspired by the Unix command line utility
      * {@code copy}.
+     *
+     * @param  preserve if an elementary copy operation shall copy as much
+     *         properties of the source file to the destination file, too.
+     *         Currently, only the last modification time is preserved.
+     *         Note that this property set may get extended over time.
+     * @param  src the source file.
+     *         This file system entity needs to exist.
+     * @param  dst the destination file.
+     *         This file systeme entity may or may not exist.
+     *         If it does, its contents are overwritten.
+     * @throws IOException if the source path contains the destination path
+     *         or an elementary operation fails for any reason.
      */
-    static void
+    public static void
     copy(   final boolean preserve,
             final File src,
             final File dst)
@@ -242,52 +275,34 @@ final class TFiles {
     }
 
     /**
-     * Deletes the entire directory tree represented by the parameter,
-     * regardless whether it's a file or directory, whether the directory
-     * is empty.
-     * <p>
-     * This file system operation is <em>not</em> atomic.
+     * Recursively deletes the given directory tree or file.
      *
-     * @return Whether or not the entire directory tree was successfully
-     *         removed.
+     * @param  node the directory tree or file to delete recursively.
+     * @throws IOException if an elementary operation fails for any reason.
      */
-    static boolean deleteAll(final File file) {
-        boolean ok = true;
-        if (file.isDirectory()) {
-            // If the directory is an archive file, one may be tempted to delete it
-            // directly (using e.g. java.io.TFile.delete()).
-            // However, this would bypass the ArchiveController's state and cause
-            // subsequent mayhem.
-            // So we play it safe despite the fact that this procedure is comparably
-            // much slower.
-            File[] members = file.listFiles();
-            for (int i = members.length; --i >= 0;)
-                ok &= deleteAll(members[i]);
-        }
-        return ok && file.delete();
+    public static void deleteAll(File node) throws IOException {
+        if (node.isDirectory())
+            for (File member : node.listFiles())
+                deleteAll(member);
+        if (!node.delete())
+            throw new IOException(node + " (cannot delete)");
     }
 
     /**
-     * Returns {@code true} if and only if the path represented
-     * by {@code a} contains the path represented by {@code b},
-     * where a path is said to contain another path if and only
-     * if it is equal or a parent of the other path.
+     * Returns {@code true} if and only if the path represented by {@code a}
+     * contains the path represented by {@code b}, where a path is said to
+     * contain another path if and only if it is equal or a parent of the other
+     * path.
      * <p>
-     * <b>Note:</b>
-     * <ul>
-     * <li>This method uses the canonical path name of the given files or,
-     *     if failing to canonicalize the path names, the normalized absolute
-     *     path names in order to compute reliable results.
-     * <li>This method does <em>not</em> access the file system.
-     *     It just tests the path names.
-     * </ul>
+     * Note that this method uses the absolute path of both files as if by
+     * calling {@link File#getAbsolutePath()}.
      *
      * @param a a file.
      * @param b another file.
      */
-    static boolean contains(File a, File b) {
+    public static boolean contains(File a, File b) {
         return Paths.contains(  a.getAbsolutePath(),
                                 b.getAbsolutePath(),
-                                TFile.separatorChar);
+                                File.separatorChar);
     }
 }

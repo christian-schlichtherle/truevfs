@@ -48,9 +48,9 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
  *     The part <em>after</em> the last mount point separator is parsed
  *     according to the syntax constraints for an {@link FsEntryName} and set as
  *     the value of the property {@link #getEntryName() entry name}.
- * <li>If the URI is absolute, it's resolved with {@code "."}, parsed according
- *     to the syntax constraints for a {@link FsMountPoint} and set as the
- *     value of the property {@link #getMountPoint() mount point}.
+ * <li>Otherwise, if the URI is absolute, it's resolved with {@code "."},
+ *     parsedaccording to the syntax constraints for a {@link FsMountPoint} and
+ *     set as the value of the property {@link #getMountPoint() mount point}.
  *     The value of the property {@link #getEntryName() entry name} is then set
  *     to the URI relativized to this {@link #getMountPoint() mount point}.
  * <li>Otherwise, the value of the property
@@ -58,6 +58,10 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
  *     is parsed according to the syntax constraints for an {@link FsEntryName}
  *     and set as the value of the property {@link #getEntryName() entry name}.
  * </ol>
+ * For opaque URIs, the constraints build a close subset of the syntax allowed
+ * with a {@link java.net.JarURLConnection}, so that any opaque URL
+ * {@link #getUri() obtained} from an instance of this class could be used to
+ * create a {@link java.net.JarURLConnection} object.
  * <p>
  * Examples for valid path URIs are:
  * <ul>
@@ -88,6 +92,8 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
     /**
      * The separator which is used to split opaque path names into
      * {@link FsMountPoint mount points} and {@link EntryName entry names}.
+     * This is identical to the separator in the class
+     * {@link java.net.JarURLConnection}.
      */
     public static final String MOUNT_POINT_SEPARATOR = "!" + SEPARATOR;
 

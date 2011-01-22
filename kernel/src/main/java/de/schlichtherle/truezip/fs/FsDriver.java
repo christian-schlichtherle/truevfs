@@ -30,7 +30,7 @@ import net.jcip.annotations.ThreadSafe;
 public interface FsDriver {
 
     /**
-     * Returns {@code true} iff this driver implements a federated virtual file
+     * Returns {@code true} iff this driver implements a federated file
      * system type, i.e. if the type of file system must be a member of a
      * parent file system.
      * E.g. the file system drivers for the ZIP or TAR file formats would

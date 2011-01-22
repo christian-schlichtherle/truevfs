@@ -30,17 +30,13 @@
 
     <name>TrueZIP (POM)</name>
     <description>
-        TrueZIP is a framework for federated virtual file systems and a library
-        for accessing archive files as if they were just plain old directories.
+        TrueZIP is a framework for virtual file systems and a library for
+        accessing archive files as if they were just plain old directories.
         As a framework, TrueZIP provides the interfaces and classes to write
-        file system drivers which seamlessly plug-in to the federated virtual
-        file system space.
-        As a library, TrueZIP provides convenient APIs for multi-threaded
-        read/write access to federated virtual file systems.
-        TrueZIP ships with file system driver families for ZIP, TAR and TZP
-        archive file formats and their derivatives (JAR, TGZ etc.)
-        The TZP file format is a custom JAR file format which is transparently
-        wrapped in an AES-256/CTR/SHA-256 envelope for safe encryption.
+        file system drivers which plug-in to its file system space.
+        As a library, TrueZIP's File* API provides convenient multi-threaded
+        read/write access to archive files as if they were just plain old
+        directories in a file system path.
     </description>
     <url>http://java.net/projects/truezip</url>
     <inceptionYear>2005</inceptionYear>
@@ -127,23 +123,7 @@
                 <plugin>
                     <artifactId>maven-site-plugin</artifactId>
                     <configuration>
-                        <reportPlugins>
-                            <plugin>
-                                <artifactId>maven-project-info-reports-plugin</artifactId>
-                                <version>2.2</version>
-                            </plugin>
-                            <plugin>
-                                <artifactId>maven-javadoc-plugin</artifactId>
-                                <version>2.7</version>
-                                <configuration>
-                                    <author>true</author>
-                                    <encoding>${project.build.sourceEncoding}</encoding>
-                                    <header>&lt;b&gt;${project.name} ${project.version}&lt;/b&gt;</header>
-                                    <quiet>true</quiet>
-                                    <splitindex>${javadoc.splitindex}</splitindex>
-                                    <version>true</version>
-                                </configuration>
-                            </plugin>
+                        <reportPlugins combine.children="append">
                             <plugin>
                                 <groupId>org.codehaus.mojo</groupId>
                                 <artifactId>findbugs-maven-plugin</artifactId>

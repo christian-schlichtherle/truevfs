@@ -69,7 +69,7 @@ import static de.schlichtherle.truezip.fs.FsSyncOption.*;
 import static de.schlichtherle.truezip.fs.FsUriModifier.*;
 import static de.schlichtherle.truezip.entry.Entry.Size.*;
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
-import static de.schlichtherle.truezip.file.TFiles.*;
+import static de.schlichtherle.truezip.file.TIO.*;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 
 /**
@@ -1508,7 +1508,7 @@ public final class TFile extends File {
      * @throws NullPointerException If the parameter is {@code null}.
      */
     public boolean isParentOf(final File file) {
-        return TFiles.contains(this, file);
+        return TIO.contains(this, file);
     }
 
     /**
@@ -1555,7 +1555,7 @@ public final class TFile extends File {
      * @throws NullPointerException If any parameter is {@code null}.
      */
     public static boolean contains(File a, File b) {
-        return TFiles.contains(a, b);
+        return TIO.contains(a, b);
     }
 
     /**
@@ -2357,7 +2357,12 @@ public final class TFile extends File {
      *         deleted.
      */
     public boolean deleteAll() {
-        return TFiles.deleteAll(this);
+        try {
+            TIO.deleteAll(this);
+            return true;
+        } catch (IOException ex) {
+            return false;
+        }
     }
 
     @Override
@@ -2399,7 +2404,7 @@ public final class TFile extends File {
         if (dst.exists())
             return false;
         try {
-            TFiles.move(this, dst, detector);
+            TIO.moveAll(this, dst, detector);
             return true;
         } catch (IOException ex) {
             return false;
@@ -2579,7 +2584,7 @@ public final class TFile extends File {
      */
     public boolean copyAllFrom(final File src) {
         try {
-            TFiles.copyAll(false, src, this, detector, detector);
+            TIO.copyAll(false, src, this, detector, detector);
             return true;
         } catch (IOException ex) {
             return false;
@@ -2642,7 +2647,7 @@ public final class TFile extends File {
             final File src,
             final TArchiveDetector detector) {
         try {
-            TFiles.copyAll(false, src, this, detector, detector);
+            TIO.copyAll(false, src, this, detector, detector);
             return true;
         } catch (IOException ex) {
             return false;
@@ -2714,7 +2719,7 @@ public final class TFile extends File {
             final TArchiveDetector srcDetector,
             final TArchiveDetector dstDetector) {
         try {
-            TFiles.copyAll(false, src, this, srcDetector, dstDetector);
+            TIO.copyAll(false, src, this, srcDetector, dstDetector);
             return true;
         } catch (IOException ex) {
             return false;
@@ -2890,7 +2895,7 @@ public final class TFile extends File {
      */
     public boolean copyAllTo(final File dst) {
         try {
-            TFiles.copyAll(false, this, dst, detector, detector);
+            TIO.copyAll(false, this, dst, detector, detector);
             return true;
         } catch (IOException ex) {
             return false;
@@ -2954,7 +2959,7 @@ public final class TFile extends File {
             final File dst,
             final TArchiveDetector detector) {
         try {
-            TFiles.copyAll(false, this, dst, detector, detector);
+            TIO.copyAll(false, this, dst, detector, detector);
             return true;
         } catch (IOException ex) {
             return false;
@@ -3026,7 +3031,7 @@ public final class TFile extends File {
             final TArchiveDetector srcDetector,
             final TArchiveDetector dstDetector) {
         try {
-            TFiles.copyAll(false, this, dst, srcDetector, dstDetector);
+            TIO.copyAll(false, this, dst, srcDetector, dstDetector);
             return true;
         } catch (IOException ex) {
             return false;
@@ -3152,7 +3157,7 @@ public final class TFile extends File {
      */
     public boolean archiveCopyAllFrom(final File src) {
         try {
-            TFiles.copyAll(true, src, this, detector, detector);
+            TIO.copyAll(true, src, this, detector, detector);
             return true;
         } catch (IOException ex) {
             return false;
@@ -3220,7 +3225,7 @@ public final class TFile extends File {
             final File src,
             final TArchiveDetector detector) {
         try {
-            TFiles.copyAll(true, src, this, detector, detector);
+            TIO.copyAll(true, src, this, detector, detector);
             return true;
         } catch (IOException ex) {
             return false;
@@ -3296,7 +3301,7 @@ public final class TFile extends File {
             final TArchiveDetector srcDetector,
             final TArchiveDetector dstDetector) {
         try {
-            TFiles.copyAll(true, src, this, srcDetector, dstDetector);
+            TIO.copyAll(true, src, this, srcDetector, dstDetector);
             return true;
         } catch (IOException ex) {
             return false;
@@ -3424,7 +3429,7 @@ public final class TFile extends File {
      */
     public boolean archiveCopyAllTo(final File dst) {
         try {
-            TFiles.copyAll(true, this, dst, detector, detector);
+            TIO.copyAll(true, this, dst, detector, detector);
             return true;
         } catch (IOException ex) {
             return false;
@@ -3494,7 +3499,7 @@ public final class TFile extends File {
             final File dst,
             final TArchiveDetector detector) {
         try {
-            TFiles.copyAll(true, this, dst, detector, detector);
+            TIO.copyAll(true, this, dst, detector, detector);
             return true;
         } catch (IOException ex) {
             return false;
@@ -3570,7 +3575,7 @@ public final class TFile extends File {
             final TArchiveDetector srcDetector,
             final TArchiveDetector dstDetector) {
         try {
-            TFiles.copyAll(true, this, dst, srcDetector, dstDetector);
+            TIO.copyAll(true, this, dst, srcDetector, dstDetector);
             return true;
         } catch (IOException ex) {
             return false;
@@ -3578,8 +3583,13 @@ public final class TFile extends File {
     }
 
     /**
-     * Copies the input stream {@code in} to the output stream
-     * {@code out}.
+     * Copies the data from the given input stream to the given output stream
+     * and <em>always</em> closes <em>both</em> streams - even if an exception
+     * occurs.
+     * <p>
+     * This is a high performance implementation which uses a pooled background
+     * thread to fill a FIFO of data buffers which is concurrently flushed by
+     * the current thread.
      * <p>
      * <table border="2" cellpadding="4">
      * <tr>
@@ -3620,13 +3630,12 @@ public final class TFile extends File {
      * </tr>
      * </table>
      *
-     * @param in The input stream.
-     * @param out The output stream.
-     * @throws InputException If copying the data fails because of an
+     * @param  in the input stream.
+     * @param  out the output stream.
+     * @throws InputException if copying the data fails because of an
      *         {@code IOException} in the <em>input</em> stream.
-     * @throws IOException If copying the data fails because of an
+     * @throws IOException if copying the data fails because of an
      *         {@code IOException} in the <em>output</em> stream.
-     * @throws NullPointerException If any parameter is {@code null}.
      * @see <a href="#copy_methods">Copy Methods</a>
      */
     public static void cp(final InputStream in, final OutputStream out)
@@ -3688,7 +3697,7 @@ public final class TFile extends File {
      */
     public static void cp(File src, File dst)
     throws IOException {
-        TFiles.copy(false, src, dst);
+        TIO.copy(false, src, dst);
     }
 
     /**
@@ -3747,7 +3756,7 @@ public final class TFile extends File {
      */
     public static void cp_p(File src, File dst)
     throws IOException {
-        TFiles.copy(true, src, dst);
+        TIO.copy(true, src, dst);
     }
 
     /**
@@ -3878,7 +3887,15 @@ public final class TFile extends File {
     }
 
     /**
-     * Copies all data from one stream to another without closing them.
+     * Copies the data from the given input stream to the given output stream
+     * <em>without</em> closing them.
+     * The name of this method is inspired by the Unix command line utility
+     * {@code cat} because you could use it to con<i>cat</i>enate the contents
+     * of multiple streams.
+     * <p>
+     * This is a high performance implementation which uses a pooled background
+     * thread to fill a FIFO of data buffers which is concurrently flushed by
+     * the current thread.
      * <p>
      * <table border="2" cellpadding="4">
      * <tr>
@@ -3919,12 +3936,12 @@ public final class TFile extends File {
      * </tr>
      * </table>
      *
-     * @param in The input stream.
-     * @param out The output stream.
-     * @throws InputException If copying the data fails because of an
-     *         IOException in the input stream.
-     * @throws IOException If copying the data fails because of an
-     *         IOException in the output stream.
+     * @param  in the input stream.
+     * @param  out the output stream.
+     * @throws InputException if copying the data fails because of an
+     *         {@code IOException} in the <em>input</em> stream.
+     * @throws IOException if copying the data fails because of an
+     *         {@code IOException} in the <em>output</em> stream.
      * @see <a href="#copy_methods">Copy Methods</a>
      */
     public static void cat(final InputStream in, final OutputStream out)
