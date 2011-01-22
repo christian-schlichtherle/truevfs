@@ -153,7 +153,7 @@ public final class TFileOutputStream extends DecoratingOutputStream {
     private static OutputStream newOutputStream(    final File dst,
                                                     final boolean append)
     throws FileNotFoundException {
-        final OutputSocket<?> output = TFiles.getOutputSocket(
+        final OutputSocket<?> output = TIO.getOutputSocket(
                 dst,
                 BitField.noneOf(FsOutputOption.class)
                     .set(APPEND, append)

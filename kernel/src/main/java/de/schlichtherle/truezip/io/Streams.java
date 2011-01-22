@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,6 +41,7 @@ import java.util.logging.Logger;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public final class Streams {
 
     /** You cannot instantiate this class. */
@@ -60,42 +62,13 @@ public final class Streams {
     }
 
     /**
-     * Copies the input stream {@code in} to the output stream {@code out}.
-     * This method <em>always</em> closes <em>both</em> streams - even if an
-     * exception occurs.
-     *
-     * @param  input the input stream.
-     * @param  output the output stream.
-     * @throws InputException if copying the data fails because of an
-     *         {@code IOException} in the <em>input</em> stream.
-     * @throws IOException if copying the data fails because of an
-     *         {@code IOException} in the <em>output</em> stream.
-     * @throws NullPointerException if any parameter is {@code null}.
-     */
-    public static void copy(@NonNull final InputStream input,
-                            @NonNull final OutputStream output)
-    throws IOException {
-        try {
-            Streams.cat(input, output);
-        } finally {
-            try {
-                input.close();
-            } catch (IOException ex) {
-                throw new InputException(ex);
-            } finally {
-                output.close();
-            }
-        }
-    }
-
-    /**
-     * Copies the data from the given input stream to the given output stream.
+     * Copies the data from the given input stream to the given output stream
+     * and <em>always</em> closes <em>both</em> streams - even if an exception
+     * occurs.
+     * <p>
      * This is a high performance implementation which uses a pooled background
      * thread to fill a FIFO of data buffers which is concurrently flushed by
      * the current thread.
-     * The name of this method is inspired by the Unix command line utility
-     * {@code cat} because you could use it to con<i>cat</i>enate the contents
-     * of multiple streams.
      *
      * @param  in the input stream.
      * @param  out the output stream.
@@ -103,7 +76,40 @@ public final class Streams {
      *         {@code IOException} in the <em>input</em> stream.
      * @throws IOException if copying the data fails because of an
      *         {@code IOException} in the <em>output</em> stream.
-     * @throws NullPointerException if any parameter is {@code null}.
+     */
+    public static void copy(final InputStream in,
+                            final OutputStream out)
+    throws IOException {
+        try {
+            Streams.cat(in, out);
+        } finally {
+            try {
+                in.close();
+            } catch (IOException ex) {
+                throw new InputException(ex);
+            } finally {
+                out.close();
+            }
+        }
+    }
+
+    /**
+     * Copies the data from the given input stream to the given output stream
+     * <em>without</em> closing them.
+     * The name of this method is inspired by the Unix command line utility
+     * {@code cat} because you could use it to con<i>cat</i>enate the contents
+     * of multiple streams.
+     * <p>
+     * This is a high performance implementation which uses a pooled background
+     * thread to fill a FIFO of data buffers which is concurrently flushed by
+     * the current thread.
+     *
+     * @param  in the input stream.
+     * @param  out the output stream.
+     * @throws InputException if copying the data fails because of an
+     *         {@code IOException} in the <em>input</em> stream.
+     * @throws IOException if copying the data fails because of an
+     *         {@code IOException} in the <em>output</em> stream.
      */
     public static void cat(final InputStream in, final OutputStream out)
     throws IOException {

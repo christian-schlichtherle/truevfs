@@ -121,7 +121,7 @@ public final class TFileInputStream extends DecoratingInputStream {
 
     private static InputStream newInputStream(final File src)
     throws FileNotFoundException {
-        final InputSocket<?> input = TFiles.getInputSocket(
+        final InputSocket<?> input = TIO.getInputSocket(
                 src,
                 BitField.noneOf(FsInputOption.class));
         try {

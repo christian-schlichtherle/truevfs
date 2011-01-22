@@ -27,9 +27,9 @@ import static de.schlichtherle.truezip.fs.FsSyncOption.*;
 /**
  * A container which manages the lifecycle of controllers for federated file
  * systems. A file system is federated if and only if it's a member of a parent
- * file system.
+ * (virtual) file system.
  * <p>
- * Sub-classes must be thread-safe.
+ * Sub-classes must be thread-safe, too.
  *
  * @author Christian Schlichtherle
  * @version $Id$

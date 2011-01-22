@@ -22,7 +22,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.Immutable;
 
 /**
- * Detects prospective archive files (i.e. prospective federated virtual file
+ * Detects prospective archive files (i.e. prospective federated file
  * systems) solely by scanning file path names - usually by testing for file
  * name suffixes like <i>.zip</i> etc.
  * <p>
@@ -51,7 +51,7 @@ public interface TArchiveDetector extends FsCompositeDriver {
      *
      * @param  path the path name of the file in the federated file system.
      *         This does not need to be absolute and it does not need to be
-     *         accessible in its containing federated virtual file system!
+     *         accessible in its containing virtual file system!
      * @return A {@code scheme} for accessing the archive file or {@code null}
      *         if the path does not denote an archive file (i.e. the path does
      *         not have a known suffix) or an appropriate {@code scheme} is

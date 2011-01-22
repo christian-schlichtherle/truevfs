@@ -25,7 +25,7 @@
 
     <artifactId>truezip-swing</artifactId>
     <name>TrueZIP Swing</name>
-    <description>Provides Swing classes which use the File* API.</description>
+    <description>Provides Swing GUI classes.</description>
 
     <dependencies>
         <dependency>

@@ -40,7 +40,7 @@ import net.jcip.annotations.Immutable;
 /**
  * An archive detector which matches file paths against a pattern of
  * file suffixes in order to detect prospective archive files (i.e. prospective
- * federated virtual file systems) and look up their corresponding file system
+ * federated file systems) and look up their corresponding file system
  * driver using a file system driver service.
  * <p>
  * There are basically two types of constructors available in this class:

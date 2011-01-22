@@ -32,7 +32,7 @@ public interface FsManagerService {
      * Returns the file system manager.
      * <p>
      * Calling this method multiple times must return the same file system
-     * manager in order to ensure consistency of the federated virtual file
+     * manager in order to ensure consistency of the virtual file
      * system space.
      *
      * @return The file system manager.

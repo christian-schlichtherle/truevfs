@@ -18,197 +18,121 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
     <head/>
     <body>
-        <p>TrueZIP is a Java based Virtual File System (VFS) to enable transparent,
-            multi-threaded read/write access to archive files (ZIP, TAR, etc) as if they
-            were directories.
-            Archive files may be arbitrarily nested and the nesting level is only limited
-            by heap and file system size.</p>
-        <p>TrueZIP&#39;s design strategy is to &quot;make simple things easy and
-            complex things possible&quot;.
-            For example, when using the default configuration, the instance
-            {@link de.schlichtherle.truezip.file.TFile#TFile(java.lang.String) new File("app.ear/web.war/WEB-INF/lib/lib.jar/META-INF/MANIFEST.MF")}
-            would refer to the text file entry <i>META-INF/MANIFEST.MF</i> within the JAR file
-            entry <i>WEB-INF/lib/lib.jar</i> within the WAR file entry <i>web.war</i> within
-            the EAR file <i>app.ear</i>. The same applies for any other supported and configured
-            archive type.</p>
-        <p><b>Limitation:</b> TrueZIP works on <b>files</b> only. If an archive is just
-            available as an {@code InputStream}, it needs to be saved to a (temporary)
-            file first. If this is not an option, TrueZIP can&#39;t be used.</p>
-        <p>TrueZIP provides a pluggable archive driver architecture to support virtually
-            any archive type: Out of the box, TrueZIP supports ZIP, SFX/EXE, JAR, TZP, TAR,
-            TAR.BZ2 and TAR.GZ. This list will be extended in future releases. Note that some
-            of these archive types require additional JARs on the runtime class path.</p>
-        <p>To be minimal intrusive, TrueZIP provides drop-in replacements for many classes
-            in the {@code java.io} package. This reduces the learning curve to the essential
-            minimum and allows to introduce TrueZIP&#39;s functionality gradually within legacy
-            applications or even other VFS solutions which are currently built on top of
-            {@code java.io.File*}.</p>
-        <h3><a name="defaults"></a>Default Configuration</h3>
-        <p>The following archive types and access parameters are defined by the
-            default configuration resource file in <i>truezip.jar/META-INF/services/de.schlichtherle.truezip.io.archive.driver.registry.properties</i>.
-            Note that only the archive file suffixes {@code "ear|jar|war|zip"}
-            are recognized in file paths by default.</p>
-        <table border="2" cellpadding="0" cellspacing="2">
-            <tr>
-                <th>
-                    <p>Type</p>
-                </th>
-                <th>
-                    <p>Canonical Suffixes<sup>0</sup></p>
-                </th>
-                <th>
-                    <p>Charset<sup>1</sup></p>
-                </th>
-                <th>
-                    <p>Dependencies<sup>1</sup></p>
-                </th>
-                <th>
-                    <p>Description</p>
-                </th>
-            </tr>
-            <tr>
-                <td>
-                    <p>ZIP</p>
-                </td>
-                <td>
-                    <p>zip</p>
-                </td>
-                <td>
-                    <p>IBM437<sup>3</sup></p>
-                </td>
-                <td>
-                    <p>&nbsp;</p>
-                </td>
-                <td>
-                    <p>ZIP file: Archive file with central directory and compressible entries</p>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <p>JAR</p>
-                </td>
-                <td>
-                    <p>ear|jar|war</p>
-                </td>
-                <td>
-                    <p>UTF-8</p>
-                </td>
-                <td>
-                    <p>&nbsp;</p>
-                </td>
-                <td>
-                    <p>Java Archive: ZIP with custom directory tree layout</p>
-                </td>
-            </tr>
-            <tr>
-                <td>ODF</td>
-                <td>odb|odf|odg|odm|odp|ods|odt|otg|oth|otp|ots|ott</td>
-                <td>UTF-8</td>
-                <td>&nbsp;</td>
-                <td>OpenDocument Format: If present, the <i>mimetype</i> entry is written
-		first with STORED method.</td>
-            </tr>
-            <tr>
-                <td>TZP</td>
-                <td>
-                    <p>tzp|zip.rae|zip.raes</p>
-                </td>
-                <td>
-                    <p>UTF-8</p>
-                </td>
-                <td>
-                    <p><i>lcrypto.jar</i><sup>4</sup></p>
-                </td>
-                <td>
-                    <p>RAES encrypted ZIP file.</p>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <p>SFX/EXE</p>
-                </td>
-                <td>
-                    <p>exe</p>
-                </td>
-                <td>
-                    <p>system specific</p>
-                </td>
-                <td>
-                    <p>&nbsp;</p>
-                </td>
-                <td>
-                    <p>ZIP file with a code preamble for self extraction. This driver is pretty
-		slow.</p>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <p>TAR</p>
-                </td>
-                <td>
-                    <p>tar</p>
-                </td>
-                <td>
-                    <p>US-ASCII<sup>5</sup></p>
-                </td>
-                <td>
-                    <p><i>ant.jar</i><sup>6</sup></p>
-                </td>
-                <td>
-                    <p>TAR: Uncompressed tape archive file.</p>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <p>TAR.BZ2</p>
-                </td>
-                <td>
-                    <p>tbz2|tar.bz2</p>
-                </td>
-                <td>
-                    <p>US-ASCII<sup>5</sup></p>
-                </td>
-                <td>
-                    <p><i>ant.jar</i><sup>5</sup></p>
-                </td>
-                <td>
-                    <p>TAR file wrapped in BZIP2 compression format.</p>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <p>TAR.GZ</p>
-                </td>
-                <td>
-                    <p>tar.gz|tgz</p>
-                </td>
-                <td>
-                    <p>US-ASCII<sup>5</sup></p>
-                </td>
-                <td>
-                    <p><i>ant.jar</i><sup>6</sup></p>
-                </td>
-                <td>
-                    <p>TAR file wrapped in GZIP compression format.</p>
-                </td>
-            </tr>
-        </table>
-        <p><sup>0</sup> Suffix recognition is case insensitive with the {@link de.schlichtherle.truezip.file.TDefaultArchiveDetector}
-            class.<br/>
-            <sup>1</sup> The code page to use for entry names and other entry meta data. This
-            access parameter is determined by the archive driver (not the archive detector)
-            and can be customized by subclassing it.<br/>
-            <sup>2</sup> This needs to be on the runtime class path.<br/>
-            <sup>3</sup> The charset for ZIP files is not specified. This is a heuristic value
-            which is based on the fact that IBM437 is the original PC character set for the
-            USA and the ZIP file format has been invented there. <b>Do not rely on this!<br/>
-            </b><sup>4</sup> Bouncy Castle&#39;s Lightweight Crypto API for JDK 1.5, version 1.45
-            or higher. Available at
-            <a href="http://www.bouncycastle.org/latest_releases.html">http://www.bouncycastle.org/latest_releases.html</a>.<br/>
-            <sup>5</sup> The charset for TAR files is not specified. This is a heuristic value
-            which is based on the fact that the TAR file format stems from UNIX implementations
-            of the seventies.<br/>
-            <sup>6</sup> Apache&#39;s Ant, version 1.8.1 or higher.
-            Available at <a href="http://ant.apache.org/">http://ant.apache.org</a>.</p>
+        <p>TrueZIP is a framework for virtual file systems and a library for
+            accessing archive files as if they were just plain old
+            directories.</p>
+        <p>As a framework, TrueZIP provides the interfaces and classes to write
+            file system drivers which plug-in to its federated file system space.</p>
+        <p>As a library, TrueZIP's File* API provides convenient multi-threaded
+            read/write access to archive files as if they were just plain old
+            directories in a file system path.</p>
+
+        <h2>Use Cases</h2>
+        <p></p>
+        
+        <h2>Core Concept and Definitions</h2>
+        <p>The core concept of TrueZIP is the federation of virtual file
+            systems into a file system space which can be transparently
+            accessed via uniform calls to a convenient and comprehensive API.
+            To understand what this means, let's check the following
+            definitions first:</p>
+        <dl>
+            <dt>File System</dt>
+            <dd>An atomic, persistent container for files and directories in
+                order to store and structure arbitrary data.
+                Normally, the operating system provides an application with the
+                means to access a set of one or more file systems like NTFS or
+                ext4.</dd>
+            <dt>Virtual File System</dt>
+            <dd>A component which provides the same services like a file
+                system, but is synthesized at run time from one or more
+                components which are <em>not</em> file systems by
+                themselves.</dd>
+            <dt>Federated File System</dt>
+            <dd>A file system with a root directory which is a member within
+                another (parent) file system, which may be federated, too.</dd>
+            <dt>File System Space</dt>
+            <dd>The union of all file systems.</dd>
+        </dl>
+        <p>Note that the attributes <i>virtual</i> and <i>federated</i> in
+            their strict sense are complementary, so a file system could be
+            one or the other or both at the same time.</p>
+        <p>As an example for a file system which is virtual, but not federated,
+            consider the HTTP(S) protocols:
+            With their methods PUT, GET, POST and DELETE and the URI adressing
+            scheme, the HTTP(S) protocols provide a subset of typical file
+            system services.</p>
+        <p>As an example for a file system which is federated, but not virtual,
+            consider a native Unix file system which is mounted at a directory
+            path within the operating system's file system space, like e.g.
+            {@code /mnt/cdrom}.</p>
+        <p>As an example for a file system which is both virtual and federated,
+            consider any archive file which is accessed via TrueZIP's API:
+            It's virtual because it's adapted to typical file system services
+            by TrueZIP and its federated because its a file member within
+            another file system - which is a native file system of the
+            operating system in most cases.</p>
+        <p>Within the context of TrueZIP, the terms
+            <i>federated virtual file system</i>,
+            <i>virtual federated file system</i> and
+            <i>federated file system</i> are used as synonyms.
+            This simplification should do no harm because as a Java
+            application, TrueZIP provides only federated file systems which
+            are virtual file systems at the same time, too.</p>
+
+        <h2>Key Features</h2>
+        <dl>
+            <dt>Easy To Use</dt>
+            <dd>The File* API provides convenient read/write access to archive
+                files as if they were just plain old directories in a file
+                system path. Using the classes
+                {@link de.schlichtherle.truezip.file.TFile},
+                {@code de.schlichtherle.truezip.file.TFileInputStream},
+                {@code de.schlichtherle.truezip.file.TFileOutputStream} et al,
+                you can instantly access ZIP files, TAR files and their
+                derivatives or your own custom archive file format.</dd>
+            <dt>Fast Bulk I/O</dt>
+            <dd>The File* API provides convenient and powerful methods for fast
+                bulk I/O operations like recursive copying, moving or deleting
+                of directory trees and files.
+                E.g. using the multi-threaded method
+                {@link de.schlichtherle.truezip.file.TFile#cat(java.io.InputStream, java.io.OutputStream)},
+                you'll never have to write a naive read-then-write copy loop
+                again.
+            </dd>
+            <dt>File System Federation</dt>
+            <dd>TrueZIP supports virtual file system federation.
+                This enables an application to access archive files within any
+                other virtual file systems, e.g. you could read the contents of
+                a ZIP file which is accessed via HTTP(S) instead of reading it
+                from a file.
+                Archive files may also be nested, i.e. contained in another
+                archive file.
+                This is a generalization of the concept implemented by the
+                class {@link java.net.JarURLConnection}.</dd>
+            <dt>Extensible Driver Architecture</dt>
+            <dd>TrueZIP supports any virtual file system type via its pluggable
+                {@link de.schlichtherle.truezip.fs.FsDriver file system driver}
+                architecture.
+                TrueZIP ships with file system drivers for HTTP(S), ZIP, TAR
+                and their derivatives (JAR, TGZ, TBZ2 etc).</dd>
+            <dt>Thread-Safe</dt>
+            <dd>Multiple threads can read and write the same archive
+                file at the same time.</dd>
+            <dt>Robust</dt>
+            <dd>TrueZIP code uses assertions, JUnit tests and static code
+                analysis tools like FindBugs and JDepend in order to achieve
+                its high reliability standards.</dd>
+            <dt>Encrypted Archive File Format</dt>
+            <dd>TrueZIP includes a reference implementation for it's custom
+                Random Access Encryption Specification (RAES).
+                RAES is a generic wrapper file format which supports SHA-256
+                authentication and AES-256 encryption in CTR block mode for
+                random read access.
+                When combined with the ZIP File Format, this results in the
+                encrypted archive file format called ZIP.RAES or TZP for short.
+                TrueZIP ships with a file system driver to enable transparent
+                read/write access to TZP files.</dd>
+        </dl>
     </body>
 </html>
