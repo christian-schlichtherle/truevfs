@@ -153,7 +153,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  * <p>
  * <table border="2" cellpadding="4">
  * <tr>
- *   <th>FsPath</th>
+ *   <th>Path</th>
  *   <th>True State</th>
  *   <th>{@code isArchive()}<sup>1</sup></th>
  *   <th>{@code isDirectory()}</th>
@@ -365,8 +365,6 @@ public final class TFile extends File {
     /** The file system roots. */
     private static final Set<File> roots
     		= new TreeSet<File>(Arrays.asList(listRoots()));
-
-    static final FsManager manager = FsManagerContainer.SINGLETON.getManager();
 
     private static boolean lenient = true;
 
@@ -891,7 +889,7 @@ public final class TFile extends File {
     private static void sync(BitField<FsSyncOption> options)
     throws FsSyncException {
         FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
-        manager.sync(options, builder);
+        TConfig.MANAGER.sync(options, builder);
         builder.check();
     }
 
@@ -925,7 +923,7 @@ public final class TFile extends File {
             throw new IllegalArgumentException(archive.getPath() + " (not a top level federated file system)");
         final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
         new FsFilteringManager(
-                manager,
+                TConfig.MANAGER,
                 archive .getController()
                         .getModel()
                         .getMountPoint())
@@ -1486,7 +1484,7 @@ public final class TFile extends File {
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
         }
-        return controller = manager.getController(mountPoint, detector);
+        return controller = TConfig.MANAGER.getController(mountPoint, detector);
     }
 
     /**
@@ -3636,7 +3634,8 @@ public final class TFile extends File {
      *         {@code IOException} in the <em>input</em> stream.
      * @throws IOException if copying the data fails because of an
      *         {@code IOException} in the <em>output</em> stream.
-     * @see <a href="#copy_methods">Copy Methods</a>
+     * @see    #cat(InputStream, OutputStream)
+     * @see    <a href="#copy_methods">Copy Methods</a>
      */
     public static void cp(final InputStream in, final OutputStream out)
     throws IOException {
@@ -3942,7 +3941,8 @@ public final class TFile extends File {
      *         {@code IOException} in the <em>input</em> stream.
      * @throws IOException if copying the data fails because of an
      *         {@code IOException} in the <em>output</em> stream.
-     * @see <a href="#copy_methods">Copy Methods</a>
+     * @see    #cp(InputStream, OutputStream)
+     * @see    <a href="#copy_methods">Copy Methods</a>
      */
     public static void cat(final InputStream in, final OutputStream out)
     throws IOException {

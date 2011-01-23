@@ -97,7 +97,7 @@ implements TArchiveDetector, FsDriverService {
     public static final TDefaultArchiveDetector
             ALL = new TDefaultArchiveDetector(null);
 
-    private final Map<FsScheme, ? extends FsDriver> drivers;
+    private final Map<FsScheme, FsDriver> drivers;
 
     /**
      * The canonical string respresentation of the set of suffixes recognized
@@ -138,7 +138,7 @@ implements TArchiveDetector, FsDriverService {
      */
     public TDefaultArchiveDetector( final FsDriverService service,
                                     final @CheckForNull String suffixes) {
-        final Map<FsScheme, ? extends FsDriver> drivers = service.getDrivers();
+        final Map<FsScheme, FsDriver> drivers = service.getDrivers();
         final SuffixSet known = getSuffixes(service.getDrivers());
         final SuffixSet given;
         if (null != suffixes) {
@@ -157,9 +157,9 @@ implements TArchiveDetector, FsDriverService {
     }
 
     private static SuffixSet getSuffixes(
-            final Map<FsScheme, ? extends FsDriver> drivers) {
+            final Map<FsScheme, FsDriver> drivers) {
         SuffixSet set = new SuffixSet();
-        for (Map.Entry<FsScheme, ? extends FsDriver> entry : drivers.entrySet()) {
+        for (Map.Entry<FsScheme, FsDriver> entry : drivers.entrySet()) {
             FsDriver driver = entry.getValue();
             if (null != driver && driver.isFederated())
                 set.add(entry.getKey().toString());
@@ -229,10 +229,10 @@ implements TArchiveDetector, FsDriverService {
      */
     public TDefaultArchiveDetector( FsDriverService delegate,
                                     Object[] config) {
-        this(delegate, toMap(config));
+        this(delegate, newMap(config));
     }
 
-    private static Map<String, Object> toMap(final Object[] config) {
+    private static Map<String, Object> newMap(final Object[] config) {
         final Map<String, Object> map
                 = new LinkedHashMap<String, Object>((int) (config.length / .75f) + 1); // order may be important!
         for (int i = 0, l = config.length; i < l; i++)
@@ -265,8 +265,7 @@ implements TArchiveDetector, FsDriverService {
      */
     public TDefaultArchiveDetector( final FsDriverService delegate,
                                     final Map<String, Object> config) {
-        final Map<FsScheme, ? extends FsDriver>
-                delegateDrivers = delegate.getDrivers();
+        final Map<FsScheme, FsDriver> delegateDrivers = delegate.getDrivers();
         final Map<FsScheme, FsDriver>
                 drivers = new HashMap<FsScheme, FsDriver>(delegateDrivers);
         final SuffixSet suffixes = getSuffixes(delegateDrivers);
@@ -305,7 +304,7 @@ implements TArchiveDetector, FsDriverService {
     }
 
     @Override
-    public Map<FsScheme, ? extends FsDriver> getDrivers() {
+    public Map<FsScheme, FsDriver> getDrivers() {
         return drivers;
     }
 

@@ -46,7 +46,8 @@ import net.jcip.annotations.Immutable;
 @DefaultAnnotation(NonNull.class)
 @Immutable
 public abstract class FsArchiveDriver<E extends FsArchiveEntry>
-implements FsDriver, EntryFactory<E> {
+extends FsDriver
+implements EntryFactory<E> {
 
     /**
      * {@inheritDoc}

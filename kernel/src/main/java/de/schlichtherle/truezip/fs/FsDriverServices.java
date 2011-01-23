@@ -47,43 +47,49 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 @DefaultAnnotation(NonNull.class)
-public final class FsDriverContainer implements FsDriverService {
+public final class FsDriverServices {
 
-    /** The singleton instance of this class. */
-    public static final FsDriverContainer SINGLETON = new FsDriverContainer();
-
-    private final Map<FsScheme, FsDriver> drivers;
+    private static final ServiceLocator serviceLocator
+            = new ServiceLocator(FsDriverServices.class.getClassLoader());
 
     /** You cannot instantiate this class. */
-    private FsDriverContainer() {
-        final Logger
-                logger = Logger.getLogger(  FsDriverContainer.class.getName(),
-                                            FsDriverContainer.class.getName());
-        final Iterator<FsDriverService>
-                i = new ServiceLocator(FsDriverContainer.class.getClassLoader())
-                    .getServices(FsDriverService.class);
-        final Map<FsScheme, FsDriver>
-                drivers = new HashMap<FsScheme, FsDriver>();
-        if (!i.hasNext())
-            throw new ServiceConfigurationError(
-                    "No services available for " + FsDriverService.class);
-        while (i.hasNext()) {
-            for (final Map.Entry<FsScheme, FsDriver> entry
-                    : i.next().getDrivers().entrySet()) {
-                final FsScheme scheme = entry.getKey();
-                final FsDriver driver = entry.getValue();
-                if (null != scheme && null != driver) {
-                    drivers.put(scheme, driver);
-                    logger.log(Level.CONFIG, "mapping",
-                            new Object[] { scheme, driver });
-                }
-            }
-        }
-        this.drivers = Collections.unmodifiableMap(drivers);
+    private FsDriverServices() {
     }
 
-    @Override
-    public Map<FsScheme, FsDriver> getDrivers() {
-        return drivers;
+    /**
+     * A static factory method for an unmodifiable driver map which is
+     * constructed from the given configuration.
+     * This method is intended to be used by provider implementations of the
+     * {@link FsDriverService} interface for convenient creation of the map to
+     * return by
+     *
+     * @param  config
+     * @return The new map to use as the return value of
+     *         {@link FsDriverService#getDrivers()}.
+     */
+    public static Map<FsScheme, FsDriver> newMap(final Object[][] config) {
+        final Map<FsScheme, FsDriver> drivers = new HashMap<FsScheme, FsDriver>();
+        for (final Object[] param : config) {
+            final SuffixSet schemes = new SuffixSet((String) param[0]);
+            final FsDriver driver = newDriver(param[1]);
+            if (schemes.isEmpty())
+                throw new IllegalArgumentException("No schemes for " + driver);
+            for (String scheme : schemes)
+                drivers.put(FsScheme.create(scheme), driver);
+        }
+        return Collections.unmodifiableMap(drivers);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static @CheckForNull FsDriver newDriver(@CheckForNull Object driver) {
+        try {
+            if (driver instanceof String)
+                driver = serviceLocator.getClass((String) driver);
+            if (driver instanceof Class<?>)
+                driver = ((Class<? extends FsDriver>) driver).newInstance();
+            return (FsDriver) driver; // may throw ClassCastException
+        } catch (Exception ex) {
+            throw new IllegalArgumentException(ex); // NOI18N
+        }
     }
 }

@@ -246,13 +246,13 @@ public final class Streams {
                         try {
                             task.get();
                             break;
-                        } catch (CancellationException cancelled) {
+                        } catch (CancellationException ex2) {
                             break;
-                        } catch (ExecutionException readerFailure) {
-                            throw new AssertionError(readerFailure);
-                        } catch (InterruptedException interrupted) {
+                        } catch (ExecutionException ex2) {
+                            throw new AssertionError(ex2);
+                        } catch (InterruptedException ex2) {
                             Logger  .getLogger(Streams.class.getName())
-                                    .log(Level.INFO, "Ignored: ", interrupted);
+                                    .log(Level.INFO, ex2.getLocalizedMessage(), ex2);
                         }
                     }
                     throw ex;

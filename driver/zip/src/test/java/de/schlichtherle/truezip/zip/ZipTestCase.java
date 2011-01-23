@@ -20,7 +20,7 @@ import de.schlichtherle.truezip.zip.CRC32Exception;
 import de.schlichtherle.truezip.zip.ZipFile;
 import de.schlichtherle.truezip.zip.ZipOutputStream;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.rof.SimpleReadOnlyFile;
+import de.schlichtherle.truezip.rof.DefaultReadOnlyFile;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -162,7 +162,7 @@ public abstract class ZipTestCase {
             os.close();
         }
 
-        final ReadOnlyFile rof = new SimpleReadOnlyFile(zip);
+        final ReadOnlyFile rof = new DefaultReadOnlyFile(zip);
 
         try {
             newZipOutputStream(null, (Charset) null);

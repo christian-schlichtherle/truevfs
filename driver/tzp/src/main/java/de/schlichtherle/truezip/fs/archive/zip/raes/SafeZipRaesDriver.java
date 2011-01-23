@@ -20,11 +20,9 @@ import de.schlichtherle.truezip.fs.archive.zip.CheckedZipInputShop;
 import de.schlichtherle.truezip.fs.archive.zip.ZipInputShop;
 import de.schlichtherle.truezip.key.KeyManagerService;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.IOPoolService;
 import java.io.IOException;
 import net.jcip.annotations.Immutable;
-
 
 /**
  * A safe archive driver which builds RAES encrypted ZIP files.

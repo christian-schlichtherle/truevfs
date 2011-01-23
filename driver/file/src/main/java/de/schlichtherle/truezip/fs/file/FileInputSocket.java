@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.fs.file;
 
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.rof.SimpleReadOnlyFile;
+import de.schlichtherle.truezip.rof.DefaultReadOnlyFile;
 import de.schlichtherle.truezip.socket.InputSocket;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -48,7 +48,7 @@ final class FileInputSocket extends InputSocket<FileEntry> {
 
     @Override
     public ReadOnlyFile newReadOnlyFile() throws IOException {
-        return new SimpleReadOnlyFile(entry.getFile());
+        return new DefaultReadOnlyFile(entry.getFile());
     }
 
     @Override

@@ -80,7 +80,7 @@ public abstract class ReadOnlyFileTestCase {
                 out.close();
             }
             assert data.length == temp.length();
-            rrof = new SimpleReadOnlyFile(temp);
+            rrof = new DefaultReadOnlyFile(temp);
             trof = newReadOnlyFile(temp);
         } catch (IOException ex) {
             if (!temp.delete())

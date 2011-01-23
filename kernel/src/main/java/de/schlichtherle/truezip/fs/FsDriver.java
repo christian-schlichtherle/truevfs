@@ -15,11 +15,10 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
-import java.io.Serializable;
 import net.jcip.annotations.Immutable;
-import net.jcip.annotations.ThreadSafe;
 
 /**
  * A factory for thread-safe file system controllers.
@@ -27,24 +26,8 @@ import net.jcip.annotations.ThreadSafe;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface FsDriver {
-
-    /**
-     * Returns {@code true} iff this driver implements a federated file
-     * system type, i.e. if the type of file system must be a member of a
-     * parent file system.
-     * E.g. the file system drivers for the ZIP or TAR file formats would
-     * return {@code true} because a ZIP or TAR file must be a member of
-     * another file system, e.g. a regular directory.
-     * To the contrary, the driver for the file scheme would return
-     * {@code false} because this file system type cannot be a member of a
-     * parent file system.
-     * 
-     * @return {@code true} iff the type of the file system implemented by this
-     *         driver is federated, i.e. must be a member of a parent file
-     *         system.
-     */
-    boolean isFederated();
+@Immutable
+public abstract class FsDriver {
 
     /**
      * Returns a new thread-safe file system controller for the given mount
@@ -62,7 +45,34 @@ public interface FsDriver {
      * @return A new thread-safe file system controller for the given mount
      *         point and parent file system controller.
      */
-    @NonNull FsController<?>
+    public abstract @NonNull FsController<?>
     newController(  @NonNull  FsMountPoint mountPoint,
                     @Nullable FsController<?> parent);
+
+    /**
+     * Returns {@code true} iff this driver implements a federated file
+     * system type, i.e. if the type of file system must be a member of a
+     * parent file system.
+     * E.g. the file system drivers for the ZIP or TAR file formats should
+     * return {@code true} because a ZIP or TAR file is always a member of
+     * another file system, e.g. a regular directory.
+     * To the contrary, the driver for the file scheme should return
+     * {@code false} because this file system type cannot be a member of a
+     * parent file system.
+     * 
+     * @return {@code true} iff the type of the file system implemented by this
+     *         driver is federated, i.e. must be a member of a parent file
+     *         system.
+     */
+    public abstract boolean isFederated();
+
+    @Override
+    public String toString() {
+        return new StringBuilder()
+                .append(getClass().getName())
+                .append("[federated=")
+                .append(isFederated())
+                .append(']')
+                .toString();
+    }
 }

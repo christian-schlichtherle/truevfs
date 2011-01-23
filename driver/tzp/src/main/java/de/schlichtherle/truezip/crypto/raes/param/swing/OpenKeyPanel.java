@@ -24,6 +24,7 @@ import java.awt.Window;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.io.EOFException;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
@@ -151,10 +152,9 @@ final class OpenKeyPanel extends EnhancedPanel {
                 return true;
 
             case AuthenticationPanel.AUTH_KEY_FILE:
-                final String keyFilePathname
-                        = authenticationPanel.getKeyFilePath();
+                final File keyFile = authenticationPanel.getKeyFile();
                 try {
-                    param.setKeyFileBytes(AesCipherParametersUI.readKeyFile(keyFilePathname));
+                    param.setKeyFileBytes(AesCipherParametersUI.readKeyFile(keyFile));
                     return true;
                 } catch (EOFException ex) {
                     setError(resources.getString("keyFile.eofException"));

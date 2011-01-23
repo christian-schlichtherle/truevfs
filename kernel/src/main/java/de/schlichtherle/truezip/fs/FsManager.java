@@ -25,7 +25,7 @@ import net.jcip.annotations.ThreadSafe;
 import static de.schlichtherle.truezip.fs.FsSyncOption.*;
 
 /**
- * A container which manages the lifecycle of controllers for federated file
+ * A container which manages the life cycle of controllers for federated file
  * systems. A file system is federated if and only if it's a member of a parent
  * (virtual) file system.
  * <p>

@@ -29,7 +29,7 @@ import net.jcip.annotations.ThreadSafe;
  * {@code FilteredReadOnlyFile}, you should synchronize its file pointer like
  * this:
  * <pre>
- *     ReadOnlyFile rof = new SimpleReadOnlyFile(new File("HelloWorld.java"));
+ *     ReadOnlyFile rof = new DefaultReadOnlyFile(new File("HelloWorld.java"));
  *     try {
  *         ReadOnlyFile frof = new FilteredReadOnlyFile(rof);
  *         try {

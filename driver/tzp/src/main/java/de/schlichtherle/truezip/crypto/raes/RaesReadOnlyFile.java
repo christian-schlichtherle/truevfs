@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.crypto.raes;
 import de.schlichtherle.truezip.crypto.CipherReadOnlyFile;
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.rof.SimpleReadOnlyFile;
+import de.schlichtherle.truezip.rof.DefaultReadOnlyFile;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -116,7 +116,7 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
             RaesParametersException,
             RaesException,
             IOException {
-        final ReadOnlyFile rof = new SimpleReadOnlyFile(file);
+        final ReadOnlyFile rof = new DefaultReadOnlyFile(file);
         try {
             return getInstance(rof, params);
         } catch (IOException failure) {

@@ -22,9 +22,7 @@ import java.util.ServiceConfigurationError;
 /**
  * Queries the scheme of the given mount point in order to lookup the
  * appropriate file system driver which is then used to create the requested
- * file system controller.
- * <p>
- * Implementations must be thread-safe.
+ * thread-safe file system controller.
  *
  * @author  Christian Schlichtherle
  * @version $Id$

@@ -33,7 +33,7 @@
         TrueZIP is a framework for virtual file systems and a library for
         accessing archive files as if they were just plain old directories.
         As a framework, TrueZIP provides the interfaces and classes to write
-        file system drivers which plug-in to its file system space.
+        file system drivers which plug-in to its federated file system space.
         As a library, TrueZIP's File* API provides convenient multi-threaded
         read/write access to archive files as if they were just plain old
         directories in a file system path.
@@ -111,6 +111,14 @@
         <pluginManagement>
             <plugins>
                 <plugin>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <configuration>
+                        <systemPropertyVariables>
+                            <java.util.logging.config.file>${java.util.logging.config.file}</java.util.logging.config.file>
+                        </systemPropertyVariables>
+                    </configuration>
+                </plugin>
+                <plugin>
                     <artifactId>maven-jar-plugin</artifactId>
                     <executions>
                         <execution>
@@ -140,4 +148,8 @@
             </plugins>
         </pluginManagement>
     </build>
+
+    <properties>
+        <java.util.logging.config.file>logging.properties</java.util.logging.config.file>
+    </properties>
 </project>

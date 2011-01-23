@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.zip;
 
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.rof.SimpleReadOnlyFile;
+import de.schlichtherle.truezip.rof.DefaultReadOnlyFile;
 import de.schlichtherle.truezip.io.SynchronizedInputStream;
 import de.schlichtherle.truezip.util.Pool;
 import java.io.File;
@@ -255,7 +255,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
 
         @Override
 		public ReadOnlyFile allocate() throws IOException {
-            return new SimpleReadOnlyFile(file);
+            return new DefaultReadOnlyFile(file);
         }
 
         @Override

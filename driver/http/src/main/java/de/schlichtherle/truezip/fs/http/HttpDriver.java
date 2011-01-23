@@ -34,7 +34,7 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 @DefaultAnnotation(NonNull.class)
-final class HttpDriver implements FsDriver {
+final class HttpDriver extends FsDriver {
 
     private final IOPool<?> pool;
 
@@ -46,17 +46,6 @@ final class HttpDriver implements FsDriver {
         return pool;
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The implementation in the class {@link HttpDriver} always returns
-     * {@code false}.
-     */
-    @Override
-    public boolean isFederated() {
-        return false;
-    }
-
     @Override
     public FsController<?>
     newController(FsMountPoint mountPoint, @CheckForNull FsController<?> parent) {
@@ -66,5 +55,16 @@ final class HttpDriver implements FsDriver {
         if (null != parent)
             throw new IllegalArgumentException();
         return new HttpController(this, new FsModel(mountPoint));
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The implementation in the class {@link HttpDriver} always returns
+     * {@code false}.
+     */
+    @Override
+    public boolean isFederated() {
+        return false;
     }
 }

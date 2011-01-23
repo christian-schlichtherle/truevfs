@@ -41,5 +41,5 @@ public interface FsDriverService {
      * @return An immutable map of the supported file system schemes and
      *         drivers.
      */
-    @NonNull Map<FsScheme, ? extends FsDriver> getDrivers();
+    @NonNull Map<FsScheme, FsDriver> getDrivers();
 }

@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 
 /**
@@ -53,10 +52,12 @@ public class Pickr extends CommandLineUtility {
             });
             return 0;
         } catch (InterruptedException ex) {
-            Logger.getLogger(Pickr.class.getName()).log(Level.SEVERE, null, ex);
+            Logger  .getLogger(Pickr.class.getName())
+                    .log(Level.SEVERE, ex.getLocalizedMessage(), ex);
             return 1;
         } catch (InvocationTargetException ex) {
-            Logger.getLogger(Pickr.class.getName()).log(Level.SEVERE, null, ex);
+            Logger  .getLogger(Pickr.class.getName())
+                    .log(Level.SEVERE, ex.getLocalizedMessage(), ex);
             return 2;
         }
     }

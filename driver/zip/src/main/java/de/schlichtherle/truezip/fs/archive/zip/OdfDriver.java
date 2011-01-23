@@ -13,11 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.fs.FsConcurrentModel;
-import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.IOPoolService;
 import java.io.OutputStream;
 import de.schlichtherle.truezip.socket.InputShop;
@@ -25,7 +23,6 @@ import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import java.io.IOException;
 import net.jcip.annotations.Immutable;
-
 
 /**
  * An archive driver which supports building archive files according to

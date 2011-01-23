@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Schlichtherle IT Services
+ * Copyright (C) 2011 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,28 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.fs;
+package de.schlichtherle.truezip.file;
 
-import java.util.Map;
+import de.schlichtherle.truezip.fs.FsManager;
+import de.schlichtherle.truezip.fs.FsManagerContainer;
 
 /**
- * A provider for the dummy driver.
- *
- * @author  Christian Schlichtherle
+ * Holds the file system manager to use within this package.
+ * 
+ * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class DummyDriverContainer implements FsDriverService {
+interface TConfig {
 
-    private final Map<FsScheme, FsDriver> drivers;
-
-    public DummyDriverContainer(String suffixes) {
-        this.drivers = FsDriverServices.newMap(new Object[][] {
-            { suffixes, new DummyDriver() },
-        });
-    }
-
-    @Override
-    public Map<FsScheme, FsDriver> getDrivers() {
-        return drivers;
-    }
+    /** The file system manager to use within this package. */
+    FsManager MANAGER = FsManagerContainer.SINGLETON.getManager();
 }

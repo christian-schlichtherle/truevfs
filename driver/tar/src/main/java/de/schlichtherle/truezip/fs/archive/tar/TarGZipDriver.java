@@ -17,7 +17,6 @@ package de.schlichtherle.truezip.fs.archive.tar;
 
 import java.util.zip.Deflater;
 import de.schlichtherle.truezip.fs.FsConcurrentModel;
-import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.IOPoolService;
 import java.io.IOException;
 import java.io.InputStream;

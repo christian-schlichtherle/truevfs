@@ -50,21 +50,21 @@ public class AuthenticationPanelTest {
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                final AuthenticationPanel instance = new AuthenticationPanel();
+                final AuthenticationPanel panel = new AuthenticationPanel();
 
                 JPanel passwdPanel = null;
                 try {
-                    instance.setPasswdPanel(passwdPanel);
+                    panel.setPasswdPanel(passwdPanel);
                     fail("Calling setPasswdPanel(null) should throw an NPE!");
                 } catch (NullPointerException npe) {
                 }
 
                 passwdPanel = new JPanel();
                 passwdPanel.add(new JLabel(text));
-                instance.setPasswdPanel(passwdPanel);
+                panel.setPasswdPanel(passwdPanel);
 
                 final JFrame frame = new JFrame();
-                frame.getContentPane().add(instance);
+                frame.getContentPane().add(panel);
                 frame.pack();
                 frame.setLocationRelativeTo(null);
                 frame.setVisible(true);
@@ -78,7 +78,6 @@ public class AuthenticationPanelTest {
         new JTabbedPaneOperator(frame).selectPage(AuthenticationPanel.AUTH_KEY_FILE); // select tab for key files
         new JButtonOperator(frame, keyFileChooser).push(); // open file chooser
         JFileChooserOperator fc = new JFileChooserOperator();
-        assertSame(AuthenticationPanel.getFileChooser(), fc.getSource());
         fc.cancel();
         new JTabbedPaneOperator(frame).selectPage(AuthenticationPanel.AUTH_PASSWD); // select tab for passwords
         new JLabelOperator(frame, text);

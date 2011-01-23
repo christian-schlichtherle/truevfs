@@ -22,6 +22,7 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
 import java.util.Arrays;
+import net.jcip.annotations.Immutable;
 
 /**
  * A memory efficient base class for simple 8 bit (octet) character sets.
@@ -29,6 +30,7 @@ import java.util.Arrays;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@Immutable
 public abstract class OctetCharset extends Charset {
 
     /**
@@ -40,10 +42,9 @@ public abstract class OctetCharset extends Charset {
     private final char[] byte2char;
     private final char[][] char2byte;
 
-    protected OctetCharset(
-            final String cname,
-            final String[] aliases,
-            final char[] byte2char) {
+    protected OctetCharset( final String cname,
+                            final String[] aliases,
+                            final char[] byte2char) {
         super(cname, aliases);
 
         // Construct sparse inverse lookup table.
@@ -78,15 +79,14 @@ public abstract class OctetCharset extends Charset {
         return new Encoder();
     }
 
-    protected class Encoder extends CharsetEncoder {
-        protected Encoder() {
+    private class Encoder extends CharsetEncoder {
+        Encoder() {
             super(OctetCharset.this, 1, 1);
         }
 
         @Override
-        protected CoderResult encodeLoop(
-                final CharBuffer in,
-                final ByteBuffer out) {
+        protected CoderResult encodeLoop(   final CharBuffer in,
+                                            final ByteBuffer out) {
             final char[][] c2b = char2byte;
             while (in.hasRemaining()) {
                 if (!out.hasRemaining())
@@ -107,19 +107,18 @@ public abstract class OctetCharset extends Charset {
     }
 
     @Override
-	public CharsetDecoder newDecoder() {
+    public CharsetDecoder newDecoder() {
         return new Decoder();
     }
 
-    protected class Decoder extends CharsetDecoder {
-        protected Decoder() {
+    private class Decoder extends CharsetDecoder {
+        Decoder() {
             super(OctetCharset.this, 1, 1);
         }
 
         @Override
-		protected CoderResult decodeLoop(
-                final ByteBuffer in,
-                final CharBuffer out) {
+        protected CoderResult decodeLoop(   final ByteBuffer in,
+                                            final CharBuffer out) {
             final char[] b2c = byte2char;
             while (in.hasRemaining()) {
                 if (!out.hasRemaining())

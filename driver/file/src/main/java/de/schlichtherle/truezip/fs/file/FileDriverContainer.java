@@ -17,10 +17,10 @@ package de.schlichtherle.truezip.fs.file;
 
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsDriverService;
+import de.schlichtherle.truezip.fs.FsDriverServices;
 import de.schlichtherle.truezip.fs.FsScheme;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import java.util.Collections;
 import java.util.Map;
 import net.jcip.annotations.Immutable;
 
@@ -34,12 +34,13 @@ import net.jcip.annotations.Immutable;
 @DefaultAnnotation(NonNull.class)
 public final class FileDriverContainer implements FsDriverService {
 
-    private static final Map<FsScheme, FileDriver>
-    DRIVERS = Collections.singletonMap( FsScheme.create("file"),
-                                        new FileDriver());
+    private static final Map<FsScheme, FsDriver>
+            DRIVERS = FsDriverServices.newMap(new Object[][] {
+                { "file", new FileDriver() },
+            });
 
     @Override
-    public Map<FsScheme, ? extends FsDriver> getDrivers() {
+    public Map<FsScheme, FsDriver> getDrivers() {
         return DRIVERS;
     }
 }

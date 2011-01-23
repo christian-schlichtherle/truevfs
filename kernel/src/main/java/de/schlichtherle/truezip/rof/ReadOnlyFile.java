@@ -20,10 +20,10 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- * A minimal interface to allow random read-only access to a file.
- * The methods of this interface define the subset of {@link RandomAccessFile}
+ * Provides random read-only access to a file.
+ * The methods of this interface form a subset of {@link RandomAccessFile}
  * which is required for random read-only access.
- * The default implementation can be found in {@link SimpleReadOnlyFile}.
+ * The default implementation can be found in {@link DefaultReadOnlyFile}.
  * <p>
  * Though not strictly required, implementations should be thread-safe.
  * At least they should document their level of thread-safety.
@@ -48,7 +48,7 @@ public interface ReadOnlyFile extends Closeable {
      * which the next read occurs.
      * Whether the offset may be set beyond the end of the file is up to
      * the implementor.
-     * For example, the {@link SimpleReadOnlyFile} subclass
+     * For example, the {@link DefaultReadOnlyFile} subclass
      * {@link java.io.RandomAccessFile} passes {@code "r"} as a parameter to
      * the superclass constructor.
      * With Sun's JSE implementation, on the Windows platform this
