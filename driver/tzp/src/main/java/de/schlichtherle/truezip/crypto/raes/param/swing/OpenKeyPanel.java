@@ -17,6 +17,9 @@ package de.schlichtherle.truezip.crypto.raes.param.swing;
 
 import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
 import de.schlichtherle.truezip.swing.EnhancedPanel;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
@@ -47,6 +50,7 @@ import javax.swing.event.DocumentListener;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 final class OpenKeyPanel extends EnhancedPanel {
 
     private static final String CLASS_NAME = OpenKeyPanel.class.getName();
@@ -119,7 +123,7 @@ final class OpenKeyPanel extends EnhancedPanel {
     /**
      * Getter for property {@code error}.
      */
-    String getError() {
+    @CheckForNull String getError() {
         final String error = this.error.getText();
         return error.trim().length() > 0 ? error : null;
     }
@@ -129,7 +133,7 @@ final class OpenKeyPanel extends EnhancedPanel {
      *
      * @param error New value of property error.
      */
-    void setError(final String error) {
+    void setError(final @CheckForNull String error) {
         // Fix layout issue with GridBagLayout:
         // If null is set, the layout seems to ignore the widthy = 1.0
         // constraint for the component.

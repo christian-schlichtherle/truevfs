@@ -16,6 +16,8 @@
 package de.schlichtherle.truezip.crypto.raes.param.swing;
 
 import de.schlichtherle.truezip.io.swing.FileComboBoxBrowser;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.awt.EventQueue;
 import java.awt.Window;
 import java.awt.event.WindowEvent;
@@ -40,6 +42,7 @@ import javax.swing.text.JTextComponent;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 final class AuthenticationPanel extends JPanel {
 
     private static final String CLASS_NAME = AuthenticationPanel.class.getName();
@@ -102,9 +105,8 @@ final class AuthenticationPanel extends JPanel {
 
     private void setKeyFile(final File file) {
         final String oldPath = (String) keyFile.getSelectedItem();
-        if (null != file && file.getPath().equals(oldPath))
+        if (file.getPath().equals(oldPath))
             return;
-
         keyFile.setSelectedItem(file.getPath());
     }
 
