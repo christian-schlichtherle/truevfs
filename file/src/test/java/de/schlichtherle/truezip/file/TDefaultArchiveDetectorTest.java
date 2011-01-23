@@ -21,6 +21,7 @@ import de.schlichtherle.truezip.fs.archive.DummyArchiveDriver;
 import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
 import java.util.Locale;
 import java.util.Map;
+import java.util.ServiceConfigurationError;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -61,9 +62,10 @@ public class TDefaultArchiveDetectorTest {
                     { null, new Object[][] {{ "xyz", DummyArchiveDriver.class }} },
                     { NULL, null },
                     { NULL, new Object[][] {{ null, null }} },
+                    { NULL, new Object[][] {{ null, "" }} },
                     { NULL, new Object[][] {{ null, "xyz" }} },
                     //{ TDefaultArchiveDetector.NULL, new Object[] { "xyz", null } },
-        });
+               });
 
         testIllegalConstructors(IllegalArgumentException.class,
                 new Object[][] {
@@ -97,20 +99,17 @@ public class TDefaultArchiveDetectorTest {
                     { NULL, new Object[][] {{ "|.|", DRIVER }} }, // empty suffix set
                     { NULL, new Object[][] {{ "|.|.", DRIVER }} }, // empty suffix set
                     { NULL, new Object[][] {{ "anySuffix", "" }} }, // empty class name
-                    { NULL, new Object[][] {{ "anySuffix", new Object() }} }, // not an archive driver
-                    { NULL, new Object[][] {{ "anySuffix", Object.class }} }, // not an archive driver class
-        });
-
-        testIllegalConstructors(ClassCastException.class,
-                new Object[][] {
+                    { NULL, new Object[][] {{ "anySuffix", "xyz" }} }, // not a class name
                     { NULL, new Object[][] {{ DummyArchiveDriver.class, DRIVER }} }, // not a suffix list
                     { NULL, new Object[][] {{ DRIVER, DRIVER }} }, // not a suffix list
-        });
+                    { NULL, new Object[][] {{ "anySuffix", new Object() }} }, // not an archive driver
+                    { NULL, new Object[][] {{ "anySuffix", Object.class }} }, // not an archive driver class
+                });
     }
 
     @SuppressWarnings({"unchecked", "ResultOfObjectAllocationIgnored"})
     private void testIllegalConstructors(
-            final Class<? extends Exception> expected,
+            final Class<? extends Throwable> expected,
             final Object[][] list) {
         for (int i = 0; i < list.length; i++) {
             final Object[] args = list[i];
@@ -201,7 +200,7 @@ public class TDefaultArchiveDetectorTest {
                     default:
                         throw new AssertionError();
                 }
-            } catch (Exception ex) {
+            } catch (Throwable ex) {
                 assertTrue(expected.isAssignableFrom(ex.getClass()));
             }
         }

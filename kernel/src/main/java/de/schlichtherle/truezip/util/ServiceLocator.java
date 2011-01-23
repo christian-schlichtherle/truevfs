@@ -123,8 +123,8 @@ public final class ServiceLocator {
      * @param  def the default service provider implementation.
      * @return A new service provider implementation instance or {@code null}
      *         if no service provider implementation is known.
-     * @throws RuntimeException if a {@link RuntimeException} occurs.
-     * @throws ServiceConfigurationError if any other {@link Exception} occurs.
+     * @throws ServiceConfigurationError if locating, instantiating or casting
+     *         the service fails for some reason.
      */
     @SuppressWarnings("unchecked")
     public @Nullable <S> S
@@ -134,10 +134,12 @@ public final class ServiceLocator {
         if (null == name)
             return null;
         try {
-            return ((Class<S>) getClass(name)).newInstance();
-        } catch (RuntimeException ex) {
-            throw ex;
-        } catch (Exception ex) {
+            return ((Class<? extends S>) getClass(name)).newInstance();
+        } catch (ClassCastException ex) {
+            throw new ServiceConfigurationError(ex.toString(), ex);
+        } catch (InstantiationException ex) {
+            throw new ServiceConfigurationError(ex.toString(), ex);
+        } catch (IllegalAccessException ex) {
             throw new ServiceConfigurationError(ex.toString(), ex);
         }
     }
@@ -145,20 +147,23 @@ public final class ServiceLocator {
     /**
      * Loads a class according to the algorithm described in the class Javadoc.
      * 
-     * @param  name The class to locate.
+     * @param  name The fully qualified name of the class to locate.
      * @return The loaded class.
-     * @throws ClassNotFoundException if loading the class failed for some
+     * @throws ServiceConfigurationError if locating the class fails for some
      *         reason.
      */
-    public Class<?> getClass(String name)
-    throws ClassNotFoundException {
+    public Class<?> getClass(String name) {
         try {
-            return l1.loadClass(name);
-        } catch (ClassNotFoundException ex) {
-            ClassLoader l2 = Thread.currentThread().getContextClassLoader();
-            if (l1 == l2)
-                throw ex; // there's no point in trying this twice.
-            return l2.loadClass(name);
+            try {
+                return l1.loadClass(name);
+            } catch (ClassNotFoundException ex) {
+                ClassLoader l2 = Thread.currentThread().getContextClassLoader();
+                if (l1 == l2)
+                    throw ex; // there's no point in trying this twice.
+                return l2.loadClass(name);
+            }
+        } catch (ClassNotFoundException ex2) {
+            throw new ServiceConfigurationError(ex2.toString(), ex2);
         }
     }
 
@@ -166,16 +171,20 @@ public final class ServiceLocator {
      * Enumerates resources according to the algorithm described in the class
      * Javadoc.
      *
-     * @param  name The resource to locate.
+     * @param  name The fully qualified name of the resources to locate.
      * @return A concatenated enumeration for the resource on the class path.
-     * @throws IOException If an I/O exception occurs.
+     * @throws ServiceConfigurationError if locating the resources fails for
+     *         some reason.
      */
-    public Enumeration<URL> getResources(String name)
-    throws IOException {
+    public Enumeration<URL> getResources(String name) {
         ClassLoader l2 = Thread.currentThread().getContextClassLoader();
-        return l1 == l2
-                ? l1.getResources(name)
-                : new JointEnumeration<URL>(l1.getResources(name),
-                                            l2.getResources(name));
+        try {
+            return l1 == l2
+                    ? l1.getResources(name)
+                    : new JointEnumeration<URL>(l1.getResources(name),
+                                                l2.getResources(name));
+        } catch (IOException ex) {
+            throw new ServiceConfigurationError(ex.toString(), ex);
+        }
     }
 }

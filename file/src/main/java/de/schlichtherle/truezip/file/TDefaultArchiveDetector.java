@@ -76,9 +76,6 @@ import net.jcip.annotations.Immutable;
 public final class TDefaultArchiveDetector
 implements TArchiveDetector, FsDriverService {
 
-    private static final ServiceLocator serviceLocator
-            = new ServiceLocator(TDefaultArchiveDetector.class.getClassLoader());
-
     /**
      * This instance never recognizes any archive files in a path.
      * This could be used as the end of a chain of
@@ -147,7 +144,8 @@ implements TArchiveDetector, FsDriverService {
             if (given.retainAll(known)) {
                 final SuffixSet unknown = new SuffixSet(suffixes);
                 unknown.removeAll(known);
-                throw new IllegalArgumentException("\"" + unknown + "\" (no archive driver installed for these suffixes)");
+                throw new IllegalArgumentException(
+                        "\"" + unknown + "\" (no archive driver installed for these suffixes)");
             }
         } else {
             given = known;
@@ -210,19 +208,22 @@ implements TArchiveDetector, FsDriverService {
      * mappings for all entries in {@code config}.
      * 
      * @param  delegate the file system driver service to decorate.
-     * @param  config an array of key-value arrays.
-     *         Each key in this map must be a file system scheme or a non-empty
-     *         file suffix list.
-     *         Each value must either be a file system driver object, a file
-     *         system driver class, a string with the fully qualified name name
-     *         of a file system driver class, or {@code null}.
+     * @param  config an array of key-value pair arrays.
+     *         The first element of each inner array must either be a
+     *         {@link FsScheme file system scheme}, an object {@code o} which
+     *         can get converted to a set of file system suffixes by calling
+     *         {@link SuffixSet#SuffixSet(String) new SuffixSet(o.toString())}
+     *         or a {@link Collection collection} of these.
+     *         The second element of each inner array must either be a
+     *         {@link FsDriver file system driver object}, a
+     *         {@link Class file system driver class}, a
+     *         {@link String fully qualified name of a file system driver class},
+     *         or {@code null}.
      *         {@code null} may be used to <i>shadow</i> a mapping for an equal
      *         file system scheme in {@code delegate} by removing it from the
      *         resulting map for this detector.
      * @throws NullPointerException if a required configuration element is
      *         {@code null}.
-     * @throws ClassCastException if a configuration element is of the wrong
-     *         type.
      * @throws IllegalArgumentException if any other parameter precondition
      *         does not hold.
      * @see    SuffixSet Syntax contraints for suffix lists.
