@@ -18,13 +18,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
     <head/>
     <body>
-        <p>
-            The Swing GUI based implementation of the abstract base class
-            {@link de.schlichtherle.truezip.key.KeyManager}.
-            The implementation in this package supports password keys (as char
-            arrays) and key files (as byte arrays).
-            In case of key files, the file size must be 512 bytes or more, of
-            which only the first 512 bytes are returned in the byte array.
-        </p>
+        <p>The console I/O based implementation of the interface
+            {@link de.schlichtherle.truezip.key.PromptingKeyProvider.UI}.
+            If a key file is used for authentication instead of a password,
+            the file size must be 512 bytes or more, of which only the first
+            512 bytes are used.</p>
     </body>
 </html>

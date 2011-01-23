@@ -15,15 +15,11 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
-import de.schlichtherle.truezip.util.SuffixSet;
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsDriverService;
+import de.schlichtherle.truezip.fs.FsDriverServices;
 import de.schlichtherle.truezip.fs.FsScheme;
-import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
 import de.schlichtherle.truezip.socket.IOPoolContainer;
-import de.schlichtherle.truezip.socket.IOPool;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import net.jcip.annotations.Immutable;
 
@@ -36,26 +32,16 @@ import net.jcip.annotations.Immutable;
 @Immutable
 public final class ZipDriverContainer implements FsDriverService {
 
-    private static final Map<FsScheme, FsArchiveDriver<?>> DRIVERS;
-
-    static {
-        final Map<FsScheme, FsArchiveDriver<?>>
-                drivers = new HashMap<FsScheme, FsArchiveDriver<?>>();
-        drivers.put(FsScheme.create("zip"),
-                    new ZipDriver(IOPoolContainer.SINGLETON));
-        FsArchiveDriver<?> driver = new JarDriver(IOPoolContainer.SINGLETON);
-        for (String suffix : new SuffixSet("ear|jar|war"))
-            drivers.put(FsScheme.create(suffix), driver);
-        driver = new OdfDriver(IOPoolContainer.SINGLETON);
-        for (String suffix : new SuffixSet("odg|odp|ods|odt|otg|otp|ots|ott|odb|odf|odm|oth"))
-            drivers.put(FsScheme.create(suffix), driver);
-        drivers.put(FsScheme.create("exe"),
-                    new ReadOnlySfxDriver(IOPoolContainer.SINGLETON));
-        DRIVERS = Collections.unmodifiableMap(drivers);
-    }
+    private static final Map<FsScheme, FsDriver>
+            DRIVERS = FsDriverServices.newMap(new Object[][] {
+                { "zip", new ZipDriver(IOPoolContainer.SINGLETON) },
+                { "ear|jar|war", new JarDriver(IOPoolContainer.SINGLETON) },
+                { "odg|odp|ods|odt|otg|otp|ots|ott|odb|odf|odm|oth", new OdfDriver(IOPoolContainer.SINGLETON) },
+                { "exe", new ReadOnlySfxDriver(IOPoolContainer.SINGLETON) },
+            });
 
     @Override
-    public Map<FsScheme, FsArchiveDriver<?>> getDrivers() {
+    public Map<FsScheme, FsDriver> getDrivers() {
         return DRIVERS;
     }
 }

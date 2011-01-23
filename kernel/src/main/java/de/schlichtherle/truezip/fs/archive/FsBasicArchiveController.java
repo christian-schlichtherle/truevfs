@@ -111,11 +111,9 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 abstract class FsBasicArchiveController<E extends FsArchiveEntry>
 extends FsController<FsConcurrentModel> {
 
-    private static final String CLASS_NAME
-            = FsBasicArchiveController.class.getName();
-
-    private static final Logger logger
-            = Logger.getLogger(CLASS_NAME, CLASS_NAME);
+    private static final Logger
+            logger = Logger.getLogger(  FsBasicArchiveController.class.getName(),
+                                        FsBasicArchiveController.class.getName());
 
     private static final BitField<FsOutputOption> AUTO_MOUNT_OPTIONS
             = BitField.noneOf(FsOutputOption.class);

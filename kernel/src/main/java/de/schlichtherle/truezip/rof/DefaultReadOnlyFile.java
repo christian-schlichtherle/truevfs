@@ -28,10 +28,10 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-public class SimpleReadOnlyFile
+public class DefaultReadOnlyFile
 extends RandomAccessFile
 implements ReadOnlyFile {
-    public SimpleReadOnlyFile(File file)
+    public DefaultReadOnlyFile(File file)
     throws FileNotFoundException {
         super(file, "r");
     }

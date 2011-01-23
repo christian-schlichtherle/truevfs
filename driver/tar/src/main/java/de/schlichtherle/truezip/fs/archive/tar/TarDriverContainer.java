@@ -15,15 +15,11 @@
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
-import de.schlichtherle.truezip.util.SuffixSet;
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsDriverService;
+import de.schlichtherle.truezip.fs.FsDriverServices;
 import de.schlichtherle.truezip.fs.FsScheme;
-import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
 import de.schlichtherle.truezip.socket.IOPoolContainer;
-import de.schlichtherle.truezip.socket.IOPool;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import net.jcip.annotations.Immutable;
 
@@ -36,24 +32,15 @@ import net.jcip.annotations.Immutable;
 @Immutable
 public final class TarDriverContainer implements FsDriverService {
 
-    private static final Map<FsScheme, FsArchiveDriver<?>> DRIVERS;
-
-    static {
-        final Map<FsScheme, FsArchiveDriver<?>>
-                drivers = new HashMap<FsScheme, FsArchiveDriver<?>>();
-        drivers.put(FsScheme.create("tar"),
-                    new TarDriver(IOPoolContainer.SINGLETON));
-        FsArchiveDriver<?> driver = new TarGZipDriver(IOPoolContainer.SINGLETON);
-        for (String suffix : new SuffixSet("tgz|tar.gz"))
-            drivers.put(FsScheme.create(suffix), driver);
-        driver = new TarBZip2Driver(IOPoolContainer.SINGLETON);
-        for (String suffix : new SuffixSet("tbz2|tar.bz2"))
-            drivers.put(FsScheme.create(suffix), driver);
-        DRIVERS = Collections.unmodifiableMap(drivers);
-    }
+    private static final Map<FsScheme, FsDriver>
+            DRIVERS = FsDriverServices.newMap(new Object[][] {
+                { "tar", new TarDriver(IOPoolContainer.SINGLETON) },
+                { "tgz|tar.gz", new TarGZipDriver(IOPoolContainer.SINGLETON) },
+                { "tbz2|tar.bz2", new TarBZip2Driver(IOPoolContainer.SINGLETON) },
+            });
 
     @Override
-    public Map<FsScheme, FsArchiveDriver<?>> getDrivers() {
+    public Map<FsScheme, FsDriver> getDrivers() {
         return DRIVERS;
     }
 }

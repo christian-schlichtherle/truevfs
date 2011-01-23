@@ -13,12 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.IOPoolService;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
@@ -26,7 +24,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.CharConversionException;
 import java.nio.charset.Charset;
 import net.jcip.annotations.Immutable;
-
 
 /**
  * An archive driver which builds JAR files.

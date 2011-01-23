@@ -148,7 +148,7 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
 
         // Check parameters (fail fast).
         if (rof == null) {
-            rof = new SimpleReadOnlyFile(file);
+            rof = new DefaultReadOnlyFile(file);
         } else { // rof != null
             assert file == null;
         }

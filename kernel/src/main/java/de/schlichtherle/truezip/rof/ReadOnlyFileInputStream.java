@@ -103,9 +103,9 @@ public class ReadOnlyFileInputStream extends InputStream {
     public void mark(int readlimit) {
         try {
             mark = rof.getFilePointer();
-        } catch (IOException failure) {
-            Logger.getLogger(ReadOnlyFileInputStream.class.getName())
-                .log(Level.WARNING, "mark()/reset() not supported", failure);
+        } catch (IOException ex) {
+            Logger  .getLogger(ReadOnlyFileInputStream.class.getName())
+                    .log(Level.WARNING, ex.getLocalizedMessage(), ex);
             mark = -2;
         }
     }

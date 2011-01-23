@@ -44,7 +44,8 @@ public final class Wget {
 
     public static void main(String[] args)
     throws IOException, URISyntaxException {
-        // Obtain a manager for file system controller life cycle management.
+        // Obtain a manager for the life cycle of controllers for federated
+        // file systems.
         FsManager manager = new FsDefaultManager();
         try {
             // Search the class path for the set of all supported file system

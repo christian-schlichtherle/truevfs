@@ -15,8 +15,7 @@
  */
 package de.schlichtherle.truezip.nio.charset;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import net.jcip.annotations.Immutable;
 
 /**
  * The {@code IBM437} character set, also known as {@code CP437}.
@@ -26,15 +25,13 @@ import java.util.logging.Logger;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@Immutable
 final class Ibm437Charset extends OctetCharset {
-
-    private static final String CLASS_NAME = Ibm437Charset.class.getName();
-    private static final Logger logger = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 
     private static final String NAME = "IBM437";
 
     private static final String[] ALIASES = {
-        "cp437", "437", "csPC8CodePage437" // source: IANA
+        "cp437", "437", "csPC8CodePage437" // source: IANA, RFC1345
     };
 
     // This table is printed from Sun's JDK 1.6.0-b105.
@@ -63,7 +60,5 @@ final class Ibm437Charset extends OctetCharset {
 
     Ibm437Charset() {
         super(NAME, ALIASES, BYTE2CHAR);
-        logger.log(Level.FINE, "instantiated",
-                new String[] { displayName(), aliases().toString() });
     }
 }

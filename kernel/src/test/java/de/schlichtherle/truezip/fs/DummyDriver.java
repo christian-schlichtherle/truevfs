@@ -19,7 +19,7 @@ package de.schlichtherle.truezip.fs;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class DummyDriver implements FsDriver {
+public class DummyDriver extends FsDriver {
 
     /**
      * {@inheritDoc}

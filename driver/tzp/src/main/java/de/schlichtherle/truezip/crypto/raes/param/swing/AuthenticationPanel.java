@@ -22,11 +22,11 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.io.File;
 import java.io.IOException;
-import java.lang.ref.SoftReference;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
+import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
@@ -43,11 +43,9 @@ import javax.swing.text.JTextComponent;
 final class AuthenticationPanel extends JPanel {
 
     private static final String CLASS_NAME = AuthenticationPanel.class.getName();
-    private static final ResourceBundle resources
-            = ResourceBundle.getBundle(CLASS_NAME);
+    private static final ResourceBundle
+            resources = ResourceBundle.getBundle(CLASS_NAME);
     private static final File BASE_DIR = new File(".");
-
-    private static SoftReference<javax.swing.JFileChooser> fileChooser;
 
     /** The password authentication method. */
     static final int AUTH_PASSWD = 0;
@@ -98,19 +96,16 @@ final class AuthenticationPanel extends JPanel {
      * {@code true}, then the returned path is remembered in a static
      * field for the next instance of this class.
      */
-    String getKeyFilePath() {
-        return (String) keyFile.getSelectedItem();
+    File getKeyFile() {
+        return new File((String) keyFile.getSelectedItem());
     }
 
-    private void setKeyFilePath(final String path) {
+    private void setKeyFile(final File file) {
         final String oldPath = (String) keyFile.getSelectedItem();
-        if (null != path && path.equals(oldPath))
+        if (null != file && file.getPath().equals(oldPath))
             return;
 
-        keyFile.setSelectedItem(path);
-        /*final Window window = SwingUtilities.getWindowAncestor(this);
-        if (window != null)
-            window.pack();*/
+        keyFile.setSelectedItem(file.getPath());
     }
 
     /**
@@ -133,26 +128,6 @@ final class AuthenticationPanel extends JPanel {
                 throw new AssertionError("Unsupported authentication method!");
         }
         return method;
-    }
-
-    /**
-     * Return a {@code JFileChooser} to use within this panel.
-     * The file chooser is stored in a cache for subsequent use.
-     * If the JVM gets short of storage, the cache is cleared and a new
-     * file chooser is instantiated again on the next call to this method.
-     * In any case, the file chooser will always remember its current directory.
-     * In addition, the returned file chooser has file hiding disabled.
-     * Note that the file chooser is a plain javax.swing.FileChooser which
-     * does <em>not</em> support archive browsing to prevent illegal recursion.
-     */
-    static javax.swing.JFileChooser getFileChooser() {
-        final SoftReference<javax.swing.JFileChooser> ref = fileChooser; // cache
-        javax.swing.JFileChooser fc = ref != null ? ref.get() : null;
-        if (fc == null) {
-            fc = new CustomFileChooser();
-            fileChooser = new SoftReference<javax.swing.JFileChooser>(fc);
-        }
-        return fc;
     }
 
     /** This method is called from within the constructor to
@@ -219,19 +194,18 @@ final class AuthenticationPanel extends JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void keyFileChooserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_keyFileChooserActionPerformed
-        final javax.swing.JFileChooser fc = getFileChooser();
-        if (fc.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
+        final JFileChooser fc = new CustomFileChooser();
+        if (JFileChooser.APPROVE_OPTION == fc.showOpenDialog(this)) {
+            File file = fc.getSelectedFile();
             try {
-                final File file = fc.getSelectedFile();
+                final String filePath = file.getCanonicalPath();
                 final String baseDirPath = BASE_DIR.getCanonicalPath();
-                String keyFilePath = file.getCanonicalPath();
-                if (keyFilePath.startsWith(baseDirPath)) {
-                    assert keyFilePath.charAt(baseDirPath.length()) == File.separatorChar;
-                    keyFilePath = keyFilePath.substring(baseDirPath.length() + 1); // skip file separator
-                }
-                setKeyFilePath(keyFilePath);
+                if (filePath.startsWith(baseDirPath))
+                    file = new File(filePath.substring(baseDirPath.length() + 1)); // cut off file separator, too.
+                setKeyFile(file);
             } catch (IOException ex) {
-                Logger.getLogger(AuthenticationPanel.class.getName()).log(Level.SEVERE, null, ex);
+                Logger  .getLogger(CLASS_NAME)
+                        .log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
         }
     }//GEN-LAST:event_keyFileChooserActionPerformed
@@ -270,11 +244,11 @@ final class AuthenticationPanel extends JPanel {
         final Window window = evt.getSource().getAncestorWindow();
         window.addWindowFocusListener(new WindowFocusListener() {
             @Override
-			public void windowGainedFocus(WindowEvent e) {
+            public void windowGainedFocus(WindowEvent e) {
                 window.removeWindowFocusListener(this);
                 EventQueue.invokeLater(new Runnable() {
                     @Override
-					public void run() {
+                    public void run() {
                         if (keyFile.requestFocusInWindow())
                             ((JTextComponent) keyFile.getEditor().getEditorComponent()).selectAll();
                     }
@@ -282,7 +256,7 @@ final class AuthenticationPanel extends JPanel {
             }
 
             @Override
-			public void windowLostFocus(WindowEvent e) {
+            public void windowLostFocus(WindowEvent e) {
             }
         });
     }//GEN-LAST:event_keyFilePanelAncestorWindowShown
@@ -294,7 +268,7 @@ final class AuthenticationPanel extends JPanel {
     private javax.swing.JTabbedPane tabs;
     // End of variables declaration//GEN-END:variables
 
-    private static class CustomFileChooser extends javax.swing.JFileChooser {
+    private static class CustomFileChooser extends JFileChooser {
         private static final long serialVersionUID = 2361832976537648223L;
         private static File lastCurrentDir = BASE_DIR;
         

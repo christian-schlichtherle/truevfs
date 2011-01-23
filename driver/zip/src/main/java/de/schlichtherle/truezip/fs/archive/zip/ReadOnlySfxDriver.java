@@ -13,11 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.fs.FsConcurrentModel;
-import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.IOPoolService;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -26,7 +24,6 @@ import java.nio.charset.Charset;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.jcip.annotations.Immutable;
-
 
 /**
  * An archive driver which reads Self Executable (SFX/EXE) ZIP files,

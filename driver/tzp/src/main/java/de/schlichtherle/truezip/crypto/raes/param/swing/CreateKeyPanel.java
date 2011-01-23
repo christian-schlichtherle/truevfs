@@ -141,16 +141,15 @@ final class CreateKeyPanel extends EnhancedPanel {
                     }
 
                 case AuthenticationPanel.AUTH_KEY_FILE:
-                    final String keyFilePathname
-                            = authenticationPanel.getKeyFilePath();
-                    if (new File(keyFilePathname).canWrite()) {
+                    final File keyFile = authenticationPanel.getKeyFile();
+                    if (keyFile.canWrite()) {
                         setError(resources.getString("keyFile.canWrite"));
                         return false;
                     }
 
                     final byte[] key;
                     try {
-                        key = AesCipherParametersUI.readKeyFile(keyFilePathname);
+                        key = AesCipherParametersUI.readKeyFile(keyFile);
                     } catch (EOFException ex) {
                         setError(resources.getString("keyFile.eofException"));
                         return false;

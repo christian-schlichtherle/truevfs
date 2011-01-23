@@ -205,8 +205,7 @@ public abstract class FsController<M extends FsModel> {
         return super.hashCode();
     }
 
-    @Override public final String
-    toString() {
+    @Override public final String toString() {
         return new StringBuilder()
                 .append(getClass().getName())
                 .append("[model=")

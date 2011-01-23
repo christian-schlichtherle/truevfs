@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2011 Schlichtherle IT Services
+ * Copyright (C) 2011 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  */
 @DefaultAnnotation(NonNull.class)
 @Immutable
-public final class TIO {
+final class TIO {
 
     /** You cannot instantiate this class. */
     private TIO() {
@@ -243,7 +243,9 @@ public final class TIO {
     getInputSocket( final File src,
                     final BitField<FsInputOption> options) {
         if (src instanceof TFile) {
-            // TODO: Consider removing this block and using the more general pattern below it!
+            // This block could get removed in order to use the more general
+            // pattern below. However, it's kept for better performance.
+            // TODO: Removing this block yields occasional racing problems - fix this!
             final TFile file = (TFile) src;
             final TFile archive = file.getInnerArchive();
             if (null != archive)
@@ -251,7 +253,7 @@ public final class TIO {
                         .getInputSocket(file.getInnerEntryName0(), options);
         }
         final FsPath path = new FsPath(src);
-        return TFile.manager
+        return TConfig.MANAGER
                 .getController(path.getMountPoint(), TFile.getDefaultArchiveDetector())
                 .getInputSocket(path.getEntryName(), options);
     }
@@ -261,7 +263,9 @@ public final class TIO {
                     final BitField<FsOutputOption> options,
                     final @CheckForNull Entry template) {
         if (dst instanceof TFile) {
-            // TODO: Consider removing this block and using the more general pattern below it!
+            // This block could get removed in order to use the more general
+            // pattern below. However, it's kept for better performance.
+            // TODO: Removing this block yields occasional racing problems - fix this!
             final TFile file = (TFile) dst;
             final TFile archive = file.getInnerArchive();
             if (null != archive)
@@ -269,7 +273,7 @@ public final class TIO {
                         .getOutputSocket(file.getInnerEntryName0(), options, template);
         }
         final FsPath path = new FsPath(dst);
-        return TFile.manager
+        return TConfig.MANAGER
                 .getController(path.getMountPoint(), TFile.getDefaultArchiveDetector())
                 .getOutputSocket(path.getEntryName(), options, template);
     }

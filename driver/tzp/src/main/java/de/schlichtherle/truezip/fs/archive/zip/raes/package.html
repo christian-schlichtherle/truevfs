@@ -18,14 +18,15 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
     <head/>
     <body>
-        <p>The archive driver family for RAES encrypted ZIP files.
-            RAES encrypted ZIP files are regular ZIP files which use UTF-8 as
-            their character set (like JARs) and have been wrapped in a RAES
-            file format envelope.
-            The RAES File Format enables transparent random access to AES
+        <p>The archive driver family for RAES encrypted ZIP files,
+            alias TZP files.
+            TZP files are regular ZIP files which use UTF-8 as their character
+            set (like JARs) and have been wrapped in a RAES file format
+            envelope.
+            The RAES File Format enables transparent, random access to AES
             encrypted data (the payload) in the file as if the application were
             reading decrypted data from a {@link java.io.RandomAccessFile}.
             Note that RAES is not specific to ZIP files - any kind of content
-            can be encrypted.</p>
+            could get encrypted.</p>
     </body>
 </html>

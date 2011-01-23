@@ -87,8 +87,8 @@
                 files as if they were just plain old directories in a file
                 system path. Using the classes
                 {@link de.schlichtherle.truezip.file.TFile},
-                {@code de.schlichtherle.truezip.file.TFileInputStream},
-                {@code de.schlichtherle.truezip.file.TFileOutputStream} et al,
+                {@link de.schlichtherle.truezip.file.TFileInputStream},
+                {@link de.schlichtherle.truezip.file.TFileOutputStream} et al,
                 you can instantly access ZIP files, TAR files and their
                 derivatives or your own custom archive file format.</dd>
             <dt>Fast Bulk I/O</dt>
@@ -126,9 +126,9 @@
             <dt>Encrypted Archive File Format</dt>
             <dd>TrueZIP includes a reference implementation for it's custom
                 Random Access Encryption Specification (RAES).
-                RAES is a generic wrapper file format which supports SHA-256
-                authentication and AES-256 encryption in CTR block mode for
-                random read access.
+                RAES is an envelope file format which supports SHA-256
+                authentication and AES-256 decryption in CTR block mode for
+                transparent, random read access to its encrypted payload.
                 When combined with the ZIP File Format, this results in the
                 encrypted archive file format called ZIP.RAES or TZP for short.
                 TrueZIP ships with a file system driver to enable transparent

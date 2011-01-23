@@ -27,7 +27,7 @@ import de.schlichtherle.truezip.file.TFileOutputStream;
 import de.schlichtherle.truezip.key.KeyManagerContainer;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFileInputStream;
-import de.schlichtherle.truezip.rof.SimpleReadOnlyFile;
+import de.schlichtherle.truezip.rof.DefaultReadOnlyFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -123,7 +123,7 @@ public class RaesFiles {
         final RaesParameters params = new KeyManagerRaesParameters(
                 KeyManagerContainer.SINGLETON,
                 raesFile.getCanonicalFile().toURI());
-        final ReadOnlyFile rof = new SimpleReadOnlyFile(raesFile);
+        final ReadOnlyFile rof = new DefaultReadOnlyFile(raesFile);
         try {
             final RaesReadOnlyFile rrof
                     = RaesReadOnlyFile.getInstance(rof, params);

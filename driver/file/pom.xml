@@ -27,7 +27,7 @@
     <name>TrueZIP Driver File</name>
     <description>
         The File Scheme Driver.
-        Add this artifact to the run time class path in order to make the
-        Kernel support this file system type.
+        This artifact is required as a run time dependency of the File* API
+        of the truezip-file artifact.
     </description>
 </project>

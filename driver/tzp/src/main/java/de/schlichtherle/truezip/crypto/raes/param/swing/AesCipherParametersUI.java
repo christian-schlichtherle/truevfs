@@ -27,6 +27,7 @@ import de.schlichtherle.truezip.util.ServiceLocator;
 import java.awt.EventQueue;
 import java.awt.Window;
 import java.io.EOFException;
+import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.lang.reflect.InvocationTargetException;
@@ -91,10 +92,10 @@ implements PromptingKeyProvider.UI<AesCipherParameters> {
      *         bytes long.
      * @throws IOException on any other I/O related issue.
      */
-    static byte[] readKeyFile(String pathname) throws IOException {
+    static byte[] readKeyFile(File file) throws IOException {
         final byte[] buf = new byte[KEY_FILE_LEN];
 
-        final RandomAccessFile raf = new RandomAccessFile(pathname, "r");
+        final RandomAccessFile raf = new RandomAccessFile(file, "r");
         try {
             raf.readFully(buf);
         } finally {
