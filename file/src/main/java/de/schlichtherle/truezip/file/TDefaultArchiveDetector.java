@@ -21,6 +21,7 @@ import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.util.SuffixSet;
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsDriverService;
+import de.schlichtherle.truezip.fs.FsDriverServices;
 import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.util.ServiceLocator;
@@ -30,7 +31,6 @@ import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ServiceConfigurationError;
@@ -127,10 +127,11 @@ implements TArchiveDetector, FsDriverService {
      * list.
      *
      * @param  service the file system driver service to filter.
-     * @param  suffixes A nullable list of suffixes which shall identify
-     *         prospective archive files.
-     *         If this is {@code null}, all drivers known by the service are
-     *         available for use with this archive detector.
+     * @param  suffixes A list of suffixes which shall identify prospective
+     *         archive files.
+     *         If this is {@code null}, no filtering is applied and all drivers
+     *         known by the given service are available for use with this
+     *         archive detector.
      * @throws IllegalArgumentException If any of the suffixes in the list
      *         names a suffix for which no file system driver is known by the
      *         service.
@@ -139,7 +140,7 @@ implements TArchiveDetector, FsDriverService {
     public TDefaultArchiveDetector( final FsDriverService service,
                                     final @CheckForNull String suffixes) {
         final Map<FsScheme, FsDriver> drivers = service.getDrivers();
-        final SuffixSet known = getSuffixes(service.getDrivers());
+        final SuffixSet known = getSuffixes(service);
         final SuffixSet given;
         if (null != suffixes) {
             given = new SuffixSet(suffixes);
@@ -156,10 +157,10 @@ implements TArchiveDetector, FsDriverService {
         this.matcher = new ThreadLocalMatcher(given.toPattern());
     }
 
-    private static SuffixSet getSuffixes(
-            final Map<FsScheme, FsDriver> drivers) {
+    private static SuffixSet getSuffixes(FsDriverService service) {
         SuffixSet set = new SuffixSet();
-        for (Map.Entry<FsScheme, FsDriver> entry : drivers.entrySet()) {
+        for (Map.Entry<FsScheme, FsDriver> entry
+                : service.getDrivers().entrySet()) {
             FsDriver driver = entry.getValue();
             if (null != driver && driver.isFederated())
                 set.add(entry.getKey().toString());
@@ -187,12 +188,12 @@ implements TArchiveDetector, FsDriverService {
      * @param  suffixes a list of suffixes which shall identify prospective
      *         archive files.
      *         This must not be {@code null} and must not be empty.
-     * @param  driver the archive driver to map for the suffix list.
-     *         This must either be an archive driver instance or
+     * @param  driver the file system driver to map for the suffix list.
+     *         {@code null} may be used to <i>shadow</i> a mapping for an equal
+     *         file system scheme in {@code delegate} by removing it from the
+     *         resulting map for this detector.
+     * @throws NullPointerException if a required configuration element is
      *         {@code null}.
-     *         A {@code null} archive driver may be used to shadow a
-     *         mapping for the same archive driver in {@code delegate} which
-     *         effectively removes it.
      * @throws IllegalArgumentException if any other parameter precondition
      *         does not hold.
      * @see    SuffixSet Syntax contraints for suffix lists.
@@ -200,7 +201,7 @@ implements TArchiveDetector, FsDriverService {
     public TDefaultArchiveDetector( FsDriverService delegate,
                                     String suffixes,
                                     @CheckForNull FsDriver driver) {
-        this(delegate, new Object[] { suffixes, driver });
+        this(delegate, new Object[][] {{ suffixes, driver }});
     }
 
     /**
@@ -209,35 +210,26 @@ implements TArchiveDetector, FsDriverService {
      * mappings for all entries in {@code config}.
      * 
      * @param  delegate the file system driver service to decorate.
-     * @param  config an array of key-value pairs.
-     *         Each key in this map must be a non-null, non-empty file suffix
-     *         list.
-     *         Each value must either be an archive driver instance, an archive
-     *         driver class, a string with the fully qualified name name of
-     *         an archive driver class, or {@code null}.
-     *         A {@code null} archive driver may be used to shadow a
-     *         mapping for the same archive driver in {@code delegate},
-     *         effectively removing it.
-     * @throws NullPointerException if any parameter or configuration element
-     *         other than an archive driver is {@code null}.
+     * @param  config an array of key-value arrays.
+     *         Each key in this map must be a file system scheme or a non-empty
+     *         file suffix list.
+     *         Each value must either be a file system driver object, a file
+     *         system driver class, a string with the fully qualified name name
+     *         of a file system driver class, or {@code null}.
+     *         {@code null} may be used to <i>shadow</i> a mapping for an equal
+     *         file system scheme in {@code delegate} by removing it from the
+     *         resulting map for this detector.
+     * @throws NullPointerException if a required configuration element is
+     *         {@code null}.
+     * @throws ClassCastException if a configuration element is of the wrong
+     *         type.
      * @throws IllegalArgumentException if any other parameter precondition
      *         does not hold.
-     * @throws ClassCastException if the keys are not {@link String}s or the
-     * 	       values are not {@link String}s, {@link Class}es or
-     *         {@link FsDriver}s.
      * @see    SuffixSet Syntax contraints for suffix lists.
      */
     public TDefaultArchiveDetector( FsDriverService delegate,
-                                    Object[] config) {
-        this(delegate, newMap(config));
-    }
-
-    private static Map<String, Object> newMap(final Object[] config) {
-        final Map<String, Object> map
-                = new LinkedHashMap<String, Object>((int) (config.length / .75f) + 1); // order may be important!
-        for (int i = 0, l = config.length; i < l; i++)
-            map.put((String) config[i], config[++i]);
-        return map;
+                                    Object[][] config) {
+        this(delegate, FsDriverServices.newMap(config));
     }
 
     /**
@@ -246,61 +238,37 @@ implements TArchiveDetector, FsDriverService {
      * mappings for all entries in {@code config}.
      * 
      * @param  delegate the file system driver service to decorate.
-     * @param  config a map of suffix lists and archive drivers.
-     *         Each key in this map must be a non-null, non-empty file suffix
-     *         list.
-     *         Each value must either be an archive driver instance, an archive
-     *         driver class, a string with the fully qualified name name of
-     *         an archive driver class, or {@code null}.
-     *         A {@code null} archive driver may be used to shadow a
-     *         mapping for the same archive driver in {@code delegate},
-     *         effectively removing it.
-     * @throws NullPointerException if any parameter or configuration element
-     *         other than an archive driver is {@code null}.
+     * @param  config a map of file system schemes to file system drivers.
+     *         {@code null} may be used to <i>shadow</i> a mapping for an equal
+     *         file system scheme in {@code delegate} by removing it from the
+     *         resulting map for this detector.
+     * @throws NullPointerException if a required configuration element is
+     *         {@code null}.
+     * @throws ClassCastException if a configuration element is of the wrong
+     *         type.
      * @throws IllegalArgumentException if any other parameter precondition
      *         does not hold.
-     * @throws ClassCastException if the values are not {@link String}s,
-     *         {@link Class}es or {@link FsDriver}s.
      * @see    SuffixSet Syntax contraints for suffix lists.
      */
     public TDefaultArchiveDetector( final FsDriverService delegate,
-                                    final Map<String, Object> config) {
-        final Map<FsScheme, FsDriver> delegateDrivers = delegate.getDrivers();
+                                    final Map<FsScheme, FsDriver> config) {
         final Map<FsScheme, FsDriver>
-                drivers = new HashMap<FsScheme, FsDriver>(delegateDrivers);
-        final SuffixSet suffixes = getSuffixes(delegateDrivers);
-        for (final Map.Entry<String, Object> entry : config.entrySet()) {
-            final SuffixSet keySet = new SuffixSet(entry.getKey());
-            if (keySet.isEmpty())
-                throw new IllegalArgumentException("No archive file suffixes!");
-            for (final String suffix : keySet) {
-                final FsScheme scheme = FsScheme.create(suffix);
-                final FsDriver driver = newDriver(entry.getValue());
-                if (null != driver) {
-                    suffixes.add(suffix);
-                    drivers.put(scheme, driver);
-                } else {
-                    suffixes.remove(suffix);
-                    drivers.remove(scheme);
-                }
+                drivers = new HashMap<FsScheme, FsDriver>(delegate.getDrivers());
+        final SuffixSet suffixes = getSuffixes(delegate);
+        for (final Map.Entry<FsScheme, FsDriver> entry : config.entrySet()) {
+            final FsScheme scheme = entry.getKey();
+            final FsDriver driver = entry.getValue();
+            if (null != driver) {
+                suffixes.add(scheme.toString());
+                drivers.put(scheme, driver);
+            } else {
+                suffixes.remove(scheme.toString());
+                drivers.remove(scheme);
             }
         }
         this.drivers = Collections.unmodifiableMap(drivers);
         this.suffixes = suffixes.toString();
         this.matcher = new ThreadLocalMatcher(suffixes.toPattern());
-    }
-
-    @SuppressWarnings("unchecked")
-    private static @CheckForNull FsDriver newDriver(@CheckForNull Object driver) {
-        try {
-            if (driver instanceof String)
-                driver = serviceLocator.getClass((String) driver);
-            if (driver instanceof Class<?>)
-                driver = ((Class<? extends FsDriver>) driver).newInstance();
-            return (FsDriver) driver; // may throw ClassCastException
-        } catch (Exception ex) {
-            throw new IllegalArgumentException(ex); // NOI18N
-        }
     }
 
     @Override
@@ -309,8 +277,8 @@ implements TArchiveDetector, FsDriverService {
     }
 
     @Override
-    public @CheckForNull FsScheme getScheme(final String path) {
-        final Matcher m = matcher.reset(path);
+    public @CheckForNull FsScheme getScheme(String path) {
+        Matcher m = matcher.reset(path);
         return m.matches()
                 ? FsScheme.create(m.group(1).toLowerCase(Locale.ENGLISH))
                 : null;

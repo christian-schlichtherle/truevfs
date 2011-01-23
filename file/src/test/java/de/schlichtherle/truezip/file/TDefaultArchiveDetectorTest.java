@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.file;
 
+import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.archive.DummyArchiveDriver;
 import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
@@ -57,10 +58,10 @@ public class TDefaultArchiveDetectorTest {
                     { NULL, null, null },
                     { NULL, null, DRIVER },
                     //{ TDefaultArchiveDetector.NULL, "xyz", null },
-                    { null, new Object[] { "xyz", DummyArchiveDriver.class } },
+                    { null, new Object[][] {{ "xyz", DummyArchiveDriver.class }} },
                     { NULL, null },
-                    { NULL, new Object[] { null, null } },
-                    { NULL, new Object[] { null, "xyz" } },
+                    { NULL, new Object[][] {{ null, null }} },
+                    { NULL, new Object[][] {{ null, "xyz" }} },
                     //{ TDefaultArchiveDetector.NULL, new Object[] { "xyz", null } },
         });
 
@@ -87,23 +88,23 @@ public class TDefaultArchiveDetectorTest {
                     { NULL, "||.", DRIVER }, // empty suffix set
                     { NULL, "|.|", DRIVER }, // empty suffix set
                     { NULL, "|.|.", DRIVER }, // empty suffix set
-                    { NULL, new Object[] { "", DRIVER } }, // empty suffix set
-                    { NULL, new Object[] { ".", DRIVER } }, // empty suffix set
-                    { NULL, new Object[] { "|", DRIVER } }, // empty suffix set
-                    { NULL, new Object[] { "|.", DRIVER } }, // empty suffix set
-                    { NULL, new Object[] { "||", DRIVER } }, // empty suffix set
-                    { NULL, new Object[] { "||.", DRIVER } }, // empty suffix set
-                    { NULL, new Object[] { "|.|", DRIVER } }, // empty suffix set
-                    { NULL, new Object[] { "|.|.", DRIVER } }, // empty suffix set
-                    { NULL, new Object[] { "anySuffix", "" } }, // empty class name
-                    { NULL, new Object[] { "anySuffix", new Object() } }, // not an archive driver
-                    { NULL, new Object[] { "anySuffix", Object.class } }, // not an archive driver class
+                    { NULL, new Object[][] {{ "", DRIVER }} }, // empty suffix set
+                    { NULL, new Object[][] {{ ".", DRIVER }} }, // empty suffix set
+                    { NULL, new Object[][] {{ "|", DRIVER }} }, // empty suffix set
+                    { NULL, new Object[][] {{ "|.", DRIVER }} }, // empty suffix set
+                    { NULL, new Object[][] {{ "||", DRIVER }} }, // empty suffix set
+                    { NULL, new Object[][] {{ "||.", DRIVER }} }, // empty suffix set
+                    { NULL, new Object[][] {{ "|.|", DRIVER }} }, // empty suffix set
+                    { NULL, new Object[][] {{ "|.|.", DRIVER }} }, // empty suffix set
+                    { NULL, new Object[][] {{ "anySuffix", "" }} }, // empty class name
+                    { NULL, new Object[][] {{ "anySuffix", new Object() }} }, // not an archive driver
+                    { NULL, new Object[][] {{ "anySuffix", Object.class }} }, // not an archive driver class
         });
 
         testIllegalConstructors(ClassCastException.class,
                 new Object[][] {
-                    { NULL, new Object[] { DummyArchiveDriver.class, DRIVER } }, // not a suffix list
-                    { NULL, new Object[] { DRIVER, DRIVER } }, // not a suffix list
+                    { NULL, new Object[][] {{ DummyArchiveDriver.class, DRIVER }} }, // not a suffix list
+                    { NULL, new Object[][] {{ DRIVER, DRIVER }} }, // not a suffix list
         });
     }
 
@@ -129,10 +130,10 @@ public class TDefaultArchiveDetectorTest {
                             if (arg1 != null) {
                                 if (arg0 instanceof String)
                                     new TDefaultArchiveDetector((String) arg0, (FsArchiveDriver<?>) arg1);
-                                else if (arg1 instanceof Object[])
-                                    new TDefaultArchiveDetector((TDefaultArchiveDetector) arg0, (Object[]) arg1);
+                                else if (arg1 instanceof Object[][])
+                                    new TDefaultArchiveDetector((TDefaultArchiveDetector) arg0, (Object[][]) arg1);
                                 else
-                                    new TDefaultArchiveDetector((TDefaultArchiveDetector) arg0, (Map<String, Object>) arg1);
+                                    new TDefaultArchiveDetector((TDefaultArchiveDetector) arg0, (Map<FsScheme, FsDriver>) arg1);
                                 fail("Index " + i);
                             } else {
                                 assert arg0 != null;
@@ -142,13 +143,13 @@ public class TDefaultArchiveDetectorTest {
                                     fail("Index " + i);
                                 } else {
                                     try {
-                                        new TDefaultArchiveDetector((TDefaultArchiveDetector) arg0, (Object[]) null);
+                                        new TDefaultArchiveDetector((TDefaultArchiveDetector) arg0, (Object[][]) null);
                                         fail("Index " + i);
                                     } catch (Throwable failure) {
                                         assertTrue(expected.isAssignableFrom(failure.getClass()));
                                     }
                                     try {
-                                        new TDefaultArchiveDetector((TDefaultArchiveDetector) arg0, (Map<String, Object>) null);
+                                        new TDefaultArchiveDetector((TDefaultArchiveDetector) arg0, (Map<FsScheme, FsDriver>) null);
                                         fail("Index " + i);
                                     } catch (Throwable failure) {
                                         assertTrue(expected.isAssignableFrom(failure.getClass()));
@@ -160,10 +161,10 @@ public class TDefaultArchiveDetectorTest {
                             if (arg1 != null) {
                                 if (arg1 instanceof FsArchiveDriver<?>)
                                     new TDefaultArchiveDetector(null, (FsArchiveDriver<?>) arg1);
-                                else if (arg1 instanceof Object[])
-                                    new TDefaultArchiveDetector(null, (Object[]) arg1);
+                                else if (arg1 instanceof Object[][])
+                                    new TDefaultArchiveDetector(null, (Object[][]) arg1);
                                 else
-                                    new TDefaultArchiveDetector(null, (Map<String, Object>) arg1);
+                                    new TDefaultArchiveDetector(null, (Map<FsScheme, FsDriver>) arg1);
                                 fail("Index " + i);
                             } else {
                                 assert arg0 == null;
@@ -175,13 +176,13 @@ public class TDefaultArchiveDetectorTest {
                                     assertTrue(expected.isAssignableFrom(failure.getClass()));
                                 }
                                 try {
-                                    new TDefaultArchiveDetector((TDefaultArchiveDetector) null, (Object[]) null);
+                                    new TDefaultArchiveDetector((TDefaultArchiveDetector) null, (Object[][]) null);
                                     fail("Index " + i);
                                 } catch (Throwable failure) {
                                     assertTrue(expected.isAssignableFrom(failure.getClass()));
                                 }
                                 try {
-                                    new TDefaultArchiveDetector((TDefaultArchiveDetector) null, (Map<String, Object>) null);
+                                    new TDefaultArchiveDetector((TDefaultArchiveDetector) null, (Map<FsScheme, FsDriver>) null);
                                     fail("Index " + i);
                                 } catch (Throwable failure) {
                                     assertTrue(expected.isAssignableFrom(failure.getClass()));
@@ -276,7 +277,7 @@ public class TDefaultArchiveDetectorTest {
             assertEquals(result, detector.toString());
             detector = new TDefaultArchiveDetector(NULL, suffixes, DRIVER);
             assertEquals(result, detector.toString());
-            detector = new TDefaultArchiveDetector(NULL, new Object[] { suffixes, DRIVER });
+            detector = new TDefaultArchiveDetector(NULL, new Object[][] {{ suffixes, DRIVER }});
             assertEquals(result, detector.toString());
         }
     }
@@ -387,9 +388,9 @@ public class TDefaultArchiveDetectorTest {
         }
 
         try {
-            detector = new TDefaultArchiveDetector(detector, new Object[] {
-                "foo", "java.lang.Object",
-                "bar", "java.io.FilterInputStream",
+            detector = new TDefaultArchiveDetector(detector, new Object[][] {
+                { "foo", "java.lang.Object", },
+                { "bar", "java.io.FilterInputStream", },
             });
             fail("Expected IllegalArgumentException");
         } catch (IllegalArgumentException expected) {
@@ -401,7 +402,7 @@ public class TDefaultArchiveDetectorTest {
             assertDefaultArchiveDetector(detector, result, path);
 
             // Add level of indirection in order to test caching.
-            detector = new TDefaultArchiveDetector(detector, new Object[0]);
+            detector = new TDefaultArchiveDetector(detector, new Object[0][0]);
             assertDefaultArchiveDetector(detector, result, path);
         }
     }
