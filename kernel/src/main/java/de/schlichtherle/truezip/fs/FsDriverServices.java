@@ -93,7 +93,7 @@ public final class FsDriverServices {
         return Collections.unmodifiableMap(drivers);
     }
 
-    private static @Nullable Collection<FsScheme> toSchemes(@CheckForNull Object o) {
+    private static @NonNull Collection<FsScheme> toSchemes(@NonNull Object o) {
         Collection<FsScheme> set = new TreeSet<FsScheme>();
         try {
             if (o instanceof Collection<?>)
