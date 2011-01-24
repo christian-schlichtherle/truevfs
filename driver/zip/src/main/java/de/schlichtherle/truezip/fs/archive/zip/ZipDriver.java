@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
+import de.schlichtherle.truezip.zip.ZipEntry;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import de.schlichtherle.truezip.socket.IOPool;
@@ -40,7 +41,7 @@ import net.jcip.annotations.Immutable;
 
 import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
 import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
-import static java.util.zip.Deflater.BEST_COMPRESSION;
+//import static java.util.zip.Deflater.BEST_COMPRESSION;
 
 /**
  * An archive driver which builds ZIP files.
@@ -134,6 +135,20 @@ implements ZipEntryFactory<ZipArchiveEntry> {
     }
 
     /**
+     * Returns the value of the property {@code method}.
+     * This is the compression method to use when writing an entry to a ZIP
+     * output stream.
+     * <p>
+     * The implementation in the class {@link ZipDriver} returns
+     * {@link ZipEntry#DEFLATED}.
+     *
+     * @return The value of the property {@code method}.
+     */
+    public int getMethod() {
+        return ZipEntry.DEFLATED;
+    }
+
+    /**
      * Returns the value of the property {@code level}.
      * This is the compression level to use when deflating an entry to a ZIP
      * output stream.
@@ -144,7 +159,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
      * @return The value of the property {@code level}.
      */
     public int getLevel() {
-        return BEST_COMPRESSION;
+        return Deflater.BEST_COMPRESSION;
     }
 
     @Override
