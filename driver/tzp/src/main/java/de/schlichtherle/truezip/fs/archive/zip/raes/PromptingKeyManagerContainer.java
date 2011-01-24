@@ -21,6 +21,7 @@ import de.schlichtherle.truezip.key.KeyManagerService;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import java.awt.GraphicsEnvironment;
 import java.util.ServiceConfigurationError;
+import net.jcip.annotations.Immutable;
 
 /**
  * A container for a prompting key manager implementation for
@@ -34,7 +35,8 @@ import java.util.ServiceConfigurationError;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class PromptingKeyManagerContainer implements KeyManagerService {
+@Immutable
+public final class PromptingKeyManagerContainer implements KeyManagerService {
 
     private static final PromptingKeyManager<AesCipherParameters>
             manager = new PromptingKeyManager<AesCipherParameters>(

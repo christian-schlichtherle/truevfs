@@ -104,7 +104,7 @@ public abstract class ZipRaesDriver extends JarDriver {
          *        which has been successfully synchronized.
          */
         public abstract void sync(KeyProvider<?> provider);
-    }
+    } // enum KeyProviderSyncStrategy
 
     private final KeyManagerService service;
 
@@ -158,7 +158,7 @@ public abstract class ZipRaesDriver extends JarDriver {
     public abstract long getAuthenticationTrigger();
 
     @Override
-    public FsController<?>
+    public final FsController<?>
     newController(FsMountPoint mountPoint, FsController<?> parent) {
         return new KeyManagerArchiveController(
                 super.newController(mountPoint, parent), this);
@@ -171,9 +171,10 @@ public abstract class ZipRaesDriver extends JarDriver {
      * This feature strengthens the security of the authentication process.
      */
     @Override
-    public JarArchiveEntry newEntry(final String path,
-                                    final Type type,
-                                    final @CheckForNull Entry template)
+    public final JarArchiveEntry
+    newEntry(   final String path,
+                final Type type,
+                final @CheckForNull Entry template)
     throws CharConversionException {
         final JarArchiveEntry entry = super.newEntry(path, type, template);
         if (DEFLATED != entry.getMethod()) {
@@ -197,9 +198,9 @@ public abstract class ZipRaesDriver extends JarDriver {
      * class implementation.
      */
     @Override
-    public ZipInputShop newInputShop(
-            final FsConcurrentModel model,
-            final InputSocket<?> target)
+    public final ZipInputShop
+    newInputShop(   final FsConcurrentModel model,
+                    final InputSocket<?> target)
     throws IOException {
         class Input extends DecoratingInputSocket<Entry> {
             Input() {
@@ -242,10 +243,10 @@ public abstract class ZipRaesDriver extends JarDriver {
      * {@link #getRaesParameters} for authentication.
      */
     @Override
-    public OutputShop<ZipArchiveEntry> newOutputShop(
-            final FsConcurrentModel model,
-            final OutputSocket<?> target,
-            final @CheckForNull InputShop<ZipArchiveEntry> source)
+    public OutputShop<ZipArchiveEntry>
+    newOutputShop(  final FsConcurrentModel model,
+                    final OutputSocket<?> target,
+                    final @CheckForNull InputShop<ZipArchiveEntry> source)
     throws IOException {
         class Output extends DecoratingOutputSocket<Entry> {
             Output() {
@@ -278,7 +279,7 @@ public abstract class ZipRaesDriver extends JarDriver {
         return super.newOutputShop(model, new Output(), source);
     }
 
-    public KeyManagerService getKeyManagerService() {
+    final KeyManagerService getKeyManagerService() {
         return service;
     }
 
@@ -288,7 +289,7 @@ public abstract class ZipRaesDriver extends JarDriver {
      * @param  model the file system model.
      * @return The {@link RaesParameters} for the given file system model.
      */
-    public RaesParameters getRaesParameters(FsModel model) {
+    final RaesParameters getRaesParameters(FsModel model) {
         return new KeyManagerRaesParameters(getKeyManagerService(),
                                             model.getMountPoint().getUri());
     }
