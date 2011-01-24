@@ -227,20 +227,6 @@ implements Iterable<E> {
     }
 
     /**
-     * Returns the compression level currently used.
-     */
-    public int getLevel() {
-        return def.getLevel();
-    }
-
-    /**
-     * Sets the compression level for subsequent entries.
-     */
-    public void setLevel(int level) {
-	def.setLevel(level);
-    }
-
-    /**
      * Returns the default compression method for subsequent entries.
      * This property is only used if a {@link ZipEntry} does not specify a
      * compression method.
@@ -269,6 +255,20 @@ implements Iterable<E> {
 	    throw new IllegalArgumentException(
                     "Invalid compression method: " + method);
         this.method = (short) method;
+    }
+
+    /**
+     * Returns the compression level currently used.
+     */
+    public int getLevel() {
+        return def.getLevel();
+    }
+
+    /**
+     * Sets the compression level for subsequent entries.
+     */
+    public void setLevel(int level) {
+	def.setLevel(level);
     }
 
     /**

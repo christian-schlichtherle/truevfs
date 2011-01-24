@@ -69,6 +69,7 @@ implements OutputShop<ZipArchiveEntry> {
                             final @CheckForNull ZipInputShop source)
     throws IOException {
         super(out, driver.getCharset());
+        super.setMethod(driver.getMethod());
         super.setLevel(driver.getLevel());
         this.pool = driver.getPool();
         if (null != source) {
