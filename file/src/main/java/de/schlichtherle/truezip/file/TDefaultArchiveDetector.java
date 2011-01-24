@@ -24,7 +24,6 @@ import de.schlichtherle.truezip.fs.FsDriverService;
 import de.schlichtherle.truezip.fs.FsDriverServices;
 import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.fs.FsScheme;
-import de.schlichtherle.truezip.util.regex.ThreadLocalMatcher;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
