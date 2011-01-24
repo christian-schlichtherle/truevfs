@@ -56,15 +56,4 @@ final class HttpDriver extends FsDriver {
             throw new IllegalArgumentException();
         return new HttpController(this, new FsModel(mountPoint));
     }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The implementation in the class {@link HttpDriver} always returns
-     * {@code false}.
-     */
-    @Override
-    public boolean isFederated() {
-        return false;
-    }
 }

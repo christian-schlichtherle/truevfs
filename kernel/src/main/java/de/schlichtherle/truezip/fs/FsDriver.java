@@ -50,21 +50,19 @@ public abstract class FsDriver {
                     @Nullable FsController<?> parent);
 
     /**
-     * Returns {@code true} iff this driver implements a federated file
-     * system type, i.e. if the type of file system must be a member of a
+     * Returns {@code true} iff this file system driver implements a federated
+     * file system type, i.e. if the type of file system must be a member of a
      * parent file system.
-     * E.g. the file system drivers for the ZIP or TAR file formats should
-     * return {@code true} because a ZIP or TAR file is always a member of
-     * another file system, e.g. a regular directory.
-     * To the contrary, the driver for the file scheme should return
-     * {@code false} because this file system type cannot be a member of a
-     * parent file system.
+     * <p>
+     * The implementation in the class {@link FsDriver} returns {@code false}.
      * 
      * @return {@code true} iff the type of the file system implemented by this
-     *         driver is federated, i.e. must be a member of a parent file
-     *         system.
+     *         file system driver is federated, i.e. must be a member of a
+     *         parent file system.
      */
-    public abstract boolean isFederated();
+    public boolean isFederated() {
+        return false;
+    }
 
     @Override
     public String toString() {

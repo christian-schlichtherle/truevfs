@@ -42,15 +42,4 @@ final class FileDriver extends FsDriver {
             throw new IllegalArgumentException();
         return new FileController<FsModel>(new FsModel(mountPoint));
     }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The implementation in the class {@link FileDriver} always returns
-     * {@code false}.
-     */
-    @Override
-    public boolean isFederated() {
-        return false;
-    }
 }
