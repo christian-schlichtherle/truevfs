@@ -59,7 +59,7 @@ public class ParanoidZipRaesDriver extends ZipRaesDriver {
     }
 
     @Override
-    public long getAuthenticationTrigger() {
+    public final long getAuthenticationTrigger() {
         return Long.MAX_VALUE;
     }
 
@@ -73,7 +73,7 @@ public class ParanoidZipRaesDriver extends ZipRaesDriver {
      * buffering the written entries.
      */
     @Override
-    public OutputShop<ZipArchiveEntry>
+    public final OutputShop<ZipArchiveEntry>
     newOutputShop(  final FsConcurrentModel model,
                     final OutputSocket<?> output,
                     final InputShop<ZipArchiveEntry> source)

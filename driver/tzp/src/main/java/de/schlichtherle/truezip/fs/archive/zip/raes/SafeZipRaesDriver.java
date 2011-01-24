@@ -65,7 +65,7 @@ public class SafeZipRaesDriver extends ZipRaesDriver {
     private static final long AUTHENTICATION_TRIGGER = 512 * 1024;
 
     @Override
-    public long getAuthenticationTrigger() {
+    public final long getAuthenticationTrigger() {
         return AUTHENTICATION_TRIGGER;
     }
 
@@ -87,7 +87,7 @@ public class SafeZipRaesDriver extends ZipRaesDriver {
      * and CRC-32 authenticated.
      */
     @Override
-    protected ZipInputShop
+    protected final ZipInputShop
     newZipInputShop(FsConcurrentModel model, ReadOnlyFile rof)
     throws IOException {
         // Optimization: If the read-only file is smaller than the
