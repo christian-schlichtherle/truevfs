@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.util.regex;
+package de.schlichtherle.truezip.file;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,39 +31,17 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-public class ThreadLocalMatcher extends ThreadLocal<Matcher> {
-    private final @NonNull Pattern pattern;
+@DefaultAnnotation(NonNull.class)
+final class ThreadLocalMatcher extends ThreadLocal<Matcher> {
+    private final Pattern pattern;
 
     /**
-     * Equivalent to {@code new}
-     * {@link #ThreadLocalMatcher(String, int) ThreadLocal(regex, 0)}.
-     */
-    public ThreadLocalMatcher(@NonNull String regex)
-    throws PatternSyntaxException {
-        this(regex, 0);
-    }
-
-    /**
-     * Creates a new thread local matcher by compiling the given regex with the
-     * given flags.
+     * Constructs a new thread local matcher by using the given pattern.
      *
-     * @param regex The expression to be compiled.
-     * @param flags The flags to use for compilation.
-     * @throws PatternSyntaxException If the expression's syntax is invalid.
+     * @param  pattern the pattern to be used.
      */
-    public ThreadLocalMatcher(@NonNull String regex, int flags)
-    throws PatternSyntaxException {
-        this.pattern = Pattern.compile(regex, flags);
-    }
-
-    /**
-     * Creates a new thread local matcher by using the given pattern.
-     *
-     * @param pattern The pattern to be used.
-     * @throws NullPointerException If the parameter is {@code null}.
-     */
-    public ThreadLocalMatcher(@NonNull Pattern pattern) {
-        if (pattern == null)
+    public ThreadLocalMatcher(Pattern pattern) {
+        if (null == pattern)
             throw new NullPointerException();
         this.pattern = pattern;
     }
@@ -76,7 +55,7 @@ public class ThreadLocalMatcher extends ThreadLocal<Matcher> {
      * Resets the thread local matcher with the given character sequence and
      * returns it.
      */
-    public final @NonNull Matcher reset(CharSequence input) {
+    public final Matcher reset(CharSequence input) {
         return get().reset(input);
     }
 }
