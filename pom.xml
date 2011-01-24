@@ -20,7 +20,7 @@
     <parent>
         <groupId>de.schlichtherle</groupId>
         <artifactId>asl20-oss-parent</artifactId>
-        <version>6</version>
+        <version>7</version>
     </parent>
 
     <groupId>de.schlichtherle.truezip</groupId>
@@ -28,7 +28,7 @@
     <version>7.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>TrueZIP (POM)</name>
+    <name>TrueZIP</name>
     <description>
         TrueZIP is a framework for virtual file systems and a library for
         accessing archive files as if they were just plain old directories.

@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Release Notes for TrueZIP 6.8</title>
+        <meta name="Author" content="Christian Schlichtherle"/>
+    </head>
+    <body>
+        <div id="content">
+            <h1>Release Notes for TrueZIP 6.8</h1>
+            <p class="subtitle">Release Date: September 21<sup>st</sup>, 2010</p>
+            <h2>Contents</h2>
+            <ol>
+                <li><a href="#introduction">Introduction</a></li>
+                <li><a href="#updates">List of Updates (Change Log)</a></li>
+            </ol>
+            <h2><a name="introduction">Introduction</a></h2>
+            <p>This is a maintenance release - it fixes classloading for OSGI
+                environments, updates the Javadoc and fixes some issues with
+                the unit tests for Swing GUI classes.</p>
+            <p>Last, but not least, Maven is now used for the build and
+                release process.
+                The Maven Coordinates are
+                <code>de.schlichtherle:truezip:jar:6.8</code>.
+                You should soon see the artifacts appear in
+                <a href="http://repo1.maven.org/maven2/de/schlichtherle/truezip/">Maven Central</a>.</p>
+            <p>If and only if you are using TrueZIP to access TAR files or
+                derivative archive file types, then you need to upgrade the run
+                time dependency <code>ant.jar</code> to Ant 1.8.1 (see below).</p>
+            <p>Upgrading is recommended for all users.</p>
+            <table id="legend">
+                <thead>
+                    <tr>
+                        <th colspan="2">Legend</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>New</th>
+                        <td>Introduces a new feature.</td>
+                    </tr>
+                    <tr>
+                        <th>Fixed</th>
+                        <td>Introduces a bug fix of an existing feature.</td>
+                    </tr>
+                    <tr>
+                        <th>Enhanced</th>
+                        <td>
+                            Introduces the enhancement of an existing feature.
+                            This update is fully backwards compatible.
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Changed</th>
+                        <td>
+                            Introduces the change of an existing feature.
+                            This update may cause
+                            <a href="releases.html#compatibility">
+                                backwards incompatibilities
+                            </a>.
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Deprecated</th>
+                        <td>Introduces the deprecation of an existing feature.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h2><a name="updates">List of Updates (Change Log)</a></h2>
+            <p>
+                Following is an overview of all updates in this release
+                which affect the public API.
+                Please note that internal refactorings are not listed.
+                For a full list of updates, please refer to the CVS repository
+                and diff to the tag <code>TrueZIP-6_7</code>.
+            </p>
+            <h3>Cross Package Updates</h3>
+            <ol>
+                <li>
+                    <b>Changed:</b> Switched Build Management from Ant to Maven.
+                </li>
+                <li>
+                    <b>Fixed:</b> Removed non-working support for code obfuscation.
+                </li>
+            </ol>
+            <h3>Updates in the Default Package</h3>
+            <ol>
+                <li>
+                    <b>Changed:</b> Removed the command line utility classes in this
+                    package. This step is intended to enhance compatibility with OSGi
+                    environments.
+                </li>
+            </ol>
+            <h3>
+                Updates in the Package
+                <a href="apidocs/de/schlichtherle/package-summary.html">
+                    <code>de.schlichtherle</code>
+                </a>
+            </h3>
+            <ol>
+                <li>
+                    <b>Changed:</b> Moved the command line utility classes in this
+                    package to the package
+                    <a href="apidocs/de/schlichtherle/io/samples/package-summary.html">
+                        <code>de.schlichtherle.io.samples</code>
+                    </a>.
+                </li>
+            </ol>
+            <h3>
+                Updates in the Package
+                <a href="apidocs/de/schlichtherle/io/package-summary.html">
+                    <code>de.schlichtherle.io</code>
+                </a>
+            </h3>
+            <ol>
+                <li>
+                    <b>Fixed:</b> Changed the class loading algorithm in the method
+                    <a href="apidocs/de/schlichtherle/io/ArchiveDriverRegistry.html#createArchiveDriver(java.lang.Object)">
+                        <code>ArchiveDriverRegistry.createArchiveDriver</code>
+                    </a>
+                    so that it should work in both OSGi and JEE environments.
+                    For more information, please refer to
+                    <a href="https://truezip.dev.java.net/issues/show_bug.cgi?id=34">issue #34</a>.
+                </li>
+                <li>
+                    <b>Fixed:</b> Changed the resource enumeration algorithm in the method
+                    <a href="apidocs/de/schlichtherle/io/GlobalArchiveDriverRegistry.html#registerArchiveDrivers(java.lang.String, de.schlichtherle.io.ArchiveDriverRegistry, de.schlichtherle.io.ArchiveDriverRegistry)">
+                        <code>GlobalArchiveDriverRegistry.registerArchiveDrivers</code>
+                    </a>
+                    so that it should work in both OSGi and JEE environments.
+                    For more information, please refer to
+                    <a href="https://truezip.dev.java.net/issues/show_bug.cgi?id=34">issue #34</a>.
+                </li>
+            </ol>
+            <h3>
+                Updates in the Package
+                <a href="apidocs/de/schlichtherle/io/samples/package-summary.html">
+                    <code>de.schlichtherle.io.samples</code>
+                </a>
+            </h3>
+            <ol>
+                <li>
+                    <b>Changed:</b> Moved the command line utility classes from the
+                    package
+                    <a href="apidocs/de/schlichtherle/package-summary.html">
+                        <code>de.schlichtherle</code>
+                    </a> to this package.
+                </li>
+                <li>
+                    <b>Enhanced:</b> Internationalized Strings by using a ResourceBundle.
+                </li>
+            </ol>
+            <h3>
+                Updates in the Package
+                <a href="apidocs/de/schlichtherle/io/archive/tar/package-summary.html">
+                    <code>de.schlichtherle.io.archive.tar</code>
+                </a>
+            </h3>
+            <ol>
+                <li>
+                    <b>Fixed:</b> The constructors <code>TarEntry(String)</code> and
+                    <code>TarEntry(org.apache.tools.tar.TarEntry)</code> in the class
+                    <code>TarEntry</code> now use the newly introduced constructor
+                    <code>org.apache.tools.tar.TarEntry(String, boolean)</code> in order
+                    to work around a regression introduced in Ant 1.8 (see
+                    <a href="https://truezip.dev.java.net/issues/show_bug.cgi?id=36">issue #36</a>
+                    ).
+                    As a consequence, in order to access TAR files or derivative archive
+                    file types, you need to have <code>ant.jar</code> from Ant 1.8.1 in
+                    your class path.
+                </li>
+            </ol>
+            <h3>
+                Updates in the Package
+                <a href="apidocs/de/schlichtherle/io/util/package-summary.html">
+                    <code>de.schlichtherle.io.util</code>
+                </a>
+            </h3>
+            <ol>
+                <li>
+                    <b>Enhanced:</b> The class
+                    <a href="apidocs/de/schlichtherle/io/util/Paths.html">
+                        <code>Paths</code>
+                    </a>
+                    is not marked as deprecated anymore.
+                    Its implementation and Javadoc have been updated.
+                </li>
+            </ol>
+            <h3>
+                Updates in the Package
+                <a href="apidocs/de/schlichtherle/key/package-summary.html">
+                    <code>de.schlichtherle.key</code>
+                </a>
+            </h3>
+            <ol>
+                <li>
+                    <b>Fixed:</b> Changed the class loading algorithm in the method
+                    <a href="apidocs/de/schlichtherle/key/KeyManager.html#getInstance()">
+                        <code>KeyManager.getInstance</code>
+                    </a>
+                    so that it should work in both OSGi and JEE environments.
+                    For more information, please refer to
+                    <a href="https://truezip.dev.java.net/issues/show_bug.cgi?id=34">issue #34</a>.
+                </li>
+            </ol>
+            <h3>
+                Updates in the Package
+                <a href="apidocs/de/schlichtherle/key/passwd/swing/package-summary.html">
+                    <code>de.schlichtherle.key.passwd.swing</code>
+                </a>
+            </h3>
+            <ol>
+                <li>
+                    <b>Fixed:</b> Changed the class loading algorithm in the method
+                    <a href="apidocs/de/schlichtherle/key/passwd/swing/PromptingKeyProviderUI.html#createFeedback(java.lang.String)">
+                        <code>PromptingKeyProviderUI.createFeedback</code>
+                    </a>
+                    so that it should work in both OSGi and JEE environments.
+                    For more information, please refer to
+                    <a href="https://truezip.dev.java.net/issues/show_bug.cgi?id=34">issue #34</a>.
+                </li>
+            </ol>
+            <h3>
+                Updates in the Package
+                <a href="apidocs/de/schlichtherle/util/zip/package-summary.html">
+                    <code>de.schlichtherle.util.zip</code>
+                </a>
+            </h3>
+            <ol>
+                <li>
+                    <b>Fixed:</b> The methods
+                    <a href="apidocs/de/schlichtherle/util/zip/ZipFile.html#getInputStream">
+                        <code>ZipFile.getInputStream</code>
+                    </a>
+                    threw a <code>NullPointerException</code> if the requested
+                    entry does not exist.
+                    For more information, please refer to
+                    <a href="https://truezip.dev.java.net/issues/show_bug.cgi?id=37">issue #37</a>.
+                </li>
+                <li>
+                    <b>New/Enhanced:</b> Added the method
+                    <a href="apidocs/de/schlichtherle/util/zip/ZipFile.html#getName()">
+                        <code>ZipFile.getName</code>
+                    </a>
+                    for enhanced compatibility with Java Standard Edition.
+                    For more information, please refer to
+                    <a href="https://truezip.dev.java.net/issues/show_bug.cgi?id=34">issue #24</a>.
+                </li>
+                <li>
+                    <b>Deprecated:</b> The method
+                    <a href="apidocs/de/schlichtherle/util/zip/BasicZipFile.html#createReadOnlyFile(java.io.File)">
+                        <code>BasicZipFile.createReadOnlyFile</code>
+                    </a>
+                    has been deprecated because it's called by some constructors.
+                    Use a constructor with a
+                    <a href="apidocs/de/schlichtherle/io/rof/ReadOnlyFile.html">
+                        <code>ReadOnlyFile</code>
+                    </a>
+                    parameter instead.
+                </li>
+                <li>
+                    <b>Deprecated:</b> The method
+                    <a href="apidocs/de/schlichtherle/util/zip/BasicZipFile.html#createZipEntry(java.lang.String)">
+                        <code>BasicZipFile.createZipEntry</code>
+                    </a>
+                    has been deprecated because it's called by some constructors.
+                    It will be replaced by a factory interface in TrueZIP 7.
+                </li>
+            </ol>
+        </div>
+    </body>
+</html>

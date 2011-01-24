@@ -25,7 +25,7 @@
 
     <artifactId>truezip-driver</artifactId>
     <packaging>pom</packaging>
-    <name>TrueZIP Driver (POM)</name>
+    <name>TrueZIP Driver</name>
     <description>
         The Project Object Model (POM) for pluggable file system drivers.
     </description>
