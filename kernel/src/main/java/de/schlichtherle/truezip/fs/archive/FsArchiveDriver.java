@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.fs.archive;
 
 import de.schlichtherle.truezip.fs.FsConcurrentModel;
@@ -31,13 +30,14 @@ import de.schlichtherle.truezip.socket.OutputSocket;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import javax.swing.Icon;
 import net.jcip.annotations.Immutable;
 
 /**
- * This file system driver interface is used to access archives of a
- * particular type, e.g. ZIP, TZP, JAR, TAR, TAR.GZ, TAR.BZ2 or any other.
+ * Provides access to a federated file system which is persistet in an archive
+ * file format like ZIP, JAR, TZP, TAR, TAR.GZ, TAR.BZ2 etc.
  *
  * @param   <E> The type of the archive entries.
  * @author  Christian Schlichtherle
