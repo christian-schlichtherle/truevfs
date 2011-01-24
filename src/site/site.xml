@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project    xmlns="http://maven.apache.org/DECORATION/1.0.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://maven.apache.org/DECORATION/1.0.0 http://maven.apache.org/xsd/decoration-1.0.0.xsd">
+    <!-- <skin>
+        <groupId>org.jvnet.maven-javanet-skin</groupId>
+        <artifactId>maven-javanet-skin</artifactId>
+        <version>1.2</version>
+    </skin> -->
+
+    <body>
+        <menu name="Documentation">
+            <item name="Overview" href="index.html"/>
+            <item name="News" href="news.html"/>
+            <item name="Concept and Definitions" href="concept.html"/>
+            <item name="Key Features" href="features.html"/>
+            <item name="Use Cases" href="usecases.html"/>
+            <item name="Release Notes" href="releases.html" collapse="true">
+                <item name="6.8" href="relnotes/release-6_8.html"/>
+                <item name="6.7" href="relnotes/release-6_7.html"/>
+                <item name="6.6" href="relnotes/release-6_6.html"/>
+                <item name="6.5.4" href="relnotes/release-6_5_4.html"/>
+                <item name="6.4" href="relnotes/release-6_4.html"/>
+                <item name="6.3.2" href="relnotes/release-6_3_2.html"/>
+                <item name="6.3" href="relnotes/release-6_3.html"/>
+                <item name="6.2.1" href="relnotes/release-6_2_1.html"/>
+                <item name="6.2" href="relnotes/release-6_2.html"/>
+                <item name="6.1" href="relnotes/release-6_1.html"/>
+                <item name="6.0" href="relnotes/release-6_0.html"/>
+            </item>
+            <item name="TrueZIP 6 (deprecated)" href="6/index.html" collapse="true">
+                <item name="Tutorial" href="6/tutorial.html"/>
+                <item name="NZip Utility" href="6/nzip.html"/>
+            </item>
+        </menu>
+        <menu ref="modules" inheritAsRef="false"/>
+        <menu ref="reports" inheritAsRef="false"/>
+    </body>
+</project>

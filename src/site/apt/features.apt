@@ -1,0 +1,67 @@
+Key Features
+
+    [Easy To Use]
+        The File* API provides convenient read/write access to
+        archive files as if they were just plain old directories in a file
+        system path.
+        Using the classes
+        {{{./apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}},
+        {{{./apidocs/de/schlichtherle/truezip/file/TFileInputStream.html}<<<TFileInputStream>>>}},
+        {{{./apidocs/de/schlichtherle/truezip/file/TFileOutputStream.html}<<<TFileOutputStream>>>}}
+        et al, you can instantly access ZIP files, TAR files and their
+        derivatives or your own custom archive file format.
+
+    [Fast Bulk I/O]
+        The File* API provides convenient and powerful methods for fast bulk
+        I/O operations like recursive copying, moving or deleting of directory
+        trees and files.
+        E.g. using the multi-threaded method
+        {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#cat(java.io.InputStream, java.io.OutputStream)}<<<TFile.cat(InputStream, OutputStream)>>>}},
+        you'll never have to write a naive read-then-write copy loop again.
+
+    [File System Federation]
+        TrueZIP supports virtual file system federation.
+        This enables an application to access archive files within any other
+        virtual file systems, e.g. you could read the contents of a ZIP file
+        which is accessed via HTTP(S) instead of reading it from a file.
+        Archive files may also be nested, i.e. contained in another archive
+        file.
+
+    [Modular Architecture]
+        TrueZIP's architecture is split into separate modules for the kernel,
+        a set of file system drivers and some user APIs like e.g. the File* API.
+        Each module is implemented as a JAR.
+        To configure the set of file system types which shall be accessible by
+        the application, you simply add the respective file system driver JAR
+        to the application's class path.
+
+    [Pluggable File System Driver Architecture]
+        TrueZIP supports any virtual file system type via its pluggable
+        {{{./apidocs/de/schlichtherle/truezip/fs/FsDriver.html}file system driver}}
+        architecture.
+        TrueZIP ships with file system drivers for the file system schemes
+        FILE, HTTP(S), ZIP, TAR and their derivatives like JAR, TGZ, TBZ2 etc.
+
+    [Encrypted Archive File Format]
+        The TZP File System Driver
+        (Maven \<artifactId\>truezip-driver-tzp\<artifactId\>) provides support
+        for TrueZIP's custom encrypted ZIP.RAES (or TZP for short) file format.
+        A TZP file is a ZIP file with UTF-8 character set which is wrapped in
+        a RAES file envelope.
+        RAES is TrueZIP's custom Random Access Encryption Specification which
+        supports SHA-256 authentication and AES-256 decryption in CTR block
+        mode for transparent, read/write access to its encrypted payload.
+        By using CTR mode, RAES supports transparent <random> read access to
+        its encrypted payload, which makes reading a TZP pretty fast.
+
+    [Thread-Safe]
+        Multiple threads can read and write the same archive file at the same
+        time.
+
+    [Robust]
+        TrueZIP recognizes false positive archive files, so it cannot
+        get confused by an arbitrary file which inadvertenly uses a suffix of
+        a supported archive file type.
+        TrueZIP code uses assertions, JUnit tests and static code analysis
+        tools like FindBugs and JDepend in order to achieve its high
+        reliability standards.
