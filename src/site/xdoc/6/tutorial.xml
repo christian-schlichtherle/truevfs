@@ -1,18 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document xmlns="http://maven.apache.org/XDOC/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+<document   xmlns="http://maven.apache.org/XDOC/2.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
     <properties>
         <title>Tutorial</title>
         <author>Christian Schlichtherle</author>
     </properties>
     <body>
         <h1>The TrueZIP 6 Tutorial</h1>
-        <p><i>Archive files are virtual directories!</i> (a TrueZIP claim)</p>
-        <p><i>Make simple things easy and complex things possible!</i> (another TrueZIP claim)</p>
+        <p><em>Note that the version described in this document is deprecated
+            and should not be used for new applications anymore.
+            The links to the Javadoc in this document are non-functional
+            because the package names have been changed in TrueZIP 7.
+            The Javadoc for TrueZIP 6.8.2 is now available for download via
+            <a href="http://repo1.maven.org/maven2/de/schlichtherle/truezip/">Maven Central</a>.</em></p>
         <h1>Contents</h1>
         <macro name="toc">
             <param name="fromDepth" value="1"/>
         </macro>
         <section name="Introduction">
+            <p>Key Claims:</p>
+            <ol>
+            <li><b>Archive files are virtual directories!</b></li>
+            <li><b>Make simple things easy and complex things possible!</b></li>
+            <li><b>Quality matters!</b></li>
+            </ol>
             <p>TrueZIP is a Java based virtual file system (VFS) implementation for
                 transparent read/write access to archive files as if they were
                 directories. Archive files may be arbitrarily nested and the nesting
@@ -439,7 +451,7 @@ try {
         </section>
         <section name="Customizing Archive File Suffixes and Archive Drivers">
             <p>Out of the box, the global registry is configured to support the
-                ZIP and TAR file family with all known derivatives.
+                ZIP and TAR file family with all known relatives.
                 For a complete reference of all supported archive file formats
                 and their parameters please refer to the
                 <a href="apidocs/overview-summary.html#defaults">API Overview</a>.</p>

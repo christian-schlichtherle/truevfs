@@ -1,0 +1,53 @@
+    -----------------------
+    Sample Code
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+Sample Code
+
+    There's a module with samples to demonstrate the usage of two different
+    APIs:
+
+    * [The File* API]
+        This is the API which should be used by most applications.
+        It's designed to be convenient to use while providing a great level of
+        flexibility.
+
+        However, due to its addressing scheme, it can only access native file
+        systems and any member file systems (i.e. archive files) within a
+        native file system.
+        In particular, it cannot access virtual HTTP(S) file systems or any
+        member file systems (i.e. archive files) within an HTTP(S) file system.
+
+        The File* API is in the module with the artifactId <<<truezip-file>>>.
+
+    * [The Kernel API}
+        As the name implies, this is the core of it all.
+        As an API, it's somewhat more complex to use, but very flexible because
+        of its clean architecture (e.g. uses Dependency Injection wherever
+        reasonable).
+
+        Using this API directly allows you to access non-federated file systems
+        other than the native file system and any member file system.
+        E.g. you could access an entry within an archive file which is located
+        at a web site like this: <<<zip:http://acme.com/archive.zip!/entry>>>.
+        Note that the HTTP(S) file system driver is still in its infancy,
+        so don't expect too much of it.
+
+        The Kernel API is in the module with the artifactId <<<truezip-kernel>>>.
+
+    []
+
+    Here are the Maven coordinates of the sample code:</p>
+    <source><![CDATA[
+    <dependency>
+    <groupId>${project.groupId}</groupId>
+    <artifactId>truezip-samples</artifactId>
+    <version>${project.version}</version>
+    <classifier>sources</classifier>
+    </dependency>]]></source>
+    <p>If you don't use Maven, you could download the artifact from
+    it's directory at
+    <a href="http://repo1.maven.org/maven2/de/schlichtherle/truezip/">Maven Central</a>
+    instead.</p>

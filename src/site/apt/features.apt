@@ -1,3 +1,9 @@
+    -----------------------
+    Key Features
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
 Key Features
 
     [Easy To Use]
@@ -9,7 +15,7 @@ Key Features
         {{{./apidocs/de/schlichtherle/truezip/file/TFileInputStream.html}<<<TFileInputStream>>>}},
         {{{./apidocs/de/schlichtherle/truezip/file/TFileOutputStream.html}<<<TFileOutputStream>>>}}
         et al, you can instantly access ZIP files, TAR files and their
-        derivatives or your own custom archive file format.
+        relatives or your own custom archive file format.
 
     [Fast Bulk I/O]
         The File* API provides convenient and powerful methods for fast bulk
@@ -32,18 +38,18 @@ Key Features
         a set of file system drivers and some user APIs like e.g. the File* API.
         Each module is implemented as a JAR.
         To configure the set of file system types which shall be accessible by
-        the application, you simply add the respective file system driver JAR
-        to the application's class path.
+        the application, you simply add the desired file system driver JARs
+        to the application's run time class path.
 
     [Pluggable File System Driver Architecture]
         TrueZIP supports any virtual file system type via its pluggable
         {{{./apidocs/de/schlichtherle/truezip/fs/FsDriver.html}file system driver}}
         architecture.
         TrueZIP ships with file system drivers for the file system schemes
-        FILE, HTTP(S), ZIP, TAR and their derivatives like JAR, TGZ, TBZ2 etc.
+        FILE, HTTP(S), ZIP, TAR and their relatives like JAR, TGZ, TBZ2 etc.
 
     [Encrypted Archive File Format]
-        The TZP File System Driver
+        The TZP Archive Driver
         (Maven \<artifactId\>truezip-driver-tzp\<artifactId\>) provides support
         for TrueZIP's custom encrypted ZIP.RAES (or TZP for short) file format.
         A TZP file is a ZIP file with UTF-8 character set which is wrapped in
@@ -53,6 +59,13 @@ Key Features
         mode for transparent, read/write access to its encrypted payload.
         By using CTR mode, RAES supports transparent <random> read access to
         its encrypted payload, which makes reading a TZP pretty fast.
+
+    [ZIP64 Support]
+        The ZIP Archive Driver provides read/write support for ZIP64 files.
+        This is fully transparent, so the application does not have to do
+        anything - even when using the class
+        {{{./apidocs/de/schlichtherle/truezip/zip/ZipOutputStream.html}<<<ZipOutputStream>>>}}
+        directly.
 
     [Thread-Safe]
         Multiple threads can read and write the same archive file at the same

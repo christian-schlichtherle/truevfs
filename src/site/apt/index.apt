@@ -1,3 +1,9 @@
+    -----------------------
+    Overview
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
 Overview
 
     TrueZIP is a framework for virtual file systems and a library for
@@ -10,3 +16,11 @@ Overview
     As a library, TrueZIP's File* API provides convenient multi-threaded
     read/write access to archive files as if they were just plain old
     directories in a file system path.
+
+* Key Claims
+
+    [[1]] <<{Archive files are virtual directories}!>>
+
+    [[2]] <<{Make simple things easy and complex things possible}!>>
+
+    [[3]] <<{Quality matters}!>>
