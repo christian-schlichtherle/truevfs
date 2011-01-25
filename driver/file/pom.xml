@@ -27,7 +27,8 @@
     <name>TrueZIP Driver File</name>
     <description>
         The File Scheme Driver.
-        This artifact is required as a run time dependency of the File* API
-        of the truezip-file artifact.
+
+        This artifact is required as a run time dependency of the TrueZIP File*
+        module.
     </description>
 </project>

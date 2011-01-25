@@ -7,9 +7,10 @@
         <artifactId>maven-javanet-skin</artifactId>
         <version>1.2</version>
     </skin> -->
-
     <body>
-        <menu name="Documentation">
+        <menu name="Parent Project" ref="parent" inherit="top"/>
+        <menu name="Member Projects (Modules)" ref="modules" inherit="top"/>
+        <menu name="Project Documentation">
             <item name="Overview" href="index.html"/>
             <item name="News" href="news/20100831.html" collapse="true">
                 <item name="6.8 Release" href="news/20100831.html"/>
@@ -61,7 +62,6 @@
                 <item name="Tutorial" href="6/tutorial.html"/>
             </item>
         </menu>
-        <menu name="Automated Documentation" ref="reports" inheritAsRef="false"/>
-        <menu name="Modules" ref="modules" inheritAsRef="false"/>
+        <menu name="Project Reports" ref="reports" inherit="bottom"/>
     </body>
 </project>

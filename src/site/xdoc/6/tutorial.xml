@@ -8,7 +8,8 @@
     </properties>
     <body>
         <h1>The TrueZIP 6 Tutorial</h1>
-        <p><em>Note that the version described in this document is deprecated
+        <p><strong>Important:</strong>
+            <em>Note that the version described in this document is deprecated
             and should not be used for new applications anymore.
             The links to the Javadoc in this document are non-functional
             because the package names have been changed in TrueZIP 7.

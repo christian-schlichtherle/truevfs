@@ -7,4 +7,18 @@
                 <goal>help:effective-pom</goal>
             </goals>
         </action>
+        <action>
+            <actionName>CUSTOM-site</actionName>
+            <displayName>site</displayName>
+            <goals>
+                <goal>site</goal>
+            </goals>
+        </action>
+        <action>
+            <actionName>CUSTOM-site:run</actionName>
+            <displayName>site:run</displayName>
+            <goals>
+                <goal>site:run</goal>
+            </goals>
+        </action>
     </actions>

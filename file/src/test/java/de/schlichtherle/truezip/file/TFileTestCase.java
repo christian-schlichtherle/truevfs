@@ -51,7 +51,7 @@ import static org.junit.Assert.*;
 
 /**
  * Performs an integration test of a particular FsArchiveDriver by using the
- * TFile* API.
+ * API of the TrueZIP File* module.
  *
  * @author Christian Schlichtherle
  * @version $Id$

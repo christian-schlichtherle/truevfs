@@ -2,38 +2,16 @@
 <faqs   xmlns="http://maven.apache.org/FML/1.0.1"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://maven.apache.org/FML/1.0.1 http://maven.apache.org/xsd/fml-1.0.1.xsd"
-        title="Frequently Asked Questions">
+        title="Frequently Asked Questions (TrueZIP 7 only)">
     <part id="general">
-        <title>General Questions About TrueZIP 7</title>
-        <faq id="where-to-start">
-            <question>Where should I start?</question>
+        <title>General Questions</title>
+        <faq id="where-javadoc">
+            <question>Where's the Javadoc?</question>
             <answer>
-                <p>I don't know!</p>
-                <p>Ok - I was just joking:</p>
-                <ol>
-                    <li>Please read the information on this site to get the
-                        gist of it all.</li>
-                    <li>Then have a look at the source code of the samples
-                        module with the Maven artifactId
-                        <code>truezip-samples</code>.
-                        There are samples to demonstrate the usage of both the
-                        File* and the Kernel API.</li>
-                    <li>For more information, please refer to the
-                        <a href="apidocs/index.html">Javadoc</a>
-                        - it's quite comprehensive.</li>
-                </ol>
-                <p>Here are the Maven coordinates of the sample code:</p>
-                <source><![CDATA[
-<dependency>
-    <groupId>${project.groupId}</groupId>
-    <artifactId>truezip-samples</artifactId>
-    <version>${project.version}</version>
-    <classifier>sources</classifier>
-</dependency>]]></source>
-                <p>If you don't use Maven, you could download the artifact from
-                    it's directory at
-                    <a href="http://repo1.maven.org/maven2/de/schlichtherle/truezip/">Maven Central</a>
-                    instead.</p>
+                <p>You find it in the navigation bar by following
+                    <i>Project Reports</i>, then <i>Project Reports</i> again
+                    and then <i>JavaDocs</i>, or you could simply click
+                    <a href="apidocs/index.html">here</a>.</p>
             </answer>
         </faq>
     </part>

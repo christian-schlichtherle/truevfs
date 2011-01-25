@@ -6,11 +6,11 @@
 
 Sample Code
 
-    There's a module with samples to demonstrate the usage of two different
-    APIs:
+    The {{{../truezip-samples/index.html}TrueZIP Samples}} module demonstrates
+    the usage of two other module APIs:
 
-    * [The File* API]
-        This is the API which should be used by most applications.
+    * [{{{../truezip-file/index.html}TrueZIP File*}}]
+        The API of this module should be used by most applications.
         It's designed to be convenient to use while providing a great level of
         flexibility.
 
@@ -20,10 +20,8 @@ Sample Code
         In particular, it cannot access virtual HTTP(S) file systems or any
         member file systems (i.e. archive files) within an HTTP(S) file system.
 
-        The File* API is in the module with the artifactId <<<truezip-file>>>.
-
-    * [The Kernel API}
-        As the name implies, this is the core of it all.
+    * [{{{../truezip-kernel/index.html}TrueZIP Kernel}}]
+        As the name implies, this module is the core of it all.
         As an API, it's somewhat more complex to use, but very flexible because
         of its clean architecture (e.g. uses Dependency Injection wherever
         reasonable).
@@ -35,19 +33,4 @@ Sample Code
         Note that the HTTP(S) file system driver is still in its infancy,
         so don't expect too much of it.
 
-        The Kernel API is in the module with the artifactId <<<truezip-kernel>>>.
-
     []
-
-    Here are the Maven coordinates of the sample code:</p>
-    <source><![CDATA[
-    <dependency>
-    <groupId>${project.groupId}</groupId>
-    <artifactId>truezip-samples</artifactId>
-    <version>${project.version}</version>
-    <classifier>sources</classifier>
-    </dependency>]]></source>
-    <p>If you don't use Maven, you could download the artifact from
-    it's directory at
-    <a href="http://repo1.maven.org/maven2/de/schlichtherle/truezip/">Maven Central</a>
-    instead.</p>
