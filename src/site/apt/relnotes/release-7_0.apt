@@ -32,11 +32,11 @@ Release Notes for TrueZIP 7.0
     * Modularization makes the configuration of archive detectors redundant in
         many cases: Just add the archive driver modules you need to the run
         time class path of your application - that's all which is required to
-        make the File* API detect the canonical file suffixes for the
-        respective archive type.
+        make the TrueZIP File* module detect the canonical file suffixes for
+        the respective archive type.
 
         E.g. by adding the module with the artifactId <<<truezip-driver-tar>>>
-        to the application's run time class path, the File* API will
+        to the application's run time class path, the TrueZIP File* module will
         automatically detect the canonical file suffixes <<<.tar>>>,
         <<<.tar.gz>>>, <<<.tgz>>>, <<<.tar.bz2>>> and <<<.tbz2>>> as TAR files
         and select the appropriate archive driver.

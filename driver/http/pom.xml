@@ -27,8 +27,9 @@
     <name>TrueZIP Driver HTTP(S)</name>
     <description>
         The HTTP(S) Scheme Drivers.
+
         Add this artifact to the run time class path in order to make the
-        Kernel support this file system type.
+        TrueZIP Kernel module support this file system type.
     </description>
 
     <dependencies>
