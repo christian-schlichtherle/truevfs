@@ -1,10 +1,15 @@
+    -----------------------
+    Concept and Definitions
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
 Concept and Definitions
 
-    The core concept of TrueZIP is the federation of virtual file
-    systems into a file system space which can be transparently
-    accessed via uniform calls to a convenient and comprehensive API.
-    To understand what this means, let's check the following
-    definitions first:
+    At its heart, TrueZIP is a tool for the federation of virtual file systems
+    into a file system space which can be transparently accessed via uniform
+    calls to a convenient and comprehensive API.
+    To understand what this means, let's check the following definitions first:
 
     [File System]
         An atomic, persistent container for files and directories

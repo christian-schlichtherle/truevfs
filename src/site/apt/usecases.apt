@@ -1,3 +1,9 @@
+    -----------------------
+    Use Cases
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
 Software Build Tool (SBT)
 
     Suppose you're writing a plug-in for the next generation Software Build
@@ -42,8 +48,8 @@ new TFile("directory").archiveCopyAllTo(new TFile("archive.tar.gz"));
     suffix in the path name.
     In this case <<<.tar.gz>>> was used, but you could use any other
     configured archive file suffix, too.
-    Configuration is easy - just add the file system driver JAR to the
-    application's run time class path.
+    Configuration is easy - just add the JAR for the desired archive driver
+    to the application's run time class path.
     This will configure the File* API to detect the canonical file suffixes
     of the archive file format implemented by the driver.
     
