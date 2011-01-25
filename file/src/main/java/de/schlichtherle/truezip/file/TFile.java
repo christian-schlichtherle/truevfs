@@ -328,26 +328,6 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  *    {@code true}.</li>
  * </ol>
  *
- * <h4><a name="miscellaneous">Miscellaneous</a></h4>
- * <ol>
- * <li>Since TrueZIP 6.4, this class is serializable in order to meet the
- *     requirements of its super class.
- *     However, it's not recommended to serialize TFile instances:
- *     Together with the instance, its archive detector and all associated
- *     archive drivers are serialized, too, which is pretty inefficient for
- *     a single instance.
- *     Serialization might even fail since it's not a general requirement for
- *     the interface implementations to be serializable - although the default
- *     implementations in TrueZIP 6.4 are all serializable.
- *     Instead of serializing TFile instances, a client application should
- *     serialize paths (which are simply String instances) and leave it up
- *     to the receiver to create a new TFile instance from it with archive
- *     files recognized by a suitable local archive detector - usually the
- *     {@link #getDefaultArchiveDetector default archive detector}.
- * </ol>
- *
- * @see TDefaultArchiveDetector API reference for configuring archive type
- *      recognition
  * @author  Christian Schlichtherle
  * @version $Id$
  */

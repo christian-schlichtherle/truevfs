@@ -81,7 +81,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.CREATE_PARENTS;
  * and require less space in the temp file folder.
  *
  * @see     <a href="package-summary.html#streams">Using Archive Entry Streams</a>
- * @see     TFile#cat
+ * @see     TFile#cat(InputStream, OutputStream)
  * @see     TFileInputStream
  * @author  Christian Schlichtherle
  * @version $Id$
