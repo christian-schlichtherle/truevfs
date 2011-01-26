@@ -136,7 +136,7 @@ implements Iterable<E> {
             final @NonNull OutputStream out,
             final @NonNull RawZipFile<E> appendee)
     throws ZipException {
-        super(new CustomLEDataOutputStream(out, appendee));
+        super(new AppendingLEDataOutputStream(out, appendee));
         if (null == out)
             throw new NullPointerException();
         if (appendee.getPostambleLength() > 0)
@@ -152,14 +152,15 @@ implements Iterable<E> {
                 : new LEDataOutputStream(out);
     }
 
-    private static class CustomLEDataOutputStream extends LEDataOutputStream {
-        public CustomLEDataOutputStream(OutputStream out, RawZipFile<?> appendee) {
+    /* Adjusts the number of written bytes for appending mode. */
+    private static class AppendingLEDataOutputStream extends LEDataOutputStream {
+        public AppendingLEDataOutputStream(OutputStream out, RawZipFile<?> appendee) {
             super(out);
             super.written = null == appendee
                     ? 0
                     : appendee.getOffsetMapper().location(appendee.length());
         }
-    }
+    } // class AppendingLEDataOutputStream
 
     /** Returns the charset to use for entry names and the file comment. */
     public String getCharset() {

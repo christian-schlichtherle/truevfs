@@ -47,6 +47,8 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import static java.io.File.separatorChar;
 
 /**
+ * A controller for a mount point of the operating system's file system.
+ *
  * @author Christian Schlichtherle
  * @version $Id$
  */

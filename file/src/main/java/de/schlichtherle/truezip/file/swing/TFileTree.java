@@ -63,7 +63,11 @@ public final class TFileTree extends JTree {
                 : Collator.TERTIARY);
     }
 
-    private static class FileNameComparator
+    /**
+     * Compares two files by their status and path name, so that directories
+     * are always ordered <em>before</em> other files.
+     */
+    private static final class FileComparator
     implements Comparator<TFile>, Serializable {
         private static final long serialVersionUID = 1234567890123456789L;
 
@@ -77,11 +81,11 @@ public final class TFileTree extends JTree {
                         ? 1
                         : COLLATOR.compare(f1.getName(), f2.getName());
         }
-    } // class FileNameComparator
+    } // class FileComparator
 
     /** A comparator which sorts directory entries to the beginning. */
     public static final Comparator<TFile>
-            FILE_NAME_COMPARATOR = new FileNameComparator();
+            FILE_NAME_COMPARATOR = new FileComparator();
 
     /** The name of the property {@code displayingSuffixes}. */
     private static final String PROPERTY_DISPLAYING_SUFFIXES = "displayingSuffixes"; // NOI18N
@@ -720,5 +724,5 @@ public final class TFileTree extends JTree {
         public void editingStopped(ChangeEvent evt) {
             onEditingStopped(evt);
         }
-    }
+    } // class Controller
 }

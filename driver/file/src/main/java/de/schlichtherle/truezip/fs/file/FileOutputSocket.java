@@ -37,6 +37,8 @@ import static de.schlichtherle.truezip.entry.Entry.Access.*;
 import static de.schlichtherle.truezip.entry.Entry.*;
 
 /**
+ * An output socket for a file entry.
+ *
  * @see     FileInputSocket
  * @author  Christian Schlichtherle
  * @version $Id$

@@ -87,6 +87,7 @@ extends FsFileSystemArchiveController<E> {
     private static final BitField<FsSyncOption> SYNC_OPTIONS
             = BitField.of(WAIT_CLOSE_INPUT, WAIT_CLOSE_OUTPUT, CLEAR_CACHE);
 
+    /** A dummy input service to substitute for {@code null}. */
     private static final class DummyInputService<E extends Entry>
     implements InputShop<E> {
 
@@ -154,6 +155,10 @@ extends FsFileSystemArchiveController<E> {
         }
     }
 
+    /**
+     * An archive file system listener which makes the output before it
+     * touches the file system model.
+     */
     private final class TouchListener
     implements FsArchiveFileSystemTouchListener<E> {
         @Override

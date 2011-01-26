@@ -26,6 +26,8 @@ import java.io.InputStream;
 import net.jcip.annotations.ThreadSafe;
 
 /**
+ * An input socket for a file entry.
+ *
  * @see     FileOutputSocket
  * @author  Christian Schlichtherle
  * @version $Id$

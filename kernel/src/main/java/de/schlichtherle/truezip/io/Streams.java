@@ -51,6 +51,7 @@ public final class Streams {
     private static final ExecutorService executor
             = Executors.newCachedThreadPool(new InputStreamReaderThreadFactory());
 
+    /** A factory for input stream reader threads. */
     private static class InputStreamReaderThreadFactory
     implements ThreadFactory {
         @Override
@@ -299,6 +300,7 @@ public final class Streams {
         }
     }
 
+    /** A buffer for I/O. */
     private static class Buffer {
         /**
          * Each entry in this list holds a soft reference to an array

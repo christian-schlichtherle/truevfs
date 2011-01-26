@@ -90,14 +90,16 @@ public final class FsFailSafeManager extends FsDecoratingManager<FsManager> {
         delegate.sync(options, handler);
     }
 
+    /** A shutdown hook thread. */
     private static class Shutdown extends Thread {
         Shutdown(Runnable runnable) {
             super(  runnable,
                     "TrueZIP FileSystemManager Shutdown Hook");
             super.setPriority(Thread.MAX_PRIORITY);
         }
-    } // class ShutdownThread
+    } // class Shutdown
 
+    /** A runnable which committs all unsynchronized changes to file systems. */
     private static class Sync implements Runnable {
         private final FsManager manager;
 
@@ -118,5 +120,6 @@ public final class FsFailSafeManager extends FsDecoratingManager<FsManager> {
                 ex.printStackTrace();
             }
         }
-    } // class ShutdownRunnable
+    } // class Sync
 }
+

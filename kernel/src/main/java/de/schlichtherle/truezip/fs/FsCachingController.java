@@ -269,6 +269,7 @@ extends FsDecoratingController< FsConcurrentModel,
         }
     }
 
+    /** A cache for an individual file system entry. */
     private final class Cache {
         private final FsEntryName name;
         private final IOCache cache;
@@ -290,31 +291,6 @@ extends FsDecoratingController< FsConcurrentModel,
             input = null;
             return this;
         }
-
-        /*private final class ProxyInputSocket
-        extends DecoratingInputSocket<Entry> {
-            private ProxyInputSocket(InputSocket <?> input) {
-                super(input);
-            }
-
-            @Override
-            public ReadOnlyFile newReadOnlyFile() throws IOException {
-                getModel().assertWriteLockedByCurrentThread();
-
-                final ReadOnlyFile rof = getBoundSocket().newReadOnlyFile();
-                caches.put(name, Cache.this);
-                return rof;
-            }
-
-            @Override
-            public InputStream newInputStream() throws IOException {
-                getModel().assertWriteLockedByCurrentThread();
-
-                final InputStream in = getBoundSocket().newInputStream();
-                caches.put(name, Cache.this);
-                return in;
-            }
-        } // class ProxyInputSocket*/
 
         @NonNull
         public Cache configure( @NonNull BitField<FsOutputOption> options,
@@ -351,6 +327,7 @@ extends FsDecoratingController< FsConcurrentModel,
                     = new ProxyOutputSocket(cache.getOutputSocket()));
         }
 
+        /** An output socket proxy. */
         private final class ProxyOutputSocket
         extends DecoratingOutputSocket<Entry> {
             private ProxyOutputSocket(OutputSocket <?> output) {
@@ -387,6 +364,7 @@ extends FsDecoratingController< FsConcurrentModel,
         } // class ProxyOutputSocket
     } // class Cache
 
+    /** A file system entry proxy. */
     private static class ProxyFileSystemEntry extends FsDecoratingEntry<Entry> {
         ProxyFileSystemEntry(Entry entry) {
             super(entry);

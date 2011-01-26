@@ -112,7 +112,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
             final boolean preambled,
             final boolean postambled)
     throws IOException {
-        super(  new SimpleReadOnlyFilePool(path),
+        super(  new DefaultReadOnlyFilePool(path),
                 charset,
                 preambled, postambled, DefaultZipEntryFactory.SINGLETON);
         this.name = path;
@@ -174,7 +174,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
             final boolean preambled,
             final boolean postambled)
     throws IOException {
-        super(  new SimpleReadOnlyFilePool(file),
+        super(  new DefaultReadOnlyFilePool(file),
                 charset,
                 preambled, postambled, DefaultZipEntryFactory.SINGLETON);
         this.name = file.toString();
@@ -241,25 +241,29 @@ public class ZipFile extends RawZipFile<ZipEntry> {
         this.name = rof.toString();
     }
 
-    private static class SimpleReadOnlyFilePool
+    /**
+     * A pool which allocates {@link DefaultReadOnlyFile} objects for the
+     * provided to its constructor.
+     */
+    private static class DefaultReadOnlyFilePool
     implements Pool<ReadOnlyFile, IOException> {
         final File file;
 
-        public SimpleReadOnlyFilePool(File file) {
+        public DefaultReadOnlyFilePool(File file) {
             this.file = file;
         }
 
-        public SimpleReadOnlyFilePool(String name) {
+        public DefaultReadOnlyFilePool(String name) {
             this.file = new File(name);
         }
 
         @Override
-		public ReadOnlyFile allocate() throws IOException {
+        public ReadOnlyFile allocate() throws IOException {
             return new DefaultReadOnlyFile(file);
         }
 
         @Override
-		public void release(ReadOnlyFile rof) throws IOException {
+        public void release(ReadOnlyFile rof) throws IOException {
             rof.close();
         }
     }
