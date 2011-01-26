@@ -32,8 +32,9 @@ import javax.swing.Icon;
 import static de.schlichtherle.truezip.fs.FsSyncOption.*;
 
 /**
- * Provides read/write access to one or more file systems which are organized
- * in a chain of responsibility for file system federation.
+ * An abstract class which provides read/write access to a file system.
+ * This class may be organized in a chain of responsibility for file system
+ * federation.
  * The {@link FsModel#getMountPoint() mount point} of the
  * {@link #getModel() file system model} addresses the file system at the head
  * of this chain of federated file systems.
@@ -205,6 +206,10 @@ public abstract class FsController<M extends FsModel> {
         return super.hashCode();
     }
 
+    /**
+     * Returns a string representation of this object for debugging and logging
+     * purposes.
+     */
     @Override public final String toString() {
         return new StringBuilder()
                 .append(getClass().getName())

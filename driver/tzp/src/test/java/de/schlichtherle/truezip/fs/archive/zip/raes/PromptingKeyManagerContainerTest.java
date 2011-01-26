@@ -32,7 +32,7 @@ public final class PromptingKeyManagerContainerTest {
     
     @Before
     public void setUp() {
-        instance = new PromptingKeyManagerContainer();
+        instance = new PromptingKeyManagerProvider();
     }
 
     @Test

@@ -16,7 +16,6 @@
 package de.schlichtherle.truezip.fs;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
-import java.io.IOException;
 
 /**
  * A service for a file system manager.

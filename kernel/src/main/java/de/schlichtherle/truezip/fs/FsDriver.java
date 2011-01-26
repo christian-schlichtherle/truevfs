@@ -15,13 +15,12 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import net.jcip.annotations.Immutable;
 
 /**
- * A factory for thread-safe file system controllers.
+ * An abstract factory for thread-safe file system controllers.
  * 
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -64,6 +63,10 @@ public abstract class FsDriver {
         return false;
     }
 
+    /**
+     * Returns a string representation of this object for debugging and logging
+     * purposes.
+     */
     @Override
     public String toString() {
         return new StringBuilder()

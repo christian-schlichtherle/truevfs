@@ -23,7 +23,8 @@ import java.io.IOException;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * Indicates an exceptional condition which is specific to a file system.
+ * An abstract exception which indicates an exceptional condition in a file
+ * system.
  *
  * @see     FsController
  * @author  Christian Schlichtherle

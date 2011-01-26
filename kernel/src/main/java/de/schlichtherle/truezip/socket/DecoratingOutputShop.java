@@ -21,7 +21,7 @@ import de.schlichtherle.truezip.entry.DecoratingEntryContainer;
 import java.io.IOException;
 
 /**
- * A decorator for an output shop.
+ * An abstract decorator for an output shop.
  *
  * @param   <E> The type of the entries.
  * @see     DecoratingInputShop

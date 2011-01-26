@@ -15,13 +15,12 @@
  */
 package de.schlichtherle.truezip.file;
 
-import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.fs.FsDriver;
+import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.fs.archive.DummyArchiveDriver;
 import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
 import java.util.Locale;
 import java.util.Map;
-import java.util.ServiceConfigurationError;
 import org.junit.Before;
 import org.junit.Test;
 

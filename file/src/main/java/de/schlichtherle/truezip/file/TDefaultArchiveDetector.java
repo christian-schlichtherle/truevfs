@@ -15,15 +15,15 @@
  */
 package de.schlichtherle.truezip.file;
 
-import de.schlichtherle.truezip.fs.FsDriverContainer;
+import de.schlichtherle.truezip.fs.sl.FsDriverLocator;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.util.SuffixSet;
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsDriverService;
-import de.schlichtherle.truezip.fs.FsDriverServices;
 import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.fs.FsScheme;
+import de.schlichtherle.truezip.fs.spi.FsDriverProvider;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -47,7 +47,7 @@ import net.jcip.annotations.Immutable;
  * <li>Constructors which filter the drivers of a given file system driver
  *     service by a given list of file suffixes.
  *     For example, the drivers known by the service
- *     {@link FsDriverContainer#SINGLETON} could be filtered by the suffix
+ *     {@link FsDriverLocator#SINGLETON} could be filtered by the suffix
  *     list {@code "tar|zip"} in order to recognize only TAR and ZIP files.
  * <li>Constructors which decorate a given file system driver service with a
  *     given map of file system schemes to file system drivers - whereby a
@@ -86,7 +86,7 @@ implements TArchiveDetector, FsDriverService {
 
     /**
      * This instance recognizes all archive files which are known by the file
-     * system driver service {@link FsDriverContainer#SINGLETON}.
+     * system driver service {@link FsDriverLocator#SINGLETON}.
      * The file system schemes are used as the archive file suffixes to
      * recognize.
      */
@@ -111,10 +111,10 @@ implements TArchiveDetector, FsDriverService {
 
     /**
      * Equivalent to
-     * {@link #TDefaultArchiveDetector(FsDriverService, String) new TDefaultArchiveDetector(FsDriverContainer.SINGLETON, suffixes)}.
+     * {@link #TDefaultArchiveDetector(FsDriverService, String) new TDefaultArchiveDetector(FsDriverLocator.SINGLETON, suffixes)}.
      */
     public TDefaultArchiveDetector(@CheckForNull String suffixes) {
-        this(FsDriverContainer.SINGLETON, suffixes);
+        this(FsDriverLocator.SINGLETON, suffixes);
     }
 
     /**
@@ -229,7 +229,7 @@ implements TArchiveDetector, FsDriverService {
      */
     public TDefaultArchiveDetector( FsDriverService delegate,
                                     Object[][] config) {
-        this(delegate, FsDriverServices.newMap(config));
+        this(delegate, FsDriverProvider.newMap(config));
     }
 
     /**

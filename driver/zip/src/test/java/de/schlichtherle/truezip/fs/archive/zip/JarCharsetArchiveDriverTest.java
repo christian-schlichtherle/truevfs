@@ -16,8 +16,6 @@
 package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.fs.archive.CharsetArchiveDriverTestCase;
-import de.schlichtherle.truezip.socket.ByteArrayIOPool;
-import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.IOPoolService;
 
 /**

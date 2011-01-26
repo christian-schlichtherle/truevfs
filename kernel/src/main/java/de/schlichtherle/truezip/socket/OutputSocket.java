@@ -25,7 +25,8 @@ import java.io.OutputStream;
 import net.jcip.annotations.NotThreadSafe;
 
 /**
- * Creates output streams for writing bytes to its <i>local target</i>.
+ * An abstract factory for output streams for writing bytes to its
+ * <i>local target</i>.
  * <p>
  * Note that the entity relationship between output sockets and input sockets
  * is n:1, i.e. any output socket can have at most one peer input socket, but

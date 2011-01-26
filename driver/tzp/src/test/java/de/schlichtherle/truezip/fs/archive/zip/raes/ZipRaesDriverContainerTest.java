@@ -36,7 +36,7 @@ public class ZipRaesDriverContainerTest {
 
     @Before
     public void setUp() {
-        instance = new ZipRaesDriverContainer();
+        instance = new ZipRaesDriverProvider();
     }
 
     @Test

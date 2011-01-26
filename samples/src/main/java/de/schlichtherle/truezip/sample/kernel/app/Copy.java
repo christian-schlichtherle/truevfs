@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.sample.kernel.app;
 
 import de.schlichtherle.truezip.fs.FsDefaultDriver;
-import de.schlichtherle.truezip.fs.FsDriverContainer;
+import de.schlichtherle.truezip.fs.sl.FsDriverLocator;
 import de.schlichtherle.truezip.fs.FsCompositeDriver;
 import de.schlichtherle.truezip.fs.FsDefaultManager;
 import de.schlichtherle.truezip.fs.FsInputOption;
@@ -50,7 +50,7 @@ public final class Copy {
             // Search the class path for the set of all supported file system
             // drivers and build a composite driver from it.
             FsCompositeDriver
-                    driver = new FsDefaultDriver(FsDriverContainer.SINGLETON);
+                    driver = new FsDefaultDriver(FsDriverLocator.SINGLETON);
 
             // Resolve the source socket.
             // Note that an absolute URI is required, so we may need to use the

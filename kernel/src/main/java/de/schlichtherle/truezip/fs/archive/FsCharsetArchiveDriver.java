@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.fs.archive;
 
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.entry.EntryFactory;
+import de.schlichtherle.truezip.fs.archive.FsArchiveEntry;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.CharConversionException;
@@ -28,13 +29,12 @@ import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import static de.schlichtherle.truezip.io.Paths.*;
 
 /**
- * A partial implementation of an archive driver which provides convenient
- * methods for dealing with the character set supported by the respective
+ * An abstract base class of an archive driver which provides convenient
+ * methods for dealing with the character set supported by a particular
  * archive type.
- * <p>
- * This class is only useful for archive types with a defined character set,
- * e.g. the ZIP file format with its IBM437 character set or the TAR file
- * format with its US-ASCII character set.
+ * This class is intended to be used to implement archive types with a defined
+ * character set, e.g. the ZIP file format with its IBM437 character set or
+ * the TAR file format with its US-ASCII character set.
  * <p>
  * Implementations must be immutable.
  * 

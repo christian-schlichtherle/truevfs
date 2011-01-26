@@ -20,7 +20,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * A decorator for an entry.
+ * An abstract decorator for an entry.
  *
  * @param   <E> The type of the decorated entries.
  * @author  Christian Schlichtherle

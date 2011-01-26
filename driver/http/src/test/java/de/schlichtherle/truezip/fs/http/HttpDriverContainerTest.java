@@ -36,7 +36,7 @@ public final class HttpDriverContainerTest {
 
     @Before
     public void setUp() {
-        instance = new HttpDriverContainer();
+        instance = new HttpDriverProvider();
     }
 
     @Test

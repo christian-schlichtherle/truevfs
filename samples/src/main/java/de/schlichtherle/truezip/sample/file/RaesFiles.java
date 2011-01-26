@@ -24,7 +24,7 @@ import de.schlichtherle.truezip.file.TDefaultArchiveDetector;
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.TFileInputStream;
 import de.schlichtherle.truezip.file.TFileOutputStream;
-import de.schlichtherle.truezip.key.KeyManagerContainer;
+import de.schlichtherle.truezip.key.sl.KeyManagerLocator;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFileInputStream;
 import de.schlichtherle.truezip.rof.DefaultReadOnlyFile;
@@ -72,7 +72,7 @@ public class RaesFiles {
         final TFile plainFile = newNonArchiveFile(plainFilePath, detector);
         final TFile raesFile = newNonArchiveFile(raesFilePath, detector);
         final RaesParameters params = new KeyManagerRaesParameters(
-                KeyManagerContainer.SINGLETON,
+                KeyManagerLocator.SINGLETON,
                 raesFile.getCanonicalFile().toURI());
         final InputStream in = new TFileInputStream(plainFile);
         try {
@@ -121,7 +121,7 @@ public class RaesFiles {
         final TFile raesFile = newNonArchiveFile(raesFilePath, detector);
         final TFile plainFile = newNonArchiveFile(plainFilePath, detector);
         final RaesParameters params = new KeyManagerRaesParameters(
-                KeyManagerContainer.SINGLETON,
+                KeyManagerLocator.SINGLETON,
                 raesFile.getCanonicalFile().toURI());
         final ReadOnlyFile rof = new DefaultReadOnlyFile(raesFile);
         try {

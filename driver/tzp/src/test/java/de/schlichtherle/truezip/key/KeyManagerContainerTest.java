@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.key;
 
+import de.schlichtherle.truezip.key.sl.KeyManagerLocator;
 import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +32,7 @@ public final class KeyManagerContainerTest {
     
     @Before
     public void setUp() {
-        instance = KeyManagerContainer.SINGLETON;
+        instance = KeyManagerLocator.SINGLETON;
     }
 
     @Test

@@ -20,10 +20,10 @@ import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.entry.EntryFactory;
 import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsConcurrentController;
 import de.schlichtherle.truezip.fs.FsCachingController;
+import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
@@ -36,8 +36,9 @@ import javax.swing.Icon;
 import net.jcip.annotations.Immutable;
 
 /**
- * Provides access to a federated file system which is persistet in an archive
- * file format like ZIP, JAR, TZP, TAR, TAR.GZ, TAR.BZ2 etc.
+ * An abstract archive driver which provides access to a federated file system
+ * which is persistet in an archive file format like ZIP, JAR, TZP, TAR,
+ * TAR.GZ, TAR.BZ2 etc.
  *
  * @param   <E> The type of the archive entries.
  * @author  Christian Schlichtherle

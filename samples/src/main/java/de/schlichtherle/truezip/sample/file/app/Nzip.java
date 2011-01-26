@@ -25,7 +25,7 @@ import de.schlichtherle.truezip.fs.archive.tar.TarGZipDriver;
 import de.schlichtherle.truezip.fs.archive.zip.CheckedJarDriver;
 import de.schlichtherle.truezip.fs.archive.zip.CheckedReadOnlySfxDriver;
 import de.schlichtherle.truezip.fs.archive.zip.CheckedZipDriver;
-import de.schlichtherle.truezip.socket.IOPoolContainer;
+import de.schlichtherle.truezip.socket.sl.IOPoolLocator;
 import de.schlichtherle.truezip.file.swing.TFileTree;
 import de.schlichtherle.truezip.socket.IOPoolService;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
@@ -73,7 +73,7 @@ public class Nzip extends CommandLineUtility {
     private static final String CLASS_NAME = Nzip.class.getName();
     private static final ResourceBundle resources
             = ResourceBundle.getBundle(CLASS_NAME);
-    private static final IOPoolService POOL_SERVICE = IOPoolContainer.SINGLETON;
+    private static final IOPoolService POOL_SERVICE = IOPoolLocator.SINGLETON;
 
     private final NumberFormat numberFormat = NumberFormat.getNumberInstance();
     private final DateFormat dateFormat = DateFormat.getDateTimeInstance();

@@ -15,15 +15,17 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import de.schlichtherle.truezip.fs.sl.FsDriverLocator;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Map;
-import java.util.ServiceLoader;
-import net.jcip.annotations.Immutable;
 
 /**
  * A service for a map of file system schemes and drivers.
  * <p>
  * Implementations must be thread-safe.
+ *
+ * @see FsDriverLocator How-to support the enumeration of an implementation
+ *      on the class path
  *
  * @author  Christian Schlichtherle
  * @version $Id$
