@@ -71,6 +71,7 @@ import java.util.regex.Pattern;
 @DefaultAnnotation(NonNull.class)
 public final class SuffixSet extends CanonicalStringSet {
 
+    /** A canonicalizer for file suffixes. */
     private static class SuffixMapper implements Canonicalizer {
         /**
          * Returns the canonical form of {@code suffix} or {@code null}

@@ -148,6 +148,7 @@ abstract class CommandLineUtility {
     public abstract int runChecked(String[] args)
     throws IllegalUsageException, IOException;
 
+    /** Indicates illegal application parameters. */
     protected static class IllegalUsageException extends Exception {
         private static final long serialVersionUID = 1985623981423542464L;
 
@@ -156,6 +157,10 @@ abstract class CommandLineUtility {
         }
     } // class IllegalUsageException
 
+    /**
+     * Monitors progress when committing changes to the unsynchronized
+     * contents of an archive file.
+     */
     protected static final class ProgressMonitor extends Thread {
         private final PrintStream err;
         private final Long[] args = new Long[2];

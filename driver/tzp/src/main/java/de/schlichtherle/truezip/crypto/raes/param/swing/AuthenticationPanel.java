@@ -270,25 +270,14 @@ final class AuthenticationPanel extends JPanel {
     private javax.swing.JTabbedPane tabs;
     // End of variables declaration//GEN-END:variables
 
+    /** A file chooser which with a dialog title and disabled file hiding. */
     private static class CustomFileChooser extends JFileChooser {
         private static final long serialVersionUID = 2361832976537648223L;
-        private static File lastCurrentDir = BASE_DIR;
         
         public CustomFileChooser() {
-            super(lastCurrentDir);
+            super(BASE_DIR);
             setDialogTitle(resources.getString("fileChooser.title"));
             setFileHidingEnabled(false);
-        }
-
-        @Override
-        public void setCurrentDirectory(File dir) {
-            super.setCurrentDirectory(dir);
-            lastCurrentDir = dir;
-        }
-
-        @Override
-        public File getCurrentDirectory() {
-            return lastCurrentDir = super.getCurrentDirectory();
         }
     }
 }

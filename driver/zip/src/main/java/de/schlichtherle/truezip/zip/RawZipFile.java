@@ -189,6 +189,7 @@ implements Iterable<E>, Closeable {
         assert mapper != null;
     }
 
+    /** A pool with a singleton read only file provided to its constructor. */
     private static class SingletonReadOnlyFilePool
     implements Pool<ReadOnlyFile, IOException> {
         final ReadOnlyFile rof;
@@ -206,7 +207,7 @@ implements Iterable<E>, Closeable {
 		public void release(ReadOnlyFile rof) {
             assert this.rof == rof;
         }
-    }
+    } // class SingletonReadOnlyFile
 
     /**
      * Reads the central directory of the given file and populates
@@ -854,6 +855,7 @@ implements Iterable<E>, Closeable {
             throw new ZipException("ZIP file has been closed!");
     }
 
+    /** An input stream which uses a pooled inflater. */
     private static final class PooledInflaterInputStream
             extends InflaterInputStream {
         private boolean closed;
@@ -875,6 +877,10 @@ implements Iterable<E>, Closeable {
         }
     } // class PooledInflaterInputStream
 
+    /**
+     * extends its super class to perform the check again the expected CRC
+     * from the entry provided to its constructor when close() is called.
+     */
     private static final class CheckedInputStream
             extends java.util.zip.CheckedInputStream {
         private final ZipEntry entry;
@@ -1186,6 +1192,7 @@ implements Iterable<E>, Closeable {
         }
     } // class IntervalInputStream
 
+    /** Accounts itself until it gets closed. */
     private abstract class AccountedInputStream extends InputStream {
         private boolean closed;
 
@@ -1204,12 +1211,14 @@ implements Iterable<E>, Closeable {
         }
     } // class AccountedInputStream
 
+    /** Maps a given offset to a file pointer position. */
     static class OffsetMapper {
         long location(long offset) {
             return offset;
         }
     } // class OffsetMapper
 
+    /** Adds a start value to the given offset. */
     private static class IrregularOffsetMapper extends OffsetMapper {
         final long start;
 

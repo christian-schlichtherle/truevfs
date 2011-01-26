@@ -280,6 +280,7 @@ extends SafeKeyProvider<K> {
         reset(this.key);
     }
 
+    /** Implements the behavior strategy of its enclosing class. */
     @DefaultAnnotation(NonNull.class)
     enum State {
         RESET {

@@ -8,8 +8,11 @@ package de.schlichtherle.truezip.fs;
 import java.beans.*;
 
 /**
+ * Provides a persistence delegate to support
+ * {@link XMLEncoder}/{@link XMLDecoder}.
  *
- * @author christian
+ * @author Christian Schlichtherle
+ * @version $Id$
  */
 public class FsSchemeBeanInfo extends SimpleBeanInfo {
 

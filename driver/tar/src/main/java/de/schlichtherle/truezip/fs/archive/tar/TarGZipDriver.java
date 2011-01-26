@@ -79,6 +79,7 @@ public class TarGZipDriver extends TarDriver {
                 source);
     }
 
+    /** Extends its super class to set the deflater level. */
     private static class GZIPOutputStream
     extends java.util.zip.GZIPOutputStream {
         public GZIPOutputStream(OutputStream out, int size, int level)

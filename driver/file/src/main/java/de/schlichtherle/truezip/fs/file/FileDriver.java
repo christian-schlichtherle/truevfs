@@ -25,6 +25,8 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.Immutable;
 
 /**
+ * A driver for the operating system's file system.
+ * 
  * @author  Christian Schlichtherle
  * @version $Id$
  */

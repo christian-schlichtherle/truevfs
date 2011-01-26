@@ -26,6 +26,8 @@ import net.jcip.annotations.ThreadSafe;
 import static de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength.*;
 
 /**
+ * A console based user interface to prompt for passwords.
+ * 
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -33,6 +35,7 @@ import static de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStreng
 public final class AesCipherParametersUI
 implements PromptingKeyProvider.UI<AesCipherParameters> {
 
+    /** Used to lock out concurrent prompting. */
     private static class PromptingLock { }
 
     private static final String CLASS_NAME

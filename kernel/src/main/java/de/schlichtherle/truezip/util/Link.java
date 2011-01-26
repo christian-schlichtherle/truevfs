@@ -81,6 +81,7 @@ public interface Link<T> {
         /** Returns a new typed link to the given nullable target. */
         public abstract @NonNull <T> Link<T> newLink(@Nullable T target);
 
+        /** A strong reference. */
         private static class StrongLink<T> implements Link<T> {
             private final T target;
 
@@ -104,6 +105,7 @@ public interface Link<T> {
             }
         }
 
+        /** Adapts its subclass to the {@link Link} interface. */
         private static class SoftLink<T> extends SoftReference<T>
         implements Link<T> {
             SoftLink(T target) {
@@ -126,6 +128,7 @@ public interface Link<T> {
             }
         }
 
+        /** Adapts its subclass to the {@link Link} interface. */
         private static class WeakLink<T> extends WeakReference<T>
         implements Link<T> {
             WeakLink(T target) {

@@ -193,6 +193,7 @@ extends FsArchiveController<E> {
     } // class FalsePositiveFileSystem
 }
 
+/** A cacheable false positive exception. */
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
 @DefaultAnnotation(NonNull.class)
 class FsCacheableFalsePositiveException extends FsFalsePositiveException {

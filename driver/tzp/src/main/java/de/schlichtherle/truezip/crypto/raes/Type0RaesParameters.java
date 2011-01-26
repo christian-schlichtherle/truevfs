@@ -31,6 +31,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 @DefaultAnnotation(NonNull.class)
 public interface Type0RaesParameters extends RaesParameters {
 
+    /** Defines the key strength for the AES algorithm. */
     public enum KeyStrength {
         /** Enum identifier for a 128 bit ciphering key. */
         BITS_128,
