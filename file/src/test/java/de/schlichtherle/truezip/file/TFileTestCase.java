@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.file;
 
+import de.schlichtherle.truezip.socket.IOPoolService;
 import de.schlichtherle.truezip.util.ArrayHelper;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
@@ -27,7 +28,6 @@ import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.socket.ByteArrayIOPool;
 import de.schlichtherle.truezip.socket.IOPool;
-import de.schlichtherle.truezip.socket.IOPoolService;
 import de.schlichtherle.truezip.socket.OutputClosedException;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.ByteArrayInputStream;

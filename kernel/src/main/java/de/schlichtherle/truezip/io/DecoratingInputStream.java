@@ -16,11 +16,13 @@
 package de.schlichtherle.truezip.io;
 
 import edu.umd.cs.findbugs.annotations.Nullable;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Clean room implementation of its cousin {@link java.io.FilterInputStream}
+ * An abstract decorator for an input stream.
+ * This is a clean room implementation of its cousin {@link FilterInputStream}
  * in the JSE, but optimized for performance and <em>without</em>
  * multithreading support.
  *

@@ -28,7 +28,7 @@ import javax.swing.Icon;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * A decorator for a file system controller.
+ * An abstract decorator for a file system controller.
  *
  * @param   <M> The type of the file system model.
  * @param   <C> The type of the decorated file system controller.

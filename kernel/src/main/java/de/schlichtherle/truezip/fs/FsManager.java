@@ -25,8 +25,9 @@ import net.jcip.annotations.ThreadSafe;
 import static de.schlichtherle.truezip.fs.FsSyncOption.*;
 
 /**
- * A container which manages the life cycle of controllers for federated file
- * systems. A file system is federated if and only if it's a member of a parent
+ * An abstract container which manages the life cycle of controllers for
+ * federated file systems.
+ * A file system is federated if and only if it's a member of a parent
  * (virtual) file system.
  * <p>
  * Sub-classes must be thread-safe, too.
@@ -187,5 +188,19 @@ implements Iterable<FsController<?>> {
     @Override
     public final int hashCode() {
         return super.hashCode();
+    }
+
+    /**
+     * Returns a string representation of this object for debugging and logging
+     * purposes.
+     */
+    @Override
+    public String toString() {
+        return new StringBuilder()
+                .append(getClass().getName())
+                .append("[size=")
+                .append(getSize())
+                .append(']')
+                .toString();
     }
 }

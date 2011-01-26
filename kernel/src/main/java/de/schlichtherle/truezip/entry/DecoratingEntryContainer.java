@@ -19,7 +19,7 @@ import java.util.Iterator;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * A decorator for an entry container.
+ * An abstract decorator for an entry container.
  *
  * @param   <E> The type of the entries.
  * @author  Christian Schlichtherle

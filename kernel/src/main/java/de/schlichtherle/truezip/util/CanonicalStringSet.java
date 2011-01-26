@@ -27,8 +27,8 @@ import java.util.StringTokenizer;
 import java.util.TreeSet;
 
 /**
- * A set of the canonical string representation of objects in natural sort
- * order.
+ * An abstract set of the canonical string representation of objects in
+ * natural sort order.
  * An object is canonicalized by the idempotent function
  * {@link Canonicalizer#map}.
  * <p>

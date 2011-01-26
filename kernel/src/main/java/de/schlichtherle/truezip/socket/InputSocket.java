@@ -27,8 +27,8 @@ import java.io.InputStream;
 import net.jcip.annotations.NotThreadSafe;
 
 /**
- * Creates input streams and read only files for reading bytes from its
- * <i>local target</i>.
+ * An abstract factory for input streams and read only files for reading bytes
+ * from its <i>local target</i>.
  * <p>
  * Note that the entity relationship between input sockets and output sockets
  * is n:1, i.e. any input socket can have at most one peer output socket, but

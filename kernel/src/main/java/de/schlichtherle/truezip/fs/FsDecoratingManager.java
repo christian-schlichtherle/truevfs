@@ -23,7 +23,7 @@ import java.util.Iterator;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * A decorator for a file system manager.
+ * An abstract decorator for a file system manager.
  * 
  * @param   <M> The type of the file system model.
  * @author  Christian Schlichtherle

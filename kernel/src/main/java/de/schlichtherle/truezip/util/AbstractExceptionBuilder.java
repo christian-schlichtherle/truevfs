@@ -19,7 +19,7 @@ package de.schlichtherle.truezip.util;
 import net.jcip.annotations.NotThreadSafe;
 
 /**
- * Abstract implementation of exception builder.
+ * Abstract implementation of an exception builder.
  * Subclasses must implement {@link #update(Exception, Exception)} and may
  * override {@link #post(Exception)}.
  *

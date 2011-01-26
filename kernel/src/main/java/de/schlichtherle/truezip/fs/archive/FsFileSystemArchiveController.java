@@ -28,7 +28,7 @@ import java.io.IOException;
 import net.jcip.annotations.NotThreadSafe;
 
 /**
- * This archive controller controls the mount state transition.
+ * This abstract archive controller controls the mount state transition.
  * It is up to the sub class to implement the actual mounting/unmounting
  * strategy.
  *
@@ -39,7 +39,7 @@ import net.jcip.annotations.NotThreadSafe;
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
 abstract class FsFileSystemArchiveController<E extends FsArchiveEntry>
-extends FsBasicArchiveController<E> {
+extends FsArchiveController<E> {
 
     /** The mount state of the archive file system. */
     private MountState<E> mountState = new ResetFileSystem();

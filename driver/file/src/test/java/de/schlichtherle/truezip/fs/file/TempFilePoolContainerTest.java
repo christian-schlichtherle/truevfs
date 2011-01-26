@@ -31,7 +31,7 @@ public final class TempFilePoolContainerTest {
     
     @Before
     public void setUp() {
-        instance = new TempFilePoolContainer();
+        instance = new TempFilePoolProvider();
     }
 
     @Test

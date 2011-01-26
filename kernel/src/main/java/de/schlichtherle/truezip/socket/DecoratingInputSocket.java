@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * A decorator for an input socket.
+ * An abstract decorator for an input socket.
  * 
  * @see     DecoratingOutputSocket
  * @param   <E> The type of the {@link #getLocalTarget() local target}.

@@ -20,7 +20,7 @@ import java.io.IOException;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * A decorator for a read only file.
+ * An abstract decorator for a read only file.
  * <p>
  * Note that subclasses of this class may implement their own virtual file
  * pointer.

@@ -17,9 +17,9 @@ package de.schlichtherle.truezip.sample.file.app;
 
 import de.schlichtherle.truezip.crypto.raes.param.swing.HurlingWindowFeedback;
 import de.schlichtherle.truezip.file.TFile;
-import de.schlichtherle.truezip.fs.FsManagerService;
 import de.schlichtherle.truezip.fs.FsStatistics;
 import de.schlichtherle.truezip.crypto.raes.param.swing.InvalidKeyFeedback;
+import de.schlichtherle.truezip.fs.spi.FsManagerProvider;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -59,7 +59,7 @@ abstract class CommandLineUtility {
      * <li>If Swing based prompting is used, the Hurling Window Feedback is
      *     set for feedback on wrong key entry unless the respective system
      *     properties have been explicitly set.
-     * <li>Similarly, the {@link SampleManagerContainer} class is set for
+     * <li>Similarly, the {@link SampleManagerProvider} class is set for
      *     obtaining statistics when synchronizing any uncommitted changes to
      *     the contents of archive files.
      * </ul>
@@ -100,8 +100,8 @@ abstract class CommandLineUtility {
     }
 
     private static void configureManagerService() {
-        String spec = FsManagerService.class.getName();
-        String impl = SampleManagerContainer.class.getName();
+        String spec = FsManagerProvider.class.getName();
+        String impl = SampleManagerProvider.class.getName();
         System.setProperty(spec, System.getProperty(spec, impl));
     }
 
@@ -165,7 +165,7 @@ abstract class CommandLineUtility {
             setDaemon(true);
             setPriority(Thread.MAX_PRIORITY);
             this.err = err;
-            this.stats = SampleManagerContainer.manager.getStatistics();
+            this.stats = SampleManagerProvider.manager.getStatistics();
         }
 
         @Override

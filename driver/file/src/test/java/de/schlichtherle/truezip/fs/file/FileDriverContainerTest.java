@@ -36,7 +36,7 @@ public final class FileDriverContainerTest {
 
     @Before
     public void setUp() {
-        instance = new FileDriverContainer();
+        instance = new FileDriverProvider();
     }
 
     @Test

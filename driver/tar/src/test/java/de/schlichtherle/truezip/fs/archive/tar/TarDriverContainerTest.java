@@ -24,7 +24,7 @@ import java.util.Map;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-import static de.schlichtherle.truezip.fs.FsDriverContainer.*;
+import static de.schlichtherle.truezip.fs.sl.FsDriverLocator.*;
 import static org.hamcrest.CoreMatchers.*;
 
 /**
@@ -39,7 +39,7 @@ public class TarDriverContainerTest {
 
     @Before
     public void setUp() {
-        instance = new TarDriverContainer();
+        instance = new TarDriverProvider();
     }
 
     @Test

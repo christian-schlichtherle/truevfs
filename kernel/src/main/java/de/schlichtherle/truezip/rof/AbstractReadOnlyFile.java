@@ -20,8 +20,7 @@ import java.io.IOException;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * A base class for {@code ReadOnlyFile} implementations which implements the
- * common boilerplate.
+ * An abstract read only file which implements the common boilerplate.
  *
  * @author Christian Schlichtherle
  * @version $Id$

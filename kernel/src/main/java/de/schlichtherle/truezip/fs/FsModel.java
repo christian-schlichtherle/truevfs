@@ -159,6 +159,10 @@ public class FsModel {
         return mountPoint.hashCode();
     }
 
+    /**
+     * Returns a string representation of this object for debugging and logging
+     * purposes.
+     */
     @Override
     public final String toString() {
         return new StringBuilder()

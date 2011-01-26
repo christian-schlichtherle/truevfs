@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.fs.FsManager;
-import de.schlichtherle.truezip.fs.FsManagerContainer;
+import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 
 /**
  * Holds the file system manager to use within this package.
@@ -27,5 +27,5 @@ import de.schlichtherle.truezip.fs.FsManagerContainer;
 interface TConfig {
 
     /** The file system manager to use within this package. */
-    FsManager MANAGER = FsManagerContainer.SINGLETON.getManager();
+    FsManager MANAGER = FsManagerLocator.SINGLETON.getManager();
 }

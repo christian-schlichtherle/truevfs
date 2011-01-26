@@ -21,7 +21,7 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Set;
 
 /**
- * A file system entry is an entry which can list directory members.
+ * An abstract file system entry is an entry which can list directory members.
  * Optionally, it may also provide access to another entry which is decorated
  * by it.
  *

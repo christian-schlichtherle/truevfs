@@ -16,11 +16,13 @@
 package de.schlichtherle.truezip.io;
 
 import edu.umd.cs.findbugs.annotations.Nullable;
+import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * Clean room implementation of its cousin {@link java.io.FilterOutputStream}
+ * An abstract decorator for an output stream.
+ * This is a clean room implementation of its cousin {@link FilterOutputStream}
  * in the JSE, but optimized for performance and <em>without</em>
  * multithreading support.
  *

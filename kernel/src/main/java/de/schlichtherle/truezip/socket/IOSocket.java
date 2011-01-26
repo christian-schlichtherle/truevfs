@@ -25,7 +25,8 @@ import java.io.OutputStream;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * Addresses a target for I/O operations provided by sub class implementations.
+ * An abstract address of a target for I/O operations which is provided by sub
+ * class implementations.
  * <p>
  * A key feature of an I/O socket is that it's targets can be resolved lazily,
  * i.e. the local or peer target may get resolved by a method of a sub class.

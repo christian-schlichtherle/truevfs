@@ -28,7 +28,8 @@ import net.jcip.annotations.NotThreadSafe;
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
 
 /**
- * Adapts an {@link FsArchiveEntry} to a {@link FsEntry}.
+ * An abstract archive file system entry which adapts an
+ * {@link FsArchiveEntry archive entry} to a {@link FsEntry file system entry}.
  * 
  * @param   <E> The type of the decorated archive entries.
  * @author  Christian Schlichtherle
