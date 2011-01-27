@@ -20,6 +20,9 @@
             <item name="Samples" href="samples/index.html" collapse="true">
                 <item name="Nzip (File*)" href="samples/Nzip.html"/>
             </item>
+            <item name="TrueZIP 6 (deprecated)" href="6/index.html" collapse="true">
+                <item name="Tutorial" href="6/tutorial.html"/>
+            </item>
             <item name="News Archive" href="news/index.html" collapse="true">
                 <item name="6.8 Release" href="news/20100831.html"/>
                 <item name="6.7 Release" href="news/20100716.html"/>
@@ -56,9 +59,6 @@
                 <item name="6.2" href="relnotes/release-6_2.html"/>
                 <item name="6.1" href="relnotes/release-6_1.html"/>
                 <item name="6.0" href="relnotes/release-6_0.html"/>
-            </item>
-            <item name="TrueZIP 6 (deprecated)" href="6/index.html" collapse="true">
-                <item name="Tutorial" href="6/tutorial.html"/>
             </item>
         </menu>
         <menu name="Project Reports" ref="reports" inherit="bottom"/>

@@ -5,6 +5,15 @@
         <author>Christian Schlichtherle</author>
     </properties>
     <body>
+        <section name="Notice">
+            <p><em>The version described in this document is
+                <strong>deprecated</strong> and should not be used for new
+                applications anymore.
+                The links to the Javadoc in this document are non-functional
+                because the package names have been changed in TrueZIP 7.
+                The Javadoc for TrueZIP 6.8.2 is now available for download via
+                <a href="http://repo1.maven.org/maven2/de/schlichtherle/truezip/">Maven Central</a>.</em></p>
+        </section>
         <section name="Introduction to TrueZIP 6 (deprecated)">
             <p><strong>Important:</strong>
                 <em>Note that the version described in this document is deprecated
