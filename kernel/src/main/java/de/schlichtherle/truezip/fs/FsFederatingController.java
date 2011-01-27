@@ -24,13 +24,11 @@ import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.reflect.UndeclaredThrowableException;
 import javax.swing.Icon;
 import net.jcip.annotations.ThreadSafe;
 
@@ -264,19 +262,6 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             delegate.unlink(name);
         } catch (FsFalsePositiveException ex) {
             getParent().unlink(resolveParent(name));
-        }
-    }
-
-    @Override
-    public <X extends IOException>
-    void sync(
-            @NonNull final BitField<FsSyncOption> options,
-            @NonNull final ExceptionHandler<? super FsSyncException, X> handler)
-    throws X, FsException {
-        try {
-            delegate.sync(options, handler);
-        } catch (FsFalsePositiveException ex) {
-            throw new UndeclaredThrowableException(ex);
         }
     }
 }

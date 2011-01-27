@@ -16,12 +16,10 @@
 package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
-import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.fs.FsPath;
@@ -30,7 +28,6 @@ import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsFilteringManager;
 import de.schlichtherle.truezip.fs.FsSyncException;
-import de.schlichtherle.truezip.fs.FsSyncExceptionBuilder;
 import de.schlichtherle.truezip.fs.FsSyncOption;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -868,9 +865,7 @@ public final class TFile extends File {
      */
     private static void sync(BitField<FsSyncOption> options)
     throws FsSyncException {
-        FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
-        TConfig.MANAGER.sync(options, builder);
-        builder.check();
+        TConfig.MANAGER.sync(options);
     }
 
     /**
@@ -901,14 +896,12 @@ public final class TFile extends File {
             throw new IllegalArgumentException(archive.getPath() + " (not a federated file system)");
         if (null != archive.getEnclArchive())
             throw new IllegalArgumentException(archive.getPath() + " (not a top level federated file system)");
-        final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
         new FsFilteringManager(
                 TConfig.MANAGER,
                 archive .getController()
                         .getModel()
                         .getMountPoint())
-                        .sync(options, builder);
-        builder.check();
+                    .sync(options);
     }
 
     /**

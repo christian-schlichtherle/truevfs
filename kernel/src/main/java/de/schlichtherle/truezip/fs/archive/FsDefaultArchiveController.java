@@ -24,7 +24,6 @@ import de.schlichtherle.truezip.fs.FsConcurrentModel;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.fs.FsFalsePositiveException;
 import de.schlichtherle.truezip.fs.FsException;
-import de.schlichtherle.truezip.fs.FsSyncExceptionBuilder;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.fs.FsSyncOption;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
@@ -40,7 +39,6 @@ import de.schlichtherle.truezip.socket.OutputService;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.ExceptionBuilder;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
@@ -302,6 +300,18 @@ extends FsFileSystemArchiveController<E> {
     }
 
     @Override
+    public void unlink(FsEntryName name) throws IOException {
+        super.unlink(name);
+        if (name.isRoot())
+            getParent().unlink(
+                    getModel()
+                        .getMountPoint()
+                        .getPath()
+                        .resolve(name)
+                        .getEntryName());
+    }
+
+    @Override
     boolean autoSync(   final FsEntryName name,
                         final @CheckForNull Access intention)
     throws FsSyncException, FsException {
@@ -325,10 +335,7 @@ extends FsFileSystemArchiveController<E> {
 
     private boolean sync() throws FsSyncException, FsException {
         getModel().assertWriteLockedByCurrentThread();
-        final ExceptionBuilder<IOException, FsSyncException> builder
-                = new FsSyncExceptionBuilder();
-        sync(SYNC_OPTIONS, builder);
-        builder.check();
+        sync(SYNC_OPTIONS);
         return true;
     }
 
@@ -336,7 +343,7 @@ extends FsFileSystemArchiveController<E> {
     public <X extends IOException> void sync(
             final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
-    throws X, FsException {
+    throws X {
         assert !isTouched() || null != output; // file system touched => output archive
         assert getModel().writeLock().isHeldByCurrentThread();
 
@@ -552,17 +559,5 @@ extends FsFileSystemArchiveController<E> {
     private boolean isTouched() {
         final FsArchiveFileSystem<E> fileSystem = getFileSystem();
         return null != fileSystem && fileSystem.isTouched();
-    }
-
-    @Override
-    public void unlink(FsEntryName name) throws IOException {
-        super.unlink(name);
-        if (name.isRoot())
-            getParent().unlink(
-                    getModel()
-                        .getMountPoint()
-                        .getPath()
-                        .resolve(name)
-                        .getEntryName());
     }
 }

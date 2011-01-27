@@ -145,7 +145,7 @@ extends FsController<M> {
     public <X extends IOException> void
     sync(   @NonNull BitField<FsSyncOption> options,
             @NonNull ExceptionHandler<? super FsSyncException, X> handler)
-    throws X, FsException {
+    throws X {
         delegate.sync(options, handler);
     }
 }

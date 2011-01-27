@@ -23,11 +23,8 @@ import de.schlichtherle.truezip.fs.FsDecoratingController;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
-import de.schlichtherle.truezip.fs.FsException;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.FsTabuException;
-import de.schlichtherle.truezip.key.KeyProvider;
-import de.schlichtherle.truezip.key.PromptingKeyProvider;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.CharConversionException;
@@ -106,7 +103,7 @@ extends FsDecoratingController< FsModel,
     public <X extends IOException> void
     sync(   BitField<FsSyncOption> options,
             ExceptionHandler<? super FsSyncException, X> handler)
-    throws X, FsException {
+    throws X {
         delegate.sync(options, handler);
         driver  .getKeyProviderSyncStrategy()
                 .sync(

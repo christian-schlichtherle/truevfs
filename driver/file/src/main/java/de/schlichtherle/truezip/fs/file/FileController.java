@@ -22,7 +22,6 @@ import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsController;
 import java.net.URI;
 import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.fs.FsException;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.FsInputOption;
 import de.schlichtherle.truezip.fs.FsOutputOption;
@@ -284,6 +283,6 @@ final class FileController<M extends FsModel> extends FsController<M>  {
     public <X extends IOException>
     void sync(  BitField<FsSyncOption> options,
                 ExceptionHandler<? super FsSyncException, X> handler)
-    throws X, FsException {
+    throws X {
     }
 }

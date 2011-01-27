@@ -117,6 +117,9 @@ public class DummyController<M extends FsModel> extends FsController<M> {
     }
 
     @Override
-    public <X extends IOException> void sync(BitField<FsSyncOption> options, ExceptionHandler<? super FsSyncException, X> handler) throws X, FsException {
+    public <X extends IOException> void
+    sync(   BitField<FsSyncOption> options,
+            ExceptionHandler<? super FsSyncException, X> handler)
+    throws X {
     }
 }

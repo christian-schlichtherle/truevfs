@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import java.util.Iterator;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
@@ -36,6 +37,7 @@ import static de.schlichtherle.truezip.fs.FsSyncOption.*;
  * @version $Id$
  */
 @ThreadSafe
+@DefaultAnnotation(NonNull.class)
 public abstract class FsManager
 implements Iterable<FsController<?>> {
 
@@ -51,9 +53,8 @@ implements Iterable<FsController<?>> {
      *         create a new file system controller if required.
      * @return A file system controller.
      */
-    public abstract @NonNull FsController<?>
-    getController(  @NonNull FsMountPoint mountPoint,
-                    @NonNull FsCompositeDriver driver);
+    public abstract FsController<?>
+    getController(FsMountPoint mountPoint, FsCompositeDriver driver);
 
     /**
      * Returns the number of federated file systems managed by this instance.
@@ -73,26 +74,8 @@ implements Iterable<FsController<?>> {
      * @return An iterator for the controller of all federated file systems
      *         managed by this instance.
      */
-    @Override public abstract Iterator<FsController<?>>
-    iterator();
-
-    /**
-     * Commits all changes of the contents of the federated file systems
-     * managed by this instance to their respective parent file system.
-     * This will reset the state of the respective file system controllers.
-     * <p>
-     * This method calls {@link #sync sync(UMOUNT, builder)}, where builder is
-     * an instance of {@link FsSyncExceptionBuilder}.
-     * If the call succeeds, the builder's {@link FsSyncExceptionBuilder#check}
-     * method is called to check out any {@link FsSyncWarningException}, too.
-     *
-     * @throws FsSyncException if committing the changes fails for any reason.
-     */
-    public final void umount() throws FsSyncException {
-        FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
-        sync(UMOUNT, builder);
-        builder.check(); // check out any warning exceptions, too.
-    }
+    @Override
+    public abstract Iterator<FsController<?>> iterator();
 
     /**
      * Equivalent to
@@ -104,9 +87,32 @@ implements Iterable<FsController<?>> {
                                     CLEAR_CACHE);
 
     /**
-     * Synchronizes all uncommitted changes to the contents of all federated
-     * file systems managed by this instance to their respective parent file
-     * system.
+     * Commits all unsynchronized changes to the contents of the federated file
+     * systems managed by this instance to their respective parent file system.
+     * This will reset the state of the respective file system controllers.
+     * <p>
+     * This method calls {@link #sync sync(options, builder)}, where builder is
+     * an instance of {@link FsSyncExceptionBuilder}.
+     * If the call succeeds, the builder's {@link FsSyncExceptionBuilder#check}
+     * method is called to check out any {@link FsSyncWarningException}, too.
+     *
+     * @param  options the synchronization options.
+     * @throws FsSyncException if committing the changes fails for any reason.
+     * @throws IllegalArgumentException if the combination of synchronization
+     *         options is illegal, e.g. if {@code FORCE_CLOSE_INPUT} is cleared
+     *         and {@code FORCE_CLOSE_OUTPUT} is set or if the synchronization
+     *         option {@code ABORT_CHANGES} is set.
+     */
+    public final void
+    sync(BitField<FsSyncOption> options) throws FsSyncException {
+        FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
+        sync(options, builder);
+        builder.check();
+    }
+
+    /**
+     * Commits all unsynchronized changes to the contents of all federated file
+     * systems managed by this instance to their respective parent file system.
      * This will reset the state of the respective file system controllers.
      *
      * @param  options the synchronization options.
@@ -121,8 +127,8 @@ implements Iterable<FsController<?>> {
      *         option {@code ABORT_CHANGES} is set.
      */
     public <X extends IOException> void
-    sync(   final @NonNull BitField<FsSyncOption> options,
-            final @NonNull ExceptionHandler<? super IOException, X> handler)
+    sync(   final BitField<FsSyncOption> options,
+            final ExceptionHandler<? super IOException, X> handler)
     throws X {
         if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT)
                 || options.get(ABORT_CHANGES))
@@ -150,8 +156,7 @@ implements Iterable<FsController<?>> {
      * @throws IOException at the discretion of the exception {@code handler}.
      */
     private <X extends IOException> void
-    visit(  @NonNull Visitor visitor,
-            @NonNull ExceptionHandler<? super IOException, X> handler)
+    visit(Visitor visitor, ExceptionHandler<? super IOException, X> handler)
     throws X {
         for (FsController<?> controller : this) {
             try {
@@ -168,7 +173,7 @@ implements Iterable<FsController<?>> {
      * @see #visit(Visitor, ExceptionHandler)
      */
     private interface Visitor {
-        void visit(@NonNull FsController<?> controller) throws IOException;
+        void visit(FsController<?> controller) throws IOException;
     }
 
     /**
