@@ -2,14 +2,12 @@
 <faqs   xmlns="http://maven.apache.org/FML/1.0.1"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://maven.apache.org/FML/1.0.1 http://maven.apache.org/xsd/fml-1.0.1.xsd"
-        title="Frequently Asked Questions (TrueZIP 7 only)">
+        title="Frequently Asked Questions">
     <part id="general">
         <title>General Questions</title>
         <faq id="where-blog">
             <question>Where are the latest News / Release Notes?</question>
             <answer>
-                <a name="news"/>
-                <a name="relnotes"/>
                 <p>Starting from version 7.0, the TrueZIP project has it's own
                     blog.
                     You can find it at
