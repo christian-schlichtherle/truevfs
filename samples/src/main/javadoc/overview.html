@@ -18,17 +18,15 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
     <head/>
     <body>
-        <p>
-        The sample applications demonstrate the use of various TrueZIP module
-        APIs.
-        Some of them use rather advanced or exotic features which makes them
-        more complex than would be expected from a typical application.
-        As by design, the sample applications can use all file system drivers
-        which can be loaded from the class path at runtime.
-        Enumeration of the available file system drivers is performed by
-        scanning the class path for files with the name
-        {@code "META-INF/services/de.schlichtherle.truezip.fs.spi.FsDriverService"}
-        and instantiating any class named in them.
-        </p>
+        <p>Sample applications to demonstrate the usage of various TrueZIP
+            module APIs.</p>
+        <p>Some of them use rather advanced or exotic features which makes them
+            more complex than would be expected from a typical application.</p>
+        <p>By design, the sample applications use all file system drivers which
+            can be located at runtime.
+            Location of the available file system drivers is performed by
+            scanning the class path - see the Javaodoc for the TrueZIP Kernel
+            class {@code de.schlichtherle.truezip.fs.sl.FsDriverLocator}
+            for more information.</p>
     </body>
 </html>
