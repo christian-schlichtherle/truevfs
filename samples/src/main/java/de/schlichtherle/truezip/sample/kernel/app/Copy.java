@@ -77,8 +77,9 @@ public final class Copy {
             // Copy the data.
             IOSocket.copy(srcSocket, dstSocket);
         } finally {
-            // Commit all changes to federated file systems, if any were
-            // accessed, and clean up temporary files used for caching.
+            // Commit all unsynchronized changes to the contents of federated
+            // file systems, if any were accessed, and clean up temporary files
+            // used for caching.
             manager.umount();
         }
     }

@@ -26,16 +26,17 @@
     <artifactId>truezip-samples</artifactId>
     <name>TrueZIP Samples</name>
     <description>
-        The sample applications demonstrate the use of the various TrueZIP
-        module APIs.
+        Sample applications to demonstrate the usage of various TrueZIP module
+        APIs.
+
         Some of them use rather advanced or exotic features which makes them
         more complex than would be expected from a typical application.
-        As by design, the sample applications can use all file system drivers
-        which can be loaded from the class path at runtime.
+
+        By design, the sample applications use all file system drivers which
+        can be loaded from the class path at runtime.
         Enumeration of the available file system drivers is performed by
-        scanning the class path for files with the name
-        "META-INF/services/de.schlichtherle.truezip.fs.FsDriverProvider"
-        and instantiating any class named in them.
+        scanning the class path - see the Javaodoc for the class
+        de.schlichtherle.truezip.fs.sl.FsDriverLocator for more information.
     </description>
 
     <dependencies>

@@ -158,8 +158,8 @@ abstract class CommandLineUtility {
     } // class IllegalUsageException
 
     /**
-     * Monitors progress when committing changes to the unsynchronized
-     * contents of an archive file.
+     * Monitors progress when committing unsynchronized changes to the
+     * contents of archive files.
      */
     protected static final class ProgressMonitor extends Thread {
         private final PrintStream err;

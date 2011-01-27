@@ -28,5 +28,11 @@
     <description>
         The Kernel is the nexus between federated file system applications and
         providers.
+
+        It establishes virtual file systems from arbitrary sources, maintains
+        state and commits unsynchronized changes to the contents of federated
+        file systems if required or requested.
+
+        This module does not depend on other TrueZIP modules.
     </description>
 </project>

@@ -26,10 +26,10 @@
     <artifactId>truezip-driver-tar</artifactId>
     <name>TrueZIP Driver TAR</name>
     <description>
-        The TAR driver family.
+        The file system driver family for TAR and related file types.
 
         Add this artifact to the run time class path in order to make the
-        TrueZIP Kernel module support this archive type.
+        TrueZIP File* module support this archive type.
     </description>
 
     <dependencies>

@@ -75,7 +75,9 @@ public final class Wget {
                 in.close();
             }
         } finally {
-            // Clean up temporary files used for caching.
+            // Commit all unsynchronized changes to the contents of federated
+            // file systems, if any were accessed, and clean up temporary files
+            // used for caching.
             manager.umount();
         }
     }
