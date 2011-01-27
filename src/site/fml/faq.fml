@@ -5,10 +5,21 @@
         title="Frequently Asked Questions (TrueZIP 7 only)">
     <part id="general">
         <title>General Questions</title>
-        <faq id="where-javadoc">
-            <question>Where's the Javadoc?</question>
+        <faq id="where-blog">
+            <question>Where are the latest News / Release Notes?</question>
             <answer>
-                <p>You find it in the navigation bar by following
+                <a name="news"/>
+                <a name="relnotes"/>
+                <p>Starting from version 7.0, the TrueZIP project has it's own
+                    blog.
+                    You can find it at
+                    <a href="http://truezip.schlichtherle.de">http://truezip.schlichtherle.de</a>.</p>
+            </answer>
+        </faq>
+        <faq id="where-javadoc">
+            <question>Where is the Javadoc?</question>
+            <answer>
+                <p>You can find it in the navigation bar by following
                     <i>Project Reports</i>, then <i>Project Reports</i> again
                     and then <i>JavaDocs</i>, or you could simply click
                     <a href="apidocs/index.html">here</a>.</p>
