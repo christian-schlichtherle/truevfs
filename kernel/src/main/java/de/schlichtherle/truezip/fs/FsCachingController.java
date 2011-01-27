@@ -16,20 +16,8 @@
 package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.socket.IOCache.Strategy;
-import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.fs.FsDecoratingController;
-import de.schlichtherle.truezip.fs.FsDecoratingEntry;
-import de.schlichtherle.truezip.fs.FsFalsePositiveException;
-import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.FsEntryName;
-import de.schlichtherle.truezip.fs.FsException;
-import de.schlichtherle.truezip.fs.FsInputOption;
-import de.schlichtherle.truezip.fs.FsOutputOption;
-import de.schlichtherle.truezip.fs.FsSyncException;
-import de.schlichtherle.truezip.fs.FsSyncOption;
-import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import de.schlichtherle.truezip.socket.DecoratingInputSocket;
 import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.socket.IOCache;
@@ -233,7 +221,7 @@ extends FsDecoratingController< FsConcurrentModel,
     public <X extends IOException> void sync(
             @NonNull final BitField<FsSyncOption> options,
             @NonNull final ExceptionHandler<? super FsSyncException, X> handler)
-    throws X, FsException {
+    throws X {
         beforeSync(options, handler);
         delegate.sync(options.clear(CLEAR_CACHE), handler);
     }
@@ -241,7 +229,7 @@ extends FsDecoratingController< FsConcurrentModel,
     private <X extends IOException> void beforeSync(
             @NonNull final BitField<FsSyncOption> options,
             @NonNull final ExceptionHandler<? super FsSyncException, X> handler)
-    throws X, FsException {
+    throws X {
         assert getModel().writeLock().isHeldByCurrentThread();
 
         if (0 >= caches.size())

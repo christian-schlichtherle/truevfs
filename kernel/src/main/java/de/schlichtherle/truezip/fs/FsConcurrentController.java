@@ -357,8 +357,8 @@ extends FsDecoratingController< FsConcurrentModel,
     void sync(
             @NonNull final BitField<FsSyncOption> options,
             @NonNull final ExceptionHandler<? super FsSyncException, X> handler)
-    throws X, FsException {
-        assertNotReadLockedByCurrentThread(null);
+    throws X {
+        //assertNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
             delegate.sync(options, handler);

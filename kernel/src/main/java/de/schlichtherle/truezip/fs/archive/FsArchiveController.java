@@ -355,7 +355,10 @@ extends FsController<FsConcurrentModel> {
                     // that the file system can be successfully mounted again
                     // if the target archive file is subsequently modified to
                     // be a regular archive file.
-                    sync(UNLINK_SYNC_OPTIONS, new FsSyncExceptionBuilder());
+                    final FsSyncExceptionBuilder
+                            builder = new FsSyncExceptionBuilder();
+                    sync(UNLINK_SYNC_OPTIONS, builder);
+                    builder.check();
                 } catch (IOException cannotHappen) {
                     throw new AssertionError(cannotHappen);
                 }
@@ -369,7 +372,9 @@ extends FsController<FsConcurrentModel> {
                 logger.log(Level.WARNING, "unlink.absolute",
                         new Object[] {  fileSystem.getSize() - 1,
                                         getModel().getMountPoint() });
-            sync(UNLINK_SYNC_OPTIONS, new FsSyncExceptionBuilder());
+            final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
+            sync(UNLINK_SYNC_OPTIONS, builder);
+            builder.check();
         } else { // !isRoot(path)
             autoMount().unlink(name);
         }

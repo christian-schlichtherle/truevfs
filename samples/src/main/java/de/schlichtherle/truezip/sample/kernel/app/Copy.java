@@ -43,7 +43,7 @@ public final class Copy {
 
     public static void main(String[] args)
     throws IOException, URISyntaxException {
-        // Obtain a manager for the life cycle of controllers for federated
+        // Create a manager for the life cycle of controllers for federated
         // file systems.
         FsManager manager = new FsDefaultManager();
         try {
@@ -80,7 +80,7 @@ public final class Copy {
             // Commit all unsynchronized changes to the contents of federated
             // file systems, if any were accessed, and clean up temporary files
             // used for caching.
-            manager.umount();
+            manager.sync(FsManager.UMOUNT);
         }
     }
 }

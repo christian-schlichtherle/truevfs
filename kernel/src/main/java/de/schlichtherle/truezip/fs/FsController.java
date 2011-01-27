@@ -168,15 +168,42 @@ public abstract class FsController<M extends FsModel> {
     throws IOException;
 
     /**
-     * Synchronizes all uncommitted changes to the contents of this file system
+     * Commits all unsynchronized changes to the contents of this file
      * to its parent file system.
+     * If this is not a federated file system, i.e. if its not a member of a
+     * parent file system, then nothing happens.
+     * Otherwise, the state of this file system controller is reset.
+     * <p>
+     * This method calls {@link #sync sync(options, builder)}, where builder is
+     * an instance of {@link FsSyncExceptionBuilder}.
+     * If the call succeeds, the builder's {@link FsSyncExceptionBuilder#check}
+     * method is called to check out any {@link FsSyncWarningException}, too.
+     *
+     * @param  options the synchronization options.
+     * @throws FsSyncException if committing the changes fails for any reason.
+     * @throws IllegalArgumentException if the combination of synchronization
+     *         options is illegal, e.g. if {@code FORCE_CLOSE_INPUT} is cleared
+     *         and {@code FORCE_CLOSE_OUTPUT} is set.
+     */
+    public final void
+    sync(BitField<FsSyncOption> options) throws FsSyncException {
+        FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
+        sync(options, builder);
+        builder.check();
+    }
+
+    /**
+     * Commits all unsynchronized changes to the contents of this file system
+     * to its parent file system.
+     * If this is not a federated file system, i.e. if its not a member of a
+     * parent file system, then nothing happens.
+     * Otherwise, the state of this file system controller is reset.
      *
      * @param  options the synchronization options.
      * @param  handler the exception handling strategy for dealing with one or
      *         more input {@code FsSyncException}s which may trigger an {@code X}.
      * @param  <X> the type of the {@code IOException} to throw at the
      *         discretion of the exception {@code handler}.
-     * @throws IOException at the discretion of the exception {@code handler}.
      * @throws IllegalArgumentException if the combination of synchronization
      *         options is illegal, e.g. if {@code FORCE_CLOSE_INPUT} is cleared
      *         and {@code FORCE_CLOSE_OUTPUT} is set.
@@ -184,7 +211,7 @@ public abstract class FsController<M extends FsModel> {
     public abstract <X extends IOException> void
     sync(   BitField<FsSyncOption> options,
             ExceptionHandler<? super FsSyncException, X> handler)
-    throws X, FsException;
+    throws X;
 
     /**
      * Two file system controllers are considered equal if and only if they

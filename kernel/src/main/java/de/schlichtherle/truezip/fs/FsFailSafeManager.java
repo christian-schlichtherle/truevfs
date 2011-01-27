@@ -112,9 +112,7 @@ public final class FsFailSafeManager extends FsDecoratingManager<FsManager> {
         @SuppressWarnings("CallToThreadDumpStack")
         public void run() {
             try {
-                FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
-                manager.sync(UMOUNT, builder);
-                builder.check();
+                manager.sync(UMOUNT);
             } catch (IOException ex) {
                 // Logging doesn't work in a shutdown hook!
                 ex.printStackTrace();
