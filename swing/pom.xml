@@ -25,7 +25,11 @@
 
     <artifactId>truezip-swing</artifactId>
     <name>TrueZIP Swing</name>
-    <description>Provides Swing GUI classes.</description>
+    <description>
+        General Swing GUI classes.
+
+        This module does not depend on other TrueZIP modules.
+    </description>
 
     <dependencies>
         <dependency>
