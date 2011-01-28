@@ -33,10 +33,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 /**
- * A poor man's wget command line utility.
- * Copies the contents of the first URI to standard output.
+ * A poor man's Wget command line utility which copies the contents of the
+ * first URI to standard output.
  *
- * @see <a href="http://www.gnu.org/software/wget/">GNU Wget home page</a>
+ * @see <a href="http://www.gnu.org/software/wget/">GNU Wget - Home Page</a>
  * @author Christian Schlichtherle
  * @version $Id$
  */

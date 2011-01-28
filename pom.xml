@@ -48,18 +48,24 @@
     </issueManagement>
     <mailingLists>
         <mailingList>
-            <name>Announcements Mailing List</name>
-            <subscribe>announce-subscribe@truezip.java.net</subscribe>
+            <name>Announce Mailing List</name>
+            <subscribe>sympa@truezip.java.net</subscribe>
+            <unsubscribe>sympa@truezip.java.net</unsubscribe>
             <post>announce@truezip.java.net</post>
-            <unsubscribe>announce-unsubscribe@truezip.java.net</unsubscribe>
-            <archive>http://java.net/projects/truezip/lists</archive>
+            <archive>http://java.net/projects/truezip/lists/announce/archive</archive>
+            <otherArchives>
+                <otherArchive>https://truezip.dev.java.net/servlets/SummarizeList?listName=announce</otherArchive>
+            </otherArchives>
         </mailingList>
         <mailingList>
             <name>Users Mailing List</name>
-            <subscribe>users-subscribe@truezip.java.net</subscribe>
+            <subscribe>sympa@truezip.java.net</subscribe>
+            <unsubscribe>sympa@truezip.java.net</unsubscribe>
             <post>users@truezip.java.net</post>
-            <unsubscribe>users-unsubscribe@truezip.java.net</unsubscribe>
-            <archive>http://java.net/projects/truezip/lists</archive>
+            <archive>http://java.net/projects/truezip/lists/users/archive</archive>
+            <otherArchives>
+                <otherArchive>https://truezip.dev.java.net/servlets/SummarizeList?listName=users</otherArchive>
+            </otherArchives>
         </mailingList>
     </mailingLists>
     <scm>
@@ -75,7 +81,6 @@
         <module>samples</module>
         <module>swing</module>
     </modules>
-
 
     <dependencyManagement>
         <dependencies>
@@ -150,6 +155,14 @@
             </plugins>
         </pluginManagement>
     </build>
+
+    <distributionManagement>
+        <site>
+            <id>truezip-website</id>
+            <name>TrueZIP Website</name>
+            <url>scp://truezip.java.net</url>
+        </site>
+    </distributionManagement>
 
     <properties>
         <java.util.logging.config.file>logging.properties</java.util.logging.config.file>

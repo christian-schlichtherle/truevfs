@@ -108,4 +108,11 @@
                 <goal>site:run</goal>
             </goals>
         </action>
+    <action>
+            <actionName>CUSTOM-site:deploy</actionName>
+            <displayName>site:deploy</displayName>
+            <goals>
+                <goal>site:deploy</goal>
+            </goals>
+        </action>
 </actions>
