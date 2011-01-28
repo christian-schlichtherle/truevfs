@@ -34,12 +34,14 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 /**
- * Copies the contents of the first URI to the second URI.
+ * A poor man's cURL command line utility which copies the contents of the
+ * first URI to the second URI.
  * 
+ * @see <a href="http://curl.haxx.se/">cURL and libcurl - Home Page</a>
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class Copy {
+public final class Curl {
 
     public static void main(String[] args)
     throws IOException, URISyntaxException {
@@ -74,7 +76,7 @@ public final class Copy {
                                                     FsOutputOption.EXCLUSIVE),
                                         srcSocket.getLocalTarget());
 
-            // Copy the data.
+            // Curl the data.
             IOSocket.copy(srcSocket, dstSocket);
         } finally {
             // Commit all unsynchronized changes to the contents of federated
