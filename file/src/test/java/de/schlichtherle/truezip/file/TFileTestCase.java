@@ -79,10 +79,6 @@ public abstract class TFileTestCase {
     static {
         rnd.nextBytes(DATA);
     }
-
-    private static String mb(long value) {
-        return ((value - 1 + 1024 * 1024) / (1024 * 1024)) + " MB"; // round up
-    }
     
     private final FsScheme scheme;
     private final FsArchiveDriver<?> driver;
@@ -533,15 +529,18 @@ public abstract class TFileTestCase {
         TFileInputStream fis1 = new TFileInputStream(file1);
         try {
             new TFileInputStream(file2);
-            fail("Accessing file2 was expected to fail because an auto update needs to be done but the archive file is busy on input for fis1!");
-        } catch (FileBusyException expected) {
+            fail();
+        } catch (FileNotFoundException ex) {
+            if (!(ex.getCause() instanceof FsSyncException)
+                    || !(ex.getCause().getCause() instanceof FileBusyException))
+                    throw ex;
         }
         assertTrue(file2.catFrom(fis1)); // fails for same reason.
 
         // fis1 is still open!
         try {
             TFile.umount(); // forces closing of fisA
-            fail("ArchiveFileBusyWarningException expected!");
+            fail();
         } catch (FsSyncWarningException ex) {
             // Warning about fisA still being used.
             if (!(ex.getCause() instanceof FileBusyException))
@@ -601,13 +600,19 @@ public abstract class TFileTestCase {
         // fos1 is still open!
         try {
             new TFileOutputStream(file1);
-        } catch (FileBusyException expected) {
+        } catch (FileNotFoundException ex) {
+            if (!(ex.getCause() instanceof FsSyncException)
+                    || !(ex.getCause().getCause() instanceof FileBusyException))
+                    throw ex;
         }
-        
+
         // fos1 is still open!
         try {
             new TFileOutputStream(file2);
-        } catch (FileBusyException busy) {
+        } catch (FileNotFoundException ex) {
+            if (!(ex.getCause() instanceof FsSyncException)
+                    || !(ex.getCause().getCause() instanceof FileBusyException))
+                    throw ex;
             logger.warning("This archive driver does NOT support concurrent writing of different entries in the same archive file.");
         }
 
@@ -616,7 +621,7 @@ public abstract class TFileTestCase {
         
         try {
             TFile.umount(); // forces closing of all streams
-            fail("Output stream should have been forced to close!");
+            fail();
         } catch (FsSyncWarningException ex) {
             if (!(ex.getCause() instanceof FileBusyException))
                 throw ex;
@@ -624,7 +629,7 @@ public abstract class TFileTestCase {
         
         try {
             TFile.cat(new ByteArrayInputStream(data), fos1); // write again
-            fail("Output stream should have been forcibly closed!");
+            fail();
         } catch (OutputClosedException expected) {
         }
         
