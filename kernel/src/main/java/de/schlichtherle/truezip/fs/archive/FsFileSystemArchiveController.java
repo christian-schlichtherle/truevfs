@@ -194,9 +194,10 @@ extends FsArchiveController<E> {
 }
 
 /** A cacheable false positive exception. */
-@SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
 @DefaultAnnotation(NonNull.class)
 class FsCacheableFalsePositiveException extends FsFalsePositiveException {
+    private static final long serialVersionUID = 5436924103910446876L;
+
     FsCacheableFalsePositiveException(  FsModel model,
                                         @CheckForNull IOException cause) {
         super(model, cause);
