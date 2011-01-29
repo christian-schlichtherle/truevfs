@@ -865,7 +865,7 @@ public final class TFile extends File {
      */
     private static void sync(BitField<FsSyncOption> options)
     throws FsSyncException {
-        TConfig.MANAGER.sync(options);
+        TIO.MANAGER.sync(options);
     }
 
     /**
@@ -897,7 +897,7 @@ public final class TFile extends File {
         if (null != archive.getEnclArchive())
             throw new IllegalArgumentException(archive.getPath() + " (not a top level federated file system)");
         new FsFilteringManager(
-                TConfig.MANAGER,
+                TIO.MANAGER,
                 archive .getController()
                         .getModel()
                         .getMountPoint())
@@ -1457,7 +1457,7 @@ public final class TFile extends File {
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
         }
-        return controller = TConfig.MANAGER.getController(mountPoint, detector);
+        return controller = TIO.MANAGER.getController(mountPoint, detector);
     }
 
     /**
