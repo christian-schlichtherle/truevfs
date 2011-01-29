@@ -128,11 +128,6 @@ public final class TFileInputStream extends DecoratingInputStream {
             return input.newInputStream();
         } catch (FileNotFoundException ex) {
             throw ex;
-        } catch (FsSyncException ex) {
-            throw ex.getCause() instanceof FileBusyException
-                    ? (FileBusyException) ex.getCause()
-                    : (FileNotFoundException) new FileNotFoundException(
-                        ex.toString()).initCause(ex);
         } catch (IOException ex) {
             throw (FileNotFoundException) new FileNotFoundException(
                     ex.toString()).initCause(ex);
