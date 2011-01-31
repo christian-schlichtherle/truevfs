@@ -20,7 +20,7 @@
     <parent>
         <groupId>de.schlichtherle</groupId>
         <artifactId>asl20-oss-parent</artifactId>
-        <version>7</version>
+        <version>8</version>
     </parent>
 
     <groupId>de.schlichtherle.truezip</groupId>
@@ -75,11 +75,11 @@
     </scm>
 
     <modules>
-        <module>truezip-driver</module>
-        <module>truezip-file</module>
-        <module>truezip-kernel</module>
-        <module>truezip-samples</module>
-        <module>truezip-swing</module>
+        <module>driver</module>
+        <module>file</module>
+        <module>kernel</module>
+        <module>samples</module>
+        <module>swing</module>
     </modules>
 
     <dependencyManagement>
