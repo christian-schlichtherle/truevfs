@@ -29,8 +29,8 @@
         Sample applications to demonstrate the usage of various TrueZIP module
         APIs.
 
-        Some of them use rather advanced or exotic features which makes them
-        more complex than would be expected from a typical application.
+        Some of these samples use rather advanced or exotic features which
+        makes them more complex than necessary for a typical application.
 
         By design, the sample applications use all file system drivers which
         can be located at runtime.

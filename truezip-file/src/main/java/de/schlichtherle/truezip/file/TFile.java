@@ -105,7 +105,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  *     It performs the data transfer from an input stream to an output stream.
  *     When used with <em>unbuffered</em> input and output stream
  *     implementations, it delivers the same performance as the transfer
- *     method in the package {@link java.nio}.
+ *     method in the package {@code java.nio}.
  * </ol>
  * All copy methods use pooled buffers and pooled threads to achieve best
  * performance.
@@ -841,29 +841,28 @@ public final class TFile extends File {
     }
 
     /**
-     * Synchronizes all uncommitted changes to the contents of all federated
+     * Commits all unsynchronized changes to the contents of all federated
      * file systems (i.e. archive files) to their respective parent file system.
      *
      * @throws FsSyncWarningException if <em>only</em> warning conditions
-     *         occured throughout the course of this method.
+     *         occur.
      *         This implies that the respective parent file system has been
      *         updated with constraints, such as a failure to set the last
      *         modification time of the entry for the federated file system
      *         (i.e. archive file) in its parent file system.
-     * @throws FsSyncException if any error condition occured throughout the
-     *         course of this method.
+     * @throws FsSyncException if any error conditions occur.
      *         This implies loss of data!
      * @throws IllegalArgumentException if the combination of options is
      *         illegal.
      */
-    private static void sync(BitField<FsSyncOption> options)
+    public static void sync(BitField<FsSyncOption> options)
     throws FsSyncException {
         TIO.MANAGER.sync(options);
     }
 
     /**
      * Similar to {@link #sync(BitField) sync(options)},
-     * but updates only the given {@code archive} and all its member file
+     * but synchronizes only the given {@code archive} and all its member file
      * systems.
      * <p>
      * If a client application needs to sync an individual federated file
@@ -871,7 +870,7 @@ public final class TFile extends File {
      * <pre>{@code
      * if (file.isArchive() && file.getEnclArchive() == null) // filter top level federated file system
      *   if (file.isDirectory()) // ignore false positives
-     *     TFile.sync(file); // update federated file system and all its members
+     *     TFile.sync(file); // sync federated file system and all its members
      * }</pre>
      * Again, this will also sync all federated file systems which are
      * located within the file system referred to by {@code file}.
@@ -881,7 +880,7 @@ public final class TFile extends File {
      *         federated file system or the combination of options is illegal.
      * @see    #sync(BitField)
      */
-    private static void sync(
+    public static void sync(
             final TFile archive,
             final BitField<FsSyncOption> options)
     throws FsSyncException {

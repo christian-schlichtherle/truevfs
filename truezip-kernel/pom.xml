@@ -26,7 +26,7 @@
     <artifactId>truezip-kernel</artifactId>
     <name>TrueZIP Kernel</name>
     <description>
-        The Kernel is the nexus between federated file system applications and
+        This module is the nexus between federated file system applications and
         providers.
 
         It establishes virtual file systems from arbitrary sources, maintains
