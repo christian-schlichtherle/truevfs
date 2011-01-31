@@ -46,6 +46,7 @@ public final class Wget {
     throws IOException, URISyntaxException {
         // Create a manager for the life cycle of controllers for federated
         // file systems.
+        // Alternatively, we could use FsManagerLocator.SINGLETON.getManager();
         FsManager manager = new FsDefaultManager();
         try {
             // Search the class path for the set of all supported file system
@@ -70,6 +71,7 @@ public final class Wget {
             // were not just the end of the application.
             InputStream in = srcSocket.newInputStream();
             try {
+                // Copy the data.
                 Streams.cat(in, System.out);
             } finally {
                 in.close();
