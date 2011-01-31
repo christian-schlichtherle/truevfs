@@ -3,12 +3,12 @@
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xsi:schemaLocation="http://maven.apache.org/DECORATION/1.0.0 http://maven.apache.org/xsd/decoration-1.0.0.xsd">
     <!-- <skin>
-        <groupId>org.jvnet.maven-javanet-skin</groupId>
-        <artifactId>maven-javanet-skin</artifactId>
+        <groupId>org.apache.maven.skins</groupId>
+        <artifactId>maven-stylus-skin</artifactId>
         <version>1.2</version>
     </skin> -->
     <body>
-        <!-- <menu name="Parent Project" ref="parent" inherit="top"/> -->
+        <menu name="Parent Project" ref="parent" inherit="top"/>
         <menu name="Member Projects (Modules)" ref="modules" inherit="top"/>
         <menu name="Project Documentation">
             <item name="About" href="index.html"/>
