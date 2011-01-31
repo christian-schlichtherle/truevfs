@@ -1,0 +1,586 @@
+    ---
+    Usage
+    ---
+    Christian Schlichtherle
+    ---
+
+%{toc}
+
+Basic Operations
+
+    In order to create a new archive file, applications can simply call
+    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#mkdir()}<<<TFile.mkdir()>>>}}.
+
+    In order to delete it, applications can call
+    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#delete()}<<<TFile.delete()>>>}}.
+    Similar to a regular directory this is only possible if the archive file is
+    empty.
+    Alternatively, applications could call
+    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#deleteAll()}<<<TFile.deleteAll()>>>}}
+    in order to delete the (virtual) directory in one go, regardless of its
+    contents.
+
+    To read an archive <entry>, applications can simply create a
+    {{{./apidocs/de/schlichtherle/truezip/file/TFileInputStream.html}<<<TFileInputStream>>>}}
+    or a
+    {{{./apidocs/de/schlichtherle/truezip/file/TFileReader.html}<<<TFileReader>>>}}
+    with the path or a
+    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}
+    instance as their constructor parameter.
+    Note that applications cannot create a <<<TFileInputStream>>> or a
+    <<<TFileReader>>> to read a valid archive <file> itself.
+
+    Likewise, to write an archive <entry>, applications can simply create a
+    {{{./apidocs/de/schlichtherle/truezip/file/TFileOutputStream.html}<<<TFileOutputStream>>>}}
+    or a
+    {{{./apidocs/de/schlichtherle/truezip/file/TFileWriter.html}<<<TFileWriter>>>}}
+    with the path or a
+    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}
+    instance as their constructor parameter.
+    Note that applications cannot create a <<<TFileOutputStream>>> or a
+    <<<TFileWriter>>> to write a valid archive <file> itself.
+
+    If an application just needs to copy data however, using one of the
+    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#Copy_Methods}copy methods}}
+    in the class <<<TFile>>> is highly recommended instead of using
+    <<<TFile(In|Out)putStream>>> directly.
+    These methods use pooled buffers and pooled threads and do not need to
+    decompress/recompress archive entry data when copying from one archive file
+    to another for supported archive types.
+    In addition, they are guaranteed to to close their streams if an
+    <<<IOException>>> occurs.
+
+    Note that there is no eqivalent to <<<RandomAccessFile>>> in this package
+    because it's impossible to seek within compressed archive entry data.
+
+* Using Archive Entry Streams
+
+    When using streams, applications should always close them in a
+    <<<finally>>> -block like this:
+
++--
+TFileOutputStream out = new TFileOutputStream(file);
+try {
+    // Do I/O here...
+} finally {
+    out.close(); // ALWAYS close the stream!
+}
++--
+
+    This ensures that the stream is closed even if an exception occurs.
+
+    Note that the <<<File.close()>>> method may throw an <<<IOException>>>, too.
+    Applications need to deal with this appropriately, for example by enclosing
+    the entire block with another <<<try-catch>>>-block:
+
++--
+try {
+    TFileOutputStream out = new TFileOutputStream(file);
+    try {
+        // Do I/O here...
+    } finally {
+        out.close(); // ALWAYS close the stream!
+    }
+} catch (IOException ex) {
+    ex.printStackTrace();
+}
++--
+
+    This idiom is not at all specific to TrueZIP: Streams often utilize OS
+    resources such as file descriptors, database or network connections.
+    All OS resources are limited however and sometimes they are even
+    exclusively allocated for a stream, so the stream should always be closed
+    as soon as possible again, especially in long running server applications
+    (relying on <<<finalize()>>> to do this during garbage collection is
+    unsafe).
+
+    TrueZIP is affected by open archive entry streams in the following way:
+    When unmounting an archive file (see {{{Updating_Archive_Files}below}}),
+    depending on the parameters, TrueZIP may choose to force the closing of
+    any open entry streams or not.
+    If the entry streams are <not> forced to close, the archive file cannot
+    get unmounted and an
+    {{{./apidocs/de.schlichtherle.truezip.fs.FsSyncException}de.schlichtherle.truezip.fs.FsSyncException}}
+    is thrown.
+    If the entry streams are forced to close however, the archive file is
+    unmounted and an
+    {{{./apidocs/de.schlichtherle.truezip.fs.FsSyncWarningException}de.schlichtherle.truezip.fs.FsSyncWarningException}}
+    is thrown to indicate that subsequent I/O operations on these entry
+    streams (other than <<<close()>>> ) will fail with an
+    {{{./apidocs/de.schlichtherle.truezip.socket.InputClosedException}de.schlichtherle.truezip.socket.InputClosedException}}
+    or
+    {{{./apidocs/de.schlichtherle.truezip.socket.OutputClosedException}de.schlichtherle.truezip.socket.OutputClosedException}}
+
+    In order to prevent these exceptions, TrueZIP automatically closes entry
+    streams when they are garbage collected.
+    However, applications should never rely on this because the delay and order
+    in which streams are processed by the finalizer thread is not specified and
+    any data buffered by an output stream gets lost.
+
+Atomicity of File System Operations
+
+    In general, a file system operation is either atomic or not.
+    In its strict sense, an atomic operation meets the following conditions:
+
+    [[1]] The operation either completely succeeds or completely fails.
+        If it fails, the state of the file system is not changed.
+
+    [[2]] {{{Third_Party_Access}Third parties}} can't monitor or influence the
+        changes as they are in progress - they can only observe the result.
+
+    []
+
+    All reliable file system implementations meet the first condition and so
+    does TrueZIP.
+    However, the situation is different for the second condition:
+
+    * TrueZIP's virtual file system implementation is running in a JVM process,
+        so other processes could monitor or influence changes in progress.
+
+    * TrueZIP's recognition of archive files is configurable, so other
+        <<<File>>> instances could monitor or influence changes in progress.
+
+    * TrueZIP caches state information about archive files on the heap and in
+        temporary files, so other definitions of the classes in this package
+        which have been loaded by other class loaders could monitor or
+        influence changes in progress.
+
+    []
+
+    This implies that TrueZIP cannot provide any operations which are atomic
+    in its strict sense.
+    However, many file system operations in this package are declared to be
+    virtually atomic according to their Javadoc.
+    A virtually atomic operation meets the following conditions:
+
+    [[1]] The operation either completely succeeds or completely fails.
+        If it fails, the state of the (virtual) file system is not changed.
+
+    [[2]] If the path does not contain any archive files, the operation is
+        always delegated to the real file system and third parties can't
+        monitor or influence the changes as they are in progress - they can
+        only observe the result.
+
+    [[3]] Otherwise, all <<<File>>> instances which recognize the same set of
+        archive files in the path and share the same definition of classes in
+        this package can't monitor or influence the changes as they are in
+        progress - they can only observe the result.
+
+    []
+
+    These conditions apply regardless of whether the <<<File>>> instances are
+    used by different threads or not.
+    In other words, TrueZIP is thread safe as much as you could expect from a
+    real file system.
+
+Updating Archive Files
+
+    To provide random read/write access to archive files, TrueZIP needs to
+    associate some state for every recognized archive file on the heap and in
+    the folder for temporary files while the application is operating on the
+    VFS.
+
+    TrueZIP automatically mounts the VFS from an archive file on the first
+    access.
+    The application can then operate on the VFS in an arbitrary manner.
+    Finally, an archive file must get unmounted in order to commit any
+    unsynchronized changes to its contents.
+    Note that an archive entry gets modified by any operation which creates,
+    modifies or deletes it.
+
+* Explicit vs. Implicit Unmounting
+
+    Archive file unmounting is performed semi-automatic:
+
+    * Explicit unmounting happens when the application calls
+        {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#umount}<<<TFile.umount()>>>}}.
+
+    * Implicit unmounting happens when the JVM terminates (by a JVM shutdown
+        hook) or when the application modifies an archive entry more than once
+        and the archive controller is implementing a full update strategy,
+        which is the default.
+
+    []
+
+    Explicit unmounting is required to support third-party access to an
+    archive file (see {{{Third_Party_Access}below}} ) or to monitor progress
+    (see {{{Monitoring_Progress}below}}).
+    It also allows some control over any exceptions thrown:
+    <<<umount()>>> may throw a
+    {{{./apidocs/de/schlichtherle/truezip/fs/FsSyncException.html}<<<FsSyncException>>>}}.
+    Applications may catch these exceptions and act on them individually
+    (see {{{ExceptionHandling}below}}).
+
+    However, calling <<<umount()>>> too often may increase the overall runtime:
+    On each call, all remaining entries in the archive file are copied to the
+    archive file again if the archive file did already exist.
+    If an application is explicitly unmounting the archive file after each
+    modification, this may lead to an overall runtime of <<<O(s*s)>>>, where
+    <<<s>>> is the size of the archive file in bytes
+    (see {{{PerformanceConsiderations}below}}).
+
+    In comparison, implicit unmounting provides best performance because
+    archive files are only updated if there's really a need to.
+    It also works reliably:
+    The JVM shutdown hook is always run unless the JVM crashes.
+    Note that an uncatched throwable <terminates> the JVM, but does not <crash>
+    it - a JVM crash is an extremely rare situation which indicates a bug in
+    the JVM implementation, not a bug in the JRE or the application.
+
+    The disadvantage is that applications cannot easily detect and deal with
+    any exceptions thrown as a result of updating an archive file:
+    Depending on where the implicit unmount happens, either an arbitrary
+    {{{./apidocs/java/io/IOException}IOException}} is thrown, a boolean value
+    is returned, or - when called from the JVM shutdown hook - just a stack
+    trace is printed.
+    In addition, updating an existing archive file takes linear runtime
+    (see {{{Performance_Considerations}below}}).
+    However, using long running JVM shutdown hooks is generally discouraged:
+    They can't use {{{./apidocs/java/util/logging}java.util.logging}} and they
+    can't use a GUI to monitor progress (see {{{MonitoringProgress}below}}).
+
+* Third Party Access
+
+    Because TrueZIP associates some state with any archive file which is read
+    and/or write accessed by its applications, it requires exclusive access to
+    these archive files until they get unmounted again.
+
+    <Third parties must not concurrently access these archive files nor their
+    entries unless the precautions outlined below have been taken!>
+
+    In this context, third parties are:
+
+    [[1]] Instances of the class <<<File>>> which are not instances of the
+        class <<<TFile>>> .
+
+    [[2]] Instances of the class <<<TFile>>> which do not recognize the same
+        set of archive files in the path due to the use of a differently
+        working
+        {{{./apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}.
+
+    [[3]] Other definitions of the classes in this package which have been
+        loaded by different class loaders.
+
+    [[4]] Other system processes.
+
+    []
+
+    As a rule of thumb, the same archive file or entry within an archive file
+    should not be accessed by different <<<File>>> classes
+    - let it be <<<File>>> or <<<TFile>>> - or <<<TFile>>> instances with
+    different <<<ArchiveDetector>>> parameters.
+    This ensures that the state associated to an archive file is not shadowed
+    or bypassed.
+
+    To ensure that all <<<TFile>>> instances recognize the same set of archive
+    files in a path, it's recommended <not> to use constructors or methods of
+    the <<<File>>> class with explicit <<<ArchiveDetector>>> parameters unless
+    there is good reason to.
+
+    If the prerequisites for these recommendations don't apply or if the
+    recommendations can't be followed, applications may call
+    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#umount}<<<TFile.umount()>>>}}
+    to perform an explicit unmount.
+    This clears all state information so that the third party can then safely
+    access any archive file.
+    In addition, applications must make sure not to access the same archive
+    file or any of its entries in any way while the third party is still
+    accessing it.
+
+    <Failure to comply to these guidelines may result in unpredictable
+    behavior and may even cause <<loss of data>>!>
+
+* Exception Handling
+
+    <<<umount()>>> is guaranteed to process <all> archive files which are in
+    use or have been touched by the application.
+    However, processing some of these archive files may fail for a number of
+    I/O related reasons.
+    Hence, during processing, a <sequential chain> of archive exceptions is
+    constructed and thrown upon termination unless its empty.
+    Note that sequential exception chaining is a concept which is completely
+    orthogonal to Java's general exception cause chaining:
+    In a sequential archive exception chain, each archive exception may still
+    have a chain of other exceptions as its cause (most likely
+    <<<IOException>>>s).
+
+    Archive exceptions fall into two categories:
+
+    [[1]] The class
+        {{{./apidocs/de/schlichtherle/truezip/fs/FsSyncWarningException}FsSyncWarningException}}
+        is the root of all warning exception types.
+        These exceptions are thrown if an archive file has been completely
+        updated, but some warning conditions apply.
+        No data has been lost.
+
+    [[2]] Its super class
+        {{{./apidocs/de/schlichtherle/truezip/fs/FsSyncException.html}<<<FsSyncException>>>}}
+        is the root of all other exception types - unless it's an
+        {{{./apidocs/de/schlichtherle/truezip/fs/FsSyncWarningException}FsSyncWarningException}}
+        again.
+        These exceptions are thrown if an archive file could not get updated
+        completely.
+        This implies loss of some or all data in the respective archive file.
+
+    []
+
+    Note that the effect which is indicated by an archive exception is local to
+    the archive file, i.e. an exception thrown when processing an archive file
+    does not imply an archive exception or loss of data when processing another
+    archive file.
+
+    When the archive exception chain is thrown by this method, it's first
+    sorted according to (1) descending order of priority and (2) ascending
+    order of appearance, and the resulting head exception is then thrown.
+    Because
+    {{{./apidocs/de/schlichtherle/truezip/fs/FsSyncWarningException.html}<<<FsSyncWarningException>>>}}s
+    have a lower priority than
+    {{{./apidocs/de/schlichtherle/truezip/fs/FsSyncException.html}<<<FsSyncException>>>}}s,
+    they are always pushed back to the end of the chain, so that an application
+    can use the following simple idiom to detect if only some warnings or at
+    least one severe error has occured:
+
++--
+try {
+    File.umount(); // with or without parameters
+} catch (ArchiveWarningException oops) {
+    // Only instances of the class ArchiveWarningException exist in
+    // the sequential chain of exceptions. We decide to ignore this.
+} catch (ArchiveException ouch) {
+    // At least one exception occured which is not just an
+    // ArchiveWarningException. This is a severe situation that
+    // needs to be handled.
+
+    // Print the sequential chain of exceptions in order of
+    // descending priority and ascending appearance.
+    //ouch.printStackTrace();
+
+    // Print the sequential chain of exceptions in order of
+    // appearance instead.
+    ouch.sortAppearance().printStackTrace();
+}
++--
+
+    Note that the
+    {{{./apidocs/java/lang/Throwable.html#getMessage()}<<<Throwable.getMessage()>>>}}
+    method (and hence
+    {{{./apidocs/java/lang/Throwable.html#printStackTrace()}<<<Throwable.printStackTrace()>>>}}
+    will concatenate the detail messages of the exceptions in the sequential
+    chain in the given order.
+
+* Performance Considerations
+
+    Unmounting a modified archive file is a linear runtime operation:
+    If the size of the resulting archive file is <<<s>>> bytes, the operation
+    always completes in <<<O(s)>>>, even if only a single, small archive entry
+    has been modified within a very large archive file.
+    Unmounting an unmodified or newly created archive file is a constant
+    run-time operation:
+    It always completes in <<<O(1)>>>.
+    These magnitudes are independent of whether unmounting was performed
+    explicitly or implicitly.
+
+    Now if an application modifies each entry in a loop and accidentally
+    triggers unmounting the archive file on each iteration, then the overall
+    runtime increases to <<<O(s*s)>>>!
+    Here's an example:
+
++--
+String[] names = { "a","b","c" };
+int n = names.length;
+for (int i = 0; i < n; i++) { // n * ...
+    File entry = new File("archive.zip", names[i]); // O(1)
+    entry.createNewFile(); // O(1)
+    File.umount(); // O(i + 1) !!
+}
+// Overall: O(n*n) !!!
++--
+
+    The bad run-time performance is because <<<File.umount()>>> is called
+    within the loop.
+    Moving it out of the loop fixes the issue:
+
++--
+String[] names = { "a","b","c" };
+int n = names.length;
+for (int i = 0; i < n; i++) { // n * ...
+    File entry = new File("archive.zip", names[i]); // O(1)
+    entry.createNewFile(); // O(1)
+}
+File.umount(); // new file: O(1); modified: O(n)
+// Overall: O(n)
++--
+
+    In essence: If at all, applications should never call <<<File.umount()>>>
+    in a loop which modifies an archive file.
+
+    The situation gets more complicated with implicit remounting:
+    If a file entry shall get modified which already has been modified before,
+    TrueZIP implicitly remounts the archive file in order to avoid writing
+    duplicated entries to it (which would waste space and may even confuse
+    other utilities).
+    Here's an example:
+
++--
+String[] names = { "a", "b", "c" };
+int n = names.length;
+for (int i = 0; i < n; i++) { // n * ...
+    File entry = new File("archive.zip", names[i]); // O(1)
+    entry.createNewFile(); // First modification: O(1)
+    entry.createNewFile(); // Second modification triggers remount: O(i + 1) !!
+}
+// Overall: O(n*n) !!!
++--
+
+    Each call to <<<File.createNewFile()>>> is a modification operation.
+    Hence, on the second call to this method, TrueZIP needs to do an implicit
+    remount which writes all entries in the archive file created so far to
+    disk again.
+
+    Unfortunately, a modification operation is not always so easy to spot.
+    Consider the following example to create an archive file with empty
+    entries which all share the same last modification time:
+
++--
+long time = System.currentTimeMillis();
+String[] names = { "a", "b", "c" };
+int n = names.length;
+for (int i = 0; i < n; i++) { // n * ...
+    File entry = new File("archive.zip", names[i]); // O(1)
+    entry.createNewFile(); // First modification: O(1)
+    entry.setLastModified(time); // Second modification triggers remount: O(i + 1) !!
+}
+// Overall: O(n*n) !!!
++--
+
+    When <<<File.setLastModified()>>> gets called, the entry has already been
+    written and so an implicit remount is triggered, which writes all entries
+    in the archive file created so far to disk again.
+
+    <<Detail:>> This deficiency is caused by archive file formats:
+    All currently supported archive types require to write an entry's meta
+    data (including the last modification time) before its content to the
+    archive file.
+    So if the meta data is to be modified, the archive entry and hence the
+    whole archive file needs to get rewritten, which is what the implicit
+    remount is doing.
+
+    To avoid accidental synchronization when copying data, please consider
+    using the advanced
+    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#CopyMethods}copy methods}}
+    instead.
+    These methods are easy to use and provide best performance.
+
+* Conclusions
+
+    Here are some guidelines to find the right balance between performance and
+    control:
+
+    [[1]] When the JVM terminates, calling <<<File.umount()>>> is recommended
+        in order to handle exceptions explicitly, but not required because
+        TrueZIP's JVM shutdown hook takes care of unmounting anyway and prints
+        the stacktrace of any exceptions on the standard error output.
+
+    [[2]] Otherwise, in order to achieve best performance, <<<File.umount()>>>
+        should not get called unless either third party access or explicit
+        exception handling is required.
+
+    [[3]] For the same reason, these methods should never get called in a loop
+        which modifies an archive file.
+
+    []
+
+Miscellaneous
+
+* Virtual Directories within Archive Files
+
+    The top level entries in an archive file build its root directory.
+    The root directory is never written to the output when an archive file is
+    modified.
+
+    For an application, the root directory behaves like any other directory and
+    is addressed by naming the archive file in a path:
+    For example, an application may list its contents by calling
+    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#list()}TFile.list()}}
+    or
+    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#listFiles()}TFile.listFiles()}}
+
+    An archive may contain directories for which no entry is present in the
+    file although they contain at least one member in their directory tree for
+    which an entry is actually present in the file.
+    Similarly, if
+    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#isLenient()}TFile.isLenient()}}
+    returns <<<true>>> (which is the default), an archive entry may be created
+    in an archive file although its parent directory hasn't been explicitly
+    created by calling
+    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#mkdir()}TFile.mkdir()}}
+    before.
+
+    Such a directory is called a <ghost directory>:
+    Like the root directory, a ghost directory is not written to the output
+    whenever an archive file is modified.
+    This is to mimic the behavior of most archive utilities which do not create
+    archive entries for directories.
+
+    To the application, a ghost directory behaves like a regular directory with
+    the exception that its last modification time returned by
+    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#lastModified()}TFile.lastModified()}}
+    is <<<0L>>>.
+    If the application sets the last modification time explicitly using
+    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#setLastModified(long)}TFile.setLastModified(long)}},
+    then the ghost directory reincarnates as a regular directory and will be
+    output to the archive file.
+
+    Mind that a ghost directory can only exist within an archive file, but not
+    every directory within an archive file is actually a ghost directory.
+
+* Entry Names in Archive Files
+
+    File paths may be composed of elements which either refer to regular nodes
+    in the real file system (directories, files or special files), including
+    top level archive files, or refer to entries within an archive file.
+
+    As usual in Java, elements in a path which refer to regular nodes may be
+    case sensitive or not in TrueZIP's VFS, depending on the real file system
+    and/or the platform.
+
+    However, elements in a path which refer to archive entries are <always>
+    case sensitive.
+    This enables applications to address all files in existing archive files,
+    regardless of the operating system they've been created on.
+
+    If an entry name contains characters which have no representation in the
+    character set of the corresponding archive file type, then all file
+    operations to create the archive entry will fail gracefully according to
+    the documented contract of the respective operation.
+    This is to protect applications from creating archive entries which cannot
+    get encoded and decoded again correctly.
+    For example, the Euro sign (€) does not have a representation in the IBM437
+    character set and hence cannot be used for entries in ordinary ZIP files
+    unless TrueZIP's configuration is customized to use another charset.
+
+    If an archive file contains entries with absolute entry names, such as
+    <<</readme.txt>>> rather than <<<readme.txt>>>, the application cannot
+    address these entries using the VFS in this package.
+    However, these entries are retained like any other entry whenever the
+    application modifies the archive file.
+
+    If an archive file contains both a file and a directory entry with the same
+    name it's up to the individual methods how they behave in this case.
+    This could happen with archive files created by external tools only.
+    Both
+    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#isDirectory()}<<<TFile.isDirectory()>>>}}
+    and
+    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#isFile()}<<<TFile.isFile()>>>}}
+    will return <<<true>>> in this case and in fact they are the only methods
+    an application can rely upon to act properly in this situation:
+    Many other methods use a combination of <<<File.isDirectory()>>> and
+    <<<File.isFile()>>> calls and will show an undefined behavior.
+
+    The good news is that both the file and the directory coexist in the
+    virtual archive file system implemented by this package.
+    Thus, whenever the archive file is modified, both entries will be retained
+    and no data gets lost.
+    This allows applications to use another tool to fix the issue in the
+    archive file.
+    TrueZIP never allows applications to create such an archive file, however.

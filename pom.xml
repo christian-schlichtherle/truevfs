@@ -40,7 +40,7 @@
         access to archive files as if they were just plain old directories in
         a file system path.
     </description>
-    <url>http://java.net/projects/truezip</url>
+    <url>http://java.net/projects/truezip(</url>
     <inceptionYear>2005</inceptionYear>
     <issueManagement>
         <system>JIRA</system>
@@ -52,7 +52,7 @@
             <subscribe>sympa@truezip.java.net</subscribe>
             <unsubscribe>sympa@truezip.java.net</unsubscribe>
             <post>announce@truezip.java.net</post>
-            <archive>http://java.net/projects/truezip/lists/announce/archive</archive>
+            <archive>http://java.net/projects/truezip/lists/announce/archive/</archive>
             <otherArchives>
                 <otherArchive>https://truezip.dev.java.net/servlets/SummarizeList?listName=announce</otherArchive>
             </otherArchives>
@@ -62,7 +62,7 @@
             <subscribe>sympa@truezip.java.net</subscribe>
             <unsubscribe>sympa@truezip.java.net</unsubscribe>
             <post>users@truezip.java.net</post>
-            <archive>http://java.net/projects/truezip/lists/users/archive</archive>
+            <archive>http://java.net/projects/truezip/lists/users/archive/</archive>
             <otherArchives>
                 <otherArchive>https://truezip.dev.java.net/servlets/SummarizeList?listName=users</otherArchive>
             </otherArchives>
@@ -71,7 +71,7 @@
     <scm>
         <connection>scm:hg:https://hg.java.net/hg/truezip~v7</connection>
         <developerConnection>scm:hg:ssh://hg.java.net/truezip~v7</developerConnection>
-        <url>http://java.net/projects/truezip/sources/v7/show</url>
+        <url>http://java.net/projects/truezip/sources/v7/show/</url>
     </scm>
 
     <modules>
@@ -160,7 +160,7 @@
         <site>
             <id>truezip-website</id>
             <name>TrueZIP Website</name>
-            <url>scp://truezip.java.net</url>
+            <url>scp://truezip.java.net/</url>
         </site>
     </distributionManagement>
 

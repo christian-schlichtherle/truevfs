@@ -8,10 +8,10 @@
         <version>1.2</version>
     </skin> -->
     <body>
-        <menu name="Parent Project" ref="parent" inherit="top"/>
+        <!-- <menu name="Parent Project" ref="parent" inherit="top"/> -->
         <menu name="Member Projects (Modules)" ref="modules" inherit="top"/>
         <menu name="Project Documentation">
-            <item name="Overview" href="index.html"/>
+            <item name="About" href="index.html"/>
             <item name="Use Cases" href="usecases.html"/>
             <item name="Concept &amp; Definitions" href="concept.html"/>
             <item name="Key Features" href="features.html"/>

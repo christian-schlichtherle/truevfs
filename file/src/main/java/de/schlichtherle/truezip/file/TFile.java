@@ -75,16 +75,11 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  * files.
  * This class extends {@link File} so that it can be used with a
  * {@link FileSystemView}.
- * <p>
- * <b>Warning:</b>The classes in this package access and manipulate archive
- * files as external resources and may cache some of their state in memory
- * and temporary files. Third parties must not concurrently access these
- * archive files unless some precautions have been taken!
  *
- * <h4><a name="copy_methods">Copy methods</a></h4>
+ * <a name="Copy_Methods"/><h4>Copy Methods</h4>
  * <p>
- * This class provides a bunch of convenient copy methods which work much
- * faster and more reliable than the usual read-write-in-a-loop approach for
+ * This class provides some convenient copy methods which work much faster and
+ * more reliable than the naive read-then-write-in-a-loop approach for
  * individual files and its recursive companion for directory trees.
  * These copy methods fall into the following categories:
  * <ol>
@@ -92,61 +87,64 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  *     simply return a boolean value indicating success or failure.
  *     Though this is suboptimal, this is consistent with most methods in
  *     the super class.
- * <li>The copy(_p)? methods return void and throw an {@code IOException}
- *     on failure.
- *     The exception hierarchy is fine grained enough to let a client
- *     application differentiate between access restrictions, input exceptions
- *     and output exceptions.
- *     The method names have been modelled after the Unix &quot;copy -p&quot;
+ * <li>The cp(_p)? methods return void and throw an {@code IOException} on
+ *     failure.
+ *     The exception hierarchy is fine grained enough to let an application
+ *     differentiate between access restrictions, input exceptions and output
+ *     exceptions.
+ *     The method names have been modelled after the Unix {@code cp -p}
  *     utility.
  *     None of these methods does recursive copying, however.
  * <li>The cat(To|From) methods return a boolean value. In contrast to the
- *     previous methods, they never close their argument streams, so you
- *     can call them multiple times on the same streams to concatenate data.
- *     Their name is modelled after the Unix command line utility &quot;cat&quot;.
- * <li>Finally, the cat method is the core engine for all these methods.
- *     It performs the asynchronous data transfer from an input stream to an
- *     output stream. When used with properly crafted input and output stream
+ *     previous methods, they never close their argument streams, so
+ *     applications can call them multiple times on the same streams to
+ *     concatenate data.
+ *     Their name is modelled after the Unix command line utility {@code cat}.
+ * <li>Finally, the {@link #cat(java.io.InputStream, java.io.OutputStream)}
+ *     method is the core copy engine for all these methods.
+ *     It performs the data transfer from an input stream to an output stream.
+ *     When used with <em>unbuffered</em> input and output stream
  *     implementations, it delivers the same performance as the transfer
- *     method in the package {@code java.nio}.
+ *     method in the package {@link java.nio}.
  * </ol>
- * All copy methods use asynchronous I/O, pooled large buffers and pooled
- * threads (if run on JSE 1.5) to achieve best performance.
+ * All copy methods use pooled buffers and pooled threads to achieve best
+ * performance.
  *
- * <h4><a name="DDC">Direct Data Copying (DDC)</a></h4>
+ * <a name="Direct_Data_Copying"/><h5>Direct Data Copying (DDC)</h5>
  * <p>
  * If data is copied from an archive file to another archive file of the
  * same type, some of the copy methods use a feature called <i>Direct Data
- * Copying</i> (DDC) to achieve even better performance:</a>
+ * Copying</i> (DDC) to achieve best performance:</a>
  * DDC copies the raw data from the source archive entry to the destination
  * archive entry without the need to temporarily reproduce, copy and process
  * the original data again.
  * <p>
  * The benefits of this feature are archive driver specific:
  * In case of ZIP compatible files with compressed entries, it avoids the
- * need to decompress the data from the source entry just to compress it
- * again for the destination entry.
+ * need to inflate the data from the source entry just to deflate it again for
+ * the destination entry.
  * In case of TAR compatible files, it avoids the need to create an
- * additional temporary file, but shows no impact otherwise - TAR doesn't
- * support compression.
+ * additional temporary file, but shows no impact otherwise (the TAR file
+ * format doesn't support compression).
  *
- * <h4><a name="false_positives">Identifying Archive Paths and False Positives</a></h4>
+ * <a name="False_Positives"/><h4>Identifying Archive Paths and False Positives</h4>
  * <p>
- * Whenever an archive file suffix is recognized in a path, TrueZIP treats
+ * Whenever an archive file suffix is recognized in a path, this class treats
  * the corresponding file or directory as a <i>prospective archive file</i>.
  * The word &quot;prospective&quot; suggests that just because a file is named
  * <i>archive.zip</i> it isn't necessarily a valid ZIP file.
- * In fact, it could be anything, even a regular directory!
+ * In fact, it could be anything, even a plain old directory in the OS file
+ * system!
  * <p>
- * Such an invalid archive file is called a <i>false positive</i>, which
- * means a file, special file (a Unix concept) or directory which's path has
- * a configured archive file suffix, but is actually something else.
- * TrueZIP correctly identifies all kinds of false positives and treats them
- * according to what they really are: Regular files, special files or
- * directories.
+ * Such an invalid archive file is called a <i>false positive</i> archive file.
+ * TrueZIP correctly identifies all types of false positive archive files by
+ * performing a recursive look up operation for the first parent file system
+ * where the given archive file actually exists and treats it according to the
+ * <i>true state</i> of this entity.
  * <p>
  * The following table shows how certain methods in this class behave,
- * depending upon a file's path and its <i>true state</i> in the file system:
+ * depending upon an archive file's path and its <i>true state</i> in the
+ * first parent file system where it actually exists.
  * <p>
  * <table border="2" cellpadding="4">
  * <tr>
@@ -174,7 +172,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  *   <td>{@code true}</td>
  *   <td>{@code false}</td>
  *   <td>{@code true}</td>
- *   <td>{@code <i>?</i>}</td>
+ *   <td><i>{@code ?}</i></td>
  * </tr>
  * <tr>
  *   <td><i>archive.zip</i></td>
@@ -183,7 +181,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  *   <td>{@code false}</td>
  *   <td>{@code true}</td>
  *   <td>{@code true}</td>
- *   <td>{@code <i>?</i>}</td>
+ *   <td><i>{@code ?}</i></td>
  * </tr>
  * <tr>
  *   <td><i>archive.zip</i></td>
@@ -192,7 +190,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  *   <td>{@code false}</td>
  *   <td>{@code false}</td>
  *   <td>{@code true}</td>
- *   <td>{@code <i>?</i>}</td>
+ *   <td><i>{@code ?}</i></td>
  * </tr>
  * <tr>
  *   <td><i>archive.zip</i></td>
@@ -222,7 +220,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  *   <td>{@code false}</td>
  *   <td>{@code false}</td>
  *   <td>{@code true}</td>
- *  <td>{@code <i>?</i>}</td>
+ *   <td><i>{@code ?}</i></td>
  * </tr>
  * <tr>
  *   <td><i>archive.tzp</i></td>
@@ -231,7 +229,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  *   <td>{@code true}</td>
  *   <td>{@code false}</td>
  *   <td>{@code true}</td>
- *   <td>{@code <i>?</i>}</td>
+ *   <td><i>{@code ?}</i></td>
  * </tr>
  * <tr>
  *   <td><i>archive.tzp</i></td>
@@ -240,7 +238,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  *   <td>{@code false}</td>
  *   <td>{@code true}</td>
  *   <td>{@code true}</td>
- *   <td>{@code <i>?</i>}</td>
+ *   <td><i>{@code ?}</i></td>
  * </tr>
  * <tr>
  *   <td><i>archive.tzp</i></td>
@@ -249,7 +247,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  *   <td>{@code false}</td>
  *   <td>{@code false}</td>
  *   <td>{@code true}</td>
- *   <td>{@code <i>?</i>}</td>
+ *   <td><i>{@code ?}</i></td>
  * </tr>
  * <tr>
  *   <td><i>archive.tzp</i></td>
@@ -310,19 +308,16 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  *     platform and file system, which is indicated by <i>{@code ?}</i>.
  *     For regular directories on Windows/NTFS for example, the return value
  *     would be {@code 0}.
- * <li><i>archive.zip</i> is just an example: If TrueZIP is configured to
- *     recognize TAR.GZ files, the same behavior applies to
- *     <i>archive.tar.gz</i>.</li>
- * <li>This assumes that <i>.tzp</i> is configured as an archive file suffix
- *     for RAES encrypted ZIP files.
- *     By default, this is <b>not</b> the case.</li>
+ * <li>This example assumes that the TrueZIP Driver ZIP module is
+ *     present on the run-time class path.</li>
+ * <li>This example assumes that the TrueZIP Driver TZP (ZIP.RAES) module is
+ *     present on the run-time class path.</li>
  * <li>The methods behave exactly the same for both <i>archive.zip</i> and
  *    <i>archive.tzp</i> with one exception: If the key for a RAES encrypted
  *    ZIP file remains unknown (e.g. because the user cancelled password
  *    prompting), then these methods behave as if the true state of the path
- *    were a special file: Both {@link #isDirectory} and {@link #isFile}
- *    return {@code false}, while {@link #exists} returns
- *    {@code true}.</li>
+ *    were a special file, i.e. both {@link #isDirectory} and {@link #isFile}
+ *    return {@code false}, while {@link #exists} returns {@code true}.</li>
  * </ol>
  *
  * @author  Christian Schlichtherle
@@ -332,10 +327,6 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 @Immutable
 @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
 public final class TFile extends File {
-
-    //
-    // Static fields:
-    //
 
     private static final long serialVersionUID = 3617072259051821745L;
 
@@ -347,10 +338,6 @@ public final class TFile extends File {
 
     private static TArchiveDetector
             defaultDetector = TDefaultArchiveDetector.ALL;
-
-    //
-    // Instance fields:
-    //
 
     /**
      * The delegate is used to implement the behaviour of the file system
@@ -379,14 +366,10 @@ public final class TFile extends File {
      */
     private transient volatile @Nullable FsController<?> controller;
 
-    //
-    // Constructors and helper methods:
-    //
-
     /**
      * Copy constructor.
      * Equivalent to {@link #TFile(File, TArchiveDetector)
-     * TFile(template, getDefaultArchiveDetector())}.
+     * new TFile(template, getDefaultArchiveDetector())}.
      */
     public TFile(File file) {
         this(file, defaultDetector);
@@ -430,7 +413,7 @@ public final class TFile extends File {
 
     /**
      * Equivalent to {@link #TFile(String, TArchiveDetector)
-     * TFile(path, getDefaultArchiveDetector())}.
+     * new TFile(path, getDefaultArchiveDetector())}.
      */
     public TFile(String path) {
         this(path, defaultDetector);
@@ -460,7 +443,7 @@ public final class TFile extends File {
 
     /**
      * Equivalent to {@link #TFile(String, String, TArchiveDetector)
-     * TFile(parent, child, getDefaultArchiveDetector())}.
+     * new TFile(parent, child, getDefaultArchiveDetector())}.
      */
     public TFile(String parent, String member) {
         this(parent, member, defaultDetector);
@@ -493,7 +476,7 @@ public final class TFile extends File {
 
     /**
      * Equivalent to {@link #TFile(File, String, TArchiveDetector)
-     * TFile(parent, child, null)}.
+     * new TFile(parent, child, null)}.
      *
      * @param parent The parent directory as a {@code TFile} instance.
      *        If this parameter is an instance of this class, its
@@ -549,32 +532,46 @@ public final class TFile extends File {
      * Constructs a new {@code TFile} instance from the given
      * {@code uri}.
      * This method behaves similar to the super class constructor
-     * {@link File#File(URI) new File(uri)} with the following amendment:
-     * If the URI matches the pattern
-     * {@code (scheme:)*file:(path!/)*entry}, then the
-     * constructed file object treats the URI like an entry in the federated
-     * file system of the type named "scheme".
+     * {@link File#File(URI)} with the following amendment:
+     * If the URI matches the pattern {@code scheme:file:path!/entry},
+     * then the constructed file object treats the URI like an entry in the
+     * federated file system of the type named {@code scheme}.
+     * This may be applied unlimitedly recursively to access archive entries
+     * within other archive files.
      * <p>
-     * For example, in a Java application which is running from a JAR in the
-     * local file system you could use this constructor to arbitrarily access
-     * (and modify) any resource in the JAR file from which the application is
-     * currently running by using the following simple expression:
-     * {@code new TFile(getClass().getResource(resource).toURI())}.
-     * </pre>
      * Note that the newly created {@code TFile} instance uses the
-     * {@link #getDefaultArchiveDetector() default archive detector}.
+     * {@link #getDefaultArchiveDetector() default archive detector} to look
+     * up archive drivers for the named scheme(s).
      *
-     * @param  uri an absolute, hierarchical URI with a scheme supported by the
-     *         {@link #getDefaultArchiveDetector() default archive detector}
-     *         with the explained syntax constraints.
-     *         Its authority, query, and fragment components must be undefined.
+     * @param  uri an absolute URI with a scheme supported by the
+     *         {@link #getDefaultArchiveDetector() default archive detector}.
      * @throws IllegalArgumentException if the given URI does not conform to
-     *         its syntax constraints.
+     *         the syntax constraints for {@link FsPath}s.
      */
     public TFile(URI uri) {
         this(FsPath.create(uri, CANONICALIZE), defaultDetector);
     }
 
+    /**
+     * Constructs a new {@code TFile} instance from the given
+     * {@code path}.
+     * This method behaves similar to the super class constructor
+     * {@link File#File(URI)} with the following amendment:
+     * If the path matches the pattern {@code scheme:file:path!/entry},
+     * then the constructed file object treats the URI like an entry in the
+     * federated file system of the type named {@code scheme}.
+     * This may be applied unlimitedly recursively to access archive entries
+     * within other archive files.
+     * <p>
+     * Note that the newly created {@code TFile} instance uses the
+     * {@link #getDefaultArchiveDetector() default archive detector} to look
+     * up archive drivers for the named scheme(s).
+     *
+     * @param  path an absolute path with a scheme supported by the
+     *         {@link #getDefaultArchiveDetector() default archive detector}.
+     * @throws IllegalArgumentException if the given URI does not conform to
+     *         the syntax constraints for {@link FsPath}s.
+     */
     public TFile(FsPath path) {
         this(path, defaultDetector);
     }
@@ -843,10 +840,6 @@ public final class TFile extends File {
         return true;
     }
 
-    //
-    // Methods:
-    //
-
     /**
      * Synchronizes all uncommitted changes to the contents of all federated
      * file systems (i.e. archive files) to their respective parent file system.
@@ -1008,99 +1001,50 @@ public final class TFile extends File {
 
     /**
      * Returns the value of the class property {@code lenient}.
-     * By default, this is the inverse of the boolean system property
-     * {@code de.schlichtherle.truezip.file.strict}.
-     * In other words, this returns {@code true} unless you map the
-     * system property {@code de.schlichtherle.truezip.file.strict}
-     * to {@code true} or call {@link #setLenient(boolean) setLenient(false)}.
+     * By default, the value of this class property is {@code true}.
      *
-     * @see #setLenient
+     * @see #setLenient(boolean)
      */
     public static boolean isLenient() {
         return lenient;
     }
 
     /**
-     * This class property controls whether (1) archive files and enclosed
-     * directories shall be created on the fly if they don't exist and (2)
-     * open archive entry streams should automatically be closed if they are
-     * only weakly reachable.
-     * By default, this class property is {@code true}.
-     * <ol>
-     * <li>
-     * Consider the following path: &quot;a/outer.zip/b/inner.zip/c&quot;.
-     * Now let's assume that &quot;a&quot; isExisting as a directory in the real file
-     * system, while all other parts of this path don't, and that TrueZIP's
-     * default configuration is used which would recognize &quot;outer.zip&quot; and
-     * &quot;inner.zip&quot; as ZIP files.
+     * Sets the value of the class property {@code lenient}.
+     * This class property controls whether archive files and their member
+     * directories get created on the fly if they don't exist.
+     * By default, the value of this class property is {@code true}.
      * <p>
-     * If this class property is map to {@code false}, then
-     * the client application would have to call
-     * {@code new TFile(&quot;a/outer.zip/b/inner.zip&quot;).mkdirs()}
-     * before it could actually create the innermost &quot;c&quot; entry as a file
+     * Consider the following path: {@code a/outer.zip/b/inner.zip/c}.
+     * Now let's assume that {@code a} exists as a plain old directory in the
+     * OS' file system, while all other parts of this path don't, and that the
+     * TrueZIP Driver ZIP module is present on the run-time class path in order
+     * to recognize {@code outer.zip} and {@code inner.zip} as ZIP files by
+     * default.
+     * <p>
+     * Now, if this class property is set to {@code false}, then an application
+     * would have to call {@code new TFile("a/outer.zip/b/inner.zip").mkdirs()}
+     * before it could actually create the innermost {@code c} entry as a file
      * or directory.
      * <p>
-     * More formally, before you can access an entry in the federated file
-     * system, all its parent directories must exist, including archive
-     * files. This emulates the behaviour of native file systems.
+     * More formally, before an application could access an entry in a
+     * federated file system, all its parent directories would need to exist,
+     * including archive files.
+     * This emulates the behaviour of native file systems.
      * <p>
-     * If this class property is map to {@code true} however, then
-     * any missing parent directories (including archive files) up to the
-     * outermost archive file (&quot;outer.zip&quot;) are created on the fly when using
-     * operations to create the innermost element of the path (&quot;c&quot;).
+     * If this class property is set to {@code true} however, then any missing
+     * parent directories (including archive files) up to the outermost archive
+     * file {@code outer.zip} would get created on the fly when using
+     * operations to create the innermost element of the path {@code c}.
      * <p>
-     * This allows applications to succeed when doing this:
-     * {@code new TFile(&quot;a/outer.zip/b/inner.zip/c&quot;).createNewFile()},
+     * This allows applications to succeed with doing this:
+     * {@code new TFile("a/outer.zip/b/inner.zip/c").createNewFile()},
      * or that:
-     * {@code new TFileOutputStream(&quot;a/outer.zip/b/inner.zip/c&quot;)}.
+     * {@code new TFileOutputStream("a/outer.zip/b/inner.zip/c")}.
      * <p>
-     * Note that in any case the parent directory of the outermost archive
-     * file (&quot;a&quot;), must exist - TrueZIP does not create regular directories
-     * in the real file system on the fly.
-     * </li>
-     * <li>
-     * Many Java applications unfortunately fail to close their streams in all
-     * cases, in particular if an {@code IOException} occured while
-     * accessing it.
-     * However, open streams are a limited resource in any operating system
-     * and may interfere with other services of the OS (on Windows, you can't
-     * delete an open file).
-     * This is called the &quot;unclosed streams issue&quot;.
-     * <p>
-     * Likewise, in TrueZIP an unclosed archive entry stream may result in an
-     * {@code ArchiveFileBusy(Warning)?Exception} to be thrown when
-     * {@link #umount} is called.
-     * In order to prevent this, TrueZIP's archive entry streams have a
-     * {@link Object#finalize()} method which closes an archive entry stream
-     * if its garbage collected.
-     * <p>
-     * Now if this class property is map to {@code false}, then
-     * TrueZIP maintains a hard reference to all archive entry streams
-     * until {@link #umount} is called, which will deal
-     * with them: If they are not closed, an
-     * {@code ArchiveFileBusy(Warning)?Exception} is thrown, depending on
-     * the boolean parameters to these methods.
-     * <p>
-     * This setting is useful if you do not want to tolerate the
-     * &quot;unclosed streams issue&quot; in a client application.
-     * <p>
-     * If this class property is map to {@code true} however, then
-     * TrueZIP maintains only a weak reference to all archive entry streams.
-     * This allows the garbage collector to finalize them before
-     * {@link #umount} is called.
-     * The finalize() method will then close these archive entry streams,
-     * which exempts them, from triggering an
-     * {@code ArchiveBusy(Warning)?Exception} on the next call to
-     * {@link #umount}.
-     * However, closing an archive entry output stream this way may result
-     * in loss of buffered data, so it's only a workaround for this issue.
-     * <p>
-     * Note that for the setting of this class property to take effect, any
-     * change must be made before an archive is first accessed.
-     * The setting will then persist until the archive is reset by the next
-     * call to {@link #umount}.
-     * </li>
-     * </ol>
+     * Note that in either case the parent directory of the outermost archive
+     * file {@code a} must exist - TrueZIP does not create directories in the
+     * OS file system on the fly!
      *
      * @see #isLenient()
      */
@@ -1296,7 +1240,7 @@ public final class TFile extends File {
      * This will automount the (virtual) file system from the archive file and
      * return {@code true} if and only if it's a valid archive file.
      *
-     * @see <a href="#false_positives">Identifying Archive Paths and False Positives</a>
+     * @see <a href="#False_Positives">Identifying Archive Paths and False Positives</a>
      * @see #isDirectory
      * @see #isEntry
      */
@@ -1739,7 +1683,7 @@ public final class TFile extends File {
     /**
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      *
-     * @see <a href="#false_positives">Identifying Archive Paths and False Positives</a>
+     * @see <a href="#False_Positives">Identifying Archive Paths and False Positives</a>
      */
     @Override
     public boolean exists() {
@@ -1760,7 +1704,7 @@ public final class TFile extends File {
      * <p>
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      *
-     * @see <a href="#false_positives">Identifying Archive Paths and False Positives</a>
+     * @see <a href="#False_Positives">Identifying Archive Paths and False Positives</a>
      */
     @Override
     public boolean isFile() {
@@ -1790,7 +1734,7 @@ public final class TFile extends File {
      * <p>
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      *
-     * @see <a href="#false_positives">Identifying Archive Paths and False Positives</a>
+     * @see <a href="#False_Positives">Identifying Archive Paths and False Positives</a>
      */
     @Override
     public boolean isDirectory() {
@@ -1899,7 +1843,7 @@ public final class TFile extends File {
      * <p>
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      *
-     * @see <a href="#false_positives">Identifying Archive Paths and False Positives</a>
+     * @see <a href="#False_Positives">Identifying Archive Paths and False Positives</a>
      */
     @Override
     public long length() {
@@ -2407,7 +2351,7 @@ public final class TFile extends File {
      *   <td>Always</td>
      * </tr>
      * <tr>
-     *   <td><a href="#DDC">Direct Data Copying (DDC)</a></td>
+     *   <td><a href="#Direct_Data_Copying">Direct Data Copying (DDC)</a></td>
      *   <td>No</td>
      * </tr>
      * <tr>
@@ -2426,7 +2370,7 @@ public final class TFile extends File {
      *
      * @return {@code true} if and only if the operation succeeded.
      * @throws NullPointerException If any parameter is {@code null}.
-     * @see <a href="#copy_methods">Copy Methods</a>
+     * @see <a href="#Copy_Methods">Copy Methods</a>
      */
     public boolean copyFrom(final InputStream in) {
         try {
@@ -2467,7 +2411,7 @@ public final class TFile extends File {
      *   <td>n/a</td>
      * </tr>
      * <tr>
-     *   <td><a href="#DDC">Direct Data Copying (DDC)</a></td>
+     *   <td><a href="#Direct_Data_Copying">Direct Data Copying (DDC)</a></td>
      *   <td>Yes</td>
      * </tr>
      * <tr>
@@ -2489,7 +2433,7 @@ public final class TFile extends File {
      *        supported for instances of this class.
      * @return {@code true} if and only if the operation succeeded.
      * @throws NullPointerException If any parameter is {@code null}.
-     * @see <a href="#copy_methods">Copy Methods</a>
+     * @see <a href="#Copy_Methods">Copy Methods</a>
      */
     public boolean copyFrom(final File src) {
         try {
@@ -2529,7 +2473,7 @@ public final class TFile extends File {
      *   <td>n/a</td>
      * </tr>
      * <tr>
-     *   <td><a href="#DDC">Direct Data Copying (DDC)</a></td>
+     *   <td><a href="#Direct_Data_Copying">Direct Data Copying (DDC)</a></td>
      *   <td>Yes</td>
      * </tr>
      * <tr>
@@ -2551,7 +2495,7 @@ public final class TFile extends File {
      *        are only supported for instances of this class.
      * @return {@code true} if and only if the operation succeeded.
      * @throws NullPointerException If any parameter is {@code null}.
-     * @see <a href="#copy_methods">Copy Methods</a>
+     * @see <a href="#Copy_Methods">Copy Methods</a>
      */
     public boolean copyAllFrom(final File src) {
         try {
@@ -2590,7 +2534,7 @@ public final class TFile extends File {
      *   <td>n/a</td>
      * </tr>
      * <tr>
-     *   <td><a href="#DDC">Direct Data Copying (DDC)</a></td>
+     *   <td><a href="#Direct_Data_Copying">Direct Data Copying (DDC)</a></td>
      *   <td>Yes</td>
      * </tr>
      * <tr>
@@ -2612,7 +2556,7 @@ public final class TFile extends File {
      *        are only supported for instances of this class.
      * @param detector The object used to detect any archive files
      *        in the source and destination directory trees.
-     * @see <a href="#copy_methods">Copy Methods</a>
+     * @see <a href="#Copy_Methods">Copy Methods</a>
      */
     public boolean copyAllFrom(
             final File src,
@@ -2658,7 +2602,7 @@ public final class TFile extends File {
      *   <td>n/a</td>
      * </tr>
      * <tr>
-     *   <td><a href="#DDC">Direct Data Copying (DDC)</a></td>
+     *   <td><a href="#Direct_Data_Copying">Direct Data Copying (DDC)</a></td>
      *   <td>Yes</td>
      * </tr>
      * <tr>
@@ -2683,7 +2627,7 @@ public final class TFile extends File {
      * @param dstDetector The object used to detect any archive files
      *        in the destination directory tree.
      * @return {@code true} if and only if the operation succeeded.
-     * @see <a href="#copy_methods">Copy Methods</a>
+     * @see <a href="#Copy_Methods">Copy Methods</a>
      */
     public boolean copyAllFrom(
             final File src,
@@ -2722,7 +2666,7 @@ public final class TFile extends File {
      *   <td>Always</td>
      * </tr>
      * <tr>
-     *   <td><a href="#DDC">Direct Data Copying (DDC)</a></td>
+     *   <td><a href="#Direct_Data_Copying">Direct Data Copying (DDC)</a></td>
      *   <td>No</td>
      * </tr>
      * <tr>
@@ -2741,7 +2685,7 @@ public final class TFile extends File {
      *
      * @return {@code true} if and only if the operation succeeded.
      * @throws NullPointerException If any parameter is {@code null}.
-     * @see <a href="#copy_methods">Copy Methods</a>
+     * @see <a href="#Copy_Methods">Copy Methods</a>
      */
     public boolean copyTo(final OutputStream out) {
         try {
@@ -2778,7 +2722,7 @@ public final class TFile extends File {
      *   <td>n/a</td>
      * </tr>
      * <tr>
-     *   <td><a href="#DDC">Direct Data Copying (DDC)</a></td>
+     *   <td><a href="#Direct_Data_Copying">Direct Data Copying (DDC)</a></td>
      *   <td>Yes</td>
      * </tr>
      * <tr>
@@ -2800,7 +2744,7 @@ public final class TFile extends File {
      *        supported for instances of this class.
      * @return {@code true} if the file has been successfully copied.
      * @throws NullPointerException If any parameter is {@code null}.
-     * @see <a href="#copy_methods">Copy Methods</a>
+     * @see <a href="#Copy_Methods">Copy Methods</a>
      */
     public boolean copyTo(final File dst) {
         try {
@@ -2840,7 +2784,7 @@ public final class TFile extends File {
      *   <td>n/a</td>
      * </tr>
      * <tr>
-     *   <td><a href="#DDC">Direct Data Copying (DDC)</a></td>
+     *   <td><a href="#Direct_Data_Copying">Direct Data Copying (DDC)</a></td>
      *   <td>Yes</td>
      * </tr>
      * <tr>
@@ -2862,7 +2806,7 @@ public final class TFile extends File {
      *        are only supported for instances of this class.
      * @return {@code true} if and only if the operation succeeded.
      * @throws NullPointerException If any parameter is {@code null}.
-     * @see <a href="#copy_methods">Copy Methods</a>
+     * @see <a href="#Copy_Methods">Copy Methods</a>
      */
     public boolean copyAllTo(final File dst) {
         try {
@@ -2901,7 +2845,7 @@ public final class TFile extends File {
      *   <td>n/a</td>
      * </tr>
      * <tr>
-     *   <td><a href="#DDC">Direct Data Copying (DDC)</a></td>
+     *   <td><a href="#Direct_Data_Copying">Direct Data Copying (DDC)</a></td>
      *   <td>Yes</td>
      * </tr>
      * <tr>
@@ -2924,7 +2868,7 @@ public final class TFile extends File {
      * @param detector The object used to detect any archive files
      *        in the source and destination directory trees.
      * @return {@code true} if and only if the operation succeeded.
-     * @see <a href="#copy_methods">Copy Methods</a>
+     * @see <a href="#Copy_Methods">Copy Methods</a>
      */
     public boolean copyAllTo(
             final File dst,
@@ -2970,7 +2914,7 @@ public final class TFile extends File {
      *   <td>n/a</td>
      * </tr>
      * <tr>
-     *   <td><a href="#DDC">Direct Data Copying (DDC)</a></td>
+     *   <td><a href="#Direct_Data_Copying">Direct Data Copying (DDC)</a></td>
      *   <td>Yes</td>
      * </tr>
      * <tr>
@@ -2995,7 +2939,7 @@ public final class TFile extends File {
      * @param dstDetector The object used to detect any archive files
      *        in the destination directory tree.
      * @return {@code true} if and only if the operation succeeded.
-     * @see <a href="#copy_methods">Copy Methods</a>
+     * @see <a href="#Copy_Methods">Copy Methods</a>
      */
     public boolean copyAllTo(
             final File dst,
@@ -3037,7 +2981,7 @@ public final class TFile extends File {
      *   <td>n/a</td>
      * </tr>
      * <tr>
-     *   <td><a href="#DDC">Direct Data Copying (DDC)</a></td>
+     *   <td><a href="#Direct_Data_Copying">Direct Data Copying (DDC)</a></td>
      *   <td>Yes</td>
      * </tr>
      * <tr>
@@ -3058,7 +3002,7 @@ public final class TFile extends File {
      *        be a plain {@code File}, archive entries are only
      *        supported for instances of this class.
      * @return {@code true} if and only if the operation succeeded.
-     * @see <a href="#copy_methods">Copy Methods</a>
+     * @see <a href="#Copy_Methods">Copy Methods</a>
      */
     public boolean archiveCopyFrom(final File src) {
         try {
@@ -3102,7 +3046,7 @@ public final class TFile extends File {
      *   <td>n/a</td>
      * </tr>
      * <tr>
-     *   <td><a href="#DDC">Direct Data Copying (DDC)</a></td>
+     *   <td><a href="#Direct_Data_Copying">Direct Data Copying (DDC)</a></td>
      *   <td>Yes</td>
      * </tr>
      * <tr>
@@ -3124,7 +3068,7 @@ public final class TFile extends File {
      *        are only supported for instances of this class.
      * @return {@code true} if and only if the operation succeeded.
      * @throws NullPointerException If any parameter is {@code null}.
-     * @see <a href="#copy_methods">Copy Methods</a>
+     * @see <a href="#Copy_Methods">Copy Methods</a>
      */
     public boolean archiveCopyAllFrom(final File src) {
         try {
@@ -3167,7 +3111,7 @@ public final class TFile extends File {
      *   <td>n/a</td>
      * </tr>
      * <tr>
-     *   <td><a href="#DDC">Direct Data Copying (DDC)</a></td>
+     *   <td><a href="#Direct_Data_Copying">Direct Data Copying (DDC)</a></td>
      *   <td>Yes</td>
      * </tr>
      * <tr>
@@ -3190,7 +3134,7 @@ public final class TFile extends File {
      * @param detector The object used to detect any archive files
      *        in the source and destination directory trees.
      * @return {@code true} if and only if the operation succeeded.
-     * @see <a href="#copy_methods">Copy Methods</a>
+     * @see <a href="#Copy_Methods">Copy Methods</a>
      */
     public boolean archiveCopyAllFrom(
             final File src,
@@ -3240,7 +3184,7 @@ public final class TFile extends File {
      *   <td>n/a</td>
      * </tr>
      * <tr>
-     *   <td><a href="#DDC">Direct Data Copying (DDC)</a></td>
+     *   <td><a href="#Direct_Data_Copying">Direct Data Copying (DDC)</a></td>
      *   <td>Yes</td>
      * </tr>
      * <tr>
@@ -3265,7 +3209,7 @@ public final class TFile extends File {
      * @param dstDetector The object used to detect archive files
      *        in the destination directory tree.
      * @return {@code true} if and only if the operation succeeded.
-     * @see <a href="#copy_methods">Copy Methods</a>
+     * @see <a href="#Copy_Methods">Copy Methods</a>
      */
     public boolean archiveCopyAllFrom(
             final File src,
@@ -3308,7 +3252,7 @@ public final class TFile extends File {
      *   <td>n/a</td>
      * </tr>
      * <tr>
-     *   <td><a href="#DDC">Direct Data Copying (DDC)</a></td>
+     *   <td><a href="#Direct_Data_Copying">Direct Data Copying (DDC)</a></td>
      *   <td>Yes</td>
      * </tr>
      * <tr>
@@ -3330,7 +3274,7 @@ public final class TFile extends File {
      *        supported for instances of this class.
      * @return {@code true} if and only if the operation succeeded.
      * @throws NullPointerException If any parameter is {@code null}.
-     * @see <a href="#copy_methods">Copy Methods</a>
+     * @see <a href="#Copy_Methods">Copy Methods</a>
      */
     public boolean archiveCopyTo(File dst) {
         try {
@@ -3374,7 +3318,7 @@ public final class TFile extends File {
      *   <td>n/a</td>
      * </tr>
      * <tr>
-     *   <td><a href="#DDC">Direct Data Copying (DDC)</a></td>
+     *   <td><a href="#Direct_Data_Copying">Direct Data Copying (DDC)</a></td>
      *   <td>Yes</td>
      * </tr>
      * <tr>
@@ -3396,7 +3340,7 @@ public final class TFile extends File {
      *        are only supported for instances of this class.
      * @return {@code true} if and only if the operation succeeded.
      * @throws NullPointerException If any parameter is {@code null}.
-     * @see <a href="#copy_methods">Copy Methods</a>
+     * @see <a href="#Copy_Methods">Copy Methods</a>
      */
     public boolean archiveCopyAllTo(final File dst) {
         try {
@@ -3441,7 +3385,7 @@ public final class TFile extends File {
      *   <td>n/a</td>
      * </tr>
      * <tr>
-     *   <td><a href="#DDC">Direct Data Copying (DDC)</a></td>
+     *   <td><a href="#Direct_Data_Copying">Direct Data Copying (DDC)</a></td>
      *   <td>Yes</td>
      * </tr>
      * <tr>
@@ -3464,7 +3408,7 @@ public final class TFile extends File {
      * @param detector The object used to detect any archive files
      *        in the source and destination directory trees.
      * @return {@code true} if and only if the operation succeeded.
-     * @see <a href="#copy_methods">Copy Methods</a>
+     * @see <a href="#Copy_Methods">Copy Methods</a>
      */
     public boolean archiveCopyAllTo(
             final File dst,
@@ -3514,7 +3458,7 @@ public final class TFile extends File {
      *   <td>n/a</td>
      * </tr>
      * <tr>
-     *   <td><a href="#DDC">Direct Data Copying (DDC)</a></td>
+     *   <td><a href="#Direct_Data_Copying">Direct Data Copying (DDC)</a></td>
      *   <td>Yes</td>
      * </tr>
      * <tr>
@@ -3539,7 +3483,7 @@ public final class TFile extends File {
      * @param dstDetector The object used to detect any archive files
      *        in the destination directory tree.
      * @return {@code true} if and only if the operation succeeded.
-     * @see <a href="#copy_methods">Copy Methods</a>
+     * @see <a href="#Copy_Methods">Copy Methods</a>
      */
     public boolean archiveCopyAllTo(
             final File dst,
@@ -3584,7 +3528,7 @@ public final class TFile extends File {
      *   <td>Always</td>
      * </tr>
      * <tr>
-     *   <td><a href="#DDC">Direct Data Copying (DDC)</a></td>
+     *   <td><a href="#Direct_Data_Copying">Direct Data Copying (DDC)</a></td>
      *   <td>n/a</td>
      * </tr>
      * <tr>
@@ -3608,7 +3552,7 @@ public final class TFile extends File {
      * @throws IOException if copying the data fails because of an
      *         {@code IOException} in the <em>output</em> stream.
      * @see    #cat(InputStream, OutputStream)
-     * @see    <a href="#copy_methods">Copy Methods</a>
+     * @see    <a href="#Copy_Methods">Copy Methods</a>
      */
     public static void cp(final InputStream in, final OutputStream out)
     throws IOException {
@@ -3640,7 +3584,7 @@ public final class TFile extends File {
      *   <td>n/a</td>
      * </tr>
      * <tr>
-     *   <td><a href="#DDC">Direct Data Copying (DDC)</a></td>
+     *   <td><a href="#Direct_Data_Copying">Direct Data Copying (DDC)</a></td>
      *   <td>Yes</td>
      * </tr>
      * <tr>
@@ -3665,7 +3609,7 @@ public final class TFile extends File {
      *        supported for instances of this class.
      * @throws IOException If copying the data fails for some reason.
      * @throws NullPointerException If any parameter is {@code null}.
-     * @see <a href="#copy_methods">Copy Methods</a>
+     * @see <a href="#Copy_Methods">Copy Methods</a>
      */
     public static void cp(File src, File dst)
     throws IOException {
@@ -3699,7 +3643,7 @@ public final class TFile extends File {
      *   <td>n/a</td>
      * </tr>
      * <tr>
-     *   <td><a href="#DDC">Direct Data Copying (DDC)</a></td>
+     *   <td><a href="#Direct_Data_Copying">Direct Data Copying (DDC)</a></td>
      *   <td>Yes</td>
      * </tr>
      * <tr>
@@ -3724,7 +3668,7 @@ public final class TFile extends File {
      *        supported for instances of this class.
      * @throws IOException If copying the data fails for some reason.
      * @throws NullPointerException If any parameter is {@code null}.
-     * @see <a href="#copy_methods">Copy Methods</a>
+     * @see <a href="#Copy_Methods">Copy Methods</a>
      */
     public static void cp_p(File src, File dst)
     throws IOException {
@@ -3757,7 +3701,7 @@ public final class TFile extends File {
      *   <td>Never</td>
      * </tr>
      * <tr>
-     *   <td><a href="#DDC">Direct Data Copying (DDC)</a></td>
+     *   <td><a href="#Direct_Data_Copying">Direct Data Copying (DDC)</a></td>
      *   <td>n/a</td>
      * </tr>
      * <tr>
@@ -3776,7 +3720,7 @@ public final class TFile extends File {
      *
      * @param in The input stream.
      * @return {@code true} if and only if the operation succeeded.
-     * @see <a href="#copy_methods">Copy Methods</a>
+     * @see <a href="#Copy_Methods">Copy Methods</a>
      */
     public boolean catFrom(final InputStream in) {
         try {
@@ -3823,7 +3767,7 @@ public final class TFile extends File {
      *   <td>Never</td>
      * </tr>
      * <tr>
-     *   <td><a href="#DDC">Direct Data Copying (DDC)</a></td>
+     *   <td><a href="#Direct_Data_Copying">Direct Data Copying (DDC)</a></td>
      *   <td>n/a</td>
      * </tr>
      * <tr>
@@ -3842,7 +3786,7 @@ public final class TFile extends File {
      *
      * @param out The output stream.
      * @return {@code true} if and only if the operation succeeded.
-     * @see <a href="#copy_methods">Copy Methods</a>
+     * @see <a href="#Copy_Methods">Copy Methods</a>
      */
     public boolean catTo(final OutputStream out) {
         try {
@@ -3891,7 +3835,7 @@ public final class TFile extends File {
      *   <td>Never</td>
      * </tr>
      * <tr>
-     *   <td><a href="#DDC">Direct Data Copying (DDC)</a></td>
+     *   <td><a href="#Direct_Data_Copying">Direct Data Copying (DDC)</a></td>
      *   <td>n/a</td>
      * </tr>
      * <tr>
@@ -3915,7 +3859,7 @@ public final class TFile extends File {
      * @throws IOException if copying the data fails because of an
      *         {@code IOException} in the <em>output</em> stream.
      * @see    #cp(InputStream, OutputStream)
-     * @see    <a href="#copy_methods">Copy Methods</a>
+     * @see    <a href="#Copy_Methods">Copy Methods</a>
      */
     public static void cat(final InputStream in, final OutputStream out)
     throws IOException {
