@@ -20,12 +20,10 @@ import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
-import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.File;
-import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -35,53 +33,54 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.APPEND;
 import static de.schlichtherle.truezip.fs.FsOutputOption.CREATE_PARENTS;
 
 /**
- * A replacement for {@link FileOutputStream} which provides transparent write
- * access to archive entries as if they were (virtual) files.
- * All file system operations in this class are
- * <a href="package-summary.html#atomicity">virtually atomic</a>.
+ * A replacement for {@link FileOutputStream} for writing plain old files or
+ * entries in an archive file.
+ * Note that applications cannot write archive <em>files</em> directly using
+ * this class - just their entries.
  * <p>
- * To prevent exceptions to be thrown subsequently, client applications
- * should always close their streams using the following idiom:
+ * To prevent exceptions to be thrown subsequently, applications should
+ * <em>always</em> close their streams using the following idiom:
  * <pre>{@code 
- * TFileOutputStream fos = new TFileOutputStream(file);
+ * TFileOutputStream out = new TFileOutputStream(file);
  * try {
- *     // access fos here
+ *     // Do I/O here...
  * } finally {
- *     fos.close();
+ *     out.close(); // ALWAYS close the stream!
  * }
  * }</pre>
  * <p>
- * Note that for various (mostly archive driver specific) reasons, the
- * {@code close()} method may throw an {@code IOException}, too.
- * Client applications need to deal with this appropriately, for example
- * by enclosing the entire block with another {@code try-catch}-block.
+ * Note that the {@link #close()} method may throw an {@link IOException}, too.
+ * Applications need to deal with this appropriately, for example by enclosing
+ * the entire block with another {@code try-catch}-block:
+ * <pre>{@code
+ * try {
+ *     TFileOutputStream out = new TFileOutputStream(file);
+ *     try {
+ *         // Do I/O here...
+ *     } finally {
+ *         out.close(); // ALWAYS close the stream!
+ *     }
+ * } catch (IOException ex) {
+ *     ex.printStackTrace();
+ * }
+ * }</pre>
  * <p>
- * Client applications cannot write to an entry in an archive file if an
- * automatic update is required but cannot get performed because other
- * {@code FileInputStream} or {@code TFileOutputStream} instances
- * haven't been closed or garbage collected yet.
- * A {@link FileBusyException} is thrown by the constructors of this class
+ * Applications cannot write to an entry in an archive file if an implicit
+ * {@link TFile#umount() unmount} is required but cannot get performed because
+ * another {@link TFileInputStream} or {@link TFileOutputStream} object hasn't
+ * been closed or garbage collected yet.
+ * A {@link FileNotFoundException} is thrown by the constructors of this class
  * in this case.
  * <p>
- * Whether or not a client application can write to more than one entry
- * in the same archive archive file concurrently is an implementation
- * detail of the respective archive driver.
- * As of version 6.5, all archive drivers provided by TrueZIP don't restrict
- * this.
- * However, custom archive drivers provided by third parties may do so.
- * <p>
- * If a client application tries to exceed the number of entry streams
- * supported to operate on the same archive file concurrently, a
- * {@link FileBusyException} is thrown by the constructors of this class.
- * <p>
  * If you would like to use this class in order to copy files,
- * please consider using the {@code *copy*} methods in the {@link TFile}
- * class instead.
+ * please consider using one of the
+ * <a href="TFile.java#Copy_Methods">copy methods</a> of the class {@link TFile}
+ * instead.
  * These methods provide ease of use, enhanced features, superior performance
  * and require less space in the temp file folder.
  *
- * @see     <a href="package-summary.html#streams">Using Archive Entry Streams</a>
  * @see     TFile#cat(InputStream, OutputStream)
+ * @see     TFile#setLenient
  * @see     TFileInputStream
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -90,38 +89,52 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.CREATE_PARENTS;
 @Immutable
 public final class TFileOutputStream extends DecoratingOutputStream {
 
+    private static final BitField<FsOutputOption>
+            DEFAULT_OPTIONS = BitField.noneOf(FsOutputOption.class);
+
     /**
-     * Creates a new {@code TFileOutputStream} for accessing regular files or
-     * archive entries.
+     * Constructs a new output stream for writing plain old files or entries
+     * in an archive file.
+     * This constructor calls {@link TFile#TFile(String) new TFile(path)} for
+     * the given path.
      *
+     * @param  path the path of the plain old file or entry in an archive file
+     *         to write.
      * @throws FileBusyException If the path denotes an archive entry and the
      *         archive driver does not support to create an additional output
      *         stream for the archive file.
      * @throws FileNotFoundException On any other I/O related issue.
      */
-    public TFileOutputStream(String name)
+    public TFileOutputStream(String path)
     throws FileNotFoundException {
-        super(newOutputStream(new TFile(name), false));
+        super(newOutputStream(new TFile(path), false));
     }
 
     /**
-     * Creates a new {@code TFileOutputStream} for accessing regular files or
-     * archive entries.
+     * Constructs a new output stream for writing plain old files or entries
+     * in an archive file.
+     * This constructor calls {@link TFile#TFile(String) new TFile(path)} for
+     * the given path.
      *
+     * @param  path the path of the plain old file or entry in an archive file
+     *         to write.
+     * @param  append if the data shall get appended to the file rather than
+     *         replacing it.
      * @throws FileBusyException If the path denotes an archive entry and the
      *         archive driver does not support to create an additional output
      *         stream for the archive file.
      * @throws FileNotFoundException On any other I/O related issue.
      */
-    public TFileOutputStream(String name, boolean append)
+    public TFileOutputStream(String path, boolean append)
     throws FileNotFoundException {
-        super(newOutputStream(new TFile(name), append));
+        super(newOutputStream(new TFile(path), append));
     }
 
     /**
-     * Creates a new {@code TFileOutputStream} for accessing regular files or
-     * archive entries.
+     * Constructs a new output stream for writing plain old files or entries
+     * in an archive file.
      *
+     * @param  file the plain old file or entry in an archive file to write.
      * @throws FileBusyException If the path denotes an archive entry and the
      *         archive driver does not support to create an additional output
      *         stream for the archive file.
@@ -133,9 +146,12 @@ public final class TFileOutputStream extends DecoratingOutputStream {
     }
 
     /**
-     * Creates a new {@code TFileOutputStream} for accessing regular files or
-     * archive entries.
+     * Constructs a new output stream for writing plain old files or entries
+     * in an archive file.
      *
+     * @param  file the plain old file or entry in an archive file to write.
+     * @param  append if the data shall get appended to the file rather than
+     *         replacing it.
      * @throws FileBusyException If the path denotes an archive entry and the
      *         archive driver does not support to create an additional output
      *         stream for the archive file.
@@ -146,16 +162,12 @@ public final class TFileOutputStream extends DecoratingOutputStream {
         super(newOutputStream(file, append));
     }
 
-    public TFileOutputStream(FileDescriptor fd) {
-        super(new FileOutputStream(fd));
-    }
-
-    private static OutputStream newOutputStream(    final File dst,
-                                                    final boolean append)
+    private static OutputStream newOutputStream(final File dst,
+                                                final boolean append)
     throws FileNotFoundException {
         final OutputSocket<?> output = TIO.getOutputSocket(
                 dst,
-                BitField.noneOf(FsOutputOption.class)
+                DEFAULT_OPTIONS
                     .set(APPEND, append)
                     .set(CREATE_PARENTS, TFile.isLenient()),
                 null);

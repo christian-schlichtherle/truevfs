@@ -42,6 +42,7 @@
             <xsl:apply-templates/>
             <xsl:text>&#x0a;&#x0a;</xsl:text>
         </xsl:for-each>
+        <xsl:text>    []&#x0a;&#x0a;</xsl:text>
     </xsl:template>
 
     <xsl:template match="html:ol">
@@ -50,9 +51,34 @@
             <xsl:apply-templates/>
             <xsl:text>&#x0a;&#x0a;</xsl:text>
         </xsl:for-each>
+        <xsl:text>    []&#x0a;&#x0a;</xsl:text>
     </xsl:template>
 
-    <xsl:template match="html:h2|html:h3|html:h4|html:h5|html:h6|html:h7|html:h8|html:h9">
+    <xsl:template match="html:h2">
+        <xsl:apply-templates/>
+        <xsl:text>&#x0a;&#x0a;</xsl:text>
+    </xsl:template>
+
+    <xsl:template match="html:h3">
+        <xsl:text>* </xsl:text>
+        <xsl:apply-templates/>
+        <xsl:text>&#x0a;&#x0a;</xsl:text>
+    </xsl:template>
+
+    <xsl:template match="html:h4">
+        <xsl:text>** </xsl:text>
+        <xsl:apply-templates/>
+        <xsl:text>&#x0a;&#x0a;</xsl:text>
+    </xsl:template>
+
+    <xsl:template match="html:h5">
+        <xsl:text>*** </xsl:text>
+        <xsl:apply-templates/>
+        <xsl:text>&#x0a;&#x0a;</xsl:text>
+    </xsl:template>
+
+    <xsl:template match="html:h6|html:h7|html:h8|html:h9">
+        <xsl:text>**** </xsl:text>
         <xsl:apply-templates/>
         <xsl:text>&#x0a;&#x0a;</xsl:text>
     </xsl:template>
@@ -93,6 +119,12 @@
         <xsl:text> &lt;&lt;&lt;</xsl:text>
         <xsl:apply-templates/>
         <xsl:text>&gt;&gt;&gt; </xsl:text>
+    </xsl:template>
+
+    <xsl:template match="html:pre">
+        <xsl:text>&#x0a;+--&#x0a;</xsl:text>
+        <xsl:apply-templates/>
+        <xsl:text>&#x0a;+--&#x0a;&#x0a;</xsl:text>
     </xsl:template>
 
     <xsl:template match="text()">

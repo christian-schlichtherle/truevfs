@@ -26,5 +26,10 @@
             TrueZIP&nbsp;6 which have now been renamed to <code>TFile</code>*
             and relocated to the new package
             {@link de.schlichtherle.truezip.file}.</p>
+        <p><strong>Warning:</strong>The classes in this package access and
+            manipulate archive files as external resources and may cache some
+            of their state in memory and temporary files.
+            <em>Third parties must not concurrently access these archive
+                files!</em></p>
     </body>
 </html>

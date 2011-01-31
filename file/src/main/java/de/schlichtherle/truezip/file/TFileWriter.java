@@ -17,19 +17,17 @@ package de.schlichtherle.truezip.file;
 
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import java.io.FileDescriptor;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import net.jcip.annotations.Immutable;
 
 /**
- * A replacement for {@link FileWriter} which provides transparent write access
- * to archive entries as if they were (virtual) files.
- * All file system operations in this class are
- * <a href="package-summary.html#atomicity">virtually atomic</a>.
+ * A replacement for {@link FileWriter} for writing plain old files or
+ * entries in an archive file.
+ * Note that applications cannot write archive <em>files</em> directly using
+ * this class - just their entries.
  *
- * @see     <a href="package-summary.html#streams">Using Archive Entry Streams</a>
  * @see     TFile#setLenient
  * @see     TFileReader
  * @author  Christian Schlichtherle
@@ -39,23 +37,11 @@ import net.jcip.annotations.Immutable;
 @Immutable
 public final class TFileWriter extends OutputStreamWriter {
 
-    public TFileWriter(String path) throws IOException {
-	super(new TFileOutputStream(path));
-    }
-
-    public TFileWriter(String path, boolean append) throws IOException {
-	super(new TFileOutputStream(path, append));
-    }
-
     public TFileWriter(TFile file) throws IOException {
 	super(new TFileOutputStream(file));
     }
 
     public TFileWriter(TFile file, boolean append) throws IOException {
         super(new TFileOutputStream(file, append));
-    }
-
-    public TFileWriter(FileDescriptor fd) {
-	super(new TFileOutputStream(fd));
     }
 }
