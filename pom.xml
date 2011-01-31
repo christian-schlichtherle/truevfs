@@ -75,11 +75,11 @@
     </scm>
 
     <modules>
-        <module>driver</module>
-        <module>file</module>
-        <module>kernel</module>
-        <module>samples</module>
-        <module>swing</module>
+        <module>truezip-driver</module>
+        <module>truezip-file</module>
+        <module>truezip-kernel</module>
+        <module>truezip-samples</module>
+        <module>truezip-swing</module>
     </modules>
 
     <dependencyManagement>
