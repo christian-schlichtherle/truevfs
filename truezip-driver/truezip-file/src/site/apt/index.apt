@@ -15,4 +15,4 @@ About TrueZIP Driver FILE
 
     For a documentation which URI schemes get registered by this module for use
     with the TrueZIP Kernel module, please refer to the Javadoc for the class
-    {{{../apidocs/de/schlichtherle/truezip/fs/file/FileDriverProvider.html}<<<FileDriverProvider>>>}}.
+    {{{../../apidocs/de/schlichtherle/truezip/fs/file/FileDriverProvider.html}<<<FileDriverProvider>>>}}.

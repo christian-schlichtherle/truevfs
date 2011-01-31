@@ -18,4 +18,4 @@ About TrueZIP Driver TZP
     with the TrueZIP Kernel module and which canonical archive file suffixes
     get registered for automatic detection by the TrueZIP File* module, please
     refer to the Javadoc for the class
-    {{{../apidocs/de/schlichtherle/truezip/fs/archive/zip/raes/ZipRaesDriverProvider.html}<<<ZipRaesDriverProvider>>>}}.
+    {{{../../apidocs/de/schlichtherle/truezip/fs/archive/zip/raes/ZipRaesDriverProvider.html}<<<ZipRaesDriverProvider>>>}}.
