@@ -147,6 +147,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  * first parent file system where it actually exists.
  * <p>
  * <table border="2" cellpadding="4">
+ * <thead>
  * <tr>
  *   <th>Path</th>
  *   <th>True State</th>
@@ -156,6 +157,8 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  *   <th>{@code exists()}</th>
  *   <th>{@code length()}<sup>2</sup></th>
  * </tr>
+ * </thead>
+ * <tbody>
  * <tr>
  *   <td><i>archive.zip</i><sup>3</sup></td>
  *   <td>Valid ZIP file</td>
@@ -297,6 +300,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  *   <td>{@code false}</td>
  *   <td>{@code 0}</td>
  * </tr>
+ * </tbody>
  * </table>
  * <ol>
  * <li>{@link #isArchive} doesn't check the true state of the file - it just
@@ -2329,10 +2333,13 @@ public final class TFile extends File {
      * Copies the input stream {@code in} to this file and closes it.
      * <p>
      * <table border="2" cellpadding="4">
+     * <thead>
      * <tr>
      *   <th>Feature</th>
      *   <th>Supported</th>
      * </tr>
+     * </thead>
+     * <tbody>
      * <tr>
      *   <td>Preserves file attributes</td>
      *   <td>None</td>
@@ -2365,6 +2372,7 @@ public final class TFile extends File {
      *   <td>Atomic</td>
      *   <td>No</td>
      * </tr>
+     * </tbody>
      * </table>
      *
      * @return {@code true} if and only if the operation succeeded.
@@ -2389,10 +2397,13 @@ public final class TFile extends File {
      * Copies the file {@code src} to this file.
      * <p>
      * <table border="2" cellpadding="4">
+     * <thead>
      * <tr>
      *   <th>Feature</th>
      *   <th>Supported</th>
      * </tr>
+     * </thead>
+     * <tbody>
      * <tr>
      *   <td>Preserves file attributes</td>
      *   <td>None</td>
@@ -2425,6 +2436,7 @@ public final class TFile extends File {
      *   <td>Atomic</td>
      *   <td>No</td>
      * </tr>
+     * </tbody>
      * </table>
      *
      * @param src The source file. Note that although this just needs to
@@ -2451,10 +2463,13 @@ public final class TFile extends File {
      * and destination directory trees.
      * <p>
      * <table border="2" cellpadding="4">
+     * <thead>
      * <tr>
      *   <th>Feature</th>
      *   <th>Supported</th>
      * </tr>
+     * </thead>
+     * <tbody>
      * <tr>
      *   <td>Preserves file attributes</td>
      *   <td>None</td>
@@ -2487,6 +2502,7 @@ public final class TFile extends File {
      *   <td>Atomic</td>
      *   <td>No</td>
      * </tr>
+     * </tbody>
      * </table>
      *
      * @param src The source file. Note that although this just needs to
@@ -2512,10 +2528,13 @@ public final class TFile extends File {
      * files in the source and destination directory trees.
      * <p>
      * <table border="2" cellpadding="4">
+     * <thead>
      * <tr>
      *   <th>Feature</th>
      *   <th>Supported</th>
      * </tr>
+     * </thead>
+     * <tbody>
      * <tr>
      *   <td>Preserves file attributes</td>
      *   <td>None</td>
@@ -2548,6 +2567,7 @@ public final class TFile extends File {
      *   <td>Atomic</td>
      *   <td>No</td>
      * </tr>
+     * </tbody>
      * </table>
      *
      * @param src The source file. Note that although this just needs to
@@ -2580,10 +2600,13 @@ public final class TFile extends File {
      * a custom {@link TDefaultArchiveDetector}.
      * <p>
      * <table border="2" cellpadding="4">
+     * <thead>
      * <tr>
      *   <th>Feature</th>
      *   <th>Supported</th>
      * </tr>
+     * </thead>
+     * <tbody>
      * <tr>
      *   <td>Preserves file attributes</td>
      *   <td>None</td>
@@ -2616,6 +2639,7 @@ public final class TFile extends File {
      *   <td>Atomic</td>
      *   <td>No</td>
      * </tr>
+     * </tbody>
      * </table>
      *
      * @param src The source file. Note that although this just needs to
@@ -2644,10 +2668,13 @@ public final class TFile extends File {
      * Copies this file to the output stream {@code out} and closes it.
      * <p>
      * <table border="2" cellpadding="4">
+     * <thead>
      * <tr>
      *   <th>Feature</th>
      *   <th>Supported</th>
      * </tr>
+     * </thead>
+     * <tbody>
      * <tr>
      *   <td>Preserves file attributes</td>
      *   <td>None</td>
@@ -2680,6 +2707,7 @@ public final class TFile extends File {
      *   <td>Atomic</td>
      *   <td>No</td>
      * </tr>
+     * </tbody>
      * </table>
      *
      * @return {@code true} if and only if the operation succeeded.
@@ -2700,10 +2728,13 @@ public final class TFile extends File {
      * Copies this file to the file {@code dst}.
      * <p>
      * <table border="2" cellpadding="4">
+     * <thead>
      * <tr>
      *   <th>Feature</th>
      *   <th>Supported</th>
      * </tr>
+     * </thead>
+     * <tbody>
      * <tr>
      *   <td>Preserves file attributes</td>
      *   <td>None</td>
@@ -2736,6 +2767,7 @@ public final class TFile extends File {
      *   <td>Atomic</td>
      *   <td>No</td>
      * </tr>
+     * </tbody>
      * </table>
      *
      * @param dst The destination file. Note that although this just needs to
@@ -2762,10 +2794,13 @@ public final class TFile extends File {
      * and destination directory trees.
      * <p>
      * <table border="2" cellpadding="4">
+     * <thead>
      * <tr>
      *   <th>Feature</th>
      *   <th>Supported</th>
      * </tr>
+     * </thead>
+     * <tbody>
      * <tr>
      *   <td>Preserves file attributes</td>
      *   <td>None</td>
@@ -2798,6 +2833,7 @@ public final class TFile extends File {
      *   <td>Atomic</td>
      *   <td>No</td>
      * </tr>
+     * </tbody>
      * </table>
      *
      * @param dst The destination file. Note that although this just needs to
@@ -2823,10 +2859,13 @@ public final class TFile extends File {
      * files in the source and destination directory trees.
      * <p>
      * <table border="2" cellpadding="4">
+     * <thead>
      * <tr>
      *   <th>Feature</th>
      *   <th>Supported</th>
      * </tr>
+     * </thead>
+     * <tbody>
      * <tr>
      *   <td>Preserves file attributes</td>
      *   <td>None</td>
@@ -2859,6 +2898,7 @@ public final class TFile extends File {
      *   <td>Atomic</td>
      *   <td>No</td>
      * </tr>
+     * </tbody>
      * </table>
      *
      * @param dst The destination file. Note that although this just needs to
@@ -2892,10 +2932,13 @@ public final class TFile extends File {
      * a custom {@link TDefaultArchiveDetector}.
      * <p>
      * <table border="2" cellpadding="4">
+     * <thead>
      * <tr>
      *   <th>Feature</th>
      *   <th>Supported</th>
      * </tr>
+     * </thead>
+     * <tbody>
      * <tr>
      *   <td>Preserves file attributes</td>
      *   <td>None</td>
@@ -2928,6 +2971,7 @@ public final class TFile extends File {
      *   <td>Atomic</td>
      *   <td>No</td>
      * </tr>
+     * </tbody>
      * </table>
      *
      * @param dst The destination file. Note that although this just needs to
@@ -2959,10 +3003,13 @@ public final class TFile extends File {
      * modification time.
      * <p>
      * <table border="2" cellpadding="4">
+     * <thead>
      * <tr>
      *   <th>Feature</th>
      *   <th>Supported</th>
      * </tr>
+     * </thead>
+     * <tbody>
      * <tr>
      *   <td>Preserves file attributes</td>
      *   <td>Best effort</td>
@@ -2995,6 +3042,7 @@ public final class TFile extends File {
      *   <td>Atomic</td>
      *   <td>No</td>
      * </tr>
+     * </tbody>
      * </table>
      *
      * @param src The source file. Note that although this just needs to
@@ -3024,10 +3072,13 @@ public final class TFile extends File {
      * and destination directory trees.
      * <p>
      * <table border="2" cellpadding="4">
+     * <thead>
      * <tr>
      *   <th>Feature</th>
      *   <th>Supported</th>
      * </tr>
+     * </thead>
+     * <tbody>
      * <tr>
      *   <td>Preserves file attributes</td>
      *   <td>Best effort</td>
@@ -3060,6 +3111,7 @@ public final class TFile extends File {
      *   <td>Atomic</td>
      *   <td>No</td>
      * </tr>
+     * </tbody>
      * </table>
      *
      * @param src The source file. Note that although this just needs to
@@ -3089,10 +3141,13 @@ public final class TFile extends File {
      * files in the source and destination directory trees.
      * <p>
      * <table border="2" cellpadding="4">
+     * <thead>
      * <tr>
      *   <th>Feature</th>
      *   <th>Supported</th>
      * </tr>
+     * </thead>
+     * <tbody>
      * <tr>
      *   <td>Preserves file attributes</td>
      *   <td>Best effort</td>
@@ -3125,6 +3180,7 @@ public final class TFile extends File {
      *   <td>Atomic</td>
      *   <td>No</td>
      * </tr>
+     * </tbody>
      * </table>
      *
      * @param src The source file. Note that although this just needs to
@@ -3162,10 +3218,13 @@ public final class TFile extends File {
      * a custom {@link TDefaultArchiveDetector}.
      * <p>
      * <table border="2" cellpadding="4">
+     * <thead>
      * <tr>
      *   <th>Feature</th>
      *   <th>Supported</th>
      * </tr>
+     * </thead>
+     * <tbody>
      * <tr>
      *   <td>Preserves file attributes</td>
      *   <td>Best effort</td>
@@ -3198,6 +3257,7 @@ public final class TFile extends File {
      *   <td>Atomic</td>
      *   <td>No</td>
      * </tr>
+     * </tbody>
      * </table>
      *
      * @param src The source file. Note that although this just needs to
@@ -3230,10 +3290,13 @@ public final class TFile extends File {
      * modification time.
      * <p>
      * <table border="2" cellpadding="4">
+     * <thead>
      * <tr>
      *   <th>Feature</th>
      *   <th>Supported</th>
      * </tr>
+     * </thead>
+     * <tbody>
      * <tr>
      *   <td>Preserves file attributes</td>
      *   <td>Best effort</td>
@@ -3266,6 +3329,7 @@ public final class TFile extends File {
      *   <td>Atomic</td>
      *   <td>No</td>
      * </tr>
+     * </tbody>
      * </table>
      *
      * @param dst The destination file. Note that although this just needs to
@@ -3296,10 +3360,13 @@ public final class TFile extends File {
      * source <em>and</em> destination directory trees.
      * <p>
      * <table border="2" cellpadding="4">
+     * <thead>
      * <tr>
      *   <th>Feature</th>
      *   <th>Supported</th>
      * </tr>
+     * </thead>
+     * <tbody>
      * <tr>
      *   <td>Preserves file attributes</td>
      *   <td>Best effort</td>
@@ -3332,6 +3399,7 @@ public final class TFile extends File {
      *   <td>Atomic</td>
      *   <td>No</td>
      * </tr>
+     * </tbody>
      * </table>
      *
      * @param dst The destination file. Note that although this just needs to
@@ -3363,10 +3431,13 @@ public final class TFile extends File {
      * files in the source and destination directory trees.
      * <p>
      * <table border="2" cellpadding="4">
+     * <thead>
      * <tr>
      *   <th>Feature</th>
      *   <th>Supported</th>
      * </tr>
+     * </thead>
+     * <tbody>
      * <tr>
      *   <td>Preserves file attributes</td>
      *   <td>Best effort</td>
@@ -3399,6 +3470,7 @@ public final class TFile extends File {
      *   <td>Atomic</td>
      *   <td>No</td>
      * </tr>
+     * </tbody>
      * </table>
      *
      * @param dst The destination file. Note that although this just needs to
@@ -3436,10 +3508,13 @@ public final class TFile extends File {
      * a custom {@link TDefaultArchiveDetector}.
      * <p>
      * <table border="2" cellpadding="4">
+     * <thead>
      * <tr>
      *   <th>Feature</th>
      *   <th>Supported</th>
      * </tr>
+     * </thead>
+     * <tbody>
      * <tr>
      *   <td>Preserves file attributes</td>
      *   <td>Best effort</td>
@@ -3472,6 +3547,7 @@ public final class TFile extends File {
      *   <td>Atomic</td>
      *   <td>No</td>
      * </tr>
+     * </tbody>
      * </table>
      *
      * @param dst The destination file. Note that although this just needs to
@@ -3506,10 +3582,13 @@ public final class TFile extends File {
      * the current thread.
      * <p>
      * <table border="2" cellpadding="4">
+     * <thead>
      * <tr>
      *   <th>Feature</th>
      *   <th>Supported</th>
      * </tr>
+     * </thead>
+     * <tbody>
      * <tr>
      *   <td>Preserves file attributes</td>
      *   <td>n/a</td>
@@ -3542,6 +3621,7 @@ public final class TFile extends File {
      *   <td>Atomic</td>
      *   <td>No</td>
      * </tr>
+     * </tbody>
      * </table>
      *
      * @param  in the input stream.
@@ -3562,10 +3642,13 @@ public final class TFile extends File {
      * Copies {@code src} to {@code dst}.
      * <p>
      * <table border="2" cellpadding="4">
+     * <thead>
      * <tr>
      *   <th>Feature</th>
      *   <th>Supported</th>
      * </tr>
+     * </thead>
+     * <tbody>
      * <tr>
      *   <td>Preserves file attributes</td>
      *   <td>None</td>
@@ -3598,6 +3681,7 @@ public final class TFile extends File {
      *   <td>Atomic</td>
      *   <td>No</td>
      * </tr>
+     * </tbody>
      * </table>
      * 
      * @param src The source file. Note that although this just needs to
@@ -3621,10 +3705,13 @@ public final class TFile extends File {
      * Currently, only the last modification time is preserved.
      * <p>
      * <table border="2" cellpadding="4">
+     * <thead>
      * <tr>
      *   <th>Feature</th>
      *   <th>Supported</th>
      * </tr>
+     * </thead>
+     * <tbody>
      * <tr>
      *   <td>Preserves file attributes</td>
      *   <td>Best effort</td>
@@ -3657,6 +3744,7 @@ public final class TFile extends File {
      *   <td>Atomic</td>
      *   <td>No</td>
      * </tr>
+     * </tbody>
      * </table>
      * 
      * @param src The source file. Note that although this just needs to
@@ -3679,10 +3767,13 @@ public final class TFile extends File {
      * entry in an archive file without closing the input stream.
      * <p>
      * <table border="2" cellpadding="4">
+     * <thead>
      * <tr>
      *   <th>Feature</th>
      *   <th>Supported</th>
      * </tr>
+     * </thead>
+     * <tbody>
      * <tr>
      *   <td>Preserves file attributes</td>
      *   <td>n/a</td>
@@ -3715,6 +3806,7 @@ public final class TFile extends File {
      *   <td>Atomic</td>
      *   <td>No</td>
      * </tr>
+     * </tbody>
      * </table>
      *
      * @param in The input stream.
@@ -3745,10 +3837,13 @@ public final class TFile extends File {
      * {@code out} without closing it.
      * <p>
      * <table border="2" cellpadding="4">
+     * <thead>
      * <tr>
      *   <th>Feature</th>
      *   <th>Supported</th>
      * </tr>
+     * </thead>
+     * <tbody>
      * <tr>
      *   <td>Preserves file attributes</td>
      *   <td>n/a</td>
@@ -3781,6 +3876,7 @@ public final class TFile extends File {
      *   <td>Atomic</td>
      *   <td>No</td>
      * </tr>
+     * </tbody>
      * </table>
      *
      * @param out The output stream.
@@ -3813,10 +3909,13 @@ public final class TFile extends File {
      * the current thread.
      * <p>
      * <table border="2" cellpadding="4">
+     * <thead>
      * <tr>
      *   <th>Feature</th>
      *   <th>Supported</th>
      * </tr>
+     * </thead>
+     * <tbody>
      * <tr>
      *   <td>Preserves file attributes</td>
      *   <td>n/a</td>
@@ -3849,6 +3948,7 @@ public final class TFile extends File {
      *   <td>Atomic</td>
      *   <td>No</td>
      * </tr>
+     * </tbody>
      * </table>
      *
      * @param  in the input stream.
