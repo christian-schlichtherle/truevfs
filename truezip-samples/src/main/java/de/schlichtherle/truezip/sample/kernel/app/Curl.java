@@ -24,6 +24,7 @@ import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.fs.FsUriModifier;
+import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
@@ -47,6 +48,7 @@ public final class Curl {
     throws IOException, URISyntaxException {
         // Create a manager for the life cycle of controllers for federated
         // file systems.
+        // Alternatively, we could use FsManagerLocator.SINGLETON.getManager();
         FsManager manager = new FsDefaultManager();
         try {
             // Search the class path for the set of all supported file system
@@ -76,7 +78,7 @@ public final class Curl {
                                                     FsOutputOption.EXCLUSIVE),
                                         srcSocket.getLocalTarget());
 
-            // Curl the data.
+            // Copy the data.
             IOSocket.copy(srcSocket, dstSocket);
         } finally {
             // Commit all unsynchronized changes to the contents of federated
