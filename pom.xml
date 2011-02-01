@@ -160,11 +160,12 @@
         <site>
             <id>truezip-website</id>
             <name>TrueZIP Website</name>
-            <url>scp://truezip.java.net</url>
+            <url>${site.url}</url>
         </site>
     </distributionManagement>
 
     <properties>
         <java.util.logging.config.file>logging.properties</java.util.logging.config.file>
+        <site.url>scp://truezip.java.net</site.url>
     </properties>
 </project>
