@@ -237,7 +237,7 @@ public abstract class FsController<M extends FsModel> {
      * Returns a string representation of this object for debugging and logging
      * purposes.
      */
-    @Override public final String toString() {
+    @Override public String toString() {
         return new StringBuilder()
                 .append(getClass().getName())
                 .append("[model=")

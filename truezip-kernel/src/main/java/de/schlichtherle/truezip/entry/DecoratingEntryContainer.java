@@ -60,4 +60,18 @@ implements EntryContainer<E> {
     public E getEntry(String name) {
         return delegate.getEntry(name);
     }
+
+    /**
+     * Returns a string representation of this object for debugging and logging
+     * purposes.
+     */
+    @Override
+    public String toString() {
+        return new StringBuilder()
+                .append(getClass().getName())
+                .append("[delegate=")
+                .append(delegate)
+                .append(']')
+                .toString();
+    }
 }
