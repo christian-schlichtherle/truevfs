@@ -15,5 +15,6 @@ About TrueZIP Samples
     By design, the sample applications use all file system drivers which
     can be located at runtime.
     Location of the available file system drivers is performed by
-    scanning the class path - see the Javaodoc for the TrueZIP Kernel class
-    de.schlichtherle.truezip.fs.sl.FsDriverLocator for more information.
+    scanning the class path - see the Javadoc for the TrueZIP Kernel class
+    {{{./apidocs/de/schlichtherle/fs/sl/FsDriverLocator.html}<<<FsDriverLocator>>>}}
+    for more information.
