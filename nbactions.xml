@@ -129,4 +129,18 @@
                 <goal>release:prepare</goal>
             </goals>
         </action>
+    <action>
+            <actionName>CUSTOM-release:perform</actionName>
+            <displayName>release:perform</displayName>
+            <goals>
+                <goal>release:perform</goal>
+            </goals>
+        </action>
+    <action>
+            <actionName>CUSTOM-release:rollback</actionName>
+            <displayName>release:rollback</displayName>
+            <goals>
+                <goal>release:rollback</goal>
+            </goals>
+        </action>
 </actions>
