@@ -20,7 +20,7 @@
     <parent>
         <groupId>de.schlichtherle.truezip</groupId>
         <artifactId>truezip-driver</artifactId>
-        <version>7.0-SNAPSHOT</version>
+        <version>7.0-rc1</version>
     </parent>
 
     <artifactId>truezip-driver-http</artifactId>
