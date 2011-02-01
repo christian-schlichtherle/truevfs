@@ -74,4 +74,18 @@ public abstract class DecoratingOutputStream extends OutputStream {
             delegate.close();
         }
     }
+
+    /**
+     * Returns a string representation of this object for debugging and logging
+     * purposes.
+     */
+    @Override
+    public String toString() {
+        return new StringBuilder()
+                .append(getClass().getName())
+                .append("[delegate=")
+                .append(delegate)
+                .append(']')
+                .toString();
+    }
 }

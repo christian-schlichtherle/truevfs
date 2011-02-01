@@ -68,12 +68,16 @@ public abstract class FsEntry implements Entry {
     }
 
     /**
-     * Returns {@link #getName()}.
-     * 
-     * @return {@link #getName()}.
+     * Returns a string representation of this object for debugging and logging
+     * purposes.
      */
     @Override
     public String toString() {
-        return getName();
+        return new StringBuilder()
+                .append(getClass().getName())
+                .append("[name=")
+                .append(getName())
+                .append(']')
+                .toString();
     }
 }

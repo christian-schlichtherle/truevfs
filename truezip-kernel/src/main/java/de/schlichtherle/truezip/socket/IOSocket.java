@@ -117,7 +117,7 @@ public abstract class IOSocket<LT, PT> {
      */
     @Override
     @NonNull
-    public final String toString() {
+    public String toString() {
         // Note that the target actually must not be null, but this method
         // should work even if the interface contract is broken in order to
         // support debugging.
