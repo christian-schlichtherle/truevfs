@@ -50,7 +50,7 @@ import java.util.Comparator;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ChainableIOException extends IOException implements Cloneable {
+public class SequentialIOException extends IOException implements Cloneable {
 
     private static final long serialVersionUID = 2203967634187324928L;
 
@@ -63,10 +63,10 @@ public class ChainableIOException extends IOException implements Cloneable {
      * order of their appearance.
      */
     // Note: Not private for unit testing purposes only!
-    static final Comparator<ChainableIOException> PRIORITY_COMP
-            = new Comparator<ChainableIOException>() {
+    static final Comparator<SequentialIOException> PRIORITY_COMP
+            = new Comparator<SequentialIOException>() {
         @Override
-		public int compare(ChainableIOException l, ChainableIOException r) {
+		public int compare(SequentialIOException l, SequentialIOException r) {
             final int cmp = l.priority - r.priority;
             return cmp != 0 ? cmp : INDEX_COMP.compare(l, r);
         }
@@ -77,10 +77,10 @@ public class ChainableIOException extends IOException implements Cloneable {
      * appearance.
      */
     // Note: Not private for unit testing purposes only!
-    static final Comparator<ChainableIOException> INDEX_COMP
-            = new Comparator<ChainableIOException>() {
+    static final Comparator<SequentialIOException> INDEX_COMP
+            = new Comparator<SequentialIOException>() {
         @Override
-		public int compare(ChainableIOException l, ChainableIOException r) {
+		public int compare(SequentialIOException l, SequentialIOException r) {
             return l.index - r.index;
         }
     };
@@ -88,10 +88,10 @@ public class ChainableIOException extends IOException implements Cloneable {
     /**
      * The tail of this exception chain.
      * Maybe {@code this} if the predecessor hasn't been
-     * {@link #initPredecessor(ChainableIOException)} initialized yet or
+     * {@link #initPredecessor(SequentialIOException)} initialized yet or
      * {@code null} if there are no more exceptions in this chain.
      */
-    private ChainableIOException predecessor = this;
+    private SequentialIOException predecessor = this;
 
     private final int priority;
 
@@ -100,37 +100,37 @@ public class ChainableIOException extends IOException implements Cloneable {
     // Note: Not private for unit testing purposes only!
     int maxIndex; // effectively final
 
-    public ChainableIOException() {
+    public SequentialIOException() {
         priority = 0;
     }
 
-    public ChainableIOException(String message) {
+    public SequentialIOException(String message) {
         super(message);
         priority = 0;
     }
 
-    public ChainableIOException(Throwable cause) {
+    public SequentialIOException(Throwable cause) {
         super(null == cause ? null : cause.toString());
         super.initCause(cause);
         priority = 0;
     }
 
-    public ChainableIOException(String message, Throwable cause) {
+    public SequentialIOException(String message, Throwable cause) {
         super(message);
         super.initCause(cause);
         priority = 0;
     }
 
-    public ChainableIOException(int priority) {
+    public SequentialIOException(int priority) {
         this.priority = priority;
     }
 
-    public ChainableIOException(String message, int priority) {
+    public SequentialIOException(String message, int priority) {
         super(message);
         this.priority = priority;
     }
 
-    public ChainableIOException(Throwable cause, int priority) {
+    public SequentialIOException(Throwable cause, int priority) {
         super(null == cause ? null : cause.toString());
         super.initCause(cause);
         this.priority = priority;
@@ -140,7 +140,7 @@ public class ChainableIOException extends IOException implements Cloneable {
      * Constructs a new chainable I/O exception with the given
      * {@code message}, {@code cause} and {@code priority}.
      * The predecessor of this exception remains unknown until initiliazed
-     * by calling the method {@link #initPredecessor(ChainableIOException)}.
+     * by calling the method {@link #initPredecessor(SequentialIOException)}.
      *
      * @param message The message for this exception.
      * @param cause The cause exception.
@@ -149,7 +149,7 @@ public class ChainableIOException extends IOException implements Cloneable {
      * @param priority The priority of this exception to be used for
      *        {@link #sortPriority() priority sorting}.
      */
-    public ChainableIOException(String message, Throwable cause, int priority) {
+    public SequentialIOException(String message, Throwable cause, int priority) {
         super(message);
         super.initCause(cause);
         this.priority = priority;
@@ -157,16 +157,16 @@ public class ChainableIOException extends IOException implements Cloneable {
 
     /** Returns a <em>shallow</em> clone of this exception. */
     @Override
-    public ChainableIOException clone() {
+    public SequentialIOException clone() {
         try {
-            return (ChainableIOException) super.clone();
+            return (SequentialIOException) super.clone();
         } catch (CloneNotSupportedException cannotHappen) {
             throw new AssertionError(cannotHappen);
         }
     }
 
     @Override
-    public ChainableIOException initCause(final Throwable cause) {
+    public SequentialIOException initCause(final Throwable cause) {
         super.initCause(cause);
         return this;
     }
@@ -186,8 +186,8 @@ public class ChainableIOException extends IOException implements Cloneable {
      *         this instance or has not been initialized with a predecessor
      *         itself.
      */
-    public final synchronized ChainableIOException initPredecessor(
-            ChainableIOException predecessor) {
+    public final synchronized SequentialIOException initPredecessor(
+            SequentialIOException predecessor) {
         setPredecessor(predecessor);
         predecessor = getPredecessor();
         if (predecessor != null)
@@ -196,7 +196,7 @@ public class ChainableIOException extends IOException implements Cloneable {
     }
 
     private void setPredecessor(
-            final ChainableIOException predecessor) {
+            final SequentialIOException predecessor) {
         if (this.predecessor != this) {
             if (this.predecessor == predecessor)
                 return;
@@ -213,9 +213,9 @@ public class ChainableIOException extends IOException implements Cloneable {
      * Returns the exception chain represented by the predecessing exception,
      * or {@code null} if no predecessing exception exists or this property
      * hasn't been
-     * {@link #initPredecessor(ChainableIOException) initialized} yet.
+     * {@link #initPredecessor(SequentialIOException) initialized} yet.
      */
-    public final synchronized ChainableIOException getPredecessor() {
+    public final synchronized SequentialIOException getPredecessor() {
         return this == predecessor ? null : predecessor;
     }
 
@@ -237,40 +237,40 @@ public class ChainableIOException extends IOException implements Cloneable {
      *         If and only if all elements are in order, this exception chain
      *         is returned and no elements are cloned.
      */
-    public ChainableIOException sortPriority() {
+    public SequentialIOException sortPriority() {
         return sort(PRIORITY_COMP);
     }
     
     /**
      * Sorts the elements of this exception chain in descending order
-     * of their index.
+     * of their appearance.
      *
      * @return The sorted exception chain, consisting of cloned elements where
      *         required to enforce the immutability of this class.
      *         This is a non-destructive sort, i.e. elements already in order
-     *         are guaranteed not to get rearranged.
+     *         are guaranteed <em>not</em> to get rearranged.
      *         If and only if all elements are in order, this exception chain
      *         is returned and no elements are cloned.
      */
-    public ChainableIOException sortIndex() {
+    public SequentialIOException sortAppearance() {
         return sort(INDEX_COMP);
     }
 
-    private ChainableIOException sort(
-            final Comparator<ChainableIOException> cmp) {
-        final ChainableIOException predecessor = getPredecessor();
+    private SequentialIOException sort(
+            final Comparator<SequentialIOException> cmp) {
+        final SequentialIOException predecessor = getPredecessor();
         if (predecessor == null)
             return this;
-        final ChainableIOException tail = predecessor.sort(cmp);
+        final SequentialIOException tail = predecessor.sort(cmp);
         if (tail == predecessor && cmp.compare(this, tail) >= 0)
             return this;
         else
             return tail.insert(clone(), cmp);
     }
 
-    private ChainableIOException insert(
-            final ChainableIOException element,
-            final Comparator<ChainableIOException> cmp) {
+    private SequentialIOException insert(
+            final SequentialIOException element,
+            final Comparator<SequentialIOException> cmp) {
         if (cmp.compare(element, this) >= 0) {
             // Prepend to chain.
             element.predecessor = this;
@@ -278,9 +278,9 @@ public class ChainableIOException extends IOException implements Cloneable {
             return element;
         } else {
             // Insert element in the predecessor exception chain.
-            final ChainableIOException predecessor = this.predecessor;
+            final SequentialIOException predecessor = this.predecessor;
             assert predecessor != this;
-            final ChainableIOException clone = clone();
+            final SequentialIOException clone = clone();
             if (predecessor != null) {
                 clone.predecessor = predecessor.insert(element, cmp);
                 clone.maxIndex = Math.max(clone.index, clone.predecessor.maxIndex);
@@ -328,7 +328,7 @@ public class ChainableIOException extends IOException implements Cloneable {
      */
     public void printStackTrace(final PrintStream s, int maxExceptions) {
         maxExceptions--;
-        final ChainableIOException predecessor = getPredecessor();
+        final SequentialIOException predecessor = getPredecessor();
         if (null != predecessor) {
             if (maxExceptions > 0) {
                 predecessor.printStackTrace(s, maxExceptions);
@@ -341,7 +341,7 @@ public class ChainableIOException extends IOException implements Cloneable {
     }
 
     private int getNumExceptions() {
-        final ChainableIOException predecessor = getPredecessor();
+        final SequentialIOException predecessor = getPredecessor();
         return null != predecessor ? predecessor.getNumExceptions() + 1 : 1;
     }
 
@@ -381,7 +381,7 @@ public class ChainableIOException extends IOException implements Cloneable {
     public void printStackTrace(final PrintWriter s, int maxExceptions) {
         maxExceptions--;
 
-        final ChainableIOException predecessor = getPredecessor();
+        final SequentialIOException predecessor = getPredecessor();
         if (predecessor != null) {
             if (maxExceptions > 0) {
                 predecessor.printStackTrace(s, maxExceptions);
@@ -407,6 +407,6 @@ public class ChainableIOException extends IOException implements Cloneable {
      * @see #printStackTrace(PrintWriter)
      */
     public static void setMaxPrintExceptions(int maxPrintExcepions) {
-        ChainableIOException.maxPrintExceptions = maxPrintExcepions;
+        SequentialIOException.maxPrintExceptions = maxPrintExcepions;
     }
 }

@@ -21,20 +21,20 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- * Tests the class {@link ChainableIOException}.
+ * Tests the class {@link SequentialIOException}.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class ChainableIOExceptionTest {
+public final class SequentialIOExceptionTest {
 
     @Test
     public void testSorting() {
-        ChainableIOException exc = null;
+        SequentialIOException exc = null;
         final int max = 9;
         assertEquals(0, max % 3);
-        final ChainableIOException[] appearance = new ChainableIOException[max];
-        final ChainableIOException[] priority = new ChainableIOException[max];
+        final SequentialIOException[] appearance = new SequentialIOException[max];
+        final SequentialIOException[] priority = new SequentialIOException[max];
         for (int i = 0; i < max; i++) {
             final File dummy = new File("" + (i + 1)).getAbsoluteFile();
             exc = new TestException(dummy.getPath(), i % 3).initPredecessor(exc);
@@ -47,24 +47,24 @@ public final class ChainableIOExceptionTest {
         assertEquals(max - 1, maxIndex);
         final Check indexCheck = new Check() {
             @Override
-			public boolean equals(ChainableIOException e1, ChainableIOException e2) {
+			public boolean equals(SequentialIOException e1, SequentialIOException e2) {
                 //return Exception0.INDEX_COMP.compare(e1, e2) == 0;
                 return e1 == e2;
             }
         };
         assertChain(indexCheck, appearance, exc);
 
-        final ChainableIOException appearanceExc = exc.sortIndex();
+        final SequentialIOException appearanceExc = exc.sortAppearance();
         assertEquals(maxIndex, appearanceExc.maxIndex);
         assertChain(indexCheck, appearance, appearanceExc);
 
         final Check priorityCheck = new Check() {
             @Override
-			public boolean equals(ChainableIOException e1, ChainableIOException e2) {
-                return ChainableIOException.PRIORITY_COMP.compare(e1, e2) == 0;
+			public boolean equals(SequentialIOException e1, SequentialIOException e2) {
+                return SequentialIOException.PRIORITY_COMP.compare(e1, e2) == 0;
             }
         };
-        final ChainableIOException priorityExc = exc.sortPriority();
+        final SequentialIOException priorityExc = exc.sortPriority();
         assertNotSame(exc, priorityExc);
         assertEquals(maxIndex, priorityExc.maxIndex);
         assertChain(priorityCheck, priority, priorityExc);
@@ -72,11 +72,11 @@ public final class ChainableIOExceptionTest {
 
     private void assertChain(
             final Check c,
-            final ChainableIOException[] expected,
-            ChainableIOException exc) {
+            final SequentialIOException[] expected,
+            SequentialIOException exc) {
         assert c != null;
         for (int i = 0; i < expected.length; i++) {
-            final ChainableIOException exp = expected[i];
+            final SequentialIOException exp = expected[i];
             assertNotNull(exp);
             assertNotNull(exc);
             assertTrue(c.equals(exp, exc));
@@ -86,10 +86,10 @@ public final class ChainableIOExceptionTest {
     }
 
     private interface Check {
-        boolean equals(ChainableIOException e1, ChainableIOException e2);
+        boolean equals(SequentialIOException e1, SequentialIOException e2);
     }
 
-    private static class TestException extends ChainableIOException {
+    private static class TestException extends SequentialIOException {
         private static final long serialVersionUID = 4893204620357369739L;
 
         TestException(String message, int priority) {
@@ -99,10 +99,10 @@ public final class ChainableIOExceptionTest {
 
     @Test
     public void testInitPredecessor() {
-        ChainableIOException exc1, exc2;
+        SequentialIOException exc1, exc2;
 
-        exc1 = new ChainableIOException();
-        exc2 = new ChainableIOException();
+        exc1 = new SequentialIOException();
+        exc2 = new SequentialIOException();
 
         try {
             exc1.initPredecessor(exc1);
