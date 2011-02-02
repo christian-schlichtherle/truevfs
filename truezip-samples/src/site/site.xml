@@ -6,7 +6,8 @@
         <!-- <menu name="Parent Project" ref="parent" inherit="top"/> -->
         <menu name="Project Documentation">
             <item name="About" href="index.html"/>
-            <item name="File* Usage" href="file-usage.html"/>
+            <item name="TrueZIP File* API Usage" href="file-usage.html"/>
+            <item name="TrueZIP Kernel API Usage" href="kernel-usage.html"/>
         </menu>
     </body>
 </project>

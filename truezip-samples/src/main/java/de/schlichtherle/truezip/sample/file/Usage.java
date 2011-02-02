@@ -41,10 +41,10 @@ abstract class Usage {
     private Usage() {
     }
 
-    void cat(TFile file) {
+    void cat(String path) {
         // START SNIPPET: cat
         try {
-            InputStream in = new TFileInputStream(file);
+            InputStream in = new TFileInputStream(path);
             try {
                 Streams.cat(in, System.out);
             } finally {
