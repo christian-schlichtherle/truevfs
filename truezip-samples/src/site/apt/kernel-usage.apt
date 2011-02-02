@@ -1,0 +1,70 @@
+    ---
+    TrueZIP Kernel API Usage
+    ---
+    Christian Schlichtherle
+    ---
+
+%{toc}
+
+Abstract
+
+    This article shows the usage of the API of the TrueZIP Kernel module.
+
+Introduction
+
+    The API of the TrueZIP Kernel module is considerably different to the API
+    of the TrueZIP File* module:
+    While the File* API primarily aims to "make simple things easy",
+    the Kernel API primarily aims to "make complex things possible".
+
+    This means that while the Kernel API offers more features than the File*
+    API, it also requires more coding to get a job done.
+    So when is it appropriate to code against the Kernel API instead of the
+    File* API?
+
+    * If you don't want to rely on the service locator pattern which is
+        employed by the File* API in order to enumerate the set of file
+        system drivers which are available on the run-time class path.
+
+    * If the type of the top level file system your application needs to
+        access is not an OS file system (adressed by the "file" scheme),
+        but any other file system type, e.g. a web service
+        (adressed by the "http" scheme).
+
+    * If you need to access file system specific entry properties,
+        e.g. the property
+        {{{../apidocs/de/schlichtherle/truezip/zip/ZipEntry.html#getComment()}<<<comment>>>}}
+        of the class
+        {{{../apidocs/de/schlichtherle/truezip/zip/ZipEntry.html}<<<ZipEntry>>>}}
+        in a ZIP file.
+
+    * If you want to reduce the number of kernel calls required to query
+        a set of properties for the same file system entry.
+
+    []
+
+Basic Operations
+
+    Suppose you'ld like to imitate the functionality of the <<<cat(1)>>> Unix
+    command line utility.
+    This utility simply concatenates the contents of each named parameter
+    file on the standard output.
+    E.g. the shell command
+
++--
+$ cat fileA fileB
++--
+
+    would print the contents of <<<fileA>>> and then <<<fileB>>> to standard
+    output.
+
+    Here's how to print the contents of a single resource which is addressed
+    by the file path string <<<path>>> using the File* API:
+
+%{snippet|id=cat|file=src/main/java/de/schlichtherle/truezip/sample/file/app/Cat.java}
+
+    For comparison, let's implement the same functionality using the Kernel API.
+    This time however, the single resource is addressed by the URI string
+    <<<uri>>>.
+
+%{snippet|id=cat|file=src/main/java/de/schlichtherle/truezip/sample/kernel/app/Cat.java}

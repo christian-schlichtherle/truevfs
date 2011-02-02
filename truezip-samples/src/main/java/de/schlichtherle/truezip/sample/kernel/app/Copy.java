@@ -21,29 +21,32 @@ import de.schlichtherle.truezip.fs.FsCompositeDriver;
 import de.schlichtherle.truezip.fs.FsDefaultManager;
 import de.schlichtherle.truezip.fs.FsInputOption;
 import de.schlichtherle.truezip.fs.FsManager;
+import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.fs.FsUriModifier;
-import de.schlichtherle.truezip.io.Streams;
+import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
+import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
+import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
 /**
- * A poor man's Wget command line utility which copies the contents of the
- * first URI to standard output.
- *
- * @see <a href="http://www.gnu.org/software/wget/">GNU Wget - Home Page</a>
+ * A poor man's cURL command line utility which copies the contents of the
+ * first URI to the second URI.
+ * 
+ * @see <a href="http://curl.haxx.se/">cURL and libcurl - Home Page</a>
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class Wget {
+public final class Copy {
 
     public static void main(String[] args)
     throws IOException, URISyntaxException {
+        // START SNIPPET: curl
         // Create a manager for the life cycle of controllers for federated
         // file systems.
         // Alternatively, we could use FsManagerLocator.SINGLETON.getManager();
@@ -53,7 +56,6 @@ public final class Wget {
             // drivers and build a composite driver from it.
             FsCompositeDriver
                     driver = new FsDefaultDriver(FsDriverLocator.SINGLETON);
-
             // Resolve the source socket.
             // Note that an absolute URI is required, so we may need to use the
             // File class as a helper.
@@ -64,23 +66,24 @@ public final class Wget {
                     .getController(     srcPath.getMountPoint(), driver)
                     .getInputSocket(    srcPath.getEntryName(),
                                         BitField.noneOf(FsInputOption.class));
-
+            // Resolve the destination socket. Again, we need an absolute URI.
+            URI dstUri = new URI(args[1]);
+            dstUri = dstUri.isAbsolute() ? dstUri : new File(args[1]).toURI();
+            FsPath dstPath = new FsPath(dstUri, FsUriModifier.CANONICALIZE);
+            OutputSocket<?> dstSocket = manager
+                    .getController(     dstPath.getMountPoint(), driver)
+                    .getOutputSocket(   dstPath.getEntryName(),
+                                        BitField.of(FsOutputOption.CREATE_PARENTS,
+                                                    FsOutputOption.EXCLUSIVE),
+                                        srcSocket.getLocalTarget());
             // Copy the data.
-            // For this small example, we could skip the call to in.close() or
-            // use Streams.copy(in, out), but this would not be correct if this
-            // were not just the end of the application.
-            InputStream in = srcSocket.newInputStream();
-            try {
-                // Copy the data.
-                Streams.cat(in, System.out);
-            } finally {
-                in.close();
-            }
+            IOSocket.copy(srcSocket, dstSocket);
         } finally {
             // Commit all unsynchronized changes to the contents of federated
             // file systems, if any were accessed, and clean up temporary files
             // used for caching.
             manager.sync(FsManager.UMOUNT);
         }
+        // END SNIPPET: curl
     }
 }

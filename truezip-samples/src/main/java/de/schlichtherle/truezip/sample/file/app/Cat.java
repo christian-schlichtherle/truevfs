@@ -37,14 +37,14 @@ public class Cat extends CommandLineUtility {
 
     @Override
     public int runChecked(String[] args) throws IOException {
-        for (String arg : args)
-            cat(new TFile(arg));
+        for (String path : args)
+            cat(path);
         return 0;
     }
 
-    public void cat(TFile file) throws IOException {
+    private void cat(String path) throws IOException {
         // START SNIPPET: cat
-        InputStream in = new TFileInputStream(file);
+        InputStream in = new TFileInputStream(path);
         try {
             Streams.cat(in, System.out);
         } finally {
