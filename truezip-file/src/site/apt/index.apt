@@ -13,7 +13,7 @@ About TrueZIP File*
 
     These were the well-known <<<File*>>> classes in TrueZIP 6 which have now
     been renamed to <<<TFile*>>> and relocated to the new package
-    {{{../apidocs/de/schlichtherle/truezip/file/package-summary.html}de.schlichtherle.truezip.file}}.
+    {{{../apidocs/de/schlichtherle/truezip/file/package-summary.html}<<<de.schlichtherle.truezip.file>>>}}.
 
     This module also provides Swing GUI classes for viewing file trees,
     choosing entries in archive files or path name autocompletion in

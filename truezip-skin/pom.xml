@@ -19,11 +19,11 @@
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- <parent>
-        <groupId>de.schlichtherle.truezip</groupId>
-        <artifactId>truezip</artifactId>
-        <version>7.0-rc2-SNAPSHOT</version>
-    </parent> -->
+    <parent>
+        <groupId>de.schlichtherle</groupId>
+        <artifactId>asl20-oss-parent</artifactId>
+        <version>9</version>
+    </parent>
 
     <groupId>de.schlichtherle.truezip</groupId>
     <artifactId>truezip-skin</artifactId>
