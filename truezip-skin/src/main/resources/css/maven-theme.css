@@ -21,7 +21,7 @@ body {
     padding: 0px 0px 10px 0px;
 }
 body, td, select, input, li{
-    font-family: Verdana, Helvetica, Arial, sans-serif;
+    font-family: Arial, Helvetica, sans-serif;
     font-size: 13px;
 }
 code{
@@ -32,13 +32,13 @@ a {
     text-decoration: none;
 }
 a:link {
-    color:#36a;
+    color: #cc0c5c;
 }
 a:visited  {
-    color:#47a;
+    color: #af0a4f;
 }
 a:active, a:hover {
-    color:#69c;
+    text-decoration: underline;
 }
 #legend li.externalLink {
     background: url(../images/external.png) left top no-repeat;
@@ -58,17 +58,19 @@ a.newWindow, a.newWindow:link, a.newWindow:visited, a.newWindow:active, a.newWin
 }
 h2 {
     padding: 4px 4px 4px 6px;
-    border: 1px solid #999;
-    color: #900;
-    background-color: #ddd;
+    background-image: url(../images/nw_maj_rond.gif);
+    background-repeat: no-repeat;
+    background-color: #cc0c5c;
+    color: #fff;
     font-weight:900;
     font-size: x-large;
 }
 h3 {
     padding: 4px 4px 4px 6px;
-    border: 1px solid #aaa;
-    color: #900;
-    background-color: #eee;
+    background-image: url(../images/nw_maj_rond.gif);
+    background-repeat: no-repeat;
+    background-color: #d785a7;
+    color: #fff;
     font-weight: normal;
     font-size: large;
 }
