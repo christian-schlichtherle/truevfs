@@ -6,7 +6,7 @@
         <!-- <menu name="Parent Project" ref="parent" inherit="top"/> -->
         <menu name="Project Documentation">
             <item name="About" href="index.html"/>
-            <item name="Usage" href="usage.html"/>
+            <item name="File* Usage" href="file-usage.html"/>
         </menu>
     </body>
 </project>

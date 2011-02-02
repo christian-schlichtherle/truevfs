@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.io.ChainableIOException;
+import de.schlichtherle.truezip.io.SequentialIOException;
 import java.io.IOException;
 import net.jcip.annotations.ThreadSafe;
 
@@ -30,7 +30,7 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-public class FsSyncException extends ChainableIOException {
+public class FsSyncException extends SequentialIOException {
     private static final long serialVersionUID = 4893219420357369739L;
 
     /**

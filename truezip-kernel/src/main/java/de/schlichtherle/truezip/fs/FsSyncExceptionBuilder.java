@@ -15,24 +15,24 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.io.ChainableIOException;
-import de.schlichtherle.truezip.io.ChainableIOExceptionBuilder;
+import de.schlichtherle.truezip.io.SequentialIOException;
+import de.schlichtherle.truezip.io.SequentialIOExceptionBuilder;
 import java.io.IOException;
 import net.jcip.annotations.NotThreadSafe;
 
 /**
  * Assembles a {@link FsSyncException} from one or more {@link IOException}s by
- * {@link ChainableIOException#initPredecessor(ChainableIOException) chaining}
+ * {@link SequentialIOException#initPredecessor(SequentialIOException) chaining}
  * them.
  * When the assembly is thrown or returned later, it is sorted by
- * {@link ChainableIOException#sortPriority() priority}.
+ * {@link SequentialIOException#sortPriority() priority}.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
 @NotThreadSafe
 public final class FsSyncExceptionBuilder
-extends ChainableIOExceptionBuilder<IOException, FsSyncException> {
+extends SequentialIOExceptionBuilder<IOException, FsSyncException> {
     public FsSyncExceptionBuilder() {
         super(IOException.class, FsSyncException.class);
     }

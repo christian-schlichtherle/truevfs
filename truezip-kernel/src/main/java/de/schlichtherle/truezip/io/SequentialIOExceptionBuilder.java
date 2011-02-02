@@ -19,11 +19,11 @@ import de.schlichtherle.truezip.util.AbstractExceptionBuilder;
 import net.jcip.annotations.NotThreadSafe;
 
 /**
- * Assembles a {@link ChainableIOException} from one or more {@link Exception}s by
- * {@link ChainableIOException#initPredecessor(ChainableIOException) chaining}
+ * Assembles a {@link SequentialIOException} from one or more {@link Exception}s by
+ * {@link SequentialIOException#initPredecessor(SequentialIOException) chaining}
  * them.
  * When the assembly is thrown or returned later, it is sorted by
- * {@link ChainableIOException#sortPriority() priority}.
+ * {@link SequentialIOException#sortPriority() priority}.
  *
  * @param   <C> The type of the cause exception.
  * @param   <E> The type of the assembled exception.
@@ -31,8 +31,8 @@ import net.jcip.annotations.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
-public class ChainableIOExceptionBuilder<   C extends Exception,
-                                            E extends ChainableIOException>
+public class SequentialIOExceptionBuilder<   C extends Exception,
+                                            E extends SequentialIOException>
 extends AbstractExceptionBuilder<C, E> {
 
     private final Class<E> clazz;
@@ -40,12 +40,12 @@ extends AbstractExceptionBuilder<C, E> {
     /**
      * Static constructor provided for comforting the most prominent use case.
      */
-    public static ChainableIOExceptionBuilder<ChainableIOException, ChainableIOException>
+    public static SequentialIOExceptionBuilder<SequentialIOException, SequentialIOException>
     create() {
-        return new ChainableIOExceptionBuilder<ChainableIOException, ChainableIOException>(ChainableIOException.class, ChainableIOException.class);
+        return new SequentialIOExceptionBuilder<SequentialIOException, SequentialIOException>(SequentialIOException.class, SequentialIOException.class);
     }
 
-    public ChainableIOExceptionBuilder(Class<C> c, Class<E> e) {
+    public SequentialIOExceptionBuilder(Class<C> c, Class<E> e) {
         try {
             if (!e.isAssignableFrom(c))
                 e.getConstructor(String.class).newInstance("test"); // fail-fast!
@@ -59,9 +59,9 @@ extends AbstractExceptionBuilder<C, E> {
      * Chains the given exceptions and returns the result.
      *
      * @throws IllegalStateException if
-     *         {@code cause.}{@link ChainableIOException#getPredecessor()} is
+     *         {@code cause.}{@link SequentialIOException#getPredecessor()} is
      *         already initialized by a previous call to
-     *         {@link ChainableIOException#initPredecessor(ChainableIOException)}.
+     *         {@link SequentialIOException#initPredecessor(SequentialIOException)}.
      */
     @SuppressWarnings("unchecked")
     @Override
@@ -91,7 +91,7 @@ extends AbstractExceptionBuilder<C, E> {
      * {@inheritDoc}
      * <p>
      * Sorts the given exception chain by
-     * {@link ChainableIOException#sortPriority() priority}
+     * {@link SequentialIOException#sortPriority() priority}
      * and returns the result.
      */
     @SuppressWarnings("unchecked")

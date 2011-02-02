@@ -72,9 +72,9 @@
             </item>
         </menu>
         <menu name="Project Reports" ref="reports" inherit="bottom"/>
-        <menu name="External Project Websites" ref="sites" inherit="bottom">
+        <links>
             <item name="TrueZIP Blog" href="http://truezip.schlichtherle.de"/>
-            <item name="Developer Website" href="http://java.net/projects/truezip"/>
-        </menu>
+            <item name="TrueZIP Developer Website" href="http://java.net/projects/truezip"/>
+        </links>
     </body>
 </project>

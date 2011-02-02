@@ -28,8 +28,8 @@ import de.schlichtherle.truezip.socket.DecoratingOutputShop;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.socket.IOSocket;
-import de.schlichtherle.truezip.io.ChainableIOException;
-import de.schlichtherle.truezip.io.ChainableIOExceptionBuilder;
+import de.schlichtherle.truezip.io.SequentialIOException;
+import de.schlichtherle.truezip.io.SequentialIOExceptionBuilder;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.util.JointIterator;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -299,9 +299,9 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
         if (isBusy())
             return;
 
-        final ChainableIOExceptionBuilder<IOException, ChainableIOException> builder
-                = new ChainableIOExceptionBuilder<IOException, ChainableIOException>(
-                    IOException.class, ChainableIOException.class);
+        final SequentialIOExceptionBuilder<IOException, SequentialIOException> builder
+                = new SequentialIOExceptionBuilder<IOException, SequentialIOException>(
+                    IOException.class, SequentialIOException.class);
         final Iterator<TempEntryOutputStream> i = temps.values().iterator();
         while (i.hasNext()) {
             final TempEntryOutputStream out = i.next();
