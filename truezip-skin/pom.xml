@@ -19,13 +19,15 @@
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
+    <!-- <parent>
         <groupId>de.schlichtherle.truezip</groupId>
         <artifactId>truezip</artifactId>
         <version>7.0-rc2-SNAPSHOT</version>
-    </parent>
+    </parent> -->
 
+    <groupId>de.schlichtherle.truezip</groupId>
     <artifactId>truezip-skin</artifactId>
+    <version>7.0-rc2-SNAPSHOT</version>
     <name>TrueZIP Skin</name>
     <description>
         This module provides the skin for TrueZIP's Maven generated web site.
