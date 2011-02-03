@@ -23,7 +23,7 @@ import net.jcip.annotations.ThreadSafe;
  * file system.
  */
 @ThreadSafe
-final class ReadOnlyFileSystemTypeException extends IOException {
+public final class ReadOnlyFileSystemTypeException extends IOException {
 
     private static final long serialVersionUID = 987645923512463262L;
 
