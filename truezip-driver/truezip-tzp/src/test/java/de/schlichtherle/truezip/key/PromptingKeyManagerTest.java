@@ -26,7 +26,7 @@ import static org.junit.Assert.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class PromptingKeyManagerTest extends KeyManagerTestCase {
+public class PromptingKeyManagerTest extends KeyManagerTestSuite {
 
     @Override
     protected PromptingKeyManager<?> newKeyManager() {

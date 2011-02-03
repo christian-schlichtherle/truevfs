@@ -21,7 +21,7 @@ import java.nio.charset.Charset;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class Ibm437CharsetTest extends OctetCharsetTestCase {
+public class Ibm437CharsetTest extends OctetCharsetTestSuite {
 
     @Override
     protected Charset newCharset() {

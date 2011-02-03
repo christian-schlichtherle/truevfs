@@ -37,10 +37,10 @@ import static org.junit.Assert.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class ReadOnlyFileTestCase {
+public abstract class ReadOnlyFileTestSuite {
 
     private static final Logger logger = Logger.getLogger(
-            ReadOnlyFileTestCase.class.getName());
+            ReadOnlyFileTestSuite.class.getName());
 
     protected static final String TEMP_FILE_PREFIX = "tzp";
 

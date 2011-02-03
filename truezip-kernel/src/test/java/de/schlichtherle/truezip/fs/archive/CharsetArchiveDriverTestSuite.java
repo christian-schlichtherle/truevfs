@@ -26,7 +26,7 @@ import org.junit.Test;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class CharsetArchiveDriverTestCase {
+public abstract class CharsetArchiveDriverTestSuite {
 
     private static class ByteArrayIOPoolService implements IOPoolService {
         @Override

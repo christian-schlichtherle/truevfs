@@ -37,7 +37,7 @@ import java.util.logging.Logger;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class RaesZipTest extends ZipTestCase {
+public final class RaesZipTest extends ZipTestSuite {
 
     private static final Logger logger
             = Logger.getLogger(RaesZipTest.class.getName());

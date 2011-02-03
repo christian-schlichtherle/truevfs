@@ -23,7 +23,7 @@ import de.schlichtherle.truezip.socket.ByteArrayIOPool;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class TOdfFileTest extends TFileTestCase {
+public class TOdfFileTest extends TFileTestSuite {
     
     public TOdfFileTest() {
         super(FsScheme.create("odf"), new OdfDriver(POOL_SERVICE));

@@ -23,7 +23,7 @@ import de.schlichtherle.truezip.socket.ByteArrayIOPool;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class TTarGZipFileTest extends TFileTestCase {
+public final class TTarGZipFileTest extends TFileTestSuite {
 
     public TTarGZipFileTest() {
         super(FsScheme.create("tar.gz"), new TarGZipDriver(POOL_SERVICE));

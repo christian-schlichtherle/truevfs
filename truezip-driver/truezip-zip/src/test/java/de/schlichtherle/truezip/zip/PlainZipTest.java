@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class PlainZipTest extends ZipTestCase {
+public final class PlainZipTest extends ZipTestSuite {
 
     private static final Random rnd = new Random();
 

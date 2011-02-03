@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.crypto.raes;
 import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.rof.ReadOnlyFileTestCase;
+import de.schlichtherle.truezip.rof.ReadOnlyFileTestSuite;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -36,7 +36,7 @@ import static org.junit.Assert.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class RaesTest extends ReadOnlyFileTestCase {
+public final class RaesTest extends ReadOnlyFileTestSuite {
 
     private static final Logger logger = Logger.getLogger(
             RaesTest.class.getName());

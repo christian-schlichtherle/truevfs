@@ -23,7 +23,7 @@ import de.schlichtherle.truezip.socket.ByteArrayIOPool;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class TCheckedZipFileTest extends TFileTestCase {
+public final class TCheckedZipFileTest extends TFileTestSuite {
     
     public TCheckedZipFileTest() {
         super(FsScheme.create("zip"), new CheckedZipDriver(POOL_SERVICE));

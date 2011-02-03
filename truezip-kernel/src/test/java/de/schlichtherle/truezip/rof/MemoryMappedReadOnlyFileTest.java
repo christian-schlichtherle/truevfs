@@ -24,7 +24,7 @@ import org.junit.After;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class MemoryMappedReadOnlyFileTest extends ReadOnlyFileTestCase {
+public final class MemoryMappedReadOnlyFileTest extends ReadOnlyFileTestSuite {
 
     @Override
     protected ReadOnlyFile newReadOnlyFile(File file) throws IOException {
