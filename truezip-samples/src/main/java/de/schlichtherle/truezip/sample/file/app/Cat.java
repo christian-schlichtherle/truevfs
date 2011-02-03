@@ -15,15 +15,14 @@
  */
 package de.schlichtherle.truezip.sample.file.app;
 
-import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.TFileInputStream;
 import de.schlichtherle.truezip.io.Streams;
 import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * A poor man's cat(1) command line utility which concatenates the contents
- * of the given files on the standard output.
+ * A poor man's imitate of the cat(1) command line utility
+ * for concatenating the contents of the given files on the standard output.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -42,14 +41,15 @@ public class Cat extends CommandLineUtility {
         return 0;
     }
 
-    private void cat(String path) throws IOException {
-        // START SNIPPET: cat
+    // START SNIPPET: cat
+    private static void cat(String path)
+    throws IOException {
         InputStream in = new TFileInputStream(path);
         try {
             Streams.cat(in, System.out);
         } finally {
             in.close();
         }
-        // END SNIPPET: cat
     }
+    // END SNIPPET: cat
 }

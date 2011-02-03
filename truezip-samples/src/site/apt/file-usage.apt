@@ -60,7 +60,7 @@ Basic Operations
     In general, when using streams, an application should always close them in a
     <<<finally>>>-block like this:
 
-%{snippet|id=cat|file=src/main/java/de/schlichtherle/truezip/sample/file/app/Cat.java}
+%{snippet|id=cat1|file=src/main/java/de/schlichtherle/truezip/sample/file/Usage.java}
 
     This ensures that the stream is closed even if an exception occurs.
 
@@ -69,7 +69,7 @@ Basic Operations
     An application need to deal with this appropriately, for example by
     enclosing the entire block with another <<<try-catch>>>-block:
 
-%{snippet|id=cat|file=src/main/java/de/schlichtherle/truezip/sample/file/Usage.java}
+%{snippet|id=cat2|file=src/main/java/de/schlichtherle/truezip/sample/file/Usage.java}
 
     This idiom is not specific to TrueZIP:
     Streams often utilize OS resources such as file descriptors or network

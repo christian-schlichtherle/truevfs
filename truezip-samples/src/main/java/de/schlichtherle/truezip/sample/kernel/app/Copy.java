@@ -35,8 +35,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 /**
- * A poor man's cURL command line utility which copies the contents of the
- * first URI to the second URI.
+ * A poor man's blend of the cp(1) or curl(1) command line utilities
+ * for copying the contents of the first URI to the second URI.
  * 
  * @see <a href="http://curl.haxx.se/">cURL and libcurl - Home Page</a>
  * @author Christian Schlichtherle
@@ -46,7 +46,12 @@ public final class Copy {
 
     public static void main(String[] args)
     throws IOException, URISyntaxException {
-        // START SNIPPET: curl
+        copy(args[0], args[1]);
+    }
+
+    // START SNIPPET: copy
+    private static void copy(String src, String dst)
+    throws IOException, URISyntaxException {
         // Create a manager for the life cycle of controllers for federated
         // file systems.
         // Alternatively, we could use FsManagerLocator.SINGLETON.getManager();
@@ -59,16 +64,16 @@ public final class Copy {
             // Resolve the source socket.
             // Note that an absolute URI is required, so we may need to use the
             // File class as a helper.
-            URI srcUri = new URI(args[0]);
-            srcUri = srcUri.isAbsolute() ? srcUri : new File(args[0]).toURI();
+            URI srcUri = new URI(src);
+            srcUri = srcUri.isAbsolute() ? srcUri : new File(src).toURI();
             FsPath srcPath = new FsPath(srcUri, FsUriModifier.CANONICALIZE);
             InputSocket<?> srcSocket = manager
                     .getController(     srcPath.getMountPoint(), driver)
                     .getInputSocket(    srcPath.getEntryName(),
                                         BitField.noneOf(FsInputOption.class));
             // Resolve the destination socket. Again, we need an absolute URI.
-            URI dstUri = new URI(args[1]);
-            dstUri = dstUri.isAbsolute() ? dstUri : new File(args[1]).toURI();
+            URI dstUri = new URI(dst);
+            dstUri = dstUri.isAbsolute() ? dstUri : new File(dst).toURI();
             FsPath dstPath = new FsPath(dstUri, FsUriModifier.CANONICALIZE);
             OutputSocket<?> dstSocket = manager
                     .getController(     dstPath.getMountPoint(), driver)
@@ -84,6 +89,6 @@ public final class Copy {
             // used for caching.
             manager.sync(FsManager.UMOUNT);
         }
-        // END SNIPPET: curl
     }
+    // END SNIPPET: copy
 }

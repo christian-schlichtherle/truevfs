@@ -59,12 +59,17 @@ $ cat fileA fileB
     output.
 
     Here's how to print the contents of a single resource which is addressed
-    by the file path string <<<path>>> using the File* API:
+    by the given <<<path>>> using the File* API:
 
 %{snippet|id=cat|file=src/main/java/de/schlichtherle/truezip/sample/file/app/Cat.java}
 
     For comparison, let's implement the same functionality using the Kernel API.
-    This time however, the single resource is addressed by the URI string
-    <<<uri>>>.
+    This time however, the single resource is addressed by the given <<<uri>>>.
 
 %{snippet|id=cat|file=src/main/java/de/schlichtherle/truezip/sample/kernel/app/Cat.java}
+
+    The difference is that the File* API version can address only file path
+    names, which limits its usage to files and archive entries detected by a
+    {{{../apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html}<<<TArchiveDetector>>>}},
+    while the Kernel API version can address any URI scheme which is supported
+    by a file system driver which is available on the class path at run-time.
