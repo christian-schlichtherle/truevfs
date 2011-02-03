@@ -33,8 +33,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 /**
- * A poor man's Cat command line utility which copies the contents of the
- * first URI to standard output.
+ * A poor man's blend of the cat(1) and wget(1) command line utility
+ * for concatenating the contents of the given URIs on the standard output.
+ * This version can address any URI scheme which is supported by a file system
+ * driver which is available on the run-time class path.
  *
  * @see <a href="http://www.gnu.org/software/wget/">GNU Cat - Home Page</a>
  * @author Christian Schlichtherle
@@ -48,8 +50,9 @@ public final class Cat {
             cat(path);
     }
 
-    private static void cat(String uri) throws IOException, URISyntaxException {
-        // START SNIPPET: cat
+    // START SNIPPET: cat
+    private static void cat(String uri)
+    throws IOException, URISyntaxException {
         // Create a manager for the life cycle of controllers for federated
         // file systems.
         // Alternatively, we could use FsManagerLocator.SINGLETON.getManager();
@@ -86,6 +89,6 @@ public final class Cat {
             // used for caching.
             manager.sync(FsManager.UMOUNT);
         }
-        // END SNIPPET: cat
     }
+    // END SNIPPET: cat
 }
