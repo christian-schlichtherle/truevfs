@@ -28,7 +28,7 @@ import static org.junit.Assert.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class DateTimeConverterTestCase {
+public abstract class DateTimeConverterTestSuite {
 
     private static final long MIN_DOS_TIME = DateTimeConverter.MIN_DOS_TIME;
 

@@ -36,7 +36,7 @@ import static org.junit.Assert.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class TZipRaesFileTest extends TFileTestCase {
+public final class TZipRaesFileTest extends TFileTestSuite {
 
     private static boolean cancelling;
 

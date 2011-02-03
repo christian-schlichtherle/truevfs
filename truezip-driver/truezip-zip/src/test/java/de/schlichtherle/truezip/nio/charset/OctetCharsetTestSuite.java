@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.nio.charset;
 
 import java.nio.ByteBuffer;
@@ -32,7 +31,7 @@ import static org.junit.Assert.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class OctetCharsetTestCase {
+public abstract class OctetCharsetTestSuite {
 
     private Charset charset;
 

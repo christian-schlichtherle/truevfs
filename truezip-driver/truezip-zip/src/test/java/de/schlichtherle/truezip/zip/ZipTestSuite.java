@@ -15,13 +15,8 @@
  */
 package de.schlichtherle.truezip.zip;
 
-import de.schlichtherle.truezip.zip.ZipEntry;
-import de.schlichtherle.truezip.zip.CRC32Exception;
-import de.schlichtherle.truezip.zip.ZipFile;
-import de.schlichtherle.truezip.zip.ZipOutputStream;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.rof.DefaultReadOnlyFile;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -51,10 +46,10 @@ import static org.junit.Assert.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class ZipTestCase {
+public abstract class ZipTestSuite {
 
     private static final Logger logger
-            = Logger.getLogger(ZipTestCase.class.getName());
+            = Logger.getLogger(ZipTestSuite.class.getName());
 
     protected static final String TEMP_FILE_PREFIX = "tzp";
 

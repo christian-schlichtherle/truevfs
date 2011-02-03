@@ -56,7 +56,7 @@ import static org.junit.Assert.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class TFileTestCase {
+public abstract class TFileTestSuite {
 
     private static class ByteArrayIOPoolService implements IOPoolService {
         @Override
@@ -68,7 +68,7 @@ public abstract class TFileTestCase {
             POOL_SERVICE = new ByteArrayIOPoolService();
 
     private static final Logger logger = Logger.getLogger(
-            TFileTestCase.class.getName());
+            TFileTestSuite.class.getName());
 
     private static final String TEMP_FILE_PREFIX = "tzp";
 
@@ -87,7 +87,7 @@ public abstract class TFileTestCase {
     private TFile archive;
     private byte[] data;
 
-    protected TFileTestCase(final @NonNull FsScheme scheme,
+    protected TFileTestSuite(final @NonNull FsScheme scheme,
                             final @NonNull FsArchiveDriver<?> driver) {
         if (null == scheme || null == driver)
             throw new NullPointerException();
@@ -203,7 +203,7 @@ public abstract class TFileTestCase {
         try {
             Thread.sleep(50);
         } catch (InterruptedException ex) {
-            Logger.getLogger(TFileTestCase.class.getName()).log(Level.WARNING, "Current thread was interrupted while waiting!", ex);
+            Logger.getLogger(TFileTestSuite.class.getName()).log(Level.WARNING, "Current thread was interrupted while waiting!", ex);
         }
     }
 

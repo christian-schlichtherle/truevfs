@@ -27,7 +27,7 @@ import static org.junit.Assert.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class FsFilterManagerTest extends FsManagerTestCase {
+public class FsFilterManagerTest extends FsManagerTestSuite {
 
     @Override
     protected FsManager newManager() {

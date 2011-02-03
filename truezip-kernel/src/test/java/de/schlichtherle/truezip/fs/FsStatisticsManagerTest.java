@@ -19,7 +19,7 @@ package de.schlichtherle.truezip.fs;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class FsStatisticsManagerTest extends FsManagerTestCase {
+public class FsStatisticsManagerTest extends FsManagerTestSuite {
 
     @Override
     protected FsManager newManager() {

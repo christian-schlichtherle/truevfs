@@ -25,7 +25,7 @@ import static org.junit.Assert.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class KeyManagerTestCase {
+public abstract class KeyManagerTestSuite {
     private KeyManager<?, ?> instance;
 
     @Before

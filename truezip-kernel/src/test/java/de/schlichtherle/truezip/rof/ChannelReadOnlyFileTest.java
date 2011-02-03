@@ -23,7 +23,7 @@ import java.io.IOException;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class ChannelReadOnlyFileTest extends ReadOnlyFileTestCase {
+public final class ChannelReadOnlyFileTest extends ReadOnlyFileTestSuite {
 
     @Override
     protected ReadOnlyFile newReadOnlyFile(File file) throws IOException {

@@ -32,7 +32,7 @@ import static org.junit.Assert.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class FsManagerTestCase {
+public abstract class FsManagerTestSuite {
 
     private final FsCompositeDriver driver
             = new FsDefaultDriver(new DummyDriverProvider("file|zip"));
@@ -136,7 +136,7 @@ public abstract class FsManagerTestCase {
         try {
             Thread.sleep(50);
         } catch (InterruptedException ex) {
-            Logger.getLogger(FsManagerTestCase.class.getName()).log(Level.WARNING, "Current thread was interrupted while waiting!", ex);
+            Logger.getLogger(FsManagerTestSuite.class.getName()).log(Level.WARNING, "Current thread was interrupted while waiting!", ex);
         }
     }
 }
