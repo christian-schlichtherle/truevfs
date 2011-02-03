@@ -82,8 +82,9 @@ public enum FsUriModifier {
                 if (uri.isOpaque())
                     return uri;
 
-                // Note that we do not limit these fixes to Windows only in order
-                // to make this function work identically on all platforms!
+                // Note that we do not limit these fixes to Windows only in
+                // order to make this function work identically on all
+                // platforms!
 
                 // Move Windows-like UNC host from path to authority.
                 if (uri.getRawPath().startsWith(SEPARATOR + SEPARATOR)) {
