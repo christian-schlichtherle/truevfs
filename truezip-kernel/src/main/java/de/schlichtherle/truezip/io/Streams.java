@@ -68,8 +68,9 @@ public final class Streams {
      * occurs.
      * <p>
      * This is a high performance implementation which uses a pooled background
-     * thread to fill a FIFO of data buffers which is concurrently flushed by
+     * thread to fill a FIFO of pooled buffers which is concurrently flushed by
      * the current thread.
+     * It performs best when used with <em>unbuffered</em> streams.
      *
      * @param  in the input stream.
      * @param  out the output stream.
@@ -78,8 +79,7 @@ public final class Streams {
      * @throws IOException if copying the data fails because of an
      *         {@code IOException} in the <em>output</em> stream.
      */
-    public static void copy(final InputStream in,
-                            final OutputStream out)
+    public static void copy(final InputStream in, final OutputStream out)
     throws IOException {
         try {
             Streams.cat(in, out);
@@ -102,8 +102,9 @@ public final class Streams {
      * of multiple streams.
      * <p>
      * This is a high performance implementation which uses a pooled background
-     * thread to fill a FIFO of data buffers which is concurrently flushed by
+     * thread to fill a FIFO of pooled buffers which is concurrently flushed by
      * the current thread.
+     * It performs best when used with <em>unbuffered</em> streams.
      *
      * @param  in the input stream.
      * @param  out the output stream.
@@ -114,7 +115,7 @@ public final class Streams {
      */
     public static void cat(final InputStream in, final OutputStream out)
     throws IOException {
-        if (in == null || out == null)
+        if (null == in || null == out)
             throw new NullPointerException();
 
         // Note that we do not use PipedInput/OutputStream because these

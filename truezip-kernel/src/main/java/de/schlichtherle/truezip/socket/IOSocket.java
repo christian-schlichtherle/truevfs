@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.socket;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,6 +40,7 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
+@DefaultAnnotation(NonNull.class)
 public abstract class IOSocket<LT, PT> {
 
     /** You cannot instantiate this class outside its package. */
@@ -63,7 +65,6 @@ public abstract class IOSocket<LT, PT> {
      *
      * @return The local target for I/O operations.
      */
-    @NonNull
     public abstract LT getLocalTarget() throws IOException;
 
     /**
@@ -81,6 +82,10 @@ public abstract class IOSocket<LT, PT> {
      * by the given input socket {@code input} to an output stream
      * {@link OutputSocket#newOutputStream created} by the given output socket
      * {@code output}.
+     * <p>
+     * This is a high performance implementation which uses a pooled background
+     * thread to fill a FIFO of pooled buffers which is concurrently flushed by
+     * the current thread.
      *
      * @param  input an input socket for the input target.
      * @param  output an output socket for the output target.
@@ -88,10 +93,9 @@ public abstract class IOSocket<LT, PT> {
      *         {@code IOException} thrown by the <em>input</em> stream.
      * @throws IOException if copying the data fails because of an
      *         {@code IOException} thrown by the <em>output</em> stream.
-     * @throws NullPointerException if any parameter is {@code null}.
      */
-    public static void copy(@NonNull final InputSocket <?> input,
-                            @NonNull final OutputSocket<?> output)
+    public static void copy(final InputSocket <?> input,
+                            final OutputSocket<?> output)
     throws IOException {
         final InputStream in = input.connect(output).newInputStream();
         OutputStream out = null;
@@ -100,7 +104,7 @@ public abstract class IOSocket<LT, PT> {
             // with the connection.
             out = output.connect(input).newOutputStream();
         } finally {
-            if (out == null) { // exception?
+            if (null == out) { // exception?
                 try {
                     in.close();
                 } catch (IOException ex) {
@@ -116,7 +120,6 @@ public abstract class IOSocket<LT, PT> {
      * targets.
      */
     @Override
-    @NonNull
     public String toString() {
         // Note that the target actually must not be null, but this method
         // should work even if the interface contract is broken in order to

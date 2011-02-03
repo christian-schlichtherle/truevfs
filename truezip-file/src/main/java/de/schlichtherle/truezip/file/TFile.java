@@ -550,7 +550,8 @@ public final class TFile extends File {
      * @param  uri an absolute URI with a scheme supported by the
      *         {@link #getDefaultArchiveDetector() default archive detector}.
      * @throws IllegalArgumentException if the given URI does not conform to
-     *         the syntax constraints for {@link FsPath}s.
+     *         the syntax constraints for {@link FsPath}s or
+     *         {@link File#File(URI)}.
      */
     public TFile(URI uri) {
         this(FsPath.create(uri, CANONICALIZE), defaultDetector);
@@ -574,7 +575,8 @@ public final class TFile extends File {
      * @param  path an absolute path with a scheme supported by the
      *         {@link #getDefaultArchiveDetector() default archive detector}.
      * @throws IllegalArgumentException if the given URI does not conform to
-     *         the syntax constraints for {@link FsPath}s.
+     *         the syntax constraints for {@link FsPath}s or
+     *         {@link File#File(URI)}.
      */
     public TFile(FsPath path) {
         this(path, defaultDetector);

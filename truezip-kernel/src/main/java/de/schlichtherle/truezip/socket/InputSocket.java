@@ -19,6 +19,7 @@ import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFileInputStream;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.FileNotFoundException;
@@ -41,6 +42,7 @@ import net.jcip.annotations.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
+@DefaultAnnotation(NonNull.class)
 public abstract class InputSocket<E extends Entry>
 extends IOSocket<E, Entry> {
 
@@ -69,7 +71,6 @@ extends IOSocket<E, Entry> {
      * @param  to the input socket which has a peer target to share.
      * @return {@code this}
      */
-    @NonNull
     public final InputSocket<E> bind(@CheckForNull final InputSocket<?> to) {
         peer = null == to ? null : to.peer;
         return this;
@@ -81,9 +82,8 @@ extends IOSocket<E, Entry> {
      * the given peer output socket to this instance.
      *
      * @param  newPeer the nullable peer output socket to connect to.
-     * @return This input socket.
+     * @return {@code this}
      */
-    @NonNull
     final InputSocket<E> connect(@CheckForNull final OutputSocket<?> newPeer) {
         final OutputSocket<?> oldPeer = peer;
         if (oldPeer != newPeer) {
@@ -113,7 +113,6 @@ extends IOSocket<E, Entry> {
      * @throws IOException on any other exceptional condition.
      * @return A new read only file.
      */
-    @NonNull
     public abstract ReadOnlyFile newReadOnlyFile() throws IOException;
 
     /**
@@ -134,7 +133,6 @@ extends IOSocket<E, Entry> {
      * @throws IOException on any other exceptional condition.
      * @return A new input stream.
      */
-    @NonNull
     public InputStream newInputStream() throws IOException {
         return new ReadOnlyFileInputStream(newReadOnlyFile());
     }

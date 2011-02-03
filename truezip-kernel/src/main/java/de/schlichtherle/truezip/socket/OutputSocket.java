@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.entry.Entry;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.FileNotFoundException;
@@ -39,6 +40,7 @@ import net.jcip.annotations.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
+@DefaultAnnotation(NonNull.class)
 public abstract class OutputSocket<E extends Entry>
 extends IOSocket<E, Entry> {
 
@@ -67,7 +69,6 @@ extends IOSocket<E, Entry> {
      * @param  to the output socket which has a peer target to share.
      * @return {@code this}
      */
-    @NonNull
     public final OutputSocket<E> bind(@CheckForNull final OutputSocket<?> to) {
         peer = null == to ? null : to.peer;
         return this;
@@ -79,9 +80,8 @@ extends IOSocket<E, Entry> {
      * the given peer input socket to this instance.
      *
      * @param  newPeer the nullable peer input socket to connect to.
-     * @return This output socket.
+     * @return {@code this}
      */
-    @NonNull
     final OutputSocket<E> connect(@CheckForNull final InputSocket<?> newPeer) {
         final InputSocket<?> oldPeer = peer;
         if (oldPeer != newPeer) {
@@ -109,6 +109,5 @@ extends IOSocket<E, Entry> {
      * @throws IOException on any other exceptional condition.
      * @return A new output stream.
      */
-    @NonNull
     public abstract OutputStream newOutputStream() throws IOException;
 }
