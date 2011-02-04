@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.file.swing;
 
+import de.schlichtherle.truezip.file.TFileComparator;
 import de.schlichtherle.truezip.file.TFile;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
@@ -24,8 +25,6 @@ import java.awt.Toolkit;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.text.Collator;
-import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import javax.swing.CellEditor;
@@ -50,42 +49,7 @@ import javax.swing.tree.TreePath;
 @DefaultAnnotation(NonNull.class)
 public final class TFileTree extends JTree {
 
-    /**
-     * A collator for file names which considers case according to the
-     * platform's standard.
-     */
-    private static final Collator COLLATOR = Collator.getInstance();
-    static {
-        // Set minimum requirements for maximum performance.
-        COLLATOR.setDecomposition(Collator.NO_DECOMPOSITION);
-        COLLATOR.setStrength(TFile.separatorChar == '\\'
-                ? Collator.SECONDARY
-                : Collator.TERTIARY);
-    }
-
-    /**
-     * Compares two files by their status and path name, so that directories
-     * are always ordered <em>before</em> other files.
-     */
-    private static final class FileComparator
-    implements Comparator<TFile>, Serializable {
-        private static final long serialVersionUID = 1234567890123456789L;
-
-        @Override
-        public int compare(TFile f1, TFile f2) {
-            return f1.isDirectory()
-                ? f2.isDirectory()
-                        ? COLLATOR.compare(f1.getName(), f2.getName())
-                        : -1
-                : f2.isDirectory()
-                        ? 1
-                        : COLLATOR.compare(f1.getName(), f2.getName());
-        }
-    } // class FileComparator
-
-    /** A comparator which sorts directory entries to the beginning. */
-    public static final Comparator<TFile>
-            FILE_NAME_COMPARATOR = new FileComparator();
+    private static final long serialVersionUID = 1064787562479927601L;
 
     /** The name of the property {@code displayingSuffixes}. */
     private static final String PROPERTY_DISPLAYING_SUFFIXES = "displayingSuffixes"; // NOI18N
@@ -96,8 +60,6 @@ public final class TFileTree extends JTree {
     /** The name of the property {@code defaultSuffix}. */
     private static final String PROPERTY_DEFAULT_SUFFIX = "defaultSuffix"; // NOI18N
 
-    private static final long serialVersionUID = 1064787562479927601L;
-
     private final Controller controller = new Controller();
 
     private boolean displayingSuffixes = true;
@@ -106,7 +68,7 @@ public final class TFileTree extends JTree {
 
     private @CheckForNull String defaultSuffix;
 
-    private @CheckForNull TFile editedNode;
+    private transient @CheckForNull TFile editedNode;
 
     /**
      * Creates an empty {@code TFileTree} with no root.
@@ -114,7 +76,7 @@ public final class TFileTree extends JTree {
      * It's only provided to implement the JavaBean pattern.
      */
     public TFileTree() {
-        this(new TFileTreeModel(null, null, FILE_NAME_COMPARATOR));
+        this(new TFileTreeModel(null, null, new TFileComparator()));
     }
 
     /**
@@ -122,7 +84,7 @@ public final class TFileTree extends JTree {
      * root {@code root} file.
      */
     public TFileTree(TFile root) {
-        this(new TFileTreeModel(root, null, FILE_NAME_COMPARATOR));
+        this(new TFileTreeModel(root, null, new TFileComparator()));
     }
 
     /**
@@ -291,27 +253,26 @@ public final class TFileTree extends JTree {
      */
     protected void onEditingStopped(final ChangeEvent evt) {
         final TreeCellEditor tce = (TreeCellEditor) evt.getSource();
-        String base = tce.getCellEditorValue().toString().trim();
+        String member = tce.getCellEditorValue().toString().trim();
         final TFile oldNode
                 = (TFile) getLeadSelectionPath().getLastPathComponent();
         final TFile parent = oldNode.getParentFile();
         assert parent != null;
         if (!oldNode.isDirectory()) {
             if (isDisplayingSuffixes() && isEditingSuffixes()) {
-                final String suffix = getSuffix(base);
+                final String suffix = getSuffix(member);
                 if (null == suffix) {
                     final String defaultSuffix = getDefaultSuffix();
                     if (defaultSuffix != null)
-                        base += defaultSuffix;
+                        member += defaultSuffix;
                 }
             } else {
                 final String suffix = getSuffix(oldNode.getName());
                 if (null != suffix)
-                    base += suffix;
+                    member += suffix;
             }
         }
-        final TFile node = new de.schlichtherle.truezip.file.TFile(parent, base);
-
+        final TFile node = new TFile(parent, member);
         if (!renameTo(oldNode, node))
             Toolkit.getDefaultToolkit().beep();
     }
@@ -486,7 +447,7 @@ public final class TFileTree extends JTree {
      * and scrolls the tree so that the copied node
      * is selected and visible.
      */
-    public boolean copyFrom(final de.schlichtherle.truezip.file.TFile node, final InputStream in) {
+    public boolean copyFrom(final TFile node, final InputStream in) {
         final TFileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
         if (path == null)
@@ -506,7 +467,7 @@ public final class TFileTree extends JTree {
      * and scrolls the tree so that the copied node
      * is selected and visible.
      */
-    public boolean copyTo(final de.schlichtherle.truezip.file.TFile oldNode, final TFile node) {
+    public boolean copyTo(final TFile oldNode, final TFile node) {
         final TFileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
         if (path == null)
@@ -526,7 +487,7 @@ public final class TFileTree extends JTree {
      * and scrolls the tree so that the recursively copied node
      * is selected and visible.
      */
-    public boolean copyAllTo(final de.schlichtherle.truezip.file.TFile oldNode, final TFile node) {
+    public boolean copyAllTo(final TFile oldNode, final TFile node) {
         final TFileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
         if (path == null)
@@ -546,7 +507,7 @@ public final class TFileTree extends JTree {
      * and scrolls the tree so that the copied node
      * is selected and visible.
      */
-    public boolean archiveCopyTo(final de.schlichtherle.truezip.file.TFile oldNode, final TFile node) {
+    public boolean archiveCopyTo(final TFile oldNode, final TFile node) {
         final TFileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
         if (path == null)
@@ -566,7 +527,7 @@ public final class TFileTree extends JTree {
      * and scrolls the tree so that the recursively copied node
      * is selected and visible.
      */
-    public boolean archiveCopyAllTo(final de.schlichtherle.truezip.file.TFile oldNode, final TFile node) {
+    public boolean archiveCopyAllTo(final TFile oldNode, final TFile node) {
         final TFileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
         if (path == null)
@@ -654,7 +615,7 @@ public final class TFileTree extends JTree {
      * and scrolls the tree so that the successor to the deleted node
      * is selected and visible.
      */
-    public boolean deleteAll(final de.schlichtherle.truezip.file.TFile node) {
+    public boolean deleteAll(final TFile node) {
         final TFileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
         if (path == null)

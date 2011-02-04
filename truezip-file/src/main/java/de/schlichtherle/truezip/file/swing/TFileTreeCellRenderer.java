@@ -49,8 +49,7 @@ final class TFileTreeCellRenderer extends DefaultTreeCellRenderer {
     /**
      * Returns the file system view.
      * If this property has been set to {@code null} before, it's reinitialized
-     * by calling {@link TFileSystemView#TFileSystemView() new TFileSystemView},
-     * so {@code null} is never returned.
+     * by calling {@link TFileSystemView#TFileSystemView() new TFileSystemView()}.
      *
      * @return The file system view.
      */

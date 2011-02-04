@@ -50,7 +50,6 @@ public final class TFileTreeModel implements TreeModel {
      * Used to cache the contents of directories.
      * Maps {@link TFile} -&gt; {@link TFile}[] instances.
      */
-    // Tactical note: Working with a WeakHashMap shows strange results.
     private final Map<TFile, TFile[]> cache = new HashMap<TFile, TFile[]>();
 
     private final @CheckForNull TFile root;
@@ -98,10 +97,6 @@ public final class TFileTreeModel implements TreeModel {
         this.filter = filter;
         this.comparator = comparator;
     }
-
-    //
-    // TreeModel implementation.
-    //
 
     @Override
     public TFile getRoot() {
@@ -164,10 +159,6 @@ public final class TFileTreeModel implements TreeModel {
         return children;
     }
 
-    //
-    // TreePath retrieval.
-    //
-
     /**
      * Returns a new {@link TreePath} for the given {@code node} or
      * {@code null} if {@code node} is not part of this file tree or
@@ -214,10 +205,6 @@ public final class TFileTreeModel implements TreeModel {
         }
         return path;
     }
-
-    //
-    // TFile system operations.
-    //
 
     /**
      * Creates {@code node} as a new file in the file system
@@ -346,9 +333,7 @@ public final class TFileTreeModel implements TreeModel {
      *
      * @return Whether or not the file has been successfully renamed.
      */
-    public boolean renameTo(
-            final TFile oldNode,
-            final TFile newNode) {
+    public boolean renameTo(final TFile oldNode, final TFile newNode) {
         if (!oldNode.renameTo(newNode))
             return false;
         nodeRemoved(oldNode);
@@ -385,10 +370,6 @@ public final class TFileTreeModel implements TreeModel {
         nodeRemoved(node);
         return true;
     }
-
-    //
-    // TFile system change notifications.
-    //
 
     /**
      * Inserts the given node in the tree or reloads the tree structure for
@@ -511,10 +492,6 @@ public final class TFileTreeModel implements TreeModel {
             for (int i = 0, l = children.length; i < l; i++)
                 forget(children[i], childrenToo);
     }
-
-    //
-    // Event handling.
-    //
 
     /**
      * Adds a listener to this model.
