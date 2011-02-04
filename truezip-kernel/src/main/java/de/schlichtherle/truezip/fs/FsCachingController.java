@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import java.io.InputStream;
 import de.schlichtherle.truezip.socket.IOCache.Strategy;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.entry.Entry;
@@ -27,6 +29,7 @@ import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
@@ -70,6 +73,7 @@ import static de.schlichtherle.truezip.fs.FsSyncOption.*;
  * @version $Id$
  */
 @NotThreadSafe
+@DefaultAnnotation(NonNull.class)
 public final class FsCachingController
 extends FsDecoratingController< FsConcurrentModel,
                                 FsController<? extends FsConcurrentModel>> {
@@ -77,8 +81,8 @@ extends FsDecoratingController< FsConcurrentModel,
     private static final Strategy STRATEGY = WRITE_BACK;
 
     private final IOPool<?> pool;
-    private final Map<FsEntryName, Cache> caches
-            = new HashMap<FsEntryName, Cache>();
+    private final Map<FsEntryName, Cache>
+            caches = new HashMap<FsEntryName, Cache>();
 
     /**
      * Constructs a new content caching file system controller.
@@ -87,8 +91,8 @@ extends FsDecoratingController< FsConcurrentModel,
      * @param pool the pool of temporary entries to hold the copied entry data.
      */
     public FsCachingController(
-            final @NonNull FsController<? extends FsConcurrentModel> controller,
-            final @NonNull IOPool<?> pool) {
+            final FsController<? extends FsConcurrentModel> controller,
+            final IOPool<?> pool) {
         super(controller);
         if (null == pool)
             throw new NullPointerException();
@@ -145,11 +149,11 @@ extends FsDecoratingController< FsConcurrentModel,
     private class Output extends DecoratingOutputSocket<Entry> {
         final FsEntryName name;
         final BitField<FsOutputOption> options;
-        final Entry template;
+        final @CheckForNull Entry template;
 
         Output( final FsEntryName name,
                 final BitField<FsOutputOption> options,
-                final Entry template) {
+                final @CheckForNull Entry template) {
             super(delegate.getOutputSocket(name, options, template));
             this.name = name;
             this.options = options;
@@ -182,11 +186,10 @@ extends FsDecoratingController< FsConcurrentModel,
     } // class Output
 
     @Override
-    public void mknod(
-            @NonNull final FsEntryName name,
-            @NonNull final Type type,
-            @NonNull final BitField<FsOutputOption> options,
-            @CheckForNull final Entry template)
+    public void mknod(  final FsEntryName name,
+                        final Type type,
+                        final BitField<FsOutputOption> options,
+                        final Entry template)
     throws IOException {
         assert getModel().writeLock().isHeldByCurrentThread();
 
@@ -202,7 +205,7 @@ extends FsDecoratingController< FsConcurrentModel,
     }
 
     @Override
-    public void unlink(@NonNull final FsEntryName name)
+    public void unlink(final FsEntryName name)
     throws IOException {
         assert getModel().writeLock().isHeldByCurrentThread();
 
@@ -219,16 +222,16 @@ extends FsDecoratingController< FsConcurrentModel,
 
     @Override
     public <X extends IOException> void sync(
-            @NonNull final BitField<FsSyncOption> options,
-            @NonNull final ExceptionHandler<? super FsSyncException, X> handler)
+            final BitField<FsSyncOption> options,
+            final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         beforeSync(options, handler);
         delegate.sync(options.clear(CLEAR_CACHE), handler);
     }
 
     private <X extends IOException> void beforeSync(
-            @NonNull final BitField<FsSyncOption> options,
-            @NonNull final ExceptionHandler<? super FsSyncException, X> handler)
+            final BitField<FsSyncOption> options,
+            final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         assert getModel().writeLock().isHeldByCurrentThread();
 
@@ -261,28 +264,26 @@ extends FsDecoratingController< FsConcurrentModel,
     private final class Cache {
         private final FsEntryName name;
         private final IOCache cache;
-        private volatile InputSocket<?> input;
-        private volatile OutputSocket<?> output;
-        private volatile BitField<FsOutputOption> outputOptions;
-        private volatile Entry template;
+        private volatile @CheckForNull InputSocket<?> input;
+        private volatile @CheckForNull OutputSocket<?> output;
+        private volatile @Nullable BitField<FsOutputOption> outputOptions;
+        private volatile @CheckForNull Entry template;
 
-        Cache(@NonNull final FsEntryName name) {
+        Cache(final FsEntryName name) {
             this.name = name;
             this.cache = STRATEGY.newCache(pool);
         }
 
-        @NonNull
-        public Cache configure(@NonNull BitField<FsInputOption> options) {
-            cache.configure(/*new ProxyInputSocket(*/delegate.getInputSocket(
+        public Cache configure(BitField<FsInputOption> options) {
+            cache.configure(/*new ProxyInputSocket*/(delegate.getInputSocket(
                     name,
-                    options.clear(FsInputOption.CACHE)));
+                    options.clear(FsInputOption.CACHE))));
             input = null;
             return this;
         }
 
-        @NonNull
-        public Cache configure( @NonNull BitField<FsOutputOption> options,
-                                @Nullable Entry template) {
+        public Cache configure( BitField<FsOutputOption> options,
+                                @CheckForNull Entry template) {
             cache.configure(delegate.getOutputSocket(
                     name,
                     this.outputOptions = options.clear(FsOutputOption.CACHE),
@@ -302,17 +303,52 @@ extends FsDecoratingController< FsConcurrentModel,
         @CheckForNull
         public FsEntry getEntry() {
             final Entry entry = cache.getEntry();
-            return null == entry ? null : new ProxyFileSystemEntry(
-                    null == template ? entry : template);
+            final Entry template;
+            return null == entry
+                    ? null
+                    : new CacheEntry(null == (template = this.template)
+                        ? entry
+                        : template);
         }
 
         public InputSocket<?> getInputSocket() {
-            return null != input ? input : (input = cache.getInputSocket());
+            final InputSocket<?> input = this.input;
+            return null != input ? input : (this.input = cache.getInputSocket());
         }
 
+        /** An input socket proxy. */
+        /*private final class ProxyInputSocket
+        extends DecoratingInputSocket<Entry> {
+            private ProxyInputSocket(InputSocket <?> input) {
+                super(input);
+            }
+
+            @Override
+            public ReadOnlyFile newReadOnlyFile() throws IOException {
+                final FsConcurrentModel model = getModel();
+                model.assertWriteLockedByCurrentThread();
+                final ReadOnlyFile rof = getBoundSocket().newReadOnlyFile();
+                caches.put(name, Cache.this);
+                model.setTouched(true);
+                return rof;
+            }
+
+            @Override
+            public InputStream newInputStream() throws IOException {
+                final FsConcurrentModel model = getModel();
+                model.assertWriteLockedByCurrentThread();
+                final InputStream in = getBoundSocket().newInputStream();
+                caches.put(name, Cache.this);
+                model.setTouched(true);
+                return in;
+            }
+        } // class ProxyInputSocket*/
+
         public OutputSocket<?> getOutputSocket() {
-            return null != output ? output : (output
-                    = new ProxyOutputSocket(cache.getOutputSocket()));
+            final OutputSocket<?> output = this.output;
+            return null != output
+                    ? output
+                    : (this.output = new ProxyOutputSocket(cache.getOutputSocket()));
         }
 
         /** An output socket proxy. */
@@ -352,9 +388,9 @@ extends FsDecoratingController< FsConcurrentModel,
         } // class ProxyOutputSocket
     } // class Cache
 
-    /** A file system entry proxy. */
-    private static class ProxyFileSystemEntry extends FsDecoratingEntry<Entry> {
-        ProxyFileSystemEntry(Entry entry) {
+    /** Proxies the decorated entry to hide socket connections. */
+    private static class CacheEntry extends FsDecoratingEntry<Entry> {
+        CacheEntry(Entry entry) {
             super(entry);
             assert DIRECTORY != entry.getType();
         }

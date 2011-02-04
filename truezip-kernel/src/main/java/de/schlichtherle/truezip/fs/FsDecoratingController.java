@@ -22,6 +22,7 @@ import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import javax.swing.Icon;
@@ -36,6 +37,7 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
+@DefaultAnnotation(NonNull.class)
 public abstract class FsDecoratingController<
         M extends FsModel,
         C extends FsController<? extends M>>
@@ -51,7 +53,7 @@ extends FsController<M> {
      *
      * @param controller the decorated file system controller.
      */
-    protected FsDecoratingController(final @NonNull C controller) {
+    protected FsDecoratingController(final C controller) {
         if (null == controller)
             throw new NullPointerException();
         this.delegate = controller;
@@ -59,7 +61,8 @@ extends FsController<M> {
 
     @Override
     public final M getModel() {
-        return null != model ? model : (model = delegate.getModel());
+        final M model = this.model;
+        return null != model ? model : (this.model = delegate.getModel());
     }
 
     @Override
@@ -143,8 +146,8 @@ extends FsController<M> {
 
     @Override
     public <X extends IOException> void
-    sync(   @NonNull BitField<FsSyncOption> options,
-            @NonNull ExceptionHandler<? super FsSyncException, X> handler)
+    sync(   BitField<FsSyncOption> options,
+            ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         delegate.sync(options, handler);
     }

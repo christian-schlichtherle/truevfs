@@ -55,49 +55,39 @@ import static de.schlichtherle.truezip.fs.FsSyncOption.*;
 public abstract class FsController<M extends FsModel> {
 
     /** Returns the file system model. */
-    public abstract M
-    getModel();
+    public abstract M getModel();
 
     /**
      * Returns the controller for the parent file system or {@code null} if
      * and only if this file system is not federated, i.e. not a member of
      * another file system.
      */
-    public abstract @Nullable FsController<?>
-    getParent();
+    public abstract @Nullable FsController<?> getParent();
 
-    public abstract @Nullable Icon
-    getOpenIcon()
+    public abstract @Nullable Icon getOpenIcon()
     throws IOException;
 
-    public abstract @Nullable Icon
-    getClosedIcon()
+    public abstract @Nullable Icon getClosedIcon()
     throws IOException;
 
-    public abstract boolean
-    isReadOnly()
+    public abstract boolean isReadOnly()
     throws IOException;
 
-    public abstract @CheckForNull FsEntry
-    getEntry(FsEntryName name)
+    public abstract @CheckForNull FsEntry getEntry(FsEntryName name)
     throws IOException;
 
-    public abstract boolean
-    isReadable(FsEntryName name)
+    public abstract boolean isReadable(FsEntryName name)
     throws IOException;
 
-    public abstract boolean
-    isWritable(FsEntryName name)
+    public abstract boolean isWritable(FsEntryName name)
     throws IOException;
 
-    public abstract void
-    setReadOnly(FsEntryName name)
+    public abstract void setReadOnly(FsEntryName name)
     throws IOException;
 
-    public abstract boolean
-    setTime(FsEntryName name,
-            BitField<Access> types,
-            long value)
+    public abstract boolean setTime(FsEntryName name,
+                                    BitField<Access> types,
+                                    long value)
     throws IOException;
 
     /**
@@ -186,7 +176,8 @@ public abstract class FsController<M extends FsModel> {
      *         and {@code FORCE_CLOSE_OUTPUT} is set.
      */
     public final void
-    sync(BitField<FsSyncOption> options) throws FsSyncException {
+    sync(BitField<FsSyncOption> options)
+    throws FsSyncException {
         FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
         sync(options, builder);
         builder.check();
@@ -219,8 +210,8 @@ public abstract class FsController<M extends FsModel> {
      * This can't get overriden.
      */
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
-    @Override public final boolean
-    equals(@CheckForNull Object that) {
+    @Override
+    public final boolean equals(@CheckForNull Object that) {
         return this == that;
     }
 
@@ -228,8 +219,8 @@ public abstract class FsController<M extends FsModel> {
      * Returns a hash code which is consistent with {@link #equals}.
      * This can't get overriden.
      */
-    @Override public final int
-    hashCode() {
+    @Override
+    public final int hashCode() {
         return super.hashCode();
     }
 
@@ -237,7 +228,8 @@ public abstract class FsController<M extends FsModel> {
      * Returns a string representation of this object for debugging and logging
      * purposes.
      */
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return new StringBuilder()
                 .append(getClass().getName())
                 .append("[model=")

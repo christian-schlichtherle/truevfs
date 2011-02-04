@@ -906,9 +906,9 @@ public abstract class TFileTestSuite {
         assertCopyDelete0(a, b, 2000); // works in all archive types currently supported
     }
 
-    private void assertCopyDelete0(   final TFile a,
-                                final TFile b,
-                                final long granularity)
+    private void assertCopyDelete0( final TFile a,
+                                    final TFile b,
+                                    final long granularity)
     throws IOException {
         // Create file an with old timestamp.
         {
