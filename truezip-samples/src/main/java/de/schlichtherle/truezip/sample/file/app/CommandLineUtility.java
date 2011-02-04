@@ -206,7 +206,7 @@ abstract class CommandLineUtility {
             args[0] = (stats.getTopLevelRead() + 1023) / 1024;
             args[1] = (stats.getTopLevelWritten() + 1023) / 1024;
             err.print(MessageFormat.format(
-                    "Top level archive I/O: {0} / {1} KB        \r", (Object[]) args));
+                    "Top level archive I/O: {0}/{1} KB        \r", (Object[]) args));
             err.flush();
         }
 
