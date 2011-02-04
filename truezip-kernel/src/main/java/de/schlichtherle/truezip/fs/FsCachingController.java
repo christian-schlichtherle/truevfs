@@ -15,8 +15,6 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import java.io.InputStream;
 import de.schlichtherle.truezip.socket.IOCache.Strategy;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.entry.Entry;
@@ -81,8 +79,8 @@ extends FsDecoratingController< FsConcurrentModel,
     private static final Strategy STRATEGY = WRITE_BACK;
 
     private final IOPool<?> pool;
-    private final Map<FsEntryName, Cache>
-            caches = new HashMap<FsEntryName, Cache>();
+    private final Map<FsEntryName, EntryCache>
+            caches = new HashMap<FsEntryName, EntryCache>();
 
     /**
      * Constructs a new content caching file system controller.
@@ -103,7 +101,7 @@ extends FsDecoratingController< FsConcurrentModel,
     public FsEntry getEntry(final FsEntryName name)
     throws IOException {
         final FsEntry entry;
-        final Cache cache = caches.get(name);
+        final EntryCache cache = caches.get(name);
         return null != cache && null != (entry = cache.getEntry())
                 ? entry
                 : delegate.getEntry(name);
@@ -128,11 +126,11 @@ extends FsDecoratingController< FsConcurrentModel,
 
         @Override
         public InputSocket<?> getBoundSocket() throws IOException {
-            Cache cache = caches.get(name);
+            EntryCache cache = caches.get(name);
             if (null == cache) {
                 if (!options.get(FsInputOption.CACHE))
                     return super.getBoundSocket(); // don't cache
-                cache = new Cache(name);
+                cache = new EntryCache(name);
             }
             return cache.configure(options).getInputSocket().bind(this);
         }
@@ -162,11 +160,11 @@ extends FsDecoratingController< FsConcurrentModel,
 
         @Override
         public OutputSocket<?> getBoundSocket() throws IOException {
-            Cache cache = caches.get(name);
+            EntryCache cache = caches.get(name);
             if (null == cache) {
                 if (!options.get(FsOutputOption.CACHE))
                     return super.getBoundSocket(); // don't cache
-                cache = new Cache(name);
+                cache = new EntryCache(name);
             } else {
                 if (options.get(APPEND)) {
                     // This combination of features would be expected to work
@@ -193,7 +191,7 @@ extends FsDecoratingController< FsConcurrentModel,
     throws IOException {
         assert getModel().writeLock().isHeldByCurrentThread();
 
-        final Cache cache = caches.get(name);
+        final EntryCache cache = caches.get(name);
         if (null != cache) {
             //cache.flush(); // redundant
             delegate.mknod(name, type, options, template);
@@ -209,7 +207,7 @@ extends FsDecoratingController< FsConcurrentModel,
     throws IOException {
         assert getModel().writeLock().isHeldByCurrentThread();
 
-        final Cache cache = caches.get(name);
+        final EntryCache cache = caches.get(name);
         if (null != cache) {
             //cache.flush(); // redundant
             delegate.unlink(name);
@@ -240,8 +238,8 @@ extends FsDecoratingController< FsConcurrentModel,
 
         final boolean flush = !options.get(ABORT_CHANGES);
         final boolean clear = !flush || options.get(CLEAR_CACHE);
-        for (final Iterator<Cache> i = caches.values().iterator(); i.hasNext(); ) {
-            final Cache cache = i.next();
+        for (final Iterator<EntryCache> i = caches.values().iterator(); i.hasNext(); ) {
+            final EntryCache cache = i.next();
             try {
                 if (flush)
                     cache.flush();
@@ -261,7 +259,7 @@ extends FsDecoratingController< FsConcurrentModel,
     }
 
     /** A cache for an individual file system entry. */
-    private final class Cache {
+    private final class EntryCache {
         private final FsEntryName name;
         private final IOCache cache;
         private volatile @CheckForNull InputSocket<?> input;
@@ -269,12 +267,12 @@ extends FsDecoratingController< FsConcurrentModel,
         private volatile @Nullable BitField<FsOutputOption> outputOptions;
         private volatile @CheckForNull Entry template;
 
-        Cache(final FsEntryName name) {
+        EntryCache(final FsEntryName name) {
             this.name = name;
             this.cache = STRATEGY.newCache(pool);
         }
 
-        public Cache configure(BitField<FsInputOption> options) {
+        public EntryCache configure(BitField<FsInputOption> options) {
             cache.configure(/*new ProxyInputSocket*/(delegate.getInputSocket(
                     name,
                     options.clear(FsInputOption.CACHE))));
@@ -282,7 +280,7 @@ extends FsDecoratingController< FsConcurrentModel,
             return this;
         }
 
-        public Cache configure( BitField<FsOutputOption> options,
+        public EntryCache configure( BitField<FsOutputOption> options,
                                 @CheckForNull Entry template) {
             cache.configure(delegate.getOutputSocket(
                     name,
@@ -364,7 +362,7 @@ extends FsDecoratingController< FsConcurrentModel,
 
                 makeEntry();
                 final OutputStream out = getBoundSocket().newOutputStream();
-                caches.put(name, Cache.this);
+                caches.put(name, EntryCache.this);
                 return out;
             }
 
@@ -388,7 +386,7 @@ extends FsDecoratingController< FsConcurrentModel,
         } // class ProxyOutputSocket
     } // class Cache
 
-    /** Proxies the decorated entry to hide socket connections. */
+    /** A proxy entry for hiding socket connections. */
     private static class CacheEntry extends FsDecoratingEntry<Entry> {
         CacheEntry(Entry entry) {
             super(entry);
