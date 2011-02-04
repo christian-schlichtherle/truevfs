@@ -32,6 +32,7 @@ import java.io.CharConversionException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -149,7 +150,7 @@ implements EntryContainer<FsArchiveFileSystemEntry<E>> {
             : new FsArchiveFileSystem<E>(factory, archive, rootTemplate);
     }
 
-    FsArchiveFileSystem(  final EntryFactory<E> factory,
+    FsArchiveFileSystem(final EntryFactory<E> factory,
                         final EntryContainer<E> archive,
                         final @CheckForNull Entry rootTemplate) {
         if (null == rootTemplate)
@@ -162,7 +163,7 @@ implements EntryContainer<FsArchiveFileSystemEntry<E>> {
                 (int) (archive.getSize() / .7f) + 1); // allow overhead to create missing parent directories
 
         // Load entries from input archive.
-        final List<String> paths = new LinkedList<String>();
+        final List<String> paths = new ArrayList<String>(archive.getSize());
         final Normalizer normalizer = new Normalizer(SEPARATOR_CHAR);
         for (final E entry : archive) {
             // Fix issue #42 - see https://truezip.dev.java.net/issues/show_bug.cgi?id=42
@@ -183,8 +184,7 @@ implements EntryContainer<FsArchiveFileSystemEntry<E>> {
         // separately!
         // entries = Collections.enumeration(master.values()); // concurrent modification!
         final Checker fsck = new Checker();
-        for (final Iterator<String> i = paths.iterator(); i.hasNext(); i.remove()) {
-            final String path = i.next();
+        for (final String path : paths) {
             try {
                 fsck.fix(new FsEntryName(
                         new URI(null, null, path, null, null),
