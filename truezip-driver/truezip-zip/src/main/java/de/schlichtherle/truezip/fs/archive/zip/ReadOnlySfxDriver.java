@@ -36,19 +36,12 @@ import net.jcip.annotations.Immutable;
 @Immutable
 public class ReadOnlySfxDriver extends ZipDriver {
 
-    private static final String CLASS_NAME = ReadOnlySfxDriver.class.getName();
-
     /**
      * The character set used in SFX archives by default, which is determined
      * by calling {@code System.getProperty("file.encoding")}.
      */
     public static final Charset SFX_CHARSET
             = Charset.forName(System.getProperty("file.encoding"));
-
-    static {
-        Logger  .getLogger(CLASS_NAME, CLASS_NAME)
-                .log(Level.CONFIG, "charset", SFX_CHARSET);
-    }
 
     public ReadOnlySfxDriver(IOPoolService service) {
         super(service, SFX_CHARSET);
