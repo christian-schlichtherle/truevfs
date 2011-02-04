@@ -15,40 +15,56 @@
  */
 package de.schlichtherle.truezip.sample.file.app;
 
+import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.TFileInputStream;
 import de.schlichtherle.truezip.io.Streams;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 
 /**
  * A poor man's imitate of the cat(1) command line utility
- * for concatenating the contents of the given files on the standard output.
+ * for concatenating the contents of each parameter URI on the standard output.
+ * The URI must be file-based, i.e. the top level file system scheme must
+ * be {@code file}.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class Cat extends CommandLineUtility {
+public class UriCat extends CommandLineUtility {
 
-    /** Equivalent to {@code System.exit(new Cat().run(args));}. */
+    /** Equivalent to {@code System.exit(new CatPath().run(args));}. */
     public static void main(String[] args) {
-        System.exit(new Cat().run(args));
+        System.exit(new UriCat().run(args));
     }
 
     @Override
     public int runChecked(String[] args) throws IOException {
         for (String path : args)
-            cat(path);
+            uriCat(path);
         return 0;
     }
 
     // START SNIPPET: cat
-    private static void cat(String path)
-    throws IOException {
-        InputStream in = new TFileInputStream(path);
+    /**
+     * Copies the contents of the parameter resource to the standard output.
+     *
+     * @param  resource the URI string of the resource to copy.
+     *         The URI must be file-based, i.e. the top level file system
+     *         scheme must be {@code file}.
+     * @throws IOException if accessing the resource results in an I/O error.
+     * @throws IllegalArgumentException if {@code resource} does not
+     *         conform to the syntax constraints for {@link URI}s.
+     */
+    static void uriCat(String resource) throws IOException {
+        URI uri = URI.create(resource);
+        TFile file = uri.isAbsolute() ? new TFile(uri) : new TFile(resource);
+        InputStream in = new TFileInputStream(file);
         try {
+            // Copy the data.
             Streams.cat(in, System.out);
         } finally {
-            in.close();
+            in.close(); // ALWAYS close the stream!
         }
     }
     // END SNIPPET: cat

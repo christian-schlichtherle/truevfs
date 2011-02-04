@@ -35,13 +35,13 @@ import java.io.InputStream;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class Usage {
+abstract class Usage {
 
     /** Nope! */
     private Usage() {
     }
 
-    static void cat1(String path) throws IOException {
+    void cat1(String path) throws IOException {
         // START SNIPPET: cat1
         InputStream in = new TFileInputStream(path);
         try {
@@ -52,7 +52,7 @@ final class Usage {
         // END SNIPPET: cat1
     }
 
-    static void cat2(String path) {
+    void cat2(String path) {
         // START SNIPPET: cat2
         try {
             InputStream in = new TFileInputStream(path);
@@ -67,7 +67,7 @@ final class Usage {
         // END SNIPPET: cat2
     }
 
-    static void umount1() {
+    void umount1() {
         // START SNIPPET: umount1
         try {
             TFile.umount(); // with or without parameters
@@ -80,7 +80,7 @@ final class Usage {
         // END SNIPPET: umount1
     }
 
-    static void umount2() {
+    void umount2() {
         // START SNIPPET: umount2
         try {
             TFile.umount(); // with or without parameters
@@ -92,7 +92,7 @@ final class Usage {
         // END SNIPPET: umount2
     }
 
-    static void umount3() {
+    void umount3() {
         // START SNIPPET: umount3
         try {
             TFile.umount(); // with or without parameters
@@ -111,7 +111,7 @@ final class Usage {
         // END SNIPPET: umount3
     }
 
-    static void performance1() throws IOException {
+    void performance1() throws IOException {
         // START SNIPPET: performance1
         String[] names = {"a", "b", "c"};
         int n = names.length;
@@ -124,7 +124,7 @@ final class Usage {
         // END SNIPPET: performance1
     }
 
-    static void performance2() throws IOException {
+    void performance2() throws IOException {
         // START SNIPPET: performance2
         String[] names = {"a", "b", "c"};
         int n = names.length;
@@ -137,7 +137,7 @@ final class Usage {
         // END SNIPPET: performance2
     }
 
-    static void performance3() throws IOException {
+    void performance3() throws IOException {
         // START SNIPPET: performance3
         String[] names = { "a", "b", "c" };
         int n = names.length;
@@ -150,7 +150,7 @@ final class Usage {
         // END SNIPPET: performance3
     }
 
-    static void performance4() throws IOException {
+    void performance4() throws IOException {
         // START SNIPPET: performance4
         long time = System.currentTimeMillis();
         String[] names = { "a", "b", "c" };

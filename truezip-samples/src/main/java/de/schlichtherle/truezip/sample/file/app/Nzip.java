@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.sample.file.app;
 import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.file.TDefaultArchiveDetector;
 import de.schlichtherle.truezip.file.TFile;
+import de.schlichtherle.truezip.file.TFileComparator;
 import de.schlichtherle.truezip.file.TFileInputStream;
 import de.schlichtherle.truezip.fs.archive.tar.TarBZip2Driver;
 import de.schlichtherle.truezip.fs.archive.tar.TarDriver;
@@ -26,7 +27,6 @@ import de.schlichtherle.truezip.fs.archive.zip.CheckedJarDriver;
 import de.schlichtherle.truezip.fs.archive.zip.CheckedReadOnlySfxDriver;
 import de.schlichtherle.truezip.fs.archive.zip.CheckedZipDriver;
 import de.schlichtherle.truezip.socket.sl.IOPoolLocator;
-import de.schlichtherle.truezip.file.swing.TFileTree;
 import de.schlichtherle.truezip.socket.IOPoolService;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -253,7 +253,7 @@ public class Nzip extends CommandLineUtility {
             if (entries == null)
                 throw new IOException(path + " (" + resources.getString("ls.dia") + ")");
             // Sort directories to the start.
-            Arrays.sort(entries, TFileTree.FILE_NAME_COMPARATOR);
+            Arrays.sort(entries, new TFileComparator());
             for (int i = 0; i < entries.length; i++) {
                 final TFile entry = entries[i];
                 final String entryPath = path.length() > 0

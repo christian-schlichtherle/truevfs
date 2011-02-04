@@ -7,8 +7,9 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.1.1:exec</goal>
             </goals>
             <properties>
+                <exec.workingdir>C:\Users\christian\Documents\Schlichtherle_IT_Services\Projekte\truezip-7\truezip-samples</exec.workingdir>
                 <exec.classpathScope>runtime</exec.classpathScope>
-                <exec.args>-ea -Djava.util.logging.config.file=logging.properties -classpath %classpath de.schlichtherle.truezip.sample.file.app.Cat pom.xml</exec.args>
+                <exec.args>-ea -classpath %classpath de.schlichtherle.truezip.sample.kernel.app.Cat zip:zip:zip:zip:zip:zip:zip:http://truezip.java.net/truezip-samples/test/1.zip!/0.zip!/this.zip!/is.zip!/nuts.zip!/or.zip!/not.zip!/x</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
@@ -19,8 +20,9 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.1.1:exec</goal>
             </goals>
             <properties>
+                <exec.workingdir>C:\Users\christian\Documents\Schlichtherle_IT_Services\Projekte\truezip-7\truezip-samples</exec.workingdir>
                 <exec.classpathScope>runtime</exec.classpathScope>
-                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -ea -Djava.util.logging.config.file=logging.properties -classpath %classpath de.schlichtherle.truezip.sample.file.app.Cat pom.xml</exec.args>
+                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -ea -classpath %classpath de.schlichtherle.truezip.sample.kernel.app.Cat zip:zip:zip:zip:zip:zip:zip:http://truezip.java.net/truezip-samples/test/1.zip!/0.zip!/this.zip!/is.zip!/nuts.zip!/or.zip!/not.zip!/x</exec.args>
                 <jpda.listen>true</jpda.listen>
                 <exec.executable>java</exec.executable>
             </properties>
@@ -32,17 +34,11 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.1.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>${profiler.args} -ea -Djava.util.logging.config.file=logging.properties -classpath %classpath de.schlichtherle.truezip.sample.file.app.Cat pom.xml</exec.args>
+                <exec.workingdir>C:\Users\christian\Documents\Schlichtherle_IT_Services\Projekte\truezip-7\truezip-samples</exec.workingdir>
+                <exec.args>${profiler.args} -ea -classpath %classpath de.schlichtherle.truezip.sample.kernel.app.Cat zip:zip:zip:zip:zip:zip:zip:http://truezip.java.net/truezip-samples/test/1.zip!/0.zip!/this.zip!/is.zip!/nuts.zip!/or.zip!/not.zip!/x</exec.args>
                 <profiler.action>profile</profiler.action>
                 <exec.executable>${profiler.java}</exec.executable>
             </properties>
-        </action>
-        <action>
-            <actionName>CUSTOM-site</actionName>
-            <displayName>site</displayName>
-            <goals>
-                <goal>site</goal>
-            </goals>
         </action>
         <action>
             <actionName>CUSTOM-site:run</actionName>
