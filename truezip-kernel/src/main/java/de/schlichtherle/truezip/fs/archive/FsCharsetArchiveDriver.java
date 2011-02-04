@@ -121,4 +121,20 @@ extends FsArchiveDriver<E> {
             return get().canEncode(cs);
         }
     }
+
+    /**
+     * Returns a string representation of this object for debugging and logging
+     * purposes.
+     */
+    @Override
+    public String toString() {
+        return new StringBuilder()
+                .append(getClass().getName())
+                .append("[charset=")
+                .append(getCharset())
+                .append(",federated=")
+                .append(isFederated())
+                .append(']')
+                .toString();
+    }
 }
