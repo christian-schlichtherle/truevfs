@@ -219,7 +219,7 @@ public final class Paths {
             memberEnd++;
             if (prefixLength <= memberBegin) {
                 final int parentEnd = lastIndexNot(path, separatorChar, memberBegin);
-                parentPath = path.substring(0, prefixLength < parentEnd ? parentEnd + 2 : prefixLength);
+                parentPath = path.substring(0, prefixLength <= parentEnd ? parentEnd + 2 : prefixLength);
                 memberName = path.substring(memberBegin + 1, memberEnd);
             } else if (0 < prefixLength && prefixLength <= memberEnd) {
                 parentPath = path.substring(0, prefixLength);

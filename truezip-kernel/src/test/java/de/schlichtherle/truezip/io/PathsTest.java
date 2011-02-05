@@ -36,17 +36,17 @@ public class PathsTest {
         path = "";
         assertSame(path, cutTrailingSeparators(path, '/'));
 
-        path = "dir";
+        path = "d";
         assertSame(path, cutTrailingSeparators(path, '/'));
-        assertEquals("dir", cutTrailingSeparators("dir/", '/'));
-        assertEquals("dir", cutTrailingSeparators("dir//", '/'));
-        assertEquals("dir", cutTrailingSeparators("dir///", '/'));
+        assertEquals("d", cutTrailingSeparators("d/", '/'));
+        assertEquals("d", cutTrailingSeparators("d//", '/'));
+        assertEquals("d", cutTrailingSeparators("d///", '/'));
 
-        path = "/dir";
+        path = "/d";
         assertSame(path, cutTrailingSeparators(path, '/'));
-        assertEquals("/dir", cutTrailingSeparators("/dir/", '/'));
-        assertEquals("/dir", cutTrailingSeparators("/dir//", '/'));
-        assertEquals("/dir", cutTrailingSeparators("/dir///", '/'));
+        assertEquals("/d", cutTrailingSeparators("/d/", '/'));
+        assertEquals("/d", cutTrailingSeparators("/d//", '/'));
+        assertEquals("/d", cutTrailingSeparators("/d///", '/'));
 
         path = new String("/"); // need new object!
         assertSame(path, cutTrailingSeparators(path, '/'));
@@ -59,85 +59,85 @@ public class PathsTest {
     public void testSplitPathName() {
         final String fs = File.separator;
 
-        assertSplit(fs + "dir" + fs + "file" + fs);
-        assertSplit(fs + "dir" + fs + "file");
-        assertSplit(fs + "dir" + fs);
-        assertSplit(fs + "dir");
+        assertSplit(fs + "d" + fs + "f" + fs);
+        assertSplit(fs + "d" + fs + "f");
+        assertSplit(fs + "d" + fs);
+        assertSplit(fs + "d");
         assertSplit(fs);
 
-        assertSplit("dir" + fs + "file" + fs);
-        assertSplit("dir" + fs + "file");
-        assertSplit("dir" + fs);
-        assertSplit("dir");
+        assertSplit("d" + fs + "f" + fs);
+        assertSplit("d" + fs + "f");
+        assertSplit("d" + fs);
+        assertSplit("d");
         assertSplit("d");
         assertSplit("");
 
         assertSplit(".");
         assertSplit("..");
 
-        assertSplit("dir");
-        assertSplit("dir" + fs);
-        assertSplit("dir" + fs + fs);
-        assertSplit("dir" + fs + fs + fs);
+        assertSplit("d");
+        assertSplit("d" + fs);
+        assertSplit("d" + fs + fs);
+        assertSplit("d" + fs + fs + fs);
 
-        assertSplit("dir" + fs + "file");
-        assertSplit("dir" + fs + "file" + fs);
-        assertSplit("dir" + fs + "file" + fs + fs);
-        assertSplit("dir" + fs + "file" + fs + fs + fs);
+        assertSplit("d" + fs + "f");
+        assertSplit("d" + fs + "f" + fs);
+        assertSplit("d" + fs + "f" + fs + fs);
+        assertSplit("d" + fs + "f" + fs + fs + fs);
 
-        assertSplit("dir" + fs + fs + "file");
-        assertSplit("dir" + fs + fs + fs + "file");
+        assertSplit("d" + fs + fs + "f");
+        assertSplit("d" + fs + fs + fs + "f");
 
-        assertSplit("dir" + fs + fs + fs + "file" + fs);
-        assertSplit("dir" + fs + fs + fs + "file" + fs + fs);
-        assertSplit("dir" + fs + fs + fs + "file" + fs + fs + fs);
+        assertSplit("d" + fs + fs + fs + "f" + fs);
+        assertSplit("d" + fs + fs + fs + "f" + fs + fs);
+        assertSplit("d" + fs + fs + fs + "f" + fs + fs + fs);
 
         if (File.separatorChar == '\\') { // Windoze?
-            assertSplit("\\\\\\host");
-            assertSplit("\\\\\\\\host");
-            assertSplit("\\\\\\\\\\host");
+            assertSplit("\\\\\\h");
+            assertSplit("\\\\\\\\h");
+            assertSplit("\\\\\\\\\\h");
 
-            assertSplit("\\\\host\\share\\\\file\\\\");
-            assertSplit("\\\\host\\share\\file\\");
-            assertSplit("\\\\host\\share\\file");
-            assertSplit("\\\\host\\share\\");
-            assertSplit("\\\\host\\share");
-            assertSplit("\\\\host\\");
-            assertSplit("\\\\host");
+            assertSplit("\\\\h\\share\\\\f\\\\");
+            assertSplit("\\\\h\\share\\f\\");
+            assertSplit("\\\\h\\share\\f");
+            assertSplit("\\\\h\\share\\");
+            assertSplit("\\\\h\\share");
+            assertSplit("\\\\h\\");
+            assertSplit("\\\\h");
             assertSplit("\\\\h");
             assertSplit("\\\\");
 
-            /*assertSplit("\\\\\\host\\share\\\\file\\\\");
-            assertSplit("\\\\\\host\\share\\file\\");
-            assertSplit("\\\\\\host\\share\\file");
-            assertSplit("\\\\\\host\\share\\");
-            assertSplit("\\\\\\host\\share");
-            assertSplit("\\\\\\host\\");
-            assertSplit("\\\\\\host");
+            /*assertSplit("\\\\\\h\\share\\\\f\\\\");
+            assertSplit("\\\\\\h\\share\\f\\");
+            assertSplit("\\\\\\h\\share\\f");
+            assertSplit("\\\\\\h\\share\\");
+            assertSplit("\\\\\\h\\share");
+            assertSplit("\\\\\\h\\");
+            assertSplit("\\\\\\h");
             assertSplit("\\\\\\h");*/
             assertSplit("\\\\\\");
 
-            assertSplit("C:\\dir\\\\file\\\\");
-            assertSplit("C:\\dir\\file\\");
-            assertSplit("C:\\dir\\file");
-            assertSplit("C:\\dir\\");
-            assertSplit("C:\\dir");
+            assertSplit("C:\\d\\\\f\\\\");
+            assertSplit("C:\\d\\f\\");
+            assertSplit("C:\\d\\f");
+            assertSplit("C:\\d\\");
+            assertSplit("C:\\d");
             assertSplit("C:\\d");
             assertSplit("C:\\");
 
-            /*assertSplit("C:\\\\dir\\\\file\\\\");
-            assertSplit("C:\\\\dir\\file\\");
-            assertSplit("C:\\\\dir\\file");
-            assertSplit("C:\\\\dir\\");
-            assertSplit("C:\\\\dir");
+            /*assertSplit("C:\\\\d\\\\f\\\\");
+            assertSplit("C:\\\\d\\f\\");
+            assertSplit("C:\\\\d\\f");
+            assertSplit("C:\\\\d\\");
+            assertSplit("C:\\\\d");
             assertSplit("C:\\\\d");*/
             assertSplit("C:\\\\");
 
-            assertSplit("C:dir\\\\file\\\\");
-            assertSplit("C:dir\\file\\");
-            assertSplit("C:dir\\file");
-            assertSplit("C:dir\\");
-            assertSplit("C:dir");
+            assertSplit("C:d\\\\f\\\\");
+            assertSplit("C:d\\f\\");
+            assertSplit("C:d\\f");
+            assertSplit("C:d\\");
+            assertSplit("C:d");
             assertSplit("C:d");
             assertSplit("C:");
         }
@@ -279,21 +279,21 @@ public class PathsTest {
         assertNormalize("/../..", "/.././..");
         assertNormalize("/../../", "/.././../.");
 
-        /*testNormalize("\\\\host", "\\\\host", '\\');
-        testNormalize("\\\\host", "\\\\\\host", '\\');
-        testNormalize("\\\\host", "\\\\\\\\host", '\\');
+        /*testNormalize("\\\\h", "\\\\h", '\\');
+        testNormalize("\\\\h", "\\\\\\h", '\\');
+        testNormalize("\\\\h", "\\\\\\\\h", '\\');
 
-        testNormalize("C:\\dir", "C:\\dir", '\\');
-        testNormalize("C:\\dir", "C:\\\\dir", '\\');
-        testNormalize("C:\\dir", "C:\\\\\\dir", '\\');
+        testNormalize("C:\\d", "C:\\d", '\\');
+        testNormalize("C:\\d", "C:\\\\d", '\\');
+        testNormalize("C:\\d", "C:\\\\\\d", '\\');
 
-        testNormalize("C:dir", "C:dir", '\\');
-        testNormalize("C:dir", "C:dir\\.", '\\');
-        testNormalize("C:dir", "C:dir\\.\\.", '\\');
+        testNormalize("C:d", "C:d", '\\');
+        testNormalize("C:d", "C:d\\.", '\\');
+        testNormalize("C:d", "C:d\\.\\.", '\\');
 
-        testNormalize("C:dir", "C:.\\dir", '\\');
-        testNormalize("C:dir", "C:.\\dir\\.", '\\');
-        testNormalize("C:dir", "C:.\\dir\\.\\.", '\\');*/
+        testNormalize("C:d", "C:.\\d", '\\');
+        testNormalize("C:d", "C:.\\d\\.", '\\');
+        testNormalize("C:d", "C:.\\d\\.\\.", '\\');*/
 
         assertNormalize("", ".");
         assertNormalize("", "./");
