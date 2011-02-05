@@ -15,16 +15,16 @@
  */
 package de.schlichtherle.truezip.fs.archive;
 
-import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.entry.EntryFactory;
-import de.schlichtherle.truezip.fs.archive.FsArchiveEntry;
+import java.io.CharConversionException;
+import de.schlichtherle.truezip.entry.Entry.Type;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import java.io.CharConversionException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import net.jcip.annotations.Immutable;
 
+import static de.schlichtherle.truezip.entry.Entry.Type.*;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import static de.schlichtherle.truezip.io.Paths.*;
 
@@ -83,12 +83,9 @@ extends FsArchiveDriver<E> {
      * @return The fixed entry name.
      */
     protected static String toZipOrTarEntryName(String name, Type type) {
-        switch (type) {
-            case DIRECTORY:
-                return name.endsWith(SEPARATOR) ? name : name + SEPARATOR_CHAR;
-            default:
-                return cutTrailingSeparators(name, SEPARATOR_CHAR);
-        }
+        return DIRECTORY == type
+                ? name.endsWith(SEPARATOR) ? name : name + SEPARATOR_CHAR
+                : cutTrailingSeparators(name, SEPARATOR_CHAR);
     }
 
     /**
