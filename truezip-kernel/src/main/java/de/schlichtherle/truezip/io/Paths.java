@@ -54,8 +54,8 @@ public final class Paths {
 
         /**
          * Removes all redundant separators, dot directories ({@code "."}) and
-         * dot-dot directories ({@code ".."}) from the path name and returns
-         * the result.
+         * dot-dot directories ({@code ".."}) from the given path name and
+         * returns the result.
          * If present, a single trailing separator character is retained,
          * except after a dot-dot directory which couldn't get erased.
          * A resulting single dot-directory is truncated to an empty path.
@@ -191,19 +191,19 @@ public final class Paths {
         }
 
         /**
-         * Splits a path name into its parent path name and its base name,
+         * Splits the given path name into its parent path name and member name,
          * recognizing platform specific file system roots.
          * The returned array will hold the following strings:
          * <ol>
          * <li>At index zero: The parent path name or {@code null} if the
          *     path name does not specify a parent.
          *     This compares equal with {@link java.io.File#getParent()}.</li>
-         * <li>At index one: The base name.
+         * <li>At index one: The member name.
          *     This compares equal with {@link java.io.File#getName()}.</li>
          * </ol>
          *
-         * @param  path The name of the path which's parent path name and base
-         *         name are to be returned.
+         * @param  path The name of the path which's parent path name and
+         *         member name are to be returned.
          * @return {@code this}
          */
         public Splitter split(final String path) {
@@ -230,6 +230,12 @@ public final class Paths {
             return this;
         }
 
+        private static int lastIndexNot(String path, char separatorChar, int last) {
+            while (path.charAt(last) == separatorChar && --last >= 0) {
+            }
+            return last;
+        }
+
         @CheckForNull
         public String getParentPath() {
             return parentPath;
@@ -239,13 +245,6 @@ public final class Paths {
             return memberName;
         }
     } // class Splitter
-
-    @SuppressWarnings("empty-statement")
-    private static int lastIndexNot(String path, char separatorChar, int last) {
-        while (path.charAt(last) == separatorChar && --last >= 0)
-            ;
-        return last;
-    }
 
     /**
      * Returns {@code true} iff the given path name refers to the root
