@@ -197,22 +197,17 @@ implements EntryContainer<FsArchiveFileSystemEntry<E>> {
     private static class Splitter
     extends de.schlichtherle.truezip.io.Paths.Splitter {
         Splitter() {
-            super(SEPARATOR_CHAR);
+            super(SEPARATOR_CHAR, false);
         }
 
         /**
-         * Like its super class implementation, but removes the trailing
-         * separator of the parent path name and substitutes {@code ROOT}
+         * Like its super class implementation, but substitutes {@code ROOT}
          * for {@code null}.
          */
         @Override
         public @NonNull String getParentPath() {
             String path = super.getParentPath();
-            if (null == path)
-                return ROOT.toString();
-            while (path.endsWith(SEPARATOR))
-                path = path.substring(0, path.length() - 1);
-            return path;
+            return null == path ? ROOT.toString() : path;
         }
     }
 

@@ -145,14 +145,12 @@ public class PathsTest {
 
     private void assertSplit(final String path) {
         final File file = new File(path);
-        String parent = file.getParent();
-        if (null != parent && parent.length() > prefixLength(path, File.separatorChar) && !parent.endsWith(File.separator))
-            parent = parent + File.separator;
-        final String base = file.getName();
+        final String parent = file.getParent();
+        final String member = file.getName();
 
-        final Splitter splitter = Paths.split(path, File.separatorChar);
+        final Splitter splitter = Paths.split(path, File.separatorChar, false);
         assertEquals(parent, splitter.getParentPath());
-        assertEquals(base, splitter.getMemberName());
+        assertEquals(member, splitter.getMemberName());
     }
 
     /** Copied from {@link Paths#prefixLength}. */

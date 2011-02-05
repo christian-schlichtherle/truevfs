@@ -175,20 +175,33 @@ public final class Paths {
 
     /**
      * Equivalent to
-     * {@code return new Splitter(separatorChar).{@link Splitter#split(String) split(path)};}.
+     * <code>return new {@link Splitter#Paths.Splitter(char, boolean) Splitter(separatorChar, keepTrailingSeparator)}.{@link Splitter#split(String) split(path)};</code>.
      */
-    public static Splitter split(String path, char separatorChar) {
-        return new Splitter(separatorChar).split(path);
+    public static Splitter split(   String path,
+                                    char separatorChar,
+                                    boolean keepTrailingSeparator) {
+        return new Splitter(separatorChar, keepTrailingSeparator).split(path);
     }
 
     /** Splits a given path name into its parent path name and member name. */
     public static class Splitter {
         private final char separatorChar;
+        private final int fixum;
         private @CheckForNull String parentPath;
         private String memberName;
 
-        public Splitter(final char separatorChar) {
+        /**
+         * Constructs a new splitter.
+         *
+         * @param separatorChar the file name separator character.
+         * @param keepTrailingSeparator whether or not a parent path name
+         *        should have a single trailing separator if present in the
+         *        original path name.
+         */
+        public Splitter(final char separatorChar,
+                        final boolean keepTrailingSeparator) {
             this.separatorChar = separatorChar;
+            this.fixum = keepTrailingSeparator ? 2 : 1;
         }
 
         /**
@@ -202,7 +215,7 @@ public final class Paths {
          * <li>At index one: The member name without a {@code separatorChar}.</li>
          * </ol>
          *
-         * @param  path The name of the path which's parent path name and
+         * @param  path the name of the path which's parent path name and
          *         member name are to be returned.
          * @return {@code this}
          */
@@ -219,7 +232,7 @@ public final class Paths {
             memberEnd++;
             if (prefixLength <= memberBegin) {
                 final int parentEnd = lastIndexNot(path, separatorChar, memberBegin);
-                parentPath = path.substring(0, prefixLength <= parentEnd ? parentEnd + 2 : prefixLength);
+                parentPath = path.substring(0, prefixLength <= parentEnd ? parentEnd + fixum : prefixLength);
                 memberName = path.substring(memberBegin + 1, memberEnd);
             } else if (0 < prefixLength && prefixLength <= memberEnd) {
                 parentPath = path.substring(0, prefixLength);
@@ -240,11 +253,13 @@ public final class Paths {
             return last;
         }
 
+        /** Returns the parent path name. */
         @Nullable
         public String getParentPath() {
             return parentPath;
         }
 
+        /** Returns the member name. */
         public String getMemberName() {
             return memberName;
         }
@@ -263,8 +278,8 @@ public final class Paths {
      * Windows drives and UNC's are always recognized by this method, even
      * on non-Windows platforms in order to ease interoperability.
      *
-     * @param path The path name to test.
-     * @param separatorChar The file name separator character.
+     * @param  path the path name to test.
+     * @param  separatorChar the file name separator character.
      * @return Whether or not path is prefixed and the prefix ends with a
      *         separator character.
      */
