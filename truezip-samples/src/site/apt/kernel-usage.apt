@@ -126,3 +126,10 @@ $ cat fileA fileB
 ---
 zip:zip:zip:zip:zip:zip:zip:http://truezip.java.net/truezip-samples/test/1.zip!/0.zip!/this.zip!/is.zip!/nuts.zip!/or.zip!/not.zip!/x
 ---
+
+    And for even more fun, try the code above with the following URI and
+    provide the top secret password <<<test1234>>> when prompted:
+
+---
+zip:zip:zip:zip:tzp:zip:zip:http://truezip.java.net/truezip-samples/test/1.zip!/0.zip!/test1234.tzp!/is.zip!/nuts.zip!/or.zip!/not.zip!/x
+---
