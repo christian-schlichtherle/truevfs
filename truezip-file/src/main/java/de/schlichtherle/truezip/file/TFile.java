@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.file;
 
+import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.io.InputException;
@@ -700,7 +701,7 @@ public final class TFile extends File {
         assert null != detector;
 
         final StringBuilder enclEntryNameBuf = new StringBuilder(path.length());
-        scan(ancestor, detector, 0, path, enclEntryNameBuf, new Splitter());
+        scan(ancestor, detector, 0, path, enclEntryNameBuf, new Splitter(separatorChar, false));
         enclEntryName = 0 < enclEntryNameBuf.length()
                 ? FsEntryName.create(enclEntryNameBuf.toString(), null, CANONICALIZE)
                 : null;
@@ -791,29 +792,6 @@ public final class TFile extends File {
         }
 
         scan(ancestor, detector, skip, parent, enclEntryNameBuf, splitter);
-    }
-
-    /** Splits a given path name into its parent path name and member name. */
-    private static class Splitter
-    extends de.schlichtherle.truezip.io.Paths.Splitter {
-        Splitter() {
-            super(separatorChar);
-        }
-
-        /**
-         * Like its super class implementation, but removes the trailing
-         * separator of the parent path name and returns {@code null} if the
-         * result is empty.
-         */
-        @Override
-        public String getParentPath() {
-            String path = super.getParentPath();
-            if (null == path)
-                return null;
-            while (path.endsWith(separator))
-                path = path.substring(0, path.length() - 1);
-            return path.isEmpty() ? null : path;
-        }
     }
 
     private Object writeReplace() throws ObjectStreamException {
