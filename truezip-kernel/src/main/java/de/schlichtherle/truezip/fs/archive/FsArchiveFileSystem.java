@@ -196,6 +196,8 @@ implements EntryContainer<FsArchiveFileSystemEntry<E>> {
     /** Splits a given path name into its parent path name and member name. */
     private static class Splitter
     extends de.schlichtherle.truezip.io.Paths.Splitter {
+        static final String AFS_ROOT = ROOT.toString();
+
         Splitter() {
             super(SEPARATOR_CHAR, false);
         }
@@ -207,7 +209,7 @@ implements EntryContainer<FsArchiveFileSystemEntry<E>> {
         @Override
         public @NonNull String getParentPath() {
             String path = super.getParentPath();
-            return null == path ? ROOT.toString() : path;
+            return null == path ? AFS_ROOT : path;
         }
     }
 
@@ -353,15 +355,14 @@ implements EntryContainer<FsArchiveFileSystemEntry<E>> {
     }
 
     @Nullable
-    public final FsArchiveFileSystemEntry<E> getEntry(
-            FsEntryName name) {
+    public final FsArchiveFileSystemEntry<E> getEntry(FsEntryName name) {
         return getEntry(name.getPath());
     }
 
     @Override
     @Nullable
     public FsArchiveFileSystemEntry<E> getEntry(String path) {
-        if (path == null)
+        if (null == path)
             throw new NullPointerException();
         final FsArchiveFileSystemEntry<E> entry = master.get(path);
         return null == entry ? null : entry.clone(this);
@@ -632,7 +633,7 @@ implements EntryContainer<FsArchiveFileSystemEntry<E>> {
         final String path = name.getPath();
         if (name.isRoot())
             throw new FsArchiveFileSystemException(path,
-                    "(virtual) root directory cannot get unlinked");
+                    "root directory cannot get unlinked");
         final FsArchiveFileSystemEntry<E> entry = master.get(path);
         if (entry == null)
             throw new FsArchiveFileSystemException(path,
