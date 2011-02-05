@@ -193,13 +193,13 @@ TFile.setDefaultArchiveDetector(
     supports SHA-256 authentication and AES-256 decryption in CTR block
     mode for transparent, read/write access to its encrypted payload.
     By using CTR mode, RAES supports transparent <random> read access to
-    its encrypted payload, which makes reading a TZP pretty fast.
+    its encrypted payload, which makes reading a TZP file pretty fast.
 
     Note the injection of a
     {{{./apidocs/de/schlichtherle/truezip/fs/archive/zip/raes/PromptingKeyManagerContainer.html}<<<PromptingKeyManagerContainer>>>}}
     into the <<<ZipRaesDriver>>>.
     This object is responsible for prompting the user for passwords.
-    It will check if the JVM is in headless mode and use the console for
+    It will check if the JVM is in headless mode and then use the console for
     prompting, otherwise a Swing GUI.
     If you want to hard code a password instead, you would need to inject an
     instance of your own implementation of the interface
