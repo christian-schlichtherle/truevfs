@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.io;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Locale;
 
 /**
@@ -180,7 +181,7 @@ public final class Paths {
         return new Splitter(separatorChar).split(path);
     }
 
-    /** A splitter for path names. */
+    /** Splits a given path name into its parent path name and member name. */
     public static class Splitter {
         private final char separatorChar;
         private @CheckForNull String parentPath;
@@ -195,11 +196,10 @@ public final class Paths {
          * recognizing platform specific file system roots.
          * The returned array will hold the following strings:
          * <ol>
-         * <li>At index zero: The parent path name or {@code null} if the
-         *     path name does not specify a parent.
-         *     This compares equal with {@link java.io.File#getParent()}.</li>
-         * <li>At index one: The member name.
-         *     This compares equal with {@link java.io.File#getName()}.</li>
+         * <li>At index zero: The parent path name with a single trailing
+         *     {@code separatorChar} or {@code null} if the path name does not
+         *     specify a parent.</li>
+         * <li>At index one: The member name without a {@code separatorChar}.</li>
          * </ol>
          *
          * @param  path The name of the path which's parent path name and
@@ -208,24 +208,28 @@ public final class Paths {
          */
         public Splitter split(final String path) {
             final int prefixLength = prefixLength(path, separatorChar);
-            // Skip any trailing separators and look for the previous separator.
-            int baseBegin = -1;
-            int baseEnd = path.length() - 1;
-            if (prefixLength <= baseEnd) {
-                baseEnd = lastIndexNot(path, separatorChar, baseEnd);
-                baseBegin = path.lastIndexOf(separatorChar, baseEnd);
+            int memberEnd = path.length() - 1;
+            if (memberEnd < prefixLength) {
+                parentPath = null;
+                memberName = "";
+                return this;
             }
-            baseEnd++; // convert end index to interval boundary
-            // Finally split according to our findings.
-            if (baseBegin >= prefixLength) { // found separator after the prefix?
-                final int parentEnd = lastIndexNot(path, separatorChar, baseBegin) + 1;
-                parentPath = path.substring(0, parentEnd > prefixLength ? parentEnd : prefixLength);    // include separator, may produce separator only!
-                memberName = path.substring(baseBegin + 1, baseEnd);    // between separator and trailing separator
-            } else { // no separator after prefix
-                parentPath = 0 < prefixLength && prefixLength < baseEnd // prefix exists and we have more?
-                    ? path.substring(0, prefixLength)                   // prefix is parent
-                    : null;                                             // no parent
-                memberName = path.substring(prefixLength, baseEnd);
+            memberEnd = lastIndexNot(path, separatorChar, memberEnd);
+            int memberBegin = path.lastIndexOf(separatorChar, memberEnd);
+            memberEnd++;
+            if (prefixLength <= memberBegin) {
+                final int parentEnd = lastIndexNot(path, separatorChar, memberBegin);
+                parentPath = path.substring(0, prefixLength < parentEnd ? parentEnd + 2 : prefixLength);
+                memberName = path.substring(memberBegin + 1, memberEnd);
+            } else if (0 < prefixLength && prefixLength <= memberEnd) {
+                parentPath = path.substring(0, prefixLength);
+                memberName = path.substring(prefixLength, memberEnd);
+            } else if (prefixLength <= memberEnd) {
+                parentPath = null;
+                memberName = path.substring(memberBegin + 1, memberEnd);
+            } else {
+                parentPath = null;
+                memberName = "";
             }
             return this;
         }
@@ -236,7 +240,7 @@ public final class Paths {
             return last;
         }
 
-        @CheckForNull
+        @Nullable
         public String getParentPath() {
             return parentPath;
         }
@@ -263,7 +267,6 @@ public final class Paths {
      * @param separatorChar The file name separator character.
      * @return Whether or not path is prefixed and the prefix ends with a
      *         separator character.
-     * @throws NullPointerException If {@code path} is {@code null}.
      */
     public static boolean isAbsolute(String path, char separatorChar) {
         final int prefixLen = prefixLength(path, separatorChar);
@@ -285,10 +288,9 @@ public final class Paths {
      * is {@code '/'}, two leading separators would be considered to
      * be a UNC and hence the return value would be {@code 2}.
      *
-     * @param path The file system path.
-     * @param separatorChar The file name separator character.
+     * @param  path The file system path.
+     * @param  separatorChar The file name separator character.
      * @return The number of characters in the prefix.
-     * @throws NullPointerException If {@code path} is {@code null}.
      */
     private static int prefixLength(final String path, final char separatorChar) {
         final int pathLength = path.length();
@@ -315,7 +317,6 @@ public final class Paths {
      * @param a A non-{@code null} {@link String} reference.
      * @param b A non-{@code null} {@link String} reference.
      * @param separatorChar The file name separator character.
-     * @throws NullPointerException If any parameter is {@code null}.
      */
     public static boolean contains(String a, String b, char separatorChar) {
         // Windows is just case preserving, all others are case sensitive.

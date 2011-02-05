@@ -74,7 +74,6 @@ public class PathsTest {
 
         assertSplit(".");
         assertSplit("..");
-        //testSplit(fs);
 
         assertSplit("dir");
         assertSplit("dir" + fs);
@@ -108,6 +107,16 @@ public class PathsTest {
             assertSplit("\\\\h");
             assertSplit("\\\\");
 
+            /*assertSplit("\\\\\\host\\share\\\\file\\\\");
+            assertSplit("\\\\\\host\\share\\file\\");
+            assertSplit("\\\\\\host\\share\\file");
+            assertSplit("\\\\\\host\\share\\");
+            assertSplit("\\\\\\host\\share");
+            assertSplit("\\\\\\host\\");
+            assertSplit("\\\\\\host");
+            assertSplit("\\\\\\h");*/
+            assertSplit("\\\\\\");
+
             assertSplit("C:\\dir\\\\file\\\\");
             assertSplit("C:\\dir\\file\\");
             assertSplit("C:\\dir\\file");
@@ -115,6 +124,14 @@ public class PathsTest {
             assertSplit("C:\\dir");
             assertSplit("C:\\d");
             assertSplit("C:\\");
+
+            /*assertSplit("C:\\\\dir\\\\file\\\\");
+            assertSplit("C:\\\\dir\\file\\");
+            assertSplit("C:\\\\dir\\file");
+            assertSplit("C:\\\\dir\\");
+            assertSplit("C:\\\\dir");
+            assertSplit("C:\\\\d");*/
+            assertSplit("C:\\\\");
 
             assertSplit("C:dir\\\\file\\\\");
             assertSplit("C:dir\\file\\");
@@ -128,12 +145,33 @@ public class PathsTest {
 
     private void assertSplit(final String path) {
         final File file = new File(path);
-        final String parent = file.getParent();
+        String parent = file.getParent();
+        if (null != parent && parent.length() > prefixLength(path, File.separatorChar) && !parent.endsWith(File.separator))
+            parent = parent + File.separator;
         final String base = file.getName();
 
         final Splitter splitter = Paths.split(path, File.separatorChar);
         assertEquals(parent, splitter.getParentPath());
         assertEquals(base, splitter.getMemberName());
+    }
+
+    /** Copied from {@link Paths#prefixLength}. */
+    private static int prefixLength(final String path, final char separatorChar) {
+        final int pathLength = path.length();
+        int len = 0; // default prefix length
+        if (pathLength > 0 && path.charAt(0) == separatorChar) {
+            len++; // leading separator or first character of a UNC.
+        } else if (pathLength > 1 && path.charAt(1) == ':') {
+            final char drive = path.charAt(0);
+            if ('A' <= drive && drive <= 'Z'
+                    || 'a' <= drive && drive <= 'z') { // US-ASCII letters only
+                // Path is prefixed with drive, e.g. "C:\\Programs".
+                len = 2;
+            }
+        }
+        if (pathLength > len && path.charAt(len) == separatorChar)
+            len++; // next separator is considered part of prefix
+        return len;
     }
 
     @Test
