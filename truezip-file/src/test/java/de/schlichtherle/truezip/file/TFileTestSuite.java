@@ -384,8 +384,7 @@ public abstract class TFileTestSuite {
         try {
             file2.createNewFile();
             fail("Creating a file in another file should throw an IOException!");
-        } catch (IOException ok) {
-            // This is exactly what we expect here!
+        } catch (IOException expected) {
         }
         
         assertTrue(file1.delete()); // OK now!

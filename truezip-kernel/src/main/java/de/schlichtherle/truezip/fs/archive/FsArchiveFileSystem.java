@@ -30,8 +30,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.CharConversionException;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -48,7 +46,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import static de.schlichtherle.truezip.io.Paths.*;
 
 /**
- * A base class for a virtual file system for archive entries.
+ * A read/write virtual file system for archive entries.
  * 
  * @param   <E> The type of the archive entries.
  * @author  Christian Schlichtherle
@@ -57,21 +55,11 @@ import static de.schlichtherle.truezip.io.Paths.*;
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
 class FsArchiveFileSystem<E extends FsArchiveEntry>
-implements EntryContainer<FsArchiveFileSystemEntry<E>> {
+implements Iterable<FsArchiveFileSystemEntry<E>> {
 
+    private final Splitter splitter = new Splitter();
     private final EntryFactory<E> factory;
-
-    /**
-     * The map of archive file system entries.
-     * <p>
-     * Note that the archive entries in this map are shared with the
-     * {@link EntryContainer} object provided to the constructor of
-     * this class.
-     */
-    private final Map<String, FsArchiveFileSystemEntry<E>> master;
-
-    /** The file system entry for the (virtual) root of this file system. */
-    private final FsArchiveFileSystemEntry<E> root;
+    private final MasterEntryTable<E> master;
 
     /** Whether or not this file system has been modified (touched). */
     private boolean touched;
@@ -95,13 +83,12 @@ implements EntryContainer<FsArchiveFileSystemEntry<E>> {
 
     private FsArchiveFileSystem(final EntryFactory<E> factory) {
         this.factory = factory;
-        master = new LinkedHashMap<String, FsArchiveFileSystemEntry<E>>(64);
-
-        // Setup root.
-        root = newEntryUnchecked(ROOT.toString(), DIRECTORY, null);
+        final FsArchiveFileSystemEntry<E>
+                root = newEntryUnchecked(ROOT, DIRECTORY, null);
+        final E rootEntry = root.getEntry();
         for (Access access : BitField.allOf(Access.class))
-            root.getEntry().setTime(access, System.currentTimeMillis());
-        master.put(ROOT.toString(), root);
+            rootEntry.setTime(access, System.currentTimeMillis());
+        this.master = newMasterEntryTable(root, 64);
         try {
             touch();
         } catch (FsArchiveFileSystemException ex) {
@@ -158,91 +145,72 @@ implements EntryContainer<FsArchiveFileSystemEntry<E>> {
             throw new IllegalArgumentException();
 
         this.factory = factory;
-        master = new LinkedHashMap<String, FsArchiveFileSystemEntry<E>>(
-                (int) (archive.getSize() / .7f) + 1); // allow overhead to create missing parent directories
+        final FsArchiveFileSystemEntry<E>
+                root = newEntryUnchecked(ROOT, DIRECTORY, rootTemplate);
+        // Allocate some overhead to create missing parent directories.
+        this.master = newMasterEntryTable(root, (int) (archive.getSize() / .7f) + 1);
 
         // Load entries from input archive.
-        final List<String> paths = new ArrayList<String>(archive.getSize());
-        final Normalizer normalizer = new Normalizer(SEPARATOR_CHAR);
+        final List<FsEntryName>
+                names = new ArrayList<FsEntryName>(archive.getSize());
         for (final E entry : archive) {
-            // Fix issue #42 - see https://truezip.dev.java.net/issues/show_bug.cgi?id=42
-            final String path = cutTrailingSeparators(
-                normalizer.normalize(entry.getName().replace('\\', SEPARATOR_CHAR)),
-                SEPARATOR_CHAR);
-            master.put(path, FsArchiveFileSystemEntry.create(path, entry.getType(), entry));
-            paths.add(path);
+            final FsEntryName name = FsEntryName.create(
+                    cutTrailingSeparators(entry.getName().replace('\\', SEPARATOR_CHAR), SEPARATOR_CHAR),
+                    null,
+                    FsUriModifier.CANONICALIZE);
+            master.add(FsArchiveFileSystemEntry.create(name, entry.getType(), entry));
+            names.add(name);
         }
 
         // Setup root file system entry, potentially replacing its previous
         // mapping from the input archive.
-        root = newEntryUnchecked(ROOT.getPath(), DIRECTORY, rootTemplate);
-        master.put(ROOT.getPath(), root);
+        master.add(root);
 
         // Now perform a file system check to create missing parent directories
         // and populate directories with their members - this needs to be done
         // separately!
         // entries = Collections.enumeration(master.values()); // concurrent modification!
-        final Checker fsck = new Checker();
-        for (final String path : paths) {
-            try {
-                fsck.fix(new FsEntryName(
-                        new URI(null, null, path, null, null),
-                        FsUriModifier.CANONICALIZE).getPath());
-            } catch (URISyntaxException dontFix) {
-            }
-        }
+        for (FsEntryName name : names)
+            fix(name);
     }
 
-    /** Splits a given path name into its parent path name and member name. */
-    private static class Splitter
-    extends de.schlichtherle.truezip.io.Paths.Splitter {
-        static final String AFS_ROOT = ROOT.toString();
-
-        Splitter() {
-            super(SEPARATOR_CHAR, false);
-        }
-
-        /**
-         * Like its super class implementation, but substitutes {@code ROOT}
-         * for {@code null}.
-         */
-        @Override
-        public @NonNull String getParentPath() {
-            String path = super.getParentPath();
-            return null == path ? AFS_ROOT : path;
-        }
+    private static <E extends FsArchiveEntry> MasterEntryTable<E>
+    newMasterEntryTable(final FsArchiveFileSystemEntry<E> root, final int initialCapacity) {
+        final MasterEntryTable<E>
+                master = root.getEntry().getName().endsWith(SEPARATOR)
+                    ? new ZipOrTarEntryTable<E>(initialCapacity)
+                    : new DefaultEntryTable<E>(initialCapacity);
+        master.add(root);
+        return master;
     }
 
-    private class Checker extends Splitter {
+    /**
+     * Called from a constructor to fix the parent directories of the
+     * file system entry identified by {@code name}, ensuring that all
+     * parent directories of the file system entry exist and that they
+     * contain the respective base.
+     * If a parent directory does not exist, it is created using an
+     * unkown time as the last modification time - this is defined to be a
+     * <i>ghost directory<i>.
+     * If a parent directory does exist, the respective base is added
+     * (possibly yet again) and the process is continued.
+     */
+    private void fix(final FsEntryName name) {
+        // When recursing into this method, it may be called with the root
+        // directory as its parameter, so we may NOT skip the following test.
+        if (isRoot(name.getPath()))
+            return; // never fix root or empty or absolute pathnames
 
-        /**
-         * Called from a constructor to fix the parent directories of the
-         * file system entry identified by {@code path}, ensuring that all
-         * parent directories of the file system entry exist and that they
-         * contain the respective member.
-         * If a parent directory does not exist, it is created using an
-         * unkown time as the last modification time - this is defined to be a
-         * <i>ghost directory<i>.
-         * If a parent directory does exist, the respective member is added
-         * (possibly yet again) and the process is continued.
-         */
-        void fix(final String path) {
-            // When recursing into this method, it may be called with the root
-            // directory as its parameter, so we may NOT skip the following test.
-            if (isRoot(path))
-                return; // never fix root or empty or absolute pathnames
-
-            split(path);
-            final String parentPath = getParentPath();
-            final String memberName = getMemberName();
-            FsArchiveFileSystemEntry<E> parent = master.get(parentPath);
-            if (null == parent) {
-                parent = newEntryUnchecked(parentPath, DIRECTORY, null);
-                master.put(parentPath, parent);
-            }
-            parent.add(memberName);
-            fix(parentPath);
+        splitter.split(name);
+        final FsEntryName parentName = splitter.getParentName();
+        final String memberName = splitter.getMemberName();
+        FsArchiveFileSystemEntry<E> parent = master.get(parentName, DIRECTORY);
+        if (null == parent) {
+            parent = newEntryUnchecked(parentName, DIRECTORY, null);
+            master.add(parent);
         }
+        parent.add(memberName);
+        fix(parentName);
     }
 
     /**
@@ -251,7 +219,7 @@ implements EntryContainer<FsArchiveFileSystemEntry<E>> {
      * This method is provided for inheritance - the implementation in this
      * class always returns {@code false}.
      */
-    public boolean isReadOnly() {
+    boolean isReadOnly() {
         return false;
     }
 
@@ -259,7 +227,7 @@ implements EntryContainer<FsArchiveFileSystemEntry<E>> {
      * Returns {@code true} if and only if this archive file system has been
      * modified since its time of creation.
      */
-    public boolean isTouched() {
+    boolean isTouched() {
         return touched;
     }
 
@@ -308,7 +276,7 @@ implements EntryContainer<FsArchiveFileSystemEntry<E>> {
      *
      * @param  listener the listener for archive file system events.
      */
-    public final void addArchiveFileSystemTouchListener(
+    final void addArchiveFileSystemTouchListener(
             FsArchiveFileSystemTouchListener<? super E> listener) {
         if (null == listener)
             throw new NullPointerException();
@@ -320,51 +288,24 @@ implements EntryContainer<FsArchiveFileSystemEntry<E>> {
      *
      * @param  listener the listener for archive file system events.
      */
-    public final void removeArchiveFileSystemTouchListener(
+    final void removeArchiveFileSystemTouchListener(
             @Nullable FsArchiveFileSystemTouchListener<? super E> listener) {
         touchListeners.remove(listener);
     }
 
-    @Override
-    public int getSize() {
-        return master.size();
+    int getSize() {
+        return master.getSize();
     }
 
     @Override
     public Iterator<FsArchiveFileSystemEntry<E>> iterator() {
-        class ArchiveEntryIterator implements Iterator<FsArchiveFileSystemEntry<E>> {
-            final Iterator<FsArchiveFileSystemEntry<E>> it = master.values().iterator();
-
-            @Override
-            public boolean hasNext() {
-                return it.hasNext();
-            }
-
-            @Override
-            public FsArchiveFileSystemEntry<E> next() {
-                return it.next();
-            }
-
-            @Override
-            public void remove() {
-                throw new UnsupportedOperationException();
-            }
-        } // class ArchiveEntryIterator
-
-        return new ArchiveEntryIterator();
+        return master.iterator();
     }
 
     @Nullable
-    public final FsArchiveFileSystemEntry<E> getEntry(FsEntryName name) {
-        return getEntry(name.getPath());
-    }
-
-    @Override
-    @Nullable
-    public FsArchiveFileSystemEntry<E> getEntry(String path) {
-        if (null == path)
-            throw new NullPointerException();
-        final FsArchiveFileSystemEntry<E> entry = master.get(path);
+    final FsArchiveFileSystemEntry<E> getEntry(FsEntryName name) {
+        assert null != name;
+        FsArchiveFileSystemEntry<E> entry = master.get(name, null);
         return null == entry ? null : entry.clone(this);
     }
 
@@ -377,16 +318,16 @@ implements EntryContainer<FsArchiveFileSystemEntry<E>> {
      *         occurs. The original exception is wrapped as its cause.
      */
     private FsArchiveFileSystemEntry<E> newEntryUnchecked(
-            final String path,
+            final FsEntryName name,
             final Type type,
             @CheckForNull final Entry template) {
         assert null != type;
-        assert !isRoot(path) || DIRECTORY == type;
+        assert !isRoot(name.getPath()) || DIRECTORY == type;
         assert !(template instanceof FsArchiveFileSystemEntry<?>);
 
         try {
             return FsArchiveFileSystemEntry.create(
-                    path, type, factory.newEntry(path, type, template));
+                    name, type, factory.newEntry(name.getPath(), type, template));
         } catch (CharConversionException ex) {
             throw new AssertionError(ex);
         }
@@ -397,23 +338,23 @@ implements EntryContainer<FsArchiveFileSystemEntry<E>> {
      * This is only a factory method, i.e. the returned file system entry is
      * not yet linked into this (virtual) archive file system.
      *
-     * @see    #mknod
-     * @param  path the path name of the archive file system entry.
+     * @see   #mknod
+     * @param path the path name of the archive file system entry.
      */
     private FsArchiveFileSystemEntry<E> newEntryChecked(
-            final String path,
+            final FsEntryName name,
             final Type type,
             @CheckForNull final Entry template)
     throws FsArchiveFileSystemException {
         assert null != type;
-        assert !isRoot(path) || DIRECTORY == type;
+        assert !isRoot(name.getPath()) || DIRECTORY == type;
         assert !(template instanceof FsArchiveFileSystemEntry<?>);
 
         try {
             return FsArchiveFileSystemEntry.create(
-                    path, type, factory.newEntry(path, type, template));
+                    name, type, factory.newEntry(name.getPath(), type, template));
         } catch (CharConversionException ex) {
-            throw new FsArchiveFileSystemException(path, ex);
+            throw new FsArchiveFileSystemException(name.toString(), ex);
         }
     }
 
@@ -475,25 +416,27 @@ implements EntryContainer<FsArchiveFileSystemEntry<E>> {
             final BitField<FsOutputOption> options,
             @CheckForNull Entry template)
     throws FsArchiveFileSystemException {
-        final String path = name.getPath();
         if (null == type)
             throw new NullPointerException();
-        if (FILE != type && DIRECTORY != type)
-            throw new FsArchiveFileSystemException(path, // TODO: Add support for other types.
+        if (FILE != type && DIRECTORY != type) // TODO: Add support for other types.
+            throw new FsArchiveFileSystemException(name.toString(),
                     "only FILE and DIRECTORY entries are currently supported");
-        final FsArchiveFileSystemEntry<E> oldEntry = master.get(path);
+        final FsArchiveFileSystemEntry<E> oldEntry = master.get(name, null);
         if (null != oldEntry) {
             if (options.get(EXCLUSIVE))
-                throw new FsArchiveFileSystemException(path, "entry exists already");
+                throw new FsArchiveFileSystemException(name.toString(),
+                        "entry exists already");
             final Entry.Type oldEntryType = oldEntry.getType();
-            if (oldEntryType == DIRECTORY)
-                throw new FsArchiveFileSystemException(path, "directories cannot get replaced");
+            if (oldEntryType != FILE && oldEntryType != HYBRID)
+                throw new FsArchiveFileSystemException(name.toString(),
+                        "only (hybrid) files can get replaced");
             if (oldEntryType != type)
-                throw new FsArchiveFileSystemException(path, "entry exists already as a different type");
+                throw new FsArchiveFileSystemException(name.toString(),
+                        "entry exists already as a different type");
         }
         while (template instanceof FsArchiveFileSystemEntry<?>)
             template = ((FsArchiveFileSystemEntry<?>) template).getEntry();
-        return new PathLink(path, type, options.get(CREATE_PARENTS), template);
+        return new PathLink(name, type, options.get(CREATE_PARENTS), template);
     }
 
     /**
@@ -506,51 +449,51 @@ implements EntryContainer<FsArchiveFileSystemEntry<E>> {
      * happen, however.
      */
     private final class PathLink implements FsArchiveFileSystemOperation<E> {
-        final Splitter splitter = new Splitter();
         final boolean createParents;
         final SegmentLink<E>[] links;
         long time = -1;
 
-        PathLink(   final String entryPath,
-                    final Entry.Type entryType,
+        PathLink(   final FsEntryName name,
+                    final Entry.Type type,
                     final boolean createParents,
                     @CheckForNull final Entry template)
         throws FsArchiveFileSystemException {
             this.createParents = createParents;
-            links = newSegmentLinks(entryPath, entryType, template, 1);
+            links = newSegmentLinks(name, type, template, 1);
         }
 
         @SuppressWarnings({ "unchecked", "rawtypes" })
         private SegmentLink<E>[] newSegmentLinks(
-                final String entryPath,
+                final FsEntryName entryName,
                 final Entry.Type entryType,
                 @CheckForNull final Entry template,
                 final int level)
         throws FsArchiveFileSystemException {
-            splitter.split(entryPath);
-            final String parentPath = splitter.getParentPath(); // could equal ROOT
+            splitter.split(entryName);
+            final FsEntryName parentName = splitter.getParentName(); // could equal ROOT
             final String memberName = splitter.getMemberName();
             final SegmentLink<E>[] elements;
 
             // Lookup parent entry, creating it where necessary and allowed.
-            final FsArchiveFileSystemEntry<E> parentEntry = master.get(parentPath);
+            final FsArchiveFileSystemEntry<E>
+                    parentEntry = master.get(parentName, null);
             final FsArchiveFileSystemEntry<E> newEntry;
             if (parentEntry != null) {
                 if (DIRECTORY != parentEntry.getType())
-                    throw new FsArchiveFileSystemException(entryPath,
+                    throw new FsArchiveFileSystemException(entryName.toString(),
                             "parent entry must be a directory");
                 elements = new SegmentLink[level + 1];
-                elements[0] = new SegmentLink<E>(parentEntry, null);
-                newEntry = newEntryChecked(entryPath, entryType, template);
-                elements[1] = new SegmentLink<E>(newEntry, memberName);
+                elements[0] = new SegmentLink<E>(parentName, null, parentEntry);
+                newEntry = newEntryChecked(entryName, entryType, template);
+                elements[1] = new SegmentLink<E>(entryName, memberName, newEntry);
             } else if (createParents) {
                 elements = newSegmentLinks(
-                        parentPath, DIRECTORY, null, level + 1);
-                newEntry = newEntryChecked(entryPath, entryType, template);
+                        parentName, DIRECTORY, null, level + 1);
+                newEntry = newEntryChecked(entryName, entryType, template);
                 elements[elements.length - level]
-                        = new SegmentLink<E>(newEntry, memberName);
+                        = new SegmentLink<E>(entryName, memberName, newEntry);
             } else {
-                throw new FsArchiveFileSystemException(entryPath,
+                throw new FsArchiveFileSystemException(entryName.toString(),
                         "missing parent directory entry");
             }
             return elements;
@@ -565,11 +508,12 @@ implements EntryContainer<FsArchiveFileSystemEntry<E>> {
             FsArchiveFileSystemEntry<E> parent = links[0].entry;
             for (int i = 1; i < l ; i++) {
                 final SegmentLink<E> link = links[i];
+                final FsEntryName name = link.name;
                 final FsArchiveFileSystemEntry<E> entry = link.entry;
-                final String base = link.base;
+                final String member = link.base;
                 assert DIRECTORY == parent.getType();
-                master.put(entry.getName(), entry);
-                if (parent.add(base) && UNKNOWN != parent.getTime(Access.WRITE)) // never beforeTouch ghosts!
+                master.add(entry);
+                if (parent.add(member) && UNKNOWN != parent.getTime(Access.WRITE)) // never touch ghosts!
                     parent.getEntry().setTime(Access.WRITE, getCurrentTimeMillis());
                 parent = entry;
             }
@@ -594,19 +538,23 @@ implements EntryContainer<FsArchiveFileSystemEntry<E>> {
      */
     private static final class SegmentLink<E extends FsArchiveEntry>
     implements Link<FsArchiveFileSystemEntry<E>> {
+        final FsEntryName name;
+        final @CheckForNull String base;
         final FsArchiveFileSystemEntry<E> entry;
-        @CheckForNull final String base;
 
         /**
          * Constructs a new {@code SegmentLink}.
          *
-         * @param entry The non-{@code null} file system entry for the path
-         *        path.
-         * @param base The nullable base (segment) path of the path name.
+         * @param name the entry name.
+         * @param base the nullable base name of the entry name.
+         * @param entry the non-{@code null} file system entry for the entry
+         *        name.
          */
         SegmentLink(
-                final FsArchiveFileSystemEntry<E> entry,
-                @CheckForNull final String base) {
+                final FsEntryName name,
+                final @CheckForNull String base,
+                final FsArchiveFileSystemEntry<E> entry) {
+            this.name = name;
             this.entry = entry;
             this.base = base;
         }
@@ -629,31 +577,28 @@ implements EntryContainer<FsArchiveFileSystemEntry<E>> {
      * @throws FsArchiveFileSystemException If the operation fails for some other
      *         reason.
      */
-    public void unlink(final FsEntryName name) throws FsArchiveFileSystemException {
-        final String path = name.getPath();
+    public void unlink(final FsEntryName name)
+    throws FsArchiveFileSystemException {
         if (name.isRoot())
-            throw new FsArchiveFileSystemException(path,
+            throw new FsArchiveFileSystemException(name.toString(),
                     "root directory cannot get unlinked");
-        final FsArchiveFileSystemEntry<E> entry = master.get(path);
+        final FsArchiveFileSystemEntry<E> entry = master.get(name, null);
         if (entry == null)
-            throw new FsArchiveFileSystemException(path,
+            throw new FsArchiveFileSystemException(name.toString(),
                     "archive entry does not exist");
-        assert entry != root;
         if (DIRECTORY == entry.getType() && 0 < entry.getMembers().size()) {
-            throw new FsArchiveFileSystemException(path,
+            throw new FsArchiveFileSystemException(name.toString(),
                     "directory is not empty");
         }
         touch();
-        final FsArchiveFileSystemEntry<E> entry2 = master.remove(path);
-        assert entry == entry2;
-        final Splitter splitter = new Splitter();
-        splitter.split(path);
-        final String parentPath = splitter.getParentPath();
-        final FsArchiveFileSystemEntry<E> parent = master.get(parentPath);
-        assert parent != null : "The parent directory of \"" + path
+        master.remove(name, entry.getType());
+        splitter.split(name);
+        final FsEntryName parentName = splitter.getParentName();
+        final FsArchiveFileSystemEntry<E> parent = master.get(parentName, DIRECTORY);
+        assert parent != null : "The parent directory of \"" + name.toString()
                     + "\" is missing - archive file system is corrupted!";
         final boolean ok = parent.remove(splitter.getMemberName());
-        assert ok : "The parent directory of \"" + path
+        assert ok : "The parent directory of \"" + name.toString()
                     + "\" does not contain this entry - archive file system is corrupted!";
         final E ae = parent.getEntry();
         if (ae.getTime(Access.WRITE) != UNKNOWN) // never touch ghosts!
@@ -665,13 +610,12 @@ implements EntryContainer<FsArchiveFileSystemEntry<E>> {
             final BitField<Access> types,
             final long value)
     throws FsArchiveFileSystemException {
-        final String path = name.getPath();
         if (0 > value)
-            throw new IllegalArgumentException(path +
-                    " (negative access time)");
-        final FsArchiveFileSystemEntry<E> entry = master.get(path);
+            throw new IllegalArgumentException(name.toString()
+                    + " (negative access time)");
+        final FsArchiveFileSystemEntry<E> entry = master.get(name, null);
         if (entry == null)
-            throw new FsArchiveFileSystemException(path,
+            throw new FsArchiveFileSystemException(name.toString(),
                     "archive entry not found");
         // Order is important here!
         touch();
@@ -691,4 +635,142 @@ implements EntryContainer<FsArchiveFileSystemEntry<E>> {
             throw new FsArchiveFileSystemException(name.getPath(),
                 "cannot set read-only state");
     }
+
+    private static final class ZipOrTarEntryTable<E extends FsArchiveEntry>
+    extends MasterEntryTable<E> {
+        ZipOrTarEntryTable(int initialCapacity) {
+            super(initialCapacity);
+        }
+
+        @Override
+        void add(FsArchiveFileSystemEntry<E> entry) {
+            String fsName = entry.getName();
+            String aeName = entry.getEntry().getName();
+            if (aeName.startsWith(fsName))
+                table.put(aeName, entry);
+            else if (DIRECTORY == entry.getType())
+                table.put(fsName + SEPARATOR_CHAR, entry);
+            else
+                table.put(fsName, entry);
+        }
+
+        @Override
+        FsArchiveFileSystemEntry<E> get(FsEntryName name, Type type) {
+            String path = name.getPath();
+            if (null == type) {
+                final FsArchiveFileSystemEntry<E> file = table.get(path);
+                final FsArchiveFileSystemEntry<E> directory = table.get(path + SEPARATOR_CHAR);
+                return null == file
+                        ? null == directory
+                            ? null
+                            : directory
+                        : null == directory
+                            ? file
+                            : new FsArchiveFileSystemEntry.HybridEntry<E>(
+                                file.getEntry(), file, directory);
+            } else if (DIRECTORY == type) {
+                return table.get(path + SEPARATOR_CHAR);
+            } else {
+                return table.get(path);
+            }
+        }
+
+        @Override
+        void remove(FsEntryName name, Type type) {
+            assert null != type;
+            String path = name.getPath();
+            table.remove(DIRECTORY == type ? path + SEPARATOR_CHAR : path);
+        }
+    } // class ZipOrTarEntryTable
+
+    private static final class DefaultEntryTable<E extends FsArchiveEntry>
+    extends MasterEntryTable<E> {
+        DefaultEntryTable(int initialCapacity) {
+            super(initialCapacity);
+        }
+
+        @Override
+        void add(FsArchiveFileSystemEntry<E> entry) {
+            table.put(entry.getName(), entry);
+        }
+
+        @Override
+        FsArchiveFileSystemEntry<E> get(FsEntryName name, Type type) {
+            return table.get(name.getPath());
+        }
+
+        @Override
+        void remove(FsEntryName name, Type type) {
+            table.remove(name.getPath());
+        }
+    } // class DefaultEntryTable
+
+    /** Splits a given path name into its parent path name and base name. */
+    private static abstract class MasterEntryTable<E extends FsArchiveEntry> {
+
+        /**
+         * The map of archive file system entries.
+         * <p>
+         * Note that the archive entries in this map are shared with the
+         * {@link EntryContainer} object provided to the constructor of
+         * this class.
+         */
+        final Map<String, FsArchiveFileSystemEntry<E>> table;
+
+        MasterEntryTable(int initialCapacity) {
+            this.table = new LinkedHashMap<String, FsArchiveFileSystemEntry<E>>(
+                    initialCapacity);
+        }
+
+        final int getSize() {
+            return table.size();
+        }
+
+        final Iterator<FsArchiveFileSystemEntry<E>> iterator() {
+            class ArchiveEntryIterator implements Iterator<FsArchiveFileSystemEntry<E>> {
+                final Iterator<FsArchiveFileSystemEntry<E>> it = table.values().iterator();
+
+                @Override
+                public boolean hasNext() {
+                    return it.hasNext();
+                }
+
+                @Override
+                public FsArchiveFileSystemEntry<E> next() {
+                    return it.next();
+                }
+
+                @Override
+                public void remove() {
+                    throw new UnsupportedOperationException();
+                }
+            } // class ArchiveEntryIterator
+
+            return new ArchiveEntryIterator();
+        }
+
+        abstract void add(FsArchiveFileSystemEntry<E> entry);
+        abstract FsArchiveFileSystemEntry<E> get(FsEntryName name, @CheckForNull Type type);
+        abstract void remove(FsEntryName name, @CheckForNull Type type);
+    } // class MasterEntryTable
+
+    private static final class Splitter {
+        private final de.schlichtherle.truezip.io.Paths.Splitter
+                splitter = new de.schlichtherle.truezip.io.Paths.Splitter(SEPARATOR_CHAR, false);
+
+        final void split(FsEntryName name) {
+            splitter.split(name.getPath());
+        }
+
+        final FsEntryName getParentName() {
+            String path = splitter.getParentPath();
+            return null == path
+                    ? ROOT
+                    : FsEntryName.create(path, (String) null, FsUriModifier.NULL);
+        }
+
+        final String getMemberName() {
+            return splitter.getMemberName();
+        }
+    } // class Splitter
 }

@@ -15,12 +15,15 @@
  */
 package de.schlichtherle.truezip.fs.archive;
 
+import de.schlichtherle.truezip.entry.Entry.Access;
+import de.schlichtherle.truezip.entry.Entry.Size;
+import de.schlichtherle.truezip.entry.Entry.Type;
+import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsDecoratingEntry;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import de.schlichtherle.truezip.fs.FsEntry;
-import de.schlichtherle.truezip.fs.FsEntryName;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.NotThreadSafe;
@@ -45,31 +48,37 @@ extends FsDecoratingEntry<E> {
      * archive entry.
      */
     public static <E extends FsArchiveEntry>
-    FsArchiveFileSystemEntry<E> create(   final FsEntryName name,
+    FsArchiveFileSystemEntry<E> create( final FsEntryName name,
                                         final Type        type,
                                         final E           entry) {
         return create(name.getPath(), type, entry);
     }
 
-    static <E extends FsArchiveEntry>
-    FsArchiveFileSystemEntry<E> create(   final String path,
+    private static <E extends FsArchiveEntry>
+    FsArchiveFileSystemEntry<E> create( final String path,
                                         final Type   type,
                                         final E      entry) {
         switch (type) {
             case FILE:
                 assert FILE == entry.getType();
                 return path.equals(entry.getName())
-                        ? new      FileEntry<E>(      entry)
-                        : new NamedFileEntry<E>(path, entry);
+                        ? new      FileEntry<E>(entry)
+                        : new NamedFileEntry<E>(entry, path);
 
             case DIRECTORY:
                 assert DIRECTORY == entry.getType();
                 return path.equals(entry.getName())
-                        ? new      DirectoryEntry<E>(      entry)
-                        : new NamedDirectoryEntry<E>(path, entry);
+                        ? new      DirectoryEntry<E>(entry)
+                        : new NamedDirectoryEntry<E>(entry, path);
 
             case SPECIAL:
-                return new NamedSpecialFileEntry<E>(path, entry);
+                return path.equals(entry.getName())
+                        ? DIRECTORY == entry.getType()
+                            ? new      SpecialDirectoryEntry<E>(entry)
+                            : new           SpecialFileEntry<E>(entry)
+                        : DIRECTORY == entry.getType()
+                            ? new NamedSpecialDirectoryEntry<E>(entry, path)
+                            : new      NamedSpecialFileEntry<E>(entry, path);
 
             default:
                 throw new UnsupportedOperationException(entry + " (type not supported)");
@@ -151,17 +160,43 @@ extends FsDecoratingEntry<E> {
         final String path;
 
         /** Decorates the given archive entry. */
-        NamedFileEntry(final String path, final E entry) {
+        NamedFileEntry(final E entry, final String path) {
             super(entry);
             assert !path.equals(entry.getName());
             this.path = path;
         }
 
         @Override
-        public String getName() {
+        public final String getName() {
             return path;
         }
     } // class NamedFileEntry
+
+    /** A named special file entry. */
+    private static class SpecialFileEntry<E extends FsArchiveEntry>
+    extends FileEntry<E> {
+        SpecialFileEntry(E entry) {
+            super(entry);
+        }
+
+        @Override
+        public Type getType() {
+            return SPECIAL;
+        }
+    } // class SpecialFileEntry
+
+    /** A named special file entry. */
+    private static class NamedSpecialFileEntry<E extends FsArchiveEntry>
+    extends NamedFileEntry<E> {
+        NamedSpecialFileEntry(E entry, String path) {
+            super(entry, path);
+        }
+
+        @Override
+        public Type getType() {
+            return SPECIAL;
+        }
+    } // class NamedSpecialFileEntry
 
     /** A directory entry. */
     private static class DirectoryEntry<E extends FsArchiveEntry>
@@ -174,8 +209,8 @@ extends FsDecoratingEntry<E> {
         }
 
         @Override
-        FsArchiveFileSystemEntry<E> clone(final FsArchiveFileSystem<E> fileSystem) {
-            final DirectoryEntry<E> clone = (DirectoryEntry<E>) super.clone(fileSystem);
+        FsArchiveFileSystemEntry<E> clone(FsArchiveFileSystem<E> fileSystem) {
+            DirectoryEntry<E> clone = (DirectoryEntry<E>) super.clone(fileSystem);
             clone.members = Collections.unmodifiableSet(members);
             return clone;
         }
@@ -207,43 +242,80 @@ extends FsDecoratingEntry<E> {
         final String path;
 
         /** Decorates the given archive entry. */
-        NamedDirectoryEntry(final String path, final E entry) {
+        NamedDirectoryEntry(final E entry, final String path) {
             super(entry);
             assert !path.equals(entry.getName());
             this.path = path;
         }
 
         @Override
-        public String getName() {
+        public final String getName() {
             return path;
         }
     } // class NamedDirectoryEntry
 
-    /** A named special file entry. */
-    private static class NamedSpecialFileEntry<E extends FsArchiveEntry>
-    extends FsArchiveFileSystemEntry<E> {
-        final String path;
-
-        NamedSpecialFileEntry(final String path, final E entry) {
+    /** A named special directory entry. */
+    private static class SpecialDirectoryEntry<E extends FsArchiveEntry>
+    extends DirectoryEntry<E> {
+        SpecialDirectoryEntry(E entry) {
             super(entry);
-            //assert SPECIAL == entry.getType(); // drivers could ignore this type, so we must ignore this!
-            final String name = entry.getName();
-            this.path = name.equals(path) ? name : path;
-        }
-
-        @Override
-        public String getName() {
-            return path;
         }
 
         @Override
         public Type getType() {
             return SPECIAL;
         }
+    } // class SpecialDirectoryEntry
+
+    /** A named special file entry. */
+    private static class NamedSpecialDirectoryEntry<E extends FsArchiveEntry>
+    extends NamedDirectoryEntry<E> {
+        NamedSpecialDirectoryEntry(E entry, String path) {
+            super(entry, path);
+        }
+
+        @Override
+        public Type getType() {
+            return SPECIAL;
+        }
+    } // class NamedSpecialDirectoryEntry
+
+    /** A hybrid file entry. */
+    static class HybridEntry<E extends FsArchiveEntry>
+    extends FsArchiveFileSystemEntry<E> {
+        final FsArchiveFileSystemEntry<E> file, directory;
+
+        HybridEntry(    E delegate,
+                        FsArchiveFileSystemEntry<E> file,
+                        FsArchiveFileSystemEntry<E> directory) {
+            super(delegate);
+            this.file = file;
+            this.directory = directory;
+        }
+
+        @Override
+        public String getName() {
+            return file.getName();
+        }
+
+        @Override
+        public Type getType() {
+            return HYBRID;
+        }
+
+        @Override
+        public long getSize(Size type) {
+            return file.getSize(type);
+        }
+
+        @Override
+        public long getTime(Access type) {
+            return Math.max(file.getTime(type), directory.getTime(type));
+        }
 
         @Override
         public Set<String> getMembers() {
-            return null;
+            return directory.getMembers();
         }
-    } // class NamedSpecialFileEntry
+    }
 }

@@ -64,7 +64,7 @@ public enum FsUriModifier {
     public enum PostFix {
 
         /**
-         * The post-fix for an {@link FsPath} depends on the URI type.
+         * The post-fix for an {@link FsPath} depends on the URI type:
          * For an opaque URI, nothing is modified.
          * For a hierarchical URI, its path is truncated so that it does not
          * end with a
@@ -102,7 +102,7 @@ public enum FsUriModifier {
                 // Delete trailing slash separator from directory URI.
                 for (String s; (s = uri.getPath()).endsWith(SEPARATOR)
                         && 2 <= s.length()
-                        && (':' != s.charAt(s.length() - 2));) {
+                        && (':' != s.charAt(s.length() - 2)); ) {
                     uri = new URI(  uri.getScheme(),
                                     uri.getAuthority(),
                                     s.substring(0, s.length() - 1),
@@ -125,7 +125,16 @@ public enum FsUriModifier {
         /** The post-fix for an {@link FsEntryName} does nothing. */
         ENTRY_NAME {
             @Override
-            URI modify(URI uri) {
+            URI modify(URI uri) throws URISyntaxException {
+                // Delete trailing slash separator from directory URI.
+                /*for (String s; (s = uri.getPath()).endsWith(SEPARATOR); ) {
+                    uri = new URI(  uri.getScheme(),
+                                    uri.getAuthority(),
+                                    s.substring(0, s.length() - 1),
+                                    uri.getQuery(),
+                                    uri.getFragment());
+                }*/
+
                 return uri;
             }
         };
