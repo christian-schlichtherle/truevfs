@@ -67,7 +67,7 @@ public interface Entry {
      */
     byte UNKNOWN = -1;
 
-    /** Defines the type of archive entry. */
+    /** Defines the type of file system entry. */
     enum Type {
 
         /**
@@ -79,14 +79,22 @@ public interface Entry {
 
         /**
          * Regular directory.
-         * A directory can have other archive entries as children.
+         * A directory can have other file system entries as members.
          */
         DIRECTORY,
 
         /**
+         * File AND directory at the same time.
+         * A hybrid file behaves like a regular file when reading or writing
+         * its content and like a regular directory when reading or writing its
+         * members.
+         */
+        HYBRID,
+
+        /**
          * Symbolic (named) link.
-         * A symbolic link refers to another file system node which could even
-         * be located outside the current archive file.
+         * A symbolic link refers to another file system entry which could even
+         * be located outside the current file system.
          */
         SYMLINK,
 

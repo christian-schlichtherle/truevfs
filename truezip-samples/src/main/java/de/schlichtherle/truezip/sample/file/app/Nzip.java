@@ -284,7 +284,7 @@ public class Nzip extends CommandLineUtility {
         buf.append(path);
         if (detailed)
             buf.append(file.isDirectory()
-                    ? TFile.separator
+                    ? (file.isFile() ? "+" : TFile.separator)
                     : file.isFile()
                         ? ""
                         : file.exists()

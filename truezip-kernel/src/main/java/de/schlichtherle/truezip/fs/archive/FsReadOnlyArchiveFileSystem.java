@@ -28,7 +28,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.NotThreadSafe;
 
 /**
- * A read-only archive file system.
+ * A read-only virtual file system for archive entries.
  * <p>
  * All modifying methods throw a {@link FsReadOnlyArchiveFileSystemException}.
  *

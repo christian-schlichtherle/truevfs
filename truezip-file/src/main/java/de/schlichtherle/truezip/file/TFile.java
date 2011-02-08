@@ -335,8 +335,8 @@ public final class TFile extends File {
     private static final long serialVersionUID = 3617072259051821745L;
 
     /** The file system roots. */
-    private static final Set<File> roots
-    		= new TreeSet<File>(Arrays.asList(listRoots()));
+    private static final Set<File>
+            roots = new TreeSet<File>(Arrays.asList(listRoots()));
 
     private static boolean lenient = true;
 
@@ -1694,8 +1694,8 @@ public final class TFile extends File {
     public boolean exists() {
         if (innerArchive != null) {
             try {
-                return innerArchive.getController()
-                        .getEntry(getInnerEntryName0()) != null;
+                return null != innerArchive.getController()
+                        .getEntry(getInnerEntryName0());
             } catch (IOException ex) {
                 return false;
             }
@@ -1717,7 +1717,10 @@ public final class TFile extends File {
             try {
                 final FsEntry entry = innerArchive.getController()
                         .getEntry(getInnerEntryName0());
-                return null != entry && FILE == entry.getType();
+                if (null == entry)
+                    return false;
+                final Type type = entry.getType();
+                return FILE == type || HYBRID == type;
             } catch (IOException ex) {
                 return false;
             }
@@ -1747,7 +1750,10 @@ public final class TFile extends File {
             try {
                 final FsEntry entry = innerArchive.getController()
                         .getEntry(getInnerEntryName0());
-                return null != entry && entry.getType() == DIRECTORY;
+                if (null == entry)
+                    return false;
+                final Type type = entry.getType();
+                return DIRECTORY == type || HYBRID == type;
             } catch (IOException ex) {
                 return false;
             }
