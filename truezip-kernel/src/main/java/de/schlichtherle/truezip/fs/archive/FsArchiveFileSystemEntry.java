@@ -90,6 +90,10 @@ extends FsDecoratingEntry<E> {
         super(entry);
     }
 
+    FsArchiveFileSystemEntry<E> clone(FsArchiveFileSystem<E> fileSystem) {
+        return create(getName(), getType(), fileSystem.copy(delegate));
+    }
+
     /**
      * Returns the archive entry which is adapted by this archive file system
      * entry.
@@ -99,10 +103,6 @@ extends FsDecoratingEntry<E> {
      */
     public final E getEntry() {
         return delegate;
-    }
-
-    FsArchiveFileSystemEntry<E> clone(FsArchiveFileSystem<E> fileSystem) {
-        return create(getName(), getType(), fileSystem.copy(delegate));
     }
 
     /**
@@ -285,12 +285,17 @@ extends FsDecoratingEntry<E> {
     extends FsArchiveFileSystemEntry<E> {
         final FsArchiveFileSystemEntry<E> file, directory;
 
-        HybridEntry(    E delegate,
-                        FsArchiveFileSystemEntry<E> file,
-                        FsArchiveFileSystemEntry<E> directory) {
+        HybridEntry(    final E delegate,
+                        final FsArchiveFileSystemEntry<E> file,
+                        final FsArchiveFileSystemEntry<E> directory) {
             super(delegate);
             this.file = file;
             this.directory = directory;
+        }
+
+        @Override
+        FsArchiveFileSystemEntry<E> clone(FsArchiveFileSystem<E> fileSystem) {
+            return new HybridEntry<E>(fileSystem.copy(delegate), file, directory);
         }
 
         @Override
