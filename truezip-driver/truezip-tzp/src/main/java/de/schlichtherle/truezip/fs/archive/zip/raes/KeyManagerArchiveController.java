@@ -59,7 +59,6 @@ extends FsDecoratingController< FsModel,
         this.driver = driver;
     }
 
-
     @Override
     public final FsEntry getEntry(final FsEntryName name)
     throws IOException {
@@ -83,7 +82,7 @@ extends FsDecoratingController< FsModel,
                 entry = ((FsArchiveFileSystemEntry<?>) entry).getEntry();
             try {
                 return FsArchiveFileSystemEntry.create(ROOT, SPECIAL,
-                        driver.newEntry(ROOT.toString(), SPECIAL, entry));
+                        driver.newEntry(ROOT.getPath(), SPECIAL, entry));
             } catch (CharConversionException cannotHappen) {
                 throw new AssertionError(cannotHappen);
             }
