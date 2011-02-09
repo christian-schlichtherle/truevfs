@@ -265,6 +265,7 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
 
     private void parse(@NonNull URI uri, final @NonNull FsUriModifier modifier)
     throws URISyntaxException {
+        uri = modifier.modify(uri, PATH);
         if (uri.isOpaque()) {
             final String ssp = uri.getSchemeSpecificPart();
             final int i = ssp.lastIndexOf(MOUNT_POINT_SEPARATOR);
@@ -283,12 +284,11 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
                     uri = nuri;
             }
         } else if (uri.isAbsolute()) {
-            uri = modifier.modify(uri, PATH);
             mountPoint = new FsMountPoint(uri.resolve(DOT), NULL);
             entryName = new FsEntryName(mountPoint.getUri().relativize(uri), NULL);
         } else {
             mountPoint = null;
-            entryName = new FsEntryName(uri, modifier);
+            entryName = new FsEntryName(uri, NULL);
             uri = entryName.getUri();
         }
         this.uri = uri;
