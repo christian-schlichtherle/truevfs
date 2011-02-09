@@ -161,6 +161,7 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
                         new URI(null,
                                 null,
                                 cutTrailingSeparators(entry.getName().replace('\\', SEPARATOR_CHAR), SEPARATOR_CHAR),
+                                //entry.getName().replace('\\', SEPARATOR_CHAR),
                                 null),
                         FsUriModifier.CANONICALIZE);
                 master.add(FsArchiveFileSystemEntry.create(name, entry.getType(), entry));

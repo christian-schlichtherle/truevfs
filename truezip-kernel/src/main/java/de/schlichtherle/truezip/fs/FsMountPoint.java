@@ -258,6 +258,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
 
     private void parse(@NonNull URI uri, final @NonNull FsUriModifier modifier)
     throws URISyntaxException {
+        uri = modifier.modify(uri, MOUNT_POINT);
         if (null != uri.getRawFragment())
             throw new URISyntaxException(quote(uri), "Fragment not allowed");
         if (uri.isOpaque()) {
@@ -282,7 +283,6 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
                     uri = nuri;
             }
         } else {
-            uri = modifier.modify(uri, MOUNT_POINT);
             if (!uri.isAbsolute())
                 throw new URISyntaxException(quote(uri), "Not absolute");
             if (!uri.getRawPath().endsWith(SEPARATOR))

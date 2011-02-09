@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -30,6 +31,7 @@ import static de.schlichtherle.truezip.entry.EntryName.*;
  * @version $Id$
  */
 @Immutable
+@DefaultAnnotation(NonNull.class)
 public enum FsUriModifier {
 
     /** The null modifier does nothing but ensure that the URI is normalized. */
@@ -53,8 +55,14 @@ public enum FsUriModifier {
         }
     };
 
-    abstract @NonNull URI modify(@NonNull URI uri, @NonNull PostFix fix)
-    throws URISyntaxException;
+    /**
+     * An idempotent function which modifies a URI.
+     *
+     * @param  uri the URI to modify.
+     * @param  modify the post-modify to apply if required.
+     * @return the modified URI.
+     */
+    abstract URI modify(URI uri, PostFix fix) throws URISyntaxException;
 
     /**
      * Post-fixes a URI when it gets
@@ -82,9 +90,8 @@ public enum FsUriModifier {
                 if (uri.isOpaque())
                     return uri;
 
-                // Note that we do not limit these fixes to Windows only in
-                // order to make this function work identically on all
-                // platforms!
+                // Note that these fixes are not limited to Windows in order
+                // to make this function work identically on all platforms!
 
                 // Move Windows-like UNC host from path to authority.
                 if (uri.getRawPath().startsWith(SEPARATOR + SEPARATOR)) {
@@ -99,7 +106,8 @@ public enum FsUriModifier {
                     }
                 }
 
-                // Delete trailing slash separator from directory URI.
+                // Delete trailing slash separator from directory URI and mind
+                // Windoze paths with drive letters.
                 for (String s; (s = uri.getPath()).endsWith(SEPARATOR)
                         && 2 <= s.length()
                         && (':' != s.charAt(s.length() - 2)); ) {
@@ -122,24 +130,43 @@ public enum FsUriModifier {
             }
         },
 
-        /** The post-fix for an {@link FsEntryName} does nothing. */
+        /**
+         * The post-fix for an {@link FsEntryName} depends on the URI type:
+         * For an opaque URI, nothing is modified.
+         * For a hierarchical URI, its path is truncated so that it does not
+         * end with a
+         * {@value de.schlichtherle.truezip.entry.EntryName#SEPARATOR}
+         * separator.
+         */
         ENTRY_NAME {
             @Override
             URI modify(URI uri) throws URISyntaxException {
-                // Delete trailing slash separator from directory URI.
-                /*for (String s; (s = uri.getPath()).endsWith(SEPARATOR); ) {
+                if (uri.isOpaque())
+                    return uri;
+
+                // Delete trailing slash separator from directory URI and mind
+                // Windoze paths with drive letters.
+                for (String s; (s = uri.getPath()).endsWith(SEPARATOR)
+                        && 2 <= s.length()
+                        && (':' != s.charAt(s.length() - 2)); ) {
                     uri = new URI(  uri.getScheme(),
                                     uri.getAuthority(),
                                     s.substring(0, s.length() - 1),
                                     uri.getQuery(),
                                     uri.getFragment());
-                }*/
+                }
 
                 return uri;
             }
         };
 
-        abstract @NonNull URI modify(@NonNull URI uri)
-        throws URISyntaxException;
+        /**
+         * An idempotent function which modifies a URI.
+         *
+         * @param  uri the URI to modify.
+         * @param  modify the post-modify to apply if required.
+         * @return the modified URI.
+         */
+        abstract URI modify(URI uri) throws URISyntaxException;
     }
 }
