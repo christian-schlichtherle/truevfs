@@ -39,7 +39,6 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
  * in order to assert the following additional syntax constraints:
  * <p>
  * <ol>
- * <li>The URI must not have a fragment.
  * <li>If the URI is opaque, its scheme specific part must contain at least
  *     one mount point separator {@value de.schlichtherle.truezip.fs.FsPath#MOUNT_POINT_SEPARATOR}.
  *     The part <em>up to</em> the last mount point separator is parsed
@@ -96,6 +95,8 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
      * {@link java.net.JarURLConnection}.
      */
     public static final String MOUNT_POINT_SEPARATOR = "!" + SEPARATOR;
+
+    private static final URI DOT = URI.create(".");
 
     private @NonNull URI uri; // not final for serialization only!
 
@@ -264,8 +265,6 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
 
     private void parse(@NonNull URI uri, final @NonNull FsUriModifier modifier)
     throws URISyntaxException {
-        if (null != uri.getRawFragment())
-            throw new URISyntaxException(quote(uri), "Fragment not allowed");
         if (uri.isOpaque()) {
             final String ssp = uri.getSchemeSpecificPart();
             final int i = ssp.lastIndexOf(MOUNT_POINT_SEPARATOR);
@@ -285,7 +284,7 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
             }
         } else if (uri.isAbsolute()) {
             uri = modifier.modify(uri, PATH);
-            mountPoint = new FsMountPoint(uri.resolve("."), NULL);
+            mountPoint = new FsMountPoint(uri.resolve(DOT), NULL);
             entryName = new FsEntryName(mountPoint.getUri().relativize(uri), NULL);
         } else {
             mountPoint = null;
@@ -303,7 +302,6 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
 
     private boolean invariants() {
         assert null != getUri();
-        assert null == getUri().getRawFragment();
         assert (null != getMountPoint()) == getUri().isAbsolute();
         assert null != getEntryName();
         if (getUri().isOpaque()) {
