@@ -15,10 +15,11 @@
  */
 package de.schlichtherle.truezip.file;
 
-import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
-import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.io.InputException;
+import java.io.InvalidObjectException;
+import de.schlichtherle.truezip.io.Paths.Splitter;
+import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsScheme;
@@ -39,7 +40,6 @@ import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.ObjectStreamException;
@@ -674,11 +674,18 @@ public final class TFile extends File {
             } else {
                 this.detector = detector;
                 this.innerArchive = this.enclArchive = innerArchive;
-                this.enclEntryName = FsEntryName.create(
-                        path.substring(innerArchivePathLength + 1) // cut off leading separatorChar
-                            .replace(separatorChar, SEPARATOR_CHAR),
-                        null,
-                        CANONICALIZE);
+                try {
+                    this.enclEntryName = new FsEntryName(
+                            new URI(
+                                null,
+                                null,
+                                path.substring(innerArchivePathLength + 1) // cut off leading separatorChar
+                                    .replace(separatorChar, SEPARATOR_CHAR),
+                                null),
+                            CANONICALIZE);
+                } catch (URISyntaxException ex) {
+                    throw new AssertionError(ex);
+                }
             }
         } else {
             this.detector = detector;
@@ -702,9 +709,15 @@ public final class TFile extends File {
 
         final StringBuilder enclEntryNameBuf = new StringBuilder(path.length());
         scan(ancestor, detector, 0, path, enclEntryNameBuf, new Splitter(separatorChar, false));
-        enclEntryName = 0 < enclEntryNameBuf.length()
-                ? FsEntryName.create(enclEntryNameBuf.toString(), null, CANONICALIZE)
-                : null;
+        try {
+            enclEntryName = 0 >= enclEntryNameBuf.length()
+                    ? null
+                    : new FsEntryName(
+                        new URI(null, null, enclEntryNameBuf.toString(), null),
+                        CANONICALIZE);
+        } catch (URISyntaxException ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     private void scan(

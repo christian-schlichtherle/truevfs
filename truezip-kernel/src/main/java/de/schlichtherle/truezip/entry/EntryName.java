@@ -34,7 +34,6 @@ import net.jcip.annotations.Immutable;
  * <ol>
  * <li>The URI must be relative, i.e. it must not have a scheme.
  * <li>The URI must not have an authority.
- * <li>The URI must not have a fragment.
  * </ol>
  * <p>
  * Examples for valid entry name URIs are:
@@ -42,6 +41,7 @@ import net.jcip.annotations.Immutable;
  * <li>{@code /foo}
  * <li>{@code foo/bar}
  * <li>{@code foo}
+ * <li>{@code foo#bar}
  * <li>{@code foo/}
  * <li>{@code foo/.}
  * <li>{@code foo/..}
@@ -51,7 +51,6 @@ import net.jcip.annotations.Immutable;
  * <ul>
  * <li>{@code foo:/bar} (not relative)
  * <li>{@code //foo/bar} (authority defined)
- * <li>{@code foo#bar} (fragment defined)
  * </ul>
  * <p>
  * Although this class is declared to be immutable, it's not declared to be
@@ -109,26 +108,6 @@ public class EntryName implements Serializable, Comparable<EntryName> {
             return new EntryName(uri);
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
-        }
-    }
-
-    /**
-     * Constructs a new entry name by constructing a new URI from
-     * the given path and query elements and parsing the result.
-     * This static factory method calls
-     * {@link #EntryName(URI) new EntryName(new URI(null, null, path, query, null))}
-     * and returns the result.
-     *
-     * @param  path the {@link #getPath() path}.
-     * @param  query the {@link #getQuery() query}.
-     * @return A new entry name.
-     */
-    public static @NonNull EntryName
-    create(@NonNull String path, @CheckForNull String query) {
-        try {
-            return new EntryName(new URI(null, null, path, query, null));
-        } catch (URISyntaxException ex) {
-            throw new AssertionError(ex);
         }
     }
 
@@ -196,19 +175,20 @@ public class EntryName implements Serializable, Comparable<EntryName> {
         final String parentUriPath = parentUri.getPath();
         final URI memberUri = member.uri;
         try {
-            uri = 0 == parentUriPath.length()
+            uri = parentUriPath.isEmpty()
                     ? memberUri
                     : parentUriPath.endsWith(SEPARATOR)
                         ? parentUri.resolve(memberUri)
-                        : 0 == memberUri.getPath().length()
+                        : memberUri.getPath().isEmpty()
                             ? new URI(  null, null,
                                         parentUriPath,
                                         memberUri.getQuery(),
-                                        null)
+                                        memberUri.getFragment())
                             : new URI(  null, null,
                                         parentUriPath + SEPARATOR_CHAR,
-                                        null, // query is irrelevant!
-                                        null).resolve(memberUri);
+                                        null, // query is irrelevant because of resolve!
+                                        null) // dito for fragment
+                                            .resolve(memberUri);
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
         }
@@ -236,8 +216,8 @@ public class EntryName implements Serializable, Comparable<EntryName> {
             throw new URISyntaxException(quote(uri), "Scheme not allowed");
         if (uri.getRawAuthority() != null)
             throw new URISyntaxException(quote(uri), "Authority not allowed");
-        if (null != uri.getRawFragment())
-            throw new URISyntaxException(quote(uri), "Fragment not allowed");
+        /*if (null != uri.getRawFragment())
+            throw new URISyntaxException(quote(uri), "Fragment not allowed");*/
         this.uri = uri;
 
         assert invariants();
@@ -251,7 +231,7 @@ public class EntryName implements Serializable, Comparable<EntryName> {
         assert null != getUri();
         assert !getUri().isAbsolute();
         assert null == getUri().getRawAuthority();
-        assert null == getUri().getRawFragment();
+        //assert null == getUri().getRawFragment();
         return true;
     }
 

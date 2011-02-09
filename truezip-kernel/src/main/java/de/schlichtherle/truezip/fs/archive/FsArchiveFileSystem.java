@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.fs.archive;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.entry.Entry;
@@ -154,12 +156,18 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
         final List<FsEntryName>
                 names = new ArrayList<FsEntryName>(archive.getSize());
         for (final E entry : archive) {
-            final FsEntryName name = FsEntryName.create(
-                    cutTrailingSeparators(entry.getName().replace('\\', SEPARATOR_CHAR), SEPARATOR_CHAR),
-                    null,
-                    FsUriModifier.CANONICALIZE);
-            master.add(FsArchiveFileSystemEntry.create(name, entry.getType(), entry));
-            names.add(name);
+            try {
+                final FsEntryName name = new FsEntryName(
+                        new URI(null,
+                                null,
+                                cutTrailingSeparators(entry.getName().replace('\\', SEPARATOR_CHAR), SEPARATOR_CHAR),
+                                null),
+                        FsUriModifier.CANONICALIZE);
+                master.add(FsArchiveFileSystemEntry.create(name, entry.getType(), entry));
+                names.add(name);
+            } catch (URISyntaxException ex) {
+                throw new AssertionError(ex);
+            }
         }
 
         // Setup root file system entry, potentially replacing its previous
@@ -764,9 +772,14 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
 
         final FsEntryName getParentName() {
             String path = splitter.getParentPath();
-            return null == path
-                    ? ROOT
-                    : FsEntryName.create(path, (String) null, FsUriModifier.NULL);
+            try {
+                return null == path
+                        ? ROOT
+                        : new FsEntryName(  new URI(null, null, path, null),
+                                            FsUriModifier.NULL);
+            } catch (URISyntaxException ex) {
+                throw new AssertionError(ex);
+            }
         }
 
         final String getMemberName() {

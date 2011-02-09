@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import de.schlichtherle.truezip.entry.EntryName;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -37,8 +36,7 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
  * <ol>
  * <li>The URI must be relative, i.e. it must not have a scheme.
  * <li>The URI must not have an authority.
- * <li>The URI must not have a fragment.
- * <li>The URI's path must be in normal form, i.e. it must not contain
+ * <li>The URI's path must be in normal form, i.e. its path must not contain
  *     redundant {@code "."} and {@code ".."} segments.
  * <li>The URI's path must not equal {@code "."}.
  * <li>The URI's path must not equal {@code ".."}.
@@ -105,38 +103,6 @@ public final class FsEntryName extends EntryName {
     create(@NonNull String uri, @NonNull FsUriModifier modifier) {
         try {
             return new FsEntryName(uri, modifier);
-        } catch (URISyntaxException ex) {
-            throw new IllegalArgumentException(ex);
-        }
-    }
-
-    /**
-     * Equivalent to {@link #create(String, String, FsUriModifier) create(path, query, FsUriModifier.NULL)}.
-     */
-    public static @NonNull FsEntryName
-    create(@NonNull String path, @CheckForNull String query) {
-        return create(path, query, NULL);
-    }
-
-    /**
-     * Constructs a new file system entry name by constructing a new URI from
-     * the given path and query elements and parsing the result.
-     * This static factory method calls
-     * {@link #FsEntryName(URI, FsUriModifier) new FsEntryName(new URI(null, null, path, query, null), modifier)}
-     * and wraps any thrown {@link URISyntaxException} in an
-     * {@link IllegalArgumentException}.
-     *
-     * @param  path the {@link #getPath() path}.
-     * @param  query the {@link #getQuery() query}.
-     * @param  modifier the URI modifier.
-     * @throws IllegalArgumentException if {@code uri} does not conform to the
-     *         syntax constraints for entry names.
-     * @return A new file system entry name.
-     */
-    public static @NonNull FsEntryName
-    create(@NonNull String path, @CheckForNull String query, @NonNull FsUriModifier modifier) {
-        try {
-            return new FsEntryName(new URI(null, null, path, query, null), modifier);
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }

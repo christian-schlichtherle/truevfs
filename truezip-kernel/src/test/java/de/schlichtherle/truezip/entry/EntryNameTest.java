@@ -52,12 +52,14 @@ public class EntryNameTest {
         };
 
         for (final String[] params : new String[][] {
-            { "föö bär", null },
+            { "föö%20bär", },
             { "föö/bär/", },
             { "föö/bär", },
             { "föö/", },
             { "föö", },
             { "föö?bär", },
+            { "föö#bär", },
+            { "#bär", },
             { "", },
             { "/", },
             { "/föö", },
@@ -70,9 +72,7 @@ public class EntryNameTest {
             { "/..", },
             { "/../", },
         }) {
-            final EntryName original = 1 < params.length
-                    ? EntryName.create(params[0], params[1])
-                    : EntryName.create(params[0]);
+            final EntryName original = EntryName.create(params[0]);
 
             {
                 final ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -116,10 +116,6 @@ public class EntryNameTest {
     public void testConstructorWithInvalidUri() {
         for (final String param : new String[] {
             "foo bar",
-            "/../foo#boo",
-            "/../foo#",
-            "foo#bar",
-            "#foo",
             "foo:bar",
             "foo:bar:",
             "foo:bar:/",
@@ -195,6 +191,12 @@ public class EntryNameTest {
     @Test
     public void testConstructorWithValidUri() {
         for (final String[] params : new String[][] {
+            { "/../foo", "#bar", "/../foo#bar", },
+            { "/../foo", "#", "/../foo#", },
+            { "foo", "#bar", "foo#bar", },
+            { "foo", "#", "foo#", },
+            { "", "#foo", "#foo", },
+            { "", "#", "#", },
             { "föö/", "?bär", "föö/?bär" },
             { "föö", "?bär", "föö?bär" },
             { "föö/?bär", "", "föö/" },

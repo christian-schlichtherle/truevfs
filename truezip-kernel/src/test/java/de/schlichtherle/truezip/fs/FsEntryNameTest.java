@@ -53,15 +53,13 @@ public class FsEntryNameTest {
 
 
         for (final String[] params : new String[][] {
-            { "föö bär", null },
+            { "föö%20bär", },
             { "föö/bär", },
             { "föö", },
             { "föö?bär", },
             { "", },
         }) {
-            final FsEntryName original = 1 < params.length
-                    ? FsEntryName.create(params[0], params[1])
-                    : FsEntryName.create(params[0]);
+            final FsEntryName original = FsEntryName.create(params[0]);
 
             {
                 final ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -113,8 +111,6 @@ public class FsEntryNameTest {
             "/foo/bar",
             "/foo/bar/",
             "/",
-            "foo#bar",
-            "#foo",
             "foo/",
             "foo//",
             "foo/.",
@@ -198,6 +194,10 @@ public class FsEntryNameTest {
     @Test
     public void testConstructorWithValidUri() {
         for (final String[] params : new String[][] {
+            { "foo", "#bar", "foo#bar", },
+            { "foo", "#", "foo#", },
+            { "", "#foo", "#foo", },
+            { "", "#", "#", },
             { "föö", "?bär", "föö?bär" },
             { "föö?bär", "", "föö" },
             { "föö?bär", "?tüü", "föö?tüü" },
