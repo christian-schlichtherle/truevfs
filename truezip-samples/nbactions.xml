@@ -9,7 +9,7 @@
             <properties>
                 <exec.workingdir>C:\Users\christian\Documents\Schlichtherle_IT_Services\Projekte\truezip-7\truezip-samples</exec.workingdir>
                 <exec.classpathScope>runtime</exec.classpathScope>
-                <exec.args>-ea -classpath %classpath de.schlichtherle.truezip.sample.file.app.Nzip llr src/site/resources/test/1.zip/0.zip/duplicates.jar</exec.args>
+                <exec.args>-ea -classpath %classpath de.schlichtherle.truezip.sample.file.app.Nzip cat src/site/resources/test/1.zip/0.zip/this.zip/is.zip/x</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
@@ -22,7 +22,7 @@
             <properties>
                 <exec.workingdir>C:\Users\christian\Documents\Schlichtherle_IT_Services\Projekte\truezip-7\truezip-samples</exec.workingdir>
                 <exec.classpathScope>runtime</exec.classpathScope>
-                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -ea -classpath %classpath de.schlichtherle.truezip.sample.file.app.Nzip llr src/site/resources/test/1.zip/0.zip/duplicates.jar</exec.args>
+                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -ea -classpath %classpath de.schlichtherle.truezip.sample.file.app.Nzip cat src/site/resources/test/1.zip/0.zip/this.zip/is.zip/x</exec.args>
                 <jpda.listen>true</jpda.listen>
                 <exec.executable>java</exec.executable>
             </properties>
@@ -35,7 +35,7 @@
             </goals>
             <properties>
                 <exec.workingdir>C:\Users\christian\Documents\Schlichtherle_IT_Services\Projekte\truezip-7\truezip-samples</exec.workingdir>
-                <exec.args>${profiler.args} -ea -classpath %classpath de.schlichtherle.truezip.sample.file.app.Nzip llr src/site/resources/test/1.zip/0.zip/duplicates.jar</exec.args>
+                <exec.args>${profiler.args} -ea -classpath %classpath de.schlichtherle.truezip.sample.file.app.Nzip cat src/site/resources/test/1.zip/0.zip/this.zip/is.zip/x</exec.args>
                 <profiler.action>profile</profiler.action>
                 <exec.executable>${profiler.java}</exec.executable>
             </properties>
