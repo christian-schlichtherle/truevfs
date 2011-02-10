@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import java.io.InputStream;
 import de.schlichtherle.truezip.socket.IOCache.Strategy;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.entry.Entry;
@@ -258,8 +260,8 @@ extends FsDecoratingController< FsConcurrentModel,
         }
     }
 
-    /** A cache for an individual file system entry. */
-    private final class EntryCache {
+    /** A cache for the contents of an individual file system entry. */
+    private class EntryCache {
         private final FsEntryName name;
         private final IOCache cache;
         private volatile @CheckForNull InputSocket<?> input;
@@ -272,7 +274,7 @@ extends FsDecoratingController< FsConcurrentModel,
             this.cache = STRATEGY.newCache(pool);
         }
 
-        public EntryCache configure(BitField<FsInputOption> options) {
+        EntryCache configure(BitField<FsInputOption> options) {
             cache.configure(/*new ProxyInputSocket*/(delegate.getInputSocket(
                     name,
                     options.clear(FsInputOption.CACHE))));
@@ -280,7 +282,7 @@ extends FsDecoratingController< FsConcurrentModel,
             return this;
         }
 
-        public EntryCache configure( BitField<FsOutputOption> options,
+        EntryCache configure(   BitField<FsOutputOption> options,
                                 @CheckForNull Entry template) {
             cache.configure(delegate.getOutputSocket(
                     name,
@@ -290,16 +292,16 @@ extends FsDecoratingController< FsConcurrentModel,
             return this;
         }
 
-        public void flush() throws IOException {
+        void flush() throws IOException {
             cache.flush();
         }
 
-        public void clear() throws IOException {
+        void clear() throws IOException {
             cache.clear();
         }
 
         @CheckForNull
-        public FsEntry getEntry() {
+        FsEntry getEntry() {
             final Entry entry = cache.getEntry();
             final Entry template;
             return null == entry
@@ -309,15 +311,15 @@ extends FsDecoratingController< FsConcurrentModel,
                         : template);
         }
 
-        public InputSocket<?> getInputSocket() {
+        InputSocket<?> getInputSocket() {
             final InputSocket<?> input = this.input;
             return null != input ? input : (this.input = cache.getInputSocket());
         }
 
         /** An input socket proxy. */
-        /*private final class ProxyInputSocket
+        private class ProxyInputSocket
         extends DecoratingInputSocket<Entry> {
-            private ProxyInputSocket(InputSocket <?> input) {
+            ProxyInputSocket(InputSocket <?> input) {
                 super(input);
             }
 
@@ -326,7 +328,7 @@ extends FsDecoratingController< FsConcurrentModel,
                 final FsConcurrentModel model = getModel();
                 model.assertWriteLockedByCurrentThread();
                 final ReadOnlyFile rof = getBoundSocket().newReadOnlyFile();
-                caches.put(name, Cache.this);
+                caches.put(name, EntryCache.this);
                 model.setTouched(true);
                 return rof;
             }
@@ -336,13 +338,13 @@ extends FsDecoratingController< FsConcurrentModel,
                 final FsConcurrentModel model = getModel();
                 model.assertWriteLockedByCurrentThread();
                 final InputStream in = getBoundSocket().newInputStream();
-                caches.put(name, Cache.this);
+                caches.put(name, EntryCache.this);
                 model.setTouched(true);
                 return in;
             }
-        } // class ProxyInputSocket*/
+        } // class ProxyInputSocket
 
-        public OutputSocket<?> getOutputSocket() {
+        OutputSocket<?> getOutputSocket() {
             final OutputSocket<?> output = this.output;
             return null != output
                     ? output
@@ -350,9 +352,9 @@ extends FsDecoratingController< FsConcurrentModel,
         }
 
         /** An output socket proxy. */
-        private final class ProxyOutputSocket
+        private class ProxyOutputSocket
         extends DecoratingOutputSocket<Entry> {
-            private ProxyOutputSocket(OutputSocket <?> output) {
+            ProxyOutputSocket(OutputSocket <?> output) {
                 super(output);
             }
 
@@ -367,7 +369,7 @@ extends FsDecoratingController< FsConcurrentModel,
             }
 
             /** Ensure the existence of an entry in the file system. */
-            private void makeEntry() throws IOException {
+            void makeEntry() throws IOException {
                 boolean mknod = null != template;
                 if (!mknod) {
                     try {
