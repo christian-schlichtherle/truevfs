@@ -623,7 +623,7 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
             throw new IllegalArgumentException(name.toString()
                     + " (negative access time)");
         final FsArchiveFileSystemEntry<E> entry = master.get(name, null);
-        if (entry == null)
+        if (null == entry)
             throw new FsArchiveFileSystemException(name.toString(),
                     "archive entry not found");
         // Order is important here!

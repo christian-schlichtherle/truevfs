@@ -99,8 +99,6 @@ extends FsController<FsConcurrentModel> {
      * @param model the non-{@code null} archive model.
      */
     protected FsArchiveController(final FsConcurrentModel model) {
-        if (null == model)
-            throw new NullPointerException();
         if (null == model.getParent())
             throw new IllegalArgumentException();
         this.model = model;

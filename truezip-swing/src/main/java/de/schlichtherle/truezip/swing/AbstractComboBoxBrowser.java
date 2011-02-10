@@ -287,8 +287,7 @@ public abstract class AbstractComboBoxBrowser implements Serializable {
         recursion = false;
     }
 
-    private final class Listener
-    implements DocumentListener, PropertyChangeListener {
+    private class Listener implements DocumentListener, PropertyChangeListener {
         @Override
         public void insertUpdate(DocumentEvent e) {
             documentUpdated();

@@ -21,8 +21,8 @@ import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.entry.EntryFactory;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsMountPoint;
-import de.schlichtherle.truezip.fs.FsConcurrentController;
 import de.schlichtherle.truezip.fs.FsCachingController;
+import de.schlichtherle.truezip.fs.FsConcurrentController;
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.InputSocket;
@@ -30,7 +30,6 @@ import de.schlichtherle.truezip.socket.OutputSocket;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import javax.swing.Icon;
 import net.jcip.annotations.Immutable;
@@ -44,8 +43,8 @@ import net.jcip.annotations.Immutable;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 @Immutable
+@DefaultAnnotation(NonNull.class)
 public abstract class FsArchiveDriver<E extends FsArchiveEntry>
 extends FsDriver
 implements EntryFactory<E> {

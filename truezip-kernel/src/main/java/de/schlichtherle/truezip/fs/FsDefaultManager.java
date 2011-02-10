@@ -84,13 +84,12 @@ public final class FsDefaultManager extends FsManager {
     }
 
     private final class Scheduler implements FsTouchedListener {
-
         final FsFederatingController controller;
 
         @SuppressWarnings("LeakingThisInConstructor")
         Scheduler(final FsController<?> prospect) {
             controller = new FsFederatingController(prospect);
-            controller.getModel().addFileSystemTouchedListener(this);
+            controller.getModel().addFsTouchedListener(this);
             touchedChanged(null); // setup schedule
         }
 

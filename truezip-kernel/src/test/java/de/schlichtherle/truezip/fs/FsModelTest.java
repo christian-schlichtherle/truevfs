@@ -103,36 +103,36 @@ public class FsModelTest {
         final FsModel model = new FsModel(FsMountPoint.create(URI.create("foo:/")));
 
         try {
-            model.addFileSystemTouchedListener(null);
+            model.addFsTouchedListener(null);
         } catch (NullPointerException expected) {
         }
-        assertThat(model.getFileSystemTouchedListeners(), notNullValue());
-        assertThat(model.getFileSystemTouchedListeners().size(), is(0));
+        assertThat(model.getFsTouchedListeners(), notNullValue());
+        assertThat(model.getFsTouchedListeners().size(), is(0));
 
         final Listener listener1 = new Listener(model);
-        model.addFileSystemTouchedListener(listener1);
-        assertThat(model.getFileSystemTouchedListeners().size(), is(1));
+        model.addFsTouchedListener(listener1);
+        assertThat(model.getFsTouchedListeners().size(), is(1));
 
         final Listener listener2 = new Listener(model);
-        model.addFileSystemTouchedListener(listener2);
-        assertThat(model.getFileSystemTouchedListeners().size(), is(2));
+        model.addFsTouchedListener(listener2);
+        assertThat(model.getFsTouchedListeners().size(), is(2));
 
-        model.getFileSystemTouchedListeners().clear();
-        assertThat(model.getFileSystemTouchedListeners().size(), is(2));
+        model.getFsTouchedListeners().clear();
+        assertThat(model.getFsTouchedListeners().size(), is(2));
 
         try {
-            model.removeFileSystemTouchedListener(null);
+            model.removeFsTouchedListener(null);
         } catch (NullPointerException expected) {
         }
-        assertThat(model.getFileSystemTouchedListeners().size(), is(2));
+        assertThat(model.getFsTouchedListeners().size(), is(2));
 
-        model.removeFileSystemTouchedListener(listener1);
-        model.removeFileSystemTouchedListener(listener1);
-        assertThat(model.getFileSystemTouchedListeners().size(), is(1));
+        model.removeFsTouchedListener(listener1);
+        model.removeFsTouchedListener(listener1);
+        assertThat(model.getFsTouchedListeners().size(), is(1));
 
-        model.removeFileSystemTouchedListener(listener2);
-        model.removeFileSystemTouchedListener(listener2);
-        assertThat(model.getFileSystemTouchedListeners().size(), is(0));
+        model.removeFsTouchedListener(listener2);
+        model.removeFsTouchedListener(listener2);
+        assertThat(model.getFsTouchedListeners().size(), is(0));
     }
 
     @Test
@@ -165,7 +165,7 @@ public class FsModelTest {
         @SuppressWarnings("LeakingThisInConstructor")
         Listener(final FsModel model) {
             this.model = model;
-            model.addFileSystemTouchedListener(this);
+            model.addFsTouchedListener(this);
         }
 
         @Override
