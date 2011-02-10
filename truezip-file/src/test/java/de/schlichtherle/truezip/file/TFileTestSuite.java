@@ -348,16 +348,13 @@ public abstract class TFileTestSuite {
     private void assertCreateNewEnhancedFile() throws IOException {
         final File file1 = new TFile(archive, "test.txt");
         final File file2 = new TFile(file1, "test.txt");
-
         TFile.setLenient(false);
         try {
             file1.createNewFile();
             fail("Creating a file in a non-existent directory should throw an IOException!");
-        } catch (IOException ok) {
-            // This is exactly what we expect here!
+        } catch (IOException expected) {
         }
         assertCreateNewFile(archive, file1, file2);
-
         TFile.setLenient(true);
         assertCreateNewFile(archive, file1, file2);
     }
