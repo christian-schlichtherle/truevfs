@@ -15,7 +15,7 @@
     <skin>
         <groupId>${project.groupId}</groupId>
         <artifactId>truezip-skin</artifactId>
-        <version>7.0-SNAPSHOT</version>
+        <version>1-SNAPSHOT</version>
     </skin>
     <body>
         <menu name="Parent Project" ref="parent" inherit="top"/>
