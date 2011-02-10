@@ -43,8 +43,7 @@ import static de.schlichtherle.truezip.fs.FsEntryName.*;
  */
 @ThreadSafe
 final class KeyManagerArchiveController
-extends FsDecoratingController< FsModel,
-                                FsController<? extends FsModel>> {
+extends FsDecoratingController<FsModel, FsController<?>> {
 
     private final ZipRaesDriver driver;
 

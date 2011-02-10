@@ -101,8 +101,7 @@ public class FsModel {
         touched = newTouched;
         if (newTouched != oldTouched) {
             final FsEvent event = new FsEvent(this);
-            for (final FsTouchedListener listener
-                    : getFileSystemTouchedListeners())
+            for (FsTouchedListener listener : getFsTouchedListeners())
                 listener.touchedChanged(event);
         }
     }
@@ -112,7 +111,7 @@ public class FsModel {
      *
      * @return A clone of the set of file system touched listeners.
      */
-    final synchronized Set<FsTouchedListener> getFileSystemTouchedListeners() {
+    final synchronized Set<FsTouchedListener> getFsTouchedListeners() {
         return new LinkedHashSet<FsTouchedListener>(touchedListeners);
     }
 
@@ -121,7 +120,7 @@ public class FsModel {
      *
      * @param listener the listener for file system touched events.
      */
-    public final synchronized void addFileSystemTouchedListener(
+    public final synchronized void addFsTouchedListener(
             FsTouchedListener listener) {
         if (null == listener)
             throw new NullPointerException();
@@ -133,7 +132,7 @@ public class FsModel {
      *
      * @param listener the listener for file system touched events.
      */
-    public final synchronized void removeFileSystemTouchedListener(
+    public final synchronized void removeFsTouchedListener(
             @CheckForNull FsTouchedListener listener) {
         touchedListeners.remove(listener);
     }

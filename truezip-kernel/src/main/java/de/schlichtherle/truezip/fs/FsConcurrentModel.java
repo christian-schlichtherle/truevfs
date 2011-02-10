@@ -35,7 +35,6 @@ import net.jcip.annotations.ThreadSafe;
 public class FsConcurrentModel extends FsModel {
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
-
     public FsConcurrentModel(FsMountPoint mountPoint) {
         this(mountPoint, null);
     }

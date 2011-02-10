@@ -148,12 +148,12 @@ public final class EnhancedPanelTest {
         public int shown, hidden;
 
         @Override
-		public void ancestorWindowShown(PanelEvent evt) {
+        public void ancestorWindowShown(PanelEvent evt) {
             shown++;
         }
 
         @Override
-		public void ancestorWindowHidden(PanelEvent evt) {
+        public void ancestorWindowHidden(PanelEvent evt) {
             hidden++;
         }
     }

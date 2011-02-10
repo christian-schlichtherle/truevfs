@@ -61,11 +61,17 @@ extends FsDecoratingController< FsConcurrentModel,
     }
 
     private ReadLock readLock() {
-        return null != readLock ? readLock : (readLock = getModel().readLock());
+        final ReadLock readLock = this.readLock;
+        return null != readLock
+                ? readLock
+                : (this.readLock = getModel().readLock());
     }
 
     private WriteLock writeLock() {
-        return null != writeLock ? writeLock : (writeLock = getModel().writeLock());
+        final WriteLock writeLock = this.writeLock;
+        return null != writeLock
+                ? writeLock
+                : (this.writeLock = getModel().writeLock());
     }
 
     private void assertNotReadLockedByCurrentThread(FsNotWriteLockedException ex)
