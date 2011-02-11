@@ -36,12 +36,12 @@ final class FileDriver extends FsDriver {
 
     @Override
     public FsController<?>
-    newController(FsMountPoint mountPoint, @CheckForNull FsController<?> parent) {
-        assert null == mountPoint.getParent()
+    newController(FsModel model, @CheckForNull FsController<?> parent) {
+        assert null == model.getParent()
                 ? null == parent
-                : mountPoint.getParent().equals(parent.getModel().getMountPoint());
+                : model.getParent().equals(parent.getModel());
         if (null != parent)
             throw new IllegalArgumentException();
-        return new FileController<FsModel>(new FsModel(mountPoint));
+        return new FileController<FsModel>(model);
     }
 }

@@ -25,13 +25,13 @@ import static org.junit.Assert.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class FsModelTest {
+public class FsDefaultModelTest {
 
     @Test
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testConstructorWithNull() {
         try {
-            new FsModel(null, null);
+            new FsDefaultModel(null, null);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -44,7 +44,7 @@ public class FsModelTest {
             { "foo:/bar/" },
         }) {
             final FsMountPoint mountPoint = FsMountPoint.create(URI.create(params[0]));
-            final FsModel model = new FsModel(mountPoint);
+            final FsModel model = new FsDefaultModel(mountPoint, null);
             assertThat(model.getMountPoint(), sameInstance(mountPoint));
             assertThat(model.getMountPoint().getPath(), nullValue());
             assertThat(model.getParent(), nullValue());
@@ -61,9 +61,9 @@ public class FsModelTest {
         }) {
             final FsMountPoint mountPoint = FsMountPoint.create(URI.create(params[0]));
             final FsMountPoint parentMountPoint = FsMountPoint.create(URI.create(params[1]));
-            final FsModel parent = new FsModel(parentMountPoint);
+            final FsModel parent = new FsDefaultModel(parentMountPoint, null);
             try {
-                new FsModel(mountPoint, parent);
+                new FsDefaultModel(mountPoint, parent);
                 fail(params[0]);
             } catch (RuntimeException expected) {
             }
@@ -81,7 +81,7 @@ public class FsModelTest {
             final FsEntryName parentEntryName = FsEntryName.create(URI.create(params[3]));
             final FsPath path = FsPath.create(URI.create(params[4]));
             FsModel parent = newModel(parentMountPoint);
-            FsModel model = new FsModel(mountPoint, parent);
+            FsModel model = new FsDefaultModel(mountPoint, parent);
 
             assertThat(model.getMountPoint(), sameInstance(mountPoint));
             assertThat(model.getParent(), sameInstance(parent));
@@ -92,87 +92,9 @@ public class FsModelTest {
     }
 
     private static FsModel newModel(final FsMountPoint mountPoint) {
-        return new FsModel( mountPoint,
+        return new FsDefaultModel(  mountPoint,
                                     null == mountPoint.getParent()
                                         ? null
                                         : newModel(mountPoint.getParent()));
-    }
-
-    @Test
-    public void testAddRemoveFileSystemListeners() {
-        final FsModel model = new FsModel(FsMountPoint.create(URI.create("foo:/")));
-
-        try {
-            model.addFsTouchedListener(null);
-        } catch (NullPointerException expected) {
-        }
-        assertThat(model.getFsTouchedListeners(), notNullValue());
-        assertThat(model.getFsTouchedListeners().size(), is(0));
-
-        final Listener listener1 = new Listener(model);
-        model.addFsTouchedListener(listener1);
-        assertThat(model.getFsTouchedListeners().size(), is(1));
-
-        final Listener listener2 = new Listener(model);
-        model.addFsTouchedListener(listener2);
-        assertThat(model.getFsTouchedListeners().size(), is(2));
-
-        model.getFsTouchedListeners().clear();
-        assertThat(model.getFsTouchedListeners().size(), is(2));
-
-        try {
-            model.removeFsTouchedListener(null);
-        } catch (NullPointerException expected) {
-        }
-        assertThat(model.getFsTouchedListeners().size(), is(2));
-
-        model.removeFsTouchedListener(listener1);
-        model.removeFsTouchedListener(listener1);
-        assertThat(model.getFsTouchedListeners().size(), is(1));
-
-        model.removeFsTouchedListener(listener2);
-        model.removeFsTouchedListener(listener2);
-        assertThat(model.getFsTouchedListeners().size(), is(0));
-    }
-
-    @Test
-    public void testNotifyFileSystemListeners() {
-        final FsModel model = new FsModel(FsMountPoint.create(URI.create("foo:/")));
-        final Listener listener1 = new Listener(model);
-        final Listener listener2 = new Listener(model);
-
-        model.setTouched(false);
-        assertThat(listener1.changes, is(0));
-        assertThat(listener2.changes, is(0));
-
-        model.setTouched(true);
-        assertThat(listener1.changes, is(1));
-        assertThat(listener2.changes, is(1));
-
-        model.setTouched(true);
-        assertThat(listener1.changes, is(1));
-        assertThat(listener2.changes, is(1));
-
-        model.setTouched(false);
-        assertThat(listener1.changes, is(2));
-        assertThat(listener2.changes, is(2));
-    }
-
-    private static class Listener implements FsTouchedListener {
-        final FsModel model;
-        int changes;
-
-        @SuppressWarnings("LeakingThisInConstructor")
-        Listener(final FsModel model) {
-            this.model = model;
-            model.addFsTouchedListener(this);
-        }
-
-        @Override
-        public void touchedChanged(FsEvent event) {
-            assertThat(event, notNullValue());
-            assertThat(event.getSource(), sameInstance(model));
-            changes++;
-        }
     }
 }

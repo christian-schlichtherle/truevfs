@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.entry;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InvalidObjectException;
@@ -67,6 +68,7 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
+@DefaultAnnotation(NonNull.class)
 public class EntryName implements Serializable, Comparable<EntryName> {
 
     private static final long serialVersionUID = 2927354934726235478L;
@@ -87,7 +89,7 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      */
     public static final char SEPARATOR_CHAR = '/';
 
-    private @NonNull URI uri; // not final for serialization only!
+    private URI uri; // not final for serialization only!
 
     /**
      * Constructs a new entry name by constructing a new URI from
@@ -102,8 +104,8 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      *         syntax constraints for entry names.
      * @return A new entry name.
      */
-    public static @NonNull EntryName
-    create(@NonNull String uri) {
+    public static EntryName
+    create(String uri) {
         try {
             return new EntryName(uri);
         } catch (URISyntaxException ex) {
@@ -123,8 +125,8 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      *         syntax constraints for entry names.
      * @return A new entry name.
      */
-    public static @NonNull EntryName
-    create(@NonNull URI uri) {
+    public static EntryName
+    create(URI uri) {
         try {
             return new EntryName(uri);
         } catch (URISyntaxException ex) {
@@ -140,7 +142,7 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      * @throws URISyntaxException if {@code uri} does not conform to the
      *         syntax constraints for entry names.
      */
-    public EntryName(@NonNull String uri) throws URISyntaxException {
+    public EntryName(String uri) throws URISyntaxException {
         parse(new URI(uri));
     }
 
@@ -151,7 +153,7 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      * @throws URISyntaxException if {@code uri} does not conform to the
      *         syntax constraints for entry names.
      */
-    public EntryName(@NonNull URI uri)
+    public EntryName(URI uri)
     throws URISyntaxException {
         parse(uri);
     }
@@ -169,8 +171,8 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      * @param  parent an entry name for the parent.
      * @param  member an entry name for the member.
      */
-    public EntryName(   final @NonNull EntryName parent,
-                        final @NonNull EntryName member) {
+    public EntryName(   final EntryName parent,
+                        final EntryName member) {
         final URI parentUri = parent.uri;
         final String parentUriPath = parentUri.getPath();
         final URI memberUri = member.uri;
@@ -196,12 +198,12 @@ public class EntryName implements Serializable, Comparable<EntryName> {
         assert invariants();
     }
 
-    private void writeObject(@NonNull ObjectOutputStream out)
+    private void writeObject(ObjectOutputStream out)
     throws IOException {
         out.writeObject(uri.toString());
     }
 
-    private void readObject(@NonNull ObjectInputStream in)
+    private void readObject(ObjectInputStream in)
     throws IOException, ClassNotFoundException {
         try {
             parse(new URI(in.readObject().toString()));
@@ -211,7 +213,7 @@ public class EntryName implements Serializable, Comparable<EntryName> {
         }
     }
 
-    private void parse(final @NonNull URI uri) throws URISyntaxException {
+    private void parse(final URI uri) throws URISyntaxException {
         if (uri.isAbsolute())
             throw new URISyntaxException(quote(uri), "Scheme not allowed");
         if (uri.getRawAuthority() != null)
@@ -241,7 +243,7 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      *
      * @return The path of this entry name.
      */
-    public final @NonNull String getPath() {
+    public final String getPath() {
         return uri.getPath();
     }
 
@@ -260,7 +262,7 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      *
      * @return The URI of this entry name.
      */
-    public final @NonNull URI getUri() {
+    public final URI getUri() {
         return uri;
     }
 
@@ -280,7 +282,7 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      * {@link #equals(Object)}.
      */
     @Override
-    public final int compareTo(@NonNull EntryName that) {
+    public final int compareTo(EntryName that) {
         return this.uri.compareTo(that.uri);
     }
 
@@ -296,7 +298,7 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      * Equivalent to calling {@link URI#toString()} on {@link #getUri()}.
      */
     @Override
-    public final @NonNull String toString() {
+    public final String toString() {
         return uri.toString();
     }
 }

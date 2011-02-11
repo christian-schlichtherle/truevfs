@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -74,12 +75,13 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
  * @version $Id$
  */
 @Immutable
+@DefaultAnnotation(NonNull.class)
 @edu.umd.cs.findbugs.annotations.SuppressWarnings({ "JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS", "SE_TRANSIENT_FIELD_NOT_RESTORED" })
 public final class FsMountPoint implements Serializable, Comparable<FsMountPoint> {
 
     private static final long serialVersionUID = 5723957985634276648L;
 
-    private @NonNull URI uri; // not final for serialization only!
+    private URI uri; // not final for serialization only!
 
     private transient @Nullable FsPath path;
 
@@ -90,8 +92,8 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
     /**
      * Equivalent to {@link #create(URI, FsUriModifier) create(uri, FsUriModifier.NULL)}.
      */
-    public static @NonNull FsMountPoint
-    create(@NonNull String uri) {
+    public static FsMountPoint
+    create(String uri) {
         return create(uri, NULL);
     }
 
@@ -109,8 +111,8 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
      *         syntax constraints for mount points.
      * @return A new mount point.
      */
-    public static @NonNull FsMountPoint
-    create(@NonNull String uri, @NonNull FsUriModifier modifier) {
+    public static FsMountPoint
+    create(String uri, FsUriModifier modifier) {
         try {
             return new FsMountPoint(uri, modifier);
         } catch (URISyntaxException ex) {
@@ -121,8 +123,8 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
     /**
      * Equivalent to {@link #create(URI, FsUriModifier) create(uri, FsUriModifier.NULL)}.
      */
-    public static @NonNull FsMountPoint
-    create(@NonNull URI uri) {
+    public static FsMountPoint
+    create(URI uri) {
         return create(uri, NULL);
     }
 
@@ -139,8 +141,8 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
      *         syntax constraints for mount points.
      * @return A new mount point.
      */
-    public static @NonNull FsMountPoint
-    create(@NonNull URI uri, @NonNull FsUriModifier modifier) {
+    public static FsMountPoint
+    create(URI uri, FsUriModifier modifier) {
         try {
             return new FsMountPoint(uri, modifier);
         } catch (URISyntaxException ex) {
@@ -162,8 +164,8 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
      *         would not conform to the syntax constraints for mount points.
      * @return A new mount point.
      */
-    public static @NonNull FsMountPoint
-    create(@NonNull FsScheme scheme, @NonNull FsPath path) {
+    public static FsMountPoint
+    create(FsScheme scheme, FsPath path) {
         try {
             return new FsMountPoint(scheme, path);
         } catch (URISyntaxException ex) {
@@ -174,7 +176,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
     /**
      * Equivalent to {@link #FsMountPoint(String, FsUriModifier) new FsMountPoint(uri, FsUriModifier.NULL)}.
      */
-    public FsMountPoint(@NonNull String uri) throws URISyntaxException {
+    public FsMountPoint(String uri) throws URISyntaxException {
         parse(new URI(uri), NULL);
     }
 
@@ -187,7 +189,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
      * @throws URISyntaxException if {@code uri} does not conform to the
      *         syntax constraints for mount points.
      */
-    public FsMountPoint(@NonNull String uri, @NonNull FsUriModifier modifier)
+    public FsMountPoint(String uri, FsUriModifier modifier)
     throws URISyntaxException {
         parse(new URI(uri), modifier);
     }
@@ -195,7 +197,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
     /**
      * Equivalent to {@link #FsMountPoint(URI, FsUriModifier) new FsMountPoint(uri, FsUriModifier.NULL)}.
      */
-    public FsMountPoint(@NonNull URI uri) throws URISyntaxException {
+    public FsMountPoint(URI uri) throws URISyntaxException {
         parse(uri, NULL);
     }
 
@@ -207,7 +209,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
      * @throws URISyntaxException if {@code uri} does not conform to the
      *         syntax constraints for mount points.
      */
-    public FsMountPoint(@NonNull URI uri, @NonNull FsUriModifier modifier)
+    public FsMountPoint(URI uri, FsUriModifier modifier)
     throws URISyntaxException {
         parse(uri, modifier);
     }
@@ -221,8 +223,8 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
      * @throws URISyntaxException if the synthesized mount point URI
      *         would not conform to the syntax constraints for mount points.
      */
-    public FsMountPoint(final @NonNull FsScheme scheme,
-                        final @NonNull FsPath path)
+    public FsMountPoint(final FsScheme scheme,
+                        final FsPath path)
     throws URISyntaxException {
         final URI pathUri = path.getUri();
         if (!pathUri.isAbsolute())
@@ -241,12 +243,12 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
         assert invariants();
     }
 
-    private void writeObject(@NonNull ObjectOutputStream out)
+    private void writeObject(ObjectOutputStream out)
     throws IOException {
         out.writeObject(uri.toString());
     }
 
-    private void readObject(@NonNull ObjectInputStream in)
+    private void readObject(ObjectInputStream in)
     throws IOException, ClassNotFoundException {
         try {
             parse(new URI(in.readObject().toString()), NULL);
@@ -256,7 +258,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
         }
     }
 
-    private void parse(@NonNull URI uri, final @NonNull FsUriModifier modifier)
+    private void parse(URI uri, final FsUriModifier modifier)
     throws URISyntaxException {
         uri = modifier.modify(uri, MOUNT_POINT);
         if (null != uri.getRawFragment())
@@ -322,7 +324,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
      *
      * @return The URI scheme.
      */
-    public @NonNull FsScheme getScheme() {
+    public FsScheme getScheme() {
         return null != scheme ? scheme : (scheme = FsScheme.create(uri.getScheme()));
     }
 
@@ -342,7 +344,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
      *
      * @return The non-{@code null} URI.
      */
-    public @NonNull URI getUri() {
+    public URI getUri() {
         return uri;
     }
 
@@ -365,8 +367,8 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
      * @param  entryName an entry name relative to this mount point.
      * @return A new path with an absolute URI.
      */
-    public @NonNull FsPath
-    resolve(@NonNull FsEntryName entryName) {
+    public FsPath
+    resolve(FsEntryName entryName) {
         return new FsPath(this, entryName);
     }
 
@@ -386,7 +388,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
      * @return A mount point which has its URI converted from the URI of
      *         this mount point so that it's absolute and hierarchical.
      */
-    public @NonNull FsMountPoint hierarchicalize() {
+    public FsMountPoint hierarchicalize() {
         if (null != hierarchical)
             return hierarchical;
         if (uri.isOpaque()) {
@@ -421,7 +423,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
      * {@link #equals(Object)}.
      */
     @Override
-    public int compareTo(@NonNull FsMountPoint that) {
+    public int compareTo(FsMountPoint that) {
         return this.uri.compareTo(that.uri);
     }
 
@@ -437,7 +439,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
      * Equivalent to calling {@link URI#toString()} on {@link #getUri()}.
      */
     @Override
-    public @NonNull String toString() {
+    public String toString() {
         return uri.toString();
     }
 }

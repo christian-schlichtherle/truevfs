@@ -20,16 +20,17 @@ import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.entry.EntryFactory;
 import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsCachingController;
 import de.schlichtherle.truezip.fs.FsConcurrentController;
 import de.schlichtherle.truezip.fs.FsDriver;
+import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import javax.swing.Icon;
 import net.jcip.annotations.Immutable;
@@ -86,19 +87,18 @@ implements EntryFactory<E> {
      * <p>
      * Note again that the returned file system controller must be thread-safe!
      *
-     * @param  mountPoint the mount point of the file system.
-     * @param  parent the parent file system controller.
+     * @param  model the file system model.
+     * @param  parent the nullable parent file system controller.
      * @return A new thread-safe file system controller for the given mount
      *         point and parent file system controller.
      */
     @Override
     public FsController<?>
-    newController(  FsMountPoint mountPoint,
-                    FsController<?> parent) {
+    newController(FsModel model, FsController<?> parent) {
         return  new FsConcurrentController(
                    new FsCachingController(
                         new FsDefaultArchiveController<E>(
-                            new FsConcurrentModel(mountPoint, parent.getModel()),
+                            new FsConcurrentModel(model),
                             this, parent, false),
                         getPool()));
     }

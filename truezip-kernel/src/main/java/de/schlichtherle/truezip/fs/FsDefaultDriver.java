@@ -44,14 +44,14 @@ public final class FsDefaultDriver implements FsCompositeDriver {
 
     @Override
     public FsController<?>
-    newController(FsMountPoint mountPoint, FsController<?> parent) {
-        assert null == mountPoint.getParent()
-                ? null == parent
-                : mountPoint.getParent().equals(parent.getModel().getMountPoint());
-        final FsScheme scheme = mountPoint.getScheme();
+    newController(FsModel model, FsController<?> parent) {
+        assert null == model.getParent()
+                    ? null == parent
+                    : model.getParent().equals(parent.getModel());
+        final FsScheme scheme = model.getMountPoint().getScheme();
         final FsDriver driver = drivers.get(scheme);
         if (null == driver)
             throw new ServiceConfigurationError(scheme + "(unknown file system scheme)");
-        return driver.newController(mountPoint, parent);
+        return driver.newController(model, parent);
     }
 }

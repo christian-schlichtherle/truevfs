@@ -21,6 +21,7 @@ import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.util.SuffixSet;
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsDriverService;
+import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.fs.spi.FsDriverProvider;
@@ -291,11 +292,12 @@ implements TArchiveDetector, FsDriverService {
 
     @Override
     public FsController<?>
-    newController(  final FsMountPoint mountPoint,
+    newController(  final FsModel model,
                     final @CheckForNull FsController<?> parent) {
-        assert null == mountPoint.getParent()
+        assert null == model.getParent()
                 ? null == parent
-                : mountPoint.getParent().equals(parent.getModel().getMountPoint());
+                : model.getParent().equals(parent.getModel());
+        final FsMountPoint mountPoint = model.getMountPoint();
         final FsScheme declaredScheme = mountPoint.getScheme();
         final FsPath path = mountPoint.getPath();
         if (null != path) {
@@ -307,7 +309,7 @@ implements TArchiveDetector, FsDriverService {
         if (null == driver)
             throw new ServiceConfigurationError(declaredScheme
                     + "(unknown file system scheme - check run-time class path configuration)");
-        return driver.newController(mountPoint, parent);
+        return driver.newController(model, parent);
     }
 
     /**

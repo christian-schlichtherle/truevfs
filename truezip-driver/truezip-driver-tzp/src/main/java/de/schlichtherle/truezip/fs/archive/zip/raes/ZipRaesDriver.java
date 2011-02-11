@@ -21,7 +21,6 @@ import de.schlichtherle.truezip.key.PromptingKeyProvider;
 import de.schlichtherle.truezip.crypto.raes.param.KeyManagerRaesParameters;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsConcurrentModel;
 import de.schlichtherle.truezip.socket.LazyOutputSocket;
 import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
@@ -159,9 +158,9 @@ public abstract class ZipRaesDriver extends JarDriver {
 
     @Override
     public final FsController<?>
-    newController(FsMountPoint mountPoint, FsController<?> parent) {
+    newController(FsModel model, FsController<?> parent) {
         return new KeyManagerArchiveController(
-                super.newController(mountPoint, parent), this);
+                super.newController(model, parent), this);
     }
 
     /**

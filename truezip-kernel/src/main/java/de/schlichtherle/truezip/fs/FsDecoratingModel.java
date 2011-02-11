@@ -15,59 +15,47 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.ExceptionHandler;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import java.io.IOException;
-import java.util.Iterator;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * An abstract decorator for a file system manager.
- * 
- * @param   <M> The type of the decorated file system manager.
+ * An abstract decorator for a file system model.
+ *
+ * @param   <M> The type of the decorated file system model.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
-public abstract class FsDecoratingManager<M extends FsManager>
-extends FsManager {
+@DefaultAnnotation(NonNull.class)
+public abstract class FsDecoratingModel<M extends FsModel> extends FsModel {
 
     protected final M delegate;
-    
-    /**
-     * Constructs a new decorating file system manager.
-     *
-     * @param manager the decorated file system manager.
-     */
-    protected FsDecoratingManager(final @NonNull M manager) {
-        if (null == manager)
+
+    protected FsDecoratingModel(final M model) {
+        if (null == model)
             throw new NullPointerException();
-        this.delegate = manager;
+        this.delegate = model;
     }
 
     @Override
-    public FsController<?>
-    getController(FsMountPoint mountPoint, FsCompositeDriver driver) {
-        return delegate.getController(mountPoint, driver);
+    public FsMountPoint getMountPoint() {
+        return delegate.getMountPoint();
     }
 
     @Override
-    public int getSize() {
-        return delegate.getSize();
+    public FsModel getParent() {
+        return delegate.getParent();
     }
 
     @Override
-    public Iterator<FsController<?>> iterator() {
-        return delegate.iterator();
+    public boolean isTouched() {
+        return delegate.isTouched();
     }
 
     @Override
-    public <X extends IOException> void
-    sync(   BitField<FsSyncOption> options,
-            ExceptionHandler<? super IOException, X> handler)
-    throws X {
-        delegate.sync(options, handler);
+    public void setTouched(boolean touched) {
+        delegate.setTouched(touched);
     }
 
     /**
@@ -80,7 +68,7 @@ extends FsManager {
                 .append(getClass().getName())
                 .append("[delegate=")
                 .append(delegate)
-                .append(']')
+                .append("]")
                 .toString();
     }
 }

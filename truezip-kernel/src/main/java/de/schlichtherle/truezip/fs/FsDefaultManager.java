@@ -15,11 +15,11 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import de.schlichtherle.truezip.util.Link.Type;
 import java.util.Iterator;
 import de.schlichtherle.truezip.util.Link;
 import de.schlichtherle.truezip.util.Links;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
@@ -44,8 +44,8 @@ public final class FsDefaultManager extends FsManager {
      * keyed by the mount point of their respective file system model.
      * All access to this map must be externally synchronized!
      */
-    private final Map<FsMountPoint, Link<Scheduler>> schedulers
-            = new WeakHashMap<FsMountPoint, Link<Scheduler>>();
+    private final Map<FsMountPoint, Link<ScheduledModel>> schedulers
+            = new WeakHashMap<FsMountPoint, Link<ScheduledModel>>();
 
     private final Type optionalScheduleType;
 
@@ -59,38 +59,50 @@ public final class FsDefaultManager extends FsManager {
     }
 
     @Override
-    @NonNull public synchronized FsController<?>
-    getController(  @NonNull FsMountPoint mountPoint,
-                    @NonNull FsCompositeDriver driver) {
+    public synchronized FsController<?>
+    getController(  FsMountPoint mountPoint,
+                    FsCompositeDriver driver) {
         return getController(mountPoint, null, driver);
     }
 
     private FsController<?>
     getController(  final FsMountPoint mountPoint,
-                    FsController<?> parent,
+                    @CheckForNull FsController<?> parent,
                     final FsCompositeDriver driver) {
         if (null == mountPoint.getParent()) {
             if (null != parent)
                 throw new IllegalArgumentException("Parent/member mismatch!");
-            return driver.newController(mountPoint, null);
+            return driver.newController(new FsDefaultModel(mountPoint, null), null);
         }
-        Scheduler scheduler = Links.getTarget(schedulers.get(mountPoint));
-        if (null == scheduler) {
+        ScheduledModel model = Links.getTarget(schedulers.get(mountPoint));
+        if (null == model) {
             if (null == parent)
                 parent = getController(mountPoint.getParent(), null, driver);
-            scheduler = new Scheduler(driver.newController(mountPoint, parent));
+            model = new ScheduledModel(mountPoint, parent, driver);
         }
-        return scheduler.controller;
+        return model.controller;
     }
 
-    private final class Scheduler implements FsTouchedListener {
+    /**
+     * A model which schedules its controller for
+     * {@link #sync(BitField) synchronization} by &quot;observing&quot; its
+     * {@code touched} property.
+     * Extending its sub-class to register for updates to the {@code touched}
+     * property is simpler, faster and requires a smaller memory footprint as
+     * using the alternative observer pattern which is implemented by the
+     * class {@link FsObservableModel}.
+     */
+    private final class ScheduledModel extends FsDefaultModel {
         final FsFederatingController controller;
 
         @SuppressWarnings("LeakingThisInConstructor")
-        Scheduler(final FsController<?> prospect) {
-            controller = new FsFederatingController(prospect);
-            controller.getModel().addFsTouchedListener(this);
-            touchedChanged(null); // setup schedule
+        ScheduledModel( final FsMountPoint mountPoint,
+                        final @CheckForNull FsController<?> parent,
+                        final FsCompositeDriver driver) {
+            super(mountPoint, null == parent ? null : parent.getModel());
+            schedule(false);
+            this.controller = new FsFederatingController(
+                    driver.newController(this, parent));
         }
 
         /**
@@ -98,16 +110,21 @@ public final class FsDefaultManager extends FsManager {
          * to the given touch status.
          */
         @Override
-        public void touchedChanged(final FsEvent event) {
-            final FsModel model = controller.getModel();
-            assert null == event || event.getSource() == model;
+        public void setTouched(boolean touched) {
+            if (touched == super.isTouched())
+                return;
+            super.setTouched(touched);
+            schedule(touched);
+        }
+
+        void schedule(boolean unconditional) {
             synchronized (FsDefaultManager.this) {
-                schedulers.put(model.getMountPoint(),
-                        (model.isTouched() ? STRONG : optionalScheduleType)
+                schedulers.put(getMountPoint(),
+                        (unconditional ? STRONG : optionalScheduleType)
                             .newLink(this));
             }
         }
-    } // class Scheduler
+    } // class ScheduledModel
 
     @Override
     public synchronized int getSize() {
@@ -122,10 +139,10 @@ public final class FsDefaultManager extends FsManager {
     private Set<FsController<?>> getControllers() {
         final Set<FsController<?>> snapshot
                 = new TreeSet<FsController<?>>(BOTTOM_UP_COMPARATOR);
-        for (final Link<Scheduler> link : schedulers.values()) {
-            final Scheduler scheduler = Links.getTarget(link);
+        for (final Link<ScheduledModel> link : schedulers.values()) {
+            final ScheduledModel model = Links.getTarget(link);
             final FsFederatingController controller
-                    = null == scheduler ? null : scheduler.controller;
+                    = null == model ? null : model.controller;
             if (null != controller)
                 snapshot.add(controller);
         }
@@ -136,8 +153,8 @@ public final class FsDefaultManager extends FsManager {
      * Orders file system controllers so that all file systems appear before
      * any of their parent file systems.
      */
-    private static final Comparator<FsController<?>> BOTTOM_UP_COMPARATOR
-            = new Comparator<FsController<?>>() {
+    private static final Comparator<FsController<?>>
+            BOTTOM_UP_COMPARATOR = new Comparator<FsController<?>>() {
         @Override
         public int compare( FsController<?> l,
                             FsController<?> r) {

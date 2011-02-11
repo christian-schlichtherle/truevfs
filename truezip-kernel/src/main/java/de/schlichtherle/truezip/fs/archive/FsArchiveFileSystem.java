@@ -203,6 +203,8 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
      * <i>ghost directory<i>.
      * If a parent directory does exist, the respective base is added
      * (possibly yet again) and the process is continued.
+     *
+     * @param name the archive file system entry name.
      */
     private void fix(final FsEntryName name) {
         // When recursing into this method, it may be called with the root
@@ -323,6 +325,10 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
      * but wraps any {@link CharConversionException} in an
      * {@link AssertionError}.
      *
+     * @param name the archive file system entry name.
+     * @param type the type of the archive file system entry to create.
+     * @param template the nullable template for the archive file system entry
+     *        to create.
      * @throws AssertionError if a {@link CharConversionException}
      *         occurs. The original exception is wrapped as its cause.
      */
@@ -348,7 +354,10 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
      * not yet linked into this (virtual) archive file system.
      *
      * @see   #mknod
-     * @param path the path name of the archive file system entry.
+     * @param name the archive file system entry name.
+     * @param type the type of the archive file system entry to create.
+     * @param template the nullable template for the archive file system entry
+     *        to create.
      */
     private FsArchiveFileSystemEntry<E> newEntryChecked(
             final FsEntryName name,
@@ -387,8 +396,8 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
      * system entries to the system's current time at the moment of the call
      * to this method.
      *
-     * @param  name an entry name.
-     * @param  type an entry type.
+     * @param  name the archive file system entry name.
+     * @param  type the type of the archive file system entry to create.
      * @param  options if {@code CREATE_PARENTS} is set, any missing parent
      *         directories will be created and linked into this file
      *         system with its last modification time set to the system's
@@ -581,6 +590,7 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
      * If the file system entry is a directory, it must be empty for successful
      * deletion.
      *
+     * @param  name the archive file system entry name.
      * @throws ArchiveReadOnlyExceptionn If this (virtual) archive file system
      *         is read-only.
      * @throws FsArchiveFileSystemException If the operation fails for some other
@@ -759,7 +769,10 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
         }
 
         abstract void add(FsArchiveFileSystemEntry<E> entry);
-        abstract FsArchiveFileSystemEntry<E> get(FsEntryName name, @CheckForNull Type type);
+
+        abstract @CheckForNull FsArchiveFileSystemEntry<E>
+        get(FsEntryName name, @CheckForNull Type type);
+
         abstract void remove(FsEntryName name, @CheckForNull Type type);
     } // class MasterEntryTable
 

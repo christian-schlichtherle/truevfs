@@ -37,20 +37,18 @@ public interface FsCompositeDriver {
      * <p>
      * When called, the following expression is a precondition:
      * {@code
-            null == mountPoint.getParent()
+            null == model.getParent()
                     ? null == parent
-                    : mountPoint.getParent().equals(parent.getModel().getMountPoint())
+                    : model.getParent().equals(parent.getModel())
      * }
-     * <p>
      *
-     * @param  mountPoint the mount point of the file system.
-     * @param  parent the parent file system controller.
+     * @param  model the file system model.
+     * @param  parent the nullable parent file system controller.
      * @return A new thread-safe file system controller for the given mount
      *         point and parent file system controller.
      * @throws ServiceConfigurationError if no appropriate file system driver
      *         is found for the scheme of the given mount point.
      */
     @NonNull FsController<?>
-    newController(  @NonNull  FsMountPoint mountPoint,
-                    @Nullable FsController<?> parent);
+    newController(@NonNull FsModel model, @Nullable FsController<?> parent);
 }

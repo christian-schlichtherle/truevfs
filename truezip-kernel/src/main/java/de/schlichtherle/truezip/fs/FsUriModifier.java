@@ -59,7 +59,7 @@ public enum FsUriModifier {
      * An idempotent function which modifies a URI.
      *
      * @param  uri the URI to modify.
-     * @param  modify the post-modify to apply if required.
+     * @param  fix the post-fix to apply if required.
      * @return the modified URI.
      */
     abstract URI modify(URI uri, PostFix fix) throws URISyntaxException;
@@ -164,7 +164,6 @@ public enum FsUriModifier {
          * An idempotent function which modifies a URI.
          *
          * @param  uri the URI to modify.
-         * @param  modify the post-modify to apply if required.
          * @return the modified URI.
          */
         abstract URI modify(URI uri) throws URISyntaxException;

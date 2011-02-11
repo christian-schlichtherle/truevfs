@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -32,16 +31,12 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-public class FsConcurrentModel extends FsModel {
+public class FsConcurrentModel extends FsDecoratingModel<FsModel> {
+
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
-    public FsConcurrentModel(FsMountPoint mountPoint) {
-        this(mountPoint, null);
-    }
-
-    public FsConcurrentModel(  FsMountPoint mountPoint,
-                               @CheckForNull FsModel parent) {
-        super(mountPoint, parent);
+    public FsConcurrentModel(FsModel model) {
+        super(model);
     }
 
     public final ReadLock readLock() {

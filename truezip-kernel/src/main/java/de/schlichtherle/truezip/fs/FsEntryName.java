@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
@@ -67,6 +68,7 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
  * @version $Id$
  */
 @Immutable
+@DefaultAnnotation(NonNull.class)
 public final class FsEntryName extends EntryName {
     private static final long serialVersionUID = 2212342253466752478L;
 
@@ -80,8 +82,8 @@ public final class FsEntryName extends EntryName {
     /**
      * Equivalent to {@link #create(String, FsUriModifier) create(uri, FsUriModifier.NULL)}.
      */
-    public static @NonNull FsEntryName
-    create(@NonNull String uri) {
+    public static FsEntryName
+    create(String uri) {
         return create(uri, NULL);
     }
 
@@ -99,8 +101,8 @@ public final class FsEntryName extends EntryName {
      *         syntax constraints for entry names.
      * @return A new file system entry name.
      */
-    public static @NonNull FsEntryName
-    create(@NonNull String uri, @NonNull FsUriModifier modifier) {
+    public static FsEntryName
+    create(String uri, FsUriModifier modifier) {
         try {
             return new FsEntryName(uri, modifier);
         } catch (URISyntaxException ex) {
@@ -109,8 +111,8 @@ public final class FsEntryName extends EntryName {
     }
 
     /** Equivalent to {@link #create(URI, FsUriModifier) create(uri, FsUriModifier.NULL)}. */
-    public static @NonNull FsEntryName
-    create(@NonNull URI uri) {
+    public static FsEntryName
+    create(URI uri) {
         return create(uri, NULL);
     }
 
@@ -127,8 +129,8 @@ public final class FsEntryName extends EntryName {
      *         syntax constraints for entry names.
      * @return A new file system entry name.
      */
-    public static @NonNull FsEntryName
-    create(@NonNull URI uri, @NonNull FsUriModifier modifier) {
+    public static FsEntryName
+    create(URI uri, FsUriModifier modifier) {
         try {
             return new FsEntryName(uri, modifier);
         } catch (URISyntaxException ex) {
@@ -139,7 +141,7 @@ public final class FsEntryName extends EntryName {
     /**
      * Equivalent to {@link #FsEntryName(String, FsUriModifier) new FsEntryName(uri, FsUriModifier.NULL)}.
      */
-    public FsEntryName(@NonNull String uri) throws URISyntaxException {
+    public FsEntryName(String uri) throws URISyntaxException {
         this(uri, NULL);
     }
 
@@ -152,7 +154,7 @@ public final class FsEntryName extends EntryName {
      * @throws URISyntaxException if {@code uri} does not conform to the
      *         syntax constraints for entry names.
      */
-    public FsEntryName(@NonNull String uri, @NonNull FsUriModifier modifier)
+    public FsEntryName(String uri, FsUriModifier modifier)
     throws URISyntaxException {
         this(new URI(uri), modifier);
     }
@@ -160,7 +162,7 @@ public final class FsEntryName extends EntryName {
     /**
      * Equivalent to {@link #FsEntryName(URI, FsUriModifier) new FsEntryName(uri, FsUriModifier.NULL)}.
      */
-    public FsEntryName(@NonNull URI uri) throws URISyntaxException {
+    public FsEntryName(URI uri) throws URISyntaxException {
         this(uri, NULL);
     }
 
@@ -173,13 +175,13 @@ public final class FsEntryName extends EntryName {
      * @throws URISyntaxException if {@code uri} does not conform to the
      *         syntax constraints for file system entry names.
      */
-    public FsEntryName(@NonNull URI uri, final @NonNull FsUriModifier modifier)
+    public FsEntryName(URI uri, final FsUriModifier modifier)
     throws URISyntaxException {
         super(uri = modifier.modify(uri, ENTRY_NAME));
         parse(uri);
     }
 
-    private void readObject(@NonNull ObjectInputStream in)
+    private void readObject(ObjectInputStream in)
     throws IOException, ClassNotFoundException {
         in.defaultReadObject();
         try {
@@ -190,7 +192,7 @@ public final class FsEntryName extends EntryName {
         }
     }
 
-    private void parse(final @NonNull URI uri) throws URISyntaxException {
+    private void parse(final URI uri) throws URISyntaxException {
         final String p = uri.getRawPath();
         if (       "..".equals(p)
                 || p.startsWith(SEPARATOR)
@@ -205,7 +207,7 @@ public final class FsEntryName extends EntryName {
         assert invariants();
     }
 
-    private static @NonNull String quote(@NonNull Object s) {
+    private static String quote(Object s) {
         return "\"" + s + "\"";
     }
 
@@ -222,8 +224,8 @@ public final class FsEntryName extends EntryName {
      * @param  parent an entry name for the parent.
      * @param  member an entry name for the member.
      */
-    FsEntryName(final @NonNull FsEntryName parent,
-                final @NonNull FsEntryName member) {
+    FsEntryName(final FsEntryName parent,
+                final FsEntryName member) {
         super(parent, member);
 
         assert invariants();

@@ -50,11 +50,11 @@ extends FsDecoratingManager<FsManager> {
         class StatisticsDriver implements FsCompositeDriver {
             @Override
             public FsController<?>
-            newController(FsMountPoint mountPoint, FsController<?> parent) {
-                assert null == mountPoint.getParent()
-                        ? null == parent
-                        : mountPoint.getParent().equals(parent.getModel().getMountPoint());
-                FsController<?> controller = driver.newController(mountPoint, parent);
+            newController(FsModel model, FsController<?> parent) {
+                assert null == model.getParent()
+                            ? null == parent
+                            : model.getParent().equals(parent.getModel());
+                FsController<?> controller = driver.newController(model, parent);
                 return null != parent && null == parent.getParent() // controller is top level federated file system?
                         ? new FsStatisticsController(controller, FsStatisticsManager.this)
                         : controller;

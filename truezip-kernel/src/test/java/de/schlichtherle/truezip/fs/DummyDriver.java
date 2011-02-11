@@ -23,11 +23,10 @@ public class DummyDriver extends FsDriver {
 
     @Override
     public FsController<?>
-    newController(FsMountPoint mountPoint, FsController<?> parent) {
-        assert null == mountPoint.getParent()
-                ? null == parent
-                : mountPoint.getParent().equals(parent.getModel().getMountPoint());
-        return new DummyController<FsModel>(
-                new FsModel(mountPoint, null == parent ? null : parent.getModel()), parent);
+    newController(FsModel model, FsController<?> parent) {
+        assert null == model.getParent()
+                    ? null == parent
+                    : model.getParent().equals(parent.getModel());
+        return new DummyController<FsModel>(model, parent);
     }
 }
