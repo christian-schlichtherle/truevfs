@@ -59,7 +59,9 @@ final class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
     private final URL url;
     private volatile @CheckForNull URLConnection connection;
 
-    HttpEntry(final HttpController controller, final FsMountPoint mountPoint, final FsEntryName name) {
+    HttpEntry(  final FsMountPoint mountPoint,
+                final FsEntryName name,
+                final HttpController controller) {
         assert null != controller;
         this.controller = controller;
         this.name = name;
