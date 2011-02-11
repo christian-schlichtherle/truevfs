@@ -49,7 +49,7 @@ final class HttpController extends FsController<FsModel>  {
     private final HttpDriver driver;
     private final FsModel model;
 
-    HttpController(final HttpDriver driver, final FsModel model) {
+    HttpController(final FsModel model, final HttpDriver driver) {
         if (null != model.getParent())
             throw new IllegalArgumentException();
         assert null != driver;
@@ -57,13 +57,13 @@ final class HttpController extends FsController<FsModel>  {
         this.model = model;
     }
 
-    HttpDriver getDriver() {
-        return driver;
-    }
-
     @Override
     public FsModel getModel() {
         return model;
+    }
+
+    HttpDriver getDriver() {
+        return driver;
     }
 
     @Override
@@ -88,7 +88,7 @@ final class HttpController extends FsController<FsModel>  {
 
     @Override
     public HttpEntry getEntry(FsEntryName name) throws IOException {
-        HttpEntry entry = new HttpEntry(this, model.getMountPoint(), name);
+        HttpEntry entry = new HttpEntry(model.getMountPoint(), name, this);
         return null != entry.getType() ? entry : null;
     }
 
@@ -116,7 +116,7 @@ final class HttpController extends FsController<FsModel>  {
     public InputSocket<?> getInputSocket(
             FsEntryName name,
             BitField<FsInputOption> options) {
-        return new HttpEntry(this, model.getMountPoint(), name).getInputSocket();
+        return new HttpEntry(model.getMountPoint(), name, this).getInputSocket();
     }
 
     @Override
@@ -124,7 +124,7 @@ final class HttpController extends FsController<FsModel>  {
             FsEntryName name,
             BitField<FsOutputOption> options,
             @CheckForNull Entry template) {
-        return new HttpEntry(this, model.getMountPoint(), name).getOutputSocket(options, template);
+        return new HttpEntry(model.getMountPoint(), name, this).getOutputSocket(options, template);
     }
 
     @Override

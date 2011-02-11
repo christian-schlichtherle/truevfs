@@ -42,6 +42,6 @@ final class FileDriver extends FsDriver {
                 : model.getParent().equals(parent.getModel());
         if (null != parent)
             throw new IllegalArgumentException();
-        return new FileController<FsModel>(model);
+        return new FileController(model);
     }
 }
