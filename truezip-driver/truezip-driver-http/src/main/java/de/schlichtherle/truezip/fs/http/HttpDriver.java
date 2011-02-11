@@ -18,7 +18,6 @@ package de.schlichtherle.truezip.fs.http;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsModel;
-import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.IOPoolService;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -48,12 +47,12 @@ final class HttpDriver extends FsDriver {
 
     @Override
     public FsController<?>
-    newController(FsMountPoint mountPoint, @CheckForNull FsController<?> parent) {
-        assert null == mountPoint.getParent()
+    newController(FsModel model, @CheckForNull FsController<?> parent) {
+        assert null == model.getParent()
                 ? null == parent
-                : mountPoint.getParent().equals(parent.getModel().getMountPoint());
+                : model.getParent().equals(parent.getModel());
         if (null != parent)
             throw new IllegalArgumentException();
-        return new HttpController(this, new FsModel(mountPoint));
+        return new HttpController(this, model);
     }
 }

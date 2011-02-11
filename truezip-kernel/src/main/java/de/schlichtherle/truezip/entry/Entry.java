@@ -140,7 +140,7 @@ public interface Entry {
      * when being parsed.
      *
      * @return The entry name.
-     * @see    EntryName#create(java.lang.String, java.lang.String)
+     * @see    EntryName#create(String)
      */
     @NonNull String getName();
 

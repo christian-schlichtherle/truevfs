@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import net.jcip.annotations.Immutable;
@@ -26,6 +27,7 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
+@DefaultAnnotation(NonNull.class)
 public abstract class FsDriver {
 
     /**
@@ -34,19 +36,18 @@ public abstract class FsDriver {
      * <p>
      * When called, the following expression is a precondition:
      * {@code
-            null == mountPoint.getParent()
+            null == model.getParent()
                     ? null == parent
-                    : mountPoint.getParent().equals(parent.getModel().getMountPoint())
+                    : model.getParent().equals(parent.getModel())
      * }
      *
-     * @param  mountPoint the mount point of the file system.
-     * @param  parent the parent file system controller.
+     * @param  model the file system model.
+     * @param  parent the nullable parent file system controller.
      * @return A new thread-safe file system controller for the given mount
      *         point and parent file system controller.
      */
-    public abstract @NonNull FsController<?>
-    newController(  @NonNull  FsMountPoint mountPoint,
-                    @Nullable FsController<?> parent);
+    public abstract FsController<?>
+    newController(FsModel model, @Nullable FsController<?> parent);
 
     /**
      * Returns {@code true} iff this file system driver implements a federated

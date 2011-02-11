@@ -15,16 +15,15 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
-import java.util.Set;
-import java.util.LinkedHashSet;
 import net.jcip.annotations.ThreadSafe;
 
 /**
  * Defines the common properties of a file system.
+ * <p>
+ * Sub-classes must be thread-safe, too.
  *
  * @see     FsController
  * @author  Christian Schlichtherle
@@ -32,30 +31,7 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-public class FsModel {
-
-    private final FsMountPoint mountPoint;
-    private final @CheckForNull FsModel parent;
-    private volatile boolean touched;
-    private Set<FsTouchedListener> touchedListeners
-            = new LinkedHashSet<FsTouchedListener>();
-
-    public FsModel(FsMountPoint mountPoint) {
-        this(mountPoint, null);
-    }
-
-    public FsModel( final FsMountPoint mountPoint,
-                    final @CheckForNull FsModel parent) {
-        if (!equals(mountPoint.getParent(),
-                    (null == parent ? null : parent.getMountPoint())))
-            throw new IllegalArgumentException("Parent/Member mismatch!");
-        this.mountPoint = mountPoint;
-        this.parent = parent;
-    }
-
-    private static boolean equals(@CheckForNull Object o1, @CheckForNull Object o2) {
-        return o1 == o2 || null != o1 && o1.equals(o2);
-    }
+public abstract class FsModel {
 
     /**
      * Returns the mount point of this file system model.
@@ -66,9 +42,7 @@ public class FsModel {
      *
      * @return The mount point of this file system model.
      */
-    public final FsMountPoint getMountPoint() {
-        return mountPoint;
-    }
+    public abstract FsMountPoint getMountPoint();
 
     /**
      * Returns the model of the parent file system or {@code null} if and
@@ -78,9 +52,7 @@ public class FsModel {
      * @return The nullable parent file system model.
      */
     @Nullable
-    public final FsModel getParent() {
-        return parent;
-    }
+    public abstract FsModel getParent();
 
     /**
      * Returns {@code true} if and only if the contents of the federated file
@@ -88,65 +60,24 @@ public class FsModel {
      * {@link FsController#sync synchronization} with its parent file
      * system.
      */
-    public final boolean isTouched() {
-        return touched;
-    }
+    public abstract boolean isTouched();
 
     /**
-     * Sets the value of the property {@code touched} to the new value and
-     * notifies all listeners if it has effectively changed.
-     */
-    public final void setTouched(final boolean newTouched) {
-        final boolean oldTouched = touched;
-        touched = newTouched;
-        if (newTouched != oldTouched) {
-            final FsEvent event = new FsEvent(this);
-            for (FsTouchedListener listener : getFsTouchedListeners())
-                listener.touchedChanged(event);
-        }
-    }
-
-    /**
-     * Returns a protective copy of the set of file system touched listeners.
+     * Sets the value of the property {@code touched}.
      *
-     * @return A clone of the set of file system touched listeners.
+     * @param touched the new value of this property.
      */
-    final synchronized Set<FsTouchedListener> getFsTouchedListeners() {
-        return new LinkedHashSet<FsTouchedListener>(touchedListeners);
-    }
+    public abstract void setTouched(boolean touched);
 
     /**
-     * Adds the given listener to the set of file system touched listeners.
-     *
-     * @param listener the listener for file system touched events.
-     */
-    public final synchronized void addFsTouchedListener(
-            FsTouchedListener listener) {
-        if (null == listener)
-            throw new NullPointerException();
-        touchedListeners.add(listener);
-    }
-
-    /**
-     * Removes the given listener from the set of file system touched listeners.
-     *
-     * @param listener the listener for file system touched events.
-     */
-    public final synchronized void removeFsTouchedListener(
-            @CheckForNull FsTouchedListener listener) {
-        touchedListeners.remove(listener);
-    }
-
-    /**
-     * Two file system models are considered equal if and only if their mount
-     * points are equal.
+     * Two file system models are considered equal if and only if they are
+     * identical.
      * This can't get overriden.
      */
     @Override
-    public final boolean equals(@CheckForNull Object that) {
-        return this == that
-                || that instanceof FsModel
-                    && this.mountPoint.equals(((FsModel) that).mountPoint);
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+    public final boolean equals(Object that) {
+        return this == that;
     }
 
     /**
@@ -155,7 +86,7 @@ public class FsModel {
      */
     @Override
     public final int hashCode() {
-        return mountPoint.hashCode();
+        return super.hashCode();
     }
 
     /**
@@ -163,7 +94,7 @@ public class FsModel {
      * purposes.
      */
     @Override
-    public final String toString() {
+    public String toString() {
         return new StringBuilder()
                 .append(getClass().getName())
                 .append("[mountPoint=")
@@ -171,7 +102,7 @@ public class FsModel {
                 .append(",parent=")
                 .append(getParent())
                 .append(",touched=")
-                .append(touched)
+                .append(isTouched())
                 .append("]")
                 .toString();
     }

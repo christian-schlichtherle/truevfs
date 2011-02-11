@@ -21,6 +21,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import de.schlichtherle.truezip.entry.EntryName;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.InvalidObjectException;
@@ -83,6 +84,7 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
  * @version $Id$
  */
 @Immutable
+@DefaultAnnotation(NonNull.class)
 @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
 public final class FsPath implements Serializable, Comparable<FsPath> {
 
@@ -98,19 +100,19 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
 
     private static final URI DOT = URI.create(".");
 
-    private @NonNull URI uri; // not final for serialization only!
+    private URI uri; // not final for serialization only!
 
     private transient @Nullable FsMountPoint mountPoint;
 
-    private transient @NonNull FsEntryName entryName;
+    private transient FsEntryName entryName;
 
     private transient volatile @Nullable FsPath hierarchical;
 
     /**
      * Equivalent to {@link #create(String, FsUriModifier) create(uri, FsUriModifier.NULL)}.
      */
-    public static @NonNull FsPath
-    create(@NonNull String uri) {
+    public static FsPath
+    create(String uri) {
         return create(uri, NULL);
     }
 
@@ -128,8 +130,8 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
      *         syntax constraints for paths.
      * @return A new path.
      */
-    public static @NonNull FsPath
-    create(@NonNull String uri, @NonNull FsUriModifier modifier) {
+    public static FsPath
+    create(String uri, FsUriModifier modifier) {
         try {
             return new FsPath(uri, modifier);
         } catch (URISyntaxException ex) {
@@ -140,8 +142,8 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
     /**
      * Equivalent to {@link #create(URI, FsUriModifier) create(uri, FsUriModifier.NULL)}.
      */
-    public static @NonNull FsPath
-    create(@NonNull URI uri) {
+    public static FsPath
+    create(URI uri) {
         return create(uri, NULL);
     }
 
@@ -158,8 +160,8 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
      *         syntax constraints for paths.
      * @return A new path.
      */
-    public static @NonNull FsPath
-    create(@NonNull URI uri, @NonNull FsUriModifier modifier) {
+    public static FsPath
+    create(URI uri, FsUriModifier modifier) {
         try {
             return new FsPath(uri, modifier);
         } catch (URISyntaxException ex) {
@@ -170,7 +172,7 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
     /**
      * Equivalent to {@link #FsPath(String, FsUriModifier) new FsPath(uri, FsUriModifier.NULL)}.
      */
-    public FsPath(@NonNull String uri) throws URISyntaxException {
+    public FsPath(String uri) throws URISyntaxException {
         parse(new URI(uri), NULL);
     }
 
@@ -183,7 +185,7 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
      * @throws URISyntaxException if {@code uri} does not conform to the
      *         syntax constraints for paths.
      */
-    public FsPath(@NonNull String uri, @NonNull FsUriModifier modifier)
+    public FsPath(String uri, FsUriModifier modifier)
     throws URISyntaxException {
         parse(new URI(uri), modifier);
     }
@@ -192,7 +194,7 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
      * Equivalent to {@link #FsPath(URI, FsUriModifier) new FsPath(file.toURI(), FsUriModifier.CANONICALIZE)}.
      * Note that this constructor is expected not to throw any exceptions.
      */
-    public FsPath(@NonNull File file) {
+    public FsPath(File file) {
         try {
             parse(file.toURI(), CANONICALIZE);
         } catch (URISyntaxException ex) {
@@ -203,7 +205,7 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
     /**
      * Equivalent to {@link #FsPath(URI, FsUriModifier) new FsPath(uri, FsUriModifier.NULL)}.
      */
-    public FsPath(@NonNull URI uri) throws URISyntaxException {
+    public FsPath(URI uri) throws URISyntaxException {
         parse(uri, NULL);
     }
 
@@ -215,7 +217,7 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
      * @throws URISyntaxException if {@code uri} does not conform to the
      *         syntax constraints for paths.
      */
-    public FsPath(@NonNull URI uri, @NonNull FsUriModifier modifier)
+    public FsPath(URI uri, FsUriModifier modifier)
     throws URISyntaxException {
         parse(uri, modifier);
     }
@@ -230,7 +232,7 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
      *         would not conform to the syntax constraints for paths.
      */
     public FsPath(  final @CheckForNull FsMountPoint mountPoint,
-                    final @NonNull FsEntryName entryName) {
+                    final FsEntryName entryName) {
         if (null == mountPoint) {
             this.uri = entryName.getUri();
         } else if (mountPoint.getUri().isOpaque()) {
@@ -248,12 +250,12 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
         assert invariants();
     }
 
-    private void writeObject(@NonNull ObjectOutputStream out)
+    private void writeObject(ObjectOutputStream out)
     throws IOException {
         out.writeObject(uri.toString());
     }
 
-    private void readObject(@NonNull ObjectInputStream in)
+    private void readObject(ObjectInputStream in)
     throws IOException, ClassNotFoundException {
         try {
             parse(new URI(in.readObject().toString()), NULL);
@@ -263,7 +265,7 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
         }
     }
 
-    private void parse(@NonNull URI uri, final @NonNull FsUriModifier modifier)
+    private void parse(URI uri, final FsUriModifier modifier)
     throws URISyntaxException {
         uri = modifier.modify(uri, PATH);
         if (uri.isOpaque()) {
@@ -334,7 +336,7 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
      *
      * @return The entry name.
      */
-    public @NonNull FsEntryName getEntryName() {
+    public FsEntryName getEntryName() {
         return entryName;
     }
 
@@ -343,7 +345,7 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
      *
      * @return The URI of this path.
      */
-    public @NonNull URI getUri() {
+    public URI getUri() {
         return uri;
     }
 
@@ -353,8 +355,8 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
      * @param  entryName an entry name relative to this path.
      * @return A new path with an absolute URI.
      */
-    public @NonNull FsPath
-    resolve(final @NonNull FsEntryName entryName) {
+    public FsPath
+    resolve(final FsEntryName entryName) {
         return new FsPath(
                 this.mountPoint,
                 new FsEntryName(this.entryName, entryName));
@@ -378,7 +380,7 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
      *
      * @return A hierarchical URI for this path.
      */
-    public @NonNull FsPath hierarchicalize() {
+    public FsPath hierarchicalize() {
         return null != hierarchical
                 ? hierarchical
                 : (hierarchical = !uri.isOpaque()
@@ -405,7 +407,7 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
      * {@link #equals(Object)}.
      */
     @Override
-    public int compareTo(@NonNull FsPath that) {
+    public int compareTo(FsPath that) {
         return this.uri.compareTo(that.uri);
     }
 
@@ -421,7 +423,7 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
      * Equivalent to calling {@link URI#toString()} on {@link #getUri()}.
      */
     @Override
-    public @NonNull String toString() {
+    public String toString() {
         return uri.toString();
     }
 }
