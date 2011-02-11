@@ -88,9 +88,8 @@ public final class FsDefaultManager extends FsManager {
      * {@link #sync(BitField) synchronization} by &quot;observing&quot; its
      * {@code touched} property.
      * Extending its sub-class to register for updates to the {@code touched}
-     * property is simpler, faster and requires a smaller memory footprint as
-     * using the alternative observer pattern which is implemented by the
-     * class {@link FsObservableModel}.
+     * property is simpler, faster and requires a smaller memory footprint than
+     * the alternative observer pattern.
      */
     private final class ScheduledModel extends FsDefaultModel {
         final FsFederatingController controller;
