@@ -32,36 +32,36 @@ public class ArchiveFileSystemTest {
                 = FsArchiveFileSystem.newArchiveFileSystem(new DummyArchiveDriver());
 
         try {
-            model.addArchiveFileSystemTouchListener(null);
+            model.addFsArchiveFileSystemTouchListener(null);
         } catch (NullPointerException expected) {
         }
-        assertThat(model.getArchiveFileSystemTouchListeners(), notNullValue());
-        assertThat(model.getArchiveFileSystemTouchListeners().size(), is(0));
+        assertThat(model.getFsArchiveFileSystemTouchListeners(), notNullValue());
+        assertThat(model.getFsArchiveFileSystemTouchListeners().size(), is(0));
 
         final Listener listener1 = new Listener(model);
-        model.addArchiveFileSystemTouchListener(listener1);
-        assertThat(model.getArchiveFileSystemTouchListeners().size(), is(1));
+        model.addFsArchiveFileSystemTouchListener(listener1);
+        assertThat(model.getFsArchiveFileSystemTouchListeners().size(), is(1));
 
         final Listener listener2 = new Listener(model);
-        model.addArchiveFileSystemTouchListener(listener2);
-        assertThat(model.getArchiveFileSystemTouchListeners().size(), is(2));
+        model.addFsArchiveFileSystemTouchListener(listener2);
+        assertThat(model.getFsArchiveFileSystemTouchListeners().size(), is(2));
 
-        model.getArchiveFileSystemTouchListeners().clear();
-        assertThat(model.getArchiveFileSystemTouchListeners().size(), is(2));
+        model.getFsArchiveFileSystemTouchListeners().clear();
+        assertThat(model.getFsArchiveFileSystemTouchListeners().size(), is(2));
 
         try {
-            model.removeArchiveFileSystemTouchListener(null);
+            model.removeFsArchiveFileSystemTouchListener(null);
         } catch (NullPointerException expected) {
         }
-        assertThat(model.getArchiveFileSystemTouchListeners().size(), is(2));
+        assertThat(model.getFsArchiveFileSystemTouchListeners().size(), is(2));
 
-        model.removeArchiveFileSystemTouchListener(listener1);
-        model.removeArchiveFileSystemTouchListener(listener1);
-        assertThat(model.getArchiveFileSystemTouchListeners().size(), is(1));
+        model.removeFsArchiveFileSystemTouchListener(listener1);
+        model.removeFsArchiveFileSystemTouchListener(listener1);
+        assertThat(model.getFsArchiveFileSystemTouchListeners().size(), is(1));
 
-        model.removeArchiveFileSystemTouchListener(listener2);
-        model.removeArchiveFileSystemTouchListener(listener2);
-        assertThat(model.getArchiveFileSystemTouchListeners().size(), is(0));
+        model.removeFsArchiveFileSystemTouchListener(listener2);
+        model.removeFsArchiveFileSystemTouchListener(listener2);
+        assertThat(model.getFsArchiveFileSystemTouchListeners().size(), is(0));
     }
 
     private static class Listener
@@ -73,7 +73,7 @@ public class ArchiveFileSystemTest {
         @SuppressWarnings("LeakingThisInConstructor")
         Listener(final FsArchiveFileSystem<?> model) {
             this.model = model;
-            model.addArchiveFileSystemTouchListener(this);
+            model.addFsArchiveFileSystemTouchListener(this);
         }
 
         @Override

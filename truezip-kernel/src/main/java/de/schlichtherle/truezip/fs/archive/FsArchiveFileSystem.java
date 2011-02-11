@@ -259,7 +259,7 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
         final FsArchiveFileSystemEvent<E> event
                 = new FsArchiveFileSystemEvent<E>(this);
         final Iterable<FsArchiveFileSystemTouchListener<? super E>> listeners
-                = getArchiveFileSystemTouchListeners();
+                = getFsArchiveFileSystemTouchListeners();
         try {
             for (FsArchiveFileSystemTouchListener<? super E> listener : listeners)
                 listener.beforeTouch(event);
@@ -278,7 +278,7 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
      */
     @SuppressWarnings("unchecked")
     Set<FsArchiveFileSystemTouchListener<? super E>>
-    getArchiveFileSystemTouchListeners() {
+    getFsArchiveFileSystemTouchListeners() {
         return (Set<FsArchiveFileSystemTouchListener<? super E>>) touchListeners.clone();
     }
 
@@ -287,7 +287,7 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
      *
      * @param  listener the listener for archive file system events.
      */
-    final void addArchiveFileSystemTouchListener(
+    final void addFsArchiveFileSystemTouchListener(
             FsArchiveFileSystemTouchListener<? super E> listener) {
         if (null == listener)
             throw new NullPointerException();
@@ -299,7 +299,7 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
      *
      * @param  listener the listener for archive file system events.
      */
-    final void removeArchiveFileSystemTouchListener(
+    final void removeFsArchiveFileSystemTouchListener(
             @Nullable FsArchiveFileSystemTouchListener<? super E> listener) {
         touchListeners.remove(listener);
     }

@@ -270,7 +270,7 @@ extends FsFileSystemArchiveController<E> {
             setFileSystem(fileSystem);
             getModel().setTouched(true);
         }
-        getFileSystem().addArchiveFileSystemTouchListener(touchListener);
+        getFileSystem().addFsArchiveFileSystemTouchListener(touchListener);
     }
 
     void makeOutput(final BitField<FsOutputOption> options,
