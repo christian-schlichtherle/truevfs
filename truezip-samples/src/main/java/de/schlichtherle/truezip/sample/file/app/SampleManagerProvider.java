@@ -39,7 +39,7 @@ public final class SampleManagerProvider extends FsManagerProvider {
             new FsFailSafeManager(new FsDefaultManager()));
 
     @Override
-    public FsManager getManager() {
+    public FsManager getFsManager() {
         return manager;
     }
 }
