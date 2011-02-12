@@ -53,7 +53,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
      *
      * @param controller the non-{@code null} archive controller.
      */
-    ZipRaesArchiveController(final FsController<?> controller,
+    ZipRaesArchiveController(   final FsController<?> controller,
                                 final ZipRaesDriver driver) {
         super(controller);
         this.driver = driver;
@@ -64,7 +64,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     throws IOException {
         try {
             return delegate.getEntry(name);
-        } catch (FsFalsePositiveException ex) {
+        } catch (final FsFalsePositiveException ex) {
             if (!(ex.getCause() instanceof RaesKeyException))
                 throw ex;
             if (!name.isRoot())
@@ -75,9 +75,8 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                         .getPath()
                         .resolve(name)
                         .getEntryName());
-            if (null == entry)
-                return null;
-            // The entry exists, but we can't access it for some reason.
+            assert null != entry;
+            // The entry is inaccessible for some reason.
             // This may be because the cipher key is not available.
             // Now mask the entry as a special file.
             while (entry instanceof FsArchiveFileSystemEntry<?>)
@@ -95,7 +94,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     public void unlink(final FsEntryName name) throws IOException {
         try {
             delegate.unlink(name);
-        } catch (FsFalsePositiveException ex) {
+        } catch (final FsFalsePositiveException ex) {
             // If the false positive exception is caused by a RAES key
             // exception, then throw this instead in order to avoid delegating
             // this method to the parent file system.

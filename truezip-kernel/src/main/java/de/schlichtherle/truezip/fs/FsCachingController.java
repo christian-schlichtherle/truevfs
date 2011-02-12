@@ -273,7 +273,7 @@ extends FsDecoratingController< FsConcurrentModel,
             this.cache = STRATEGY.newCache(pool);
         }
 
-        EntryCache configure(BitField<FsInputOption> options) {
+        EntryCache configure(final BitField<FsInputOption> options) {
             cache.configure(/*new ProxyInputSocket*/(delegate.getInputSocket(
                     name,
                     options.clear(FsInputOption.CACHE))));
@@ -281,8 +281,8 @@ extends FsDecoratingController< FsConcurrentModel,
             return this;
         }
 
-        EntryCache configure(   BitField<FsOutputOption> options,
-                                @CheckForNull Entry template) {
+        EntryCache configure(   final BitField<FsOutputOption> options,
+                                final @CheckForNull Entry template) {
             cache.configure(delegate.getOutputSocket(
                     name,
                     this.outputOptions = options.clear(FsOutputOption.CACHE),
