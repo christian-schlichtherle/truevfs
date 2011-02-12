@@ -80,7 +80,7 @@ public final class KeyManagerLocator implements KeyManagerService {
     }
 
     @Override
-    public <K> KeyManager<? extends K, ?> getManager(Class<K> type) {
-        return provider.getManager(type);
+    public <K> KeyManager<? extends K, ?> getKeyManager(Class<K> type) {
+        return provider.getKeyManager(type);
     }
 }

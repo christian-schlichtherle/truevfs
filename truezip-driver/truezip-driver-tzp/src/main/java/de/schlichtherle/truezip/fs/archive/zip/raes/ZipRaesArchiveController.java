@@ -108,7 +108,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         }
         if (name.isRoot())
             driver  .getKeyManagerService()
-                    .getManager(Object.class)
+                    .getKeyManager(Object.class)
                     .removeKeyProvider(getModel().getMountPoint().getUri());
     }
 
@@ -121,7 +121,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         driver  .getKeyProviderSyncStrategy()
                 .sync(
                     driver  .getKeyManagerService()
-                            .getManager(Object.class)
+                            .getKeyManager(Object.class)
                             .getKeyProvider(
                                 getModel().getMountPoint().getUri()));
     }

@@ -103,7 +103,7 @@ public abstract class ZipRaesDriver extends JarDriver {
         public abstract void sync(KeyProvider<?> provider);
     } // enum KeyProviderSyncStrategy
 
-    private final KeyManagerService service;
+    private final KeyManagerService keyManagerService;
 
     /**
      * Constructs a new RAES encrypted ZIP file driver.
@@ -116,7 +116,7 @@ public abstract class ZipRaesDriver extends JarDriver {
         super(ioPoolService);
         if (null == keyManagerService)
             throw new NullPointerException();
-        this.service = keyManagerService;
+        this.keyManagerService = keyManagerService;
     }
 
     /**
@@ -268,7 +268,7 @@ public abstract class ZipRaesDriver extends JarDriver {
     }
 
     final KeyManagerService getKeyManagerService() {
-        return service;
+        return keyManagerService;
     }
 
     /**

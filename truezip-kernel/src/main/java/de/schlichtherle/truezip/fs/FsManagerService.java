@@ -36,5 +36,5 @@ public interface FsManagerService {
      *
      * @return The file system manager.
      */
-    @NonNull FsManager getManager();
+    @NonNull FsManager getFsManager();
 }

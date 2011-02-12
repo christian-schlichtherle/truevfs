@@ -46,7 +46,7 @@ public final class PromptingKeyManagerProvider extends KeyManagerProvider {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <K> KeyManager<? extends K, ?> getManager(Class<K> type) {
+    public <K> KeyManager<? extends K, ?> getKeyManager(Class<K> type) {
         if (type.isAssignableFrom(AesCipherParameters.class))
             return (KeyManager<? extends K, ?>) manager;
         throw new ServiceConfigurationError("No service available for " + type);
