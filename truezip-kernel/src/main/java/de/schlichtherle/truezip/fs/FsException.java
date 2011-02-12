@@ -36,11 +36,11 @@ public abstract class FsException extends IOException {
 
     private static final long serialVersionUID = 2947623946725372554L;
 
-    protected FsException(FsModel model) {
+    FsException(FsModel model) {
         super(model.getMountPoint().toString());
     }
 
-    protected FsException(FsModel model, @CheckForNull Throwable cause) {
+    FsException(FsModel model, @CheckForNull Throwable cause) {
         super(model.getMountPoint().toString(), cause);
     }
 }

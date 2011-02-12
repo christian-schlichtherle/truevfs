@@ -20,14 +20,15 @@ import net.jcip.annotations.ThreadSafe;
 /**
  * Indicates that a controller is not write locked and the lock cannot get
  * acquired by the current thread for some reason.
- * Note that the write lock is required for any change to the state of the
- * archive controller - not only the state of the archive file system.
+ * Note that the write lock is required for any change to the state of a
+ * controller which uses a {@link FsConcurrentModel} - not just to the state
+ * of the file system.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
-public final class FsNotWriteLockedException extends FsException {
+final class FsNotWriteLockedException extends FsException {
     private static final long serialVersionUID = 2345952581284762637L;
 
     FsNotWriteLockedException(FsConcurrentModel model) {
