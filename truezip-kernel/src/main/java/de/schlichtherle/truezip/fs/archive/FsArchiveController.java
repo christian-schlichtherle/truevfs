@@ -21,7 +21,6 @@ import de.schlichtherle.truezip.fs.FsEntryNotFoundException;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.fs.FsNotWriteLockedException;
 import de.schlichtherle.truezip.fs.FsConcurrentModel;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Type;
@@ -31,7 +30,6 @@ import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsException;
 import de.schlichtherle.truezip.fs.FsSyncException;
-import de.schlichtherle.truezip.fs.FsSyncExceptionBuilder;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.fs.FsInputOption;
@@ -387,7 +385,6 @@ extends FsController<FsConcurrentModel> {
      * @see    FsController#sync
      * @throws IOException if any exceptional condition occurs
      *         throughout the synchronization of the target archive file.
-     * @throws FsNotWriteLockedException
      * @return Whether or not a synchronization has been performed.
      */
     abstract boolean autoSync(  FsEntryName name,
