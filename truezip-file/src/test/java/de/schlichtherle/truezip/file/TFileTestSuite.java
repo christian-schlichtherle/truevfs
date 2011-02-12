@@ -990,7 +990,7 @@ public abstract class TFileTestSuite {
         assertFalse(archive.isFile());
         assertEquals(0, archive.length());
     }
-    
+
     // This test needs to be redesigned: It primarily lacks a clear intention.
     /*@Test
     public final void testGarbageCollection() throws Throwable {
