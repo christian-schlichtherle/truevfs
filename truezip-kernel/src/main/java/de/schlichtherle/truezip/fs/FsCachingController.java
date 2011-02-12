@@ -208,7 +208,6 @@ extends FsDecoratingController< FsConcurrentModel,
     public void unlink(final FsEntryName name)
     throws IOException {
         assert getModel().writeLock().isHeldByCurrentThread();
-
         final EntryCache cache = caches.get(name);
         if (null != cache) {
             //cache.flush(); // redundant

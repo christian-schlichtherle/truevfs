@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.crypto.raes;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+
 /**
  * These {@link RaesParameters} delegate to some other instance of a sibling
  * interface or itself in order to locate the parameters required to read
@@ -34,22 +36,16 @@ package de.schlichtherle.truezip.crypto.raes;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface RaesParametersAgent extends RaesParameters {
+public interface RaesParametersProvider extends RaesParameters {
 
     /**
      * Requests a {@link RaesParameters} instance of the given
      * {@code type}.
-     * It is permissible to return an instance of any other implementation
-     * of the {@code RaesParameters} interface.
-     * If the returned object is an instance of an implementation of this
-     * interface, it will be used to continue the search for RAES parameters
-     * recursively.
-     * Otherwise the search will be aborted.
      *
      * @param type The {@link RaesParameters} interface class which's
      *        implementation is searched.
      * @return An instance of {@code RaesParameters} or {@code null}
      *         if no RAES parameters are available.
      */
-    RaesParameters getParameters(Class<? extends RaesParameters> type);
+    @CheckForNull <P extends RaesParameters> P getParameters(Class<P> type);
 }

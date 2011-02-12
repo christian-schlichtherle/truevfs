@@ -31,12 +31,10 @@ import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Type;
-import de.schlichtherle.truezip.crypto.raes.RaesKeyException;
 import de.schlichtherle.truezip.crypto.raes.RaesOutputStream;
 import de.schlichtherle.truezip.crypto.raes.RaesParameters;
 import de.schlichtherle.truezip.crypto.raes.RaesReadOnlyFile;
 import de.schlichtherle.truezip.socket.OutputShop;
-import de.schlichtherle.truezip.fs.FsTabuException;
 import de.schlichtherle.truezip.fs.archive.zip.JarDriver;
 import de.schlichtherle.truezip.fs.archive.zip.JarArchiveEntry;
 import de.schlichtherle.truezip.fs.archive.zip.ZipArchiveEntry;
@@ -96,7 +94,7 @@ public abstract class ZipRaesDriver extends JarDriver {
 
         /**
          * This method is called upon a call to
-         * {@link KeyManagerArchiveController#sync} after a successful
+         * {@link ZipRaesArchiveController#sync} after a successful
          * synchronization of a RAES encrypted ZIP file.
          *
          * @param provider the key provider for the RAES encrypted ZIP file
@@ -159,7 +157,7 @@ public abstract class ZipRaesDriver extends JarDriver {
     @Override
     public final FsController<?>
     newController(FsModel model, FsController<?> parent) {
-        return new KeyManagerArchiveController(
+        return new ZipRaesArchiveController(
                 super.newController(model, parent), this);
     }
 
@@ -210,13 +208,8 @@ public abstract class ZipRaesDriver extends JarDriver {
             public ReadOnlyFile newReadOnlyFile() throws IOException {
                 final ReadOnlyFile rof = super.newReadOnlyFile();
                 try {
-                    final RaesReadOnlyFile rrof;
-                    try {
-                        rrof = RaesReadOnlyFile.getInstance(
-                                rof, getRaesParameters(model));
-                    } catch (RaesKeyException ex) {
-                        throw new FsTabuException(model, ex);
-                    }
+                    final RaesReadOnlyFile rrof = RaesReadOnlyFile.getInstance(
+                            rof, getRaesParameters(model));
                     if (rof.length() <= getAuthenticationTrigger()) { // compare rof, not rrof!
                         // Note: If authentication fails, this is reported through some
                         // sort of IOException, not a FileNotFoundException!
@@ -258,12 +251,8 @@ public abstract class ZipRaesDriver extends JarDriver {
                         out = new LazyOutputSocket<Entry>(getBoundSocket())
                             .newOutputStream();
                 try {
-                    try {
-                        return RaesOutputStream.getInstance(
-                                out, getRaesParameters(model));
-                    } catch (RaesKeyException ex) {
-                        throw new FsTabuException(model, ex);
-                    }
+                    return RaesOutputStream.getInstance(
+                            out, getRaesParameters(model));
                 } catch (IOException cause) {
                     try {
                         out.close();

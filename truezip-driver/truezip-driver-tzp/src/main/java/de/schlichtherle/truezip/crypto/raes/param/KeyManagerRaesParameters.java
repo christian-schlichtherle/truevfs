@@ -17,7 +17,7 @@ package de.schlichtherle.truezip.crypto.raes.param;
 
 import de.schlichtherle.truezip.crypto.raes.RaesKeyException;
 import de.schlichtherle.truezip.crypto.raes.RaesParameters;
-import de.schlichtherle.truezip.crypto.raes.RaesParametersAgent;
+import de.schlichtherle.truezip.crypto.raes.RaesParametersProvider;
 import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters;
 import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.key.KeyManagerService;
@@ -40,7 +40,7 @@ import java.net.URI;
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-public final class KeyManagerRaesParameters implements RaesParametersAgent {
+public final class KeyManagerRaesParameters implements RaesParametersProvider {
 
     private final KeyManagerService service;
     private final URI resource;
@@ -62,8 +62,9 @@ public final class KeyManagerRaesParameters implements RaesParametersAgent {
     }
 
     @Override
-    public RaesParameters getParameters(Class<? extends RaesParameters> type) {
-        return new Type0();
+    @SuppressWarnings("unchecked")
+    public <P extends RaesParameters> P getParameters(Class<P> type) {
+        return type.isAssignableFrom(Type0.class) ? (P) new Type0() : null;
     }
 
     /**

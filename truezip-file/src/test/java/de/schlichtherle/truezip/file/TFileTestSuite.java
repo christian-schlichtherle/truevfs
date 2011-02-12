@@ -906,7 +906,7 @@ public abstract class TFileTestSuite {
                                     final TFile b,
                                     final long granularity)
     throws IOException {
-        // Create file an with old timestamp.
+        // Create a file with an old timestamp.
         {
             final OutputStream out = new TFileOutputStream(a);
             try {

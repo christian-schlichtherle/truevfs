@@ -353,10 +353,7 @@ extends FsController<FsConcurrentModel> {
                     // that the file system can be successfully mounted again
                     // if the target archive file is subsequently modified to
                     // be a regular archive file.
-                    final FsSyncExceptionBuilder
-                            builder = new FsSyncExceptionBuilder();
-                    sync(UNLINK_SYNC_OPTIONS, builder);
-                    builder.check();
+                    sync(UNLINK_SYNC_OPTIONS);
                 } catch (IOException cannotHappen) {
                     throw new AssertionError(cannotHappen);
                 }
@@ -366,13 +363,11 @@ extends FsController<FsConcurrentModel> {
                 throw new IOException("root directory not empty");
             // Check for any archive entries with absolute entry names.
             // Subtract one for the ROOT entry.
-            if (1 != fileSystem.getSize())
+            if (1 < fileSystem.getSize())
                 logger.log(Level.WARNING, "unlink.absolute",
                         new Object[] {  fileSystem.getSize() - 1,
                                         getModel().getMountPoint() });
-            final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
-            sync(UNLINK_SYNC_OPTIONS, builder);
-            builder.check();
+            sync(UNLINK_SYNC_OPTIONS);
         } else { // !isRoot(path)
             autoMount().unlink(name);
         }

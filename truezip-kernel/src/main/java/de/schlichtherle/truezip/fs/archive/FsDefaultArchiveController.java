@@ -244,11 +244,10 @@ extends FsFileSystemArchiveController<E> {
         } catch (FsException ex) {
             throw ex;
         } catch (IOException ex) {
-            if (!autoCreate)
-                if (ex instanceof FileNotFoundException)
-                    throw new FsFalsePositiveException(getModel(), ex);
-                else
-                    throw new FsCacheableFalsePositiveException(getModel(), ex);
+            if (!autoCreate /*|| null != parent.getEntry(parentName)*/)
+                throw ex instanceof FileNotFoundException
+                    ? new FsFalsePositiveException(getModel(), ex)
+                    : new FsCacheableFalsePositiveException(getModel(), ex);
             if (null != parent.getEntry(parentName))
                 throw new FsCacheableFalsePositiveException(getModel(), ex);
             // The entry does NOT exist in the parent archive
@@ -260,13 +259,7 @@ extends FsFileSystemArchiveController<E> {
             // This may fail if e.g. the container file is an RAES
             // encrypted ZIP file and the user cancels password
             // prompting.
-            try {
-                makeOutput(options, root);
-            } catch (FsException ex2) {
-                throw ex2;
-            } catch (IOException ex2) {
-                throw new FsFalsePositiveException(getModel(), ex2);
-            }
+            makeOutput(options, root);
             setFileSystem(fileSystem);
             getModel().setTouched(true);
         }
