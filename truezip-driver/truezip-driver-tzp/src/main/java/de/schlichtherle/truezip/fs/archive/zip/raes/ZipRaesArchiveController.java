@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip.raes;
 
+import de.schlichtherle.truezip.crypto.raes.RaesKeyException;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.fs.FsSyncOption;
 import de.schlichtherle.truezip.fs.archive.FsArchiveFileSystemEntry;
@@ -23,8 +24,8 @@ import de.schlichtherle.truezip.fs.FsDecoratingController;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
+import de.schlichtherle.truezip.fs.FsFalsePositiveException;
 import de.schlichtherle.truezip.fs.FsModel;
-import de.schlichtherle.truezip.fs.FsTabuException;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.CharConversionException;
@@ -42,7 +43,7 @@ import static de.schlichtherle.truezip.fs.FsEntryName.*;
  * @version $Id$
  */
 @ThreadSafe
-final class KeyManagerArchiveController
+final class ZipRaesArchiveController
 extends FsDecoratingController<FsModel, FsController<?>> {
 
     private final ZipRaesDriver driver;
@@ -52,7 +53,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
      *
      * @param controller the non-{@code null} archive controller.
      */
-    KeyManagerArchiveController(final FsController<?> controller,
+    ZipRaesArchiveController(final FsController<?> controller,
                                 final ZipRaesDriver driver) {
         super(controller);
         this.driver = driver;
@@ -63,7 +64,9 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     throws IOException {
         try {
             return delegate.getEntry(name);
-        } catch (FsTabuException ex) {
+        } catch (FsFalsePositiveException ex) {
+            if (!(ex.getCause() instanceof RaesKeyException))
+                throw ex;
             if (!name.isRoot())
                 return null;
             Entry entry = getParent().getEntry(
@@ -89,8 +92,21 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     }
 
     @Override
-    public void unlink(FsEntryName name) throws IOException {
-        delegate.unlink(name);
+    public void unlink(final FsEntryName name) throws IOException {
+        try {
+            delegate.unlink(name);
+        } catch (FsFalsePositiveException ex) {
+            // If the false positive exception is caused by a RAES key
+            // exception, then throw this instead in order to avoid delegating
+            // this method to the parent file system.
+            // This prevents the application from inadvertently deleting a
+            // RAES encrypted ZIP file just because its key wasn't available
+            // because e.g. the user has cancelled key prompting.
+            final Throwable cause = ex.getCause();
+            throw cause instanceof RaesKeyException
+                    ? (RaesKeyException) cause
+                    : ex;
+        }
         if (name.isRoot())
             driver  .getKeyManagerService()
                     .getManager(Object.class)

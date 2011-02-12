@@ -120,15 +120,14 @@ implements EntryFactory<E> {
      *         A tabu file will not be accessible through the API although it
      *         exists.
      * @throws FileNotFoundException if the target archive file does not exist
-     *         or is not accessible.
-     *         The client application will recognize the target archive file
-     *         as a <i>special file</i> until a subsequent repetition of this
-     *         method call succeeds.
+     *         or is (temporarily) not accessible.
+     *         An exception of this type marks a <em>transient</em> cause,
+     *         i.e. this method may get subsequently called until it succeeds.
      * @throws IOException if the target archive file is a
      *         <i>false positive</i> archive file.
-     *         The client application will recognize the target archive file
-     *         as a <i>regular file</i> until the archive file system is
-     *         synchronized with its parent file system.
+     *         An exception of this type marks a <em>persistent</em> cause,
+     *         i.e. this method will not get called again until the archive
+     *         file system is synchronized with its parent file system.
      */
     public abstract InputShop<E>
     newInputShop(   FsConcurrentModel model,
@@ -151,24 +150,15 @@ implements EntryFactory<E> {
      *         For example, this could be used to copy the comment of a ZIP
      *         file.
      * @return A new output shop.
-     * @throws TabuFileException if the target archive file is temporarily not
-     *         accessible, e.g. if a key for decryption is currently not
-     *         available.
-     *         The client application will recognize the target archive file
-     *         as a <i>tabu file</i> until a subsequent repetition of this
-     *         method call succeeds.
-     *         A tabu file will not be accessible through the API although it
-     *         exists.
      * @throws FileNotFoundException if the target archive file does not exist
-     *         or is not accessible.
-     *         The client application will recognize the target archive file
-     *         as a <i>special file</i> until a subsequent repetition of this
-     *         method call succeeds.
+     *         or is (temporarily) not accessible.
+     *         An exception of this type marks a <em>transient</em> cause,
+     *         i.e. this method may get subsequently called until it succeeds.
      * @throws IOException if the target archive file is a
      *         <i>false positive</i> archive file.
-     *         The client application will recognize the target archive file
-     *         as a <i>regular file</i> until the archive file system is
-     *         synchronized with its parent file system.
+     *         An exception of this type marks a <em>persistent</em> cause,
+     *         i.e. this method will not get called again until the archive
+     *         file system is synchronized with its parent file system.
      */
     public abstract OutputShop<E>
     newOutputShop(  FsConcurrentModel model,

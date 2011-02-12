@@ -105,8 +105,9 @@ extends FsArchiveController<E> {
 
     private class ResetFileSystem extends MountState<E> {
         @Override
-        FsArchiveFileSystem<E> autoMount( final boolean autoCreate,
-                                        final BitField<FsOutputOption> options)
+        FsArchiveFileSystem<E> autoMount(
+                final boolean autoCreate,
+                final BitField<FsOutputOption> options)
         throws IOException {
             getModel().assertWriteLockedByCurrentThread();
             try {

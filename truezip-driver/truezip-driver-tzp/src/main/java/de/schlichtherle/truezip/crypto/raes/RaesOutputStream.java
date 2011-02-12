@@ -61,7 +61,7 @@ public abstract class RaesOutputStream extends CipherOutputStream {
      *        RAES file is created.
      *        If you need more control over this, pass in an instance which's
      *        run time class just implements the
-     *        {@link RaesParametersAgent} interface.
+     *        {@link RaesParametersProvider} interface.
      *        Instances of this interface are recursively used to find RAES
      *        parameters which match a known RAES type.
      * @throws NullPointerException If {@link #delegate} is {@code null}
@@ -79,15 +79,15 @@ public abstract class RaesOutputStream extends CipherOutputStream {
             IllegalArgumentException,
             RaesParametersException,
             IOException {
-        if (out == null)
+        if (null == out)
             throw new NullPointerException("out");
 
         // Order is important here to support multiple interface implementations!
         if (parameters instanceof Type0RaesParameters) {
             return new Type0RaesOutputStream(out,
                     (Type0RaesParameters) parameters);
-        } else if (parameters instanceof RaesParametersAgent) {
-            parameters = ((RaesParametersAgent) parameters).getParameters(
+        } else if (parameters instanceof RaesParametersProvider) {
+            parameters = ((RaesParametersProvider) parameters).getParameters(
                     RaesParameters.class);
             return getInstance(out, parameters);
         } else {

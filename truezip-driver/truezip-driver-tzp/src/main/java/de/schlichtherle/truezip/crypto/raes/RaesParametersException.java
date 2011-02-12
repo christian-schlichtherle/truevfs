@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.crypto.raes;
 
-import java.io.IOException;
+import java.io.FileNotFoundException;
 
 /**
  * Thrown to indicate that no suitable RAES parameters have been provided or
@@ -24,7 +24,7 @@ import java.io.IOException;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class RaesParametersException extends IOException {
+public class RaesParametersException extends FileNotFoundException {
 
     private static final long serialVersionUID = 1605398165986459281L;
 

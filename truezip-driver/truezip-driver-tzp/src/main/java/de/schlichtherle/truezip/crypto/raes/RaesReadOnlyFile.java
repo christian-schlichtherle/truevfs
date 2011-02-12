@@ -98,7 +98,7 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
      *        If the run time class of this parameter does not match the
      *        required parameter interface according to the RAES type found
      *        in the file, but is an instance of the
-     *        {@link RaesParametersAgent} interface, it is used to find
+     *        {@link RaesParametersProvider} interface, it is used to find
      *        the required RAES parameters.
      *        This is applied recursively.
      *
@@ -134,7 +134,7 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
      *        If the run time class of this parameter does not match the
      *        required parameter interface according to the RAES type found
      *        in the file, but is an instance of the
-     *        {@link RaesParametersAgent} interface, it is used to find
+     *        {@link RaesParametersProvider} interface, it is used to find
      *        the required RAES parameters.
      *        This is applied recursively.
      * @throws NullPointerException If any of the parameters is {@code null}.
@@ -177,13 +177,13 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
             final RaesParameters parameters)
     throws RaesParametersException {
         // Order is important here to support multiple interface implementations!
-        if (parameters == null) {
+        if (null == parameters) {
             throw new RaesParametersException();
         } else if (type.isAssignableFrom(parameters.getClass())) {
             return (P) parameters;
-        } else if (parameters instanceof RaesParametersAgent) {
+        } else if (parameters instanceof RaesParametersProvider) {
             return findParameters(type,
-                    ((RaesParametersAgent) parameters).getParameters(type));
+                    ((RaesParametersProvider) parameters).getParameters(type));
         } else {
             throw new RaesParametersException();
         }
