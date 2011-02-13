@@ -58,7 +58,7 @@ public class TarDriver extends FsCharsetArchiveDriver<TarArchiveEntry> {
 
     public TarDriver(final IOPoolService service) {
         super(TAR_CHARSET);
-        this.pool = service.getPool();
+        this.pool = service.get();
     }
 
     @Override

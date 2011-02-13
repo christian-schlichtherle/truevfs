@@ -42,13 +42,13 @@ public final class FileDriverProviderTest {
     @Test
     public void testGetDrivers() {
         for (String scheme : new SuffixSet(DRIVER_LIST))
-            assertThat(instance.getDrivers().get(FsScheme.create(scheme)), notNullValue());
+            assertThat(instance.get().get(FsScheme.create(scheme)), notNullValue());
     }
 
     @Test
     public void testImmutability() {
         try {
-            instance.getDrivers().remove(FsScheme.create("file"));
+            instance.get().remove(FsScheme.create("file"));
             fail("put");
         } catch (UnsupportedOperationException ex) {
         }

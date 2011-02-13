@@ -19,7 +19,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.ServiceConfigurationError;
 
 /**
- * A service for key managers.
+ * A service for the singleton key manager for given key type.
  * <p>
  * Implementations must be thread-safe.
  *
@@ -29,14 +29,14 @@ import java.util.ServiceConfigurationError;
 public interface KeyManagerService {
 
     /**
-     * Returns the key manager for the given key type.
+     * Returns the singleton key manager for the given key type.
      * <p>
-     * Calling this method multiple times must return the same key manager
+     * Calling this method several times must return the same key manager
      * for the same key type in order to ensure consistency of the key space.
      *
      * @return The key manager for the given key type.
      * @throws ServiceConfigurationError if no appropriate key manager is
      *         available.
      */
-    @NonNull <K> KeyManager<? extends K, ?> getKeyManager(@NonNull Class<K> type);
+    @NonNull <K> KeyManager<? extends K, ?> get(@NonNull Class<K> type);
 }

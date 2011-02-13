@@ -83,7 +83,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
      */
     protected ZipDriver(final IOPoolService service, Charset charset) {
         super(charset);
-        this.pool = service.getPool();
+        this.pool = service.get();
     }
 
     @Override

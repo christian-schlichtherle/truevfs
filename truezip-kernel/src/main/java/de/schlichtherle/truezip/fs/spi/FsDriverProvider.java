@@ -62,7 +62,7 @@ public abstract class FsDriverProvider implements FsDriverService {
      * constructed from the given configuration.
      * This method is intended to be used by provider implementations
      * of the {@link FsDriverService} interface for convenient creation of the
-     * map to return by their {@link FsDriverService#getDrivers()} method.
+     * map to return by their {@link FsDriverService#get()} method.
      *
      * @param  config an array of key-value pair arrays.
      *         The first element of each inner array must either be a
@@ -76,7 +76,7 @@ public abstract class FsDriverProvider implements FsDriverService {
      *         {@link String fully qualified name of a file system driver class},
      *         or {@code null}.
      * @return The new map to use as the return value of
-     *         {@link FsDriverService#getDrivers()}.
+     *         {@link FsDriverService#get()}.
      * @throws NullPointerException if a required configuration element is
      *         {@code null}.
      * @throws IllegalArgumentException if any other parameter precondition

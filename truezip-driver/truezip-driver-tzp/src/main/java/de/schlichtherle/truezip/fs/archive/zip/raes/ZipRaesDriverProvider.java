@@ -60,7 +60,7 @@ public final class ZipRaesDriverProvider extends FsDriverProvider {
         });
 
     @Override
-    public Map<FsScheme, FsDriver> getDrivers() {
+    public Map<FsScheme, FsDriver> get() {
         return DRIVERS;
     }
 }

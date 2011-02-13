@@ -37,7 +37,7 @@ public final class DummyDriverProvider extends FsDriverProvider {
     }
 
     @Override
-    public Map<FsScheme, FsDriver> getDrivers() {
+    public Map<FsScheme, FsDriver> get() {
         return drivers;
     }
 }

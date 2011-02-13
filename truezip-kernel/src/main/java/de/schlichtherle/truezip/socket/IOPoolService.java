@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.socket;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
+import javax.inject.Provider;
 
 /**
  * A service for an I/O pool.
@@ -25,15 +26,16 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface IOPoolService {
+public interface IOPoolService extends Provider<IOPool<?>> {
 
     /**
      * Returns an I/O pool.
      * <p>
-     * Calling this method multiple times may return different I/O pools,
+     * Calling this method several times may return different I/O pools,
      * so callers might need to cache the result for subsequent use.
      *
      * @return An I/O pool.
      */
-    @NonNull IOPool<?> getPool();
+    @Override
+    @NonNull IOPool<?> get();
 }

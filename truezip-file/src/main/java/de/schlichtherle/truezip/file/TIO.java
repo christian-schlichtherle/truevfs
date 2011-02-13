@@ -51,7 +51,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 final class TIO {
 
     /** The file system manager to use within this package. */
-    static final FsManager MANAGER = FsManagerLocator.SINGLETON.getFsManager();
+    static final FsManager MANAGER = FsManagerLocator.SINGLETON.get();
 
     /** You cannot instantiate this class. */
     private TIO() {

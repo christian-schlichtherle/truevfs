@@ -30,7 +30,7 @@ import net.jcip.annotations.Immutable;
 @Immutable
 public final class FsDefaultDriver implements FsCompositeDriver {
 
-    private final Map<FsScheme, ? extends FsDriver> drivers;
+    private final Map<FsScheme, FsDriver> drivers;
 
     /**
      * Constructs a new file system default driver which will query the given
@@ -38,7 +38,7 @@ public final class FsDefaultDriver implements FsCompositeDriver {
      * scheme of a given mount point.
      */
     public FsDefaultDriver(final @NonNull FsDriverService service) {
-        this.drivers = service.getDrivers(); // immutable map!
+        this.drivers = service.get(); // immutable map!
         assert null != drivers;
     }
 

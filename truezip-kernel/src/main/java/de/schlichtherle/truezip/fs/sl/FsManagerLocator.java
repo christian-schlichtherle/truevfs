@@ -77,14 +77,14 @@ public final class FsManagerLocator implements FsManagerService {
             manager = new FsFailSafeManager(new FsDefaultManager());
         } else {
             logger.log(Level.CONFIG, "located", provider);
-            manager = provider.getFsManager();
+            manager = provider.get();
         }
         this.manager = manager;
         logger.log(Level.CONFIG, null != provider ? "provided" : "default", manager);
     }
 
     @Override
-    public FsManager getFsManager() {
+    public FsManager get() {
         return manager;
     }
 }
