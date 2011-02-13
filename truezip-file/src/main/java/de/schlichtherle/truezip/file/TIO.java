@@ -20,11 +20,9 @@ import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.fs.FsInputOption;
-import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.fs.FsOutputOption;
-import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -49,9 +47,6 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 @DefaultAnnotation(NonNull.class)
 @Immutable
 final class TIO {
-
-    /** The file system manager to use within this package. */
-    static final FsManager MANAGER = FsManagerLocator.SINGLETON.get();
 
     /** You cannot instantiate this class. */
     private TIO() {
@@ -258,7 +253,7 @@ final class TIO {
                         .getInputSocket(file.getInnerEntryName0(), options);
         }
         final FsPath path = new FsPath(src);
-        return MANAGER
+        return TFile.manager
                 .getController(path.getMountPoint(), TFile.getDefaultArchiveDetector())
                 .getInputSocket(path.getEntryName(), options);
     }
@@ -278,7 +273,7 @@ final class TIO {
                         .getOutputSocket(file.getInnerEntryName0(), options, template);
         }
         final FsPath path = new FsPath(dst);
-        return MANAGER
+        return TFile.manager
                 .getController(path.getMountPoint(), TFile.getDefaultArchiveDetector())
                 .getOutputSocket(path.getEntryName(), options, template);
     }
