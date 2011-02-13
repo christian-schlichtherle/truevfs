@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.file;
 
+import de.schlichtherle.truezip.fs.FsManager;
+import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import de.schlichtherle.truezip.io.InputException;
 import java.io.InvalidObjectException;
@@ -51,10 +53,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.ServiceConfigurationError;
 import java.util.Set;
 import java.util.TreeSet;
+import javax.inject.Inject;
 import javax.swing.Icon;
 import javax.swing.filechooser.FileSystemView;
 import net.jcip.annotations.Immutable;
@@ -334,14 +338,22 @@ public final class TFile extends File {
 
     private static final long serialVersionUID = 3617072259051821745L;
 
+    /** The prefix of a UNC (a Windows concept). */
+    private static final String UNC_PREFIX = separator + separator;
+
     /** The file system roots. */
     private static final Set<File>
-            roots = new TreeSet<File>(Arrays.asList(listRoots()));
+            ROOTS = Collections.unmodifiableSet(
+                new TreeSet<File>(Arrays.asList(listRoots())));
 
-    private static boolean lenient = true;
+    /** The file system manager to use within this package. */
+    @Inject
+    static final FsManager manager = FsManagerLocator.SINGLETON.get();
 
     private static TArchiveDetector
             defaultDetector = TDefaultArchiveDetector.ALL;
+
+    private static boolean lenient = true;
 
     /**
      * The delegate is used to implement the behaviour of the file system
@@ -876,7 +888,7 @@ public final class TFile extends File {
      */
     public static void sync(BitField<FsSyncOption> options)
     throws FsSyncException {
-        TIO.MANAGER.sync(options);
+        manager.sync(options);
     }
 
     /**
@@ -908,7 +920,7 @@ public final class TFile extends File {
         if (null != archive.getEnclArchive())
             throw new IllegalArgumentException(archive.getPath() + " (not a top level federated file system)");
         new FsFilteringManager(
-                TIO.MANAGER,
+                manager,
                 archive .getController()
                         .getModel()
                         .getMountPoint())
@@ -1097,6 +1109,7 @@ public final class TFile extends File {
      *        explicitly passed to the constructor
      * @see   #getDefaultArchiveDetector()
      */
+    @Inject
     public static void setDefaultArchiveDetector(TArchiveDetector detector) {
         if (null == detector)
             throw new NullPointerException();
@@ -1419,7 +1432,7 @@ public final class TFile extends File {
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
         }
-        return controller = TIO.MANAGER.getController(mountPoint, detector);
+        return controller = manager.getController(mountPoint, detector);
     }
 
     /**
@@ -1497,7 +1510,7 @@ public final class TFile extends File {
      */
     public boolean isFileSystemRoot() {
         TFile canOrAbsFile = getCanOrAbsFile();
-        return roots.contains(canOrAbsFile) || isUNC(canOrAbsFile.getPath());
+        return ROOTS.contains(canOrAbsFile) || isUNC(canOrAbsFile.getPath());
     }
 
     /**
@@ -1507,9 +1520,6 @@ public final class TFile extends File {
     public boolean isUNC() {
         return isUNC(getCanOrAbsPath());
     }
-
-    /** The prefix of a UNC (a Windows concept). */
-    private static final String UNC_PREFIX = separator + separator;
 
     /**
      * Returns {@code true} iff the given path is a UNC.

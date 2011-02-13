@@ -60,7 +60,7 @@ Basic Operations
     In general, when using streams, an application should always close them in a
     <<<finally>>>-block like this:
 
-%{snippet|id=cat1|file=src/main/java/de/schlichtherle/truezip/sample/file/Usage.java}
+%{snippet|id=cat1|file=truezip-samples/src/main/java/de/schlichtherle/truezip/sample/file/Usage.java}
 
     This ensures that the stream is closed even if an exception occurs.
 
@@ -69,7 +69,7 @@ Basic Operations
     An application need to deal with this appropriately, for example by
     enclosing the entire block with another <<<try-catch>>>-block:
 
-%{snippet|id=cat2|file=src/main/java/de/schlichtherle/truezip/sample/file/Usage.java}
+%{snippet|id=cat2|file=truezip-samples/src/main/java/de/schlichtherle/truezip/sample/file/Usage.java}
 
     This idiom is not specific to TrueZIP:
     Streams often utilize OS resources such as file descriptors or network
@@ -340,12 +340,12 @@ Committing Unsynchronized Changes To The Contents Of Archive Files
     The following snippet demonstrates the default priority/appearance sorting
     order if a sequential I/O exception chain is catched and printed:
 
-%{snippet|id=umount1|file=src/main/java/de/schlichtherle/truezip/sample/file/Usage.java}
+%{snippet|id=umount1|file=truezip-samples/src/main/java/de/schlichtherle/truezip/sample/file/Usage.java}
 
     Rearranging a sequential I/O exception chain in order of appearance
     is done like this instead:
 
-%{snippet|id=umount2|file=src/main/java/de/schlichtherle/truezip/sample/file/Usage.java}
+%{snippet|id=umount2|file=truezip-samples/src/main/java/de/schlichtherle/truezip/sample/file/Usage.java}
 
     The default priority/appearance sorting order enables applications to
     selectively catch the following sequential I/O exception chain sub-classes:
@@ -373,7 +373,7 @@ Committing Unsynchronized Changes To The Contents Of Archive Files
     so that an application could use the following snippet to detect if only
     some warnings or at least one severe error condition has occured:
 
-%{snippet|id=umount3|file=src/main/java/de/schlichtherle/truezip/sample/file/Usage.java}
+%{snippet|id=umount3|file=truezip-samples/src/main/java/de/schlichtherle/truezip/sample/file/Usage.java}
 
     Note that the method <<<Throwable.getMessage()>>> (and hence
     <<<Throwable.printStackTrace()>>> will concatenate the detail messages of
@@ -396,13 +396,13 @@ Committing Unsynchronized Changes To The Contents Of Archive Files
     runtime increases to <<<O(s*s)>>>!
     Here's an example:
 
-%{snippet|id=performance1|file=src/main/java/de/schlichtherle/truezip/sample/file/Usage.java}
+%{snippet|id=performance1|file=truezip-samples/src/main/java/de/schlichtherle/truezip/sample/file/Usage.java}
 
     The bad run-time performance is because <<<File.umount()>>> is called
     within the loop.
     Moving it out of the loop fixes the issue:
 
-%{snippet|id=performance2|file=src/main/java/de/schlichtherle/truezip/sample/file/Usage.java}
+%{snippet|id=performance2|file=truezip-samples/src/main/java/de/schlichtherle/truezip/sample/file/Usage.java}
 
     In essence: If at all, an application should never call
     {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#umount()}<<<TFile.umount()>>>}}
@@ -417,7 +417,7 @@ Committing Unsynchronized Changes To The Contents Of Archive Files
     other utilities).
     Here's an example:
 
-%{snippet|id=performance3|file=src/main/java/de/schlichtherle/truezip/sample/file/Usage.java}
+%{snippet|id=performance3|file=truezip-samples/src/main/java/de/schlichtherle/truezip/sample/file/Usage.java}
 
     Each call to
     {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#createNewFile()}<<<TFile.createNewFile()>>>}}
@@ -430,7 +430,7 @@ Committing Unsynchronized Changes To The Contents Of Archive Files
     Consider the following example to create an archive file with empty
     entries which all share the same last modification time:
 
-%{snippet|id=performance4|file=src/main/java/de/schlichtherle/truezip/sample/file/Usage.java}
+%{snippet|id=performance4|file=truezip-samples/src/main/java/de/schlichtherle/truezip/sample/file/Usage.java}
 
     When
     {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#setLastModified(long)}<<<TFile.setLastModified(long)>>>}}

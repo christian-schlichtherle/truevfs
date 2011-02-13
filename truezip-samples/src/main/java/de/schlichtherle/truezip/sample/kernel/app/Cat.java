@@ -60,7 +60,7 @@ public final class Cat {
     static void cat(String resource) throws IOException {
         // Create a manager for the life cycle of controllers for federated
         // file systems.
-        // Alternatively, we could use FsManagerLocator.SINGLETON.getManager();
+        // Alternatively, we could use FsManagerLocator.SINGLETON.get();
         FsManager manager = new FsDefaultManager();
         try {
             // Search the class path for the set of all supported file system
