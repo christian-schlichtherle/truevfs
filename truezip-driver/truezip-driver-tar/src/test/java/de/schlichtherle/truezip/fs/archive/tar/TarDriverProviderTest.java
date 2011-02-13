@@ -15,27 +15,24 @@
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
+import de.schlichtherle.truezip.fs.spi.FsDriverProvider;
 import org.junit.Before;
-import de.schlichtherle.truezip.fs.FsDriver;
-import de.schlichtherle.truezip.fs.FsDriverService;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.util.SuffixSet;
-import java.util.Map;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-import static de.schlichtherle.truezip.fs.sl.FsDriverLocator.*;
 import static org.hamcrest.CoreMatchers.*;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class TarDriverContainerTest {
+public class TarDriverProviderTest {
 
     public static final String DRIVER_LIST = "tar|tar.bz2|tar.gz|tbz2|tgz";
 
-    private FsDriverService instance;
+    private FsDriverProvider instance;
 
     @Before
     public void setUp() {

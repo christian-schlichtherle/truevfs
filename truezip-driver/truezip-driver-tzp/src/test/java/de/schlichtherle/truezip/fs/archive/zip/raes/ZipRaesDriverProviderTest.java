@@ -15,29 +15,42 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip.raes;
 
-import de.schlichtherle.truezip.key.*;
-import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
+import de.schlichtherle.truezip.fs.spi.FsDriverProvider;
+import de.schlichtherle.truezip.fs.FsScheme;
+import de.schlichtherle.truezip.util.SuffixSet;
 import org.junit.Before;
 import org.junit.Test;
-
 import static org.junit.Assert.*;
+
+import static org.hamcrest.CoreMatchers.*;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class PromptingKeyManagerContainerTest {
+public class ZipRaesDriverProviderTest {
 
-    private KeyManagerService instance;
-    
+    public static final String DRIVER_LIST = "tzp|zip.rae|zip.raes";
+
+    private FsDriverProvider instance;
+
     @Before
     public void setUp() {
-        instance = new PromptingKeyManagerProvider();
+        instance = new ZipRaesDriverProvider();
     }
 
     @Test
-    public void testGetManager() {
-        assertNotNull(instance.getKeyManager(Object.class));
-        assertNotNull(instance.getKeyManager(AesCipherParameters.class));
+    public void testGetDrivers() {
+        for (String scheme : new SuffixSet(DRIVER_LIST))
+            assertThat(instance.getDrivers().get(FsScheme.create(scheme)), notNullValue());
+    }
+
+    @Test
+    public void testImmutability() {
+        try {
+            instance.getDrivers().remove(FsScheme.create("tzp"));
+            fail("put");
+        } catch (UnsupportedOperationException ex) {
+        }
     }
 }
