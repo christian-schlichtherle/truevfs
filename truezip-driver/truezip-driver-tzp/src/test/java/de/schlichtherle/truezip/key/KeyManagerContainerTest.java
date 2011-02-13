@@ -37,7 +37,7 @@ public final class KeyManagerContainerTest {
 
     @Test
     public void testGetManager() {
-        assertNotNull(instance.getKeyManager(Object.class));
-        assertNotNull(instance.getKeyManager(AesCipherParameters.class));
+        assertNotNull(instance.get(Object.class));
+        assertNotNull(instance.get(AesCipherParameters.class));
     }
 }

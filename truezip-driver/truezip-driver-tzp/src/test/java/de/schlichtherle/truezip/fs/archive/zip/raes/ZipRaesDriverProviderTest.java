@@ -42,13 +42,13 @@ public class ZipRaesDriverProviderTest {
     @Test
     public void testGetDrivers() {
         for (String scheme : new SuffixSet(DRIVER_LIST))
-            assertThat(instance.getDrivers().get(FsScheme.create(scheme)), notNullValue());
+            assertThat(instance.get().get(FsScheme.create(scheme)), notNullValue());
     }
 
     @Test
     public void testImmutability() {
         try {
-            instance.getDrivers().remove(FsScheme.create("tzp"));
+            instance.get().remove(FsScheme.create("tzp"));
             fail("put");
         } catch (UnsupportedOperationException ex) {
         }

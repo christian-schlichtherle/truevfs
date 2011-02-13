@@ -30,7 +30,7 @@ public abstract class CharsetArchiveDriverTestSuite {
 
     private static class ByteArrayIOPoolService implements IOPoolService {
         @Override
-        public IOPool<?> getPool() {
+        public IOPool<?> get() {
             return new ByteArrayIOPool(2048);
         }
     }

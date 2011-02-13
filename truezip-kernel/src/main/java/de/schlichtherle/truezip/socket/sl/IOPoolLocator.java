@@ -82,7 +82,7 @@ public final class IOPoolLocator implements IOPoolService {
      * call to the container loaded by the constructor.
      */
     @Override
-    public IOPool<?> getPool() {
-        return provider.getPool();
+    public IOPool<?> get() {
+        return provider.get();
     }
 }

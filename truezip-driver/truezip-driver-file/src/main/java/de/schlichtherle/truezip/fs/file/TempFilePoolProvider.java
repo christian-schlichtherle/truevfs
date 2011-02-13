@@ -32,7 +32,7 @@ import net.jcip.annotations.Immutable;
 public final class TempFilePoolProvider extends IOPoolProvider {
 
     @Override
-    public IOPool<?> getPool() {
+    public IOPool<?> get() {
         return TempFilePool.INSTANCE;
     }
 }

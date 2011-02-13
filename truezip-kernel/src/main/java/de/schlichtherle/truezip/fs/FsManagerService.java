@@ -16,25 +16,27 @@
 package de.schlichtherle.truezip.fs;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
+import javax.inject.Provider;
 
 /**
- * A service for a file system manager.
+ * A service for the singleton file system manager.
  * <p>
  * Implementations must be thread-safe.
  *
  * @author Christian Schlichtherle
  * @version $Id: FsManagers$
  */
-public interface FsManagerService {
+public interface FsManagerService extends Provider<FsManager> {
 
     /**
-     * Returns the file system manager.
+     * Returns the singleton file system manager.
      * <p>
-     * Calling this method multiple times must return the same file system
-     * manager in order to ensure consistency of the virtual file
-     * system space.
+     * Calling this method several times must return the <em>same</em> file
+     * system manager in order to ensure consistency of the virtual file system
+     * space.
      *
      * @return The file system manager.
      */
-    @NonNull FsManager getFsManager();
+    @Override
+    @NonNull FsManager get();
 }

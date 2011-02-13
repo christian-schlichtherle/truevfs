@@ -56,7 +56,7 @@ public final class KeyManagerLocator implements KeyManagerService {
     public static final KeyManagerLocator
             SINGLETON = new KeyManagerLocator();
 
-    private final KeyManagerService provider;
+    private final KeyManagerProvider provider;
 
     /** You cannot instantiate this class. */
     private KeyManagerLocator() {
@@ -80,7 +80,7 @@ public final class KeyManagerLocator implements KeyManagerService {
     }
 
     @Override
-    public <K> KeyManager<? extends K, ?> getKeyManager(Class<K> type) {
-        return provider.getKeyManager(type);
+    public <K> KeyManager<? extends K, ?> get(Class<K> type) {
+        return provider.get(type);
     }
 }

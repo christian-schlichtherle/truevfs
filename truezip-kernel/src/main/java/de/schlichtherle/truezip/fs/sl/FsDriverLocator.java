@@ -70,7 +70,7 @@ public final class FsDriverLocator implements FsDriverService {
             FsDriverProvider provider = i.next();
             logger.log(Level.CONFIG, "located", provider);
             for (final Map.Entry<FsScheme, FsDriver> entry
-                    : provider.getDrivers().entrySet()) {
+                    : provider.get().entrySet()) {
                 final FsScheme scheme = entry.getKey();
                 final FsDriver driver = entry.getValue();
                 if (null != scheme && null != driver) {
@@ -84,7 +84,7 @@ public final class FsDriverLocator implements FsDriverService {
     }
 
     @Override
-    public Map<FsScheme, FsDriver> getDrivers() {
+    public Map<FsScheme, FsDriver> get() {
         return drivers;
     }
 }

@@ -56,7 +56,7 @@ public final class FileDriverProvider extends FsDriverProvider {
             });
 
     @Override
-    public Map<FsScheme, FsDriver> getDrivers() {
+    public Map<FsScheme, FsDriver> get() {
         return DRIVERS;
     }
 }

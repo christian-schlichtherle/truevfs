@@ -60,7 +60,7 @@ public abstract class TFileTestSuite {
 
     private static class ByteArrayIOPoolService implements IOPoolService {
         @Override
-        public IOPool<?> getPool() {
+        public IOPool<?> get() {
             return new ByteArrayIOPool(2048);
         }
     }

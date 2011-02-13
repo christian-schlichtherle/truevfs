@@ -134,7 +134,7 @@ public final class TZipRaesFileTest extends TFileTestSuite {
 
         @Override
         @SuppressWarnings("unchecked")
-        public <K> KeyManager<? extends K, ?> getKeyManager(Class<K> type) {
+        public <K> KeyManager<? extends K, ?> get(Class<K> type) {
             if (type.isAssignableFrom(AesCipherParameters.class))
                 return (KeyManager<? extends K, ?>) manager;
             throw new ServiceConfigurationError("No service available for " + type);

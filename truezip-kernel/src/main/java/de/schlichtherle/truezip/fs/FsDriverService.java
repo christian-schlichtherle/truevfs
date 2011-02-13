@@ -15,33 +15,31 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.fs.sl.FsDriverLocator;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Map;
+import javax.inject.Provider;
 
 /**
- * A service for a map of file system schemes and drivers.
+ * A service for an immutable map of file system schemes to drivers.
  * <p>
  * Implementations must be thread-safe.
- *
- * @see FsDriverLocator How-to support the enumeration of an implementation
- *      on the class path
  *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface FsDriverService {
+public interface FsDriverService extends Provider<Map<FsScheme, FsDriver>> {
 
     /**
-     * Returns an immutable map of the supported file system drivers.
+     * Returns an immutable map of file system schemes to drivers.
      * While the key of the returned map need not be {@code null},
      * its values must be nullable.
      * <p>
-     * Calling this method multiple times should return the same map in order
-     * to ensure a consistent file system implementation scheme.
+     * Calling this method several times should return a map which compares
+     * {@link Object#equals equal} to each other in order to ensure a
+     * consistent file system implementation scheme.
      *
-     * @return An immutable map of the supported file system schemes and
-     *         drivers.
+     * @return An immutable map of file system schemes to drivers.
      */
-    @NonNull Map<FsScheme, FsDriver> getDrivers();
+    @Override
+    @NonNull Map<FsScheme, FsDriver> get();
 }
