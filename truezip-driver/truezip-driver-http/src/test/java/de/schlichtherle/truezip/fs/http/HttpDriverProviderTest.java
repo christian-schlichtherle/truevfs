@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.http;
 
-import de.schlichtherle.truezip.fs.FsDriverService;
+import de.schlichtherle.truezip.fs.spi.FsDriverProvider;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.util.SuffixSet;
 import org.junit.Before;
@@ -28,11 +28,11 @@ import static org.hamcrest.CoreMatchers.*;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class HttpDriverContainerTest {
+public final class HttpDriverProviderTest {
 
     public static final String DRIVER_LIST = "http|https";
 
-    private FsDriverService instance;
+    private FsDriverProvider instance;
 
     @Before
     public void setUp() {

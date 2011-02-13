@@ -15,24 +15,24 @@
  */
 package de.schlichtherle.truezip.fs.file;
 
-import de.schlichtherle.truezip.fs.FsDriverService;
 import de.schlichtherle.truezip.fs.FsScheme;
+import de.schlichtherle.truezip.fs.spi.FsDriverProvider;
 import de.schlichtherle.truezip.util.SuffixSet;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
+import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class FileDriverContainerTest {
+public final class FileDriverProviderTest {
 
     public static final String DRIVER_LIST = "file";
 
-    private FsDriverService instance;
+    private FsDriverProvider instance;
 
     @Before
     public void setUp() {
