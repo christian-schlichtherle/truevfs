@@ -45,7 +45,7 @@ import static de.schlichtherle.truezip.crypto.raes.RaesConstants.*;
  */
 class Type0RaesOutputStream extends RaesOutputStream {
 
-    private static final SecureRandom secureRandom = new SecureRandom();
+    private static final SecureRandom shaker = new SecureRandom();
 
     /**
      * The iteration count for the derived keys of the cipher, KLAC and MAC.
@@ -91,7 +91,7 @@ class Type0RaesOutputStream extends RaesOutputStream {
             throw new RaesKeyException();
         final int keyStrength = param.getKeyStrength().ordinal();
 
-        // Init digest for salt and key generation and KLAC.
+        // Init digest for key generation and KLAC.
         final Digest digest = new SHA256Digest();
 
         // Init key strength info and salt.
@@ -99,7 +99,7 @@ class Type0RaesOutputStream extends RaesOutputStream {
         keyStrengthBits = keyStrengthBytes * 8; // key strength in bits
         assert digest.getDigestSize() >= keyStrengthBytes;
         final byte[] salt = new byte[keyStrengthBytes];
-        generateSalt(digest, salt);
+        shaker.nextBytes(salt);
 
         // Init PBE parameters.
         final PBEParametersGenerator gen = new PKCS12ParametersGenerator(digest);
@@ -131,7 +131,7 @@ class Type0RaesOutputStream extends RaesOutputStream {
 
         // Init KLAC.
         klac = new HMac(digest);
-        klac.init(macParam);
+        klac.init(macParam); // resets the digest
         final byte[] cipherKey = ((KeyParameter) cipherParam.getParameters())
                 .getKey();
         klac.update(cipherKey, 0, cipherKey.length);
@@ -153,12 +153,6 @@ class Type0RaesOutputStream extends RaesOutputStream {
 
         // Finally init the super class cipher.
         this.cipher = cipher;
-    }
-
-    private static void generateSalt(final Digest digest, final byte[] salt) {
-        final RandomGenerator randomGenerator = new DigestRandomGenerator(digest);
-        randomGenerator.addSeedMaterial(secureRandom.generateSeed(salt.length));
-        randomGenerator.nextBytes(salt);
     }
 
     @Override
