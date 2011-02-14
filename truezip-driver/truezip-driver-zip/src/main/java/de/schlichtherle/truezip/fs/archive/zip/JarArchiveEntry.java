@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.zip.DateTimeConverter;
+import de.schlichtherle.truezip.zip.ZipEntry;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 
@@ -33,7 +34,7 @@ public class JarArchiveEntry extends ZipArchiveEntry {
         super(name);
     }
 
-    JarArchiveEntry(String name, ZipArchiveEntry template) {
+    JarArchiveEntry(String name, ZipEntry template) {
         super(name, template);
     }
 

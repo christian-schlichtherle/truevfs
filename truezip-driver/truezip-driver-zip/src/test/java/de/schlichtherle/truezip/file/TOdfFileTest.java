@@ -17,7 +17,6 @@ package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.fs.archive.zip.OdfDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
-import de.schlichtherle.truezip.socket.ByteArrayIOPool;
 
 /**
  * @author Christian Schlichtherle
