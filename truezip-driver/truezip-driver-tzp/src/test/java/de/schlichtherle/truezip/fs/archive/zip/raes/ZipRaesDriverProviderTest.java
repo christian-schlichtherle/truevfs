@@ -40,7 +40,7 @@ public class ZipRaesDriverProviderTest {
     }
 
     @Test
-    public void testGetDrivers() {
+    public void testGet() {
         for (String scheme : new SuffixSet(DRIVER_LIST))
             assertThat(instance.get().get(FsScheme.create(scheme)), notNullValue());
     }

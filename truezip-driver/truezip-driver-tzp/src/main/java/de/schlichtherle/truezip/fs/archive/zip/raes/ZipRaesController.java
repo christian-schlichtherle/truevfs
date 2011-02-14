@@ -36,14 +36,15 @@ import static de.schlichtherle.truezip.entry.Entry.Type.*;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
 
 /**
- * This archive controller resets the key provider in the key manager if the
- * target RAES encrypted ZIP archive file gets deleted.
+ * This file system controller decorates another file system controller in
+ * order to manage the authentication key required for accessing its target
+ * RAES encrypted ZIP archive file.
  * 
  * @author Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
-final class ZipRaesArchiveController
+final class ZipRaesController
 extends FsDecoratingController<FsModel, FsController<?>> {
 
     private final ZipRaesDriver driver;
@@ -53,7 +54,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
      *
      * @param controller the non-{@code null} archive controller.
      */
-    ZipRaesArchiveController(   final FsController<?> controller,
+    ZipRaesController(   final FsController<?> controller,
                                 final ZipRaesDriver driver) {
         super(controller);
         this.driver = driver;

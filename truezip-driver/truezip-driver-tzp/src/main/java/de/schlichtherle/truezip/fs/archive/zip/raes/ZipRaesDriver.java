@@ -94,7 +94,7 @@ public abstract class ZipRaesDriver extends JarDriver {
 
         /**
          * This method is called upon a call to
-         * {@link ZipRaesArchiveController#sync} after a successful
+         * {@link ZipRaesController#sync} after a successful
          * synchronization of a RAES encrypted ZIP file.
          *
          * @param provider the key provider for the RAES encrypted ZIP file
@@ -157,7 +157,7 @@ public abstract class ZipRaesDriver extends JarDriver {
     @Override
     public final FsController<?>
     newController(FsModel model, FsController<?> parent) {
-        return new ZipRaesArchiveController(
+        return new ZipRaesController(
                 super.newController(model, parent), this);
     }
 
