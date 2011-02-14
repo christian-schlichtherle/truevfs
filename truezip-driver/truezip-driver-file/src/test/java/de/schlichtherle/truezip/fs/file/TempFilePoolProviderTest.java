@@ -35,7 +35,7 @@ public final class TempFilePoolProviderTest {
     }
 
     @Test
-    public void testGetPool() {
+    public void testGet() {
         assertSame(instance.get(), TempFilePool.INSTANCE);
     }
 }
