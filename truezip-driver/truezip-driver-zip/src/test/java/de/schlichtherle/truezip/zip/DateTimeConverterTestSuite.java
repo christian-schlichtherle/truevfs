@@ -18,10 +18,11 @@ package de.schlichtherle.truezip.zip;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
-import junit.framework.AssertionFailedError;
 import org.junit.Before;
 import org.junit.Test;
 
+import static de.schlichtherle.truezip.zip.DateTimeConverter.*;
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
 /**
@@ -30,83 +31,25 @@ import static org.junit.Assert.*;
  */
 public abstract class DateTimeConverterTestSuite {
 
-    private static final long MIN_DOS_TIME = DateTimeConverter.MIN_DOS_TIME;
-
     private DateTimeConverter instance;
-    private Calendar cal;
+    private long minJavaTime = new GregorianCalendar(1980, Calendar.JANUARY, 1, 0, 0, 0).getTimeInMillis();
+    private long maxJavaTime = new GregorianCalendar(2107, Calendar.DECEMBER, 31, 23, 59, 58).getTimeInMillis();
 
     @Before
     public void setUp() {
         instance = getInstance();
-        cal = new GregorianCalendar(instance.newTimeZone());
-        cal.set(Calendar.MILLISECOND, 0);
+        GregorianCalendar calendar = new GregorianCalendar(instance.newTimeZone());
+        calendar.set(Calendar.MILLISECOND, 0);
+        calendar.set(1980, Calendar.JANUARY, 1, 0, 0, 0);
+        minJavaTime = calendar.getTimeInMillis();
+        calendar.set(2107, Calendar.DECEMBER, 31, 23, 59, 58); // 58 seconds!!!
+        maxJavaTime = calendar.getTimeInMillis();
     }
 
-    protected abstract DateTimeConverter getInstance();
+    abstract DateTimeConverter getInstance();
 
     @Test
-    public final void testToJavaTime() {
-        try {
-            instance.toJavaTime(-1);
-            fail("Expected RuntimeException");
-        } catch (RuntimeException ex) {
-        }
-
-        try {
-            instance.toJavaTime(0);
-            fail("Expected RuntimeException");
-        } catch (RuntimeException ex) {
-        }
-
-        try {
-            instance.toJavaTime(MIN_DOS_TIME - 1);
-            fail("Expected RuntimeException");
-        } catch (RuntimeException ex) {
-        }
-
-        boolean ea = false;
-        assert ea = true; // NOT ea == true !
-        try {
-            instance.toJavaTime(UInt.MAX_VALUE);
-            assertFalse("Expected RuntimeException if assertions are enabled", ea);
-        } catch (RuntimeException ex) {
-            if (!ea) {
-                final Error afe = new AssertionFailedError(
-                        "Did not expect a RuntimeException if assertions are disabled");
-                afe.initCause(ex);
-                throw afe;
-            }
-        }
-
-        try {
-            instance.toJavaTime(UInt.MAX_VALUE + 1);
-            fail("Expected RuntimeException");
-        } catch (RuntimeException ex) {
-        }
-
-        // Check MIN_DOS_TIME constant.
-        cal.set(1980, Calendar.JANUARY, 1, 0, 0, 0);
-        assertEquals(cal.getTimeInMillis(),
-                instance.toJavaTime(MIN_DOS_TIME));
-    }
-
-    @Test
-    public final void testToDosTime() {
-        try {
-            instance.toDosTime(-1);
-            fail("Expected RuntimeException");
-        } catch (RuntimeException ex) {
-        }
-
-        assertEquals(MIN_DOS_TIME, instance.toDosTime(0));
-
-        // Check MIN_DOS_TIME constant.
-        cal.set(1980, Calendar.JANUARY, 1, 0, 0, 0);
-        assertEquals(MIN_DOS_TIME, instance.toDosTime(cal.getTimeInMillis()));
-    }
-
-    @Test
-    public final void testCreateTimeZone() {
+    public final void testNewTimeZone() {
         final TimeZone tz1 = instance.newTimeZone();
         assertNotNull(tz1);
         final TimeZone tz2 = instance.newTimeZone();
@@ -116,7 +59,79 @@ public abstract class DateTimeConverterTestSuite {
     }
 
     @Test
-    public final void testRoundUp() {
-        instance.roundUp(System.currentTimeMillis()); // check for RuntimeException
+    public final void testToJavaTime() {
+        try {
+            instance.toJavaTime(-1);
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
+
+        try {
+            instance.toJavaTime(0);
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
+
+        try {
+            instance.toJavaTime(MIN_DOS_TIME - 1);
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
+
+        try {
+            instance.toJavaTime(UInt.MAX_VALUE + 1);
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
+    }
+
+    @Test
+    public final void testToDosTime() {
+        try {
+            instance.toDosTime(-1);
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
+
+        assertThat(instance.toDosTime(0), is(MIN_DOS_TIME));
+
+        try {
+            instance.toDosTime(maxJavaTime + 2000);
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
+    }
+
+    @Test
+    public void testTwoWayConversion() {
+        for (long args[] : new long[][] {
+            { MIN_DOS_TIME, minJavaTime },
+            { MAX_DOS_TIME, maxJavaTime },
+        }) {
+            final long dTime = args[0];
+            final long jTime = args[1];
+            assertThat(instance.toJavaTime(dTime), is(jTime));
+            assertThat(instance.toDosTime(jTime), is(dTime));
+        }
+    }
+
+    @Test
+    public void testRoundTripConversion() {
+        for (long dTime : new long[] {
+            MIN_DOS_TIME,
+            MAX_DOS_TIME,
+        }) {
+            assertThat(instance.toDosTime(instance.toJavaTime(dTime)), is(dTime));
+        }
+    }
+
+    @Test
+    public void testGranularity() {
+        final long jTime = System.currentTimeMillis();
+        final long dTime = instance.toDosTime(jTime);
+        assertThat(instance.toDosTime(jTime - 2000), not(is(dTime)));
+        assertThat(instance.toDosTime(jTime + 2000), not(is(dTime)));
+        assertThat(instance.toJavaTime(instance.toDosTime(jTime - 2000)), not(is(jTime)));
+        assertThat(instance.toJavaTime(instance.toDosTime(jTime + 2000)), not(is(jTime)));
     }
 }

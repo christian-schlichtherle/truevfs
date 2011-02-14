@@ -22,7 +22,7 @@ package de.schlichtherle.truezip.zip;
 public final class ZIPDateTimeConverterTest extends DateTimeConverterTestSuite {
 
     @Override
-    protected DateTimeConverter getInstance() {
+    DateTimeConverter getInstance() {
         return DateTimeConverter.ZIP;
     }
 }
