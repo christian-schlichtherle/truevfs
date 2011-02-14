@@ -17,7 +17,6 @@ package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.fs.archive.tar.TarBZip2Driver;
 import de.schlichtherle.truezip.fs.FsScheme;
-import de.schlichtherle.truezip.socket.ByteArrayIOPool;
 import org.apache.tools.bzip2.CBZip2OutputStream;
 
 /**
