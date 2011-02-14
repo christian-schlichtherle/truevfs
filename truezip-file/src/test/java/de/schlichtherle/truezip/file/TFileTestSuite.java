@@ -47,6 +47,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
 /**
@@ -64,6 +65,7 @@ public abstract class TFileTestSuite {
             return new ByteArrayIOPool(2048);
         }
     }
+
     protected static final IOPoolService
             POOL_SERVICE = new ByteArrayIOPoolService();
 
@@ -852,11 +854,11 @@ public abstract class TFileTestSuite {
             //"2" + getSuffix(),
         };
 
-        assertTrue(archive.mkdir());
+        assertTrue(archive.mkdir()); // create valid archive file
         assertCopyDelete(archive, names, 0);
         assertTrue(archive.delete());
 
-        assertTrue(newNonArchiveFile(archive).mkdir());
+        assertTrue(newNonArchiveFile(archive).mkdir()); // create false positive archive file
         assertCopyDelete(archive, names, 0);
         assertTrue(archive.delete());
     }
@@ -881,25 +883,31 @@ public abstract class TFileTestSuite {
 
     private void assertCopyDelete(final TFile parent, final TFile dir)
     throws IOException {
-        final TFile parentA = new TFile(parent, "a");
-        final TFile parentB = new TFile(parent, "b" + getSuffix());
-        final TFile dirA = new TFile(dir, "a");
-        final TFile dirB = new TFile(dir, "b" + getSuffix());
+        final TFile parentFile = new TFile(parent, "file");
+        final TFile parentArchive = new TFile(parent, "archive" + getSuffix());
+        final TFile dirFile = new TFile(dir, "file");
+        final TFile dirArchive = new TFile(dir, "archive" + getSuffix());
 
-        assertCopyDelete0(dirA, dirB);
-        assertCopyDelete0(dirA, parentA);
-        assertCopyDelete0(dirA, parentB);
-        assertCopyDelete0(parentA, dirA);
-        assertCopyDelete0(parentA, dirB);
-        assertCopyDelete0(parentB, dirA);
-        assertCopyDelete0(parentB, dirB);
-        assertCopyDelete0(dirB, dirA);
-        assertCopyDelete0(dirB, parentA);
-        assertCopyDelete0(dirB, parentB);
+        assertCopyDelete0(dirFile, dirArchive);
+        assertCopyDelete0(dirFile, parentFile);
+        assertCopyDelete0(dirFile, parentArchive);
+        assertCopyDelete0(parentFile, dirFile);
+        assertCopyDelete0(parentFile, dirArchive);
+        assertCopyDelete0(parentArchive, dirFile);
+        assertCopyDelete0(parentArchive, dirArchive);
+        assertCopyDelete0(dirArchive, dirFile);
+        assertCopyDelete0(dirArchive, parentFile);
+        assertCopyDelete0(dirArchive, parentArchive);
     }
 
     private void assertCopyDelete0(TFile a, TFile b) throws IOException {
-        assertCopyDelete0(a, b, 2000); // works in all archive types currently supported
+        // This must be the granularity of the tested file system type PLUS
+        // the granularity of the parent file system, i.e. the OS file system!
+        // Note that older OS file systems and even ext4 (!) have a granularity
+        // of two seconds.
+        // Plus the worst case of another two seconds for ZIP files results in
+        // four seconds!
+        assertCopyDelete0(a, b, 2000 + 2000);
     }
 
     private void assertCopyDelete0( final TFile a,
@@ -907,6 +915,7 @@ public abstract class TFileTestSuite {
                                     final long granularity)
     throws IOException {
         // Create a file with an old timestamp.
+        final long time = System.currentTimeMillis();
         {
             final OutputStream out = new TFileOutputStream(a);
             try {
@@ -914,15 +923,15 @@ public abstract class TFileTestSuite {
             } finally {
                 out.close();
             }
-            assertTrue(a.setLastModified(System.currentTimeMillis() - granularity));
+            assertTrue(a.setLastModified(time - granularity));
         }
 
         // Test copyFrom.
         assertTrue(b.copyFrom(a));
-        assertEquals(a.length(), b.length());
-        assertTrue(a.lastModified() != b.lastModified());
+        assertThat(b.length(), is(a.length()));
+        assertThat(b.lastModified(), not(is(a.lastModified())));
         assertTrue(b.archiveCopyFrom(a));
-        assertEquals(a.length(), b.length());
+        assertThat(b.length(), is(a.length()));
         long almd = a.lastModified() / granularity * granularity;
         long blmd = b.lastModified() / granularity * granularity;
         long almu = (a.lastModified() + granularity - 1) / granularity * granularity;
@@ -931,10 +940,10 @@ public abstract class TFileTestSuite {
 
         // Test copyTo.
         assertTrue(b.copyTo(a)); // updates timestamp
-        assertEquals(a.length(), b.length());
-        assertTrue(a.lastModified() != b.lastModified());
+        assertThat(a.length(), is(b.length()));
+        assertThat(a.lastModified(), not(is(b.lastModified())));
         assertTrue(b.archiveCopyTo(a));
-        assertEquals(a.length(), b.length());
+        assertThat(a.length(), is(b.length()));
         almd = a.lastModified() / granularity * granularity;
         blmd = b.lastModified() / granularity * granularity;
         almu = (a.lastModified() + granularity - 1) / granularity * granularity;
