@@ -36,7 +36,7 @@ public final class PromptingKeyManagerProviderTest {
     }
 
     @Test
-    public void testGetManager() {
+    public void testGet() {
         assertNotNull(instance.get(Object.class));
         assertNotNull(instance.get(AesCipherParameters.class));
     }
