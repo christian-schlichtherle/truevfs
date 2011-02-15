@@ -16,7 +16,8 @@
 package de.schlichtherle.truezip.crypto.raes.param.console;
 
 import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
-import de.schlichtherle.truezip.key.PromptingKeyProvider;
+import de.schlichtherle.truezip.key.PromptingKeyProvider.Controller;
+import de.schlichtherle.truezip.key.PromptingKeyProvider.View;
 import java.io.Console;
 import java.net.URI;
 import java.util.Arrays;
@@ -32,14 +33,14 @@ import static de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStreng
  * @version $Id$
  */
 @ThreadSafe
-public final class AesCipherParametersUI
-implements PromptingKeyProvider.UI<AesCipherParameters> {
+public final class AesCipherParametersView
+implements View<AesCipherParameters> {
 
     /** Used to lock out concurrent prompting. */
     private static class PromptingLock { }
 
     private static final String CLASS_NAME
-            = AesCipherParametersUI.class.getName();
+            = AesCipherParametersView.class.getName();
     static final ResourceBundle resources
             = ResourceBundle.getBundle(CLASS_NAME);
 
@@ -69,9 +70,9 @@ implements PromptingKeyProvider.UI<AesCipherParameters> {
 
     @Override
     public final void promptCreateKey(
-            final PromptingKeyProvider<? super AesCipherParameters> provider) {
+            final Controller<? super AesCipherParameters> controller) {
         synchronized (lock) {
-            final URI resource = provider.getResource();
+            final URI resource = controller.getResource();
             assert null != resource : "violation of contract for PromptingKeyProviderUI";
             if (!lastResource.equals(resource))
                 con.printf(resources.getString("createKey.banner"), resource);
@@ -112,7 +113,7 @@ implements PromptingKeyProvider.UI<AesCipherParameters> {
             prompting: while (true) {
                 String keyStrength = con.readLine(
                         resources.getString("keyStrength.prompt"),
-                        provider);
+                        controller);
                 if (null == keyStrength || keyStrength.length() <= 0)
                     return;
                 try {
@@ -133,19 +134,19 @@ implements PromptingKeyProvider.UI<AesCipherParameters> {
                 }
             }
 
-            provider.setKey(param);
+            controller.setKey(param);
         }
     }
 
     @Override
     public void promptOpenKey(
-            final PromptingKeyProvider<? super AesCipherParameters> provider,
+            final Controller<? super AesCipherParameters> controller,
             final boolean invalid) {
         synchronized (lock) {
             if (invalid)
                 con.printf(resources.getString("openKey.invalid"));
 
-            final URI resource = provider.getResource();
+            final URI resource = controller.getResource();
             assert resource != null : "violation of contract for PromptingKeyProviderUI";
             if (!lastResource.equals(resource))
                 con.printf(resources.getString("openKey.banner"), resource);
@@ -153,17 +154,17 @@ implements PromptingKeyProvider.UI<AesCipherParameters> {
 
             final char[] passwd = con.readPassword(resources.getString("openKey.passwd"));
             if (null == passwd || passwd.length <= 0) {
-                provider.setKey(null);
+                controller.setKey(null);
                 return;
             }
 
             final AesCipherParameters param = new AesCipherParameters();
             param.setPassword(passwd);
-            provider.setKey(param);
+            controller.setKey(param);
 
             while (true) {
                 String changeKey = con.readLine(resources.getString("openKey.change"));
-                provider.setChangeKeySelected(YES.equalsIgnoreCase(changeKey));
+                controller.setChangeRequested(YES.equalsIgnoreCase(changeKey));
                 if (       null == changeKey
                         || changeKey.length() <= 0
                         || YES.equalsIgnoreCase(changeKey)

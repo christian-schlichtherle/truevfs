@@ -15,10 +15,11 @@
  */
 package de.schlichtherle.truezip.key;
 
+import java.net.URI;
 import org.junit.Before;
 import org.junit.Test;
 
-import static de.schlichtherle.truezip.key.PromptingKeyProvider.State.*;
+import static de.schlichtherle.truezip.key.MockView.Action.*;
 import static org.junit.Assert.*;
 
 /**
@@ -27,72 +28,74 @@ import static org.junit.Assert.*;
  */
 public class PromptingKeyProviderTest {
 
-    private PromptingKeyProvider<DummyKey> instance;
+    private static final URI RESOURCE = URI.create("foo");
+
+    private MockView<DummyKey> view;
+    private PromptingKeyProvider<DummyKey> provider;
 
     @Before
     public void setUp() {
-        instance = new PromptingKeyProvider<DummyKey>();
+        view = new MockView<DummyKey>();
+        view.setResource(RESOURCE);
+        view.setChangeRequested(true);
+        provider = new PromptingKeyProvider<DummyKey>();
+        provider.setView(view);
+        provider.setResource(RESOURCE);
     }
 
     @Test
-    public void testKey() {
-        final DummyKey key = new DummyKey();
+    public void testLifeCycle() throws UnknownKeyException {
+        view.setKey(new DummyKey());
 
-        assertSame(RESET, instance.getState());
-        assertNull(instance.getKey());
+        assertEquals(view.getKey(), provider.getCreateKey());
+        assertEquals(view.getKey(), provider.getOpenKey(false));
 
-        instance.setKey(key);
-        assertSame(PROVIDED, instance.getState());
-        assertEquals(key, instance.getKey());
+        view.setAction(CANCEL);
 
+        assertEquals(view.getKey(), provider.getCreateKey());
+        assertEquals(view.getKey(), provider.getOpenKey(false));
+
+        provider.resetCancelledKey();
+
+        assertEquals(view.getKey(), provider.getOpenKey(false));
+        assertEquals(view.getKey(), provider.getCreateKey());
+
+        provider.resetUnconditionally();
+
+        view.setKey(new DummyKey());
         try {
-            instance.setKey(key);
+            provider.getOpenKey(false);
             fail();
-        } catch (IllegalStateException expected) {
+        } catch (UnknownKeyException expected) {
+        }
+        view.setKey(new DummyKey());
+        try {
+            provider.getCreateKey();
+            fail();
+        } catch (UnknownKeyException expected) {
         }
 
+        view.setAction(IGNORE);
+
+        view.setKey(new DummyKey());
         try {
-            instance.setKey(null);
+            provider.getOpenKey(false);
             fail();
-        } catch (IllegalStateException expected) {
+        } catch (UnknownKeyException expected) {
+        }
+        view.setKey(new DummyKey());
+        try {
+            provider.getCreateKey();
+            fail();
+        } catch (UnknownKeyException expected) {
         }
 
-        instance.resetCancelledKey();
+        provider.resetCancelledKey();
+        view.setAction(ENTER);
 
-        try {
-            instance.setKey(key);
-            fail();
-        } catch (IllegalStateException expected) {
-        }
-
-        try {
-            instance.setKey(null);
-            fail();
-        } catch (IllegalStateException expected) {
-        }
-
-        instance.resetUnconditionally();
-
-        instance.setKey(null);
-        assertSame(CANCELLED, instance.getState());
-        assertNull(instance.getKey());
-
-        try {
-            instance.setKey(key);
-            fail();
-        } catch (IllegalStateException expected) {
-        }
-
-        try {
-            instance.setKey(null);
-            fail();
-        } catch (IllegalStateException expected) {
-        }
-
-        instance.resetCancelledKey();
-
-        instance.setKey(key);
-        assertSame(PROVIDED, instance.getState());
-        assertEquals(key, instance.getKey());
+        view.setKey(new DummyKey());
+        assertEquals(view.getKey(), provider.getOpenKey(false));
+        view.setKey(new DummyKey());
+        assertEquals(view.getKey(), provider.getCreateKey());
     }
 }

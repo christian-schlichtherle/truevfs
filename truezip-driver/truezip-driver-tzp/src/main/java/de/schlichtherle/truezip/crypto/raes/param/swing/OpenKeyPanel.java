@@ -109,15 +109,15 @@ final class OpenKeyPanel extends EnhancedPanel {
      * @param resource New value of property {@code resourceID}.
      */
     void setResource(final URI resource) {
-        final URI lastResource = AesCipherParametersUI.lastResource;
+        final URI lastResource = AesCipherParametersView.lastResource;
         if (!lastResource.equals(resource)
-                && !lastResource.equals(AesCipherParametersUI.INITIAL_RESOURCE)) {
+                && !lastResource.equals(AesCipherParametersView.INITIAL_RESOURCE)) {
             this.resource.setForeground(Color.RED);
         } else {
             this.resource.setForeground(defaultForeground);
         }
         this.resource.setText(resource.toString());
-        AesCipherParametersUI.lastResource = resource;
+        AesCipherParametersView.lastResource = resource;
     }
 
     /**
@@ -158,7 +158,7 @@ final class OpenKeyPanel extends EnhancedPanel {
             case AuthenticationPanel.AUTH_KEY_FILE:
                 final File keyFile = authenticationPanel.getKeyFile();
                 try {
-                    param.setKeyFileBytes(AesCipherParametersUI.readKeyFile(keyFile));
+                    param.setKeyFileBytes(AesCipherParametersView.readKeyFile(keyFile));
                     return true;
                 } catch (EOFException ex) {
                     setError(resources.getString("keyFile.eofException"));

@@ -28,9 +28,9 @@ import net.jcip.annotations.Immutable;
  * {@link AesCipherParameters}.
  * If this JVM is running {@link GraphicsEnvironment#isHeadless() headless},
  * then its UI is an instance of
- * {@link de.schlichtherle.truezip.crypto.raes.param.console.AesCipherParametersUI}.
+ * {@link de.schlichtherle.truezip.crypto.raes.param.console.AesCipherParametersView}.
  * Otherwise, it's an instance of
- * {@link de.schlichtherle.truezip.crypto.raes.param.swing.AesCipherParametersUI}.
+ * {@link de.schlichtherle.truezip.crypto.raes.param.swing.AesCipherParametersView}.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -41,8 +41,8 @@ public final class PromptingKeyManagerProvider extends KeyManagerProvider {
     private static final PromptingKeyManager<AesCipherParameters>
             manager = new PromptingKeyManager<AesCipherParameters>(
                 GraphicsEnvironment.isHeadless()
-                    ? new de.schlichtherle.truezip.crypto.raes.param.console.AesCipherParametersUI()
-                    : new de.schlichtherle.truezip.crypto.raes.param.swing.AesCipherParametersUI());
+                    ? new de.schlichtherle.truezip.crypto.raes.param.console.AesCipherParametersView()
+                    : new de.schlichtherle.truezip.crypto.raes.param.swing.AesCipherParametersView());
 
     @Override
     @SuppressWarnings("unchecked")

@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.key;
 
 import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
-import de.schlichtherle.truezip.crypto.raes.param.console.AesCipherParametersUI;
+import de.schlichtherle.truezip.crypto.raes.param.console.AesCipherParametersView;
 import java.net.URI;
 import org.junit.Test;
 
@@ -31,7 +31,7 @@ public class PromptingKeyManagerTest extends KeyManagerTestSuite {
     @Override
     protected PromptingKeyManager<?> newKeyManager() {
         return new PromptingKeyManager<AesCipherParameters>(
-                new AesCipherParametersUI());
+                new AesCipherParametersView());
     }
 
     @Test

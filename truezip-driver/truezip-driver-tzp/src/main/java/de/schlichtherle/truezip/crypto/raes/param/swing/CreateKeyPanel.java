@@ -115,16 +115,16 @@ final class CreateKeyPanel extends EnhancedPanel {
      * @param resource New value of property {@code resourceID}.
      */
     void setResource(final URI resource) {
-        final URI lastResource = AesCipherParametersUI.lastResource;
+        final URI lastResource = AesCipherParametersView.lastResource;
         assert lastResource != null : "violation of contract in PromptingKeyProvider";
         if (!lastResource.equals(resource)
-                && !lastResource.equals(AesCipherParametersUI.INITIAL_RESOURCE)) {
+                && !lastResource.equals(AesCipherParametersView.INITIAL_RESOURCE)) {
             this.resource.setForeground(Color.RED);
         } else {
             this.resource.setForeground(defaultForeground);
         }
         this.resource.setText(resource.toString());
-        AesCipherParametersUI.lastResource = resource;
+        AesCipherParametersView.lastResource = resource;
     }
     
     boolean updateCreateKey(final AesCipherParameters param) {
@@ -153,7 +153,7 @@ final class CreateKeyPanel extends EnhancedPanel {
 
                     final byte[] key;
                     try {
-                        key = AesCipherParametersUI.readKeyFile(keyFile);
+                        key = AesCipherParametersView.readKeyFile(keyFile);
                     } catch (EOFException ex) {
                         setError(resources.getString("keyFile.eofException"));
                         return false;

@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.key;
 
+import de.schlichtherle.truezip.key.KeyProvider.Factory;
+import de.schlichtherle.truezip.key.PromptingKeyProvider.View;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URI;
@@ -35,7 +37,7 @@ extends SafeKeyManager<K, PromptingKeyProvider<K>> {
 
     /** A factory for {@link PromptingKeyProvider}s. */
     private static class PromptingKeyProviderFactory<K extends SafeKey<K>>
-    implements KeyProvider.Factory<K, PromptingKeyProvider<K>> {
+    implements Factory<K, PromptingKeyProvider<K>> {
 
         @Override
         public PromptingKeyProvider<K> newKeyProvider() {
@@ -43,30 +45,25 @@ extends SafeKeyManager<K, PromptingKeyProvider<K>> {
         }
     }
 
-    /**
-     * The user interface classes or instances.
-     * Values may be instances of {@link PromptingKeyProvider.UI} or
-     * {@link Class}.
-     */
-    private final PromptingKeyProvider.UI<? extends K> ui;
+    private final View<? extends K> view;
 
     /**
      * Constructs a new prompting key manager.
      *
-     * @param ui the user interface for prompting for keys.
+     * @param view the view instance for prompting for keys.
      */
-    public PromptingKeyManager(final PromptingKeyProvider.UI<? extends K> ui) {
+    public PromptingKeyManager(final View<? extends K> view) {
         super(new PromptingKeyProviderFactory<K>());
-        if (null == ui)
+        if (null == view)
             throw new NullPointerException();
-        this.ui = ui;
+        this.view = view;
     }
 
     @Override
     public synchronized PromptingKeyProvider<K> getKeyProvider(URI resource) {
         PromptingKeyProvider<K> provider = super.getKeyProvider(resource);
         provider.setResource(resource);
-        provider.setUI(ui);
+        provider.setView(view);
         return provider;
     }
 
@@ -76,7 +73,7 @@ extends SafeKeyManager<K, PromptingKeyProvider<K>> {
         if (changed) {
             PromptingKeyProvider<K> provider = super.getKeyProvider(newResource);
             provider.setResource(newResource);
-            provider.setUI(ui);
+            provider.setView(view);
         }
         return changed;
     }
@@ -87,7 +84,7 @@ extends SafeKeyManager<K, PromptingKeyProvider<K>> {
         boolean changed = super.removeKeyProvider(resource);
         if (changed) {
             provider.setResource(null);
-            provider.setUI(null);
+            provider.setView(null);
         }
         return changed;
     }
