@@ -113,7 +113,7 @@ public class FileComboBoxPanel extends JPanel implements Runnable {
             @Override
             public void run() {
                 final JFrame frame = new JFrame("File name auto completion fun");
-                frame.getContentPane().add(FileComboBoxPanel.this);
+                frame.add(FileComboBoxPanel.this);
                 frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
                 frame.pack();
                 frame.setLocationRelativeTo(null);

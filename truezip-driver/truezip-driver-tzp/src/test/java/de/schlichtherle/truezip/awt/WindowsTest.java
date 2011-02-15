@@ -35,7 +35,6 @@ public class WindowsTest {
     public void testParentWindow()
     throws InterruptedException, InvocationTargetException {
         EventQueue.invokeAndWait(new Runnable() {
-
             @Override
             public void run() {
                 Window result = Windows.getParentWindow();

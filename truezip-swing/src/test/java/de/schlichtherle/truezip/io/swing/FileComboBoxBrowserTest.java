@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.io.swing;
 
-import java.awt.EventQueue;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FilenameFilter;
@@ -154,12 +153,12 @@ public final class FileComboBoxBrowserTest {
         tc0.typeText("?");
         assertEquals("?", tc1.getText());
 
-        // Clear character in tc1, ensure that its cleared in tc0
+        // Clear character in tc1, then ensure that its cleared in tc0, too.
         tc1.clearText();
         assertEquals("", tc0.getText());
 
         // Select first element in list of tc0 (entry in current directory),
-        // if any, and check its appearance in tc1.
+        // if any, and check its appearance in tc1, too.
         tc0.pressKey(KeyEvent.VK_DOWN);
         final String child = tc0.getText();
         assertEquals(child, tc1.getText());
