@@ -17,14 +17,12 @@ package de.schlichtherle.truezip.swing;
 
 import java.awt.Component;
 import java.awt.EventQueue;
-import java.awt.Toolkit;
 import java.awt.Window;
 import java.lang.reflect.InvocationTargetException;
 import java.util.EventListener;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
 import org.netbeans.jemmy.JemmyProperties;
@@ -72,9 +70,9 @@ public final class EnhancedPanelTest {
     private static JFrame showInNewFrame(final Component instance)
     throws InterruptedException, InvocationTargetException {
         final JFrame frame = new JFrame();
-        invokeAndWait(new Runnable() {
+        EventQueue.invokeAndWait(new Runnable() {
             @Override
-			public void run() {
+            public void run() {
                 frame.getContentPane().add(instance);
                 frame.pack();
                 frame.setLocationRelativeTo(null);
@@ -86,9 +84,9 @@ public final class EnhancedPanelTest {
 
     private static void disposeFrame(final JFrame frame)
     throws InterruptedException, InvocationTargetException {
-        invokeAndWait(new Runnable() {
+        EventQueue.invokeAndWait(new Runnable() {
             @Override
-			public void run() {
+            public void run() {
                 frame.setVisible(false);
                 frame.dispose();
             }
@@ -256,8 +254,8 @@ public final class EnhancedPanelTest {
             }
 
             @Override
-			public void run() {
-                frame.getContentPane().add(instance);
+            public void run() {
+                frame.add(instance);
                 frame.pack();
                 frame.setLocationRelativeTo(null);
             }
@@ -269,7 +267,7 @@ public final class EnhancedPanelTest {
             }
 
             @Override
-			@SuppressWarnings("deprecation")
+            @SuppressWarnings("deprecation")
             public void run() {
                 // Use multiple ways to make the frame visible.
                 // Depending on the version of the Swing implementation, this may
@@ -287,9 +285,9 @@ public final class EnhancedPanelTest {
             }
 
             @Override
-			@SuppressWarnings("deprecation")
+            @SuppressWarnings("deprecation")
             public void run() {
-                // Use multiple ways to make the frame visible.
+                // Use multiple ways to make the frame invisible.
                 // Depending on the version of the Swing implementation, this may
                 // create multiple PanelEvents with an ID equal to
                 // PanelEvent.ANCESTOR_WINDOW_HIDDEN.
@@ -302,12 +300,12 @@ public final class EnhancedPanelTest {
 
         // Test in first frame.
         final JFrame frame1 = new JFrame();
-        invokeAndWait(new SetupFrame(frame1));
+        EventQueue.invokeAndWait(new SetupFrame(frame1));
         events(new MakeFrameVisible(frame1), new MakeFrameInvisible(frame1), l);
 
         // Test in second frame.
         final JFrame frame2 = new JFrame();
-        invokeAndWait(new SetupFrame(frame2));
+        EventQueue.invokeAndWait(new SetupFrame(frame2));
         events(new MakeFrameVisible(frame2), new MakeFrameInvisible(frame2), l);
     }
 
@@ -319,45 +317,13 @@ public final class EnhancedPanelTest {
         l.shown = l.hidden = 0; // reset counters
 
         for (int i = 1; i <= 3; i++) {
-            invokeAndWait(makeVisible);
+            EventQueue.invokeAndWait(makeVisible);
             assertEquals(i, l.shown);
             assertEquals(i - 1, l.hidden);
 
-            invokeAndWait(makeInvisible);
+            EventQueue.invokeAndWait(makeInvisible);
             assertEquals(i, l.shown);
             assertEquals(i, l.hidden);
-        }
-    }
-
-    /**
-     * Invokes the given {@code runnable} from the AWT Event Dispatch
-     * Thread and waits for the AWT Event Queue to drain.
-     *
-     * @throws Error If this method is called from the AWT Event Dispatch Thread.
-     */
-    private static void invokeAndWait(final Runnable runnable)
-    throws InterruptedException, InvocationTargetException {
-        //EventQueue.invokeLater(runnable);
-        EventQueue.invokeAndWait(runnable);
-        waitEmptyQueue();
-    }
-
-    @SuppressWarnings("CallToThreadDumpStack")
-    private static void waitEmptyQueue() throws AssertionError {
-        //new QueueTool().waitEmpty();
-        final EventQueue queue = Toolkit.getDefaultToolkit().getSystemEventQueue();
-        while (queue.peekEvent() != null) {
-            try {
-                EventQueue.invokeAndWait(new Runnable() {
-                    @Override
-					public void run() {
-                    }
-                });
-            } catch (InvocationTargetException cannotHappen) {
-                throw new AssertionError(cannotHappen);
-            } catch (InterruptedException continueAnyway) {
-                continueAnyway.printStackTrace();
-            }
         }
     }
 
@@ -372,7 +338,7 @@ public final class EnhancedPanelTest {
 
         final Runnable makeVisible = new Runnable() {
             @Override
-			public void run() {
+            public void run() {
                 JOptionPane.showMessageDialog(null, instance);
             }
         };
@@ -380,13 +346,11 @@ public final class EnhancedPanelTest {
         for (int i = 1; i <= 3; i++) {
             EventQueue.invokeLater(makeVisible);
             JDialogOperator dialogOp = new JDialogOperator(); // wait for JOptionPane
-            waitEmptyQueue(); // wait until PanelEvent delivered
             assertEquals(i, l.shown);
             assertEquals(i - 1, l.hidden);
 
             JButtonOperator buttonOp = new JButtonOperator(dialogOp);
             buttonOp.push();
-            waitEmptyQueue(); // wait until PanelEvent delivered
             assertEquals(i, l.shown);
             assertEquals(i, l.hidden);
         }
