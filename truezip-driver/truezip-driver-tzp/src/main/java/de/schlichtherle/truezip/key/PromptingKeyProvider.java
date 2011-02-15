@@ -26,12 +26,12 @@ import static de.schlichtherle.truezip.key.PromptingKeyProvider.State.*;
 /**
  * A "safe" key provider which prompts the user for a key for its protected
  * resource.
- * The user is prompted via an instance of the {@link UI} user interface which
- * is {@link #setUI injected} to this instance by a {@link PromptingKeyManager}.
- * The UI may then display the resource URI by calling {@link #getResource} on
- * this instance (which is also {@link #setResource injected} by a
- * {@link PromptingKeyManager}) and finally set the key by calling
- * {@link #setKey}.
+ * The user is prompted via an instance of the {@link View} interface which
+ * is {@link #setView injected} to this instance by a {@link PromptingKeyManager}.
+ * The view may then display the resource URI by calling {@link #getResource}
+ * on this instance (which is also {@link #setResource injected} by a
+ * {@link PromptingKeyManager}) and finally set the key by using the given
+ * {@link Controller}.
  *
  * @param   <K> The type of the keys.
  * @see     PromptingKeyManager
@@ -59,18 +59,18 @@ extends SafeKeyProvider<K> {
      * and should have no side effects!
      */
     @DefaultAnnotation(NonNull.class)
-    public interface UI<K extends SafeKey<K>> {
+    public interface View<K extends SafeKey<K>> {
 
         /**
          * Prompts the user for the key which may be used to create a new
          * protected resource or entirely replace the contents of an already
          * existing protected resource.
          * Upon return, the implementation should have updated the
-         * {@link #setKey key} property of the given {@code provider}.
+         * {@link Proxy#setKey key} property of the given {@code controller}.
          * <p>
-         * If the implementation has called {@link #setKey} with a
+         * If the implementation has called {@link Controller#setKey} with a
          * non-{@code null} parameter, then a clone of this object will be
-         * used as the key of the given {@code provider}.
+         * used as the key.
          * <p>
          * Otherwise, prompting for a key is permanently disabled and each
          * subsequent call to {@link #getCreateKey} or {@link #getOpenKey}
@@ -78,24 +78,24 @@ extends SafeKeyProvider<K> {
          * {@link #resetCancelledKey()} or {@link #resetUnconditionally()} gets
          * called.
          *
-         * @param  provider The key provider to store the result in.
+         * @param  controller The key controller for storing the result.
          * @throws UnknownKeyException if key prompting fails for any reason.
          */
-        void promptCreateKey(PromptingKeyProvider<? super K> provider)
+        void promptCreateKey(Controller<? super K> controller)
         throws UnknownKeyException;
 
         /**
          * Prompts the user for the key which may be used to open an existing
          * protected resource in order to access its contents.
          * Upon return, the implementation should have updated the
-         * {@link #setKey key} property of the given {@code provider}.
+         * {@link Proxy#setKey key} property of the given {@code controller}.
          * <p>
-         * If the implementation has called {@link #setKey} with a
+         * If the implementation has called {@link Controller#setKey} with a
          * non-{@code null} parameter, then a clone of this object will be
-         * used as the key of the given {@code provider}.
+         * used as the key.
          * <p>
-         * Otherwise, if the implementation has called {@link #setKey} with a
-         * {@code null} parameter or throws a
+         * Otherwise, if the implementation has called {@link Controller#setKey}
+         * with a {@code null} parameter or throws a
          * {@link KeyPromptingCancelledException}, then prompting for the key
          * is permanently disabled and each subsequent call to
          * {@link #getCreateKey} or {@link #getOpenKey} results in a
@@ -106,7 +106,7 @@ extends SafeKeyProvider<K> {
          * Otherwise, the state of the key provider is not changed and this
          * method gets called again.
          *
-         * @param  provider The key provider to store the result in.
+         * @param  controller The key controller for storing the result.
          * @param  invalid {@code true} iff a previous call to this method
          *         resulted in an invalid key.
          * @throws KeyPromptingCancelledException if key prompting has been
@@ -114,24 +114,92 @@ extends SafeKeyProvider<K> {
          * @throws UnknownKeyException if key prompting fails for any other
          *         reason.
          */
-        void promptOpenKey( PromptingKeyProvider<? super K> provider,
-                            boolean invalid)
+        void promptOpenKey(Controller<? super K> controller, boolean invalid)
         throws UnknownKeyException;
-    } // interface UI
+    } // interface View
 
-    private volatile @NonNull State state = RESET;
+    /** Proxies access to the key for {@link View} implementations. */
+    public static class Controller<K extends SafeKey<K>> {
+        private final PromptingKeyProvider<K> provider;
+        private State state;
+
+        private Controller( final PromptingKeyProvider<K> provider,
+                            final State state) {
+            this.provider = provider;
+            this.state = state;
+        }
+
+        /**
+         * Returns the unique resource identifier (resource ID) of the
+         * protected resource for which this controller is used.
+         *
+         * @throws IllegalStateException if getting this property is not legal
+         *         in the current state.
+         */
+        public @NonNull URI getResource() {
+            if (null == state)
+                throw new IllegalStateException();
+            return state.getResource(provider);
+        }
+
+        /**
+         * Sets the {@code key} property.
+         *
+         * @param  key The {@code key} property.
+         * @throws IllegalStateException if setting this property is not legal
+         *         in the current state.
+         */
+        public void setKey(K key) {
+            if (null == state)
+                throw new IllegalStateException();
+            state.setKey(provider, key);
+        }
+
+        /**
+         * Requests to prompt the user for a new key upon the next call to
+         * {@link #getCreateKey()}, provided that the key is
+         * {@link #setKey set} then.
+         *
+         * @param  changeRequested whether or not the user shall get prompted
+         *         for a new key upon the next call to {@link #getCreateKey()},
+         *         provided that the key is {@link #setKey set} then.
+         * @throws IllegalStateException if setting this property is not legal
+         *         in the current state.
+         */
+        public void setChangeRequested(boolean changeRequested) {
+            if (null == state)
+                throw new IllegalStateException();
+            state.setChangeRequested(provider, changeRequested);
+        }
+
+        private void invalidate() {
+            state = null;
+        }
+    } // class Controller
+
+    private static final class CreateKeyController<K extends SafeKey<K>>
+    extends Controller<K> {
+        private CreateKeyController(PromptingKeyProvider<K> provider, State state) {
+            super(provider, state);
+        }
+
+        @Override
+        public void setChangeRequested(boolean changeRequested) {
+            throw new IllegalStateException();
+        }
+    } // class CreateKeyController
 
     /** The resource identifier for the protected resource. */
     private volatile URI resource;
 
-    /**
-     * The user interface instance which is used to prompt the user for a key.
-     */
-    private volatile UI<? extends K> ui;
+    /** The view instance which is used to prompt the user for a key. */
+    private volatile View<? extends K> view;
+
+    private volatile @NonNull State state = RESET;
 
     private volatile K key;
 
-    private volatile boolean changeKeySelected;
+    private volatile boolean changeRequested;
 
     /**
      * Returns the unique resource identifier (resource ID) of the protected
@@ -151,15 +219,15 @@ extends SafeKeyProvider<K> {
         this.resource = resource;
     }
 
-    final UI<? extends K> getUI() {
-        return ui;
+    final View<? extends K> getView() {
+        return view;
     }
 
-    final void setUI(final UI<? extends K> ui) {
-        this.ui = ui;
+    final void setView(final View<? extends K> view) {
+        this.view = view;
     }
 
-    @NonNull State getState() {
+    private @NonNull State getState() {
         return state;
     }
 
@@ -208,29 +276,16 @@ extends SafeKeyProvider<K> {
      *
      * @return The nullable {@code key} property.
      */
-    K getKey() {
+    private K getKey() {
         return clone(key);
     }
 
-    /**
-     * Sets the {@code key} property maintained by this key provider.
-     * Client applications should not call this method directly:
-     * It's intended to be used by user interface classes only.
-     *
-     * @param  key The {@code key} property.
-     * @throws IllegalStateException if setting the key is not legal in the
-     *         current state.
-     */
-    public void setKey(@CheckForNull K key) {
-        getState().setKey(this, key);
-    }
-
-    private void setKeyImpl(final @CheckForNull K newKey) {
+    private void setKey(final @CheckForNull K newKey) {
         // This is quite paranoid, but supposedly fairly safe.
         final K oldKey = this.key;
         this.key = clone(newKey);
         reset(oldKey);
-        reset(newKey);
+        //reset(newKey); // don't be mean!
     }
 
     /**
@@ -242,25 +297,17 @@ extends SafeKeyProvider<K> {
      *         the next call to {@link #getCreateKey()}, provided that the key
      *         has been {@link #setKey set} before.
      */
-    boolean isChangeKeySelected() {
-        return changeKeySelected;
+    private boolean isChangeRequested() {
+        return changeRequested;
+    }
+
+    private void setChangeRequested(final boolean changeRequested) {
+        this.changeRequested = changeRequested;
     }
 
     /**
-     * Requests to prompt the user for a new key upon the next call to
-     * {@link #getCreateKey()}, provided that the key has been
-     * {@link #setKey set} before.
-     *
-     * @param changeKeySelected whether or not the user shall get prompted for
-     *        a new key upon the next call to {@link #getCreateKey()}, provided
-     *        that the key has been {@link #setKey set} before.
-     */
-    public void setChangeKeySelected(final boolean changeKeySelected) {
-        this.changeKeySelected = changeKeySelected;
-    }
-
-    /**
-     * Resets the state of this key provider and the current key
+     * Resets the state of this key provider, its current key and the value of
+     * its {@code changeRequested} property
      * if and only if prompting for a key has been cancelled.
      */
     public void resetCancelledKey() {
@@ -268,7 +315,8 @@ extends SafeKeyProvider<K> {
     }
 
     /**
-     * Resets the state of this key provider and the current key
+     * Resets the state of this key provider, its current key and the value of
+     * its {@code changeRequested} property
      * unconditionally.
      */
     public void resetUnconditionally() {
@@ -277,20 +325,24 @@ extends SafeKeyProvider<K> {
 
     private void reset() {
         setState(RESET);
-        reset(this.key);
+        setKey(null);
+        setChangeRequested(false);
     }
 
     /** Implements the behavior strategy of its enclosing class. */
+    @ThreadSafe
     @DefaultAnnotation(NonNull.class)
     enum State {
         RESET {
             @Override
             <K extends SafeKey<K>> K
-            getCreateKey(PromptingKeyProvider<K> provider)
+            getCreateKey(final PromptingKeyProvider<K> provider)
             throws UnknownKeyException {
                 State state;
                 try {
-                    provider.getUI().promptCreateKey(provider);
+                    Controller<K> controller = new CreateKeyController<K>(provider, this);
+                    provider.getView().promptCreateKey(controller);
+                    controller.invalidate();
                 } finally {
                     if ((state = provider.getState()) == this)
                         provider.setState(state = CANCELLED);
@@ -305,7 +357,9 @@ extends SafeKeyProvider<K> {
                 State state;
                 do {
                     try {
-                        provider.getUI().promptOpenKey(provider, invalid);
+                        Controller<K> controller = new Controller<K>(provider, this);
+                        provider.getView().promptOpenKey(controller, invalid);
+                        controller.invalidate();
                     } catch (KeyPromptingCancelledException ex) {
                         provider.setState(CANCELLED);
                         throw ex;
@@ -318,7 +372,7 @@ extends SafeKeyProvider<K> {
             @Override
             <K extends SafeKey<K>> void
             setKey(PromptingKeyProvider<K> provider, K key) {
-                provider.setKeyImpl(key);
+                provider.setKey(key);
                 provider.setState(null != key ? PROVIDED : CANCELLED);
             }
 
@@ -333,8 +387,8 @@ extends SafeKeyProvider<K> {
             <K extends SafeKey<K>> K
             getCreateKey(PromptingKeyProvider<K> provider)
             throws UnknownKeyException {
-                if (provider.isChangeKeySelected()) {
-                    provider.setChangeKeySelected(false);
+                if (provider.isChangeRequested()) {
+                    provider.setChangeRequested(false);
                     return RESET.getCreateKey(provider); // DON'T change state!
                 } else {
                     return provider.getKey();
@@ -356,7 +410,8 @@ extends SafeKeyProvider<K> {
             @Override
             <K extends SafeKey<K>> void
             setKey(PromptingKeyProvider<K> provider, K key) {
-                throw new IllegalStateException(toString());
+                if (null != key)
+                    provider.setKey(key);
             }
 
             @Override
@@ -402,9 +457,19 @@ extends SafeKeyProvider<K> {
         throws UnknownKeyException;
 
         abstract <K extends SafeKey<K>> void
-        setKey(PromptingKeyProvider<K> provider, @CheckForNull K key);
+        resetCancelledKey(PromptingKeyProvider<K> provider);
 
         abstract <K extends SafeKey<K>> void
-        resetCancelledKey(PromptingKeyProvider<K> provider);
+        setKey(PromptingKeyProvider<K> provider, @CheckForNull K key);
+
+        <K extends SafeKey<K>> void
+        setChangeRequested(PromptingKeyProvider<K> provider, boolean changeRequested) {
+            provider.setChangeRequested(changeRequested);
+        }
+
+        <K extends SafeKey<K>> URI
+        getResource(PromptingKeyProvider<K> provider) {
+            return provider.getResource();
+        }
     }
 }

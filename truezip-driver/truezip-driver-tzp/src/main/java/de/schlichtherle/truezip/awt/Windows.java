@@ -28,14 +28,14 @@ import javax.swing.JOptionPane;
 
 /**
  * A utility class for window management.
- * This class cannot get instantiated outside its package.
+ * This class cannot get instantiated.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
 public class Windows {
 
-    Windows() {
+    private Windows() {
     }
 
     private static final String PROPERTY_FOCUSED_WINDOW = "focusedWindow";

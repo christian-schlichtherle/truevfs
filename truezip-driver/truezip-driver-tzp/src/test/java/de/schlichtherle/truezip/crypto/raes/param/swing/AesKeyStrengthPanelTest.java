@@ -17,7 +17,6 @@ package de.schlichtherle.truezip.crypto.raes.param.swing;
 
 import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
 import java.awt.EventQueue;
-import java.lang.reflect.InvocationTargetException;
 import javax.swing.JFrame;
 import org.junit.After;
 import org.junit.Before;
@@ -41,7 +40,6 @@ public final class AesKeyStrengthPanelTest {
 
     private AesKeyStrengthPanel instance;
     private JFrame frame;
-    private JFrameOperator frameOp;
 
     @Before
     public void setUp() {
@@ -50,14 +48,12 @@ public final class AesKeyStrengthPanelTest {
             public void run() {
                 instance = new AesKeyStrengthPanel();
                 frame = new JFrame();
-                frame.getContentPane().add(instance);
+                frame.add(instance);
                 frame.pack();
                 frame.setLocationRelativeTo(null);
                 frame.setVisible(true);
             }
         });
-
-        frameOp = new JFrameOperator(); // wait for JFrame
     }
 
     @After
@@ -65,7 +61,6 @@ public final class AesKeyStrengthPanelTest {
         EventQueue.invokeAndWait(new Runnable() {
             @Override
             public void run() {
-                //frame.setVisible(false);
                 frame.dispose();
             }
         });
@@ -76,7 +71,8 @@ public final class AesKeyStrengthPanelTest {
         KeyStrength keyStrength, expResult;
         int selection;
 
-        JComboBoxOperator comboBoxOp = new JComboBoxOperator(frameOp);
+        final JComboBoxOperator
+                comboBoxOp = new JComboBoxOperator(new JFrameOperator());
 
         //
         // Check default.
