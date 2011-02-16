@@ -52,8 +52,8 @@ extends SafeKeyProvider<K> {
      * Implementations of this interface are maintained by a
      * {@link PromptingKeyManager} and injected into the
      * {@link PromptingKeyProvider} before
-     * {@link PromptingKeyProvider#getCreateKey()} or
-     * {@link PromptingKeyProvider#getOpenKey(boolean)} is called.
+     * {@link PromptingKeyProvider#getWriteKey()} or
+     * {@link PromptingKeyProvider#getReadKey(boolean)} is called.
      * <p>
      * Implementations of this interface <em>must</em> be thread safe
      * and should have no side effects!
@@ -62,18 +62,18 @@ extends SafeKeyProvider<K> {
     public interface View<K extends SafeKey<K>> {
 
         /**
-         * Prompts the user for the key which may be used to create a new
-         * protected resource or entirely replace the contents of an already
-         * existing protected resource.
+         * Prompts the user for the key for (over)writing the contents of a
+         * new or existing protected resource.
          * Upon return, the implementation should have updated the
-         * {@link Proxy#setKey key} property of the given {@code controller}.
+         * {@link Controller#setKey key} property of the given
+         * {@code controller}.
          * <p>
          * If the implementation has called {@link Controller#setKey} with a
          * non-{@code null} parameter, then a clone of this object will be
          * used as the key.
          * <p>
          * Otherwise, prompting for a key is permanently disabled and each
-         * subsequent call to {@link #getCreateKey} or {@link #getOpenKey}
+         * subsequent call to {@link #getWriteKey} or {@link #getReadKey}
          * results in a {@link KeyPromptingCancelledException} until
          * {@link #resetCancelledKey()} or {@link #resetUnconditionally()} gets
          * called.
@@ -81,14 +81,15 @@ extends SafeKeyProvider<K> {
          * @param  controller The key controller for storing the result.
          * @throws UnknownKeyException if key prompting fails for any reason.
          */
-        void promptCreateKey(Controller<? super K> controller)
+        void promptWriteKey(Controller<? super K> controller)
         throws UnknownKeyException;
 
         /**
-         * Prompts the user for the key which may be used to open an existing
-         * protected resource in order to access its contents.
+         * Prompts the user for the key for reading the contents of an
+         * existing protected resource.
          * Upon return, the implementation should have updated the
-         * {@link Proxy#setKey key} property of the given {@code controller}.
+         * {@link Controller#setKey key} property of the given
+         * {@code controller}.
          * <p>
          * If the implementation has called {@link Controller#setKey} with a
          * non-{@code null} parameter, then a clone of this object will be
@@ -98,7 +99,7 @@ extends SafeKeyProvider<K> {
          * with a {@code null} parameter or throws a
          * {@link KeyPromptingCancelledException}, then prompting for the key
          * is permanently disabled and each subsequent call to
-         * {@link #getCreateKey} or {@link #getOpenKey} results in a
+         * {@link #getWriteKey} or {@link #getReadKey} results in a
          * {@link KeyPromptingCancelledException} until
          * {@link #resetCancelledKey()} or {@link #resetUnconditionally()} gets
          * called.
@@ -114,7 +115,7 @@ extends SafeKeyProvider<K> {
          * @throws UnknownKeyException if key prompting fails for any other
          *         reason.
          */
-        void promptOpenKey(Controller<? super K> controller, boolean invalid)
+        void promptReadKey(Controller<? super K> controller, boolean invalid)
         throws UnknownKeyException;
     } // interface View
 
@@ -157,11 +158,11 @@ extends SafeKeyProvider<K> {
 
         /**
          * Requests to prompt the user for a new key upon the next call to
-         * {@link #getCreateKey()}, provided that the key is
+         * {@link #getWriteKey()}, provided that the key is
          * {@link #setKey set} then.
          *
          * @param  changeRequested whether or not the user shall get prompted
-         *         for a new key upon the next call to {@link #getCreateKey()},
+         *         for a new key upon the next call to {@link #getWriteKey()},
          *         provided that the key is {@link #setKey set} then.
          * @throws IllegalStateException if setting this property is not legal
          *         in the current state.
@@ -245,7 +246,7 @@ extends SafeKeyProvider<K> {
      *
      * @throws UnknownKeyException If the user has cancelled prompting or
      *         prompting has been disabled by the {@link PromptingKeyManager}.
-     * @see KeyProvider#getCreateKey
+     * @see KeyProvider#getWriteKey
      */
     @Override
     protected final K getCreateKeyImpl() throws UnknownKeyException {
@@ -260,7 +261,7 @@ extends SafeKeyProvider<K> {
      *
      * @throws UnknownKeyException If the user has cancelled prompting or
      *         prompting has been disabled by the {@link PromptingKeyManager}.
-     * @see KeyProvider#getOpenKey
+     * @see KeyProvider#getReadKey
      */
     @Override
     protected final K getOpenKeyImpl(boolean invalid)
@@ -271,7 +272,7 @@ extends SafeKeyProvider<K> {
     /**
      * Returns the {@code key} property maintained by this key provider.
      * Client applications should not call this method directly
-     * but rather call {@link #getOpenKey} or {@link #getCreateKey}:
+     * but rather call {@link #getReadKey} or {@link #getWriteKey}:
      * It's intended to be used by subclasses and user interface classes only.
      *
      * @return The nullable {@code key} property.
@@ -290,11 +291,11 @@ extends SafeKeyProvider<K> {
 
     /**
      * Returns whether or not the user shall get prompted for a new key upon
-     * the next call to {@link #getCreateKey()}, provided that the key
+     * the next call to {@link #getWriteKey()}, provided that the key
      * has been {@link #setKey set} before.
      *
      * @return Whether or not the user shall get prompted for a new key upon
-     *         the next call to {@link #getCreateKey()}, provided that the key
+     *         the next call to {@link #getWriteKey()}, provided that the key
      *         has been {@link #setKey set} before.
      */
     private boolean isChangeRequested() {
@@ -341,7 +342,7 @@ extends SafeKeyProvider<K> {
                 State state;
                 try {
                     Controller<K> controller = new CreateKeyController<K>(provider, this);
-                    provider.getView().promptCreateKey(controller);
+                    provider.getView().promptWriteKey(controller);
                     controller.invalidate();
                 } finally {
                     if ((state = provider.getState()) == this)
@@ -358,7 +359,7 @@ extends SafeKeyProvider<K> {
                 do {
                     try {
                         Controller<K> controller = new Controller<K>(provider, this);
-                        provider.getView().promptOpenKey(controller, invalid);
+                        provider.getView().promptReadKey(controller, invalid);
                         controller.invalidate();
                     } catch (KeyPromptingCancelledException ex) {
                         provider.setState(CANCELLED);

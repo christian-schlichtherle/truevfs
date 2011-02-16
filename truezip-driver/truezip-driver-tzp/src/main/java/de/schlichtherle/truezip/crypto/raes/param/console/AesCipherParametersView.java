@@ -69,7 +69,7 @@ implements View<AesCipherParameters> {
     private static final String NO = resources.getString("no");
 
     @Override
-    public final void promptCreateKey(
+    public final void promptWriteKey(
             final Controller<? super AesCipherParameters> controller) {
         synchronized (lock) {
             final URI resource = controller.getResource();
@@ -139,7 +139,7 @@ implements View<AesCipherParameters> {
     }
 
     @Override
-    public void promptOpenKey(
+    public void promptReadKey(
             final Controller<? super AesCipherParameters> controller,
             final boolean invalid) {
         synchronized (lock) {

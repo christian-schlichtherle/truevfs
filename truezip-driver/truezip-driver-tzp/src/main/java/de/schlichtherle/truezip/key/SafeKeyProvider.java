@@ -25,8 +25,8 @@ import net.jcip.annotations.ThreadSafe;
  * Provides the base functionality required to implement a "safe" key provider.
  * Each instance of this class maintains a single key which can be of any
  * run time type (it is just required to be {@link Cloneable}).
- * A clone of this key is returned on each call to {@link #getCreateKey}
- * and {@link #getOpenKey}.
+ * A clone of this key is returned on each call to {@link #getWriteKey}
+ * and {@link #getReadKey}.
  *
  * @param   <K> The type of the keys.
  * @author  Christian Schlichtherle
@@ -41,7 +41,7 @@ implements KeyProvider<K> {
      * The minimum delay between subsequent attempts to verify a key in
      * milliseconds.
      * More specifically, this is the minimum delay between two calls to
-     * {@link #getOpenKey} by the same thread.
+     * {@link #getReadKey} by the same thread.
      */
     public static final int MIN_KEY_RETRY_DELAY = 3 * 1000;
 
@@ -65,7 +65,7 @@ implements KeyProvider<K> {
      *         this exception or the returned key is {@code null}.
      */
     @Override
-    public final K getCreateKey() throws UnknownKeyException {
+    public final K getWriteKey() throws UnknownKeyException {
         final K key = getCreateKeyImpl();
         if (null == key)
             throw new UnknownKeyException();
@@ -83,7 +83,7 @@ implements KeyProvider<K> {
      * @throws UnknownKeyException if the required key is unknown for some
      *         reason, e.g. if prompting for the key has been disabled or
      *         cancelled by the user.
-     * @see #getCreateKey
+     * @see #getWriteKey
      */
     protected @CheckForNull K getCreateKeyImpl() throws UnknownKeyException {
         return null;
@@ -103,7 +103,7 @@ implements KeyProvider<K> {
      *         this exception or the returned key is {@code null}.
      */
     @Override
-    public final K getOpenKey(boolean invalid) throws UnknownKeyException {
+    public final K getReadKey(boolean invalid) throws UnknownKeyException {
         if (invalid)
             invalidated.set(System.currentTimeMillis());
         try {
@@ -124,7 +124,7 @@ implements KeyProvider<K> {
      * @throws UnknownKeyException If the required key is unknown.
      *         At the subclasses discretion, this may mean that prompting for
      *         the key has been disabled or cancelled by the user.
-     * @see KeyProvider#getCreateKey
+     * @see KeyProvider#getWriteKey
      */
     protected @CheckForNull K getOpenKeyImpl(boolean invalid)
     throws UnknownKeyException {

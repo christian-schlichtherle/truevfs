@@ -64,7 +64,7 @@ public final class RaesTest extends ReadOnlyFileTestSuite {
             }
 
             @Override
-            public char[] getOpenPasswd(boolean invalid) {
+            public char[] getReadPasswd(boolean invalid) {
                 assertEquals(secondTry, invalid);
                 if (secondTry) {
                     logger.finer("First returned password was wrong, providing the right one now!");
@@ -80,7 +80,7 @@ public final class RaesTest extends ReadOnlyFileTestSuite {
             }
 
             @Override
-            public char[] getCreatePasswd() {
+            public char[] getWritePasswd() {
                 return PASSWD.toCharArray();
             }
         };

@@ -60,12 +60,12 @@ public final class RaesZipTest extends ZipTestSuite {
 
     private static final RaesParameters raesParameters = new Type0RaesParameters() {
         @Override
-        public char[] getOpenPasswd(boolean invalid) {
+        public char[] getReadPasswd(boolean invalid) {
             return PASSWD.toCharArray();
         }
 
         @Override
-        public char[] getCreatePasswd() {
+        public char[] getWritePasswd() {
             return PASSWD.toCharArray();
         }
 

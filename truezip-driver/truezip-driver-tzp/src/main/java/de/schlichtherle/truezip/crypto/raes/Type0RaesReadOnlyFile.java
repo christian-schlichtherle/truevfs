@@ -130,7 +130,7 @@ class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
         CipherParameters macParam;
         long lastTry = 0; // don't enforce suspension on first prompt!
         for (boolean invalid = false; ; invalid = true) {
-            final char[] passwd = param.getOpenPasswd(invalid);
+            final char[] passwd = param.getReadPasswd(invalid);
             if (null == passwd) // safety first!
                 throw new RaesKeyException();
             final byte[] pass = PKCS12PasswordToBytes(passwd);
