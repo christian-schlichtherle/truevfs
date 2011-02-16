@@ -196,15 +196,4 @@ public final class ReadKeyPanelTest {
         new JCheckBoxOperator(frame).setSelected(false);
         assertFalse(instance.isChangeKeySelected());
     }
-
-    @Test
-    @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    public void testExtraDataUI() {
-        final JComponent ui = new AesKeyStrengthPanel();
-        instance.setExtraDataUI(ui);
-        frame.pack();
-        assertSame(ui, instance.getExtraDataUI());
-
-        new JComboBoxOperator(frame); // find combo box
-    }
 }

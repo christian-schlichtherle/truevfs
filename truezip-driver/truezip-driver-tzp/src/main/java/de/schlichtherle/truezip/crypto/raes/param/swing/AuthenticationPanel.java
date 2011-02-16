@@ -43,7 +43,7 @@ import javax.swing.text.JTextComponent;
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-final class AuthenticationPanel extends JPanel {
+public class AuthenticationPanel extends JPanel {
 
     private static final long serialVersionUID = 3876515923659236921L;
 
@@ -59,7 +59,7 @@ final class AuthenticationPanel extends JPanel {
     static final int AUTH_KEY_FILE = 1;
 
     /**
-     * Creates a new authentication panel.
+     * Constructs a new authentication panel.
      * This version of the constructor does not remember the key file path.
      */
     public AuthenticationPanel() {
@@ -77,7 +77,7 @@ final class AuthenticationPanel extends JPanel {
      * @throws NullPointerException If {@code passwdPanel} is
      *         {@code null}.
      */
-    void setPasswdPanel(JPanel passwdPanel) {
+    public void setPasswdPanel(JPanel passwdPanel) {
         if (passwdPanel == null)
             throw new NullPointerException();
 
@@ -95,12 +95,11 @@ final class AuthenticationPanel extends JPanel {
     }
 
     /**
-     * Returns the path of the key file.
-     * If the parameter {@code rememberPath} of the constructor was
-     * {@code true}, then the returned path is remembered in a static
-     * field for the next instance of this class.
+     * Returns the key file.
+     *
+     * @return The key file.
      */
-    File getKeyFile() {
+    public File getKeyFile() {
         return new File((String) keyFile.getSelectedItem());
     }
 
@@ -116,7 +115,7 @@ final class AuthenticationPanel extends JPanel {
      *
      * @return {@code AUTH_PASSWD} or {@code AUTH_KEY_FILE}.
      */
-    int getAuthenticationMethod() {
+    public int getAuthenticationMethod() {
         final int method = tabs.getSelectedIndex();
         switch (method) {
             case AUTH_PASSWD:
