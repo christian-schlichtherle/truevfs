@@ -16,8 +16,6 @@
 package de.schlichtherle.truezip.crypto.raes.param.swing;
 
 import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
-import java.awt.EventQueue;
-import javax.swing.JFrame;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,36 +32,18 @@ import static org.junit.Assert.*;
  * @version $Id$
  */
 public final class AesKeyStrengthPanelTest {
-    static {
-        JemmyProperties.setCurrentOutput(TestOut.getNullOutput()); // shut up!
-    }
-
-    private AesKeyStrengthPanel instance;
-    private JFrame frame;
+    private AesKeyStrengthPanel panel;
+    private JFrameOperator frame;
 
     @Before
     public void setUp() {
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                instance = new AesKeyStrengthPanel();
-                frame = new JFrame();
-                frame.add(instance);
-                frame.pack();
-                frame.setLocationRelativeTo(null);
-                frame.setVisible(true);
-            }
-        });
+        panel = new AesKeyStrengthPanel();
+        frame = JemmyUtils.showInNewFrame(panel);
     }
 
     @After
     public void tearDown() throws Exception {
-        EventQueue.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                frame.dispose();
-            }
-        });
+        frame.dispose();
     }
 
     @Test
@@ -71,17 +51,16 @@ public final class AesKeyStrengthPanelTest {
         KeyStrength keyStrength, expResult;
         int selection;
 
-        final JComboBoxOperator
-                comboBoxOp = new JComboBoxOperator(new JFrameOperator());
+        final JComboBoxOperator comboBox = new JComboBoxOperator(frame);
 
         //
         // Check default.
         //
 
         expResult = BITS_256;
-        keyStrength = instance.getKeyStrength();
+        keyStrength = panel.getKeyStrength();
         assertSame(expResult, keyStrength);
-        selection = comboBoxOp.getSelectedIndex();
+        selection = comboBox.getSelectedIndex();
         assertSame(expResult.ordinal(), selection);
 
         //
@@ -89,34 +68,34 @@ public final class AesKeyStrengthPanelTest {
         //
 
         expResult = BITS_128;
-        instance.setKeyStrength(expResult);
-        keyStrength = instance.getKeyStrength();
+        panel.setKeyStrength(expResult);
+        keyStrength = panel.getKeyStrength();
         assertSame(expResult, keyStrength);
-        selection = comboBoxOp.getSelectedIndex();
+        selection = comboBox.getSelectedIndex();
         assertSame(expResult.ordinal(), selection);
 
         expResult = BITS_192;
-        instance.setKeyStrength(expResult);
-        keyStrength = instance.getKeyStrength();
+        panel.setKeyStrength(expResult);
+        keyStrength = panel.getKeyStrength();
         assertSame(expResult, keyStrength);
-        selection = comboBoxOp.getSelectedIndex();
+        selection = comboBox.getSelectedIndex();
         assertSame(expResult.ordinal(), selection);
 
         expResult = BITS_256;
-        instance.setKeyStrength(expResult);
-        keyStrength = instance.getKeyStrength();
+        panel.setKeyStrength(expResult);
+        keyStrength = panel.getKeyStrength();
         assertSame(expResult, keyStrength);
-        selection = comboBoxOp.getSelectedIndex();
+        selection = comboBox.getSelectedIndex();
         assertSame(expResult.ordinal(), selection);
 
         try {
-            instance.setKeyStrength(null);
+            panel.setKeyStrength(null);
             fail();
         } catch (NullPointerException expected) {
         }
-        keyStrength = instance.getKeyStrength();
+        keyStrength = panel.getKeyStrength();
         assertSame(expResult, keyStrength);
-        selection = comboBoxOp.getSelectedIndex();
+        selection = comboBox.getSelectedIndex();
         assertSame(expResult.ordinal(), selection);
 
         //
@@ -124,24 +103,24 @@ public final class AesKeyStrengthPanelTest {
         //
 
         expResult = BITS_128;
-        comboBoxOp.setSelectedIndex(expResult.ordinal());
-        keyStrength = instance.getKeyStrength();
+        comboBox.setSelectedIndex(expResult.ordinal());
+        keyStrength = panel.getKeyStrength();
         assertSame(expResult, keyStrength);
-        selection = comboBoxOp.getSelectedIndex();
+        selection = comboBox.getSelectedIndex();
         assertSame(expResult.ordinal(), selection);
 
         expResult = BITS_192;
-        comboBoxOp.setSelectedIndex(expResult.ordinal());
-        keyStrength = instance.getKeyStrength();
+        comboBox.setSelectedIndex(expResult.ordinal());
+        keyStrength = panel.getKeyStrength();
         assertSame(expResult, keyStrength);
-        selection = comboBoxOp.getSelectedIndex();
+        selection = comboBox.getSelectedIndex();
         assertSame(expResult.ordinal(), selection);
 
         expResult = BITS_256;
-        comboBoxOp.setSelectedIndex(expResult.ordinal());
-        keyStrength = instance.getKeyStrength();
+        comboBox.setSelectedIndex(expResult.ordinal());
+        keyStrength = panel.getKeyStrength();
         assertSame(expResult, keyStrength);
-        selection = comboBoxOp.getSelectedIndex();
+        selection = comboBox.getSelectedIndex();
         assertSame(expResult.ordinal(), selection);
     };
 }

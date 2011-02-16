@@ -15,15 +15,15 @@
  */
 package de.schlichtherle.truezip.crypto.raes.param.swing;
 
-import java.awt.EventQueue;
-import java.io.File;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import org.junit.Test;
-import org.netbeans.jemmy.ComponentChooser;
 import org.netbeans.jemmy.JemmyProperties;
 import org.netbeans.jemmy.TestOut;
+import java.io.File;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.netbeans.jemmy.ComponentChooser;
 import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JFileChooserOperator;
 import org.netbeans.jemmy.operators.JFrameOperator;
@@ -43,44 +43,36 @@ public class AuthenticationPanelTest {
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput()); // shut up!
     }
 
+    private static final String LABEL_TEXT = "Hello World!";
+
+    private AuthenticationPanel panel;
+    private JFrameOperator frame;
+
+    @Before
+    public void setUp() {
+        final JPanel passwdPanel = new JPanel();
+        passwdPanel.add(new JLabel(LABEL_TEXT));
+        panel = new AuthenticationPanel();
+        panel.setPasswdPanel(passwdPanel);
+        frame = JemmyUtils.showInNewFrame(panel);
+    }
+
+    @After
+    public void tearDown() {
+        frame.dispose();
+    }
+
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     @Test
     public void testTabbedPane() {
-        final String text = "Hello world!";
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                final AuthenticationPanel panel = new AuthenticationPanel();
-
-                JPanel passwdPanel = null;
-                try {
-                    panel.setPasswdPanel(passwdPanel);
-                    fail("Calling setPasswdPanel(null) should throw an NPE!");
-                } catch (NullPointerException npe) {
-                }
-
-                passwdPanel = new JPanel();
-                passwdPanel.add(new JLabel(text));
-                panel.setPasswdPanel(passwdPanel);
-
-                final JFrame frame = new JFrame();
-                frame.getContentPane().add(panel);
-                frame.pack();
-                frame.setLocationRelativeTo(null);
-                frame.setVisible(true);
-            }
-        });
-
-        final JFrameOperator frame = new JFrameOperator();
-
-        final ComponentChooser keyFileChooser
-                = new NameComponentChooser("keyFileChooser");
+        final ComponentChooser
+                keyFileChooser = new NameComponentChooser("keyFileChooser");
         new JTabbedPaneOperator(frame).selectPage(AuthenticationPanel.AUTH_KEY_FILE); // select tab for key files
         new JButtonOperator(frame, keyFileChooser).push(); // open file chooser
         JFileChooserOperator fc = new JFileChooserOperator();
         fc.cancel();
         new JTabbedPaneOperator(frame).selectPage(AuthenticationPanel.AUTH_PASSWD); // select tab for passwords
-        new JLabelOperator(frame, text);
+        new JLabelOperator(frame, LABEL_TEXT);
         fc = null;
 
         new JTabbedPaneOperator(frame).selectPage(AuthenticationPanel.AUTH_KEY_FILE); // select tab for key files
@@ -94,8 +86,6 @@ public class AuthenticationPanelTest {
         fc = null;
 
         new JTabbedPaneOperator(frame).selectPage(AuthenticationPanel.AUTH_PASSWD); // select tab for passwords
-        new JLabelOperator(frame, text);
-
-        frame.dispose();
+        new JLabelOperator(frame, LABEL_TEXT);
     }
 }

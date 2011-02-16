@@ -16,16 +16,15 @@
 package de.schlichtherle.truezip.crypto.raes.param.swing;
 
 import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
-import java.awt.EventQueue;
 import java.io.File;
 import java.net.URI;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.netbeans.jemmy.ComponentChooser;
 import org.netbeans.jemmy.JemmyProperties;
+import org.netbeans.jemmy.QueueTool;
 import org.netbeans.jemmy.TestOut;
 import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JComboBoxOperator;
@@ -49,7 +48,7 @@ public final class WriteKeyPanelTest {
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput()); // shut up!
     }
 
-    private WriteKeyPanel instance;
+    private WriteKeyPanel panel;
     private JFrameOperator frame;
     private JLabelOperator errorLabel;
     private final ComponentChooser keyFileChooser
@@ -57,63 +56,44 @@ public final class WriteKeyPanelTest {
 
     @Before
     public void setUp() throws Exception {
-        instance = new WriteKeyPanel();
-        frame = showInstanceInFrame();
+        panel = new WriteKeyPanel();
+        frame = JemmyUtils.showInNewFrame(panel);
         errorLabel = findErrorLabel(frame);
-    }
-
-    private JFrameOperator showInstanceInFrame() {
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                final JFrame frame = new JFrame();
-                frame.getContentPane().add(instance);
-                frame.pack();
-                frame.setLocationRelativeTo(null);
-                frame.setVisible(true);
-            }
-        });
-        return new JFrameOperator();
     }
 
     private JLabelOperator findErrorLabel(final JFrameOperator frame) {
         final String error = "error";
-        instance.setError(error);
+        panel.setError(error);
         final JLabelOperator errorLabel = new JLabelOperator(frame, error);
-        ((JFrame) frame.getSource()).pack();
-        instance.setError(null);
+        frame.pack();
+        new QueueTool().waitEmpty();
+        panel.setError(null);
         return errorLabel;
     }
 
     @After
     public void tearDown() throws Exception {
-        EventQueue.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                //frame.setVisible(false);
-                frame.dispose();
-            }
-        });
+        frame.dispose();
     }
 
     @Test
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testResourceID() {
         final URI id = URI.create("HelloWorld!");
-        instance.setResource(id);
-        assertEquals(id, instance.getResource());
+        panel.setResource(id);
+        assertEquals(id, panel.getResource());
 
         new JTextComponentOperator(frame, id.toString());
     }
 
     @Test
     public void testSetError() {
-        instance.setError("This is a test error message!");
+        panel.setError("This is a test error message!");
         assertFalse(isBlank(errorLabel.getText()));
         new JTextFieldOperator(frame).typeText("secret");
         assertTrue(isBlank(errorLabel.getText()));
 
-        instance.setError("This is a test error message!");
+        panel.setError("This is a test error message!");
         assertFalse(isBlank(errorLabel.getText()));
         new JTabbedPaneOperator(frame).selectPage(AuthenticationPanel.AUTH_KEY_FILE); // select tab for key files
         new JButtonOperator(frame, keyFileChooser).push(); // open file chooser
@@ -130,14 +110,14 @@ public final class WriteKeyPanelTest {
         final AesCipherParameters param = new AesCipherParameters();
 
         // Check default.
-        assertFalse(instance.updateWriteKey(param));
+        assertFalse(panel.updateWriteKey(param));
         assertNull(param.getPassword());
         assertFalse(isBlank(errorLabel.getText()));
 
         // Enter mismatching passwords.
         new JPasswordFieldOperator(frame, 0).setText("foofoo");
         new JPasswordFieldOperator(frame, 1).setText("barbar");
-        assertFalse(instance.updateWriteKey(param));
+        assertFalse(panel.updateWriteKey(param));
         assertNull(param.getPassword());
         assertFalse(isBlank(errorLabel.getText()));
 
@@ -145,7 +125,7 @@ public final class WriteKeyPanelTest {
         String passwd = "secre"; // 5 chars is too short
         new JPasswordFieldOperator(frame, 0).setText(passwd);
         new JPasswordFieldOperator(frame, 1).setText(passwd);
-        assertFalse(instance.updateWriteKey(param));
+        assertFalse(panel.updateWriteKey(param));
         assertNull(param.getPassword());
         assertFalse(isBlank(errorLabel.getText()));
 
@@ -153,7 +133,7 @@ public final class WriteKeyPanelTest {
         passwd = "secret"; // min 6 chars is OK
         new JPasswordFieldOperator(frame, 0).setText(passwd);
         new JPasswordFieldOperator(frame, 1).setText(passwd);
-        assertTrue(instance.updateWriteKey(param));
+        assertTrue(panel.updateWriteKey(param));
         assertEquals(passwd, new String(param.getPassword()));
         assertTrue(isBlank(errorLabel.getText()));
     }
@@ -167,7 +147,7 @@ public final class WriteKeyPanelTest {
         new JButtonOperator(frame, keyFileChooser).push(); // open file chooser
         new JFileChooserOperator().chooseFile("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"$%&/()=?");
         assertTrue(isBlank(errorLabel.getText()));
-        assertFalse(instance.updateWriteKey(param));
+        assertFalse(panel.updateWriteKey(param));
         assertFalse(isBlank(errorLabel.getText()));
 
         new JButtonOperator(frame, keyFileChooser).push(); // open file chooser
@@ -184,7 +164,7 @@ public final class WriteKeyPanelTest {
             fc = new JFileChooserOperator();
             fc.setSelectedFile(file);
             fc.approve();
-            if (instance.updateWriteKey(param)) {
+            if (panel.updateWriteKey(param)) {
                 assertNotNull(param.getPassword());
                 assertTrue(isBlank(errorLabel.getText()));
             } else {
@@ -197,9 +177,9 @@ public final class WriteKeyPanelTest {
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testExtraDataUI() {
         final JComponent ui = new AesKeyStrengthPanel();
-        instance.setExtraDataUI(ui);
+        panel.setExtraDataUI(ui);
         frame.pack();
-        assertSame(ui, instance.getExtraDataUI());
+        assertSame(ui, panel.getExtraDataUI());
 
         new JComboBoxOperator(frame); // find combo box
     }
