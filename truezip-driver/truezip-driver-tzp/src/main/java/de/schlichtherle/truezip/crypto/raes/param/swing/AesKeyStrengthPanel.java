@@ -17,6 +17,8 @@ package de.schlichtherle.truezip.crypto.raes.param.swing;
 
 import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
 import de.schlichtherle.truezip.swing.EnhancedPanel;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.ResourceBundle;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
@@ -29,7 +31,8 @@ import static de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStreng
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class AesKeyStrengthPanel extends EnhancedPanel {
+@DefaultAnnotation(NonNull.class)
+public class AesKeyStrengthPanel extends EnhancedPanel {
     private static final long serialVersionUID = 5629581723148235643L;
 
     private static final String CLASS_NAME = AesKeyStrengthPanel.class.getName();
@@ -43,8 +46,8 @@ final class AesKeyStrengthPanel extends EnhancedPanel {
         assert 2 == BITS_256.ordinal();
     }
 
-    /** Constructs a new AesKeyStrengthPanel. */
-    AesKeyStrengthPanel() {
+    /** Constructs a new AES key strength panel. */
+    public AesKeyStrengthPanel() {
         initComponents();
         keyStrength.setSelectedIndex(BITS_256.ordinal());
     }
@@ -99,12 +102,22 @@ final class AesKeyStrengthPanel extends EnhancedPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 5);
         add(keyStrengthShort, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
-    
-    KeyStrength getKeyStrength() {
+
+    /**
+     * Returns the value of the property {@code keyStrength}.
+     *
+     * @return The value of the property {@code keyStrength}.
+     */
+    public KeyStrength getKeyStrength() {
         return KeyStrength.values()[keyStrength.getSelectedIndex()];
     }
     
-    void setKeyStrength(KeyStrength keyStrength) {
+    /**
+     * Sets the value of the property {@code keyStrength}.
+     *
+     * @param  keyStrength the new value of the property {@code keyStrength}.
+     */
+    public void setKeyStrength(KeyStrength keyStrength) {
         this.keyStrength.setSelectedIndex(keyStrength.ordinal());
     }
     

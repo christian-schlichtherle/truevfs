@@ -51,7 +51,7 @@ import javax.swing.event.DocumentListener;
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-final class ReadKeyPanel extends EnhancedPanel {
+public class ReadKeyPanel extends EnhancedPanel {
 
     private static final String CLASS_NAME = ReadKeyPanel.class.getName();
     private static final ResourceBundle resources
@@ -60,28 +60,24 @@ final class ReadKeyPanel extends EnhancedPanel {
 
     private final Color defaultForeground;
 
-    private JComponent extraDataUI;
-
     private Feedback feedback;
     
-    /**
-     * Creates new form ReadKeyPanel
-     */
+    /** Constructs a new read key panel. */
     public ReadKeyPanel() {
         initComponents();
         final DocumentListener dl = new DocumentListener() {
             @Override
-			public void insertUpdate(DocumentEvent e) {
+            public void insertUpdate(DocumentEvent e) {
                 setError(null);
             }
 
             @Override
-			public void removeUpdate(DocumentEvent e) {
+            public void removeUpdate(DocumentEvent e) {
                 setError(null);
             }
 
             @Override
-			public void changedUpdate(DocumentEvent e) {
+            public void changedUpdate(DocumentEvent e) {
                 setError(null);
             }
         };
@@ -95,20 +91,20 @@ final class ReadKeyPanel extends EnhancedPanel {
     }
 
     /**
-     * Getter for property {@code resourceID}.
+     * Getter for property {@code resource}.
      *
-     * @return Value of property {@code resourceID}.
+     * @return Value of property {@code resource}.
      */
-    URI getResource() {
+    public URI getResource() {
         return URI.create(resource.getText());
     }
 
     /**
-     * Setter for property {@code resourceID}.
+     * Setter for property {@code resource}.
      *
-     * @param resource New value of property {@code resourceID}.
+     * @param resource New value of property {@code resource}.
      */
-    void setResource(final URI resource) {
+    public void setResource(final URI resource) {
         final URI lastResource = AesCipherParametersView.lastResource;
         if (!lastResource.equals(resource)
                 && !lastResource.equals(AesCipherParametersView.INITIAL_RESOURCE)) {
@@ -123,7 +119,7 @@ final class ReadKeyPanel extends EnhancedPanel {
     /**
      * Getter for property {@code error}.
      */
-    @CheckForNull String getError() {
+    public @CheckForNull String getError() {
         final String error = this.error.getText();
         return error.trim().length() > 0 ? error : null;
     }
@@ -133,7 +129,7 @@ final class ReadKeyPanel extends EnhancedPanel {
      *
      * @param error New value of property error.
      */
-    void setError(final @CheckForNull String error) {
+    public void setError(final @CheckForNull String error) {
         // Fix layout issue with GridBagLayout:
         // If null is set, the layout seems to ignore the widthy = 1.0
         // constraint for the component.
@@ -181,7 +177,7 @@ final class ReadKeyPanel extends EnhancedPanel {
      *
      * @return Value of property changeKeySelected.
      */
-    boolean isChangeKeySelected() {
+    public boolean isChangeKeySelected() {
         return changeKey.isSelected();
     }
 
@@ -190,56 +186,15 @@ final class ReadKeyPanel extends EnhancedPanel {
      * 
      * @param changeKeySelected New value of property changeKeySelected.
      */
-    void setChangeKeySelected(boolean changeKeySelected) {
+    public void setChangeKeySelected(boolean changeKeySelected) {
         this.changeKey.setSelected(changeKeySelected);
-    }
-    
-    /**
-     * Getter for property {@code extraDataUI}.
-     * 
-     * @return Value of property {@code extraDataUI}.
-     */
-    JComponent getExtraDataUI() {
-        return extraDataUI;
-    }
-    
-    /**
-     * Setter for property {@code extraDataUI}.
-     * This component is placed below the password field and above the
-     * "change password / key file" check box.
-     * It may be used to prompt the user for additional data which may form
-     * part of the key or is separately stored in the key provider.
-     * The panel is automatically revalidated.
-     * 
-     * @param extraDataUI New value of property {@code extraDataUI}.
-     */
-    void setExtraDataUI(final JComponent extraDataUI) {
-        if (this.extraDataUI == extraDataUI)
-            return;
-
-        if (this.extraDataUI != null) {
-            remove(this.extraDataUI);
-        }
-        if (extraDataUI != null) {
-            java.awt.GridBagConstraints gridBagConstraints;
-            gridBagConstraints = new java.awt.GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = 4;
-            gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.insets = new java.awt.Insets(15, 0, 0, 0);
-            add(extraDataUI, gridBagConstraints);
-        }
-        this.extraDataUI = extraDataUI;
-
-        revalidate();
     }
 
     /**
      * Returns the feedback to run when this panel is shown in its ancestor
      * window.
      */
-    Feedback getFeedback() {
+    public Feedback getFeedback() {
         return feedback;
     }
 
@@ -247,7 +202,7 @@ final class ReadKeyPanel extends EnhancedPanel {
      * Sets the feedback to run when this panel is shown in its ancestor
      * window.
      */
-    void setFeedback(final Feedback feedback) {
+    public void setFeedback(final Feedback feedback) {
         this.feedback = feedback;
     }
 
@@ -396,11 +351,11 @@ final class ReadKeyPanel extends EnhancedPanel {
         assert null != window : "illegal state";
         window.addWindowFocusListener(new WindowFocusListener() {
             @Override
-			public void windowGainedFocus(WindowEvent e) {
+            public void windowGainedFocus(WindowEvent e) {
                 window.removeWindowFocusListener(this);
                 EventQueue.invokeLater(new Runnable() {
                     @Override
-					public void run() {
+                    public void run() {
                         if (passwd.requestFocusInWindow())
                             passwd.selectAll();
                     }
@@ -408,7 +363,7 @@ final class ReadKeyPanel extends EnhancedPanel {
             }
 
             @Override
-			public void windowLostFocus(WindowEvent e) {
+            public void windowLostFocus(WindowEvent e) {
             }
         });
     }//GEN-LAST:event_passwdPanelAncestorWindowShown

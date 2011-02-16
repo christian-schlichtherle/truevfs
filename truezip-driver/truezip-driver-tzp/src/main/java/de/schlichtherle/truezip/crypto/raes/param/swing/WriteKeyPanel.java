@@ -51,7 +51,7 @@ import javax.swing.event.DocumentListener;
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-final class WriteKeyPanel extends EnhancedPanel {
+public class WriteKeyPanel extends EnhancedPanel {
 
     private static final String CLASS_NAME = WriteKeyPanel.class.getName();
     private static final ResourceBundle resources
@@ -68,24 +68,22 @@ final class WriteKeyPanel extends EnhancedPanel {
 
     private Feedback feedback;
 
-    /**
-     * Creates new form WriteKeyPanel
-     */
+    /** Constructs a new write key panel. */
     public WriteKeyPanel() {
         initComponents();
         final DocumentListener dl = new DocumentListener() {
             @Override
-			public void insertUpdate(DocumentEvent e) {
+            public void insertUpdate(DocumentEvent e) {
                 setError(null);
             }
 
             @Override
-			public void removeUpdate(DocumentEvent e) {
+            public void removeUpdate(DocumentEvent e) {
                 setError(null);
             }
 
             @Override
-			public void changedUpdate(DocumentEvent e) {
+            public void changedUpdate(DocumentEvent e) {
                 setError(null);
             }
         };
@@ -96,25 +94,24 @@ final class WriteKeyPanel extends EnhancedPanel {
     }
 
     private Font getBoldFont() {
-        Font font = resource.getFont();
-        return new Font(font.getName(), Font.BOLD, font.getSize());
+        return resource.getFont().deriveFont(Font.BOLD);
     }
 
     /**
-     * Getter for property {@code resourceID}.
+     * Getter for property {@code resource}.
      *
-     * @return Value of property {@code resourceID}.
+     * @return Value of property {@code resource}.
      */
-    URI getResource() {
+    public URI getResource() {
         return URI.create(resource.getText());
     }
     
     /**
-     * Setter for property {@code resourceID}.
+     * Setter for property {@code resource}.
      *
-     * @param resource New value of property {@code resourceID}.
+     * @param resource New value of property {@code resource}.
      */
-    void setResource(final URI resource) {
+    public void setResource(final URI resource) {
         final URI lastResource = AesCipherParametersView.lastResource;
         assert lastResource != null : "violation of contract in PromptingKeyProvider";
         if (!lastResource.equals(resource)
@@ -135,7 +132,7 @@ final class WriteKeyPanel extends EnhancedPanel {
                     final char[] newPasswd2Content = newPasswd2.getPassword();
                     if (Arrays.equals(newPasswd1Content, newPasswd2Content)) {
                         Arrays.fill(newPasswd2Content, (char) 0);
-                        checkPasswdWriteKey(newPasswd1Content);
+                        checkPasswdKey(newPasswd1Content);
                         setError(null);
                         param.setPassword(newPasswd1Content);
                         return true;
@@ -164,7 +161,7 @@ final class WriteKeyPanel extends EnhancedPanel {
                         setError(resources.getString("keyFile.ioException"));
                         return false;
                     }
-                    checkKeyFileWriteKey(key);
+                    checkKeyFileKey(key);
                     setError(null);
                     param.setKeyFileBytes(key);
                     return true;
@@ -178,14 +175,19 @@ final class WriteKeyPanel extends EnhancedPanel {
         }
     }
 
-    /** Check the data entropy in the new key. */
-    void checkKeyFileWriteKey(byte[] writeKey)
+    /**
+     * Checks the entropy of the given key.
+     * 
+     * @param key the key to check.
+     * @throws WeakKeyException if the entropy of the given key is too weak.
+     */
+    protected void checkKeyFileKey(byte[] key)
     throws WeakKeyException {
         Deflater def = new Deflater();
-        def.setInput(writeKey);
+        def.setInput(key);
         def.finish();
         assert def.getTotalOut() == 0;
-        final int n = def.deflate(new byte[writeKey.length * 2]);
+        final int n = def.deflate(new byte[key.length * 2]);
         assert def.getTotalOut() == n;
         def.end();
         if (n < 2 * 256 / 8) // see RandomAccessEncryptionSpecification
@@ -193,9 +195,15 @@ final class WriteKeyPanel extends EnhancedPanel {
                     localizedMessage(resources, "keyFile.badEntropy", null));
     }
 
-    void checkPasswdWriteKey(char[] writeKey)
+    /**
+     * Checks the entropy of the given key.
+     *
+     * @param key the key to check.
+     * @throws WeakKeyException if the entropy of the given key is too weak.
+     */
+    protected void checkPasswdKey(char[] key)
     throws WeakKeyException {
-        if (writeKey.length < MIN_PASSWD_LEN)
+        if (key.length < MIN_PASSWD_LEN)
             throw new WeakKeyException(localizedMessage(
                     resources, "passwd.tooShort", MIN_PASSWD_LEN));
     }
@@ -212,7 +220,7 @@ final class WriteKeyPanel extends EnhancedPanel {
     /**
      * Getter for property {@code error}.
      */
-    @CheckForNull String getError() {
+    public @CheckForNull String getError() {
         final String error = this.error.getText();
         return error.trim().length() > 0 ? error : null;
     }
@@ -222,7 +230,7 @@ final class WriteKeyPanel extends EnhancedPanel {
      *
      * @param error New value of property error.
      */
-    void setError(final @CheckForNull String error) {
+    public void setError(final @CheckForNull String error) {
         // Fix layout issue with GridBagLayout:
         // If null is set, the layout seems to ignore the width = 1.0
         // constraint for the component.
@@ -234,7 +242,7 @@ final class WriteKeyPanel extends EnhancedPanel {
      * 
      * @return Value of property {@code extraDataUI}.
      */
-    JComponent getExtraDataUI() {
+    public JComponent getExtraDataUI() {
         return extraDataUI;
     }
     
@@ -248,7 +256,7 @@ final class WriteKeyPanel extends EnhancedPanel {
      * 
      * @param extraDataUI New value of property {@code extraDataUI}.
      */
-    void setExtraDataUI(final JComponent extraDataUI) {
+    public void setExtraDataUI(final JComponent extraDataUI) {
         if (this.extraDataUI == extraDataUI)
             return;
 
@@ -273,7 +281,7 @@ final class WriteKeyPanel extends EnhancedPanel {
      * Returns the feedback to run when this panel is shown in its ancestor
      * window.
      */
-    Feedback getFeedback() {
+    public Feedback getFeedback() {
         return feedback;
     }
 
@@ -281,7 +289,7 @@ final class WriteKeyPanel extends EnhancedPanel {
      * Sets the feedback to run when this panel is shown in its ancestor
      * window.
      */
-    void setFeedback(final Feedback feedback) {
+    public void setFeedback(final Feedback feedback) {
         this.feedback = feedback;
     }
     
@@ -442,11 +450,11 @@ final class WriteKeyPanel extends EnhancedPanel {
         assert window != null : "illegal state";
         window.addWindowFocusListener(new WindowFocusListener() {
             @Override
-			public void windowGainedFocus(WindowEvent e) {
+            public void windowGainedFocus(WindowEvent e) {
                 window.removeWindowFocusListener(this);
                 EventQueue.invokeLater(new Runnable() {
                     @Override
-					public void run() {
+                    public void run() {
                         if (newPasswd1.requestFocusInWindow()) {
                             newPasswd1.selectAll();
                             newPasswd2.selectAll();
@@ -456,7 +464,7 @@ final class WriteKeyPanel extends EnhancedPanel {
             }
 
             @Override
-			public void windowLostFocus(WindowEvent e) {
+            public void windowLostFocus(WindowEvent e) {
             }
         });
     }//GEN-LAST:event_newPasswdPanelAncestorWindowShown
