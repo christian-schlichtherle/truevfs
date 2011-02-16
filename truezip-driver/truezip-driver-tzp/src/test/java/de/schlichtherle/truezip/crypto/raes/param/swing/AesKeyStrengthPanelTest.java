@@ -32,6 +32,10 @@ import static org.junit.Assert.*;
  * @version $Id$
  */
 public final class AesKeyStrengthPanelTest {
+    static {
+        JemmyProperties.setCurrentOutput(TestOut.getNullOutput()); // shut up!
+    }
+
     private AesKeyStrengthPanel panel;
     private JFrameOperator frame;
 
