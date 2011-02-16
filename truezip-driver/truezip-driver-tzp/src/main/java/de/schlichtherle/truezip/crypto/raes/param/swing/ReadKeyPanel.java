@@ -23,8 +23,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
@@ -33,45 +31,43 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
-import java.text.MessageFormat;
-import java.util.Arrays;
 import java.util.ResourceBundle;
-import java.util.zip.Deflater;
 import javax.swing.JComponent;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 /**
- * This panel prompts the user for a key to create or overwrite a protected
+ * This panel prompts the user for a key to open an existing protected
  * resource.
  * It currently supports password and key file authentication, but is
  * extensible for use with certificate based authentication, too.
+ * <p>
+ * Note that the contents of the password and file path fields are stored in
+ * a static field from which they are restored when a new panel is created.
+ * This is very convenient for the user if she inadvertently entered a wrong
+ * key or shares the same key for multiple protected resources.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-final class CreateKeyPanel extends EnhancedPanel {
+final class ReadKeyPanel extends EnhancedPanel {
 
-    private static final String CLASS_NAME = CreateKeyPanel.class.getName();
+    private static final String CLASS_NAME = ReadKeyPanel.class.getName();
     private static final ResourceBundle resources
             = ResourceBundle.getBundle(CLASS_NAME);
-
-    /** The minimum acceptable length of a password. */
-    private static final int MIN_PASSWD_LEN = 6;
-    
-    private static final long serialVersionUID = 6416529465492387235L;
+    private static final long serialVersionUID = 984673974236493651L;
 
     private final Color defaultForeground;
 
     private JComponent extraDataUI;
 
     private Feedback feedback;
-
+    
     /**
-     * Creates new form CreateKeyPanel
+     * Creates new form ReadKeyPanel
      */
-    public CreateKeyPanel() {
+    public ReadKeyPanel() {
         initComponents();
         final DocumentListener dl = new DocumentListener() {
             @Override
@@ -89,15 +85,13 @@ final class CreateKeyPanel extends EnhancedPanel {
                 setError(null);
             }
         };
-        newPasswd1.getDocument().addDocumentListener(dl);
-        newPasswd2.getDocument().addDocumentListener(dl);
+        passwd.getDocument().addDocumentListener(dl);
         authenticationPanel.getKeyFileDocument().addDocumentListener(dl);
         defaultForeground = resource.getForeground();
     }
 
     private Font getBoldFont() {
-        Font font = resource.getFont();
-        return new Font(font.getName(), Font.BOLD, font.getSize());
+        return resource.getFont().deriveFont(Font.BOLD);
     }
 
     /**
@@ -108,7 +102,7 @@ final class CreateKeyPanel extends EnhancedPanel {
     URI getResource() {
         return URI.create(resource.getText());
     }
-    
+
     /**
      * Setter for property {@code resourceID}.
      *
@@ -116,7 +110,6 @@ final class CreateKeyPanel extends EnhancedPanel {
      */
     void setResource(final URI resource) {
         final URI lastResource = AesCipherParametersView.lastResource;
-        assert lastResource != null : "violation of contract in PromptingKeyProvider";
         if (!lastResource.equals(resource)
                 && !lastResource.equals(AesCipherParametersView.INITIAL_RESOURCE)) {
             this.resource.setForeground(Color.RED);
@@ -125,88 +118,6 @@ final class CreateKeyPanel extends EnhancedPanel {
         }
         this.resource.setText(resource.toString());
         AesCipherParametersView.lastResource = resource;
-    }
-    
-    boolean updateCreateKey(final AesCipherParameters param) {
-        try {
-            switch (authenticationPanel.getAuthenticationMethod()) {
-                case AuthenticationPanel.AUTH_PASSWD:
-                    final char[] newPasswd1Content = newPasswd1.getPassword();
-                    final char[] newPasswd2Content = newPasswd2.getPassword();
-                    if (Arrays.equals(newPasswd1Content, newPasswd2Content)) {
-                        Arrays.fill(newPasswd2Content, (char) 0);
-                        checkPasswdCreateKey(newPasswd1Content);
-                        setError(null);
-                        param.setPassword(newPasswd1Content);
-                        return true;
-                    } else {
-                        setError(resources.getString("passwd.noMatch"));
-                        return false;
-                    }
-
-                case AuthenticationPanel.AUTH_KEY_FILE:
-                    final File keyFile = authenticationPanel.getKeyFile();
-                    if (keyFile.canWrite()) {
-                        setError(resources.getString("keyFile.canWrite"));
-                        return false;
-                    }
-
-                    final byte[] key;
-                    try {
-                        key = AesCipherParametersView.readKeyFile(keyFile);
-                    } catch (EOFException ex) {
-                        setError(resources.getString("keyFile.eofException"));
-                        return false;
-                    } catch (FileNotFoundException ex) {
-                        setError(resources.getString("keyFile.fileNotFoundException"));
-                        return false;
-                    } catch (IOException ex) {
-                        setError(resources.getString("keyFile.ioException"));
-                        return false;
-                    }
-                    checkKeyFileCreateKey(key);
-                    setError(null);
-                    param.setKeyFileBytes(key);
-                    return true;
-
-                default:
-                    throw new AssertionError("Unsupported authentication method!");
-            }
-        } catch (WeakKeyException failure) {
-            setError(failure.getLocalizedMessage());
-            return false;
-        }
-    }
-
-    /** Check the data entropy in the new key. */
-    void checkKeyFileCreateKey(byte[] createKey)
-    throws WeakKeyException {
-        Deflater def = new Deflater();
-        def.setInput(createKey);
-        def.finish();
-        assert def.getTotalOut() == 0;
-        final int n = def.deflate(new byte[createKey.length * 2]);
-        assert def.getTotalOut() == n;
-        def.end();
-        if (n < 2 * 256 / 8) // see RandomAccessEncryptionSpecification
-            throw new WeakKeyException(
-                    localizedMessage(resources, "keyFile.badEntropy", null));
-    }
-
-    void checkPasswdCreateKey(char[] createKey)
-    throws WeakKeyException {
-        if (createKey.length < MIN_PASSWD_LEN)
-            throw new WeakKeyException(localizedMessage(
-                    resources, "passwd.tooShort", MIN_PASSWD_LEN));
-    }
-
-    private static String localizedMessage(
-            final ResourceBundle resources,
-            final String key,
-            final @CheckForNull Object param) {
-        return param != null
-                ? MessageFormat.format(resources.getString(key), new Object[] { param })
-                : resources.getString(key);
     }
 
     /**
@@ -224,9 +135,63 @@ final class CreateKeyPanel extends EnhancedPanel {
      */
     void setError(final @CheckForNull String error) {
         // Fix layout issue with GridBagLayout:
-        // If null is set, the layout seems to ignore the width = 1.0
+        // If null is set, the layout seems to ignore the widthy = 1.0
         // constraint for the component.
         this.error.setText(error != null ? error : " ");
+    }
+
+    /**
+     * Getter for property {@code openKey}.
+     * If a key file is selected and an error occurs when accessing it,
+     * a descriptive message is set for the {@code error} property.
+     *
+     * @return Value of property {@code openKey}.
+     *         May be {@code null} if a key file is selected and
+     *         accessing it results in an exception.
+     */
+    boolean updateReadKey(final AesCipherParameters param) {
+        switch (authenticationPanel.getAuthenticationMethod()) {
+            case AuthenticationPanel.AUTH_PASSWD:
+                param.setPassword(passwd.getPassword());
+                return true;
+
+            case AuthenticationPanel.AUTH_KEY_FILE:
+                final File keyFile = authenticationPanel.getKeyFile();
+                try {
+                    param.setKeyFileBytes(AesCipherParametersView.readKeyFile(keyFile));
+                    return true;
+                } catch (EOFException ex) {
+                    setError(resources.getString("keyFile.eofException"));
+                    return false;
+                } catch (FileNotFoundException ex) {
+                    setError(resources.getString("keyFile.fileNotFoundException"));
+                    return false;
+                } catch (IOException ex) {
+                    setError(resources.getString("keyFile.ioException"));
+                    return false;
+                }
+
+            default:
+                throw new AssertionError("Unsupported authentication method!");
+        }
+    }
+
+    /**
+     * Getter for property changeKeySelected.
+     *
+     * @return Value of property changeKeySelected.
+     */
+    boolean isChangeKeySelected() {
+        return changeKey.isSelected();
+    }
+
+    /**
+     * Setter for property changeKeySelected.
+     * 
+     * @param changeKeySelected New value of property changeKeySelected.
+     */
+    void setChangeKeySelected(boolean changeKeySelected) {
+        this.changeKey.setSelected(changeKeySelected);
     }
     
     /**
@@ -240,8 +205,8 @@ final class CreateKeyPanel extends EnhancedPanel {
     
     /**
      * Setter for property {@code extraDataUI}.
-     * This component is placed below the two password fields and above the
-     * error label.
+     * This component is placed below the password field and above the
+     * "change password / key file" check box.
      * It may be used to prompt the user for additional data which may form
      * part of the key or is separately stored in the key provider.
      * The panel is automatically revalidated.
@@ -256,12 +221,13 @@ final class CreateKeyPanel extends EnhancedPanel {
             remove(this.extraDataUI);
         }
         if (extraDataUI != null) {
-            GridBagConstraints gridBagConstraints = new GridBagConstraints();
+            java.awt.GridBagConstraints gridBagConstraints;
+            gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = 3;
-            gridBagConstraints.gridwidth = GridBagConstraints.REMAINDER;
-            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.insets = new Insets(15, 0, 0, 0);
+            gridBagConstraints.gridy = 4;
+            gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
+            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.insets = new java.awt.Insets(15, 0, 0, 0);
             add(extraDataUI, gridBagConstraints);
         }
         this.extraDataUI = extraDataUI;
@@ -284,7 +250,7 @@ final class CreateKeyPanel extends EnhancedPanel {
     void setFeedback(final Feedback feedback) {
         this.feedback = feedback;
     }
-    
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -294,63 +260,41 @@ final class CreateKeyPanel extends EnhancedPanel {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        newPasswdPanel = new de.schlichtherle.truezip.swing.EnhancedPanel();
-        newPasswd1Label = new javax.swing.JLabel();
-        newPasswd1 = new javax.swing.JPasswordField();
-        newPasswd2Label = new javax.swing.JLabel();
-        newPasswd2 = new javax.swing.JPasswordField();
+        passwdPanel = new de.schlichtherle.truezip.swing.EnhancedPanel();
+        passwdLabel = new javax.swing.JLabel();
+        passwd = new javax.swing.JPasswordField();
         final javax.swing.JLabel prompt = new javax.swing.JLabel();
         resource = new javax.swing.JTextPane();
         authenticationPanel = new de.schlichtherle.truezip.crypto.raes.param.swing.AuthenticationPanel();
         error = new javax.swing.JLabel();
 
-        newPasswdPanel.addPanelListener(new de.schlichtherle.truezip.swing.PanelListener() {
+        passwdPanel.addPanelListener(new de.schlichtherle.truezip.swing.PanelListener() {
             @Override
 			public void ancestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {
-                newPasswdPanelAncestorWindowShown(evt);
+                passwdPanelAncestorWindowShown(evt);
             }
             @Override
 			public void ancestorWindowHidden(de.schlichtherle.truezip.swing.PanelEvent evt) {
             }
         });
-        newPasswdPanel.setLayout(new java.awt.GridBagLayout());
+        passwdPanel.setLayout(new java.awt.GridBagLayout());
 
-        newPasswd1Label.setDisplayedMnemonic(resources.getString("newPasswd1").charAt(0));
-        newPasswd1Label.setLabelFor(newPasswd1);
-        newPasswd1Label.setText(resources.getString("newPasswd1")); // NOI18N
+        passwdLabel.setDisplayedMnemonic(resources.getString("passwd").charAt(0));
+        passwdLabel.setLabelFor(passwd);
+        passwdLabel.setText(resources.getString("passwd")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 5);
-        newPasswdPanel.add(newPasswd1Label, gridBagConstraints);
-
-        newPasswd1.setColumns(20);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
-        newPasswdPanel.add(newPasswd1, gridBagConstraints);
-
-        newPasswd2Label.setDisplayedMnemonic(resources.getString("newPasswd2").charAt(0));
-        newPasswd2Label.setLabelFor(newPasswd2);
-        newPasswd2Label.setText(resources.getString("newPasswd2")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
-        newPasswdPanel.add(newPasswd2Label, gridBagConstraints);
+        passwdPanel.add(passwdLabel, gridBagConstraints);
 
-        newPasswd2.setColumns(20);
+        passwd.setColumns(20);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
-        newPasswdPanel.add(newPasswd2, gridBagConstraints);
+        passwdPanel.add(passwd, gridBagConstraints);
 
         addPanelListener(new de.schlichtherle.truezip.swing.PanelListener() {
             @Override
@@ -366,6 +310,8 @@ final class CreateKeyPanel extends EnhancedPanel {
         prompt.setLabelFor(resource);
         prompt.setText(resources.getString("prompt")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
         add(prompt, gridBagConstraints);
@@ -377,24 +323,32 @@ final class CreateKeyPanel extends EnhancedPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 15, 0);
         add(resource, gridBagConstraints);
 
-        authenticationPanel.setPasswdPanel(newPasswdPanel);
+        authenticationPanel.setPasswdPanel(passwdPanel);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         add(authenticationPanel, gridBagConstraints);
 
-        error.setForeground(new java.awt.Color(255, 0, 0));
+        changeKey.setText(resources.getString("changeKey")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(15, 0, 0, 0);
+        add(changeKey, gridBagConstraints);
+
+        error.setForeground(java.awt.Color.red);
         error.setText(" ");
         error.setName("error"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(15, 0, 0, 0);
@@ -407,9 +361,9 @@ final class CreateKeyPanel extends EnhancedPanel {
             feedback.feedback(this);
     }//GEN-LAST:event_formAncestorWindowShown
 
-    private void newPasswdPanelAncestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {//GEN-FIRST:event_newPasswdPanelAncestorWindowShown
+    private void passwdPanelAncestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {//GEN-FIRST:event_passwdPanelAncestorWindowShown
         // These are the things I hate Swing for: All I want to do here is to
-        // set the focus to the newPasswd1 field in this panel when it shows.
+        // set the focus to the passwd field in this panel when it shows.
         // However, this can't be done in the constructor since the panel is
         // not yet placed in a window which is actually showing.
         // Right, then we use this event listener to do it. This listener
@@ -439,7 +393,7 @@ final class CreateKeyPanel extends EnhancedPanel {
         // This mess is insane (and I can hardly abstain from writing down
         // all the other insulting scatology which comes to my mind)!
         final Window window = evt.getSource().getAncestorWindow();
-        assert window != null : "illegal state";
+        assert null != window : "illegal state";
         window.addWindowFocusListener(new WindowFocusListener() {
             @Override
 			public void windowGainedFocus(WindowEvent e) {
@@ -447,10 +401,8 @@ final class CreateKeyPanel extends EnhancedPanel {
                 EventQueue.invokeLater(new Runnable() {
                     @Override
 					public void run() {
-                        if (newPasswd1.requestFocusInWindow()) {
-                            newPasswd1.selectAll();
-                            newPasswd2.selectAll();
-                        }
+                        if (passwd.requestFocusInWindow())
+                            passwd.selectAll();
                     }
                 });
             }
@@ -459,16 +411,15 @@ final class CreateKeyPanel extends EnhancedPanel {
 			public void windowLostFocus(WindowEvent e) {
             }
         });
-    }//GEN-LAST:event_newPasswdPanelAncestorWindowShown
+    }//GEN-LAST:event_passwdPanelAncestorWindowShown
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private de.schlichtherle.truezip.crypto.raes.param.swing.AuthenticationPanel authenticationPanel;
+    private final javax.swing.JCheckBox changeKey = new javax.swing.JCheckBox();
     private javax.swing.JLabel error;
-    private javax.swing.JPasswordField newPasswd1;
-    private javax.swing.JLabel newPasswd1Label;
-    private javax.swing.JPasswordField newPasswd2;
-    private javax.swing.JLabel newPasswd2Label;
-    private de.schlichtherle.truezip.swing.EnhancedPanel newPasswdPanel;
+    private javax.swing.JPasswordField passwd;
+    private javax.swing.JLabel passwdLabel;
+    private de.schlichtherle.truezip.swing.EnhancedPanel passwdPanel;
     private javax.swing.JTextPane resource;
     // End of variables declaration//GEN-END:variables
 }

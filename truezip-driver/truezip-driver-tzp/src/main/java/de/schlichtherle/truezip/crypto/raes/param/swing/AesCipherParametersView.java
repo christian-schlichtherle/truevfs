@@ -61,8 +61,8 @@ implements View<AesCipherParameters> {
     // output.
     public static final int KEY_FILE_LEN = 512;
 
-    private static final Map<URI, OpenKeyPanel>
-            openKeyPanels = new WeakHashMap<URI, OpenKeyPanel>();
+    private static final Map<URI, ReadKeyPanel>
+            readKeyPanels = new WeakHashMap<URI, ReadKeyPanel>();
 
     private static final ServiceLocator serviceLocator
             = new ServiceLocator(AesCipherParametersView.class.getClassLoader());
@@ -123,13 +123,13 @@ implements View<AesCipherParameters> {
     public void promptWriteKey(
             final Controller<? super AesCipherParameters> controller)
     throws UnknownKeyException {
-        class PromptCreateKey implements Runnable {
+        class PromptWriteKey implements Runnable {
             @Override
             public void run() {
-                promptCreateKeyEDT(controller);
+                promptWriteKeyEDT(controller);
             }
-        } // class PromptCreateKey
-        multiplexOnEDT(new PromptCreateKey()); // synchronized on class instance!
+        } // class PromptWriteKey
+        multiplexOnEDT(new PromptWriteKey()); // synchronized on class instance!
     }
 
     @Override
@@ -137,20 +137,20 @@ implements View<AesCipherParameters> {
             final Controller<? super AesCipherParameters> controller,
             final boolean invalid)
     throws UnknownKeyException {
-        class PromptOpenKey implements Runnable {
+        class PromptReadKey implements Runnable {
             @Override
             public void run() {
-                promptOpenKeyEDT(controller, invalid);
+                promptReadKeyEDT(controller, invalid);
             }
-        } // class PromptOpenKey
-        multiplexOnEDT(new PromptOpenKey()); // synchronized on class instance!
+        } // class PromptReadKey
+        multiplexOnEDT(new PromptReadKey()); // synchronized on class instance!
     }
 
     /**
      * This method is only called by the AWT Event Dispatch Thread,
      * so it doesn't need to be thread safe.
      */
-    private void promptCreateKeyEDT(
+    private void promptWriteKeyEDT(
             final Controller<? super AesCipherParameters> controller) {
         assert EventQueue.isDispatchThread();
 
@@ -159,8 +159,8 @@ implements View<AesCipherParameters> {
 
         final AesKeyStrengthPanel keyStrengthPanel = new AesKeyStrengthPanel();
         keyStrengthPanel.setKeyStrength(param.getKeyStrength());
-        final CreateKeyPanel createKeyPanel = new CreateKeyPanel();
-        createKeyPanel.setExtraDataUI(keyStrengthPanel);
+        final WriteKeyPanel writeKeyPanel = new WriteKeyPanel();
+        writeKeyPanel.setExtraDataUI(keyStrengthPanel);
 
         final Window parent = Windows.getParentWindow();
         while (!Thread.interrupted()) { // test and clear status!
@@ -169,14 +169,14 @@ implements View<AesCipherParameters> {
             // loop iteration has to be repeated due to an invalid
             // user input.
             assert null != resource : "violation of contract for PromptingKeyProviderUI";
-            createKeyPanel.setResource(resource);
-            createKeyPanel.setFeedback(createKeyPanel.getError() != null
+            writeKeyPanel.setResource(resource);
+            writeKeyPanel.setFeedback(writeKeyPanel.getError() != null
                     ? getInvalidKeyFeedback()
                     : getUnknownKeyFeedback());
 
             final int result = JOptionPane.showConfirmDialog(
                     parent,
-                    createKeyPanel,
+                    writeKeyPanel,
                     resources.getString("newPasswdDialog.title"),
                     JOptionPane.OK_CANCEL_OPTION,
                     JOptionPane.QUESTION_MESSAGE);
@@ -186,14 +186,14 @@ implements View<AesCipherParameters> {
             if (result != JOptionPane.OK_OPTION)
                 break; // reuse old key
 
-            if (createKeyPanel.updateCreateKey(param)) { // valid input?
+            if (writeKeyPanel.updateWriteKey(param)) { // valid input?
                 param.setKeyStrength(keyStrengthPanel.getKeyStrength());
                 controller.setKey(param);
                 break;
             }
 
             // Continue looping until valid input.
-            assert createKeyPanel.getError() != null;
+            assert writeKeyPanel.getError() != null;
         }
     }
 
@@ -201,7 +201,7 @@ implements View<AesCipherParameters> {
      * This method is only called by the AWT Event Dispatch Thread,
      * so it doesn't need to be thread safe.
      */
-    private void promptOpenKeyEDT(
+    private void promptReadKeyEDT(
             final Controller<? super AesCipherParameters> controller,
             final boolean invalid) {
         assert EventQueue.isDispatchThread();
@@ -209,19 +209,19 @@ implements View<AesCipherParameters> {
         final URI resource = controller.getResource();
         final AesCipherParameters param = new AesCipherParameters();
 
-        final OpenKeyPanel openKeyPanel;
+        final ReadKeyPanel readKeyPanel;
         if (invalid) {
-            final OpenKeyPanel panel = openKeyPanels.get(resource);
+            final ReadKeyPanel panel = readKeyPanels.get(resource);
             if (panel != null) {
-                openKeyPanel = panel;
+                readKeyPanel = panel;
             } else {
-                openKeyPanel = new OpenKeyPanel();
+                readKeyPanel = new ReadKeyPanel();
             }
-            openKeyPanel.setError(resources.getString("invalidKey"));
+            readKeyPanel.setError(resources.getString("invalidKey"));
         } else {
-            openKeyPanel = new OpenKeyPanel();
+            readKeyPanel = new ReadKeyPanel();
         }
-        openKeyPanels.put(resource, openKeyPanel);
+        readKeyPanels.put(resource, readKeyPanel);
 
         final Window parent = Windows.getParentWindow();
         while (!Thread.interrupted()) { // test and clear status!
@@ -230,14 +230,14 @@ implements View<AesCipherParameters> {
             // loop iteration has to be repeated due to an invalid
             // user input.
             assert resource != null : "violation of contract for PromptingKeyProviderUI";
-            openKeyPanel.setResource(resource);
-            openKeyPanel.setFeedback(null != openKeyPanel.getError()
+            readKeyPanel.setResource(resource);
+            readKeyPanel.setFeedback(null != readKeyPanel.getError()
                     ? getInvalidKeyFeedback()
                     : getUnknownKeyFeedback());
 
             final int result = JOptionPane.showConfirmDialog(
                     parent,
-                    openKeyPanel,
+                    readKeyPanel,
                     resources.getString("passwdDialog.title"),
                     JOptionPane.OK_CANCEL_OPTION,
                     JOptionPane.QUESTION_MESSAGE);
@@ -249,14 +249,14 @@ implements View<AesCipherParameters> {
                 break;
             }
 
-            if (openKeyPanel.updateOpenKey(param)) { // valid input?
+            if (readKeyPanel.updateReadKey(param)) { // valid input?
                 controller.setKey(param);
-                controller.setChangeRequested(openKeyPanel.isChangeKeySelected());
+                controller.setChangeRequested(readKeyPanel.isChangeKeySelected());
                 break;
             }
 
             // Continue looping until valid input.
-            assert openKeyPanel.getError() != null;
+            assert readKeyPanel.getError() != null;
         }
     }
 

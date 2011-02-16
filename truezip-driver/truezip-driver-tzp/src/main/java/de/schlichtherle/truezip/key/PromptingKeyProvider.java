@@ -178,9 +178,9 @@ extends SafeKeyProvider<K> {
         }
     } // class Controller
 
-    private static final class CreateKeyController<K extends SafeKey<K>>
+    private static final class WriteKeyController<K extends SafeKey<K>>
     extends Controller<K> {
-        private CreateKeyController(PromptingKeyProvider<K> provider, State state) {
+        private WriteKeyController(PromptingKeyProvider<K> provider, State state) {
             super(provider, state);
         }
 
@@ -188,7 +188,7 @@ extends SafeKeyProvider<K> {
         public void setChangeRequested(boolean changeRequested) {
             throw new IllegalStateException();
         }
-    } // class CreateKeyController
+    } // class WriteKeyController
 
     /** The resource identifier for the protected resource. */
     private volatile URI resource;
@@ -249,8 +249,8 @@ extends SafeKeyProvider<K> {
      * @see KeyProvider#getWriteKey
      */
     @Override
-    protected final K getCreateKeyImpl() throws UnknownKeyException {
-        return getState().getCreateKey(this);
+    protected final K getWriteKeyImpl() throws UnknownKeyException {
+        return getState().getWriteKey(this);
     }
 
     /**
@@ -264,9 +264,9 @@ extends SafeKeyProvider<K> {
      * @see KeyProvider#getReadKey
      */
     @Override
-    protected final K getOpenKeyImpl(boolean invalid)
+    protected final K getReadKeyImpl(boolean invalid)
     throws UnknownKeyException {
-        return getState().getOpenKey(this, invalid);
+        return getState().getReadKey(this, invalid);
     }
 
     /**
@@ -337,23 +337,23 @@ extends SafeKeyProvider<K> {
         RESET {
             @Override
             <K extends SafeKey<K>> K
-            getCreateKey(final PromptingKeyProvider<K> provider)
+            getWriteKey(final PromptingKeyProvider<K> provider)
             throws UnknownKeyException {
                 State state;
                 try {
-                    Controller<K> controller = new CreateKeyController<K>(provider, this);
+                    Controller<K> controller = new WriteKeyController<K>(provider, this);
                     provider.getView().promptWriteKey(controller);
                     controller.invalidate();
                 } finally {
                     if ((state = provider.getState()) == this)
                         provider.setState(state = CANCELLED);
                 }
-                return state.getCreateKey(provider);
+                return state.getWriteKey(provider);
             }
 
             @Override
             <K extends SafeKey<K>> K
-            getOpenKey(PromptingKeyProvider<K> provider, boolean invalid)
+            getReadKey(PromptingKeyProvider<K> provider, boolean invalid)
             throws UnknownKeyException {
                 State state;
                 do {
@@ -367,7 +367,7 @@ extends SafeKeyProvider<K> {
                     }
                     state = provider.getState();
                 } while (state == this);
-                return state.getOpenKey(provider, false);
+                return state.getReadKey(provider, false);
             }
 
             @Override
@@ -386,11 +386,11 @@ extends SafeKeyProvider<K> {
         PROVIDED {
             @Override
             <K extends SafeKey<K>> K
-            getCreateKey(PromptingKeyProvider<K> provider)
+            getWriteKey(PromptingKeyProvider<K> provider)
             throws UnknownKeyException {
                 if (provider.isChangeRequested()) {
                     provider.setChangeRequested(false);
-                    return RESET.getCreateKey(provider); // DON'T change state!
+                    return RESET.getWriteKey(provider); // DON'T change state!
                 } else {
                     return provider.getKey();
                 }
@@ -398,11 +398,11 @@ extends SafeKeyProvider<K> {
 
             @Override
             <K extends SafeKey<K>> K
-            getOpenKey(PromptingKeyProvider<K> provider, boolean invalid)
+            getReadKey(PromptingKeyProvider<K> provider, boolean invalid)
             throws UnknownKeyException {
                 if (invalid) {
                     provider.setState(RESET);
-                    return RESET.getOpenKey(provider, true);
+                    return RESET.getReadKey(provider, true);
                 } else {
                     return provider.getKey();
                 }
@@ -424,14 +424,14 @@ extends SafeKeyProvider<K> {
         CANCELLED {
             @Override
             <K extends SafeKey<K>> K
-            getCreateKey(PromptingKeyProvider<K> provider)
+            getWriteKey(PromptingKeyProvider<K> provider)
             throws UnknownKeyException {
                 throw new KeyPromptingCancelledException();
             }
 
             @Override
             <K extends SafeKey<K>> K
-            getOpenKey(PromptingKeyProvider<K> provider, boolean invalid)
+            getReadKey(PromptingKeyProvider<K> provider, boolean invalid)
             throws UnknownKeyException {
                 throw new KeyPromptingCancelledException();
             }
@@ -450,11 +450,11 @@ extends SafeKeyProvider<K> {
         };
 
         abstract <K extends SafeKey<K>> K
-        getCreateKey(PromptingKeyProvider<K> provider)
+        getWriteKey(PromptingKeyProvider<K> provider)
         throws UnknownKeyException;
 
         abstract <K extends SafeKey<K>> K
-        getOpenKey(PromptingKeyProvider<K> provider, boolean invalid)
+        getReadKey(PromptingKeyProvider<K> provider, boolean invalid)
         throws UnknownKeyException;
 
         abstract <K extends SafeKey<K>> void

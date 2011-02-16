@@ -59,14 +59,14 @@ implements KeyProvider<K> {
      * {@inheritDoc}
      * <p>
      * The implementation in {@link SafeKeyProvider} forwards the call to
-     * {@link #getCreateKeyImpl}.
+     * {@link #getWriteKeyImpl}.
      *
-     * @throws UnknownKeyException If {@code getCreateKeyImpl} throws
+     * @throws UnknownKeyException If {@code getWriteKeyImpl} throws
      *         this exception or the returned key is {@code null}.
      */
     @Override
     public final K getWriteKey() throws UnknownKeyException {
-        final K key = getCreateKeyImpl();
+        final K key = getWriteKeyImpl();
         if (null == key)
             throw new UnknownKeyException();
         return clone(key);
@@ -85,7 +85,7 @@ implements KeyProvider<K> {
      *         cancelled by the user.
      * @see #getWriteKey
      */
-    protected @CheckForNull K getCreateKeyImpl() throws UnknownKeyException {
+    protected @CheckForNull K getWriteKeyImpl() throws UnknownKeyException {
         return null;
     }
 
@@ -93,13 +93,13 @@ implements KeyProvider<K> {
      * {@inheritDoc}
      * <p>
      * The implementation in {@link SafeKeyProvider} forwards the call to
-     * {@link #getOpenKeyImpl} and enforces a three seconds suspension penalty
+     * {@link #getReadKeyImpl} and enforces a three seconds suspension penalty
      * if {@code invalid} is {@code true} before returning.
      * Because this method is final, this qualifies the implementation in
      * this class as a "friendly" {@code KeyProvider} implementation,
      * even when subclassed.
      *
-     * @throws UnknownKeyException If {@code getOpenKeyImpl} throws
+     * @throws UnknownKeyException If {@code getReadKeyImpl} throws
      *         this exception or the returned key is {@code null}.
      */
     @Override
@@ -107,7 +107,7 @@ implements KeyProvider<K> {
         if (invalid)
             invalidated.set(System.currentTimeMillis());
         try {
-            final K key = getOpenKeyImpl(invalid);
+            final K key = getReadKeyImpl(invalid);
             if (null == key)
                 throw new UnknownKeyException();
             return clone(key);
@@ -126,7 +126,7 @@ implements KeyProvider<K> {
      *         the key has been disabled or cancelled by the user.
      * @see KeyProvider#getWriteKey
      */
-    protected @CheckForNull K getOpenKeyImpl(boolean invalid)
+    protected @CheckForNull K getReadKeyImpl(boolean invalid)
     throws UnknownKeyException {
         return null;
     }

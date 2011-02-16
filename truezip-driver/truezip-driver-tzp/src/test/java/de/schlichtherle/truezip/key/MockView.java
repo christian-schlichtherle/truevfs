@@ -37,7 +37,7 @@ public final class MockView<K extends SafeKey<K>> implements View<K> {
         ENTER {
             @Override
             <K extends SafeKey<K>> void
-            promptCreateKey(Controller<? super K> controller, K key)
+            promptWriteKey(Controller<? super K> controller, K key)
             throws UnknownKeyException {
                 controller.setKey(null);
                 controller.setKey(null != key ? key.clone() : null);
@@ -45,7 +45,7 @@ public final class MockView<K extends SafeKey<K>> implements View<K> {
 
             @Override
             <K extends SafeKey<K>> void
-            promptOpenKey(Controller<? super K> controller, K key, boolean changeRequested)
+            promptReadKey(Controller<? super K> controller, K key, boolean changeRequested)
             throws UnknownKeyException {
                 controller.setKey(null);
                 controller.setChangeRequested(false);
@@ -60,7 +60,7 @@ public final class MockView<K extends SafeKey<K>> implements View<K> {
 
             @Override
             <K extends SafeKey<K>> void
-            promptCreateKey(Controller<? super K> controller, K key)
+            promptWriteKey(Controller<? super K> controller, K key)
             throws UnknownKeyException {
                 if (rnd.nextBoolean()) {
                     throw new KeyPromptingCancelledException();
@@ -71,7 +71,7 @@ public final class MockView<K extends SafeKey<K>> implements View<K> {
 
             @Override
             <K extends SafeKey<K>> void
-            promptOpenKey(Controller<? super K> controller, K key, boolean changeRequested)
+            promptReadKey(Controller<? super K> controller, K key, boolean changeRequested)
             throws UnknownKeyException {
                 if (rnd.nextBoolean()) {
                     throw new KeyPromptingCancelledException();
@@ -86,23 +86,23 @@ public final class MockView<K extends SafeKey<K>> implements View<K> {
         IGNORE {
             @Override
             <K extends SafeKey<K>> void
-            promptCreateKey(Controller<? super K> controller, K key)
+            promptWriteKey(Controller<? super K> controller, K key)
             throws UnknownKeyException {
             }
 
             @Override
             <K extends SafeKey<K>> void
-            promptOpenKey(Controller<? super K> controller, K key, boolean changeRequested)
+            promptReadKey(Controller<? super K> controller, K key, boolean changeRequested)
             throws UnknownKeyException {
             }
         };
 
         abstract <K extends SafeKey<K>> void
-        promptCreateKey(Controller<? super K> controller, K key)
+        promptWriteKey(Controller<? super K> controller, K key)
         throws UnknownKeyException;
 
         abstract <K extends SafeKey<K>> void
-        promptOpenKey(Controller<? super K> controller, K key, boolean changeRequested)
+        promptReadKey(Controller<? super K> controller, K key, boolean changeRequested)
         throws UnknownKeyException;
     } // enum Action
 
@@ -162,7 +162,7 @@ public final class MockView<K extends SafeKey<K>> implements View<K> {
             throw new IllegalArgumentException();
         } catch (IllegalStateException expected) {
         }
-        action.promptCreateKey(controller, key);
+        action.promptWriteKey(controller, key);
     }
 
     @Override
@@ -172,6 +172,6 @@ public final class MockView<K extends SafeKey<K>> implements View<K> {
         final URI resource = this.resource;
         if (null != resource && !resource.equals(controller.getResource()))
             throw new IllegalArgumentException();
-        action.promptOpenKey(controller, key, changeRequested);
+        action.promptReadKey(controller, key, changeRequested);
     }
 }

@@ -12,13 +12,13 @@
         <Component class="javax.swing.JLabel" name="newPasswd1Label">
           <Properties>
             <Property name="displayedMnemonic" type="int" editor="org.netbeans.modules.i18n.form.FormI18nMnemonicEditor">
-              <ResourceString bundle="de/schlichtherle/truezip/key/passwd/swing/CreateKeyPanel.properties" key="newPasswd1" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="de/schlichtherle/truezip/crypto/raes/param/swing/WriteKeyPanel.properties" key="newPasswd1" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
             </Property>
             <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
               <ComponentRef name="newPasswd1"/>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="de/schlichtherle/truezip/key/passwd/swing/CreateKeyPanel.properties" key="newPasswd1" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="de/schlichtherle/truezip/crypto/raes/param/swing/WriteKeyPanel.properties" key="newPasswd1" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Constraints>
@@ -40,13 +40,13 @@
         <Component class="javax.swing.JLabel" name="newPasswd2Label">
           <Properties>
             <Property name="displayedMnemonic" type="int" editor="org.netbeans.modules.i18n.form.FormI18nMnemonicEditor">
-              <ResourceString bundle="de/schlichtherle/truezip/key/passwd/swing/CreateKeyPanel.properties" key="newPasswd2" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="de/schlichtherle/truezip/crypto/raes/param/swing/WriteKeyPanel.properties" key="newPasswd2" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
             </Property>
             <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
               <ComponentRef name="newPasswd2"/>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="de/schlichtherle/truezip/key/passwd/swing/CreateKeyPanel.properties" key="newPasswd2" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="de/schlichtherle/truezip/crypto/raes/param/swing/WriteKeyPanel.properties" key="newPasswd2" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Constraints>
@@ -90,7 +90,7 @@
           <ComponentRef name="resource"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/schlichtherle/truezip/key/passwd/swing/CreateKeyPanel.properties" key="prompt" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="de/schlichtherle/truezip/crypto/raes/param/swing/WriteKeyPanel.properties" key="prompt" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
         </Property>
       </Properties>
       <AuxValues>

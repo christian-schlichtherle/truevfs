@@ -35,7 +35,7 @@
           <ComponentRef name="keyStrength"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/schlichtherle/truezip/key/passwd/swing/AesKeyStrengthPanel.properties" key="prompt" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="de/schlichtherle/truezip/crypto/raes/param/swing/AesKeyStrengthPanel.properties" key="prompt" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
         </Property>
       </Properties>
       <AuxValues>
@@ -54,7 +54,7 @@
           <ComponentRef name="keyStrength"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/schlichtherle/truezip/key/passwd/swing/AesKeyStrengthPanel.properties" key="keyStrength" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="de/schlichtherle/truezip/crypto/raes/param/swing/AesKeyStrengthPanel.properties" key="keyStrength" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
         </Property>
       </Properties>
       <AuxValues>

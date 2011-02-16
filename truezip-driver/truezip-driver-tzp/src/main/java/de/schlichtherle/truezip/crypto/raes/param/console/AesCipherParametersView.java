@@ -75,29 +75,29 @@ implements View<AesCipherParameters> {
             final URI resource = controller.getResource();
             assert null != resource : "violation of contract for PromptingKeyProviderUI";
             if (!lastResource.equals(resource))
-                con.printf(resources.getString("createKey.banner"), resource);
+                con.printf(resources.getString("writeKey.banner"), resource);
             lastResource = resource;
 
             final AesCipherParameters param = new AesCipherParameters();
 
             while (true) {
                 char[] newPasswd1 = con.readPassword(
-                        resources.getString("createKey.newPasswd1"));
+                        resources.getString("writeKey.newPasswd1"));
                 if (null == newPasswd1 || newPasswd1.length <= 0)
                     return;
 
                 char[] newPasswd2 = con.readPassword(
-                        resources.getString("createKey.newPasswd2"));
+                        resources.getString("writeKey.newPasswd2"));
                 if (newPasswd2 == null)
                     return;
 
                 if (!Arrays.equals(newPasswd1, newPasswd2)) {
-                    con.printf(resources.getString("createKey.passwd.noMatch"));
+                    con.printf(resources.getString("writeKey.passwd.noMatch"));
                     continue;
                 }
 
                 if (newPasswd1.length < MIN_PASSWD_LEN) {
-                    con.printf(resources.getString("createKey.passwd.tooShort"));
+                    con.printf(resources.getString("writeKey.passwd.tooShort"));
                     continue;
                 }
 
@@ -144,15 +144,15 @@ implements View<AesCipherParameters> {
             final boolean invalid) {
         synchronized (lock) {
             if (invalid)
-                con.printf(resources.getString("openKey.invalid"));
+                con.printf(resources.getString("readKey.invalid"));
 
             final URI resource = controller.getResource();
             assert resource != null : "violation of contract for PromptingKeyProviderUI";
             if (!lastResource.equals(resource))
-                con.printf(resources.getString("openKey.banner"), resource);
+                con.printf(resources.getString("readKey.banner"), resource);
             lastResource = resource;
 
-            final char[] passwd = con.readPassword(resources.getString("openKey.passwd"));
+            final char[] passwd = con.readPassword(resources.getString("readKey.passwd"));
             if (null == passwd || passwd.length <= 0) {
                 controller.setKey(null);
                 return;
@@ -163,7 +163,7 @@ implements View<AesCipherParameters> {
             controller.setKey(param);
 
             while (true) {
-                String changeKey = con.readLine(resources.getString("openKey.change"));
+                String changeKey = con.readLine(resources.getString("readKey.change"));
                 controller.setChangeRequested(YES.equalsIgnoreCase(changeKey));
                 if (       null == changeKey
                         || changeKey.length() <= 0
