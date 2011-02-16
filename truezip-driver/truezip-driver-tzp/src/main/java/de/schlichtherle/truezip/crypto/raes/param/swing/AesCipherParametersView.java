@@ -120,7 +120,7 @@ implements View<AesCipherParameters> {
     }
 
     @Override
-    public void promptCreateKey(
+    public void promptWriteKey(
             final Controller<? super AesCipherParameters> controller)
     throws UnknownKeyException {
         class PromptCreateKey implements Runnable {
@@ -133,7 +133,7 @@ implements View<AesCipherParameters> {
     }
 
     @Override
-    public void promptOpenKey(
+    public void promptReadKey(
             final Controller<? super AesCipherParameters> controller,
             final boolean invalid)
     throws UnknownKeyException {

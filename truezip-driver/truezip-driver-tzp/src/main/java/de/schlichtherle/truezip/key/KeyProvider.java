@@ -41,12 +41,12 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * <li>A key is required in order to create a new protected resource or
  *     entirely replace its contents.
  *     This implies that the key does not need to be authenticated.
- *     For this purpose, client applications call the method {@link #getCreateKey}.
+ *     For this purpose, client applications call the method {@link #getWriteKey}.
  * <li>A key is required in order to open an already existing protected
  *     resource for access to its contents.
  *     This implies that the key needs to be authenticated by the client
  *     application.
- *     For this purpose, client applications call the method {@link #getOpenKey}.
+ *     For this purpose, client applications call the method {@link #getReadKey}.
  * </ol>
  * If the same resource is accessed multiple times, these basic operations
  * are guaranteed to return keys which compare {@link Object#equals equal},
@@ -81,8 +81,8 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  *     In this case, the second and then the first operation is applied.
  * </ol>
  * As you can see in the last example, it is at the discretion of the key
- * provider whether or not {@link #getCreateKey} returns a key which compares
- * equal to the key returned by {@link #getOpenKey} or returns a completely
+ * provider whether or not {@link #getWriteKey} returns a key which compares
+ * equal to the key returned by {@link #getReadKey} or returns a completely
  * different (new) key.
  * Ideally, a brave provider implementation would allow the user to control this.
  * In fact, this is the behaviour of the {@link PromptingKeyProvider} in
@@ -112,11 +112,10 @@ public interface KeyProvider<K> {
     } // interface Factory
 
     /**
-     * Returns the key which should be used to create a new protected
-     * resource or entirely replace the contents of an already existing
+     * Returns the key for (over)writing the contents of a new or existing
      * protected resource.
-     * Hence, this key is not going to be used to authenticate an existing
-     * resource by the client application.
+     * So this key is not going to be used to authenticate an existing resource
+     * by the application.
      * <p>
      * Each call to this method returns an object which compares
      * {@link Object#equals equal} to the previously returned object,
@@ -127,11 +126,11 @@ public interface KeyProvider<K> {
      *         reason, e.g. if prompting for the key has been disabled or
      *         cancelled by the user.
      */
-    K getCreateKey() throws UnknownKeyException;
+    K getWriteKey() throws UnknownKeyException;
 
     /**
-     * Returns the key which should be used to open an existing protected
-     * resource in order to access its contents.
+     * Returns the key for reading the contents of an existing protected
+     * resource.
      * This method is expected to be called consecutively until either the
      * returned key is verified or an exception is thrown.
      * <p>
@@ -140,13 +139,12 @@ public interface KeyProvider<K> {
      * returned object,
      * but is not necessarily the same.
      * <p>
-     * <b>Important:</b> From a client application's perspective, a
+     * <b>Important:</b> From an application's perspective, a
      * {@code KeyProvider} is not trustworthy!
      * Hence, the key returned by this method must not only get authenticated,
-     * but the client application should also throttle the pace for the
-     * return from a subsequent call to this method if the key is invalid
-     * in order to protect the client application from an exhaustive search
-     * for the correct key.
+     * but the application should also throttle the pace for the return from a
+     * subsequent call to this method if the key is invalid in order to protect
+     * the client application from an exhaustive search for the correct key.
      * As a rule of thumb, at least three seconds should pass between two
      * consecutive calls to this method by the same thread.
      * "Safe" implementations of this interface should enforce this
@@ -160,5 +158,5 @@ public interface KeyProvider<K> {
      *         reason, e.g. if prompting for the key has been disabled or
      *         cancelled by the user.
      */
-    K getOpenKey(boolean invalid) throws UnknownKeyException;
+    K getReadKey(boolean invalid) throws UnknownKeyException;
 }

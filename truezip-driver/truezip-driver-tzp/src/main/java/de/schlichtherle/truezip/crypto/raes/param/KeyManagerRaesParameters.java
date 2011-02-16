@@ -81,24 +81,24 @@ public final class KeyManagerRaesParameters implements RaesParametersProvider {
         }
 
         @Override
-        public char[] getCreatePasswd() throws RaesKeyException {
+        public char[] getWritePasswd() throws RaesKeyException {
             final KeyProvider<? extends AesCipherParameters> provider = service
                     .get(AesCipherParameters.class)
                     .getKeyProvider(resource);
             try {
-                return (param = provider.getCreateKey()).getPassword();
+                return (param = provider.getWriteKey()).getPassword();
             } catch (UnknownKeyException failure) {
                 throw new RaesKeyException(failure);
             }
         }
 
         @Override
-        public char[] getOpenPasswd(boolean invalid) throws RaesKeyException {
+        public char[] getReadPasswd(boolean invalid) throws RaesKeyException {
             final KeyProvider<? extends AesCipherParameters> provider = service
                     .get(AesCipherParameters.class)
                     .getKeyProvider(resource);
             try {
-                return provider.getOpenKey(invalid).getPassword();
+                return provider.getReadKey(invalid).getPassword();
             } catch (UnknownKeyException failure) {
                 throw new RaesKeyException(failure);
             }

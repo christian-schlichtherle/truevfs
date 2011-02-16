@@ -58,7 +58,7 @@ public interface Type0RaesParameters extends RaesParameters {
      * @throws RaesKeyException If password retrieval has been disabled or
      *         cancelled.
      */
-    char[] getCreatePasswd() throws RaesKeyException;
+    char[] getWritePasswd() throws RaesKeyException;
 
     /**
      * Returns the password required to open the RAES type 0 file for reading.
@@ -72,5 +72,5 @@ public interface Type0RaesParameters extends RaesParameters {
      * @throws RaesKeyException If password retrieval has been disabled or
      *         cancelled.
      */
-    char[] getOpenPasswd(boolean invalid) throws RaesKeyException;
+    char[] getReadPasswd(boolean invalid) throws RaesKeyException;
 }

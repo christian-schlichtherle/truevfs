@@ -47,30 +47,30 @@ public class PromptingKeyProviderTest {
     public void testLifeCycle() throws UnknownKeyException {
         view.setKey(new DummyKey());
 
-        assertEquals(view.getKey(), provider.getCreateKey());
-        assertEquals(view.getKey(), provider.getOpenKey(false));
+        assertEquals(view.getKey(), provider.getWriteKey());
+        assertEquals(view.getKey(), provider.getReadKey(false));
 
         view.setAction(CANCEL);
 
-        assertEquals(view.getKey(), provider.getCreateKey());
-        assertEquals(view.getKey(), provider.getOpenKey(false));
+        assertEquals(view.getKey(), provider.getWriteKey());
+        assertEquals(view.getKey(), provider.getReadKey(false));
 
         provider.resetCancelledKey();
 
-        assertEquals(view.getKey(), provider.getOpenKey(false));
-        assertEquals(view.getKey(), provider.getCreateKey());
+        assertEquals(view.getKey(), provider.getReadKey(false));
+        assertEquals(view.getKey(), provider.getWriteKey());
 
         provider.resetUnconditionally();
 
         view.setKey(new DummyKey());
         try {
-            provider.getOpenKey(false);
+            provider.getReadKey(false);
             fail();
         } catch (UnknownKeyException expected) {
         }
         view.setKey(new DummyKey());
         try {
-            provider.getCreateKey();
+            provider.getWriteKey();
             fail();
         } catch (UnknownKeyException expected) {
         }
@@ -79,13 +79,13 @@ public class PromptingKeyProviderTest {
 
         view.setKey(new DummyKey());
         try {
-            provider.getOpenKey(false);
+            provider.getReadKey(false);
             fail();
         } catch (UnknownKeyException expected) {
         }
         view.setKey(new DummyKey());
         try {
-            provider.getCreateKey();
+            provider.getWriteKey();
             fail();
         } catch (UnknownKeyException expected) {
         }
@@ -94,8 +94,8 @@ public class PromptingKeyProviderTest {
         view.setAction(ENTER);
 
         view.setKey(new DummyKey());
-        assertEquals(view.getKey(), provider.getOpenKey(false));
+        assertEquals(view.getKey(), provider.getReadKey(false));
         view.setKey(new DummyKey());
-        assertEquals(view.getKey(), provider.getCreateKey());
+        assertEquals(view.getKey(), provider.getWriteKey());
     }
 }
