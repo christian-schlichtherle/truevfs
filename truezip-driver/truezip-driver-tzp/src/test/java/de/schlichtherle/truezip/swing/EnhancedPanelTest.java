@@ -67,13 +67,13 @@ public final class EnhancedPanelTest {
         assertNotSame(window1, window2);
     }
 
-    private static JFrame showInNewFrame(final Component instance)
+    private static JFrame showInNewFrame(final Component component)
     throws InterruptedException, InvocationTargetException {
         final JFrame frame = new JFrame();
         EventQueue.invokeAndWait(new Runnable() {
             @Override
             public void run() {
-                frame.getContentPane().add(instance);
+                frame.add(component);
                 frame.pack();
                 frame.setLocationRelativeTo(null);
                 frame.setVisible(true);
@@ -87,7 +87,7 @@ public final class EnhancedPanelTest {
         EventQueue.invokeAndWait(new Runnable() {
             @Override
             public void run() {
-                frame.setVisible(false);
+                //frame.setVisible(false);
                 frame.dispose();
             }
         });

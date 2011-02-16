@@ -16,20 +16,17 @@
 package de.schlichtherle.truezip.crypto.raes.param.swing;
 
 import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
-import java.awt.EventQueue;
 import java.io.File;
 import java.net.URI;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.netbeans.jemmy.ComponentChooser;
 import org.netbeans.jemmy.JemmyProperties;
+import org.netbeans.jemmy.QueueTool;
 import org.netbeans.jemmy.TestOut;
 import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JCheckBoxOperator;
-import org.netbeans.jemmy.operators.JComboBoxOperator;
 import org.netbeans.jemmy.operators.JFileChooserOperator;
 import org.netbeans.jemmy.operators.JFrameOperator;
 import org.netbeans.jemmy.operators.JLabelOperator;
@@ -50,7 +47,7 @@ public final class ReadKeyPanelTest {
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput()); // shut up!
     }
 
-    private ReadKeyPanel instance;
+    private ReadKeyPanel panel;
     private JFrameOperator frame;
     private JLabelOperator errorLabel;
     private final ComponentChooser keyFileChooser
@@ -58,63 +55,44 @@ public final class ReadKeyPanelTest {
 
     @Before
     public void setUp() throws Exception {
-        instance = new ReadKeyPanel();
-        frame = showInstanceInFrame();
+        panel = new ReadKeyPanel();
+        frame = JemmyUtils.showInNewFrame(panel);
         errorLabel = findErrorLabel(frame);
-    }
-
-    private JFrameOperator showInstanceInFrame() {
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                final JFrame frame = new JFrame();
-                frame.getContentPane().add(instance);
-                frame.pack();
-                frame.setLocationRelativeTo(null);
-                frame.setVisible(true);
-            }
-        });
-        return new JFrameOperator();
     }
 
     private JLabelOperator findErrorLabel(final JFrameOperator frame) {
         final String error = "error";
-        instance.setError(error);
+        panel.setError(error);
         final JLabelOperator errorLabel = new JLabelOperator(frame, error);
-        ((JFrame) frame.getSource()).pack();
-        instance.setError(null);
+        frame.pack();
+        new QueueTool().waitEmpty();
+        panel.setError(null);
         return errorLabel;
     }
 
     @After
     public void tearDown() throws Exception {
-        EventQueue.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                //frame.setVisible(false);
-                frame.dispose();
-            }
-        });
+        frame.dispose();
     }
 
     @Test
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testResourceID() {
         final URI id = URI.create("HelloWorld!");
-        instance.setResource(id);
-        assertEquals(id, instance.getResource());
+        panel.setResource(id);
+        assertEquals(id, panel.getResource());
 
         new JTextComponentOperator(frame, id.toString());
     }
 
     @Test
     public void testSetError() {
-        instance.setError("This is a test error message!");
+        panel.setError("This is a test error message!");
         assertFalse(isBlank(errorLabel.getText()));
         new JTextFieldOperator(frame).typeText("secret");
         assertTrue(isBlank(errorLabel.getText()));
 
-        instance.setError("This is a test error message!");
+        panel.setError("This is a test error message!");
         assertFalse(isBlank(errorLabel.getText()));
         new JTabbedPaneOperator(frame).selectPage(AuthenticationPanel.AUTH_KEY_FILE); // select tab for key files
         new JButtonOperator(frame, keyFileChooser).push(); // open file chooser
@@ -131,13 +109,13 @@ public final class ReadKeyPanelTest {
         final AesCipherParameters param = new AesCipherParameters();
 
         // Check default.
-        assertTrue(instance.updateReadKey(param));
+        assertTrue(panel.updateReadKey(param));
         assertEquals(0, param.getPassword().length);
         assertTrue(isBlank(errorLabel.getText()));
 
         String passwd = "secret";
         new JPasswordFieldOperator(frame).setText(passwd);
-        assertTrue(instance.updateReadKey(param));
+        assertTrue(panel.updateReadKey(param));
         assertEquals(passwd, new String(param.getPassword()));
         assertTrue(isBlank(errorLabel.getText()));
     }
@@ -151,7 +129,7 @@ public final class ReadKeyPanelTest {
         new JButtonOperator(frame, keyFileChooser).push(); // open file chooser
         new JFileChooserOperator().chooseFile("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"$%&/()=?");
         assertTrue(isBlank(errorLabel.getText()));
-        assertFalse(instance.updateReadKey(param));
+        assertFalse(panel.updateReadKey(param));
         assertNotNull(errorLabel.getText());
 
         new JButtonOperator(frame, keyFileChooser).push(); // open file chooser
@@ -168,7 +146,7 @@ public final class ReadKeyPanelTest {
             fc = new JFileChooserOperator();
             fc.setSelectedFile(file);
             fc.approve(); // close file chooser
-            if (instance.updateReadKey(param)) {
+            if (panel.updateReadKey(param)) {
                 assertNotNull(param.getPassword());
                 assertTrue(isBlank(errorLabel.getText()));
             } else {
@@ -179,21 +157,21 @@ public final class ReadKeyPanelTest {
 
     @Test
     public void testKeyChangeRequested() {
-        assertFalse(instance.isChangeKeySelected());
+        assertFalse(panel.isChangeKeySelected());
         assertFalse(new JCheckBoxOperator(frame).isSelected());
 
-        instance.setChangeKeySelected(true);
-        assertTrue(instance.isChangeKeySelected());
+        panel.setChangeKeySelected(true);
+        assertTrue(panel.isChangeKeySelected());
         assertTrue(new JCheckBoxOperator(frame).isSelected());
 
-        instance.setChangeKeySelected(false);
-        assertFalse(instance.isChangeKeySelected());
+        panel.setChangeKeySelected(false);
+        assertFalse(panel.isChangeKeySelected());
         assertFalse(new JCheckBoxOperator(frame).isSelected());
 
         new JCheckBoxOperator(frame).setSelected(true);
-        assertTrue(instance.isChangeKeySelected());
+        assertTrue(panel.isChangeKeySelected());
 
         new JCheckBoxOperator(frame).setSelected(false);
-        assertFalse(instance.isChangeKeySelected());
+        assertFalse(panel.isChangeKeySelected());
     }
 }

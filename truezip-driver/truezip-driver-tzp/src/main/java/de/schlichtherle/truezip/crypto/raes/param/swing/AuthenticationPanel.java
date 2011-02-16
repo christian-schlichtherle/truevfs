@@ -32,6 +32,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
+import javax.swing.filechooser.FileSystemView;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 
@@ -50,11 +51,12 @@ public class AuthenticationPanel extends JPanel {
     private static final String CLASS_NAME = AuthenticationPanel.class.getName();
     private static final ResourceBundle
             resources = ResourceBundle.getBundle(CLASS_NAME);
-    private static final File BASE_DIR = new File(".");
+    private static final File
+            BASE_DIR = FileSystemView.getFileSystemView().getDefaultDirectory();
 
     /** The password authentication method. */
     static final int AUTH_PASSWD = 0;
-    
+
     /** The key file authentication method. */
     static final int AUTH_KEY_FILE = 1;
 
@@ -201,9 +203,9 @@ public class AuthenticationPanel extends JPanel {
             File file = fc.getSelectedFile();
             try {
                 final String filePath = file.getCanonicalPath();
-                final String baseDirPath = BASE_DIR.getCanonicalPath();
-                if (filePath.startsWith(baseDirPath))
-                    file = new File(filePath.substring(baseDirPath.length() + 1)); // cut off file separator, too.
+                final String userDirPath = BASE_DIR.getPath();
+                if (filePath.startsWith(userDirPath))
+                    file = new File(filePath.substring(userDirPath.length() + 1)); // cut off file separator, too.
                 setKeyFile(file);
             } catch (IOException ex) {
                 Logger  .getLogger(CLASS_NAME)
