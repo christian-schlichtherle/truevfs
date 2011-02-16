@@ -28,7 +28,6 @@ import org.netbeans.jemmy.ComponentChooser;
 import org.netbeans.jemmy.JemmyProperties;
 import org.netbeans.jemmy.TestOut;
 import org.netbeans.jemmy.operators.JButtonOperator;
-import org.netbeans.jemmy.operators.JCheckBoxOperator;
 import org.netbeans.jemmy.operators.JComboBoxOperator;
 import org.netbeans.jemmy.operators.JFileChooserOperator;
 import org.netbeans.jemmy.operators.JFrameOperator;
@@ -45,12 +44,12 @@ import static org.junit.Assert.*;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class OpenKeyPanelTest {
+public final class WriteKeyPanelTest {
     static {
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput()); // shut up!
     }
 
-    private OpenKeyPanel instance;
+    private WriteKeyPanel instance;
     private JFrameOperator frame;
     private JLabelOperator errorLabel;
     private final ComponentChooser keyFileChooser
@@ -58,7 +57,7 @@ public final class OpenKeyPanelTest {
 
     @Before
     public void setUp() throws Exception {
-        instance = new OpenKeyPanel();
+        instance = new WriteKeyPanel();
         frame = showInstanceInFrame();
         errorLabel = findErrorLabel(frame);
     }
@@ -131,13 +130,30 @@ public final class OpenKeyPanelTest {
         final AesCipherParameters param = new AesCipherParameters();
 
         // Check default.
-        assertTrue(instance.updateOpenKey(param));
-        assertEquals(0, param.getPassword().length);
-        assertTrue(isBlank(errorLabel.getText()));
+        assertFalse(instance.updateWriteKey(param));
+        assertNull(param.getPassword());
+        assertFalse(isBlank(errorLabel.getText()));
 
-        String passwd = "secret";
-        new JPasswordFieldOperator(frame).setText(passwd);
-        assertTrue(instance.updateOpenKey(param));
+        // Enter mismatching passwords.
+        new JPasswordFieldOperator(frame, 0).setText("foofoo");
+        new JPasswordFieldOperator(frame, 1).setText("barbar");
+        assertFalse(instance.updateWriteKey(param));
+        assertNull(param.getPassword());
+        assertFalse(isBlank(errorLabel.getText()));
+
+        // Enter matching passwords, too short.
+        String passwd = "secre"; // 5 chars is too short
+        new JPasswordFieldOperator(frame, 0).setText(passwd);
+        new JPasswordFieldOperator(frame, 1).setText(passwd);
+        assertFalse(instance.updateWriteKey(param));
+        assertNull(param.getPassword());
+        assertFalse(isBlank(errorLabel.getText()));
+
+        // Enter matching passwords, long enough.
+        passwd = "secret"; // min 6 chars is OK
+        new JPasswordFieldOperator(frame, 0).setText(passwd);
+        new JPasswordFieldOperator(frame, 1).setText(passwd);
+        assertTrue(instance.updateWriteKey(param));
         assertEquals(passwd, new String(param.getPassword()));
         assertTrue(isBlank(errorLabel.getText()));
     }
@@ -151,13 +167,13 @@ public final class OpenKeyPanelTest {
         new JButtonOperator(frame, keyFileChooser).push(); // open file chooser
         new JFileChooserOperator().chooseFile("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"$%&/()=?");
         assertTrue(isBlank(errorLabel.getText()));
-        assertFalse(instance.updateOpenKey(param));
-        assertNotNull(errorLabel.getText());
+        assertFalse(instance.updateWriteKey(param));
+        assertFalse(isBlank(errorLabel.getText()));
 
         new JButtonOperator(frame, keyFileChooser).push(); // open file chooser
         JFileChooserOperator fc = new JFileChooserOperator();
         File[] files = fc.getFiles();
-        fc.cancel(); // close file chooser
+        fc.cancel(); // revert to password panel
 
         for (int i = 0, l = files.length; i < l; i++) {
             final File file = files[i];
@@ -167,34 +183,14 @@ public final class OpenKeyPanelTest {
             new JButtonOperator(frame, keyFileChooser).push(); // open file chooser
             fc = new JFileChooserOperator();
             fc.setSelectedFile(file);
-            fc.approve(); // close file chooser
-            if (instance.updateOpenKey(param)) {
+            fc.approve();
+            if (instance.updateWriteKey(param)) {
                 assertNotNull(param.getPassword());
                 assertTrue(isBlank(errorLabel.getText()));
             } else {
                 assertFalse(isBlank(errorLabel.getText()));
             }
         }
-    }
-
-    @Test
-    public void testKeyChangeRequested() {
-        assertFalse(instance.isChangeKeySelected());
-        assertFalse(new JCheckBoxOperator(frame).isSelected());
-
-        instance.setChangeKeySelected(true);
-        assertTrue(instance.isChangeKeySelected());
-        assertTrue(new JCheckBoxOperator(frame).isSelected());
-
-        instance.setChangeKeySelected(false);
-        assertFalse(instance.isChangeKeySelected());
-        assertFalse(new JCheckBoxOperator(frame).isSelected());
-
-        new JCheckBoxOperator(frame).setSelected(true);
-        assertTrue(instance.isChangeKeySelected());
-
-        new JCheckBoxOperator(frame).setSelected(false);
-        assertFalse(instance.isChangeKeySelected());
     }
 
     @Test

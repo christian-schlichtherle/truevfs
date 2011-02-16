@@ -51,7 +51,7 @@ public final class RaesZipTest extends ZipTestSuite {
 
     private static final Random rnd = new Random();
 
-    private static KeyStrength createKeyStrength() {
+    private static KeyStrength writeKeyStrength() {
         final KeyStrength keyStrength = keyStrengths[rnd.nextInt(keyStrengths.length)];
         //final int keyStrength = KEY_STRENGTH_ULTRA;
         logger.log(Level.FINE, "Using {0} bits cipher key.", (128 + keyStrength.ordinal() * 64));
@@ -71,7 +71,7 @@ public final class RaesZipTest extends ZipTestSuite {
 
         @Override
         public KeyStrength getKeyStrength() {
-            return createKeyStrength();
+            return writeKeyStrength();
         }
     };
 
