@@ -21,7 +21,9 @@ package de.schlichtherle.truezip.key;
  */
 final class DummyKey implements SafeKey<DummyKey> {
 
-    private final int rnd = (int) Math.random();
+    private static volatile int count;
+
+    private final int key = count++;
     boolean reset;
 
     @Override
@@ -40,11 +42,11 @@ final class DummyKey implements SafeKey<DummyKey> {
 
     @Override
     public boolean equals(Object that) {
-        return that instanceof DummyKey && this.rnd == ((DummyKey) that).rnd;
+        return that instanceof DummyKey && this.key == ((DummyKey) that).key;
     }
 
     @Override
     public int hashCode() {
-        return rnd;
+        return key;
     }
 }

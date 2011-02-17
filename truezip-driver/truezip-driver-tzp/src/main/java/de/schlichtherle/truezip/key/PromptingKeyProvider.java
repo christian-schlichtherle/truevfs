@@ -88,49 +88,19 @@ extends SafeKeyProvider<K> {
         this.state = state;
     }
 
-    /**
-     * Returns the key which should be used to create a new protected
-     * resource or entirely replace the contents of an already existing
-     * protected resource.
-     * <p>
-     * If required or explicitly requested by the user, the user is prompted
-     * for this key.
-     *
-     * @throws UnknownKeyException If the user has cancelled prompting or
-     *         prompting has been disabled by the {@link PromptingKeyManager}.
-     * @see KeyProvider#getWriteKey
-     */
     @Override
     protected final K getWriteKeyImpl() throws UnknownKeyException {
         return getState().getWriteKey(this);
     }
 
-    /**
-     * Returns the key which should be used to open an existing protected
-     * resource in order to access its contents.
-     * <p>
-     * If required, the user is prompted for this key.
-     *
-     * @throws UnknownKeyException If the user has cancelled prompting or
-     *         prompting has been disabled by the {@link PromptingKeyManager}.
-     * @see KeyProvider#getReadKey
-     */
     @Override
     protected final K getReadKeyImpl(boolean invalid)
     throws UnknownKeyException {
         return getState().getReadKey(this, invalid);
     }
 
-    /**
-     * Returns the {@code key} property maintained by this key provider.
-     * Client applications should not call this method directly
-     * but rather call {@link #getReadKey} or {@link #getWriteKey}:
-     * It's intended to be used by subclasses and user interface classes only.
-     *
-     * @return The nullable {@code key} property.
-     */
-    private K getKey() {
-        return clone(key);
+    private @CheckForNull K getKey() {
+        return key;
     }
 
     private void setKey(final @CheckForNull K newKey) {
@@ -193,7 +163,7 @@ extends SafeKeyProvider<K> {
             throws UnknownKeyException {
                 State state;
                 try {
-                    Controller<K> controller = new WriteKeyController<K>(provider, this);
+                    Controller<K> controller = new WriteController<K>(provider, this);
                     provider.getView().promptWriteKey(controller);
                     controller.invalidate();
                 } finally {
@@ -423,18 +393,18 @@ extends SafeKeyProvider<K> {
          * @throws IllegalStateException if getting this property is not legal
          *         in the current state.
          */
-        public @NonNull URI getResource() {
+        public URI getResource() {
             if (null == state)
                 throw new IllegalStateException();
             return state.getResource(provider);
         }
 
         /**
-         * Sets the {@code key} property.
+         * Sets the protected resource's key to a clone of the given key.
          *
-         * @param  key The {@code key} property.
-         * @throws IllegalStateException if setting this property is not legal
-         *         in the current state.
+         * @param  key The key to clone to use for the protected resource.
+         * @throws IllegalStateException if setting key is not legal in the
+         *         current state.
          */
         public void setKey(@CheckForNull K key) {
             if (null == state)
@@ -445,7 +415,7 @@ extends SafeKeyProvider<K> {
         /**
          * Requests to prompt the user for a new key upon the next call to
          * {@link #getWriteKey()}, provided that the key is
-         * {@link #setKey set} then.
+         * {@link #setKey set} by then.
          *
          * @param  changeRequested whether or not the user shall get prompted
          *         for a new key upon the next call to {@link #getWriteKey()},
@@ -464,9 +434,9 @@ extends SafeKeyProvider<K> {
         }
     } // class Controller
 
-    private static class WriteKeyController<K extends SafeKey<K>>
+    private static class WriteController<K extends SafeKey<K>>
     extends Controller<K> {
-        private WriteKeyController(PromptingKeyProvider<K> provider, State state) {
+        private WriteController(PromptingKeyProvider<K> provider, State state) {
             super(provider, state);
         }
 

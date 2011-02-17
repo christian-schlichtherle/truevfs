@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.key;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -26,18 +25,11 @@ import static org.junit.Assert.*;
  */
 public final class SafeKeyProviderTest {
 
-    private SafeKeyProvider<DummyKey> instance;
-
-    @Before
-    public void setUp() {
-        instance = new SafeKeyProvider<DummyKey>();
-    }
-
     @Test
     public void testClone() {
         DummyKey key = new DummyKey();
-        assertClone(key, instance.clone(key));
-        assertClone(instance.clone(key), instance.clone(key));
+        assertClone(key, SafeKeyProvider.clone(key));
+        assertClone(SafeKeyProvider.clone(key), SafeKeyProvider.clone(key));
     }
 
     private static void assertClone(final DummyKey key, final DummyKey clone) {
@@ -48,7 +40,7 @@ public final class SafeKeyProviderTest {
     @Test
     public void testReset() {
         DummyKey key = new DummyKey();
-        instance.reset(key);
+        SafeKeyProvider.reset(key);
         assertTrue(key.reset);
     }
 }
