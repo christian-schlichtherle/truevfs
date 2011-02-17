@@ -36,7 +36,7 @@ import javax.swing.JPanel;
 public class EnhancedPanel extends JPanel  {
 
     private static final long serialVersionUID = 6984576810262891640L;
-    
+
     /**
      * Creates a new {@code EnhancedPanel} with the specified layout
      * manager and buffering strategy.
@@ -48,7 +48,7 @@ public class EnhancedPanel extends JPanel  {
      */
     public EnhancedPanel(LayoutManager layout, boolean isDoubleBuffered) {
         super(layout, isDoubleBuffered);
-        init();
+        addHierarchyListener(new EnhancedPanelHierarchyListener());
     }
 
     /**
@@ -59,7 +59,7 @@ public class EnhancedPanel extends JPanel  {
      */
     public EnhancedPanel(LayoutManager layout) {
         super(layout);
-        init();
+        addHierarchyListener(new EnhancedPanelHierarchyListener());
     }
 
     /**
@@ -74,7 +74,7 @@ public class EnhancedPanel extends JPanel  {
      */
     public EnhancedPanel(boolean isDoubleBuffered) {
         super(isDoubleBuffered);
-        init();
+        addHierarchyListener(new EnhancedPanelHierarchyListener());
     }
 
     /**
@@ -82,31 +82,7 @@ public class EnhancedPanel extends JPanel  {
      * and a flow layout.
      */
     public EnhancedPanel() {
-        init();
-    }
-
-    private void init() {
-        class Listener implements HierarchyListener {
-            @Override
-            public void hierarchyChanged(final HierarchyEvent e) {
-                if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED)
-                        != HierarchyEvent.SHOWING_CHANGED)
-                    return;
-
-                final Window window = getAncestorWindow();
-                assert null != window : "A showing panel must have a containing window!";
-                final boolean windowShown = window.isShowing();
-                if (windowShown != isShowing())
-                    return;
-
-                processPanelEvent(new PanelEvent(EnhancedPanel.this,
-                        windowShown
-                            ? PanelEvent.ANCESTOR_WINDOW_SHOWN
-                            : PanelEvent.ANCESTOR_WINDOW_HIDDEN));
-            }
-        } // class Listener
-
-        addHierarchyListener(new Listener());
+        addHierarchyListener(new EnhancedPanelHierarchyListener());
     }
 
     /**
@@ -260,4 +236,24 @@ public class EnhancedPanel extends JPanel  {
             if (listeners[i] == PanelListener.class)
                 ((PanelListener) listeners[i+1]).ancestorWindowHidden(event);
     }
+
+    private class EnhancedPanelHierarchyListener implements HierarchyListener {
+        @Override
+        public void hierarchyChanged(final HierarchyEvent e) {
+            if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED)
+                    != HierarchyEvent.SHOWING_CHANGED)
+                return;
+
+            final Window window = getAncestorWindow();
+            assert null != window : "A showing panel must have a containing window!";
+            final boolean windowShown = window.isShowing();
+            if (windowShown != isShowing())
+                return;
+
+            processPanelEvent(new PanelEvent(EnhancedPanel.this,
+                    windowShown
+                        ? PanelEvent.ANCESTOR_WINDOW_SHOWN
+                        : PanelEvent.ANCESTOR_WINDOW_HIDDEN));
+        }
+    } // class EnhancedPanelHierarchyListener
 }
