@@ -88,10 +88,6 @@ public class WriteKeyPanel extends KeyPanel {
         defaultForeground = resource.getForeground();
     }
 
-    private Font getBoldFont() {
-        return resource.getFont().deriveFont(Font.BOLD);
-    }
-
     @Override
     public URI getResource() {
         return URI.create(resource.getText());
@@ -118,12 +114,9 @@ public class WriteKeyPanel extends KeyPanel {
 
     @Override
     public void setError(final String error) {
-        // Fix layout issue with GridBagLayout:
-        // If null is set, the layout seems to ignore the width = 1.0
-        // constraint for the component.
-        this.error.setText(error != null ? error : " ");
+        this.error.setText(error);
     }
-    
+
     @Override
     boolean updateParam(final AesCipherParameters param) {
         try {
@@ -267,7 +260,7 @@ public class WriteKeyPanel extends KeyPanel {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        newPasswdPanel = new de.schlichtherle.truezip.swing.EnhancedPanel();
+        passwdPanel = new de.schlichtherle.truezip.swing.EnhancedPanel();
         newPasswd1Label = new javax.swing.JLabel();
         newPasswd1 = new javax.swing.JPasswordField();
         newPasswd2Label = new javax.swing.JLabel();
@@ -277,14 +270,14 @@ public class WriteKeyPanel extends KeyPanel {
         authenticationPanel = new de.schlichtherle.truezip.crypto.raes.param.swing.AuthenticationPanel();
         error = new javax.swing.JLabel();
 
-        newPasswdPanel.addPanelListener(new de.schlichtherle.truezip.swing.PanelListener() {
+        passwdPanel.addPanelListener(new de.schlichtherle.truezip.swing.PanelListener() {
             public void ancestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {
-                newPasswdPanelAncestorWindowShown(evt);
+                passwdPanelAncestorWindowShown(evt);
             }
             public void ancestorWindowHidden(de.schlichtherle.truezip.swing.PanelEvent evt) {
             }
         });
-        newPasswdPanel.setLayout(new java.awt.GridBagLayout());
+        passwdPanel.setLayout(new java.awt.GridBagLayout());
 
         newPasswd1Label.setDisplayedMnemonic(resources.getString("newPasswd1").charAt(0));
         newPasswd1Label.setLabelFor(newPasswd1);
@@ -294,7 +287,7 @@ public class WriteKeyPanel extends KeyPanel {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 5);
-        newPasswdPanel.add(newPasswd1Label, gridBagConstraints);
+        passwdPanel.add(newPasswd1Label, gridBagConstraints);
 
         newPasswd1.setColumns(20);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -303,7 +296,7 @@ public class WriteKeyPanel extends KeyPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
-        newPasswdPanel.add(newPasswd1, gridBagConstraints);
+        passwdPanel.add(newPasswd1, gridBagConstraints);
 
         newPasswd2Label.setDisplayedMnemonic(resources.getString("newPasswd2").charAt(0));
         newPasswd2Label.setLabelFor(newPasswd2);
@@ -313,7 +306,7 @@ public class WriteKeyPanel extends KeyPanel {
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
-        newPasswdPanel.add(newPasswd2Label, gridBagConstraints);
+        passwdPanel.add(newPasswd2Label, gridBagConstraints);
 
         newPasswd2.setColumns(20);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -321,7 +314,7 @@ public class WriteKeyPanel extends KeyPanel {
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
-        newPasswdPanel.add(newPasswd2, gridBagConstraints);
+        passwdPanel.add(newPasswd2, gridBagConstraints);
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -334,7 +327,7 @@ public class WriteKeyPanel extends KeyPanel {
 
         resource.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createEtchedBorder(), javax.swing.BorderFactory.createEmptyBorder(2, 2, 2, 2)));
         resource.setEditable(false);
-        resource.setFont(getBoldFont());
+        resource.setFont(resource.getFont().deriveFont(resource.getFont().getStyle() | java.awt.Font.BOLD));
         resource.setOpaque(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -344,7 +337,7 @@ public class WriteKeyPanel extends KeyPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 15, 0);
         add(resource, gridBagConstraints);
 
-        authenticationPanel.setPasswdPanel(newPasswdPanel);
+        authenticationPanel.setPasswdPanel(passwdPanel);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -352,7 +345,6 @@ public class WriteKeyPanel extends KeyPanel {
         add(authenticationPanel, gridBagConstraints);
 
         error.setForeground(new java.awt.Color(255, 0, 0));
-        error.setText(" ");
         error.setName("error"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -363,10 +355,7 @@ public class WriteKeyPanel extends KeyPanel {
         add(error, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void formAncestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {//GEN-FIRST:event_formAncestorWindowShown
-    }//GEN-LAST:event_formAncestorWindowShown
-
-    private void newPasswdPanelAncestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {//GEN-FIRST:event_newPasswdPanelAncestorWindowShown
+    private void passwdPanelAncestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {//GEN-FIRST:event_passwdPanelAncestorWindowShown
         // These are the things I hate Swing for: All I want to do here is to
         // set the focus to the newPasswd1 field in this panel when it shows.
         // However, this can't be done in the constructor since the panel is
@@ -417,7 +406,7 @@ public class WriteKeyPanel extends KeyPanel {
             public void windowLostFocus(WindowEvent e) {
             }
         });
-    }//GEN-LAST:event_newPasswdPanelAncestorWindowShown
+    }//GEN-LAST:event_passwdPanelAncestorWindowShown
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private de.schlichtherle.truezip.crypto.raes.param.swing.AuthenticationPanel authenticationPanel;
@@ -426,7 +415,7 @@ public class WriteKeyPanel extends KeyPanel {
     private javax.swing.JLabel newPasswd1Label;
     private javax.swing.JPasswordField newPasswd2;
     private javax.swing.JLabel newPasswd2Label;
-    private de.schlichtherle.truezip.swing.EnhancedPanel newPasswdPanel;
+    private de.schlichtherle.truezip.swing.EnhancedPanel passwdPanel;
     private javax.swing.JTextPane resource;
     // End of variables declaration//GEN-END:variables
 }

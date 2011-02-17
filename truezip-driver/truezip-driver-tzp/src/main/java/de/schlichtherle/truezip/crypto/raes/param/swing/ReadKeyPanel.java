@@ -80,10 +80,6 @@ public class ReadKeyPanel extends KeyPanel {
         defaultForeground = resource.getForeground();
     }
 
-    private Font getBoldFont() {
-        return resource.getFont().deriveFont(Font.BOLD);
-    }
-
     @Override
     public URI getResource() {
         return URI.create(resource.getText());
@@ -105,15 +101,12 @@ public class ReadKeyPanel extends KeyPanel {
     @Override
     public String getError() {
         final String error = this.error.getText();
-        return error.trim().length() > 0 ? error : null;
+        return error.isEmpty() ? null : error;
     }
-    
+
     @Override
     public void setError(final String error) {
-        // Fix layout issue with GridBagLayout:
-        // If null is set, the layout seems to ignore the widthy = 1.0
-        // constraint for the component.
-        this.error.setText(error != null ? error : " ");
+        this.error.setText(error);
     }
 
     @Override
@@ -219,7 +212,7 @@ public class ReadKeyPanel extends KeyPanel {
 
         resource.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createEtchedBorder(), javax.swing.BorderFactory.createEmptyBorder(2, 2, 2, 2)));
         resource.setEditable(false);
-        resource.setFont(getBoldFont());
+        resource.setFont(resource.getFont().deriveFont(resource.getFont().getStyle() | java.awt.Font.BOLD));
         resource.setOpaque(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -245,7 +238,6 @@ public class ReadKeyPanel extends KeyPanel {
         add(changeKey, gridBagConstraints);
 
         error.setForeground(java.awt.Color.red);
-        error.setText(" ");
         error.setName("error"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -255,9 +247,6 @@ public class ReadKeyPanel extends KeyPanel {
         gridBagConstraints.insets = new java.awt.Insets(15, 0, 0, 0);
         add(error, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
-
-    private void formAncestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {//GEN-FIRST:event_formAncestorWindowShown
-    }//GEN-LAST:event_formAncestorWindowShown
 
     private void passwdPanelAncestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {//GEN-FIRST:event_passwdPanelAncestorWindowShown
         // These are the things I hate Swing for: All I want to do here is to

@@ -1,10 +1,10 @@
 <?xml version="1.1" encoding="UTF-8" ?>
 
-<Form version="1.2" maxVersion="1.2" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
+<Form version="1.5" maxVersion="1.5" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
   <NonVisualComponents>
-    <Container class="de.schlichtherle.truezip.swing.EnhancedPanel" name="newPasswdPanel">
+    <Container class="de.schlichtherle.truezip.swing.EnhancedPanel" name="passwdPanel">
       <Events>
-        <EventHandler event="ancestorWindowShown" listener="de.schlichtherle.truezip.swing.PanelListener" parameters="de.schlichtherle.truezip.swing.PanelEvent" handler="newPasswdPanelAncestorWindowShown"/>
+        <EventHandler event="ancestorWindowShown" listener="de.schlichtherle.truezip.swing.PanelListener" parameters="de.schlichtherle.truezip.swing.PanelEvent" handler="passwdPanelAncestorWindowShown"/>
       </Events>
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout"/>
@@ -116,8 +116,10 @@
           </Border>
         </Property>
         <Property name="editable" type="boolean" value="false"/>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="getBoldFont()" type="code"/>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.editors2.FontEditor">
+          <FontInfo relative="true">
+            <Font bold="true" component="resource" property="font" relativeSize="true" size="0"/>
+          </FontInfo>
         </Property>
         <Property name="opaque" type="boolean" value="false"/>
       </Properties>
@@ -130,7 +132,7 @@
     <Component class="de.schlichtherle.truezip.crypto.raes.param.swing.AuthenticationPanel" name="authenticationPanel">
       <Properties>
         <Property name="passwdPanel" type="javax.swing.JPanel" editor="org.netbeans.modules.form.ComponentChooserEditor">
-          <ComponentRef name="newPasswdPanel"/>
+          <ComponentRef name="passwdPanel"/>
         </Property>
       </Properties>
       <Constraints>
@@ -144,7 +146,6 @@
         <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="0" green="0" red="ff" type="rgb"/>
         </Property>
-        <Property name="text" type="java.lang.String" value=" "/>
         <Property name="name" type="java.lang.String" value="error" noResource="true"/>
       </Properties>
       <Constraints>
