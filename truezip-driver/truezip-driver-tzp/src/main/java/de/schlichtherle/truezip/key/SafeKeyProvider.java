@@ -34,7 +34,7 @@ import net.jcip.annotations.ThreadSafe;
  */
 @DefaultAnnotation(NonNull.class)
 @ThreadSafe
-public class SafeKeyProvider<K extends SafeKey<K>>
+public abstract class SafeKeyProvider<K extends SafeKey<K>>
 implements KeyProvider<K> {
 
     /**
@@ -75,21 +75,20 @@ implements KeyProvider<K> {
     }
 
     /**
-     * Returns the key which should be used to create a new protected
-     * resource or entirely replace the contents of an already existing
+     * Returns the key for (over)writing the contents of a new or existing
      * protected resource.
      * <p>
      * Consecutive calls to this method may return the same object.
      *
-     * @return A template for the {@code key} to clone or {@code null}.
+     * @return The key for (over)writing the contents of a new or existing
+     *         protected resource.
      * @throws UnknownKeyException if the required key is unknown for some
      *         reason, e.g. if prompting for the key has been disabled or
      *         cancelled by the user.
      * @see #getWriteKey
      */
-    protected @CheckForNull K getWriteKeyImpl() throws UnknownKeyException {
-        return null;
-    }
+    protected abstract @CheckForNull K getWriteKeyImpl()
+    throws UnknownKeyException;
 
     /**
      * {@inheritDoc}
@@ -119,26 +118,27 @@ implements KeyProvider<K> {
     }
 
     /**
-     * Returns the key which should be used to open an existing protected
-     * resource in order to access its contents.
+     * Returns the key for reading the contents of an existing protected
+     * resource.
+     * <p>
+     * Consecutive calls to this method may return the same object.
      *
-     * @return A template for the {@code key} to use or {@code null}.
+     * @return The key for reading the contents of an existing protected
+     *         resource.
      * @throws UnknownKeyException If the required key is unknown.
      *         At the subclasses discretion, this may mean that prompting for
      *         the key has been disabled or cancelled by the user.
      * @see KeyProvider#getWriteKey
      */
-    protected @CheckForNull K getReadKeyImpl(boolean invalid)
-    throws UnknownKeyException {
-        return null;
-    }
+    protected abstract @CheckForNull K getReadKeyImpl(boolean invalid)
+    throws UnknownKeyException;
 
     /**
      * Returns a clone of the given key.
      *
      * @return A clone of the given key.
      */
-    protected @Nullable K clone(@CheckForNull K key) {
+    protected static @Nullable <K extends SafeKey<K>> K clone(@CheckForNull K key) {
         return null == key ? null : key.clone();
     }
 
@@ -147,7 +147,7 @@ implements KeyProvider<K> {
      *
      * @param key the key to reset.
      */
-    protected void reset(@CheckForNull K key) {
+    protected static <K extends SafeKey<K>> void reset(@CheckForNull K key) {
         if (null != key)
             key.reset();
     }
