@@ -181,12 +181,10 @@ public class ReadKeyPanel extends KeyPanel {
         error = new javax.swing.JLabel();
 
         passwdPanel.addPanelListener(new de.schlichtherle.truezip.swing.PanelListener() {
-            @Override
-			public void ancestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {
+            public void ancestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {
                 passwdPanelAncestorWindowShown(evt);
             }
-            @Override
-			public void ancestorWindowHidden(de.schlichtherle.truezip.swing.PanelEvent evt) {
+            public void ancestorWindowHidden(de.schlichtherle.truezip.swing.PanelEvent evt) {
             }
         });
         passwdPanel.setLayout(new java.awt.GridBagLayout());
@@ -208,15 +206,6 @@ public class ReadKeyPanel extends KeyPanel {
         gridBagConstraints.weightx = 1.0;
         passwdPanel.add(passwd, gridBagConstraints);
 
-        addPanelListener(new de.schlichtherle.truezip.swing.PanelListener() {
-            @Override
-			public void ancestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {
-                formAncestorWindowShown(evt);
-            }
-            @Override
-			public void ancestorWindowHidden(de.schlichtherle.truezip.swing.PanelEvent evt) {
-            }
-        });
         setLayout(new java.awt.GridBagLayout());
 
         prompt.setLabelFor(resource);
@@ -268,9 +257,6 @@ public class ReadKeyPanel extends KeyPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void formAncestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {//GEN-FIRST:event_formAncestorWindowShown
-        final Feedback feedback = getFeedback();
-        if (null != feedback)
-            feedback.run(this);
     }//GEN-LAST:event_formAncestorWindowShown
 
     private void passwdPanelAncestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {//GEN-FIRST:event_passwdPanelAncestorWindowShown
@@ -325,12 +311,12 @@ public class ReadKeyPanel extends KeyPanel {
     }//GEN-LAST:event_passwdPanelAncestorWindowShown
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private de.schlichtherle.truezip.crypto.raes.param.swing.AuthenticationPanel authenticationPanel;
+    de.schlichtherle.truezip.crypto.raes.param.swing.AuthenticationPanel authenticationPanel;
     private final javax.swing.JCheckBox changeKey = new javax.swing.JCheckBox();
-    private javax.swing.JLabel error;
-    private javax.swing.JPasswordField passwd;
-    private javax.swing.JLabel passwdLabel;
-    private de.schlichtherle.truezip.swing.EnhancedPanel passwdPanel;
-    private javax.swing.JTextPane resource;
+    javax.swing.JLabel error;
+    javax.swing.JPasswordField passwd;
+    javax.swing.JLabel passwdLabel;
+    de.schlichtherle.truezip.swing.EnhancedPanel passwdPanel;
+    javax.swing.JTextPane resource;
     // End of variables declaration//GEN-END:variables
 }

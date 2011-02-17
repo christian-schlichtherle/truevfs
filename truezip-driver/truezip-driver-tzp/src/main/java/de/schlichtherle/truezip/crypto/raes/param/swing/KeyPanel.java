@@ -17,6 +17,8 @@ package de.schlichtherle.truezip.crypto.raes.param.swing;
 
 import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
 import de.schlichtherle.truezip.swing.EnhancedPanel;
+import de.schlichtherle.truezip.swing.PanelEvent;
+import de.schlichtherle.truezip.swing.PanelListener;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -31,7 +33,23 @@ import java.net.URI;
 @DefaultAnnotation(NonNull.class)
 public abstract class KeyPanel extends EnhancedPanel {
 
+    private static class KeyPanelListener implements PanelListener {
+        @Override
+        public void ancestorWindowShown(final PanelEvent evt) {
+            ((KeyPanel) evt.getSource()).runFeedback();
+        }
+
+        @Override
+        public void ancestorWindowHidden(PanelEvent evt) {
+        }
+    }
+
     private Feedback feedback;
+    private String error;
+
+    public KeyPanel() {
+        addPanelListener(new KeyPanelListener());
+    }
 
     /**
      * Returns the feedback to run when this panel is shown in its ancestor
@@ -47,6 +65,12 @@ public abstract class KeyPanel extends EnhancedPanel {
      */
     public void setFeedback(final Feedback feedback) {
         this.feedback = feedback;
+    }
+
+    private void runFeedback() {
+        final Feedback feedback = getFeedback();
+        if (null != feedback)
+            feedback.run(this);
     }
 
     /**
@@ -66,14 +90,18 @@ public abstract class KeyPanel extends EnhancedPanel {
     /**
      * Getter for property {@code error}.
      */
-    public abstract @CheckForNull String getError();
+    public @CheckForNull String getError() {
+        return error;
+    }
 
     /**
      * Setter for property error.
      *
      * @param error New value of property error.
      */
-    public abstract void setError(final @CheckForNull String error);
+    public void setError(final @CheckForNull String error) {
+        this.error = error;
+    }
 
     abstract boolean updateParam(final AesCipherParameters param);
 }
