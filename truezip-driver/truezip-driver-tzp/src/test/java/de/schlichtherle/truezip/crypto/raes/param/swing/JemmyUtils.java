@@ -18,18 +18,21 @@ package de.schlichtherle.truezip.crypto.raes.param.swing;
 import java.awt.Component;
 import java.awt.EventQueue;
 import javax.swing.JFrame;
+import org.netbeans.jemmy.JemmyProperties;
+import org.netbeans.jemmy.TestOut;
 import org.netbeans.jemmy.operators.JFrameOperator;
 
 /**
  * A helper class for JUnit tests with JemmyUtils.
+ * Note that using this class causes Jemmy to output nothing as a permanent
+ * side effect!
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class JemmyUtils {
-
-    /** You cannot instantiate this class. */
-    private JemmyUtils() {
+public abstract class JemmyUtils {
+    static {
+        JemmyProperties.setCurrentOutput(TestOut.getNullOutput()); // shut up!
     }
 
     /**

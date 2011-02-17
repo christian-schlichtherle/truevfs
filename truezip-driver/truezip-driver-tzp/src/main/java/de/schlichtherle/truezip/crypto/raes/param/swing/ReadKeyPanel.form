@@ -43,9 +43,6 @@
       </SubComponents>
     </Container>
   </NonVisualComponents>
-  <Events>
-    <EventHandler event="ancestorWindowShown" listener="de.schlichtherle.truezip.swing.PanelListener" parameters="de.schlichtherle.truezip.swing.PanelEvent" handler="formAncestorWindowShown"/>
-  </Events>
   <AuxValues>
     <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>

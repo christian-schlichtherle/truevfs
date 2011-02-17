@@ -27,7 +27,7 @@ import javax.swing.Timer;
 import static de.schlichtherle.truezip.key.SafeKeyProvider.*;
 
 /**
- * Provides feedback by beeping using the default toolkit, disabling the
+ * Provides run by beeping using the default toolkit, disabling the
  * default button in the root pane for three seconds and concurrently
  * hurling the containing window for 1.5 seconds.
  * <p>
@@ -77,9 +77,9 @@ public class HurlingWindowFeedback extends BasicInvalidKeyFeedback {
     }
 
     @Override
-    public void feedback(@NonNull JPanel panel) {
+    public void run(@NonNull JPanel panel) {
         final Window window = SwingUtilities.getWindowAncestor(panel);
-        super.feedback(panel); // temporarily disable default button
+        super.run(panel); // temporarily disable default button
         if (null == window)
             return;
         final Point origin = window.getLocation();

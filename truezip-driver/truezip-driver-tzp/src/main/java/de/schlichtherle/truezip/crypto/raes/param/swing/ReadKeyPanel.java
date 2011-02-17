@@ -16,8 +16,6 @@
 package de.schlichtherle.truezip.crypto.raes.param.swing;
 
 import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
-import de.schlichtherle.truezip.swing.EnhancedPanel;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.awt.Color;
@@ -32,15 +30,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ResourceBundle;
-import javax.swing.JComponent;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 /**
  * This panel prompts the user for a key to open an existing protected
  * resource.
- * It currently supports password and key file authentication, but is
- * extensible for use with certificate based authentication, too.
+ * It currently supports password and key file authentication.
  * <p>
  * Note that the contents of the password and file path fields are stored in
  * a static field from which they are restored when a new panel is created.
@@ -51,16 +47,14 @@ import javax.swing.event.DocumentListener;
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-public class ReadKeyPanel extends EnhancedPanel {
+public class ReadKeyPanel extends KeyPanel {
 
-    private static final String CLASS_NAME = ReadKeyPanel.class.getName();
-    private static final ResourceBundle resources
-            = ResourceBundle.getBundle(CLASS_NAME);
     private static final long serialVersionUID = 984673974236493651L;
+    private static final String CLASS_NAME = ReadKeyPanel.class.getName();
+    private static final ResourceBundle
+            resources = ResourceBundle.getBundle(CLASS_NAME);
 
     private final Color defaultForeground;
-
-    private Feedback feedback;
     
     /** Constructs a new read key panel. */
     public ReadKeyPanel() {
@@ -90,20 +84,12 @@ public class ReadKeyPanel extends EnhancedPanel {
         return resource.getFont().deriveFont(Font.BOLD);
     }
 
-    /**
-     * Getter for property {@code resource}.
-     *
-     * @return Value of property {@code resource}.
-     */
+    @Override
     public URI getResource() {
         return URI.create(resource.getText());
     }
 
-    /**
-     * Setter for property {@code resource}.
-     *
-     * @param resource New value of property {@code resource}.
-     */
+    @Override
     public void setResource(final URI resource) {
         final URI lastResource = AesCipherParametersView.lastResource;
         if (!lastResource.equals(resource)
@@ -116,36 +102,22 @@ public class ReadKeyPanel extends EnhancedPanel {
         AesCipherParametersView.lastResource = resource;
     }
 
-    /**
-     * Getter for property {@code error}.
-     */
-    public @CheckForNull String getError() {
+    @Override
+    public String getError() {
         final String error = this.error.getText();
         return error.trim().length() > 0 ? error : null;
     }
     
-    /**
-     * Setter for property error.
-     *
-     * @param error New value of property error.
-     */
-    public void setError(final @CheckForNull String error) {
+    @Override
+    public void setError(final String error) {
         // Fix layout issue with GridBagLayout:
         // If null is set, the layout seems to ignore the widthy = 1.0
         // constraint for the component.
         this.error.setText(error != null ? error : " ");
     }
 
-    /**
-     * Getter for property {@code openKey}.
-     * If a key file is selected and an error occurs when accessing it,
-     * a descriptive message is set for the {@code error} property.
-     *
-     * @return Value of property {@code openKey}.
-     *         May be {@code null} if a key file is selected and
-     *         accessing it results in an exception.
-     */
-    boolean updateReadKey(final AesCipherParameters param) {
+    @Override
+    boolean updateParam(final AesCipherParameters param) {
         switch (authenticationPanel.getAuthenticationMethod()) {
             case AuthenticationPanel.AUTH_PASSWD:
                 param.setPassword(passwd.getPassword());
@@ -154,7 +126,8 @@ public class ReadKeyPanel extends EnhancedPanel {
             case AuthenticationPanel.AUTH_KEY_FILE:
                 final File keyFile = authenticationPanel.getKeyFile();
                 try {
-                    param.setKeyFileBytes(AesCipherParametersView.readKeyFile(keyFile));
+                    param.setKeyFileBytes(AesCipherParametersView.readKeyFile(
+                            keyFile));
                     return true;
                 } catch (EOFException ex) {
                     setError(resources.getString("keyFile.eofException"));
@@ -188,22 +161,6 @@ public class ReadKeyPanel extends EnhancedPanel {
      */
     public void setChangeKeySelected(boolean changeKeySelected) {
         this.changeKey.setSelected(changeKeySelected);
-    }
-
-    /**
-     * Returns the feedback to run when this panel is shown in its ancestor
-     * window.
-     */
-    public Feedback getFeedback() {
-        return feedback;
-    }
-
-    /**
-     * Sets the feedback to run when this panel is shown in its ancestor
-     * window.
-     */
-    public void setFeedback(final Feedback feedback) {
-        this.feedback = feedback;
     }
 
     /** This method is called from within the constructor to
@@ -313,7 +270,7 @@ public class ReadKeyPanel extends EnhancedPanel {
     private void formAncestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {//GEN-FIRST:event_formAncestorWindowShown
         final Feedback feedback = getFeedback();
         if (null != feedback)
-            feedback.feedback(this);
+            feedback.run(this);
     }//GEN-LAST:event_formAncestorWindowShown
 
     private void passwdPanelAncestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {//GEN-FIRST:event_passwdPanelAncestorWindowShown
@@ -348,7 +305,6 @@ public class ReadKeyPanel extends EnhancedPanel {
         // This mess is insane (and I can hardly abstain from writing down
         // all the other insulting scatology which comes to my mind)!
         final Window window = evt.getSource().getAncestorWindow();
-        assert null != window : "illegal state";
         window.addWindowFocusListener(new WindowFocusListener() {
             @Override
             public void windowGainedFocus(WindowEvent e) {

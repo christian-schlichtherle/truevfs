@@ -24,6 +24,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.netbeans.jemmy.ComponentChooser;
+import org.netbeans.jemmy.QueueTool;
 import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JFileChooserOperator;
 import org.netbeans.jemmy.operators.JFrameOperator;
@@ -38,23 +39,18 @@ import static org.junit.Assert.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class AuthenticationPanelTest {
-    static {
-        JemmyProperties.setCurrentOutput(TestOut.getNullOutput()); // shut up!
-    }
-
+public class AuthenticationPanelTest extends JemmyUtils {
     private static final String LABEL_TEXT = "Hello World!";
 
-    private AuthenticationPanel panel;
     private JFrameOperator frame;
 
     @Before
     public void setUp() {
         final JPanel passwdPanel = new JPanel();
         passwdPanel.add(new JLabel(LABEL_TEXT));
-        panel = new AuthenticationPanel();
+        final AuthenticationPanel panel = new AuthenticationPanel();
         panel.setPasswdPanel(passwdPanel);
-        frame = JemmyUtils.showInNewFrame(panel);
+        frame = showInNewFrame(panel);
     }
 
     @After
@@ -80,7 +76,9 @@ public class AuthenticationPanelTest {
         fc = new JFileChooserOperator();
         final File file = new File("test");
         fc.setSelectedFile(file);
+        new QueueTool().waitEmpty();
         fc.approve();
+        new QueueTool().waitEmpty();
         JTextFieldOperator tfOp = new JTextFieldOperator(frame);
         assertEquals(file.getPath(), tfOp.getText());
         fc = null;

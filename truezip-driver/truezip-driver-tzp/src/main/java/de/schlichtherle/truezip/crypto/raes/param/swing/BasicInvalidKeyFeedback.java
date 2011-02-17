@@ -25,7 +25,7 @@ import javax.swing.Timer;
 import static de.schlichtherle.truezip.key.SafeKeyProvider.*;
 
 /**
- * Provides feedback by beeping using the default toolkit and disabling the
+ * Provides run by beeping using the default toolkit and disabling the
  * default button in the root pane for {@link SafeKeyProvider#MIN_KEY_RETRY_DELAY}
  * milliseconds when prompting for a key and the last input was invalid.
  * <p>
@@ -47,7 +47,7 @@ implements InvalidKeyFeedback {
     }
 
     /**
-     * Constructs a new feedback.
+     * Constructs a new run.
      *
      * @param duration the duration for disabling the default button in the
      *        root pane in milliseconds.
@@ -59,9 +59,9 @@ implements InvalidKeyFeedback {
     }
 
     @Override
-    public void feedback(JPanel panel) {
+    public void run(JPanel panel) {
         final JButton b = panel.getRootPane().getDefaultButton();
-        super.feedback(panel);
+        super.run(panel);
         if (null == b)
             return;
         b.setEnabled(false);

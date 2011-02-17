@@ -45,12 +45,14 @@ implements KeyProvider<K> {
      */
     public static final int MIN_KEY_RETRY_DELAY = 3 * 1000;
 
-    private final ThreadLocal<Long> invalidated = new ThreadLocal<Long>() {
+    private static final class ThreadLocalLong extends ThreadLocal<Long> {
         @Override
         public Long initialValue() {
             return 0L;
         }
-    };
+    } // class ThreadLocalLong
+
+    private final ThreadLocal<Long> invalidated = new ThreadLocalLong();
 
     protected SafeKeyProvider() {
     }

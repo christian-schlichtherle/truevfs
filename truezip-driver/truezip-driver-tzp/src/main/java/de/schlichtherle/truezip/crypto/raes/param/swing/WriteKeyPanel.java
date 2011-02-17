@@ -16,7 +16,6 @@
 package de.schlichtherle.truezip.crypto.raes.param.swing;
 
 import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
-import de.schlichtherle.truezip.swing.EnhancedPanel;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -44,29 +43,25 @@ import javax.swing.event.DocumentListener;
 /**
  * This panel prompts the user for a key to create or overwrite a protected
  * resource.
- * It currently supports password and key file authentication, but is
- * extensible for use with certificate based authentication, too.
+ * It currently supports password and key file authentication.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-public class WriteKeyPanel extends EnhancedPanel {
+public class WriteKeyPanel extends KeyPanel {
 
+    private static final long serialVersionUID = 6416529465492387235L;
     private static final String CLASS_NAME = WriteKeyPanel.class.getName();
-    private static final ResourceBundle resources
-            = ResourceBundle.getBundle(CLASS_NAME);
+    private static final ResourceBundle
+            resources = ResourceBundle.getBundle(CLASS_NAME);
 
     /** The minimum acceptable length of a password. */
     private static final int MIN_PASSWD_LEN = 6;
-    
-    private static final long serialVersionUID = 6416529465492387235L;
 
     private final Color defaultForeground;
 
     private JComponent extraDataUI;
-
-    private Feedback feedback;
 
     /** Constructs a new write key panel. */
     public WriteKeyPanel() {
@@ -97,23 +92,14 @@ public class WriteKeyPanel extends EnhancedPanel {
         return resource.getFont().deriveFont(Font.BOLD);
     }
 
-    /**
-     * Getter for property {@code resource}.
-     *
-     * @return Value of property {@code resource}.
-     */
+    @Override
     public URI getResource() {
         return URI.create(resource.getText());
     }
     
-    /**
-     * Setter for property {@code resource}.
-     *
-     * @param resource New value of property {@code resource}.
-     */
+    @Override
     public void setResource(final URI resource) {
         final URI lastResource = AesCipherParametersView.lastResource;
-        assert lastResource != null : "violation of contract in PromptingKeyProvider";
         if (!lastResource.equals(resource)
                 && !lastResource.equals(AesCipherParametersView.INITIAL_RESOURCE)) {
             this.resource.setForeground(Color.RED);
@@ -123,8 +109,23 @@ public class WriteKeyPanel extends EnhancedPanel {
         this.resource.setText(resource.toString());
         AesCipherParametersView.lastResource = resource;
     }
+
+    @Override
+    public String getError() {
+        final String error = this.error.getText();
+        return error.trim().length() > 0 ? error : null;
+    }
+
+    @Override
+    public void setError(final String error) {
+        // Fix layout issue with GridBagLayout:
+        // If null is set, the layout seems to ignore the width = 1.0
+        // constraint for the component.
+        this.error.setText(error != null ? error : " ");
+    }
     
-    boolean updateWriteKey(final AesCipherParameters param) {
+    @Override
+    boolean updateParam(final AesCipherParameters param) {
         try {
             switch (authenticationPanel.getAuthenticationMethod()) {
                 case AuthenticationPanel.AUTH_PASSWD:
@@ -216,26 +217,6 @@ public class WriteKeyPanel extends EnhancedPanel {
                 ? MessageFormat.format(resources.getString(key), new Object[] { param })
                 : resources.getString(key);
     }
-
-    /**
-     * Getter for property {@code error}.
-     */
-    public @CheckForNull String getError() {
-        final String error = this.error.getText();
-        return error.trim().length() > 0 ? error : null;
-    }
-    
-    /**
-     * Setter for property error.
-     *
-     * @param error New value of property error.
-     */
-    public void setError(final @CheckForNull String error) {
-        // Fix layout issue with GridBagLayout:
-        // If null is set, the layout seems to ignore the width = 1.0
-        // constraint for the component.
-        this.error.setText(error != null ? error : " ");
-    }
     
     /**
      * Getter for property {@code extraDataUI}.
@@ -275,22 +256,6 @@ public class WriteKeyPanel extends EnhancedPanel {
         this.extraDataUI = extraDataUI;
 
         revalidate();
-    }
-
-    /**
-     * Returns the feedback to run when this panel is shown in its ancestor
-     * window.
-     */
-    public Feedback getFeedback() {
-        return feedback;
-    }
-
-    /**
-     * Sets the feedback to run when this panel is shown in its ancestor
-     * window.
-     */
-    public void setFeedback(final Feedback feedback) {
-        this.feedback = feedback;
     }
     
     /** This method is called from within the constructor to
@@ -412,7 +377,7 @@ public class WriteKeyPanel extends EnhancedPanel {
     private void formAncestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {//GEN-FIRST:event_formAncestorWindowShown
         final Feedback feedback = getFeedback();
         if (null != feedback)
-            feedback.feedback(this);
+            feedback.run(this);
     }//GEN-LAST:event_formAncestorWindowShown
 
     private void newPasswdPanelAncestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {//GEN-FIRST:event_newPasswdPanelAncestorWindowShown
@@ -447,7 +412,6 @@ public class WriteKeyPanel extends EnhancedPanel {
         // This mess is insane (and I can hardly abstain from writing down
         // all the other insulting scatology which comes to my mind)!
         final Window window = evt.getSource().getAncestorWindow();
-        assert window != null : "illegal state";
         window.addWindowFocusListener(new WindowFocusListener() {
             @Override
             public void windowGainedFocus(WindowEvent e) {

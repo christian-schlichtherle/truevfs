@@ -16,26 +16,10 @@
 package de.schlichtherle.truezip.crypto.raes.param.swing;
 
 import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
-import java.io.File;
-import java.net.URI;
 import javax.swing.JComponent;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
-import org.netbeans.jemmy.ComponentChooser;
-import org.netbeans.jemmy.JemmyProperties;
-import org.netbeans.jemmy.QueueTool;
-import org.netbeans.jemmy.TestOut;
-import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JComboBoxOperator;
-import org.netbeans.jemmy.operators.JFileChooserOperator;
-import org.netbeans.jemmy.operators.JFrameOperator;
-import org.netbeans.jemmy.operators.JLabelOperator;
 import org.netbeans.jemmy.operators.JPasswordFieldOperator;
-import org.netbeans.jemmy.operators.JTabbedPaneOperator;
-import org.netbeans.jemmy.operators.JTextComponentOperator;
-import org.netbeans.jemmy.operators.JTextFieldOperator;
-import org.netbeans.jemmy.util.NameComponentChooser;
 
 import static org.junit.Assert.*;
 
@@ -43,66 +27,11 @@ import static org.junit.Assert.*;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class WriteKeyPanelTest {
-    static {
-        JemmyProperties.setCurrentOutput(TestOut.getNullOutput()); // shut up!
-    }
+public final class WriteKeyPanelTest extends KeyPanelTestSuite<WriteKeyPanel> {
 
-    private WriteKeyPanel panel;
-    private JFrameOperator frame;
-    private JLabelOperator errorLabel;
-    private final ComponentChooser keyFileChooser
-                = new NameComponentChooser("keyFileChooser");
-
-    @Before
-    public void setUp() throws Exception {
-        panel = new WriteKeyPanel();
-        frame = JemmyUtils.showInNewFrame(panel);
-        errorLabel = findErrorLabel(frame);
-    }
-
-    private JLabelOperator findErrorLabel(final JFrameOperator frame) {
-        final String error = "error";
-        panel.setError(error);
-        final JLabelOperator errorLabel = new JLabelOperator(frame, error);
-        frame.pack();
-        new QueueTool().waitEmpty();
-        panel.setError(null);
-        return errorLabel;
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        frame.dispose();
-    }
-
-    @Test
-    @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    public void testResourceID() {
-        final URI id = URI.create("HelloWorld!");
-        panel.setResource(id);
-        assertEquals(id, panel.getResource());
-
-        new JTextComponentOperator(frame, id.toString());
-    }
-
-    @Test
-    public void testSetError() {
-        panel.setError("This is a test error message!");
-        assertFalse(isBlank(errorLabel.getText()));
-        new JTextFieldOperator(frame).typeText("secret");
-        assertTrue(isBlank(errorLabel.getText()));
-
-        panel.setError("This is a test error message!");
-        assertFalse(isBlank(errorLabel.getText()));
-        new JTabbedPaneOperator(frame).selectPage(AuthenticationPanel.AUTH_KEY_FILE); // select tab for key files
-        new JButtonOperator(frame, keyFileChooser).push(); // open file chooser
-        new JFileChooserOperator().chooseFile("file");
-        assertTrue(isBlank(errorLabel.getText()));
-    }
-
-    private static boolean isBlank(String s) {
-        return s == null || s.trim().length() <= 0;
+    @Override
+    protected WriteKeyPanel newKeyPanel() {
+        return new WriteKeyPanel();
     }
 
     @Test
@@ -110,67 +39,32 @@ public final class WriteKeyPanelTest {
         final AesCipherParameters param = new AesCipherParameters();
 
         // Check default.
-        assertFalse(panel.updateWriteKey(param));
+        assertFalse(panel.updateParam(param));
         assertNull(param.getPassword());
-        assertFalse(isBlank(errorLabel.getText()));
+        assertFalse(isBlank(error.getText()));
 
         // Enter mismatching passwords.
         new JPasswordFieldOperator(frame, 0).setText("foofoo");
         new JPasswordFieldOperator(frame, 1).setText("barbar");
-        assertFalse(panel.updateWriteKey(param));
+        assertFalse(panel.updateParam(param));
         assertNull(param.getPassword());
-        assertFalse(isBlank(errorLabel.getText()));
+        assertFalse(isBlank(error.getText()));
 
         // Enter matching passwords, too short.
         String passwd = "secre"; // 5 chars is too short
         new JPasswordFieldOperator(frame, 0).setText(passwd);
         new JPasswordFieldOperator(frame, 1).setText(passwd);
-        assertFalse(panel.updateWriteKey(param));
+        assertFalse(panel.updateParam(param));
         assertNull(param.getPassword());
-        assertFalse(isBlank(errorLabel.getText()));
+        assertFalse(isBlank(error.getText()));
 
         // Enter matching passwords, long enough.
         passwd = "secret"; // min 6 chars is OK
         new JPasswordFieldOperator(frame, 0).setText(passwd);
         new JPasswordFieldOperator(frame, 1).setText(passwd);
-        assertTrue(panel.updateWriteKey(param));
+        assertTrue(panel.updateParam(param));
         assertEquals(passwd, new String(param.getPassword()));
-        assertTrue(isBlank(errorLabel.getText()));
-    }
-
-    @Test
-    public void testKeyFile() {
-        final AesCipherParameters param = new AesCipherParameters();
-
-        new JTabbedPaneOperator(frame).selectPage(AuthenticationPanel.AUTH_KEY_FILE); // select tab for key files
-
-        new JButtonOperator(frame, keyFileChooser).push(); // open file chooser
-        new JFileChooserOperator().chooseFile("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"$%&/()=?");
-        assertTrue(isBlank(errorLabel.getText()));
-        assertFalse(panel.updateWriteKey(param));
-        assertFalse(isBlank(errorLabel.getText()));
-
-        new JButtonOperator(frame, keyFileChooser).push(); // open file chooser
-        JFileChooserOperator fc = new JFileChooserOperator();
-        File[] files = fc.getFiles();
-        fc.cancel(); // revert to password panel
-
-        for (int i = 0, l = files.length; i < l; i++) {
-            final File file = files[i];
-            if (!file.isFile())
-                continue;
-
-            new JButtonOperator(frame, keyFileChooser).push(); // open file chooser
-            fc = new JFileChooserOperator();
-            fc.setSelectedFile(file);
-            fc.approve();
-            if (panel.updateWriteKey(param)) {
-                assertNotNull(param.getPassword());
-                assertTrue(isBlank(errorLabel.getText()));
-            } else {
-                assertFalse(isBlank(errorLabel.getText()));
-            }
-        }
+        assertTrue(isBlank(error.getText()));
     }
 
     @Test

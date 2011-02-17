@@ -120,9 +120,11 @@ extends SafeKeyProvider<K> {
     } // interface View
 
     /** Proxies access to the key for {@link View} implementations. */
+    @ThreadSafe
+    @DefaultAnnotation(NonNull.class)
     public static class Controller<K extends SafeKey<K>> {
         private final PromptingKeyProvider<K> provider;
-        private State state;
+        private @CheckForNull State state;
 
         private Controller( final PromptingKeyProvider<K> provider,
                             final State state) {
@@ -150,7 +152,7 @@ extends SafeKeyProvider<K> {
          * @throws IllegalStateException if setting this property is not legal
          *         in the current state.
          */
-        public void setKey(K key) {
+        public void setKey(@CheckForNull K key) {
             if (null == state)
                 throw new IllegalStateException();
             state.setKey(provider, key);
