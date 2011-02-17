@@ -278,12 +278,10 @@ public class WriteKeyPanel extends KeyPanel {
         error = new javax.swing.JLabel();
 
         newPasswdPanel.addPanelListener(new de.schlichtherle.truezip.swing.PanelListener() {
-            @Override
-			public void ancestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {
+            public void ancestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {
                 newPasswdPanelAncestorWindowShown(evt);
             }
-            @Override
-			public void ancestorWindowHidden(de.schlichtherle.truezip.swing.PanelEvent evt) {
+            public void ancestorWindowHidden(de.schlichtherle.truezip.swing.PanelEvent evt) {
             }
         });
         newPasswdPanel.setLayout(new java.awt.GridBagLayout());
@@ -325,15 +323,6 @@ public class WriteKeyPanel extends KeyPanel {
         gridBagConstraints.weightx = 1.0;
         newPasswdPanel.add(newPasswd2, gridBagConstraints);
 
-        addPanelListener(new de.schlichtherle.truezip.swing.PanelListener() {
-            @Override
-			public void ancestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {
-                formAncestorWindowShown(evt);
-            }
-            @Override
-			public void ancestorWindowHidden(de.schlichtherle.truezip.swing.PanelEvent evt) {
-            }
-        });
         setLayout(new java.awt.GridBagLayout());
 
         prompt.setLabelFor(resource);
@@ -375,9 +364,6 @@ public class WriteKeyPanel extends KeyPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void formAncestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {//GEN-FIRST:event_formAncestorWindowShown
-        final Feedback feedback = getFeedback();
-        if (null != feedback)
-            feedback.run(this);
     }//GEN-LAST:event_formAncestorWindowShown
 
     private void newPasswdPanelAncestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {//GEN-FIRST:event_newPasswdPanelAncestorWindowShown

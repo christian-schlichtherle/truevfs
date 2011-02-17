@@ -177,7 +177,7 @@ implements View<AesCipherParameters> {
             final int result = JOptionPane.showConfirmDialog(
                     parent,
                     writeKeyPanel,
-                    resources.getString("newPasswdDialog.title"),
+                    resources.getString("writeKeyDialog.title"),
                     JOptionPane.OK_CANCEL_OPTION,
                     JOptionPane.QUESTION_MESSAGE);
             /*if (Thread.interrupted()) // test and clear status!
@@ -238,7 +238,7 @@ implements View<AesCipherParameters> {
             final int result = JOptionPane.showConfirmDialog(
                     parent,
                     readKeyPanel,
-                    resources.getString("passwdDialog.title"),
+                    resources.getString("readKeyDialog.title"),
                     JOptionPane.OK_CANCEL_OPTION,
                     JOptionPane.QUESTION_MESSAGE);
             /*if (Thread.interrupted()) // test and clear status!
