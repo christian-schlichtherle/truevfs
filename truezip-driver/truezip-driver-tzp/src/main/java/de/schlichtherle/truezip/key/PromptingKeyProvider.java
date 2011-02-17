@@ -42,156 +42,6 @@ import static de.schlichtherle.truezip.key.PromptingKeyProvider.State.*;
 public final class PromptingKeyProvider<K extends SafeKey<K>>
 extends SafeKeyProvider<K> {
 
-    /**
-     * Used for the actual prompting of the user for a key (a password for
-     * example) which is required to access a protected resource.
-     * This interface is not depending on any particular user interface
-     * techology, so prompting could be implemented using Swing, the console,
-     * a web page or any other user interface technology.
-     * <p>
-     * Implementations of this interface are maintained by a
-     * {@link PromptingKeyManager} and injected into the
-     * {@link PromptingKeyProvider} before
-     * {@link PromptingKeyProvider#getWriteKey()} or
-     * {@link PromptingKeyProvider#getReadKey(boolean)} is called.
-     * <p>
-     * Implementations of this interface <em>must</em> be thread safe
-     * and should have no side effects!
-     */
-    @DefaultAnnotation(NonNull.class)
-    public interface View<K extends SafeKey<K>> {
-
-        /**
-         * Prompts the user for the key for (over)writing the contents of a
-         * new or existing protected resource.
-         * Upon return, the implementation should have updated the
-         * {@link Controller#setKey key} property of the given
-         * {@code controller}.
-         * <p>
-         * If the implementation has called {@link Controller#setKey} with a
-         * non-{@code null} parameter, then a clone of this object will be
-         * used as the key.
-         * <p>
-         * Otherwise, prompting for a key is permanently disabled and each
-         * subsequent call to {@link #getWriteKey} or {@link #getReadKey}
-         * results in a {@link KeyPromptingCancelledException} until
-         * {@link #resetCancelledKey()} or {@link #resetUnconditionally()} gets
-         * called.
-         *
-         * @param  controller The key controller for storing the result.
-         * @throws UnknownKeyException if key prompting fails for any reason.
-         */
-        void promptWriteKey(Controller<? super K> controller)
-        throws UnknownKeyException;
-
-        /**
-         * Prompts the user for the key for reading the contents of an
-         * existing protected resource.
-         * Upon return, the implementation should have updated the
-         * {@link Controller#setKey key} property of the given
-         * {@code controller}.
-         * <p>
-         * If the implementation has called {@link Controller#setKey} with a
-         * non-{@code null} parameter, then a clone of this object will be
-         * used as the key.
-         * <p>
-         * Otherwise, if the implementation has called {@link Controller#setKey}
-         * with a {@code null} parameter or throws a
-         * {@link KeyPromptingCancelledException}, then prompting for the key
-         * is permanently disabled and each subsequent call to
-         * {@link #getWriteKey} or {@link #getReadKey} results in a
-         * {@link KeyPromptingCancelledException} until
-         * {@link #resetCancelledKey()} or {@link #resetUnconditionally()} gets
-         * called.
-         * <p>
-         * Otherwise, the state of the key provider is not changed and this
-         * method gets called again.
-         *
-         * @param  controller The key controller for storing the result.
-         * @param  invalid {@code true} iff a previous call to this method
-         *         resulted in an invalid key.
-         * @throws KeyPromptingCancelledException if key prompting has been
-         *         cancelled by the user.
-         * @throws UnknownKeyException if key prompting fails for any other
-         *         reason.
-         */
-        void promptReadKey(Controller<? super K> controller, boolean invalid)
-        throws UnknownKeyException;
-    } // interface View
-
-    /** Proxies access to the key for {@link View} implementations. */
-    @ThreadSafe
-    @DefaultAnnotation(NonNull.class)
-    public static class Controller<K extends SafeKey<K>> {
-        private final PromptingKeyProvider<K> provider;
-        private @CheckForNull State state;
-
-        private Controller( final PromptingKeyProvider<K> provider,
-                            final State state) {
-            this.provider = provider;
-            this.state = state;
-        }
-
-        /**
-         * Returns the unique resource identifier (resource ID) of the
-         * protected resource for which this controller is used.
-         *
-         * @throws IllegalStateException if getting this property is not legal
-         *         in the current state.
-         */
-        public @NonNull URI getResource() {
-            if (null == state)
-                throw new IllegalStateException();
-            return state.getResource(provider);
-        }
-
-        /**
-         * Sets the {@code key} property.
-         *
-         * @param  key The {@code key} property.
-         * @throws IllegalStateException if setting this property is not legal
-         *         in the current state.
-         */
-        public void setKey(@CheckForNull K key) {
-            if (null == state)
-                throw new IllegalStateException();
-            state.setKey(provider, key);
-        }
-
-        /**
-         * Requests to prompt the user for a new key upon the next call to
-         * {@link #getWriteKey()}, provided that the key is
-         * {@link #setKey set} then.
-         *
-         * @param  changeRequested whether or not the user shall get prompted
-         *         for a new key upon the next call to {@link #getWriteKey()},
-         *         provided that the key is {@link #setKey set} then.
-         * @throws IllegalStateException if setting this property is not legal
-         *         in the current state.
-         */
-        public void setChangeRequested(boolean changeRequested) {
-            if (null == state)
-                throw new IllegalStateException();
-            state.setChangeRequested(provider, changeRequested);
-        }
-
-        private void invalidate() {
-            state = null;
-        }
-    } // class Controller
-
-    private static final class WriteKeyController<K extends SafeKey<K>>
-    extends Controller<K> {
-        private WriteKeyController(PromptingKeyProvider<K> provider, State state) {
-            super(provider, state);
-        }
-
-        @Override
-        public void setChangeRequested(boolean changeRequested) {
-            throw new IllegalStateException();
-        }
-    } // class WriteKeyController
-
     /** The resource identifier for the protected resource. */
     private volatile URI resource;
 
@@ -474,5 +324,155 @@ extends SafeKeyProvider<K> {
         getResource(PromptingKeyProvider<K> provider) {
             return provider.getResource();
         }
-    }
+    } // enum State
+
+    /**
+     * Used for the actual prompting of the user for a key (a password for
+     * example) which is required to access a protected resource.
+     * This interface is not depending on any particular user interface
+     * techology, so prompting could be implemented using Swing, the console,
+     * a web page or any other user interface technology.
+     * <p>
+     * Implementations of this interface are maintained by a
+     * {@link PromptingKeyManager} and injected into the
+     * {@link PromptingKeyProvider} before
+     * {@link PromptingKeyProvider#getWriteKey()} or
+     * {@link PromptingKeyProvider#getReadKey(boolean)} is called.
+     * <p>
+     * Implementations of this interface <em>must</em> be thread safe
+     * and should have no side effects!
+     */
+    @DefaultAnnotation(NonNull.class)
+    public interface View<K extends SafeKey<K>> {
+
+        /**
+         * Prompts the user for the key for (over)writing the contents of a
+         * new or existing protected resource.
+         * Upon return, the implementation should have updated the
+         * {@link Controller#setKey key} property of the given
+         * {@code controller}.
+         * <p>
+         * If the implementation has called {@link Controller#setKey} with a
+         * non-{@code null} parameter, then a clone of this object will be
+         * used as the key.
+         * <p>
+         * Otherwise, prompting for a key is permanently disabled and each
+         * subsequent call to {@link #getWriteKey} or {@link #getReadKey}
+         * results in a {@link KeyPromptingCancelledException} until
+         * {@link #resetCancelledKey()} or {@link #resetUnconditionally()} gets
+         * called.
+         *
+         * @param  controller The key controller for storing the result.
+         * @throws UnknownKeyException if key prompting fails for any reason.
+         */
+        void promptWriteKey(Controller<? super K> controller)
+        throws UnknownKeyException;
+
+        /**
+         * Prompts the user for the key for reading the contents of an
+         * existing protected resource.
+         * Upon return, the implementation should have updated the
+         * {@link Controller#setKey key} property of the given
+         * {@code controller}.
+         * <p>
+         * If the implementation has called {@link Controller#setKey} with a
+         * non-{@code null} parameter, then a clone of this object will be
+         * used as the key.
+         * <p>
+         * Otherwise, if the implementation has called {@link Controller#setKey}
+         * with a {@code null} parameter or throws a
+         * {@link KeyPromptingCancelledException}, then prompting for the key
+         * is permanently disabled and each subsequent call to
+         * {@link #getWriteKey} or {@link #getReadKey} results in a
+         * {@link KeyPromptingCancelledException} until
+         * {@link #resetCancelledKey()} or {@link #resetUnconditionally()} gets
+         * called.
+         * <p>
+         * Otherwise, the state of the key provider is not changed and this
+         * method gets called again.
+         *
+         * @param  controller The key controller for storing the result.
+         * @param  invalid {@code true} iff a previous call to this method
+         *         resulted in an invalid key.
+         * @throws KeyPromptingCancelledException if key prompting has been
+         *         cancelled by the user.
+         * @throws UnknownKeyException if key prompting fails for any other
+         *         reason.
+         */
+        void promptReadKey(Controller<? super K> controller, boolean invalid)
+        throws UnknownKeyException;
+    } // interface View
+
+    /** Proxies access to the key for {@link View} implementations. */
+    @ThreadSafe
+    @DefaultAnnotation(NonNull.class)
+    public static class Controller<K extends SafeKey<K>> {
+        private final PromptingKeyProvider<K> provider;
+        private @CheckForNull State state;
+
+        private Controller( final PromptingKeyProvider<K> provider,
+                            final State state) {
+            this.provider = provider;
+            this.state = state;
+        }
+
+        /**
+         * Returns the unique resource identifier (resource ID) of the
+         * protected resource for which this controller is used.
+         *
+         * @throws IllegalStateException if getting this property is not legal
+         *         in the current state.
+         */
+        public @NonNull URI getResource() {
+            if (null == state)
+                throw new IllegalStateException();
+            return state.getResource(provider);
+        }
+
+        /**
+         * Sets the {@code key} property.
+         *
+         * @param  key The {@code key} property.
+         * @throws IllegalStateException if setting this property is not legal
+         *         in the current state.
+         */
+        public void setKey(@CheckForNull K key) {
+            if (null == state)
+                throw new IllegalStateException();
+            state.setKey(provider, key);
+        }
+
+        /**
+         * Requests to prompt the user for a new key upon the next call to
+         * {@link #getWriteKey()}, provided that the key is
+         * {@link #setKey set} then.
+         *
+         * @param  changeRequested whether or not the user shall get prompted
+         *         for a new key upon the next call to {@link #getWriteKey()},
+         *         provided that the key is {@link #setKey set} then.
+         * @throws IllegalStateException if setting this property is not legal
+         *         in the current state.
+         */
+        public void setChangeRequested(boolean changeRequested) {
+            if (null == state)
+                throw new IllegalStateException();
+            state.setChangeRequested(provider, changeRequested);
+        }
+
+        private void invalidate() {
+            state = null;
+        }
+    } // class Controller
+
+    private static class WriteKeyController<K extends SafeKey<K>>
+    extends Controller<K> {
+        private WriteKeyController(PromptingKeyProvider<K> provider, State state) {
+            super(provider, state);
+        }
+
+        @Override
+        public void setChangeRequested(boolean changeRequested) {
+            throw new IllegalStateException();
+        }
+    } // class WriteKeyController
 }

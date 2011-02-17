@@ -35,16 +35,6 @@ import net.jcip.annotations.ThreadSafe;
 public final class PromptingKeyManager<K extends SafeKey<K>>
 extends SafeKeyManager<K, PromptingKeyProvider<K>> {
 
-    /** A factory for {@link PromptingKeyProvider}s. */
-    private static class PromptingKeyProviderFactory<K extends SafeKey<K>>
-    implements Factory<K, PromptingKeyProvider<K>> {
-
-        @Override
-        public PromptingKeyProvider<K> newKeyProvider() {
-            return new PromptingKeyProvider<K>();
-        }
-    }
-
     private final View<? extends K> view;
 
     /**
@@ -88,4 +78,14 @@ extends SafeKeyManager<K, PromptingKeyProvider<K>> {
         }
         return changed;
     }
+
+    /** A factory for {@link PromptingKeyProvider}s. */
+    private static class PromptingKeyProviderFactory<K extends SafeKey<K>>
+    implements Factory<K, PromptingKeyProvider<K>> {
+
+        @Override
+        public PromptingKeyProvider<K> newKeyProvider() {
+            return new PromptingKeyProvider<K>();
+        }
+    } // class PromptingKeyProviderFactory
 }

@@ -33,19 +33,9 @@ import java.net.URI;
 @DefaultAnnotation(NonNull.class)
 public abstract class KeyPanel extends EnhancedPanel {
 
-    private static class KeyPanelListener implements PanelListener {
-        @Override
-        public void ancestorWindowShown(final PanelEvent evt) {
-            ((KeyPanel) evt.getSource()).runFeedback();
-        }
-
-        @Override
-        public void ancestorWindowHidden(PanelEvent evt) {
-        }
-    }
+    private static final long serialVersionUID = 2762934728646652873L;
 
     private Feedback feedback;
-    private String error;
 
     public KeyPanel() {
         addPanelListener(new KeyPanelListener());
@@ -90,18 +80,25 @@ public abstract class KeyPanel extends EnhancedPanel {
     /**
      * Getter for property {@code error}.
      */
-    public @CheckForNull String getError() {
-        return error;
-    }
+    public abstract @CheckForNull String getError();
 
     /**
      * Setter for property error.
      *
      * @param error New value of property error.
      */
-    public void setError(final @CheckForNull String error) {
-        this.error = error;
-    }
+    public abstract void setError(final @CheckForNull String error);
 
     abstract boolean updateParam(final AesCipherParameters param);
+
+    private static class KeyPanelListener implements PanelListener {
+        @Override
+        public void ancestorWindowShown(final PanelEvent evt) {
+            ((KeyPanel) evt.getSource()).runFeedback();
+        }
+
+        @Override
+        public void ancestorWindowHidden(PanelEvent evt) {
+        }
+    }
 }
