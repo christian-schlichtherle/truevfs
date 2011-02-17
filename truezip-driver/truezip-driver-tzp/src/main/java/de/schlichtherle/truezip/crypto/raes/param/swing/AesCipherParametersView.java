@@ -186,7 +186,7 @@ implements View<AesCipherParameters> {
             if (result != JOptionPane.OK_OPTION)
                 break; // reuse old key
 
-            if (writeKeyPanel.updateWriteKey(param)) { // valid input?
+            if (writeKeyPanel.updateParam(param)) { // valid input?
                 param.setKeyStrength(keyStrengthPanel.getKeyStrength());
                 controller.setKey(param);
                 break;
@@ -249,7 +249,7 @@ implements View<AesCipherParameters> {
                 break;
             }
 
-            if (readKeyPanel.updateReadKey(param)) { // valid input?
+            if (readKeyPanel.updateParam(param)) { // valid input?
                 controller.setKey(param);
                 controller.setChangeRequested(readKeyPanel.isChangeKeySelected());
                 break;

@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.crypto.raes.param.swing;
 
 /**
- * Behaves exactly like its base class, but implements the unknown key feedback
+ * Behaves exactly like its base class, but implements the unknown key run
  * interface, too.
  *
  * @author Christian Schlichtherle

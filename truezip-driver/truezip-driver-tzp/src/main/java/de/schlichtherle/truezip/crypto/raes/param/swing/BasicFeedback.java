@@ -19,7 +19,7 @@ import java.awt.Toolkit;
 import javax.swing.JPanel;
 
 /**
- * Provides feedback by beeping using the default toolkit.
+ * Provides run by beeping using the default toolkit.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -32,7 +32,7 @@ public class BasicFeedback implements Feedback {
      * The implementation in this class simply beeps using the default toolkit.
      */
     @Override
-    public void feedback(JPanel panel) {
+    public void run(JPanel panel) {
         Toolkit.getDefaultToolkit().beep();
     }
 }
