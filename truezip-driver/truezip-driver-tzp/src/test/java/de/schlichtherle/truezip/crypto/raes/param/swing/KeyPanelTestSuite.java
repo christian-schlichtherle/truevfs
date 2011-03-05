@@ -41,7 +41,7 @@ import static org.junit.Assert.*;
 public abstract class KeyPanelTestSuite<P extends KeyPanel> extends JemmyUtils {
     private static final ComponentChooser
             KEY_FILE_CHOOSER = new NameComponentChooser("keyFileChooser");
-
+	
     protected P panel;
     protected JFrameOperator frame;
     protected JLabelOperator error;
@@ -92,7 +92,7 @@ public abstract class KeyPanelTestSuite<P extends KeyPanel> extends JemmyUtils {
         assertFalse(isBlank(error.getText()));
         new JTabbedPaneOperator(frame).selectPage(AuthenticationPanel.AUTH_KEY_FILE); // select tab for key files
         new JButtonOperator(frame, KEY_FILE_CHOOSER).push(); // open file chooser
-        new JFileChooserOperator().chooseFile("file");
+        new FileChooserOperator().chooseFile("file");
         new QueueTool().waitEmpty();
         assertTrue(isBlank(error.getText()));
     }
@@ -108,14 +108,14 @@ public abstract class KeyPanelTestSuite<P extends KeyPanel> extends JemmyUtils {
         new JTabbedPaneOperator(frame).selectPage(AuthenticationPanel.AUTH_KEY_FILE); // select tab for key files
 
         new JButtonOperator(frame, KEY_FILE_CHOOSER).push(); // open file chooser
-        new JFileChooserOperator().chooseFile("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"$%&/()=?");
+        new FileChooserOperator().chooseFile("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"$%&/()=?");
         new QueueTool().waitEmpty();
         assertTrue(isBlank(error.getText()));
         assertFalse(panel.updateParam(param));
         assertNotNull(error.getText());
 
         new JButtonOperator(frame, KEY_FILE_CHOOSER).push(); // open file chooser
-        JFileChooserOperator fc = new JFileChooserOperator();
+        JFileChooserOperator fc = new FileChooserOperator();
         File[] files = fc.getFiles();
         fc.cancel(); // close file chooser
 
@@ -125,7 +125,7 @@ public abstract class KeyPanelTestSuite<P extends KeyPanel> extends JemmyUtils {
                 continue;
 
             new JButtonOperator(frame, KEY_FILE_CHOOSER).push(); // open file chooser
-            fc = new JFileChooserOperator();
+            fc = new FileChooserOperator();
             fc.setSelectedFile(file);
             fc.approve(); // close file chooser
             new QueueTool().waitEmpty();
