@@ -63,7 +63,7 @@ public final class KeyManagerRaesParameters implements RaesParametersProvider {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <P extends RaesParameters> P getParameters(Class<P> type) {
+    public <P extends RaesParameters> P get(Class<P> type) {
         return type.isAssignableFrom(Type0.class) ? (P) new Type0() : null;
     }
 
@@ -73,12 +73,6 @@ public final class KeyManagerRaesParameters implements RaesParametersProvider {
      */
     private class Type0 implements Type0RaesParameters {
         private AesCipherParameters param;
-
-        @Override
-        public KeyStrength getKeyStrength() {
-            assert null != param : "getCreatePasswd() must get called first!";
-            return param.getKeyStrength();
-        }
 
         @Override
         public char[] getWritePasswd() throws RaesKeyException {
@@ -98,10 +92,24 @@ public final class KeyManagerRaesParameters implements RaesParametersProvider {
                     .get(AesCipherParameters.class)
                     .getKeyProvider(resource);
             try {
-                return provider.getReadKey(invalid).getPassword();
+                return (param = provider.getReadKey(invalid)).getPassword();
             } catch (UnknownKeyException failure) {
                 throw new RaesKeyException(failure);
             }
+        }
+
+        @Override
+        public KeyStrength getKeyStrength() {
+            if (null == param)
+                throw new IllegalStateException("getWritePasswd() must get called first!");
+            return param.getKeyStrength();
+        }
+
+        @Override
+        public void setKeyStrength(KeyStrength keyStrength) {
+            if (null == param)
+                throw new IllegalStateException("getReadPasswd(boolean) must get called first!");
+            param.setKeyStrength(keyStrength);
         }
     }
 }

@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.zip;
 
+import de.schlichtherle.truezip.crypto.raes.MockType0RaesParameters;
 import de.schlichtherle.truezip.crypto.raes.RaesOutputStream;
 import de.schlichtherle.truezip.crypto.raes.RaesParameters;
 import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters;
@@ -30,6 +31,8 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static org.junit.Assert.*;
+
 /**
  * Tests compression and encryption of data.
  * Subclasses must override {@link #setUp}.
@@ -39,41 +42,10 @@ import java.util.logging.Logger;
  */
 public final class RaesZipTest extends ZipTestSuite {
 
-    private static final Logger logger
-            = Logger.getLogger(RaesZipTest.class.getName());
-
     /** Cipher text shorter than this gets authenticated. */
     private static int AUTHENTICATION_TRIGGER = 512 * 1024;
     
-    private static final String PASSWD = "passwd";
-
-    private static final KeyStrength[] keyStrengths = KeyStrength.values();
-
-    private static final Random rnd = new Random();
-
-    private static KeyStrength writeKeyStrength() {
-        final KeyStrength keyStrength = keyStrengths[rnd.nextInt(keyStrengths.length)];
-        //final int keyStrength = KEY_STRENGTH_ULTRA;
-        logger.log(Level.FINE, "Using {0} bits cipher key.", (128 + keyStrength.ordinal() * 64));
-        return keyStrength;
-    }
-
-    private static final RaesParameters raesParameters = new Type0RaesParameters() {
-        @Override
-        public char[] getReadPasswd(boolean invalid) {
-            return PASSWD.toCharArray();
-        }
-
-        @Override
-        public char[] getWritePasswd() {
-            return PASSWD.toCharArray();
-        }
-
-        @Override
-        public KeyStrength getKeyStrength() {
-            return writeKeyStrength();
-        }
-    };
+    private static final RaesParameters raesParameters = new MockType0RaesParameters();
 
     @Override
     protected ZipOutputStream newZipOutputStream(final OutputStream out)
@@ -90,12 +62,12 @@ public final class RaesZipTest extends ZipTestSuite {
 
     @Override
     protected ZipOutputStream newZipOutputStream(
-            final OutputStream out, final Charset charset)
+            final OutputStream out, final Charset cs)
     throws IOException {
         final RaesOutputStream ros = RaesOutputStream.getInstance(
                 out, raesParameters);
         try {
-            return new ZipOutputStream(ros, charset);
+            return new ZipOutputStream(ros, cs);
         } catch (RuntimeException exc) {
             ros.close();
             throw exc;
@@ -122,18 +94,17 @@ public final class RaesZipTest extends ZipTestSuite {
 
     @Override
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    protected ZipFile newZipFile(
-            final String name, final Charset charset)
+    protected ZipFile newZipFile(final String name, final Charset cs)
     throws IOException {
-        if (charset == null)
+        if (null == cs)
             throw new NullPointerException();
-        new String(new byte[0], charset); // may throw UnsupportedEncodingExceoption!
+        new String(new byte[0], cs); // may throw UnsupportedEncodingExceoption!
         final RaesReadOnlyFile rof
                 = RaesReadOnlyFile.getInstance(new File(name), raesParameters);
         try {
             if (rof.length() < AUTHENTICATION_TRIGGER) // heuristic
                 rof.authenticate();
-            return new ZipFile(rof, charset);
+            return new ZipFile(rof, cs);
         } catch (RuntimeException exc) {
             rof.close();
             throw exc;
@@ -166,7 +137,7 @@ public final class RaesZipTest extends ZipTestSuite {
     protected ZipFile newZipFile(
             final File file, final Charset charset)
     throws IOException {
-        if (charset == null)
+        if (null == charset)
             throw new NullPointerException();
         new String(new byte[0], charset); // may throw UnsupportedEncodingExceoption!
         final RaesReadOnlyFile rof
@@ -185,42 +156,41 @@ public final class RaesZipTest extends ZipTestSuite {
     }
 
     @Override
-    protected ZipFile newZipFile(final ReadOnlyFile file)
+    protected ZipFile newZipFile(final ReadOnlyFile rof)
     throws IOException {
-        final RaesReadOnlyFile rof
-                = RaesReadOnlyFile.getInstance(file, raesParameters);
+        final RaesReadOnlyFile rrof
+                = RaesReadOnlyFile.getInstance(rof, raesParameters);
         try {
-            if (rof.length() < AUTHENTICATION_TRIGGER) // heuristic
-                rof.authenticate();
-            return new ZipFile(rof);
+            if (rrof.length() < AUTHENTICATION_TRIGGER) // heuristic
+                rrof.authenticate();
+            return new ZipFile(rrof);
         } catch (RuntimeException exc) {
-            rof.close();
+            rrof.close();
             throw exc;
         } catch (IOException exc) {
-            rof.close();
+            rrof.close();
             throw exc;
         }
     }
 
     @Override
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    protected ZipFile newZipFile(
-            final ReadOnlyFile file, final Charset charset)
+    protected ZipFile newZipFile(final ReadOnlyFile rof, final Charset cs)
     throws IOException {
-        if (charset == null)
+        if (null == cs)
             throw new NullPointerException();
-        new String(new byte[0], charset); // may throw UnsupportedEncodingExceoption!
-        final RaesReadOnlyFile rof
-                = RaesReadOnlyFile.getInstance(file, raesParameters);
+        new String(new byte[0], cs); // may throw UnsupportedEncodingExceoption!
+        final RaesReadOnlyFile rrof
+                = RaesReadOnlyFile.getInstance(rof, raesParameters);
         try {
-            if (rof.length() < AUTHENTICATION_TRIGGER) // heuristic
-                rof.authenticate();
-            return new ZipFile(rof, charset);
+            if (rrof.length() < AUTHENTICATION_TRIGGER) // heuristic
+                rrof.authenticate();
+            return new ZipFile(rrof, cs);
         } catch (RuntimeException exc) {
-            rof.close();
+            rrof.close();
             throw exc;
         } catch (IOException exc) {
-            rof.close();
+            rrof.close();
             throw exc;
         }
     }

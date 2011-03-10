@@ -16,8 +16,12 @@
 package de.schlichtherle.truezip.crypto.raes;
 
 import de.schlichtherle.truezip.crypto.CipherOutputStream;
+import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.OutputStream;
+import net.jcip.annotations.NotThreadSafe;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.Mac;
 
@@ -30,6 +34,8 @@ import org.bouncycastle.crypto.Mac;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
+@DefaultAnnotation(NonNull.class)
 public abstract class RaesOutputStream extends CipherOutputStream {
 
     /**
@@ -87,7 +93,7 @@ public abstract class RaesOutputStream extends CipherOutputStream {
             return new Type0RaesOutputStream(out,
                     (Type0RaesParameters) parameters);
         } else if (parameters instanceof RaesParametersProvider) {
-            parameters = ((RaesParametersProvider) parameters).getParameters(
+            parameters = ((RaesParametersProvider) parameters).get(
                     RaesParameters.class);
             return getInstance(out, parameters);
         } else {
@@ -100,8 +106,8 @@ public abstract class RaesOutputStream extends CipherOutputStream {
     }
 
     /**
-     * Returns the key size in bits which is actually used to encrypt or
-     * decrypt the data for this output stream.
+     * Returns the key strength which is actually used to encrypt the data of
+     * the RAES file.
      */
-    public abstract int getKeySizeBits();
+    public abstract KeyStrength getKeyStrength();
 }

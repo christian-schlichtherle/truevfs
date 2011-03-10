@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.key;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+
 /**
  * A safe key for a protected resource.
  *
@@ -24,7 +26,7 @@ package de.schlichtherle.truezip.key;
 public interface SafeKey<K> extends Cloneable {
 
     /** Clones this safe key. */
-    K clone();
+    @NonNull K clone();
 
     /** Resets this safe key to it's initial state, wiping any data from heap. */
     void reset();

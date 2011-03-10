@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.crypto.raes.param;
 
 import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
 import de.schlichtherle.truezip.key.SafeKey;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import java.util.Arrays;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
@@ -29,6 +30,7 @@ import static de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStreng
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public final class AesCipherParameters implements SafeKey<AesCipherParameters> {
 
     private KeyStrength keyStrength = BITS_256;
@@ -50,23 +52,6 @@ public final class AesCipherParameters implements SafeKey<AesCipherParameters> {
     public void reset() {
         setPassword(null);
         setKeyStrength(BITS_256);
-    }
-
-    /**
-     * Returns the AES key strength, which defaults to
-     * {@link KeyStrength#BITS_256}.
-     *
-     * @return The AES key strength, which defaults to
-     *         {@link KeyStrength#BITS_256}.
-     */
-    public @NonNull KeyStrength getKeyStrength() {
-        return keyStrength;
-    }
-
-    public void setKeyStrength(final @NonNull KeyStrength keyStrength) {
-        if (null == keyStrength)
-            throw new NullPointerException();
-        this.keyStrength = keyStrength;
     }
 
     public @Nullable char[] getPassword() {
@@ -107,5 +92,22 @@ public final class AesCipherParameters implements SafeKey<AesCipherParameters> {
         } else {
             this.password = null;
         }
+    }
+
+    /**
+     * Returns the AES key strength, which defaults to
+     * {@link KeyStrength#BITS_256}.
+     *
+     * @return The AES key strength, which defaults to
+     *         {@link KeyStrength#BITS_256}.
+     */
+    public KeyStrength getKeyStrength() {
+        return keyStrength;
+    }
+
+    public void setKeyStrength(final KeyStrength keyStrength) {
+        if (null == keyStrength)
+            throw new NullPointerException();
+        this.keyStrength = keyStrength;
     }
 }

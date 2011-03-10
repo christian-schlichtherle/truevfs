@@ -15,7 +15,10 @@
  */
 package de.schlichtherle.truezip.crypto.raes;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import de.schlichtherle.truezip.crypto.CipherReadOnlyFile;
+import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.rof.DefaultReadOnlyFile;
@@ -67,6 +70,7 @@ import static de.schlichtherle.truezip.crypto.raes.RaesConstants.*;
  * @version $Id$
  */
 @NotThreadSafe
+@DefaultAnnotation(NonNull.class)
 public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
 
     static short readUByte(final byte[] b, final int off) {
@@ -148,8 +152,8 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
             final ReadOnlyFile rof,
             RaesParameters parameters)
     throws IOException {
-        if (parameters == null)
-            throw new NullPointerException();
+        /*if (null == parameters)
+            throw new NullPointerException();*/
 
         // Load header data.
         final byte[] leadIn = new byte[LEAD_IN_LENGTH];
@@ -183,7 +187,7 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
             return (P) parameters;
         } else if (parameters instanceof RaesParametersProvider) {
             return findParameters(type,
-                    ((RaesParametersProvider) parameters).getParameters(type));
+                    ((RaesParametersProvider) parameters).get(type));
         } else {
             throw new RaesParametersException();
         }
@@ -194,10 +198,10 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
     }
 
     /**
-     * Returns the key size in bits which is actually used to decrypt the data
-     * of this RAES file.
+     * Returns the key strength which is actually used to decrypt the data
+     * of the RAES file.
      */
-    public abstract int getKeySizeBits();
+    public abstract KeyStrength getKeyStrength();
 
     /**
      * Authenticates all encrypted data in the read only file.
