@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.crypto.raes;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * These {@link RaesParameters} delegate to some other instance of a sibling
@@ -47,5 +48,5 @@ public interface RaesParametersProvider extends RaesParameters {
      * @return An instance of {@code RaesParameters} or {@code null}
      *         if no RAES parameters are available.
      */
-    @CheckForNull <P extends RaesParameters> P getParameters(Class<P> type);
+    @CheckForNull <P extends RaesParameters> P get(@NonNull Class<P> type);
 }

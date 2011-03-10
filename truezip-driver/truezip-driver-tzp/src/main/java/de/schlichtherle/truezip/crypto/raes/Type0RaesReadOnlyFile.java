@@ -17,8 +17,11 @@ package de.schlichtherle.truezip.crypto.raes;
 
 import de.schlichtherle.truezip.crypto.SeekableBlockCipher;
 import de.schlichtherle.truezip.crypto.SICSeekableBlockCipher;
+import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.util.ArrayHelper;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import net.jcip.annotations.NotThreadSafe;
@@ -43,6 +46,7 @@ import static org.bouncycastle.crypto.PBEParametersGenerator.PKCS12PasswordToByt
  * @version $Id$
  */
 @NotThreadSafe
+@DefaultAnnotation(NonNull.class)
 class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
 
     /**
@@ -52,7 +56,7 @@ class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
     private static final long MIN_KEY_RETRY_DELAY = 3 * 1000;
 
     /** The key strength. */
-    private final int keyStrength;
+    private final KeyStrength keyStrength;
 
     /**
      * The parameters required to init the Message Authentication Code (MAC).
@@ -74,8 +78,8 @@ class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
             IOException {
         super(rof);
 
-        assert rof != null;
-        assert param != null;
+        assert null != rof;
+        assert null != param;
 
         // Load header data.
         final byte[] header = new byte[ENVELOPE_TYPE_0_HEADER_LEN_WO_SALT];
@@ -84,14 +88,19 @@ class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
         rof.readFully(header);
 
         // Check key size and iteration count
-        keyStrength = readUByte(header, 5);
-        if (keyStrength < 0 || 2 < keyStrength)
+        final int keyStrengthOrdinal = readUByte(header, 5);
+        final int keyStrengthBytes = 16 + 8 * keyStrengthOrdinal; // key strength in bytes: 16, 24 or 32
+        final int keyStrengthBits = 8 * keyStrengthBytes;
+        try {
+            keyStrength = KeyStrength.values()[keyStrengthOrdinal];
+        } catch (ArrayIndexOutOfBoundsException ex) {
             throw new RaesException(
                     "Unknown index for cipher key strength: "
-                    + keyStrength
-                    + "!");
-        final int keyLen = 16 + keyStrength * 8; // key strength in bytes: 16, 24 or 32
-        final int keySize = keyLen * 8; // key strength in bits
+                    + keyStrengthOrdinal
+                    + "!",
+                    ex);
+        }
+
         final int iCount = readUShort(header, 6);
         if (1024 > iCount)
             throw new RaesException(
@@ -100,10 +109,10 @@ class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
                     + "!");
 
         // Init start of encrypted data.
-        final long start = header.length + keyLen;
+        final long start = header.length + keyStrengthBytes;
 
         // Load salt.
-        final byte[] salt = new byte[keyLen];
+        final byte[] salt = new byte[keyStrengthBytes];
         rof.readFully(salt);
 
         // Init digest for key generation and KLAC.
@@ -139,8 +148,8 @@ class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
 
             gen.init(pass, salt, iCount);
             cipherParam = (ParametersWithIV) gen.generateDerivedParameters(
-                    keySize, AES_BLOCK_SIZE);
-            macParam = gen.generateDerivedMacParameters(keySize);
+                    keyStrengthBits, AES_BLOCK_SIZE);
+            macParam = gen.generateDerivedMacParameters(keyStrengthBits);
             for (int i = pass.length; --i >= 0; ) // nullify password buffer
                 pass[i] = 0;
 
@@ -158,6 +167,8 @@ class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
             if (ArrayHelper.equals(footer, 0, buf, 0, buf.length / 2))
                 break;
         }
+
+        param.setKeyStrength(keyStrength);
 
         this.macParam = macParam;
 
@@ -185,8 +196,8 @@ class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
     }
 
     @Override
-    public int getKeySizeBits() {
-        return 128 + keyStrength * 64;
+    public KeyStrength getKeyStrength() {
+        return keyStrength;
     }
 
     @Override

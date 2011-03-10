@@ -31,25 +31,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 @DefaultAnnotation(NonNull.class)
 public interface Type0RaesParameters extends RaesParameters {
 
-    /** Defines the key strength for the AES algorithm. */
-    public enum KeyStrength {
-        /** Enum identifier for a 128 bit ciphering key. */
-        BITS_128,
-
-        /** Enum identifier for a 192 bit ciphering key. */
-        BITS_192,
-
-        /** Enum identifier for a 256 bit ciphering key. */
-        BITS_256,
-    }
-
-    /**
-     * Returns the key strength to use for creating or overwriting the RAES file.
-     *
-     * @return The key strength to use for creating or overwriting the RAES file.
-     */
-    KeyStrength getKeyStrength();
-
     /**
      * Returns the password required to create or overwrite the RAES type 0 file.
      *
@@ -73,4 +54,35 @@ public interface Type0RaesParameters extends RaesParameters {
      *         cancelled.
      */
     char[] getReadPasswd(boolean invalid) throws RaesKeyException;
+
+    /** Defines the key strength for the AES algorithm. */
+    enum KeyStrength {
+        /** Enum identifier for a 128 bit ciphering key. */
+        BITS_128,
+
+        /** Enum identifier for a 192 bit ciphering key. */
+        BITS_192,
+
+        /** Enum identifier for a 256 bit ciphering key. */
+        BITS_256,
+    }
+
+    /**
+     * Returns the key strength to use for creating or overwriting the RAES file.
+     *
+     * @return The key strength to use for creating or overwriting the RAES file.
+     * @throws RuntimeException if {@link #getWritePasswd()} hasn't
+     *         been called before and the implementation can't tolerate this.
+     */
+    KeyStrength getKeyStrength();
+
+    /**
+     * Sets the key strength to use for creating or overwriting the RAES file.
+     *
+     * @param keyStrength the key strength to use for creating or overwriting
+     *        the RAES file.
+     * @throws RuntimeException if {@link #getReadPasswd(boolean)} hasn't
+     *         been called before and the implementation can't tolerate this.
+     */
+    void setKeyStrength(KeyStrength keyStrength);
 }

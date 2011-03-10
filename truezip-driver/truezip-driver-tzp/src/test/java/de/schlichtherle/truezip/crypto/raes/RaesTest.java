@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.crypto.raes;
 
-import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFileTestSuite;
@@ -26,11 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.bouncycastle.crypto.digests.SHA256Digest;
-import org.bouncycastle.crypto.prng.DigestRandomGenerator;
-import org.bouncycastle.crypto.prng.RandomGenerator;
 
-import static org.junit.Assert.*;
 
 /**
  * @author Christian Schlichtherle
@@ -41,49 +36,8 @@ public final class RaesTest extends ReadOnlyFileTestSuite {
     private static final Logger logger = Logger.getLogger(
             RaesTest.class.getName());
 
-    private static final String PASSWD = "secret";
-
-    private static final RandomGenerator rng
-            = new DigestRandomGenerator(new SHA256Digest());
-
-    static {
-        rng.addSeedMaterial(System.currentTimeMillis());
-    }
-
-    private static final KeyStrength[] keyStrengths = KeyStrength.values();
-
     private static RaesParameters newRaesParameters() {
-        return new Type0RaesParameters() {
-            boolean secondTry;
-
-            @Override
-            public KeyStrength getKeyStrength() {
-                byte[] buf = new byte[1];
-                rng.nextBytes(buf);
-                return keyStrengths[(buf[0] & 0xFF) % keyStrengths.length];
-            }
-
-            @Override
-            public char[] getReadPasswd(boolean invalid) {
-                assertEquals(secondTry, invalid);
-                if (secondTry) {
-                    logger.finer("First returned password was wrong, providing the right one now!");
-                    return PASSWD.toCharArray();
-                } else {
-                    secondTry = true;
-                    byte[] buf = new byte[1];
-                    rng.nextBytes(buf);
-                    return buf[0] >= 0
-                            ? PASSWD.toCharArray()
-                            : "wrong".toCharArray();
-                }
-            }
-
-            @Override
-            public char[] getWritePasswd() {
-                return PASSWD.toCharArray();
-            }
-        };
+        return new MockType0RaesParameters();
     }
 
     private File cipherFile;
@@ -101,7 +55,7 @@ public final class RaesTest extends ReadOnlyFileTestSuite {
                 Streams.copy(in, out);
                 logger.log(Level.FINE,
                         "Encrypted {0} bytes of random data using AES-{1}/CTR/Hmac-SHA-256/PBKDFv2.",
-                        new Object[]{ plainFile.length(), out.getKeySizeBits() });
+                        new Object[]{ plainFile.length(), 128 + 64 * out.getKeyStrength().ordinal() });
                 // Open cipherFile for random access decryption.
             } catch (IOException ex) {
                 final File cipherFile = this.cipherFile;

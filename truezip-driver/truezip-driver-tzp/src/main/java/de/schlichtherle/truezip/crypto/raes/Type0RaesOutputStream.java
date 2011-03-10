@@ -15,11 +15,15 @@
  */
 package de.schlichtherle.truezip.crypto.raes;
 
-import java.security.SecureRandom;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import de.schlichtherle.truezip.crypto.SICSeekableBlockCipher;
+import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
 import de.schlichtherle.truezip.io.LEDataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.security.SecureRandom;
+import net.jcip.annotations.NotThreadSafe;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.Digest;
@@ -41,6 +45,8 @@ import static de.schlichtherle.truezip.crypto.raes.RaesConstants.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
+@DefaultAnnotation(NonNull.class)
 class Type0RaesOutputStream extends RaesOutputStream {
 
     private static final SecureRandom shaker = new SecureRandom();
@@ -50,8 +56,8 @@ class Type0RaesOutputStream extends RaesOutputStream {
      */
     final static int ITERATION_COUNT = 2005; // The RAES epoch :-)
 
-    /** The actual key strength in bits. */
-    private int keyStrengthBits;
+    /** The key strength. */
+    private final KeyStrength keyStrength;
 
     /** The Message Authentication Code (MAC). */
     private Mac mac;
@@ -87,14 +93,16 @@ class Type0RaesOutputStream extends RaesOutputStream {
         final char[] passwd = param.getWritePasswd();
         if (null == passwd)
             throw new RaesKeyException();
-        final int keyStrength = param.getKeyStrength().ordinal();
+
+        keyStrength = param.getKeyStrength();
+        final int keyStrengthOrdinal = keyStrength.ordinal();
+        final int keyStrengthBytes = 16 + 8 * keyStrengthOrdinal; // key strength in bytes: 16, 24 or 32
+        final int keyStrengthBits = 8 * keyStrengthBytes;
 
         // Init digest for key generation and KLAC.
         final Digest digest = new SHA256Digest();
 
         // Init key strength info and salt.
-        final int keyStrengthBytes = 16 + keyStrength * 8;
-        keyStrengthBits = keyStrengthBytes * 8; // key strength in bits
         assert digest.getDigestSize() >= keyStrengthBytes;
         final byte[] salt = new byte[keyStrengthBytes];
         shaker.nextBytes(salt);
@@ -141,7 +149,7 @@ class Type0RaesOutputStream extends RaesOutputStream {
         // Write data envelope header.
         dos.writeInt(SIGNATURE);
         dos.writeByte(ENVELOPE_TYPE_0);
-        dos.writeByte(keyStrength);
+        dos.writeByte(keyStrengthOrdinal);
         dos.writeShort(ITERATION_COUNT);
         dos.write(salt);
 
@@ -154,8 +162,8 @@ class Type0RaesOutputStream extends RaesOutputStream {
     }
 
     @Override
-    public int getKeySizeBits() {
-        return keyStrengthBits;
+    public KeyStrength getKeyStrength() {
+        return keyStrength;
     }
 
     @Override
