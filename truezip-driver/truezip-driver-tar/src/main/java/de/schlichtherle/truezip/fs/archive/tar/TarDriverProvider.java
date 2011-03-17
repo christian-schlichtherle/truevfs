@@ -47,8 +47,8 @@ import net.jcip.annotations.Immutable;
  * <td>{@code .tar.gz} | {@code .tgz}</td>
  * </tr>
  * <tr>
- * <td>{@code tar.bz2} | {@code tbz2}</td>
- * <td>{@code .tar.bz2} | {@code .tbz2}</td>
+ * <td>{@code tar.bz2} | {@code tbz} | {@code tb2}</td>
+ * <td>{@code .tar.bz2} | {@code .tbz} | {@code .tb2}</td>
  * </tr>
  * </tbody>
  * </table>
@@ -63,7 +63,7 @@ public final class TarDriverProvider extends FsDriverProvider {
             DRIVERS = newMap(new Object[][] {
                 { "tar", new TarDriver(IOPoolLocator.SINGLETON) },
                 { "tgz|tar.gz", new TarGZipDriver(IOPoolLocator.SINGLETON) },
-                { "tbz2|tar.bz2", new TarBZip2Driver(IOPoolLocator.SINGLETON) },
+                { "tbz|tb2|tar.bz2", new TarBZip2Driver(IOPoolLocator.SINGLETON) },
             });
 
     @Override

@@ -30,7 +30,7 @@ import static org.hamcrest.CoreMatchers.*;
  */
 public class TarDriverProviderTest {
 
-    public static final String DRIVER_LIST = "tar|tar.bz2|tar.gz|tbz2|tgz";
+    public static final String DRIVER_LIST = "tar|tar.bz2|tar.gz|tbz|tb2|tgz";
 
     private FsDriverProvider instance;
 
