@@ -166,21 +166,19 @@ implements ZipEntryFactory<ZipArchiveEntry> {
     public ZipArchiveEntry newEntry(
             String name,
             final Type type,
-            final @CheckForNull Entry template)
+            final Entry template)
     throws CharConversionException {
         assertEncodable(name);
         name = toZipOrTarEntryName(name, type);
         final ZipArchiveEntry entry;
-        if (null != template) {
-            if (template instanceof ZipArchiveEntry) {
-                entry = newEntry(name, (ZipArchiveEntry) template);
-            } else {
-                entry = newEntry(name);
+        if (template instanceof ZipArchiveEntry) {
+            entry = newEntry(name, (ZipArchiveEntry) template);
+        } else {
+            entry = newEntry(name);
+            if (null != template) {
                 entry.setTime(template.getTime(WRITE));
                 entry.setSize(template.getSize(DATA));
             }
-        } else {
-            entry = newEntry(name);
         }
         return entry;
     }
