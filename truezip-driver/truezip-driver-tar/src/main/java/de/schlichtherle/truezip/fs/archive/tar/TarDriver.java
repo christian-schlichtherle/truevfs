@@ -75,17 +75,14 @@ public class TarDriver extends FsCharsetArchiveDriver<TarArchiveEntry> {
         assertEncodable(name);
         name = toZipOrTarEntryName(name, type);
         final TarArchiveEntry entry;
-        if (null != template) {
-            if (template instanceof TarArchiveEntry) {
-                entry = newEntry(name, (TarArchiveEntry) template);
-                entry.setName(name);
-            } else {
-                entry = newEntry(name);
+        if (template instanceof TarArchiveEntry) {
+            entry = newEntry(name, (TarArchiveEntry) template);
+        } else {
+            entry = newEntry(name);
+            if (null != template) {
                 entry.setModTime(template.getTime(WRITE));
                 entry.setSize(template.getSize(DATA));
             }
-        } else {
-            entry = newEntry(name);
         }
         return entry;
     }
