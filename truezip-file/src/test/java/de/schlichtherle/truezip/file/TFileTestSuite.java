@@ -89,8 +89,8 @@ public abstract class TFileTestSuite {
     private TFile archive;
     private byte[] data;
 
-    protected TFileTestSuite(final @NonNull FsScheme scheme,
-                            final @NonNull FsArchiveDriver<?> driver) {
+    protected TFileTestSuite(   final @NonNull FsScheme scheme,
+                                final @NonNull FsArchiveDriver<?> driver) {
         if (null == scheme || null == driver)
             throw new NullPointerException();
         this.scheme = scheme;
