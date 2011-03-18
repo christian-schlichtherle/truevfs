@@ -17,12 +17,13 @@ package de.schlichtherle.truezip.fs.archive.tar;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import de.schlichtherle.truezip.socket.IOPool.Entry;
+import de.schlichtherle.truezip.entry.EntryName;
+import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.InputShop;
-import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.socket.IOPool;
+import de.schlichtherle.truezip.socket.IOPool.Entry;
 import java.io.OutputStream;
 import java.io.EOFException;
 import java.io.FileNotFoundException;
@@ -39,6 +40,8 @@ import org.apache.tools.tar.TarEntry;
 import org.apache.tools.tar.TarInputStream;
 import org.apache.tools.tar.TarUtils;
 
+import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR;
+import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR_CHAR;
 import static org.apache.tools.tar.TarConstants.GIDLEN;
 import static org.apache.tools.tar.TarConstants.MODELEN;
 import static org.apache.tools.tar.TarConstants.MODTIMELEN;
@@ -91,17 +94,18 @@ implements InputShop<TarArchiveEntry> {
         final IOPool<?> pool = driver.getPool();
         try {
             TarEntry tinEntry;
-            while ((tinEntry = tin.getNextEntry()) != null) {
-                final String name = tinEntry.getName();
+            while (null != (tinEntry = tin.getNextEntry())) {
+                final String name = getName(tinEntry);
                 TarArchiveEntry entry = entries.get(name);
                 if (null != entry)
                     entry.release();
-                entry = new TarArchiveEntry(tinEntry);
+                entry = new TarArchiveEntry(name, tinEntry);
                 if (!tinEntry.isDirectory()) {
                     final Entry<?> temp = pool.allocate();
                     entry.setTemp(temp);
                     try {
-                        final OutputStream out = temp.getOutputSocket().newOutputStream();
+                        final OutputStream
+                                out = temp.getOutputSocket().newOutputStream();
                         try {
                             Streams.cat(tin, out);
                         } finally {
@@ -118,6 +122,19 @@ implements InputShop<TarArchiveEntry> {
             close0();
             throw ex;
         }
+    }
+
+    /**
+     * Returns the fixed name of the given TAR entry, ensuring that it ends
+     * with a {@link EntryName#SEPARATOR} if it's a directory.
+     *
+     * @param entry the TAR entry.
+     * @return the fixed name of the given TAR entry.
+     * @see <a href="http://java.net/jira/browse/TRUEZIP-62">Issue TRUEZIP-62</a>
+     */
+    private static String getName(TarEntry entry) {
+        final String name = entry.getName();
+        return entry.isDirectory() && !name.endsWith(SEPARATOR) ? name + SEPARATOR_CHAR : name;
     }
 
     /**
@@ -152,8 +169,8 @@ implements InputShop<TarArchiveEntry> {
      * returns an input stream from which you can still read all data,
      * including the data in buf.
      *
-     * @param in The stream to read from. May <em>not</em> be {@code null}.
-     * @param buf The buffer to fill entirely with data.
+     * @param  in The stream to read from. May <em>not</em> be {@code null}.
+     * @param  buf The buffer to fill entirely with data.
      * @return A stream which holds all the data {@code in} did.
      * @throws IOException If {@code buf} couldn't get filled entirely.
      */
@@ -179,7 +196,7 @@ implements InputShop<TarArchiveEntry> {
         int n = 0;
         do  {
             final int r = in.read(buf, n, l - n);
-            if (r == -1)
+            if (0 >= r)
                 throw new EOFException();
             n += r;
         } while (n < l);

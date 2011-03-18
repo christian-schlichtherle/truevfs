@@ -18,7 +18,6 @@ package de.schlichtherle.truezip.fs.archive.tar;
 import de.schlichtherle.truezip.util.Pool.Releasable;
 import de.schlichtherle.truezip.socket.IOPool.Entry;
 import de.schlichtherle.truezip.fs.archive.FsArchiveEntry;
-import java.io.File;
 import java.io.IOException;
 import org.apache.tools.tar.TarEntry;
 
@@ -40,44 +39,18 @@ implements FsArchiveEntry, Releasable<IOException> {
 
     private Entry<?> temp;
 
-    public TarArchiveEntry(final String entryName) {
-        super(entryName, true);
+    public TarArchiveEntry(final String name) {
+        super(name, true);
         // Fix super class constructor.
         super.setModTime(Long.MIN_VALUE);
         super.setSize(UNKNOWN);
         super.setUserName(System.getProperty("user.name", ""));
     }
 
-    public TarArchiveEntry(final TarEntry template)
-    throws IOException {
-        super(template.getName(), true);
-        super.setMode(template.getMode());
-        super.setModTime(template.getModTime());
-        super.setSize(template.getSize());
-        super.setUserId(template.getUserId());
-        super.setUserName(template.getUserName());
-        super.setGroupId(template.getGroupId());
-        super.setGroupName(template.getGroupName());
-    }
-
     public TarArchiveEntry(
             final String name,
             final TarEntry template) {
         super(name, true);
-        super.setMode(template.getMode());
-        super.setModTime(template.getModTime());
-        super.setSize(template.getSize());
-        super.setUserId(template.getUserId());
-        super.setUserName(template.getUserName());
-        super.setGroupId(template.getGroupId());
-        super.setGroupName(template.getGroupName());
-    }
-
-    public TarArchiveEntry(
-            final TarEntry template,
-            final File file) {
-        super(file);
-        super.setName(template.getName());
         super.setMode(template.getMode());
         super.setModTime(template.getModTime());
         super.setSize(template.getSize());
@@ -97,8 +70,10 @@ implements FsArchiveEntry, Releasable<IOException> {
 
     @Override
     public void release() throws IOException {
-        if (null != temp)
+        if (null != temp) {
             temp.release();
+            temp = null;
+        }
     }
 
     @Override
