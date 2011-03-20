@@ -22,6 +22,7 @@ import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.rof.DefaultReadOnlyFile;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -130,7 +131,7 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
     }
 
     /**
-     * Creates a new instance of {@code RaesReadOnlyFile}.
+     * Returns a new instance of an {@code RaesReadOnlyFile}.
      *
      * @param rof The read only file to read.
      * @param parameters The {@link RaesParameters} required to access the
@@ -138,14 +139,15 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
      *        If the run time class of this parameter does not match the
      *        required parameter interface according to the RAES type found
      *        in the file, but is an instance of the
-     *        {@link RaesParametersProvider} interface, it is used to find
+     *        {@link RaesParametersProvider} interface, it's queried to find
      *        the required RAES parameters.
-     *        This is applied recursively.
-     * @throws NullPointerException If any of the parameters is {@code null}.
-     * @throws FileNotFoundException If the file cannot get opened for reading.
-     * @throws RaesParametersException If no suitable RAES parameters have been
-     *         provided or something is wrong with the parameters.
+     *        This algorithm is recursively applied.
+     * @return A new instance of an {@code RaesReadOnlyFile}.
+     * @throws NullPointerException If {@code rof} is {@code null}.
+     * @throws RaesParametersException If {@code parameters} is {@code null} or
+     *         no suitable RAES parameters can be found.
      * @throws RaesException If the file is not RAES compatible.
+     * @throws FileNotFoundException If the file cannot get opened for reading.
      * @throws IOException On any other I/O related issue.
      */
     public static RaesReadOnlyFile getInstance(
@@ -178,7 +180,7 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
     @SuppressWarnings("unchecked")
     private static <P extends RaesParameters> P findParameters(
             final Class<P> type,
-            final RaesParameters parameters)
+            final @CheckForNull RaesParameters parameters)
     throws RaesParametersException {
         // Order is important here to support multiple interface implementations!
         if (null == parameters) {
@@ -193,7 +195,7 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
         }
     }
 
-    RaesReadOnlyFile(ReadOnlyFile rof) {
+    RaesReadOnlyFile(@CheckForNull ReadOnlyFile rof) {
         super(rof);
     }
 

@@ -13,32 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.fs.file;
+package de.schlichtherle.truezip.fs.archive.zip.raes;
 
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.fs.sl.FsDriverLocator;
-import de.schlichtherle.truezip.fs.spi.FsDriverProvider;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
+import de.schlichtherle.truezip.fs.spi.FsDriverService;
+import de.schlichtherle.truezip.key.sl.KeyManagerLocator;
+import de.schlichtherle.truezip.socket.sl.IOPoolLocator;
 import java.util.Map;
 import net.jcip.annotations.Immutable;
 
 /**
- * An immutable container of a driver for the {@code file} scheme.
+ * An immutable container of a driver for the RAES encrypted ZIP file format.
  * <p>
  * When used with the service locator class {@link FsDriverLocator}, this
  * service provider class will register the following URI schemes for use with
- * the TrueZIP Kernel module:
+ * the TrueZIP Kernel module and the following canonical archive file suffixes
+ * for automatic detection by the TrueZIP File* module:
  * <table border="2" cellpadding="4">
  * <thead>
  * <tr>
  * <th>URI Schemes</th>
+ * <th>Canonical Archive File Suffixes</th>
  * </tr>
  * </thead>
  * <tbody>
  * <tr>
- * <td>{@code file}</td>
+ * <td>{@code tzp} | {@code zip.rae} | {@code zip.raes}</td>
+ * <td>{@code .tzp} | {@code .zip.rae} | {@code .zip.raes}</td>
  * </tr>
  * </tbody>
  * </table>
@@ -47,13 +50,14 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-@DefaultAnnotation(NonNull.class)
-public final class FileDriverProvider extends FsDriverProvider {
+public final class ZipRaesDriverService extends FsDriverService {
 
     private static final Map<FsScheme, FsDriver>
             DRIVERS = newMap(new Object[][] {
-                { "file", new FileDriver() },
-            });
+            {   "tzp|zip.rae|zip.raes",
+                new SafeZipRaesDriver(  IOPoolLocator.SINGLETON,
+                                        KeyManagerLocator.SINGLETON) },
+        });
 
     @Override
     public Map<FsScheme, FsDriver> get() {

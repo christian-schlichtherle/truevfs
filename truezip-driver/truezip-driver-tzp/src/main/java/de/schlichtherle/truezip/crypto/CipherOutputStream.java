@@ -17,6 +17,10 @@
 package de.schlichtherle.truezip.crypto;
 
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.OutputStream;
 import org.bouncycastle.crypto.BufferedBlockCipher;
@@ -39,11 +43,13 @@ import org.bouncycastle.crypto.InvalidCipherTextException;
  * </ul>
  *
  * @author Christian Schlichtherle
+ * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public class CipherOutputStream extends DecoratingOutputStream {
 
     /** The buffered block cipher used for preprocessing the output. */
-    protected BufferedBlockCipher cipher;
+    protected @Nullable BufferedBlockCipher cipher;
 
     /**
      * The buffer used for preprocessing the output.
@@ -67,7 +73,8 @@ public class CipherOutputStream extends DecoratingOutputStream {
      * @param cipher The cipher to use for encryption or decryption.
      *        Maybe {@code null} for subsequent initialization by a subclass.
      */
-    public CipherOutputStream(OutputStream out, BufferedBlockCipher cipher) {
+    public CipherOutputStream(  @CheckForNull OutputStream out,
+                                final @CheckForNull BufferedBlockCipher cipher) {
         super(out);
         this.cipher = cipher;
     }
@@ -79,7 +86,7 @@ public class CipherOutputStream extends DecoratingOutputStream {
      * @throws IOException If the preconditions do not hold.
      */
     private void assertOpen() throws IOException {
-        if (cipher == null)
+        if (null == cipher)
             throw new IOException("cipher output stream is not in open state");
     }
 

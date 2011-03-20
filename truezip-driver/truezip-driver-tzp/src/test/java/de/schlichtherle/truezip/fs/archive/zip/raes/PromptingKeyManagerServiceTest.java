@@ -13,31 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.fs.spi;
+package de.schlichtherle.truezip.fs.archive.zip.raes;
 
-import de.schlichtherle.truezip.fs.DummyDriver;
-import de.schlichtherle.truezip.fs.FsDriver;
-import de.schlichtherle.truezip.fs.FsScheme;
-import java.util.Map;
+import de.schlichtherle.truezip.key.spi.KeyManagerService;
+import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
- * A provider for the dummy driver.
- *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class DummyDriverProvider extends FsDriverProvider {
+public final class PromptingKeyManagerServiceTest {
 
-    private final Map<FsScheme, FsDriver> drivers;
-
-    public DummyDriverProvider(String suffixes) {
-        this.drivers = newMap(new Object[][] {
-            { suffixes, new DummyDriver() },
-        });
+    private KeyManagerService instance;
+    
+    @Before
+    public void setUp() {
+        instance = new PromptingKeyManagerService();
     }
 
-    @Override
-    public Map<FsScheme, FsDriver> get() {
-        return drivers;
+    @Test
+    public void testGet() {
+        assertNotNull(instance.get(Object.class));
+        assertNotNull(instance.get(AesCipherParameters.class));
     }
 }

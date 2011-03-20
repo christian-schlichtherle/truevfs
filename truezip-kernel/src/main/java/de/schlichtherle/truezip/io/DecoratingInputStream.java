@@ -15,6 +15,9 @@
  */
 package de.schlichtherle.truezip.io;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.FilterInputStream;
 import java.io.IOException;
@@ -30,6 +33,7 @@ import java.io.InputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public abstract class DecoratingInputStream extends InputStream {
 
     /** The nullable decorated input stream. */
@@ -41,7 +45,7 @@ public abstract class DecoratingInputStream extends InputStream {
      *
      * @param in the input stream to wrap in this decorator.
      */
-    protected DecoratingInputStream(final InputStream in) {
+    protected DecoratingInputStream(final @CheckForNull InputStream in) {
         this.delegate = in;
     }
 

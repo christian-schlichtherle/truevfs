@@ -16,8 +16,8 @@
 package de.schlichtherle.truezip.socket.sl;
 
 import de.schlichtherle.truezip.socket.IOPool;
-import de.schlichtherle.truezip.socket.IOPoolService;
-import de.schlichtherle.truezip.socket.spi.IOPoolProvider;
+import de.schlichtherle.truezip.socket.IOPoolProvider;
+import de.schlichtherle.truezip.socket.spi.IOPoolService;
 import de.schlichtherle.truezip.util.ServiceLocator;
 import java.util.Iterator;
 import java.util.ServiceConfigurationError;
@@ -31,13 +31,13 @@ import net.jcip.annotations.Immutable;
  * whatever yields a result first.
  * <p>
  * First, the value of the {@link System#getProperty system property}
- * with the class name {@code "de.schlichtherle.truezip.socket.spi.IOPoolProvider"}
+ * with the class name {@code "de.schlichtherle.truezip.socket.spi.IOPoolService"}
  * as the key is queried.
  * If this yields a value, the class with that name is then loaded and
  * instantiated by calling its no-arg constructor.
  * <p>
  * Otherwise, the class path is searched for any resource file with the name
- * {@code "META-INF/services/de.schlichtherle.truezip.socket.spi.IOPoolProvider"}.
+ * {@code "META-INF/services/de.schlichtherle.truezip.socket.spi.IOPoolService"}.
  * If this yields a result, the class with the name in this file is then loaded
  * and instantiated by calling its no-arg constructor.
  * <p>
@@ -47,32 +47,32 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-public final class IOPoolLocator implements IOPoolService {
+public final class IOPoolLocator implements IOPoolProvider {
 
     /** The singleton instance of this class. */
     public static final IOPoolLocator SINGLETON = new IOPoolLocator();
 
-    private final IOPoolProvider provider;
+    private final IOPoolService service;
 
     /** You cannot instantiate this class. */
     private IOPoolLocator() {
         final ServiceLocator locator = new ServiceLocator(
                 IOPoolLocator.class.getClassLoader());
-        IOPoolProvider
-                provider = locator.getService(IOPoolProvider.class, null);
-        if (null == provider) {
-            final Iterator<IOPoolProvider>
-                    i = locator.getServices(IOPoolProvider.class);
+        IOPoolService
+                service = locator.getService(IOPoolService.class, null);
+        if (null == service) {
+            final Iterator<IOPoolService>
+                    i = locator.getServices(IOPoolService.class);
             if (i.hasNext())
-                provider = i.next();
+                service = i.next();
             else
                 throw new ServiceConfigurationError(
-                        "No service provider available for " + IOPoolProvider.class);
+                        "No provider available for " + IOPoolService.class);
         }
-        this.provider = provider;
+        this.service = service;
         Logger  .getLogger( IOPoolLocator.class.getName(),
                             IOPoolLocator.class.getName())
-                .log(Level.CONFIG, "located", provider);
+                .log(Level.CONFIG, "located", service);
     }
 
     /**
@@ -83,6 +83,6 @@ public final class IOPoolLocator implements IOPoolService {
      */
     @Override
     public IOPool<?> get() {
-        return provider.get();
+        return service.get();
     }
 }

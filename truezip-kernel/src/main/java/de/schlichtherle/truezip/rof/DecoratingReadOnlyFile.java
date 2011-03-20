@@ -15,6 +15,9 @@
  */
 package de.schlichtherle.truezip.rof;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import net.jcip.annotations.ThreadSafe;
@@ -62,6 +65,7 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
+@DefaultAnnotation(NonNull.class)
 public abstract class DecoratingReadOnlyFile extends AbstractReadOnlyFile {
 
     /** The nullable decorated read only file. */
@@ -72,7 +76,7 @@ public abstract class DecoratingReadOnlyFile extends AbstractReadOnlyFile {
      * Creates a new instance of {@code DecoratingReadOnlyFile},
      * which filters the given read only file.
      */
-    protected DecoratingReadOnlyFile(ReadOnlyFile rof) {
+    protected DecoratingReadOnlyFile(@CheckForNull ReadOnlyFile rof) {
         this.delegate = rof;
     }
 

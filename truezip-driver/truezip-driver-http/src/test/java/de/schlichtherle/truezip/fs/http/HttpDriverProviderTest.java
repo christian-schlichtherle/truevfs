@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.http;
 
-import de.schlichtherle.truezip.fs.spi.FsDriverProvider;
+import de.schlichtherle.truezip.fs.spi.FsDriverService;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.util.SuffixSet;
 import org.junit.Before;
@@ -32,11 +32,11 @@ public final class HttpDriverProviderTest {
 
     public static final String DRIVER_LIST = "http|https";
 
-    private FsDriverProvider instance;
+    private FsDriverService instance;
 
     @Before
     public void setUp() {
-        instance = new HttpDriverProvider();
+        instance = new HttpDriverService();
     }
 
     @Test

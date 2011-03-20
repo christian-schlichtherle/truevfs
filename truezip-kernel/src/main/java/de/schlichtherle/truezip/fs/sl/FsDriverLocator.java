@@ -17,8 +17,8 @@ package de.schlichtherle.truezip.fs.sl;
 
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
-import de.schlichtherle.truezip.fs.FsDriverService;
-import de.schlichtherle.truezip.fs.spi.FsDriverProvider;
+import de.schlichtherle.truezip.fs.FsDriverProvider;
+import de.schlichtherle.truezip.fs.spi.FsDriverService;
 import de.schlichtherle.truezip.util.ServiceLocator;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -35,7 +35,7 @@ import net.jcip.annotations.Immutable;
  * Locates all file system drivers found on the class path.
  * The map of file system drivers is populated by instantiating all classes
  * which are named in the resource files with the name
- * {@code "META-INF/services/de.schlichtherle.truezip.fs.spi.FsDriverProvider"}
+ * {@code "META-INF/services/de.schlichtherle.truezip.fs.spi.FsDriverService"}
  * on the class path by calling their no-arg constructor.
  * <p>
  * If no file system drivers are found, a {@link ServiceConfigurationError} is
@@ -46,7 +46,7 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 @DefaultAnnotation(NonNull.class)
-public final class FsDriverLocator implements FsDriverService {
+public final class FsDriverLocator implements FsDriverProvider {
 
     /** The singleton instance of this class. */
     public static final FsDriverLocator SINGLETON = new FsDriverLocator();
@@ -58,19 +58,19 @@ public final class FsDriverLocator implements FsDriverService {
         final Logger
                 logger = Logger.getLogger(  FsDriverLocator.class.getName(),
                                             FsDriverLocator.class.getName());
-        final Iterator<FsDriverProvider>
+        final Iterator<FsDriverService>
                 i = new ServiceLocator(FsDriverLocator.class.getClassLoader())
-                    .getServices(FsDriverProvider.class);
+                    .getServices(FsDriverService.class);
         final Map<FsScheme, FsDriver>
                 drivers = new HashMap<FsScheme, FsDriver>();
         if (!i.hasNext())
             throw new ServiceConfigurationError(
-                    "No service providers available for " + FsDriverProvider.class);
+                    "No provider available for " + FsDriverService.class);
         while (i.hasNext()) {
-            FsDriverProvider provider = i.next();
-            logger.log(Level.CONFIG, "located", provider);
+            FsDriverService service = i.next();
+            logger.log(Level.CONFIG, "located", service);
             for (final Map.Entry<FsScheme, FsDriver> entry
-                    : provider.get().entrySet()) {
+                    : service.get().entrySet()) {
                 final FsScheme scheme = entry.getKey();
                 final FsDriver driver = entry.getValue();
                 if (null != scheme && null != driver) {

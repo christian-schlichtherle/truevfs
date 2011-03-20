@@ -29,7 +29,7 @@ import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriver;
 import de.schlichtherle.truezip.fs.archive.FsMultiplexedArchiveOutputShop;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.socket.IOPoolService;
+import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.zip.ZipEntryFactory;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import java.io.CharConversionException;
@@ -68,22 +68,22 @@ implements ZipEntryFactory<ZipArchiveEntry> {
 
     /**
      * Equivalent to
-     * {@link ZipDriver#ZipDriver(IOPoolService, Charset) new ZipDriver(pool, ZIP_CHARSET)}.
+     * {@link ZipDriver#ZipDriver(IOPoolProvider, Charset) new ZipDriver(pool, ZIP_CHARSET)}.
      */
-    public ZipDriver(final IOPoolService service) {
+    public ZipDriver(final IOPoolProvider service) {
         this(service, ZIP_CHARSET);
     }
 
     /**
      * Constructs a new ZIP driver.
      *
-     * @param service the I/O pool service to use for allocating temporary I/O
+     * @param provider the I/O pool service to use for allocating temporary I/O
      *        entries.
      * @param charset the character set to use for entry names and comments.
      */
-    protected ZipDriver(final IOPoolService service, Charset charset) {
+    protected ZipDriver(final IOPoolProvider provider, Charset charset) {
         super(charset);
-        this.pool = service.get();
+        this.pool = provider.get();
     }
 
     @Override

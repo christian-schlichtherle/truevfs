@@ -13,26 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.fs.file;
+package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.socket.IOPool;
-import de.schlichtherle.truezip.socket.spi.IOPoolProvider;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import net.jcip.annotations.Immutable;
+import javax.inject.Provider;
 
 /**
- * Contains {@link TempFilePool#INSTANCE}.
+ * A provider for the singleton file system manager.
+ * <p>
+ * Implementations must be thread-safe.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-@Immutable
-@DefaultAnnotation(NonNull.class)
-public final class TempFilePoolProvider extends IOPoolProvider {
+public interface FsManagerProvider extends Provider<FsManager> {
 
+    /**
+     * Returns the singleton file system manager.
+     * <p>
+     * Calling this method several times must return the <em>same</em> file
+     * system manager in order to ensure consistency of the virtual file system
+     * space.
+     *
+     * @return The file system manager.
+     */
     @Override
-    public IOPool<?> get() {
-        return TempFilePool.INSTANCE;
-    }
+    @NonNull FsManager get();
 }

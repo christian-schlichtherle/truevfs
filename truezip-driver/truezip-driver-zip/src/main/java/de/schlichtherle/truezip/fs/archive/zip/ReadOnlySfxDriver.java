@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.fs.FsConcurrentModel;
-import de.schlichtherle.truezip.socket.IOPoolService;
+import de.schlichtherle.truezip.socket.IOPoolProvider;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -43,8 +43,8 @@ public class ReadOnlySfxDriver extends ZipDriver {
     public static final Charset SFX_CHARSET
             = Charset.forName(System.getProperty("file.encoding"));
 
-    public ReadOnlySfxDriver(IOPoolService service) {
-        super(service, SFX_CHARSET);
+    public ReadOnlySfxDriver(IOPoolProvider provider) {
+        super(provider, SFX_CHARSET);
     }
 
     @Override

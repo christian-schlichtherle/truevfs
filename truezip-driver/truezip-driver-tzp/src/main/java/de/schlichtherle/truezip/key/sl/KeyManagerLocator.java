@@ -16,8 +16,8 @@
 package de.schlichtherle.truezip.key.sl;
 
 import de.schlichtherle.truezip.key.KeyManager;
-import de.schlichtherle.truezip.key.KeyManagerService;
-import de.schlichtherle.truezip.key.spi.KeyManagerProvider;
+import de.schlichtherle.truezip.key.KeyManagerProvider;
+import de.schlichtherle.truezip.key.spi.KeyManagerService;
 import de.schlichtherle.truezip.util.ServiceLocator;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -33,13 +33,13 @@ import net.jcip.annotations.Immutable;
  * whatever yields a result first.
  * <p>
  * First, the value of the {@link System#getProperty system property}
- * with the class name {@code "de.schlichtherle.truezip.key.KeyManagerService"}
+ * with the class name {@code "de.schlichtherle.truezip.key.spi.KeyManagerService"}
  * as the key is queried.
  * If this yields a value, the class with that name is then loaded and
  * instantiated by calling its no-arg constructor.
  * <p>
  * Otherwise, the class path is searched for any resource file with the name
- * {@code "META-INF/services/de.schlichtherle.truezip.key.KeyManagerService"}.
+ * {@code "META-INF/services/de.schlichtherle.truezip.key.spi.KeyManagerService"}.
  * If this yields a result, the class with the name in this file is then loaded
  * and instantiated by calling its no-arg constructor.
  * <p>
@@ -50,37 +50,37 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 @DefaultAnnotation(NonNull.class)
-public final class KeyManagerLocator implements KeyManagerService {
+public final class KeyManagerLocator implements KeyManagerProvider {
 
     /** The singleton instance of this class. */
     public static final KeyManagerLocator
             SINGLETON = new KeyManagerLocator();
 
-    private final KeyManagerProvider provider;
+    private final KeyManagerService service;
 
     /** You cannot instantiate this class. */
     private KeyManagerLocator() {
         final ServiceLocator locator = new ServiceLocator(
                 KeyManagerLocator.class.getClassLoader());
-        KeyManagerProvider
-                provider = locator.getService(KeyManagerProvider.class, null);
-        if (null == provider) {
-            final Iterator<KeyManagerProvider>
-                    i = locator.getServices(KeyManagerProvider.class);
+        KeyManagerService
+                service = locator.getService(KeyManagerService.class, null);
+        if (null == service) {
+            final Iterator<KeyManagerService>
+                    i = locator.getServices(KeyManagerService.class);
             if (i.hasNext())
-                provider = i.next();
+                service = i.next();
             else
                 throw new ServiceConfigurationError(
-                        "No service provider available for " + KeyManagerProvider.class);
+                        "No provider available for " + KeyManagerService.class);
         }
-        this.provider = provider;
+        this.service = service;
         Logger  .getLogger( KeyManagerLocator.class.getName(),
                             KeyManagerLocator.class.getName())
-                .log(Level.CONFIG, "located", provider);
+                .log(Level.CONFIG, "located", service);
     }
 
     @Override
     public <K> KeyManager<? extends K, ?> get(Class<K> type) {
-        return provider.get(type);
+        return service.get(type);
     }
 }

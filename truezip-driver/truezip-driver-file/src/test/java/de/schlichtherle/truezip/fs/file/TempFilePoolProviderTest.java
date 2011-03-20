@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.file;
 
-import de.schlichtherle.truezip.socket.spi.IOPoolProvider;
+import de.schlichtherle.truezip.socket.spi.IOPoolService;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -27,11 +27,11 @@ import static org.junit.Assert.*;
  */
 public final class TempFilePoolProviderTest {
 
-    private IOPoolProvider instance;
+    private IOPoolService instance;
     
     @Before
     public void setUp() {
-        instance = new TempFilePoolProvider();
+        instance = new TempFilePoolService();
     }
 
     @Test

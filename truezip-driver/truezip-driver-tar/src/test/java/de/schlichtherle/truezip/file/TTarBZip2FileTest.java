@@ -26,7 +26,7 @@ import org.apache.tools.bzip2.CBZip2OutputStream;
 public final class TTarBZip2FileTest extends TFileTestSuite {
 
     public TTarBZip2FileTest() {
-        super(FsScheme.create("tar.bz2"), new TarBZip2Driver(POOL_SERVICE) {
+        super(FsScheme.create("tar.bz2"), new TarBZip2Driver(POOL_PROVIDER) {
             @Override
             public int getLevel() {
                 return CBZip2OutputStream.MIN_BLOCKSIZE;

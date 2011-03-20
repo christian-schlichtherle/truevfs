@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.fs.archive.zip.raes;
 import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
 import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
-import de.schlichtherle.truezip.key.spi.KeyManagerProvider;
+import de.schlichtherle.truezip.key.spi.KeyManagerService;
 import java.awt.GraphicsEnvironment;
 import java.util.ServiceConfigurationError;
 import net.jcip.annotations.Immutable;
@@ -36,7 +36,7 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-public final class PromptingKeyManagerProvider extends KeyManagerProvider {
+public final class PromptingKeyManagerService extends KeyManagerService {
 
     private static final PromptingKeyManager<AesCipherParameters>
             manager = new PromptingKeyManager<AesCipherParameters>(

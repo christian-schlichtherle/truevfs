@@ -19,11 +19,10 @@ import de.schlichtherle.truezip.fs.FsFailSafeManager;
 import de.schlichtherle.truezip.fs.FsDefaultManager;
 import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.FsStatisticsManager;
-import de.schlichtherle.truezip.fs.spi.FsManagerProvider;
+import de.schlichtherle.truezip.fs.spi.FsManagerService;
 
 /**
- * A service provider for a statistics-enabled fail-safe federated file system
- * manager.
+ * A service for a statistics-enabled fail-safe federated file system manager.
  * Note that implementing a service provider for a file system manager is
  * <strong>optional</strong>:
  * If no file system manager service provider is configured, the kernel
@@ -33,7 +32,7 @@ import de.schlichtherle.truezip.fs.spi.FsManagerProvider;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class SampleManagerProvider extends FsManagerProvider {
+public final class SampleManagerService extends FsManagerService {
 
     static final FsStatisticsManager manager = new FsStatisticsManager(
             new FsFailSafeManager(new FsDefaultManager()));

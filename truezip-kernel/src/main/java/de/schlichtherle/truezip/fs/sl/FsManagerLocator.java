@@ -18,8 +18,8 @@ package de.schlichtherle.truezip.fs.sl;
 import de.schlichtherle.truezip.fs.FsDefaultManager;
 import de.schlichtherle.truezip.fs.FsFailSafeManager;
 import de.schlichtherle.truezip.fs.FsManager;
-import de.schlichtherle.truezip.fs.FsManagerService;
-import de.schlichtherle.truezip.fs.spi.FsManagerProvider;
+import de.schlichtherle.truezip.fs.FsManagerProvider;
+import de.schlichtherle.truezip.fs.spi.FsManagerService;
 import de.schlichtherle.truezip.util.ServiceLocator;
 import java.util.Iterator;
 import java.util.logging.Level;
@@ -32,13 +32,13 @@ import net.jcip.annotations.Immutable;
  * whatever yields a result first.
  * <p>
  * First, the value of the {@link System#getProperty system property}
- * with the class name {@code "de.schlichtherle.truezip.fs.spi.FsManagerProvider"}
+ * with the class name {@code "de.schlichtherle.truezip.fs.spi.FsManagerService"}
  * as the key is queried.
  * If this yields a value, the class with that name is then loaded and
  * instantiated by calling its no-arg constructor.
  * <p>
  * Otherwise, the class path is searched for any resource file with the name
- * {@code "META-INF/services/de.schlichtherle.truezip.fs.spi.FsManagerProvider"}.
+ * {@code "META-INF/services/de.schlichtherle.truezip.fs.spi.FsManagerService"}.
  * If this yields a result, the class with the name in this file is then loaded
  * and instantiated by calling its no-arg constructor.
  * <p>
@@ -50,7 +50,7 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-public final class FsManagerLocator implements FsManagerService {
+public final class FsManagerLocator implements FsManagerProvider {
 
     /** The singleton instance of this class. */
     public static final FsManagerLocator SINGLETON = new FsManagerLocator();
@@ -64,23 +64,23 @@ public final class FsManagerLocator implements FsManagerService {
                                             FsManagerLocator.class.getName());
         final ServiceLocator locator = new ServiceLocator(
                 FsManagerLocator.class.getClassLoader());
-        FsManagerProvider
-                provider = locator.getService(FsManagerProvider.class, null);
-        if (null == provider) {
-            final Iterator<FsManagerProvider>
-                    i = locator.getServices(FsManagerProvider.class);
+        FsManagerService
+                service = locator.getService(FsManagerService.class, null);
+        if (null == service) {
+            final Iterator<FsManagerService>
+                    i = locator.getServices(FsManagerService.class);
             if (i.hasNext())
-                provider = i.next();
+                service = i.next();
         }
         FsManager manager;
-        if (null == provider) {
+        if (null == service) {
             manager = new FsFailSafeManager(new FsDefaultManager());
         } else {
-            logger.log(Level.CONFIG, "located", provider);
-            manager = provider.get();
+            logger.log(Level.CONFIG, "located", service);
+            manager = service.get();
         }
         this.manager = manager;
-        logger.log(Level.CONFIG, null != provider ? "provided" : "default", manager);
+        logger.log(Level.CONFIG, null != service ? "provided" : "default", manager);
     }
 
     @Override

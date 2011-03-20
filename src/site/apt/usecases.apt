@@ -131,7 +131,7 @@ try {
 Application File Format
 
     Suppose you're writing a plug-in for the next generation application
-    which shall use the JAR file format with a custom file suffix as a
+    which shall use an archive file format with a custom file suffix as a
     container for some application data.
 
     Then, wouldn't it be nice if you wouldn't need to worry about how to read
@@ -160,6 +160,14 @@ TFile.setDefaultArchiveDetector(
     get confused by an arbitrary file which inadvertenly uses a suffix of
     a supported archive file type.
 
+    Please also note the usage of the class
+    {{{./apidocs/de/schlichtherle/truezip/fs/archive/zip/JarDriver.html}<<<JarDriver>>>}}
+    for using the JAR file format.
+    The JAR file format is typically the best choice for custom application
+    file formats because it supports compression, fast access and UTF-8 encoded
+    entry names for maximum interoperability.
+    In particular, the last point makes it superior to the ZIP file format.
+
 Encrypted Application File Format
 
     Suppose you're still writing a plug-in for the next generation application,
@@ -187,8 +195,8 @@ TFile.setDefaultArchiveDetector(
     {{{./apidocs/de/schlichtherle/truezip/fs/archive/zip/raes/SafeZipRaesDriver.html}<<<SafeZipRaesDriver>>>}}
     is one of two available archive driver implementations for TrueZIP's
     custom encrypted ZIP.RAES (or TZP for short) file format.
-    A TZP file is a ZIP file with UTF-8 character set which is wrapped in
-    a RAES file envelope.
+    A TZP file is a ZIP file with UTF-8 encoded entry names (like the JAR file
+    format) which is wrapped in a RAES file envelope.
     RAES is TrueZIP's custom Random Access Encryption Specification which
     supports SHA-256 authentication and AES-256 decryption in CTR block
     mode for transparent, read/write access to its encrypted payload.

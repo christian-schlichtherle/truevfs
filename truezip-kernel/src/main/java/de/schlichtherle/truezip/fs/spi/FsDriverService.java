@@ -33,7 +33,7 @@ import java.util.ServiceConfigurationError;
 import java.util.TreeSet;
 
 /**
- * An abstract locatable service provider for a map of file system schemes to
+ * An abstract locatable service for a map of file system schemes to
  * file system drivers.
  * Implementations of this abstract class are subject to service location
  * by the class {@link FsDriverLocator}.
@@ -44,7 +44,7 @@ import java.util.TreeSet;
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-public abstract class FsDriverProvider implements FsDriverService {
+public abstract class FsDriverService implements FsDriverProvider {
 
     /**
      * Returns a string representation of this object for debugging and logging
@@ -61,8 +61,8 @@ public abstract class FsDriverProvider implements FsDriverService {
      * A static factory method for an unmodifiable driver map which is
      * constructed from the given configuration.
      * This method is intended to be used by provider implementations
-     * of the {@link FsDriverService} interface for convenient creation of the
-     * map to return by their {@link FsDriverService#get()} method.
+     * of the {@link FsDriverProvider} interface for convenient creation of the
+     * map to return by their {@link FsDriverProvider#get()} method.
      *
      * @param  config an array of key-value pair arrays.
      *         The first element of each inner array must either be a
@@ -76,7 +76,7 @@ public abstract class FsDriverProvider implements FsDriverService {
      *         {@link String fully qualified name of a file system driver class},
      *         or {@code null}.
      * @return The new map to use as the return value of
-     *         {@link FsDriverService#get()}.
+     *         {@link FsDriverProvider#get()}.
      * @throws NullPointerException if a required configuration element is
      *         {@code null}.
      * @throws IllegalArgumentException if any other parameter precondition
@@ -121,7 +121,7 @@ public abstract class FsDriverProvider implements FsDriverService {
     private static @CheckForNull FsDriver toDriver(@CheckForNull Object driver) {
         try {
         if (driver instanceof String)
-            driver = new ServiceLocator(FsDriverProvider.class.getClassLoader())
+            driver = new ServiceLocator(FsDriverService.class.getClassLoader())
                     .getClass((String) driver);
         } catch (ServiceConfigurationError ex) {
             throw new IllegalArgumentException(ex);

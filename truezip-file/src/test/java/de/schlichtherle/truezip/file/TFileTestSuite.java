@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.file;
 
-import de.schlichtherle.truezip.socket.IOPoolService;
+import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.util.ArrayHelper;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
@@ -59,15 +59,15 @@ import static org.junit.Assert.*;
  */
 public abstract class TFileTestSuite {
 
-    private static class ByteArrayIOPoolService implements IOPoolService {
+    private static class ByteArrayIOPoolProvider implements IOPoolProvider {
         @Override
         public IOPool<?> get() {
             return new ByteArrayIOPool(2048);
         }
     }
 
-    protected static final IOPoolService
-            POOL_SERVICE = new ByteArrayIOPoolService();
+    protected static final IOPoolProvider
+            POOL_PROVIDER = new ByteArrayIOPoolProvider();
 
     private static final Logger logger = Logger.getLogger(
             TFileTestSuite.class.getName());
@@ -137,12 +137,8 @@ public abstract class TFileTestSuite {
         // clean sheet of paper with subsequent tests.
         try {
             TFile.umount();
-        } catch (FsSyncException ignored) {
-            // Normally, you should NOT ignore all exceptions thrown by this
-            // method.
-            // The reason we do it here is that they are usually after effects
-            // of failed tests and we don't want any exception from the tests
-            // to be overridden by an exception thrown in this clean up method.
+        } catch (FsSyncException ex) {
+            logger.log(Level.WARNING, ex.toString(), ex);
         }
 
         if (temp.exists() && !temp.delete())

@@ -13,22 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.key.spi;
+package de.schlichtherle.truezip.socket.spi;
 
-import de.schlichtherle.truezip.key.*;
-import de.schlichtherle.truezip.key.sl.KeyManagerLocator;
+import de.schlichtherle.truezip.socket.*;
+import de.schlichtherle.truezip.socket.sl.IOPoolLocator;
 
 /**
- * An abstract locatable service provider for key managers.
+ * An abstract locatable service for an I/O pool.
  * Implementations of this abstract class are subject to service location
- * by the class {@link KeyManagerLocator}.
+ * by the class {@link IOPoolLocator}.
  * <p>
  * Implementations must be thread-safe.
  *
- * @author Christian Schlichtherle
- * @version $Id: FsManagers$
+ * @author  Christian Schlichtherle
+ * @version $Id$
  */
-public abstract class KeyManagerProvider implements KeyManagerService {
+public abstract class IOPoolService implements IOPoolProvider {
 
     /**
      * Returns a string representation of this object for debugging and logging

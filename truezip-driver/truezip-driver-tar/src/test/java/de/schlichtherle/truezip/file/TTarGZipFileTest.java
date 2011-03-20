@@ -25,6 +25,6 @@ import de.schlichtherle.truezip.fs.FsScheme;
 public final class TTarGZipFileTest extends TFileTestSuite {
 
     public TTarGZipFileTest() {
-        super(FsScheme.create("tar.gz"), new TarGZipDriver(POOL_SERVICE));
+        super(FsScheme.create("tar.gz"), new TarGZipDriver(POOL_PROVIDER));
     }
 }
