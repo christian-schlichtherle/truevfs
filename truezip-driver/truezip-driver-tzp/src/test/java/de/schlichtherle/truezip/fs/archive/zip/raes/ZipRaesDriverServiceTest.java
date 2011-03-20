@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.fs.archive.zip;
+package de.schlichtherle.truezip.fs.archive.zip.raes;
 
-import de.schlichtherle.truezip.fs.spi.FsDriverProvider;
+import de.schlichtherle.truezip.fs.spi.FsDriverService;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.util.SuffixSet;
 import org.junit.Before;
@@ -28,15 +28,15 @@ import static org.hamcrest.CoreMatchers.*;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class ZipDriverProviderTest {
+public class ZipRaesDriverServiceTest {
 
-    public static final String DRIVER_LIST = "zip|ear|jar|war|odg|odp|ods|odt|otg|otp|ots|ott|odb|odf|odm|oth|exe";
+    public static final String DRIVER_LIST = "tzp|zip.rae|zip.raes";
 
-    private FsDriverProvider instance;
+    private FsDriverService instance;
 
     @Before
     public void setUp() {
-        instance = new ZipDriverProvider();
+        instance = new ZipRaesDriverService();
     }
 
     @Test
@@ -48,7 +48,7 @@ public class ZipDriverProviderTest {
     @Test
     public void testImmutability() {
         try {
-            instance.get().remove(FsScheme.create("zip"));
+            instance.get().remove(FsScheme.create("tzp"));
             fail("put");
         } catch (UnsupportedOperationException ex) {
         }

@@ -19,14 +19,14 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import javax.inject.Provider;
 
 /**
- * A service for an I/O pool.
+ * A provider for an I/O pool.
  * <p>
  * Implementations must be thread-safe.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface IOPoolService extends Provider<IOPool<?>> {
+public interface IOPoolProvider extends Provider<IOPool<?>> {
 
     /**
      * Returns an I/O pool.

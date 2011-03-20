@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.fs.FsConcurrentModel;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.socket.IOPoolService;
+import de.schlichtherle.truezip.socket.IOPoolProvider;
 import java.io.IOException;
 import net.jcip.annotations.Immutable;
 
@@ -44,8 +44,8 @@ import net.jcip.annotations.Immutable;
 @Immutable
 public class CheckedJarDriver extends JarDriver {
 
-    public CheckedJarDriver(IOPoolService service) {
-        super(service);
+    public CheckedJarDriver(IOPoolProvider provider) {
+        super(provider);
     }
 
     @Override

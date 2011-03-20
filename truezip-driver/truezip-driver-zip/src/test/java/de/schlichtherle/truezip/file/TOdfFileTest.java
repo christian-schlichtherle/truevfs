@@ -25,6 +25,6 @@ import de.schlichtherle.truezip.fs.FsScheme;
 public class TOdfFileTest extends TFileTestSuite {
     
     public TOdfFileTest() {
-        super(FsScheme.create("odf"), new OdfDriver(POOL_SERVICE));
+        super(FsScheme.create("odf"), new OdfDriver(POOL_PROVIDER));
     }
 }

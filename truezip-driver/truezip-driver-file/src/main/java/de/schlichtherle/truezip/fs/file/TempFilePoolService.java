@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2011 Schlichtherle IT Services
+ * Copyright (C) 2011 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,20 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.fs.archive.tar;
+package de.schlichtherle.truezip.fs.file;
 
-import de.schlichtherle.truezip.fs.archive.CharsetArchiveDriverTestSuite;
-import de.schlichtherle.truezip.socket.IOPoolProvider;
+import de.schlichtherle.truezip.socket.IOPool;
+import de.schlichtherle.truezip.socket.spi.IOPoolService;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import net.jcip.annotations.Immutable;
 
 /**
+ * Contains {@link TempFilePool#INSTANCE}.
+ *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class TarCharsetArchiveDriverTest
-extends CharsetArchiveDriverTestSuite {
+@Immutable
+@DefaultAnnotation(NonNull.class)
+public final class TempFilePoolService extends IOPoolService {
 
     @Override
-    protected TarDriver newArchiveDriver(IOPoolProvider provider) {
-        return new TarDriver(provider);
+    public IOPool<?> get() {
+        return TempFilePool.INSTANCE;
     }
 }

@@ -13,22 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.socket.spi;
+package de.schlichtherle.truezip.fs.spi;
 
-import de.schlichtherle.truezip.socket.*;
-import de.schlichtherle.truezip.socket.sl.IOPoolLocator;
+import de.schlichtherle.truezip.fs.*;
+import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 
 /**
- * An abstract locatable service provider for an I/O pool.
+ * An abstract locatable service for a file system manager.
  * Implementations of this abstract class are subject to service location
- * by the class {@link IOPoolLocator}.
+ * by the class {@link FsManagerLocator}.
  * <p>
  * Implementations must be thread-safe.
  *
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @author Christian Schlichtherle
+ * @version $Id: FsManagers$
  */
-public abstract class IOPoolProvider implements IOPoolService {
+public abstract class FsManagerService implements FsManagerProvider {
 
     /**
      * Returns a string representation of this object for debugging and logging

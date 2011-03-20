@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.key;
+package de.schlichtherle.truezip.key.sl;
 
 import de.schlichtherle.truezip.key.sl.KeyManagerLocator;
 import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
+import de.schlichtherle.truezip.key.KeyManagerProvider;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -26,9 +27,9 @@ import static org.junit.Assert.*;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class KeyManagerContainerTest {
+public final class KeyManagerLocatorTest {
 
-    private KeyManagerService instance;
+    private KeyManagerProvider instance;
     
     @Before
     public void setUp() {

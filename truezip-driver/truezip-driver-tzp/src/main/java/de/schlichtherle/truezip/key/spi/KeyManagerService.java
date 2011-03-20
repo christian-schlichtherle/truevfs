@@ -13,30 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.key;
+package de.schlichtherle.truezip.key.spi;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
-import java.util.ServiceConfigurationError;
+import de.schlichtherle.truezip.key.*;
+import de.schlichtherle.truezip.key.sl.KeyManagerLocator;
 
 /**
- * A service for the singleton key manager for given key type.
+ * An abstract locatable service for key managers.
+ * Implementations of this abstract class are subject to service location
+ * by the class {@link KeyManagerLocator}.
  * <p>
  * Implementations must be thread-safe.
  *
  * @author Christian Schlichtherle
  * @version $Id: FsManagers$
  */
-public interface KeyManagerService {
+public abstract class KeyManagerService implements KeyManagerProvider {
 
     /**
-     * Returns the singleton key manager for the given key type.
-     * <p>
-     * Calling this method several times must return the same key manager
-     * for the same key type in order to ensure consistency of the key space.
-     *
-     * @return The key manager for the given key type.
-     * @throws ServiceConfigurationError if no appropriate key manager is
-     *         available.
+     * Returns a string representation of this object for debugging and logging
+     * purposes.
      */
-    @NonNull <K> KeyManager<? extends K, ?> get(@NonNull Class<K> type);
+    @Override
+    public String toString() {
+        return new StringBuilder()
+                .append(getClass().getName())
+                .toString();
+    }
 }

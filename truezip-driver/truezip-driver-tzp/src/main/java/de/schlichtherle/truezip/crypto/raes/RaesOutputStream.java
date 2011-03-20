@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.crypto.raes;
 
 import de.schlichtherle.truezip.crypto.CipherOutputStream;
 import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
@@ -56,7 +57,7 @@ public abstract class RaesOutputStream extends CipherOutputStream {
     }
 
     /**
-     * Creates a new instance of {@code RaesOutputStream}.
+     * Returns a new instance of an {@code RaesOutputStream}.
      *
      * @param out The underlying output stream to use for the encrypted data.
      * @param parameters The {@link RaesParameters} used to determine and
@@ -68,25 +69,21 @@ public abstract class RaesOutputStream extends CipherOutputStream {
      *        If you need more control over this, pass in an instance which's
      *        run time class just implements the
      *        {@link RaesParametersProvider} interface.
-     *        Instances of this interface are recursively used to find RAES
-     *        parameters which match a known RAES type.
-     * @throws NullPointerException If {@link #delegate} is {@code null}
-     *         or {@code parameters} is {@code null}.
-     * @throws IllegalArgumentException If an illegal keyStrength is provided
-     *         in the parameters.
-     * @throws RaesParametersException If no suitable RAES parameters have been
-     *         provided or something is wrong with the parameters.
+     *        Instances of this interface are queried to find RAES parameters
+     *        which match a known RAES type.
+     *        This algorithm is recursively applied.
+     * @return A new instance of an {@code RaesOutputStream}.
+     * @throws NullPointerException If {@link #delegate} is {@code null}.
+     * @throws RaesParametersException If {@code parameters} is {@code null} or
+     *         no suitable RAES parameters can be found.
      * @throws IOException On any other I/O related issue.
      */
     public static RaesOutputStream getInstance(
             final OutputStream out,
-            RaesParameters parameters)
-    throws  NullPointerException,
-            IllegalArgumentException,
-            RaesParametersException,
-            IOException {
+            @CheckForNull RaesParameters parameters)
+    throws IOException {
         if (null == out)
-            throw new NullPointerException("out");
+            throw new NullPointerException();
 
         // Order is important here to support multiple interface implementations!
         if (parameters instanceof Type0RaesParameters) {
@@ -101,7 +98,8 @@ public abstract class RaesOutputStream extends CipherOutputStream {
         }
     }
 
-    RaesOutputStream(OutputStream out, BufferedBlockCipher cipher) {
+    RaesOutputStream(   @CheckForNull OutputStream out,
+                        @CheckForNull BufferedBlockCipher cipher) {
         super(out, cipher);
     }
 

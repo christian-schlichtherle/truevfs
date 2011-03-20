@@ -39,8 +39,8 @@ import de.schlichtherle.truezip.fs.archive.zip.JarDriver;
 import de.schlichtherle.truezip.fs.archive.zip.JarArchiveEntry;
 import de.schlichtherle.truezip.fs.archive.zip.ZipArchiveEntry;
 import de.schlichtherle.truezip.fs.archive.zip.ZipInputShop;
-import de.schlichtherle.truezip.key.KeyManagerService;
-import de.schlichtherle.truezip.socket.IOPoolService;
+import de.schlichtherle.truezip.key.KeyManagerProvider;
+import de.schlichtherle.truezip.socket.IOPoolProvider;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import java.io.CharConversionException;
@@ -103,20 +103,20 @@ public abstract class ZipRaesDriver extends JarDriver {
         public abstract void sync(KeyProvider<?> provider);
     } // enum KeyProviderSyncStrategy
 
-    private final KeyManagerService keyManagerService;
+    private final KeyManagerProvider keyManagerProvider;
 
     /**
      * Constructs a new RAES encrypted ZIP file driver.
      *
-     * @param ioPoolService the I/O pool service to use for temporary data.
-     * @param keyManagerService the key manager service.
+     * @param ioPoolProvider the I/O pool service to use for temporary data.
+     * @param keyManagerProvider the key manager service.
      */
-    public ZipRaesDriver(   IOPoolService ioPoolService,
-                            final KeyManagerService keyManagerService) {
-        super(ioPoolService);
-        if (null == keyManagerService)
+    public ZipRaesDriver(   IOPoolProvider ioPoolProvider,
+                            final KeyManagerProvider keyManagerProvider) {
+        super(ioPoolProvider);
+        if (null == keyManagerProvider)
             throw new NullPointerException();
-        this.keyManagerService = keyManagerService;
+        this.keyManagerProvider = keyManagerProvider;
     }
 
     /**
@@ -267,8 +267,8 @@ public abstract class ZipRaesDriver extends JarDriver {
         return super.newOutputShop(model, new Output(), source);
     }
 
-    final KeyManagerService getKeyManagerService() {
-        return keyManagerService;
+    final KeyManagerProvider getKeyManagerProvider() {
+        return keyManagerProvider;
     }
 
     /**
@@ -278,7 +278,7 @@ public abstract class ZipRaesDriver extends JarDriver {
      * @return The {@link RaesParameters} for the given file system model.
      */
     final RaesParameters getRaesParameters(FsModel model) {
-        return new KeyManagerRaesParameters(getKeyManagerService(),
+        return new KeyManagerRaesParameters(getKeyManagerProvider(),
                                             model.getMountPoint().getUri());
     }
 }

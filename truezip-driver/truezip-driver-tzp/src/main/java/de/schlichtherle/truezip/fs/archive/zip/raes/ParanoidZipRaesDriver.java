@@ -25,8 +25,8 @@ import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.fs.archive.zip.ZipInputShop;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.fs.archive.zip.ZipDriver;
-import de.schlichtherle.truezip.key.KeyManagerService;
-import de.schlichtherle.truezip.socket.IOPoolService;
+import de.schlichtherle.truezip.key.KeyManagerProvider;
+import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.socket.LazyOutputSocket;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -52,9 +52,9 @@ import net.jcip.annotations.Immutable;
 @Immutable
 public class ParanoidZipRaesDriver extends ZipRaesDriver {
 
-    public ParanoidZipRaesDriver(   IOPoolService ioPoolService,
-                                    KeyManagerService keyManagerService) {
-        super(ioPoolService, keyManagerService);
+    public ParanoidZipRaesDriver(   IOPoolProvider ioPoolProvider,
+                                    KeyManagerProvider keyManagerProvider) {
+        super(ioPoolProvider, keyManagerProvider);
     }
 
     @Override

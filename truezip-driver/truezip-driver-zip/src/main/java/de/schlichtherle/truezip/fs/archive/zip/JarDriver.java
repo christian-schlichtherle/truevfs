@@ -17,7 +17,7 @@ package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.socket.IOPoolService;
+import de.schlichtherle.truezip.socket.IOPoolProvider;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -47,8 +47,8 @@ public class JarDriver extends ZipDriver {
      */
     public static final Charset JAR_CHARSET = Charset.forName("UTF-8");
 
-    public JarDriver(IOPoolService service) {
-        super(service, JAR_CHARSET);
+    public JarDriver(IOPoolProvider provider) {
+        super(provider, JAR_CHARSET);
     }
 
     @Override

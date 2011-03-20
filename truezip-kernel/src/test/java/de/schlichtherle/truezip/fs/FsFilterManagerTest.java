@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.fs.spi.DummyDriverProvider;
+import de.schlichtherle.truezip.fs.spi.DummyDriverService;
 import java.util.HashSet;
 import java.util.Set;
 import org.junit.Test;
@@ -54,7 +54,7 @@ public class FsFilterManagerTest extends FsManagerTestSuite {
                 manager.getController(
                     FsMountPoint.create(param),
                     new FsDefaultDriver(
-                        new DummyDriverProvider("file|tar|zip")));
+                        new DummyDriverService("file|tar|zip")));
             assertThat(manager.getSize(), is(params[1].length));
 
             final Set<FsMountPoint> set = new HashSet<FsMountPoint>();

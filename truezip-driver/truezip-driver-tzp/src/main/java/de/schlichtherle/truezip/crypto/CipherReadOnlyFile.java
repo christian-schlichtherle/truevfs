@@ -18,6 +18,10 @@ package de.schlichtherle.truezip.crypto;
 
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import net.jcip.annotations.NotThreadSafe;
 import org.bouncycastle.crypto.Mac;
@@ -57,6 +61,7 @@ import org.bouncycastle.crypto.Mac;
 // actually decrypt it, which is redundant.
 //
 @NotThreadSafe
+@DefaultAnnotation(NonNull.class)
 public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
 
     /**
@@ -105,7 +110,7 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
     private byte[] window;
 
     /** The seekable block cipher which allows random access. */
-    private SeekableBlockCipher cipher;
+    private @Nullable SeekableBlockCipher cipher;
 
     /**
      * The current offset in the encrypted file where the data starts that
@@ -130,10 +135,10 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
      * before it can actually read anything!
      *
      * @param rof A read-only file.
-     *        This may be {@code null}, but must be properly init before
-     *        the call to {@code init()}.
+     *        This may be {@code null}, but must be properly initialized
+     *        <em>before</em> a call to {@link #init}.
      */
-    public CipherReadOnlyFile(ReadOnlyFile rof) {
+    public CipherReadOnlyFile(@CheckForNull ReadOnlyFile rof) {
         super(rof);
     }
 
@@ -144,7 +149,7 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
      * @throws IOException If the preconditions do not hold.
      */
     private void assertOpen() throws IOException {
-        if (cipher == null)
+        if (null == cipher)
             throw new IOException("cipher read only file is not in open state");
     }
 
@@ -175,8 +180,8 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
             throw new IllegalStateException("file is already initialized");
 
         // Check state (recoverable).
-        if (delegate == null)
-            throw new NullPointerException("rof");
+        if (null == delegate)
+            throw new NullPointerException();
 
         // Check parameters (fail fast).
         if (cipher == null)

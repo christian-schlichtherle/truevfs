@@ -20,7 +20,7 @@ import de.schlichtherle.truezip.key.PromptingKeyProvider.View;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import java.util.ServiceConfigurationError;
 import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
-import de.schlichtherle.truezip.key.KeyManagerService;
+import de.schlichtherle.truezip.key.KeyManagerProvider;
 import java.io.File;
 import de.schlichtherle.truezip.fs.archive.zip.raes.SafeZipRaesDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
@@ -43,7 +43,7 @@ public final class TZipRaesFileTest extends TFileTestSuite {
 
     public TZipRaesFileTest() {
         super(  FsScheme.create("tzp"),
-                new SafeZipRaesDriver(POOL_SERVICE, new MockKeyManagerService(view)) {
+                new SafeZipRaesDriver(POOL_PROVIDER, new MockKeyManagerProvider(view)) {
             @Override
             public KeyProviderSyncStrategy getKeyProviderSyncStrategy() {
                 return KeyProviderSyncStrategy.RESET_UNCONDITIONALLY;
@@ -130,11 +130,11 @@ public final class TZipRaesFileTest extends TFileTestSuite {
         assertTrue(archive.deleteAll());
     }
 
-    private static class MockKeyManagerService implements KeyManagerService {
+    private static class MockKeyManagerProvider implements KeyManagerProvider {
 
         private final PromptingKeyManager<AesCipherParameters> manager;
 
-        public MockKeyManagerService(View<AesCipherParameters> view) {
+        public MockKeyManagerProvider(View<AesCipherParameters> view) {
             this.manager = new PromptingKeyManager<AesCipherParameters>(view);
         }
 
@@ -143,7 +143,7 @@ public final class TZipRaesFileTest extends TFileTestSuite {
         public <K> KeyManager<? extends K, ?> get(Class<K> type) {
             if (type.isAssignableFrom(AesCipherParameters.class))
                 return (KeyManager<? extends K, ?>) manager;
-            throw new ServiceConfigurationError("No service available for " + type);
+            throw new ServiceConfigurationError("No key manager available for " + type);
         }
     } // CustomKeyManagerService
 }

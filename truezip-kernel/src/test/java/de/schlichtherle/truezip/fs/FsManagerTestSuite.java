@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.fs.spi.DummyDriverProvider;
+import de.schlichtherle.truezip.fs.spi.DummyDriverService;
 import java.util.Iterator;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URI;
@@ -35,7 +35,7 @@ import static org.junit.Assert.*;
 public abstract class FsManagerTestSuite {
 
     private final FsCompositeDriver driver
-            = new FsDefaultDriver(new DummyDriverProvider("file|zip"));
+            = new FsDefaultDriver(new DummyDriverService("file|zip"));
     private FsManager manager;
 
     @Before

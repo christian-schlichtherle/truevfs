@@ -20,7 +20,7 @@ import de.schlichtherle.truezip.crypto.raes.RaesParameters;
 import de.schlichtherle.truezip.crypto.raes.RaesParametersProvider;
 import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters;
 import de.schlichtherle.truezip.key.KeyManager;
-import de.schlichtherle.truezip.key.KeyManagerService;
+import de.schlichtherle.truezip.key.KeyManagerProvider;
 import de.schlichtherle.truezip.key.KeyProvider;
 import de.schlichtherle.truezip.key.UnknownKeyException;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
@@ -42,7 +42,7 @@ import java.net.URI;
 @DefaultAnnotation(NonNull.class)
 public final class KeyManagerRaesParameters implements RaesParametersProvider {
 
-    private final KeyManagerService service;
+    private final KeyManagerProvider provider;
     private final URI resource;
 
     /**
@@ -51,13 +51,13 @@ public final class KeyManagerRaesParameters implements RaesParametersProvider {
      * @param resource the non-{@code null} absolute, hierarchical and normalized
      *        URI of the RAES file.
      */
-    public KeyManagerRaesParameters(final KeyManagerService service,
+    public KeyManagerRaesParameters(final KeyManagerProvider provider,
                                     final URI resource) {
-        if (null == service)
+        if (null == provider)
             throw new NullPointerException();
         if (!resource.isAbsolute())
             throw new IllegalArgumentException();
-        this.service = service;
+        this.provider = provider;
         this.resource = resource;
     }
 
@@ -76,7 +76,8 @@ public final class KeyManagerRaesParameters implements RaesParametersProvider {
 
         @Override
         public char[] getWritePasswd() throws RaesKeyException {
-            final KeyProvider<? extends AesCipherParameters> provider = service
+            final KeyProvider<? extends AesCipherParameters>
+                    provider = KeyManagerRaesParameters.this.provider
                     .get(AesCipherParameters.class)
                     .getKeyProvider(resource);
             try {
@@ -88,7 +89,8 @@ public final class KeyManagerRaesParameters implements RaesParametersProvider {
 
         @Override
         public char[] getReadPasswd(boolean invalid) throws RaesKeyException {
-            final KeyProvider<? extends AesCipherParameters> provider = service
+            final KeyProvider<? extends AesCipherParameters>
+                    provider = KeyManagerRaesParameters.this.provider
                     .get(AesCipherParameters.class)
                     .getKeyProvider(resource);
             try {

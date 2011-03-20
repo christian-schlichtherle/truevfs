@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.fs.archive.zip;
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.fs.sl.FsDriverLocator;
-import de.schlichtherle.truezip.fs.spi.FsDriverProvider;
+import de.schlichtherle.truezip.fs.spi.FsDriverService;
 import de.schlichtherle.truezip.socket.sl.IOPoolLocator;
 import java.util.Map;
 import net.jcip.annotations.Immutable;
@@ -61,7 +61,7 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-public final class ZipDriverProvider extends FsDriverProvider {
+public final class ZipDriverService extends FsDriverService {
 
     private static final Map<FsScheme, FsDriver>
             DRIVERS = newMap(new Object[][] {

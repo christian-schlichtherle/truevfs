@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Schlichtherle IT Services
+ * Copyright 2011 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,27 +16,30 @@
 package de.schlichtherle.truezip.fs;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
+import java.util.Map;
 import javax.inject.Provider;
 
 /**
- * A service for the singleton file system manager.
+ * A provider for an immutable map of file system schemes to drivers.
  * <p>
  * Implementations must be thread-safe.
  *
- * @author Christian Schlichtherle
- * @version $Id: FsManagers$
+ * @author  Christian Schlichtherle
+ * @version $Id$
  */
-public interface FsManagerService extends Provider<FsManager> {
+public interface FsDriverProvider extends Provider<Map<FsScheme, FsDriver>> {
 
     /**
-     * Returns the singleton file system manager.
+     * Returns an immutable map of file system schemes to drivers.
+     * While the key of the returned map need not be {@code null},
+     * its values must be nullable.
      * <p>
-     * Calling this method several times must return the <em>same</em> file
-     * system manager in order to ensure consistency of the virtual file system
-     * space.
+     * Calling this method several times should return a map which compares
+     * {@link Object#equals equal} to each other in order to ensure a
+     * consistent file system implementation scheme.
      *
-     * @return The file system manager.
+     * @return An immutable map of file system schemes to drivers.
      */
     @Override
-    @NonNull FsManager get();
+    @NonNull Map<FsScheme, FsDriver> get();
 }

@@ -25,6 +25,6 @@ import de.schlichtherle.truezip.fs.FsScheme;
 public final class TZipFileTest extends TFileTestSuite {
 
     public TZipFileTest() {
-        super(FsScheme.create("zip"), new ZipDriver(POOL_SERVICE));
+        super(FsScheme.create("zip"), new ZipDriver(POOL_PROVIDER));
     }
 }

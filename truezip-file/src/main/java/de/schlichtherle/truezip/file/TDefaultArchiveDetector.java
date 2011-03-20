@@ -20,11 +20,11 @@ import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.util.SuffixSet;
 import de.schlichtherle.truezip.fs.FsDriver;
-import de.schlichtherle.truezip.fs.FsDriverService;
+import de.schlichtherle.truezip.fs.FsDriverProvider;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.fs.FsScheme;
-import de.schlichtherle.truezip.fs.spi.FsDriverProvider;
+import de.schlichtherle.truezip.fs.spi.FsDriverService;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -74,7 +74,7 @@ import net.jcip.annotations.Immutable;
 @Immutable
 @DefaultAnnotation(NonNull.class)
 public final class TDefaultArchiveDetector
-implements TArchiveDetector, FsDriverService {
+implements TArchiveDetector, FsDriverProvider {
 
     /**
      * This instance never recognizes any archive files in a path.
@@ -112,7 +112,7 @@ implements TArchiveDetector, FsDriverService {
 
     /**
      * Equivalent to
-     * {@link #TDefaultArchiveDetector(FsDriverService, String) new TDefaultArchiveDetector(FsDriverLocator.SINGLETON, suffixes)}.
+     * {@link #TDefaultArchiveDetector(FsDriverProvider, String) new TDefaultArchiveDetector(FsDriverLocator.SINGLETON, suffixes)}.
      */
     public TDefaultArchiveDetector(@CheckForNull String suffixes) {
         this(FsDriverLocator.SINGLETON, suffixes);
@@ -123,7 +123,7 @@ implements TArchiveDetector, FsDriverService {
      * driver service for all canonicalized suffixes in the {@code suffixes}
      * list.
      *
-     * @param  service the file system driver service to filter.
+     * @param  provider the file system driver provider to filter.
      * @param  suffixes A list of suffixes which shall identify prospective
      *         archive files.
      *         If this is {@code null}, no filtering is applied and all drivers
@@ -134,10 +134,10 @@ implements TArchiveDetector, FsDriverService {
      *         service.
      * @see    SuffixSet Syntax constraints for suffix lists.
      */
-    public TDefaultArchiveDetector( final FsDriverService service,
+    public TDefaultArchiveDetector( final FsDriverProvider provider,
                                     final @CheckForNull String suffixes) {
-        final Map<FsScheme, FsDriver> drivers = service.get();
-        final SuffixSet known = getSuffixes(service);
+        final Map<FsScheme, FsDriver> drivers = provider.get();
+        final SuffixSet known = getSuffixes(provider);
         final SuffixSet given;
         if (null != suffixes) {
             given = new SuffixSet(suffixes);
@@ -155,10 +155,10 @@ implements TArchiveDetector, FsDriverService {
         this.matcher = new ThreadLocalMatcher(given.toPattern());
     }
 
-    private static SuffixSet getSuffixes(FsDriverService service) {
+    private static SuffixSet getSuffixes(FsDriverProvider provider) {
         SuffixSet set = new SuffixSet();
         for (Map.Entry<FsScheme, FsDriver> entry
-                : service.get().entrySet()) {
+                : provider.get().entrySet()) {
             FsDriver driver = entry.getValue();
             if (null != driver && driver.isFederated())
                 set.add(entry.getKey().toString());
@@ -168,7 +168,7 @@ implements TArchiveDetector, FsDriverService {
 
     /**
      * Equivalent to
-     * {@link #TDefaultArchiveDetector(FsDriverService, String, FsDriver)
+     * {@link #TDefaultArchiveDetector(FsDriverProvider, String, FsDriver)
      * TDefaultArchiveDetector(TDefaultArchiveDetector.NULL, suffixes, driver)}.
      */
     public TDefaultArchiveDetector( String suffixes,
@@ -196,7 +196,7 @@ implements TArchiveDetector, FsDriverService {
      *         does not hold.
      * @see    SuffixSet Syntax contraints for suffix lists.
      */
-    public TDefaultArchiveDetector( FsDriverService delegate,
+    public TDefaultArchiveDetector( FsDriverProvider delegate,
                                     String suffixes,
                                     @CheckForNull FsDriver driver) {
         this(delegate, new Object[][] {{ suffixes, driver }});
@@ -228,9 +228,9 @@ implements TArchiveDetector, FsDriverService {
      *         does not hold.
      * @see    SuffixSet Syntax contraints for suffix lists.
      */
-    public TDefaultArchiveDetector( FsDriverService delegate,
+    public TDefaultArchiveDetector( FsDriverProvider delegate,
                                     Object[][] config) {
-        this(delegate, FsDriverProvider.newMap(config));
+        this(delegate, FsDriverService.newMap(config));
     }
 
     /**
@@ -251,7 +251,7 @@ implements TArchiveDetector, FsDriverService {
      *         does not hold.
      * @see    SuffixSet Syntax contraints for suffix lists.
      */
-    public TDefaultArchiveDetector( final FsDriverService delegate,
+    public TDefaultArchiveDetector( final FsDriverProvider delegate,
                                     final Map<FsScheme, FsDriver> config) {
         final Map<FsScheme, FsDriver>
                 drivers = new HashMap<FsScheme, FsDriver>(delegate.get());

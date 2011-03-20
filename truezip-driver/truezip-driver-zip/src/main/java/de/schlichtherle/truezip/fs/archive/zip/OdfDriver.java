@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.fs.FsConcurrentModel;
-import de.schlichtherle.truezip.socket.IOPoolService;
+import de.schlichtherle.truezip.socket.IOPoolProvider;
 import java.io.OutputStream;
 import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.socket.OutputShop;
@@ -49,8 +49,8 @@ import net.jcip.annotations.Immutable;
 @Immutable
 public class OdfDriver extends JarDriver {
 
-    public OdfDriver(IOPoolService service) {
-        super(service);
+    public OdfDriver(IOPoolProvider provider) {
+        super(provider);
     }
 
     @Override

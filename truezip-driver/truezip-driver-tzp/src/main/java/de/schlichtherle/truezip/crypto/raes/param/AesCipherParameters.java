@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.crypto.raes.param;
 
 import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
 import de.schlichtherle.truezip.key.SafeKey;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import java.util.Arrays;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -34,7 +35,7 @@ import static de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStreng
 public final class AesCipherParameters implements SafeKey<AesCipherParameters> {
 
     private KeyStrength keyStrength = BITS_256;
-    private char[] password;
+    private @CheckForNull char[] password;
 
     @Override
     public AesCipherParameters clone() {
@@ -58,7 +59,7 @@ public final class AesCipherParameters implements SafeKey<AesCipherParameters> {
         return null == password ? null : password.clone();
     }
 
-    public void setPassword(final @Nullable char[] newPW) {
+    public void setPassword(final @CheckForNull char[] newPW) {
         final char[] oldPW = this.password;
         if (null != oldPW)
             Arrays.fill(oldPW, (char) 0);
@@ -70,7 +71,7 @@ public final class AesCipherParameters implements SafeKey<AesCipherParameters> {
         }
     }
 
-    public void setKeyFileBytes(final @Nullable byte[] bytes) {
+    public void setKeyFileBytes(final @CheckForNull byte[] bytes) {
         // Do NOT use the following - it would omit a byte order sequence
         // and cannot decode all characters.
         // return new String(buf, 0, n, "UTF-16BE").toCharArray();
