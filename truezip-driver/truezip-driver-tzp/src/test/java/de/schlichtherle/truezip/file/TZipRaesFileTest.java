@@ -140,9 +140,9 @@ public final class TZipRaesFileTest extends TFileTestSuite {
 
         @Override
         @SuppressWarnings("unchecked")
-        public <K> KeyManager<K, ?> get(Class<K> type) {
+        public <K> KeyManager<K> get(Class<K> type) {
             if (type.isAssignableFrom(AesCipherParameters.class))
-                return (KeyManager<K, ?>) manager;
+                return (KeyManager<K>) manager;
             throw new ServiceConfigurationError("No key manager available for " + type);
         }
     } // CustomKeyManagerService
