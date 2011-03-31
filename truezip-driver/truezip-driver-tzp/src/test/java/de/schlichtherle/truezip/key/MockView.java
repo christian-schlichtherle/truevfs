@@ -147,7 +147,7 @@ public final class MockView<K extends SafeKey<K>> implements View<K> {
 
     @Override
     public synchronized void
-    promptWriteKey(Controller<? super K> controller)
+    promptWriteKey(Controller<K> controller)
     throws UnknownKeyException {
         final URI resource = this.resource;
         if (null != resource && !resource.equals(controller.getResource()))
@@ -167,7 +167,7 @@ public final class MockView<K extends SafeKey<K>> implements View<K> {
 
     @Override
     public synchronized void
-    promptReadKey(Controller<? super K> controller, boolean invalid)
+    promptReadKey(Controller<K> controller, boolean invalid)
     throws UnknownKeyException {
         final URI resource = this.resource;
         if (null != resource && !resource.equals(controller.getResource()))

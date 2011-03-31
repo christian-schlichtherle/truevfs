@@ -70,15 +70,17 @@ implements View<AesCipherParameters> {
 
     @Override
     public final void promptWriteKey(
-            final Controller<? super AesCipherParameters> controller) {
+            final Controller<AesCipherParameters> controller) {
         synchronized (lock) {
             final URI resource = controller.getResource();
-            assert null != resource : "violation of contract for PromptingKeyProviderUI";
+            assert null != resource;
             if (!lastResource.equals(resource))
                 con.printf(resources.getString("writeKey.banner"), resource);
             lastResource = resource;
 
-            final AesCipherParameters param = new AesCipherParameters();
+            AesCipherParameters param = controller.getKey();
+            if (null == param)
+                param = new AesCipherParameters();
 
             while (true) {
                 char[] newPasswd1 = con.readPassword(
@@ -140,14 +142,14 @@ implements View<AesCipherParameters> {
 
     @Override
     public void promptReadKey(
-            final Controller<? super AesCipherParameters> controller,
+            final Controller<AesCipherParameters> controller,
             final boolean invalid) {
         synchronized (lock) {
             if (invalid)
                 con.printf(resources.getString("readKey.invalid"));
 
             final URI resource = controller.getResource();
-            assert resource != null : "violation of contract for PromptingKeyProviderUI";
+            assert null != resource;
             if (!lastResource.equals(resource))
                 con.printf(resources.getString("readKey.banner"), resource);
             lastResource = resource;

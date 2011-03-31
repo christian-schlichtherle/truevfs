@@ -23,8 +23,8 @@ import net.jcip.annotations.ThreadSafe;
 
 /**
  * Provides the base functionality required to implement a "safe" key provider.
- * Each instance of this class maintains a single key which can be of any
- * run time type (it is just required to be {@link Cloneable}).
+ * Each instance of this class maintains a single key which implements the
+ * interface {@link SafeKey}).
  * A clone of this key is returned on each call to {@link #getWriteKey}
  * and {@link #getReadKey}.
  *
@@ -78,7 +78,7 @@ implements KeyProvider<K> {
      * Returns the key for (over)writing the contents of a new or existing
      * protected resource.
      * <p>
-     * Consecutive calls to this method may return the same object.
+     * Subsequent calls to this method may return the same object.
      *
      * @return The key for (over)writing the contents of a new or existing
      *         protected resource.
@@ -121,7 +121,7 @@ implements KeyProvider<K> {
      * Returns the key for reading the contents of an existing protected
      * resource.
      * <p>
-     * Consecutive calls to this method may return the same object.
+     * Subsequent calls to this method may return the same object.
      *
      * @return The key for reading the contents of an existing protected
      *         resource.

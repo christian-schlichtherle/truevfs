@@ -79,19 +79,19 @@ class Type0RaesOutputStream extends RaesOutputStream {
 
     Type0RaesOutputStream(
             final OutputStream out,
-            final Type0RaesParameters parameters)
+            final Type0RaesParameters param)
     throws IOException{
         super(out, null);
 
         assert null != out;
-        assert null != parameters;
+        assert null != param;
 
         // Check parameters (fail fast).
-        final char[] passwd = parameters.getWritePasswd();
+        final char[] passwd = param.getWritePasswd();
         if (null == passwd)
             throw new RaesKeyException();
 
-        keyStrength = parameters.getKeyStrength();
+        keyStrength = param.getKeyStrength();
         final int keyStrengthOrdinal = keyStrength.ordinal();
         final int keyStrengthBytes = 16 + 8 * keyStrengthOrdinal; // key strength in bytes: 16, 24 or 32
         final int keyStrengthBits = 8 * keyStrengthBytes;

@@ -32,7 +32,8 @@ import static de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStreng
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-public final class AesCipherParameters implements SafeKey<AesCipherParameters> {
+public final class AesCipherParameters
+implements SafeKey<AesCipherParameters>, Cloneable {
 
     private KeyStrength keyStrength = BITS_256;
     private @CheckForNull char[] password;

@@ -35,14 +35,14 @@ import net.jcip.annotations.ThreadSafe;
 public final class PromptingKeyManager<K extends SafeKey<K>>
 extends SafeKeyManager<K, PromptingKeyProvider<K>> {
 
-    private final View<? extends K> view;
+    private final View<K> view;
 
     /**
      * Constructs a new prompting key manager.
      *
      * @param view the view instance for prompting for keys.
      */
-    public PromptingKeyManager(final View<? extends K> view) {
+    public PromptingKeyManager(final View<K> view) {
         super(new PromptingKeyProviderFactory<K>());
         if (null == view)
             throw new NullPointerException();
