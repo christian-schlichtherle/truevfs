@@ -26,12 +26,11 @@ import java.net.URI;
  * Implementations must be safe for multi-threading.
  *
  * @param   <K> The type of the keys.
- * @param   <P> The type of the providers.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-public interface KeyManager<K, P extends KeyProvider<K>> {
+public interface KeyManager<K> {
 
     /**
      * Returns the key provider for the given protected resource.
@@ -40,7 +39,7 @@ public interface KeyManager<K, P extends KeyProvider<K>> {
      * @param  resource the URI of the protected resource.
      * @return The key provider mapped for the protected resource.
      */
-    P getKeyProvider(URI resource);
+    KeyProvider<K> getKeyProvider(URI resource);
 
     /**
      * Moves the key provider from the URI {@code oldResource} to

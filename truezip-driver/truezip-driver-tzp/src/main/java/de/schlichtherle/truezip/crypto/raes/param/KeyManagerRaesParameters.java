@@ -42,7 +42,7 @@ import java.net.URI;
 @DefaultAnnotation(NonNull.class)
 public final class KeyManagerRaesParameters implements RaesParametersProvider {
 
-    private final KeyManager<AesCipherParameters, ?> manager;
+    private final KeyManager<AesCipherParameters> manager;
     private final URI resource;
 
     /**

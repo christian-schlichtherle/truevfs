@@ -31,7 +31,7 @@ import net.jcip.annotations.ThreadSafe;
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
 public class SafeKeyManager<K extends SafeKey<K>, P extends SafeKeyProvider<K>>
-implements KeyManager<K, P> {
+implements KeyManager<K> {
 
     private final Map<URI, P> providers = new HashMap<URI, P>();
     private final KeyProvider.Factory<? extends K, ? extends P> factory;

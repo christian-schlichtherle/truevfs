@@ -26,14 +26,14 @@ import static org.junit.Assert.*;
  * @version $Id$
  */
 public abstract class KeyManagerTestSuite {
-    private KeyManager<?, ?> instance;
+    private KeyManager<?> instance;
 
     @Before
     public void setUp() {
         instance = newKeyManager();
     }
 
-    protected abstract KeyManager<?, ?> newKeyManager();
+    protected abstract KeyManager<?> newKeyManager();
 
     @Test
     public final void testGetKeyProvider() {
