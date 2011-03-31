@@ -97,5 +97,17 @@ public class PromptingKeyProviderTest {
         assertEquals(view.getKey(), provider.getReadKey(false));
         view.setKey(new DummyKey());
         assertEquals(view.getKey(), provider.getWriteKey());
+
+        provider.setKey(null);
+        try {
+            provider.getReadKey(false);
+            fail();
+        } catch (UnknownKeyException expected) {
+        }
+        try {
+            provider.getWriteKey();
+            fail();
+        } catch (UnknownKeyException expected) {
+        }
     }
 }

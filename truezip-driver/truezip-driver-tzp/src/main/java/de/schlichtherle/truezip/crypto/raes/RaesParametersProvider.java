@@ -43,8 +43,8 @@ public interface RaesParametersProvider extends RaesParameters {
      * Requests a {@link RaesParameters} instance of the given
      * {@code type}.
      *
-     * @param type The {@link RaesParameters} interface class which's
-     *        implementation is searched.
+     * @param  type the {@link RaesParameters} interface class which's
+     *         implementation is searched.
      * @return An instance of {@code RaesParameters} or {@code null}
      *         if no RAES parameters are available.
      */

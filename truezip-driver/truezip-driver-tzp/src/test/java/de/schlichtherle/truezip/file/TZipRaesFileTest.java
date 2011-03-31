@@ -43,7 +43,7 @@ public final class TZipRaesFileTest extends TFileTestSuite {
 
     public TZipRaesFileTest() {
         super(  FsScheme.create("tzp"),
-                new SafeZipRaesDriver(POOL_PROVIDER, new MockKeyManagerProvider(view)) {
+                new SafeZipRaesDriver(IO_POOL_PROVIDER, new MockKeyManagerProvider(view)) {
             @Override
             public KeyProviderSyncStrategy getKeyProviderSyncStrategy() {
                 return KeyProviderSyncStrategy.RESET_UNCONDITIONALLY;

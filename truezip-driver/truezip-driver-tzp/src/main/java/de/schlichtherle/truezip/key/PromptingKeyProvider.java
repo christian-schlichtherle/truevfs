@@ -108,6 +108,7 @@ extends SafeKeyProvider<K> {
         // This is quite paranoid, but supposedly fairly safe.
         final K oldKey = this.key;
         this.key = clone(newKey);
+        setState(null != newKey ? PROVIDED : CANCELLED);
         reset(oldKey);
         //reset(newKey); // don't be mean!
     }
@@ -148,9 +149,9 @@ extends SafeKeyProvider<K> {
     }
 
     private void reset() {
-        setState(RESET);
         setKey(null);
         setChangeRequested(false);
+        setState(RESET);
     }
 
     /** Implements the behavior strategy of its enclosing class. */
@@ -195,13 +196,6 @@ extends SafeKeyProvider<K> {
 
             @Override
             <K extends SafeKey<K>> void
-            setKey(PromptingKeyProvider<K> provider, K key) {
-                provider.setKey(key);
-                provider.setState(null != key ? PROVIDED : CANCELLED);
-            }
-
-            @Override
-            <K extends SafeKey<K>> void
             resetCancelledKey(PromptingKeyProvider<K> provider) {
             }
         },
@@ -233,13 +227,6 @@ extends SafeKeyProvider<K> {
 
             @Override
             <K extends SafeKey<K>> void
-            setKey(PromptingKeyProvider<K> provider, K key) {
-                if (null != key)
-                    provider.setKey(key);
-            }
-
-            @Override
-            <K extends SafeKey<K>> void
             resetCancelledKey(PromptingKeyProvider<K> provider) {
             }
         },
@@ -257,12 +244,6 @@ extends SafeKeyProvider<K> {
             getReadKey(PromptingKeyProvider<K> provider, boolean invalid)
             throws UnknownKeyException {
                 throw new KeyPromptingCancelledException();
-            }
-
-            @Override
-            <K extends SafeKey<K>> void
-            setKey(PromptingKeyProvider<K> provider, K key) {
-                throw new IllegalStateException(toString());
             }
 
             @Override
@@ -288,8 +269,10 @@ extends SafeKeyProvider<K> {
             return provider.getKey();
         }
 
-        abstract <K extends SafeKey<K>> void
-        setKey(PromptingKeyProvider<K> provider, @CheckForNull K key);
+        final <K extends SafeKey<K>> void
+        setKey(PromptingKeyProvider<K> provider, K key) {
+            provider.setKey(key);
+        }
 
         <K extends SafeKey<K>> void
         setChangeRequested(PromptingKeyProvider<K> provider, boolean changeRequested) {
