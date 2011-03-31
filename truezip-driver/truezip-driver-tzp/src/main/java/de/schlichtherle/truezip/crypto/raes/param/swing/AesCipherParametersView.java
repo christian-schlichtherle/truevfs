@@ -121,7 +121,7 @@ implements View<AesCipherParameters> {
 
     @Override
     public void promptWriteKey(
-            final Controller<? super AesCipherParameters> controller)
+            final Controller<AesCipherParameters> controller)
     throws UnknownKeyException {
         class PromptWriteKey implements Runnable {
             @Override
@@ -137,11 +137,15 @@ implements View<AesCipherParameters> {
      * so it doesn't need to be thread safe.
      */
     private void promptWriteKeyEDT(
-            final Controller<? super AesCipherParameters> controller) {
+            final Controller<AesCipherParameters> controller) {
         assert EventQueue.isDispatchThread();
 
         final URI resource = controller.getResource();
-        AesCipherParameters param = new AesCipherParameters();
+        assert null != resource;
+
+        AesCipherParameters param = controller.getKey();
+        if (null == param)
+            param = new AesCipherParameters();
 
         final AesKeyStrengthPanel keyStrengthPanel = new AesKeyStrengthPanel();
         keyStrengthPanel.setKeyStrength(param.getKeyStrength());
@@ -154,7 +158,6 @@ implements View<AesCipherParameters> {
             // de-highlighting the resource ID in the panel if the
             // loop iteration has to be repeated due to an invalid
             // user input.
-            assert null != resource : "violation of contract for PromptingKeyProviderUI";
             keyPanel.setResource(resource);
             keyPanel.setFeedback(keyPanel.getError() != null
                     ? getInvalidKeyFeedback()
@@ -185,7 +188,7 @@ implements View<AesCipherParameters> {
 
     @Override
     public void promptReadKey(
-            final Controller<? super AesCipherParameters> controller,
+            final Controller<AesCipherParameters> controller,
             final boolean invalid)
     throws UnknownKeyException {
         class PromptReadKey implements Runnable {
@@ -202,11 +205,12 @@ implements View<AesCipherParameters> {
      * so it doesn't need to be thread safe.
      */
     private void promptReadKeyEDT(
-            final Controller<? super AesCipherParameters> controller,
+            final Controller<AesCipherParameters> controller,
             final boolean invalid) {
         assert EventQueue.isDispatchThread();
 
         final URI resource = controller.getResource();
+        assert null != resource;
         final AesCipherParameters param = new AesCipherParameters();
 
         final ReadKeyPanel keyPanel;
@@ -229,7 +233,6 @@ implements View<AesCipherParameters> {
             // de-highlighting the resource ID in the panel if the
             // loop iteration has to be repeated due to an invalid
             // user input.
-            assert resource != null : "violation of contract for PromptingKeyProviderUI";
             keyPanel.setResource(resource);
             keyPanel.setFeedback(null != keyPanel.getError()
                     ? getInvalidKeyFeedback()

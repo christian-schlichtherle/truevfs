@@ -43,14 +43,14 @@ public final class PromptingKeyProvider<K extends SafeKey<K>>
 extends SafeKeyProvider<K> {
 
     /** The resource identifier for the protected resource. */
-    private volatile URI resource;
+    private volatile @CheckForNull URI resource;
 
     /** The view instance which is used to prompt the user for a key. */
-    private volatile View<? extends K> view;
+    private volatile @CheckForNull View<K> view;
 
     private volatile @NonNull State state = RESET;
 
-    private volatile K key;
+    private volatile @CheckForNull K key;
 
     private volatile boolean changeRequested;
 
@@ -72,11 +72,11 @@ extends SafeKeyProvider<K> {
         this.resource = resource;
     }
 
-    final View<? extends K> getView() {
+    final View<K> getView() {
         return view;
     }
 
-    final void setView(final View<? extends K> view) {
+    final void setView(final View<K> view) {
         this.view = view;
     }
 
@@ -103,7 +103,8 @@ extends SafeKeyProvider<K> {
         return key;
     }
 
-    private void setKey(final @CheckForNull K newKey) {
+    @Override
+    public void setKey(final @CheckForNull K newKey) {
         // This is quite paranoid, but supposedly fairly safe.
         final K oldKey = this.key;
         this.key = clone(newKey);
@@ -180,7 +181,7 @@ extends SafeKeyProvider<K> {
                 State state;
                 do {
                     try {
-                        Controller<K> controller = new Controller<K>(provider, this);
+                        Controller<K> controller = new ReadController<K>(provider, this);
                         provider.getView().promptReadKey(controller, invalid);
                         controller.invalidate();
                     } catch (KeyPromptingCancelledException ex) {
@@ -282,6 +283,11 @@ extends SafeKeyProvider<K> {
         abstract <K extends SafeKey<K>> void
         resetCancelledKey(PromptingKeyProvider<K> provider);
 
+        @CheckForNull <K extends SafeKey<K>> K
+        getKey(PromptingKeyProvider<K> provider) {
+            return provider.getKey();
+        }
+
         abstract <K extends SafeKey<K>> void
         setKey(PromptingKeyProvider<K> provider, @CheckForNull K key);
 
@@ -335,7 +341,7 @@ extends SafeKeyProvider<K> {
          * @param  controller The key controller for storing the result.
          * @throws UnknownKeyException if key prompting fails for any reason.
          */
-        void promptWriteKey(Controller<? super K> controller)
+        void promptWriteKey(Controller<K> controller)
         throws UnknownKeyException;
 
         /**
@@ -369,7 +375,7 @@ extends SafeKeyProvider<K> {
          * @throws UnknownKeyException if key prompting fails for any other
          *         reason.
          */
-        void promptReadKey(Controller<? super K> controller, boolean invalid)
+        void promptReadKey(Controller<K> controller, boolean invalid)
         throws UnknownKeyException;
     } // interface View
 
@@ -397,6 +403,19 @@ extends SafeKeyProvider<K> {
             if (null == state)
                 throw new IllegalStateException();
             return state.getResource(provider);
+        }
+
+        /**
+         * Returns the protected resource's key.
+         *
+         * @return The protected resource's key.
+         * @throws IllegalStateException if getting key is not legal in the
+         *         current state.
+         */
+        public @CheckForNull K getKey() {
+            if (null == state)
+                throw new IllegalStateException();
+            return state.getKey(provider);
         }
 
         /**
@@ -442,6 +461,18 @@ extends SafeKeyProvider<K> {
 
         @Override
         public void setChangeRequested(boolean changeRequested) {
+            throw new IllegalStateException();
+        }
+    } // class WriteKeyController
+
+    private static class ReadController<K extends SafeKey<K>>
+    extends Controller<K> {
+        private ReadController(PromptingKeyProvider<K> provider, State state) {
+            super(provider, state);
+        }
+
+        @Override
+        public K getKey() {
             throw new IllegalStateException();
         }
     } // class WriteKeyController

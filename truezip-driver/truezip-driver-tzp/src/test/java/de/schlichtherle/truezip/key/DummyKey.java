@@ -19,7 +19,7 @@ package de.schlichtherle.truezip.key;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-final class DummyKey implements SafeKey<DummyKey> {
+final class DummyKey implements SafeKey<DummyKey>, Cloneable {
 
     private static volatile int count;
 

@@ -38,5 +38,5 @@ public interface KeyManagerProvider {
      * @throws ServiceConfigurationError if no appropriate key manager is
      *         available.
      */
-    @NonNull <K> KeyManager<? extends K, ?> get(@NonNull Class<K> type);
+    @NonNull <K> KeyManager<K, ?> get(@NonNull Class<K> type);
 }

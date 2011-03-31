@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.fs.archive.zip.raes;
 
 import de.schlichtherle.truezip.crypto.raes.RaesKeyException;
+import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.fs.FsSyncOption;
 import de.schlichtherle.truezip.fs.archive.FsArchiveFileSystemEntry;
@@ -54,8 +55,8 @@ extends FsDecoratingController<FsModel, FsController<?>> {
      *
      * @param controller the non-{@code null} archive controller.
      */
-    ZipRaesController(   final FsController<?> controller,
-                                final ZipRaesDriver driver) {
+    ZipRaesController(  final FsController<?> controller,
+                        final ZipRaesDriver driver) {
         super(controller);
         this.driver = driver;
     }
@@ -109,7 +110,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         }
         if (name.isRoot())
             driver  .getKeyManagerProvider()
-                    .get(Object.class)
+                    .get(AesCipherParameters.class)
                     .removeKeyProvider(getModel().getMountPoint().getUri());
     }
 
@@ -122,7 +123,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         driver  .getKeyProviderSyncStrategy()
                 .sync(
                     driver  .getKeyManagerProvider()
-                            .get(Object.class)
+                            .get(AesCipherParameters.class)
                             .getKeyProvider(
                                 getModel().getMountPoint().getUri()));
     }

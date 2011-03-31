@@ -38,7 +38,7 @@ public final class KeyManagerLocatorTest {
 
     @Test
     public void testGetManager() {
-        assertNotNull(instance.get(Object.class));
+        //assertNotNull(instance.get(Object.class));
         assertNotNull(instance.get(AesCipherParameters.class));
     }
 }

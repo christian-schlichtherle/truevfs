@@ -42,7 +42,7 @@ import java.net.URI;
 @DefaultAnnotation(NonNull.class)
 public final class KeyManagerRaesParameters implements RaesParametersProvider {
 
-    private final KeyManagerProvider provider;
+    private final KeyManager<AesCipherParameters, ?> manager;
     private final URI resource;
 
     /**
@@ -57,7 +57,7 @@ public final class KeyManagerRaesParameters implements RaesParametersProvider {
             throw new NullPointerException();
         if (!resource.isAbsolute())
             throw new IllegalArgumentException();
-        this.provider = provider;
+        this.manager = provider.get(AesCipherParameters.class);
         this.resource = resource;
     }
 
@@ -76,10 +76,8 @@ public final class KeyManagerRaesParameters implements RaesParametersProvider {
 
         @Override
         public char[] getWritePasswd() throws RaesKeyException {
-            final KeyProvider<? extends AesCipherParameters>
-                    provider = KeyManagerRaesParameters.this.provider
-                    .get(AesCipherParameters.class)
-                    .getKeyProvider(resource);
+            final KeyProvider<AesCipherParameters>
+                    provider = manager.getKeyProvider(resource);
             try {
                 return (param = provider.getWriteKey()).getPassword();
             } catch (UnknownKeyException failure) {
@@ -89,10 +87,8 @@ public final class KeyManagerRaesParameters implements RaesParametersProvider {
 
         @Override
         public char[] getReadPasswd(boolean invalid) throws RaesKeyException {
-            final KeyProvider<? extends AesCipherParameters>
-                    provider = KeyManagerRaesParameters.this.provider
-                    .get(AesCipherParameters.class)
-                    .getKeyProvider(resource);
+            final KeyProvider<AesCipherParameters>
+                    provider = manager.getKeyProvider(resource);
             try {
                 return (param = provider.getReadKey(invalid)).getPassword();
             } catch (UnknownKeyException failure) {
@@ -111,7 +107,10 @@ public final class KeyManagerRaesParameters implements RaesParametersProvider {
         public void setKeyStrength(KeyStrength keyStrength) {
             if (null == param)
                 throw new IllegalStateException("getReadPasswd(boolean) must get called first!");
+            final KeyProvider<AesCipherParameters>
+                    provider = manager.getKeyProvider(resource);
             param.setKeyStrength(keyStrength);
+            provider.setKey(param);
         }
     }
 }
