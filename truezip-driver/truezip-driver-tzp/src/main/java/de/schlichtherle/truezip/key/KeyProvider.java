@@ -157,5 +157,12 @@ public interface KeyProvider<K> {
      */
     K getReadKey(boolean invalid) throws UnknownKeyException;
 
+    /**
+     * Sets the key programmatically.
+     *
+     * @param key the key.
+     *        If this is {@code null}, this key provider is set to a state
+     *        as if prompting for the key had been disabled or cancelled.
+     */
     void setKey(@CheckForNull K key);
 }

@@ -25,6 +25,6 @@ import de.schlichtherle.truezip.fs.FsScheme;
 public final class TJarFileTest extends TFileTestSuite {
     
     public TJarFileTest() {
-        super(FsScheme.create("jar"), new JarDriver(POOL_PROVIDER));
+        super(FsScheme.create("jar"), new JarDriver(IO_POOL_PROVIDER));
     }
 }

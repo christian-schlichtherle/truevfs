@@ -67,7 +67,7 @@ public abstract class TFileTestSuite {
     }
 
     protected static final IOPoolProvider
-            POOL_PROVIDER = new ByteArrayIOPoolProvider();
+            IO_POOL_PROVIDER = new ByteArrayIOPoolProvider();
 
     private static final Logger logger = Logger.getLogger(
             TFileTestSuite.class.getName());
