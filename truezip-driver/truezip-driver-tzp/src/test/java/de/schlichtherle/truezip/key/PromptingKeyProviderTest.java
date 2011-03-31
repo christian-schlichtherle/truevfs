@@ -109,5 +109,10 @@ public class PromptingKeyProviderTest {
             fail();
         } catch (UnknownKeyException expected) {
         }
+
+        provider.setKey(new DummyKey());
+        assertEquals(view.getKey(), provider.getReadKey(false));
+        view.setKey(new DummyKey());
+        assertEquals(view.getKey(), provider.getWriteKey());
     }
 }
