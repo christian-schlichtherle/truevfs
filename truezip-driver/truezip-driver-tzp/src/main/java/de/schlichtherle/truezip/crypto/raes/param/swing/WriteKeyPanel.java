@@ -21,7 +21,6 @@ import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.awt.Color;
 import java.awt.EventQueue;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.Window;
@@ -82,8 +81,8 @@ public class WriteKeyPanel extends KeyPanel {
                 setError(null);
             }
         };
-        newPasswd1.getDocument().addDocumentListener(dl);
-        newPasswd2.getDocument().addDocumentListener(dl);
+        newPasswd1Field.getDocument().addDocumentListener(dl);
+        newPasswd2Field.getDocument().addDocumentListener(dl);
         authenticationPanel.getKeyFileDocument().addDocumentListener(dl);
         defaultForeground = resource.getForeground();
     }
@@ -122,17 +121,21 @@ public class WriteKeyPanel extends KeyPanel {
         try {
             switch (authenticationPanel.getAuthenticationMethod()) {
                 case AuthenticationPanel.AUTH_PASSWD:
-                    final char[] newPasswd1Content = newPasswd1.getPassword();
-                    final char[] newPasswd2Content = newPasswd2.getPassword();
-                    if (Arrays.equals(newPasswd1Content, newPasswd2Content)) {
-                        Arrays.fill(newPasswd2Content, (char) 0);
-                        checkPasswdKey(newPasswd1Content);
-                        setError(null);
-                        param.setPassword(newPasswd1Content);
-                        return true;
-                    } else {
-                        setError(resources.getString("passwd.noMatch"));
-                        return false;
+                    final char[] newPasswd1 = newPasswd1Field.getPassword();
+                    final char[] newPasswd2 = newPasswd2Field.getPassword();
+                    try {
+                        if (Arrays.equals(newPasswd1, newPasswd2)) {
+                            checkPasswdKey(newPasswd1);
+                            setError(null);
+                            param.setPassword(newPasswd1);
+                            return true;
+                        } else {
+                            setError(resources.getString("passwd.noMatch"));
+                            return false;
+                        }
+                    } finally {
+                        Arrays.fill(newPasswd1, (char) 0);
+                        Arrays.fill(newPasswd2, (char) 0);
                     }
 
                 case AuthenticationPanel.AUTH_KEY_FILE:
@@ -262,9 +265,9 @@ public class WriteKeyPanel extends KeyPanel {
 
         passwdPanel = new de.schlichtherle.truezip.swing.EnhancedPanel();
         newPasswd1Label = new javax.swing.JLabel();
-        newPasswd1 = new javax.swing.JPasswordField();
+        newPasswd1Field = new javax.swing.JPasswordField();
         newPasswd2Label = new javax.swing.JLabel();
-        newPasswd2 = new javax.swing.JPasswordField();
+        newPasswd2Field = new javax.swing.JPasswordField();
         final javax.swing.JLabel prompt = new javax.swing.JLabel();
         resource = new javax.swing.JTextPane();
         authenticationPanel = new de.schlichtherle.truezip.crypto.raes.param.swing.AuthenticationPanel();
@@ -280,7 +283,7 @@ public class WriteKeyPanel extends KeyPanel {
         passwdPanel.setLayout(new java.awt.GridBagLayout());
 
         newPasswd1Label.setDisplayedMnemonic(resources.getString("newPasswd1").charAt(0));
-        newPasswd1Label.setLabelFor(newPasswd1);
+        newPasswd1Label.setLabelFor(newPasswd1Field);
         newPasswd1Label.setText(resources.getString("newPasswd1")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -289,17 +292,17 @@ public class WriteKeyPanel extends KeyPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 5);
         passwdPanel.add(newPasswd1Label, gridBagConstraints);
 
-        newPasswd1.setColumns(20);
+        newPasswd1Field.setColumns(20);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
-        passwdPanel.add(newPasswd1, gridBagConstraints);
+        passwdPanel.add(newPasswd1Field, gridBagConstraints);
 
         newPasswd2Label.setDisplayedMnemonic(resources.getString("newPasswd2").charAt(0));
-        newPasswd2Label.setLabelFor(newPasswd2);
+        newPasswd2Label.setLabelFor(newPasswd2Field);
         newPasswd2Label.setText(resources.getString("newPasswd2")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -308,13 +311,13 @@ public class WriteKeyPanel extends KeyPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
         passwdPanel.add(newPasswd2Label, gridBagConstraints);
 
-        newPasswd2.setColumns(20);
+        newPasswd2Field.setColumns(20);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
-        passwdPanel.add(newPasswd2, gridBagConstraints);
+        passwdPanel.add(newPasswd2Field, gridBagConstraints);
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -394,9 +397,9 @@ public class WriteKeyPanel extends KeyPanel {
                 EventQueue.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        if (newPasswd1.requestFocusInWindow()) {
-                            newPasswd1.selectAll();
-                            newPasswd2.selectAll();
+                        if (newPasswd1Field.requestFocusInWindow()) {
+                            newPasswd1Field.selectAll();
+                            newPasswd2Field.selectAll();
                         }
                     }
                 });
@@ -411,9 +414,9 @@ public class WriteKeyPanel extends KeyPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private de.schlichtherle.truezip.crypto.raes.param.swing.AuthenticationPanel authenticationPanel;
     private javax.swing.JLabel error;
-    private javax.swing.JPasswordField newPasswd1;
+    private javax.swing.JPasswordField newPasswd1Field;
     private javax.swing.JLabel newPasswd1Label;
-    private javax.swing.JPasswordField newPasswd2;
+    private javax.swing.JPasswordField newPasswd2Field;
     private javax.swing.JLabel newPasswd2Label;
     private de.schlichtherle.truezip.swing.EnhancedPanel passwdPanel;
     private javax.swing.JTextPane resource;

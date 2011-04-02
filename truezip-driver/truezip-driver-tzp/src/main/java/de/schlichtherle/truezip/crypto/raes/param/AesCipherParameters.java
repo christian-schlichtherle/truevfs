@@ -64,12 +64,7 @@ implements SafeKey<AesCipherParameters>, Cloneable {
         final char[] oldPW = this.password;
         if (null != oldPW)
             Arrays.fill(oldPW, (char) 0);
-        if (null != newPW) {
-            this.password = newPW.clone();
-            Arrays.fill(newPW, (char) 0);
-        } else {
-            this.password = null;
-        }
+        this.password = null != newPW ? newPW.clone() : null;
     }
 
     public void setKeyFileBytes(final @CheckForNull byte[] bytes) {

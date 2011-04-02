@@ -85,26 +85,30 @@ implements View<AesCipherParameters> {
             while (true) {
                 char[] newPasswd1 = con.readPassword(
                         resources.getString("writeKey.newPasswd1"));
-                if (null == newPasswd1 || newPasswd1.length <= 0)
+                if (null == newPasswd1 || 0 >= newPasswd1.length)
                     return;
-
-                char[] newPasswd2 = con.readPassword(
-                        resources.getString("writeKey.newPasswd2"));
-                if (newPasswd2 == null)
-                    return;
-
-                if (!Arrays.equals(newPasswd1, newPasswd2)) {
-                    con.printf(resources.getString("writeKey.passwd.noMatch"));
-                    continue;
+                try {
+                    char[] newPasswd2 = con.readPassword(
+                            resources.getString("writeKey.newPasswd2"));
+                    if (newPasswd2 == null)
+                        return;
+                    try {
+                        if (!Arrays.equals(newPasswd1, newPasswd2)) {
+                            con.printf(resources.getString("writeKey.passwd.noMatch"));
+                            continue;
+                        }
+                        if (newPasswd1.length < MIN_PASSWD_LEN) {
+                            con.printf(resources.getString("writeKey.passwd.tooShort"));
+                            continue;
+                        }
+                        param.setPassword(newPasswd1);
+                        break;
+                    } finally {
+                        Arrays.fill(newPasswd2, (char) 0);
+                    }
+                }  finally {
+                    Arrays.fill(newPasswd1, (char) 0);
                 }
-
-                if (newPasswd1.length < MIN_PASSWD_LEN) {
-                    con.printf(resources.getString("writeKey.passwd.tooShort"));
-                    continue;
-                }
-
-                param.setPassword(newPasswd1);
-                break;
             }
 
             con.printf(resources.getString("keyStrength.banner"));
@@ -162,6 +166,7 @@ implements View<AesCipherParameters> {
 
             final AesCipherParameters param = new AesCipherParameters();
             param.setPassword(passwd);
+            Arrays.fill(passwd, (char) 0);
             controller.setKey(param);
 
             while (true) {
