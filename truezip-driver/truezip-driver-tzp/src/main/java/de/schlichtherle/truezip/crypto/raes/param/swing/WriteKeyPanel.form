@@ -15,7 +15,7 @@
               <ResourceString bundle="de/schlichtherle/truezip/crypto/raes/param/swing/WriteKeyPanel.properties" key="newPasswd1" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
             </Property>
             <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
-              <ComponentRef name="newPasswd1"/>
+              <ComponentRef name="newPasswd1Field"/>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
               <ResourceString bundle="de/schlichtherle/truezip/crypto/raes/param/swing/WriteKeyPanel.properties" key="newPasswd1" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
@@ -27,7 +27,7 @@
             </Constraint>
           </Constraints>
         </Component>
-        <Component class="javax.swing.JPasswordField" name="newPasswd1">
+        <Component class="javax.swing.JPasswordField" name="newPasswd1Field">
           <Properties>
             <Property name="columns" type="int" value="20"/>
           </Properties>
@@ -43,7 +43,7 @@
               <ResourceString bundle="de/schlichtherle/truezip/crypto/raes/param/swing/WriteKeyPanel.properties" key="newPasswd2" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
             </Property>
             <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
-              <ComponentRef name="newPasswd2"/>
+              <ComponentRef name="newPasswd2Field"/>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
               <ResourceString bundle="de/schlichtherle/truezip/crypto/raes/param/swing/WriteKeyPanel.properties" key="newPasswd2" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
@@ -55,7 +55,7 @@
             </Constraint>
           </Constraints>
         </Component>
-        <Component class="javax.swing.JPasswordField" name="newPasswd2">
+        <Component class="javax.swing.JPasswordField" name="newPasswd2Field">
           <Properties>
             <Property name="columns" type="int" value="20"/>
           </Properties>

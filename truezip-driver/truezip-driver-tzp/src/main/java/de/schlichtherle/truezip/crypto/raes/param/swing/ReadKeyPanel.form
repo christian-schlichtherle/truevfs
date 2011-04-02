@@ -18,7 +18,7 @@
               <ResourceString bundle="de/schlichtherle/truezip/crypto/raes/param/swing/ReadKeyPanel.properties" key="passwd" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
             </Property>
             <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
-              <ComponentRef name="passwd"/>
+              <ComponentRef name="passwdField"/>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
               <ResourceString bundle="de/schlichtherle/truezip/crypto/raes/param/swing/ReadKeyPanel.properties" key="passwd" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
@@ -30,7 +30,7 @@
             </Constraint>
           </Constraints>
         </Component>
-        <Component class="javax.swing.JPasswordField" name="passwd">
+        <Component class="javax.swing.JPasswordField" name="passwdField">
           <Properties>
             <Property name="columns" type="int" value="20"/>
           </Properties>

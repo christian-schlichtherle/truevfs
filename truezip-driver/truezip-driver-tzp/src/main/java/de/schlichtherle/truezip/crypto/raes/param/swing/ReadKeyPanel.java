@@ -20,7 +20,6 @@ import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.awt.Color;
 import java.awt.EventQueue;
-import java.awt.Font;
 import java.awt.Window;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
@@ -29,6 +28,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.ResourceBundle;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -75,7 +75,7 @@ public class ReadKeyPanel extends KeyPanel {
                 setError(null);
             }
         };
-        passwd.getDocument().addDocumentListener(dl);
+        passwdField.getDocument().addDocumentListener(dl);
         authenticationPanel.getKeyFileDocument().addDocumentListener(dl);
         defaultForeground = resource.getForeground();
     }
@@ -113,7 +113,9 @@ public class ReadKeyPanel extends KeyPanel {
     boolean updateParam(final AesCipherParameters param) {
         switch (authenticationPanel.getAuthenticationMethod()) {
             case AuthenticationPanel.AUTH_PASSWD:
-                param.setPassword(passwd.getPassword());
+                final char[] passwd = passwdField.getPassword();
+                param.setPassword(passwd);
+                Arrays.fill(passwd, (char) 0);
                 return true;
 
             case AuthenticationPanel.AUTH_KEY_FILE:
@@ -167,7 +169,7 @@ public class ReadKeyPanel extends KeyPanel {
 
         passwdPanel = new de.schlichtherle.truezip.swing.EnhancedPanel();
         passwdLabel = new javax.swing.JLabel();
-        passwd = new javax.swing.JPasswordField();
+        passwdField = new javax.swing.JPasswordField();
         final javax.swing.JLabel prompt = new javax.swing.JLabel();
         resource = new javax.swing.JTextPane();
         authenticationPanel = new de.schlichtherle.truezip.crypto.raes.param.swing.AuthenticationPanel();
@@ -183,7 +185,7 @@ public class ReadKeyPanel extends KeyPanel {
         passwdPanel.setLayout(new java.awt.GridBagLayout());
 
         passwdLabel.setDisplayedMnemonic(resources.getString("passwd").charAt(0));
-        passwdLabel.setLabelFor(passwd);
+        passwdLabel.setLabelFor(passwdField);
         passwdLabel.setText(resources.getString("passwd")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -191,13 +193,13 @@ public class ReadKeyPanel extends KeyPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
         passwdPanel.add(passwdLabel, gridBagConstraints);
 
-        passwd.setColumns(20);
+        passwdField.setColumns(20);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
-        passwdPanel.add(passwd, gridBagConstraints);
+        passwdPanel.add(passwdField, gridBagConstraints);
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -287,8 +289,8 @@ public class ReadKeyPanel extends KeyPanel {
                 EventQueue.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        if (passwd.requestFocusInWindow())
-                            passwd.selectAll();
+                        if (passwdField.requestFocusInWindow())
+                            passwdField.selectAll();
                     }
                 });
             }
@@ -303,7 +305,7 @@ public class ReadKeyPanel extends KeyPanel {
     de.schlichtherle.truezip.crypto.raes.param.swing.AuthenticationPanel authenticationPanel;
     private final javax.swing.JCheckBox changeKey = new javax.swing.JCheckBox();
     javax.swing.JLabel error;
-    javax.swing.JPasswordField passwd;
+    javax.swing.JPasswordField passwdField;
     javax.swing.JLabel passwdLabel;
     de.schlichtherle.truezip.swing.EnhancedPanel passwdPanel;
     javax.swing.JTextPane resource;
