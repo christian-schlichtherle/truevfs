@@ -1264,10 +1264,10 @@ public final class TFile extends File {
      * instance.
      * <p>
      * Please note that no file system tests are performed!
-     * If a client application needs to know whether this file really isExisting
-     * as an archive file in the file system (and the correct password has
-     * been entered in case it's a RAES encrypted ZIP file), it should
-     * subsequently call {@link #isDirectory}, too.
+     * If you need to know whether this file really exists as an archive file
+     * in the file system (and the correct password has been entered in case
+     * it's a RAES encrypted ZIP file),
+     * you should call {@link #isDirectory}, too.
      * This will automount the (virtual) file system from the archive file and
      * return {@code true} if and only if it's a valid archive file.
      *
@@ -1281,20 +1281,23 @@ public final class TFile extends File {
 
     /**
      * Returns {@code true} if and only if the path represented by this
-     * instance names an archive file as an ancestor.
+     * instance names an archive file as its ancestor.
      * Whether or not this is true solely depends on the
      * {@link TArchiveDetector} which was used to construct this {@code TFile}
      * instance.
      * <p>
-     * Please note that no tests on the file's true state are performed!
+     * Please note that no file system tests are performed!
      * If you need to know whether this file is really an entry in an archive
      * file (and the correct password has been entered in case it's a RAES
-     * encrypted ZIP file), you should call
+     * encrypted ZIP file),
+     * you should call
      * {@link #getParentFile getParentFile()}.{@link #isDirectory isDirectory()}, too.
      * This will automount the (virtual) file system from the archive file and
      * return {@code true} if and only if it's a valid archive file.
      *
+     * @see <a href="#False_Positives">Identifying Archive Paths and False Positives</a>
      * @see #isArchive
+     * @see #isDirectory
      */
     public boolean isEntry() {
         return enclEntryName != null;
@@ -1766,6 +1769,8 @@ public final class TFile extends File {
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      *
      * @see <a href="#False_Positives">Identifying Archive Paths and False Positives</a>
+     * @see #isArchive
+     * @see #isEntry
      */
     @Override
     public boolean isDirectory() {
