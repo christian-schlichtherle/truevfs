@@ -153,25 +153,6 @@ public class PathsTest {
         assertEquals(member, splitter.getMemberName());
     }
 
-    /** Copied from {@link Paths#prefixLength}. */
-    private static int prefixLength(final String path, final char separatorChar) {
-        final int pathLength = path.length();
-        int len = 0; // default prefix length
-        if (pathLength > 0 && path.charAt(0) == separatorChar) {
-            len++; // leading separator or first character of a UNC.
-        } else if (pathLength > 1 && path.charAt(1) == ':') {
-            final char drive = path.charAt(0);
-            if ('A' <= drive && drive <= 'Z'
-                    || 'a' <= drive && drive <= 'z') { // US-ASCII letters only
-                // Path is prefixed with drive, e.g. "C:\\Programs".
-                len = 2;
-            }
-        }
-        if (pathLength > len && path.charAt(len) == separatorChar)
-            len++; // next separator is considered part of prefix
-        return len;
-    }
-
     @Test
     public void testNormalize() {
         assertNormalize("", "");
@@ -326,8 +307,8 @@ public class PathsTest {
         assertNormalize("../b/", "..//a//..//b//");
     }
 
-    private void assertNormalize(String result, final String path) {
-        assertNormalize(result, path, '/');
+    private void assertNormalize(String expected, final String path) {
+        assertNormalize(expected, path, '/');
     }
 
     private void assertNormalize(
