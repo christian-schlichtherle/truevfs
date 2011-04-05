@@ -36,7 +36,7 @@ public final class Paths {
 
     /**
      * Equivalent to
-     * {@code new Normalizer(separatorChar).}{@link Normalizer#normalize(String)}.
+     * {@code new Normalizer(separatorChar).}{@link Normalizer#normalize(String) normalize(path)}.
      */
     public static String normalize(String path, char separatorChar) {
         return new Normalizer(separatorChar).normalize(path);
