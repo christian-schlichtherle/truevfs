@@ -54,10 +54,10 @@ public final class ZipRaesDriverService extends FsDriverService {
 
     private static final Map<FsScheme, FsDriver>
             DRIVERS = newMap(new Object[][] {
-            {   "tzp|zip.rae|zip.raes",
-                new SafeZipRaesDriver(  IOPoolLocator.SINGLETON,
-                                        KeyManagerLocator.SINGLETON) },
-        });
+                {   "tzp|zip.rae|zip.raes",
+                    new SafeZipRaesDriver(  IOPoolLocator.SINGLETON,
+                                            KeyManagerLocator.SINGLETON) },
+            });
 
     @Override
     public Map<FsScheme, FsDriver> get() {
