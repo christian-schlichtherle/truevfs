@@ -30,7 +30,7 @@
             <item name="Samples" href="samples/index.html" collapse="true">
                 <item name="Nzip (File*)" href="samples/Nzip.html"/>
             </item>
-            <item name="TrueZIP 6 (deprecated)" href="6/index.html" collapse="true">
+            <item name="TrueZIP 6 (obsolete)" href="6/index.html" collapse="true">
                 <item name="Tutorial" href="6/tutorial.html"/>
             </item>
             <item name="News Archive" href="news/index.html" collapse="true">
