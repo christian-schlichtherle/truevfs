@@ -75,7 +75,7 @@ public final class KeyManagerRaesParameters implements RaesParametersProvider {
         private AesCipherParameters param;
 
         @Override
-        public char[] getWritePasswd() throws RaesKeyException {
+        public char[] getWritePassword() throws RaesKeyException {
             final KeyProvider<AesCipherParameters>
                     provider = manager.getKeyProvider(resource);
             try {
@@ -86,7 +86,7 @@ public final class KeyManagerRaesParameters implements RaesParametersProvider {
         }
 
         @Override
-        public char[] getReadPasswd(boolean invalid) throws RaesKeyException {
+        public char[] getReadPassword(boolean invalid) throws RaesKeyException {
             final KeyProvider<AesCipherParameters>
                     provider = manager.getKeyProvider(resource);
             try {

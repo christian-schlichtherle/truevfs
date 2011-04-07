@@ -78,7 +78,7 @@ implements View<AesCipherParameters> {
 
     /**
      * Reads the encryption key as a byte sequence from the given pathname
-     * into a buffer of exactly {@code KEY_FILE_LEN} bytes and returns it.
+     * into a new buffer of exactly {@code KEY_FILE_LEN} bytes and returns it.
      *
      * @throws EOFException If the file is not at least {@code KEY_FILE_LEN}
      *         bytes long.

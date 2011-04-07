@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.key;
 
-import de.schlichtherle.truezip.key.KeyProvider.Factory;
 import de.schlichtherle.truezip.key.PromptingKeyProvider.View;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -43,7 +42,7 @@ extends SafeKeyManager<K, PromptingKeyProvider<K>> {
      * @param view the view instance for prompting for keys.
      */
     public PromptingKeyManager(final View<K> view) {
-        super(new PromptingKeyProviderFactory<K>());
+        super(new PromptingKeyProvider.Factory<K>());
         if (null == view)
             throw new NullPointerException();
         this.view = view;
@@ -58,34 +57,25 @@ extends SafeKeyManager<K, PromptingKeyProvider<K>> {
     }
 
     @Override
-    public synchronized boolean moveKeyProvider(URI oldResource, URI newResource) {
-        boolean changed = super.moveKeyProvider(oldResource, newResource);
-        if (changed) {
-            PromptingKeyProvider<K> provider = super.getKeyProvider(newResource);
-            provider.setResource(newResource);
-            provider.setView(view);
+    public synchronized PromptingKeyProvider<K> moveKeyProvider(URI oldResource, URI newResource) {
+        final PromptingKeyProvider<K>
+                oldProvider = super.moveKeyProvider(oldResource, newResource);
+        if (null != oldProvider) {
+            oldProvider.setResource(null);
+            oldProvider.setView(null);
         }
-        return changed;
+        PromptingKeyProvider<K> newProvider = super.getKeyProvider(newResource);
+        newProvider.setResource(newResource);
+        newProvider.setView(view);
+        return oldProvider;
     }
 
     @Override
-    public synchronized boolean removeKeyProvider(URI resource) {
-        PromptingKeyProvider<K> provider = super.findKeyProvider(resource);
-        boolean changed = super.removeKeyProvider(resource);
-        if (changed) {
-            provider.setResource(null);
-            provider.setView(null);
-        }
-        return changed;
+    public synchronized PromptingKeyProvider<K> removeKeyProvider(URI resource) {
+        final PromptingKeyProvider<K>
+                provider = super.removeKeyProvider(resource);
+        provider.setResource(null);
+        provider.setView(null);
+        return provider;
     }
-
-    /** A factory for {@link PromptingKeyProvider}s. */
-    private static class PromptingKeyProviderFactory<K extends SafeKey<K>>
-    implements Factory<K, PromptingKeyProvider<K>> {
-
-        @Override
-        public PromptingKeyProvider<K> newKeyProvider() {
-            return new PromptingKeyProvider<K>();
-        }
-    } // class PromptingKeyProviderFactory
 }

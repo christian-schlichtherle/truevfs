@@ -303,7 +303,6 @@ extends SafeKeyProvider<K> {
      */
     @DefaultAnnotation(NonNull.class)
     public interface View<K extends SafeKey<K>> {
-
         /**
          * Prompts the user for the key for (over)writing the contents of a
          * new or existing protected resource.
@@ -459,4 +458,13 @@ extends SafeKeyProvider<K> {
             throw new IllegalStateException();
         }
     } // class WriteKeyController
+
+    /** A factory for {@link PromptingKeyProvider}s. */
+    public static final class Factory<K extends SafeKey<K>>
+    implements KeyProvider.Factory<K, PromptingKeyProvider<K>> {
+        @Override
+        public PromptingKeyProvider<K> newKeyProvider() {
+            return new PromptingKeyProvider<K>();
+        }
+    } // class Factory
 }
