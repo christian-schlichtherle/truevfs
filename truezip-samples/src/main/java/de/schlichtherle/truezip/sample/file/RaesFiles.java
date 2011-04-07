@@ -73,7 +73,7 @@ public class RaesFiles {
         final TFile raesFile = newNonArchiveFile(raesFilePath, detector);
         final RaesParameters params = new KeyManagerRaesParameters(
                 KeyManagerLocator.SINGLETON,
-                raesFile.getCanonicalFile().toURI());
+                raesFile/*.getCanonicalFile()*/.toURI());
         final InputStream in = new TFileInputStream(plainFile);
         try {
             final RaesOutputStream out = RaesOutputStream.getInstance(
@@ -122,7 +122,7 @@ public class RaesFiles {
         final TFile plainFile = newNonArchiveFile(plainFilePath, detector);
         final RaesParameters params = new KeyManagerRaesParameters(
                 KeyManagerLocator.SINGLETON,
-                raesFile.getCanonicalFile().toURI());
+                raesFile/*.getCanonicalFile()*/.toURI());
         final ReadOnlyFile rof = new DefaultReadOnlyFile(raesFile);
         try {
             final RaesReadOnlyFile rrof
@@ -148,7 +148,7 @@ public class RaesFiles {
             TArchiveDetector detector) {
         TFile file = new TFile(path, detector);
         TFile parent = file.getParentFile();
-        assert null != parent : "expected non-null from context!";
+        assert null != parent : "expected non-null from call context!";
         return new TFile(parent, file.getName(), TDefaultArchiveDetector.NULL);
     }
 }
