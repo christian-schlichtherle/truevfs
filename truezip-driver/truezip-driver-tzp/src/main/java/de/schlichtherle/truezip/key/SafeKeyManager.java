@@ -49,7 +49,7 @@ implements KeyManager<K> {
     }
 
     @Override
-    public synchronized P getKeyProvider(URI resource) {
+    public synchronized P getKeyProvider(final URI resource) {
         if (null == resource)
             throw new NullPointerException();
         P provider = providers.get(resource);
@@ -60,29 +60,26 @@ implements KeyManager<K> {
         return provider;
     }
 
-    P findKeyProvider(URI resource) {
-        return providers.get(resource);
-    }
-
     @Override
-    public synchronized boolean moveKeyProvider(URI oldResource, URI newResource) {
-        if (oldResource.equals(newResource))
-            return false;
+    public synchronized P moveKeyProvider(final URI oldResource, final URI newResource) {
         if (null == newResource)
             throw new NullPointerException();
-        final P provider = providers.remove(oldResource);
-        if (null != provider) {
-            providers.put(newResource, provider);
-            return true;
-        } else {
-            return false;
-        }
+        if (oldResource.equals(newResource))
+            throw new IllegalArgumentException();
+        return providers.put(newResource, removeKeyProvider0(oldResource));
     }
 
     @Override
-    public synchronized boolean removeKeyProvider(URI resource) {
+    public synchronized P removeKeyProvider(final URI resource) {
         if (null == resource)
             throw new NullPointerException();
-        return null != providers.remove(resource);
+        return removeKeyProvider0(resource);
+    }
+
+    private P removeKeyProvider0(final URI resource) {
+        final P provider = providers.remove(resource);
+        if (null == provider)
+            throw new IllegalArgumentException();
+        return provider;
     }
 }

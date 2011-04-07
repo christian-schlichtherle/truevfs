@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.key;
 
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.net.URI;
 
 /**
@@ -47,17 +48,22 @@ public interface KeyManager<K> {
      * 
      * @param  oldResource the old URI of the protected resource.
      * @param  newResource the new URI of the protected resource.
-     * @return whether or not the operation succeeded, i.e. if a key provider
-     *         was present for the old URI.
+     * @return The key provider which was previously mapped for the protected
+     *         resource {@code newResource}.
+     * @throws IllegalArgumentException if no key provider exists for
+     *         {@code oldResource} or if {@code oldResource} compares
+     *         {@link URI#equals(Object) equal} to {@code newResource}.
      */
-    boolean moveKeyProvider(URI oldResource, URI newResource);
+    @Nullable KeyProvider<K> moveKeyProvider(URI oldResource, URI newResource);
 
     /**
      * Removes the key provider for the given protected resource.
      *
      * @param  resource the URI of the protected resource.
-     * @return whether or not the operation succeeded, i.e. if a key provider
-     *         was present for the old URI.
+     * @return The key provider which was previously mapped for the protected
+     *         resource.
+     * @throws IllegalArgumentException if no key provider exists for
+     *         {@code resource}.
      */
-    boolean removeKeyProvider(URI resource);
+    @Nullable KeyProvider<K> removeKeyProvider(URI resource);
 }

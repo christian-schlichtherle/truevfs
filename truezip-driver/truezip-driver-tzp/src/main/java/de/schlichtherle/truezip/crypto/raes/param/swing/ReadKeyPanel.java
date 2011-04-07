@@ -121,8 +121,10 @@ public class ReadKeyPanel extends KeyPanel {
             case AuthenticationPanel.AUTH_KEY_FILE:
                 final File keyFile = authenticationPanel.getKeyFile();
                 try {
-                    param.setKeyFileBytes(AesCipherParametersView.readKeyFile(
-                            keyFile));
+                    final byte[] key = AesCipherParametersView.readKeyFile(
+                            keyFile);
+                    param.setKeyFileBytes(key);
+                    Arrays.fill(key, (byte) 0);
                     return true;
                 } catch (EOFException ex) {
                     setError(resources.getString("keyFile.eofException"));

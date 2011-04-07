@@ -39,7 +39,7 @@ public interface Type0RaesParameters extends RaesParameters {
      * @throws RaesKeyException If password retrieval has been disabled or
      *         cancelled.
      */
-    char[] getWritePasswd() throws RaesKeyException;
+    char[] getWritePassword() throws RaesKeyException;
 
     /**
      * Returns the password required to open the RAES type 0 file for reading.
@@ -53,7 +53,7 @@ public interface Type0RaesParameters extends RaesParameters {
      * @throws RaesKeyException If password retrieval has been disabled or
      *         cancelled.
      */
-    char[] getReadPasswd(boolean invalid) throws RaesKeyException;
+    char[] getReadPassword(boolean invalid) throws RaesKeyException;
 
     /** Defines the key strength for the AES algorithm. */
     enum KeyStrength {
@@ -71,7 +71,7 @@ public interface Type0RaesParameters extends RaesParameters {
      * Returns the key strength to use for creating or overwriting the RAES file.
      *
      * @return The key strength to use for creating or overwriting the RAES file.
-     * @throws RuntimeException if {@link #getWritePasswd()} hasn't
+     * @throws RuntimeException if {@link #getWritePassword()} hasn't
      *         been called before and the implementation can't tolerate this.
      */
     KeyStrength getKeyStrength();
@@ -81,7 +81,7 @@ public interface Type0RaesParameters extends RaesParameters {
      *
      * @param keyStrength the key strength to use for creating or overwriting
      *        the RAES file.
-     * @throws RuntimeException if {@link #getReadPasswd(boolean)} hasn't
+     * @throws RuntimeException if {@link #getReadPassword(boolean)} hasn't
      *         been called before and the implementation can't tolerate this.
      */
     void setKeyStrength(KeyStrength keyStrength);

@@ -161,6 +161,7 @@ public class WriteKeyPanel extends KeyPanel {
                     checkKeyFileKey(key);
                     setError(null);
                     param.setKeyFileBytes(key);
+                    Arrays.fill(key, (byte) 0);
                     return true;
 
                 default:

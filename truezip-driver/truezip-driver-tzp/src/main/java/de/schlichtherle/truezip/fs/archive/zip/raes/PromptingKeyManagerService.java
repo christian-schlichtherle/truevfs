@@ -27,7 +27,7 @@ import net.jcip.annotations.Immutable;
  * A container for a prompting key manager implementation for
  * {@link AesCipherParameters}.
  * If this JVM is running {@link GraphicsEnvironment#isHeadless() headless},
- * then its UI is an instance of
+ * then the view of the prompting key manager is an instance of
  * {@link de.schlichtherle.truezip.crypto.raes.param.console.AesCipherParametersView}.
  * Otherwise, it's an instance of
  * {@link de.schlichtherle.truezip.crypto.raes.param.swing.AesCipherParametersView}.
@@ -38,7 +38,7 @@ import net.jcip.annotations.Immutable;
 @Immutable
 public final class PromptingKeyManagerService extends KeyManagerService {
 
-    private static final PromptingKeyManager<AesCipherParameters>
+    private final PromptingKeyManager<AesCipherParameters>
             manager = new PromptingKeyManager<AesCipherParameters>(
                 GraphicsEnvironment.isHeadless()
                     ? new de.schlichtherle.truezip.crypto.raes.param.console.AesCipherParametersView()

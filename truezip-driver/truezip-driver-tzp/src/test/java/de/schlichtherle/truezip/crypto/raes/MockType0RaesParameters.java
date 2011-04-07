@@ -38,12 +38,12 @@ public final class MockType0RaesParameters implements Type0RaesParameters {
     private KeyStrength keyStrength;
 
     @Override
-    public char[] getWritePasswd() {
+    public char[] getWritePassword() {
         return PASSWD.toCharArray();
     }
 
     @Override
-    public char[] getReadPasswd(boolean invalid) {
+    public char[] getReadPassword(boolean invalid) {
         assertTrue(secondTry || !invalid);
         if (secondTry) {
             logger.finer("First returned password was wrong, providing the right one now!");

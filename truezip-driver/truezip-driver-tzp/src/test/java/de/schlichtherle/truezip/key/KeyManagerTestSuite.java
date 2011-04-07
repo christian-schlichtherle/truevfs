@@ -59,30 +59,33 @@ public abstract class KeyManagerTestSuite {
 
         try {
             instance.moveKeyProvider(null, null);
-            fail("A NullPointerException is expected from the previous call!");
+            fail();
         } catch (NullPointerException expected) {
         }
 
         try {
             instance.moveKeyProvider(idA, null);
-            fail("A NullPointerException is expected from the previous call!");
+            fail();
         } catch (NullPointerException expected) {
         }
 
         try {
             instance.moveKeyProvider(null, idB);
-            fail("A NullPointerException is expected from the previous call!");
+            fail();
         } catch (NullPointerException expected) {
         }
 
-        boolean result = instance.moveKeyProvider(idA, idB);
-        assertFalse(result); // no provider mapped yet
+        try {
+            instance.moveKeyProvider(idA, idB);
+            fail();
+        } catch (IllegalArgumentException expected) {
+            // no provider mapped yet
+        }
 
         KeyProvider<?> provA1 = instance.getKeyProvider(idA);
         assertNotNull(provA1);
 
-        result = instance.moveKeyProvider(idA, idB);
-        assertTrue(result);
+        assertNull(instance.moveKeyProvider(idA, idB));
 
         KeyProvider<?> provA2 = instance.getKeyProvider(idA);
         assertNotNull(provA2);
@@ -97,22 +100,32 @@ public abstract class KeyManagerTestSuite {
     public final void testRemoveKeyProvider() {
         URI id = URI.create("a");
 
-        boolean result = instance.removeKeyProvider(id);
-        assertFalse(result);
+        try {
+            instance.removeKeyProvider(id);
+            fail();
+        } catch (IllegalArgumentException expected) {
+            // no provider mapped yet
+        }
 
         KeyProvider<?> prov1 = instance.getKeyProvider(id);
-        result = instance.removeKeyProvider(id);
-        assertTrue(result);
+        assertNotNull(instance.removeKeyProvider(id));
 
-        result = instance.removeKeyProvider(id);
-        assertFalse(result);
+        try {
+            instance.removeKeyProvider(id);
+            fail();
+        } catch (IllegalArgumentException expected) {
+            // no provider mapped any more
+        }
 
         KeyProvider<?> prov2 = instance.getKeyProvider(id);
-        result = instance.removeKeyProvider(id);
-        assertTrue(result);
+        assertNotNull(instance.removeKeyProvider(id));
 
-        result = instance.removeKeyProvider(id);
-        assertFalse(result);
+        try {
+            instance.removeKeyProvider(id);
+            fail();
+        } catch (IllegalArgumentException expected) {
+            // no provider mapped any more
+        }
 
         assertFalse(prov1.equals(prov2));
     }

@@ -56,10 +56,25 @@ implements SafeKey<AesCipherParameters>, Cloneable {
         setKeyStrength(BITS_256);
     }
 
+    /**
+     * Returns a protective copy of the password char array.
+     *
+     * @return A protective copy of the password char array.
+     */
     public @Nullable char[] getPassword() {
         return null == password ? null : password.clone();
     }
 
+    /**
+     * Copies the given password char array for subsequent use as the AES
+     * cipher key.
+     * <p>
+     * This method makes a protective copy of the given password char array.
+     * It's highly recommended to overwrite this array with any non-password
+     * data after calling this method.
+     *
+     * @param newPW the password char array to be copied for subsequent use.
+     */
     public void setPassword(final @CheckForNull char[] newPW) {
         final char[] oldPW = this.password;
         if (null != oldPW)
@@ -67,6 +82,16 @@ implements SafeKey<AesCipherParameters>, Cloneable {
         this.password = null != newPW ? newPW.clone() : null;
     }
 
+    /**
+     * Decodes the given byte array to a password char array for subsequent use.
+     * This method should be used if a key file is used rather than a password.
+     * <p>
+     * This method makes a protective copy of the given key file byte array.
+     * It's highly recommended to overwrite this array with any non-password
+     * data after calling this method.
+     *
+     * @param bytes the byte array to decode.
+     */
     public void setKeyFileBytes(final @CheckForNull byte[] bytes) {
         // Do NOT use the following - it would omit a byte order sequence
         // and cannot decode all characters.
@@ -85,23 +110,27 @@ implements SafeKey<AesCipherParameters>, Cloneable {
             for (int i = 0, off = 0; i < len; i++)
                 newPW[i] = (char) (bytes[off++] << 8 | bytes[off++] & 0xFF); // attention!
             this.password = newPW;
-            Arrays.fill(bytes, (byte) 0);
         } else {
             this.password = null;
         }
     }
 
     /**
-     * Returns the AES key strength, which defaults to
+     * Returns the AES cipher key strength, which defaults to
      * {@link KeyStrength#BITS_256}.
      *
-     * @return The AES key strength, which defaults to
+     * @return The AES cipher key strength, which defaults to
      *         {@link KeyStrength#BITS_256}.
      */
     public KeyStrength getKeyStrength() {
         return keyStrength;
     }
 
+    /**
+     * Sets the AES cipher key strength.
+     *
+     * @param keyStrength the AES cipher key strength.
+     */
     public void setKeyStrength(final KeyStrength keyStrength) {
         if (null == keyStrength)
             throw new NullPointerException();

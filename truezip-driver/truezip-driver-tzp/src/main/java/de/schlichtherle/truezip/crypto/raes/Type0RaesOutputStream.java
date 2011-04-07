@@ -87,7 +87,7 @@ class Type0RaesOutputStream extends RaesOutputStream {
         assert null != param;
 
         // Check parameters (fail fast).
-        final char[] passwd = param.getWritePasswd();
+        final char[] passwd = param.getWritePassword();
         if (null == passwd)
             throw new RaesKeyException();
 
