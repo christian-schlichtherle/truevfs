@@ -18,7 +18,6 @@ package de.schlichtherle.truezip.sample.file.app;
 import de.schlichtherle.truezip.sample.file.RaesFiles;
 import de.schlichtherle.truezip.file.TFile;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ResourceBundle;
 
 /**
@@ -32,7 +31,7 @@ import java.util.ResourceBundle;
  * as their character set, whereas plain ZIP files use &quot;IBM437&quot;,
  * a.k.a. &quot;CP437&quot;.
  * To decrypt an RAES encrypted ZIP file to a plain ZIP file, use the
- * {@code "cp"} command of the {@link Nzip} class instead.
+ * {@code cp} command of the {@link Nzip} class instead.
  * This class knows about the correct character set charsets for the
  * various flavours of ZIP compatible files.
  *
