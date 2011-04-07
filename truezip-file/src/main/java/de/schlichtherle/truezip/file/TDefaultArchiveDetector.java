@@ -41,16 +41,16 @@ import net.jcip.annotations.Immutable;
  * An archive detector which matches file paths against a pattern of
  * file suffixes in order to detect prospective archive files (i.e. prospective
  * federated file systems) and look up their corresponding file system
- * driver using a file system driver service.
+ * driver using a file system driver provider.
  * <p>
  * There are basically two types of constructors available in this class:
  * <ol>
  * <li>Constructors which filter the drivers of a given file system driver
- *     service by a given list of file suffixes.
- *     For example, the drivers known by the service
+ *     provider by a given list of file suffixes.
+ *     For example, the drivers known by the provider
  *     {@link FsDriverLocator#SINGLETON} could be filtered by the suffix
  *     list {@code "tar|zip"} in order to recognize only TAR and ZIP files.
- * <li>Constructors which decorate a given file system driver service with a
+ * <li>Constructors which decorate a given file system driver provider with a
  *     given map of file system schemes to file system drivers - whereby a
  *     number of options are available to conveniently specify the map.
  *     This could be used to specify custom archive file suffixes or file
@@ -112,7 +112,8 @@ implements TArchiveDetector, FsDriverProvider {
 
     /**
      * Equivalent to
-     * {@link #TDefaultArchiveDetector(FsDriverProvider, String) new TDefaultArchiveDetector(FsDriverLocator.SINGLETON, suffixes)}.
+     * {@link #TDefaultArchiveDetector(FsDriverProvider, String)
+     * TDefaultArchiveDetector(FsDriverLocator.SINGLETON, suffixes)}.
      */
     public TDefaultArchiveDetector(@CheckForNull String suffixes) {
         this(FsDriverLocator.SINGLETON, suffixes);
