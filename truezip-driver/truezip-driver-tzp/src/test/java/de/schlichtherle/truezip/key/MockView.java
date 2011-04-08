@@ -32,6 +32,80 @@ import static de.schlichtherle.truezip.key.MockView.Action.*;
  */
 @ThreadSafe
 public final class MockView<K extends SafeKey<K>> implements View<K> {
+    private volatile Action action = ENTER;
+    private volatile URI resource;
+    private volatile K key;
+    private volatile boolean changeRequested;
+
+    public Action getAction() {
+        return action;
+    }
+
+    public void setAction(final Action action) {
+        if (null == action)
+            throw new NullPointerException();
+        this.action = action;
+    }
+
+    public URI getResource() {
+        return resource;
+    }
+
+    public void setResource(final URI resource) {
+        this.resource = resource;
+    }
+
+    public K getKey() {
+        return key;
+    }
+
+    public void setKey(K key) {
+        this.key = key;
+    }
+
+    public boolean isChangeRequested() {
+        return changeRequested;
+    }
+
+    public void setChangeRequested(final boolean changeRequested) {
+        this.changeRequested = changeRequested;
+    }
+
+    @Override
+    public synchronized void
+    promptWriteKey(Controller<K> controller)
+    throws UnknownKeyException {
+        final URI resource = this.resource;
+        if (null != resource && !resource.equals(controller.getResource()))
+            throw new IllegalArgumentException();
+        controller.getKey();
+        try {
+            controller.setChangeRequested(true);
+            throw new IllegalArgumentException();
+        } catch (IllegalStateException expected) {
+        }
+        try {
+            controller.setChangeRequested(false);
+            throw new IllegalArgumentException();
+        } catch (IllegalStateException expected) {
+        }
+        action.promptWriteKey(controller, key);
+    }
+
+    @Override
+    public synchronized void
+    promptReadKey(Controller<K> controller, boolean invalid)
+    throws UnknownKeyException {
+        final URI resource = this.resource;
+        if (null != resource && !resource.equals(controller.getResource()))
+            throw new IllegalArgumentException();
+        try {
+            controller.getKey();
+            throw new IllegalArgumentException();
+        } catch (IllegalStateException expected) {
+        }
+        action.promptReadKey(controller, key, changeRequested);
+    }
 
     public enum Action {
         ENTER {
@@ -105,73 +179,4 @@ public final class MockView<K extends SafeKey<K>> implements View<K> {
         promptReadKey(Controller<? super K> controller, K key, boolean changeRequested)
         throws UnknownKeyException;
     } // enum Action
-
-    private volatile Action action = ENTER;
-    private volatile URI resource;
-    private volatile K key;
-    private volatile boolean changeRequested;
-
-    public Action getAction() {
-        return action;
-    }
-
-    public void setAction(final Action action) {
-        if (null == action)
-            throw new NullPointerException();
-        this.action = action;
-    }
-
-    public URI getResource() {
-        return resource;
-    }
-
-    public void setResource(final URI resource) {
-        this.resource = resource;
-    }
-
-    public K getKey() {
-        return key;
-    }
-
-    public void setKey(K key) {
-        this.key = key;
-    }
-
-    public boolean isChangeRequested() {
-        return changeRequested;
-    }
-
-    public void setChangeRequested(final boolean changeRequested) {
-        this.changeRequested = changeRequested;
-    }
-
-    @Override
-    public synchronized void
-    promptWriteKey(Controller<K> controller)
-    throws UnknownKeyException {
-        final URI resource = this.resource;
-        if (null != resource && !resource.equals(controller.getResource()))
-            throw new IllegalArgumentException();
-        try {
-            controller.setChangeRequested(true);
-            throw new IllegalArgumentException();
-        } catch (IllegalStateException expected) {
-        }
-        try {
-            controller.setChangeRequested(false);
-            throw new IllegalArgumentException();
-        } catch (IllegalStateException expected) {
-        }
-        action.promptWriteKey(controller, key);
-    }
-
-    @Override
-    public synchronized void
-    promptReadKey(Controller<K> controller, boolean invalid)
-    throws UnknownKeyException {
-        final URI resource = this.resource;
-        if (null != resource && !resource.equals(controller.getResource()))
-            throw new IllegalArgumentException();
-        action.promptReadKey(controller, key, changeRequested);
-    }
 }
