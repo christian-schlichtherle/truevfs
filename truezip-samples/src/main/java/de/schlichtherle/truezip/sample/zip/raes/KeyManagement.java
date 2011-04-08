@@ -18,9 +18,13 @@ package de.schlichtherle.truezip.sample.zip.raes;
 import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
 import de.schlichtherle.truezip.file.TDefaultArchiveDetector;
 import de.schlichtherle.truezip.file.TFile;
+import de.schlichtherle.truezip.fs.archive.zip.raes.PromptingKeyManagerService;
 import de.schlichtherle.truezip.fs.archive.zip.raes.SafeZipRaesDriver;
 import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.key.KeyProvider;
+import de.schlichtherle.truezip.key.PromptingKeyProvider;
+import de.schlichtherle.truezip.key.PromptingKeyProvider.Controller;
+import de.schlichtherle.truezip.key.PromptingKeyProvider.View;
 import de.schlichtherle.truezip.key.SafeKeyManager;
 import de.schlichtherle.truezip.key.SafeKeyProvider;
 import de.schlichtherle.truezip.key.sl.KeyManagerLocator;
@@ -85,6 +89,8 @@ public final class KeyManagement {
      * custom archive driver for the canonical archive file suffixes
      * {@code "tzp|zip.rae|zip.raes"} and installs the result as the
      * default archive detector using {@link TFile#setDefaultArchiveDetector}.
+     * The custom archive driver uses a custom {@link View} implementation for
+     * its {@link PromptingKeyManagerService}.
      * <p>
      * As another side effect, the key strength of the
      * {@link AesCipherParameters} is set to the maximum 256 bits.
@@ -95,7 +101,57 @@ public final class KeyManagement {
      *
      * @param password the password char array to be copied for subsequent use.
      */
-    public static void setAllPasswords(final char[] password) {
+    public static void setAllPasswords1(final char[] password) {
+        TFile.setDefaultArchiveDetector(
+                new TDefaultArchiveDetector(
+                    TDefaultArchiveDetector.ALL,
+                    "tzp|zip.rae|zip.raes",
+                    new SafeZipRaesDriver(
+                        IOPoolLocator.SINGLETON,
+                        new PromptingKeyManagerService(
+                            new SimpleView(password)))));
+    }
+
+    private static final class SimpleView
+    implements PromptingKeyProvider.View<AesCipherParameters> {
+        private final AesCipherParameters parameters = new AesCipherParameters();
+
+        public SimpleView(char[] password) {
+            parameters.setPassword(password);
+        }
+
+        @Override
+        public void promptWriteKey(Controller<AesCipherParameters> controller) {
+            controller.setKey(parameters);
+        }
+
+        @Override
+        public void promptReadKey(  Controller<AesCipherParameters> controller,
+                                    boolean invalid) {
+            controller.setKey(parameters);
+        }
+    } // class SimpleView
+
+    /**
+     * Sets the password for all RAES encrypted ZIP files.
+     * This method decorates {@link TDefaultArchiveDetector#ALL} with a
+     * custom archive driver for the canonical archive file suffixes
+     * {@code "tzp|zip.rae|zip.raes"} and installs the result as the
+     * default archive detector using {@link TFile#setDefaultArchiveDetector}.
+     * The custom archive driver uses a custom implementation of a
+     * {@link KeyManager} which requires considerably more code than the
+     * approach used in {@link #setAllPasswords1}.
+     * <p>
+     * As another side effect, the key strength of the
+     * {@link AesCipherParameters} is set to the maximum 256 bits.
+     * <p>
+     * This method makes a protective copy of the given password char array.
+     * It's highly recommended to overwrite this array with any non-password
+     * data after calling this method.
+     *
+     * @param password the password char array to be copied for subsequent use.
+     */
+    public static void setAllPasswords2(final char[] password) {
         TFile.setDefaultArchiveDetector(
                 new TDefaultArchiveDetector(
                     TDefaultArchiveDetector.ALL,

@@ -303,6 +303,7 @@ extends SafeKeyProvider<K> {
      */
     @DefaultAnnotation(NonNull.class)
     public interface View<K extends SafeKey<K>> {
+
         /**
          * Prompts the user for the key for (over)writing the contents of a
          * new or existing protected resource.
