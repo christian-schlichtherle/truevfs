@@ -26,14 +26,15 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 public interface SafeKey<K> /*extends Cloneable*/ {
 
     /**
-     * Returns a clone of this safe key or {@code this} if and only if the
-     * implementation is immutable.
+     * Returns a clone of this safe key or {@code this}
+     * if and only if the implementation is immutable.
      */
     @NonNull K clone();
 
     /**
      * Resets this safe key to it's initial state, wiping any data from heap,
-     * or does nothing if and only if the implementation is immutable.
+     * or does nothing
+     * if and only if the implementation is immutable.
      */
     void reset();
 }
