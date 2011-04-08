@@ -55,18 +55,6 @@ public interface Type0RaesParameters extends RaesParameters {
      */
     char[] getReadPassword(boolean invalid) throws RaesKeyException;
 
-    /** Defines the key strength for the AES algorithm. */
-    enum KeyStrength {
-        /** Enum identifier for a 128 bit ciphering key. */
-        BITS_128,
-
-        /** Enum identifier for a 192 bit ciphering key. */
-        BITS_192,
-
-        /** Enum identifier for a 256 bit ciphering key. */
-        BITS_256,
-    }
-
     /**
      * Returns the key strength to use for creating or overwriting the RAES file.
      *
@@ -85,4 +73,16 @@ public interface Type0RaesParameters extends RaesParameters {
      *         been called before and the implementation can't tolerate this.
      */
     void setKeyStrength(KeyStrength keyStrength);
+
+    /** Defines the key strength for the AES algorithm. */
+    enum KeyStrength {
+        /** Enum identifier for a 128 bit ciphering key. */
+        BITS_128,
+
+        /** Enum identifier for a 192 bit ciphering key. */
+        BITS_192,
+
+        /** Enum identifier for a 256 bit ciphering key. */
+        BITS_256,
+    }
 }
