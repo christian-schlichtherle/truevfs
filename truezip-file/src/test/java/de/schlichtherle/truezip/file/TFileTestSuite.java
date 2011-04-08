@@ -45,6 +45,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -66,11 +67,11 @@ public abstract class TFileTestSuite {
         }
     }
 
-    protected static final IOPoolProvider
-            IO_POOL_PROVIDER = new ByteArrayIOPoolProvider();
-
     private static final Logger logger = Logger.getLogger(
             TFileTestSuite.class.getName());
+
+    private static boolean lenientBackup;
+    private static TArchiveDetector detectorBackup;
 
     private static final String TEMP_FILE_PREFIX = "tzp";
 
@@ -81,6 +82,9 @@ public abstract class TFileTestSuite {
     static {
         rnd.nextBytes(DATA);
     }
+
+    protected static final IOPoolProvider
+            IO_POOL_PROVIDER = new ByteArrayIOPoolProvider();
     
     private final FsScheme scheme;
     private final FsArchiveDriver<?> driver;
@@ -97,18 +101,16 @@ public abstract class TFileTestSuite {
         this.driver = driver;
     }
 
-    /**
-     * A subclass must override this method to create the {@link #data}
-     * to be archived.
-     * It must also finally call this superclass implementation to create
-     * the temporary file to be used as an archive file.
-     */
+    @BeforeClass
+    public static void setUpClass() {
+        lenientBackup = TFile.isLenient();
+        detectorBackup = TFile.getDefaultArchiveDetector();
+    }
+
     @Before
     public void setUp() throws IOException {
-        TFile.setLenient(true); // Restore default
         TFile.setDefaultArchiveDetector(
                 new TDefaultArchiveDetector(scheme.toString(), driver));
-        TFile.umount();
         temp = createTempFile();
         assertTrue(temp.delete());
         archive = new TFile(temp);
@@ -116,7 +118,9 @@ public abstract class TFileTestSuite {
     }
 
     private File createTempFile() throws IOException {
-        return TFile.createTempFile(TEMP_FILE_PREFIX, getSuffix()).getCanonicalFile();
+        // TODO: Removing .getCanonicalFile() causes archive.deleteAll() to
+        // fail in testCopyContainingOrSameFiles() - explain why!
+        return File.createTempFile(TEMP_FILE_PREFIX, getSuffix()).getCanonicalFile();
     }
 
     protected final TFile getArchive() {
@@ -128,7 +132,7 @@ public abstract class TFileTestSuite {
     }
 
     @After
-    public void tearDown() throws IOException {
+    public void tearDown() {
         this.archive = null;
 
         // sync now to delete temps and free memory.
@@ -144,8 +148,8 @@ public abstract class TFileTestSuite {
         if (temp.exists() && !temp.delete())
             logger.log(Level.WARNING, "{0} (could not delete)", temp);
 
-        TFile.setDefaultArchiveDetector(TDefaultArchiveDetector.ALL); // restore default
-        TFile.setLenient(true); // Restore default
+        TFile.setDefaultArchiveDetector(detectorBackup);
+        TFile.setLenient(lenientBackup);
     }
 
     private static TFile newNonArchiveFile(TFile file) {
@@ -823,22 +827,22 @@ public abstract class TFileTestSuite {
         try {
             TFile.cp(a, a);
             fail("Expected IOException");
-        } catch (IOException sfe) {
+        } catch (IOException expected) {
         }
         try {
             TFile.cp(a, b);
             fail("Expected IOException");
-        } catch (IOException sfe) {
+        } catch (IOException expected) {
         }
         try {
             TFile.cp(b, a);
             fail("Expected IOException");
-        } catch (IOException sfe) {
+        } catch (IOException expected) {
         }
         try {
             TFile.cp(b, b);
             fail("Expected IOException");
-        } catch (IOException sfe) {
+        } catch (IOException expected) {
         }
     }
 
