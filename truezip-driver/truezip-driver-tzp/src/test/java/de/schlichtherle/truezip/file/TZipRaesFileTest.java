@@ -16,16 +16,12 @@
 package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.key.MockView;
-import de.schlichtherle.truezip.key.PromptingKeyProvider.View;
-import de.schlichtherle.truezip.key.PromptingKeyManager;
-import java.util.ServiceConfigurationError;
 import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
-import de.schlichtherle.truezip.key.KeyManagerProvider;
 import java.io.File;
 import de.schlichtherle.truezip.fs.archive.zip.raes.SafeZipRaesDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
+import de.schlichtherle.truezip.fs.archive.zip.raes.PromptingKeyManagerService;
 import de.schlichtherle.truezip.fs.archive.zip.raes.ZipRaesDriver.KeyProviderSyncStrategy;
-import de.schlichtherle.truezip.key.KeyManager;
 import java.io.IOException;
 import org.junit.Test;
 
@@ -43,7 +39,8 @@ public final class TZipRaesFileTest extends TFileTestSuite {
 
     public TZipRaesFileTest() {
         super(  FsScheme.create("tzp"),
-                new SafeZipRaesDriver(IO_POOL_PROVIDER, new MockKeyManagerProvider(view)) {
+                new SafeZipRaesDriver(  IO_POOL_PROVIDER,
+                                        new PromptingKeyManagerService(view)) {
             @Override
             public KeyProviderSyncStrategy getKeyProviderSyncStrategy() {
                 return KeyProviderSyncStrategy.RESET_UNCONDITIONALLY;
@@ -129,21 +126,4 @@ public final class TZipRaesFileTest extends TFileTestSuite {
         view.setAction(ENTER);
         assertTrue(archive.deleteAll());
     }
-
-    private static class MockKeyManagerProvider implements KeyManagerProvider {
-
-        private final PromptingKeyManager<AesCipherParameters> manager;
-
-        public MockKeyManagerProvider(View<AesCipherParameters> view) {
-            this.manager = new PromptingKeyManager<AesCipherParameters>(view);
-        }
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public <K> KeyManager<K> get(Class<K> type) {
-            if (type.isAssignableFrom(AesCipherParameters.class))
-                return (KeyManager<K>) manager;
-            throw new ServiceConfigurationError("No key manager available for " + type);
-        }
-    } // CustomKeyManagerService
 }
