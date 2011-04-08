@@ -99,7 +99,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 public interface KeyProvider<K> {
 
     /** A factory for key providers. */
-    public interface Factory<K, P extends KeyProvider<K>> {
+    public interface Factory<P extends KeyProvider<?>> {
 
         /**
          * Returns a new key provider.

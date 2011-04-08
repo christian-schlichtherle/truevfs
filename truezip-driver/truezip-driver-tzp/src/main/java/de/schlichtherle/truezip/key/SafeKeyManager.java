@@ -34,15 +34,14 @@ public class SafeKeyManager<K extends SafeKey<K>, P extends SafeKeyProvider<K>>
 implements KeyManager<K> {
 
     private final Map<URI, P> providers = new HashMap<URI, P>();
-    private final KeyProvider.Factory<? extends K, ? extends P> factory;
+    private final KeyProvider.Factory<? extends P> factory;
 
     /**
      * Constructs a new default key manager.
      *
      * @param factory the factory for creating new key providers.
      */
-    public SafeKeyManager(
-            final KeyProvider.Factory<? extends K, ? extends P> factory) {
+    public SafeKeyManager(final KeyProvider.Factory<? extends P> factory) {
         if (null == factory)
             throw new NullPointerException();
         this.factory = factory;
