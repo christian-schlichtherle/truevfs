@@ -62,47 +62,6 @@ import static de.schlichtherle.truezip.zip.ZipEntry.*;
 @DefaultAnnotation(NonNull.class)
 public abstract class ZipRaesDriver extends JarDriver {
 
-    /**
-     * Defines strategies for updating a key provider once a RAES encrypted
-     * ZIP file has been successfully synchronized.
-     */
-    public enum KeyProviderSyncStrategy {
-
-        /**
-         * Calls {@link PromptingKeyProvider#resetCancelledKey}
-         * if and only if the given provider is a {@link PromptingKeyProvider}.
-         */
-        RESET_CANCELLED_KEY {
-            @Override
-            public void sync(KeyProvider<?> provider) {
-                if (provider instanceof PromptingKeyProvider<?>)
-                    ((PromptingKeyProvider<?>) provider).resetCancelledKey();
-            }
-        },
-
-        /**
-         * Calls {@link PromptingKeyProvider#resetUnconditionally}
-         * if and only if the given provider is a {@link PromptingKeyProvider}.
-         */
-        RESET_UNCONDITIONALLY {
-            @Override
-            public void sync(KeyProvider<?> provider) {
-                if (provider instanceof PromptingKeyProvider<?>)
-                    ((PromptingKeyProvider<?>) provider).resetUnconditionally();
-            }
-        };
-
-        /**
-         * This method is called upon a call to
-         * {@link ZipRaesController#sync} after a successful
-         * synchronization of a RAES encrypted ZIP file.
-         *
-         * @param provider the key provider for the RAES encrypted ZIP file
-         *        which has been successfully synchronized.
-         */
-        public abstract void sync(KeyProvider<?> provider);
-    } // enum KeyProviderSyncStrategy
-
     private final KeyManagerProvider keyManagerProvider;
 
     /**
@@ -281,4 +240,45 @@ public abstract class ZipRaesDriver extends JarDriver {
         return new KeyManagerRaesParameters(getKeyManagerProvider(),
                                             model.getMountPoint().getUri());
     }
+
+    /**
+     * Defines strategies for updating a key provider once a RAES encrypted
+     * ZIP file has been successfully synchronized.
+     */
+    public enum KeyProviderSyncStrategy {
+
+        /**
+         * Calls {@link PromptingKeyProvider#resetCancelledKey}
+         * if and only if the given provider is a {@link PromptingKeyProvider}.
+         */
+        RESET_CANCELLED_KEY {
+            @Override
+            public void sync(KeyProvider<?> provider) {
+                if (provider instanceof PromptingKeyProvider<?>)
+                    ((PromptingKeyProvider<?>) provider).resetCancelledKey();
+            }
+        },
+
+        /**
+         * Calls {@link PromptingKeyProvider#resetUnconditionally}
+         * if and only if the given provider is a {@link PromptingKeyProvider}.
+         */
+        RESET_UNCONDITIONALLY {
+            @Override
+            public void sync(KeyProvider<?> provider) {
+                if (provider instanceof PromptingKeyProvider<?>)
+                    ((PromptingKeyProvider<?>) provider).resetUnconditionally();
+            }
+        };
+
+        /**
+         * This method is called upon a call to
+         * {@link ZipRaesController#sync} after a successful
+         * synchronization of a RAES encrypted ZIP file.
+         *
+         * @param provider the key provider for the RAES encrypted ZIP file
+         *        which has been successfully synchronized.
+         */
+        public abstract void sync(KeyProvider<?> provider);
+    } // enum KeyProviderSyncStrategy
 }
