@@ -226,10 +226,6 @@ public abstract class ZipRaesDriver extends JarDriver {
         return super.newOutputShop(model, new Output(), source);
     }
 
-    final KeyManagerProvider getKeyManagerProvider() {
-        return keyManagerProvider;
-    }
-
     /**
      * Returns the {@link RaesParameters} for the given file system model.
      * 
@@ -239,6 +235,10 @@ public abstract class ZipRaesDriver extends JarDriver {
     final RaesParameters getRaesParameters(FsModel model) {
         return new KeyManagerRaesParameters(getKeyManagerProvider(),
                                             model.getMountPoint().getUri());
+    }
+
+    final KeyManagerProvider getKeyManagerProvider() {
+        return keyManagerProvider;
     }
 
     /**
