@@ -71,8 +71,6 @@ public final class KeyManagement {
     public static void setPassword(final TFile file, final char[] password) {
         if (!file.isArchive())
             throw new IllegalArgumentException(file + " (not an archive file)");
-        if (null == password)
-            throw new NullPointerException();
         AesCipherParameters params = new AesCipherParameters();
         params.setPassword(password);
         Arrays.fill(password, (char) 0);
@@ -85,6 +83,10 @@ public final class KeyManagement {
 
     /**
      * Sets the password for all RAES encrypted ZIP files.
+     * <em>Important:</em> This method installs a new default archive detector
+     * using {@link TFile#setDefaultArchiveDetector}.
+     * This will affect only subsequently created {@link TFile} objects!
+     * <p>
      * This method decorates {@link TDefaultArchiveDetector#ALL} with a
      * custom archive driver for the canonical archive file suffixes
      * {@code "tzp|zip.rae|zip.raes"} and installs the result as the
@@ -92,7 +94,7 @@ public final class KeyManagement {
      * The custom archive driver uses a custom {@link View} implementation for
      * its {@link PromptingKeyManagerService}.
      * <p>
-     * As another side effect, the key strength of the
+     * The key strength for all archive files 
      * {@link AesCipherParameters} is set to the maximum 256 bits.
      * <p>
      * This method makes a protective copy of the given password char array.
@@ -114,26 +116,32 @@ public final class KeyManagement {
 
     private static final class SimpleView
     implements PromptingKeyProvider.View<AesCipherParameters> {
-        private final AesCipherParameters parameters = new AesCipherParameters();
+        private final AesCipherParameters params = new AesCipherParameters();
 
         public SimpleView(char[] password) {
-            parameters.setPassword(password);
+            if (null == password)
+                throw new NullPointerException();
+            params.setPassword(password);
         }
 
         @Override
         public void promptWriteKey(Controller<AesCipherParameters> controller) {
-            controller.setKey(parameters);
+            controller.setKey(params);
         }
 
         @Override
         public void promptReadKey(  Controller<AesCipherParameters> controller,
                                     boolean invalid) {
-            controller.setKey(parameters);
+            controller.setKey(params);
         }
     } // class SimpleView
 
     /**
      * Sets the password for all RAES encrypted ZIP files.
+     * <em>Important:</em> This method installs a new default archive detector
+     * using {@link TFile#setDefaultArchiveDetector}.
+     * This will affect only subsequently created {@link TFile} objects!
+     * <p>
      * This method decorates {@link TDefaultArchiveDetector#ALL} with a
      * custom archive driver for the canonical archive file suffixes
      * {@code "tzp|zip.rae|zip.raes"} and installs the result as the
