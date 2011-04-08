@@ -27,21 +27,17 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * The protected resource is not even explicitly modelled in this interface.
  * So in order to use it, an instance must be associated with a protected
  * resource by a third party - this is the job of the {@link KeyManager} class.
- * Because the protected resource is not modelled within this interface,
- * it is at the discretion of the provider implementation whether its
- * instances may or may not be shared among protected resources.
- * If they do, then all associated protected resources share the same key.
  * <p>
  * Once an instance has been associated to a protected resource, the client
  * application is assumed to use the key for two basic operations:
  * <ol>
- * <li>A key is required in order to create a new protected resource or
- *     entirely replace its contents.
+ * <li>The key is used in order to create a new protected resource or entirely
+ *     replace its contents.
  *     This implies that the key does not need to be authenticated.
  *     For this purpose, client applications call the method
  *     {@link #getWriteKey}.
- * <li>A key is required in order to open an already existing protected
- *     resource for access to its contents.
+ * <li>The key is used in order to open an already existing protected resource
+ *     for access to its contents.
  *     This implies that the key needs to be authenticated by the client
  *     application.
  *     For this purpose, client applications call the method
@@ -97,17 +93,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  */
 @DefaultAnnotation(NonNull.class)
 public interface KeyProvider<K> {
-
-    /** A factory for key providers. */
-    public interface Factory<P extends KeyProvider<?>> {
-
-        /**
-         * Returns a new key provider.
-         *
-         * @return a new key provider.
-         */
-        P newKeyProvider();
-    } // interface Factory
 
     /**
      * Returns the key for (over)writing the contents of a new or existing
@@ -165,4 +150,15 @@ public interface KeyProvider<K> {
      *        as if prompting for the key had been disabled or cancelled.
      */
     void setKey(@CheckForNull K key);
+
+    /** A factory for key providers. */
+    public interface Factory<P extends KeyProvider<?>> {
+
+        /**
+         * Returns a new key provider.
+         *
+         * @return a new key provider.
+         */
+        P newKeyProvider();
+    } // interface Factory
 }
