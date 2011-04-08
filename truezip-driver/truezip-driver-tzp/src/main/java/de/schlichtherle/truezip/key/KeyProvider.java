@@ -116,7 +116,7 @@ public interface KeyProvider<K> {
      * by the application.
      * <p>
      * Subsequent calls to this method return an object which at least compares
-     * {@link Object#equals equal} to the previously returned object, but is
+     * {@link Object#equals equal} to any previously returned object, but is
      * not necessarily the same.
      *
      * @return the key object.
@@ -134,7 +134,7 @@ public interface KeyProvider<K> {
      * <p>
      * Unless {@code invalid} is {@code true}, subsequent calls to this method
      * return an object which at least compares {@link Object#equals equal} to
-     * the previously returned object, but is not necessarily the same.
+     * any previously returned object, but is not necessarily the same.
      * <p>
      * <b>Important:</b> From an application's perspective, a
      * {@code KeyProvider} is not trustworthy!
