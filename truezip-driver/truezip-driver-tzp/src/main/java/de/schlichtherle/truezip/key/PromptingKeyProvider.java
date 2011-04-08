@@ -461,7 +461,7 @@ extends SafeKeyProvider<K> {
 
     /** A factory for {@link PromptingKeyProvider}s. */
     public static final class Factory<K extends SafeKey<K>>
-    implements KeyProvider.Factory<K, PromptingKeyProvider<K>> {
+    implements KeyProvider.Factory<PromptingKeyProvider<K>> {
         @Override
         public PromptingKeyProvider<K> newKeyProvider() {
             return new PromptingKeyProvider<K>();
