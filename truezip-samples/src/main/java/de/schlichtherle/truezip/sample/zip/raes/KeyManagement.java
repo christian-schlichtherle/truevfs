@@ -36,8 +36,8 @@ import java.util.Arrays;
 import java.util.ServiceConfigurationError;
 
 /**
- * Provides static utility methods to demonstrate various approaches to set
- * the password for one or more RAES encrypted ZIP files programmatically.
+ * Provides static utility methods to set passwords for RAES encrypted ZIP
+ * files programmatically.
  * Use whatever approach fits your needs best when you want to set the password
  * programmatically instead of prompting the user for a key by means of the
  * default Swing or Console based user interfaces.
@@ -68,6 +68,7 @@ public final class KeyManagement {
      * @param file the TZP archive file to set the password for.
      * @param password the password char array to be copied for subsequent use.
      */
+    // START SNIPPET: setPassword
     public static void setPassword(final TFile file, final char[] password) {
         if (!file.isArchive())
             throw new IllegalArgumentException(file + " (not an archive file)");
@@ -80,6 +81,7 @@ public final class KeyManagement {
                 .getKeyProvider(file.toURI())
                 .setKey(params);
     }
+    // END SNIPPET: setPassword
 
     /**
      * Sets the password for all RAES encrypted ZIP files.
@@ -103,6 +105,7 @@ public final class KeyManagement {
      *
      * @param password the password char array to be copied for subsequent use.
      */
+    // START SNIPPET: setAllPasswords1
     public static void setAllPasswords1(final char[] password) {
         TFile.setDefaultArchiveDetector(
                 new TDefaultArchiveDetector(
@@ -135,6 +138,7 @@ public final class KeyManagement {
             controller.setKey(params);
         }
     } // class SimpleView
+    // END SNIPPET: setAllPasswords1
 
     /**
      * Sets the password for all RAES encrypted ZIP files.
@@ -159,13 +163,15 @@ public final class KeyManagement {
      *
      * @param password the password char array to be copied for subsequent use.
      */
+    // START SNIPPET: setAllPasswords2
     public static void setAllPasswords2(final char[] password) {
         TFile.setDefaultArchiveDetector(
                 new TDefaultArchiveDetector(
                     TDefaultArchiveDetector.ALL,
                     "tzp|zip.rae|zip.raes",
-                    new SafeZipRaesDriver(  IOPoolLocator.SINGLETON,
-                                            new SimpleKeyManagerService(password))));
+                    new SafeZipRaesDriver(
+                        IOPoolLocator.SINGLETON,
+                        new SimpleKeyManagerService(password))));
     }
 
     private static final class SimpleKeyManagerService
@@ -174,7 +180,7 @@ public final class KeyManagement {
 
         SimpleKeyManagerService(final char[] password) {
             manager = new SafeKeyManager<AesCipherParameters, SimpleKeyProvider>(
-                        new SimpleKeyProviderFactory(password));
+                    new SimpleKeyProviderFactory(password));
         }
 
         @Override
@@ -223,4 +229,5 @@ public final class KeyManagement {
             this.key = key.clone();
         }
     } // class SimpleKeyProvider
+    // END SNIPPET: setAllPasswords2
 }

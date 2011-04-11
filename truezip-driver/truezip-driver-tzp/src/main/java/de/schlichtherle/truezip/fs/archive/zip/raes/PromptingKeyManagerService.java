@@ -36,6 +36,7 @@ import net.jcip.annotations.Immutable;
 @Immutable
 @DefaultAnnotation(NonNull.class)
 public final class PromptingKeyManagerService extends KeyManagerService {
+
     private final PromptingKeyManager<AesCipherParameters> manager;
 
     /**
