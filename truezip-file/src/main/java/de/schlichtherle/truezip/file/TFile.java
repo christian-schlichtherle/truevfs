@@ -58,7 +58,6 @@ import java.util.List;
 import java.util.ServiceConfigurationError;
 import java.util.Set;
 import java.util.TreeSet;
-import javax.inject.Inject;
 import javax.swing.Icon;
 import javax.swing.filechooser.FileSystemView;
 import net.jcip.annotations.Immutable;
@@ -347,7 +346,6 @@ public final class TFile extends File {
                 new TreeSet<File>(Arrays.asList(listRoots())));
 
     /** The file system manager to use within this package. */
-    @Inject
     static final FsManager manager = FsManagerLocator.SINGLETON.get();
 
     private static TArchiveDetector
@@ -1109,7 +1107,6 @@ public final class TFile extends File {
      *        explicitly passed to the constructor
      * @see   #getDefaultArchiveDetector()
      */
-    @Inject
     public static void setDefaultArchiveDetector(TArchiveDetector detector) {
         if (null == detector)
             throw new NullPointerException();

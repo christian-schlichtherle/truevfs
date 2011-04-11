@@ -16,7 +16,6 @@
 package de.schlichtherle.truezip.fs;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
-import javax.inject.Provider;
 
 /**
  * A provider for the singleton file system manager.
@@ -26,7 +25,7 @@ import javax.inject.Provider;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface FsManagerProvider extends Provider<FsManager> {
+public interface FsManagerProvider {
 
     /**
      * Returns the singleton file system manager.
@@ -37,6 +36,5 @@ public interface FsManagerProvider extends Provider<FsManager> {
      *
      * @return The file system manager.
      */
-    @Override
     @NonNull FsManager get();
 }

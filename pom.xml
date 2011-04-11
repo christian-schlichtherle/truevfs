@@ -22,7 +22,7 @@
     <parent>
         <groupId>de.schlichtherle</groupId>
         <artifactId>asl20-oss-parent</artifactId>
-        <version>12</version>
+        <version>13</version>
     </parent>
 
     <groupId>de.schlichtherle.truezip</groupId>
@@ -86,11 +86,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>javax.inject</groupId>
-                <artifactId>javax.inject</artifactId>
-                <version>1</version>
-            </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>truezip-driver-file</artifactId>
