@@ -73,105 +73,19 @@ import static de.schlichtherle.truezip.io.Paths.isRoot;
 public final class FsDefaultArchiveController<E extends FsArchiveEntry>
 extends FsFileSystemArchiveController<E> {
 
-    private static final BitField<FsOutputOption> MOUNT_MASK
-            = BitField.of(CREATE_PARENTS);
+    private static final BitField<FsOutputOption>
+            MOUNT_MASK = BitField.of(CREATE_PARENTS);
 
-    private static final BitField<FsInputOption> MOUNT_INPUT_OPTIONS
-            = BitField.of(FsInputOption.CACHE);
+    private static final BitField<FsInputOption>
+            MOUNT_INPUT_OPTIONS = BitField.of(FsInputOption.CACHE);
 
-    private static final BitField<FsOutputOption> MAKE_OUTPUT_OPTIONS
-            = BitField.noneOf(FsOutputOption.class);
+    private static final BitField<FsOutputOption>
+            MAKE_OUTPUT_OPTIONS = BitField.noneOf(FsOutputOption.class);
 
-    private static final BitField<FsSyncOption> SYNC_OPTIONS
-            = BitField.of(WAIT_CLOSE_INPUT, WAIT_CLOSE_OUTPUT, CLEAR_CACHE);
-
-    /** A dummy input service to substitute for {@code null}. */
-    private static final class DummyInputService<E extends Entry>
-    implements InputShop<E> {
-
-        @Override
-        public void close() throws IOException {
-        }
-
-        @Override
-        public int getSize() {
-            return 0;
-        }
-
-        @SuppressWarnings({ "unchecked", "rawtypes" })
-		@Override
-        public Iterator<E> iterator() {
-            return (Iterator) Collections.emptyList().iterator();
-        }
-
-        @Override
-        public E getEntry(String name) {
-            return null;
-        }
-
-        @Override
-        public InputSocket<? extends E> getInputSocket(String name) {
-            if (null == name)
-                throw new NullPointerException();
-            throw new UnsupportedOperationException();
-        }
-    }
-
-    /**
-     * This member class makes this archive controller instance strongly
-     * reachable from any created input stream.
-     * This is required by the memory management to ensure that for any
-     * prospective archive file at most one archive controller object is in
-     * use at any time.
-     */
-    private final class Input extends ConcurrentInputShop<E> {
-        Input(InputShop<E> input) {
-            super(input);
-        }
-
-        /** Returns the product of the archive driver this input is wrapping. */
-        InputShop<E> getDelegate() {
-            return delegate;
-        }
-    }
-
-    /**
-     * This member class makes this archive controller instance strongly
-     * reachable from any created output stream.
-     * This is required by the memory management to ensure that for any
-     * prospective archive file at most one archive controller object is in
-     * use at any time.
-     */
-    private final class Output extends ConcurrentOutputShop<E> {
-        Output(OutputShop<E> output) {
-            super(output);
-        }
-
-        /** Returns the product of the archive driver this output is wrapping. */
-        OutputShop<E> getDelegate() {
-            return delegate;
-        }
-    }
-
-    /**
-     * An archive file system listener which makes the output before it
-     * touches the file system model.
-     */
-    private final class TouchListener
-    implements FsArchiveFileSystemTouchListener<E> {
-        @Override
-        public void beforeTouch(FsArchiveFileSystemEvent<? extends E> event)
-        throws IOException {
-            assert event.getSource() == getFileSystem();
-            makeOutput(MAKE_OUTPUT_OPTIONS, getFileSystem().getEntry(ROOT));
-        }
-
-        @Override
-        public void afterTouch(FsArchiveFileSystemEvent<? extends E> event) {
-            assert event.getSource() == getFileSystem();
-            getModel().setTouched(true);
-        }
-    }
+    private static final BitField<FsSyncOption>
+            SYNC_OPTIONS = BitField.of( WAIT_CLOSE_INPUT,
+                                        WAIT_CLOSE_OUTPUT,
+                                        CLEAR_CACHE);
 
     private final FsArchiveDriver<E> driver;
     private final FsController<?> parent;
@@ -553,4 +467,92 @@ extends FsFileSystemArchiveController<E> {
         final FsArchiveFileSystem<E> fileSystem = getFileSystem();
         return null != fileSystem && fileSystem.isTouched();
     }
+
+    /** A dummy input service to substitute for {@code null}. */
+    private static final class DummyInputService<E extends Entry>
+    implements InputShop<E> {
+
+        @Override
+        public void close() throws IOException {
+        }
+
+        @Override
+        public int getSize() {
+            return 0;
+        }
+
+        @SuppressWarnings({ "unchecked", "rawtypes" })
+		@Override
+        public Iterator<E> iterator() {
+            return (Iterator) Collections.emptyList().iterator();
+        }
+
+        @Override
+        public E getEntry(String name) {
+            return null;
+        }
+
+        @Override
+        public InputSocket<? extends E> getInputSocket(String name) {
+            if (null == name)
+                throw new NullPointerException();
+            throw new UnsupportedOperationException();
+        }
+    } // class DummyInputService
+
+    /**
+     * This member class makes this archive controller instance strongly
+     * reachable from any created input stream.
+     * This is required by the memory management to ensure that for any
+     * prospective archive file at most one archive controller object is in
+     * use at any time.
+     */
+    private final class Input extends ConcurrentInputShop<E> {
+        Input(InputShop<E> input) {
+            super(input);
+        }
+
+        /** Returns the product of the archive driver this input is wrapping. */
+        InputShop<E> getDelegate() {
+            return delegate;
+        }
+    } // class Input
+
+    /**
+     * This member class makes this archive controller instance strongly
+     * reachable from any created output stream.
+     * This is required by the memory management to ensure that for any
+     * prospective archive file at most one archive controller object is in
+     * use at any time.
+     */
+    private final class Output extends ConcurrentOutputShop<E> {
+        Output(OutputShop<E> output) {
+            super(output);
+        }
+
+        /** Returns the product of the archive driver this output is wrapping. */
+        OutputShop<E> getDelegate() {
+            return delegate;
+        }
+    } // class Output
+
+    /**
+     * An archive file system listener which makes the output before it
+     * touches the file system model.
+     */
+    private final class TouchListener
+    implements FsArchiveFileSystemTouchListener<E> {
+        @Override
+        public void beforeTouch(FsArchiveFileSystemEvent<? extends E> event)
+        throws IOException {
+            assert event.getSource() == getFileSystem();
+            makeOutput(MAKE_OUTPUT_OPTIONS, getFileSystem().getEntry(ROOT));
+        }
+
+        @Override
+        public void afterTouch(FsArchiveFileSystemEvent<? extends E> event) {
+            assert event.getSource() == getFileSystem();
+            getModel().setTouched(true);
+        }
+    } // class TouchListener
 }
