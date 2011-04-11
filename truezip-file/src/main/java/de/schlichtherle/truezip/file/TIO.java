@@ -48,6 +48,12 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 @Immutable
 final class TIO {
 
+    private static final BitField<FsInputOption>
+            NONEOF_INPUT_OPTIONS = BitField.noneOf(FsInputOption.class);
+
+    private static final BitField<FsOutputOption>
+            NONEOF_OUTPUT_OPTIONS = BitField.noneOf(FsOutputOption.class);
+
     /** You cannot instantiate this class. */
     private TIO() {
     }
@@ -153,7 +159,7 @@ final class TIO {
         copyAll0(preserve, src, dst, srcDetector, dstDetector);
     }
 
-    /** Unchecked parameters version. */
+    /* Unchecked parameters version. */
     private static void
     copyAll0(   final boolean preserve,
                 final File src,
@@ -224,17 +230,15 @@ final class TIO {
         copy0(preserve, src, dst);
     }
 
-    /** Unchecked parameters version. */
+    /* Unchecked parameters version. */
     private static void
     copy0(  final boolean preserve,
             final File src,
             final File dst)
     throws IOException {
-        final InputSocket<?> input = getInputSocket(src,
-                BitField.noneOf(FsInputOption.class));
+        final InputSocket<?> input = getInputSocket(src, NONEOF_INPUT_OPTIONS);
         final OutputSocket<?> output = getOutputSocket(dst,
-                BitField.noneOf(FsOutputOption.class)
-                    .set(CREATE_PARENTS, TFile.isLenient()),
+                NONEOF_OUTPUT_OPTIONS.set(CREATE_PARENTS, TFile.isLenient()),
                 preserve ? input.getLocalTarget() : null);
         IOSocket.copy(input, output);
     }
