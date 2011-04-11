@@ -21,7 +21,6 @@ import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
-import javax.inject.Singleton;
 import net.jcip.annotations.ThreadSafe;
 
 import static de.schlichtherle.truezip.fs.FsSyncOption.*;
@@ -37,7 +36,6 @@ import static de.schlichtherle.truezip.fs.FsSyncOption.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-@Singleton
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
 public abstract class FsManager

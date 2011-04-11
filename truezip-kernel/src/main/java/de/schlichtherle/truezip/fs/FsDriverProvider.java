@@ -17,7 +17,6 @@ package de.schlichtherle.truezip.fs;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Map;
-import javax.inject.Provider;
 
 /**
  * A provider for an immutable map of file system schemes to drivers.
@@ -27,7 +26,7 @@ import javax.inject.Provider;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface FsDriverProvider extends Provider<Map<FsScheme, FsDriver>> {
+public interface FsDriverProvider {
 
     /**
      * Returns an immutable map of file system schemes to drivers.
@@ -40,6 +39,5 @@ public interface FsDriverProvider extends Provider<Map<FsScheme, FsDriver>> {
      *
      * @return An immutable map of file system schemes to drivers.
      */
-    @Override
     @NonNull Map<FsScheme, FsDriver> get();
 }

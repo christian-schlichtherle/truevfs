@@ -16,7 +16,6 @@
 package de.schlichtherle.truezip.socket;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
-import javax.inject.Provider;
 
 /**
  * A provider for an I/O pool.
@@ -26,7 +25,7 @@ import javax.inject.Provider;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface IOPoolProvider extends Provider<IOPool<?>> {
+public interface IOPoolProvider {
 
     /**
      * Returns an I/O pool.
@@ -36,6 +35,5 @@ public interface IOPoolProvider extends Provider<IOPool<?>> {
      *
      * @return An I/O pool.
      */
-    @Override
     @NonNull IOPool<?> get();
 }
