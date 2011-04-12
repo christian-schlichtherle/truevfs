@@ -209,9 +209,9 @@ public final class TFileTreeModel implements TreeModel {
     /**
      * Creates {@code node} as a new file in the file system
      * and updates the tree accordingly.
-     * However, the current selection may get lost.
      * If you would like to create a new file with initial content, please
-     * use {@link #copyFrom(de.schlichtherle.truezip.file.TFile, InputStream)}.
+     * use {@link #copyFrom(TFile, InputStream)} instead.
+     * Note that the current selection may get lost.
      *
      * @return Whether or not the file has been newly created.
      * @throws IOException If an I/O error occurs.
@@ -227,7 +227,7 @@ public final class TFileTreeModel implements TreeModel {
     /**
      * Creates {@code node} as a new directory
      * and updates the tree accordingly.
-     * However, the current selection may get lost.
+     * Note that the current selection may get lost.
      *
      * @return Whether or not the file has been newly created.
      * @throws IOException If an I/O error occurs.
@@ -242,7 +242,7 @@ public final class TFileTreeModel implements TreeModel {
     /**
      * Creates {@code node} as a new directory, including all parents,
      * and updates the tree accordingly.
-     * However, the current selection may get lost.
+     * Note that the current selection may get lost.
      *
      * @return Whether or not the file has been newly created.
      * @throws IOException If an I/O error occurs.
@@ -257,79 +257,81 @@ public final class TFileTreeModel implements TreeModel {
     /**
      * Creates {@code node} as a new file with the contents read from
      * {@code in} and updates the tree accordingly.
-     * However, the current selection may get lost.
-     * Note that the given stream is <em>always</em> closed.
+     * Note that the given stream is <em>always</em> closed and
+     * that the current selection may get lost.
      *
-     * @return Whether or not the file has been newly created.
-     * @throws IOException If an I/O error occurs.
+     * @throws IOException if copying the data fails for some reason.
      */
-    public boolean copyFrom(final TFile node, final InputStream in) {
-        if (!node.copyFrom(in))
-            return false;
+    public void copyFrom(final TFile node, final InputStream in)
+    throws IOException {
+        TFile.cp(in, node);
         nodeInsertedOrStructureChanged(node);
-        return true;
     }
 
     /**
      * Copies {@code oldNode} to {@code node}
      * and updates the tree accordingly.
-     * However, the current selection may get lost.
+     * Note that the current selection may get lost.
      *
-     * @return Whether or not the file has been successfully renamed.
+     * @throws IOException if copying the data fails for some reason.
      */
-    public boolean copyTo(final TFile oldNode, final TFile node) {
-        if (!oldNode.copyTo(node))
-            return false;
+    public void copyTo(final TFile oldNode, final TFile node)
+    throws IOException {
+        TFile.cp(oldNode, node);
         nodeInsertedOrStructureChanged(node);
-        return true;
     }
 
     /**
      * Copies {@code oldNode} to {@code node} recursively
      * and updates the tree accordingly.
-     * However, the current selection may get lost.
+     * Note that the current selection may get lost.
      *
-     * @return Whether or not the file has been successfully renamed.
+     * @throws IOException if copying the data fails for some reason.
      */
-    public boolean copyAllTo(final TFile oldNode, final TFile node) {
-        final boolean ok = oldNode.copyAllTo(node);
-        nodeInsertedOrStructureChanged(node);
-        return ok;
+    public void copyAllTo(final TFile oldNode, final TFile node)
+    throws IOException {
+        try {
+            TFile.cp_r(oldNode, node);
+        } finally {
+            nodeInsertedOrStructureChanged(node);
+        }
     }
 
     /**
      * Copies {@code oldNode} to {@code node}, preserving
      * its last modification time
      * and updates the tree accordingly.
-     * However, the current selection may get lost.
+     * Note that the current selection may get lost.
      *
-     * @return Whether or not the file has been successfully renamed.
+     * @throws IOException if copying the data fails for some reason.
      */
-    public boolean archiveCopyTo(final TFile oldNode, final TFile node) {
-        if (!oldNode.archiveCopyTo(node))
-            return false;
+    public void archiveCopyTo(final TFile oldNode, final TFile node)
+    throws IOException {
+        TFile.cp_p(oldNode, node);
         nodeInsertedOrStructureChanged(node);
-        return true;
     }
 
     /**
      * Copies {@code oldNode} to {@code node} recursively, preserving
      * its last modification time
      * and updates the tree accordingly.
-     * However, the current selection may get lost.
+     * Note that the current selection may get lost.
      *
-     * @return Whether or not the file has been successfully renamed.
+     * @throws IOException if copying the data fails for some reason.
      */
-    public boolean archiveCopyAllTo(final TFile oldNode, final TFile node) {
-        final boolean ok = oldNode.archiveCopyAllTo(node);
-        nodeInsertedOrStructureChanged(node);
-        return ok;
+    public void archiveCopyAllTo(final TFile oldNode, final TFile node)
+    throws IOException {
+        try {
+            TFile.cp_rp(oldNode, node);
+        } finally {
+            nodeInsertedOrStructureChanged(node);
+        }
     }
 
     /**
      * Renames {@code oldNode} to {@code newNode}
      * and updates the tree accordingly.
-     * However, the current selection may get lost.
+     * Note that the current selection may get lost.
      *
      * @return Whether or not the file has been successfully renamed.
      */
@@ -344,7 +346,7 @@ public final class TFileTreeModel implements TreeModel {
     /**
      * Deletes the file or empty directory {@code node}
      * and updates the tree accordingly.
-     * However, the current selection may get lost.
+     * Note that the current selection may get lost.
      *
      * @return Whether or not the file or directory has been successfully deleted.
      * @throws IOException If an I/O error occurs.
@@ -359,7 +361,7 @@ public final class TFileTreeModel implements TreeModel {
     /**
      * Deletes the file or (probably not empty) directory {@code node}
      * and updates the tree accordingly.
-     * However, the current selection may get lost.
+     * Note that the current selection may get lost.
      *
      * @return Whether or not the file or directory has been successfully deleted.
      * @throws IOException If an I/O error occurs.

@@ -391,8 +391,7 @@ public class Nzip extends CommandLineUtility {
                 if ((tmp.isFile() && !tmp.delete()) || !src.renameTo(tmp))
                     throw new IOException(src + ": " + resources.getString("cpOrMv.cmt") + ": " + tmp);
             } else { // cp
-                if (!src.archiveCopyAllTo(tmp, srcDetector, dstDetector))
-                    throw new IOException(src + ": " + resources.getString("cpOrMv.cct") + ": " + tmp + " (" + resources.getString("cpOrMv.co") + ")");
+                TFile.cp_rp(src, tmp, srcDetector, dstDetector);
             }
         }
     }

@@ -81,54 +81,58 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  *
  * <a name="Copy_Methods"/><h4>Copy Methods</h4>
  * <p>
- * This class provides some convenient copy methods which work much faster and
- * more reliable than the naive read-then-write-in-a-loop approach for
- * individual files and its recursive companion for directory trees.
+ * This class provides some convenient copy methods which use pooled buffers
+ * and pooled threads in order to achieve superior performance as compared to
+ * the naive read-then-write-in-a-loop approach.
  * These copy methods fall into the following categories:
  * <ol>
- * <li>The (archiveC|c)opy(All)?(To|From) methods (note the regular expression)
- *     simply return a boolean value indicating success or failure.
- *     Though this is suboptimal, this is consistent with most methods in
- *     the super class.
- * <li>The cp(_p)? methods return void and throw an {@code IOException} on
+ * <li><b>Deprecated:</b> The (archiveC|c)opy(All)?(To|From) methods (note the
+ *     regular expression) simply return a boolean value indicating success or
  *     failure.
+ *     This was designed to be consistent with most methods in the super-class.
+ * <li>The cp(_p|_r|_rp)? methods return void and throw an {@code IOException}
+ *     on failure.
  *     The exception hierarchy is fine grained enough to let an application
  *     differentiate between access restrictions, input exceptions and output
  *     exceptions.
- *     The method names have been modelled after the Unix {@code cp -p}
- *     utility.
+ *     The method names have been modelled after the Unix command line utility
+ *     {@code cp} with its options.
  *     None of these methods does recursive copying, however.
  * <li>The cat(To|From) methods return a boolean value. In contrast to the
  *     previous methods, they never close their argument streams, so
  *     applications can call them multiple times on the same streams to
  *     concatenate data.
  *     Their name is modelled after the Unix command line utility {@code cat}.
- * <li>Finally, the {@link #cat(java.io.InputStream, java.io.OutputStream)}
+ * <li>Finally, the {@link #cat(InputStream, OutputStream)}
  *     method is the core copy engine for all these methods.
  *     It performs the data transfer from an input stream to an output stream.
  *     When used with <em>unbuffered</em> input and output stream
  *     implementations, it delivers the same performance as the transfer
  *     method in the package {@code java.nio}.
  * </ol>
- * All copy methods use pooled buffers and pooled threads to achieve best
- * performance.
+ * <b>Important:</b> You must provide the <em>full path name</em> for both
+ * source and destination parameters to any of these methods!
+ * In particular, both the source and destination parameters must either
+ * represent a file or a directory - mixing file and directory parameters will
+ * not work.
+ * This limitation is designed to prevent ambiguous method semantics.
  *
  * <a name="Direct_Data_Copying"/><h5>Direct Data Copying (DDC)</h5>
  * <p>
  * If data is copied from an archive file to another archive file of the
- * same type, some of the copy methods use a feature called <i>Direct Data
+ * same type, some of the copy methods support a feature called <i>Direct Data
  * Copying</i> (DDC) to achieve best performance:</a>
  * DDC copies the raw data from the source archive entry to the destination
  * archive entry without the need to temporarily reproduce, copy and process
  * the original data again.
  * <p>
  * The benefits of this feature are archive driver specific:
- * In case of ZIP compatible files with compressed entries, it avoids the
+ * In case of ZIP compatible files with compressed entries, this avoids the
  * need to inflate the data from the source entry just to deflate it again for
  * the destination entry.
  * In case of TAR compatible files, it avoids the need to create an
- * additional temporary file, but shows no impact otherwise (the TAR file
- * format doesn't support compression).
+ * additional temporary file, but shows no impact otherwise - the TAR file
+ * format doesn't support compression.
  *
  * <a name="False_Positives"/><h4>Identifying Archive Paths and False Positives</h4>
  * <p>
@@ -2408,13 +2412,15 @@ public final class TFile extends File {
      * </tbody>
      * </table>
      *
+     * @param  in the input stream.
      * @return {@code true} if and only if the operation succeeded.
-     * @throws NullPointerException If any parameter is {@code null}.
-     * @see <a href="#Copy_Methods">Copy Methods</a>
+     * @see    <a href="#Copy_Methods">Copy Methods</a>
+     * @deprecated Use {@link #cp(InputStream, File)} instead.
      */
+    @Deprecated
     public boolean copyFrom(final InputStream in) {
         try {
-            final OutputStream out = new TFileOutputStream(this, false);
+            final OutputStream out = new TFileOutputStream(this);
             try {
                 cp(in, out); // always closes in and out
                 return true;
@@ -2472,16 +2478,17 @@ public final class TFile extends File {
      * </tbody>
      * </table>
      *
-     * @param src The source file. Note that although this just needs to
-     *        be a plain {@code File}, archive entries are only
-     *        supported for instances of this class.
+     * @param  src the source file. Note that although this just needs to
+     *         be a plain {@code File}, archive entries are only
+     *         supported for instances of this class.
      * @return {@code true} if and only if the operation succeeded.
-     * @throws NullPointerException If any parameter is {@code null}.
-     * @see <a href="#Copy_Methods">Copy Methods</a>
+     * @see    <a href="#Copy_Methods">Copy Methods</a>
+     * @deprecated Use {@link #cp(File, File)} instead.
      */
+    @Deprecated
     public boolean copyFrom(final File src) {
         try {
-            cp(src, this);
+            TIO.copy(false, src, this);
             return true;
         } catch (IOException ex) {
             return false;
@@ -2538,13 +2545,14 @@ public final class TFile extends File {
      * </tbody>
      * </table>
      *
-     * @param src The source file. Note that although this just needs to
-     *        be a plain {@code File}, archive files and entries
-     *        are only supported for instances of this class.
+     * @param  src the source file. Note that although this just needs to
+     *         be a plain {@code File}, archive files and entries
+     *         are only supported for instances of this class.
      * @return {@code true} if and only if the operation succeeded.
-     * @throws NullPointerException If any parameter is {@code null}.
-     * @see <a href="#Copy_Methods">Copy Methods</a>
+     * @see    <a href="#Copy_Methods">Copy Methods</a>
+     * @deprecated Use {@link #cp_r(File, File)} instead.
      */
+    @Deprecated
     public boolean copyAllFrom(final File src) {
         try {
             TIO.copyAll(false, src, this, detector, detector);
@@ -2603,13 +2611,15 @@ public final class TFile extends File {
      * </tbody>
      * </table>
      *
-     * @param src The source file. Note that although this just needs to
-     *        be a plain {@code File}, archive files and entries
-     *        are only supported for instances of this class.
-     * @param detector The object used to detect any archive files
-     *        in the source and destination directory trees.
-     * @see <a href="#Copy_Methods">Copy Methods</a>
+     * @param  src the source file. Note that although this just needs to
+     *         be a plain {@code File}, archive files and entries
+     *         are only supported for instances of this class.
+     * @param  detector the archive detector to use for detecting any archive
+     *         files in the source and destination directory trees.
+     * @see    <a href="#Copy_Methods">Copy Methods</a>
+     * @deprecated Use {@link #cp_r(File, File)} instead.
      */
+    @Deprecated
     public boolean copyAllFrom(
             final File src,
             final TArchiveDetector detector) {
@@ -2675,16 +2685,18 @@ public final class TFile extends File {
      * </tbody>
      * </table>
      *
-     * @param src The source file. Note that although this just needs to
-     *        be a plain {@code File}, archive files and entries
-     *        are only supported for instances of this class.
-     * @param srcDetector The object used to detect any archive files
-     *        in the source directory tree.
-     * @param dstDetector The object used to detect any archive files
-     *        in the destination directory tree.
+     * @param  src the source file. Note that although this just needs to
+     *         be a plain {@code File}, archive files and entries
+     *         are only supported for instances of this class.
+     * @param  srcDetector the object used to detect any archive files
+     *         in the source directory tree.
+     * @param  dstDetector the object used to detect any archive files
+     *         in the destination directory tree.
      * @return {@code true} if and only if the operation succeeded.
-     * @see <a href="#Copy_Methods">Copy Methods</a>
+     * @see    <a href="#Copy_Methods">Copy Methods</a>
+     * @deprecated Use {@link #cp_r(File, File)} instead.
      */
+    @Deprecated
     public boolean copyAllFrom(
             final File src,
             final TArchiveDetector srcDetector,
@@ -2743,10 +2755,12 @@ public final class TFile extends File {
      * </tbody>
      * </table>
      *
+     * @param  out the output stream.
      * @return {@code true} if and only if the operation succeeded.
-     * @throws NullPointerException If any parameter is {@code null}.
-     * @see <a href="#Copy_Methods">Copy Methods</a>
+     * @see    <a href="#Copy_Methods">Copy Methods</a>
+     * @deprecated Use {@link #cp(File, OutputStream)} instead.
      */
+    @Deprecated
     public boolean copyTo(final OutputStream out) {
         try {
             final InputStream in = new TFileInputStream(this);
@@ -2803,16 +2817,17 @@ public final class TFile extends File {
      * </tbody>
      * </table>
      *
-     * @param dst The destination file. Note that although this just needs to
-     *        be a plain {@code File}, archive entries are only
-     *        supported for instances of this class.
+     * @param  dst the destination file. Note that although this just needs to
+     *         be a plain {@code File}, archive entries are only
+     *         supported for instances of this class.
      * @return {@code true} if the file has been successfully copied.
-     * @throws NullPointerException If any parameter is {@code null}.
-     * @see <a href="#Copy_Methods">Copy Methods</a>
+     * @see    <a href="#Copy_Methods">Copy Methods</a>
+     * @deprecated Use {@link #cp(File, File)} instead.
      */
+    @Deprecated
     public boolean copyTo(final File dst) {
         try {
-            cp(this, dst);
+            TIO.copy(false, this, dst);
             return true;
         } catch (IOException ex) {
             return false;
@@ -2869,13 +2884,14 @@ public final class TFile extends File {
      * </tbody>
      * </table>
      *
-     * @param dst The destination file. Note that although this just needs to
-     *        be a plain {@code File}, archive files and entries
-     *        are only supported for instances of this class.
+     * @param  dst the destination file. Note that although this just needs to
+     *         be a plain {@code File}, archive files and entries
+     *         are only supported for instances of this class.
      * @return {@code true} if and only if the operation succeeded.
-     * @throws NullPointerException If any parameter is {@code null}.
-     * @see <a href="#Copy_Methods">Copy Methods</a>
+     * @see    <a href="#Copy_Methods">Copy Methods</a>
+     * @deprecated Use {@link #cp_r(File, File)} instead.
      */
+    @Deprecated
     public boolean copyAllTo(final File dst) {
         try {
             TIO.copyAll(false, this, dst, detector, detector);
@@ -2934,14 +2950,16 @@ public final class TFile extends File {
      * </tbody>
      * </table>
      *
-     * @param dst The destination file. Note that although this just needs to
-     *        be a plain {@code File}, archive files and entries
-     *        are only supported for instances of this class.
-     * @param detector The object used to detect any archive files
-     *        in the source and destination directory trees.
+     * @param  dst the destination file. Note that although this just needs to
+     *         be a plain {@code File}, archive files and entries
+     *         are only supported for instances of this class.
+     * @param  detector the object used to detect any archive files
+     *         in the source and destination directory trees.
      * @return {@code true} if and only if the operation succeeded.
-     * @see <a href="#Copy_Methods">Copy Methods</a>
+     * @see    <a href="#Copy_Methods">Copy Methods</a>
+     * @deprecated Use {@link #cp_r(File, File)} instead.
      */
+    @Deprecated
     public boolean copyAllTo(
             final File dst,
             final TArchiveDetector detector) {
@@ -3007,16 +3025,18 @@ public final class TFile extends File {
      * </tbody>
      * </table>
      *
-     * @param dst The destination file. Note that although this just needs to
-     *        be a plain {@code File}, archive files and entries
-     *        are only supported for instances of this class.
-     * @param srcDetector The object used to detect any archive files
-     *        in the source directory tree.
-     * @param dstDetector The object used to detect any archive files
-     *        in the destination directory tree.
+     * @param  dst the destination file. Note that although this just needs to
+     *         be a plain {@code File}, archive files and entries
+     *         are only supported for instances of this class.
+     * @param  srcDetector the object used to detect any archive files
+     *         in the source directory tree.
+     * @param  dstDetector the object used to detect any archive files
+     *         in the destination directory tree.
      * @return {@code true} if and only if the operation succeeded.
-     * @see <a href="#Copy_Methods">Copy Methods</a>
+     * @see    <a href="#Copy_Methods">Copy Methods</a>
+     * @deprecated Use {@link #cp_r(File, File)} instead.
      */
+    @Deprecated
     public boolean copyAllTo(
             final File dst,
             final TArchiveDetector srcDetector,
@@ -3078,15 +3098,17 @@ public final class TFile extends File {
      * </tbody>
      * </table>
      *
-     * @param src The source file. Note that although this just needs to
-     *        be a plain {@code File}, archive entries are only
-     *        supported for instances of this class.
+     * @param  src the source file. Note that although this just needs to
+     *         be a plain {@code File}, archive entries are only
+     *         supported for instances of this class.
      * @return {@code true} if and only if the operation succeeded.
-     * @see <a href="#Copy_Methods">Copy Methods</a>
+     * @see    <a href="#Copy_Methods">Copy Methods</a>
+     * @deprecated Use {@link #cp_p(File, File)} instead.
      */
+    @Deprecated
     public boolean archiveCopyFrom(final File src) {
         try {
-            cp_p(src, this);
+            TIO.copy(true, src, this);
             return true;
         } catch (IOException ex) {
             return false;
@@ -3147,13 +3169,14 @@ public final class TFile extends File {
      * </tbody>
      * </table>
      *
-     * @param src The source file. Note that although this just needs to
-     *        be a plain {@code File}, archive files and entries
-     *        are only supported for instances of this class.
+     * @param  src the source file. Note that although this just needs to
+     *         be a plain {@code File}, archive files and entries
+     *         are only supported for instances of this class.
      * @return {@code true} if and only if the operation succeeded.
-     * @throws NullPointerException If any parameter is {@code null}.
-     * @see <a href="#Copy_Methods">Copy Methods</a>
+     * @see    <a href="#Copy_Methods">Copy Methods</a>
+     * @deprecated Use {@link #cp_rp(File, File)} instead.
      */
+    @Deprecated
     public boolean archiveCopyAllFrom(final File src) {
         try {
             TIO.copyAll(true, src, this, detector, detector);
@@ -3216,14 +3239,16 @@ public final class TFile extends File {
      * </tbody>
      * </table>
      *
-     * @param src The source file. Note that although this just needs to
-     *        be a plain {@code File}, archive files and entries
-     *        are only supported for instances of this class.
-     * @param detector The object used to detect any archive files
-     *        in the source and destination directory trees.
+     * @param  src the source file. Note that although this just needs to
+     *         be a plain {@code File}, archive files and entries
+     *         are only supported for instances of this class.
+     * @param  detector the object used to detect any archive files
+     *         in the source and destination directory trees.
      * @return {@code true} if and only if the operation succeeded.
-     * @see <a href="#Copy_Methods">Copy Methods</a>
+     * @see    <a href="#Copy_Methods">Copy Methods</a>
+     * @deprecated Use {@link #cp_rp(File, File)} instead.
      */
+    @Deprecated
     public boolean archiveCopyAllFrom(
             final File src,
             final TArchiveDetector detector) {
@@ -3293,16 +3318,18 @@ public final class TFile extends File {
      * </tbody>
      * </table>
      *
-     * @param src The source file. Note that although this just needs to
-     *        be a plain {@code File}, archive files and entries
-     *        are only supported for instances of this class.
-     * @param srcDetector The object used to detect any archive files
-     *        in the source directory tree.
-     * @param dstDetector The object used to detect archive files
-     *        in the destination directory tree.
+     * @param  src the source file. Note that although this just needs to
+     *         be a plain {@code File}, archive files and entries
+     *         are only supported for instances of this class.
+     * @param  srcDetector the object used to detect any archive files
+     *         in the source directory tree.
+     * @param  dstDetector the object used to detect archive files
+     *         in the destination directory tree.
      * @return {@code true} if and only if the operation succeeded.
-     * @see <a href="#Copy_Methods">Copy Methods</a>
+     * @see    <a href="#Copy_Methods">Copy Methods</a>
+     * @deprecated Use {@link #cp_rp(File, File)} instead.
      */
+    @Deprecated
     public boolean archiveCopyAllFrom(
             final File src,
             final TArchiveDetector srcDetector,
@@ -3365,16 +3392,17 @@ public final class TFile extends File {
      * </tbody>
      * </table>
      *
-     * @param dst The destination file. Note that although this just needs to
-     *        be a plain {@code File}, archive entries are only
-     *        supported for instances of this class.
+     * @param  dst the destination file. Note that although this just needs to
+     *         be a plain {@code File}, archive entries are only
+     *         supported for instances of this class.
      * @return {@code true} if and only if the operation succeeded.
-     * @throws NullPointerException If any parameter is {@code null}.
-     * @see <a href="#Copy_Methods">Copy Methods</a>
+     * @see    <a href="#Copy_Methods">Copy Methods</a>
+     * @deprecated Use {@link #cp_p(File, File)} instead.
      */
+    @Deprecated
     public boolean archiveCopyTo(File dst) {
         try {
-            cp_p(this, dst);
+            TIO.copy(true, this, dst);
             return true;
         } catch (IOException ex) {
             return false;
@@ -3383,7 +3411,7 @@ public final class TFile extends File {
 
     /**
      * Recursively copies this file or directory to the file or directory
-     * {@code dst} and tries to preserve all attributes of the source
+     * {@code dst} and tries to preserve all attributes of each source
      * file to the destination file, too.
      * Note that the current implementation only preserves the last
      * modification time.
@@ -3435,13 +3463,14 @@ public final class TFile extends File {
      * </tbody>
      * </table>
      *
-     * @param dst The destination file. Note that although this just needs to
-     *        be a plain {@code File}, archive files and entries
-     *        are only supported for instances of this class.
+     * @param  dst the destination file. Note that although this just needs to
+     *         be a plain {@code File}, archive files and entries
+     *         are only supported for instances of this class.
      * @return {@code true} if and only if the operation succeeded.
-     * @throws NullPointerException If any parameter is {@code null}.
-     * @see <a href="#Copy_Methods">Copy Methods</a>
+     * @see    <a href="#Copy_Methods">Copy Methods</a>
+     * @deprecated Use {@link #cp_rp(File, File)} instead.
      */
+    @Deprecated
     public boolean archiveCopyAllTo(final File dst) {
         try {
             TIO.copyAll(true, this, dst, detector, detector);
@@ -3506,14 +3535,16 @@ public final class TFile extends File {
      * </tbody>
      * </table>
      *
-     * @param dst The destination file. Note that although this just needs to
-     *        be a plain {@code File}, archive files and entries
-     *        are only supported for instances of this class.
-     * @param detector The object used to detect any archive files
-     *        in the source and destination directory trees.
+     * @param  dst the destination file. Note that although this just needs to
+     *         be a plain {@code File}, archive files and entries
+     *         are only supported for instances of this class.
+     * @param  detector the object used to detect any archive files
+     *         in the source and destination directory trees.
      * @return {@code true} if and only if the operation succeeded.
-     * @see <a href="#Copy_Methods">Copy Methods</a>
+     * @see    <a href="#Copy_Methods">Copy Methods</a>
+     * @deprecated Use {@link #cp_rp(File, File)} instead.
      */
+    @Deprecated
     public boolean archiveCopyAllTo(
             final File dst,
             final TArchiveDetector detector) {
@@ -3583,16 +3614,18 @@ public final class TFile extends File {
      * </tbody>
      * </table>
      *
-     * @param dst The destination file. Note that although this just needs to
-     *        be a plain {@code File}, archive files and entries
-     *        are only supported for instances of this class.
-     * @param srcDetector The object used to detect any archive files
-     *        in the source directory tree.
-     * @param dstDetector The object used to detect any archive files
-     *        in the destination directory tree.
+     * @param  dst the destination file. Note that although this just needs to
+     *         be a plain {@code File}, archive files and entries
+     *         are only supported for instances of this class.
+     * @param  srcDetector the object used to detect any archive files
+     *         in the source directory tree.
+     * @param  dstDetector the object used to detect any archive files
+     *         in the destination directory tree.
      * @return {@code true} if and only if the operation succeeded.
-     * @see <a href="#Copy_Methods">Copy Methods</a>
+     * @see    <a href="#Copy_Methods">Copy Methods</a>
+     * @deprecated Use {@link #cp_rp(File, File)} instead.
      */
+    @Deprecated
     public boolean archiveCopyAllTo(
             final File dst,
             final TArchiveDetector srcDetector,
@@ -3606,13 +3639,13 @@ public final class TFile extends File {
     }
 
     /**
-     * Copies the data from the given input stream to the given output stream
-     * and <em>always</em> closes <em>both</em> streams - even if an exception
-     * occurs.
+     * Copies the data from the input stream {@code in} to the output stream
+     * {@code out} and closes both streams - even if an exception occurs.
      * <p>
      * This is a high performance implementation which uses a pooled background
-     * thread to fill a FIFO of data buffers which is concurrently flushed by
+     * thread to fill a FIFO of pooled buffers which is concurrently flushed by
      * the current thread.
+     * It performs best when used with <em>unbuffered</em> streams.
      * <p>
      * <table border="2" cellpadding="4">
      * <thead>
@@ -3659,10 +3692,7 @@ public final class TFile extends File {
      *
      * @param  in the input stream.
      * @param  out the output stream.
-     * @throws InputException if copying the data fails because of an
-     *         {@code IOException} in the <em>input</em> stream.
-     * @throws IOException if copying the data fails because of an
-     *         {@code IOException} in the <em>output</em> stream.
+     * @throws IOException if copying the data fails for some reason.
      * @see    #cat(InputStream, OutputStream)
      * @see    <a href="#Copy_Methods">Copy Methods</a>
      */
@@ -3672,7 +3702,130 @@ public final class TFile extends File {
     }
 
     /**
-     * Copies {@code src} to {@code dst}.
+     * Copies the input stream {@code in} to the file {@code dst} and
+     * closes the stream - even if an exception occurs.
+     * <p>
+     * <table border="2" cellpadding="4">
+     * <thead>
+     * <tr>
+     *   <th>Feature</th>
+     *   <th>Supported</th>
+     * </tr>
+     * </thead>
+     * <tbody>
+     * <tr>
+     *   <td>Preserves file attributes</td>
+     *   <td>None</td>
+     * </tr>
+     * <tr>
+     *   <td>Copies directories recursively</td>
+     *   <td>No</td>
+     * </tr>
+     * <tr>
+     *   <td>Reads and overwrites special files</td>
+     *   <td>Yes</td>
+     * </tr>
+     * <tr>
+     *   <td>Closes parameter streams</td>
+     *   <td>Always</td>
+     * </tr>
+     * <tr>
+     *   <td><a href="#Direct_Data_Copying">Direct Data Copying (DDC)</a></td>
+     *   <td>No</td>
+     * </tr>
+     * <tr>
+     *   <td>Deletes partial written files on failure</td>
+     *   <td>Yes</td>
+     * </tr>
+     * <tr>
+     *   <td>Deletes partial written directories on failure</td>
+     *   <td>n/a</td>
+     * </tr>
+     * <tr>
+     *   <td>Atomic</td>
+     *   <td>No</td>
+     * </tr>
+     * </tbody>
+     * </table>
+     *
+     * @param  dst the destination file. Note that although this just needs to
+     *         be a plain {@code File}, archive entries are only
+     *         supported for instances of this class.
+     * @throws IOException if copying the data fails for some reason.
+     * @see    <a href="#Copy_Methods">Copy Methods</a>
+     */
+    public static void cp(final InputStream in, final File dst)
+    throws IOException {
+        final OutputStream out = new TFileOutputStream(dst);
+        try {
+            cp(in, out); // always closes in and out
+        } catch (IOException ex) {
+            if (!dst.delete())
+                throw new IOException(dst + " (cannot delete)", ex);
+        }
+    }
+
+    /**
+     * Copies the file {@code src} to the output stream {@code out} and
+     * closes the stream - even if an exception occurs.
+     * <p>
+     * <table border="2" cellpadding="4">
+     * <thead>
+     * <tr>
+     *   <th>Feature</th>
+     *   <th>Supported</th>
+     * </tr>
+     * </thead>
+     * <tbody>
+     * <tr>
+     *   <td>Preserves file attributes</td>
+     *   <td>None</td>
+     * </tr>
+     * <tr>
+     *   <td>Copies directories recursively</td>
+     *   <td>No</td>
+     * </tr>
+     * <tr>
+     *   <td>Reads and overwrites special files</td>
+     *   <td>Yes</td>
+     * </tr>
+     * <tr>
+     *   <td>Closes parameter streams</td>
+     *   <td>Always</td>
+     * </tr>
+     * <tr>
+     *   <td><a href="#Direct_Data_Copying">Direct Data Copying (DDC)</a></td>
+     *   <td>No</td>
+     * </tr>
+     * <tr>
+     *   <td>Deletes partial written files on failure</td>
+     *   <td>n/a</td>
+     * </tr>
+     * <tr>
+     *   <td>Deletes partial written directories on failure</td>
+     *   <td>n/a</td>
+     * </tr>
+     * <tr>
+     *   <td>Atomic</td>
+     *   <td>No</td>
+     * </tr>
+     * </tbody>
+     * </table>
+     *
+     * @param  src the source file. Note that although this just needs to
+     *         be a plain {@code File}, archive entries are only
+     *         supported for instances of this class.
+     * @throws IOException if copying the data fails for some reason.
+     * @see    <a href="#Copy_Methods">Copy Methods</a>
+     */
+    public static void cp(final File src, final OutputStream out)
+    throws IOException {
+        final InputStream in = new TFileInputStream(src);
+        cp(in, out); // always closes in and out
+    }
+
+    /**
+     * Copies the file {@code src} to the file {@code dst}.
      * <p>
      * <table border="2" cellpadding="4">
      * <thead>
@@ -3717,15 +3870,14 @@ public final class TFile extends File {
      * </tbody>
      * </table>
      * 
-     * @param src The source file. Note that although this just needs to
-     *        be a plain {@code File}, archive entries are only
-     *        supported for instances of this class.
-     * @param dst The destination file. Note that although this just needs to
-     *        be a plain {@code File}, archive entries are only
-     *        supported for instances of this class.
-     * @throws IOException If copying the data fails for some reason.
-     * @throws NullPointerException If any parameter is {@code null}.
-     * @see <a href="#Copy_Methods">Copy Methods</a>
+     * @param  src the source file. Note that although this just needs to
+     *         be a plain {@code File}, archive entries are only
+     *         supported for instances of this class.
+     * @param  dst the destination file. Note that although this just needs to
+     *         be a plain {@code File}, archive entries are only
+     *         supported for instances of this class.
+     * @throws IOException if copying the data fails for some reason.
+     * @see    <a href="#Copy_Methods">Copy Methods</a>
      */
     public static void cp(File src, File dst)
     throws IOException {
@@ -3733,8 +3885,8 @@ public final class TFile extends File {
     }
 
     /**
-     * Copies {@code src} to {@code dst} and tries to preserve
-     * all attributes of the source file to the destination file, too.
+     * Copies the file {@code src} to the file {@code dst} and tries to
+     * preserve all attributes of the source file to the destination file, too.
      * Currently, only the last modification time is preserved.
      * <p>
      * <table border="2" cellpadding="4">
@@ -3780,19 +3932,292 @@ public final class TFile extends File {
      * </tbody>
      * </table>
      * 
-     * @param src The source file. Note that although this just needs to
-     *        be a plain {@code File}, archive entries are only
-     *        supported for instances of this class.
-     * @param dst The destination file. Note that although this just needs to
-     *        be a plain {@code File}, archive entries are only
-     *        supported for instances of this class.
-     * @throws IOException If copying the data fails for some reason.
-     * @throws NullPointerException If any parameter is {@code null}.
-     * @see <a href="#Copy_Methods">Copy Methods</a>
+     * @param  src the source file. Note that although this just needs to
+     *         be a plain {@code File}, archive entries are only
+     *         supported for instances of this class.
+     * @param  dst the destination file. Note that although this just needs to
+     *         be a plain {@code File}, archive entries are only
+     *         supported for instances of this class.
+     * @throws IOException if copying the data fails for some reason.
+     * @see    <a href="#Copy_Methods">Copy Methods</a>
      */
     public static void cp_p(File src, File dst)
     throws IOException {
         TIO.copy(true, src, dst);
+    }
+
+    /**
+     * Recursively copies the file or directory {@code src}
+     * to the file or directory {@code dst}.
+     * <p>
+     * This version uses {@link TDefaultArchiveDetector#NULL} to detect any
+     * archive files in the source and destination directory trees,
+     * i.e. it makes a verbatim copy as if they were regular files.
+     * <p>
+     * <table border="2" cellpadding="4">
+     * <thead>
+     * <tr>
+     *   <th>Feature</th>
+     *   <th>Supported</th>
+     * </tr>
+     * </thead>
+     * <tbody>
+     * <tr>
+     *   <td>Preserves file attributes</td>
+     *   <td>None</td>
+     * </tr>
+     * <tr>
+     *   <td>Copies directories recursively</td>
+     *   <td>Yes</td>
+     * </tr>
+     * <tr>
+     *   <td>Reads and overwrites special files</td>
+     *   <td>No</td>
+     * </tr>
+     * <tr>
+     *   <td>Closes parameter streams</td>
+     *   <td>n/a</td>
+     * </tr>
+     * <tr>
+     *   <td><a href="#Direct_Data_Copying">Direct Data Copying (DDC)</a></td>
+     *   <td>Yes</td>
+     * </tr>
+     * <tr>
+     *   <td>Deletes partial written files on failure</td>
+     *   <td>Yes</td>
+     * </tr>
+     * <tr>
+     *   <td>Deletes partial written directories on failure</td>
+     *   <td>No</td>
+     * </tr>
+     * <tr>
+     *   <td>Atomic</td>
+     *   <td>No</td>
+     * </tr>
+     * </tbody>
+     * </table>
+     *
+     * @param  src the source file. Note that although this just needs to
+     *         be a plain {@code File}, archive files and entries
+     *         are only supported for instances of this class.
+     * @param  dst the destination file. Note that although this just needs to
+     *         be a plain {@code File}, archive files and entries
+     *         are only supported for instances of this class.
+     * @throws IOException if copying the data fails for some reason.
+     * @see    <a href="#Copy_Methods">Copy Methods</a>
+     */
+    public static void cp_r(File src, File dst)
+    throws IOException {
+        TIO.copyAll(false, src, dst,
+                    TDefaultArchiveDetector.NULL, TDefaultArchiveDetector.NULL);
+    }
+
+    /**
+     * Recursively copies the file or directory {@code src}
+     * to the file or directory {@code dst}.
+     * <p>
+     * This version uses the given archive detectors to detect any
+     * archive files in the source and destination directory trees.
+     * <p>
+     * <table border="2" cellpadding="4">
+     * <thead>
+     * <tr>
+     *   <th>Feature</th>
+     *   <th>Supported</th>
+     * </tr>
+     * </thead>
+     * <tbody>
+     * <tr>
+     *   <td>Preserves file attributes</td>
+     *   <td>None</td>
+     * </tr>
+     * <tr>
+     *   <td>Copies directories recursively</td>
+     *   <td>Yes</td>
+     * </tr>
+     * <tr>
+     *   <td>Reads and overwrites special files</td>
+     *   <td>No</td>
+     * </tr>
+     * <tr>
+     *   <td>Closes parameter streams</td>
+     *   <td>n/a</td>
+     * </tr>
+     * <tr>
+     *   <td><a href="#Direct_Data_Copying">Direct Data Copying (DDC)</a></td>
+     *   <td>Yes</td>
+     * </tr>
+     * <tr>
+     *   <td>Deletes partial written files on failure</td>
+     *   <td>Yes</td>
+     * </tr>
+     * <tr>
+     *   <td>Deletes partial written directories on failure</td>
+     *   <td>No</td>
+     * </tr>
+     * <tr>
+     *   <td>Atomic</td>
+     *   <td>No</td>
+     * </tr>
+     * </tbody>
+     * </table>
+     *
+     * @param  src the source file. Note that although this just needs to
+     *         be a plain {@code File}, archive files and entries
+     *         are only supported for instances of this class.
+     * @param  dst the destination file. Note that although this just needs to
+     *         be a plain {@code File}, archive files and entries
+     *         are only supported for instances of this class.
+     * @param  srcDetector the archive detector to use for detecting any
+     *         archive files in the source directory tree.
+     * @param  dstDetector the archive detector to use for detecting any
+     *         archive files in the destination directory tree.
+     * @throws IOException if copying the data fails for some reason.
+     * @see    <a href="#Copy_Methods">Copy Methods</a>
+     */
+    public static void cp_r(File src, File dst,
+                            TArchiveDetector srcDetector,
+                            TArchiveDetector dstDetector)
+    throws IOException {
+        TIO.copyAll(false, src, dst, srcDetector, dstDetector);
+    }
+
+    /**
+     * Recursively copies the file or directory {@code src} to the file or
+     * directory {@code dst} and tries to preserve all attributes of each
+     * source file to the destination file, too.
+     * Note that the current implementation only preserves the last
+     * modification time.
+     * <p>
+     * This version uses {@link TDefaultArchiveDetector#NULL} to detect any
+     * archive files in the source and destination directory trees,
+     * i.e. it makes a verbatim copy as if they were regular files.
+     * <p>
+     * <table border="2" cellpadding="4">
+     * <thead>
+     * <tr>
+     *   <th>Feature</th>
+     *   <th>Supported</th>
+     * </tr>
+     * </thead>
+     * <tbody>
+     * <tr>
+     *   <td>Preserves file attributes</td>
+     *   <td>Best effort</td>
+     * </tr>
+     * <tr>
+     *   <td>Copies directories recursively</td>
+     *   <td>Yes</td>
+     * </tr>
+     * <tr>
+     *   <td>Reads and overwrites special files</td>
+     *   <td>No</td>
+     * </tr>
+     * <tr>
+     *   <td>Closes parameter streams</td>
+     *   <td>n/a</td>
+     * </tr>
+     * <tr>
+     *   <td><a href="#Direct_Data_Copying">Direct Data Copying (DDC)</a></td>
+     *   <td>Yes</td>
+     * </tr>
+     * <tr>
+     *   <td>Deletes partial written files on failure</td>
+     *   <td>Yes</td>
+     * </tr>
+     * <tr>
+     *   <td>Deletes partial written directories on failure</td>
+     *   <td>No</td>
+     * </tr>
+     * <tr>
+     *   <td>Atomic</td>
+     *   <td>No</td>
+     * </tr>
+     * </tbody>
+     * </table>
+     *
+     * @param  src the source file. Note that although this just needs to
+     *         be a plain {@code File}, archive files and entries
+     *         are only supported for instances of this class.
+     * @param  dst the destination file. Note that although this just needs to
+     *         be a plain {@code File}, archive files and entries
+     *         are only supported for instances of this class.
+     * @throws IOException if copying the data fails for some reason.
+     * @see    <a href="#Copy_Methods">Copy Methods</a>
+     */
+    public static void cp_rp(File src, File dst)
+    throws IOException {
+        TIO.copyAll(true, src, dst,
+                    TDefaultArchiveDetector.NULL, TDefaultArchiveDetector.NULL);
+    }
+
+    /**
+     * Recursively copies the file or directory {@code src} to the file or
+     * directory {@code dst} and tries to preserve all attributes of each
+     * source file to the destination file, too.
+     * Note that the current implementation only preserves the last
+     * modification time.
+     * <p>
+     * This version uses the given archive detectors to detect any
+     * archive files in the source and destination directory trees.
+     * <p>
+     * <table border="2" cellpadding="4">
+     * <thead>
+     * <tr>
+     *   <th>Feature</th>
+     *   <th>Supported</th>
+     * </tr>
+     * </thead>
+     * <tbody>
+     * <tr>
+     *   <td>Preserves file attributes</td>
+     *   <td>Best effort</td>
+     * </tr>
+     * <tr>
+     *   <td>Copies directories recursively</td>
+     *   <td>Yes</td>
+     * </tr>
+     * <tr>
+     *   <td>Reads and overwrites special files</td>
+     *   <td>No</td>
+     * </tr>
+     * <tr>
+     *   <td>Closes parameter streams</td>
+     *   <td>n/a</td>
+     * </tr>
+     * <tr>
+     *   <td><a href="#Direct_Data_Copying">Direct Data Copying (DDC)</a></td>
+     *   <td>Yes</td>
+     * </tr>
+     * <tr>
+     *   <td>Deletes partial written files on failure</td>
+     *   <td>Yes</td>
+     * </tr>
+     * <tr>
+     *   <td>Deletes partial written directories on failure</td>
+     *   <td>No</td>
+     * </tr>
+     * <tr>
+     *   <td>Atomic</td>
+     *   <td>No</td>
+     * </tr>
+     * </tbody>
+     * </table>
+     *
+     * @param  src the source file. Note that although this just needs to
+     *         be a plain {@code File}, archive files and entries
+     *         are only supported for instances of this class.
+     * @param  dst the destination file. Note that although this just needs to
+     *         be a plain {@code File}, archive files and entries
+     *         are only supported for instances of this class.
+     * @throws IOException if copying the data fails for some reason.
+     * @see    <a href="#Copy_Methods">Copy Methods</a>
+     */
+    public static void cp_rp(   File src, File dst,
+                                TArchiveDetector srcDetector,
+                                TArchiveDetector dstDetector)
+    throws IOException {
+        TIO.copyAll(true, src, dst, srcDetector, dstDetector);
     }
 
     /**
@@ -3842,9 +4267,9 @@ public final class TFile extends File {
      * </tbody>
      * </table>
      *
-     * @param in The input stream.
+     * @param  in the input stream.
      * @return {@code true} if and only if the operation succeeded.
-     * @see <a href="#Copy_Methods">Copy Methods</a>
+     * @see    <a href="#Copy_Methods">Copy Methods</a>
      */
     public boolean catFrom(final InputStream in) {
         try {
@@ -3912,9 +4337,9 @@ public final class TFile extends File {
      * </tbody>
      * </table>
      *
-     * @param out The output stream.
+     * @param  out the output stream.
      * @return {@code true} if and only if the operation succeeded.
-     * @see <a href="#Copy_Methods">Copy Methods</a>
+     * @see    <a href="#Copy_Methods">Copy Methods</a>
      */
     public boolean catTo(final OutputStream out) {
         try {
@@ -3986,10 +4411,7 @@ public final class TFile extends File {
      *
      * @param  in the input stream.
      * @param  out the output stream.
-     * @throws InputException if copying the data fails because of an
-     *         {@code IOException} in the <em>input</em> stream.
-     * @throws IOException if copying the data fails because of an
-     *         {@code IOException} in the <em>output</em> stream.
+     * @throws IOException if copying the data fails for some reason.
      * @see    #cp(InputStream, OutputStream)
      * @see    <a href="#Copy_Methods">Copy Methods</a>
      */

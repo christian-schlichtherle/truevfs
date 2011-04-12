@@ -447,19 +447,15 @@ public final class TFileTree extends JTree {
      * and scrolls the tree so that the copied node
      * is selected and visible.
      */
-    public boolean copyFrom(final TFile node, final InputStream in) {
+    public void copyFrom(final TFile node, final InputStream in)
+    throws IOException {
         final TFileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
-        if (path == null)
-            return false;
-
-        if (!ftm.copyFrom(node, in))
-            return false;
-
+        if (null == path)
+            throw new IllegalArgumentException("node");
+        ftm.copyFrom(node, in);
         setSelectionPath(path);
         scrollPathToVisible(path);
-
-        return true;
     }
 
     /**
@@ -467,19 +463,15 @@ public final class TFileTree extends JTree {
      * and scrolls the tree so that the copied node
      * is selected and visible.
      */
-    public boolean copyTo(final TFile oldNode, final TFile node) {
+    public void copyTo(final TFile oldNode, final TFile node)
+    throws IOException {
         final TFileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
-        if (path == null)
-            return false;
-
-        if (!ftm.copyTo(oldNode, node))
-            return false;
-
+        if (null == path)
+            throw new IllegalArgumentException("node");
+        ftm.copyTo(oldNode, node);
         setSelectionPath(path);
         scrollPathToVisible(path);
-
-        return true;
     }
 
     /**
@@ -487,19 +479,15 @@ public final class TFileTree extends JTree {
      * and scrolls the tree so that the recursively copied node
      * is selected and visible.
      */
-    public boolean copyAllTo(final TFile oldNode, final TFile node) {
+    public void copyAllTo(final TFile oldNode, final TFile node)
+    throws IOException {
         final TFileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
-        if (path == null)
-            return false;
-
-        if (!ftm.copyAllTo(oldNode, node))
-            return false;
-
+        if (null == path)
+            throw new IllegalArgumentException("node");
+        ftm.copyAllTo(oldNode, node);
         setSelectionPath(path);
         scrollPathToVisible(path);
-
-        return true;
     }
 
     /**
@@ -507,19 +495,15 @@ public final class TFileTree extends JTree {
      * and scrolls the tree so that the copied node
      * is selected and visible.
      */
-    public boolean archiveCopyTo(final TFile oldNode, final TFile node) {
+    public void archiveCopyTo(final TFile oldNode, final TFile node)
+    throws IOException {
         final TFileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
-        if (path == null)
-            return false;
-
-        if (!ftm.archiveCopyTo(oldNode, node))
-            return false;
-
+        if (null == path)
+            throw new IllegalArgumentException("node");
+        ftm.archiveCopyTo(oldNode, node);
         setSelectionPath(path);
         scrollPathToVisible(path);
-
-        return true;
     }
 
     /**
@@ -527,19 +511,15 @@ public final class TFileTree extends JTree {
      * and scrolls the tree so that the recursively copied node
      * is selected and visible.
      */
-    public boolean archiveCopyAllTo(final TFile oldNode, final TFile node) {
+    public void archiveCopyAllTo(final TFile oldNode, final TFile node)
+    throws IOException {
         final TFileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
-        if (path == null)
-            return false;
-
-        if (!ftm.archiveCopyAllTo(oldNode, node))
-            return false;
-
+        if (null == path)
+            throw new IllegalArgumentException("node");
+        ftm.archiveCopyAllTo(oldNode, node);
         setSelectionPath(path);
         scrollPathToVisible(path);
-
-        return true;
     }
 
     /**

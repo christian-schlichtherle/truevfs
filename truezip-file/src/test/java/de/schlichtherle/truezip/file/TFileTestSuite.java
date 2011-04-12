@@ -927,10 +927,12 @@ public abstract class TFileTestSuite {
         }
 
         // Test copyFrom.
-        assertTrue(b.copyFrom(a));
+        TFile.cp(a, b);
+        //assertTrue(b.copyFrom(a));
         assertThat(b.length(), is(a.length()));
         assertThat(b.lastModified(), not(is(a.lastModified())));
-        assertTrue(b.archiveCopyFrom(a));
+        TFile.cp_p(a, b);
+        //assertTrue(b.archiveCopyFrom(a));
         assertThat(b.length(), is(a.length()));
         long almd = a.lastModified() / granularity * granularity;
         long blmd = b.lastModified() / granularity * granularity;
@@ -939,10 +941,12 @@ public abstract class TFileTestSuite {
         assertTrue(almd == blmd || almu == blmu);
 
         // Test copyTo.
-        assertTrue(b.copyTo(a)); // updates timestamp
+        TFile.cp(b, a);
+        //assertTrue(b.copyTo(a)); // updates timestamp
         assertThat(a.length(), is(b.length()));
         assertThat(a.lastModified(), not(is(b.lastModified())));
-        assertTrue(b.archiveCopyTo(a));
+        TFile.cp_p(b, a);
+        //assertTrue(b.archiveCopyTo(a));
         assertThat(a.length(), is(b.length()));
         almd = a.lastModified() / granularity * granularity;
         blmd = b.lastModified() / granularity * granularity;
@@ -953,7 +957,7 @@ public abstract class TFileTestSuite {
         // Check result.
         {
             final ByteArrayOutputStream out = new ByteArrayOutputStream(data.length);
-            assertTrue(a.copyTo(out));
+            TFile.cp(a, out);
             assertTrue(Arrays.equals(data, out.toByteArray()));
         }
 
@@ -1132,12 +1136,7 @@ public abstract class TFileTestSuite {
         // false positive.
         final TFile tmp = new TFile(archive.getPath(), TDefaultArchiveDetector.NULL);
         final InputStream in = new ByteArrayInputStream(data);
-        try {
-            assertTrue(tmp.copyFrom(in));
-        } finally {
-            in.close(); // ALWAYS close streams!
-        }
-        
+        TFile.cp(in, tmp);
         assertRenameArchiveToTemp(archive);
     }
     
