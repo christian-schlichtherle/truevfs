@@ -25,7 +25,7 @@
 
     <groupId>de.schlichtherle.truezip</groupId>
     <artifactId>truezip</artifactId>
-    <version>7.0-rc3-SNAPSHOT</version>
+    <version>7.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>TrueZIP</name>
@@ -160,14 +160,19 @@
         <site>
             <id>truezip-website</id>
             <name>TrueZIP Website</name>
-            <url>${site.url}</url>
+            <!-- java.net doesn't support scp, so you need to provide an
+                 active-by-default profile in your settings.xml which sets the
+                 following property to a file URL which refers to a directory
+                 which is controlled by Mercurial so that any updates to this
+                 directory can be pushed to the Mercurial repository for
+                 TrueZIP's website at java.net, which is located at
+                 https://hg.java.net/hg/truezip~web.
+                 -->
+            <url>${truezip-website.url}</url>
         </site>
     </distributionManagement>
 
     <properties>
         <java.util.logging.config.file>logging.properties</java.util.logging.config.file>
-        <!-- java.net doesn't support scp.
-            Specify a file URI as parameter instead. -->
-        <site.url>invalid</site.url>
     </properties>
 </project>
