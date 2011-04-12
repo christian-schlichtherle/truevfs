@@ -6,4 +6,3 @@
 glob:**/*.log
 glob:**/*.log.xml
 glob:target/
-glob:src/site/doxia-converter-1.2-jar-with-dependencies.jar
