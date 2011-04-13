@@ -18,7 +18,6 @@ package de.schlichtherle.truezip.file;
 import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
-import de.schlichtherle.truezip.io.InputException;
 import java.io.InvalidObjectException;
 import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.io.Paths;
