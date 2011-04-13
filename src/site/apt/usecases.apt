@@ -46,7 +46,22 @@ new TFile("directory").archiveCopyAllTo(new TFile("archive.tar.gz"));
     class extends the <<<File>>> class to add the functionality required to
     make such tasks simple.
 
-    Note that the type of the prospective archive file is detected by its
+    Note that in case of an I/O error, the boolean method
+    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#archiveCopyAllTo(java.io.File)}<<<TFile.archiveCopyAllTo(*)>>>}}
+    simply returns <<<false>>>.
+    This was designed to be consistent with most methods in <<<java.io.File>>>.
+    However, getting an <<<IOException>>> for diagnosis is much better, hence
+    you could use the static void method
+    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#cp_rp(java.io.File, java.io.File)}<<<TFile.cp_rp(*)>>>}}
+    for the same task instead:
+
++-------------------------------------------------------------------+
+TFile.cp_rp(new TFile("directory"), new TFile("archive.tar.gz"));
++-------------------------------------------------------------------+
+
+    The name of this method is modeled after the Unix command line <<<cp -rp>>>.
+    
+    The type of the prospective archive file is detected by its
     suffix in the path name.
     In this case <<<.tar.gz>>> was used, but you could use any other
     configured archive file suffix, too.
@@ -115,7 +130,7 @@ if (!new TFile("archive.jar/META-INF/MANIFEST.MF").delete())
     throw new IOException("Oh s..t!");
 +----------------------------------------------------------+
 
-    You may be glad to learn that this works recursively, too.
+    You may be glad to know that this works recursively, too.
     So here's how to read the manifest of a library JAR within a web
     application:
 
