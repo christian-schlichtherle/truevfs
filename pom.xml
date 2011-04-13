@@ -31,7 +31,8 @@
     <name>TrueZIP</name>
     <description>
         TrueZIP is a framework for virtual file systems and a library for
-        accessing archive files as if they were just plain old directories.
+        transparent access to archive files as if they were just plain
+        directories.
 
         As a framework, TrueZIP provides the interfaces and classes to write
         file system drivers which plug-in to its federated file system space.
