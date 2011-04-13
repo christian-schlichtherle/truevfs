@@ -6,7 +6,7 @@
 
 %{toc}
 
-Abstract
+Overview
 
     This article shows how to set passwords for RAES encrypted ZIP files
     programmatically.
@@ -14,9 +14,7 @@ Abstract
     password programmatically instead of prompting the user for a key by means
     of the default Swing or Console based user interfaces.
 
-Overview
-
-    The examples in this article are copied from the static utility methods
+    All examples in this article are copied from the static utility methods
     class
     {{{../apidocs/de/schlichtherle/truezip/sample/zip/raes/KeyManagement.html}<<<KeyManagement>>>}}.
 
