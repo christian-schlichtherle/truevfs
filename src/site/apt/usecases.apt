@@ -104,26 +104,25 @@ Integrated Development Environment (IDE)
 
     Now, with the API of the {{{./truezip-file/index.html}TrueZIP File*}}
     module, here's your relief:
-
     To list the contents of the root directory of an archive file, you could
-    simply use...
+    simply use:
 
 +------------------------------+
 new TFile("archive.jar").list();
 +------------------------------+
 
-    To overwrite an entry in an archive file, you could simply use...
+    To overwrite an entry in an archive file, you could simply use:
 
 +---------------------------------------------------------------------------+
 OutputStream out = new TFileOutputStream("archive.jar/META-INF/MANIFEST.MF");
 try {
     // ...
 } finally {
-    out.close();
+    out.close(); // ALWAYS close the stream!
 }
 +---------------------------------------------------------------------------+
 
-    To delete an entry in an archive file, you could simply use...
+    To delete an entry in an archive file, you could simply use:
 
 +----------------------------------------------------------+
 if (!new TFile("archive.jar/META-INF/MANIFEST.MF").delete())
@@ -131,7 +130,7 @@ if (!new TFile("archive.jar/META-INF/MANIFEST.MF").delete())
 +----------------------------------------------------------+
 
     You may be glad to know that this works recursively, too.
-    So here's how to read the manifest of a library JAR within a web
+    Here's how to read the manifest of a library JAR within a web
     application:
 
 +----------------------------------------------------------------------+
@@ -139,7 +138,7 @@ Reader in = new TFileReader("app.war/lib/lib.jar/META-INF/MANIFEST.MF");
 try {
     // ...
 } finally {
-    in.close();
+    in.close(); // ALWAYS close the stream!
 }
 +----------------------------------------------------------------------+
 
@@ -163,7 +162,7 @@ Application File Format
 TFile.setDefaultArchiveDetector(
     new TDefaultArchiveDetector(
         "foo|bar",
-        new JarDriver(IOPoolContainer.SINGLETON)));
+        new JarDriver(IOPoolLocator.SINGLETON)));
 +-------------------------------------------------+
 
     Once this has been called, any new <<<TFile>>> object will recognize only
@@ -202,8 +201,8 @@ Encrypted Application File Format
 TFile.setDefaultArchiveDetector(
     new TDefaultArchiveDetector(
         "fox|bax",
-        new SafeZipRaesDriver(  IOPoolContainer.SINGLETON,
-                                new PromptingKeyManagerContainer())));
+        new SafeZipRaesDriver(  IOPoolLocator.SINGLETON,
+                                KeyManagerLocator.SINGLETON)));
 +-------------------------------------------------+
 
     The class
@@ -218,12 +217,14 @@ TFile.setDefaultArchiveDetector(
     By using CTR mode, RAES supports transparent <random> read access to
     its encrypted payload, which makes reading a TZP file pretty fast.
 
-    Note the injection of a
-    {{{./apidocs/de/schlichtherle/truezip/fs/archive/zip/raes/PromptingKeyManagerContainer.html}<<<PromptingKeyManagerContainer>>>}}
-    into the <<<ZipRaesDriver>>>.
+    Note the injection of the
+    {{{./apidocs/de/schlichtherle/truezip/key/sl/KeyManagerLocator.html#SINGLETON}<<<KeyManagerLocator.SINGLETON>>>}}
+    into the <<<SafeZipRaesDriver>>>.
     This object is responsible for prompting the user for passwords.
     It will check if the JVM is in headless mode and then use the console for
     prompting, otherwise a Swing GUI.
     If you want to hard code a password instead, you would need to inject an
     instance of your own implementation of the interface
-    {{{./apidocs/de/schlichtherle/truezip/key/KeyManagerService.html}<<<KeyManagerService>>>}}.
+    {{{./apidocs/de/schlichtherle/truezip/key/KeyManagerProvider.html}<<<KeyManagerProvider>>>}}.
+    For more information, please refer to the article about
+    {{{./truezip-samples/key-management.html}Key Management}}.
