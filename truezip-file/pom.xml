@@ -27,8 +27,9 @@
     <name>TrueZIP File*</name>
     <description>
         This module provides convenient multi-threaded read/write access to
-        archive files as if they were just plain old directories in a file
-        system path by means of the TFile* classes and their dependent classes.
+        archive files as if they were just plain directories in a file
+        system path by means of the TFile* classes and their
+        dependent classes.
 
         These were the well-known File* classes in TrueZIP 6 which have now
         been renamed to TFile* and relocated to the new package
