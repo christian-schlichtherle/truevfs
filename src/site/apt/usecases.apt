@@ -35,38 +35,44 @@ Software Build Tool (SBT)
 
     Now, with the API of the {{{./truezip-file/index.html}TrueZIP File*}}
     module, it's dead simple.
-    Here's an example:
-
-+-------------------------------------------------------------------+
-new TFile("directory").archiveCopyAllTo(new TFile("archive.tar.gz"));
-+-------------------------------------------------------------------+
-
     The
     {{{./apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}
-    class extends the <<<File>>> class to add the functionality required to
-    make such tasks simple.
-
-    Note that in case of an I/O error, the boolean method
-    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#archiveCopyAllTo(java.io.File)}<<<TFile.archiveCopyAllTo(*)>>>}}
-    simply returns <<<false>>>.
-    This was designed to be consistent with most methods in <<<java.io.File>>>.
-    However, getting an <<<IOException>>> for diagnosis is much better, hence
-    you could use the static void method
-    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#cp_rp(java.io.File, java.io.File)}<<<TFile.cp_rp(*)>>>}}
-    for the same task instead:
+    class extends the <<<java.io.File>>> class in order to add the
+    required functionality.
+    Here's an example:
 
 +-------------------------------------------------------------------+
 TFile.cp_rp(new TFile("directory"), new TFile("archive.tar.gz"));
 +-------------------------------------------------------------------+
 
-    The name of this method is modeled after the Unix command line <<<cp -rp>>>.
+    The name of the method <<<TFile.cp_rp(*)>>> is modeled after the Unix
+    command line <<<cp -rp>>> which copies its arguments recursively and
+    preserves all file attributes.
+
+    However, in order to prevent ambiguities, unlike the <<<cp>>> command line
+    utility, TrueZIP does not support auto-completion of path names or mixing
+    file and directory parameters.
+    So you must provide <complete path names> for both the source and
+    destination.
+    E.g. in order to copy a single file to an archive file, you would have to
+    call something like this:
+
++-------------------------------------------------------------------+
+TFile.cp_rp(new TFile("file"), new TFile("archive.tar.gz/file"));
++-------------------------------------------------------------------+
+
+    The <<<TFile>>> class provides many alternative constructors and methods to
+    ease the tasks of constructing complete path names and copy files or
+    directories - please consult the
+    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html}Javadoc}}
+    for more information.
     
     The type of the prospective archive file is detected by its
-    suffix in the path name.
+    suffix in a path name.
     In this case <<<.tar.gz>>> was used, but you could use any other
     configured archive file suffix, too.
-    Configuration is easy - just add the JAR for the desired archive driver
-    to the application's run time class path.
+    Configuration is easy - just add the archive driver JAR for the desired
+    archive type to the application's run time class path.
     This will configure the {{{./truezip-file/index.html}TrueZIP File*}} module
     to detect the canonical file suffixes of the archive file format
     implemented by the driver.
@@ -77,19 +83,21 @@ TFile.cp_rp(new TFile("directory"), new TFile("archive.tar.gz"));
     be recognized for TAR files.
 
     In case you want a <<<TFile>>> object to recognize a different set of
-    archive file suffixes then the ones enumerated on the run time class
+    archive file suffixes than the ones enumerated on the run time class
     path, you could directly inject a
     {{{./apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}
-    instance to the constructor of the <<<TFile>>> object instead like so:
+    instance to the constructor of the <<<TFile>>> object like so:
 
 +------------------------------------------------------------------+
 TFile file = new TFile("archive.zip", TDefaultArchiveDetector.NULL);
 +------------------------------------------------------------------+
 
-    In this example, <<<TDefaultArchiveDetector.NULL>>> has been used to
-    suppress the detection of any archive file suffixes.
+    In this example,
+    {{{./apidocs/de/schlichtherle/truezip/file/TDefaultArchiveDetector.html#NULL}<<<TDefaultArchiveDetector.NULL>>>}}
+    has been used to suppress the detection of any archive file suffixes.
     In case you need the opposite, you could inject
-    <<<TDefaultArchiveDetector.ALL>>> instead.
+    {{{./apidocs/de/schlichtherle/truezip/file/TDefaultArchiveDetector.html#ALL}<<<TDefaultArchiveDetector.ALL>>>}}
+    instead.
 
 Integrated Development Environment (IDE)
 
@@ -220,7 +228,8 @@ TFile.setDefaultArchiveDetector(
     Note the injection of the
     {{{./apidocs/de/schlichtherle/truezip/key/sl/KeyManagerLocator.html#SINGLETON}<<<KeyManagerLocator.SINGLETON>>>}}
     into the <<<SafeZipRaesDriver>>>.
-    This object is responsible for prompting the user for passwords.
+    This object is responsible for resolving keys by prompting the user for
+    passwords.
     It will check if the JVM is in headless mode and then use the console for
     prompting, otherwise a Swing GUI.
     If you want to hard code a password instead, you would need to inject an
