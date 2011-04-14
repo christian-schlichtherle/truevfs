@@ -382,11 +382,9 @@ public class Nzip extends CommandLineUtility {
 
         for (int i = srcI; i < dstI; i++) {
             final TFile src = new TFile(args[i], srcDetector);
-            final TFile tmp;
-            if (dstI - srcI > 1 || dst.isDirectory())
-                tmp = new TFile(dst, src.getName(), dstDetector);
-            else
-                tmp = dst;
+            final TFile tmp = dstI - srcI > 1 || dst.isDirectory()
+                    ? new TFile(dst, src.getName(), dstDetector)
+                    : dst;
             if (mv) {
                 if ((tmp.isFile() && !tmp.delete()) || !src.renameTo(tmp))
                     throw new IOException(src + ": " + resources.getString("cpOrMv.cmt") + ": " + tmp);
