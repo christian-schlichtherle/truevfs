@@ -54,9 +54,6 @@
             <unsubscribe>sympa@truezip.java.net</unsubscribe>
             <post>announce@truezip.java.net</post>
             <archive>http://java.net/projects/truezip/lists/announce/archive</archive>
-            <otherArchives>
-                <otherArchive>https://truezip.dev.java.net/servlets/SummarizeList?listName=announce</otherArchive>
-            </otherArchives>
         </mailingList>
         <mailingList>
             <name>Users Mailing List</name>
@@ -64,9 +61,6 @@
             <unsubscribe>sympa@truezip.java.net</unsubscribe>
             <post>users@truezip.java.net</post>
             <archive>http://java.net/projects/truezip/lists/users/archive</archive>
-            <otherArchives>
-                <otherArchive>https://truezip.dev.java.net/servlets/SummarizeList?listName=users</otherArchive>
-            </otherArchives>
         </mailingList>
     </mailingLists>
     <scm>
