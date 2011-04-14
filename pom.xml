@@ -50,15 +50,14 @@
     <mailingLists>
         <mailingList>
             <name>Announce Mailing List</name>
-            <subscribe>sympa@truezip.java.net</subscribe>
-            <unsubscribe>sympa@truezip.java.net</unsubscribe>
-            <post>announce@truezip.java.net</post>
+            <subscribe>mailto:sympa@truezip.java.net?subject=subscribe%20announce</subscribe>
+            <unsubscribe>mailto:sympa@truezip.java.net?subject=unsubscribe%20announce</unsubscribe>
             <archive>http://java.net/projects/truezip/lists/announce/archive</archive>
         </mailingList>
         <mailingList>
             <name>Users Mailing List</name>
-            <subscribe>sympa@truezip.java.net</subscribe>
-            <unsubscribe>sympa@truezip.java.net</unsubscribe>
+            <subscribe>mailto:sympa@truezip.java.net?subject=subscribe%20users</subscribe>
+            <unsubscribe>mailto:sympa@truezip.java.net?subject=unsubscribe%20users</unsubscribe>
             <post>users@truezip.java.net</post>
             <archive>http://java.net/projects/truezip/lists/users/archive</archive>
         </mailingList>
