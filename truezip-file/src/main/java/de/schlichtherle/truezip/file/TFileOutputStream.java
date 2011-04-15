@@ -165,7 +165,7 @@ public final class TFileOutputStream extends DecoratingOutputStream {
     private static OutputStream newOutputStream(final File dst,
                                                 final boolean append)
     throws FileNotFoundException {
-        final OutputSocket<?> output = TIO.getOutputSocket(
+        final OutputSocket<?> output = TBIO.getOutputSocket(
                 dst,
                 DEFAULT_OPTIONS
                     .set(APPEND, append)

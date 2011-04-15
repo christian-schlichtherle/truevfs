@@ -123,7 +123,7 @@ public final class TFileInputStream extends DecoratingInputStream {
 
     private static InputStream newInputStream(final File src)
     throws FileNotFoundException {
-        final InputSocket<?> input = TIO.getInputSocket(src, DEFAULT_OPTIONS);
+        final InputSocket<?> input = TBIO.getInputSocket(src, DEFAULT_OPTIONS);
         try {
             return input.newInputStream();
         } catch (FileNotFoundException ex) {

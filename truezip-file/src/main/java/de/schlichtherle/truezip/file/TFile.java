@@ -68,7 +68,7 @@ import static de.schlichtherle.truezip.fs.FsSyncOption.*;
 import static de.schlichtherle.truezip.fs.FsUriModifier.*;
 import static de.schlichtherle.truezip.entry.Entry.Size.*;
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
-import static de.schlichtherle.truezip.file.TIO.*;
+import static de.schlichtherle.truezip.file.TBIO.*;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 
 /**
@@ -1457,7 +1457,7 @@ public final class TFile extends File {
      * @throws NullPointerException If the parameter is {@code null}.
      */
     public boolean isParentOf(final File file) {
-        return TIO.contains(this, file);
+        return TBIO.contains(this, file);
     }
 
     /**
@@ -1504,7 +1504,7 @@ public final class TFile extends File {
      * @throws NullPointerException If any parameter is {@code null}.
      */
     public static boolean contains(File a, File b) {
-        return TIO.contains(a, b);
+        return TBIO.contains(a, b);
     }
 
     /**
@@ -2312,7 +2312,7 @@ public final class TFile extends File {
      */
     public boolean deleteAll() {
         try {
-            TIO.deleteAll(this);
+            TBIO.deleteAll(this);
             return true;
         } catch (IOException ex) {
             return false;
@@ -2358,7 +2358,7 @@ public final class TFile extends File {
         if (dst.exists())
             return false;
         try {
-            TIO.moveAll(this, dst, detector);
+            TBIO.moveAll(this, dst, detector);
             return true;
         } catch (IOException ex) {
             return false;
@@ -2487,7 +2487,7 @@ public final class TFile extends File {
     @Deprecated
     public boolean copyFrom(final File src) {
         try {
-            TIO.copy(false, src, this);
+            TBIO.copy(false, src, this);
             return true;
         } catch (IOException ex) {
             return false;
@@ -2554,7 +2554,7 @@ public final class TFile extends File {
     @Deprecated
     public boolean copyAllFrom(final File src) {
         try {
-            TIO.copyAll(false, src, this, detector, detector);
+            TBIO.copyAll(false, src, this, detector, detector);
             return true;
         } catch (IOException ex) {
             return false;
@@ -2623,7 +2623,7 @@ public final class TFile extends File {
             final File src,
             final TArchiveDetector detector) {
         try {
-            TIO.copyAll(false, src, this, detector, detector);
+            TBIO.copyAll(false, src, this, detector, detector);
             return true;
         } catch (IOException ex) {
             return false;
@@ -2701,7 +2701,7 @@ public final class TFile extends File {
             final TArchiveDetector srcDetector,
             final TArchiveDetector dstDetector) {
         try {
-            TIO.copyAll(false, src, this, srcDetector, dstDetector);
+            TBIO.copyAll(false, src, this, srcDetector, dstDetector);
             return true;
         } catch (IOException ex) {
             return false;
@@ -2826,7 +2826,7 @@ public final class TFile extends File {
     @Deprecated
     public boolean copyTo(final File dst) {
         try {
-            TIO.copy(false, this, dst);
+            TBIO.copy(false, this, dst);
             return true;
         } catch (IOException ex) {
             return false;
@@ -2893,7 +2893,7 @@ public final class TFile extends File {
     @Deprecated
     public boolean copyAllTo(final File dst) {
         try {
-            TIO.copyAll(false, this, dst, detector, detector);
+            TBIO.copyAll(false, this, dst, detector, detector);
             return true;
         } catch (IOException ex) {
             return false;
@@ -2963,7 +2963,7 @@ public final class TFile extends File {
             final File dst,
             final TArchiveDetector detector) {
         try {
-            TIO.copyAll(false, this, dst, detector, detector);
+            TBIO.copyAll(false, this, dst, detector, detector);
             return true;
         } catch (IOException ex) {
             return false;
@@ -3041,7 +3041,7 @@ public final class TFile extends File {
             final TArchiveDetector srcDetector,
             final TArchiveDetector dstDetector) {
         try {
-            TIO.copyAll(false, this, dst, srcDetector, dstDetector);
+            TBIO.copyAll(false, this, dst, srcDetector, dstDetector);
             return true;
         } catch (IOException ex) {
             return false;
@@ -3107,7 +3107,7 @@ public final class TFile extends File {
     @Deprecated
     public boolean archiveCopyFrom(final File src) {
         try {
-            TIO.copy(true, src, this);
+            TBIO.copy(true, src, this);
             return true;
         } catch (IOException ex) {
             return false;
@@ -3178,7 +3178,7 @@ public final class TFile extends File {
     @Deprecated
     public boolean archiveCopyAllFrom(final File src) {
         try {
-            TIO.copyAll(true, src, this, detector, detector);
+            TBIO.copyAll(true, src, this, detector, detector);
             return true;
         } catch (IOException ex) {
             return false;
@@ -3252,7 +3252,7 @@ public final class TFile extends File {
             final File src,
             final TArchiveDetector detector) {
         try {
-            TIO.copyAll(true, src, this, detector, detector);
+            TBIO.copyAll(true, src, this, detector, detector);
             return true;
         } catch (IOException ex) {
             return false;
@@ -3334,7 +3334,7 @@ public final class TFile extends File {
             final TArchiveDetector srcDetector,
             final TArchiveDetector dstDetector) {
         try {
-            TIO.copyAll(true, src, this, srcDetector, dstDetector);
+            TBIO.copyAll(true, src, this, srcDetector, dstDetector);
             return true;
         } catch (IOException ex) {
             return false;
@@ -3401,7 +3401,7 @@ public final class TFile extends File {
     @Deprecated
     public boolean archiveCopyTo(File dst) {
         try {
-            TIO.copy(true, this, dst);
+            TBIO.copy(true, this, dst);
             return true;
         } catch (IOException ex) {
             return false;
@@ -3472,7 +3472,7 @@ public final class TFile extends File {
     @Deprecated
     public boolean archiveCopyAllTo(final File dst) {
         try {
-            TIO.copyAll(true, this, dst, detector, detector);
+            TBIO.copyAll(true, this, dst, detector, detector);
             return true;
         } catch (IOException ex) {
             return false;
@@ -3548,7 +3548,7 @@ public final class TFile extends File {
             final File dst,
             final TArchiveDetector detector) {
         try {
-            TIO.copyAll(true, this, dst, detector, detector);
+            TBIO.copyAll(true, this, dst, detector, detector);
             return true;
         } catch (IOException ex) {
             return false;
@@ -3630,7 +3630,7 @@ public final class TFile extends File {
             final TArchiveDetector srcDetector,
             final TArchiveDetector dstDetector) {
         try {
-            TIO.copyAll(true, this, dst, srcDetector, dstDetector);
+            TBIO.copyAll(true, this, dst, srcDetector, dstDetector);
             return true;
         } catch (IOException ex) {
             return false;
@@ -3880,7 +3880,7 @@ public final class TFile extends File {
      */
     public static void cp(File src, File dst)
     throws IOException {
-        TIO.copy(false, src, dst);
+        TBIO.copy(false, src, dst);
     }
 
     /**
@@ -3942,7 +3942,7 @@ public final class TFile extends File {
      */
     public static void cp_p(File src, File dst)
     throws IOException {
-        TIO.copy(true, src, dst);
+        TBIO.copy(true, src, dst);
     }
 
     /**
@@ -4007,7 +4007,7 @@ public final class TFile extends File {
      */
     public static void cp_r(File src, File dst)
     throws IOException {
-        TIO.copyAll(false, src, dst,
+        TBIO.copyAll(false, src, dst,
                     TDefaultArchiveDetector.NULL, TDefaultArchiveDetector.NULL);
     }
 
@@ -4078,7 +4078,7 @@ public final class TFile extends File {
                             TArchiveDetector srcDetector,
                             TArchiveDetector dstDetector)
     throws IOException {
-        TIO.copyAll(false, src, dst, srcDetector, dstDetector);
+        TBIO.copyAll(false, src, dst, srcDetector, dstDetector);
     }
 
     /**
@@ -4146,7 +4146,7 @@ public final class TFile extends File {
      */
     public static void cp_rp(File src, File dst)
     throws IOException {
-        TIO.copyAll(true, src, dst,
+        TBIO.copyAll(true, src, dst,
                     TDefaultArchiveDetector.NULL, TDefaultArchiveDetector.NULL);
     }
 
@@ -4216,7 +4216,7 @@ public final class TFile extends File {
                                 TArchiveDetector srcDetector,
                                 TArchiveDetector dstDetector)
     throws IOException {
-        TIO.copyAll(true, src, dst, srcDetector, dstDetector);
+        TBIO.copyAll(true, src, dst, srcDetector, dstDetector);
     }
 
     /**
