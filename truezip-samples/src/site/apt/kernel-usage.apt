@@ -10,20 +10,20 @@ Abstract
 
     This article shows the usage of the API of the TrueZIP Kernel module.
 
-TrueZIP Kernel versus TrueZIP TFile*
+TrueZIP Kernel versus TrueZIP File*
 
     The API of the TrueZIP Kernel module is considerably different to the API
-    of the TrueZIP TFile* module:
-    While the TFile* API primarily aims to "make simple things easy",
+    of the TrueZIP File* module:
+    While the File* API primarily aims to "make simple things easy",
     the Kernel API primarily aims to "make complex things possible".
 
-    This means that while the Kernel API offers more features than the TFile*
+    This means that while the Kernel API offers more features than the File*
     API, it also requires more coding to get a job done.
     So when is it appropriate to code against the Kernel API instead of the
-    TFile* API?
+    File* API?
 
     * If you don't want to rely on the service locator pattern which is
-        employed by the TFile* API in order to enumerate the set of file
+        employed by the File* API in order to enumerate the set of file
         system drivers which are available on the class path at run-time.
 
     * If the type of the top level file system your application needs to
@@ -59,7 +59,7 @@ $ cat fileA fileB
     output.
 
     Here's how to copy the contents of the path name parameter <<<resource>>>
-    to the standard output using the API of the module TrueZIP TFile*:
+    to the standard output using the API of the module TrueZIP File*:
 
 %{snippet|id=cat|file=truezip-samples/src/main/java/de/schlichtherle/truezip/sample/file/app/PathCat.java}
 
@@ -103,7 +103,7 @@ $ cat fileA fileB
 
     []
 
-    This adds a lot of flexibility, but the TFile* API still has one limitation:
+    This adds a lot of flexibility, but the File* API still has one limitation:
     All URIs must be file-based, i.e. the scheme of their top level file system
     must be <<<file>>>.
     In particular, it's not possible to access a resource via HTTP(S).

@@ -9,7 +9,7 @@ Sample Code
     The {{{../truezip-samples/index.html}TrueZIP Samples}} module demonstrates
     the usage of two other module APIs:
 
-    * [{{{../truezip-tfile/index.html}TrueZIP TFile*}}]
+    * [{{{../truezip-file/index.html}TrueZIP File*}}]
         The API of this module should be used by most applications.
         It's designed to be convenient to use while providing a great level of
         flexibility.

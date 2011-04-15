@@ -23,16 +23,16 @@
         <version>7.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>truezip-tfile</artifactId>
-    <name>TrueZIP TFile*</name>
+    <artifactId>truezip-file</artifactId>
+    <name>TrueZIP File*</name>
     <description>
         This module provides convenient multi-threaded read/write access to
         archive files as if they were just plain directories in a file
-        system path by means of the TFile* classes and their
+        system path by means of the File* classes and their
         dependent classes.
 
-        These were the well-known TFile* classes in TrueZIP 6 which have now
-        been renamed to TFile* and relocated to the new package
+        These were the well-known File* classes in TrueZIP 6 which have now
+        been renamed to File* and relocated to the new package
         de.schlichtherle.truezip.file.
 
         This module also provides Swing GUI classes for viewing file trees,

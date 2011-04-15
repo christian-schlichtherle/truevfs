@@ -29,7 +29,7 @@ import net.jcip.annotations.Immutable;
  * When used with the service locator class {@link FsDriverLocator}, this
  * service provider class will register the following URI schemes for use with
  * the TrueZIP Kernel module and the following canonical archive file suffixes
- * for automatic detection by the TrueZIP TFile* module:
+ * for automatic detection by the TrueZIP File* module:
  * <table border="2" cellpadding="4">
  * <thead>
  * <tr>

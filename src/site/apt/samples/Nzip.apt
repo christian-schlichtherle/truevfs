@@ -8,7 +8,7 @@ Nzip - a Comprehensive Command Line Utility
 
     The Nzip command line utility implemented by the class
     {{{../apidocs/de/schlichtherle/truezip/sample/file/app/Nzip.html}<<<de.schlichtherle.truezip.sample.file.app.Nzip>>>}}
-    show cases the API of the {{{../truezip-tfile/index.html}TrueZIP TFile*}} module.
+    show cases the API of the {{{../truezip-file/index.html}TrueZIP File*}} module.
 
     This is a comprehensive command line utility which allows you to work with
     entries in any archive file supported by an archive driver
@@ -28,9 +28,9 @@ Nzip - a Comprehensive Command Line Utility
 *--+--+
 | <<<java -jar truezip-6.8.1.jar llr project.jar>>> | Prints a recursive long listing of the contents in <<<project.jar>>>. |
 *--+--+
-| <<<java -jar truezip-6.8.1.jar cp project.jar/de/schlichtherle/io/samples/NZip.class archive.zip>>> | Copies the entry <<<de/schlichtherle/io/samples/NZip.class>>> from the distribution JAR into the ZIP file <<<archive.zip>>>. |
+| <<<java -jar truezip-6.8.1.jar cp project.jar/de/schlichtherle/io/samples/Nzip.class archive.zip>>> | Copies the entry <<<de/schlichtherle/io/samples/Nzip.class>>> from the distribution JAR into the ZIP file <<<archive.zip>>>. |
 *--+--+
-| <<<java -jar truezip-6.8.1.jar rm project.jar/de/schlichtherle/io/samples/NZip.class>>> | Removes the entry <<<de/schlichtherle/io/samples/NZip.class>>> from <<<project.jar>>>. |
+| <<<java -jar truezip-6.8.1.jar rm project.jar/de/schlichtherle/io/samples/Nzip.class>>> | Removes the entry <<<de/schlichtherle/io/samples/Nzip.class>>> from <<<project.jar>>>. |
 *--+--+
 | <<<java -jar truezip-6.8.1.jar mkdir archive.zip/dir.zip>>> | Creates the new ZIP file <<<dir.zip>>> in the existing ZIP file <<<archive.zip>>>. Remember that this API treats archive files like directories, so you can simply create a ZIP file by calling the mkdir() method on a File object. |
 *--+--+
@@ -40,12 +40,12 @@ Nzip - a Comprehensive Command Line Utility
 *--+--+
 | <<<java -jar truezip-6.8.1.jar touch archive.zip>>> | Updates the last modification time of the existing ZIP file <<<archive.zip>>> to the current time. Note that if the given file does not exist, it is created as a plain file - you cannot create ZIP files using this method (use mkdir instead). |
 *--+--+
-| <<<java -jar truezip-6.8.1.jar mv archive.zip/NZip.class .>>> | Moves the entry <<<NZip.class>>> from the ZIP file <<<archive.zip>>> to the current directory <<<.>>> . |
+| <<<java -jar truezip-6.8.1.jar mv archive.zip/Nzip.class .>>> | Moves the entry <<<Nzip.class>>> from the ZIP file <<<archive.zip>>> to the current directory <<<.>>> . |
 *--+--+
 TODO: This table needs an update to reflect TrueZIP 7.
 
     <<Note:>> Although TrueZIP has been designed to provide optimum performance,
-    the <<<NZip>>> utility is a feature showcase which does <<not>> serve as a
+    the <<<Nzip>>> utility is a feature showcase which does <<not>> serve as a
     performance benchmark:
     The utility uses some optional archive drivers which are not normally used
     but provide extra safety and extra features at the price of performance,

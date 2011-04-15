@@ -10,7 +10,7 @@ About TrueZIP Driver FILE
 
     Add this artifact to the compile-time class path for dependency
     injection to the TrueZIP Kernel module or to the run-time class path
-    for service location in the TrueZIP TFile* module in order
+    for service location in the TrueZIP File* module in order
     to access FILE URIs.
 
     For a documentation which URI schemes get registered by this module for use

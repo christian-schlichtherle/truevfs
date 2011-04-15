@@ -5,7 +5,7 @@
     <body>
         <menu name="Project Documentation">
             <item name="About" href="index.html"/>
-            <item name="TrueZIP TFile* API Usage" href="file-usage.html"/>
+            <item name="TrueZIP File* API Usage" href="file-usage.html"/>
             <item name="TrueZIP Kernel API Usage" href="kernel-usage.html"/>
             <item name="TrueZIP Key Management" href="key-management.html"/>
         </menu>
