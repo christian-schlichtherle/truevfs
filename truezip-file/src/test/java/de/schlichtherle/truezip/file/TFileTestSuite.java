@@ -52,7 +52,7 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
 /**
- * Performs an integration test of a particular FsArchiveDriver by using the
+ * Performs a functional test of a particular FsArchiveDriver by using the
  * API of the TrueZIP File* module.
  *
  * @author Christian Schlichtherle
