@@ -69,6 +69,7 @@
     </scm>
 
     <modules>
+        <module>truezip-archetype</module>
         <module>truezip-driver</module>
         <module>truezip-file</module>
         <module>truezip-kernel</module>
