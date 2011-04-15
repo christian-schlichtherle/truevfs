@@ -122,6 +122,15 @@ extends FsFileSystemArchiveController<E> {
         this.parentName = getModel().getMountPoint().getPath().resolve(ROOT)
                 .getEntryName();
         this.useRootTemplate = useRootTemplate;
+
+        assert invariants();
+    }
+
+    private boolean invariants() {
+        assert null != driver;
+        assert null != parent;
+        assert null != parentName;
+        return true;
     }
 
     @Override
