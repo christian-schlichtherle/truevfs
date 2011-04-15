@@ -26,7 +26,7 @@ import java.io.InputStream;
 
 /**
  * A collection of code snippets to demonstrate the usage of the API in the
- * TrueZIP File* module.
+ * TrueZIP TFile* module.
  * Because most of the snippets are useless in isolation, this class is not
  * available for applications.
  * The benefit of having this class at all is that these code snippets get

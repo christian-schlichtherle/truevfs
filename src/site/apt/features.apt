@@ -7,7 +7,7 @@
 Key Features
 
     [Easy To Use]
-        The API of the {{{./truezip-file/index.html}TrueZIP File*}} module
+        The API of the {{{./truezip-tfile/index.html}TrueZIP TFile*}} module
         provides convenient read/write access to archive files as if they were
         just plain old directories in a file system path.
         Using the classes
@@ -18,7 +18,7 @@ Key Features
         relatives or your own custom archive file format.
 
     [Fast Bulk I/O]
-        The API of the {{{./truezip-file/index.html}TrueZIP File*}} module
+        The API of the {{{./truezip-tfile/index.html}TrueZIP TFile*}} module
         provides convenient and powerful methods for fast bulk I/O operations
         like recursive copying, moving or deleting of directory trees and files.
         E.g. using the multi-threaded method
@@ -37,7 +37,7 @@ Key Features
         TrueZIP's architecture is split into separate modules for the
         {{{./truezip-kernel/index.html}TrueZIP Kernel}},
         a set of File System Drivers and some user APIs like e.g. the
-        {{{./truezip-file/index.html}TrueZIP File*}} module.
+        {{{./truezip-tfile/index.html}TrueZIP TFile*}} module.
         Each module is implemented as a JAR.
         To configure the set of file system types which shall be accessible by
         the application, you simply add the desired file system driver JARs
