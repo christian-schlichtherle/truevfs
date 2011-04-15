@@ -1,5 +1,5 @@
     ---
-    TrueZIP TFile* API Usage
+    TrueZIP File* API Usage
     ---
     Christian Schlichtherle
     ---
@@ -8,7 +8,7 @@
 
 Abstract
 
-    This article shows the usage of the API of the TrueZIP TFile* module.
+    This article shows the usage of the API of the TrueZIP File* module.
 
 Basic Operations
 
@@ -541,7 +541,7 @@ Miscellaneous
     the documented contract of the respective operation.
     This is to protect an application from creating archive entries which cannot
     get encoded and decoded again correctly.
-    For example, the Euro sign (â‚¬) does not have a representation in the IBM437
+    For example, the Euro sign (Ã¢â€šÂ¬) does not have a representation in the IBM437
     character set and hence cannot be used for entries in ordinary ZIP files
     unless TrueZIP's configuration is customized to use another charset.
 

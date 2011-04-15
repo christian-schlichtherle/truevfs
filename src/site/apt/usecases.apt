@@ -33,7 +33,7 @@ Software Build Tool (SBT)
     these types will be a cumbersome and tedious task because each archive file
     type comes with its own classes to read and create them.
 
-    Now, with the API of the {{{./truezip-tfile/index.html}TrueZIP TFile*}}
+    Now, with the API of the {{{./truezip-file/index.html}TrueZIP File*}}
     module, it's dead simple.
     The
     {{{./apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}
@@ -73,7 +73,7 @@ TFile.cp_rp(new TFile("file"), new TFile("archive.tar.gz/file"));
     configured archive file suffix, too.
     Configuration is easy - just add the archive driver JAR for the desired
     archive type to the application's run time class path.
-    This will configure the {{{./truezip-tfile/index.html}TrueZIP TFile*}} module
+    This will configure the {{{./truezip-file/index.html}TrueZIP File*}} module
     to detect the canonical file suffixes of the archive file format
     implemented by the driver.
     
@@ -110,7 +110,7 @@ Integrated Development Environment (IDE)
     And considering the state transitions and algorithms required to support
     arbitrary modifications of an archive file may be a frightening thought.
 
-    Now, with the API of the {{{./truezip-tfile/index.html}TrueZIP TFile*}}
+    Now, with the API of the {{{./truezip-file/index.html}TrueZIP File*}}
     module, here's your relief:
     To list the contents of the root directory of an archive file, you could
     simply use:
@@ -159,7 +159,7 @@ Application File Format
     Then, wouldn't it be nice if you wouldn't need to worry about how to read
     or write the archive file?
     You've already seen how to do this with the API of the
-    {{{./truezip-tfile/index.html}TrueZIP TFile*}} module in the examples above.
+    {{{./truezip-file/index.html}TrueZIP File*}} module in the examples above.
     However, your application may need to recognize only your custom file
     suffixes "foo" or "bar" and nothing else.
 

@@ -71,7 +71,7 @@
     <modules>
         <module>truezip-archetypes</module>
         <module>truezip-drivers</module>
-        <module>truezip-tfile</module>
+        <module>truezip-file</module>
         <module>truezip-kernel</module>
         <module>truezip-samples</module>
         <module>truezip-swing</module>

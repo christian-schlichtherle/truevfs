@@ -140,11 +140,11 @@
             suffixes, you must use an <code>
             ArchiveDetector</code> object (the successor to the <code>ZipDetector</code>
             used in versions up to TrueZIP 5.1.X). For example, to recognize these suffixes
-            with all your <code>TFile*</code> classes instances, you
+            with all your <code>File*</code> classes instances, you
         could do:</p>
         <pre><code>File.setDefaultArchiveDetector(DefaultArchiveDetector.ALL);</code></pre>
         <p>In fact, this is what the <code>nzip</code>
-            utility main class does. As an alternative, you could also pass an ArchiveDetector explicitly to the constructor of the TFile* classes or change the default suffixes in the plug-in driver
+            utility main class does. As an alternative, you could also pass an ArchiveDetector explicitly to the constructor of the File* classes or change the default suffixes in the plug-in driver
             configuration resource file (see the
             <a href="apidocs/de/schlichtherle/io/DefaultArchiveDetector.html">Javadoc</a> on the <code>DefaultArchiveDetector</code>
         class for more information).</p>

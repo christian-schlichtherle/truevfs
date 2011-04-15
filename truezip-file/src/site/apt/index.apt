@@ -4,7 +4,7 @@
     Christian Schlichtherle
     -----------------------
 
-About TrueZIP TFile*
+About TrueZIP File*
 
     This module provides convenient multi-threaded read/write access to
     archive files as if they were just plain directories in a file
@@ -12,7 +12,7 @@ About TrueZIP TFile*
     dependent classes.
 
     These were the well-known <<<File*>>> classes in TrueZIP 6 which have now
-    been renamed to <<<TFile*>>> and relocated to the new package
+    been renamed to <<<File*>>> and relocated to the new package
     {{{../apidocs/de/schlichtherle/truezip/file/package-summary.html}<<<de.schlichtherle.truezip.file>>>}}.
 
     This module also provides Swing GUI classes for viewing file trees,

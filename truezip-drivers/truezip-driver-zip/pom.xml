@@ -30,20 +30,20 @@
 
         Add this artifact to the compile-time class path for dependency
         injection to the TrueZIP Kernel module or to the run-time class path
-        for service location in the TrueZIP TFile* module in order
+        for service location in the TrueZIP File* module in order
         to access ZIP and related archive file types.
     </description>
 
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truezip-tfile</artifactId>
+            <artifactId>truezip-file</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truezip-tfile</artifactId>
+            <artifactId>truezip-file</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
