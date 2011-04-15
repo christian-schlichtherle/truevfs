@@ -46,7 +46,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  */
 @DefaultAnnotation(NonNull.class)
 @Immutable
-final class TIO {
+final class TBIO {
 
     private static final BitField<FsInputOption>
             NONEOF_INPUT_OPTIONS = BitField.noneOf(FsInputOption.class);
@@ -55,7 +55,7 @@ final class TIO {
             NONEOF_OUTPUT_OPTIONS = BitField.noneOf(FsOutputOption.class);
 
     /** You cannot instantiate this class. */
-    private TIO() {
+    private TBIO() {
     }
 
     /**
