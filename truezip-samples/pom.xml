@@ -19,7 +19,7 @@
 
     <parent>
         <groupId>de.schlichtherle.truezip</groupId>
-        <artifactId>truezip</artifactId>
+        <artifactId>truezip-root</artifactId>
         <version>7.0-SNAPSHOT</version>
     </parent>
 
@@ -41,12 +41,12 @@
 
     <dependencies>
         <!-- A TrueZIP application typically has a compile time dependency on
-             either the TrueZIP File* module or the TrueZIP Kernel module.
+             either the TrueZIP TFile* module or the TrueZIP Kernel module.
              However, these sample applications demonstrate using both APIs.
              -->
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truezip-file</artifactId>
+            <artifactId>truezip-tfile</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -65,7 +65,7 @@
         <!-- A TrueZIP application typically has a dependency on one or more
              file system driver modules for accessing their respective file
              system types.
-               When using the TrueZIP File* API, file system drivers get
+               When using the TrueZIP TFile* API, file system drivers get
              automatically enumerated on the run time class path by a service
              locator singleton, so adding a run time dependency is sufficient
              for accessing the respective file system types.
@@ -75,7 +75,7 @@
 
         <!-- This driver provides access to the following URI schemes:
              file: OS file system.
-             This dependency is already added by the TrueZIP File* module.
+             This dependency is already added by the TrueZIP TFile* module.
              -->
         <!--dependency>
             <groupId>${project.groupId}</groupId>

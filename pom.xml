@@ -24,11 +24,11 @@
     </parent>
 
     <groupId>de.schlichtherle.truezip</groupId>
-    <artifactId>truezip</artifactId>
+    <artifactId>truezip-root</artifactId>
     <version>7.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>TrueZIP</name>
+    <name>TrueZIP Root</name>
     <description>
         TrueZIP is a framework for virtual file systems and a library for
         transparent access to archive files as if they were just plain
@@ -69,9 +69,9 @@
     </scm>
 
     <modules>
-        <module>truezip-archetype</module>
-        <module>truezip-driver</module>
-        <module>truezip-file</module>
+        <module>truezip-archetypes</module>
+        <module>truezip-drivers</module>
+        <module>truezip-tfile</module>
         <module>truezip-kernel</module>
         <module>truezip-samples</module>
         <module>truezip-swing</module>

@@ -72,7 +72,7 @@ public final class Cat {
             // TFile class for transformation from a normal path name.
             // Using the TFile class rather than the File class enables the
             // caller to specify archive files in a path name, but at the cost
-            // of adding a dependency on the TrueZIP File* module.
+            // of adding a dependency on the TrueZIP TFile* module.
             URI uri = URI.create(resource);
             uri = uri.isAbsolute() ? uri : new TFile(resource).toURI();
             FsPath path = FsPath.create(uri, FsUriModifier.CANONICALIZE);

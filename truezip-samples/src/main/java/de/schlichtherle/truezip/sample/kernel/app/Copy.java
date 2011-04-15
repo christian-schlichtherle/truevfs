@@ -72,7 +72,7 @@ public final class Copy {
             // TFile class for transformation from a normal path name.
             // Using the TFile class rather than the File class enables the
             // caller to specify archive files in a path name, but at the cost
-            // of adding a dependency on the TrueZIP File* module.
+            // of adding a dependency on the TrueZIP TFile* module.
             URI srcUri = URI.create(src);
             srcUri = srcUri.isAbsolute() ? srcUri : new TFile(src).toURI();
             FsPath srcPath = FsPath.create(srcUri, FsUriModifier.CANONICALIZE);
