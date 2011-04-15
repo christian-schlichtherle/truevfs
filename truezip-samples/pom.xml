@@ -13,7 +13,7 @@
   - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   - See the License for the specific language governing permissions and
   - limitations under the License.
--->
+  -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -41,9 +41,9 @@
 
     <dependencies>
         <!-- A TrueZIP application typically has a compile time dependency on
-             either only the TrueZIP File* module or only the TrueZIP Kernel
-             module.
-             However, the sample applications demonstrate using both APIs. -->
+             either the TrueZIP File* module or the TrueZIP Kernel module.
+             However, these sample applications demonstrate using both APIs.
+             -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truezip-file</artifactId>
@@ -55,21 +55,37 @@
             <version>${project.version}</version>
         </dependency>
 
-        <!-- Provides some nice swing classes which depend on the TrueZIP File*
-             module. -->
-        <!-- <dependency>
+        <!-- Currently unused: Provides some nice swing classes. -->
+        <!--dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truezip-swing</artifactId>
             <version>${project.version}</version>
-        </dependency> -->
+        </dependency-->
 
-        <!-- A TrueZIP application typically has a run time dependency on one
-             or more file system drivers.
-             When found on the class path at run time, a file system driver is
-             automatically registered for use by the TrueZIP File* module or
-             the TrueZIP Kernel module.
-             However, the TrueZIP File* module sample applications have a
-             compile time dependency because they configure some drivers directly.
+        <!-- A TrueZIP application typically has a dependency on one or more
+             file system driver modules for accessing their respective file
+             system types.
+               When using the TrueZIP File* API, file system drivers get
+             automatically enumerated on the run time class path by a service
+             locator singleton, so adding a run time dependency is sufficient
+             for accessing the respective file system types.
+               These sample applications have some compile time dependencies
+             however because they configure and inject some drivers directly.
+             -->
+
+        <!-- This driver provides access to the following URI schemes:
+             file: OS file system.
+             This dependency is already added by the TrueZIP File* module.
+             -->
+        <!--dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truezip-driver-file</artifactId>
+            <version>${project.version}</version>
+            <scope>runtime</scope>
+        </dependency-->
+
+        <!-- This driver provides access to the following URI schemes:
+             http|https: Hyper Text Transport protocol.
              -->
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -77,20 +93,43 @@
             <version>${project.version}</version>
             <scope>runtime</scope>
         </dependency>
+
+        <!-- This driver provides access to the following URI schemes and
+             archive file suffixes:
+             tar: TAR file format.
+             tgz|tar.gz: GZIP compressed TAR file format.
+             tbz|tb2|tar.bz2: BZIP2 compressed TAR file format.
+             -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truezip-driver-tar</artifactId>
             <version>${project.version}</version>
+            <!-- <scope>runtime</scope> -->
         </dependency>
+
+        <!-- This driver provides access to the following URI schemes and
+             archive file suffixes:
+             tzp|zip.rae|zip.raes: RAES encrypted ZIP file format.
+             -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truezip-driver-tzp</artifactId>
             <version>${project.version}</version>
+            <!-- <scope>runtime</scope> -->
         </dependency>
+
+        <!-- This driver provides access to the following URI schemes and
+             archive file suffixes:
+             zip: ZIP file format.
+             ear|jar|war: JAR file format.
+             odg|odp|ods|odt|otg|otp|ots|ott|odb|odf|odm|oth: Open Document File format.
+             exe: Self extracting ZIP file format.
+             -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truezip-driver-zip</artifactId>
             <version>${project.version}</version>
+            <!-- <scope>runtime</scope> -->
         </dependency>
     </dependencies>
 
