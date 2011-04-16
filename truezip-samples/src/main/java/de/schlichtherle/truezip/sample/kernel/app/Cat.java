@@ -48,7 +48,7 @@ public final class Cat {
             cat(path);
     }
 
-    // START SNIPPET: cat
+// START SNIPPET: cat
     /**
      * Copies the contents of the parameter resource to the standard output.
      *
@@ -98,5 +98,5 @@ public final class Cat {
             manager.sync(FsManager.UMOUNT);
         }
     }
-    // END SNIPPET: cat
+// END SNIPPET: cat
 }

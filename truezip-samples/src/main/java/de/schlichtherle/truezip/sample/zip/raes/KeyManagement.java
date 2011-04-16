@@ -68,7 +68,7 @@ public final class KeyManagement {
      * @param file the TZP archive file to set the password for.
      * @param password the password char array to be copied for subsequent use.
      */
-    // START SNIPPET: setPassword
+// START SNIPPET: setPassword
     public static void setPassword(final TFile file, final char[] password) {
         if (!file.isArchive())
             throw new IllegalArgumentException(file + " (not an archive file)");
@@ -81,7 +81,7 @@ public final class KeyManagement {
                 .getKeyProvider(file.toURI())
                 .setKey(params);
     }
-    // END SNIPPET: setPassword
+// END SNIPPET: setPassword
 
     /**
      * Sets the password for all RAES encrypted ZIP files.
@@ -105,7 +105,7 @@ public final class KeyManagement {
      *
      * @param password the password char array to be copied for subsequent use.
      */
-    // START SNIPPET: setAllPasswords1
+// START SNIPPET: setAllPasswords1
     public static void setAllPasswords1(final char[] password) {
         TFile.setDefaultArchiveDetector(
                 new TDefaultArchiveDetector(
@@ -116,29 +116,29 @@ public final class KeyManagement {
                         new PromptingKeyManagerService(
                             new SimpleView(password)))));
     }
-
+    
     private static final class SimpleView
     implements PromptingKeyProvider.View<AesCipherParameters> {
         private final AesCipherParameters params = new AesCipherParameters();
-
+        
         public SimpleView(char[] password) {
             if (null == password)
                 throw new NullPointerException();
             params.setPassword(password);
         }
-
+        
         @Override
         public void promptWriteKey(Controller<AesCipherParameters> controller) {
             controller.setKey(params);
         }
-
+        
         @Override
         public void promptReadKey(  Controller<AesCipherParameters> controller,
                                     boolean invalid) {
             controller.setKey(params);
         }
     } // class SimpleView
-    // END SNIPPET: setAllPasswords1
+// END SNIPPET: setAllPasswords1
 
     /**
      * Sets the password for all RAES encrypted ZIP files.
@@ -163,7 +163,7 @@ public final class KeyManagement {
      *
      * @param password the password char array to be copied for subsequent use.
      */
-    // START SNIPPET: setAllPasswords2
+// START SNIPPET: setAllPasswords2
     public static void setAllPasswords2(final char[] password) {
         TFile.setDefaultArchiveDetector(
                 new TDefaultArchiveDetector(
@@ -173,16 +173,16 @@ public final class KeyManagement {
                         IOPoolLocator.SINGLETON,
                         new SimpleKeyManagerService(password))));
     }
-
+    
     private static final class SimpleKeyManagerService
     extends KeyManagerService {
         private final KeyManager<AesCipherParameters> manager;
-
+    
         SimpleKeyManagerService(final char[] password) {
             manager = new SafeKeyManager<AesCipherParameters, SimpleKeyProvider>(
                     new SimpleKeyProviderFactory(password));
         }
-
+    
         @Override
         @SuppressWarnings("unchecked")
         public <K> KeyManager<K> get(Class<K> type) {
@@ -191,43 +191,43 @@ public final class KeyManagement {
             throw new ServiceConfigurationError("No key manager available for " + type);
         }
     } // SimpleKeyManagerService
-
+    
     private static final class SimpleKeyProviderFactory
     implements KeyProvider.Factory<SimpleKeyProvider> {
         private final char[] password;
-
+    
         SimpleKeyProviderFactory(final char[] password) {
             this.password = password.clone();
         }
-
+    
         @Override
         public SimpleKeyProvider newKeyProvider() {
             return new SimpleKeyProvider(password);
         }
     } // class SimpleKeyProviderFactory
-
+    
     private static final class SimpleKeyProvider
     extends SafeKeyProvider<AesCipherParameters> {
         private AesCipherParameters key = new AesCipherParameters();
-
+    
         SimpleKeyProvider(final char[] password) {
             key.setPassword(password);
         }
-
+    
         @Override
         protected AesCipherParameters getWriteKeyImpl() {
             return key/*.clone()*/; // cloning is optional here
         }
-
+    
         @Override
         protected AesCipherParameters getReadKeyImpl(boolean invalid) {
             return key/*.clone()*/; // cloning is optional here
         }
-
+    
         @Override
         public void setKey(final AesCipherParameters key) {
             this.key = key.clone();
         }
     } // class SimpleKeyProvider
-    // END SNIPPET: setAllPasswords2
+// END SNIPPET: setAllPasswords2
 }
