@@ -42,18 +42,18 @@ abstract class Usage {
     }
 
     void cat1(String path) throws IOException {
-        // START SNIPPET: cat1
+// START SNIPPET: cat1
         InputStream in = new TFileInputStream(path);
         try {
             Streams.cat(in, System.out);
         } finally {
             in.close(); // ALWAYS close the stream!
         }
-        // END SNIPPET: cat1
+// END SNIPPET: cat1
     }
 
     void cat2(String path) {
-        // START SNIPPET: cat2
+// START SNIPPET: cat2
         try {
             InputStream in = new TFileInputStream(path);
             try {
@@ -64,11 +64,11 @@ abstract class Usage {
         } catch (IOException ouch) {
             ouch.printStackTrace();
         }
-        // END SNIPPET: cat2
+// END SNIPPET: cat2
     }
 
     void umount1() {
-        // START SNIPPET: umount1
+// START SNIPPET: umount1
         try {
             TFile.umount(); // with or without parameters
         } catch (SequentialIOException ouch) {
@@ -77,11 +77,11 @@ abstract class Usage {
             ouch.sortPriority().printStackTrace();
             //ouch.printStackTrace(); // equivalent
         }
-        // END SNIPPET: umount1
+// END SNIPPET: umount1
     }
 
     void umount2() {
-        // START SNIPPET: umount2
+// START SNIPPET: umount2
         try {
             TFile.umount(); // with or without parameters
         } catch (SequentialIOException ouch) {
@@ -89,11 +89,11 @@ abstract class Usage {
             // appearance instead.
             ouch.sortAppearance().printStackTrace();
         }
-        // END SNIPPET: umount2
+// END SNIPPET: umount2
     }
 
     void umount3() {
-        // START SNIPPET: umount3
+// START SNIPPET: umount3
         try {
             TFile.umount(); // with or without parameters
         } catch (FsSyncWarningException oops) {
@@ -108,11 +108,11 @@ abstract class Usage {
             ouch.printStackTrace();
             //ouch.sortPriority().printStackTrace(); // equivalent
         }
-        // END SNIPPET: umount3
+// END SNIPPET: umount3
     }
 
     void performance1() throws IOException {
-        // START SNIPPET: performance1
+// START SNIPPET: performance1
         String[] names = {"a", "b", "c"};
         int n = names.length;
         for (int i = 0; i < n; i++) { // n * ...
@@ -121,11 +121,11 @@ abstract class Usage {
             TFile.umount(); // O(i + 1) !!
         }
         // Overall: O(n*n) !!!
-        // END SNIPPET: performance1
+// END SNIPPET: performance1
     }
 
     void performance2() throws IOException {
-        // START SNIPPET: performance2
+// START SNIPPET: performance2
         String[] names = {"a", "b", "c"};
         int n = names.length;
         for (int i = 0; i < n; i++) { // n * ...
@@ -134,11 +134,11 @@ abstract class Usage {
         }
         TFile.umount(); // new file: O(1); modified: O(n)
         // Overall: O(n)
-        // END SNIPPET: performance2
+// END SNIPPET: performance2
     }
 
     void performance3() throws IOException {
-        // START SNIPPET: performance3
+// START SNIPPET: performance3
         String[] names = { "a", "b", "c" };
         int n = names.length;
         for (int i = 0; i < n; i++) { // n * ...
@@ -147,11 +147,11 @@ abstract class Usage {
             entry.createNewFile(); // Second modification triggers remount: O(i + 1) !!
         }
         // Overall: O(n*n) !!!
-        // END SNIPPET: performance3
+// END SNIPPET: performance3
     }
 
     void performance4() throws IOException {
-        // START SNIPPET: performance4
+// START SNIPPET: performance4
         long time = System.currentTimeMillis();
         String[] names = { "a", "b", "c" };
         int n = names.length;
@@ -161,6 +161,6 @@ abstract class Usage {
             entry.setLastModified(time); // Second modification triggers remount: O(i + 1) !!
         }
         // Overall: O(n*n) !!!
-        // END SNIPPET: performance4
+// END SNIPPET: performance4
     }
 }

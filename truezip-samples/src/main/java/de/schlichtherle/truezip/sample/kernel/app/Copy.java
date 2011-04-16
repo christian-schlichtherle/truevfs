@@ -47,7 +47,7 @@ public final class Copy {
         copy(args[0], args[1]);
     }
 
-    // START SNIPPET: copy
+// START SNIPPET: copy
     /**
      * Copies the contents of the parameter source to the parameter destination.
      *
@@ -99,5 +99,5 @@ public final class Copy {
             manager.sync(FsManager.UMOUNT);
         }
     }
-    // END SNIPPET: copy
+// END SNIPPET: copy
 }

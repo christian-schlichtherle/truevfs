@@ -43,7 +43,7 @@ public class PathCat extends CommandLineUtility {
         return 0;
     }
 
-    // START SNIPPET: cat
+// START SNIPPET: cat
     /**
      * Copies the contents of the parameter resource to the standard output.
      *
@@ -67,5 +67,5 @@ public class PathCat extends CommandLineUtility {
             in.close(); // ALWAYS close the stream!
         }
     }
-    // END SNIPPET: cat
+// END SNIPPET: cat
 }
