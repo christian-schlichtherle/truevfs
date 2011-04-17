@@ -19,13 +19,13 @@
 
     <parent>
         <groupId>de.schlichtherle.truezip</groupId>
-        <artifactId>truezip-root</artifactId>
+        <artifactId>truezip</artifactId>
         <version>7.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>truezip-drivers</artifactId>
+    <artifactId>truezip-driver</artifactId>
     <packaging>pom</packaging>
-    <name>TrueZIP Drivers</name>
+    <name>TrueZIP Driver</name>
     <description>Pluggable file system drivers.</description>
 
     <modules>
