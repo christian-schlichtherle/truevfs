@@ -19,12 +19,12 @@
 
     <parent>
         <groupId>de.schlichtherle.truezip</groupId>
-        <artifactId>truezip-drivers</artifactId>
+        <artifactId>truezip-driver</artifactId>
         <version>7.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>truezip-driver-tzp</artifactId>
-    <name>TrueZIP TZP (ZIP.RAES) Driver</name>
+    <name>TrueZIP Driver TZP (ZIP.RAES)</name>
     <description>
         The file system driver family for the TZP (RAES encrypted ZIP) archive
         file type.

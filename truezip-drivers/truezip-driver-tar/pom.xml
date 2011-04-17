@@ -19,12 +19,12 @@
 
     <parent>
         <groupId>de.schlichtherle.truezip</groupId>
-        <artifactId>truezip-drivers</artifactId>
+        <artifactId>truezip-driver</artifactId>
         <version>7.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>truezip-driver-tar</artifactId>
-    <name>TrueZIP TAR Driver</name>
+    <name>TrueZIP Driver TAR</name>
     <description>
         The file system driver family for TAR and related archive file types.
 
