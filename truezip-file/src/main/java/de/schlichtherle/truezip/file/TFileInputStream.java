@@ -30,8 +30,8 @@ import java.io.InputStream;
 import net.jcip.annotations.Immutable;
 
 /**
- * A replacement for {@link FileInputStream} for reading plain old files or
- * entries in an archive file.
+ * A replacement for the class {@link FileInputStream} for reading plain old
+ * files or entries in an archive file.
  * Note that applications cannot read archive <em>files</em> directly using
  * this class - just their entries.
  * <p>

@@ -72,11 +72,12 @@ import static de.schlichtherle.truezip.file.TBIO.*;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 
 /**
- * A replacement for its subclass which provides transparent read/write access
- * to archive files and their entries as if they were (virtual) directories and
- * files.
- * This class extends {@link File} so that it can be used with a
- * {@link FileSystemView}.
+ * A replacement for the class {@link File} which provides transparent
+ * read/write access to archive files and their entries as if they were
+ * (virtual) directories and files.
+ * Because this class actually extends the class {@link File} it can be used
+ * with the class {@link FileSystemView} or any other classes which depend on
+ * the class {@link File}.
  *
  * <a name="Copy_Methods"/><h4>Copy Methods</h4>
  * <p>
@@ -876,6 +877,11 @@ public final class TFile extends File {
      * Commits all unsynchronized changes to the contents of all federated
      * file systems (i.e. archive files) to their respective parent file system.
      *
+     * @throws IllegalArgumentException if the combination of synchronization
+     *         options is illegal, e.g. if
+     *         {@code FsSyncOption.FORCE_CLOSE_INPUT} is cleared and
+     *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set or if the
+     *         synchronization option {@code FsSyncOption.ABORT_CHANGES} is set.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         occur.
      *         This implies that the respective parent file system has been
@@ -884,8 +890,6 @@ public final class TFile extends File {
      *         (i.e. archive file) in its parent file system.
      * @throws FsSyncException if any error conditions occur.
      *         This implies loss of data!
-     * @throws IllegalArgumentException if the combination of options is
-     *         illegal.
      */
     public static void sync(BitField<FsSyncOption> options)
     throws FsSyncException {
@@ -893,12 +897,12 @@ public final class TFile extends File {
     }
 
     /**
-     * Similar to {@link #sync(BitField) sync(options)},
-     * but synchronizes only the given {@code archive} and all its member file
-     * systems.
+     * Commits all unsynchronized changes to the contents of the federated
+     * file system (i.e. archive file) identified by {@code archive} and all
+     * its member federated file systems to their respective parent file system.
      * <p>
-     * If a client application needs to sync an individual federated file
-     * system, the following idiom can be used:
+     * If a client application needs to sync an individual archive file,
+     * the following idiom could be used:
      * <pre>{@code
      * if (file.isArchive() && file.getEnclArchive() == null) // filter top level federated file system
      *   if (file.isDirectory()) // ignore false positives
@@ -907,9 +911,21 @@ public final class TFile extends File {
      * Again, this will also sync all federated file systems which are
      * located within the file system referred to by {@code file}.
      *
-     * @param  archive a top level federated file system.
-     * @throws IllegalArgumentException If {@code archive} is not a top level
-     *         federated file system or the combination of options is illegal.
+     * @param  archive a top level federated file system, i.e. archive file.
+     * @throws IllegalArgumentException if {@code archive} is not a top level
+     *         federated file system or the combination of synchronization
+     *         options is illegal, e.g. if
+     *         {@code FsSyncOption.FORCE_CLOSE_INPUT} is cleared and
+     *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set or if the
+     *         synchronization option {@code FsSyncOption.ABORT_CHANGES} is set.
+     * @throws FsSyncWarningException if <em>only</em> warning conditions
+     *         occur.
+     *         This implies that the respective parent file system has been
+     *         updated with constraints, such as a failure to set the last
+     *         modification time of the entry for the federated file system
+     *         (i.e. archive file) in its parent file system.
+     * @throws FsSyncException if any error conditions occur.
+     *         This implies loss of data!
      * @see    #sync(BitField)
      */
     public static void sync(
@@ -929,8 +945,19 @@ public final class TFile extends File {
     }
 
     /**
-     * Equivalent to {@code sync(FsController.UMOUNT)}.
+     * Commits all unsynchronized changes to the contents of all federated
+     * file systems (i.e. archive files) to their respective parent file system.
+     * This method is equivalent to calling
+     * {@link #sync(BitField) sync(FsManager.UMOUNT)}.
      *
+     * @throws FsSyncWarningException if <em>only</em> warning conditions
+     *         occur.
+     *         This implies that the respective parent file system has been
+     *         updated with constraints, such as a failure to set the last
+     *         modification time of the entry for the federated file system
+     *         (i.e. archive file) in its parent file system.
+     * @throws FsSyncException if any error conditions occur.
+     *         This implies loss of data!
      * @see #sync(BitField)
      */
     public static void umount()
@@ -939,12 +966,23 @@ public final class TFile extends File {
     }
 
     /**
-     * Equivalent to {@code
+     * Commits all unsynchronized changes to the contents of all federated
+     * file systems (i.e. archive files) to their respective parent file system.
+     * This method is equivalent to calling
+     * {@link #sync(BitField)
         sync(   BitField.of(FsSyncOption.CLEAR_CACHE)
                 .set(FsSyncOption.FORCE_CLOSE_INPUT, closeStreams)
                 .set(FsSyncOption.FORCE_CLOSE_OUTPUT, closeStreams))
      * }.
      *
+     * @throws FsSyncWarningException if <em>only</em> warning conditions
+     *         occur.
+     *         This implies that the respective parent file system has been
+     *         updated with constraints, such as a failure to set the last
+     *         modification time of the entry for the federated file system
+     *         (i.e. archive file) in its parent file system.
+     * @throws FsSyncException if any error conditions occur.
+     *         This implies loss of data!
      * @see #sync(BitField)
      */
     public static void umount(boolean closeStreams)
@@ -955,7 +993,10 @@ public final class TFile extends File {
     }
 
     /**
-     * Equivalent to {@code
+     * Commits all unsynchronized changes to the contents of all federated
+     * file systems (i.e. archive files) to their respective parent file system.
+     * This method is equivalent to calling
+     * {@link #sync(BitField)
         sync(   BitField.of(FsSyncOption.CLEAR_CACHE)
                 .set(FsSyncOption.WAIT_CLOSE_INPUT, waitForInputStreams)
                 .set(FsSyncOption.FORCE_CLOSE_INPUT, closeInputStreams)
@@ -963,6 +1004,14 @@ public final class TFile extends File {
                 .set(FsSyncOption.FORCE_CLOSE_OUTPUT, closeOutputStreams))
      * }.
      *
+     * @throws FsSyncWarningException if <em>only</em> warning conditions
+     *         occur.
+     *         This implies that the respective parent file system has been
+     *         updated with constraints, such as a failure to set the last
+     *         modification time of the entry for the federated file system
+     *         (i.e. archive file) in its parent file system.
+     * @throws FsSyncException if any error conditions occur.
+     *         This implies loss of data!
      * @see #sync(BitField)
      */
     public static void umount(
@@ -977,10 +1026,21 @@ public final class TFile extends File {
     }
 
     /**
-     * Equivalent to {@code
-        sync(archive, BitField.of(FsController.UMOUNT))
+     * Commits all unsynchronized changes to the contents of all federated
+     * file systems (i.e. archive files) to their respective parent file system.
+     * This method is equivalent to calling
+     * {@link #sync(BitField)
+        sync(archive, FsManager.UMOUNT)
      * }.
      *
+     * @throws FsSyncWarningException if <em>only</em> warning conditions
+     *         occur.
+     *         This implies that the respective parent file system has been
+     *         updated with constraints, such as a failure to set the last
+     *         modification time of the entry for the federated file system
+     *         (i.e. archive file) in its parent file system.
+     * @throws FsSyncException if any error conditions occur.
+     *         This implies loss of data!
      * @see #sync(TFile, BitField)
      */
     public static void umount(TFile archive)
@@ -989,13 +1049,24 @@ public final class TFile extends File {
     }
 
     /**
-     * Equivalent to {@code
+     * Commits all unsynchronized changes to the contents of all federated
+     * file systems (i.e. archive files) to their respective parent file system.
+     * This method is equivalent to calling
+     * {@link #sync(BitField)
         sync(   archive,
                 BitField.of(FsSyncOption.CLEAR_CACHE)
                 .set(FsSyncOption.FORCE_CLOSE_INPUT, closeStreams)
                 .set(FsSyncOption.FORCE_CLOSE_OUTPUT, closeStreams))
      * }.
      *
+     * @throws FsSyncWarningException if <em>only</em> warning conditions
+     *         occur.
+     *         This implies that the respective parent file system has been
+     *         updated with constraints, such as a failure to set the last
+     *         modification time of the entry for the federated file system
+     *         (i.e. archive file) in its parent file system.
+     * @throws FsSyncException if any error conditions occur.
+     *         This implies loss of data!
      * @see #sync(TFile, BitField)
      */
     public static void umount(TFile archive, boolean closeStreams)
@@ -1007,7 +1078,10 @@ public final class TFile extends File {
     }
 
     /**
-     * Equivalent to {@code
+     * Commits all unsynchronized changes to the contents of all federated
+     * file systems (i.e. archive files) to their respective parent file system.
+     * This method is equivalent to calling
+     * {@link #sync(BitField)
         sync(   archive,
                 BitField.of(FsSyncOption.CLEAR_CACHE)
                 .set(FsSyncOption.WAIT_CLOSE_INPUT, waitForInputStreams)
@@ -1016,6 +1090,14 @@ public final class TFile extends File {
                 .set(FsSyncOption.FORCE_CLOSE_OUTPUT, closeOutputStreams))
      * }.
      *
+     * @throws FsSyncWarningException if <em>only</em> warning conditions
+     *         occur.
+     *         This implies that the respective parent file system has been
+     *         updated with constraints, such as a failure to set the last
+     *         modification time of the entry for the federated file system
+     *         (i.e. archive file) in its parent file system.
+     * @throws FsSyncException if any error conditions occur.
+     *         This implies loss of data!
      * @see #sync(TFile, BitField)
      */
     public static void umount(TFile archive,
