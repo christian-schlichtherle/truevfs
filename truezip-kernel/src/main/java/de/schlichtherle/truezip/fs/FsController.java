@@ -29,8 +29,6 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import javax.swing.Icon;
 
-import static de.schlichtherle.truezip.fs.FsSyncOption.*;
-
 /**
  * An abstract class which provides read/write access to a file system.
  * This class may be organized in a chain of responsibility for file system
@@ -196,8 +194,9 @@ public abstract class FsController<M extends FsModel> {
      * @param  <X> the type of the {@code IOException} to throw at the
      *         discretion of the exception {@code handler}.
      * @throws IllegalArgumentException if the combination of synchronization
-     *         options is illegal, e.g. if {@code FORCE_CLOSE_INPUT} is cleared
-     *         and {@code FORCE_CLOSE_OUTPUT} is set.
+     *         options is illegal, e.g. if
+     *         {@code FsSyncOption.FORCE_CLOSE_INPUT} is cleared and
+     *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set.
      */
     public abstract <X extends IOException> void
     sync(   BitField<FsSyncOption> options,
