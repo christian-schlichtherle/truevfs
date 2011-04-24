@@ -169,7 +169,7 @@ implements OutputShop<ZipArchiveEntry> {
                         if (       UNKNOWN == entry.getCrc()
                                 || UNKNOWN == entry.getCompressedSize()
                                 || UNKNOWN == entry.getSize())
-                            return new TempEntryOutputStream(
+                            return new StoredEntryOutputStream(
                                     pool.allocate(),
                                     entry);
                         break;
@@ -215,11 +215,6 @@ implements OutputShop<ZipArchiveEntry> {
         }
 
         @Override
-        public void write(byte[] b, int off, int len) throws IOException {
-            delegate.write(b, off, len);
-        }
-
-        @Override
         public void close() throws IOException {
             closeEntry();
         }
@@ -230,11 +225,11 @@ implements OutputShop<ZipArchiveEntry> {
      * When the stream is closed, the temporary file is then copied to this
      * output stream and finally deleted.
      */
-    private class TempEntryOutputStream extends CheckedOutputStream {
+    private class StoredEntryOutputStream extends CheckedOutputStream {
         private final IOPool.Entry<?> temp;
         private boolean closed;
 
-        TempEntryOutputStream(final IOPool.Entry<?> temp, final ZipArchiveEntry entry)
+        StoredEntryOutputStream(final IOPool.Entry<?> temp, final ZipArchiveEntry entry)
         throws IOException {
             super(temp.getOutputSocket().newOutputStream(), new CRC32());
             assert entry.getMethod() == STORED;
