@@ -18,13 +18,17 @@
             <artifactId>truezip-file</artifactId>
             <version>${truezip.version}</version>
         </dependency>
+
+        <!-- The Kernel is usually only an indirect dependency unless the
+             application calls it directly.
+             -->
         <!--dependency>
             <groupId>de.schlichtherle.truezip</groupId>
             <artifactId>truezip-kernel</artifactId>
             <version>${truezip.version}</version>
         </dependency-->
 
-        <!-- Optional: Provides some nice swing classes. -->
+        <!-- This optional dependency provides some nice swing classes. -->
         <!--dependency>
             <groupId>de.schlichtherle.truezip</groupId>
             <artifactId>truezip-swing</artifactId>
@@ -55,7 +59,7 @@
         </dependency-->
 
         <!-- This driver provides access to the following URI schemes:
-             http|https: Hyper Text Transport protocol.
+             http|https: Hyper Text Transport Protocol.
              -->
         <dependency>
             <groupId>de.schlichtherle.truezip</groupId>
