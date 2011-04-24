@@ -122,9 +122,10 @@ implements Iterable<FsController<?>> {
      *         discretion of the exception {@code handler}.
      * @throws IOException at the discretion of the exception {@code handler}.
      * @throws IllegalArgumentException if the combination of synchronization
-     *         options is illegal, e.g. if {@code FORCE_CLOSE_INPUT} is cleared
-     *         and {@code FORCE_CLOSE_OUTPUT} is set or if the synchronization
-     *         option {@code ABORT_CHANGES} is set.
+     *         options is illegal, e.g. if
+     *         {@code FsSyncOption.FORCE_CLOSE_INPUT} is cleared and
+     *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set or if the
+     *         synchronization option {@code FsSyncOption.ABORT_CHANGES} is set.
      */
     public <X extends IOException> void
     sync(   final BitField<FsSyncOption> options,
