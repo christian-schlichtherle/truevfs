@@ -33,8 +33,8 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.APPEND;
 import static de.schlichtherle.truezip.fs.FsOutputOption.CREATE_PARENTS;
 
 /**
- * A replacement for {@link FileOutputStream} for writing plain old files or
- * entries in an archive file.
+ * A replacement for the class {@link FileOutputStream} for writing plain old
+ * files or entries in an archive file.
  * Note that applications cannot write archive <em>files</em> directly using
  * this class - just their entries.
  * <p>
