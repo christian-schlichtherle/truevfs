@@ -1707,6 +1707,7 @@ public final class TFile extends File {
 
     @Deprecated
     @Override
+    @SuppressWarnings("deprecation")
     public URL toURL() throws MalformedURLException {
         return null != innerArchive ? toURI().toURL() : delegate.toURL();
     }
