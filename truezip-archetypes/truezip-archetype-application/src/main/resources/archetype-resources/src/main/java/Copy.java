@@ -76,9 +76,9 @@ public class Copy {
             // federated file systems (i.e. archive files) to their respective
             // parent file system.
             //   In this context, this is an optional operation:
-            // When the JVM shuts down properly, it performs the same tasks as
-            // this method.
-            //TFile.umount();
+            // When the JVM shuts down, it performs the same tasks as this
+            // method.
+            TFile.umount();
         }
     }
 
