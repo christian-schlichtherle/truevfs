@@ -926,13 +926,11 @@ public abstract class TFileTestSuite {
             assertTrue(a.setLastModified(time - granularity));
         }
 
-        // Test copyFrom.
+        // Test copy from.
         TFile.cp(a, b);
-        //assertTrue(b.copyFrom(a));
         assertThat(b.length(), is(a.length()));
         assertThat(b.lastModified(), not(is(a.lastModified())));
         TFile.cp_p(a, b);
-        //assertTrue(b.archiveCopyFrom(a));
         assertThat(b.length(), is(a.length()));
         long almd = a.lastModified() / granularity * granularity;
         long blmd = b.lastModified() / granularity * granularity;
@@ -940,13 +938,11 @@ public abstract class TFileTestSuite {
         long blmu = (b.lastModified() + granularity - 1) / granularity * granularity;
         assertTrue(almd == blmd || almu == blmu);
 
-        // Test copyTo.
+        // Test copy to.
         TFile.cp(b, a);
-        //assertTrue(b.copyTo(a)); // updates timestamp
         assertThat(a.length(), is(b.length()));
         assertThat(a.lastModified(), not(is(b.lastModified())));
         TFile.cp_p(b, a);
-        //assertTrue(b.archiveCopyTo(a));
         assertThat(a.length(), is(b.length()));
         almd = a.lastModified() / granularity * granularity;
         blmd = b.lastModified() / granularity * granularity;
