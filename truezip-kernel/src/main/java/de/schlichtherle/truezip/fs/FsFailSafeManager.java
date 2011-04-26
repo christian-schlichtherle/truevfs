@@ -26,6 +26,9 @@ import net.jcip.annotations.ThreadSafe;
  * file system manager when the JVM terminates.
  * This is to protect an application from loss of data if {@link #sync} isn't
  * called explicitly before the JVM terminates.
+ * <p>
+ * If any exception occurs within the shutdown hook, its stacktrace is printed
+ * to standard error - logging doesn't work in a shutdown hook.
  *
  * @see     #getController(FsMountPoint, FsCompositeDriver)
  * @see     #sync
