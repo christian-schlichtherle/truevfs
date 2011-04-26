@@ -103,64 +103,6 @@ Basic Operations
     in which streams are processed by the finalizer thread is not specified and
     any data buffered by an output stream gets lost.
 
-Atomicity of File System Operations
-
-    In general, a file system operation is either atomic or not.
-    In its strict sense, an atomic operation meets the following conditions:
-
-    [[1]] The operation either completely succeeds or completely fails.
-        If it fails, the state of the file system is not changed.
-
-    [[2]] {{{Third_Party_Access}Third parties}} can't monitor or influence the
-        changes as they are in progress - they can only observe the result.
-
-    []
-
-    All reliable file system implementations meet the first condition and so
-    does TrueZIP.
-    However, the situation is different for the second condition:
-
-    * TrueZIP's virtual file system implementation is running in a JVM process,
-        so other processes could monitor or influence changes in progress.
-
-    * TrueZIP's recognition of archive files is configurable, so other
-        <<<File>>> instances could monitor or influence changes in progress.
-
-    * TrueZIP maintains state information about archive files on the heap and
-        in temporary files, so other definitions of the classes in this package
-        which have been loaded by other class loaders could monitor or
-        influence changes in progress.
-
-    []
-
-    This implies that TrueZIP cannot provide any operations which are atomic
-    in its strict sense.
-    However, many file system operations in this package are declared to be
-    virtually atomic according to their Javadoc.
-    A virtually atomic operation meets the following conditions:
-
-    [[1]] The operation either completely succeeds or completely fails.
-        If it fails, the state of the (virtual) file system is not changed.
-
-    [[2]] If the path does not contain any archive files, the operation is
-        always delegated to the real file system and third parties can't
-        monitor or influence the changes as they are in progress - they can
-        only observe the result.
-
-    [[3]] Otherwise, all
-        {{{../apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}
-        instances which recognize the same set of archive file types and are
-        defined by the same class loader can't monitor or influence the changes
-        as they are in progress - they can only observe the result.
-
-    []
-
-    These conditions apply regardless of whether the
-    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}
-    instances are used by different threads or not.
-    In other words, TrueZIP is thread safe as much as you could expect from an
-    OS file system.
-
 Committing Unsynchronized Changes To The Contents Of Archive Files
 
     To provide random read/write access to archive files, TrueZIP needs to
@@ -474,6 +416,64 @@ Committing Unsynchronized Changes To The Contents Of Archive Files
         loop which modifies the contents of an archive file.
 
     []
+
+Atomicity of File System Operations
+
+    In general, a file system operation is either atomic or not.
+    In its strict sense, an atomic operation meets the following conditions:
+
+    [[1]] The operation either completely succeeds or completely fails.
+        If it fails, the state of the file system is not changed.
+
+    [[2]] {{{Third_Party_Access}Third parties}} can't monitor or influence the
+        changes as they are in progress - they can only observe the result.
+
+    []
+
+    All reliable file system implementations meet the first condition and so
+    does TrueZIP.
+    However, the situation is different for the second condition:
+
+    * TrueZIP's virtual file system implementation is running in a JVM process,
+        so other processes could monitor or influence changes in progress.
+
+    * TrueZIP's recognition of archive files is configurable, so other
+        <<<File>>> instances could monitor or influence changes in progress.
+
+    * TrueZIP maintains state information about archive files on the heap and
+        in temporary files, so other definitions of the classes in this package
+        which have been loaded by other class loaders could monitor or
+        influence changes in progress.
+
+    []
+
+    This implies that TrueZIP cannot provide any operations which are atomic
+    in its strict sense.
+    However, many file system operations in this package are declared to be
+    virtually atomic according to their Javadoc.
+    A virtually atomic operation meets the following conditions:
+
+    [[1]] The operation either completely succeeds or completely fails.
+        If it fails, the state of the (virtual) file system is not changed.
+
+    [[2]] If the path does not contain any archive files, the operation is
+        always delegated to the real file system and third parties can't
+        monitor or influence the changes as they are in progress - they can
+        only observe the result.
+
+    [[3]] Otherwise, all
+        {{{../apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}
+        instances which recognize the same set of archive file types and are
+        defined by the same class loader can't monitor or influence the changes
+        as they are in progress - they can only observe the result.
+
+    []
+
+    These conditions apply regardless of whether the
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}
+    instances are used by different threads or not.
+    In other words, TrueZIP is thread safe as much as you could expect from an
+    OS file system.
 
 Miscellaneous
 
