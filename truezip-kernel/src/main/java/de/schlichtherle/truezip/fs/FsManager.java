@@ -87,9 +87,14 @@ implements Iterable<FsController<?>> {
                                     CLEAR_CACHE);
 
     /**
-     * Commits all unsynchronized changes to the contents of the federated file
-     * systems managed by this instance to their respective parent file system.
-     * This will reset the state of the respective file system controllers.
+     * Commits all unsynchronized changes to the contents of all federated file
+     * systems managed by this instance to their respective parent file system,
+     * releases the associated resources for access by third parties
+     * (e.g. other processes) and cleans up any temporary resources.
+     * Note that temporary resources may get used even if the federated file
+     * systems where accessed read-only.
+     * As a side effect, this will reset the state of the respective file
+     * system controllers.
      * <p>
      * This method calls {@link #sync sync(options, builder)}, where builder is
      * an instance of {@link FsSyncExceptionBuilder}.
@@ -112,8 +117,13 @@ implements Iterable<FsController<?>> {
 
     /**
      * Commits all unsynchronized changes to the contents of all federated file
-     * systems managed by this instance to their respective parent file system.
-     * This will reset the state of the respective file system controllers.
+     * systems managed by this instance to their respective parent file system,
+     * releases the associated resources for access by third parties
+     * (e.g. other processes) and cleans up any temporary resources.
+     * Note that temporary resources may get used even if the federated file
+     * systems where accessed read-only.
+     * As a side effect, this will reset the state of the respective file
+     * system controllers.
      *
      * @param  options the synchronization options.
      * @param  handler the exception handling strategy for dealing with one or
