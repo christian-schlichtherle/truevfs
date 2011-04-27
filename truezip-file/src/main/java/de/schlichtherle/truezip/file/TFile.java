@@ -874,8 +874,13 @@ public final class TFile extends File {
     }
 
     /**
-     * Commits all unsynchronized changes to the contents of all federated
-     * file systems (i.e. archive files) to their respective parent file system.
+     * Commits all unsynchronized changes to the contents of all federated file
+     * systems (i.e. archive files) to their respective parent file system,
+     * releases the associated resources (i.e. the target archive files) for
+     * access by third parties (e.g. other processes) and cleans up any
+     * temporary resources (i.e. temporary files).
+     * Note that temporary files may get used even if the archive files where
+     * accessed read-only.
      *
      * @throws IllegalArgumentException if the combination of synchronization
      *         options is illegal, e.g. if
@@ -897,9 +902,14 @@ public final class TFile extends File {
     }
 
     /**
-     * Commits all unsynchronized changes to the contents of the federated
-     * file system (i.e. archive file) identified by {@code archive} and all
-     * its member federated file systems to their respective parent file system.
+     * Commits all unsynchronized changes to the contents of all federated file
+     * systems (i.e. archive files) identified by {@code archive} and all its
+     * member federated file systems to their respective parent file system,
+     * releases the associated resources (i.e. the target archive files) for
+     * access by third parties (e.g. other processes) and cleans up any
+     * temporary resources (i.e. temporary files).
+     * Note that temporary files may get used even if the archive files where
+     * accessed read-only.
      * <p>
      * If a client application needs to sync an individual archive file,
      * the following idiom could be used:
@@ -945,8 +955,14 @@ public final class TFile extends File {
     }
 
     /**
-     * Commits all unsynchronized changes to the contents of all federated
-     * file systems (i.e. archive files) to their respective parent file system.
+     * Commits all unsynchronized changes to the contents of all federated file
+     * systems (i.e. archive files) to their respective parent file system,
+     * releases the associated resources (i.e. the target archive files) for
+     * access by third parties (e.g. other processes) and cleans up any
+     * temporary resources (i.e. temporary files).
+     * Note that temporary files may get used even if the archive files where
+     * accessed read-only.
+     * <p>
      * This method is equivalent to calling
      * {@link #sync(BitField) sync(FsManager.UMOUNT)}.
      *
@@ -966,8 +982,14 @@ public final class TFile extends File {
     }
 
     /**
-     * Commits all unsynchronized changes to the contents of all federated
-     * file systems (i.e. archive files) to their respective parent file system.
+     * Commits all unsynchronized changes to the contents of all federated file
+     * systems (i.e. archive files) to their respective parent file system,
+     * releases the associated resources (i.e. the target archive files) for
+     * access by third parties (e.g. other processes) and cleans up any
+     * temporary resources (i.e. temporary files).
+     * Note that temporary files may get used even if the archive files where
+     * accessed read-only.
+     * <p>
      * This method is equivalent to calling
      * {@link #sync(BitField)
         sync(   BitField.of(FsSyncOption.CLEAR_CACHE)
@@ -993,8 +1015,14 @@ public final class TFile extends File {
     }
 
     /**
-     * Commits all unsynchronized changes to the contents of all federated
-     * file systems (i.e. archive files) to their respective parent file system.
+     * Commits all unsynchronized changes to the contents of all federated file
+     * systems (i.e. archive files) to their respective parent file system,
+     * releases the associated resources (i.e. the target archive files) for
+     * access by third parties (e.g. other processes) and cleans up any
+     * temporary resources (i.e. temporary files).
+     * Note that temporary files may get used even if the archive files where
+     * accessed read-only.
+     * <p>
      * This method is equivalent to calling
      * {@link #sync(BitField)
         sync(   BitField.of(FsSyncOption.CLEAR_CACHE)
@@ -1026,8 +1054,14 @@ public final class TFile extends File {
     }
 
     /**
-     * Commits all unsynchronized changes to the contents of all federated
-     * file systems (i.e. archive files) to their respective parent file system.
+     * Commits all unsynchronized changes to the contents of all federated file
+     * systems (i.e. archive files) to their respective parent file system,
+     * releases the associated resources (i.e. the target archive files) for
+     * access by third parties (e.g. other processes) and cleans up any
+     * temporary resources (i.e. temporary files).
+     * Note that temporary files may get used even if the archive files where
+     * accessed read-only.
+     * <p>
      * This method is equivalent to calling
      * {@link #sync(BitField)
         sync(archive, FsManager.UMOUNT)
@@ -1049,8 +1083,14 @@ public final class TFile extends File {
     }
 
     /**
-     * Commits all unsynchronized changes to the contents of all federated
-     * file systems (i.e. archive files) to their respective parent file system.
+     * Commits all unsynchronized changes to the contents of all federated file
+     * systems (i.e. archive files) to their respective parent file system,
+     * releases the associated resources (i.e. the target archive files) for
+     * access by third parties (e.g. other processes) and cleans up any
+     * temporary resources (i.e. temporary files).
+     * Note that temporary files may get used even if the archive files where
+     * accessed read-only.
+     * <p>
      * This method is equivalent to calling
      * {@link #sync(BitField)
         sync(   archive,
@@ -1078,8 +1118,14 @@ public final class TFile extends File {
     }
 
     /**
-     * Commits all unsynchronized changes to the contents of all federated
-     * file systems (i.e. archive files) to their respective parent file system.
+     * Commits all unsynchronized changes to the contents of all federated file
+     * systems (i.e. archive files) to their respective parent file system,
+     * releases the associated resources (i.e. the target archive files) for
+     * access by third parties (e.g. other processes) and cleans up any
+     * temporary resources (i.e. temporary files).
+     * Note that temporary files may get used even if the archive files where
+     * accessed read-only.
+     * <p>
      * This method is equivalent to calling
      * {@link #sync(BitField)
         sync(   archive,

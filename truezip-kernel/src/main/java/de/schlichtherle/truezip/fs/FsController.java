@@ -156,8 +156,12 @@ public abstract class FsController<M extends FsModel> {
     throws IOException;
 
     /**
-     * Commits all unsynchronized changes to the contents of this file
-     * to its parent file system.
+     * Commits all unsynchronized changes to the contents of this file system
+     * to its parent file system, releases the associated resources for access
+     * by third parties (e.g. other processes) and cleans up any temporary
+     * resources.
+     * Note that temporary resources may get used even if this file systems
+     * was accessed read-only.
      * If this is not a federated file system, i.e. if its not a member of a
      * parent file system, then nothing happens.
      * Otherwise, the state of this file system controller is reset.
@@ -183,7 +187,11 @@ public abstract class FsController<M extends FsModel> {
 
     /**
      * Commits all unsynchronized changes to the contents of this file system
-     * to its parent file system.
+     * to its parent file system, releases the associated resources for access
+     * by third parties (e.g. other processes) and cleans up any temporary
+     * resources.
+     * Note that temporary resources may get used even if this file systems
+     * was accessed read-only.
      * If this is not a federated file system, i.e. if its not a member of a
      * parent file system, then nothing happens.
      * Otherwise, the state of this file system controller is reset.
