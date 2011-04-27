@@ -16,28 +16,35 @@
 
 package de.schlichtherle.truezip.util;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class URICodecTest extends TestCase {
-    
-    public URICodecTest(String testName) {
-        super(testName);
+public class URICodecTest {
+
+    @Test
+    public void testDecode() {
+        for (final String[] test : new String[][] {
+            { "\ufffd", "%ZZ" },
+        }) {
+            assertEquals(test[0], URICodec.decode(test[1]));
+        }
     }
 
-    public void testEncoding() {
-        assertEquals("\ufffd", URICodec.decode("%ZZ"));
-
-        final String[][] TESTS = {
+    @Test
+    public void testRoundTrip() {
+        for (final String[] test : new String[][] {
             { null, null },
             { "\ufffd", "%EF%BF%BD" }, // replacement character
             { "abcdefghijklmnopqrstuvwxyz", "abcdefghijklmnopqrstuvwxyz" },
             { "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "ABCDEFGHIJKLMNOPQRSTUVWXYZ" },
-            { "0123456789", "0123456789" },
             { "_-!.~'()*", "_-!.~'()*" }, // mark
+            { "0123456789", "0123456789" },
+            { ":", "%3A" },
             { "%", "%25" }, // percent
             { "%a", "%25a" }, // percent adjacent
             { "a%", "a%25" }, // percent adjacent
@@ -52,14 +59,9 @@ public class URICodecTest extends TestCase {
             { "\u20aca\u20ac", "%E2%82%ACa%E2%82%AC" }, // inverse embedding
             { "\u00c4\u00d6\u00dc\u00df\u00e4\u00f6\u00fc", "%C3%84%C3%96%C3%9C%C3%9F%C3%A4%C3%B6%C3%BC" }, // German diaeresis and sharp s
             { "a\u00c4b\u00d6c\u00dcd\u00dfe\u00e4f\u00f6g\u00fch", "a%C3%84b%C3%96c%C3%9Cd%C3%9Fe%C3%A4f%C3%B6g%C3%BCh" }, // dito embedded
-        };
-
-        for (int i = 0; i < TESTS.length; i++) {
-            final String[] TEST = TESTS[i];
-
-            // Test encoding.
-            assertEquals(TEST[1], URICodec.encode(TEST[0]));
-            assertEquals(TEST[0], URICodec.decode(TEST[1]));
+        }) {
+            assertEquals(test[1], URICodec.encode(test[0]));
+            assertEquals(test[0], URICodec.decode(test[1]));
         }
     }
 }
