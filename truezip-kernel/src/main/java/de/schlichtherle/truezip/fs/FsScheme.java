@@ -68,15 +68,15 @@ public final class FsScheme implements Serializable, Comparable<FsScheme> {
      *         syntax constraints for URI schemes.
      */
     public FsScheme(final @NonNull String scheme) throws URISyntaxException {
-        int i = scheme.length();
-        if (0 >= i)
+        final int l = scheme.length();
+        if (0 >= l)
             throw new URISyntaxException(quote(scheme), "Empty URI scheme");
         char c;
         c = scheme.charAt(0);
         // TODO: Character class is no help here - consider table lookup!
         if ((c < 'a' || 'z' < c) && (c < 'A' || 'Z' < c))
             throw new URISyntaxException(quote(scheme), "Illegal character in URI scheme", 0);
-        while (--i >= 1) {
+        for (int i = 1; i < l; i++) {
             c = scheme.charAt(i);
             if ((c < 'a' || 'z' < c) && (c < 'A' || 'Z' < c)
                     && (c < '0' || '9' < c)
