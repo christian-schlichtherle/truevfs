@@ -26,15 +26,14 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
-import java.nio.charset.CodingErrorAction;
+import java.util.ArrayList;
 import net.jcip.annotations.NotThreadSafe;
 
 import static java.nio.charset.CoderResult.*;
 
 /**
- * Static utility methods for encoding/decoding illegal characters in a URI
- * according to RFC&nbsp;2396.
- * The character set used for encoding/decoding is UTF-8.
+ * Encodes and decodes illegal characters in URI components according to
+ * RFC&nbsp;2396.
  *
  * @author Christian Schlichtherle
  * @version @version@
@@ -47,14 +46,6 @@ public final class URICodec {
 
     private static final Charset UTF8 = Charset.forName("UTF-8");
 
-    private static final String DECODED_REPLACEMENT = "\ufffd";
-    private static final byte[] ENCODED_REPLACEMENT;
-    static {
-        final ByteBuffer eB = UTF8.encode(DECODED_REPLACEMENT);
-        ENCODED_REPLACEMENT = new byte[eB.limit()];
-        eB.get(ENCODED_REPLACEMENT);
-    }
-
     private static final char[] HEX = {
         '0', '1', '2', '3', '4', '5', '6', '7',
         '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
@@ -66,19 +57,30 @@ public final class URICodec {
     private static final String
             DEFAULT_LEGAL_CHARS = ALPHANUM_CHARS + MARK_CHARS + ",;$&+=@";
 
-    private final CharsetEncoder encoder = UTF8
-            .newEncoder()
-            .onMalformedInput(CodingErrorAction.REPORT)
-            .onUnmappableCharacter(CodingErrorAction.REPLACE)
-            .replaceWith(ENCODED_REPLACEMENT);
-
-    private final CharsetDecoder decoder = UTF8
-            .newDecoder()
-            .onMalformedInput(CodingErrorAction.REPORT)
-            .onUnmappableCharacter(CodingErrorAction.REPLACE)
-            .replaceWith(DECODED_REPLACEMENT);
+    private final CharsetEncoder encoder;
+    private final CharsetDecoder decoder;
 
     private @CheckForNull StringBuilder stringBuilder;
+
+    /**
+     * Constructs a new URI codec which uses the UTF-8 character set to encode
+     * non-US-ASCII characters.
+     */
+    public URICodec() {
+        this(UTF8);
+    }
+
+    /**
+     * Constructs a new URI codec which uses the given character set to encode
+     * non-US-ASCII characters.
+     * <p>
+     * <strong>WARNING:</strong> Using any other character set than UTF-8
+     * should void interoperability with most applications!
+     */
+    public URICodec(final Charset charset) {
+        this.encoder = charset.newEncoder();
+        this.decoder = charset.newDecoder();
+    }
 
     private static void quote(final char dc, final StringBuilder eS) {
         quote(UTF8.encode(CharBuffer.wrap(Character.toString(dc))), eS);
@@ -114,49 +116,70 @@ public final class URICodec {
     }
 
     /**
-     * Encodes all characters in the given URI string which do <em>not</em>
-     * belong to the character class "unreserved", that is,
-     * which are neither alphanumeric nor in the string {@code "-_.!~*'()"}.
-     * Illegal characters are encoded using UTF-8.
+     * Encodes all characters in the string {@code dS} which are illegal within
+     * the URI component {@code comp}.
      * <p>
-     * Note that calling this method on an already encoded URI string escapes
-     * any getEscapeSequence sequences again, that is, each occurence of the character
+     * Note that calling this method on an already encoded string escapes any
+     * escape sequences again, that is, each occurence of the character
      * {@code '%'} is substituted with the string {@code "%25"} again.
      * 
-     * @param comp the URI component to encode.
-     * @param dS the decoded string.
+     * @param  dS the decoded string to encode.
+     * @param  comp the URI component to encode.
      * @return The encoded string.
      */
-    public String encode(Component comp, String dS) {
+    public String encode(String dS, Component comp) {
         try {
-            StringBuilder eS = encode(comp, dS, null);
+            StringBuilder eS = encode(dS, comp, null);
             return eS != null ? eS.toString() : dS;
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
     }
 
-    public @Nullable StringBuilder encode(
-            final Component comp,
+    /**
+     * Encodes all characters in the string {@code dS} which are illegal within
+     * the URI component {@code comp} to the string builder {@code eS}.
+     * <p>
+     * Note that calling this method on an already encoded string escapes
+     * any escape sequences again, that is, each occurence of the character
+     * {@code '%'} is substituted with the string {@code "%25"} again.
+     * 
+     * @param  dS the decoded string to encode.
+     * @param  comp the URI component to encode.
+     * @param  eS the string builder to which all encoded characters shall get
+     *         appended.
+     * @return {@code null} if and only if {@code dS} contains only legal
+     *         characters for the URI component {@code comp}.
+     *         Otherwise, if {@code eS} is not {@code null}, it gets returned
+     *         with all encoded characters appended to it.
+     *         Otherwise, a temporary string builder gets returned which solely
+     *         contains all encoded characters.
+     *         This temporary string builder may get cleared and reused upon
+     *         the next call to <em>any</em> method of this object.
+     * @throws URISyntaxException on any encoding error.
+     *         This exception will leave {@code eS} in an undefined state.
+     */
+    public @CheckForNull StringBuilder encode(
             final String dS,
+            final Component comp,
             @CheckForNull StringBuilder eS)
     throws URISyntaxException {
         final String[] escapes = comp.escapes;
         final CharBuffer dC = CharBuffer.wrap(dS);  // decoded characters
         ByteBuffer eB = null;                       // encoded bytes
-        CharsetEncoder enc = null;                  // encoder
+        CharsetEncoder enc = null;
         while (dC.hasRemaining()) {
             dC.mark();
-            final char dc = dC.get();
+            final char dc = dC.get();               // decoded character
             if (dc < 0x80) {
                 final String es = escapes[dc];
                 if (es != null) {
-                    if (eS == null) {
-                        eS = stringBuilder;
+                    if (eB == null) {
                         if (eS == null)
-                            eS = stringBuilder = new StringBuilder();
-                        else
-                            eS.setLength(0);
+                            if ((eS = stringBuilder) == null)
+                                eS = stringBuilder = new StringBuilder();
+                            else
+                                eS.setLength(0);
                         eS.append(dS, 0, dC.position() - 1); // prefix until current character
                         eB = ByteBuffer.allocate(3);
                         enc = encoder;
@@ -166,13 +189,13 @@ public final class URICodec {
                     if (eS != null)
                         eS.append(dc);
                 }
-            }  else {
-                if (eS == null) {
-                    eS = stringBuilder;
+            } else {
+                if (eB == null) {
                     if (eS == null)
-                        eS = stringBuilder = new StringBuilder();
-                    else
-                        eS.setLength(0);
+                        if ((eS = stringBuilder) == null)
+                            eS = stringBuilder = new StringBuilder();
+                        else
+                            eS.setLength(0);
                     eS.append(dS, 0, dC.position() - 1); // prefix until current character
                     eB = ByteBuffer.allocate(3);
                     enc = encoder;
@@ -194,16 +217,16 @@ public final class URICodec {
                 dC.limit(dC.capacity());
             }
         }
-        return eS;
+        return eB == null ? null : eS;
     }
 
     /**
-     * Decodes all escaped characters in the given URI string, that is,
+     * Decodes all escape sequences in the string {@code eS}, that is,
      * each occurence of "%<i>XX</i>", where <i>X</i> is a hexadecimal digit,
      * gets substituted with the corresponding single byte and the resulting
-     * string gets decoded using UTF-8 as the character set.
+     * string gets decoded using the character set provided to the constructor.
      * 
-     * @param eS the encoded string.
+     * @param  eS the encoded string to decode.
      * @return The decoded string.
      */
     public String decode(String eS) {
@@ -215,38 +238,60 @@ public final class URICodec {
         }
     }
 
-    public StringBuilder decode(
+    /**
+     * Decodes all escape sequences in the string {@code eS}, that is,
+     * each occurence of "%<i>XX</i>", where <i>X</i> is a hexadecimal digit,
+     * gets substituted with the corresponding single byte and the resulting
+     * string gets decoded to the string builder {@code dS} using the character
+     * set provided to the constructor.
+     * 
+     * @param  eS the encoded string to decode.
+     * @param  dS the string builder to which all decoded characters shall get
+     *         appended.
+     * @return {@code null} if and only if {@code eS} contains no escape
+     *         sequences.
+     *         Otherwise, if {@code dS} is not {@code null}, it gets returned
+     *         with all decoded characters appended to it.
+     *         Otherwise, a temporary string builder gets returned which solely
+     *         contains all decoded characters.
+     *         This temporary string builder may get cleared and reused upon
+     *         the next call to <em>any</em> method of this object.
+     * @throws URISyntaxException on any encoding error.
+     *         This exception will leave {@code eS} in an undefined state.
+     */
+    public @CheckForNull StringBuilder decode(
             final String eS,
             @CheckForNull StringBuilder dS)
     throws URISyntaxException {
         final CharBuffer eC = CharBuffer.wrap(eS);  // encoded characters
         ByteBuffer eB = null;                       // encoded bytes
-        CharsetDecoder dec = null;                  // decoder
         CharBuffer dC = null;                       // decoded characters
+        CharsetDecoder dec = null;
         while (true) {
             eC.mark();
             final int ec = eC.hasRemaining() ? eC.get() : -1; // char is unsigned!
             if (ec == '%') {
                 if (eB == null) {
-                    dS = stringBuilder;
                     if (dS == null)
-                        dS = stringBuilder = new StringBuilder();
-                    else
-                        dS.setLength(0);
+                        if ((dS = stringBuilder) == null)
+                            dS = stringBuilder = new StringBuilder();
+                        else
+                            dS.setLength(0);
                     dS.append(eS, 0, eC.position() - 1); // prefix until current character
-                    final int l = eC.remaining();
-                    eB = ByteBuffer.allocate((l + 1) / 3 * ENCODED_REPLACEMENT.length);
+                    int l = eC.remaining();
+                    l = (l + 1) / 3;
+                    eB = ByteBuffer.allocate(l);
                     dC = CharBuffer.allocate(l);
                     dec = decoder;
                 }
-                final int eb = dequote(eC);
+                final int eb = dequote(eC);         // encoded byte
                 if (eb < 0)
                     throw new URISyntaxException(
                             eS,
                             "illegal escape sequence",
                             eC.reset().position());
                 eB.put((byte) eb);
-            }  else {
+            } else {
                 if (eB != null && eB.position() > 0) {
                     eB.flip();
                     { // Decode eB -> dC.
@@ -268,12 +313,12 @@ public final class URICodec {
                     dS.append((char) ec);
             }
         }
-        return dS;
+        return eB == null ? null : dS;
     }
 
     public enum Component {
         //SCHEME,
-        DEFAULT(DEFAULT_LEGAL_CHARS),
+        ANY(DEFAULT_LEGAL_CHARS),
         AUTHORITY(DEFAULT_LEGAL_CHARS + ":"),
         ABSOLUTE_PATH(DEFAULT_LEGAL_CHARS + ":/"),
         PATH(DEFAULT_LEGAL_CHARS + "/"),
