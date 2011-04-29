@@ -223,13 +223,13 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
     }
 
     /**
-     * Constructs a new path by synthesizing its URI from the given
-     * nullable mount point and entry name.
+     * Constructs a new path by composing its URI from the given nullable mount
+     * point and entry name.
      *
      * @param  mountPoint the nullable {@link #getMountPoint() mount point}.
      * @param  entryName the {@link #getEntryName() entry name}.
-     * @throws URISyntaxException if the synthesized path URI
-     *         would not conform to the syntax constraints for paths.
+     * @throws URISyntaxException if the composed path URI would not conform
+     *         to the syntax constraints for paths.
      */
     public FsPath(  final @CheckForNull FsMountPoint mountPoint,
                     final FsEntryName entryName) {

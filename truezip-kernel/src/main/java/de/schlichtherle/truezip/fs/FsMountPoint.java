@@ -151,8 +151,8 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
     }
 
     /**
-     * Constructs a new mount point by synthesizing its URI from the given
-     * scheme and path.
+     * Constructs a new mount point by composing its URI from the given scheme
+     * and path.
      * This static factory method calls
      * {@link #FsMountPoint(FsScheme, FsPath) new FsMountPoint(scheme, path)}
      * and wraps any thrown {@link URISyntaxException} in an
@@ -160,8 +160,8 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
      *
      * @param  scheme the {@link #getScheme() scheme}.
      * @param  path the {@link #getPath() path}.
-     * @throws IllegalArgumentException if the synthesized mount point URI
-     *         would not conform to the syntax constraints for mount points.
+     * @throws IllegalArgumentException if the composed mount point URI would
+     *         not conform to the syntax constraints for mount points.
      * @return A new mount point.
      */
     public static FsMountPoint
@@ -215,13 +215,13 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
     }
 
     /**
-     * Constructs a new mount point by synthesizing its URI from the given
-     * scheme and path.
+     * Constructs a new mount point by composing its URI from the given scheme
+     * and path.
      *
      * @param  scheme the non-{@code null} {@link #getScheme() scheme}.
      * @param  path the non-{@code null} {@link #getPath() path}.
-     * @throws URISyntaxException if the synthesized mount point URI
-     *         would not conform to the syntax constraints for mount points.
+     * @throws URISyntaxException if the composed mount point URI would not
+     *         conform to the syntax constraints for mount points.
      */
     public FsMountPoint(final FsScheme scheme,
                         final FsPath path)
