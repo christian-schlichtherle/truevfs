@@ -12,28 +12,30 @@ Concept and Definitions
     To understand what this means, let's check the following definitions first:
 
     [File System]
-        An atomic, persistent container for files and directories
-        in order to store and structure arbitrary data.
+        A persistent container for file and directory objects which can be used
+        in order to structure, store and retrieve arbitrary data.
+
+    [OS File System]
         Normally, the operating system provides an application with the means
-        to access a set of one or more file systems like NTFS or ext4.
+        to access a set of one or more file system types like NTFS or ext4.
+        This includes network file system types like CIFS or NFS.
 
     [Virtual File System]
-        A component which provides the same services like
-        a file system, but is synthesized at run time from one or more
-        components which are <not> file systems by themselves.
+        A file system which is composed of one or more components which are
+        not file systems by themselves.
 
     [Federated File System]
-        A file system with a root directory which is a
-        member within another (parent) file system, which may be federated, too.
+        A file system with a root directory which is a member within another
+        (parent) file system which may be federated, too.
 
     [File System Space]
         The union of all file systems.
 
     []
 
-    Note that the attributes <virtual> and <federated> in
-    their strict sense are complementary, so a file system could be
-    one or the other or both at the same time.
+    Note that the attributes <virtual> and <federated> are not mutually
+    exclusive, i.e. a file system could be virtual or federated or both
+    at the same time.
 
     As an example for a file system which is virtual, but not federated,
     consider the HTTP(S) protocols:
