@@ -148,10 +148,10 @@ public final class URICodec {
      * @param  comp the URI component to encode.
      * @param  eS the string builder to which all encoded characters shall get
      *         appended.
-     * @return {@code null} if and only if {@code dS} contains only legal
-     *         characters for the URI component {@code comp}.
-     *         Otherwise, if {@code eS} is not {@code null}, it gets returned
-     *         with all encoded characters appended to it.
+     * @return If {@code dS} contains only legal characters for the URI
+     *         component {@code comp}, then {@code null} gets returned.
+     *         Otherwise, if {@code eS} is not {@code null}, then it gets
+     *         returned with all encoded characters appended to it.
      *         Otherwise, a temporary string builder gets returned which solely
      *         contains all encoded characters.
      *         This temporary string builder may get cleared and reused upon
@@ -248,10 +248,10 @@ public final class URICodec {
      * @param  eS the encoded string to decode.
      * @param  dS the string builder to which all decoded characters shall get
      *         appended.
-     * @return {@code null} if and only if {@code eS} contains no escape
-     *         sequences.
-     *         Otherwise, if {@code dS} is not {@code null}, it gets returned
-     *         with all decoded characters appended to it.
+     * @return If {@code eS} contains no escape sequences, then {@code null}
+     *         gets returned.
+     *         Otherwise, if {@code dS} is not {@code null}, then it gets
+     *         returned with all decoded characters appended to it.
      *         Otherwise, a temporary string builder gets returned which solely
      *         contains all decoded characters.
      *         This temporary string builder may get cleared and reused upon
