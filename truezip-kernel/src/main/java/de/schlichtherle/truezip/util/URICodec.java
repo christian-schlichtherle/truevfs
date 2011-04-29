@@ -18,7 +18,6 @@ package de.schlichtherle.truezip.util;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -26,7 +25,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
-import java.util.ArrayList;
 import net.jcip.annotations.NotThreadSafe;
 
 import static java.nio.charset.CoderResult.*;
@@ -126,6 +124,11 @@ public final class URICodec {
      * @param  dS the decoded string to encode.
      * @param  comp the URI component to encode.
      * @return The encoded string.
+     * @throws IllegalArgumentException on any encoding error with a
+     *         {@link URISyntaxException} as its
+     *         {@link IllegalArgumentException#getCause() cause}.
+     *         This exception should never occur if the character set of this
+     *         codec is UTF-8.
      */
     public String encode(String dS, Component comp) {
         try {
@@ -157,7 +160,9 @@ public final class URICodec {
      *         This temporary string builder may get cleared and reused upon
      *         the next call to <em>any</em> method of this object.
      * @throws URISyntaxException on any encoding error.
-     *         This exception will leave {@code eS} in an undefined state.
+     *         This exception should never occur if the character set of this
+     *         codec is UTF-8.
+     *         If it occurs however, {@code eS} is left in an undefined state.
      */
     public @CheckForNull StringBuilder encode(
             final String dS,
@@ -175,12 +180,13 @@ public final class URICodec {
                 final String es = escapes[dc];
                 if (es != null) {
                     if (eB == null) {
-                        if (eS == null)
+                        if (eS == null) {
                             if ((eS = stringBuilder) == null)
                                 eS = stringBuilder = new StringBuilder();
                             else
                                 eS.setLength(0);
-                        eS.append(dS, 0, dC.position() - 1); // prefix until current character
+                            eS.append(dS, 0, dC.position() - 1); // prefix until current character
+                        }
                         eB = ByteBuffer.allocate(3);
                         enc = encoder;
                     }
@@ -191,12 +197,13 @@ public final class URICodec {
                 }
             } else {
                 if (eB == null) {
-                    if (eS == null)
+                    if (eS == null) {
                         if ((eS = stringBuilder) == null)
                             eS = stringBuilder = new StringBuilder();
                         else
                             eS.setLength(0);
-                    eS.append(dS, 0, dC.position() - 1); // prefix until current character
+                        eS.append(dS, 0, dC.position() - 1); // prefix until current character
+                    }
                     eB = ByteBuffer.allocate(3);
                     enc = encoder;
                 }
@@ -228,6 +235,9 @@ public final class URICodec {
      * 
      * @param  eS the encoded string to decode.
      * @return The decoded string.
+     * @throws IllegalArgumentException on any decoding error with a
+     *         {@link URISyntaxException} as its
+     *         {@link IllegalArgumentException#getCause() cause}.
      */
     public String decode(String eS) {
         try {
@@ -256,7 +266,7 @@ public final class URICodec {
      *         contains all decoded characters.
      *         This temporary string builder may get cleared and reused upon
      *         the next call to <em>any</em> method of this object.
-     * @throws URISyntaxException on any encoding error.
+     * @throws URISyntaxException on any decoding error.
      *         This exception will leave {@code eS} in an undefined state.
      */
     public @CheckForNull StringBuilder decode(
@@ -272,12 +282,13 @@ public final class URICodec {
             final int ec = eC.hasRemaining() ? eC.get() : -1; // char is unsigned!
             if (ec == '%') {
                 if (eB == null) {
-                    if (dS == null)
+                    if (dS == null) {
                         if ((dS = stringBuilder) == null)
                             dS = stringBuilder = new StringBuilder();
                         else
                             dS.setLength(0);
-                    dS.append(eS, 0, eC.position() - 1); // prefix until current character
+                        dS.append(eS, 0, eC.position() - 1); // prefix until current character
+                    }
                     int l = eC.remaining();
                     l = (l + 1) / 3;
                     eB = ByteBuffer.allocate(l);
@@ -319,7 +330,7 @@ public final class URICodec {
     public enum Component {
         //SCHEME,
         ANY(DEFAULT_LEGAL_CHARS),
-        AUTHORITY(DEFAULT_LEGAL_CHARS + ":"),
+        AUTHORITY(DEFAULT_LEGAL_CHARS + ":[]"),
         ABSOLUTE_PATH(DEFAULT_LEGAL_CHARS + ":/"),
         PATH(DEFAULT_LEGAL_CHARS + "/"),
         QUERY(DEFAULT_LEGAL_CHARS + ":/?"),
