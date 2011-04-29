@@ -79,7 +79,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  * with the class {@link FileSystemView} or any other classes which depend on
  * the class {@link File}.
  *
- * <a name="Copy_Methods"/><h4>Copy Methods</h4>
+ * <a name="Copy_Methods"/><h3>Copy Methods</h3>
  * <p>
  * This class provides some convenient copy methods which use pooled buffers
  * and pooled threads in order to achieve superior performance as compared to
@@ -117,7 +117,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  * not work.
  * This limitation is designed to prevent ambiguous method semantics.
  *
- * <a name="Direct_Data_Copying"/><h5>Direct Data Copying (DDC)</h5>
+ * <a name="Direct_Data_Copying"/><h4>Direct Data Copying (DDC)</h4>
  * <p>
  * If data is copied from an archive file to another archive file of the
  * same type, some of the copy methods support a feature called <i>Direct Data
@@ -134,7 +134,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  * additional temporary file, but shows no impact otherwise - the TAR file
  * format doesn't support compression.
  *
- * <a name="False_Positives"/><h4>Identifying Archive Paths and False Positives</h4>
+ * <a name="False_Positives"/><h3>Identifying Archive Paths and False Positives</h3>
  * <p>
  * Whenever an archive file suffix is recognized in a path, this class treats
  * the corresponding file or directory as a <i>prospective archive file</i>.
