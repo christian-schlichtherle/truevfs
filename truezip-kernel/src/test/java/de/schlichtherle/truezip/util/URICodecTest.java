@@ -50,13 +50,13 @@ public class URICodecTest {
         }
 
         try {
-            codec.encode(DEFAULT, null);
+            codec.encode(null, ANY);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            codec.encode(null, "");
+            codec.encode("", null);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -94,11 +94,11 @@ public class URICodecTest {
             { EnumSet.allOf(Component.class), "0123456789", "0123456789" },
             { EnumSet.allOf(Component.class), "_-!.~'()*", "_-!.~'()*" }, // mark
             { EnumSet.allOf(Component.class), "@", "@" },
-            { EnumSet.of(DEFAULT, PATH), ":", "%3A" },
+            { EnumSet.of(ANY, PATH), ":", "%3A" },
             { EnumSet.of(AUTHORITY, ABSOLUTE_PATH, QUERY, FRAGMENT), ":", ":" },
-            { EnumSet.of(DEFAULT, AUTHORITY), "/", "%2F" },
+            { EnumSet.of(ANY, AUTHORITY), "/", "%2F" },
             { EnumSet.of(ABSOLUTE_PATH, PATH, QUERY, FRAGMENT), "/", "/" },
-            { EnumSet.of(DEFAULT, AUTHORITY, ABSOLUTE_PATH, PATH), "?", "%3F" },
+            { EnumSet.of(ANY, AUTHORITY, ABSOLUTE_PATH, PATH), "?", "%3F" },
             { EnumSet.of(QUERY, FRAGMENT), "?", "?" },
             { EnumSet.allOf(Component.class), "#", "%23" },
             { EnumSet.allOf(Component.class), "%", "%25" }, // percent
@@ -116,7 +116,7 @@ public class URICodecTest {
             { EnumSet.allOf(Component.class), "a\u00c4b\u00d6c\u00dcd\u00dfe\u00e4f\u00f6g\u00fch", "a%C3%84b%C3%96c%C3%9Cd%C3%9Fe%C3%A4f%C3%B6g%C3%BCh" }, // dito embedded
         }) {
             for (final Component component : (EnumSet<Component>) test[0])
-                assertEquals(test[2], codec.encode(component, test[1].toString()));
+                assertEquals(test[2], codec.encode(test[1].toString(), component));
             assertEquals(test[1], codec.decode(test[2].toString()));
         }
     }
