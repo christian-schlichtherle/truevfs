@@ -26,10 +26,10 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.junit.Test;
 
+import static java.util.logging.Level.*;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
@@ -80,7 +80,7 @@ public class EntryNameTest {
                 oos.writeObject(original);
                 oos.close();
 
-                logger.log(Level.FINE, "Number of serialized bytes: {0}", bos.size());
+                logger.log(FINE, "Number of serialized bytes: {0}", bos.size());
 
                 final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
                 final ObjectInputStream ois = new ObjectInputStream(bis);
@@ -98,7 +98,7 @@ public class EntryNameTest {
                 enc.writeObject(original);
                 enc.close();
 
-                logger.log(Level.FINE, bos.toString("UTF-8"));
+                logger.log(FINE, bos.toString("UTF-8"));
 
                 final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
                 final XMLDecoder dec = new XMLDecoder(bis);
