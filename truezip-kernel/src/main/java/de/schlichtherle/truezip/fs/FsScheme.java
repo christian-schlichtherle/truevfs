@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import de.schlichtherle.truezip.util.URIBuilder;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -68,26 +69,8 @@ public final class FsScheme implements Serializable, Comparable<FsScheme> {
      *         syntax constraints for URI schemes.
      */
     public FsScheme(final @NonNull String scheme) throws URISyntaxException {
-        final int l = scheme.length();
-        if (0 >= l)
-            throw new URISyntaxException(quote(scheme), "Empty URI scheme");
-        char c;
-        c = scheme.charAt(0);
-        // TODO: Character class is no help here - consider table lookup!
-        if ((c < 'a' || 'z' < c) && (c < 'A' || 'Z' < c))
-            throw new URISyntaxException(quote(scheme), "Illegal character in URI scheme", 0);
-        for (int i = 1; i < l; i++) {
-            c = scheme.charAt(i);
-            if ((c < 'a' || 'z' < c) && (c < 'A' || 'Z' < c)
-                    && (c < '0' || '9' < c)
-                    && c != '+' && c != '-' && c != '.')
-                throw new URISyntaxException(quote(scheme), "Illegal character in URI scheme", i);
-        }
+        URIBuilder.validateScheme(scheme);
         this.scheme = scheme;
-    }
-
-    private static String quote(Object s) {
-        return "\"" + s + "\"";
     }
 
     @Override
