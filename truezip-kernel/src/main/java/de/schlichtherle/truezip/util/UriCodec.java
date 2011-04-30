@@ -40,7 +40,7 @@ import static java.nio.charset.CoderResult.*;
  *      RFC&nbsp;2396: Uniform Resource Identifiers (URI): Generic Syntax</a>
  * @see <a href="http://www.ietf.org/rfc/rfc2732.txt">
  *      RFC&nbsp;2732: Format for Literal IPv6 Addresses in URL's</a>
- * @see URIBuilder
+ * @see UriBuilder
  * @author Christian Schlichtherle
  * @version @version@
  */
