@@ -16,12 +16,12 @@
 package de.schlichtherle.truezip.util;
 
 import java.util.logging.Logger;
-import de.schlichtherle.truezip.util.URICodec.Encoding;
+import de.schlichtherle.truezip.util.UriCodec.Encoding;
 import java.util.EnumSet;
 import org.junit.Before;
 import org.junit.Test;
 
-import static de.schlichtherle.truezip.util.URICodec.Encoding.*;
+import static de.schlichtherle.truezip.util.UriCodec.Encoding.*;
 import static java.util.logging.Level.*;
 import static org.junit.Assert.*;
 
@@ -29,16 +29,16 @@ import static org.junit.Assert.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class URICodecTest {
+public class UriCodecTest {
 
     private static final Logger logger
-            = Logger.getLogger(URICodecTest.class.getName());
+            = Logger.getLogger(UriCodecTest.class.getName());
 
-    private URICodec codec;
+    private UriCodec codec;
 
     @Before
     public void setUp() {
-        this.codec = new URICodec();
+        this.codec = new UriCodec();
     }
 
     @Test

@@ -46,7 +46,7 @@ import static java.nio.charset.CoderResult.*;
  */
 @DefaultAnnotation(NonNull.class)
 @NotThreadSafe
-public final class URICodec {
+public final class UriCodec {
 
     private static final Charset UTF8 = Charset.forName("UTF-8");
 
@@ -70,7 +70,7 @@ public final class URICodec {
      * Constructs a new URI codec which uses the UTF-8 character set to encode
      * non-US-ASCII characters.
      */
-    public URICodec() {
+    public UriCodec() {
         this(UTF8);
     }
 
@@ -81,7 +81,7 @@ public final class URICodec {
      * <strong>WARNING:</strong> Using any other character set than UTF-8
      * should void interoperability with most applications!
      */
-    public URICodec(final Charset charset) {
+    public UriCodec(final Charset charset) {
         this.encoder = charset.newEncoder();
         this.decoder = charset.newDecoder();
     }

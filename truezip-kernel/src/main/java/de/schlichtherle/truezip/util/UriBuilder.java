@@ -26,7 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.jcip.annotations.NotThreadSafe;
 
-import static de.schlichtherle.truezip.util.URICodec.Encoding.*;
+import static de.schlichtherle.truezip.util.UriCodec.Encoding.*;
 
 /**
  * A mutable JavaBean for composing URIs according to
@@ -53,15 +53,15 @@ import static de.schlichtherle.truezip.util.URICodec.Encoding.*;
  * <h3>Identities</h3>
  * For any {@link URI} {@code u} it is generally true that
  * <code><pre>
- * new URIBuilder(u).getUri().equals(u);
+ * new UriBuilder(u).getUri().equals(u);
  * </pre></code>
  * and
  * <code><pre>
- * new URIBuilder().uri(u).getUri().equals(u);
+ * new UriBuilder().uri(u).getUri().equals(u);
  * </pre></code>
  * and
  * <code><pre>
- * new URIBuilder()
+ * new UriBuilder()
  *     .scheme(u.getScheme())
  *     .authority(u.getAuthority())
  *     .path(u.isOpaque() ? u.getSchemeSpecificPart() : u.getPath())
@@ -77,15 +77,15 @@ import static de.schlichtherle.truezip.util.URICodec.Encoding.*;
  *      RFC&nbsp;2396: Uniform Resource Identifiers (URI): Generic Syntax</a>
  * @see <a href="http://www.ietf.org/rfc/rfc2732.txt">
  *      RFC&nbsp;2732: Format for Literal IPv6 Addresses in URL's</a>
- * @see URICodec
+ * @see UriCodec
  * @author Christian Schlichtherle
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
 @NotThreadSafe
-public final class URIBuilder {
+public final class UriBuilder {
 
-    private final URICodec codec;
+    private final UriCodec codec;
     private @CheckForNull StringBuilder builder;
     private @CheckForNull String scheme;
     private @CheckForNull String authority;
@@ -97,8 +97,8 @@ public final class URIBuilder {
      * Constructs a new URI builder which uses the UTF-8 character set to
      * encode non-US-ASCII characters.
      */
-    public URIBuilder() {
-        codec = new URICodec();
+    public UriBuilder() {
+        codec = new UriCodec();
     }
 
     /**
@@ -107,7 +107,7 @@ public final class URIBuilder {
      * 
      * @param uri the uri for initializing the initial state.
      */
-    public URIBuilder(URI uri) {
+    public UriBuilder(URI uri) {
         this();
         setUri(uri); // OK - class is final!
     }
@@ -118,8 +118,8 @@ public final class URIBuilder {
      * 
      * @param charset the character set for encoding non-US-ASCII characters.
      */
-    public URIBuilder(Charset charset) {
-        codec = new URICodec(charset);
+    public UriBuilder(Charset charset) {
+        codec = new UriCodec(charset);
     }
 
     /**
@@ -129,7 +129,7 @@ public final class URIBuilder {
      * @param uri the uri for initializing the initial state.
      * @param charset the character set for encoding non-US-ASCII characters.
      */
-    public URIBuilder(URI uri, Charset charset) {
+    public UriBuilder(URI uri, Charset charset) {
         this(charset);
         setUri(uri); // OK - class is final!
     }
@@ -141,7 +141,7 @@ public final class URIBuilder {
      * 
      * @return this
      */
-    public URIBuilder clear() {
+    public UriBuilder clear() {
         //uri = null;
         scheme = null;
         authority = null;
@@ -305,7 +305,7 @@ public final class URIBuilder {
      *         syntax constraints of the {@link URI} class.
      * @return this
      */
-    public URIBuilder string(String uri) {
+    public UriBuilder string(String uri) {
         setString(uri);
         return this;
     }
@@ -370,7 +370,7 @@ public final class URIBuilder {
      * @param  uri the URI.
      * @return this
      */
-    public URIBuilder uri(URI uri) {
+    public UriBuilder uri(URI uri) {
         setUri(uri);
         return this;
     }
@@ -400,7 +400,7 @@ public final class URIBuilder {
      * @param  scheme the URI scheme component.
      * @return this
      */
-    public URIBuilder scheme(@CheckForNull String scheme) {
+    public UriBuilder scheme(@CheckForNull String scheme) {
         setScheme(scheme);
         return this;
     }
@@ -432,7 +432,7 @@ public final class URIBuilder {
      * @param  authority the URI authority component.
      * @return this
      */
-    public URIBuilder authority(@CheckForNull String authority) {
+    public UriBuilder authority(@CheckForNull String authority) {
         setAuthority(authority);
         return this;
     }
@@ -465,7 +465,7 @@ public final class URIBuilder {
      * @param  path the URI path component.
      * @return this
      */
-    public URIBuilder path(@CheckForNull String path) {
+    public UriBuilder path(@CheckForNull String path) {
         setPath(path);
         return this;
     }
@@ -497,7 +497,7 @@ public final class URIBuilder {
      * @param  query the URI query component.
      * @return this
      */
-    public URIBuilder query(@CheckForNull String query) {
+    public UriBuilder query(@CheckForNull String query) {
         setQuery(query);
         return this;
     }
@@ -527,7 +527,7 @@ public final class URIBuilder {
      * @param  fragment the URI fragment component.
      * @return this
      */
-    public URIBuilder fragment(@CheckForNull String fragment) {
+    public UriBuilder fragment(@CheckForNull String fragment) {
         setFragment(fragment);
         return this;
     }
