@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.util.URIBuilder;
+import de.schlichtherle.truezip.util.UriBuilder;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -69,7 +69,7 @@ public final class FsScheme implements Serializable, Comparable<FsScheme> {
      *         syntax constraints for URI schemes.
      */
     public FsScheme(final @NonNull String scheme) throws URISyntaxException {
-        URIBuilder.validateScheme(scheme);
+        UriBuilder.validateScheme(scheme);
         this.scheme = scheme;
     }
 

@@ -28,16 +28,16 @@ import static org.junit.Assert.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class URIBuilderTest {
+public class UriBuilderTest {
 
     private static final Logger
-            logger = Logger.getLogger(URIBuilderTest.class.getName());
+            logger = Logger.getLogger(UriBuilderTest.class.getName());
     
-    private URIBuilder builder;
+    private UriBuilder builder;
 
     @Before
     public void setUp() {
-        builder = new URIBuilder();
+        builder = new UriBuilder();
     }
 
     @Test
