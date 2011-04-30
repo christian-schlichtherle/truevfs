@@ -31,12 +31,18 @@ import static java.nio.charset.CoderResult.*;
 
 /**
  * Encodes and decodes illegal characters in URI components according to
- * RFC&nbsp;2396.
+ * <a href="http://www.ietf.org/rfc/rfc2396.txt">RFC&nbsp;2396</a>
+ * and its updates in
+ * <a href="http://www.ietf.org/rfc/rfc2732.txt">RFC&nbsp;2732</a>
+ * for IPv6 addresses.
  *
+ * @see <a href="http://www.ietf.org/rfc/rfc2396.txt">
+ *      RFC&nbsp;2396: Uniform Resource Identifiers (URI): Generic Syntax</a>
+ * @see <a href="http://www.ietf.org/rfc/rfc2732.txt">
+ *      RFC&nbsp;2732: Format for Literal IPv6 Addresses in URL's</a>
+ * @see URIBuilder
  * @author Christian Schlichtherle
  * @version @version@
- * @see <a target="_blank" href="http://www.ietf.org/rfc/rfc2396.txt">
- *      RFC&nbsp;2396: Uniform Resource Identifiers (URI): Generic Syntax</a>
  */
 @DefaultAnnotation(NonNull.class)
 @NotThreadSafe
@@ -130,7 +136,7 @@ public final class URICodec {
      *         This exception should never occur if the character set of this
      *         codec is UTF-8.
      */
-    public String encode(String dS, Component comp) {
+    public String encode(String dS, Encoding comp) {
         try {
             StringBuilder eS = encode(dS, comp, null);
             return eS != null ? eS.toString() : dS;
@@ -166,7 +172,7 @@ public final class URICodec {
      */
     public @CheckForNull StringBuilder encode(
             final String dS,
-            final Component comp,
+            final Encoding comp,
             @CheckForNull StringBuilder eS)
     throws URISyntaxException {
         final String[] escapes = comp.escapes;
@@ -327,24 +333,53 @@ public final class URICodec {
         return eB == null ? null : dS;
     }
 
-    public enum Component {
-        //SCHEME,
+    /**
+     * Defines the escape sequences for illegal characters in various URI
+     * components.
+     */
+    public enum Encoding {
+        /**
+         * Encoding which can be safely used for any URI component, except the
+         * URI scheme component which does not allow escape sequences.
+         * This encoding may produce redundant escape sequences, however.
+         */
         ANY(DEFAULT_LEGAL_CHARS),
+        
+        /** Encoding for exclusive use with the URI authority component. */
         AUTHORITY(DEFAULT_LEGAL_CHARS + ":[]"),
-        ABSOLUTE_PATH(DEFAULT_LEGAL_CHARS + ":/"),
+
+        /**
+         * Encoding for exclusive use with the URI path component
+         * where the path may contain arbitrary characters.
+         * This encoding may produce redundant escape sequences for absolute
+         * paths, however.
+         * 
+         * @see #ABSOLUTE_PATH
+         */
         PATH(DEFAULT_LEGAL_CHARS + "/"),
+
+        /**
+         * Encoding for exclusive use with the URI path component
+         * where the path starts with the separator character {@code '/'}.
+         * 
+         * @see #PATH
+         */
+        ABSOLUTE_PATH(DEFAULT_LEGAL_CHARS + ":/"),
+
+        /** Encoding for exclusive use with the URI query component. */
         QUERY(DEFAULT_LEGAL_CHARS + ":/?"),
+
+        /** Encoding for exclusive use with the URI fragment component. */
         FRAGMENT(DEFAULT_LEGAL_CHARS + ":/?");
 
         private final String[] escapes = new String[0x80];
 
-        private Component(final String legal) {
+        private Encoding(final String legal) {
             // Populate table of getEscapeSequence sequences.
             final StringBuilder sb = new StringBuilder();
             for (char c = 0; c < 0x80; c++) {
                 if (legal.indexOf(c) >= 0)
                     continue;
-
                 sb.setLength(0);
                 quote(c, sb);
                 escapes[c] = sb.toString();
