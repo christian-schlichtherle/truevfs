@@ -158,8 +158,7 @@ implements TArchiveDetector, FsDriverProvider {
 
     private static SuffixSet getSuffixes(FsDriverProvider provider) {
         SuffixSet set = new SuffixSet();
-        for (Map.Entry<FsScheme, FsDriver> entry
-                : provider.get().entrySet()) {
+        for (Map.Entry<FsScheme, FsDriver> entry : provider.get().entrySet()) {
             FsDriver driver = entry.getValue();
             if (null != driver && driver.isFederated())
                 set.add(entry.getKey().toString());
