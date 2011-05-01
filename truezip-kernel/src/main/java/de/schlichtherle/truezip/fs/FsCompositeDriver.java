@@ -20,9 +20,9 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.ServiceConfigurationError;
 
 /**
- * Queries the scheme of the given mount point in order to lookup the
- * appropriate file system driver which is then used to create the requested
- * thread-safe file system controller.
+ * Queries the scheme of the mount point of the given file system model in
+ * order to lookup the appropriate file system driver which is then used to
+ * create the requested thread-safe file system controller.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -30,10 +30,11 @@ import java.util.ServiceConfigurationError;
 public interface FsCompositeDriver {
 
     /**
-     * Returns a new thread-safe file system controller for the given mount
-     * point and parent file system controller.
+     * Returns a new thread-safe file system controller for the mount point of
+     * the given file system model and parent file system controller.
      * The file system controller is created by using a file system driver
-     * which is looked up by querying the scheme of the given mount point.
+     * which is looked up by querying the scheme of the mount point of the
+     * given file system model.
      * <p>
      * When called, the following expression is a precondition:
      * {@code

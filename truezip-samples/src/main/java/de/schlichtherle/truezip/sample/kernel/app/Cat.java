@@ -86,8 +86,7 @@ public final class Cat {
             // were not just the end of the application.
             InputStream in = socket.newInputStream();
             try {
-                // Copy the data.
-                Streams.cat(in, System.out);
+                Streams.cat(in, System.out); // copy the data
             } finally {
                 in.close(); // ALWAYS close the stream!
             }
