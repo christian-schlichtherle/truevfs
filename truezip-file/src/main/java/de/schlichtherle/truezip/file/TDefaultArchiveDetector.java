@@ -87,7 +87,7 @@ implements TArchiveDetector, FsDriverProvider {
 
     /**
      * This instance recognizes all archive files which are known by the file
-     * system driver service {@link FsDriverLocator#SINGLETON}.
+     * system driver provider {@link FsDriverLocator#SINGLETON}.
      * The file system schemes are used as the archive file suffixes to
      * recognize.
      */
@@ -121,18 +121,18 @@ implements TArchiveDetector, FsDriverProvider {
 
     /**
      * Constructs a new {@code TDefaultArchiveDetector} by filtering the given
-     * driver service for all canonicalized suffixes in the {@code suffixes}
+     * driver provider for all canonicalized suffixes in the {@code suffixes}
      * list.
      *
      * @param  provider the file system driver provider to filter.
      * @param  suffixes A list of suffixes which shall identify prospective
      *         archive files.
      *         If this is {@code null}, no filtering is applied and all drivers
-     *         known by the given service are available for use with this
+     *         known by the given provider are available for use with this
      *         archive detector.
      * @throws IllegalArgumentException If any of the suffixes in the list
      *         names a suffix for which no file system driver is known by the
-     *         service.
+     *         provider.
      * @see    SuffixSet Syntax constraints for suffix lists.
      */
     public TDefaultArchiveDetector( final FsDriverProvider provider,
@@ -183,7 +183,7 @@ implements TArchiveDetector, FsDriverProvider {
      * mappings for all canonicalized suffixes in {@code suffixes} to
      * {@code driver}.
      * 
-     * @param  delegate the file system driver service to decorate.
+     * @param  delegate the file system driver provider to decorate.
      * @param  suffixes a list of suffixes which shall identify prospective
      *         archive files.
      *         This must not be {@code null} and must not be empty.
@@ -208,7 +208,7 @@ implements TArchiveDetector, FsDriverProvider {
      * decorating the configuration of {@code delegate} with
      * mappings for all entries in {@code config}.
      * 
-     * @param  delegate the file system driver service to decorate.
+     * @param  delegate the file system driver provider to decorate.
      * @param  config an array of key-value pair arrays.
      *         The first element of each inner array must either be a
      *         {@link FsScheme file system scheme}, an object {@code o} which
@@ -239,7 +239,7 @@ implements TArchiveDetector, FsDriverProvider {
      * decorating the configuration of {@code delegate} with
      * mappings for all entries in {@code config}.
      * 
-     * @param  delegate the file system driver service to decorate.
+     * @param  delegate the file system driver provider to decorate.
      * @param  config a map of file system schemes to file system drivers.
      *         {@code null} may be used to <i>shadow</i> a mapping for an equal
      *         file system scheme in {@code delegate} by removing it from the
