@@ -31,8 +31,8 @@ import net.jcip.annotations.Immutable;
 public abstract class FsDriver {
 
     /**
-     * Returns a new thread-safe file system controller for the given mount
-     * point and parent file system controller.
+     * Returns a new thread-safe file system controller for the mount point of
+     * the given file system model and parent file system controller.
      * <p>
      * When called, the following expression is a precondition:
      * {@code

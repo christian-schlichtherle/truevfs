@@ -90,8 +90,7 @@ public final class Copy {
                                         BitField.of(FsOutputOption.CREATE_PARENTS,
                                                     FsOutputOption.EXCLUSIVE),
                                         srcSocket.getLocalTarget());
-            // Copy the data.
-            IOSocket.copy(srcSocket, dstSocket);
+            IOSocket.copy(srcSocket, dstSocket); // copy the data
         } finally {
             // Commit all unsynchronized changes to the contents of federated
             // file systems, if any were accessed, and clean up temporary files
