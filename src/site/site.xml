@@ -8,8 +8,8 @@
         <version>1</version>
     </skin>
     <body>
-        <menu name="Parent Project" ref="parent" inherit="top"/>
-        <menu name="Member Projects (Modules)" ref="modules" inherit="top"/>
+        <menu name="Parent Project / Module" ref="parent" inherit="top"/>
+        <menu name="Project Modules" ref="modules" inherit="top"/>
         <menu name="Project Documentation">
             <item name="About" href="index.html"/>
             <item name="Use Cases" href="usecases.html"/>
@@ -17,9 +17,6 @@
             <item name="Key Features" href="features.html"/>
             <item name="Compatibility" href="compatibility.html"/>
             <item name="FAQ" href="faq.html"/>
-            <item name="Samples" href="samples/index.html" collapse="true">
-                <item name="Nzip (File*)" href="samples/Nzip.html"/>
-            </item>
             <item name="TrueZIP 6 (obsolete)" href="6/index.html" collapse="true">
                 <item name="Tutorial" href="6/tutorial.html"/>
             </item>

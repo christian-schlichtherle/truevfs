@@ -43,12 +43,12 @@ import net.jcip.annotations.Immutable;
  * <td>{@code .tar}</td>
  * </tr>
  * <tr>
- * <td>{@code tar.gz} | {@code tgz}</td>
- * <td>{@code .tar.gz} | {@code .tgz}</td>
+ * <td>{@code tgz} | {@code tar.gz}</td>
+ * <td>{@code .tgz} | {@code .tar.gz}</td>
  * </tr>
  * <tr>
- * <td>{@code tar.bz2} | {@code tbz} | {@code tb2}</td>
- * <td>{@code .tar.bz2} | {@code .tbz} | {@code .tb2}</td>
+ * <td>{@code tb2} | {@code tbz} | {@code tar.bz2}</td>
+ * <td>{@code .tb2} | {@code .tbz} | {@code .tar.bz2}</td>
  * </tr>
  * </tbody>
  * </table>
@@ -63,7 +63,7 @@ public final class TarDriverService extends FsDriverService {
             DRIVERS = newMap(new Object[][] {
                 { "tar", new TarDriver(IOPoolLocator.SINGLETON) },
                 { "tgz|tar.gz", new TarGZipDriver(IOPoolLocator.SINGLETON) },
-                { "tbz|tb2|tar.bz2", new TarBZip2Driver(IOPoolLocator.SINGLETON) },
+                { "tb2|tbz|tar.bz2", new TarBZip2Driver(IOPoolLocator.SINGLETON) },
             });
 
     @Override

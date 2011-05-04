@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <prerequisites>
+        <maven>3.0.3</maven>
+    </prerequisites>
 
     <groupId>${groupId}</groupId>
     <artifactId>${artifactId}</artifactId>
@@ -10,7 +13,7 @@
     <description>TrueZIP Application Project</description>
 
     <dependencies>
-        <!-- A TrueZIP application typically has a compile time dependency on
+        <!-- An application typically has a compile time dependency on
              either the TrueZIP File* module or the TrueZIP Kernel module.
              -->
         <dependency>
@@ -19,8 +22,8 @@
             <version>${truezip.version}</version>
         </dependency>
 
-        <!-- The Kernel is usually only an indirect dependency unless the
-             application calls it directly.
+        <!-- The TrueZIP Kernel module is usually just an indirect dependency
+             unless the application calls it directly.
              -->
         <!--dependency>
             <groupId>de.schlichtherle.truezip</groupId>
@@ -35,16 +38,16 @@
             <version>${truezip.version}</version>
         </dependency-->
 
-        <!-- A TrueZIP application typically has a dependency on one or more
-             file system driver modules for accessing their respective file
-             system types.
+        <!-- An application typically has a dependency on one or more file
+             system driver modules for accessing their respective file system
+             types.
                When using the TrueZIP File* API, file system drivers get
-             automatically enumerated on the run time class path by a service
-             locator singleton, so adding a run time dependency is sufficient
-             for accessing the respective file system types.
+             automatically enumerated from the class path by a service locator
+             singleton, so adding a run time dependency is sufficient for
+             accessing the respective file system types.
                When using the TrueZIP Kernel API however, using the service
              locator singleton is optional, so you may need to promote these
-             to compile time dependencies.
+             run time dependencies to compile time dependencies.
              -->
 
         <!-- This driver provides access to the following URI schemes:
@@ -72,7 +75,7 @@
              archive file suffixes:
              tar: TAR file format.
              tgz|tar.gz: GZIP compressed TAR file format.
-             tbz|tb2|tar.bz2: BZIP2 compressed TAR file format.
+             tb2|tbz|tar.bz2: BZIP2 compressed TAR file format.
              -->
         <dependency>
             <groupId>de.schlichtherle.truezip</groupId>

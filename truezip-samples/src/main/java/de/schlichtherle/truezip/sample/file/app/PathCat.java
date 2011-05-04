@@ -50,7 +50,8 @@ public class PathCat extends CommandLineUtility {
      * @param  resource the path name string of the resource to copy.
      * @throws IOException if accessing the resource results in an I/O error.
      */
-    static void pathCat(String resource) throws IOException {
+    static void pathCat(String resource)
+    throws IOException {
         // Unless an explicit call to TFile.setDefaultArchiveDetector() has
         // been made, the TFile class will recognize any canonical archive file
         // suffix in a path name for which a file system driver is available on

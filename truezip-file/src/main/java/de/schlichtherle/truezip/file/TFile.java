@@ -554,7 +554,7 @@ public final class TFile extends File {
      * If the URI matches the pattern {@code scheme:file:path!/entry},
      * then the constructed file object treats the URI like an entry in the
      * federated file system of the type named {@code scheme}.
-     * This may be applied unlimitedly recursively to access archive entries
+     * This can be applied recursively to access the entries of archive files
      * within other archive files.
      * <p>
      * Note that the newly created {@code TFile} instance uses the
@@ -1171,13 +1171,13 @@ public final class TFile extends File {
     /**
      * Sets the value of the class property {@code lenient}.
      * This class property controls whether archive files and their member
-     * directories get created on the fly if they don't exist.
-     * By default, the value of this class property is {@code true}.
+     * directories get automatically created whenever required.
+     * By default, the value of this class property is {@code true}!
      * <p>
      * Consider the following path: {@code a/outer.zip/b/inner.zip/c}.
-     * Now let's assume that {@code a} exists as a plain old directory in the
-     * OS' file system, while all other parts of this path don't, and that the
-     * TrueZIP Driver ZIP module is present on the run-time class path in order
+     * Now let's assume that {@code a} exists as a plain directory in the OS
+     * file system, while all other parts of this path don't, and that the
+     * module TrueZIP Driver ZIP is present on the run-time class path in order
      * to recognize {@code outer.zip} and {@code inner.zip} as ZIP files by
      * default.
      * <p>
@@ -1189,11 +1189,11 @@ public final class TFile extends File {
      * More formally, before an application could access an entry in a
      * federated file system, all its parent directories would need to exist,
      * including archive files.
-     * This emulates the behaviour of native file systems.
+     * This emulates the behaviour of any OS file system type.
      * <p>
      * If this class property is set to {@code true} however, then any missing
      * parent directories (including archive files) up to the outermost archive
-     * file {@code outer.zip} would get created on the fly when using
+     * file {@code outer.zip} would get automatically created when using
      * operations to create the innermost element of the path {@code c}.
      * <p>
      * This allows applications to succeed with doing this:
@@ -1202,8 +1202,8 @@ public final class TFile extends File {
      * {@code new TFileOutputStream("a/outer.zip/b/inner.zip/c")}.
      * <p>
      * Note that in either case the parent directory of the outermost archive
-     * file {@code a} must exist - TrueZIP does not create directories in the
-     * OS file system on the fly!
+     * file {@code a} must exist - TrueZIP does not automatically create
+     * directories in the OS file system!
      *
      * @see #isLenient()
      */
