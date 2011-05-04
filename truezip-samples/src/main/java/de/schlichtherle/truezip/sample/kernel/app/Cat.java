@@ -30,6 +30,7 @@ import de.schlichtherle.truezip.util.BitField;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * A poor man's blend of the cat(1) and wget(1) command line utility
@@ -43,7 +44,8 @@ import java.net.URI;
  */
 public final class Cat {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args)
+    throws IOException, URISyntaxException {
         for (String path : args)
             cat(path);
     }
@@ -57,7 +59,8 @@ public final class Cat {
      * @throws IllegalArgumentException if {@code resource} does not
      *         conform to the syntax constraints for {@link URI}s.
      */
-    static void cat(String resource) throws IOException {
+    static void cat(String resource)
+    throws IOException, URISyntaxException {
         // Create a manager for the life cycle of controllers for federated
         // file systems.
         // Alternatively, we could use FsManagerLocator.SINGLETON.get();
@@ -73,7 +76,7 @@ public final class Cat {
             // Using the TFile class rather than the File class enables the
             // caller to specify archive files in a path name, but at the cost
             // of adding a dependency on the TrueZIP File* module.
-            URI uri = URI.create(resource);
+            URI uri = new URI(resource);
             uri = uri.isAbsolute() ? uri : new TFile(resource).toURI();
             FsPath path = FsPath.create(uri, FsUriModifier.CANONICALIZE);
             InputSocket<?> socket = manager

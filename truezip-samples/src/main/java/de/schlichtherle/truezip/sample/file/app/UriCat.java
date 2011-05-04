@@ -21,6 +21,9 @@ import de.schlichtherle.truezip.io.Streams;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A poor man's imitate of the cat(1) command line utility
@@ -40,8 +43,12 @@ public class UriCat extends CommandLineUtility {
 
     @Override
     public int runChecked(String[] args) throws IOException {
-        for (String path : args)
-            uriCat(path);
+        try {
+            for (String path : args)
+                uriCat(path);
+        } catch (URISyntaxException ex) {
+            throw new IOException(ex);
+        }
         return 0;
     }
 
@@ -56,8 +63,9 @@ public class UriCat extends CommandLineUtility {
      * @throws IllegalArgumentException if {@code resource} does not
      *         conform to the syntax constraints for {@link URI}s.
      */
-    static void uriCat(String resource) throws IOException {
-        URI uri = URI.create(resource);
+    static void uriCat(String resource)
+    throws IOException, URISyntaxException {
+        URI uri = new URI(resource);
         TFile file = uri.isAbsolute() ? new TFile(uri) : new TFile(resource);
         InputStream in = new TFileInputStream(file);
         try {
