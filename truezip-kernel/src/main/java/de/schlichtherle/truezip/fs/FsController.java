@@ -42,10 +42,15 @@ import javax.swing.Icon;
  * resolved against the {@link FsModel#getMountPoint() mount point} URI of this
  * controller's {@link #getModel() file system model}.
  * <p>
- * Sub-classes must be reentrant on exceptions - so users may repeatedly
- * call their methods.
+ * All implementations must be reentrant on exceptions - so clients may
+ * repeatedly call their methods.
+ * Whether an implementation must be thread-safe or not depends on the context,
+ * i.e. its factory.
+ * E.g. the {@link FsManager#getController} method requires all returned file
+ * system controllers to be thread-safe.
  *
  * @param   <M> The type of the file system model.
+ * @see FsManager
  * @author  Christian Schlichtherle
  * @version $Id$
  */

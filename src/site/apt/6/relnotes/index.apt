@@ -4,7 +4,10 @@
     Christian Schlichtherle
     -----------------------
 
-Notice
+Obsolescence Notice
+
+    <The versions described in this section are> <<obsoleted>> <and should not
+    be used for new applications anymore.>
 
     Starting from version 7.0, you can find the latest Release Notes on
     {{{http://truezip.schlichtherle.de/}The TrueZIP Blog}} at

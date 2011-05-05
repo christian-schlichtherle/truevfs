@@ -24,184 +24,42 @@ About TrueZIP
 
     [[3]] <<{Quality matters}!>>
 
-Documentation
+Getting Started
 
-    Documentation is generally split across modules, so please check the
-    section <Project Modules> in the navigation bar on this page.
+    First, you need to read and understand every single line of documentation
+    that I've carefully crafted for you on this site - I mean it!
+    ... OK, I was just kidding.
+    Of course the more you read the more you understand, but at its minimum,
+    you should (not kidding this time):
 
-* Sample Code
+    [[1]] Quickly skim over the section
+    {{{./usecases/index.html}Use Cases}} to get an idea if using TrueZIP would
+    benefit your client application and how it all works.
+    If you're still not sure afterwards, then please have a look at the
+    {{{./features.html}Key Features}}.
 
-    The module {{{./truezip-samples/index.html}TrueZIP Samples}} provides
-    sample code and documentation for the two client APIs:
+    [[2]] Read the page about
+    {{{./archetypes.html}Maven Archetypes}} in order to help you setup your
+    project environment correctly and get productive quickly.
 
-    * [{{{../truezip-file/index.html}TrueZIP File*}}]
-        The API of this module is the first choice for most applications:
-        It's designed to be easy to learn and convenient to use while
-        providing a great level of flexibility.
-
-        However, due to its addressing scheme, it can only access OS file
-        systems and any federated file systems (i.e. archive files) within
-        a OS file system.
-        In particular, it cannot access virtual HTTP(S) file systems or any
-        member file systems (i.e. archive files) within an HTTP(S) file system.
-
-    * [{{{../truezip-kernel/index.html}TrueZIP Kernel}}]
-        As the name implies, this module is the core of it all.
-        As an API, it's somewhat more complex to use, but very flexible because
-        of its clean architecture (e.g. uses Dependency Injection wherever
-        reasonable).
-
-        Using this API directly allows you to access non-federated file systems
-        other than the OS file system and any member file system.
-        E.g. you could access an entry within an archive file which is located
-        at a web site like this: <<<zip:http://acme.com/archive.zip!/entry>>>.
-        Note that the HTTP(S) file system driver is still in its infancy,
-        so don't expect too much of it.
-
-    []
-
-    For more sample code documentation, please refer to the module
+    [[3]] If you are looking for more sample code and applications,
+    please check the module
     {{{./truezip-samples/index.html}TrueZIP Samples}}.
+    You may also want to browse its
+    {{{http://java.net/projects/truezip/sources/v7/show/truezip-samples/}source code}}.
 
-* Maven Archetype
-
-    Since TrueZIP 7 consists of a modular architecture, a frequent issue for
-    beginners is understanding TrueZIP's run time dependencies:
-    By default, TrueZIP uses a service locator to scan the class path at run
-    time for file system driver service providers.
-    These service providers are contained in the
-    {{{./truezip-driver/index.html}file system driver modules}}.
-
-    In order to help you setup your project environment and get going quickly,
-    TrueZIP provides a Maven archetype for applications.
-    To use it, please make sure Maven is installed and type the following
-    command in a shell while substituting the <<<groupId>>>, <<<artifactId>>>
-    and <<<package>>> parameters with the appropriate values for your project:
-
-+--+
-$ mvn archetype:generate -B \
-    -DarchetypeGroupId=de.schlichtherle.truezip \
-    -DarchetypeArtifactId=truezip-archetype-application \
-    -DgroupId=com.company \
-    -DartifactId=project \
-    -Dversion=1.0-SNAPSHOT \
-    -Dpackage=com.company.project
-+--+
-
-    Upon successful execution, a new directory with the name of the
-    <<<artifactId>>> parameter will have been created in the current directory.
-    If you copy/paste the above command literally to a shell this would result
-    in the following directory structure:
-
-+--+
-project
-|-- pom.xml
-`-- src
-    `-- main
-        `-- java
-            `-- com
-                `-- company
-                    `-- project
-                        |-- Application.java
-                        |-- Copy.java
-                        `-- Tree.java
-+--+
-
-    The project directory contains the following files:
-
-    [<<<pom.xml>>>]
-    This is the Maven Project Object Model file which defines the Maven
-    dependencies in order to setup the class path.
-    It's annotated with lots of comments in order to help you updating it for
-    your specific project requirements.
-
-    [<<<src/main/java/com/company/project/Application.java>>>]
-    An abstract base class which runs the setup-work-sync lifecycle for a
-    typical TrueZIP application.
-    Subclass or edit this template class to meet your requirements.
-
-    [<<<src/main/java/com/company/project/Copy.java>>>]
-    Command line utility to recursively copy the first file or directory
-    argument to the second file or directory argument.
-    Instead of a directory, you can name any configured archive file type in
-    the path names, too.
-    If you name any archive files in the destination path name, they get
-    automatically created.
-
-    [<<<src/main/java/com/company/project/Tree.java>>>]
-    Command line utility to print the tree graph of the directory structure of
-    its file or directory arguments to the standard output.
-    Instead of a directory, you can name any configured archive file type as an
-    argument, too.
+    [[4]] If you encounter issues, please read the
+    {{{./faq.html}FAQ}}
+    before subscribing and posting to the
+    {{{./mail-lists.html}User Mailing List}}.
 
     []
 
-    To install the generated project, change to the <<<project>>> directory
-    and type:
+    Note that documentation on this site is generally split across modules,
+    so please check the section <Project Modules> in the navigation bar on
+    this page, too.
 
-+--+
-$ mvn clean install
-+--+
-
-    This will install the application to your local Maven repository.
-    Now that you've done this, you can test drive the <<<Tree>>> class by
-    entering:
-
-+--+
-$ mvn exec:java -Dexec.mainClass=com.company.project.Tree
-+--+
-
-    This should produce the following output at the end:
-
-+--+
-.
-|-- pom.xml
-|-- src
-|   `-- main
-|       `-- java
-|           `-- com
-|               `-- company
-|                   `-- project
-|                       |-- Application.java
-|                       |-- Copy.java
-|                       `-- Tree.java
-`-- target
-    |-- classes
-    |   `-- com
-    |       `-- company
-    |           `-- project
-    |               |-- Application.class
-    |               |-- Copy.class
-    |               `-- Tree.class
-    |-- generated-sources
-    |   `-- annotations
-    |-- maven-archiver
-    |   `-- pom.properties
-    |-- project-1.0-SNAPSHOT.jar
-    |   |-- META-INF
-    |   |   |-- MANIFEST.MF
-    |   |   `-- maven
-    |   |       `-- com.company
-    |   |           `-- project
-    |   |               |-- pom.xml
-    |   |               `-- pom.properties
-    |   `-- com
-    |       `-- company
-    |           `-- project
-    |               |-- Application.class
-    |               |-- Copy.class
-    |               `-- Tree.class
-    `-- surefire
-+--+
-
-    Note that the contents of the JAR file
-    <<<target/project-1.0-SNAPSHOT.jar>>> get listed, too!
-    This is because the configuration file <<<pom.xml>>> is set up to recognize
-    JAR files as virtual directories by adding the file system driver module
-    with the artifactId <<<truezip-driver-zip>>> to the run time class path.
-    You can change this by editing the configuration file <<<pom.xml>>> or the
-    method <<<setup()>>> of the class <<<Application>>>.
-
-    Now that everything is set up, go editing the source files.
-
-    That's it - enjoy!
+    If you're still not fed up, you might also want to check out
+    {{{http://truezip.schlichtherle.de}The TrueZIP Blog}}
+    or the
+    {{{http://java.net/projects/truezip}Project Developer Website}}.

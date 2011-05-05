@@ -32,9 +32,23 @@ public class Copy extends Application<IOException> {
         // Setup the file operands.
         TFile src = new TFile(args[0]);
         TFile dst = new TFile(args[1]);
-        // TFile  doesn't do path name completion, so we do it manually.
-        if (dst.isArchive() || dst.isDirectory())
+
+        // TFile  doesn't do path name completion, so we do it manually in
+        // order to emulate the behavior of many copy command line utilities.
+        if (TFile.isLenient() && dst.isArchive() || dst.isDirectory())
             dst = new TFile(dst, src.getName());
+
+        // If TFile.setLenient(false) is never called in your application,
+        // then you could shorten this to...
+        /*if (dst.isArchive() || dst.isDirectory())
+            dst = new TFile(dst, src.getName());*/
+
+        // If you don't like path name completion for non-existent files which
+        // just look like archive files according to their path name,
+        // then you could even shorten this to...
+        /*if (dst.isDirectory())
+            dst = new TFile(dst, src.getName());*/
+
         // Perform a recursive archive copy.
         TFile.cp_rp(src, dst);
         return 0;
