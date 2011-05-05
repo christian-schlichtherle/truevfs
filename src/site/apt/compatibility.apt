@@ -4,7 +4,7 @@
     Christian Schlichtherle
     -----------------------
 
-About Version Numbers
+Compatibility
 
     TrueZIP uses the same version numbering scheme as Maven,
     i.e. <major>.<minor>.<incremental>-<qualifier>
@@ -21,8 +21,8 @@ About Version Numbers
     [[1]] The feature is assumed to be rarely used by client applications or
         the implications of not changing it are considered to be unacceptable.
 
-    [[1]] The issue is documented as a ticket in the
-        {{{./issue\-tracking.html}Issue Tracking System}} (ITS).
+    [[1]] The issue is documented as a ticket in the project's
+        {{{http://java.net/jira/browse/TRUEZIP}Issue Tracking System}} (ITS).
 
     [[1]] The change is justified in the ITS ticket.
 
@@ -33,6 +33,5 @@ About Version Numbers
     []
 
     In case your client application is affected by a change and the documented
-    workaround is unacceptable for any reason, please address this in the
-    corresponding entry of the
-    {{{./issue\-tracking.html}Issue Tracking System}}.
+    workaround is unacceptable for any reason, please address this using the
+    ITS at {{http://java.net/jira/browse/TRUEZIP}}.

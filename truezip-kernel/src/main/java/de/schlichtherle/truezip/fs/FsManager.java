@@ -49,9 +49,9 @@ implements Iterable<FsController<?>> {
      * operations.
      *
      * @param  mountPoint the mount point of the file system.
-     * @param  driver the file system composite driver which will be used to
+     * @param  driver the file system composite driver which shall get used to
      *         create a new file system controller if required.
-     * @return A file system controller.
+     * @return A thread-safe file system controller for the given mount point.
      */
     public abstract FsController<?>
     getController(FsMountPoint mountPoint, FsCompositeDriver driver);

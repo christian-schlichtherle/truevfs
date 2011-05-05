@@ -9,7 +9,7 @@ Key Features
     [Easy To Use]
         The API of the {{{./truezip-file/index.html}TrueZIP File*}} module
         provides convenient read/write access to archive files as if they were
-        just plain old directories in a file system path.
+        just plain directories in a file system path.
         Using the classes
         {{{./apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}},
         {{{./apidocs/de/schlichtherle/truezip/file/TFileInputStream.html}<<<TFileInputStream>>>}},

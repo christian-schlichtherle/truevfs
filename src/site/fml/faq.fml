@@ -3,24 +3,228 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://maven.apache.org/FML/1.0.1 http://maven.apache.org/xsd/fml-1.0.1.xsd"
         title="Frequently Asked Questions">
-    <part id="general">
-        <title>General Questions</title>
-        <faq id="where-blog">
-            <question>Where are the latest News / Release Notes?</question>
+    <part id="file">
+        <title>TrueZIP File* module</title>
+        <faq id="cannotReadArchive">
+            <question>
+                When trying to read an archive file, I get an exception saying
+                I cannot read directories.
+                What's wrong?
+            </question>
             <answer>
-                <p>Starting from version 7.0, the TrueZIP project has it's own
-                    blog.
-                    You can find it at
-                    <a href="http://truezip.schlichtherle.de">http://truezip.schlichtherle.de</a>.</p>
+                <p>
+                    When configured correctly, the File* API will treat an
+                    archive file like a virtual directory (that's what TrueZIP
+                    is all about).
+                    Like with plain directories, applications cannot read or
+                    write virtual directories using an input or output stream.
+                </p>
+                <p>
+                    Use one of the 
+                    <code>list*(*)</code> methods in the
+                    <code>TFile</code> class instead.
+                </p>
+                <p>
+                    For example, to list the contents of the top level
+                    (virtual) directory of the archive file
+                    <code>archive.zip</code>, you could use...
+                </p>
+                <pre>
+                    <code>
+TFile[] entries = new TFile("archive.zip").listFiles();
+                    </code>
+                </pre>
             </answer>
         </faq>
-        <faq id="where-javadoc">
+        <faq id="cannotWriteArchive">
+            <question>
+                When trying to write an archive file, I get an exception saying
+                I cannot write directories.
+                What's wrong?
+            </question>
+            <answer>
+                <p>
+                    When configured correctly, the File* API will treat an
+                    archive file like a virtual directory (that's what TrueZIP
+                    is all about).
+                    Like with plain directories, applications cannot read or
+                    write virtual directories using an input or output stream.
+                </p>
+                <p>
+                    Use one of the 
+                    <code>mkdir*()</code> methods in the
+                    <code>TFile</code> class or directly write to the entry
+                    within the archive file using a
+                    <code>TFileOutputStream</code> instead.
+                    For example, to (over)write the entry 
+                    <code>entry</code> within the archive file
+                    <code>archive.zip</code>, you could use...
+                </p>
+                <pre>
+                    <code>
+OutputStream out = new TFileOutputStream("archive.zip/entry");
+try {
+    ... // write something here
+} finally {
+    out.close();
+}
+                    </code>
+                </pre>
+                <p>
+                    This would work even if
+                    <code>archive.zip</code> would not initially exist unless
+                    <code>TFile.setLenient(false)</code> had been called by
+                    your application before.
+                    In this case, you would need to create the archive file
+                    <code>archive.zip</code> in advance by using...
+                </p>
+                <pre>
+                    <code>
+if (!new TFile("archive.zip").mkdir())
+    throw new IOException("Oh s**t - you're doomed!");
+                    </code>
+                </pre>
+            </answer>
+        </faq>
+        <faq id="cannotCopyFileToArchive">
+            <question>
+                Copying a file to an archive file does not seem to work.
+                What's wrong?
+            </question>
+            <answer>
+                <p>
+                    Users often assume that when copying a file to an archive
+                    file, the File* API would automatically complete the path
+                    name of the destination archive file so that it ends with
+                    the base name of the source file.
+                    This is probably assumed because that's how it works with
+                    command line utilities like 
+                    <code>cp</code> on POSIX or
+                    <code>copy</code> on Windows.
+                    However, this is not true:
+                    The File* API does 
+                    <em>never</em> do path name completion.
+                    Hence, the following code may behave unexpectedly:
+                </p>
+                <pre>
+                    <code>
+TFile src = new TFile(string1); // e.g. "file"
+TFile dst = new TFile(string2); // e.g. "archive.zip"
+TFile.cp_rp(src, dst);
+                    </code>
+                </pre>
+                <p>
+                    If successful, this would only result in a verbatim copy of 
+                    <code>file</code> to 
+                    <code>archive.zip</code>, which is probably unexpected.
+                    However, the way the copy command line utilities work can
+                    be easily emulated by using the following instead:
+                </p>
+                <pre>
+                    <code>
+TFile src = new TFile(string1); // e.g. "file"
+TFile dst = new TFile(string2); // e.g. "archive.zip"
+if (TFile.isLenient() &amp;&amp; dst.isArchive() || dst.isDirectory())
+    dst = new TFile(dst, src.getName());
+TFile.cp_rp(src, dst);
+                    </code>
+                </pre>
+                <p>
+                    This will append the base name of the source path to the
+                    destination path if either the destination path name ends
+                    with a recognized archive file suffix like e.g. ".zip" or
+                    if the destination file system entry already exists as a
+                    directory.
+                    If 
+                    <code>TFile.setLenient(false)</code> is never called by
+                    your application, then you could shorten this to...
+                </p>
+                <pre>
+                    <code>
+TFile src = new TFile(string1); // e.g. "file"
+TFile dst = new TFile(string2); // e.g. "archive.zip"
+if (dst.isArchive() || dst.isDirectory())
+    dst = new TFile(dst, src.getName());
+TFile.cp_rp(src, dst);
+                    </code>
+                </pre>
+                <p>
+                    If you don't like path name completion for non-existent
+                    files which just look like archive files according to their
+                    path name, then you could even shorten this to...
+                </p>
+                <pre>
+                    <code>
+TFile src = new TFile(string1); // e.g. "file"
+TFile dst = new TFile(string2); // e.g. "archive.zip"
+if (dst.isDirectory())
+    dst = new TFile(dst, src.getName());
+TFile.cp_rp(src, dst);
+                    </code>
+                </pre>
+            </answer>
+        </faq>
+        <faq id="cannotListArchive">
+            <question>
+                The File* API is not treating an archive file as a virtual
+                directory.
+                What's wrong?
+            </question>
+            <answer>
+                <p>
+                    Most likely the TrueZIP File* module is not set up
+                    correctly in order to recognize the file suffix of the
+                    archive type you want to access.
+                    To make sure it does, call the following somewhere at the
+                    start of your application:
+                </p>
+                <pre>
+                    <code>
+TFile.setDefaultArchiveDetector(
+        new TDefaultArchiveDetector(
+            TDefaultArchiveDetector.NULL,
+            new Object[][] {
+                { "tar", new TarDriver(IOPoolLocator.SINGLETON) },
+                { "tgz|tar.gz", new TarGZipDriver(IOPoolLocator.SINGLETON) },
+                { "tbz|tb2|tar.bz2", new TarBZip2Driver(IOPoolLocator.SINGLETON) },
+                { "zip", new ZipDriver(IOPoolLocator.SINGLETON)},
+            }));
+                    </code>
+                </pre>
+                <p>
+                    Check the
+                    <a href="archetypes.html">Maven Archetypes</a> for more
+                    options and to help you get started quickly with this.
+                </p>
+            </answer>
+        </faq>
+    </part>
+    <part id="general">
+        <title>General Questions</title>
+        <faq id="whereAreNews">
+            <question>Where are the latest News?</question>
+            <answer>
+                <p>
+                    Starting from version 7.0, the TrueZIP project uses it's own
+                    blog for announcements, release notes, feature show cases
+                    and more.
+                    You can find it at
+                    <a href="http://truezip.schlichtherle.de">http://truezip.schlichtherle.de</a>.
+                </p>
+            </answer>
+        </faq>
+        <faq id="whereIsJavadoc">
             <question>Where is the Javadoc?</question>
             <answer>
-                <p>You can find it in the navigation bar by following
-                    <i>Project Reports</i>, then <i>Project Reports</i> again
-                    and then <i>JavaDocs</i>, or you could simply click
-                    <a href="apidocs/index.html">here</a>.</p>
+                <p>
+                    You can find the Javadoc for the entire TrueZIP API
+                    including all modules in the navigation bar by following
+                    <i>Project Reports</i>, then 
+                    <i>Project Reports</i> again
+                    and then 
+                    <i>JavaDocs</i>, or you could simply click
+                    <a href="apidocs/index.html">here</a>.
+                </p>
             </answer>
         </faq>
     </part>

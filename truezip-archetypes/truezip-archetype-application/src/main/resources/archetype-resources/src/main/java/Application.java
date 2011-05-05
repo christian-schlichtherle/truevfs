@@ -103,7 +103,27 @@ abstract class Application<E extends Exception> {
                         { "tbz|tb2|tar.bz2", new TarBZip2Driver(IOPoolLocator.SINGLETON) },
                         { "zip", new ZipDriver(IOPoolLocator.SINGLETON)},
                     }));*/
-        
+
+        // Another typical use case is to recognize only Java artefacts.
+        /*TFile.setDefaultArchiveDetector(
+                new TDefaultArchiveDetector(
+                        "ear|jar|war",
+                        new JarDriver(IOPoolLocator.SINGLETON));*/
+
+        // ... or an application file format.
+        /*TFile.setDefaultArchiveDetector(
+                new TDefaultArchiveDetector(
+                        "foo",
+                        new JarDriver(IOPoolLocator.SINGLETON));*/
+
+        // ... or an encrypted application file format.
+        /*TFile.setDefaultArchiveDetector(
+                new TDefaultArchiveDetector(
+                        "bar",
+                        new SafeZipRaesDriver(
+                            IOPoolLocator.SINGLETON,
+                            KeyManagerLocator.SINGLETON));*/
+
         // This class property controls whether archive files and their member
         // directories get automatically created whenever required.
         // By default, the value of this class property is {@code true}!
