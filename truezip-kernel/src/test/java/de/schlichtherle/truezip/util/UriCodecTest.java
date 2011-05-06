@@ -16,12 +16,12 @@
 package de.schlichtherle.truezip.util;
 
 import java.util.logging.Logger;
-import de.schlichtherle.truezip.util.UriCodec.Encoding;
+import de.schlichtherle.truezip.util.UriEncoder.Encoding;
 import java.util.EnumSet;
 import org.junit.Before;
 import org.junit.Test;
 
-import static de.schlichtherle.truezip.util.UriCodec.Encoding.*;
+import static de.schlichtherle.truezip.util.UriEncoder.Encoding.*;
 import static java.util.logging.Level.*;
 import static org.junit.Assert.*;
 
@@ -34,35 +34,37 @@ public class UriCodecTest {
     private static final Logger logger
             = Logger.getLogger(UriCodecTest.class.getName());
 
-    private UriCodec codec;
+    private UriEncoder encoder;
+    private UriDecoder decoder;
 
     @Before
     public void setUp() {
-        this.codec = new UriCodec();
+        this.encoder = new UriEncoder();
+        this.decoder = new UriDecoder();
     }
 
     @Test
     public void testNull() {
         try {
-            codec.encode(null, null);
+            encoder.encode(null, null);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            codec.encode(null, ANY);
+            encoder.encode(null, ANY);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            codec.encode("", null);
+            encoder.encode("", null);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            codec.decode(null);
+            decoder.decode(null);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -77,7 +79,7 @@ public class UriCodecTest {
             { "a%EF%BFb" },
         }) {
             try {
-                codec.decode(test[0]);
+                decoder.decode(test[0]);
                 fail();
             } catch (IllegalArgumentException ex) {
                 logger.log(FINE, ex.toString(), ex);
@@ -116,8 +118,8 @@ public class UriCodecTest {
             { EnumSet.allOf(Encoding.class), "a\u00c4b\u00d6c\u00dcd\u00dfe\u00e4f\u00f6g\u00fch", "a%C3%84b%C3%96c%C3%9Cd%C3%9Fe%C3%A4f%C3%B6g%C3%BCh" }, // dito embedded
         }) {
             for (final Encoding component : (EnumSet<Encoding>) test[0])
-                assertEquals(test[2], codec.encode(test[1].toString(), component));
-            assertEquals(test[1], codec.decode(test[2].toString()));
+                assertEquals(test[2], encoder.encode(test[1].toString(), component));
+            assertEquals(test[1], decoder.decode(test[2].toString()));
         }
     }
 }

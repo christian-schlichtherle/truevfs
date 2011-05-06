@@ -194,6 +194,8 @@ public class FsEntryNameTest {
     @Test
     public void testConstructorWithValidUri() {
         for (final String[] params : new String[][] {
+            { "foo%3Abar", "baz", "foo%3Abar/baz" },
+            { "foo", "bar%3Abaz", "foo/bar%3Abaz" },
             { "foo", "#bar", "foo#bar", },
             { "foo", "#", "foo#", },
             { "", "#foo", "#foo", },

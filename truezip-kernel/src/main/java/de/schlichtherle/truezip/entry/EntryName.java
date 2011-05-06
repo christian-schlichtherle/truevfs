@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.entry;
 
+import de.schlichtherle.truezip.util.UriBuilder;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -182,15 +183,14 @@ public class EntryName implements Serializable, Comparable<EntryName> {
                     : parentUriPath.endsWith(SEPARATOR)
                         ? parentUri.resolve(memberUri)
                         : memberUri.getPath().isEmpty()
-                            ? new URI(  null, null,
-                                        parentUriPath,
-                                        memberUri.getQuery(),
-                                        memberUri.getFragment())
-                            : new URI(  null, null,
-                                        parentUriPath + SEPARATOR_CHAR,
-                                        null, // query is irrelevant because of resolve!
-                                        null) // dito for fragment
-                                            .resolve(memberUri);
+                            ? new UriBuilder(parentUri)
+                                .query(memberUri.getQuery())
+                                .fragment(memberUri.getFragment())
+                                .getUri()
+                            : new UriBuilder()
+                                .path(parentUriPath + SEPARATOR_CHAR)
+                                .getUri()
+                                .resolve(memberUri);
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
         }

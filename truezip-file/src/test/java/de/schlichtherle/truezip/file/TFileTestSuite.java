@@ -128,7 +128,7 @@ public abstract class TFileTestSuite {
     }
 
     protected final String getSuffix() {
-        return "." + scheme.toString();
+        return "." + scheme;
     }
 
     @After

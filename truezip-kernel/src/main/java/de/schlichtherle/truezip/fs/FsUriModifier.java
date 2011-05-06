@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import de.schlichtherle.truezip.util.UriBuilder;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URI;
@@ -98,11 +99,10 @@ public enum FsUriModifier {
                     final String s = uri.getPath();
                     final int i = s.indexOf(SEPARATOR_CHAR, 2);
                     if (0 <= i) {
-                        uri = new URI(  uri.getScheme(),
-                                        s.substring(2, i),
-                                        s.substring(i),
-                                        uri.getQuery(),
-                                        uri.getFragment());
+                        uri = new UriBuilder(uri)
+                                .authority(s.substring(2, i))
+                                .path(s.substring(i))
+                                .getUri();
                     }
                 }
 
@@ -111,11 +111,9 @@ public enum FsUriModifier {
                 for (String s; (s = uri.getPath()).endsWith(SEPARATOR)
                         && 2 <= s.length()
                         && (':' != s.charAt(s.length() - 2)); ) {
-                    uri = new URI(  uri.getScheme(),
-                                    uri.getAuthority(),
-                                    s.substring(0, s.length() - 1),
-                                    uri.getQuery(),
-                                    uri.getFragment());
+                    uri = new UriBuilder(uri)
+                            .path(s.substring(0, s.length() - 1))
+                            .getUri();
                 }
 
                 return uri;
@@ -149,11 +147,9 @@ public enum FsUriModifier {
                 for (String s; (s = uri.getPath()).endsWith(SEPARATOR)
                         && 2 <= s.length()
                         && (':' != s.charAt(s.length() - 2)); ) {
-                    uri = new URI(  uri.getScheme(),
-                                    uri.getAuthority(),
-                                    s.substring(0, s.length() - 1),
-                                    uri.getQuery(),
-                                    uri.getFragment());
+                    uri = new UriBuilder(uri)
+                            .path(s.substring(0, s.length() - 1))
+                            .getUri();
                 }
 
                 return uri;

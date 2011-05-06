@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import de.schlichtherle.truezip.util.UriBuilder;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -382,8 +383,8 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
      * However, this function is not injective, so two different mount points
      * may produce equal results.
      * For example, the mount point URIs {@code zip:file:/archive!/} and
-     * {@code tar:file:/archive!/} will both produce an equal mount point
-     * with the absolute, hierarchical URI {@code file:/archive/}.
+     * {@code tar:file:/archive!/} would both produce the hierarchicalized
+     * mount point with the URI {@code file:/archive/}.
      *
      * @return A mount point which has its URI converted from the URI of
      *         this mount point so that it's absolute and hierarchical.
@@ -394,10 +395,10 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
         if (uri.isOpaque()) {
             final URI uri = path.hierarchicalize().getUri();
             try {
-                return hierarchical = new FsMountPoint(new URI(
-                        uri.getScheme(), uri.getAuthority(),
-                        uri.getPath() + SEPARATOR_CHAR,
-                        uri.getQuery(), null));
+                return hierarchical = new FsMountPoint(
+                        new UriBuilder(uri)
+                            .path(uri.getPath() + SEPARATOR)
+                            .getUri());
             } catch (URISyntaxException ex) {
                 throw new AssertionError(ex);
             }
