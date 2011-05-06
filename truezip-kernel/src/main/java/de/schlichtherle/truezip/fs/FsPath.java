@@ -375,8 +375,8 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
      * However, this function is not injective, so two different paths
      * may produce equal results.
      * For example, the path URIs {@code zip:file:/archive!/entry} and
-     * {@code tar:file:/archive!/entry} both have the same hierarchical URI
-     * {@code file:/archive/entry}.
+     * {@code tar:file:/archive!/entry} would both produce the hierarchicalized
+     * path with the URI {@code file:/archive/entry}.
      *
      * @return A hierarchical URI for this path.
      */

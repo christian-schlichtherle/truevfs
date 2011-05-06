@@ -62,9 +62,14 @@ final class FileController extends FsController<FsModel>  {
         if (null != model.getParent())
             throw new IllegalArgumentException();
         URI uri = model.getMountPoint().getUri();
-        // Postfix: Move Windows UNC host from authority to path.
         if ('\\' == separatorChar && null != uri.getRawAuthority()) {
             try {
+                // Postfix: Move Windows UNC host from authority to path
+                // because the File class can't deal with this.
+                // Note that the authority parameter must not be null and that
+                // you cannot use the URIBuilder class - using either of these
+                // would result in the authority property of the new URI object
+                // being equal to the original value again.
                 uri = new URI(  uri.getScheme(), "",
                                 SEPARATOR + SEPARATOR + uri.getAuthority() + uri.getPath(),
                                 uri.getQuery(), uri.getFragment());

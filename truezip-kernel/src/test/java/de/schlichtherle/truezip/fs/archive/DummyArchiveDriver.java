@@ -51,7 +51,7 @@ public class DummyArchiveDriver extends FsCharsetArchiveDriver<FsArchiveEntry> {
             FsConcurrentModel model,
             InputSocket<?> input)
     throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("This is a dummy archive driver!");
     }
 
     @Override
@@ -60,7 +60,7 @@ public class DummyArchiveDriver extends FsCharsetArchiveDriver<FsArchiveEntry> {
             OutputSocket<?> output,
             InputShop<FsArchiveEntry> source)
     throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("This is a dummy archive driver!");
     }
 
     @Override

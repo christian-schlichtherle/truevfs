@@ -21,12 +21,9 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import net.jcip.annotations.NotThreadSafe;
 
-import static de.schlichtherle.truezip.util.UriCodec.Encoding.*;
+import static de.schlichtherle.truezip.util.UriEncoder.Encoding.*;
 
 /**
  * A mutable JavaBean for composing URIs according to
@@ -45,10 +42,10 @@ import static de.schlichtherle.truezip.util.UriCodec.Encoding.*;
  * URI can be composed by calling any of the methods {@link #getUri()},
  * {@link #toUri()}, {@link #getString()} or {@link #toString()}.
  * <p>
- * This class will quote illegal characters wherever required for the
+ * This class quotes illegal characters wherever required for the
  * respective URI component.
- * Non-US-ASCII characters will get encoded using the character set selected
- * by the constructor and quoted like any other illegal character.
+ * As a deviation from RFC&nbsp;2396, non-US-ASCII characters get preserved
+ * when encoding.
  * 
  * <h3>Identities</h3>
  * For any {@link URI} {@code u} it is generally true that
@@ -77,7 +74,7 @@ import static de.schlichtherle.truezip.util.UriCodec.Encoding.*;
  *      RFC&nbsp;2396: Uniform Resource Identifiers (URI): Generic Syntax</a>
  * @see <a href="http://www.ietf.org/rfc/rfc2732.txt">
  *      RFC&nbsp;2732: Format for Literal IPv6 Addresses in URL's</a>
- * @see UriCodec
+ * @see UriEncoder
  * @author Christian Schlichtherle
  * @version $Id$
  */
@@ -85,7 +82,7 @@ import static de.schlichtherle.truezip.util.UriCodec.Encoding.*;
 @NotThreadSafe
 public final class UriBuilder {
 
-    private final UriCodec codec;
+    private final UriEncoder encoder;
     private @CheckForNull StringBuilder builder;
     private @CheckForNull String scheme;
     private @CheckForNull String authority;
@@ -94,43 +91,19 @@ public final class UriBuilder {
     private @CheckForNull String fragment;
 
     /**
-     * Constructs a new URI builder which uses the UTF-8 character set to
-     * encode non-US-ASCII characters.
+     * Constructs a new URI builder.
      */
     public UriBuilder() {
-        codec = new UriCodec();
+        encoder = new UriEncoder(null);
     }
 
     /**
-     * Constructs a new URI builder which uses the UTF-8 character set to
-     * encode non-US-ASCII characters.
+     * Constructs a new URI builder.
      * 
      * @param uri the uri for initializing the initial state.
      */
     public UriBuilder(URI uri) {
         this();
-        setUri(uri); // OK - class is final!
-    }
-
-    /**
-     * Constructs a new URI builder which uses the given character set to
-     * encode non-US-ASCII characters.
-     * 
-     * @param charset the character set for encoding non-US-ASCII characters.
-     */
-    public UriBuilder(Charset charset) {
-        codec = new UriCodec(charset);
-    }
-
-    /**
-     * Constructs a new URI builder which uses the given character set to
-     * encode non-US-ASCII characters.
-     * 
-     * @param uri the uri for initializing the initial state.
-     * @param charset the character set for encoding non-US-ASCII characters.
-     */
-    public UriBuilder(URI uri, Charset charset) {
-        this(charset);
         setUri(uri); // OK - class is final!
     }
 
@@ -182,7 +155,8 @@ public final class UriBuilder {
      *
      * @return A valid URI string which is composed from the properties of
      *         this URI builder.
-     * @throws URISyntaxException if composing a valid URI is not possible.
+     * @throws URISyntaxException if composing a valid URI is not possible due
+     *         to an invalid scheme.
      */
     public String getString() throws URISyntaxException {
         StringBuilder b = builder;
@@ -199,44 +173,40 @@ public final class UriBuilder {
         if (absUri)
             b.append(s).append(':');
         final int ssp = b.length(); // index of scheme specific part
-        try {
-            final boolean hasAuth = null != a;
-            if (hasAuth)
-                codec.encode(a, AUTHORITY, b.append("//"));
-            boolean absPath = false;
-            if (null != p && !p.isEmpty()) {
-                if (p.startsWith("/")) {
-                    absPath = true;
-                    codec.encode(p, ABSOLUTE_PATH, b);
-                } else if (hasAuth) {
-                    absPath = true;
-                    errIdx = b.length();
-                    errMsg = "Relative path with " + (a.isEmpty() ? "" : "non-") + "empty authority";
-                    codec.encode(p, ABSOLUTE_PATH, b);
-                } else if (absUri) {
-                    codec.encode(p, QUERY, b);
-                } else {
-                    codec.encode(p, PATH, b);
-                }
-            }
-            if (null != q) {
-                b.append('?');
-                if (absUri && !absPath) {
-                    errIdx = b.length();
-                    errMsg = "Query in opaque URI";
-                }
-                codec.encode(q, QUERY, b);
-            }
-            assert absUri == 0 < ssp;
-            if (absUri && ssp >= b.length()){
+        final boolean hasAuth = null != a;
+        if (hasAuth)
+            encoder.encode(a, AUTHORITY, b.append("//"));
+        boolean absPath = false;
+        if (null != p && !p.isEmpty()) {
+            if (p.startsWith("/")) {
+                absPath = true;
+                encoder.encode(p, ABSOLUTE_PATH, b);
+            } else if (hasAuth) {
+                absPath = true;
                 errIdx = b.length();
-                errMsg = "Empty scheme specific part in absolute URI";
+                errMsg = "Relative path with " + (a.isEmpty() ? "" : "non-") + "empty authority";
+                encoder.encode(p, ABSOLUTE_PATH, b);
+            } else if (absUri) {
+                encoder.encode(p, QUERY, b);
+            } else {
+                encoder.encode(p, PATH, b);
             }
-            if (null != f)
-                codec.encode(f, FRAGMENT, b.append('#'));
-        } catch (URISyntaxException ex) {
-            throw new AssertionError(ex);
         }
+        if (null != q) {
+            b.append('?');
+            if (absUri && !absPath) {
+                errIdx = b.length();
+                errMsg = "Query in opaque URI";
+            }
+            encoder.encode(q, QUERY, b);
+        }
+        assert absUri == 0 < ssp;
+        if (absUri && ssp >= b.length()){
+            errIdx = b.length();
+            errMsg = "Empty scheme specific part in absolute URI";
+        }
+        if (null != f)
+            encoder.encode(f, FRAGMENT, b.append('#'));
         if (absUri)
             validateScheme((CharBuffer) CharBuffer.wrap(b).limit(s.length()));
         final String u = b.toString();
