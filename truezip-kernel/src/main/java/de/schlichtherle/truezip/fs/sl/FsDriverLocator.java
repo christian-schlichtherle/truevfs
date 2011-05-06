@@ -20,6 +20,7 @@ import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.fs.FsDriverProvider;
 import de.schlichtherle.truezip.fs.spi.FsDriverService;
 import de.schlichtherle.truezip.util.ServiceLocator;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Collections;
@@ -46,45 +47,52 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 @DefaultAnnotation(NonNull.class)
+@edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
 public final class FsDriverLocator implements FsDriverProvider {
 
     /** The singleton instance of this class. */
     public static final FsDriverLocator SINGLETON = new FsDriverLocator();
 
-    private final Map<FsScheme, FsDriver> drivers;
+    private volatile @CheckForNull Map<FsScheme, FsDriver> drivers;
 
     /** You cannot instantiate this class. */
     private FsDriverLocator() {
-        final Logger
-                logger = Logger.getLogger(  FsDriverLocator.class.getName(),
-                                            FsDriverLocator.class.getName());
-        final Iterator<FsDriverService>
-                i = new ServiceLocator(FsDriverLocator.class.getClassLoader())
-                    .getServices(FsDriverService.class);
-        final Map<FsScheme, FsDriver>
-                drivers = new HashMap<FsScheme, FsDriver>();
-        if (!i.hasNext())
-            throw new ServiceConfigurationError(
-                    "No provider available for " + FsDriverService.class);
-        while (i.hasNext()) {
-            FsDriverService service = i.next();
-            logger.log(Level.CONFIG, "located", service);
-            for (final Map.Entry<FsScheme, FsDriver> entry
-                    : service.get().entrySet()) {
-                final FsScheme scheme = entry.getKey();
-                final FsDriver driver = entry.getValue();
-                if (null != scheme && null != driver) {
-                    drivers.put(scheme, driver);
-                    logger.log(Level.CONFIG, "mapped",
-                            new Object[] { scheme, driver });
-                }
-            }
-        }
-        this.drivers = Collections.unmodifiableMap(drivers);
     }
 
     @Override
     public Map<FsScheme, FsDriver> get() {
-        return drivers;
+        Map<FsScheme, FsDriver> drivers = this.drivers;
+        if (null != drivers)
+            return drivers;
+        synchronized (this) {
+            drivers = this.drivers;
+            if (null != drivers) // DCL DOES work with volatile fields since JSE 5!
+                return drivers;
+            final Logger
+                    logger = Logger.getLogger(  FsDriverLocator.class.getName(),
+                                                FsDriverLocator.class.getName());
+            final Iterator<FsDriverService>
+                    i = new ServiceLocator(FsDriverLocator.class.getClassLoader())
+                        .getServices(FsDriverService.class);
+            drivers = new HashMap<FsScheme, FsDriver>();
+            if (!i.hasNext())
+                throw new ServiceConfigurationError(
+                        "No provider available for " + FsDriverService.class);
+            while (i.hasNext()) {
+                FsDriverService service = i.next();
+                logger.log(Level.CONFIG, "located", service);
+                for (final Map.Entry<FsScheme, FsDriver> entry
+                        : service.get().entrySet()) {
+                    final FsScheme scheme = entry.getKey();
+                    final FsDriver driver = entry.getValue();
+                    if (null != scheme && null != driver) {
+                        drivers.put(scheme, driver);
+                        logger.log(Level.CONFIG, "mapped",
+                                new Object[] { scheme, driver });
+                    }
+                }
+            }
+            return this.drivers = Collections.unmodifiableMap(drivers);
+        }
     }
 }

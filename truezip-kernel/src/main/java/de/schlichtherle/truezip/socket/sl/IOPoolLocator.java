@@ -19,6 +19,9 @@ import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.socket.spi.IOPoolService;
 import de.schlichtherle.truezip.util.ServiceLocator;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Iterator;
 import java.util.ServiceConfigurationError;
 import java.util.logging.Level;
@@ -47,32 +50,17 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
+@DefaultAnnotation(NonNull.class)
+@edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
 public final class IOPoolLocator implements IOPoolProvider {
 
     /** The singleton instance of this class. */
     public static final IOPoolLocator SINGLETON = new IOPoolLocator();
 
-    private final IOPoolService service;
+    private volatile @CheckForNull IOPoolService service;
 
     /** You cannot instantiate this class. */
     private IOPoolLocator() {
-        final ServiceLocator locator = new ServiceLocator(
-                IOPoolLocator.class.getClassLoader());
-        IOPoolService
-                service = locator.getService(IOPoolService.class, null);
-        if (null == service) {
-            final Iterator<IOPoolService>
-                    i = locator.getServices(IOPoolService.class);
-            if (i.hasNext())
-                service = i.next();
-            else
-                throw new ServiceConfigurationError(
-                        "No provider available for " + IOPoolService.class);
-        }
-        this.service = service;
-        Logger  .getLogger( IOPoolLocator.class.getName(),
-                            IOPoolLocator.class.getName())
-                .log(Level.CONFIG, "located", service);
     }
 
     /**
@@ -83,6 +71,29 @@ public final class IOPoolLocator implements IOPoolProvider {
      */
     @Override
     public IOPool<?> get() {
-        return service.get();
+        IOPoolService service = this.service;
+        if (null != service)
+            return service.get();
+        synchronized (this) {
+            service = this.service;
+            if (null != service) // DCL DOES work with volatile fields since JSE 5!
+                return service.get();
+            final ServiceLocator locator = new ServiceLocator(
+                    IOPoolLocator.class.getClassLoader());
+            service = locator.getService(IOPoolService.class, null);
+            if (null == service) {
+                final Iterator<IOPoolService>
+                        i = locator.getServices(IOPoolService.class);
+                if (i.hasNext())
+                    service = i.next();
+                else
+                    throw new ServiceConfigurationError(
+                            "No provider available for " + IOPoolService.class);
+            }
+            Logger  .getLogger( IOPoolLocator.class.getName(),
+                                IOPoolLocator.class.getName())
+                    .log(Level.CONFIG, "located", service);
+            return (this.service = service).get();
+        }
     }
 }
