@@ -385,7 +385,7 @@ public final class TFileTree extends JTree {
      * and scrolls the tree so that the newly created file
      * is selected and visible.
      * If you would like to create a new file with initial content, please
-     * check {@link #copyFrom(de.schlichtherle.truezip.file.TFile, InputStream)}.
+     * check {@link #cp(InputStream, TFile)}.
      */
     public boolean createNewFile(final TFile node) throws IOException {
         final TFileTreeModel ftm = getModel();
@@ -447,13 +447,13 @@ public final class TFileTree extends JTree {
      * and scrolls the tree so that the copied node
      * is selected and visible.
      */
-    public void copyFrom(final TFile node, final InputStream in)
+    public void cp(final InputStream in, final TFile node)
     throws IOException {
         final TFileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
         if (null == path)
             throw new IllegalArgumentException("node");
-        ftm.copyFrom(node, in);
+        ftm.cp(in, node);
         setSelectionPath(path);
         scrollPathToVisible(path);
     }
@@ -463,13 +463,13 @@ public final class TFileTree extends JTree {
      * and scrolls the tree so that the copied node
      * is selected and visible.
      */
-    public void copyTo(final TFile oldNode, final TFile node)
+    public void cp(final TFile oldNode, final TFile node)
     throws IOException {
         final TFileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
         if (null == path)
             throw new IllegalArgumentException("node");
-        ftm.copyTo(oldNode, node);
+        ftm.cp(oldNode, node);
         setSelectionPath(path);
         scrollPathToVisible(path);
     }
@@ -479,13 +479,13 @@ public final class TFileTree extends JTree {
      * and scrolls the tree so that the recursively copied node
      * is selected and visible.
      */
-    public void copyAllTo(final TFile oldNode, final TFile node)
+    public void cp_r(final TFile oldNode, final TFile node)
     throws IOException {
         final TFileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
         if (null == path)
             throw new IllegalArgumentException("node");
-        ftm.copyAllTo(oldNode, node);
+        ftm.cp_r(oldNode, node);
         setSelectionPath(path);
         scrollPathToVisible(path);
     }
@@ -495,13 +495,13 @@ public final class TFileTree extends JTree {
      * and scrolls the tree so that the copied node
      * is selected and visible.
      */
-    public void archiveCopyTo(final TFile oldNode, final TFile node)
+    public void cp_p(final TFile oldNode, final TFile node)
     throws IOException {
         final TFileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
         if (null == path)
             throw new IllegalArgumentException("node");
-        ftm.archiveCopyTo(oldNode, node);
+        ftm.cp_p(oldNode, node);
         setSelectionPath(path);
         scrollPathToVisible(path);
     }
@@ -511,13 +511,13 @@ public final class TFileTree extends JTree {
      * and scrolls the tree so that the recursively copied node
      * is selected and visible.
      */
-    public void archiveCopyAllTo(final TFile oldNode, final TFile node)
+    public void cp_rp(final TFile oldNode, final TFile node)
     throws IOException {
         final TFileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
         if (null == path)
             throw new IllegalArgumentException("node");
-        ftm.archiveCopyAllTo(oldNode, node);
+        ftm.cp_rp(oldNode, node);
         setSelectionPath(path);
         scrollPathToVisible(path);
     }

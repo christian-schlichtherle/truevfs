@@ -75,18 +75,18 @@ final class TBIO {
      *         or an elementary operation fails for any reason.
      */
     public static void
-    moveAll(final File src,
+    move(final File src,
             final File dst,
             final TArchiveDetector detector)
     throws IOException {
         if (contains(src, dst))
             throw new TContainsFileException(src, dst);
-        moveAll0(src, dst, detector);
+        move0(src, dst, detector);
     }
 
     /** Unchecked parameters version. */
     private static void
-    moveAll0(   final File src,
+    move0(   final File src,
                 final File dst,
                 final TArchiveDetector detector)
     throws IOException {
@@ -108,7 +108,7 @@ final class TBIO {
                 Arrays.sort(members);
             }
             for (final String member : members)
-                moveAll0(   new TFile(src, member, detector),
+                move0(   new TFile(src, member, detector),
                             new TFile(dst, member, detector),
                             detector);
             if (!srcIsGhost)
