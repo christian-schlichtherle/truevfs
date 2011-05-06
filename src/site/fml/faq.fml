@@ -198,6 +198,43 @@ TFile.setDefaultArchiveDetector(
                 </p>
             </answer>
         </faq>
+        <faq id="corruptedArchive">
+            <question>
+                When I create or update archive entries,
+                the modified archive file gets corrupted.
+                What's wrong?
+            </question>
+            <answer>
+                <p>
+                    The TrueZIP Kernel module applies advanced caching
+                    strategies for archive entries.
+                    So whenever you create or update archive entries, your
+                    changes need to get committed to the archive file when
+                    you're done.
+                    On certain events, e.g. whenever the JVM terminates
+                    normally (i.e. doesn't crash), this happens automatically.
+                    However, in a long running application you may want to do
+                    this manually in order to allow <i>third parties</i> to
+                    access the archive file.
+                    The term <i>third party</i> in this context includes any
+                    other OS process and even the legacy java.io.File* API.
+                </p>
+                <p>
+                    Committing any unsynchronized changes to all archive files
+                    is easy - just call...
+                </p>
+                <pre>
+                    <code>
+TFile.umount();
+                    </code>
+                </pre>
+                <p>
+                    Please have a look at the method's
+                    <a href="apidocs/de/schlichtherle/truezip/file/TFile.html#umount()">Javadoc</a>
+                    for more options.
+                </p>
+            </answer>
+        </faq>
     </part>
     <part id="general">
         <title>General Questions</title>
