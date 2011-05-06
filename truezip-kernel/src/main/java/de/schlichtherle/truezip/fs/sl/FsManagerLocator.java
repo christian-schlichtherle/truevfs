@@ -72,7 +72,7 @@ public final class FsManagerLocator implements FsManagerProvider {
             if (i.hasNext())
                 service = i.next();
         }
-        FsManager manager;
+        final FsManager manager;
         if (null == service) {
             manager = new FsFailSafeManager(new FsDefaultManager());
         } else {
