@@ -210,7 +210,7 @@ public final class TFileTreeModel implements TreeModel {
      * Creates {@code node} as a new file in the file system
      * and updates the tree accordingly.
      * If you would like to create a new file with initial content, please
-     * use {@link #copyFrom(TFile, InputStream)} instead.
+     * use {@link #cp(InputStream, TFile)} instead.
      * Note that the current selection may get lost.
      *
      * @return Whether or not the file has been newly created.
@@ -255,14 +255,14 @@ public final class TFileTreeModel implements TreeModel {
     }
 
     /**
-     * Creates {@code node} as a new file with the contents read from
-     * {@code in} and updates the tree accordingly.
+     * Copies {@code in} to {@code node}
+     * and updates the tree accordingly.
      * Note that the given stream is <em>always</em> closed and
      * that the current selection may get lost.
      *
      * @throws IOException if copying the data fails for some reason.
      */
-    public void copyFrom(final TFile node, final InputStream in)
+    public void cp(final InputStream in, final TFile node)
     throws IOException {
         TFile.cp(in, node);
         nodeInsertedOrStructureChanged(node);
@@ -275,7 +275,7 @@ public final class TFileTreeModel implements TreeModel {
      *
      * @throws IOException if copying the data fails for some reason.
      */
-    public void copyTo(final TFile oldNode, final TFile node)
+    public void cp(final TFile oldNode, final TFile node)
     throws IOException {
         TFile.cp(oldNode, node);
         nodeInsertedOrStructureChanged(node);
@@ -288,7 +288,7 @@ public final class TFileTreeModel implements TreeModel {
      *
      * @throws IOException if copying the data fails for some reason.
      */
-    public void copyAllTo(final TFile oldNode, final TFile node)
+    public void cp_r(final TFile oldNode, final TFile node)
     throws IOException {
         try {
             TFile.cp_r(oldNode, node);
@@ -298,28 +298,28 @@ public final class TFileTreeModel implements TreeModel {
     }
 
     /**
-     * Copies {@code oldNode} to {@code node}, preserving
-     * its last modification time
+     * Copies {@code oldNode} to {@code node}
+     * preserving its last modification time
      * and updates the tree accordingly.
      * Note that the current selection may get lost.
      *
      * @throws IOException if copying the data fails for some reason.
      */
-    public void archiveCopyTo(final TFile oldNode, final TFile node)
+    public void cp_p(final TFile oldNode, final TFile node)
     throws IOException {
         TFile.cp_p(oldNode, node);
         nodeInsertedOrStructureChanged(node);
     }
 
     /**
-     * Copies {@code oldNode} to {@code node} recursively, preserving
-     * its last modification time
+     * Copies {@code oldNode} to {@code node} recursively
+     * preserving its last modification time
      * and updates the tree accordingly.
      * Note that the current selection may get lost.
      *
      * @throws IOException if copying the data fails for some reason.
      */
-    public void archiveCopyAllTo(final TFile oldNode, final TFile node)
+    public void cp_rp(final TFile oldNode, final TFile node)
     throws IOException {
         try {
             TFile.cp_rp(oldNode, node);
