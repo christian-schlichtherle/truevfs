@@ -15,22 +15,23 @@
  */
 package de.schlichtherle.truezip.key.sl;
 
+import de.schlichtherle.truezip.fs.archive.zip.raes.PromptingKeyManagerService;
 import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.key.KeyManagerProvider;
 import de.schlichtherle.truezip.key.spi.KeyManagerService;
 import de.schlichtherle.truezip.util.ServiceLocator;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Iterator;
-import java.util.ServiceConfigurationError;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.jcip.annotations.Immutable;
 
 /**
- * Locates a key manager service of a class with a name which
- * is resolved by querying a system property or searching the class path,
- * whatever yields a result first.
+ * Locates a key manager service of a class with a name which is
+ * resolved by querying a system property or searching the class path
+ * or using a default implementation, whatever yields a result first.
  * <p>
  * First, the value of the {@link System#getProperty system property}
  * with the class name {@code "de.schlichtherle.truezip.key.spi.KeyManagerService"}
@@ -43,44 +44,57 @@ import net.jcip.annotations.Immutable;
  * If this yields a result, the class with the name in this file is then loaded
  * and instantiated by calling its no-arg constructor.
  * <p>
- * Otherwise, a {@link ServiceConfigurationError} is thrown.
+ * Otherwise, the expression
+ * {@code new PromptingKeyManagerService()} is used to create the
+ * key manager service in this container.
  *
+ * @see PromptingKeyManagerService
  * @author Christian Schlichtherle
  * @version $Id$
  */
 @Immutable
 @DefaultAnnotation(NonNull.class)
+@edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
 public final class KeyManagerLocator implements KeyManagerProvider {
 
     /** The singleton instance of this class. */
     public static final KeyManagerLocator
             SINGLETON = new KeyManagerLocator();
 
-    private final KeyManagerService service;
+    private volatile @CheckForNull KeyManagerService service;
 
     /** You cannot instantiate this class. */
     private KeyManagerLocator() {
-        final ServiceLocator locator = new ServiceLocator(
-                KeyManagerLocator.class.getClassLoader());
-        KeyManagerService
-                service = locator.getService(KeyManagerService.class, null);
-        if (null == service) {
-            final Iterator<KeyManagerService>
-                    i = locator.getServices(KeyManagerService.class);
-            if (i.hasNext())
-                service = i.next();
-            else
-                throw new ServiceConfigurationError(
-                        "No provider available for " + KeyManagerService.class);
-        }
-        this.service = service;
-        Logger  .getLogger( KeyManagerLocator.class.getName(),
-                            KeyManagerLocator.class.getName())
-                .log(Level.CONFIG, "located", service);
     }
 
     @Override
     public <K> KeyManager<K> get(Class<K> type) {
-        return service.get(type);
+        KeyManagerService service = this.service;
+        if (null != service)
+            return service.get(type);
+        synchronized (this) {
+            service = this.service;
+            if (null != service) // DCL DOES work with volatile fields since JSE 5!
+                return service.get(type);
+            final Logger
+                    logger = Logger.getLogger(  KeyManagerLocator.class.getName(),
+                                                KeyManagerLocator.class.getName());
+            final ServiceLocator locator = new ServiceLocator(
+                    KeyManagerLocator.class.getClassLoader());
+            service = locator.getService(KeyManagerService.class, null);
+            if (null == service) {
+                final Iterator<KeyManagerService>
+                        i = locator.getServices(KeyManagerService.class);
+                if (i.hasNext())
+                    service = i.next();
+            }
+            if (null != service) {
+                logger.log(Level.CONFIG, "located", service);
+            } else {
+                service = new PromptingKeyManagerService();
+                logger.log(Level.CONFIG, "default", service);
+            }
+            return (this.service = service).get(type);
+        }
     }
 }

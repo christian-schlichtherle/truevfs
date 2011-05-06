@@ -21,6 +21,9 @@ import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.FsManagerProvider;
 import de.schlichtherle.truezip.fs.spi.FsManagerService;
 import de.schlichtherle.truezip.util.ServiceLocator;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,8 +31,8 @@ import net.jcip.annotations.Immutable;
 
 /**
  * Locates a file system manager service of a class with a name which is
- * resolved by querying a system property or searching the class path,
- * whatever yields a result first.
+ * resolved by querying a system property or searching the class path
+ * or using a default implementation, whatever yields a result first.
  * <p>
  * First, the value of the {@link System#getProperty system property}
  * with the class name {@code "de.schlichtherle.truezip.fs.spi.FsManagerService"}
@@ -46,45 +49,56 @@ import net.jcip.annotations.Immutable;
  * {@code new FsFailSafeManager(new FsDefaultManager())} is used to create the
  * file system manager in this container.
  *
+ * @see FsFailSafeManager
+ * @see FsDefaultManager
  * @author Christian Schlichtherle
  * @version $Id$
  */
 @Immutable
+@DefaultAnnotation(NonNull.class)
+@edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
 public final class FsManagerLocator implements FsManagerProvider {
 
     /** The singleton instance of this class. */
     public static final FsManagerLocator SINGLETON = new FsManagerLocator();
 
-    private final FsManager manager;
+    private volatile @CheckForNull FsManager manager;
 
     /** You cannot instantiate this class. */
     private FsManagerLocator() {
-        final Logger
-                logger = Logger.getLogger(  FsManagerLocator.class.getName(),
-                                            FsManagerLocator.class.getName());
-        final ServiceLocator locator = new ServiceLocator(
-                FsManagerLocator.class.getClassLoader());
-        FsManagerService
-                service = locator.getService(FsManagerService.class, null);
-        if (null == service) {
-            final Iterator<FsManagerService>
-                    i = locator.getServices(FsManagerService.class);
-            if (i.hasNext())
-                service = i.next();
-        }
-        final FsManager manager;
-        if (null == service) {
-            manager = new FsFailSafeManager(new FsDefaultManager());
-        } else {
-            logger.log(Level.CONFIG, "located", service);
-            manager = service.get();
-        }
-        this.manager = manager;
-        logger.log(Level.CONFIG, null != service ? "provided" : "default", manager);
     }
 
     @Override
     public FsManager get() {
-        return manager;
+        FsManager manager = this.manager;
+        if (null != manager)
+            return manager;
+        synchronized (this) {
+            manager = this.manager;
+            if (null != manager) // DCL DOES work with volatile fields since JSE 5!
+                return manager;
+            final Logger
+                    logger = Logger.getLogger(  FsManagerLocator.class.getName(),
+                                                FsManagerLocator.class.getName());
+            final ServiceLocator locator = new ServiceLocator(
+                    FsManagerLocator.class.getClassLoader());
+            FsManagerService
+                    service = locator.getService(FsManagerService.class, null);
+            if (null == service) {
+                final Iterator<FsManagerService>
+                        i = locator.getServices(FsManagerService.class);
+                if (i.hasNext())
+                    service = i.next();
+            }
+            if (null != service) {
+                logger.log(Level.CONFIG, "located", service);
+                manager = service.get();
+                logger.log(Level.CONFIG, "provided", manager);
+            } else {
+                manager = new FsFailSafeManager(new FsDefaultManager());
+                logger.log(Level.CONFIG, "default", manager);
+            }
+            return this.manager = manager;
+        }
     }
 }
