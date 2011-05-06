@@ -173,7 +173,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  * </tr>
  * <tr>
  *   <td><i>archive.zip</i></td>
- *   <td>False positive: Regular directory</td>
+ *   <td>False positive: Plain directory</td>
  *   <td>{@code true}</td>
  *   <td>{@code true}</td>
  *   <td>{@code false}</td>
@@ -182,7 +182,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  * </tr>
  * <tr>
  *   <td><i>archive.zip</i></td>
- *   <td>False positive: Regular file</td>
+ *   <td>False positive: Plain file</td>
  *   <td>{@code true}</td>
  *   <td>{@code false}</td>
  *   <td>{@code true}</td>
@@ -230,7 +230,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  * </tr>
  * <tr>
  *   <td><i>archive.tzp</i></td>
- *   <td>False positive: Regular directory</td>
+ *   <td>False positive: Plain directory</td>
  *   <td>{@code true}</td>
  *   <td>{@code true}</td>
  *   <td>{@code false}</td>
@@ -239,7 +239,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  * </tr>
  * <tr>
  *   <td><i>archive.tzp</i></td>
- *   <td>False positive: Regular file</td>
+ *   <td>False positive: Plain file</td>
  *   <td>{@code true}</td>
  *   <td>{@code false}</td>
  *   <td>{@code true}</td>
@@ -269,7 +269,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  * </tr>
  * <tr>
  *   <td><i>other</i></td>
- *   <td>Regular directory</td>
+ *   <td>Plain directory</td>
  *   <td>{@code false}</td>
  *   <td>{@code true}</td>
  *   <td>{@code false}</td>
@@ -278,7 +278,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  * </tr>
  * <tr>
  *   <td><i>other</i></td>
- *   <td>Regular file</td>
+ *   <td>Plain file</td>
  *   <td>{@code false}</td>
  *   <td>{@code false}</td>
  *   <td>{@code true}</td>
@@ -1738,7 +1738,7 @@ public final class TFile extends File {
      * A top level archive is not enclosed in another archive.
      * If this does not return {@code null}, this denotes the longest
      * part of the path which actually may (but does not need to) exist
-     * as a regular file in the real file system.
+     * as a plain file in the real file system.
      */
     public TFile getTopLevelArchive() {
         final TFile enclArchive = this.enclArchive;
@@ -2057,7 +2057,7 @@ public final class TFile extends File {
     /**
      * Sets the last modification of this file or (virtual) directory.
      * If this is a ghost directory within an archive file, it's reincarnated
-     * as a regular directory within the archive file.
+     * as a plain directory within the archive file.
      * <p>
      * Note that calling this method may incur a severe performance penalty
      * if the file is an entry in an archive file which has just been written
@@ -2447,8 +2447,8 @@ public final class TFile extends File {
         if (innerArchive != null) {
             // Support for this operation for archive files and entries has been
             // removed in TrueZIP 7 because using a shutdown hook uncautiously
-            // can easily introduce a memory leak when using multiple class loaders
-            // to load TrueZIP.
+            // introduces a potential memory leak when using multiple class
+            // loaders to load TrueZIP.
             throw new UnsupportedOperationException();
         }
         delegate.deleteOnExit();
@@ -2800,9 +2800,23 @@ public final class TFile extends File {
      * Recursively copies the file or directory {@code src}
      * to the file or directory {@code dst}.
      * <p>
-     * This version uses {@link TDefaultArchiveDetector#NULL} to detect any
-     * archive files in the source and destination directory trees,
-     * i.e. it makes a verbatim copy as if they were regular files.
+     * If the source object is an instance of this class, its
+     * {@link #getArchiveDetector() archive detector} is used
+     * to traverse the source tree.
+     * Otherwise, the class'
+     * {@link #getDefaultArchiveDetector() default archive detector} is used
+     * to traverse the source tree.
+     * The same rules apply for the destination object.
+     * <p>
+     * Note that this strategy may result in a structural copy rather than a
+     * verbatim copy of any archive files within the source tree but is
+     * required in order to make sure that this method does not bypass the
+     * cache in the TrueZIP Kernel.
+     * If you need a verbatim copy of any archive files within the source tree
+     * however, then make sure that the cache is initially clean by calling
+     * {@link #umount()} before calling
+     * {@link #cp_rp(File, File, TArchiveDetector, TArchiveDetector) cp_rp(src, dst, TArchiveDetector.NULL, TArchiveDetector.NULL)}
+     * instead.
      * <p>
      * <table border="2" cellpadding="4">
      * <thead>
@@ -2859,7 +2873,8 @@ public final class TFile extends File {
     public static void cp_r(File src, File dst)
     throws IOException {
         TBIO.copyAll(false, src, dst,
-                    TDefaultArchiveDetector.NULL, TDefaultArchiveDetector.NULL);
+                (src instanceof TFile) ? ((TFile)src).detector : defaultDetector,
+                (dst instanceof TFile) ? ((TFile)dst).detector : defaultDetector);
     }
 
     /**
@@ -2939,9 +2954,23 @@ public final class TFile extends File {
      * Note that the current implementation only preserves the last
      * modification time.
      * <p>
-     * This version uses {@link TDefaultArchiveDetector#NULL} to detect any
-     * archive files in the source and destination directory trees,
-     * i.e. it makes a verbatim copy as if they were regular files.
+     * If the source object is an instance of this class, its
+     * {@link #getArchiveDetector() archive detector} is used
+     * to traverse the source tree.
+     * Otherwise, the class'
+     * {@link #getDefaultArchiveDetector() default archive detector} is used
+     * to traverse the source tree.
+     * The same rules apply for the destination object.
+     * <p>
+     * Note that this strategy may result in a structural copy rather than a
+     * verbatim copy of any archive files within the source tree but is
+     * required in order to make sure that this method does not bypass the
+     * cache in the TrueZIP Kernel.
+     * If you need a verbatim copy of any archive files within the source tree
+     * however, then make sure that the cache is initially clean by calling
+     * {@link #umount()} before calling
+     * {@link #cp_rp(File, File, TArchiveDetector, TArchiveDetector) cp_rp(src, dst, TArchiveDetector.NULL, TArchiveDetector.NULL)}
+     * instead.
      * <p>
      * <table border="2" cellpadding="4">
      * <thead>
@@ -2998,7 +3027,8 @@ public final class TFile extends File {
     public static void cp_rp(File src, File dst)
     throws IOException {
         TBIO.copyAll(true, src, dst,
-                    TDefaultArchiveDetector.NULL, TDefaultArchiveDetector.NULL);
+                (src instanceof TFile) ? ((TFile)src).detector : defaultDetector,
+                (dst instanceof TFile) ? ((TFile)dst).detector : defaultDetector);
     }
 
     /**
