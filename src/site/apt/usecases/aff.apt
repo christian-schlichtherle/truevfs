@@ -29,7 +29,7 @@ Application File Format
 
 +--+
 TFile.setDefaultArchiveDetector(
-    new TDefaultArchiveDetector(
+    new TArchiveDetector(
         "foo|bar",
         new JarDriver(IOPoolLocator.SINGLETON)));
 +--+

@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.sample.file.app;
 
 import de.schlichtherle.truezip.file.TArchiveDetector;
-import de.schlichtherle.truezip.file.TDefaultArchiveDetector;
+import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.TFileComparator;
 import de.schlichtherle.truezip.file.TFileInputStream;
@@ -51,7 +51,7 @@ import java.util.ResourceBundle;
  * However, this utility features some optional archive drivers which
  * provide additional safety or otherwise unavailable features.
  * Some of these drivers are not used in their default configuration -
- * see {@link de.schlichtherle.truezip.file.TDefaultArchiveDetector} for more
+ * see {@link de.schlichtherle.truezip.file.TArchiveDetector} for more
  * information.
  * For example, the ZIP drivers used in this utility <em>always</em> check
  * the CRC-32 values provided in the ZIP file.
@@ -81,7 +81,7 @@ public class Nzip extends CommandLineUtility {
 
     /**
      * May be overridden by subclasses to create the
-     * {@link TDefaultArchiveDetector} which provides file system drivers which
+     * {@link TArchiveDetector} which provides file system drivers which
      * should use the specified charset if supported.
      * <p>
      * Note that the archive detector which is returned by the implementation
@@ -89,7 +89,7 @@ public class Nzip extends CommandLineUtility {
      * some extra compatibility tests which they perform on every archive.
      */
     protected TArchiveDetector newArchiveDetector() {
-        return new TDefaultArchiveDetector(TDefaultArchiveDetector.ALL,
+        return new TArchiveDetector(TArchiveDetector.ALL,
             new Object[][] {
                 { "ear|jar|war", new CheckedJarDriver(POOL_PROVIDER) },// check CRC-32
                 { "zip", new CheckedZipDriver(POOL_PROVIDER) }, // check CRC-32
@@ -100,7 +100,7 @@ public class Nzip extends CommandLineUtility {
     /** @see #newArchiveDetector() */
     protected TArchiveDetector newArchiveDetector(final Charset charset) {
         assert null != charset;
-        return new TDefaultArchiveDetector(TDefaultArchiveDetector.ALL,
+        return new TArchiveDetector(TArchiveDetector.ALL,
                 new Object[][] {
                     { "ear|jar|war|zip", new CheckedZipDriver(POOL_PROVIDER) { // check CRC-32
                         @Override
@@ -363,7 +363,7 @@ public class Nzip extends CommandLineUtility {
 
         final TArchiveDetector dstDetector;
         if (unzip)
-            dstDetector = TDefaultArchiveDetector.NULL;
+            dstDetector = TArchiveDetector.NULL;
         else if (cp437out)
             dstDetector = newArchiveDetector(Charset.forName("IBM437"));
         else if (utf8out)

@@ -70,11 +70,11 @@ public final class KeyManagerLocator implements KeyManagerProvider {
     @Override
     public <K> KeyManager<K> get(Class<K> type) {
         KeyManagerService service = this.service;
-        if (null != service)
+        if (null != service) // DCL does work with volatile fields since JSE 5!
             return service.get(type);
         synchronized (this) {
             service = this.service;
-            if (null != service) // DCL DOES work with volatile fields since JSE 5!
+            if (null != service)
                 return service.get(type);
             final Logger
                     logger = Logger.getLogger(  KeyManagerLocator.class.getName(),

@@ -110,7 +110,7 @@ public abstract class TFileTestSuite {
     @Before
     public void setUp() throws IOException {
         TFile.setDefaultArchiveDetector(
-                new TDefaultArchiveDetector(scheme.toString(), driver));
+                new TArchiveDetector(scheme.toString(), driver));
         temp = createTempFile();
         assertTrue(temp.delete());
         archive = new TFile(temp);
@@ -155,7 +155,7 @@ public abstract class TFileTestSuite {
     private static TFile newNonArchiveFile(TFile file) {
         return new TFile(file.getParentFile(),
                         file.getName(),
-                        TDefaultArchiveDetector.NULL);
+                        TArchiveDetector.NULL);
     }
 
     @Test
@@ -533,7 +533,7 @@ public abstract class TFileTestSuite {
                     || !(ex.getCause().getCause() instanceof FileBusyException))
                     throw ex;
         }
-        assertTrue(file2.catFrom(fis1)); // fails for same reason.
+        file2.input(fis1);
 
         // fis1 is still open!
         try {
@@ -545,8 +545,12 @@ public abstract class TFileTestSuite {
                 throw ex;
         }
         assertTrue(file2.isFile());
-        if (!file2.catFrom(fis1)) // fisA may be invalidated after update!
+        try {
+            file2.input(fis1); // fisA may be invalidated after update!
+            fail();
+        } catch (IOException expected) {
             assertFalse(file2.exists()); // previous op has removed file2!
+        }
 
         // Open file2 as stream and let the garbage collection close the stream automatically.
         new TFileInputStream(file1);
@@ -768,17 +772,17 @@ public abstract class TFileTestSuite {
         assertTrue(archive2.delete());
         assertTrue(archive.delete());
     }
-    
+
     private void assertCat(final TFile file) throws IOException {
         assertCatFrom(file);
         assertCatTo(file);
         assertTrue(file.delete());
     }
-    
+
     private void assertCatFrom(final TFile file) throws IOException {
         final InputStream in = new ByteArrayInputStream(data);
         try {
-            assertTrue(file.catFrom(in));
+            file.input(in);
         } finally {
             in.close();
         }
@@ -788,7 +792,7 @@ public abstract class TFileTestSuite {
     private void assertCatTo(final TFile file) throws IOException {
         final ByteArrayOutputStream out = new ByteArrayOutputStream(data.length);
         try {
-            assertTrue(file.catTo(out));
+            file.output(out);
         } finally {
             out.close();
         }
@@ -806,7 +810,7 @@ public abstract class TFileTestSuite {
         assertCopyContainingOrSameFiles0(dir, archive);
         assertCopyContainingOrSameFiles0(archive, entry);
         
-        assertTrue(entry.catFrom(new ByteArrayInputStream(data)));
+        entry.input(new ByteArrayInputStream(data));
         
         assertCopyContainingOrSameFiles0(dir, archive);
         assertCopyContainingOrSameFiles0(archive, entry);
@@ -1130,7 +1134,7 @@ public abstract class TFileTestSuite {
         // - not a regular archive.
         // So upon completion of this step, the object "archive" refers to a
         // false positive.
-        final TFile tmp = new TFile(archive.getPath(), TDefaultArchiveDetector.NULL);
+        final TFile tmp = new TFile(archive.getPath(), TArchiveDetector.NULL);
         final InputStream in = new ByteArrayInputStream(data);
         TFile.cp(in, tmp);
         assertRenameArchiveToTemp(archive);
@@ -1150,7 +1154,7 @@ public abstract class TFileTestSuite {
         // Depending on the true state of the object "archive", this will
         // either create a directory (iff archive is a regular archive) or a
         // plain file (iff archive is false positive).
-        assertTrue(archive.renameTo(tmp));
+        TFile.mv(archive, tmp);
         assertFalse(archive.exists());
         assertFalse(newPlainFile(archive).exists());
 
@@ -1198,14 +1202,14 @@ public abstract class TFileTestSuite {
         assertTrue(archive.delete());
     }
     
-    private void assertRenameTo(TFile src, TFile dst) {
+    private void assertRenameTo(TFile src, TFile dst) throws IOException {
         assertTrue(src.exists());
         if (!src.isEntry())
             assertTrue(newPlainFile(src).exists());
         assertFalse(dst.exists());
         if (!dst.isEntry())
             assertFalse(newPlainFile(dst).exists());
-        assertTrue(src.renameTo(dst)); // lenient!
+        TFile.mv(src, dst); // lenient!
         assertFalse(src.exists());
         if (!src.isEntry())
             assertFalse(newPlainFile(src).exists());

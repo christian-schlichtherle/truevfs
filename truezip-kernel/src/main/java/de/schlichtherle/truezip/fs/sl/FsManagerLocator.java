@@ -71,11 +71,11 @@ public final class FsManagerLocator implements FsManagerProvider {
     @Override
     public FsManager get() {
         FsManager manager = this.manager;
-        if (null != manager)
+        if (null != manager) // DCL does work with volatile fields since JSE 5!
             return manager;
         synchronized (this) {
             manager = this.manager;
-            if (null != manager) // DCL DOES work with volatile fields since JSE 5!
+            if (null != manager)
                 return manager;
             final Logger
                     logger = Logger.getLogger(  FsManagerLocator.class.getName(),

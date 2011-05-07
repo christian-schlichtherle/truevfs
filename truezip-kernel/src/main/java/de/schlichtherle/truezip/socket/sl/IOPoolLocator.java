@@ -72,11 +72,11 @@ public final class IOPoolLocator implements IOPoolProvider {
     @Override
     public IOPool<?> get() {
         IOPoolService service = this.service;
-        if (null != service)
+        if (null != service) // DCL does work with volatile fields since JSE 5!
             return service.get();
         synchronized (this) {
             service = this.service;
-            if (null != service) // DCL DOES work with volatile fields since JSE 5!
+            if (null != service)
                 return service.get();
             final ServiceLocator locator = new ServiceLocator(
                     IOPoolLocator.class.getClassLoader());

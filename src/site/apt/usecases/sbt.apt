@@ -86,14 +86,14 @@ TFile.cp_rp(new TFile("file"), new TFile("archive.tar.gz/file"));
     instance to the constructor of the <<<TFile>>> object like this:
 
 +--+
-TFile file = new TFile("archive.zip", TDefaultArchiveDetector.NULL);
+TFile file = new TFile("archive.zip", TArchiveDetector.NULL);
 +--+
 
     In this example,
-    {{{./apidocs/de/schlichtherle/truezip/file/TDefaultArchiveDetector.html#NULL}<<<TDefaultArchiveDetector.NULL>>>}}
+    {{{./apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html#NULL}<<<TArchiveDetector.NULL>>>}}
     has been used to suppress the detection of any archive file suffixes.
     In case you need the opposite, you could inject
-    {{{./apidocs/de/schlichtherle/truezip/file/TDefaultArchiveDetector.html#ALL}<<<TDefaultArchiveDetector.ALL>>>}}
+    {{{./apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html#ALL}<<<TArchiveDetector.ALL>>>}}
     instead.
 
     Enjoy TrueZIP!

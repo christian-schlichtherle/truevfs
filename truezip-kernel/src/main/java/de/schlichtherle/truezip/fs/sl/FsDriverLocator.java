@@ -62,11 +62,11 @@ public final class FsDriverLocator implements FsDriverProvider {
     @Override
     public Map<FsScheme, FsDriver> get() {
         Map<FsScheme, FsDriver> drivers = this.drivers;
-        if (null != drivers)
+        if (null != drivers) // DCL does work with volatile fields since JSE 5!
             return drivers;
         synchronized (this) {
             drivers = this.drivers;
-            if (null != drivers) // DCL DOES work with volatile fields since JSE 5!
+            if (null != drivers)
                 return drivers;
             final Logger
                     logger = Logger.getLogger(  FsDriverLocator.class.getName(),

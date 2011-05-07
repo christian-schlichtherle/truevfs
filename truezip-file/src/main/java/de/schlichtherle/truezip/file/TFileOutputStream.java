@@ -74,7 +74,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.CREATE_PARENTS;
  * <p>
  * If you would like to use this class in order to copy files,
  * please consider using one of the
- * <a href="TFile.java#Copy_Methods">copy methods</a> of the class {@link TFile}
+ * <a href="TFile.java#bulkIOMethods">copy methods</a> of the class {@link TFile}
  * instead.
  * These methods provide ease of use, enhanced features, superior performance
  * and require less space in the temp file folder.

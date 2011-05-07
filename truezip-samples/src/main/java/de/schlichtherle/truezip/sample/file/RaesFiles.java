@@ -20,7 +20,7 @@ import de.schlichtherle.truezip.crypto.raes.RaesOutputStream;
 import de.schlichtherle.truezip.crypto.raes.RaesParameters;
 import de.schlichtherle.truezip.crypto.raes.RaesReadOnlyFile;
 import de.schlichtherle.truezip.file.TArchiveDetector;
-import de.schlichtherle.truezip.file.TDefaultArchiveDetector;
+import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.TFileInputStream;
 import de.schlichtherle.truezip.file.TFileOutputStream;
@@ -149,6 +149,6 @@ public class RaesFiles {
         TFile file = new TFile(path, detector);
         TFile parent = file.getParentFile();
         assert null != parent : "expected non-null from call context!";
-        return new TFile(parent, file.getName(), TDefaultArchiveDetector.NULL);
+        return new TFile(parent, file.getName(), TArchiveDetector.NULL);
     }
 }

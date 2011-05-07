@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.file.swing;
 
-import de.schlichtherle.truezip.file.TDefaultArchiveDetector;
+import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.file.TFile;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
@@ -109,7 +109,7 @@ public class TFileView extends TDecoratingFileView {
     private static TFile newNonArchiveFile(@NonNull TFile file) {
         TFile parent = file.getParentFile();
         assert null != parent : "expected non-null from context!";
-        return new TFile(parent, file.getName(), TDefaultArchiveDetector.NULL);
+        return new TFile(parent, file.getName(), TArchiveDetector.NULL);
     }
 
     private static boolean isEntryInTrueArchive(TFile file) {
@@ -120,7 +120,7 @@ public class TFileView extends TDecoratingFileView {
         TFile parent = file.getParentFile();
         assert parent != null : "An archive entry must always name a parent!";
         return parent.isDirectory()
-                && !new TFile(parent.getPath(), TDefaultArchiveDetector.NULL)
+                && !new TFile(parent.getPath(), TArchiveDetector.NULL)
                     .isDirectory();
     }
 
