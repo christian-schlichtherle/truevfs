@@ -57,8 +57,8 @@ public final class FsFailSafeManager extends FsDecoratingManager<FsManager> {
     public FsController<?>
     getController(FsMountPoint mountPoint, FsCompositeDriver driver) {
         FsController<?> controller = delegate.getController(mountPoint, driver);
-        if (null == this.shutdown) {
-            synchronized (this) { // DCL does work in combination with volatile in JSE 5!
+        if (null == this.shutdown) { // DCL does work with volatile fields since JSE 5!
+            synchronized (this) {
                 Shutdown shutdown = this.shutdown;
                 if (null == shutdown) {
                     shutdown = new Shutdown(new Sync(delegate));

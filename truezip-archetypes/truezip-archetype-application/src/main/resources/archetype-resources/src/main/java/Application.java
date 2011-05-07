@@ -3,7 +3,7 @@
 #set( $symbol_escape = '\' )
 package ${package};
 
-//import de.schlichtherle.truezip.file.TDefaultArchiveDetector;
+//import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.fs.FsSyncException;
 //import de.schlichtherle.truezip.fs.archive.tar.TarBZip2Driver;
@@ -95,8 +95,8 @@ abstract class Application<E extends Exception> {
         // truezip-driver-tar and truezip-driver-zip to be present on the
         // class path at compile time:
         /*TFile.setDefaultArchiveDetector(
-                new TDefaultArchiveDetector(
-                    TDefaultArchiveDetector.NULL,
+                new TArchiveDetector(
+                    TArchiveDetector.NULL,
                     new Object[][] {
                         { "tar", new TarDriver(IOPoolLocator.SINGLETON) },
                         { "tgz|tar.gz", new TarGZipDriver(IOPoolLocator.SINGLETON) },
@@ -106,19 +106,19 @@ abstract class Application<E extends Exception> {
 
         // Another typical use case is to recognize only Java artefacts.
         /*TFile.setDefaultArchiveDetector(
-                new TDefaultArchiveDetector(
+                new TArchiveDetector(
                         "ear|jar|war",
                         new JarDriver(IOPoolLocator.SINGLETON));*/
 
         // ... or an application file format.
         /*TFile.setDefaultArchiveDetector(
-                new TDefaultArchiveDetector(
+                new TArchiveDetector(
                         "foo",
                         new JarDriver(IOPoolLocator.SINGLETON));*/
 
         // ... or an encrypted application file format.
         /*TFile.setDefaultArchiveDetector(
-                new TDefaultArchiveDetector(
+                new TArchiveDetector(
                         "bar",
                         new SafeZipRaesDriver(
                             IOPoolLocator.SINGLETON,

@@ -41,7 +41,7 @@ Basic Operations
     <file> itself.
 
     If an application just needs to copy data however, using one of the
-    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#Copy_Methods}copy methods}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#bulkIOMethods}copy methods}}
     in the class
     {{{../apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}
     is highly recommended instead of using
@@ -541,7 +541,7 @@ Miscellaneous
     the documented contract of the respective operation.
     This is to protect an application from creating archive entries which cannot
     get encoded and decoded again correctly.
-    For example, the Euro sign (Ã¢â€šÂ¬) does not have a representation in the IBM437
+    For example, the Euro sign (ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬) does not have a representation in the IBM437
     character set and hence cannot be used for entries in ordinary ZIP files
     unless TrueZIP's configuration is customized to use another charset.
 

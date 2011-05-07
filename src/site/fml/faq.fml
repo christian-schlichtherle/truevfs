@@ -181,8 +181,8 @@ TFile.cp_rp(src, dst);
                 <pre>
                     <code>
 TFile.setDefaultArchiveDetector(
-        new TDefaultArchiveDetector(
-            TDefaultArchiveDetector.NULL,
+        new TArchiveDetector(
+            TArchiveDetector.NULL,
             new Object[][] {
                 { "tar", new TarDriver(IOPoolLocator.SINGLETON) },
                 { "tgz|tar.gz", new TarGZipDriver(IOPoolLocator.SINGLETON) },

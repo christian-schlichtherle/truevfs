@@ -34,7 +34,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static de.schlichtherle.truezip.file.TDefaultArchiveDetector.NULL;
+import static de.schlichtherle.truezip.file.TArchiveDetector.NULL;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import static java.io.File.*;
 import static org.hamcrest.CoreMatchers.*;
@@ -51,8 +51,8 @@ public class TFileTest {
     private static final Logger logger
             = Logger.getLogger(TFileTest.class.getName());
 
-    private static final TDefaultArchiveDetector DETECTOR
-            = new TDefaultArchiveDetector(
+    private static final TArchiveDetector DETECTOR
+            = new TArchiveDetector(
                 "ear|exe|jar|odb|odf|odg|odm|odp|ods|odt|otg|oth|otp|ots|ott|tar|tar.bz2|tar.gz|tbz2|tgz|tzp|war|zip|zip.rae|zip.raes",
                 new DummyArchiveDriver());
 

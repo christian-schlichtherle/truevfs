@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.sample.zip.raes;
 
 import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
-import de.schlichtherle.truezip.file.TDefaultArchiveDetector;
+import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.fs.archive.zip.raes.PromptingKeyManagerService;
 import de.schlichtherle.truezip.fs.archive.zip.raes.SafeZipRaesDriver;
@@ -89,7 +89,7 @@ public final class KeyManagement {
      * using {@link TFile#setDefaultArchiveDetector}.
      * This will affect only subsequently created {@link TFile} objects!
      * <p>
-     * This method decorates {@link TDefaultArchiveDetector#ALL} with a
+     * This method decorates {@link TArchiveDetector#ALL} with a
      * custom archive driver for the canonical archive file suffixes
      * {@code "tzp|zip.rae|zip.raes"} and installs the result as the
      * default archive detector using {@link TFile#setDefaultArchiveDetector}.
@@ -108,8 +108,8 @@ public final class KeyManagement {
 // START SNIPPET: setAllPasswords1
     public static void setAllPasswords1(final char[] password) {
         TFile.setDefaultArchiveDetector(
-                new TDefaultArchiveDetector(
-                    TDefaultArchiveDetector.ALL,
+                new TArchiveDetector(
+                    TArchiveDetector.ALL,
                     "tzp|zip.rae|zip.raes",
                     new SafeZipRaesDriver(
                         IOPoolLocator.SINGLETON,
@@ -146,7 +146,7 @@ public final class KeyManagement {
      * using {@link TFile#setDefaultArchiveDetector}.
      * This will affect only subsequently created {@link TFile} objects!
      * <p>
-     * This method decorates {@link TDefaultArchiveDetector#ALL} with a
+     * This method decorates {@link TArchiveDetector#ALL} with a
      * custom archive driver for the canonical archive file suffixes
      * {@code "tzp|zip.rae|zip.raes"} and installs the result as the
      * default archive detector using {@link TFile#setDefaultArchiveDetector}.
@@ -166,8 +166,8 @@ public final class KeyManagement {
 // START SNIPPET: setAllPasswords2
     public static void setAllPasswords2(final char[] password) {
         TFile.setDefaultArchiveDetector(
-                new TDefaultArchiveDetector(
-                    TDefaultArchiveDetector.ALL,
+                new TArchiveDetector(
+                    TArchiveDetector.ALL,
                     "tzp|zip.rae|zip.raes",
                     new SafeZipRaesDriver(
                         IOPoolLocator.SINGLETON,

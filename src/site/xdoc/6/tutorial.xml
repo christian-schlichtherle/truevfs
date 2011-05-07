@@ -733,7 +733,7 @@ File file = new File(&quot;archive.foo&quot;, detector);</source>
             called <i>Direct Data Copying</i> (DDC). These are just two of the
             many built-in optimizations which provide improved performance when
             copying archive files. For more information, please refer to the
-            <a href="apidocs/de/schlichtherle/io/File.html#copy_methods">Javadoc
+            <a href="apidocs/de/schlichtherle/io/File.html#bulkIOMethods">Javadoc
                 for the
                 <code>File</code> class</a>.</p>
         <p>In order to keep the examples of this section as short as possible,

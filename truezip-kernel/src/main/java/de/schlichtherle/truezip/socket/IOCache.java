@@ -198,7 +198,7 @@ public final class IOCache {
      * @return this
      */
     public IOCache flush() throws IOException {
-        if (null == getBuffer()) // DCL is OK in this context!
+        if (null == getBuffer()) // DCL does work with volatile fields since JSE 5!
             return this;
         synchronized (lock) {
             final Buffer buffer = getBuffer();
@@ -372,10 +372,10 @@ public final class IOCache {
     private class WriteThroughOutputBufferPool extends OutputBufferPool {
         @Override
         public void release(Buffer buffer) throws IOException {
-            if (buffer.writers == 0) // DCL is OK in this context!
+            if (0 == buffer.writers) // DCL does work with volatile fields since JSE 5!
                 return;
             synchronized (lock) {
-                if (buffer.writers == 0)
+                if (0 == buffer.writers)
                     return;
                 super.release(buffer);
             }
@@ -385,10 +385,10 @@ public final class IOCache {
     private final class WriteBackOutputBufferPool extends OutputBufferPool {
         @Override
         public void release(final Buffer buffer) throws IOException {
-            if (buffer.writers == 0) // DCL is OK in this context!
+            if (0 == buffer.writers) // DCL does work with volatile fields since JSE 5!
                 return;
             synchronized (lock) {
-                if (buffer.writers == 0)
+                if (0 == buffer.writers)
                     return;
                 if (getBuffer() != buffer) {
                     setBuffer(buffer);
