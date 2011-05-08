@@ -50,7 +50,7 @@ public class Copy extends Application<IOException> {
             dst = new TFile(dst, src.getName());*/
 
         // Perform a recursive archive copy.
-        TFile.cp_rp(src, dst);
+        src.cp_rp(dst);
         return 0;
     }
 }
