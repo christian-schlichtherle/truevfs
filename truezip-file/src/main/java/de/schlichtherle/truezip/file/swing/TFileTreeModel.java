@@ -225,31 +225,18 @@ public final class TFileTreeModel implements TreeModel {
     }
 
     /**
-     * Creates {@code node} as a new directory
-     * and updates the tree accordingly.
+     * Ensures that {@code node} exists as a (virtual) directory in the
+     * (federated) file system and updates the tree accordingly.
      * Note that the current selection may get lost.
      *
-     * @return Whether or not the file has been newly created.
+     * @param  recursive whether or not any missing ancestor directories shall
+     *         get created if required.
+     * @throws IOException if any I/O error occurs.
      */
-    public boolean mkdir(final TFile node) {
-        if (!node.mkdir())
-            return false;
+    public void mkdir(final TFile node, final boolean recursive)
+    throws IOException {
+        node.mkdir(recursive);
         nodeInserted(node);
-        return true;
-    }
-
-    /**
-     * Creates {@code node} as a new directory, including all parents,
-     * and updates the tree accordingly.
-     * Note that the current selection may get lost.
-     *
-     * @return Whether or not the file has been newly created.
-     */
-    public boolean mkdirs(final TFile node) {
-        if (!node.mkdirs())
-            return false;
-        nodeInserted(node);
-        return true;
     }
 
     /**

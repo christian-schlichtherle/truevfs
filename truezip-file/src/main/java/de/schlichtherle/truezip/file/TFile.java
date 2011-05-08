@@ -2372,7 +2372,7 @@ public final class TFile extends File {
             return delegate.mkdirs();
 
         final TFile parent = getParentFile();
-        if (parent != null && !parent.exists())
+        if (null != parent && !parent.exists())
             parent.mkdirs();
 
         // TODO: Profile: return parent.isDirectory() && mkdir();
@@ -2387,15 +2387,14 @@ public final class TFile extends File {
      * This method creates an archive file if {@link #isArchive} returns
      * {@code true}.
      * Example:
-     * {@code new TFile(&quot;archive.zip&quot;).mkdir();}
+     * {@code new TFile("archive.zip").mkdir();}
      * <p>
-     * Alternatively, archive files can be created on the fly by simply
+     * Alternatively, archive files get created automatically by simply
      * creating their entries.
      * Example:
-     * {@code new TFileOutputStream(&quot;archive.zip/README&quot;);}
-     * <p>
-     * These examples assume TrueZIP's default configuration where ZIP file
-     * recognition is enabled and {@link #isLenient} returns {@code true}.
+     * {@code new TFileOutputStream("archive.zip/README");}
+     * This assumes the default configuration where {@link #isLenient} returns
+     * {@code true}.
      * <p>
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      */
@@ -2415,6 +2414,47 @@ public final class TFile extends File {
             }
         }
         return delegate.mkdir();
+    }
+
+    /**
+     * Ensures that a (virtual) directory with {@link #getPath() this path name}
+     * exists in the (federated) file system.
+     * 
+     * @param  recursive whether or not any missing ancestor directories shall
+     *         get created if required.
+     * @return this
+     * @throws IOException if any I/O error occurs.
+     */
+    public TFile mkdir(final boolean recursive) throws IOException {
+        if (null != innerArchive) {
+            if (recursive) {
+                final TFile parent = getParentFile();
+                if (null != parent && !parent.exists())
+                    parent.mkdir(recursive);
+            }
+            final FsController<?> controller = innerArchive.getController();
+            final FsEntryName innerEntryName = getInnerEntryName0();
+            try {
+                controller.mknod(
+                        innerEntryName,
+                        DIRECTORY,
+                        BitField.of(EXCLUSIVE) // redundant for directory entries
+                            .set(CREATE_PARENTS, isLenient()),
+                        null);
+            } catch (IOException ex) {
+                final FsEntry entry = controller.getEntry(innerEntryName);
+                if (null == entry)
+                    throw ex;
+                final Type type = entry.getType();
+                if (DIRECTORY != type && HYBRID != type)
+                    throw ex;
+            }
+        } else {
+            final File dir = delegate;
+            if (!(recursive ? dir.mkdirs() : dir.mkdir()) && !dir.isDirectory())
+                throw new IOException(dir + " (cannot create directory)");
+        }
+        return this;
     }
 
     /**
