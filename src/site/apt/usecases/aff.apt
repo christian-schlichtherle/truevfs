@@ -79,16 +79,16 @@ try {
     Alternatively, you could use a 
     {{{./apidocs/de/schlichtherle/truezip/file/TFileReader.html}<<<TFileReader>>>}}.
 
-    And finally, to delete a custom application file, you could use this:
+    And finally, to delete a virtual directory tree - in this case your custom
+    application file - you could use this:
 
 +--+
-if (!new TFile("junk.foo").deleteAll())
-    throw new IOException("Oh s**t - you're doomed!");
+new TFile("file.foo").rm_r();
 +--+
 
-    Note that the method <<<deleteAll()>>> is used to remove the application
-    file.
-    This is required because the <<<TFile>>> object refers to a virtual
-    directory, which cannot get deleted using <<<delete()>>> unless it's empty.
+    Note that calling the method <<<rm_r()>>> is required to recursively delete
+    the application file because the <<<TFile>>> object refers to a virtual
+    directory, which cannot get deleted using similar methods like
+    <<<delete()>>> or <<<rm()>>> unless it's empty.
 
     Enjoy TrueZIP!

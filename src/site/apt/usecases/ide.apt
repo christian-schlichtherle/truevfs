@@ -75,8 +75,7 @@ try {
     And finally, to delete an entry in an archive file, you could use this:
 
 +--+
-if (!new TFile("archive.jar/META-INF/MANIFEST.MF").delete())
-    throw new IOException("Oh s**t - you're doomed!");
+new TFile("archive.jar/META-INF/MANIFEST.MF").rm();
 +--+
 
     Enjoy TrueZIP!
