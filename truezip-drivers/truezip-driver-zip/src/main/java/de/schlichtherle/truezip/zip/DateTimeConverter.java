@@ -200,7 +200,7 @@ public enum DateTimeConverter {
      * Note that not all 32 bit integers are valid DOS date/time values.
      * If an invalid DOS date/time value is provided, it gets adjusted by
      * overflowing the respective field value as if using a
-     * {@link Calendar#setLenient lenient calendar}.
+     * {@link java.util.Calendar#setLenient lenient calendar}.
      * This feature is provided in order to read bogus ZIP archive files
      * created by third party tools.
      * However, the returned Java time may differ from its intended value at
