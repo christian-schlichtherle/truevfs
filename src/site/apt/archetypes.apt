@@ -18,7 +18,7 @@ Maven Archetypes
     Since TrueZIP 7 consists of a modular architecture, a frequent issue for
     TrueZIP beginners is understanding TrueZIP's run time dependencies.
     Configuring TrueZIP's run time dependencies is important because by
-    default, the {{{./truezip-file/index.html}File* API} uses a service locator
+    default, the {{{./truezip-file/index.html}File* API}} uses a service locator
     which scans the class path for file system driver service providers
     (contained in the {{{./truezip-driver/index.html}file system driver modules}}).
 
