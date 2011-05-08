@@ -1018,53 +1018,6 @@ public abstract class TFileTestSuite {
         assertFalse(archive.isFile());
         assertEquals(0, archive.length());
     }
-
-    // This test needs to be redesigned: It primarily lacks a clear intention.
-    /*@Test
-    public final void testGarbageCollection() throws Throwable {
-        logger.fine("testGarbageCollection");
-     
-        // Preamble:
-        {
-            Object obj = new Object();
-            Reference ref = new WeakReference(obj);
-            obj = null;
-            gc(); // Assumption doesn't work without this!
-            //System.runFinalization(); // doesn't work!
-            assert ref.get() == null;
-        }
-     
-        // Test:
-        try {
-            TFile file = new TFile(archive);
-            for (int i = 0; i < 100; i++) {
-                file = new TFile(file, i + getSuffix());
-                assertTrue(file.mkdir());
-            }
-        } catch (Throwable failure) {
-            // This could be an OOME with CBZip2OutputStream from Ant 1.7.0RC1!
-            TFile.sync(); // exceptions thrown here take precedence!
-            throw failure;
-        }
-        // Note that though the file chain is now eligible for garbage
-        // collection, the associated archive controllers are not since they
-        // have dirty file systems.
-     
-        // Now set the system under stress so that the garbage collector will
-        // most likely reclaim the chain of file objects and the archive
-        // controllers once they have been updated.
-        // Note that FederatedFileSystemController.finalize() is called in no particular
-        // order, i.e. the object graph is completely ignored! :-o
-        byte[] buf1 = new byte[10 * 1024 * 1024];
-        gc();
-        byte[] buf2 = new byte[10 * 1024 * 1024];
-        TFile.sync(); // allow external modifications!
-        byte[] buf3 = new byte[10 * 1024 * 1024];
-        gc();
-        byte[] buf4 = new byte[10 * 1024 * 1024];
-     
-        assertTrue(archive.rm_r());
-    }*/
     
     @Test
     public final void testIllegalDeleteEntryWithOpenStream()

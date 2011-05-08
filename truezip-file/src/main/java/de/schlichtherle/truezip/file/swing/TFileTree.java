@@ -393,19 +393,18 @@ public final class TFileTree extends JTree {
      * is selected and visible.
      * If you would like to create a new file with initial content, please
      * check {@link #cp(InputStream, TFile)}.
+     * 
+     * @throws IOException if any I/O error occurs.
      */
     public boolean createNewFile(final TFile node) throws IOException {
         final TFileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
-        if (path == null)
+        if (null == path)
             return false;
-
         if (!ftm.createNewFile(node))
             return false;
-
         setSelectionPath(path);
         scrollPathToVisible(path);
-
         return true;
     }
 
@@ -413,40 +412,18 @@ public final class TFileTree extends JTree {
      * Forwards the call to the {@link TFileTreeModel}
      * and scrolls the tree so that the newly created directory
      * is selected and visible.
+     * 
+     * @throws IOException if any I/O error occurs.
      */
-    public boolean mkdir(final TFile node) {
+    public void mkdir(final TFile node, final boolean recursive)
+    throws IOException {
         final TFileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
-        if (path == null)
-            return false;
-
-        if (!ftm.mkdir(node))
-            return false;
-
+        if (null == path)
+            return;
+        ftm.mkdir(node, recursive);
         setSelectionPath(path);
         scrollPathToVisible(path);
-
-        return true;
-    }
-
-    /**
-     * Forwards the call to the {@link TFileTreeModel}
-     * and scrolls the tree so that the newly created directory
-     * is selected and visible.
-     */
-    public boolean mkdirs(final TFile node) {
-        final TFileTreeModel ftm = getModel();
-        final TreePath path = ftm.newTreePath(node);
-        if (path == null)
-            return false;
-
-        if (!ftm.mkdirs(node))
-            return false;
-
-        setSelectionPath(path);
-        scrollPathToVisible(path);
-
-        return true;
     }
 
     /**
@@ -454,7 +431,7 @@ public final class TFileTree extends JTree {
      * and scrolls the tree so that the copied node
      * is selected and visible.
      * 
-     * @throws IOException if copying the file or directory fails for some reason.
+     * @throws IOException if any I/O error occurs.
      */
     public void cp(final InputStream in, final TFile node) throws IOException {
         final TFileTreeModel ftm = getModel();
@@ -471,7 +448,7 @@ public final class TFileTree extends JTree {
      * and scrolls the tree so that the copied node
      * is selected and visible.
      * 
-     * @throws IOException if copying the file or directory fails for some reason.
+     * @throws IOException if any I/O error occurs.
      */
     public void cp(final TFile oldNode, final TFile node) throws IOException {
         final TFileTreeModel ftm = getModel();
@@ -488,7 +465,7 @@ public final class TFileTree extends JTree {
      * and scrolls the tree so that the recursively copied node
      * is selected and visible.
      * 
-     * @throws IOException if copying the file or directory fails for some reason.
+     * @throws IOException if any I/O error occurs.
      */
     public void cp_r(final TFile oldNode, final TFile node) throws IOException {
         final TFileTreeModel ftm = getModel();
@@ -505,7 +482,7 @@ public final class TFileTree extends JTree {
      * and scrolls the tree so that the copied node
      * is selected and visible.
      * 
-     * @throws IOException if copying the file or directory fails for some reason.
+     * @throws IOException if any I/O error occurs.
      */
     public void cp_p(final TFile oldNode, final TFile node) throws IOException {
         final TFileTreeModel ftm = getModel();
@@ -522,7 +499,7 @@ public final class TFileTree extends JTree {
      * and scrolls the tree so that the recursively copied node
      * is selected and visible.
      * 
-     * @throws IOException if copying the file or directory fails for some reason.
+     * @throws IOException if any I/O error occurs.
      */
     public void cp_rp(final TFile oldNode, final TFile node) throws IOException {
         final TFileTreeModel ftm = getModel();
@@ -539,7 +516,7 @@ public final class TFileTree extends JTree {
      * restores the expanded paths, selects {@code node} and scrolls to
      * it if necessary.
      * 
-     * @throws IOException if moving the file or directory fails for some reason.
+     * @throws IOException if any I/O error occurs.
      */
     public void mv(final TFile oldNode, final TFile node) throws IOException {
         final TFileTreeModel ftm = getModel();
