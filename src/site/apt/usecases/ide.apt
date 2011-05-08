@@ -37,7 +37,7 @@ Integrated Development Environment (IDE)
     {{{./truezip-file/index.html}TrueZIP File*}}
     module, here's your relief:
     Its
-    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}
     class extends the <<<java.io.File>>> class in order to add the
     required functionality.
     See how easy listing the contents of the top level directory of an archive
