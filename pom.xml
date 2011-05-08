@@ -150,6 +150,12 @@
                         </reportPlugins>
                     </configuration>
                 </plugin>
+                <plugin>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <configuration>
+                        <preparationGoals>clean install</preparationGoals>
+                    </configuration>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
