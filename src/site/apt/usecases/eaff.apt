@@ -51,12 +51,12 @@ TFile.setDefaultArchiveDetector(
     use the suffix of your custom application file format.
 
     Please also note the usage of the class
-    {{{../apidocs/de/schlichtherle/truezip/fs/archive/zip/SafeZipRaesDriver.html}<<<SafeZipRaesDriver>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/fs/archive/zip/raes/SafeZipRaesDriver.html}<<<SafeZipRaesDriver>>>}}
     for accessing the ZIP.RAES file format.
     This is one of two available archive driver implementations for TrueZIP's
     custom encrypted ZIP.RAES (or TZP for short) file format (the other one
     is the class
-    {{{../apidocs/de/schlichtherle/truezip/fs/archive/zip/ParanoidZipRaesDriver.html}<<<ParanoidZipRaesDriver>>>}}).
+    {{{../apidocs/de/schlichtherle/truezip/fs/archive/zip/raes/ParanoidZipRaesDriver.html}<<<ParanoidZipRaesDriver>>>}}).
     A TZP file is a ZIP file with UTF-8 encoded entry names (like the JAR file
     format) which is wrapped in a RAES file envelope.
     RAES is TrueZIP's custom Random Access Encryption Specification which

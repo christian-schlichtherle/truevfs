@@ -10,7 +10,7 @@ Concept
     or any other (virtual) file system through a set of uniform client APIs.
     Each API is contained within its own module and includes:
 
-    [{{{../truezip-file/index.html}TrueZIP File*}}]
+    [{{{./truezip-file/index.html}TrueZIP File*}}]
         The API of this module is the first choice for most applications:
         It's designed to be easy to learn and convenient to use while
         providing a great level of flexibility.
@@ -21,7 +21,7 @@ Concept
         In particular, it cannot access virtual HTTP(S) file systems or any
         member file systems (i.e. archive files) within an HTTP(S) file system.
 
-    [{{{../truezip-kernel/index.html}TrueZIP Kernel}}]
+    [{{{./truezip-kernel/index.html}TrueZIP Kernel}}]
         As the name implies, this module is the core of it all.
         As an API, it's somewhat more complex to use, but very versatile
         because of its extensible architecture, e.g. it uses Dependency
