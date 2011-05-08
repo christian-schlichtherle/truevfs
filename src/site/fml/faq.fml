@@ -52,7 +52,7 @@ TFile[] entries = new TFile("archive.zip").listFiles();
                 </p>
                 <p>
                     Use one of the 
-                    <code>mkdir*()</code> methods in the
+                    <code>mkdir*(*)</code> methods in the
                     <code>TFile</code> class or directly write to the entry
                     within the archive file using a
                     <code>TFileOutputStream</code> instead.
@@ -80,8 +80,7 @@ try {
                 </p>
                 <pre>
                     <code>
-if (!new TFile("archive.zip").mkdir())
-    throw new IOException("Oh s**t - you're doomed!");
+new TFile("archive.zip").mkdir(false);
                     </code>
                 </pre>
             </answer>
@@ -110,7 +109,7 @@ if (!new TFile("archive.zip").mkdir())
                     <code>
 TFile src = new TFile(string1); // e.g. "file"
 TFile dst = new TFile(string2); // e.g. "archive.zip"
-TFile.cp_rp(src, dst);
+src.cp_rp(dst);
                     </code>
                 </pre>
                 <p>
@@ -126,7 +125,7 @@ TFile src = new TFile(string1); // e.g. "file"
 TFile dst = new TFile(string2); // e.g. "archive.zip"
 if (TFile.isLenient() &amp;&amp; dst.isArchive() || dst.isDirectory())
     dst = new TFile(dst, src.getName());
-TFile.cp_rp(src, dst);
+src.cp_rp(dst);
                     </code>
                 </pre>
                 <p>
@@ -145,7 +144,7 @@ TFile src = new TFile(string1); // e.g. "file"
 TFile dst = new TFile(string2); // e.g. "archive.zip"
 if (dst.isArchive() || dst.isDirectory())
     dst = new TFile(dst, src.getName());
-TFile.cp_rp(src, dst);
+src.cp_rp(dst);
                     </code>
                 </pre>
                 <p>
@@ -159,7 +158,7 @@ TFile src = new TFile(string1); // e.g. "file"
 TFile dst = new TFile(string2); // e.g. "archive.zip"
 if (dst.isDirectory())
     dst = new TFile(dst, src.getName());
-TFile.cp_rp(src, dst);
+src.cp_rp(dst);
                     </code>
                 </pre>
             </answer>
