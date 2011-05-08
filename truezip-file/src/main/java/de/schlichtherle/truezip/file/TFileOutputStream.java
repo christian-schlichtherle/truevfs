@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * You may obtain a cp of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -72,9 +72,9 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.CREATE_PARENTS;
  * A {@link FileNotFoundException} is thrown by the constructors of this class
  * in this case.
  * <p>
- * If you would like to use this class in order to copy files,
+ * If you would like to use this class in order to cp files,
  * please consider using one of the
- * <a href="TFile.java#bulkIOMethods">copy methods</a> of the class {@link TFile}
+ * <a href="TFile.java#bulkIOMethods">cp methods</a> of the class {@link TFile}
  * instead.
  * These methods provide ease of use, enhanced features, superior performance
  * and require less space in the temp file folder.

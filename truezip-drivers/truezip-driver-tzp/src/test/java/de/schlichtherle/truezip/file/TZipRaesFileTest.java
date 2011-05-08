@@ -120,10 +120,14 @@ public final class TZipRaesFileTest extends TFileTestSuite {
         assertFalse(inner.isFile());
 
         TFile.umount();
-        assertFalse(archive.deleteAll());
-
+        try {
+            archive.rm_r();
+            fail();
+        } catch (IOException expected) {
+        }
+            
         TFile.umount();
         view.setAction(ENTER);
-        assertTrue(archive.deleteAll());
+        archive.rm_r();
     }
 }

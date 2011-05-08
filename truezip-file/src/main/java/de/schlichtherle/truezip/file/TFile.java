@@ -68,7 +68,6 @@ import static de.schlichtherle.truezip.fs.FsSyncOption.*;
 import static de.schlichtherle.truezip.fs.FsUriModifier.*;
 import static de.schlichtherle.truezip.entry.Entry.Size.*;
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
-import static de.schlichtherle.truezip.file.TBIO.*;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 
 /**
@@ -86,15 +85,17 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  * naive read-then-write-in-a-loop approach.
  * These bulk I/O methods fall into the following categories:
  * <ol>
- * <li>The cp(_p|_r|_rp)? methods copy the contents of their parameter objects.
- *     These methods return void and throw an {@code IOException} on failure.
- *     The exception hierarchy is fine grained enough to let an application
- *     differentiate between access restrictions, input exceptions and output
- *     exceptions.
+ * <li>The {@code cp(_p|_r|_rp)?} methods copy files or directory trees.
  *     The method names have been modelled after the Unix command line utility
  *     {@code cp} with its options.
- * <li>The input|output methods copy the given streams to this file or vice
- *     versa.
+ * <li>The {@code mv} methods move files or directory trees.
+ *     The method names have been modelled after the Unix command line utility
+ *     {@code mv}.
+ * <li>The {@code rm(_r)?} methods remove files or directory trees.
+ *     The method names have been modelled after the Unix command line utility
+ *     {@code rm} with its options.
+ * <li>The {@code input|output} methods copy the given streams to this file or
+ *     vice versa.
  *     In contrast to the previous methods they never close their argument
  *     streams, so applications can call them multiple times on the same
  *     streams to con<em>cat</em>enate data.
@@ -138,11 +139,11 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  * method compares {@link String#equals(Object) equal}.
  * This is required in order to make sure that the cached data structures
  * in the TrueZIP Kernel do not get bypassed.
- * Otherwise, archive files may loose data and even get corrupted!
+ * Otherwise, archive files may loose data or even get corrupted!
  * <p>
- * When copying a directory tree, if you need a verbatim copy of any archive
- * files within this directory tree, then make sure that any cached data
- * structures in the TrueZIP Kernel are purged by calling {@link #umount()}
+ * When copying or moving a directory tree, if you need a verbatim copy of any
+ * archive files within this directory tree, then make sure that any cached
+ * data structures in the TrueZIP Kernel are purged by calling {@link #umount()}
  * before calling one of the methods which accept the additional parameter
  * {@link TArchiveDetector#NULL} for the traversal of this directory tree.
  * For example, to make a recursive archive copy, call
@@ -1588,21 +1589,20 @@ public final class TFile extends File {
      * by this instance is a direct or indirect parent of the path
      * represented by the specified {@code file}.
      * <p>
-     * <b>Note:</b>
+     * Note:
      * <ul>
-     * <li>This method uses the canonical paths or, if failing to
-     *     canonicalize the paths, at least the normalized absolute
-     *     paths in order to compute reliable results.
-     * <li>This method does <em>not</em> test the actual status
-     *     of any file or directory in the file system.
+     * <li>This method uses the absolute path name of the given files.
+     * <li>This method does <em>not</em> access the file system.
      *     It just tests the paths.
      * </ul>
      *
-     * @param file The path to test for being a child of this path.
-     * @throws NullPointerException If the parameter is {@code null}.
+     * @param file The path to test for being a direct or indirect child of
+     *        this path.
      */
-    public boolean isParentOf(final File file) {
-        return TBIO.contains(this, file);
+    public boolean isParentOf(File file) {
+        String a = this.getAbsolutePath();
+        String b = file.getAbsoluteFile().getParent();
+        return b != null ? Paths.contains(a, b, separatorChar) : false;
     }
 
     /**
@@ -1610,15 +1610,12 @@ public final class TFile extends File {
      * by this instance contains the path represented by the specified
      * {@code file},
      * where a path is said to contain another path if and only
-     * if it is equal or a parent of the other path.
+     * if it's equal or an ancestor of the other path.
      * <p>
-     * <b>Note:</b>
+     * Note:
      * <ul>
-     * <li>This method uses the canonical paths or, if failing to
-     *     canonicalize the paths, at the least normalized absolute
-     *     paths in order to compute reliable results.
-     * <li>This method does <em>not</em> test the actual status
-     *     of any file or directory in the file system.
+     * <li>This method uses the absolute path name of the given files.
+     * <li>This method does <em>not</em> access the file system.
      *     It just tests the paths.
      * </ul>
      *
@@ -1633,15 +1630,13 @@ public final class TFile extends File {
      * Returns {@code true} if and only if the path represented
      * by {@code a} contains the path represented by {@code b},
      * where a path is said to contain another path if and only
-     * if it is equal or a parent of the other path.
+     * if it's equal or an ancestor of the other path.
      * <p>
-     * <b>Note:</b>
+     * Note:
      * <ul>
-     * <li>This method uses the canonical path name of the given files or,
-     *     if failing to canonicalize the path names, the normalized absolute
-     *     path names in order to compute reliable results.
+     * <li>This method uses the absolute path name of the given files.
      * <li>This method does <em>not</em> access the file system.
-     *     It just tests the path names.
+     *     It just tests the paths.
      * </ul>
      *
      * @param a The file to test for containing {@code b}.
@@ -1649,7 +1644,9 @@ public final class TFile extends File {
      * @throws NullPointerException If any parameter is {@code null}.
      */
     public static boolean contains(File a, File b) {
-        return TBIO.contains(a, b);
+        return Paths.contains(  a.getAbsolutePath(),
+                                b.getAbsolutePath(),
+                                separatorChar);
     }
 
     /**
@@ -2421,47 +2418,83 @@ public final class TFile extends File {
     }
 
     /**
-     * Deletes an archive entry, archive file or regular node in the real file
-     * system.
-     * If the file is a directory, it must be empty.
-     * <p>
-     * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
-     *
-     * @see #deleteAll
-     */
-    @Override
-    public boolean delete() {
-        try {
-            if (null != innerArchive) {
-                innerArchive.getController().unlink(getInnerEntryName0());
-                return true;
-            }
-        } catch (IOException ex) {
-            return false;
-        }
-        return delegate.delete();
-    }
-
-    /**
-     * Deletes the entire directory tree represented by this object,
-     * regardless whether this is a file or directory, whether the directory
-     * is empty or not or whether the file or directory is actually an
-     * archive file, an entry in an archive file or not enclosed in an
-     * archive file at all.
-     * <p>
-     * This file system operation is <em>not</em> atomic.
-     *
-     * @return Whether or not the entire directory tree was successfully
-     *         deleted.
+     * {@inheritDoc}
+     * 
+     * @deprecated This method just returns a boolean value to indicate failure,
+     *             which is hard to analyze.
+     * @see #rm()
      */
     @Deprecated
-    public boolean deleteAll() {
+    @Override
+    public final boolean delete() {
         try {
-            TBIO.deleteAll(this);
+            rm(this);
             return true;
         } catch (IOException ex) {
             return false;
         }
+    }
+
+    /**
+     * Equivalent to {@link #rm(File) rm(this)}.
+     * 
+     * @return this
+     * @throws IOException if any I/O error occurs.
+     */
+    public TFile rm() throws IOException {
+        rm(this);
+        return this;
+    }
+
+    /**
+     * Deletes the given file or directory.
+     * If the file is a directory, it must be empty.
+     * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
+     *
+     * @throws IOException if any I/O error occurs.
+     */
+    public static void rm(File node) throws IOException {
+        if (node instanceof TFile) {
+            TFile file = (TFile) node;
+            if (null != file.innerArchive) {
+                file.innerArchive.getController().unlink(file.getInnerEntryName0());
+                return;
+            }
+            node = file.delegate;
+        }
+        if (!node.delete())
+            throw new IOException(node + " (cannot delete)");
+    }
+
+    /**
+     * Equivalent to {@link #rm_r(File) rm_r(this)}.
+     * 
+     * @return this
+     * @throws IOException if any I/O error occurs.
+     */
+    public TFile rm_r() throws IOException {
+        TBIO.rm_r(this, detector);
+        return this;
+    }
+
+    /**
+     * Recursively deletes the given file or directory tree.
+     * This file system operation is <em>not</em> atomic.
+     * <p>
+     * If {@code node} is an instance of this
+     * class, its {@link #getArchiveDetector() archive detector}
+     * is used to detect prospective archive files in the directory tree.
+     * Otherwise,
+     * {@link TArchiveDetector#NULL}
+     * is used to detect prospective archive files in the directory tree.
+     * 
+     * @throws IOException if any I/O error occurs.
+     */
+    public static void rm_r(File node) throws IOException {
+        TBIO.rm_r(node,
+                node instanceof TFile
+                    ? ((TFile) node).detector
+                    : TArchiveDetector.NULL);
     }
 
     @Override
@@ -2477,11 +2510,13 @@ public final class TFile extends File {
     }
 
     /**
-     * Behaves similar to the super class, but renames this file or directory
-     * by recursively copying its data if this object or the {@code dst}
-     * object is either an archive file or an entry located in an archive file.
-     * Hence in these cases, this file system operation is <em>not</em> atomic.
+     * {@inheritDoc}
+     * 
+     * @deprecated This method just returns a boolean value to indicate failure,
+     *             which is hard to analyze.
+     * @see #mv(File)
      */
+    @Deprecated
     @Override
     public final boolean renameTo(final File dst) {
         try {
@@ -2492,44 +2527,67 @@ public final class TFile extends File {
         }
     }
 
-    public static void mv(final File src, final File dst)
-    throws IOException {
-        mv(src, dst,
-                src instanceof TFile ? ((TFile) src).detector : TArchiveDetector.NULL);
+    /**
+     * Equivalent to {@link #mv(File, File, TArchiveDetector) mv(this, dst, getArchiveDetector())}.
+     * 
+     * @param  dst the destination file or directory tree.
+     * @return this
+     * @throws IOException if any I/O error occurs.
+     */
+    public TFile mv(File dst) throws IOException {
+        mv(this, dst, detector);
+        return this;
     }
 
+    /**
+     * Moves the given source file or directory to the given destination file
+     * or directory.
+     * <p>
+     * In certain cases, this method might perform a recursive copy-then-delete
+     * operation rather than an atomic move operation.
+     * This method uses the given archive detector to detect any
+     * archive files when traversing a directory tree.
+     * 
+     * @param  src the source file or directory tree.
+     * @param  dst the destination file or directory tree.
+     * @param  detector the archive detector to use for detecting any archive
+     *         files in the source directory tree.
+     * @throws IOException if any I/O error occurs.
+     * @see    <a href="#bulkIOMethods">Copy Methods</a>
+     * @see    <a href="#traversal">Traversing Directory Trees</a>
+     */
     public static void mv(  final File src,
                             final File dst,
                             final TArchiveDetector detector)
     throws IOException {
-        final boolean srcArchived;
-        final File srcDelegate;
-        if (src instanceof TFile) {
-            final TFile srcFile = (TFile) src;
-            srcArchived = null != srcFile.innerArchive;
-            srcDelegate = srcFile.delegate;
-        } else {
-            srcArchived = false;
-            srcDelegate = src;
+        if (detector.toString().isEmpty()) {
+            final boolean srcArchived;
+            final File srcDelegate;
+            if (src instanceof TFile) {
+                final TFile srcFile = (TFile) src;
+                srcArchived = null != srcFile.innerArchive;
+                srcDelegate = srcFile.delegate;
+            } else {
+                srcArchived = false;
+                srcDelegate = src;
+            }
+            final boolean dstArchived;
+            final File dstDelegate;
+            if (dst instanceof TFile) {
+                final TFile dstFile = (TFile) dst;
+                dstArchived = null != dstFile.innerArchive;
+                dstDelegate = dstFile.delegate;
+            } else {
+                dstArchived = false;
+                dstDelegate = src;
+            }
+            if (!srcArchived && !dstArchived)
+                if (srcDelegate.renameTo(dstDelegate))
+                    return;
+                else
+                    throw new IOException(src + " (cannot move to " + dst + ")");
         }
-        final boolean dstArchived;
-        final File dstDelegate;
-        if (dst instanceof TFile) {
-            final TFile dstFile = (TFile) dst;
-            dstArchived = null != dstFile.innerArchive;
-            dstDelegate = dstFile.delegate;
-        } else {
-            dstArchived = false;
-            dstDelegate = src;
-        }
-        if (!srcArchived && !dstArchived)
-            if (srcDelegate.renameTo(dstDelegate))
-                return;
-            else
-                throw new IOException(src + " (cannot move to " + dst + ")");
-        if (dst.exists())
-            throw new IOException(dst + " (destination exists already)");
-        TBIO.move(src, dst, detector);
+        TBIO.mv(src, dst, detector);
     }
 
     /**
@@ -2540,7 +2598,6 @@ public final class TFile extends File {
      * thread to fill a FIFO of pooled buffers which is concurrently flushed by
      * the current thread.
      * It performs best when used with <em>unbuffered</em> streams.
-     * <p>
      * <table border="2" cellpadding="4">
      * <thead>
      * <tr>
@@ -2586,11 +2643,11 @@ public final class TFile extends File {
      *
      * @param  in the input stream.
      * @param  out the output stream.
-     * @throws IOException if copying the data fails for some reason.
+     * @throws IOException if any I/O error occurs.
      * @see    #cat(InputStream, OutputStream)
      * @see    <a href="#bulkIOMethods">Copy Methods</a>
      */
-    public static void cp(final InputStream in, final OutputStream out)
+    public static void cp(InputStream in, OutputStream out)
     throws IOException {
         Streams.copy(in, out);
     }
@@ -2598,7 +2655,6 @@ public final class TFile extends File {
     /**
      * Copies the input stream {@code in} to the file {@code dst} and
      * closes the stream - even if an exception occurs.
-     * <p>
      * <table border="2" cellpadding="4">
      * <thead>
      * <tr>
@@ -2645,7 +2701,7 @@ public final class TFile extends File {
      * @param  dst the destination file. Note that although this just needs to
      *         be a plain {@code File}, archive entries are only
      *         supported for instances of this class.
-     * @throws IOException if copying the data fails for some reason.
+     * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Copy Methods</a>
      */
     public static void cp(final InputStream in, final File dst)
@@ -2662,7 +2718,6 @@ public final class TFile extends File {
     /**
      * Copies the file {@code src} to the output stream {@code out} and
      * closes the stream - even if an exception occurs.
-     * <p>
      * <table border="2" cellpadding="4">
      * <thead>
      * <tr>
@@ -2709,18 +2764,28 @@ public final class TFile extends File {
      * @param  src the source file. Note that although this just needs to
      *         be a plain {@code File}, archive entries are only
      *         supported for instances of this class.
-     * @throws IOException if copying the data fails for some reason.
+     * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Copy Methods</a>
      */
-    public static void cp(final File src, final OutputStream out)
+    public static void cp(File src, OutputStream out)
     throws IOException {
-        final InputStream in = new TFileInputStream(src);
-        cp(in, out); // always closes in and out
+        cp(new TFileInputStream(src), out); // always closes in and out
+    }
+
+    /**
+     * Equivalent to {@link #cp(File, File) cp(this, dst)}.
+     * 
+     * @param  dst the destination file.
+     * @return this
+     * @throws IOException if any I/O error occurs.
+     */
+    public TFile cp(File dst) throws IOException {
+        TBIO.cp(false, this, dst);
+        return this;
     }
 
     /**
      * Copies the file {@code src} to the file {@code dst}.
-     * <p>
      * <table border="2" cellpadding="4">
      * <thead>
      * <tr>
@@ -2770,19 +2835,30 @@ public final class TFile extends File {
      * @param  dst the destination file. Note that although this just needs to
      *         be a plain {@code File}, archive entries are only
      *         supported for instances of this class.
-     * @throws IOException if copying the data fails for some reason.
+     * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Copy Methods</a>
      */
     public static void cp(File src, File dst)
     throws IOException {
-        TBIO.copy(false, src, dst);
+        TBIO.cp(false, src, dst);
+    }
+
+    /**
+     * Equivalent to {@link #cp_p(File, File) cp_p(this, dst)}.
+     * 
+     * @param  dst the destination file.
+     * @return this
+     * @throws IOException if any I/O error occurs.
+     */
+    public TFile cp_p(File dst) throws IOException {
+        TBIO.cp(true, this, dst);
+        return this;
     }
 
     /**
      * Copies the file {@code src} to the file {@code dst} and tries to
      * preserve all attributes of the source file to the destination file, too.
      * Currently, only the last modification time is preserved.
-     * <p>
      * <table border="2" cellpadding="4">
      * <thead>
      * <tr>
@@ -2832,104 +2908,32 @@ public final class TFile extends File {
      * @param  dst the destination file. Note that although this just needs to
      *         be a plain {@code File}, archive entries are only
      *         supported for instances of this class.
-     * @throws IOException if copying the data fails for some reason.
+     * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Copy Methods</a>
      */
     public static void cp_p(File src, File dst)
     throws IOException {
-        TBIO.copy(true, src, dst);
+        TBIO.cp(true, src, dst);
     }
 
     /**
-     * Recursively copies the file or directory {@code src}
-     * to the file or directory {@code dst}.
-     * <p>
-     * If the source object is an instance of this class, its
-     * {@link #getArchiveDetector() archive detector}
-     * is used to detect prospective archive files in the source directory tree.
-     * Otherwise,
-     * {@link TArchiveDetector#NULL}
-     * is used to detect prospective archive files in the source directory tree.
-     * The same rules apply for the destination object.
-     * <p>
-     * Note that calling this method may result in a structural copy rather
-     * than a verbatim copy of any archive files within the source directory
-     * tree.
-     * For other options, read the section
-     * <a href="#traversal">Traversing Directory Trees</a>.
-     * <p>
-     * <table border="2" cellpadding="4">
-     * <thead>
-     * <tr>
-     *   <th>Feature</th>
-     *   <th>Supported</th>
-     * </tr>
-     * </thead>
-     * <tbody>
-     * <tr>
-     *   <td>Preserves file attributes</td>
-     *   <td>None</td>
-     * </tr>
-     * <tr>
-     *   <td>Copies directories recursively</td>
-     *   <td>Yes</td>
-     * </tr>
-     * <tr>
-     *   <td>Reads and overwrites special files</td>
-     *   <td>No</td>
-     * </tr>
-     * <tr>
-     *   <td>Closes parameter streams</td>
-     *   <td>n/a</td>
-     * </tr>
-     * <tr>
-     *   <td><a href="#directDataCopying">Direct Data Copying (DDC)</a></td>
-     *   <td>Yes</td>
-     * </tr>
-     * <tr>
-     *   <td>Deletes partial written files on failure</td>
-     *   <td>Yes</td>
-     * </tr>
-     * <tr>
-     *   <td>Deletes partial written directories on failure</td>
-     *   <td>No</td>
-     * </tr>
-     * <tr>
-     *   <td>Atomic</td>
-     *   <td>No</td>
-     * </tr>
-     * </tbody>
-     * </table>
-     *
-     * @param  src the source file. Note that although this just needs to
-     *         be a plain {@code File}, archive files and entries
-     *         are only supported for instances of this class.
-     * @param  dst the destination file. Note that although this just needs to
-     *         be a plain {@code File}, archive files and entries
-     *         are only supported for instances of this class.
-     * @throws IOException if copying the data fails for some reason.
-     * @see    <a href="#bulkIOMethods">Copy Methods</a>
-     * @see    <a href="#traversal">Traversing Directory Trees</a>
+     * Equivalent to {@link #cp_r(File, File, TArchiveDetector, TArchiveDetector) cp_r(this, dst, getArchiveDetector(), getArchiveDetector())}.
+     * 
+     * @param  dst the destination file or directory tree.
+     * @return this
+     * @throws IOException if any I/O error occurs.
      */
-    public static void cp_r(File src, File dst)
-    throws IOException {
-        TBIO.copyAll(false, src, dst,
-                src instanceof TFile ? ((TFile) src).detector : TArchiveDetector.NULL,
-                dst instanceof TFile ? ((TFile) dst).detector : TArchiveDetector.NULL);
+    public TFile cp_r(File dst) throws IOException {
+        TBIO.cp_r(false, this, dst, detector, detector);
+        return this;
     }
 
     /**
      * Recursively copies the file or directory {@code src}
      * to the file or directory {@code dst}.
      * <p>
-     * This version uses the given archive detectors to detect any
+     * This method uses the given archive detectors to detect any
      * archive files in the source and destination directory trees.
-     * Note that calling this method may result in a structural copy rather
-     * than a verbatim copy of any archive files within the source directory
-     * tree.
-     * For other options, read the section
-     * <a href="#traversal">Traversing Directory Trees</a>.
-     * <p>
      * <table border="2" cellpadding="4">
      * <thead>
      * <tr>
@@ -2983,7 +2987,7 @@ public final class TFile extends File {
      *         archive files in the source directory tree.
      * @param  dstDetector the archive detector to use for detecting any
      *         archive files in the destination directory tree.
-     * @throws IOException if copying the data fails for some reason.
+     * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Copy Methods</a>
      * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
@@ -2991,88 +2995,19 @@ public final class TFile extends File {
                             TArchiveDetector srcDetector,
                             TArchiveDetector dstDetector)
     throws IOException {
-        TBIO.copyAll(false, src, dst, srcDetector, dstDetector);
+        TBIO.cp_r(false, src, dst, srcDetector, dstDetector);
     }
 
     /**
-     * Recursively copies the file or directory {@code src} to the file or
-     * directory {@code dst} and tries to preserve all attributes of each
-     * source file to the destination file, too.
-     * Note that the current implementation only preserves the last
-     * modification time.
-     * <p>
-     * If the source object is an instance of this class, its
-     * {@link #getArchiveDetector() archive detector}
-     * is used to detect prospective archive files in the source directory tree.
-     * Otherwise,
-     * {@link TArchiveDetector#NULL}
-     * is used to detect prospective archive files in the source directory tree.
-     * The same rules apply for the destination object.
-     * <p>
-     * Note that calling this method may result in a structural copy rather
-     * than a verbatim copy of any archive files within the source directory
-     * tree.
-     * For other options, read the section
-     * <a href="#traversal">Traversing Directory Trees</a>.
-     * <p>
-     * <table border="2" cellpadding="4">
-     * <thead>
-     * <tr>
-     *   <th>Feature</th>
-     *   <th>Supported</th>
-     * </tr>
-     * </thead>
-     * <tbody>
-     * <tr>
-     *   <td>Preserves file attributes</td>
-     *   <td>Best effort</td>
-     * </tr>
-     * <tr>
-     *   <td>Copies directories recursively</td>
-     *   <td>Yes</td>
-     * </tr>
-     * <tr>
-     *   <td>Reads and overwrites special files</td>
-     *   <td>No</td>
-     * </tr>
-     * <tr>
-     *   <td>Closes parameter streams</td>
-     *   <td>n/a</td>
-     * </tr>
-     * <tr>
-     *   <td><a href="#directDataCopying">Direct Data Copying (DDC)</a></td>
-     *   <td>Yes</td>
-     * </tr>
-     * <tr>
-     *   <td>Deletes partial written files on failure</td>
-     *   <td>Yes</td>
-     * </tr>
-     * <tr>
-     *   <td>Deletes partial written directories on failure</td>
-     *   <td>No</td>
-     * </tr>
-     * <tr>
-     *   <td>Atomic</td>
-     *   <td>No</td>
-     * </tr>
-     * </tbody>
-     * </table>
-     *
-     * @param  src the source file. Note that although this just needs to
-     *         be a plain {@code File}, archive files and entries
-     *         are only supported for instances of this class.
-     * @param  dst the destination file. Note that although this just needs to
-     *         be a plain {@code File}, archive files and entries
-     *         are only supported for instances of this class.
-     * @throws IOException if copying the data fails for some reason.
-     * @see    <a href="#bulkIOMethods">Copy Methods</a>
-     * @see    <a href="traversal">Traversing Directory Trees</a>
+     * Equivalent to {@link #cp_rp(File, File, TArchiveDetector, TArchiveDetector) cp_rp(this, dst, getArchiveDetector(), getArchiveDetector())}.
+     * 
+     * @param  dst the destination file or directory tree.
+     * @return this
+     * @throws IOException if any I/O error occurs.
      */
-    public static void cp_rp(File src, File dst)
-    throws IOException {
-        TBIO.copyAll(true, src, dst,
-                src instanceof TFile ? ((TFile) src).detector : TArchiveDetector.NULL,
-                dst instanceof TFile ? ((TFile) dst).detector : TArchiveDetector.NULL);
+    public TFile cp_rp(File dst) throws IOException {
+        TBIO.cp_r(true, this, dst, detector, detector);
+        return this;
     }
 
     /**
@@ -3082,14 +3017,8 @@ public final class TFile extends File {
      * Note that the current implementation only preserves the last
      * modification time.
      * <p>
-     * This version uses the given archive detectors to detect any
-     * archive files in the source and destination directory trees.
-     * Note that calling this method may result in a structural copy rather
-     * than a verbatim copy of any archive files within the source directory
-     * tree.
-     * For other options, read the section
-     * <a href="#traversal">Traversing Directory Trees</a>.
-     * <p>
+     * This method uses the given archive detectors to detect any
+     * archive files when traversing a directory tree.
      * <table border="2" cellpadding="4">
      * <thead>
      * <tr>
@@ -3139,7 +3068,7 @@ public final class TFile extends File {
      * @param  dst the destination file. Note that although this just needs to
      *         be a plain {@code File}, archive files and entries
      *         are only supported for instances of this class.
-     * @throws IOException if copying the data fails for some reason.
+     * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Copy Methods</a>
      * @see    <a href="traversal">Traversing Directory Trees</a>
      */
@@ -3147,14 +3076,13 @@ public final class TFile extends File {
                                 TArchiveDetector srcDetector,
                                 TArchiveDetector dstDetector)
     throws IOException {
-        TBIO.copyAll(true, src, dst, srcDetector, dstDetector);
+        TBIO.cp_r(true, src, dst, srcDetector, dstDetector);
     }
 
     /**
      * Copies the input stream {@code in} to this file or entry in an archive
      * file
      * <em>without</em> closing it.
-     * <p>
      * <table border="2" cellpadding="4">
      * <thead>
      * <tr>
@@ -3199,6 +3127,7 @@ public final class TFile extends File {
      * </table>
      *
      * @param  in the input stream.
+     * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Copy Methods</a>
      */
     public void input(final InputStream in) throws IOException {
@@ -3219,7 +3148,6 @@ public final class TFile extends File {
      * Copies this file or entry in an archive file to the output stream
      * {@code out}
      * <em>without</em> closing it.
-     * <p>
      * <table border="2" cellpadding="4">
      * <thead>
      * <tr>
@@ -3264,6 +3192,7 @@ public final class TFile extends File {
      * </table>
      *
      * @param  out the output stream.
+     * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Copy Methods</a>
      */
     public void output(final OutputStream out) throws IOException {
@@ -3285,7 +3214,6 @@ public final class TFile extends File {
      * This is a high performance implementation which uses a pooled background
      * thread to fill a FIFO of data buffers which is concurrently flushed by
      * the current thread.
-     * <p>
      * <table border="2" cellpadding="4">
      * <thead>
      * <tr>
@@ -3331,7 +3259,7 @@ public final class TFile extends File {
      *
      * @param  in the input stream.
      * @param  out the output stream.
-     * @throws IOException if copying the data fails for some reason.
+     * @throws IOException if any I/O error occurs.
      * @see    #cp(InputStream, OutputStream)
      * @see    <a href="#bulkIOMethods">Copy Methods</a>
      */

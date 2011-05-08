@@ -20,6 +20,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.InputStreamReader;
+import java.nio.charset.CharsetDecoder;
 import net.jcip.annotations.Immutable;
 
 /**
@@ -38,5 +39,10 @@ public final class TFileReader extends InputStreamReader {
 
     public TFileReader(TFile file) throws FileNotFoundException {
 	super(new TFileInputStream(file));
+    }
+
+    public TFileReader(TFile file, CharsetDecoder decoder)
+    throws FileNotFoundException {
+	super(new TFileInputStream(file), decoder);
     }
 }

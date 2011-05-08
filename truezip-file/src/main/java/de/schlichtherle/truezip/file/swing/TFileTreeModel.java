@@ -180,7 +180,7 @@ public final class TFileTreeModel implements TreeModel {
      *         {@code null}.
      */
     private @Nullable TFile[] newPath(final TFile node) {
-        if (root == null /*|| !de.schlichtherle.truezip.file.TFile.contains(root, node)*/)
+        if (null == root /*|| !TFile.contains(root, node)*/)
             return null;
         // Do not apply the filter here! The filter could depend on the file's
         // state and this method may get called before the node is initialized
@@ -214,7 +214,7 @@ public final class TFileTreeModel implements TreeModel {
      * Note that the current selection may get lost.
      *
      * @return Whether or not the file has been newly created.
-     * @throws IOException If an I/O error occurs.
+     * @throws IOException if any I/O error occurs.
      */
     public boolean createNewFile(final TFile node)
     throws IOException {
@@ -230,7 +230,6 @@ public final class TFileTreeModel implements TreeModel {
      * Note that the current selection may get lost.
      *
      * @return Whether or not the file has been newly created.
-     * @throws IOException If an I/O error occurs.
      */
     public boolean mkdir(final TFile node) {
         if (!node.mkdir())
@@ -245,7 +244,6 @@ public final class TFileTreeModel implements TreeModel {
      * Note that the current selection may get lost.
      *
      * @return Whether or not the file has been newly created.
-     * @throws IOException If an I/O error occurs.
      */
     public boolean mkdirs(final TFile node) {
         if (!node.mkdirs())
@@ -260,10 +258,9 @@ public final class TFileTreeModel implements TreeModel {
      * Note that the given stream is <em>always</em> closed and
      * that the current selection may get lost.
      *
-     * @throws IOException if copying the data fails for some reason.
+     * @throws IOException if any I/O error occurs.
      */
-    public void cp(final InputStream in, final TFile node)
-    throws IOException {
+    public void cp(final InputStream in, final TFile node) throws IOException {
         TFile.cp(in, node);
         nodeInsertedOrStructureChanged(node);
     }
@@ -273,10 +270,9 @@ public final class TFileTreeModel implements TreeModel {
      * and updates the tree accordingly.
      * Note that the current selection may get lost.
      *
-     * @throws IOException if copying the data fails for some reason.
+     * @throws IOException if any I/O error occurs.
      */
-    public void cp(final TFile oldNode, final TFile node)
-    throws IOException {
+    public void cp(final TFile oldNode, final TFile node) throws IOException {
         TFile.cp(oldNode, node);
         nodeInsertedOrStructureChanged(node);
     }
@@ -286,12 +282,11 @@ public final class TFileTreeModel implements TreeModel {
      * and updates the tree accordingly.
      * Note that the current selection may get lost.
      *
-     * @throws IOException if copying the data fails for some reason.
+     * @throws IOException if any I/O error occurs.
      */
-    public void cp_r(final TFile oldNode, final TFile node)
-    throws IOException {
+    public void cp_r(final TFile oldNode, final TFile node) throws IOException {
         try {
-            TFile.cp_r(oldNode, node);
+            oldNode.cp_r(node);
         } finally {
             nodeInsertedOrStructureChanged(node);
         }
@@ -303,10 +298,9 @@ public final class TFileTreeModel implements TreeModel {
      * and updates the tree accordingly.
      * Note that the current selection may get lost.
      *
-     * @throws IOException if copying the data fails for some reason.
+     * @throws IOException if any I/O error occurs.
      */
-    public void cp_p(final TFile oldNode, final TFile node)
-    throws IOException {
+    public void cp_p(final TFile oldNode, final TFile node) throws IOException {
         TFile.cp_p(oldNode, node);
         nodeInsertedOrStructureChanged(node);
     }
@@ -317,30 +311,27 @@ public final class TFileTreeModel implements TreeModel {
      * and updates the tree accordingly.
      * Note that the current selection may get lost.
      *
-     * @throws IOException if copying the data fails for some reason.
+     * @throws IOException if any I/O error occurs.
      */
-    public void cp_rp(final TFile oldNode, final TFile node)
-    throws IOException {
+    public void cp_rp(final TFile oldNode, final TFile node) throws IOException {
         try {
-            TFile.cp_rp(oldNode, node);
+            oldNode.cp_rp(node);
         } finally {
             nodeInsertedOrStructureChanged(node);
         }
     }
 
     /**
-     * Renames {@code oldNode} to {@code newNode}
+     * Moves {@code oldNode} to {@code node}
      * and updates the tree accordingly.
      * Note that the current selection may get lost.
      *
-     * @return Whether or not the file has been successfully renamed.
+     * @throws IOException if any I/O error occurs.
      */
-    public boolean renameTo(final TFile oldNode, final TFile newNode) {
-        if (!oldNode.renameTo(newNode))
-            return false;
+    public void mv(TFile oldNode, TFile node) throws IOException {
+        oldNode.mv(node);
         nodeRemoved(oldNode);
-        nodeInserted(newNode);
-        return true;
+        nodeInserted(node);
     }
 
     /**
@@ -348,14 +339,11 @@ public final class TFileTreeModel implements TreeModel {
      * and updates the tree accordingly.
      * Note that the current selection may get lost.
      *
-     * @return Whether or not the file or directory has been successfully deleted.
-     * @throws IOException If an I/O error occurs.
+     * @throws IOException if any I/O error occurs.
      */
-    public boolean delete(final TFile node) {
-        if (!node.delete())
-            return false;
+    public void rm(TFile node) throws IOException {
+        TFile.rm(node);
         nodeRemoved(node);
-        return true;
     }
 
     /**
@@ -363,14 +351,11 @@ public final class TFileTreeModel implements TreeModel {
      * and updates the tree accordingly.
      * Note that the current selection may get lost.
      *
-     * @return Whether or not the file or directory has been successfully deleted.
-     * @throws IOException If an I/O error occurs.
+     * @throws IOException if any I/O error occurs.
      */
-    public boolean deleteAll(final TFile node) {
-        if (!node.deleteAll())
-            return false;
+    public void rm_r(TFile node) throws IOException {
+        TFile.rm_r(node);
         nodeRemoved(node);
-        return true;
     }
 
     /**
