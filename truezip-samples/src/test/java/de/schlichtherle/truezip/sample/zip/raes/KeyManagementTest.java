@@ -76,7 +76,7 @@ public class KeyManagementTest {
     }
 
     private static File createTempFile() throws IOException {
-        // TODO: Removing .getCanonicalFile() may cause archive.deleteAll() to
+        // TODO: Removing .getCanonicalFile() may cause archive.rm_r() to
         // fail in some cases - explain why!
         // For more info, refer to TFileTestSuite.
         return File.createTempFile(TEMP_FILE_PREFIX, TEMP_FILE_SUFFIX).getCanonicalFile();

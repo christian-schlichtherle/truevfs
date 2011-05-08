@@ -16,7 +16,6 @@
 package de.schlichtherle.truezip.sample.file.app;
 
 import de.schlichtherle.truezip.file.TArchiveDetector;
-import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.TFileComparator;
 import de.schlichtherle.truezip.file.TFileInputStream;
@@ -386,8 +385,13 @@ public class Nzip extends CommandLineUtility {
                     ? new TFile(dst, src.getName(), dstDetector)
                     : dst;
             if (mv) {
-                if ((tmp.isFile() && !tmp.delete()) || !src.renameTo(tmp))
-                    throw new IOException(src + ": " + resources.getString("cpOrMv.cmt") + ": " + tmp);
+                try {
+                    if (tmp.isFile())
+                        tmp.rm();
+                    src.mv(tmp);
+                } catch (IOException ex) {
+                    throw new IOException(src + ": " + resources.getString("cpOrMv.cmt") + ": " + tmp, ex);
+                }
             } else { // cp
                 TFile.cp_rp(src, tmp, srcDetector, dstDetector);
             }
@@ -451,10 +455,12 @@ public class Nzip extends CommandLineUtility {
 
         for (int i = 0; i < args.length; i++) {
             final TFile file = new TFile(args[i]);
-            final boolean ok = recursive
-                    ? file.deleteAll()
-                    : file.delete();
-            if (!ok) {
+            try {
+                if (recursive)
+                    file.rm_r();
+                else
+                    file.rm();
+            } catch (IOException ex) {
                 final String msg;
                 if (!file.exists())
                     msg = resources.getString("rm.nsfod");
@@ -467,7 +473,7 @@ public class Nzip extends CommandLineUtility {
                     msg = resources.getString("rm.crf");
                 else
                     msg = resources.getString("rm.crsfod");
-                throw new IOException(file.getPath() + " (" + msg + ")");
+                throw new IOException(file + " (" + msg + ")", ex);
             }
         }
     }

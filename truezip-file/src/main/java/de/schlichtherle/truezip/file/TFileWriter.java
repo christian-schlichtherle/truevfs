@@ -17,9 +17,10 @@ package de.schlichtherle.truezip.file;
 
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.nio.charset.CharsetEncoder;
 import net.jcip.annotations.Immutable;
 
 /**
@@ -37,11 +38,16 @@ import net.jcip.annotations.Immutable;
 @Immutable
 public final class TFileWriter extends OutputStreamWriter {
 
-    public TFileWriter(TFile file) throws IOException {
+    public TFileWriter(TFile file) throws FileNotFoundException {
 	super(new TFileOutputStream(file));
     }
 
-    public TFileWriter(TFile file, boolean append) throws IOException {
+    public TFileWriter(TFile file, boolean append) throws FileNotFoundException {
         super(new TFileOutputStream(file, append));
+    }
+
+    public TFileWriter(TFile file, boolean append, CharsetEncoder encoder)
+    throws FileNotFoundException {
+        super(new TFileOutputStream(file, append), encoder);
     }
 }

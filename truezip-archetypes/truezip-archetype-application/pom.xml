@@ -11,8 +11,8 @@
         <version>7.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>truezip-archetype-application</artifactId>
+    <artifactId>truezip-archetype-file</artifactId>
     <packaging>maven-archetype</packaging>
-    <name>TrueZIP Archetype Application</name>
-    <description>Maven archetype for TrueZIP applications.</description>
+    <name>TrueZIP Archetype File*</name>
+    <description>Maven archetype for TrueZIP File* applications.</description>
 </project>

@@ -27,6 +27,8 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.CellEditor;
 import javax.swing.JTree;
 import javax.swing.event.CellEditorListener;
@@ -273,8 +275,13 @@ public final class TFileTree extends JTree {
             }
         }
         final TFile node = new TFile(parent, member);
-        if (!renameTo(oldNode, node))
+        try {
+            mv(oldNode, node);
+        } catch (IOException ex) {
+            Logger  .getLogger(TFileTree.class.getName())
+                    .log(Level.WARNING, ex.toString(), ex);
             Toolkit.getDefaultToolkit().beep();
+        }
     }
 
     private @Nullable String getSuffix(final String base) {
@@ -446,9 +453,10 @@ public final class TFileTree extends JTree {
      * Forwards the call to the {@link TFileTreeModel}
      * and scrolls the tree so that the copied node
      * is selected and visible.
+     * 
+     * @throws IOException if copying the file or directory fails for some reason.
      */
-    public void cp(final InputStream in, final TFile node)
-    throws IOException {
+    public void cp(final InputStream in, final TFile node) throws IOException {
         final TFileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
         if (null == path)
@@ -462,9 +470,10 @@ public final class TFileTree extends JTree {
      * Forwards the call to the {@link TFileTreeModel}
      * and scrolls the tree so that the copied node
      * is selected and visible.
+     * 
+     * @throws IOException if copying the file or directory fails for some reason.
      */
-    public void cp(final TFile oldNode, final TFile node)
-    throws IOException {
+    public void cp(final TFile oldNode, final TFile node) throws IOException {
         final TFileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
         if (null == path)
@@ -478,9 +487,10 @@ public final class TFileTree extends JTree {
      * Forwards the call to the {@link TFileTreeModel}
      * and scrolls the tree so that the recursively copied node
      * is selected and visible.
+     * 
+     * @throws IOException if copying the file or directory fails for some reason.
      */
-    public void cp_r(final TFile oldNode, final TFile node)
-    throws IOException {
+    public void cp_r(final TFile oldNode, final TFile node) throws IOException {
         final TFileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
         if (null == path)
@@ -494,9 +504,10 @@ public final class TFileTree extends JTree {
      * Forwards the call to the {@link TFileTreeModel}
      * and scrolls the tree so that the copied node
      * is selected and visible.
+     * 
+     * @throws IOException if copying the file or directory fails for some reason.
      */
-    public void cp_p(final TFile oldNode, final TFile node)
-    throws IOException {
+    public void cp_p(final TFile oldNode, final TFile node) throws IOException {
         final TFileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
         if (null == path)
@@ -510,9 +521,10 @@ public final class TFileTree extends JTree {
      * Forwards the call to the {@link TFileTreeModel}
      * and scrolls the tree so that the recursively copied node
      * is selected and visible.
+     * 
+     * @throws IOException if copying the file or directory fails for some reason.
      */
-    public void cp_rp(final TFile oldNode, final TFile node)
-    throws IOException {
+    public void cp_rp(final TFile oldNode, final TFile node) throws IOException {
         final TFileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
         if (null == path)
@@ -526,32 +538,25 @@ public final class TFileTree extends JTree {
      * Forwards the call to the {@link TFileTreeModel},
      * restores the expanded paths, selects {@code node} and scrolls to
      * it if necessary.
+     * 
+     * @throws IOException if moving the file or directory fails for some reason.
      */
-    public boolean renameTo(final TFile oldNode, final TFile node) {
+    public void mv(final TFile oldNode, final TFile node) throws IOException {
         final TFileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
-        if (path == null)
-            return false;
-
+        if (null == path)
+            throw new IllegalArgumentException("node");
         final Enumeration<TreePath> expansions;
         final TreePath oldPath = ftm.newTreePath(oldNode);
-        if (oldPath != null)
-            expansions = getExpandedDescendants(oldPath);
-        else
-            expansions = null;
-
-        if (!ftm.renameTo(oldNode, node))
-            return false;
-
-        if (expansions != null)
+        expansions = oldPath == null ? null : getExpandedDescendants(oldPath);
+        ftm.mv(oldNode, node);
+        if (null != expansions)
             while (expansions.hasMoreElements())
                 setExpandedState(
                         substPath(expansions.nextElement(), oldPath, path),
                         true);
         setSelectionPath(path);
         scrollPathToVisible(path);
-
-        return true;
     }
 
     private TreePath substPath(
@@ -573,50 +578,43 @@ public final class TFileTree extends JTree {
      * Forwards the call to the {@link TFileTreeModel}
      * and scrolls the tree so that the successor to the deleted node
      * is selected and visible.
+     * 
+     * @throws IOException if any I/O error occurs.
      */
-    public boolean delete(final TFile node) {
+    public void rm(final TFile node) throws IOException {
         final TFileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
-        if (path == null)
-            return false;
+        if (null == path)
+            throw new IllegalArgumentException("node");
         scrollPathToVisible(path);
         final int row = getRowForPath(path);
-
-        if (!ftm.delete(node))
-            return false;
-
+        ftm.rm(node);
         setSelectionRow(row);
-
-        return true;
     }
 
     /**
      * Forwards the call to the {@link TFileTreeModel}
      * and scrolls the tree so that the successor to the deleted node
      * is selected and visible.
+     * 
+     * @throws IOException if any I/O error occurs.
      */
-    public boolean deleteAll(final TFile node) {
+    public void rm_r(final TFile node) throws IOException {
         final TFileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
-        if (path == null)
-            return false;
+        if (null == path)
+            throw new IllegalArgumentException("node");
         scrollPathToVisible(path);
         final int row = getRowForPath(path);
-
-        if (!ftm.deleteAll(node))
-            return false;
-
+        ftm.rm_r(node);
         setSelectionRow(row);
-
-        return true;
     }
 
     public void setSelectionNode(final TFile node) {
         final TFileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);
-        if (path != null) {
+        if (null != path)
             setSelectionPath(path);
-        }
     }
 
     public void setSelectionNodes(final TFile[] nodes) {
@@ -628,7 +626,6 @@ public final class TFileTree extends JTree {
             if (lastPath != null)
                 list.add(lastPath);
         }
-
         final int size = list.size();
         if (size > 0) {
             final TreePath[] paths = new TreePath[size];

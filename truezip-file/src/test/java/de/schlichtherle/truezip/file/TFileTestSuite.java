@@ -112,13 +112,13 @@ public abstract class TFileTestSuite {
         TFile.setDefaultArchiveDetector(
                 new TArchiveDetector(scheme.toString(), driver));
         temp = createTempFile();
-        assertTrue(temp.delete());
+        TFile.rm(temp);
         archive = new TFile(temp);
         data = DATA.clone();
     }
 
     private File createTempFile() throws IOException {
-        // TODO: Removing .getCanonicalFile() causes archive.deleteAll() to
+        // TODO: Removing .getCanonicalFile() causes archive.rm_r() to
         // fail in testCopyContainingOrSameFiles() - explain why!
         return File.createTempFile(TEMP_FILE_PREFIX, getSuffix()).getCanonicalFile();
     }
@@ -218,11 +218,11 @@ public abstract class TFileTestSuite {
 
         assertTrue(archive.mkdir());
         assertFalsePositive(entry);
-        assertTrue(archive.delete());
+        archive.rm();
 
         assertTrue(newNonArchiveFile(archive).mkdir());
         assertFalsePositive(entry);
-        assertTrue(archive.delete());
+        archive.rm();
     }
 
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
@@ -267,7 +267,7 @@ public abstract class TFileTestSuite {
                 in.close();
             }
         }
-        assertDelete(file);
+        assertRm(file);
 
         // Create directory false positive.
 
@@ -290,7 +290,7 @@ public abstract class TFileTestSuite {
         } catch (FileNotFoundException expected) {
         }
 
-        assertDelete(file);
+        assertRm(file);
 
         // Create regular archive file.
 
@@ -314,11 +314,11 @@ public abstract class TFileTestSuite {
         } catch (FileNotFoundException expected) {
         }
 
-        assertDelete(file);
+        assertRm(file);
     }
 
-    private void assertDelete(final TFile file) throws IOException {
-        assertTrue(file.delete());
+    private void assertRm(final TFile file) throws IOException {
+        file.rm();
         assertFalse(file.exists());
         assertFalse(file.isDirectory());
         assertFalse(file.isFile());
@@ -335,7 +335,7 @@ public abstract class TFileTestSuite {
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
     private void assertCreateNewPlainFile() throws IOException {
         final File archive = createTempFile();
-        assertTrue(archive.delete());
+        TFile.rm(archive);
         final File file1 = new File(archive, "test.txt");
         final File file2 = new File(file1, "test.txt");
         try {
@@ -386,13 +386,13 @@ public abstract class TFileTestSuite {
         } catch (IOException expected) {
         }
         
-        assertTrue(file1.delete()); // OK now!
+        TFile.rm(file1); // OK now!
         assertFalse(file1.exists());
         assertFalse(file1.isDirectory());
         assertFalse(file1.isFile());
         assertEquals(0, file1.length());
         
-        assertTrue(dir.delete());
+        TFile.rm(dir);
         assertFalse(dir.exists());
         assertFalse(dir.isDirectory());
         assertFalse(dir.isFile());
@@ -410,13 +410,13 @@ public abstract class TFileTestSuite {
             final TFile file2 = newNonArchiveFile(file);
             assertTrue(file2.mkdir());
             assertIllegalDirectoryOperations(file2);
-            assertTrue(file2.delete());
+            file2.rm();
             assertTrue(file.mkdir());
             assertIllegalDirectoryOperations(file);
             if (i < names.length)
                 file = new TFile(file, names[i]);
         }
-        assertTrue(archive.deleteAll());
+        archive.rm_r();
     }
 
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
@@ -446,8 +446,7 @@ public abstract class TFileTestSuite {
             } catch (IOException expected) {
             }
         } finally {
-            if (!tmp.delete())
-                throw new IOException(tmp + " (could not delete)");
+            TFile.rm(tmp);
         }
     }
 
@@ -464,7 +463,7 @@ public abstract class TFileTestSuite {
 
         assertTrue(archive.mkdir());
         assertFileOutputStream(file);
-        assertTrue(archive.delete());
+        archive.rm();
     }
     
     @Test
@@ -473,9 +472,13 @@ public abstract class TFileTestSuite {
 
         assertFileOutputStream(file);
 
-        assertFalse(archive.delete()); // directory not empty!
+        try {
+            archive.rm();
+            fail("directory not empty");
+        } catch (IOException expected) {
+        }
         TFile.umount(); // allow external modifications!
-        assertTrue(new File(archive.getPath()).delete()); // use plain file to delete instead!
+        TFile.rm(new File(archive.getPath())); // use plain file to delete instead!
         assertFalse(archive.exists());
         assertFalse(archive.isDirectory());
         assertFalse(archive.isFile());
@@ -506,7 +509,7 @@ public abstract class TFileTestSuite {
         assertTrue(file.isFile());
         assertEquals(message.length, file.length());
         
-        assertTrue(file.delete());
+        file.rm();
         assertFalse(file.exists());
         assertFalse(file.isDirectory());
         assertFalse(file.isFile());
@@ -564,14 +567,22 @@ public abstract class TFileTestSuite {
             fail("The garbage collector hasn't been collecting an open stream. If this is only happening occasionally, you can safely ignore it.");
         }
 
-        assertTrue(newNonArchiveFile(archive).delete());
+        TFile.rm(newNonArchiveFile(archive));
         // Closing the invalidated stream explicitly should be OK.
         fis1.close();
 
         // Cleanup.
-        assertFalse(file2.delete()); // already deleted externally
+        try {
+            file2.rm();
+            fail("already deleted externally");
+        } catch (IOException expected) {
+        }
         assertFalse(file2.exists());
-        assertFalse(file1.delete());
+        try {
+            file1.rm();
+            fail("already deleted externally");
+        } catch (IOException expected) {
+        }
         assertFalse(file1.exists());
     }
 
@@ -653,9 +664,9 @@ public abstract class TFileTestSuite {
         }
         
         // Cleanup.
-        assertTrue(file2.delete());
+        file2.rm();
         assertFalse(file2.exists());
-        assertTrue(file1.delete());
+        file1.rm();
         assertFalse(file1.exists());
     }
     
@@ -679,12 +690,12 @@ public abstract class TFileTestSuite {
         assertFalse(dir2.mkdir()); // isExisting already!
         assertFalse(dir1.mkdir()); // isExisting already!
         
-        assertTrue(dir6.delete());
-        assertTrue(dir5.delete());
-        assertTrue(dir4.delete());
-        assertTrue(dir3.delete());
-        assertTrue(dir2.delete());
-        assertTrue(dir1.delete());
+        dir6.rm();
+        dir5.rm();
+        dir4.rm();
+        dir3.rm();
+        dir2.rm();
+        dir1.rm();
         
         TFile.setLenient(false);
         
@@ -701,12 +712,12 @@ public abstract class TFileTestSuite {
         assertTrue(dir5.mkdir());
         assertTrue(dir6.mkdir());
         
-        assertTrue(dir6.delete());
-        assertTrue(dir5.delete());
-        assertTrue(dir4.delete());
-        assertTrue(dir3.delete());
-        assertTrue(dir2.delete());
-        assertTrue(dir1.delete());
+        dir6.rm();
+        dir5.rm();
+        dir4.rm();
+        dir3.rm();
+        dir2.rm();
+        dir1.rm();
     }
     
     @Test
@@ -739,7 +750,7 @@ public abstract class TFileTestSuite {
         if (member.isArchive())
             assertEquals(0, member.length());
         if (created) {
-            assertTrue(member.delete());
+            member.rm();
             assertFalse(member.exists());
             assertFalse(member.isDirectory());
             assertFalse(member.isFile());
@@ -760,26 +771,26 @@ public abstract class TFileTestSuite {
     }
 
     @Test
-    public final void testCat() throws IOException {
-        assertCat(archive);
+    public final void testInputOutput() throws IOException {
+        assertInputOutput(archive);
         
         final TFile archiveTest = new TFile(archive, "test");
-        assertCat(archiveTest);
+        assertInputOutput(archiveTest);
         
         final TFile archive2 = new TFile(archive, "inner" + getSuffix());
         final TFile archive2Test = new TFile(archive2, "test");
-        assertCat(archive2Test);
-        assertTrue(archive2.delete());
-        assertTrue(archive.delete());
+        assertInputOutput(archive2Test);
+        archive2.rm();
+        archive.rm();
     }
 
-    private void assertCat(final TFile file) throws IOException {
-        assertCatFrom(file);
-        assertCatTo(file);
-        assertTrue(file.delete());
+    private void assertInputOutput(final TFile file) throws IOException {
+        assertInput(file);
+        assertOutput(file);
+        file.rm();
     }
 
-    private void assertCatFrom(final TFile file) throws IOException {
+    private void assertInput(final TFile file) throws IOException {
         final InputStream in = new ByteArrayInputStream(data);
         try {
             file.input(in);
@@ -789,7 +800,7 @@ public abstract class TFileTestSuite {
         assertEquals(data.length, file.length());
     }
     
-    private void assertCatTo(final TFile file) throws IOException {
+    private void assertOutput(final TFile file) throws IOException {
         final ByteArrayOutputStream out = new ByteArrayOutputStream(data.length);
         try {
             file.output(out);
@@ -815,7 +826,7 @@ public abstract class TFileTestSuite {
         assertCopyContainingOrSameFiles0(dir, archive);
         assertCopyContainingOrSameFiles0(archive, entry);
         
-        assertTrue(archive.deleteAll());
+        TFile.rm_r(archive);
     }
     
     private void assertCopyContainingOrSameFiles0(final TFile a, final TFile b)
@@ -860,11 +871,11 @@ public abstract class TFileTestSuite {
 
         assertTrue(archive.mkdir()); // create valid archive file
         assertCopyDelete(archive, names, 0);
-        assertTrue(archive.delete());
+        archive.rm();
 
         assertTrue(newNonArchiveFile(archive).mkdir()); // create false positive archive file
         assertCopyDelete(archive, names, 0);
-        assertTrue(archive.delete());
+        archive.rm();
     }
 
     private void assertCopyDelete(final TFile parent, String[] names, int off)
@@ -877,12 +888,12 @@ public abstract class TFileTestSuite {
         assertTrue(dir.mkdir()); // create valid archive file
         assertCopyDelete(parent, dir);
         assertCopyDelete(dir, names, off + 1); // continue recursion
-        assertTrue(dir.delete());
+        dir.rm();
 
         assertTrue(newNonArchiveFile(dir).mkdir()); // create false positive archive file
         assertCopyDelete(parent, dir);
         assertCopyDelete(dir, names, off + 1); // continue recursion
-        assertTrue(dir.delete());
+        dir.rm();
     }
 
     private void assertCopyDelete(final TFile parent, final TFile dir)
@@ -962,8 +973,8 @@ public abstract class TFileTestSuite {
         }
 
         // Cleanup.
-        assertTrue(a.delete());
-        assertTrue(b.delete());
+        a.rm();
+        b.rm();
     }
 
     @Test
@@ -995,9 +1006,13 @@ public abstract class TFileTestSuite {
         time = System.currentTimeMillis() - time;
         logger.log(Level.FINER, "Time required to list these entries {0} times using a nullary FileFilter: {1}ms", new Object[]{ j, time });
         
-        assertFalse(archive.delete()); // directory not empty!
+        try {
+            archive.rm();
+            fail("directory not empty");
+        } catch (IOException expected) {
+        }
         TFile.umount(); // allow external modifications!
-        assertTrue(new File(archive.getPath()).delete()); // use plain file to delete instead!
+        TFile.rm(new File(archive.getPath())); // use plain file to delete instead!
         assertFalse(archive.exists());
         assertFalse(archive.isDirectory());
         assertFalse(archive.isFile());
@@ -1048,7 +1063,7 @@ public abstract class TFileTestSuite {
         gc();
         byte[] buf4 = new byte[10 * 1024 * 1024];
      
-        assertTrue(archive.deleteAll());
+        assertTrue(archive.rm_r());
     }*/
     
     @Test
@@ -1059,18 +1074,34 @@ public abstract class TFileTestSuite {
         
         final OutputStream out1 = new TFileOutputStream(entry1);
         try {
-            assertFalse(entry1.delete());
+            try {
+                entry1.rm();
+                fail();
+            } catch (IOException expected) {
+            }
             out1.write(data);
-            assertFalse(archive.deleteAll());
+            try {
+                archive.rm_r();
+                fail();
+            } catch (IOException ex) {
+            }
         } finally {
             out1.close();
         }
         
         final OutputStream out2 = new TFileOutputStream(entry2);
         try {
-            assertFalse(entry2.delete());
+            try {
+                entry2.rm();
+                fail();
+            } catch (IOException expected) {
+            }
             out2.write(data);
-            assertFalse(archive.deleteAll());
+            try {
+                archive.rm_r();
+                fail();
+            } catch (IOException ex) {
+            }
         } finally {
             out2.close();
         }
@@ -1079,7 +1110,7 @@ public abstract class TFileTestSuite {
         try {
             final InputStream in2 = new TFileInputStream(entry2);
             try {
-                assertTrue(entry2.delete());
+                entry2.rm();
                 final ByteArrayOutputStream out = new ByteArrayOutputStream(data.length);
                 try {
                     TFile.cat(in2, out);
@@ -1087,12 +1118,20 @@ public abstract class TFileTestSuite {
                     out.close();
                 }
                 assertTrue(Arrays.equals(data, out.toByteArray()));
-                assertFalse(archive.deleteAll());
+                try {
+                    archive.rm_r();
+                    fail();
+                } catch (IOException ex) {
+                }
             } finally {
                 in2.close();
             }
             
-            assertFalse(entry1.delete()); // deleted within archive.deleteAll()!
+            try {
+                entry1.rm();
+                fail("deleted within archive.rm_r()");
+            } catch (IOException expected) {
+            }
             final ByteArrayOutputStream out = new ByteArrayOutputStream(data.length);
             try {
                 TFile.cat(in1, out);
@@ -1100,12 +1139,16 @@ public abstract class TFileTestSuite {
                 out.close();
             }
             assertTrue(Arrays.equals(data, out.toByteArray()));
-            assertFalse(archive.deleteAll());
+            try {
+                archive.rm_r();
+                fail();
+            } catch (IOException ex) {
+            }
         } finally {
             in1.close();
         }
         
-        assertTrue(archive.deleteAll());
+        archive.rm_r();
         assertFalse(newPlainFile(archive).exists());
     }
     
@@ -1146,7 +1189,7 @@ public abstract class TFileTestSuite {
 
         // Create a temporary file.
         TFile tmp = new TFile(TFile.createTempFile(TEMP_FILE_PREFIX, null));
-        assertTrue(tmp.delete());
+        tmp.rm();
         assertFalse(tmp.exists());
         assertFalse(newPlainFile(tmp).exists());
 
@@ -1154,12 +1197,12 @@ public abstract class TFileTestSuite {
         // Depending on the true state of the object "archive", this will
         // either create a directory (iff archive is a regular archive) or a
         // plain file (iff archive is false positive).
-        TFile.mv(archive, tmp);
+        archive.mv(tmp);
         assertFalse(archive.exists());
         assertFalse(newPlainFile(archive).exists());
 
         // Now delete resulting temporary file.
-        assertTrue(tmp.deleteAll());
+        tmp.rm_r();
         assertFalse(tmp.exists());
         assertFalse(newPlainFile(tmp).exists());
     }
@@ -1176,9 +1219,9 @@ public abstract class TFileTestSuite {
         final TFile archive3a = new TFile(archive3, "a");
         final TFile archive3b = new TFile(archive3, "b");
         
-        assertTrue(temp.delete());
+        temp.rm();
         
-        assertCatFrom(archive1a);
+        assertInput(archive1a);
         
         for (int i = 2; i >= 1; i--) {
             assertRenameTo(archive1a, archive1b);
@@ -1195,11 +1238,11 @@ public abstract class TFileTestSuite {
         
         assertRenameTo(archive, temp);
         assertRenameTo(temp, archive);
-        assertTrue(archive3.delete());
-        assertTrue(archive2.delete());
-        assertCatTo(archive1a);
-        assertTrue(archive1a.delete());
-        assertTrue(archive.delete());
+        archive3.rm();
+        archive2.rm();
+        assertOutput(archive1a);
+        archive1a.rm();
+        archive.rm();
     }
     
     private void assertRenameTo(TFile src, TFile dst) throws IOException {
@@ -1209,7 +1252,7 @@ public abstract class TFileTestSuite {
         assertFalse(dst.exists());
         if (!dst.isEntry())
             assertFalse(newPlainFile(dst).exists());
-        TFile.mv(src, dst); // lenient!
+        src.mv(dst); // lenient!
         assertFalse(src.exists());
         if (!src.isEntry())
             assertFalse(newPlainFile(src).exists());
@@ -1233,7 +1276,7 @@ public abstract class TFileTestSuite {
         final File dir = createTempFile();
         final TFile dir2 = new TFile(dir);
 
-        assertTrue(dir.delete());
+        TFile.rm(dir);
 
         // Create regular directory for testing.
         assertTrue(dir.mkdir());
@@ -1242,14 +1285,14 @@ public abstract class TFileTestSuite {
         File[] files = dir.listFiles();
         Arrays.sort(files);
         assertList(files, dir2);
-        assertTrue(dir2.deleteAll());
+        TFile.rm_r(dir2);
 
         // Repeat test with regular archive file.
         assertTrue(dir2.mkdir());
         for (int i = MEMBERS.length; --i >= 0; )
             assertTrue(new TFile(dir2, MEMBERS[i]).createNewFile());
         assertList(files, dir2);
-        assertTrue(dir2.deleteAll());
+        TFile.rm_r(dir2);
     }
 
     private void assertList(final File[] refs, final TFile dir) {
@@ -1327,7 +1370,7 @@ public abstract class TFileTestSuite {
                 throw new Exception(thread.failure);
         }
         
-        assertTrue(archive.deleteAll());
+        TFile.rm_r(archive);
     }
     
     private void createTestArchive(final int nEntries) throws IOException {
@@ -1452,7 +1495,7 @@ public abstract class TFileTestSuite {
         }
         
         assertArchiveEntries(archive, nThreads);
-        assertTrue(archive.deleteAll());
+        TFile.rm_r(archive);
     }
     
     @Test
@@ -1479,7 +1522,7 @@ public abstract class TFileTestSuite {
             public void run() {
                 try {
                     final TFile archive = new TFile(createTempFile());
-                    assertTrue(archive.delete());
+                    archive.rm();
                     final TFile file = new TFile(archive, "entry");
                     try {
                         final OutputStream out = new TFileOutputStream(file);
@@ -1509,7 +1552,7 @@ public abstract class TFileTestSuite {
                                 throw new AssertionError(ex);
                         }
                     } finally {
-                        assertTrue(archive.deleteAll());
+                        TFile.rm_r(archive);
                     }
                 } catch (Throwable exception) {
                     failure = exception;

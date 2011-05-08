@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * You may obtain a cp of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -59,8 +59,8 @@ final class TBIO {
     }
 
     /**
-     * Moves the source directory tree or file to the destination directory
-     * tree or file by recursively applying copy-then-delete.
+     * Moves the source file or directory tree to the destination file or
+     * directory tree by performing a recursive cp-then-delete operation.
      * Hence, this file system operation works even with archive files or
      * entries within archive files, but is <em>not</em> atomic.
      *
@@ -75,20 +75,17 @@ final class TBIO {
      *         or an elementary operation fails for any reason.
      */
     public static void
-    move(final File src,
-            final File dst,
-            final TArchiveDetector detector)
+    mv(final File src, final File dst, final TArchiveDetector detector)
     throws IOException {
-        if (contains(src, dst))
-            throw new TContainsFileException(src, dst);
-        move0(src, dst, detector);
+        if (dst.exists())
+            throw new IOException(dst + " (destination exists already)");
+        checkContains(src, dst);
+        mv0(src, dst, detector);
     }
 
     /** Unchecked parameters version. */
     private static void
-    move0(   final File src,
-                final File dst,
-                final TArchiveDetector detector)
+    mv0(final File src, final File dst, final TArchiveDetector detector)
     throws IOException {
         if (src.isDirectory()) {
             final long srcLastModified = src.lastModified();
@@ -108,16 +105,16 @@ final class TBIO {
                 Arrays.sort(members);
             }
             for (final String member : members)
-                move0(   new TFile(src, member, detector),
-                            new TFile(dst, member, detector),
-                            detector);
+                mv0(    new TFile(src, member, detector),
+                        new TFile(dst, member, detector),
+                        detector);
             if (!srcIsGhost)
                 if (!dst.setLastModified(srcLastModified))
                     throw new IOException(dst + " (cannot set last modification time)");
         } else if (src.isFile()) {
             if (dst.exists() && !dst.isFile())
                 throw new IOException(dst + " (not a file)");
-            copy0(true, src, dst);
+            cp0(true, src, dst);
         } else if (src.isFile()) {
             throw new IOException(src + " (cannot copy special file)");
         } else {
@@ -131,7 +128,7 @@ final class TBIO {
      * Recursively copies the source directory tree or file to the destination
      * directory tree or file.
      *
-     * @param  preserve if an elementary copy operation shall copy as much
+     * @param  preserve if an elementary cp operation shall cp as much
      *         properties of the source file to the destination file, too.
      *         Currently, only the last modification time is preserved.
      *         Note that this property set may get extended over time.
@@ -148,54 +145,53 @@ final class TBIO {
      *         or an elementary operation fails for any reason.
      */
     public static void
-    copyAll(final boolean preserve,
+    cp_r(   final boolean preserve,
             final File src,
             final File dst,
             final TArchiveDetector srcDetector,
             final TArchiveDetector dstDetector)
     throws IOException {
-        if (contains(src, dst))
-            throw new TContainsFileException(src, dst);
-        copyAll0(preserve, src, dst, srcDetector, dstDetector);
+        checkContains(src, dst);
+        cp_r0(preserve, src, dst, srcDetector, dstDetector);
     }
 
     /* Unchecked parameters version. */
     private static void
-    copyAll0(   final boolean preserve,
-                final File src,
-                final File dst,
-                final TArchiveDetector srcDetector,
-                final TArchiveDetector dstDetector)
+    cp_r0(  final boolean preserve,
+            final File src,
+            final File dst,
+            final TArchiveDetector srcDetector,
+            final TArchiveDetector dstDetector)
     throws IOException {
         if (src.isDirectory()) {
             final long srcLastModified = src.lastModified();
-            final boolean srcIsArchived = src instanceof TFile
+            final boolean srcArchived = src instanceof TFile
                     && null != ((TFile) src).getInnerArchive();
-            final boolean dstIsArchived = dst instanceof TFile
+            final boolean dstArchived = dst instanceof TFile
                     && null != ((TFile) dst).getInnerArchive();
-            final boolean srcIsGhost = srcIsArchived
+            final boolean srcIsGhost = srcArchived
                     && 0 >= srcLastModified;
-            if (!srcIsGhost || !dstIsArchived || !TFile.isLenient())
+            if (!srcIsGhost || !dstArchived || !TFile.isLenient())
                 if (!dst.mkdir() && !dst.isDirectory())
                     throw new IOException(dst + " (not a directory)");
             final String[] members = src.list();
-            if (!srcIsArchived && dstIsArchived) {
+            if (!srcArchived && dstArchived) {
                 // Create sorted entries if writing a new archive.
                 // This is a courtesy only, so natural order is sufficient.
                 Arrays.sort(members);
             }
             for (final String member : members)
-                copyAll0(   preserve,
-                            new TFile(src, member, srcDetector),
-                            new TFile(dst, member, dstDetector),
-                            srcDetector, dstDetector);
+                cp_r0(  preserve,
+                        new TFile(src, member, srcDetector),
+                        new TFile(dst, member, dstDetector),
+                        srcDetector, dstDetector);
             if (preserve && !srcIsGhost)
                 if (!dst.setLastModified(srcLastModified))
                     throw new IOException(dst + " (cannot set last modification time)");
         } else if (src.isFile()) {
             if (dst.exists() && !dst.isFile())
                 throw new IOException(dst + " (not a file)");
-            copy0(preserve, src, dst);
+            cp0(preserve, src, dst);
         } else if (src.isFile()) {
             throw new IOException(src + " (cannot copy special file)");
         } else {
@@ -206,9 +202,9 @@ final class TBIO {
     /**
      * Copies a single source file to a destination file.
      * The name of this method is inspired by the Unix command line utility
-     * {@code copy}.
+     * {@code cp}.
      *
-     * @param  preserve if an elementary copy operation shall copy as much
+     * @param  preserve if an elementary cp operation shall cp as much
      *         properties of the source file to the destination file, too.
      *         Currently, only the last modification time is preserved.
      *         Note that this property set may get extended over time.
@@ -221,20 +217,15 @@ final class TBIO {
      *         or an elementary operation fails for any reason.
      */
     public static void
-    copy(   final boolean preserve,
-            final File src,
-            final File dst)
+    cp(final boolean preserve, final File src, final File dst)
     throws IOException {
-        if (contains(src, dst))
-            throw new TContainsFileException(src, dst);
-        copy0(preserve, src, dst);
+        checkContains(src, dst);
+        cp0(preserve, src, dst);
     }
 
     /* Unchecked parameters version. */
     private static void
-    copy0(  final boolean preserve,
-            final File src,
-            final File dst)
+    cp0(final boolean preserve, final File src, final File dst)
     throws IOException {
         final InputSocket<?> input = getInputSocket(src, NONEOF_INPUT_OPTIONS);
         final OutputSocket<?> output = getOutputSocket(dst,
@@ -243,9 +234,43 @@ final class TBIO {
         IOSocket.copy(input, output);
     }
 
+    /**
+     * Recursively deletes the given file or directory tree.
+     *
+     * @param  node the file or directory tree to delete recursively.
+     * @throws IOException if an elementary operation fails for any reason.
+     */
+    public static void rm_r(final File node, final TArchiveDetector detector)
+    throws IOException {
+        if (node.isDirectory()) {
+            for (final String member : node.list())
+                rm_r(new TFile(node, member, detector), detector);
+        }
+        if (!node.delete())
+            throw new IOException(node + " (cannot delete)");
+    }
+
+    /**
+     * Throws an {@code IOException} if and only if the path represented by
+     * {@code a} contains the path represented by {@code b}, where a path is
+     * said to contain another path if and only if it is equal or an ancestor
+     * of the other path.
+     * <p>
+     * Note that this method uses the absolute path of both files as if by
+     * calling {@link File#getAbsolutePath()}.
+     *
+     * @param a a file.
+     * @param b another file.
+     */
+    private static void checkContains(File a, File b) throws IOException {
+        if (Paths.contains( a.getAbsolutePath(),
+                            b.getAbsolutePath(),
+                            File.separatorChar))
+            throw new IOException(b + " (contained in " + a + ")");
+    }
+
     static InputSocket<?>
-    getInputSocket( final File src,
-                    final BitField<FsInputOption> options) {
+    getInputSocket(final File src, final BitField<FsInputOption> options) {
         if (src instanceof TFile) {
             // This block could get removed in order to use the more general
             // pattern below. However, it's kept for better performance.
@@ -280,37 +305,5 @@ final class TBIO {
         return TFile.manager
                 .getController(path.getMountPoint(), TFile.getDefaultArchiveDetector())
                 .getOutputSocket(path.getEntryName(), options, template);
-    }
-
-    /**
-     * Recursively deletes the given directory tree or file.
-     *
-     * @param  node the directory tree or file to delete recursively.
-     * @throws IOException if an elementary operation fails for any reason.
-     */
-    public static void deleteAll(File node) throws IOException {
-        if (node.isDirectory())
-            for (File member : node.listFiles())
-                deleteAll(member);
-        if (!node.delete())
-            throw new IOException(node + " (cannot delete)");
-    }
-
-    /**
-     * Returns {@code true} if and only if the path represented by {@code a}
-     * contains the path represented by {@code b}, where a path is said to
-     * contain another path if and only if it is equal or a parent of the other
-     * path.
-     * <p>
-     * Note that this method uses the absolute path of both files as if by
-     * calling {@link File#getAbsolutePath()}.
-     *
-     * @param a a file.
-     * @param b another file.
-     */
-    public static boolean contains(File a, File b) {
-        return Paths.contains(  a.getAbsolutePath(),
-                                b.getAbsolutePath(),
-                                File.separatorChar);
     }
 }
