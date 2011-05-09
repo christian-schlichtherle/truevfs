@@ -40,7 +40,7 @@ Software Build Tool (SBT)
     See how easy "tarring" a directory can be:
 
 +--+
-TFile.cp_rp(new TFile("directory"), new TFile("archive.tar.gz"));
+new TFile("directory").cp_rp(new TFile("archive.tar.gz"));
 +--+
 
     The name of the method <<<TFile.cp_rp(*)>>> is modeled after the Unix
@@ -56,7 +56,7 @@ TFile.cp_rp(new TFile("directory"), new TFile("archive.tar.gz"));
     call something like this:
 
 +--+
-TFile.cp_rp(new TFile("file"), new TFile("archive.tar.gz/file"));
+new TFile("file").cp_rp(new TFile("archive.tar.gz/file"));
 +--+
 
     The <<<TFile>>> class provides many alternative constructors and methods to
