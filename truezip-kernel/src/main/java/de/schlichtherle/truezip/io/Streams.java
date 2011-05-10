@@ -33,6 +33,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * Provides static utility methods for {@link InputStream}s and
@@ -42,6 +43,7 @@ import java.util.logging.Logger;
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
+@ThreadSafe
 public final class Streams {
 
     /** You cannot instantiate this class. */
