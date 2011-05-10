@@ -14,5 +14,5 @@
     <artifactId>truezip-archetype-file</artifactId>
     <packaging>maven-archetype</packaging>
     <name>TrueZIP Archetype File*</name>
-    <description>Maven archetype for applications of the TrueZIP File* module.</description>
+    <description>TrueZIP File* Application Archetype</description>
 </project>
