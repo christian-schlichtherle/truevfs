@@ -164,7 +164,6 @@ implements OutputShop<ZipArchiveEntry> {
                     case UNKNOWN:
                         entry.setMethod(DEFLATED);
                         break;
-
                     case STORED:
                         if (       UNKNOWN == entry.getCrc()
                                 || UNKNOWN == entry.getCompressedSize()
@@ -173,10 +172,8 @@ implements OutputShop<ZipArchiveEntry> {
                                     pool.allocate(),
                                     entry);
                         break;
-
                     case DEFLATED:
                         break;
-
                     default:
                         assert false : "unsupported method";
                 }
