@@ -104,8 +104,8 @@ implements EntryFactory<E> {
     }
 
     /**
-     * Creates a new input shop for reading the archive entries of the the
-     * described {@code archive} from the given {@code input} socket's target.
+     * Creates a new input shop for reading the archive entries for the
+     * given {@code model} from the given {@code input} socket's target.
      * 
      * @param  model the concurrent file system model.
      * @param  input the input socket for reading the contents of the archive
@@ -135,8 +135,8 @@ implements EntryFactory<E> {
     throws IOException;
 
     /**
-     * Creates a new output shop for writing archive entries to the the
-     * described {@code archive} to the given {@code output} socket's target.
+     * Creates a new output shop for writing archive entries for the
+     * given {@code model} to the given {@code output} socket's target.
      * 
      * @param  model the concurrent file system model.
      * @param  output the output socket for writing the contents of the
