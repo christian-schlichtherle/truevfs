@@ -20,6 +20,8 @@ import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Locale;
+import net.jcip.annotations.NotThreadSafe;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * Provides static utility methods for path names.
@@ -28,6 +30,7 @@ import java.util.Locale;
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
+@ThreadSafe
 public final class Paths {
 
     /** You cannot instantiate this class. */
@@ -43,6 +46,7 @@ public final class Paths {
     }
 
     /** A normalizer for path names. */
+    @NotThreadSafe
     public static class Normalizer {
         private final char separatorChar;
         private String path;
@@ -184,6 +188,7 @@ public final class Paths {
     }
 
     /** Splits a given path name into its parent path name and member name. */
+    @NotThreadSafe
     public static class Splitter {
         private final char separatorChar;
         private final int fixum;
