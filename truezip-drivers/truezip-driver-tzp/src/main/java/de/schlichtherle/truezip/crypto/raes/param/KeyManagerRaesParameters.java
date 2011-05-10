@@ -46,18 +46,29 @@ public final class KeyManagerRaesParameters implements RaesParametersProvider {
     private final URI resource;
 
     /**
-     * Constructs a new set of default RAES parameters.
-     *
-     * @param resource the non-{@code null} absolute, hierarchical and normalized
-     *        URI of the RAES file.
+     * Equivalent to
+     * {@link #KeyManagerRaesParameters(KeyManager, URI) new KeyManagerRaesParameters(provider.get(AesCipherParameters.class), resource)}.
      */
-    public KeyManagerRaesParameters(final KeyManagerProvider provider,
-                                    final URI resource) {
-        if (null == provider)
+    public KeyManagerRaesParameters(
+            final KeyManagerProvider provider,
+            final URI resource) {
+        this(provider.get(AesCipherParameters.class), resource);
+    }
+
+    /**
+     * Constructs new RAES parameters using the given key manager.
+     *
+     * @param resource the absolute URI of the RAES file.
+     * @throws IllegalArgumentException if {@code resource} is not absolute.
+     */
+    public KeyManagerRaesParameters(
+            final KeyManager<AesCipherParameters> manager,
+            final URI resource) {
+        if (null == manager)
             throw new NullPointerException();
         if (!resource.isAbsolute())
             throw new IllegalArgumentException();
-        this.manager = provider.get(AesCipherParameters.class);
+        this.manager = manager;
         this.resource = resource;
     }
 

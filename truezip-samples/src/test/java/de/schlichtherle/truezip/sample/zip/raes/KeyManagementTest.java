@@ -16,7 +16,6 @@
 package de.schlichtherle.truezip.sample.zip.raes;
 
 import de.schlichtherle.truezip.fs.FsSyncException;
-import java.io.FileNotFoundException;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,7 +24,6 @@ import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.TFileOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import org.junit.After;
@@ -93,10 +91,8 @@ public class KeyManagementTest {
         } catch (FsSyncException ex) {
             logger.log(Level.WARNING, ex.toString(), ex);
         }
-
         if (temp.exists() && !temp.delete())
             logger.log(Level.WARNING, "{0} (could not delete)", temp);
-
         TFile.setDefaultArchiveDetector(detectorBackup);
         TFile.setLenient(lenientBackup);
     }
