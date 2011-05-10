@@ -44,7 +44,7 @@
         access to archive files as if they were just plain directories in a
         file system path.
     </description>
-    <url>http://java.net/projects/truezip</url>
+    <url>http://truezip.java.net</url>
     <inceptionYear>2005</inceptionYear>
     <issueManagement>
         <system>JIRA</system>

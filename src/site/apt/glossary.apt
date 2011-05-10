@@ -1,10 +1,10 @@
     -----------------------
-    Definitions
+    Glossary
     -----------------------
     Christian Schlichtherle
     -----------------------
 
-Definitions
+Glossary
 
     \[This section reads a bit esoteric - mea culpa.
     You can safely skip it unless you want to write a file system driver or
@@ -67,3 +67,5 @@ Definitions
     started as a small library for accessing archive files like directories.
     Of course, this is still true and in virtually all use cases a federated
     file system is persisted in an archive file.
+
+    Enjoy TrueZIP!

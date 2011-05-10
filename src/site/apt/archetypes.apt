@@ -36,7 +36,8 @@ Maven Archetypes
 +--+
 $ mvn archetype:generate -B \
     -DarchetypeGroupId=de.schlichtherle.truezip \
-    -DarchetypeArtifactId=truezip-archetype-application \
+    -DarchetypeArtifactId=truezip-archetype-file \
+    -DarchetypeVersion=RELEASE \
     -DgroupId=com.company \
     -DartifactId=project \
     -Dversion=1.0-SNAPSHOT \
@@ -91,10 +92,10 @@ project
 
     []
 
-    To install the generated project, change to the <<<project>>> directory
-    and type:
+    To install the generated project, type:
 
 +--+
+$ cd project
 $ mvn clean install
 +--+
 
@@ -152,11 +153,11 @@ $ mvn exec:java -Dexec.mainClass=com.company.project.Tree
     Note that the contents of the JAR file
     <<<target/project-1.0-SNAPSHOT.jar>>> get listed, too!
     This is because the configuration file <<<pom.xml>>> is set up to recognize
-    JAR files as virtual directories by adding the file system driver module
+    JAR files as virtual directories by adding the module TrueZIP Driver ZIP
     with the artifactId <<<truezip-driver-zip>>> to the run time class path.
     You can change this by editing the configuration file <<<pom.xml>>> or the
     method <<<setup()>>> of the class <<<Application>>>.
 
     Now that everything is set up, go editing the source files.
 
-    That's it - enjoy!
+    That's it - enjoy TrueZIP!
