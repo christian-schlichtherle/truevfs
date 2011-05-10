@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip.raes;
 
+import de.schlichtherle.truezip.key.KeyManager;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import de.schlichtherle.truezip.key.KeyProvider;
 import de.schlichtherle.truezip.key.PromptingKeyProvider;
@@ -34,6 +35,7 @@ import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.crypto.raes.RaesOutputStream;
 import de.schlichtherle.truezip.crypto.raes.RaesParameters;
 import de.schlichtherle.truezip.crypto.raes.RaesReadOnlyFile;
+import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.fs.archive.zip.JarDriver;
 import de.schlichtherle.truezip.fs.archive.zip.JarArchiveEntry;
@@ -46,6 +48,7 @@ import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URI;
 import net.jcip.annotations.Immutable;
 
 import static de.schlichtherle.truezip.zip.ZipEntry.*;
@@ -233,12 +236,30 @@ public abstract class ZipRaesDriver extends JarDriver {
      * @return The {@link RaesParameters} for the given file system model.
      */
     final RaesParameters getRaesParameters(FsModel model) {
-        return new KeyManagerRaesParameters(getKeyManagerProvider(),
-                                            model.getMountPoint().getUri());
+        return new KeyManagerRaesParameters(
+                getKeyManager(),
+                getMountPointUri(model));
     }
 
-    final KeyManagerProvider getKeyManagerProvider() {
-        return keyManagerProvider;
+    final KeyManager<AesCipherParameters> getKeyManager() {
+        return keyManagerProvider.get(AesCipherParameters.class);
+    }
+
+    /**
+     * Returns a URI which represents the mount point of the given file system
+     * model.
+     * 
+     * @param  model the file system model.
+     * @return A URI representing the file system model's mount point.
+     */
+    final URI getMountPointUri(FsModel model) {
+        // Though the following statement would significantly improve the
+        // readability of the URI, this would break compatibility to the code
+        // samples which demonstrate how to set RAES keys programmatically
+        // by calling TFile.toURI() on an archive file in order to obtain its
+        // mount point URI.
+        //return model.getMountPoint().hierarchicalize().getUri();
+        return model.getMountPoint().getUri();
     }
 
     /**
