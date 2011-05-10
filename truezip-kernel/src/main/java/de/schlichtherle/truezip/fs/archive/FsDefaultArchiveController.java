@@ -197,8 +197,9 @@ extends FsFileSystemArchiveController<E> {
         final OutputSocket<?> socket = parent.getOutputSocket(
                 parentName, options.set(FsOutputOption.CACHE),
                 useRootTemplate ? rootTemplate : null);
+        final Input input = this.input;
         output = new Output(driver.newOutputShop(getModel(), socket,
-                    null == input ? null : input.getDelegate()));
+                    null != input ? input.getDelegate() : null));
     }
 
     @Override
