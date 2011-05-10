@@ -9,7 +9,7 @@
     </skin>
     <body>
         <links>
-            <item name="TrueZIP Blog" href="http://truezip.schlichtherle.de"/>
+            <item name="The TrueZIP Blog" href="http://truezip.schlichtherle.de"/>
             <item name="TrueZIP Developer Website" href="http://java.net/projects/truezip"/>
         </links>
         <menu name="Parent Project / Module" ref="parent" inherit="top"/>
