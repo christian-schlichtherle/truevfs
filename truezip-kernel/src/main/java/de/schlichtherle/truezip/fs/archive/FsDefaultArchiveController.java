@@ -189,6 +189,7 @@ extends FsFileSystemArchiveController<E> {
         getFileSystem().addFsArchiveFileSystemTouchListener(touchListener);
     }
 
+    /** Ensures that {@link #output} is not {@code null}. */
     void makeOutput(final BitField<FsOutputOption> options,
                     final Entry rootTemplate)
     throws IOException {
