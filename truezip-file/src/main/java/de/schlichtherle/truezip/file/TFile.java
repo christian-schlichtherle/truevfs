@@ -3110,7 +3110,7 @@ public final class TFile extends File {
      *         are only supported for instances of this class.
      * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Copy Methods</a>
-     * @see    <a href="traversal">Traversing Directory Trees</a>
+     * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
     public static void cp_rp(   File src, File dst,
                                 TArchiveDetector srcDetector,
