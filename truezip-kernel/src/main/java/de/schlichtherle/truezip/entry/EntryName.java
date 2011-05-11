@@ -30,35 +30,93 @@ import net.jcip.annotations.Immutable;
 
 /**
  * Addresses an entry in an entry container.
- * An entry name is usually constructed from a
- * {@link URI Uniform Resource Identifier} in order to assert the following
- * additional syntax constraints:
- * <ol>
- * <li>The URI must be relative, i.e. it must not have a scheme.
- * <li>The URI must not have an authority.
- * </ol>
- * <p>
- * Examples for valid entry name URIs are:
- * <ul>
- * <li>{@code /foo}
- * <li>{@code foo/bar}
- * <li>{@code foo}
- * <li>{@code foo#bar}
- * <li>{@code foo/}
- * <li>{@code foo/.}
- * <li>{@code foo/..}
- * <li>{@code ../foo}
- * </ul>
- * Examples for invalid entry name URIs are:
- * <ul>
- * <li>{@code foo:/bar} (not relative)
- * <li>{@code //foo/bar} (authority defined)
- * </ul>
  * <p>
  * Although this class is declared to be immutable, it's not declared to be
- * final solely in order to enable subclassing for the purpose of adding even
- * more constraints in the sub class constructor while still being able to use
- * references to this base class polymorphically.
+ * final solely for the purpose of adding more constraints in subclass
+ * constructors  so that their instances can be safely used as polymorphic
+ * instances of this class.
+ * 
+ * <a name="specification"/><h3>Specification</h3>
+ * <p>
+ * An entry name adds the following syntax constraints to a
+ * {@link URI Uniform Resource Identifier}:
+ * <ol>
+ * <li>The URI must be relative, i.e. it must not name a scheme.
+ * <li>The URI must not have an authority.
+ * </ol>
+ * 
+ * <a name="examples"/><h3>Examples</h3>
+ * <p>
+ * Examples for valid entry name URIs are:
+ * <table border="2" cellpadding="4">
+ * <thead>
+ * <tr>
+ *   <th>{@link #getUri() uri} property</th>
+ *   <th>{@link #getPath() path} property</th>
+ *   <th>{@link #getQuery() query} property</th>
+ *   <th>{@link #getFragment() fragment} property</th>
+ * </tr>
+ * </thead>
+ * <tbody>
+ * <tr>
+ *   <td>{@code foo}</td>
+ *   <td>{@code foo}</td>
+ *   <td>(null)</td>
+ *   <td>(null)</td>
+ * </tr>
+ * <tr>
+ *   <td>{@code foo/bar}</td>
+ *   <td>{@code foo/bar}</td>
+ *   <td>(null)</td>
+ *   <td>(null)</td>
+ * </tr>
+ * <tr>
+ *   <td>{@code foo?bar}</td>
+ *   <td>{@code foo}</td>
+ *   <td>{@code bar}</td>
+ *   <td>(null)</td>
+ * </tr>
+ * <tr>
+ *   <td>{@code foo#bar}</td>
+ *   <td>{@code foo}</td>
+ *   <td>(null)</td>
+ *   <td>{@code bar}</td>
+ * </tr>
+ * <tr>
+ *   <td>{@code ../foo/./#bar}</td>
+ *   <td>{@code ../foo/./}</td>
+ *   <td>(null)</td>
+ *   <td>{@code bar}</td>
+ * </tr>
+ * </tbody>
+ * </table>
+ * <p>
+ * Examples for invalid entry name URIs are:
+ * <table border="2" cellpadding="4">
+ * <thead>
+ * <tr>
+ *   <th>URI</th>
+ *   <th>Issue</th>
+ * </tr>
+ * </thead>
+ * <tbody>
+ * <tr>
+ *   <td>{@code foo:/bar}</td>
+ *   <td>not a relative URI</td>
+ * </tr>
+ * <tr>
+ *   <td>{@code //foo/bar}</td>
+ *   <td>authority component defined</td>
+ * </tr>
+ * </tbody>
+ * </table>
+ * 
+ * <a name="identities"/><h3>Identities</h3>
+ * <p>
+ * For any entry name {@code e}, it's generally true that
+ * {@code new EntryName(e.getUri()).equals(e)}.
+ * 
+ * <a name="serialization"/><h3>Serialization</h3>
  * <p>
  * This class supports serialization with both
  * {@link java.io.ObjectOutputStream} and {@link java.beans.XMLEncoder}.
@@ -165,9 +223,9 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      * Note that the URI of the parent entry name is considered to
      * name a directory even if it's not ending with a
      * {@link #SEPARATOR_CHAR}, so calling this constructor with
-     * {@code "foo"} and {@code "bar"} as the URIs for the parent and member
-     * entry names respectively will result in the URI
-     * {@code "foo/bar"} for the resulting entry name.
+     * {@code foo} and {@code bar} as the URIs for the parent and member
+     * entry names will produce the URI {@code foo/bar} for the resulting
+     * entry name.
      *
      * @param  parent an entry name for the parent.
      * @param  member an entry name for the member.
@@ -238,6 +296,15 @@ public class EntryName implements Serializable, Comparable<EntryName> {
     }
 
     /**
+     * Returns the URI of this entry name.
+     *
+     * @return The URI of this entry name.
+     */
+    public final URI getUri() {
+        return uri;
+    }
+
+    /**
      * Returns the path of this entry name.
      * Equivalent to {@link #getUri() getUri()}{@code .getPath()}.
      *
@@ -258,12 +325,13 @@ public class EntryName implements Serializable, Comparable<EntryName> {
     }
 
     /**
-     * Returns the URI of this entry name.
+     * Returns the fragment of this entry name.
+     * Equivalent to {@link #getUri() getUri()}{@code .getFragment()}.
      *
-     * @return The URI of this entry name.
+     * @return The fragment of this entry name.
      */
-    public final URI getUri() {
-        return uri;
+    public final @CheckForNull String getFragment() {
+        return uri.getFragment();
     }
 
     /**

@@ -27,10 +27,15 @@ import net.jcip.annotations.Immutable;
  * Represents a {@link java.net.URI} scheme according to the syntax constraints
  * defined in <a href="http://www.ietf.org/rfc/rfc2396.txt""><i>RFC&nbsp;2396:
  * Uniform Resource Identifiers (URI): Generic Syntax</i></a>.
+ * 
+ * <a name="serialization"/><h3>Serialization</h3>
  * <p>
  * This class supports serialization with both
  * {@link java.io.ObjectOutputStream} and {@link java.beans.XMLEncoder}.
  *
+ * @see     FsPath
+ * @see     FsMountPoint
+ * @see     FsEntryName
  * @author  Christian Schlichtherle
  * @version $Id$
  */

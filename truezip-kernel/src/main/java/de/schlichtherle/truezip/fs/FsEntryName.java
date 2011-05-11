@@ -31,38 +31,114 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
 
 /**
  * Addresses an entry in a file system relative to its mount point.
- * A file system entry name is usually constructed from a
- * {@link URI Uniform Resource Identifier} in order to assert the following
- * additional syntax constraints:
+ * 
+ * <a name="specification"/><h3>Specification</h3>
+ * <p>
+ * An entry name adds the following syntax constraints to a
+ * {@link URI Uniform Resource Identifier}:
  * <ol>
- * <li>The URI must be relative, i.e. it must not have a scheme.
+ * <li>The URI must be relative, i.e. it must not name a scheme.
  * <li>The URI must not have an authority.
  * <li>The URI's path must be in normal form, i.e. its path must not contain
  *     redundant {@code "."} and {@code ".."} segments.
  * <li>The URI's path must not equal {@code "."}.
  * <li>The URI's path must not equal {@code ".."}.
  * <li>The URI's path must not start with {@code "/"}.
- * <li>The URI's path must not start with {@code "./"}.
+ * <li>The URI's path must not start with {@code "./"}
+ *     (this rule is actually redundant - see #3).
  * <li>The URI's path must not start with {@code "../"}.
  * <li>The URI's path must not end with {@code "/"}.
  * </ol>
+ * 
+ * <a name="examples"/><h3>Examples</h3>
  * <p>
- * Examples for valid file system entry name URIs are:
+ * Examples for valid entry name URIs are:
  * <ul>
- * <li>{@code foo}
- * <li>{@code foo/bar}
+ * <li>{@code "foo"}
+ * <li>{@code "foo/bar"}
  * </ul>
- * Examples for invalid file system entry name URIs are:
- * <ul>
- * <li>{@code /foo} (leading slash separator not allowed)
- * <li>{@code foo/} (trailing slash separator not allowed)
- * <li>{@code foo/.} (not normalized)
- * <li>{@code foo/..} (not normalized)
- * </ul>
+ * <table border="2" cellpadding="4">
+ * <thead>
+ * <tr>
+ *   <th>{@link #getUri() uri} property</th>
+ *   <th>{@link #getPath() path} property</th>
+ *   <th>{@link #getQuery() query} property</th>
+ *   <th>{@link #getFragment() fragment} property</th>
+ * </tr>
+ * </thead>
+ * <tbody>
+ * <tr>
+ *   <td>{@code foo}</td>
+ *   <td>{@code foo}</td>
+ *   <td>(null)</td>
+ *   <td>(null)</td>
+ * </tr>
+ * <tr>
+ *   <td>{@code foo/bar}</td>
+ *   <td>{@code foo/bar}</td>
+ *   <td>(null)</td>
+ *   <td>(null)</td>
+ * </tr>
+ * <tr>
+ *   <td>{@code foo?bar}</td>
+ *   <td>{@code foo}</td>
+ *   <td>{@code bar}</td>
+ *   <td>(null)</td>
+ * </tr>
+ * <tr>
+ *   <td>{@code foo#bar}</td>
+ *   <td>{@code foo}</td>
+ *   <td>(null)</td>
+ *   <td>{@code bar}</td>
+ * </tr>
+ * </tbody>
+ * </table>
+ * <p>
+ * Examples for invalid entry name URIs are:
+ * <table border="2" cellpadding="4">
+ * <thead>
+ * <tr>
+ *   <th>URI</th>
+ *   <th>Issue</th>
+ * </tr>
+ * </thead>
+ * <tbody>
+ * <tr>
+ *   <td>{@code foo:/bar}</td>
+ *   <td>not a relative URI</td>
+ * </tr>
+ * <tr>
+ *   <td>{@code //foo/bar}</td>
+ *   <td>authority component defined</td>
+ * </tr>
+ * <tr>
+ *   <td>{@code /foo}</td>
+ *   <td>leading slash not allowed</td>
+ * </tr>
+ * <tr>
+ *   <td>{@code foo/}</td>
+ *   <td>trailing slash not allowed</td>
+ * </tr>
+ * <tr>
+ *   <td>{@code foo/.}</td>
+ *   <td>not a normalized URI</td>
+ * </tr>
+ * </tbody>
+ * </table>
+ * 
+ * <a name="identities"/><h3>Identities</h3>
+ * <p>
+ * For any entry name {@code e}, it's generally true that
+ * {@code new FsEntryName(e.getUri()).equals(e)}.
+ * 
+ * <a name="serialization"/><h3>Serialization</h3>
  * <p>
  * This class supports serialization with both
  * {@link java.io.ObjectOutputStream} and {@link java.beans.XMLEncoder}.
  *
+ * @see     FsPath
+ * @see     FsMountPoint
+ * @see     FsScheme
  * @see     FsEntry#getName()
  * @author  Christian Schlichtherle
  * @version $Id$
