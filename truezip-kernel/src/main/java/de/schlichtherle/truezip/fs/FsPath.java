@@ -79,6 +79,11 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
  * </thead>
  * <tbody>
  * <tr>
+ *   <td>{@code foo}</td>
+ *   <td>(null)</td>
+ *   <td>{@code foo}</td>
+ * </tr>
+ * <tr>
  *   <td>{@code foo:/bar}</td>
  *   <td>{@code foo:/}</td>
  *   <td>{@code bar}</td>
