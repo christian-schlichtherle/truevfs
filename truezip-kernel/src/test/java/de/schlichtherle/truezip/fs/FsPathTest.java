@@ -203,6 +203,8 @@ public class FsPathTest {
             "foo/./",
             "foo/..",
             "foo/../",
+            "foo:/bar/.",
+            "foo:/bar/..",
             "foo:bar",
             "foo:bar:",
             "foo:bar:/",

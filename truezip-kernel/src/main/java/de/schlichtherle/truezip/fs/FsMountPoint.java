@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import de.schlichtherle.truezip.entry.EntryName;
 import de.schlichtherle.truezip.util.UriBuilder;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import java.io.IOException;
@@ -29,49 +30,120 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import net.jcip.annotations.Immutable;
 
-import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import static de.schlichtherle.truezip.fs.FsPath.*;
 import static de.schlichtherle.truezip.fs.FsUriModifier.*;
 import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
 
 /**
  * Addresses the mount point of a file system.
- * A mount point is usually constructed from a
- * {@link URI Uniform Resource Identifier} in order to assert the following
- * additional syntax constraints:
+ * 
+ * <a name="specification"/><h3>Specification</h3>
+ * <p>
+ * A mount point adds the following syntax constraints to a
+ * {@link URI Uniform Resource Identifier}:
  * <ol>
  * <li>The URI must be absolute.
  * <li>The URI must not have a fragment.
  * <li>If the URI is opaque, its scheme specific part must end with the mount
- *     point separator {@value de.schlichtherle.truezip.fs.FsPath#MOUNT_POINT_SEPARATOR}.
- *     The scheme specific part <em>before</em> this mount point separator is
+ *     point separator {@code "!/"}.
+ *     The scheme specific part <em>before</em> the mount point separator is
  *     parsed according the syntax constraints for a {@link FsPath} and the
  *     following additional syntax constraints:
  *     The path must be absolute.
  *     If its opaque, it's entry name must not be empty.
- * <li>If the URI is hierarchical, its path must be in normal form and end with
- *     a {@value de.schlichtherle.truezip.entry.EntryName#SEPARATOR}.
+ *     Finally, its set as the value of the component property
+ *     {@link #getPath() path}.
+ * <li>Otherwise, if the URI is hierarchical, its path must be in normal form
+ *     and end with a {@code "/"}.
+ *     The {@link #getPath() path} component property is set to {@code null} in
+ *     this case.
  * </ol>
+ * 
+ * <a name="examples"/><h3>Examples</h3>
  * <p>
  * Examples for valid mount point URIs are:
- * <ul>
- * <li>{@code foo:/bar/}
- * <li>{@code foo:bar:/baz!/}
- * <li>{@code foo:bar:baz:/bang!/boom!/}
- * </ul>
+ * <table border="2" cellpadding="4">
+ * <thead>
+ * <tr>
+ *   <th>{@link #getUri() uri} property</th>
+ *   <th>{@link #getScheme() scheme} property</th>
+ *   <th>{@link #getPath() path} URI</th>
+ *   <th>{@link #getParent() parent} URI</th>
+ * </tr>
+ * </thead>
+ * <tbody>
+ * <tr>
+ *   <td>{@code foo:/bar/}</td>
+ *   <td>{@code foo}</td>
+ *   <td>(n/a)<sup>*</sup></td>
+ *   <td>(n/a)<sup>*</sup></td>
+ * </tr>
+ * <tr>
+ *   <td>{@code foo:bar:/baz!/}</td>
+ *   <td>{@code foo}</td>
+ *   <td>{@code bar:/baz}</td>
+ *   <td>{@code bar:/}</td>
+ * </tr>
+ * <tr>
+ *   <td>{@code foo:bar:baz:/bang!/boom!/}</td>
+ *   <td>{@code foo}</td>
+ *   <td>{@code bar:baz:/bang!/boom}</td>
+ *   <td>{@code baz:/bang}</td>
+ * </tr>
+ * </tbody>
+ * </table>
+ * <p>
+ * <sup>*</sup> the component property is {@code null} and hence its URI is not
+ * available.
+ * <p>
  * Examples for invalid mount point URIs are:
- * <ul>
- * <li>{@code /foo} (not absolute)
- * <li>{@code foo} (dito)
- * <li>{@code foo:/bar/#baz} (fragment)
- * <li>{@code foo:bar:/baz!/bang} (doesn't end with mount point separator)
- * <li>{@code foo:bar:baz:/bang!/!/} (empty entry name in bar:baz:/bang!/)
- * </ul>
+ * <table border="2" cellpadding="4">
+ * <thead>
+ * <tr>
+ *   <th>URI</th>
+ *   <th>Issue</th>
+ * </tr>
+ * </thead>
+ * <tbody>
+ * <tr>
+ *   <td>{@code /foo}</td>
+ *   <td>not an absolute URI</td>
+ * </tr>
+ * <tr>
+ *   <td>{@code foo:/bar}</td>
+ *   <td>missing slash at end of hierarchical URI</td>
+ * </tr>
+ * <tr>
+ *   <td>{@code foo:/bar/#baz}</td>
+ *   <td>fragment component defined</td>
+ * </tr>
+ * <tr>
+ *   <td>{@code foo:bar:/baz!/bang}</td>
+ *   <td>missing mount point separator {@code "!/"} at end</td>
+ * </tr>
+ * <tr>
+ *   <td>{@code foo:bar:baz:/bang!/!/}</td>
+ *   <td>empty entry name in path component after mount point {@code "bar:baz:/bang!/"}</td>
+ * </tr>
+ * </tbody>
+ * </table>
+ * 
+ * <a name="identities"/><h3>Identities</h3>
+ * <p>
+ * For any mount point {@code m}, it's generally true that
+ * {@code new FsMountPoint(m.getUri()).equals(m)}.
+ * <p>
+ * For any mount point {@code m} with an opaque URI, it's generally true that
+ * {@code new FsMountPoint(m.getScheme(), m.getPath()).equals(m)}.
+ * 
+ * <a name="serialization"/><h3>Serialization</h3>
  * <p>
  * This class supports serialization with both
  * {@link java.io.ObjectOutputStream} and {@link java.beans.XMLEncoder}.
  *
  * @see     FsPath
+ * @see     FsEntryName
+ * @see     FsScheme
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -81,6 +153,14 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
 public final class FsMountPoint implements Serializable, Comparable<FsMountPoint> {
 
     private static final long serialVersionUID = 5723957985634276648L;
+
+    /**
+     * The separator which is used to split opaque path names into
+     * {@link FsMountPoint mount points} and {@link EntryName entry names}.
+     * This is identical to the separator in the class
+     * {@link java.net.JarURLConnection}.
+     */
+    public static final String SEPARATOR = "!" + FsEntryName.SEPARATOR;
 
     private URI uri; // not final for serialization only!
 
@@ -216,8 +296,8 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
     }
 
     /**
-     * Constructs a new mount point by composing its URI from the given scheme
-     * and path.
+     * Constructs a new opaque mount point by composing its URI from the given
+     * scheme and path.
      *
      * @param  scheme the non-{@code null} {@link #getScheme() scheme}.
      * @param  path the non-{@code null} {@link #getPath() path}.
@@ -236,7 +316,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
         this.uri = new URI(new StringBuilder(scheme.toString())
                 .append(':')
                 .append(path.toString())
-                .append(MOUNT_POINT_SEPARATOR)
+                .append(SEPARATOR)
                 .toString());
         this.scheme = scheme;
         this.path = path;
@@ -266,10 +346,10 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
             throw new URISyntaxException(quote(uri), "Fragment not allowed");
         if (uri.isOpaque()) {
             final String ssp = uri.getRawSchemeSpecificPart();
-            final int i = ssp.lastIndexOf(MOUNT_POINT_SEPARATOR);
+            final int i = ssp.lastIndexOf(SEPARATOR);
             if (ssp.length() - 2 != i)
                 throw new URISyntaxException(quote(uri),
-                        "Doesn't end with mount point separator \"" + MOUNT_POINT_SEPARATOR + '"');
+                        "Doesn't end with mount point separator \"" + SEPARATOR + '"');
             path = new FsPath(ssp.substring(0, i), modifier);
             final URI pathUri = path.getUri();
             if (!pathUri.isAbsolute())
@@ -280,7 +360,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
                 URI nuri = new URI(new StringBuilder(uri.getScheme())
                         .append(':')
                         .append(pathUri.toString())
-                        .append(MOUNT_POINT_SEPARATOR)
+                        .append(SEPARATOR)
                         .toString());
                 if (!uri.equals(nuri))
                     uri = nuri;
@@ -288,9 +368,9 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
         } else {
             if (!uri.isAbsolute())
                 throw new URISyntaxException(quote(uri), "Not absolute");
-            if (!uri.getRawPath().endsWith(SEPARATOR))
+            if (!uri.getRawPath().endsWith(FsEntryName.SEPARATOR))
                 throw new URISyntaxException(quote(uri),
-                        "URI path doesn't end with separator \"" + SEPARATOR + '"');
+                        "URI path doesn't end with separator \"" + FsEntryName.SEPARATOR + '"');
             path = null;
         }
         this.uri = uri;
@@ -307,55 +387,55 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
         assert getUri().isAbsolute();
         assert null == getUri().getRawFragment();
         if (getUri().isOpaque()) {
-            assert getUri().getRawSchemeSpecificPart().endsWith(MOUNT_POINT_SEPARATOR);
+            assert getUri().getRawSchemeSpecificPart().endsWith(SEPARATOR);
             assert null != getPath();
             assert getPath().getUri().isAbsolute();
             assert null == getPath().getUri().getRawFragment();
             assert 0 != getPath().getEntryName().getUri().getRawPath().length();
         } else {
             assert getUri().normalize() == getUri();
-            assert getUri().getRawPath().endsWith(SEPARATOR);
+            assert getUri().getRawPath().endsWith(FsEntryName.SEPARATOR);
             assert null == getPath();
         }
         return true;
     }
 
     /**
-     * Returns the URI scheme.
+     * Returns the URI of this mount point.
      *
-     * @return The URI scheme.
-     */
-    public FsScheme getScheme() {
-        return null != scheme ? scheme : (scheme = FsScheme.create(uri.getScheme()));
-    }
-
-    /**
-     * Returns the path or {@code null} iff this mount point's
-     * {@link #getUri URI} doesn't name a parent mount point, i.e. if it's
-     * hierarchical.
-     *
-     * @return The nullable path.
-     */
-    public @Nullable FsPath getPath() {
-        return path;
-    }
-
-    /**
-     * Returns the non-{@code null} URI.
-     *
-     * @return The non-{@code null} URI.
+     * @return The URI of this mount point.
      */
     public URI getUri() {
         return uri;
     }
 
     /**
-     * Returns the nullable parent mount point, i.e. the mount point of the
-     * parent file system or {@code null} iff this mount point's
-     * {@link #getUri URI} doesn't name a parent mount point, i.e. if it's
-     * hierarchical.
+     * Returns the scheme component.
+     *
+     * @return The scheme component.
+     */
+    public FsScheme getScheme() {
+        return null != scheme ? scheme : (scheme = FsScheme.create(uri.getScheme()));
+    }
+
+    /**
+     * Returns the path component
+     * or {@code null} iff this mount point's {@link #getUri URI} doesn't name
+     * a parent mount point, i.e. if and only if it's hierarchical.
+     *
+     * @return The nullable path component.
+     */
+    public @Nullable FsPath getPath() {
+        return path;
+    }
+
+    /**
+     * Returns the parent component, i.e. the mount point of the parent file
+     * system,
+     * or {@code null} iff this mount point's {@link #getUri URI} doesn't name
+     * a parent mount point, i.e. if and only if it's hierarchical.
      * 
-     * @return The nullable parent mount point.
+     * @return The nullable parent component.
      */
     public @Nullable FsMountPoint getParent() {
         assert null == path || null != path.getMountPoint();
@@ -397,7 +477,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
             try {
                 return hierarchical = new FsMountPoint(
                         new UriBuilder(uri)
-                            .path(uri.getPath() + SEPARATOR)
+                            .path(uri.getPath() + FsEntryName.SEPARATOR)
                             .getUri());
             } catch (URISyntaxException ex) {
                 throw new AssertionError(ex);

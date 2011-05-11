@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import de.schlichtherle.truezip.entry.EntryName;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -36,50 +35,111 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
 
 /**
  * Addresses an entry in a file system.
- * A path is usually constructed from a {@link URI Uniform Resource Identifier}
- * in order to assert the following additional syntax constraints:
+ * 
+ * <a name="specification"/><h3>Specification</h3>
  * <p>
+ * A path adds the following syntax constraints to a
+ * {@link URI Uniform Resource Identifier}:
  * <ol>
  * <li>If the URI is opaque, its scheme specific part must contain at least
- *     one mount point separator {@value de.schlichtherle.truezip.fs.FsPath#MOUNT_POINT_SEPARATOR}.
- *     The part <em>up to</em> the last mount point separator is parsed
- *     according to the syntax constraints for a {@link FsMountPoint} and set
- *     as the value of the property {@link #getMountPoint() mount point}.
- *     The part <em>after</em> the last mount point separator is parsed
- *     according to the syntax constraints for an {@link FsEntryName} and set as
- *     the value of the property {@link #getEntryName() entry name}.
+ *     one mount point separator {@code "!/"}.
+ *     The part up to the last mount point separator is parsed according to the
+ *     syntax constraints for an {@link FsMountPoint} and set as the value of
+ *     the component property {@link #getMountPoint() mountPoint}.
+ *     The part after the last mount point separator is parsed according to the
+ *     syntax constraints for an {@link FsEntryName} and set as the value of
+ *     the component property {@link #getEntryName() entryName}.
  * <li>Otherwise, if the URI is absolute, it's resolved with {@code "."},
- *     parsedaccording to the syntax constraints for a {@link FsMountPoint} and
- *     set as the value of the property {@link #getMountPoint() mount point}.
- *     The value of the property {@link #getEntryName() entry name} is then set
- *     to the URI relativized to this {@link #getMountPoint() mount point}.
- * <li>Otherwise, the value of the property
- *     {@link #getMountPoint() mount point} is set to {@code null} and the URI
+ *     parsed according to the syntax constraints for an {@link FsMountPoint}
+ *     and set as the value of the component property
+ *     {@link #getMountPoint() mountPoint}.
+ *     The URI relativized to this mount point is parsed according to the
+ *     syntax constraints for an {@link FsEntryName} and set as the value of
+ *     the component property {@link #getEntryName() entryName}.
+ * <li>Otherwise, the value of the component property
+ *     {@link #getMountPoint() mountPoint} is set to {@code null} and the URI
  *     is parsed according to the syntax constraints for an {@link FsEntryName}
- *     and set as the value of the property {@link #getEntryName() entry name}.
+ *     and set as the value of the component property
+ *     {@link #getEntryName() entryName}.
  * </ol>
- * For opaque URIs, the constraints build a close subset of the syntax allowed
- * with a {@link java.net.JarURLConnection}, so that any opaque URL
- * {@link #getUri() obtained} from an instance of this class could be used to
- * create a {@link java.net.JarURLConnection} object.
+ * For opaque URIs of the form {@code jar:<url>!/<entry>}, these constraints
+ * build a close subset of the syntax allowed by a
+ * {@link java.net.JarURLConnection}.
+ * 
+ * <a name="examples"/><h3>Examples</h3>
  * <p>
  * Examples for valid path URIs are:
- * <ul>
- * <li>{@code foo:bar:/baz!/bang} (mountPoint="foo:bar:/baz!/", entryName="bang")
- * <li>{@code foo:/bar} (mountPoint="foo:/", entryName="bar")
- * <li>{@code foo:/bar/} (mountPoint="foo:/bar/", entryName="")
- * </ul>
+ * <table border="2" cellpadding="4">
+ * <thead>
+ * <tr>
+ *   <th>{@link #getUri() uri} property</th>
+ *   <th>{@link #getMountPoint() mountPoint} URI</th>
+ *   <th>{@link #getEntryName() entryName} URI</th>
+ * </tr>
+ * </thead>
+ * <tbody>
+ * <tr>
+ *   <td>{@code foo:/bar}</td>
+ *   <td>{@code foo:/}</td>
+ *   <td>{@code bar}</td>
+ * </tr>
+ * <tr>
+ *   <td>{@code foo:/bar/}</td>
+ *   <td>{@code foo:/bar}</td>
+ *   <td>(empty - not null)</td>
+ * </tr>
+ * <tr>
+ *   <td>{@code foo:bar:/baz!/bang}</td>
+ *   <td>{@code foo:bar:/baz!/}</td>
+ *   <td>{@code bang}</td>
+ * </tr>
+ * </tbody>
+ * </table>
+ * <p>
  * Examples for invalid path URIs are:
- * <ul>
- * <li>{@code /foo} (leading slash separator not allowed if not absolute)
- * <li>{@code foo/} (trailing slash separator not allowed if not absolute)
- * <li>{@code foo:bar} (opaque URI w/o mount point separator)
- * <li>{@code foo:bar:baz:/bang!/boom} (dito)
- * </ul>
+ * <table border="2" cellpadding="4">
+ * <thead>
+ * <tr>
+ *   <th>URI</th>
+ *   <th>Issue</th>
+ * </tr>
+ * </thead>
+ * <tbody>
+ * <tr>
+ *   <td>{@code /foo}</td>
+ *   <td>leading slash separator not allowed if URI is not absolute</td>
+ * </tr>
+ * <tr>
+ *   <td>{@code foo/}</td>
+ *   <td>trailing slash separator not allowed if URI is not absolute</td>
+ * </tr>
+ * <tr>
+ *   <td>{@code foo:bar}</td>
+ *   <td>missing mount point separator in opaque URI</td>
+ * </tr>
+ * <tr>
+ *   <td>{@code foo:bar:baz:/bang!/boom}</td>
+ *   <td>dito for {@code bar:baz:/bang}</td>
+ * </tr>
+ * </tbody>
+ * </table>
+ * 
+ * <a name="identities"/><h3>Identities</h3>
+ * <p>
+ * For any path {@code p}, it's generally true that
+ * {@code new FsPath(p.getUri()).equals(p)}.
+ * <p>
+ * Furthermore, it's generally true that
+ * {@code new FsPath(p.getMountPoint(), p.getEntryName()).equals(p)}.
+ * 
+ * <a name="serialization"/><h3>Serialization</h3>
  * <p>
  * This class supports serialization with both
  * {@link java.io.ObjectOutputStream} and {@link java.beans.XMLEncoder}.
  *
+ * @see     FsMountPoint
+ * @see     FsEntryName
+ * @see     FsScheme
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -89,14 +149,6 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
 public final class FsPath implements Serializable, Comparable<FsPath> {
 
     private static final long serialVersionUID = 5798435461242930648L;
-
-    /**
-     * The separator which is used to split opaque path names into
-     * {@link FsMountPoint mount points} and {@link EntryName entry names}.
-     * This is identical to the separator in the class
-     * {@link java.net.JarURLConnection}.
-     */
-    public static final String MOUNT_POINT_SEPARATOR = "!" + SEPARATOR;
 
     private static final URI DOT = URI.create(".");
 
@@ -233,16 +285,17 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
      */
     public FsPath(  final @CheckForNull FsMountPoint mountPoint,
                     final FsEntryName entryName) {
+        URI mountPointUri;
         if (null == mountPoint) {
             this.uri = entryName.getUri();
-        } else if (mountPoint.getUri().isOpaque()) {
+        } else if ((mountPointUri = mountPoint.getUri()).isOpaque()) {
             try {
-                this.uri = new URI(mountPoint.toString() + entryName);
+                this.uri = new URI(mountPointUri.toString() + entryName);
             } catch (URISyntaxException ex) {
                 throw new AssertionError(ex);
             }
         } else {
-            this.uri = mountPoint.getUri().resolve(entryName.getUri());
+            this.uri = mountPointUri.resolve(entryName.getUri());
         }
         this.mountPoint = mountPoint;
         this.entryName = entryName;
@@ -270,10 +323,10 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
         uri = modifier.modify(uri, PATH);
         if (uri.isOpaque()) {
             final String ssp = uri.getSchemeSpecificPart();
-            final int i = ssp.lastIndexOf(MOUNT_POINT_SEPARATOR);
+            final int i = ssp.lastIndexOf(FsMountPoint.SEPARATOR);
             if (0 > i)
                 throw new URISyntaxException(quote(uri),
-                        "Missing mount point separator \"" + MOUNT_POINT_SEPARATOR + '"');
+                        "Missing mount point separator \"" + FsMountPoint.SEPARATOR + '"');
             mountPoint = new FsMountPoint(
                     new URI(uri.getScheme(), ssp.substring(0, i + 2), null),
                     modifier);
@@ -307,7 +360,7 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
         assert (null != getMountPoint()) == getUri().isAbsolute();
         assert null != getEntryName();
         if (getUri().isOpaque()) {
-            assert getUri().getRawSchemeSpecificPart().contains(MOUNT_POINT_SEPARATOR);
+            assert getUri().getRawSchemeSpecificPart().contains(FsMountPoint.SEPARATOR);
             assert getUri().equals(URI.create(  getMountPoint().getUri().toString()
                                                 + getEntryName().getUri().toString()));
         } else if (getUri().isAbsolute()) {
@@ -321,7 +374,16 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
     }
 
     /**
-     * Returns the mount point or {@code null} iff this path's
+     * Returns the URI of this path.
+     *
+     * @return The URI of this path.
+     */
+    public URI getUri() {
+        return uri;
+    }
+
+    /**
+     * Returns the mount point component or {@code null} iff this path's
      * {@link #getUri() URI} is not absolute.
      *
      * @return The nullable mount point.
@@ -331,22 +393,13 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
     }
 
     /**
-     * Returns the entry name.
+     * Returns the entry name component.
      * This may be empty, but is never {@code null}.
      *
      * @return The entry name.
      */
     public FsEntryName getEntryName() {
         return entryName;
-    }
-
-    /**
-     * Returns the URI of this path.
-     *
-     * @return The URI of this path.
-     */
-    public URI getUri() {
-        return uri;
     }
 
     /**
