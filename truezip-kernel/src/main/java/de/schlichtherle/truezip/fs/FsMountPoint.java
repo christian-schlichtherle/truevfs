@@ -55,8 +55,8 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
  *     {@link #getPath() path}.
  * <li>Otherwise, if the URI is hierarchical, its path must be in normal form
  *     and end with a {@code "/"}.
- *     The {@link #getPath() path} component property is set to {@code null} in
- *     this case.
+ *     The {@link #getPath() path} component property of the mount point is set
+ *     to {@code null} in this case.
  * </ol>
  * 
  * <a name="examples"/><h3>Examples</h3>

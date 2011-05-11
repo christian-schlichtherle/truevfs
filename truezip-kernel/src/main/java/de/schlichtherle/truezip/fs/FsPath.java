@@ -43,12 +43,13 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
  * <ol>
  * <li>If the URI is opaque, its scheme specific part must contain at least
  *     one mount point separator {@code "!/"}.
- *     The part up to the last mount point separator is parsed according to the
- *     syntax constraints for an {@link FsMountPoint} and set as the value of
- *     the component property {@link #getMountPoint() mountPoint}.
- *     The part after the last mount point separator is parsed according to the
- *     syntax constraints for an {@link FsEntryName} and set as the value of
- *     the component property {@link #getEntryName() entryName}.
+ *     The part <em>up to</em> the last mount point separator is parsed
+ *     according to the syntax constraints for an {@link FsMountPoint} and set
+ *     as the value of the component property
+ *     {@link #getMountPoint() mountPoint}.
+ *     The part <em>after</em> the last mount point separator is parsed
+ *     according to the syntax constraints for an {@link FsEntryName} and set
+ *     as the value of the component property {@link #getEntryName() entryName}.
  * <li>Otherwise, if the URI is absolute, it's resolved with {@code "."},
  *     parsed according to the syntax constraints for an {@link FsMountPoint}
  *     and set as the value of the component property
