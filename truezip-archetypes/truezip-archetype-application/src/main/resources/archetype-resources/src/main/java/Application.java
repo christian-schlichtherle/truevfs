@@ -1,6 +1,21 @@
 #set( $symbol_pound = '#' )
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
+/*
+ * Copyright (C) 2011 Schlichtherle IT Services
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package ${package};
 
 //import de.schlichtherle.truezip.file.TArchiveDetector;
@@ -9,7 +24,12 @@ import de.schlichtherle.truezip.fs.FsSyncException;
 //import de.schlichtherle.truezip.fs.archive.tar.TarBZip2Driver;
 //import de.schlichtherle.truezip.fs.archive.tar.TarDriver;
 //import de.schlichtherle.truezip.fs.archive.tar.TarGZipDriver;
+//import de.schlichtherle.truezip.fs.archive.zip.JarDriver;
 //import de.schlichtherle.truezip.fs.archive.zip.ZipDriver;
+//import de.schlichtherle.truezip.fs.archive.zip.raes.ParanoidZipRaesDriver;
+//import de.schlichtherle.truezip.fs.archive.zip.raes.SafeZipRaesDriver;
+//import de.schlichtherle.truezip.key.sl.KeyManagerLocator;
+//import de.schlichtherle.truezip.socket.ByteArrayIOPoolProvider;
 //import de.schlichtherle.truezip.socket.sl.IOPoolLocator;
 
 /**
@@ -23,9 +43,10 @@ import de.schlichtherle.truezip.fs.FsSyncException;
  * Thus, this lifecycle may simply get referenced as the
  * <i>setup-work-sync lifecycle</i>.
  * 
- * @param <E> the {@link Exception} class to throw by {@link #work} and thus
- *       {@link #run}, too.
+ * @param <E> the {@link Exception} class to throw by {@link #work} and
+ *       {@link #run}.
  * @author Christian Schlichtherle
+ * @version $Id$
  */
 abstract class Application<E extends Exception> {
 
@@ -75,6 +96,10 @@ abstract class Application<E extends Exception> {
      * </ul>
      */
     protected void setup() {
+        // Mind that uncommenting any of the following lines might require to
+        // edit the file pom.xml so that the respective modules get added to
+        // the compile time class path, too.
+
         // The constructors of the TFile class use the ArchiveDetector
         // interface to scan a path name for suffixes of archive files
         // which shall be treated like virtual directories.
@@ -104,30 +129,70 @@ abstract class Application<E extends Exception> {
                         { "zip", new ZipDriver(IOPoolLocator.SINGLETON)},
                     }));*/
 
-        // Another typical use case is to recognize only Java artefacts.
+        // Another typical use case is to recognize only Java artifacts.
         /*TFile.setDefaultArchiveDetector(
                 new TArchiveDetector(
                         "ear|jar|war",
-                        new JarDriver(IOPoolLocator.SINGLETON));*/
+                        new JarDriver(IOPoolLocator.SINGLETON)));*/
 
         // ... or an application file format.
         /*TFile.setDefaultArchiveDetector(
                 new TArchiveDetector(
                         "foo",
-                        new JarDriver(IOPoolLocator.SINGLETON));*/
+                        new JarDriver(IOPoolLocator.SINGLETON)));*/
 
         // ... or an encrypted application file format.
+        // This driver authenticates input archive files up to 512 KB using
+        // the Message Authentication Code (MAC) specified by the RAES file
+        // format.
+        // For larger input archive files, it just checks the CRC-32 value
+        // whenever an archive entry input stream is closed.
+        // CRC-32 has frequent collisions when compared to a MAC.
+        // However, it should not be feasible to make an undetectable
+        // modification.
+        // The driver also uses unencrypted temporary files for archive entries
+        // whenever required.
         /*TFile.setDefaultArchiveDetector(
                 new TArchiveDetector(
                         "bar",
                         new SafeZipRaesDriver(
                             IOPoolLocator.SINGLETON,
-                            KeyManagerLocator.SINGLETON));*/
+                            KeyManagerLocator.SINGLETON)));*/
 
+        // If you're a bit paranoid, then you could use the following driver
+        // instead:
+        // This driver authenticates every input archive file using the Message
+        // Authentication Code (MAC) specified by the RAES file format, which
+        // makes it comparably slow.
+        // The driver also uses unencrypted temporary files for archive entries
+        // whenever required.
+        /*TFile.setDefaultArchiveDetector(
+                new TArchiveDetector(
+                        "bar",
+                        new ParanoidZipRaesDriver(
+                            IOPoolLocator.SINGLETON,
+                            KeyManagerLocator.SINGLETON)));*/
+        
+        // And finally, if you're quite paranoid, then this driver is for you:
+        // This driver authenticates every input archive file using the Message
+        // Authentication Code (MAC) specified by the RAES file format, which
+        // makes it comparably slow.
+        // The driver also uses unencrypted byte arrays for temporary storage
+        // of archive entries whenever required.
+        // If you were completely paranoid, you would even want to use
+        // encrypted byte arrays or wipe them with nulls after use.
+        // However, then you would have to write this yourself! ;-)
+        /*TFile.setDefaultArchiveDetector(
+                new TArchiveDetector(
+                        "bar",
+                        new ParanoidZipRaesDriver(
+                            new ByteArrayIOPoolProvider(2048),
+                            KeyManagerLocator.SINGLETON)));*/
+        
         // This class property controls whether archive files and their member
         // directories get automatically created whenever required.
         // By default, the value of this class property is {@code true}!
-        //TFile.setLenient(false);
+        /*TFile.setLenient(false);*/
     }
 
     /**
