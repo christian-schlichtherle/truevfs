@@ -1,6 +1,21 @@
 #set( $symbol_pound = '#' )
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
+/*
+ * Copyright (C) 2011 Schlichtherle IT Services
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package ${package};
 
 import de.schlichtherle.truezip.file.TFile;
@@ -17,9 +32,10 @@ import java.io.IOException;
  * run time class path and the destination path name is {@code archive.zip} a
  * ZIP file with this name gets created unless it already exists.
  * 
- * @param <E> the {@link Exception} class to throw by {@link #work} and thus
- *       {@link #run}, too.
+ * @param <E> the {@link Exception} class to throw by {@link #work} and
+ *       {@link #run}.
  * @author Christian Schlichtherle
+ * @version $Id$
  */
 public class Copy extends Application<IOException> {
 

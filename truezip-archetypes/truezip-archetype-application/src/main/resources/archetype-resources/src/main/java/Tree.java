@@ -1,6 +1,21 @@
 #set( $symbol_pound = '#' )
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
+/*
+ * Copyright (C) 2011 Schlichtherle IT Services
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package ${package};
 
 import de.schlichtherle.truezip.file.TFile;
@@ -17,9 +32,10 @@ import java.io.PrintStream;
  * this file actually exists as a ZIP file, then the tree graph of the
  * directory structure of this ZIP file will get printed.
  * 
- * @param <E> the {@link Exception} class to throw by {@link #work} and thus
- *       {@link #run}, too.
+ * @param <E> the {@link Exception} class to throw by {@link #work} and
+ *       {@link #run}.
  * @author Christian Schlichtherle
+ * @version $Id$
  */
 public class Tree extends Application<RuntimeException> {
 
@@ -27,7 +43,6 @@ public class Tree extends Application<RuntimeException> {
     private static final String LAST_PREFIX     = "`-- ";
     private static final String DEFAULT_PADDING = "|   ";
     private static final String LAST_PADDING    = "    ";
-    private static final PrintStream out = System.out;
 
     public static void main(String[] args) throws FsSyncException {
         System.exit(new Tree().run(args));
@@ -45,6 +60,7 @@ public class Tree extends Application<RuntimeException> {
     private void graph(final TFile file, final String padding, final String prefix) {
         if (!file.exists())
             throw new IllegalArgumentException(file.getPath() + " (file or directory does not exist)");
+        final PrintStream out = System.out;
         out.print(padding);
         out.print(prefix);
         out.println(file.getName());
