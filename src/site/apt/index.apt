@@ -44,10 +44,10 @@ Getting Started
     project environment correctly and get productive quickly.
 
     [[3]] If you are looking for more sample code and applications,
-    please check the module
+    please check the
+    {{{http://java.net/projects/truezip/sources/v7/show/truezip-samples/}source code}}
+    of the module
     {{{./truezip-samples/index.html}TrueZIP Samples}}.
-    You may also want to browse its
-    {{{http://java.net/projects/truezip/sources/v7/show/truezip-samples/}source code}}.
 
     [[4]] If you encounter issues, please read the
     {{{./faq.html}FAQ}}

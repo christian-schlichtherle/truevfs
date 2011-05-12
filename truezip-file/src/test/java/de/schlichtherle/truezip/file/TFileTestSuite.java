@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.file;
 
+import de.schlichtherle.truezip.socket.ByteArrayIOPoolProvider;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.util.ArrayHelper;
 import de.schlichtherle.truezip.fs.FsSyncException;
@@ -26,8 +27,6 @@ import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
-import de.schlichtherle.truezip.socket.ByteArrayIOPool;
-import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.OutputClosedException;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.ByteArrayInputStream;
@@ -60,13 +59,6 @@ import static org.junit.Assert.*;
  */
 public abstract class TFileTestSuite {
 
-    private static class ByteArrayIOPoolProvider implements IOPoolProvider {
-        @Override
-        public IOPool<?> get() {
-            return new ByteArrayIOPool(2048);
-        }
-    }
-
     private static final Logger logger = Logger.getLogger(
             TFileTestSuite.class.getName());
 
@@ -84,7 +76,7 @@ public abstract class TFileTestSuite {
     }
 
     protected static final IOPoolProvider
-            IO_POOL_PROVIDER = new ByteArrayIOPoolProvider();
+            IO_POOL_PROVIDER = new ByteArrayIOPoolProvider(2048);
     
     private final FsScheme scheme;
     private final FsArchiveDriver<?> driver;

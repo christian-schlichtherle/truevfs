@@ -15,19 +15,18 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip.raes;
 
-import de.schlichtherle.truezip.fs.FsConcurrentModel;
-import de.schlichtherle.truezip.socket.OutputSocket;
-import de.schlichtherle.truezip.fs.archive.zip.ZipArchiveEntry;
-import de.schlichtherle.truezip.socket.InputShop;
-import de.schlichtherle.truezip.crypto.raes.RaesKeyException;
 import de.schlichtherle.truezip.crypto.raes.RaesOutputStream;
-import de.schlichtherle.truezip.socket.OutputShop;
-import de.schlichtherle.truezip.fs.archive.zip.ZipInputShop;
 import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.fs.FsConcurrentModel;
+import de.schlichtherle.truezip.fs.archive.zip.ZipArchiveEntry;
 import de.schlichtherle.truezip.fs.archive.zip.ZipDriver;
+import de.schlichtherle.truezip.fs.archive.zip.ZipInputShop;
 import de.schlichtherle.truezip.key.KeyManagerProvider;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
+import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.socket.LazyOutputSocket;
+import de.schlichtherle.truezip.socket.OutputShop;
+import de.schlichtherle.truezip.socket.OutputSocket;
 import java.io.IOException;
 import java.io.OutputStream;
 import net.jcip.annotations.Immutable;

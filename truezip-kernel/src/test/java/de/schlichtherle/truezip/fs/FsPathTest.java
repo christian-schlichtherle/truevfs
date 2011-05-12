@@ -383,21 +383,20 @@ public class FsPathTest {
     @Test
     public void testHierarchicalize() {
         for (final String[] params : new String[][] {
-            { "foo:bar:/baz!/", "bar:/baz/" },
-            { "foo:bar:baz:/x/bö%20m?plö%20k!/bä%20g?zö%20k!/", "baz:/x/bö%20m/bä%20g/?zö%20k" },
+            { "foo:bar:baz:/x/bö%20m?plö%20k!/bä%20g?zö%20k!/", "baz:/x/bö%20m/bä%20g?zö%20k" },
             { "bar:baz:/x/bö%20m?plö%20k!/bä%20g?zö%20k", "baz:/x/bö%20m/bä%20g?zö%20k" },
-            { "foo:bar:baz:/x/bööm?plönk!/bäng?zönk!/", "baz:/x/bööm/bäng/?zönk" },
+            { "foo:bar:baz:/x/bööm?plönk!/bäng?zönk!/", "baz:/x/bööm/bäng?zönk" },
             { "bar:baz:/x/bööm?plönk!/bäng?zönk", "baz:/x/bööm/bäng?zönk" },
-            { "foo:bar:baz:/boom?plonk!/bang?zonk!/", "baz:/boom/bang/?zonk" },
+            { "foo:bar:baz:/boom?plonk!/bang?zonk!/", "baz:/boom/bang?zonk" },
             { "bar:baz:/boom?plonk!/bang?zonk", "baz:/boom/bang?zonk" },
             { "bar:baz:/boom?plonk!/?zonk", "baz:/boom/?zonk" },
             { "bar:baz:/boom?plonk!/bang", "baz:/boom/bang" },
-            { "bar:baz:/boom?plonk!/", "baz:/boom/?plonk" },
-            { "foo:bar:baz:/boom!/bang!/", "baz:/boom/bang/" },
+            { "bar:baz:/boom?plonk!/", "baz:/boom?plonk" },
+            { "foo:bar:baz:/boom!/bang!/", "baz:/boom/bang" },
             { "bar:baz:/boom!/bang", "baz:/boom/bang" },
-            { "foo:bar:/baz?boom!/", "bar:/baz/?boom" },
+            { "foo:bar:/baz?boom!/", "bar:/baz?boom" },
             { "bar:/baz?boom", "bar:/baz?boom" },
-            { "foo:bar:/baz!/", "bar:/baz/" },
+            { "foo:bar:/baz!/", "bar:/baz" },
             { "bar:/baz", "bar:/baz" },
             { "foo:/bar/?boom", "foo:/bar/?boom" },
             { "bar?boom", "bar?boom" },
@@ -405,9 +404,8 @@ public class FsPathTest {
             { "bar", "bar" },
         }) {
             final FsPath path = FsPath.create(params[0]);
-            final FsPath hierarchical = path.hierarchicalize();
-            assertThat(hierarchical.getUri(), equalTo(URI.create(params[1])));
-            assertThat(hierarchical.hierarchicalize(), sameInstance(hierarchical));
+            final URI hierarchical = path.hierarchicalize();
+            assertThat(hierarchical, equalTo(URI.create(params[1])));
         }
     }
 }
