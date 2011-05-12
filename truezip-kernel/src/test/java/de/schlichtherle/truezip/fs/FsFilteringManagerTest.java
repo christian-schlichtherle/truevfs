@@ -27,7 +27,7 @@ import static org.junit.Assert.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class FsFilterManagerTest extends FsManagerTestSuite {
+public class FsFilteringManagerTest extends FsManagerTestSuite {
 
     @Override
     protected FsManager newManager() {
@@ -39,18 +39,18 @@ public class FsFilterManagerTest extends FsManagerTestSuite {
     @Test
     public void testFiltering() {
         for (final String[][] params : new String[][][] {
+            // { { /* filter */ }, { /* test set */ }, { /* result set */ } },
             { { "tar:zip:file:/foo!/bar!/" }, { "zip:file:/foo!/" }, { } },
             { { "file:/foo/bar/" }, { "zip:file:/foo!/" }, { } },
             { { "tar:file:/foo!/" }, { "zip:file:/foo!/" }, { "zip:file:/foo!/" } },
             { { "zip:file:/foo!/" }, { "zip:file:/foo!/" }, { "zip:file:/foo!/" } },
-            { { "file:/foo/" }, { "zip:file:/foo!/" }, { "zip:file:/foo!/" } },
+            { { "file:/foo/" }, { "zip:file:/foo!/" }, { } },
             { { "file:/" }, { "zip:file:/foo!/" }, { "zip:file:/foo!/" } },
         }) {
             assert params[0].length == 1;
 
-            final FsManager manager = new FsDefaultManager(
-                    STRONG);
-            for (final String param : params[1])
+            final FsManager manager = new FsDefaultManager(STRONG);
+            for (String param : params[1])
                 manager.getController(
                     FsMountPoint.create(param),
                     new FsDefaultDriver(
@@ -58,13 +58,13 @@ public class FsFilterManagerTest extends FsManagerTestSuite {
             assertThat(manager.getSize(), is(params[1].length));
 
             final Set<FsMountPoint> set = new HashSet<FsMountPoint>();
-            for (final String param : params[2])
+            for (String param : params[2])
                 set.add(FsMountPoint.create(param));
 
             final FsManager filter = new FsFilteringManager(
                     manager, FsMountPoint.create(params[0][0]));
             assertThat(filter.getSize(), is(params[2].length));
-            for (final FsController<?> controller : filter)
+            for (FsController<?> controller : filter)
                 assertTrue(set.contains(controller.getModel().getMountPoint()));
         }
     }

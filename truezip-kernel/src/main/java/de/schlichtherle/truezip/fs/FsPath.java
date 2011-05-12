@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import de.schlichtherle.truezip.util.UriBuilder;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -164,7 +165,7 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
 
     private transient FsEntryName entryName;
 
-    private transient volatile @Nullable FsPath hierarchical;
+    private transient volatile @Nullable URI hierarchical;
 
     /**
      * Equivalent to {@link #create(String, FsUriModifier) create(uri, FsUriModifier.NULL)}.
@@ -422,31 +423,35 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
     }
 
     /**
-     * Returns a hierarchical URI for this path.
-     * If this path's {@link #getUri() URI} is opaque, the
-     * {@link FsMountPoint#hierarchicalize() hierarchical URI} of its
-     * {@link #getMountPoint() mount point} with its
-     * {@link #getEntryName() entry name} resolved against it is returned.
-     * Otherwise, this path is returned.
+     * Returns a URI which is recursively transformed from the URI of this
+     * path so that it's absolute and hierarchical.
+     * If this path is already in hierarchical form, its URI is returned.
      * <p>
-     * Note that this function is idempotent, so calling it repeatedly will
-     * produce the same result again.
-     * However, this function is not injective, so two different paths
-     * may produce equal results.
      * For example, the path URIs {@code zip:file:/archive!/entry} and
      * {@code tar:file:/archive!/entry} would both produce the hierarchicalized
      * path with the URI {@code file:/archive/entry}.
      *
      * @return A hierarchical URI for this path.
      */
-    public FsPath hierarchicalize() {
-        return null != hierarchical
-                ? hierarchical
-                : (hierarchical = !uri.isOpaque()
-                    ? this
-                    : 0 == entryName.toString().length()
-                        ? FsPath.create(mountPoint.hierarchicalize().getUri())
-                        : mountPoint.hierarchicalize().resolve(entryName));
+    public URI hierarchicalize() {
+        if (null != hierarchical)
+            return hierarchical;
+        if (uri.isOpaque()) {
+            final URI mpu = mountPoint.hierarchicalize();
+            final URI enu = entryName.getUri();
+            try {
+                return hierarchical = enu.toString().isEmpty()
+                        ? mpu
+                        : new UriBuilder(mpu)
+                            .path(mpu.getPath() + FsEntryName.SEPARATOR)
+                            .getUri()
+                            .resolve(enu);
+            } catch (URISyntaxException ex) {
+                throw new AssertionError(ex);
+            }
+        } else {
+            return hierarchical = uri;
+        }
     }
 
     /**

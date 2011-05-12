@@ -31,9 +31,8 @@
     <description>
         The file system driver for the FILE scheme.
 
-        Add this artifact to the compile-time class path for dependency
-        injection to the TrueZIP Kernel module or to the run-time class path
-        for service location in the TrueZIP File* module in order
-        to access FILE URIs.
+        Add the JAR artifact of this module to the compile-time class path for
+        dependency injection to the TrueZIP Kernel module or to the run-time
+        class path for service location in the TrueZIP File* module.
     </description>
 </project>

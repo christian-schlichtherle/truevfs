@@ -35,7 +35,7 @@ import net.jcip.annotations.ThreadSafe;
 public final class FsFilteringManager
 extends FsDecoratingManager<FsManager> {
 
-    private final FsMountPoint prefix;
+    private final URI prefix;
 
     /**
      * Constructs a new prefix filter file system manager from the given file
@@ -67,11 +67,10 @@ extends FsDecoratingManager<FsManager> {
                 = new ArrayList<FsController<?>>(
                     (int) (delegate.getSize() / .75f) + 1);
         for (FsController<?> controller : delegate) {
-            final FsMountPoint mountPoint
+            final URI mountPoint
                     = controller.getModel().getMountPoint().hierarchicalize();
             if (mountPoint.getScheme().equals(prefix.getScheme())
-                    && mountPoint.getUri().getPath().startsWith(
-                        prefix.getUri().getPath()))
+                    && mountPoint.getPath().startsWith(prefix.getPath()))
                 snapshot.add(controller);
         }
         return snapshot;

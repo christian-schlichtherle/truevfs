@@ -46,7 +46,7 @@ public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
     private @CheckForNull byte[] data;
     private int reads;
     private int writes;
-    int initialCapacity = 32;
+    int initialCapacity;
 
     /**
      * Equivalent to {@link #ByteArrayIOEntry(String, int) new ByteArrayIOPool(name, 32)}.

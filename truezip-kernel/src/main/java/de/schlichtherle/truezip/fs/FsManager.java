@@ -89,10 +89,11 @@ implements Iterable<FsController<?>> {
     /**
      * Commits all unsynchronized changes to the contents of all federated file
      * systems managed by this instance to their respective parent file system,
-     * releases the associated resources for access by third parties
-     * (e.g. other processes) and cleans up any temporary resources.
-     * Note that temporary resources may get used even if the federated file
-     * systems where accessed read-only.
+     * releases the associated resources (e.g. target archive files) for
+     * access by third parties (e.g. other processes), cleans up any temporary
+     * allocated resources (e.g. temporary files) and purges any cached data.
+     * Note that temporary resources may get allocated even if the federated
+     * file systems were accessed read-only.
      * As a side effect, this will reset the state of the respective file
      * system controllers.
      * <p>
@@ -118,10 +119,11 @@ implements Iterable<FsController<?>> {
     /**
      * Commits all unsynchronized changes to the contents of all federated file
      * systems managed by this instance to their respective parent file system,
-     * releases the associated resources for access by third parties
-     * (e.g. other processes) and cleans up any temporary resources.
-     * Note that temporary resources may get used even if the federated file
-     * systems where accessed read-only.
+     * releases the associated resources (e.g. target archive files) for
+     * access by third parties (e.g. other processes), cleans up any temporary
+     * allocated resources (e.g. temporary files) and purges any cached data.
+     * Note that temporary resources may get allocated even if the federated
+     * file systems were accessed read-only.
      * As a side effect, this will reset the state of the respective file
      * system controllers.
      *

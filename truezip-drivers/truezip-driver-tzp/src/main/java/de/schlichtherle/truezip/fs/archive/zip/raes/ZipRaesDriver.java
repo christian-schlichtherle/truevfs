@@ -248,18 +248,21 @@ public abstract class ZipRaesDriver extends JarDriver {
     /**
      * Returns a URI which represents the mount point of the given file system
      * model.
+     * Mind that this URI needs to be matched when setting a password
+     * programmatically!
+     * <p>
+     * The implementation in the class {@link ZipRaesDriver} returns the
+     * expression {@code model.getMountPoint().hierarchicalize()}
+     * in order to improve the readability of the URI in comparison to the
+     * expression {@code model.getMountPoint().getUri()}.
      * 
      * @param  model the file system model.
      * @return A URI representing the file system model's mount point.
+     * @see    Issue <a href="http://java.net/jira/browse/TRUEZIP-72">#TRUEZIP-72</a>.
      */
-    final URI getMountPointUri(FsModel model) {
-        // Though the following statement would significantly improve the
-        // readability of the URI, this would break compatibility to the code
-        // samples which demonstrate how to set RAES keys programmatically
-        // by calling TFile.toURI() on an archive file in order to obtain its
-        // mount point URI.
-        //return model.getMountPoint().hierarchicalize().getUri();
-        return model.getMountPoint().getUri();
+    protected URI getMountPointUri(FsModel model) {
+        return model.getMountPoint().hierarchicalize();
+        //return model.getMountPoint().getUri();
     }
 
     /**

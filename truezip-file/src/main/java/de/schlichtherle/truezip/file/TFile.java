@@ -86,13 +86,13 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  * These bulk I/O methods fall into the following categories:
  * <ol>
  * <li>The {@code cp(_p|_r|_rp)?} methods copy files or directory trees.
- *     The method names have been modelled after the Unix command line utility
+ *     The method names have been modeled after the Unix command line utility
  *     {@code cp} with its options.
  * <li>The {@code mv} methods move files or directory trees.
- *     The method names have been modelled after the Unix command line utility
+ *     The method names have been modeled after the Unix command line utility
  *     {@code mv}.
  * <li>The {@code rm(_r)?} methods remove files or directory trees.
- *     The method names have been modelled after the Unix command line utility
+ *     The method names have been modeled after the Unix command line utility
  *     {@code rm} with its options.
  * <li>The {@code input|output} methods copy the given streams to this file or
  *     vice versa.
@@ -105,7 +105,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  *     When used with <em>unbuffered</em> input and output stream
  *     implementations, it delivers the same performance as the transfer
  *     method in the package {@code java.nio}.
- *     Its name is modelled after the Unix command line utility {@code cat}.
+ *     Its name is modeled after the Unix command line utility {@code cat}.
  * </ol>
  * <b>Important:</b> You must provide the <em>full path name</em> for both
  * source and destination parameters to any of these methods!
@@ -150,7 +150,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  * <pre><code>
  * TFile src = ...
  * TFile dst = ...
- * TFile.umount();
+ * TFile.umount(); // commit changes and purge any cached data
  * TFile.cp_rp(src, dst, TArchiveDetector.NULL, TArchiveDetector.NULL);
  * </code></pre>
  * 
@@ -616,7 +616,7 @@ public final class TFile extends File {
     }
 
     private TFile(FsPath path, TArchiveDetector detector) {
-        super(path.hierarchicalize().getUri());
+        super(path.hierarchicalize());
         parse(path, detector);
     }
 
@@ -658,7 +658,7 @@ public final class TFile extends File {
     @SuppressWarnings("LeakingThisInConstructor")
     private TFile(  final FsMountPoint mountPoint,
                     TArchiveDetector detector) {
-        super(mountPoint.hierarchicalize().getUri());
+        super(mountPoint.hierarchicalize());
 
         this.delegate = new File(super.getPath());
         this.detector = detector;
@@ -894,9 +894,9 @@ public final class TFile extends File {
     /**
      * Commits all unsynchronized changes to the contents of all federated file
      * systems (i.e. archive files) to their respective parent file system,
-     * releases the associated resources (i.e. the target archive files) for
-     * access by third parties (e.g. other processes) and cleans up any
-     * temporary resources (i.e. temporary files).
+     * releases the associated resources (i.e. target archive files) for
+     * access by third parties (e.g. other processes), cleans up any temporary
+     * allocated resources (e.g. temporary files) and purges any cached data.
      * Note that temporary files may get used even if the archive files where
      * accessed read-only.
      *
@@ -923,9 +923,9 @@ public final class TFile extends File {
      * Commits all unsynchronized changes to the contents of all federated file
      * systems (i.e. archive files) identified by {@code archive} and all its
      * member federated file systems to their respective parent file system,
-     * releases the associated resources (i.e. the target archive files) for
-     * access by third parties (e.g. other processes) and cleans up any
-     * temporary resources (i.e. temporary files).
+     * releases the associated resources (i.e. target archive files) for
+     * access by third parties (e.g. other processes), cleans up any temporary
+     * allocated resources (e.g. temporary files) and purges any cached data.
      * Note that temporary files may get used even if the archive files where
      * accessed read-only.
      * <p>
@@ -975,9 +975,9 @@ public final class TFile extends File {
     /**
      * Commits all unsynchronized changes to the contents of all federated file
      * systems (i.e. archive files) to their respective parent file system,
-     * releases the associated resources (i.e. the target archive files) for
-     * access by third parties (e.g. other processes) and cleans up any
-     * temporary resources (i.e. temporary files).
+     * releases the associated resources (i.e. target archive files) for
+     * access by third parties (e.g. other processes), cleans up any temporary
+     * allocated resources (e.g. temporary files) and purges any cached data.
      * Note that temporary files may get used even if the archive files where
      * accessed read-only.
      * <p>
@@ -1002,9 +1002,9 @@ public final class TFile extends File {
     /**
      * Commits all unsynchronized changes to the contents of all federated file
      * systems (i.e. archive files) to their respective parent file system,
-     * releases the associated resources (i.e. the target archive files) for
-     * access by third parties (e.g. other processes) and cleans up any
-     * temporary resources (i.e. temporary files).
+     * releases the associated resources (i.e. target archive files) for
+     * access by third parties (e.g. other processes), cleans up any temporary
+     * allocated resources (e.g. temporary files) and purges any cached data.
      * Note that temporary files may get used even if the archive files where
      * accessed read-only.
      * <p>
@@ -1028,16 +1028,16 @@ public final class TFile extends File {
     public static void umount(boolean closeStreams)
     throws FsSyncException {
         sync(   BitField.of(CLEAR_CACHE)
-                .set(FORCE_CLOSE_INPUT, closeStreams)
-                .set(FORCE_CLOSE_OUTPUT, closeStreams));
+                    .set(FORCE_CLOSE_INPUT, closeStreams)
+                    .set(FORCE_CLOSE_OUTPUT, closeStreams));
     }
 
     /**
      * Commits all unsynchronized changes to the contents of all federated file
      * systems (i.e. archive files) to their respective parent file system,
-     * releases the associated resources (i.e. the target archive files) for
-     * access by third parties (e.g. other processes) and cleans up any
-     * temporary resources (i.e. temporary files).
+     * releases the associated resources (i.e. target archive files) for
+     * access by third parties (e.g. other processes), cleans up any temporary
+     * allocated resources (e.g. temporary files) and purges any cached data.
      * Note that temporary files may get used even if the archive files where
      * accessed read-only.
      * <p>
@@ -1065,18 +1065,18 @@ public final class TFile extends File {
             boolean waitForOutputStreams, boolean closeOutputStreams)
     throws FsSyncException {
         sync(   BitField.of(CLEAR_CACHE)
-                .set(WAIT_CLOSE_INPUT, waitForInputStreams)
-                .set(FORCE_CLOSE_INPUT, closeInputStreams)
-                .set(WAIT_CLOSE_OUTPUT, waitForOutputStreams)
-                .set(FORCE_CLOSE_OUTPUT, closeOutputStreams));
+                    .set(WAIT_CLOSE_INPUT, waitForInputStreams)
+                    .set(FORCE_CLOSE_INPUT, closeInputStreams)
+                    .set(WAIT_CLOSE_OUTPUT, waitForOutputStreams)
+                    .set(FORCE_CLOSE_OUTPUT, closeOutputStreams));
     }
 
     /**
      * Commits all unsynchronized changes to the contents of all federated file
      * systems (i.e. archive files) to their respective parent file system,
-     * releases the associated resources (i.e. the target archive files) for
-     * access by third parties (e.g. other processes) and cleans up any
-     * temporary resources (i.e. temporary files).
+     * releases the associated resources (i.e. target archive files) for
+     * access by third parties (e.g. other processes), cleans up any temporary
+     * allocated resources (e.g. temporary files) and purges any cached data.
      * Note that temporary files may get used even if the archive files where
      * accessed read-only.
      * <p>
@@ -1103,9 +1103,9 @@ public final class TFile extends File {
     /**
      * Commits all unsynchronized changes to the contents of all federated file
      * systems (i.e. archive files) to their respective parent file system,
-     * releases the associated resources (i.e. the target archive files) for
-     * access by third parties (e.g. other processes) and cleans up any
-     * temporary resources (i.e. temporary files).
+     * releases the associated resources (i.e. target archive files) for
+     * access by third parties (e.g. other processes), cleans up any temporary
+     * allocated resources (e.g. temporary files) and purges any cached data.
      * Note that temporary files may get used even if the archive files where
      * accessed read-only.
      * <p>
@@ -1131,16 +1131,16 @@ public final class TFile extends File {
     throws FsSyncException {
         sync(   archive,
                 BitField.of(CLEAR_CACHE)
-                .set(FORCE_CLOSE_INPUT, closeStreams)
-                .set(FORCE_CLOSE_OUTPUT, closeStreams));
+                    .set(FORCE_CLOSE_INPUT, closeStreams)
+                    .set(FORCE_CLOSE_OUTPUT, closeStreams));
     }
 
     /**
      * Commits all unsynchronized changes to the contents of all federated file
      * systems (i.e. archive files) to their respective parent file system,
-     * releases the associated resources (i.e. the target archive files) for
-     * access by third parties (e.g. other processes) and cleans up any
-     * temporary resources (i.e. temporary files).
+     * releases the associated resources (i.e. target archive files) for
+     * access by third parties (e.g. other processes), cleans up any temporary
+     * allocated resources (e.g. temporary files) and purges any cached data.
      * Note that temporary files may get used even if the archive files where
      * accessed read-only.
      * <p>
@@ -1170,10 +1170,10 @@ public final class TFile extends File {
     throws FsSyncException {
         sync(   archive,
                 BitField.of(CLEAR_CACHE)
-                .set(WAIT_CLOSE_INPUT, waitForInputStreams)
-                .set(FORCE_CLOSE_INPUT, closeInputStreams)
-                .set(WAIT_CLOSE_OUTPUT, waitForOutputStreams)
-                .set(FORCE_CLOSE_OUTPUT, closeOutputStreams));
+                    .set(WAIT_CLOSE_INPUT, waitForInputStreams)
+                    .set(FORCE_CLOSE_INPUT, closeInputStreams)
+                    .set(WAIT_CLOSE_OUTPUT, waitForOutputStreams)
+                    .set(FORCE_CLOSE_OUTPUT, closeOutputStreams));
     }
 
     /**
@@ -2422,7 +2422,7 @@ public final class TFile extends File {
      * 
      * @param  recursive whether or not any missing ancestor directories shall
      *         get created if required.
-     * @return this
+     * @return {@code this}
      * @throws IOException if any I/O error occurs.
      */
     public TFile mkdir(final boolean recursive) throws IOException {
@@ -2478,8 +2478,9 @@ public final class TFile extends File {
     /**
      * Equivalent to {@link #rm(File) rm(this)}.
      * 
-     * @return this
+     * @return {@code this}
      * @throws IOException if any I/O error occurs.
+     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
     public TFile rm() throws IOException {
         rm(this);
@@ -2492,6 +2493,7 @@ public final class TFile extends File {
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      *
      * @throws IOException if any I/O error occurs.
+     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
     public static void rm(File node) throws IOException {
         if (node instanceof TFile) {
@@ -2509,8 +2511,10 @@ public final class TFile extends File {
     /**
      * Equivalent to {@link #rm_r(File) rm_r(this)}.
      * 
-     * @return this
+     * @return {@code this}
      * @throws IOException if any I/O error occurs.
+     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
+     * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
     public TFile rm_r() throws IOException {
         TBIO.rm_r(this, detector);
@@ -2529,6 +2533,8 @@ public final class TFile extends File {
      * is used to detect prospective archive files in the directory tree.
      * 
      * @throws IOException if any I/O error occurs.
+     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
+     * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
     public static void rm_r(File node) throws IOException {
         TBIO.rm_r(node,
@@ -2571,8 +2577,10 @@ public final class TFile extends File {
      * Equivalent to {@link #mv(File, File, TArchiveDetector) mv(this, dst, getArchiveDetector())}.
      * 
      * @param  dst the destination file or directory tree.
-     * @return this
+     * @return {@code this}
      * @throws IOException if any I/O error occurs.
+     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
+     * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
     public TFile mv(File dst) throws IOException {
         mv(this, dst, detector);
@@ -2593,7 +2601,7 @@ public final class TFile extends File {
      * @param  detector the archive detector to use for detecting any archive
      *         files in the source directory tree.
      * @throws IOException if any I/O error occurs.
-     * @see    <a href="#bulkIOMethods">Copy Methods</a>
+     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
     public static void mv(  final File src,
@@ -2685,7 +2693,7 @@ public final class TFile extends File {
      * @param  out the output stream.
      * @throws IOException if any I/O error occurs.
      * @see    #cat(InputStream, OutputStream)
-     * @see    <a href="#bulkIOMethods">Copy Methods</a>
+     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
     public static void cp(InputStream in, OutputStream out)
     throws IOException {
@@ -2742,7 +2750,7 @@ public final class TFile extends File {
      *         be a plain {@code File}, archive entries are only
      *         supported for instances of this class.
      * @throws IOException if any I/O error occurs.
-     * @see    <a href="#bulkIOMethods">Copy Methods</a>
+     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
     public static void cp(final InputStream in, final File dst)
     throws IOException {
@@ -2805,7 +2813,7 @@ public final class TFile extends File {
      *         be a plain {@code File}, archive entries are only
      *         supported for instances of this class.
      * @throws IOException if any I/O error occurs.
-     * @see    <a href="#bulkIOMethods">Copy Methods</a>
+     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
     public static void cp(File src, OutputStream out)
     throws IOException {
@@ -2816,7 +2824,7 @@ public final class TFile extends File {
      * Equivalent to {@link #cp(File, File) cp(this, dst)}.
      * 
      * @param  dst the destination file.
-     * @return this
+     * @return {@code this}
      * @throws IOException if any I/O error occurs.
      */
     public TFile cp(File dst) throws IOException {
@@ -2876,7 +2884,7 @@ public final class TFile extends File {
      *         be a plain {@code File}, archive entries are only
      *         supported for instances of this class.
      * @throws IOException if any I/O error occurs.
-     * @see    <a href="#bulkIOMethods">Copy Methods</a>
+     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
     public static void cp(File src, File dst)
     throws IOException {
@@ -2887,7 +2895,7 @@ public final class TFile extends File {
      * Equivalent to {@link #cp_p(File, File) cp_p(this, dst)}.
      * 
      * @param  dst the destination file.
-     * @return this
+     * @return {@code this}
      * @throws IOException if any I/O error occurs.
      */
     public TFile cp_p(File dst) throws IOException {
@@ -2949,7 +2957,7 @@ public final class TFile extends File {
      *         be a plain {@code File}, archive entries are only
      *         supported for instances of this class.
      * @throws IOException if any I/O error occurs.
-     * @see    <a href="#bulkIOMethods">Copy Methods</a>
+     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
     public static void cp_p(File src, File dst)
     throws IOException {
@@ -2960,8 +2968,10 @@ public final class TFile extends File {
      * Equivalent to {@link #cp_r(File, File, TArchiveDetector, TArchiveDetector) cp_r(this, dst, getArchiveDetector(), getArchiveDetector())}.
      * 
      * @param  dst the destination file or directory tree.
-     * @return this
+     * @return {@code this}
      * @throws IOException if any I/O error occurs.
+     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
+     * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
     public TFile cp_r(File dst) throws IOException {
         TBIO.cp_r(false, this, dst, detector, detector);
@@ -3028,7 +3038,7 @@ public final class TFile extends File {
      * @param  dstDetector the archive detector to use for detecting any
      *         archive files in the destination directory tree.
      * @throws IOException if any I/O error occurs.
-     * @see    <a href="#bulkIOMethods">Copy Methods</a>
+     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
     public static void cp_r(File src, File dst,
@@ -3042,8 +3052,10 @@ public final class TFile extends File {
      * Equivalent to {@link #cp_rp(File, File, TArchiveDetector, TArchiveDetector) cp_rp(this, dst, getArchiveDetector(), getArchiveDetector())}.
      * 
      * @param  dst the destination file or directory tree.
-     * @return this
+     * @return {@code this}
      * @throws IOException if any I/O error occurs.
+     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
+     * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
     public TFile cp_rp(File dst) throws IOException {
         TBIO.cp_r(true, this, dst, detector, detector);
@@ -3109,7 +3121,7 @@ public final class TFile extends File {
      *         be a plain {@code File}, archive files and entries
      *         are only supported for instances of this class.
      * @throws IOException if any I/O error occurs.
-     * @see    <a href="#bulkIOMethods">Copy Methods</a>
+     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
     public static void cp_rp(   File src, File dst,
@@ -3168,7 +3180,7 @@ public final class TFile extends File {
      *
      * @param  in the input stream.
      * @throws IOException if any I/O error occurs.
-     * @see    <a href="#bulkIOMethods">Copy Methods</a>
+     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
     public void input(final InputStream in) throws IOException {
         final OutputStream out = new TFileOutputStream(this, false);
@@ -3233,7 +3245,7 @@ public final class TFile extends File {
      *
      * @param  out the output stream.
      * @throws IOException if any I/O error occurs.
-     * @see    <a href="#bulkIOMethods">Copy Methods</a>
+     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
     public void output(final OutputStream out) throws IOException {
         final InputStream in = new TFileInputStream(this);
@@ -3254,6 +3266,7 @@ public final class TFile extends File {
      * This is a high performance implementation which uses a pooled background
      * thread to fill a FIFO of data buffers which is concurrently flushed by
      * the current thread.
+     * It performs best when used with <em>unbuffered</em> streams.
      * <table border="2" cellpadding="4">
      * <thead>
      * <tr>
@@ -3301,7 +3314,7 @@ public final class TFile extends File {
      * @param  out the output stream.
      * @throws IOException if any I/O error occurs.
      * @see    #cp(InputStream, OutputStream)
-     * @see    <a href="#bulkIOMethods">Copy Methods</a>
+     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
     public static void cat(final InputStream in, final OutputStream out)
     throws IOException {
