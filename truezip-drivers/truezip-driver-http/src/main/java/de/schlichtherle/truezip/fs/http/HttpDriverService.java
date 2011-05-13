@@ -17,7 +17,6 @@ package de.schlichtherle.truezip.fs.http;
 
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
-import de.schlichtherle.truezip.fs.sl.FsDriverLocator;
 import de.schlichtherle.truezip.fs.spi.FsDriverService;
 import de.schlichtherle.truezip.socket.sl.IOPoolLocator;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
@@ -26,23 +25,26 @@ import java.util.Map;
 import net.jcip.annotations.Immutable;
 
 /**
- * An immutable container of a driver for the HTTP(S) schemes.
+ * An immutable container of a map with a driver for accessing the {@code http}
+ * and {@code https} schemes.
+ * The map provided by this service consists of the following entries:
+<table border="2" cellpadding="4">
+<thead>
+<tr>
+<th>URI Schemes Regular Expression</th>
+<th>File System Driver Class</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>{@code http|https}</td>
+<td>{@link de.schlichtherle.truezip.fs.http.FileDriver}</td>
+</tr>
+</tbody>
+</table>
  * <p>
- * When used with the service locator class {@link FsDriverLocator}, this
- * service provider class will register the following URI schemes for use with
- * the TrueZIP Kernel module:
- * <table border="2" cellpadding="4">
- * <thead>
- * <tr>
- * <th>URI Schemes</th>
- * </tr>
- * </thead>
- * <tbody>
- * <tr>
- * <td>{@code http} | {@code https}</td>
- * </tr>
- * </tbody>
- * </table>
+ * Note that the regular expression is actually decomposed into separate
+ * {@link FsScheme} objects which get mapped individually.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
