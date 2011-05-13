@@ -258,7 +258,7 @@ public abstract class ZipRaesDriver extends JarDriver {
      * 
      * @param  model the file system model.
      * @return A URI representing the file system model's mount point.
-     * @see    Issue <a href="http://java.net/jira/browse/TRUEZIP-72">#TRUEZIP-72</a>.
+     * @see    <a href="http://java.net/jira/browse/TRUEZIP-72">#TRUEZIP-72</a>.
      */
     protected URI getMountPointUri(FsModel model) {
         return model.getMountPoint().hierarchicalize();

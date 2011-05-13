@@ -38,7 +38,7 @@ import net.jcip.annotations.Immutable;
 <tbody>
 <tr>
 <td>{@code http|https}</td>
-<td>{@link de.schlichtherle.truezip.fs.http.FileDriver}</td>
+<td>{@link de.schlichtherle.truezip.fs.http.HttpDriver}</td>
 </tr>
 </tbody>
 </table>
