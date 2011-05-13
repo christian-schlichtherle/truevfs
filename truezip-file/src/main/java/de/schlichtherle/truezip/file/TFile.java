@@ -1861,7 +1861,7 @@ public final class TFile extends File {
      */
     @Override
     public boolean exists() {
-        if (innerArchive != null) {
+        if (null != innerArchive) {
             try {
                 return null != innerArchive.getController()
                         .getEntry(getInnerEntryName0());
