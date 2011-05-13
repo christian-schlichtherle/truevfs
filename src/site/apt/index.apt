@@ -34,29 +34,32 @@ Getting Started
     you should really (not kidding this time):
 
     [[1]] Quickly skim over the section
-    {{{./usecases/index.html}Use Cases}} to get an idea if using TrueZIP would
-    benefit your client application and how it all works.
-    If you're still not sure afterwards, then please have a look at the
-    {{{./features.html}Key Features}}.
+        {{{./usecases/index.html}Use Cases}} to get an idea if using TrueZIP would
+        benefit your client application and how it all works.
+        If you're still not sure afterwards, then please have a look at the
+        {{{./features.html}Key Features}}.
 
     [[2]] Read the page about
-    {{{./archetypes.html}Maven Archetypes}} in order to help you setup your
-    project environment correctly and get productive quickly.
+        {{{./archetypes.html}Maven Archetypes}} in order to help you setup your
+        project environment and build an application in about <<ten minutes>>!
 
     [[3]] If you are looking for more sample code and applications,
-    please check the
-    {{{http://java.net/projects/truezip/sources/v7/show/truezip-samples/}source code}}
-    of the module
-    {{{./truezip-samples/index.html}TrueZIP Samples}}.
+        please check the
+        {{{http://java.net/projects/truezip/sources/v7/show/truezip-samples/}source code}}
+        of the module
+        {{{./truezip-samples/index.html}TrueZIP Samples}}.
 
     [[4]] If you encounter issues, please read the
-    {{{./faq.html}FAQ}}
-    before subscribing and posting to the
-    {{{./mail-lists.html}User Mailing List}}.
+        {{{./faq.html}FAQ}}
+        before subscribing and posting to the
+        {{{./mail-lists.html}User Mailing List}}.
+
+    [[5]] Last, but not least, please check the comprehensive
+        {{{./apidocs/index.html}Javadoc}}.
 
     []
 
-    Note that documentation on this site is generally split across modules,
+    Note that the documentation on this site is generally split across modules,
     so please check the section <Project Modules> in the navigation bar on
     this page, too.
 
@@ -64,5 +67,9 @@ Getting Started
     {{{http://truezip.schlichtherle.de}The TrueZIP Blog}}
     or the
     {{{http://java.net/projects/truezip}TrueZIP Developer Website}}.
+
+* Migrating from TrueZIP 6
+
+    There's a {{{./migrating.html}page}} for that, too!
 
     Enjoy TrueZIP!

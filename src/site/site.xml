@@ -29,6 +29,7 @@
             <item name="Compatibility" href="compatibility.html"/>
             <item name="Maven Archetypes" href="archetypes.html"/>
             <item name="FAQ" href="faq.html"/>
+            <item name="Migrating from TrueZIP 6" href="migrating.html"/>
             <item name="TrueZIP 6 (Obsolete)" href="6/index.html" collapse="true">
                 <item name="Tutorial" href="6/tutorial.html"/>
                 <item name="News Archive" href="6/news/index.html" collapse="true">

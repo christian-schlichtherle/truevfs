@@ -30,13 +30,13 @@ import net.jcip.annotations.Immutable;
 <table border="2" cellpadding="4">
 <thead>
 <tr>
-<th>URI Schemes Regular Expression</th>
+<th>URI Schemes</th>
 <th>File System Driver Class</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>{@code tzp|zip.rae|zip.raes}</td>
+<td>{@code tzp}, {@code zip.rae}, {@code zip.raes}</td>
 <td>{@link de.schlichtherle.truezip.fs.archive.zip.raes.SafeZipRaesDriver}</td>
 </tr>
 </tbody>

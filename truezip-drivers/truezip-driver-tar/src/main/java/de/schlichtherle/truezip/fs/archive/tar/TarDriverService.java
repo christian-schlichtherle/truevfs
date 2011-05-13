@@ -28,28 +28,25 @@ import net.jcip.annotations.Immutable;
 <table border="2" cellpadding="4">
 <thead>
 <tr>
-<th>URI Schemes Regular Expression</th>
+<th>URI Schemes</th>
 <th>File System Driver Class</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>{@code tar.bz2|tb2|tbz}</td>
-<td>{@link de.schlichtherle.truezip.fs.archive.tar.TarBZip2Driver}</td>
-</tr>
-<tr>
 <td>{@code tar}</td>
 <td>{@link de.schlichtherle.truezip.fs.archive.tar.TarDriver}</td>
 </tr>
 <tr>
-<td>{@code tar.gz|tgz}</td>
+<td>{@code tar.bz2}, {@code tb2}, {@code tbz}</td>
+<td>{@link de.schlichtherle.truezip.fs.archive.tar.TarBZip2Driver}</td>
+</tr>
+<tr>
+<td>{@code tar.gz}, {@code tgz}</td>
 <td>{@link de.schlichtherle.truezip.fs.archive.tar.TarGZipDriver}</td>
 </tr>
 </tbody>
 </table>
- * <p>
- * Note that the regular expression is actually decomposed into separate
- * {@link FsScheme} objects which get mapped individually.
  *
  * @author  Christian Schlichtherle
  * @version $Id$

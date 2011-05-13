@@ -6,12 +6,16 @@
 
 About TrueZIP Driver FILE
 
-    The file system driver for the FILE scheme.
+    This module contains the file system driver service class
+    {{{../../apidocs/de/schlichtherle/truezip/fs/file/FileDriverService.html}<<<FileDriverService>>>}}
+    which provides the following map of file system drivers:
+
+*--*--*
+||URI Schemes||File System Driver Class|
+*--+--+
+|<<<file>>>|{{{../../apidocs/de/schlichtherle/truezip/fs/file/FileDriver.html}<<<FileDriver>>>}}|
+*--+--+
 
     Add the JAR artifact of this module to the compile-time class path for
     dependency injection to the TrueZIP Kernel module or to the run-time
     class path for service location in the TrueZIP File* module.
-
-    For a documentation which URI schemes get registered by this module for use
-    with the TrueZIP Kernel module, please refer to the Javadoc for the class
-    {{{../../apidocs/de/schlichtherle/truezip/fs/file/FileDriverService.html}<<<FileDriverService>>>}}.
