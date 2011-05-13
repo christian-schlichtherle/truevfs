@@ -31,20 +31,17 @@ import net.jcip.annotations.Immutable;
 <table border="2" cellpadding="4">
 <thead>
 <tr>
-<th>URI Schemes Regular Expression</th>
+<th>URI Schemes</th>
 <th>File System Driver Class</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>{@code http|https}</td>
+<td>{@code http}, {@code https}</td>
 <td>{@link de.schlichtherle.truezip.fs.http.HttpDriver}</td>
 </tr>
 </tbody>
 </table>
- * <p>
- * Note that the regular expression is actually decomposed into separate
- * {@link FsScheme} objects which get mapped individually.
  *
  * @author  Christian Schlichtherle
  * @version $Id$

@@ -24,14 +24,14 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.Immutable;
 
 /**
- * A driver for the operating system's file system.
+ * A file system driver for the FILE scheme.
  * 
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @Immutable
 @DefaultAnnotation(NonNull.class)
-final class FileDriver extends FsDriver {
+public final class FileDriver extends FsDriver {
 
     @Override
     public FsController<?>

@@ -33,7 +33,7 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 @DefaultAnnotation(NonNull.class)
-final class HttpDriver extends FsDriver {
+public final class HttpDriver extends FsDriver {
 
     private final IOPool<?> pool;
 

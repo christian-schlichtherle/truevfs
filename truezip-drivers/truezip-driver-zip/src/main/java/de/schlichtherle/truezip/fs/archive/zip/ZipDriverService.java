@@ -28,26 +28,26 @@ import net.jcip.annotations.Immutable;
 <table border="2" cellpadding="4">
 <thead>
 <tr>
-<th>URI Schemes Regular Expression</th>
+<th>URI Schemes</th>
 <th>File System Driver Class</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>{@code zip}</td>
-<td>{@link de.schlichtherle.truezip.fs.archive.zip.ZipDriver}</td>
-</tr>
-<tr>
-<td>{@code ear|jar|war}</td>
+<td>{@code ear}, {@code jar}, {@code war}</td>
 <td>{@link de.schlichtherle.truezip.fs.archive.zip.JarDriver}</td>
-</tr>
-<tr>
-<td>{@code odb|odf|odg|odm|odp|ods|odt|otg|oth|otp|ots|ott}</td>
-<td>{@link de.schlichtherle.truezip.fs.archive.zip.OdfDriver}</td>
 </tr>
 <tr>
 <td>{@code exe}</td>
 <td>{@link de.schlichtherle.truezip.fs.archive.zip.ReadOnlySfxDriver}</td>
+</tr>
+<tr>
+<td>{@code odb}, {@code odf}, {@code odg}, {@code odm}, {@code odp}, {@code ods}, {@code odt}, {@code otg}, {@code oth}, {@code otp}, {@code ots}, {@code ott}</td>
+<td>{@link de.schlichtherle.truezip.fs.archive.zip.OdfDriver}</td>
+</tr>
+<tr>
+<td>{@code zip}</td>
+<td>{@link de.schlichtherle.truezip.fs.archive.zip.ZipDriver}</td>
 </tr>
 </tbody>
 </table>

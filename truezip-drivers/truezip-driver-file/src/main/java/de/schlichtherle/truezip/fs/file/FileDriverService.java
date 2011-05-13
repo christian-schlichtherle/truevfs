@@ -30,7 +30,7 @@ import net.jcip.annotations.Immutable;
 <table border="2" cellpadding="4">
 <thead>
 <tr>
-<th>URI Schemes Regular Expression</th>
+<th>URI Schemes</th>
 <th>File System Driver Class</th>
 </tr>
 </thead>
@@ -41,9 +41,6 @@ import net.jcip.annotations.Immutable;
 </tr>
 </tbody>
 </table>
- * <p>
- * Note that the regular expression is actually decomposed into separate
- * {@link FsScheme} objects which get mapped individually.
  *
  * @author  Christian Schlichtherle
  * @version $Id$

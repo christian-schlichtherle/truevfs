@@ -19,28 +19,28 @@ Nzip - a Comprehensive Command Line Utility
     You can use this utility to conveniently copy entire directory trees into
     an archive file or from an archive file or any other virtual directory.
 
+*--*--*
+||Command||Description|
 *--+--+
-|| Command || Description |
+|<<<java -cp truezip-${project.version}-jar-with-dependencies.jar Nzip ll truezip-${project.version}-jar-with-dependencies.jar>>>|Prints a detailed listing of the contents of the root directory of the JAR file from which the tool is actually running.|
 *--+--+
-| <<<java -cp truezip-${project.version}-jar-with-dependencies.jar Nzip ll truezip-${project.version}-jar-with-dependencies.jar>>> | Prints a detailed listing of the contents of the root directory of the JAR file from which the tool is actually running. |
+|<<<java -cp truezip-${project.version}-jar-with-dependencies.jar Nzip llr truezip-${project.version}-jar-with-dependencies.jar>>>|Prints a recursive long listing of the contents of the root directory of the JAR file from which the tool is actually running.|
 *--+--+
-| <<<java -cp truezip-${project.version}-jar-with-dependencies.jar Nzip llr truezip-${project.version}-jar-with-dependencies.jar>>> | Prints a recursive long listing of the contents of the root directory of the JAR file from which the tool is actually running. |
+|<<<java -cp truezip-${project.version}-jar-with-dependencies.jar Nzip cp truezip-${project.version}-jar-with-dependencies.jar/de/schlichtherle/truezip/sample/file/app/Nzip.class archive.zip>>>|Copies the file entry <<<de/schlichtherle/truezip/sample/file/app/Nzip.class>>> from the distribution JAR into the ZIP file <<<archive.zip>>>.|
 *--+--+
-| <<<java -cp truezip-${project.version}-jar-with-dependencies.jar Nzip cp truezip-${project.version}-jar-with-dependencies.jar/de/schlichtherle/truezip/sample/file/app/Nzip.class archive.zip>>> | Copies the file entry <<<de/schlichtherle/truezip/sample/file/app/Nzip.class>>> from the distribution JAR into the ZIP file <<<archive.zip>>>. |
+|<<<java -cp truezip-${project.version}-jar-with-dependencies.jar Nzip rm archive.zip/de/schlichtherle/truezip/sample/file/app/Nzip.class>>>|Removes the file entry <<<Nzip.class>>> from <<<archive.zip/de/schlichtherle/truezip/sample/file/app>>>.|
 *--+--+
-| <<<java -cp truezip-${project.version}-jar-with-dependencies.jar Nzip rm archive.zip/de/schlichtherle/truezip/sample/file/app/Nzip.class>>> | Removes the file entry <<<Nzip.class>>> from <<<archive.zip/de/schlichtherle/truezip/sample/file/app>>>. |
+|<<<java -cp truezip-${project.version}-jar-with-dependencies.jar Nzip rmr archive.zip/de>>>|Recursively removes the directory entry <<<de>>> from <<<archive.zip>>>.|
 *--+--+
-| <<<java -cp truezip-${project.version}-jar-with-dependencies.jar Nzip rmr archive.zip/de>>> | Recursively removes the directory entry <<<de>>> from <<<archive.zip>>>. |
+|<<<java -cp truezip-${project.version}-jar-with-dependencies.jar Nzip mkdir archive.zip/dir.zip>>>|Creates the new ZIP file <<<dir.zip>>> in the existing ZIP file <<<archive.zip>>>. Remember that this API treats archive files like directories, so you can simply create a ZIP file by calling the mkdir() method on a File object.|
 *--+--+
-| <<<java -cp truezip-${project.version}-jar-with-dependencies.jar Nzip mkdir archive.zip/dir.zip>>> | Creates the new ZIP file <<<dir.zip>>> in the existing ZIP file <<<archive.zip>>>. Remember that this API treats archive files like directories, so you can simply create a ZIP file by calling the mkdir() method on a File object. |
+|<<<java -cp truezip-${project.version}-jar-with-dependencies.jar Nzip mkdirs archive.zip/a/b.zip/c/d.zip>>>|Creates the new directory <<<a>>> containing the new ZIP file <<<b.zip>>>, containing the new directory <<<c>>> containing the new ZIP file <<<d.zip>>> within the existing <<<archive.zip>>>.|
 *--+--+
-| <<<java -cp truezip-${project.version}-jar-with-dependencies.jar Nzip mkdirs archive.zip/a/b.zip/c/d.zip>>> | Creates the new directory <<<a>>> containing the new ZIP file <<<b.zip>>>, containing the new directory <<<c>>> containing the new ZIP file <<<d.zip>>> within the existing <<<archive.zip>>>. |
+|<<<java -cp truezip-${project.version}-jar-with-dependencies.jar Nzip rm archive.zip/a/b.zip/c/d.zip>>>|Removes the empty ZIP file <<<d.zip>>>. Note that similar to regular directories, this succeeds on empty ZIP files only.|
 *--+--+
-| <<<java -cp truezip-${project.version}-jar-with-dependencies.jar Nzip rm archive.zip/a/b.zip/c/d.zip>>> | Removes the empty ZIP file <<<d.zip>>>. Note that similar to regular directories, this succeeds on empty ZIP files only. |
+|<<<java -cp truezip-${project.version}-jar-with-dependencies.jar Nzip touch archive.zip>>>|Updates the last modification time of the existing ZIP file <<<archive.zip>>> to the current time. Note that if the given file does not exist, it is created as a plain file - you cannot create ZIP files using this method (use mkdir instead).|
 *--+--+
-| <<<java -cp truezip-${project.version}-jar-with-dependencies.jar Nzip touch archive.zip>>> | Updates the last modification time of the existing ZIP file <<<archive.zip>>> to the current time. Note that if the given file does not exist, it is created as a plain file - you cannot create ZIP files using this method (use mkdir instead). |
-*--+--+
-| <<<java -cp truezip-${project.version}-jar-with-dependencies.jar Nzip mv archive.zip/Nzip.class .>>> | Moves the entry <<<Nzip.class>>> from the ZIP file <<<archive.zip>>> to the current directory <<<.>>> . |
+|<<<java -cp truezip-${project.version}-jar-with-dependencies.jar Nzip mv archive.zip/Nzip.class .>>>|Moves the entry <<<Nzip.class>>> from the ZIP file <<<archive.zip>>> to the current directory <<<.>>> .|
 *--+--+
 
     <<Note:>> Although TrueZIP has been designed to provide optimum performance,
