@@ -52,9 +52,7 @@ public abstract class FsDriverService implements FsDriverProvider {
      */
     @Override
     public String toString() {
-        return new StringBuilder()
-                .append(getClass().getName())
-                .toString();
+        return getClass().getName();
     }
 
     /**

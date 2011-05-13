@@ -157,9 +157,9 @@ public final class IOCache {
      * Note that calling this method does <em>not</em> {@link #clear() clear}
      * this cache.
      *
-     * @param input an input socket for reading the entry data from the
-     *        backing store.
-     * @return this
+     * @param  input an input socket for reading the entry data from the
+     *         backing store.
+     * @return {@code this}
      */
     public IOCache configure(final InputSocket<?> input) {
         if (null == input)
@@ -177,9 +177,9 @@ public final class IOCache {
      * Note that calling this method does <em>not</em> {@link #flush() flush}
      * this cache.
      *
-     * @param output an output socket for writing the entry data to the
-     *        backing store.
-     * @return this
+     * @param  output an output socket for writing the entry data to the
+     *         backing store.
+     * @return {@code this}
      */
     public IOCache configure(final OutputSocket<?> output) {
         if (null == output)
@@ -195,7 +195,7 @@ public final class IOCache {
      * E.g. the caching strategy {@link Strategy#WRITE_THROUGH} writes any
      * changed entry data immediately, so calling this method has no effect.
      *
-     * @return this
+     * @return {@code this}
      */
     public IOCache flush() throws IOException {
         if (null == getBuffer()) // DCL does work with volatile fields since JSE 5!
@@ -211,7 +211,7 @@ public final class IOCache {
     /**
      * Discards the entry data in this buffer.
      *
-     * @return this
+     * @return {@code this}
      */
     public IOCache clear() throws IOException {
         synchronized (lock) {

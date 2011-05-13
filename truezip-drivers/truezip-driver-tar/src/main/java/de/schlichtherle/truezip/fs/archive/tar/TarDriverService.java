@@ -17,41 +17,39 @@ package de.schlichtherle.truezip.fs.archive.tar;
 
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
-import de.schlichtherle.truezip.fs.sl.FsDriverLocator;
 import de.schlichtherle.truezip.fs.spi.FsDriverService;
 import de.schlichtherle.truezip.socket.sl.IOPoolLocator;
 import java.util.Map;
 import net.jcip.annotations.Immutable;
 
 /**
- * An immutable container of the drivers for the TAR file format.
+ * An immutable container of a map of drivers for the TAR file format.
+ * The map provided by this service consists of the following entries:
+<table border="2" cellpadding="4">
+<thead>
+<tr>
+<th>URI Schemes Regular Expression</th>
+<th>File System Driver Class</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>{@code tar.bz2|tb2|tbz}</td>
+<td>{@link de.schlichtherle.truezip.fs.archive.tar.TarBZip2Driver}</td>
+</tr>
+<tr>
+<td>{@code tar}</td>
+<td>{@link de.schlichtherle.truezip.fs.archive.tar.TarDriver}</td>
+</tr>
+<tr>
+<td>{@code tar.gz|tgz}</td>
+<td>{@link de.schlichtherle.truezip.fs.archive.tar.TarGZipDriver}</td>
+</tr>
+</tbody>
+</table>
  * <p>
- * When used with the service locator class {@link FsDriverLocator}, this
- * service provider class will register the following URI schemes for use with
- * the TrueZIP Kernel module and the following canonical archive file suffixes
- * for automatic detection by the TrueZIP File* module:
- * <table border="2" cellpadding="4">
- * <thead>
- * <tr>
- * <th>URI Schemes</th>
- * <th>Canonical Archive File Suffixes</th>
- * </tr>
- * </thead>
- * <tbody>
- * <tr>
- * <td>{@code tar}</td>
- * <td>{@code .tar}</td>
- * </tr>
- * <tr>
- * <td>{@code tgz} | {@code tar.gz}</td>
- * <td>{@code .tgz} | {@code .tar.gz}</td>
- * </tr>
- * <tr>
- * <td>{@code tb2} | {@code tbz} | {@code tar.bz2}</td>
- * <td>{@code .tb2} | {@code .tbz} | {@code .tar.bz2}</td>
- * </tr>
- * </tbody>
- * </table>
+ * Note that the regular expression is actually decomposed into separate
+ * {@link FsScheme} objects which get mapped individually.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -62,8 +60,8 @@ public final class TarDriverService extends FsDriverService {
     private static final Map<FsScheme, FsDriver>
             DRIVERS = newMap(new Object[][] {
                 { "tar", new TarDriver(IOPoolLocator.SINGLETON) },
-                { "tgz|tar.gz", new TarGZipDriver(IOPoolLocator.SINGLETON) },
-                { "tb2|tbz|tar.bz2", new TarBZip2Driver(IOPoolLocator.SINGLETON) },
+                { "tar.gz|tgz", new TarGZipDriver(IOPoolLocator.SINGLETON) },
+                { "tar.bz2|tb2|tbz", new TarBZip2Driver(IOPoolLocator.SINGLETON) },
             });
 
     @Override

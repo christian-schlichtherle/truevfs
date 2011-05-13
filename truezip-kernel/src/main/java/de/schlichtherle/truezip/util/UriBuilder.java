@@ -112,7 +112,7 @@ public final class UriBuilder {
      * Calling this method is effectively the same as setting all URI component
      * properties to {@code null}.
      * 
-     * @return this
+     * @return {@code this}
      */
     public UriBuilder clear() {
         //uri = null;
@@ -273,7 +273,7 @@ public final class UriBuilder {
      * @param  uri the URI string.
      * @throws IllegalArgumentException if {@code uri} does not conform to the
      *         syntax constraints of the {@link URI} class.
-     * @return this
+     * @return {@code this}
      */
     public UriBuilder string(String uri) {
         setString(uri);
@@ -338,7 +338,7 @@ public final class UriBuilder {
      * Initializes all URI components from the given URI.
      * 
      * @param  uri the URI.
-     * @return this
+     * @return {@code this}
      */
     public UriBuilder uri(URI uri) {
         setUri(uri);
@@ -368,7 +368,7 @@ public final class UriBuilder {
      * Sets the URI scheme component.
      *
      * @param  scheme the URI scheme component.
-     * @return this
+     * @return {@code this}
      */
     public UriBuilder scheme(@CheckForNull String scheme) {
         setScheme(scheme);
@@ -400,7 +400,7 @@ public final class UriBuilder {
      * Sets the URI authority component.
      *
      * @param  authority the URI authority component.
-     * @return this
+     * @return {@code this}
      */
     public UriBuilder authority(@CheckForNull String authority) {
         setAuthority(authority);
@@ -433,7 +433,7 @@ public final class UriBuilder {
      * Sets the URI path component.
      *
      * @param  path the URI path component.
-     * @return this
+     * @return {@code this}
      */
     public UriBuilder path(@CheckForNull String path) {
         setPath(path);
@@ -465,7 +465,7 @@ public final class UriBuilder {
      * Sets the URI query component.
      *
      * @param  query the URI query component.
-     * @return this
+     * @return {@code this}
      */
     public UriBuilder query(@CheckForNull String query) {
         setQuery(query);
@@ -495,7 +495,7 @@ public final class UriBuilder {
      * Sets the URI fragment component.
      *
      * @param  fragment the URI fragment component.
-     * @return this
+     * @return {@code this}
      */
     public UriBuilder fragment(@CheckForNull String fragment) {
         setFragment(fragment);
