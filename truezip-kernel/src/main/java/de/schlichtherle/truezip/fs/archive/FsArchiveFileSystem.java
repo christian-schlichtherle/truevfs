@@ -227,8 +227,11 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
     /**
      * Returns {@code true} if and only if this archive file system is
      * read-only.
-     * This method is provided for inheritance - the implementation in this
-     * class always returns {@code false}.
+     * <p>
+     * The implementation in the class {@link FsArchiveFileSystem} always
+     * returns {@code false}.
+     * 
+     * @return Whether or not the this archive file system is read-only.
      */
     boolean isReadOnly() {
         return false;
@@ -237,6 +240,9 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
     /**
      * Returns {@code true} if and only if this archive file system has been
      * modified since its time of creation.
+     * 
+     * @return {@code true} if and only if this archive file system has been
+     *         modified since its time of creation.
      */
     boolean isTouched() {
         return touched;
@@ -247,8 +253,8 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
      * entries are properly initialized and marks this (virtual) archive
      * file system as touched.
      *
-     * @throws ArchiveReadOnlyExceptionn If this (virtual) archive file system
-     *         is read only.
+     * @throws FsReadOnlyArchiveFileSystemException If this (virtual) archive
+     *         file system is read only.
      * @throws FsArchiveFileSystemException If the listener vetoed the beforeTouch
      *         operation for any reason.
      */
@@ -329,8 +335,6 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
      * @param type the type of the archive file system entry to create.
      * @param template the nullable template for the archive file system entry
      *        to create.
-     * @throws AssertionError if a {@link CharConversionException}
-     *         occurs. The original exception is wrapped as its cause.
      */
     private FsArchiveFileSystemEntry<E> newEntryUnchecked(
             final FsEntryName name,
@@ -480,7 +484,7 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
             links = newSegmentLinks(name, type, template, 1);
         }
 
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings({ "unchecked", "all" })
         private SegmentLink<E>[] newSegmentLinks(
                 final FsEntryName entryName,
                 final Entry.Type entryType,
@@ -587,8 +591,8 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
      * deletion.
      *
      * @param  name the archive file system entry name.
-     * @throws ArchiveReadOnlyExceptionn If this (virtual) archive file system
-     *         is read-only.
+     * @throws FsReadOnlyArchiveFileSystemException If this (virtual) archive
+     *         file system is read-only.
      * @throws FsArchiveFileSystemException If the operation fails for some other
      *         reason.
      */
@@ -776,11 +780,11 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
         private final de.schlichtherle.truezip.io.Paths.Splitter
                 splitter = new de.schlichtherle.truezip.io.Paths.Splitter(SEPARATOR_CHAR, false);
 
-        final void split(FsEntryName name) {
+        void split(FsEntryName name) {
             splitter.split(name.getPath());
         }
 
-        final FsEntryName getParentName() {
+        FsEntryName getParentName() {
             String path = splitter.getParentPath();
             try {
                 return null == path
@@ -792,7 +796,7 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
             }
         }
 
-        final String getMemberName() {
+        String getMemberName() {
             return splitter.getMemberName();
         }
     } // class Splitter
