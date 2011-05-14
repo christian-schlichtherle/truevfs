@@ -404,7 +404,7 @@ public class FsPathTest {
             { "bar", "bar" },
         }) {
             final FsPath path = FsPath.create(params[0]);
-            final URI hierarchical = path.hierarchicalize();
+            final URI hierarchical = path.getHierarchicalUri();
             assertThat(hierarchical, equalTo(URI.create(params[1])));
         }
     }

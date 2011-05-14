@@ -78,7 +78,7 @@ public final class KeyManagement {
         KeyManagerLocator
                 .SINGLETON
                 .get(AesCipherParameters.class)
-                .getKeyProvider(file.toFsPath().hierarchicalize()) // http://java.net/jira/browse/TRUEZIP-72
+                .getKeyProvider(file.toFsPath().getHierarchicalUri()) // http://java.net/jira/browse/TRUEZIP-72
                 .setKey(params);
     }
 // END SNIPPET: setPassword

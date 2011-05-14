@@ -157,8 +157,8 @@ public final class FsDefaultManager extends FsManager {
         @Override
         public int compare( FsController<?> l,
                             FsController<?> r) {
-            return r.getModel().getMountPoint().hierarchicalize()
-                    .compareTo(l.getModel().getMountPoint().hierarchicalize());
+            return r.getModel().getMountPoint().getHierarchicalUri()
+                    .compareTo(l.getModel().getMountPoint().getHierarchicalUri());
         }
     };
 }
