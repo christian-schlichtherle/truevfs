@@ -565,7 +565,6 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
         /**
          * Constructs a new {@code SegmentLink}.
          *
-         * @param name the entry name.
          * @param base the nullable base name of the entry name.
          * @param entry the non-{@code null} file system entry for the entry
          *        name.
