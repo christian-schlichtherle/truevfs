@@ -122,21 +122,31 @@ Migrating from TrueZIP 6
     There is no one-to-one mapping for this, so your best option is to catch
     or declare to throw only <<<IOException>>> objects.
 
-* Optional: Configure Archive Detection
+    In case your application is using RAES encrypted ZIP files
+    (alias ZIP.RAES alias TZP) and programmatically sets authentication
+    passwords, you need to migrate the key management part of your
+    application, too.
+    In the documentation of the module TrueZIP Samples, there's an article
+    about
+    {{{./truezip-samples/key-management.html}key management}}
+    which demonstrates this.
+
+** Optional: Configure Archive Detection
 
     Once you've set up your run time class path correctly, it should not be
     necessary to configure archive detection because TrueZIP 7 supports the
     convention-over-configuration paradigm.
 
     One notable exception is if you need to detect custom archive file formats.
-    There's a {{{./usecases/aff.html}use case}} for this which may serve as an
-    example.
-    As you can see in this use case, you need to pass the
+    There's a use case article for
+    {{{./usecases/aff.html}application file formats}}
+    which demonstrates this.
+    As you can see in this article, you simply need to pass the
     {{{./apidocs/de/schlichtherle/truezip/socket/sl/IOPoolLocator.html#SINGLETON}<<<IOPoolLocator.SINGLETON>>>}}
-    to the archive driver constructors now in order to obtain their old
+    to the archive driver constructors now in order to obtain their usual
     behaviour.
 
-* Cross Fingers
+* Build Project
 
     Now cross fingers and build your project.
     If it compiles, chances are that it will work straigt away because the
