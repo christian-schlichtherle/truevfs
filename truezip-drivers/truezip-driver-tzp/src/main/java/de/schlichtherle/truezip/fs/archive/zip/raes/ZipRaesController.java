@@ -110,7 +110,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         if (name.isRoot())
             driver  .getKeyManager()
                     .removeKeyProvider(
-                        driver.getMountPointUri(getModel()));
+                        driver.toMountPointResource(getModel()));
     }
 
     @Override
@@ -123,6 +123,6 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                 .sync(
                     driver  .getKeyManager()
                             .getKeyProvider(
-                                driver.getMountPointUri(getModel())));
+                                driver.toMountPointResource(getModel())));
     }
 }

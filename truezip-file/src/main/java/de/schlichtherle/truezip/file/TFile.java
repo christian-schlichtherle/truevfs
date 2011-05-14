@@ -616,7 +616,7 @@ public final class TFile extends File {
     }
 
     private TFile(FsPath path, TArchiveDetector detector) {
-        super(path.hierarchicalize());
+        super(path.getHierarchicalUri());
         parse(path, detector);
     }
 
@@ -658,7 +658,7 @@ public final class TFile extends File {
     @SuppressWarnings("LeakingThisInConstructor")
     private TFile(  final FsMountPoint mountPoint,
                     TArchiveDetector detector) {
-        super(mountPoint.hierarchicalize());
+        super(mountPoint.getHierarchicalUri());
 
         this.delegate = new File(super.getPath());
         this.detector = detector;
@@ -1701,13 +1701,13 @@ public final class TFile extends File {
      * <p>
      * More formally, let {@code a} and {@code b} be two TFile objects.
      * Then if the expression
-     * {@code a.toFsPath().hierarchicalize().equals(b.toFsPath().hierarchicalize())}
+     * {@code a.toFsPath().getHierarchicalUri().equals(b.toFsPath().getHierarchicalUri())}
      * is true, the expression {@code a.equals(b)} is also true.
      * <p>
      * Note that this does <em>not</em> work vice versa:
      * E.g. on Windows, the expression
      * {@code new TFile("file").equals(new TFile("FILE"))} is true, but
-     * {@code new TFile("file").toFsPath().hierarchicalize().equals(new TFile("FILE").toFsPath().hierarchicalize())}
+     * {@code new TFile("file").toFsPath().getHierarchicalUri().equals(new TFile("FILE").toFsPath().getHierarchicalUri())}
      * is false because {@link FsPath#equals(Object)} is case sensitive.
      *
      * @see #hashCode()
@@ -1725,7 +1725,6 @@ public final class TFile extends File {
      * The implementation in the class {@link TFile} delegates the call to its
      * {@link #getFile() decorated file}.
      * This implies that only the hierarchicalized file system path
-     * Note that this implies that only the hierarchicalized file system path
      * of this file instance is considered in the comparison.
      * E.g. {@code new TFile(FsPath.create("zip:file:/archive!/entry"))} and
      * {@code new TFile(FsPath.create("tar:file:/archive!/entry"))} would
@@ -1734,13 +1733,13 @@ public final class TFile extends File {
      * <p>
      * More formally, let {@code a} and {@code b} be two TFile objects.
      * Then if the expression
-     * {@code a.toFsPath().hierarchicalize().compareTo(b.toFsPath().hierarchicalize()) == 0}
+     * {@code a.toFsPath().getHierarchicalUri().compareTo(b.toFsPath().getHierarchicalUri()) == 0}
      * is true, the expression {@code a.compareTo(b) == 0} is also true.
      * <p>
      * Note that this does <em>not</em> work vice versa:
      * E.g. on Windows, the expression
      * {@code new TFile("file").compareTo(new TFile("FILE")) == 0} is true, but
-     * {@code new TFile("file").toFsPath().hierarchicalize().compareTo(new TFile("FILE").toFsPath().hierarchicalize()) == 0}
+     * {@code new TFile("file").toFsPath().getHierarchicalUri().compareTo(new TFile("FILE").toFsPath().getHierarchicalUri()) == 0}
      * is false because {@link FsPath#equals(Object)} is case sensitive.
      *
      * @see #equals(Object)

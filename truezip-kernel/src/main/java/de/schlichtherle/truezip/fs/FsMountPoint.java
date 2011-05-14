@@ -409,6 +409,26 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
     }
 
     /**
+     * Returns a URI which is recursively transformed from the URI of this
+     * mount point so that it's absolute and hierarchical.
+     * If this mount point is already in hierarchical form, its URI is returned.
+     * <p>
+     * For example, the mount point URIs {@code zip:file:/archive!/} and
+     * {@code tar:file:/archive!/} would both produce the hierarchical URI
+     * {@code file:/archive}.
+     *
+     * @return A URI which is recursively transformed from the URI of this
+     *         mount point so that it's absolute and hierarchical.
+     */
+    public URI getHierarchicalUri() {
+        return null != hierarchical
+                ? hierarchical
+                : (hierarchical = !uri.isOpaque()
+                    ? uri
+                    : path.getHierarchicalUri());
+    }
+
+    /**
      * Returns the scheme component.
      *
      * @return The scheme component.
@@ -450,26 +470,6 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
     public FsPath
     resolve(FsEntryName entryName) {
         return new FsPath(this, entryName);
-    }
-
-    /**
-     * Returns a URI which is recursively transformed from the URI of this
-     * mount point so that it's absolute and hierarchical.
-     * If this mount point is already in hierarchical form, its URI is returned.
-     * <p>
-     * For example, the mount point URIs {@code zip:file:/archive!/} and
-     * {@code tar:file:/archive!/} would both produce the hierarchicalized
-     * URI {@code file:/archive}.
-     *
-     * @return A URI which is transformed from the URI of this mount point so
-     *         that it's absolute and hierarchical.
-     */
-    public URI hierarchicalize() {
-        return null != hierarchical
-                ? hierarchical
-                : (hierarchical = !uri.isOpaque()
-                    ? uri
-                    : path.hierarchicalize());
     }
 
     /**

@@ -334,9 +334,9 @@ public class FsMountPointTest {
             { "foo:/bar/", "foo:/bar/" },
         }) {
             final FsMountPoint mp = FsMountPoint.create(params[0]);
-            final URI hmp = mp.hierarchicalize();
+            final URI hmp = mp.getHierarchicalUri();
             final FsPath p = FsPath.create(params[0]);
-            final URI hp = p.hierarchicalize();
+            final URI hp = p.getHierarchicalUri();
             assertThat(hmp, equalTo(URI.create(params[1])));
             assertThat(hmp, equalTo(hp));
         }

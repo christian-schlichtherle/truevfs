@@ -238,7 +238,7 @@ public abstract class ZipRaesDriver extends JarDriver {
     final RaesParameters getRaesParameters(FsModel model) {
         return new KeyManagerRaesParameters(
                 getKeyManager(),
-                getMountPointUri(model));
+                toMountPointResource(model));
     }
 
     final KeyManager<AesCipherParameters> getKeyManager() {
@@ -246,13 +246,13 @@ public abstract class ZipRaesDriver extends JarDriver {
     }
 
     /**
-     * Returns a URI which represents the mount point of the given file system
-     * model.
-     * Mind that this URI needs to be matched when setting a password
+     * Returns a URI which represents the mount point of the given model as a
+     * resource URI for looking up a {@link KeyProvider}.
+     * Note that this URI needs to be matched exactly when setting a password
      * programmatically!
      * <p>
      * The implementation in the class {@link ZipRaesDriver} returns the
-     * expression {@code model.getMountPoint().hierarchicalize()}
+     * expression {@code model.getMountPoint().getHierarchicalUri()}
      * in order to improve the readability of the URI in comparison to the
      * expression {@code model.getMountPoint().getUri()}.
      * 
@@ -260,9 +260,8 @@ public abstract class ZipRaesDriver extends JarDriver {
      * @return A URI representing the file system model's mount point.
      * @see    <a href="http://java.net/jira/browse/TRUEZIP-72">#TRUEZIP-72</a>
      */
-    protected URI getMountPointUri(FsModel model) {
-        return model.getMountPoint().hierarchicalize();
-        //return model.getMountPoint().getUri();
+    protected URI toMountPointResource(FsModel model) {
+        return model.getMountPoint().getHierarchicalUri();
     }
 
     /**

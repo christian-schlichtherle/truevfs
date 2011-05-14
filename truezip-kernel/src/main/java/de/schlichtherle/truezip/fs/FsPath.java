@@ -390,6 +390,39 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
     }
 
     /**
+     * Returns a URI which is recursively transformed from the URI of this
+     * path so that it's absolute and hierarchical.
+     * If this path is already in hierarchical form, its URI is returned.
+     * <p>
+     * For example, the path URIs {@code zip:file:/archive!/entry} and
+     * {@code tar:file:/archive!/entry} would both produce the hierarchical URI
+     * {@code file:/archive/entry}.
+     *
+     * @return A URI which is recursively transformed from the URI of this
+     *         path so that it's absolute and hierarchical.
+     */
+    public URI getHierarchicalUri() {
+        if (null != hierarchical)
+            return hierarchical;
+        if (uri.isOpaque()) {
+            final URI mpu = mountPoint.getHierarchicalUri();
+            final URI enu = entryName.getUri();
+            try {
+                return hierarchical = enu.toString().isEmpty()
+                        ? mpu
+                        : new UriBuilder(mpu)
+                            .path(mpu.getPath() + FsEntryName.SEPARATOR)
+                            .getUri()
+                            .resolve(enu);
+            } catch (URISyntaxException ex) {
+                throw new AssertionError(ex);
+            }
+        } else {
+            return hierarchical = uri;
+        }
+    }
+
+    /**
      * Returns the mount point component or {@code null} iff this path's
      * {@link #getUri() URI} is not absolute.
      *
@@ -420,38 +453,6 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
         return new FsPath(
                 this.mountPoint,
                 new FsEntryName(this.entryName, entryName));
-    }
-
-    /**
-     * Returns a URI which is recursively transformed from the URI of this
-     * path so that it's absolute and hierarchical.
-     * If this path is already in hierarchical form, its URI is returned.
-     * <p>
-     * For example, the path URIs {@code zip:file:/archive!/entry} and
-     * {@code tar:file:/archive!/entry} would both produce the hierarchicalized
-     * path with the URI {@code file:/archive/entry}.
-     *
-     * @return A hierarchical URI for this path.
-     */
-    public URI hierarchicalize() {
-        if (null != hierarchical)
-            return hierarchical;
-        if (uri.isOpaque()) {
-            final URI mpu = mountPoint.hierarchicalize();
-            final URI enu = entryName.getUri();
-            try {
-                return hierarchical = enu.toString().isEmpty()
-                        ? mpu
-                        : new UriBuilder(mpu)
-                            .path(mpu.getPath() + FsEntryName.SEPARATOR)
-                            .getUri()
-                            .resolve(enu);
-            } catch (URISyntaxException ex) {
-                throw new AssertionError(ex);
-            }
-        } else {
-            return hierarchical = uri;
-        }
     }
 
     /**
