@@ -72,7 +72,7 @@ project
     your specific project requirements.
 
     [<<<src/main/java/com/company/project/Application.java>>>]
-    An abstract base class which runs the setup-work-sync lifecycle for a
+    An abstract base class which runs the setup-work-sync life cycle for a
     typical TrueZIP application.
     Subclass or edit this template class to meet your requirements.
 
