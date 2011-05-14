@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Iterator;
 import net.jcip.annotations.Immutable;
-import net.jcip.annotations.ThreadSafe;
 
 /**
  * A type-safe, immutable set of enums which emulates the concept of a bit

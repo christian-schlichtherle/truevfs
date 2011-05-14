@@ -77,7 +77,8 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
         return entry;
     }
 
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
     public OutputStream newOutputStream() throws IOException {
         final File entryFile = entry.getFile();

@@ -87,7 +87,8 @@ public class UriCodecTest {
         }
     }
 
-    @Test
+    @SuppressWarnings("unchecked")
+	@Test
     public void testRoundTrip() {
         for (final Object[] test : new Object[][] {
             { EnumSet.allOf(Encoding.class), "\ufffd", "%EF%BF%BD" }, // replacement character

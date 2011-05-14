@@ -18,7 +18,6 @@ package de.schlichtherle.truezip.entry;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Iterator;
-import net.jcip.annotations.NotThreadSafe;
 
 /**
  * An iterable container for entries.

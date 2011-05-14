@@ -18,7 +18,6 @@ package de.schlichtherle.truezip.socket;
 import de.schlichtherle.truezip.entry.EntryContainer;
 import de.schlichtherle.truezip.entry.Entry;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import net.jcip.annotations.NotThreadSafe;
 
 /**
  * A service for output sockets.

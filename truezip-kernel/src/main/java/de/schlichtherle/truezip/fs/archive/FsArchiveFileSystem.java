@@ -463,7 +463,7 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
      * the call to the {@link #run} method, which may render the operation
      * illegal and corrupt the file system.
      * As long as only the ArchiveControllers in the package
-     * de.schlichtherle.truezip.fs.archive.controller are used, this should not
+     * de.schlichtherle.truezip.fs.archive are used, this should not
      * happen, however.
      */
     private final class PathLink implements FsArchiveFileSystemOperation<E> {
@@ -480,7 +480,7 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
             links = newSegmentLinks(name, type, template, 1);
         }
 
-        @SuppressWarnings({ "unchecked", "rawtypes" })
+        @SuppressWarnings("unchecked")
         private SegmentLink<E>[] newSegmentLinks(
                 final FsEntryName entryName,
                 final Entry.Type entryType,
@@ -501,15 +501,15 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
                     throw new FsArchiveFileSystemException(entryName.toString(),
                             "parent entry must be a directory");
                 elements = new SegmentLink[level + 1];
-                elements[0] = new SegmentLink<E>(parentName, null, parentEntry);
+                elements[0] = new SegmentLink<E>(null, parentEntry);
                 newEntry = newEntryChecked(entryName, entryType, template);
-                elements[1] = new SegmentLink<E>(entryName, memberName, newEntry);
+                elements[1] = new SegmentLink<E>(memberName, newEntry);
             } else if (createParents) {
                 elements = newSegmentLinks(
                         parentName, DIRECTORY, null, level + 1);
                 newEntry = newEntryChecked(entryName, entryType, template);
                 elements[elements.length - level]
-                        = new SegmentLink<E>(entryName, memberName, newEntry);
+                        = new SegmentLink<E>(memberName, newEntry);
             } else {
                 throw new FsArchiveFileSystemException(entryName.toString(),
                         "missing parent directory entry");
@@ -526,7 +526,6 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
             FsArchiveFileSystemEntry<E> parent = links[0].entry;
             for (int i = 1; i < l ; i++) {
                 final SegmentLink<E> link = links[i];
-                final FsEntryName name = link.name;
                 final FsArchiveFileSystemEntry<E> entry = link.entry;
                 final String member = link.base;
                 assert DIRECTORY == parent.getType();
@@ -556,7 +555,6 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
      */
     private static final class SegmentLink<E extends FsArchiveEntry>
     implements Link<FsArchiveFileSystemEntry<E>> {
-        final FsEntryName name;
         final @CheckForNull String base;
         final FsArchiveFileSystemEntry<E> entry;
 
@@ -569,10 +567,8 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
          *        name.
          */
         SegmentLink(
-                final FsEntryName name,
                 final @CheckForNull String base,
                 final FsArchiveFileSystemEntry<E> entry) {
-            this.name = name;
             this.entry = entry;
             this.base = base;
         }

@@ -15,9 +15,6 @@
  */
 package de.schlichtherle.truezip.socket;
 
-import de.schlichtherle.truezip.entry.Entry.Access;
-import de.schlichtherle.truezip.entry.Entry.Size;
-import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.rof.ByteArrayReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import edu.umd.cs.findbugs.annotations.CheckForNull;

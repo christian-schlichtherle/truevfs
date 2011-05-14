@@ -375,7 +375,6 @@ public class TArchiveDetectorTest {
         });
     }
 
-    @SuppressWarnings("deprecation")
     private void assertDefaultArchiveDetector(
             TArchiveDetector detector,
             final Object[] args) {
@@ -405,7 +404,6 @@ public class TArchiveDetectorTest {
         }
     }
 
-    @SuppressWarnings("deprecation")
     private void assertDefaultArchiveDetector(
             final TArchiveDetector detector,
             final FsDriver result,
