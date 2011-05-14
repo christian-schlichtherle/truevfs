@@ -33,15 +33,15 @@ import de.schlichtherle.truezip.fs.FsSyncException;
 //import de.schlichtherle.truezip.socket.sl.IOPoolLocator;
 
 /**
- * An abstract base class which runs the setup-work-sync lifecycle for a
+ * An abstract base class which runs the setup-work-sync life cycle for a
  * typical TrueZIP application.
  * Subclass or edit this template class to meet your requirements.
  * <p>
- * The typical lifecycle of a TrueZIP application consists of the
+ * The typical life cycle of a TrueZIP application consists of the
  * {@link #setup()} phase and one or more iterations of the {@link #work()}
  * and {@link #sync()} phases.
- * Thus, this lifecycle may simply get referenced as the
- * <i>setup-work-sync lifecycle</i>.
+ * Thus, this life cycle may simply get referenced as the
+ * <i>setup-work-sync life cycle</i>.
  * 
  * @param <E> the {@link Exception} class to throw by {@link #work} and
  *       {@link #run}.
@@ -51,7 +51,7 @@ import de.schlichtherle.truezip.fs.FsSyncException;
 abstract class Application<E extends Exception> {
 
     /**
-     * Runs the setup-work-sync lifecycle.
+     * Runs the setup-work-sync life cycle.
      * At first, this method calls {@link #setup()}.
      * Then, a loop is entered which calls {@link #work()} and (in a finally
      * block) {@link #sync()}.
@@ -86,7 +86,7 @@ abstract class Application<E extends Exception> {
      * <p>
      * This method is {@link #run() run} only once at the start of the life
      * cycle.
-     * Its task is to configure the default behaviour of the File* API
+     * Its task is to configure the default behavior of the File* API
      * in order to answer the following questions:
      * <ul>
      * <li>What are the file suffixes which shall be recognized as archive
