@@ -15,8 +15,6 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import java.io.InputStream;
 import de.schlichtherle.truezip.socket.IOCache.Strategy;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.entry.Entry;
@@ -316,7 +314,7 @@ extends FsDecoratingController< FsConcurrentModel,
         }
 
         /** An input socket proxy. */
-        private class ProxyInputSocket
+        /*private class ProxyInputSocket
         extends DecoratingInputSocket<Entry> {
             ProxyInputSocket(InputSocket <?> input) {
                 super(input);
@@ -341,7 +339,7 @@ extends FsDecoratingController< FsConcurrentModel,
                 model.setTouched(true);
                 return in;
             }
-        } // class ProxyInputSocket
+        } // class ProxyInputSocket*/
 
         OutputSocket<?> getOutputSocket() {
             final OutputSocket<?> output = this.output;

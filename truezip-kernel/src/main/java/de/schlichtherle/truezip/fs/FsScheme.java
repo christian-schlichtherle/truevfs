@@ -17,7 +17,6 @@ package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.util.UriBuilder;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.util.Locale;

@@ -17,7 +17,6 @@ package de.schlichtherle.truezip.fs;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 
 /**

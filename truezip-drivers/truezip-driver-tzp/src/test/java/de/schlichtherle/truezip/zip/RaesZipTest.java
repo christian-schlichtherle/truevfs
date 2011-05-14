@@ -18,20 +18,13 @@ package de.schlichtherle.truezip.zip;
 import de.schlichtherle.truezip.crypto.raes.MockType0RaesParameters;
 import de.schlichtherle.truezip.crypto.raes.RaesOutputStream;
 import de.schlichtherle.truezip.crypto.raes.RaesParameters;
-import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters;
 import de.schlichtherle.truezip.crypto.raes.RaesReadOnlyFile;
-import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
-import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import static org.junit.Assert.*;
 
 /**
  * Tests compression and encryption of data.

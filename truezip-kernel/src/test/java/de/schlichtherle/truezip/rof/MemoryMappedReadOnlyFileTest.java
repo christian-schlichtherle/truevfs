@@ -18,7 +18,6 @@ package de.schlichtherle.truezip.rof;
 
 import java.io.File;
 import java.io.IOException;
-import org.junit.After;
 
 /**
  * @author Christian Schlichtherle

@@ -17,7 +17,6 @@ package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.entry.Entry;
 import java.io.Closeable;
-import net.jcip.annotations.NotThreadSafe;
 
 /**
  * A closable output service.

@@ -127,10 +127,10 @@ extends FsController<FsConcurrentModel> {
      *        directory is created with its last modification time set to the
      *        system's current time.
      * @return A valid archive file system - {@code null} is never returned.
-     * @throws FsFalsePositiveException
      */
-    abstract FsArchiveFileSystem<E> autoMount(boolean autoCreate,
-                                            BitField<FsOutputOption> options)
+    abstract FsArchiveFileSystem<E> autoMount(
+            boolean autoCreate,
+            BitField<FsOutputOption> options)
     throws IOException;
 
     @Override
@@ -172,17 +172,14 @@ extends FsController<FsConcurrentModel> {
     public final InputSocket<?> getInputSocket(
             FsEntryName name,
             BitField<FsInputOption> options) {
-        return new Input(name, options);
+        return new Input(name);
     }
 
     private class Input extends InputSocket<Entry> {
         final FsEntryName name;
-        final BitField<FsInputOption> options;
 
-        Input(  final FsEntryName name,
-                final BitField<FsInputOption> options) {
+        Input(final FsEntryName name) {
             this.name = name;
-            this.options = options;
         }
 
         @Override

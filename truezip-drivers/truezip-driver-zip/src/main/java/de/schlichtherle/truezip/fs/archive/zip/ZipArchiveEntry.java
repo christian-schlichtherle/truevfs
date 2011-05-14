@@ -36,9 +36,6 @@ import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
  */
 @DefaultAnnotation(NonNull.class)
 public class ZipArchiveEntry extends ZipEntry implements FsArchiveEntry {
-    static {
-        assert ZipEntry.UNKNOWN == FsArchiveEntry.UNKNOWN;
-    }
 
     ZipArchiveEntry(String name) {
         super(name);

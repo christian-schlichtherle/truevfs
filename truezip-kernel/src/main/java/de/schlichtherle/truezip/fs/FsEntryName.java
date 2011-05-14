@@ -25,7 +25,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import net.jcip.annotations.Immutable;
 
-import static de.schlichtherle.truezip.fs.FsEntryName.SEPARATOR;
 import static de.schlichtherle.truezip.fs.FsUriModifier.*;
 import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
 

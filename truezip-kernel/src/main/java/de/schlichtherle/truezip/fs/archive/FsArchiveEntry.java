@@ -38,8 +38,8 @@ public interface FsArchiveEntry extends Entry {
      * @param  value the size of the given size type for this archive entry in
      *         bytes or
      *         {@value de.schlichtherle.truezip.entry.Entry#UNKNOWN}.
-     * @return {@code true} on success, {@code false} otherwise, e.g. if the
-     *         type is unsupported.
+     * @return {@code false} if and only if setting a size for the given type
+     *         is unsupported.
      * @throws NullPointerException if {@code type} is {@code null}.
      * @throws IllegalArgumentException if {@code value} is negative and not
      *         {@value de.schlichtherle.truezip.entry.Entry#UNKNOWN}.
@@ -53,8 +53,8 @@ public interface FsArchiveEntry extends Entry {
      * @param  value the last time of the given access type for this archive
      *         entry in milliseconds since the epoch or
      *         {@value de.schlichtherle.truezip.entry.Entry#UNKNOWN}.
-     * @return {@code true} on success, {@code false} otherwise, e.g. if the
-     *         given type is unsupported.
+     * @return {@code false} if and only if setting a time for the given type
+     *         is unsupported.
      * @throws NullPointerException if {@code type} is {@code null}.
      * @throws IllegalArgumentException if {@code value} is negative and not
      *         {@value de.schlichtherle.truezip.entry.Entry#UNKNOWN}.

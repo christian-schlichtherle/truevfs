@@ -21,7 +21,6 @@ import java.io.File;
 import de.schlichtherle.truezip.fs.archive.zip.raes.SafeZipRaesDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.fs.archive.zip.raes.PromptingKeyManagerService;
-import de.schlichtherle.truezip.fs.archive.zip.raes.ZipRaesDriver.KeyProviderSyncStrategy;
 import java.io.IOException;
 import org.junit.Test;
 

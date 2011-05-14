@@ -24,6 +24,7 @@ import java.beans.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@SuppressWarnings("StaticNonFinalUsedInInitialization")
 public class BitFieldBeanInfo extends SimpleBeanInfo {
 
     // Bean descriptor//GEN-FIRST:BeanDescriptor
@@ -38,7 +39,7 @@ public class BitFieldBeanInfo extends SimpleBeanInfo {
         final PersistenceDelegate pd = new PersistenceDelegate() {
             @Override
             protected Expression instantiate(Object oldInstance, Encoder out) {
-                final BitField bitField = (BitField) oldInstance;
+                final BitField<?> bitField = (BitField<?>) oldInstance;
                 return new Expression(
                     bitField,
                     bitField.getClass(),

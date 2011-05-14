@@ -19,8 +19,6 @@ import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.netbeans.jemmy.JemmyProperties;
-import org.netbeans.jemmy.TestOut;
 import org.netbeans.jemmy.operators.JComboBoxOperator;
 import org.netbeans.jemmy.operators.JFrameOperator;
 

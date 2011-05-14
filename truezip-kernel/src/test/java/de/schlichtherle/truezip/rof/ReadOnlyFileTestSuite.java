@@ -52,10 +52,6 @@ public abstract class ReadOnlyFileTestSuite {
         rnd.nextBytes(DATA);
     }
 
-    private static String mb(long value) {
-        return ((value - 1 + 1024 * 1024) / (1024 * 1024)) + " MB"; // round up
-    }
-
     /** The temporary file with the test data. */
     private File temp;
 

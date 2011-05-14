@@ -132,9 +132,9 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
      * streams will throw an {@code IOException}, with the exception of
      * their {@code close()} method.
      */
-    public synchronized final <E extends Exception>
-    void closeAll(final ExceptionHandler<IOException, E> handler)
-    throws E {
+    public synchronized final <X extends Exception>
+    void closeAll(final ExceptionHandler<IOException, X> handler)
+    throws X {
         if (closed)
             return;
         for (Iterator<Closeable> i = threads.keySet().iterator(); i.hasNext(); ) {
