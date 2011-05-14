@@ -46,7 +46,12 @@ extends FsArchiveFileSystem<E> {
         super(factory, archive, rootTemplate);
     }
 
-    /** The implementation in this class returns {@code true}. */
+    /**
+     * Returns {@code true} to indicate that this archive file system is
+     * read-only.
+     * 
+     * @return {@code true}
+     */
     @Override
     public boolean isReadOnly() {
         return true;
