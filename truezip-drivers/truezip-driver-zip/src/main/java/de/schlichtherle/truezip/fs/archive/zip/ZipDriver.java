@@ -47,9 +47,12 @@ import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
  * An archive driver which builds ZIP files.
  * Note that this driver does not check the CRC value of any entries in
  * existing archives.
+ * <p>
+ * Do <em>not</em> use this driver for custom application file formats
+ * - use {@link JarDriver} instead!
  *
- * @see CheckedZipDriver
- * @author Christian Schlichtherle
+ * @see     CheckedZipDriver
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @Immutable
