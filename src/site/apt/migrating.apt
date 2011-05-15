@@ -17,8 +17,8 @@ Migrating from TrueZIP 6
 
 * Initiate Sources
 
-    If you haven't done so already - as the primary option -
-    {{{./archetypes.html}initiate a Maven project}}
+    As the primary option - if you haven't done so already -
+    {{{./archetype/file/shell.html}initiate a Maven project}}
     and integrate your sources into its directory tree or - as a secondary
     option -
     {{{http://truezip.schlichtherle.de/2011/05/13/no-maven/}download the all-in-one JAR-with-dependencies}}
@@ -155,4 +155,4 @@ Migrating from TrueZIP 6
     After all, a recursive archive copy operation (once <<<archiveCopyAll>>>)
     is still a recursive archive copy operation (now <<<cp_rp>>>).
 
-    Good luck anyway and... enjoy TrueZIP!
+    Enjoy TrueZIP!
