@@ -74,8 +74,8 @@ Migrating from TrueZIP 6
     all uses of <<<(java.io.)?File*>>>, e.g. <<<FileWriter>>> or
     <<<java.io.FileInputStream>>>.
     This should be OK - let it happen for now.
-    Once you've configured the archive detection as below, your application
-    should be fine with this.
+    Once you've configured the archive detection as described
+    {{{Archive_Detection}below}}, your application should be fine with this.
 
 ** Method Names
 
@@ -131,7 +131,7 @@ Migrating from TrueZIP 6
     {{{./truezip-samples/key-management.html}key management}}
     which demonstrates this.
 
-** Optional: Configure Archive Detection
+** Optional: Configure {Archive Detection}
 
     Once you've set up your run time class path correctly, it should not be
     necessary to configure archive detection because TrueZIP 7 supports the
