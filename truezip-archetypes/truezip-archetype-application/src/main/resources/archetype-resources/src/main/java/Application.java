@@ -33,11 +33,11 @@ import de.schlichtherle.truezip.fs.FsSyncException;
 //import de.schlichtherle.truezip.socket.sl.IOPoolLocator;
 
 /**
- * An abstract base class which runs the setup-work-sync life cycle for a
- * typical TrueZIP application.
+ * An abstract base class which runs the setup-work-sync life cycle of a
+ * typical TrueZIP File* application.
  * Subclass or edit this template class to meet your requirements.
  * <p>
- * The typical life cycle of a TrueZIP application consists of the
+ * The typical life cycle of a TrueZIP File* application consists of the
  * {@link #setup()} phase and one or more iterations of the {@link #work()}
  * and {@link #sync()} phases.
  * Thus, this life cycle may simply get referenced as the
