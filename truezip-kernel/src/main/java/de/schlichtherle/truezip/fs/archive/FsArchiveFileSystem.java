@@ -75,12 +75,14 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
      * the system's current time.
      * The file system is modifiable and marked as touched!
      *
+     * @param  <E> The type of the archive entries.
      * @param  factory the archive entry factory to use.
+     * @return A new archive file system.
      * @throws NullPointerException If {@code factory} is {@code null}.
      */
-    static <AE extends FsArchiveEntry> FsArchiveFileSystem<AE>
-    newArchiveFileSystem(EntryFactory<AE> factory) {
-        return new FsArchiveFileSystem<AE>(factory);
+    static <E extends FsArchiveEntry> FsArchiveFileSystem<E>
+    newArchiveFileSystem(EntryFactory<E> factory) {
+        return new FsArchiveFileSystem<E>(factory);
     }
 
     private FsArchiveFileSystem(final EntryFactory<E> factory) {
@@ -115,16 +117,18 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
      * Note that the entries in the file system are shared with the given
      * archive entry {@code container}.
      *
+     * @param  <E> The type of the archive entries.
+     * @param  factory the archive entry factory to use.
      * @param  archive The archive entry container to read the entries for
      *         the population of the archive file system.
-     * @param  factory the archive entry factory to use.
-     * @param  rootTemplate The last modification time of the root of the populated
-     *         file system in milliseconds since the epoch.
+     * @param  rootTemplate The nullable template to use for the root entry of
+     *         the returned archive file system.
      * @param  readOnly If and only if {@code true}, any subsequent
      *         modifying operation on the file system will result in a
      *         {@link FsReadOnlyArchiveFileSystemException}.
-     * @throws NullPointerException If {@code container}, {@code factory} or
-     *         {@code rootTemplate} are {@code null}.
+     * @return A new archive file system.
+     * @throws NullPointerException If {@code factory} or {@code archive} are
+     *         {@code null}.
      * @throws IllegalArgumentException If {@code rootTemplate} is an instance
      *         of {@link FsArchiveFileSystemEntry}.
      */
@@ -141,8 +145,6 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
     FsArchiveFileSystem(final EntryFactory<E> factory,
                         final EntryContainer<E> archive,
                         final @CheckForNull Entry rootTemplate) {
-        if (null == rootTemplate)
-            throw new NullPointerException();
         if (rootTemplate instanceof FsArchiveFileSystemEntry<?>)
             throw new IllegalArgumentException();
 
@@ -331,10 +333,11 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
      * but wraps any {@link CharConversionException} in an
      * {@link AssertionError}.
      *
-     * @param name the archive file system entry name.
-     * @param type the type of the archive file system entry to create.
-     * @param template the nullable template for the archive file system entry
-     *        to create.
+     * @param  name the archive file system entry name.
+     * @param  type the type of the archive file system entry to create.
+     * @param  template the nullable template for the archive file system entry
+     *         to create.
+     * @return A new file system entry for this (virtual) archive file system.
      */
     private FsArchiveFileSystemEntry<E> newEntryUnchecked(
             final FsEntryName name,
@@ -357,11 +360,14 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
      * This is only a factory method, i.e. the returned file system entry is
      * not yet linked into this (virtual) archive file system.
      *
-     * @see   #mknod
-     * @param name the archive file system entry name.
-     * @param type the type of the archive file system entry to create.
-     * @param template the nullable template for the archive file system entry
-     *        to create.
+     * @see    #mknod
+     * @param  name the archive file system entry name.
+     * @param  type the type of the archive file system entry to create.
+     * @param  template the nullable template for the archive file system entry
+     *         to create.
+     * @return A new file system entry for this (virtual) archive file system.
+     * @throws FsArchiveFileSystemException if a {@link CharConversionException}
+     *         occurs as its cause.
      */
     private FsArchiveFileSystemEntry<E> newEntryChecked(
             final FsEntryName name,
@@ -556,6 +562,8 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
     /**
      * A data class which represents a segment for use by
      * {@link PathLink}.
+     * 
+     * @param <E> The type of the archive entries.
      */
     private static final class SegmentLink<E extends FsArchiveEntry>
     implements Link<FsArchiveFileSystemEntry<E>> {
@@ -723,7 +731,11 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
         }
     } // class DefaultEntryTable
 
-    /** Splits a given path name into its parent path name and base name. */
+    /**
+     * Splits a given path name into its parent path name and base name.
+     * 
+     * @param <E> The type of the archive entries.
+     */
     private static abstract class MasterEntryTable<E extends FsArchiveEntry> {
 
         /**
