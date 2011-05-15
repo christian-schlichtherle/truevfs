@@ -87,10 +87,11 @@ implements FsCompositeDriver, FsDriverProvider {
             NULL = new TArchiveDetector("");
 
     /**
-     * This instance recognizes all archive files which are known by the file
-     * system driver provider {@link FsDriverLocator#SINGLETON}.
-     * The file system schemes are used as the archive file suffixes to
-     * recognize.
+     * This instance recognizes all archive types for which a file system
+     * driver can be found by the file system driver service locator singleton
+     * {@link FsDriverLocator#SINGLETON}.
+     * A file system driver is looked up by using the suffix of the file as the
+     * scheme of the file system.
      */
     public static final TArchiveDetector
             ALL = new TArchiveDetector(null);

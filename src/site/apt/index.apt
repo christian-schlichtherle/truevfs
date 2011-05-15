@@ -1,5 +1,5 @@
     -----------------------
-    About
+    About TrueZIP
     -----------------------
     Christian Schlichtherle
     -----------------------
@@ -40,8 +40,9 @@ Getting Started
         {{{./features.html}Key Features}}.
 
     [[2]] Read the page about
-        {{{./archetypes.html}Maven Archetypes}} in order to help you setup your
-        project environment and build an application in about <<ten minutes>>!
+        {{{./kick-start/index.html}kick-starting TrueZIP}}
+        in order to help you setup your project environment and build an
+        application in about ten minutes!
 
     [[3]] If you are looking for more sample code and applications,
         please check the
