@@ -23,7 +23,7 @@ import de.schlichtherle.truezip.entry.Entry.Access;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.util.BitField;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.NotThreadSafe;
 
@@ -37,12 +37,13 @@ import net.jcip.annotations.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
+@DefaultAnnotation(NonNull.class)
 final class FsReadOnlyArchiveFileSystem<E extends FsArchiveEntry>
 extends FsArchiveFileSystem<E> {
 
-    FsReadOnlyArchiveFileSystem(  final @NonNull EntryContainer<E> archive,
-                                final @NonNull EntryFactory<E> factory,
-                                final @CheckForNull Entry rootTemplate) {
+    FsReadOnlyArchiveFileSystem(final EntryContainer<E> archive,
+                                final EntryFactory<E> factory,
+                                final Entry rootTemplate) {
         super(factory, archive, rootTemplate);
     }
 
@@ -64,12 +65,11 @@ extends FsArchiveFileSystem<E> {
     }
 
     @Override
-    @NonNull
     public FsArchiveFileSystemOperation<E> mknod(
-            @NonNull FsEntryName name,
-            @NonNull Type type,
-            @NonNull BitField<FsOutputOption> options,
-            @CheckForNull Entry template)
+            FsEntryName name,
+            Type type,
+            BitField<FsOutputOption> options,
+            Entry template)
     throws FsArchiveFileSystemException {
         throw new FsReadOnlyArchiveFileSystemException();
     }
