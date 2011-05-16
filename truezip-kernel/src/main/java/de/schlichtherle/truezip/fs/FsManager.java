@@ -128,9 +128,10 @@ implements Iterable<FsController<?>> {
      * system controllers.
      *
      * @param  options a bit field of synchronization options.
-     * @param  handler the exception handling strategy for dealing with one or
-     *         more input {@code SyncException}s which may trigger an {@code X}.
-     * @param  <X> the type of the {@code IOException} to throw at the
+     * @param  handler the exception handling strategy for consuming input
+     *         {@code IOException}s and/or assembling output
+     *         {@code IOException}s.
+     * @param  <X> The type of the {@code IOException} to throw at the
      *         discretion of the exception {@code handler}.
      * @throws IOException at the discretion of the exception {@code handler}
      *         upon the occurence of an {@code IOException}.
@@ -163,9 +164,9 @@ implements Iterable<FsController<?>> {
      * instance.
      *
      * @param  visitor the visitor.
-     * @param  handler the exception handling strategy for dealing with one or
-     *         more input {@code SyncException}s which may trigger an {@code X}.
-     * @param  <X> the type of the {@code IOException} to throw at the
+     * @param  handler the exception handling strategy for consuming input
+     *         {@code IOException}s and/or assembling output {@code IOException}.
+     * @param  <X> The type of the {@code IOException} to throw at the
      *         discretion of the exception {@code handler}.
      * @throws IOException at the discretion of the exception {@code handler}
      *         upon the occurence of an {@code IOException}.
@@ -194,6 +195,8 @@ implements Iterable<FsController<?>> {
     /**
      * Two file system managers are considered equal if and only if they are
      * identical. This can't get overriden.
+     * 
+     * @param that the object to compare.
      */
     @SuppressWarnings(value = "EqualsWhichDoesntCheckParameterClass")
     @Override

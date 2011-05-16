@@ -142,8 +142,8 @@ public abstract class FsController<M extends FsModel> {
      * @param  template if not {@code null}, then the file system entry
      *         at the end of the chain shall inherit as much properties from
      *         this entry as possible - with the exception of its name and type.
-     * @throws IOException for some other I/O related reason, including but
-     *         not exclusively upon one or more of the following conditions:
+     * @throws IOException on any I/O error, including but not limited to these
+     *         reasons:
      *         <ul>
      *         <li>The file system is read only.
      *         <li>{@code name} contains characters which are not
@@ -212,9 +212,10 @@ public abstract class FsController<M extends FsModel> {
      * Otherwise, the state of this file system controller is reset.
      *
      * @param  options a bit field of synchronization options.
-     * @param  handler the exception handling strategy for dealing with one or
-     *         more input {@code FsSyncException}s which may trigger an {@code X}.
-     * @param  <X> the type of the {@code IOException} to throw at the
+     * @param  handler the exception handling strategy for consuming input
+     *         {@code FsSyncException}s and/or assembling output
+     *         {@code IOException}s.
+     * @param  <X> The type of the {@code IOException} to throw at the
      *         discretion of the exception {@code handler}.
      * @throws IOException at the discretion of the exception {@code handler}
      *         upon the occurence of an {@link FsSyncException}.

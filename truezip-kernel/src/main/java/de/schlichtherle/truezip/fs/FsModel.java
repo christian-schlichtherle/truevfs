@@ -59,6 +59,11 @@ public abstract class FsModel {
      * system have been modified so that it needs
      * {@link FsController#sync synchronization} with its parent file
      * system.
+     * 
+     * @return {@code true} if and only if the contents of the federated file
+     *         system have been modified so that it needs
+     *         {@link FsController#sync synchronization} with its parent file
+     *         system.
      */
     public abstract boolean isTouched();
 
@@ -73,6 +78,8 @@ public abstract class FsModel {
      * Two file system models are considered equal if and only if they are
      * identical.
      * This can't get overriden.
+     * 
+     * @param that the object to compare.
      */
     @Override
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")

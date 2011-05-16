@@ -32,7 +32,6 @@ import net.jcip.annotations.ThreadSafe;
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
 public abstract class FsException extends IOException {
-
     private static final long serialVersionUID = 2947623946725372554L;
 
     FsException(FsModel model) {
