@@ -154,7 +154,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  * TFile.cp_rp(src, dst, TArchiveDetector.NULL, TArchiveDetector.NULL);
  * </code></pre>
  * 
- * <a name="falsePositives"/><h3>Recognizing Archive Files and False Positives</h3>
+ * <a name="falsePositives"/><h3>Detecting Archive Files and False Positives</h3>
  * <p>
  * Whenever an archive file suffix is recognized in a path, this class treats
  * the corresponding file or directory as a <i>prospective archive file</i>.
@@ -1409,17 +1409,17 @@ public final class TFile extends File {
      * {@link TArchiveDetector} which was used to construct this {@code TFile}
      * instance.
      * <p>
-     * Please note that no file system tests are performed!
+     * Please note that no I/O is performed by this method!
      * If you need to know whether this file really exists as an archive file
      * in the file system (and the correct password has been entered in case
      * it's a RAES encrypted ZIP file),
      * you should call {@link #isDirectory}, too.
-     * This will automount the (virtual) file system from the archive file and
-     * return {@code true} if and only if it's a valid archive file.
      *
-     * @see <a href="#falsePositives">Recognizing Archive Paths and False Positives</a>
-     * @see #isDirectory
-     * @see #isEntry
+     * @return The result of scanning the name of this file with its
+     *         {@link #getArchiveDetector() archive detector}.
+     * @see    <a href="#falsePositives">Detecting Archive Paths and False Positives</a>
+     * @see    #isDirectory
+     * @see    #isEntry
      */
     public boolean isArchive() {
         return this == innerArchive;
@@ -1441,7 +1441,7 @@ public final class TFile extends File {
      * This will automount the (virtual) file system from the archive file and
      * return {@code true} if and only if it's a valid archive file.
      *
-     * @see <a href="#falsePositives">Recognizing Archive Paths and False Positives</a>
+     * @see <a href="#falsePositives">Detecting Archive Paths and False Positives</a>
      * @see #isArchive
      * @see #isDirectory
      */
@@ -1855,7 +1855,7 @@ public final class TFile extends File {
     /**
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      *
-     * @see <a href="#falsePositives">Recognizing Archive Paths and False Positives</a>
+     * @see <a href="#falsePositives">Detecting Archive Paths and False Positives</a>
      */
     @Override
     public boolean exists() {
@@ -1877,11 +1877,16 @@ public final class TFile extends File {
 
     /**
      * Similar to its super class implementation, but returns
-     * {@code false} for a valid archive file.
+     * {@code false} for a valid archive file, too.
+     * <p>
+     * For archive file validation its virtual file system gets mounted.
+     * In case a RAES encrypted ZIP file gets mounted, the user gets prompted
+     * for its password unless the default configuration for key management
+     * hasn't been overridden.
      * <p>
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      *
-     * @see <a href="#falsePositives">Recognizing Archive Paths and False Positives</a>
+     * @see <a href="#falsePositives">Detecting Archive Paths and False Positives</a>
      */
     @Override
     public boolean isFile() {
@@ -1902,19 +1907,16 @@ public final class TFile extends File {
 
     /**
      * Similar to its super class implementation, but returns
-     * {@code true} for a valid archive file.
+     * {@code true} for a valid archive file, too.
      * <p>
-     * In case a RAES encrypted ZIP file is tested which is accessed for the
-     * first time, the user is prompted for the password (if password based
-     * encryption is used).
-     * Note that this is not the only method which would prompt the user for
-     * a password: For example, {@link #length} would prompt the user and
-     * return {@code 0} unless the user cancels the prompting or the
-     * file is a false positive archive file.
+     * For archive file validation its virtual file system gets mounted.
+     * In case a RAES encrypted ZIP file gets mounted, the user gets prompted
+     * for its password unless the default configuration for key management
+     * hasn't been overridden.
      * <p>
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      *
-     * @see <a href="#falsePositives">Recognizing Archive Paths and False Positives</a>
+     * @see <a href="#falsePositives">Detecting Archive Paths and False Positives</a>
      * @see #isArchive
      * @see #isEntry
      */
@@ -2014,21 +2016,18 @@ public final class TFile extends File {
     }
 
     /**
-     * Returns the (uncompressed) getLength of the file.
-     * The getLength returned of a valid archive file is {@code 0} in order
-     * to correctly emulate virtual directories across all platforms.
+     * Returns the (uncompressed) length of the file.
+     * The length returned of a valid archive file is {@code 0} in order
+     * to properly emulate virtual directories across all platforms.
      * <p>
-     * In case a RAES encrypted ZIP file is tested which is accessed for the
-     * first time, the user is prompted for the password (if password based
-     * encryption is used).
-     * Note that this is not the only method which would prompt the user for
-     * a password: For example, {@link #isDirectory} would prompt the user and
-     * return {@code true} unless the user cancels the prompting or the
-     * file is a false positive archive file.
+     * For archive file validation its virtual file system gets mounted.
+     * In case a RAES encrypted ZIP file gets mounted, the user gets prompted
+     * for its password unless the default configuration for key management
+     * hasn't been overridden.
      * <p>
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      *
-     * @see <a href="#falsePositives">Recognizing Archive Paths and False Positives</a>
+     * @see <a href="#falsePositives">Detecting Archive Paths and False Positives</a>
      */
     @Override
     public long length() {
