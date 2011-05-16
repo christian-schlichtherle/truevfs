@@ -50,6 +50,8 @@ Migrating from TrueZIP 6
 *--+--+--+
 |1.|<<<de.schlichtherle.io>>>|<<<de.schlichtherle.truezip.file>>>|
 *--+--+--+
+|2.|<<<de.schlichtherle.util.zip>>>|<<<de.schlichtherle.truezip.zip>>>|
+*--+--+--+
 
     Do not yet fix compilation errors.
 
