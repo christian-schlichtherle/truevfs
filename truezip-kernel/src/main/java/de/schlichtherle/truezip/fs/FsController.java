@@ -57,13 +57,19 @@ import javax.swing.Icon;
 @DefaultAnnotation(NonNull.class)
 public abstract class FsController<M extends FsModel> {
 
-    /** Returns the file system model. */
+    /**
+     * Returns the file system model.
+     * 
+     * @return The file system model.
+     */
     public abstract M getModel();
 
     /**
      * Returns the controller for the parent file system or {@code null} if
      * and only if this file system is not federated, i.e. not a member of
      * another file system.
+     * 
+     * @return The nullable controller for the parent file system.
      */
     public abstract @Nullable FsController<?> getParent();
 
@@ -98,6 +104,7 @@ public abstract class FsController<M extends FsModel> {
      * by the given name from the file system.
      *
      * @param  name a file system entry name.
+     * @param  options a bit field of input options.
      * @return An {@code InputSocket}.
      */
     public abstract InputSocket<?>
@@ -112,6 +119,7 @@ public abstract class FsController<M extends FsModel> {
      * modification time.
      *
      * @param  name a file system entry name.
+     * @param  options a bit field of output options.
      * @param  template a nullable template for the properties of the output
      *         entry.
      * @return An {@code OutputSocket}.
@@ -203,11 +211,13 @@ public abstract class FsController<M extends FsModel> {
      * parent file system, then nothing happens.
      * Otherwise, the state of this file system controller is reset.
      *
-     * @param  options the synchronization options.
+     * @param  options a bit field of synchronization options.
      * @param  handler the exception handling strategy for dealing with one or
      *         more input {@code FsSyncException}s which may trigger an {@code X}.
      * @param  <X> the type of the {@code IOException} to throw at the
      *         discretion of the exception {@code handler}.
+     * @throws IOException at the discretion of the exception {@code handler}
+     *         upon the occurence of an {@link FsSyncException}.
      * @throws IllegalArgumentException if the combination of synchronization
      *         options is illegal, e.g. if
      *         {@code FsSyncOption.FORCE_CLOSE_INPUT} is cleared and
@@ -222,6 +232,8 @@ public abstract class FsController<M extends FsModel> {
      * Two file system controllers are considered equal if and only if they
      * are identical.
      * This can't get overriden.
+     * 
+     * @param that the object to compare.
      */
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     @Override

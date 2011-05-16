@@ -102,7 +102,7 @@ implements Iterable<FsController<?>> {
      * If the call succeeds, the builder's {@link FsSyncExceptionBuilder#check}
      * method is called to check out any {@link FsSyncWarningException}, too.
      *
-     * @param  options the synchronization options.
+     * @param  options a bit field of synchronization options.
      * @throws FsSyncException if committing the changes fails for any reason.
      * @throws IllegalArgumentException if the combination of synchronization
      *         options is illegal, e.g. if {@code FORCE_CLOSE_INPUT} is cleared
@@ -127,12 +127,13 @@ implements Iterable<FsController<?>> {
      * As a side effect, this will reset the state of the respective file
      * system controllers.
      *
-     * @param  options the synchronization options.
+     * @param  options a bit field of synchronization options.
      * @param  handler the exception handling strategy for dealing with one or
      *         more input {@code SyncException}s which may trigger an {@code X}.
      * @param  <X> the type of the {@code IOException} to throw at the
      *         discretion of the exception {@code handler}.
-     * @throws IOException at the discretion of the exception {@code handler}.
+     * @throws IOException at the discretion of the exception {@code handler}
+     *         upon the occurence of an {@code IOException}.
      * @throws IllegalArgumentException if the combination of synchronization
      *         options is illegal, e.g. if
      *         {@code FsSyncOption.FORCE_CLOSE_INPUT} is cleared and
@@ -166,7 +167,8 @@ implements Iterable<FsController<?>> {
      *         more input {@code SyncException}s which may trigger an {@code X}.
      * @param  <X> the type of the {@code IOException} to throw at the
      *         discretion of the exception {@code handler}.
-     * @throws IOException at the discretion of the exception {@code handler}.
+     * @throws IOException at the discretion of the exception {@code handler}
+     *         upon the occurence of an {@code IOException}.
      */
     private <X extends IOException> void
     visit(Visitor visitor, ExceptionHandler<? super IOException, X> handler)
