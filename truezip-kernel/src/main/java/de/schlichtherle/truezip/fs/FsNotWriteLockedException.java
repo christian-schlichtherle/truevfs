@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -28,6 +30,7 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
+@DefaultAnnotation(NonNull.class)
 final class FsNotWriteLockedException extends FsException {
     private static final long serialVersionUID = 2345952581284762637L;
 
