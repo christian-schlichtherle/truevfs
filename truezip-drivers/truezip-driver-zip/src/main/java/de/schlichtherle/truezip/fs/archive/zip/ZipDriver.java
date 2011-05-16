@@ -15,11 +15,11 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
+import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.zip.ZipEntry;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import de.schlichtherle.truezip.socket.IOPool;
-import de.schlichtherle.truezip.fs.FsConcurrentModel;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.socket.InputShop;
@@ -204,7 +204,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
      * {@link #newZipInputShop}.
      */
     @Override
-    public ZipInputShop newInputShop(FsConcurrentModel model, InputSocket<?> input)
+    public ZipInputShop newInputShop(FsModel model, InputSocket<?> input)
     throws IOException {
         final ReadOnlyFile rof = input.newReadOnlyFile();
         try {
@@ -215,7 +215,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
         }
     }
 
-    protected ZipInputShop newZipInputShop(FsConcurrentModel model, ReadOnlyFile rof)
+    protected ZipInputShop newZipInputShop(FsModel model, ReadOnlyFile rof)
     throws IOException {
         return new ZipInputShop(this, rof);
     }
@@ -229,7 +229,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
      */
     @Override
     public OutputShop<ZipArchiveEntry> newOutputShop(
-            FsConcurrentModel model,
+            FsModel model,
             OutputSocket<?> output,
             @CheckForNull InputShop<ZipArchiveEntry> source)
     throws IOException {
@@ -245,7 +245,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
     }
 
     protected ZipOutputShop newZipOutputShop(
-            FsConcurrentModel model, OutputStream out, @CheckForNull ZipInputShop source)
+            FsModel model, OutputStream out, @CheckForNull ZipInputShop source)
     throws IOException {
         return new ZipOutputShop(this, out, source);
     }

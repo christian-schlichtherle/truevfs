@@ -17,7 +17,7 @@ package de.schlichtherle.truezip.fs.archive.zip.raes;
 
 import de.schlichtherle.truezip.crypto.raes.RaesOutputStream;
 import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.fs.FsConcurrentModel;
+import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.archive.zip.ZipArchiveEntry;
 import de.schlichtherle.truezip.fs.archive.zip.ZipDriver;
 import de.schlichtherle.truezip.fs.archive.zip.ZipInputShop;
@@ -44,9 +44,9 @@ import net.jcip.annotations.Immutable;
  * In addition, this driver limits the number of concurrent entry output
  * streams to one, so that writing unencrypted temporary files is inhibited.
  * 
- * @author Christian Schlichtherle
+ * @see     SafeZipRaesDriver
+ * @author  Christian Schlichtherle
  * @version $Id$
- * @see SafeZipRaesDriver
  */
 @Immutable
 public class ParanoidZipRaesDriver extends ZipRaesDriver {
@@ -72,7 +72,7 @@ public class ParanoidZipRaesDriver extends ZipRaesDriver {
      */
     @Override
     public final OutputShop<ZipArchiveEntry>
-    newOutputShop(  final FsConcurrentModel model,
+    newOutputShop(  final FsModel model,
                     final OutputSocket<?> output,
                     final InputShop<ZipArchiveEntry> source)
     throws IOException {

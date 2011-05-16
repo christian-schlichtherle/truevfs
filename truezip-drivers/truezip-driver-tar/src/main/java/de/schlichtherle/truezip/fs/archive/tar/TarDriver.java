@@ -15,8 +15,8 @@
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
+import de.schlichtherle.truezip.fs.FsModel;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import de.schlichtherle.truezip.fs.FsConcurrentModel;
 import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriver;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Type;
@@ -103,7 +103,7 @@ public class TarDriver extends FsCharsetArchiveDriver<TarArchiveEntry> {
      * {@link #newTarInputShop}.
      */
     @Override
-    public TarInputShop newInputShop(FsConcurrentModel model, InputSocket<?> input)
+    public TarInputShop newInputShop(FsModel model, InputSocket<?> input)
     throws IOException {
         final InputStream in = input.newInputStream();
         try {
@@ -113,7 +113,7 @@ public class TarDriver extends FsCharsetArchiveDriver<TarArchiveEntry> {
         }
     }
 
-    protected TarInputShop newTarInputShop(FsConcurrentModel model, InputStream in)
+    protected TarInputShop newTarInputShop(FsModel model, InputStream in)
     throws IOException {
         return new TarInputShop(this, in);
     }
@@ -126,7 +126,7 @@ public class TarDriver extends FsCharsetArchiveDriver<TarArchiveEntry> {
      */
     @Override
     public OutputShop<TarArchiveEntry> newOutputShop(
-            FsConcurrentModel model,
+            FsModel model,
             OutputSocket<?> output,
             InputShop<TarArchiveEntry> source)
     throws IOException {
@@ -142,7 +142,7 @@ public class TarDriver extends FsCharsetArchiveDriver<TarArchiveEntry> {
     }
 
     protected TarOutputShop newTarOutputShop(
-            FsConcurrentModel model, OutputStream out, TarInputShop source)
+            FsModel model, OutputStream out, TarInputShop source)
     throws IOException {
         return new TarOutputShop(this, out);
     }

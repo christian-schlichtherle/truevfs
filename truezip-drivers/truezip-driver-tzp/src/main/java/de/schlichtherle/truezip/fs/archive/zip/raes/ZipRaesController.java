@@ -28,6 +28,8 @@ import de.schlichtherle.truezip.fs.FsFalsePositiveException;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.CharConversionException;
 import java.io.IOException;
 import net.jcip.annotations.ThreadSafe;
@@ -38,21 +40,23 @@ import static de.schlichtherle.truezip.fs.FsEntryName.*;
 /**
  * This file system controller decorates another file system controller in
  * order to manage the authentication key required for accessing its target
- * RAES encrypted ZIP archive file.
+ * RAES encrypted ZIP archive file (ZIP.RAES).
  * 
  * @author Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
+@DefaultAnnotation(NonNull.class)
 final class ZipRaesController
 extends FsDecoratingController<FsModel, FsController<?>> {
 
     private final ZipRaesDriver driver;
 
     /**
-     * Constructs a new key manager archive controller.
+     * Constructs a new ZIP.RAES archive controller.
      *
      * @param controller the non-{@code null} archive controller.
+     * @param driver the ZIP.RAES driver.
      */
     ZipRaesController(  final FsController<?> controller,
                         final ZipRaesDriver driver) {
@@ -61,7 +65,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     }
 
     @Override
-    public final FsEntry getEntry(final FsEntryName name)
+    public FsEntry getEntry(final FsEntryName name)
     throws IOException {
         try {
             return delegate.getEntry(name);

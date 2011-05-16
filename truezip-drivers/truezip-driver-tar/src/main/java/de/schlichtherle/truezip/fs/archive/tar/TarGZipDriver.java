@@ -15,8 +15,8 @@
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
+import de.schlichtherle.truezip.fs.FsModel;
 import java.util.zip.Deflater;
-import de.schlichtherle.truezip.fs.FsConcurrentModel;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,20 +56,22 @@ public class TarGZipDriver extends TarDriver {
      * <p>
      * The implementation in the class {@link TarBZip2Driver} returns
      * {@link Deflater#BEST_COMPRESSION}.
+     * 
+     * @return The compression level to use when writing a GZIP output stream.
      */
     public final int getLevel() {
         return Deflater.BEST_COMPRESSION;
     }
 
     @Override
-    protected TarInputShop newTarInputShop(FsConcurrentModel model, InputStream in)
+    protected TarInputShop newTarInputShop(FsModel model, InputStream in)
     throws IOException {
         return new TarInputShop(this, new GZIPInputStream(in, getBufferSize()));
     }
 
     @Override
     protected TarOutputShop newTarOutputShop(
-            final FsConcurrentModel model,
+            final FsModel model,
             final OutputStream out,
             final TarInputShop source)
     throws IOException {
@@ -82,7 +84,7 @@ public class TarGZipDriver extends TarDriver {
     /** Extends its super class to set the deflater level. */
     private static class GZIPOutputStream
     extends java.util.zip.GZIPOutputStream {
-        public GZIPOutputStream(OutputStream out, int size, int level)
+        GZIPOutputStream(OutputStream out, int size, int level)
         throws IOException {
             super(out, size);
             def.setLevel(level);
