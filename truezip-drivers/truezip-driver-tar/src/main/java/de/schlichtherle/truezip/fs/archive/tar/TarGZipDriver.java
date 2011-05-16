@@ -25,7 +25,7 @@ import java.util.zip.GZIPInputStream;
 import net.jcip.annotations.Immutable;
 
 /**
- * An archive driver which builds TAR files compressed with GZIP.
+ * An archive driver which builds GZIP compressed TAR files (TAR.GZIP).
  * 
  * @author Christian Schlichtherle
  * @version $Id$

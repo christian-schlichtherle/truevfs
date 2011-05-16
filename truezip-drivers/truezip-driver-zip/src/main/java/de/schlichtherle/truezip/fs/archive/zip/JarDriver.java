@@ -26,8 +26,8 @@ import java.nio.charset.Charset;
 import net.jcip.annotations.Immutable;
 
 /**
- * An archive driver which builds JAR files.
- * JAR files use {@code "UTF-8"} as the character set for entry names and
+ * An archive driver which builds Java Archive files (JAR).
+ * JAR files use UTF-8 as the character set encoding for entry names and
  * comments.
  * <p>
  * Other than this, JAR files are treated like regular ZIP files.

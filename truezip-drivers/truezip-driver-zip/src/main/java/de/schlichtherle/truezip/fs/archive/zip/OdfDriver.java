@@ -26,20 +26,20 @@ import net.jcip.annotations.Immutable;
 
 /**
  * An archive driver which supports building archive files according to
- * the specification of the OpenDocument Format (<i>ODF</i>), version 1.1.
- * This driver ensures that the entry named <i>mimetype</i>, if present at
- * all, is always written as the first entry and uses the STORED method
- * rather than the DEFLATED method in the resulting archive file in order
- * to meet the requirements of section 17.4 of the
+ * the OpenDocument Format Specification (ODF), version 1.1.
+ * This driver ensures that the entry named {@code mimetype}, if present at
+ * all, is always written as the first entry and uses the {@code STORED} method
+ * rather than the {@code DEFLATED} method in the resulting archive file in
+ * order to meet the requirements of section 17.4 of the
  * <a href="http://www.oasis-open.org/committees/download.php/20847/OpenDocument-v1.1-cs1.pdf" target="_blank">OpenDocument Specification</a>,
  * version 1.1.
  * <p>
  * Other than this, ODF files are treated like regular JAR files.
  * In particular, this class does <em>not</em> check an ODF file for the
- * existance of the <i>META-INF/manifest.xml</i> entry or any other entry.
+ * existance of the {@code META-INF/manifest.xml} entry or any other entry.
  * <p>
  * When using this driver to create or modify an ODF file, then in order to
- * achieve best performance, the <i>mimetype</i> entry should be created or
+ * achieve best performance, the {@code mimetype} entry should be created or
  * modified first in order to avoid temp file buffering of any other entries.
  *
  * @see OdfOutputShop
