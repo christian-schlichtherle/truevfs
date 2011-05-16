@@ -7,15 +7,16 @@
 Kick-Starting TrueZIP
 
     This section shows how to kick-start different TrueZIP applications using
-    various tools:
+    various tools.
+    The following articles are available:
 
-    * Kick-Starting TrueZIP File* applications with Maven...
+    * Kick-Starting TrueZIP File* Applications With Maven In...
 
-        * {{{./file/shell.html}in a Shell}}
+        * {{{./file/shell.html}a Shell}}
 
-        * {{{./file/eclipse.html}in Eclipse}}
+        * {{{./file/eclipse.html}Eclipse}}
 
-        * {{{./file/netbeans.html}in NetBeans}}
+        * {{{./file/netbeans.html}NetBeans}}
 
     * Using TrueZIP {{{./no-maven.html}without Maven}}
 

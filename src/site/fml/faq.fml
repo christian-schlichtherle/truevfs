@@ -172,7 +172,7 @@ TFile.setDefaultArchiveDetector(
 </source>
                 <p>
                     Check the
-                    <a href="archetypes.html">Maven Archetypes</a> for more
+                    <a href="kick-start/index.html">Maven Archetypes</a> for more
                     options and to help you get started quickly with this.
                 </p>
             </answer>
