@@ -10,14 +10,13 @@ About TrueZIP
     provides transparent access to archive files as if they were just
     plain directories.
 
-    As an API, TrueZIP provides uniform, transparent, thread-safe,
+    As an API, TrueZIP provides transparent, uniform, thread-safe,
     read/write access to archive files as if they were just plain
     directories in a file system path.
     Writing a {{{./truezip-file/index.html}TrueZIP File*}} application
     is really easy:
     Have a look at the {{{./usecases/index.html}Use Cases}} and the
-    TrueZIP File* API {{{./truezip-file/apidocs/index.html}Javadoc}}
-    to check yourself!
+    {{{./truezip-file/apidocs/index.html}TrueZIP File* API}} to check yourself!
 
     As a framework, TrueZIP provides the interfaces and classes to
     write file system drivers which plug-in to its federated file

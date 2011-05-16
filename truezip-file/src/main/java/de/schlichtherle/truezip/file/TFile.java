@@ -156,7 +156,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  * 
  * <a name="falsePositives"/><h3>Detecting Archive Files and False Positives</h3>
  * <p>
- * Whenever an archive file suffix is recognized in a path, this class treats
+ * Whenever an archive file suffix is detected in a path, this class treats
  * the corresponding file or directory as a <i>prospective archive file</i>.
  * The word &quot;prospective&quot; suggests that just because a file is named
  * <i>archive.zip</i> it isn't necessarily a valid ZIP file.
@@ -407,6 +407,8 @@ public final class TFile extends File {
      * Copy constructor.
      * Equivalent to {@link #TFile(File, TArchiveDetector)
      * new TFile(template, getDefaultArchiveDetector())}.
+     * 
+     * @param file a file object.
      */
     public TFile(File file) {
         this(file, defaultDetector);
@@ -451,6 +453,8 @@ public final class TFile extends File {
     /**
      * Equivalent to {@link #TFile(String, TArchiveDetector)
      * new TFile(path, getDefaultArchiveDetector())}.
+     * 
+     * @param path a file path.
      */
     public TFile(String path) {
         this(path, defaultDetector);
@@ -481,6 +485,12 @@ public final class TFile extends File {
     /**
      * Equivalent to {@link #TFile(String, String, TArchiveDetector)
      * new TFile(parent, child, getDefaultArchiveDetector())}.
+     *
+     * @param parent The path of the parent directory.
+     *        The {@link #getDefaultArchiveDetector() default archive detector}
+     *        is used to detect any archive files in the path of this
+     *        {@code TFile} instance.
+     * @param member The child path as a {@link String}.
      */
     public TFile(String parent, String member) {
         this(parent, member, defaultDetector);
@@ -519,10 +529,9 @@ public final class TFile extends File {
      *        If this parameter is an instance of this class, its
      *        {@code TArchiveDetector} is used to detect any archive files
      *        in the path of this {@code TFile} instance.
-     *        Otherwise, the {@link #getDefaultArchiveDetector()} is used.
-     *        This is used in order to make this {@code TFile} instance
-     *        behave as if it had been created by one of the {@link #listFiles}
-     *        methods called on {@code parent} instead.
+     *        Otherwise, the
+     *        {@link #getDefaultArchiveDetector() default archive detector}
+     *        is used.
      * @param member The child path as a {@link String}.
      */
     public TFile(File parent, String member) {
@@ -900,6 +909,7 @@ public final class TFile extends File {
      * Note that temporary files may get used even if the archive files where
      * accessed read-only.
      *
+     * @param  options a bit field of synchronization options.
      * @throws IllegalArgumentException if the combination of synchronization
      *         options is illegal, e.g. if
      *         {@code FsSyncOption.FORCE_CLOSE_INPUT} is cleared and
@@ -940,6 +950,7 @@ public final class TFile extends File {
      * located within the file system referred to by {@code file}.
      *
      * @param  archive a top level federated file system, i.e. archive file.
+     * @param  options a bit field of synchronization options.
      * @throws IllegalArgumentException if {@code archive} is not a top level
      *         federated file system or the combination of synchronization
      *         options is illegal, e.g. if
@@ -1015,6 +1026,8 @@ public final class TFile extends File {
                 .set(FsSyncOption.FORCE_CLOSE_OUTPUT, closeStreams))
      * }.
      *
+     * @param  closeStreams see {@link FsSyncOption#FORCE_CLOSE_INPUT} and
+     *         {@link FsSyncOption#FORCE_CLOSE_OUTPUT}.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         occur.
      *         This implies that the respective parent file system has been
@@ -1050,6 +1063,10 @@ public final class TFile extends File {
                 .set(FsSyncOption.FORCE_CLOSE_OUTPUT, closeOutputStreams))
      * }.
      *
+     * @param  waitForInputStreams see {@link FsSyncOption#WAIT_CLOSE_INPUT}.
+     * @param  closeInputStreams see {@link FsSyncOption#FORCE_CLOSE_INPUT}.
+     * @param  waitForOutputStreams see {@link FsSyncOption#WAIT_CLOSE_OUTPUT}.
+     * @param  closeOutputStreams see {@link FsSyncOption#FORCE_CLOSE_OUTPUT}.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         occur.
      *         This implies that the respective parent file system has been
@@ -1085,6 +1102,7 @@ public final class TFile extends File {
         sync(archive, FsManager.UMOUNT)
      * }.
      *
+     * @param  archive a top level federated file system, i.e. archive file.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         occur.
      *         This implies that the respective parent file system has been
@@ -1117,6 +1135,15 @@ public final class TFile extends File {
                 .set(FsSyncOption.FORCE_CLOSE_OUTPUT, closeStreams))
      * }.
      *
+     * @param  archive a top level federated file system, i.e. archive file.
+     * @param  closeStreams see {@link FsSyncOption#FORCE_CLOSE_INPUT} and
+     *         {@link FsSyncOption#FORCE_CLOSE_OUTPUT}.
+     * @throws IllegalArgumentException if {@code archive} is not a top level
+     *         federated file system or the combination of synchronization
+     *         options is illegal, e.g. if
+     *         {@code FsSyncOption.FORCE_CLOSE_INPUT} is cleared and
+     *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set or if the
+     *         synchronization option {@code FsSyncOption.ABORT_CHANGES} is set.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         occur.
      *         This implies that the respective parent file system has been
@@ -1154,6 +1181,17 @@ public final class TFile extends File {
                 .set(FsSyncOption.FORCE_CLOSE_OUTPUT, closeOutputStreams))
      * }.
      *
+     * @param  archive a top level federated file system, i.e. archive file.
+     * @param  waitForInputStreams see {@link FsSyncOption#WAIT_CLOSE_INPUT}.
+     * @param  closeInputStreams see {@link FsSyncOption#FORCE_CLOSE_INPUT}.
+     * @param  waitForOutputStreams see {@link FsSyncOption#WAIT_CLOSE_OUTPUT}.
+     * @param  closeOutputStreams see {@link FsSyncOption#FORCE_CLOSE_OUTPUT}.
+     * @throws IllegalArgumentException if {@code archive} is not a top level
+     *         federated file system or the combination of synchronization
+     *         options is illegal, e.g. if
+     *         {@code FsSyncOption.FORCE_CLOSE_INPUT} is cleared and
+     *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set or if the
+     *         synchronization option {@code FsSyncOption.ABORT_CHANGES} is set.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         occur.
      *         This implies that the respective parent file system has been
@@ -1162,7 +1200,7 @@ public final class TFile extends File {
      *         (i.e. archive file) in its parent file system.
      * @throws FsSyncException if any error conditions occur.
      *         This implies loss of data!
-     * @see #sync(TFile, BitField)
+     * @see    #sync(TFile, BitField)
      */
     public static void umount(TFile archive,
             boolean waitForInputStreams, boolean closeInputStreams,
@@ -1181,6 +1219,7 @@ public final class TFile extends File {
      * By default, the value of this class property is {@code true}.
      *
      * @see #setLenient(boolean)
+     * @return The value of the class property {@code lenient}.
      */
     public static boolean isLenient() {
         return lenient;
@@ -1223,7 +1262,8 @@ public final class TFile extends File {
      * file {@code a} must exist - TrueZIP does not automatically create
      * directories in the OS file system!
      *
-     * @see #isLenient()
+     * @param lenient the value of the class property {@code lenient}.
+     * @see   #isLenient()
      */
     public static void setLenient(boolean lenient) {
         TFile.lenient = lenient;
@@ -1236,6 +1276,8 @@ public final class TFile extends File {
      * This class property is initially set to
      * {@link TArchiveDetector#ALL}
      *
+     * @return The {@link TArchiveDetector} to use if no archive detector is
+     *         explicitly passed to the constructor of a {@code TFile} instance.
      * @see #setDefaultArchiveDetector
      */
     public static TArchiveDetector getDefaultArchiveDetector() {
@@ -1265,6 +1307,10 @@ public final class TFile extends File {
     /**
      * Returns the first parent directory (starting from this file) which is
      * <em>not</em> an archive file or a file located in an archive file.
+     * 
+     * @return The first parent directory (starting from this file) which is
+     *         <em>not</em> an archive file or a file located in an archive
+     *         file.
      */
     public @Nullable TFile getNonArchivedParentFile() {
         final TFile enclArchive = this.enclArchive;
@@ -1273,11 +1319,13 @@ public final class TFile extends File {
                 : getParentFile();
     }
 
+    /** {@inheritDoc} */
     @Override
     public @Nullable String getParent() {
         return delegate.getParent();
     }
 
+    /** {@inheritDoc} */
     @Override
     public @Nullable TFile getParentFile() {
         final File parent = delegate.getParentFile();
@@ -1297,12 +1345,14 @@ public final class TFile extends File {
         return new TFile(parent, enclArchive, detector);
     }
 
+    /** {@inheritDoc} */
     @Override
     public TFile getAbsoluteFile() {
         String p = getAbsolutePath();
         return p.equals(getPath()) ? this : new TFile(p, detector);
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getAbsolutePath() {
         return delegate.getAbsolutePath();
@@ -1317,8 +1367,10 @@ public final class TFile extends File {
      * This may be useful if {@code getCanonicalFile()} throws an
      * IOException.
      *
-     * @see #getCanonicalFile()
-     * @see #getNormalizedFile()
+     * @return The normalized absolute file object denoting the same file or
+     *         directory as this instance.
+     * @see    #getCanonicalFile()
+     * @see    #getNormalizedFile()
      */
     public TFile getNormalizedAbsoluteFile() {
         String p = getNormalizedAbsolutePath();
@@ -1333,6 +1385,8 @@ public final class TFile extends File {
      * This may be useful if {@code getCanonicalPath()} throws an
      * IOException.
      *
+     * @return The normalized absolute path string denoting the same file or
+     *         directory as this instance.
      * @see #getCanonicalPath()
      * @see #getNormalizedPath()
      */
@@ -1344,8 +1398,8 @@ public final class TFile extends File {
      * Removes any {@code "."} and {@code ".."} directories from the path name
      * wherever possible.
      *
-     * @return If this file is already normalized, it is returned.
-     *         Otherwise a new instance of this class is returned.
+     * @return The normalized file object denoting the same file or
+     *         directory as this instance.
      */
     public TFile getNormalizedFile() {
         String p = getNormalizedPath();
@@ -1356,18 +1410,21 @@ public final class TFile extends File {
      * Removes any redundant {@code "."}, {@code ".."} directories from the
      * path name.
      *
-     * @return The normalized path of this file as a {@link String}.
+     * @return The normalized path string denoting the same file or
+     *         directory as this instance.
      */
     public String getNormalizedPath() {
         return Paths.normalize(getPath(), separatorChar);
     }
 
+    /** {@inheritDoc} */
     @Override
     public TFile getCanonicalFile() throws IOException {
         String p = getCanonicalPath();
         return p.equals(getPath()) ? this : new TFile(p, detector);
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getCanonicalPath() throws IOException {
         return delegate.getCanonicalPath();
@@ -1381,7 +1438,7 @@ public final class TFile extends File {
      * @return The canonical or absolute path of this file as an
      *         instance of this class.
      */
-    public final TFile getCanOrAbsFile() {
+    public TFile getCanOrAbsFile() {
         String p = getCanOrAbsPath();
         return p.equals(getPath()) ? this : new TFile(p, detector);
     }
@@ -1415,8 +1472,8 @@ public final class TFile extends File {
      * it's a RAES encrypted ZIP file),
      * you should call {@link #isDirectory}, too.
      *
-     * @return The result of scanning the name of this file with its
-     *         {@link #getArchiveDetector() archive detector}.
+     * @return {@code true} if and only if the path represented by this
+     *         instance denotes an archive file.
      * @see    <a href="#falsePositives">Detecting Archive Paths and False Positives</a>
      * @see    #isDirectory
      * @see    #isEntry
@@ -1441,6 +1498,8 @@ public final class TFile extends File {
      * This will automount the (virtual) file system from the archive file and
      * return {@code true} if and only if it's a valid archive file.
      *
+     * @return {@code true} if and only if the path represented by this
+     *         instance names an archive file as its ancestor.
      * @see <a href="#falsePositives">Detecting Archive Paths and False Positives</a>
      * @see #isArchive
      * @see #isDirectory
@@ -1464,6 +1523,8 @@ public final class TFile extends File {
      * In order to support unlimited nesting levels, this method returns
      * a {@code TFile} instance which again could be an entry within
      * another archive file.
+     * 
+     * @return The innermost archive file in this path.
      */
     public @CheckForNull TFile getInnerArchive() {
         return innerArchive;
@@ -1482,6 +1543,8 @@ public final class TFile extends File {
      * This method always returns an undotified path, i.e. all occurences of
      * {@code "."} and {@code ".."} in the path name are removed according to
      * their meaning wherever possible.
+     * 
+     * @return The entry name in the innermost archive file.
      */
     public @Nullable String getInnerEntryName() {
         return this == innerArchive
@@ -1508,6 +1571,8 @@ public final class TFile extends File {
      * In order to support unlimited nesting levels, this method returns
      * a {@code TFile} instance which again could be an entry within
      * another archive file.
+     * 
+     * @return The enclosing archive file in this path.
      */
     public @CheckForNull TFile getEnclArchive() {
         return enclArchive;
@@ -1523,20 +1588,25 @@ public final class TFile extends File {
      * This method always returns an undotified path, i.e. all occurences of
      * {@code "."} and {@code ".."} in the path are removed according to their
      * meaning wherever possible.
+     * 
+     * @return The entry path in the enclosing archive file.
      */
     public @Nullable String getEnclEntryName() {
         return null == enclEntryName ? null : enclEntryName.getPath();
     }
 
-    final @Nullable FsEntryName getEnclEntryName0() {
+    @Nullable FsEntryName getEnclEntryName0() {
         return enclEntryName;
     }
 
     /**
-     * Returns the {@link TArchiveDetector} that was used to construct this
-     * object - never {@code null}.
+     * Returns the {@link TArchiveDetector} that was used to detect any archive
+     * files in the path of this file object at construction time.
+     * 
+     * @return The {@link TArchiveDetector} that was used to detect any archive
+     *         files in the path of this file object at construction time.
      */
-    public final TArchiveDetector getArchiveDetector() {
+    public TArchiveDetector getArchiveDetector() {
         return detector;
     }
 
@@ -1557,6 +1627,9 @@ public final class TFile extends File {
 
     /**
      * Returns a file system controller if and only if the path denotes an
+     * archive file, or {@code null} otherwise.
+     * 
+     * @return A file system controller if and only if the path denotes an
      * archive file, or {@code null} otherwise.
      */
     @Nullable FsController<?> getController() {
@@ -1587,7 +1660,7 @@ public final class TFile extends File {
     /**
      * Returns {@code true} if and only if the path represented
      * by this instance is a direct or indirect parent of the path
-     * represented by the specified {@code file}.
+     * represented by the given {@code file}.
      * <p>
      * Note:
      * <ul>
@@ -1596,8 +1669,11 @@ public final class TFile extends File {
      *     It just tests the paths.
      * </ul>
      *
-     * @param file The path to test for being a direct or indirect child of
-     *        this path.
+     * @param file The file object for the path to test for being a direct or
+     *        indirect child of the path of this instance.
+     * @return {@code true} if and only if the path represented
+     *         by this instance is a direct or indirect parent of the path
+     *         represented by the given {@code file}.
      */
     public boolean isParentOf(File file) {
         String a = this.getAbsolutePath();
@@ -1607,8 +1683,7 @@ public final class TFile extends File {
 
     /**
      * Returns {@code true} if and only if the path represented
-     * by this instance contains the path represented by the specified
-     * {@code file},
+     * by this instance contains the path represented by the given {@code file},
      * where a path is said to contain another path if and only
      * if it's equal or an ancestor of the other path.
      * <p>
@@ -1619,7 +1694,11 @@ public final class TFile extends File {
      *     It just tests the paths.
      * </ul>
      *
-     * @param file The path to test for being contained by this path.
+     * @param  file The file object for the path to test for being contained by
+     *         the path of this instance.
+     * @return {@code true} if and only if the path represented
+     *         by this instance contains the path represented by the given
+     *         {@code file}
      * @throws NullPointerException If the parameter is {@code null}.
      */
     public boolean contains(File file) {
@@ -1639,8 +1718,10 @@ public final class TFile extends File {
      *     It just tests the paths.
      * </ul>
      *
-     * @param a The file to test for containing {@code b}.
-     * @param b The file to test for being contained by {@code a}.
+     * @param  a the file to test for containing {@code b}.
+     * @param  b the file to test for being contained by {@code a}.
+     * @return {@code true} if and only if the path represented
+     *         by {@code a} contains the path represented by {@code b}.
      * @throws NullPointerException If any parameter is {@code null}.
      */
     public static boolean contains(File a, File b) {
@@ -1652,6 +1733,9 @@ public final class TFile extends File {
     /**
      * Returns {@code true} if and only if this file denotes a file system
      * root or a UNC (if running on the Windows platform).
+     * 
+     * @return {@code true} if and only if this file denotes a file system
+     *         root or a UNC (if running on the Windows platform).
      */
     public boolean isFileSystemRoot() {
         TFile canOrAbsFile = getCanOrAbsFile();
@@ -1661,14 +1745,19 @@ public final class TFile extends File {
     /**
      * Returns {@code true} if and only if this file denotes a UNC.
      * Note that this should be relevant on the Windows platform only.
+     * 
+     * @return {@code true} if and only if this file denotes a UNC.
      */
     public boolean isUNC() {
         return isUNC(getCanOrAbsPath());
     }
 
     /**
-     * Returns {@code true} iff the given path is a UNC.
+     * Returns {@code true} if and only if this file denotes a UNC.
      * Note that this may be only relevant on the Windows platform.
+     * 
+     * @param  path a file path.
+     * @return {@code true} if and only if {@code path} denotes a UNC.
      */
     private static boolean isUNC(String path) {
         return path.startsWith(UNC_PREFIX) && path.indexOf(separatorChar, 2) > 2;
@@ -1720,10 +1809,10 @@ public final class TFile extends File {
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritDoc }
      * <p>
      * The implementation in the class {@link TFile} delegates the call to its
-     * {@link #getFile() decorated file}.
+     * {@link #getFile() decorated file} object.
      * This implies that only the hierarchicalized file system path
      * of this file instance is considered in the comparison.
      * E.g. {@code new TFile(FsPath.create("zip:file:/archive!/entry"))} and
@@ -1742,7 +1831,7 @@ public final class TFile extends File {
      * {@code new TFile("file").toFsPath().getHierarchicalUri().compareTo(new TFile("FILE").toFsPath().getHierarchicalUri()) == 0}
      * is false because {@link FsPath#equals(Object)} is case sensitive.
      *
-     * @see #equals(Object)
+     * @see   #equals(Object)
      */
     @Override
     public int compareTo(File other) {
@@ -1764,26 +1853,31 @@ public final class TFile extends File {
                 : innerArchive;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getPath() {
         return delegate.getPath();
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getName() {
         return delegate.getName();
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean isAbsolute() {
         return delegate.isAbsolute();
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean isHidden() {
         return delegate.isHidden();
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         return delegate.toString();
@@ -1819,6 +1913,7 @@ public final class TFile extends File {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public URI toURI() {
         try {
@@ -1846,6 +1941,7 @@ public final class TFile extends File {
         }
     }
 
+    /** {@inheritDoc} */
     @Deprecated
     @Override
     public URL toURL() throws MalformedURLException {
@@ -1941,6 +2037,8 @@ public final class TFile extends File {
      * If this file is a true archive file, its archive driver is asked to
      * return an icon to be displayed for this file.
      * Otherwise, null is returned.
+     * 
+     * @return An icon or {@code null}.
      */
     public @CheckForNull Icon getOpenIcon() {
         if (this == innerArchive) {
@@ -1956,6 +2054,8 @@ public final class TFile extends File {
      * If this file is a true archive file, its archive driver is asked to
      * return an icon to be displayed for this file.
      * Otherwise, null is returned.
+     * 
+     * @return An icon or {@code null}.
      */
     public @CheckForNull Icon getClosedIcon() {
         if (this == innerArchive) {
@@ -1967,6 +2067,7 @@ public final class TFile extends File {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean canRead() {
         if (null != innerArchive) {
@@ -1980,6 +2081,7 @@ public final class TFile extends File {
         return delegate.canRead();
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean canWrite() {
         if (null != innerArchive) {
@@ -2206,8 +2308,8 @@ public final class TFile extends File {
      */
     @Override
     public @Nullable TFile[] listFiles(
-            @CheckForNull FilenameFilter filenameFilter) {
-        return listFiles(filenameFilter, detector);
+            @CheckForNull FilenameFilter filter) {
+        return listFiles(filter, detector);
     }
 
     /**
@@ -2221,7 +2323,8 @@ public final class TFile extends File {
      * <p>
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      *
-     * @param  detector The archive detector to detect any archives files in
+     * @param  filter the file filter.
+     * @param  detector the archive detector to detect any archives files in
      *         the member file names.
      * @return {@code null} if this is not a directory or an archive file,
      *         a valid (but maybe empty) array otherwise.
@@ -2267,8 +2370,8 @@ public final class TFile extends File {
      * listFiles(fileFilter, getArchiveDetector())}.
      */
     @Override
-    public @Nullable TFile[] listFiles(@CheckForNull FileFilter fileFilter) {
-        return listFiles(fileFilter, detector);
+    public @Nullable TFile[] listFiles(@CheckForNull FileFilter filter) {
+        return listFiles(filter, detector);
     }
 
     /**
@@ -2281,6 +2384,7 @@ public final class TFile extends File {
      * <p>
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      *
+     * @param  filter the file filter.
      * @param  detector The archive detector to detect any archives files in
      *         the member file names.
      * @return {@code null} if this is not a directory or an archive file,
@@ -2368,6 +2472,7 @@ public final class TFile extends File {
         return delegate.createNewFile();
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean mkdirs() {
         if (null == innerArchive)
@@ -2468,7 +2573,7 @@ public final class TFile extends File {
      */
     @Deprecated
     @Override
-    public final boolean delete() {
+    public boolean delete() {
         try {
             rm(this);
             return true;
@@ -2492,8 +2597,10 @@ public final class TFile extends File {
     /**
      * Deletes the given file or directory.
      * If the file is a directory, it must be empty.
+     * <p>
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      *
+     * @param  node the file or directory.
      * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
@@ -2525,7 +2632,6 @@ public final class TFile extends File {
 
     /**
      * Recursively deletes the given file or directory tree.
-     * This file system operation is <em>not</em> atomic.
      * <p>
      * If {@code node} is an instance of this
      * class, its {@link #getArchiveDetector() archive detector}
@@ -2533,7 +2639,10 @@ public final class TFile extends File {
      * Otherwise,
      * {@link TArchiveDetector#NULL}
      * is used to detect prospective archive files in the directory tree.
+     * <p>
+     * This file system operation is <em>not</em> atomic.
      * 
+     * @param  node the file or directory tree.
      * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      * @see    <a href="#traversal">Traversing Directory Trees</a>
@@ -2560,13 +2669,15 @@ public final class TFile extends File {
     /**
      * {@inheritDoc}
      * 
+     * @param  dst the destination file or directory tree.
+     * @return {@code true} on success or {@code false} otherwise.
      * @deprecated This method just returns a boolean value to indicate failure,
      *             which is hard to analyze.
      * @see #mv(File)
      */
     @Deprecated
     @Override
-    public final boolean renameTo(final File dst) {
+    public boolean renameTo(final File dst) {
         try {
             mv(this, dst, detector);
             return true;
@@ -2748,6 +2859,7 @@ public final class TFile extends File {
      * </tbody>
      * </table>
      *
+     * @param  in the input stream.
      * @param  dst the destination file. Note that although this just needs to
      *         be a plain {@code File}, archive entries are only
      *         supported for instances of this class.
@@ -2814,6 +2926,7 @@ public final class TFile extends File {
      * @param  src the source file. Note that although this just needs to
      *         be a plain {@code File}, archive entries are only
      *         supported for instances of this class.
+     * @param  out the output stream.
      * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
@@ -3122,6 +3235,10 @@ public final class TFile extends File {
      * @param  dst the destination file. Note that although this just needs to
      *         be a plain {@code File}, archive files and entries
      *         are only supported for instances of this class.
+     * @param  srcDetector the archive detector to use for detecting any
+     *         archive files in the source directory tree.
+     * @param  dstDetector the archive detector to use for detecting any
+     *         archive files in the destination directory tree.
      * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      * @see    <a href="#traversal">Traversing Directory Trees</a>
