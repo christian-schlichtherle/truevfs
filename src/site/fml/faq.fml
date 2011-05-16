@@ -2,7 +2,8 @@
 <faqs   xmlns="http://maven.apache.org/FML/1.0.1"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://maven.apache.org/FML/1.0.1 http://maven.apache.org/xsd/fml-1.0.1.xsd"
-        title="Frequently Asked Questions">
+        title="Frequently Asked Questions"
+        toplink="false">
     <part id="file">
         <title>TrueZIP File* module</title>
         <faq id="cannotReadArchive">
@@ -29,11 +30,7 @@
                     (virtual) directory of the archive file
                     <code>archive.zip</code>, you could use...
                 </p>
-                <pre>
-                    <code>
-TFile[] entries = new TFile("archive.zip").listFiles();
-                    </code>
-                </pre>
+                <source>TFile[] entries = new TFile("archive.zip").listFiles();</source>
             </answer>
         </faq>
         <faq id="cannotWriteArchive">
@@ -60,16 +57,14 @@ TFile[] entries = new TFile("archive.zip").listFiles();
                     <code>entry</code> within the archive file
                     <code>archive.zip</code>, you could use...
                 </p>
-                <pre>
-                    <code>
+<source>
 OutputStream out = new TFileOutputStream("archive.zip/entry");
 try {
     ... // write something here
 } finally {
     out.close();
 }
-                    </code>
-                </pre>
+</source>
                 <p>
                     This would work even if
                     <code>archive.zip</code> would not initially exist unless
@@ -78,11 +73,7 @@ try {
                     In this case, you would need to create the archive file
                     <code>archive.zip</code> in advance by using...
                 </p>
-                <pre>
-                    <code>
-new TFile("archive.zip").mkdir(false);
-                    </code>
-                </pre>
+                <source>new TFile("archive.zip").mkdir(false);</source>
             </answer>
         </faq>
         <faq id="cannotCopyFileToArchive">
@@ -105,13 +96,11 @@ new TFile("archive.zip").mkdir(false);
                     <em>never</em> do path name completion.
                     Hence, the following code may behave unexpectedly:
                 </p>
-                <pre>
-                    <code>
+<source>
 TFile src = new TFile(string1); // e.g. "file"
 TFile dst = new TFile(string2); // e.g. "archive.zip"
 src.cp_rp(dst);
-                    </code>
-                </pre>
+</source>
                 <p>
                     If successful, this would only result in a verbatim copy of 
                     <code>file</code> to 
@@ -119,15 +108,13 @@ src.cp_rp(dst);
                     However, the way the copy command line utilities work can
                     be easily emulated by using the following instead:
                 </p>
-                <pre>
-                    <code>
+<source>
 TFile src = new TFile(string1); // e.g. "file"
 TFile dst = new TFile(string2); // e.g. "archive.zip"
 if (TFile.isLenient() &amp;&amp; dst.isArchive() || dst.isDirectory())
     dst = new TFile(dst, src.getName());
 src.cp_rp(dst);
-                    </code>
-                </pre>
+</source>
                 <p>
                     This will append the base name of the source path to the
                     destination path if either the destination path name ends
@@ -138,29 +125,25 @@ src.cp_rp(dst);
                     <code>TFile.setLenient(false)</code> is never called by
                     your application, then you could shorten this to...
                 </p>
-                <pre>
-                    <code>
+<source>
 TFile src = new TFile(string1); // e.g. "file"
 TFile dst = new TFile(string2); // e.g. "archive.zip"
 if (dst.isArchive() || dst.isDirectory())
     dst = new TFile(dst, src.getName());
 src.cp_rp(dst);
-                    </code>
-                </pre>
+</source>
                 <p>
                     If you don't like path name completion for non-existent
                     files which just look like archive files according to their
                     file name, then you could even shorten this to...
                 </p>
-                <pre>
-                    <code>
+<source>
 TFile src = new TFile(string1); // e.g. "file"
 TFile dst = new TFile(string2); // e.g. "archive.zip"
 if (dst.isDirectory())
     dst = new TFile(dst, src.getName());
 src.cp_rp(dst);
-                    </code>
-                </pre>
+</source>
             </answer>
         </faq>
         <faq id="cannotListArchive">
@@ -176,8 +159,7 @@ src.cp_rp(dst);
                     To make sure it does, call the following somewhere at the
                     start of your application:
                 </p>
-                <pre>
-                    <code>
+<source>
 TFile.setDefaultArchiveDetector(
         new TArchiveDetector(
             TArchiveDetector.NULL,
@@ -187,8 +169,7 @@ TFile.setDefaultArchiveDetector(
                 { "tbz|tb2|tar.bz2", new TarBZip2Driver(IOPoolLocator.SINGLETON) },
                 { "zip", new ZipDriver(IOPoolLocator.SINGLETON)},
             }));
-                    </code>
-                </pre>
+</source>
                 <p>
                     Check the
                     <a href="archetypes.html">Maven Archetypes</a> for more
@@ -221,11 +202,7 @@ TFile.setDefaultArchiveDetector(
                     Committing any unsynchronized changes to all archive files
                     is easy - just call...
                 </p>
-                <pre>
-                    <code>
-TFile.umount();
-                    </code>
-                </pre>
+                <source>TFile.umount();</source>
                 <p>
                     Please have a look at the method's
                     <a href="apidocs/de/schlichtherle/truezip/file/TFile.html#umount()">Javadoc</a>
@@ -246,6 +223,56 @@ TFile.umount();
                     article with samples in the
                     <a href="truezip-samples/index.html">TrueZIP Samples</a>
                     module.
+                </p>
+            </answer>
+        </faq>
+        <faq id="accessAbsoluteEntries">
+            <question>
+                How can I access entries with an absolute path name in an
+                archive file?
+            </question>
+            <answer>
+                <p>
+                    You can't because there is no addressing scheme for entries
+                    with absolute path names in archive files.
+                </p>
+                <p>
+                    For example, the expression
+                    <code>new TFile("archive.zip/entry")</code> gets decomposed
+                    into the path <code>archive.zip</code> as the mount point
+                    of the archive file and the relative path name
+                    <code>entry</code> as the entry name within this archive.
+                    There's no expression to address the absolute path name
+                    <code>/entry</code> within the archive file instead.
+                    Even if you would use the expression
+                    <code>new TFile("archive.zip//entry")</code> instead, it
+                    would just get normalized to the previous expression.
+                </p>
+            </answer>
+        </faq>
+        <faq id="treatAbsoluteEntries">
+            <question>
+                How does TrueZIP handle entries with absolute path names in
+                an archive file?
+            </question>
+            <answer>
+                <p>
+                    As answered <a href="#accessAbsoluteEntries">here</a>,
+                    you cannot access entries with absolute path names in
+                    archive files.
+                    This implies that you cannot create an archive file which
+                    contains entries with absolute path names.
+                </p>
+                <p>
+                    However, you can use TrueZIP to read, modify or delete
+                    archive files which contain entries with absolute path
+                    names.
+                    So if you use TrueZIP to modify an archive file which
+                    contains entries with absolute path names, these entries
+                    are preserved.
+                    Likewise, an archive file can get deleted like any empty
+                    directory if it contains entries with absolute path names
+                    only.
                 </p>
             </answer>
         </faq>
