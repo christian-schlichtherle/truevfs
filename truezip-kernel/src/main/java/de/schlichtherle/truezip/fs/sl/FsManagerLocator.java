@@ -21,7 +21,6 @@ import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.FsManagerProvider;
 import de.schlichtherle.truezip.fs.spi.FsManagerService;
 import de.schlichtherle.truezip.util.ServiceLocator;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Iterator;
@@ -56,13 +55,10 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 @DefaultAnnotation(NonNull.class)
-@edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
 public final class FsManagerLocator implements FsManagerProvider {
 
     /** The singleton instance of this class. */
     public static final FsManagerLocator SINGLETON = new FsManagerLocator();
-
-    private volatile @CheckForNull FsManager manager;
 
     /** You cannot instantiate this class. */
     private FsManagerLocator() {
@@ -70,13 +66,14 @@ public final class FsManagerLocator implements FsManagerProvider {
 
     @Override
     public FsManager get() {
-        FsManager manager = this.manager;
-        if (null != manager) // DCL does work with volatile fields since JSE 5!
-            return manager;
-        synchronized (this) {
-            manager = this.manager;
-            if (null != manager)
-                return manager;
+        return Holder.MANAGER;
+    }
+
+    /** A static data utility class used for lazy initialization. */
+    private static class Holder {
+        static final FsManager MANAGER;
+        static {
+            FsManager manager;
             final Logger
                     logger = Logger.getLogger(  FsManagerLocator.class.getName(),
                                                 FsManagerLocator.class.getName());
@@ -98,7 +95,11 @@ public final class FsManagerLocator implements FsManagerProvider {
                 manager = new FsFailSafeManager(new FsDefaultManager());
                 logger.log(Level.CONFIG, "default", manager);
             }
-            return this.manager = manager;
+            MANAGER = manager;
         }
-    }
+
+        /** You cannot instantiate this class. */
+        Holder() {
+        }
+    } // class Holder
 }
