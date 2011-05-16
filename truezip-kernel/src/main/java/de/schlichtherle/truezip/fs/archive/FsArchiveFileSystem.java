@@ -66,8 +66,8 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
     /** Whether or not this file system has been modified (touched). */
     private boolean touched;
 
-    private LinkedHashSet<FsArchiveFileSystemTouchListener<? super E>> touchListeners
-            = new LinkedHashSet<FsArchiveFileSystemTouchListener<? super E>>();
+    private LinkedHashSet<FsArchiveFileSystemTouchListener<? super E>>
+            touchListeners = new LinkedHashSet<FsArchiveFileSystemTouchListener<? super E>>();
 
     /**
      * Returns a new archive file system and ensures its integrity.
