@@ -31,7 +31,7 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-public class FsConcurrentModel extends FsDecoratingModel<FsModel> {
+public final class FsConcurrentModel extends FsDecoratingModel<FsModel> {
 
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
@@ -39,29 +39,48 @@ public class FsConcurrentModel extends FsDecoratingModel<FsModel> {
         super(model);
     }
 
-    public final ReadLock readLock() {
+    ReadLock readLock() {
         return lock.readLock();
     }
 
-    public final WriteLock writeLock() {
+    WriteLock writeLock() {
         return lock.writeLock();
     }
 
     /**
+     * Returns {@code true} if and only if the write lock is held by the
+     * current thread.
+     * This method should only get used for assert statements, not for lock
+     * control!
+     * 
+     * @return {@code true} if and only if the write lock is held by the
+     *         current thread.
+     * @see    #assertWriteLockedByCurrentThread()
+     */
+    public boolean isWriteLockedByCurrentThread() {
+        return lock.isWriteLockedByCurrentThread();
+    }
+
+    /**
+     * Asserts that the write lock is held by the current thread.
+     * Use this method for lock control.
+     * 
      * @throws FsNotWriteLockedException if the <i>write lock</i> is not
      *         held by the current thread.
+     * @see    #isWriteLockedByCurrentThread()
      */
-    public final void assertWriteLockedByCurrentThread()
+    public void assertWriteLockedByCurrentThread()
     throws FsNotWriteLockedException {
         if (!lock.isWriteLockedByCurrentThread())
             throw new FsNotWriteLockedException(this);
     }
 
     /**
+     * @param  ex the caught exception.
      * @throws FsNotWriteLockedException if the <i>read lock</i> is
      *         held by the current thread.
      */
-    public final void assertNotReadLockedByCurrentThread(FsNotWriteLockedException ex)
+    void assertNotReadLockedByCurrentThread(FsNotWriteLockedException ex)
     throws FsNotWriteLockedException {
         if (0 < lock.getReadHoldCount())
             throw new FsNotWriteLockedException(this, ex);

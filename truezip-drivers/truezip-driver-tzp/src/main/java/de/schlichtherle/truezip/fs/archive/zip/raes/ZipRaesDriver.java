@@ -22,7 +22,6 @@ import de.schlichtherle.truezip.key.PromptingKeyProvider;
 import de.schlichtherle.truezip.crypto.raes.param.KeyManagerRaesParameters;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.FsConcurrentModel;
 import de.schlichtherle.truezip.socket.LazyOutputSocket;
 import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
@@ -47,6 +46,7 @@ import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import java.io.CharConversionException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import net.jcip.annotations.Immutable;
@@ -158,7 +158,7 @@ public abstract class ZipRaesDriver extends JarDriver {
      */
     @Override
     public final ZipInputShop
-    newInputShop(   final FsConcurrentModel model,
+    newInputShop(   final FsModel model,
                     final InputSocket<?> target)
     throws IOException {
         class Input extends DecoratingInputSocket<Entry> {
@@ -185,6 +185,11 @@ public abstract class ZipRaesDriver extends JarDriver {
                     throw ex;
                 }
             }
+
+            @Override
+            public InputStream newInputStream() throws IOException {
+                throw new UnsupportedOperationException(); // TODO: Support this feature for STORED entries.
+            }
         } // class Input
 
         return super.newInputShop(model, new Input());
@@ -198,7 +203,7 @@ public abstract class ZipRaesDriver extends JarDriver {
      */
     @Override
     public OutputShop<ZipArchiveEntry>
-    newOutputShop(  final FsConcurrentModel model,
+    newOutputShop(  final FsModel model,
                     final OutputSocket<?> target,
                     final @CheckForNull InputShop<ZipArchiveEntry> source)
     throws IOException {

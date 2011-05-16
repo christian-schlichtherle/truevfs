@@ -17,7 +17,7 @@ package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
-import de.schlichtherle.truezip.fs.archive.DummyArchiveDriver;
+import de.schlichtherle.truezip.fs.archive.MockArchiveDriver;
 import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
 import java.util.Locale;
 import java.util.Map;
@@ -34,7 +34,7 @@ import static de.schlichtherle.truezip.file.TArchiveDetector.NULL;
  */
 public class TArchiveDetectorTest {
 
-    private static final FsArchiveDriver<?> DRIVER = new DummyArchiveDriver();
+    private static final FsArchiveDriver<?> DRIVER = new MockArchiveDriver();
     private TArchiveDetector detector;
 
     @Before
@@ -58,7 +58,7 @@ public class TArchiveDetectorTest {
                     { NULL, null, null },
                     { NULL, null, DRIVER },
                     //{ TArchiveDetector.NULL, "xyz", null },
-                    { null, new Object[][] {{ "xyz", DummyArchiveDriver.class }} },
+                    { null, new Object[][] {{ "xyz", MockArchiveDriver.class }} },
                     { NULL, null },
                     { NULL, new Object[][] {{ null, null }} },
                     { NULL, new Object[][] {{ null, "" }} },
@@ -99,7 +99,7 @@ public class TArchiveDetectorTest {
                     { NULL, new Object[][] {{ "|.|.", DRIVER }} }, // empty suffix set
                     { NULL, new Object[][] {{ "anySuffix", "" }} }, // empty class name
                     { NULL, new Object[][] {{ "anySuffix", "xyz" }} }, // not a class name
-                    { NULL, new Object[][] {{ DummyArchiveDriver.class, DRIVER }} }, // not a suffix list
+                    { NULL, new Object[][] {{ MockArchiveDriver.class, DRIVER }} }, // not a suffix list
                     { NULL, new Object[][] {{ DRIVER, DRIVER }} }, // not a suffix list
                     { NULL, new Object[][] {{ "anySuffix", new Object() }} }, // not an archive driver
                     { NULL, new Object[][] {{ "anySuffix", Object.class }} }, // not an archive driver class

@@ -23,10 +23,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class CharsetArchiveDriverTestSuite {
+public abstract class FsCharsetArchiveDriverTestSuite {
 
     private static class ByteArrayIOPoolProvider implements IOPoolProvider {
         @Override

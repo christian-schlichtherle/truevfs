@@ -189,7 +189,7 @@ extends FsDecoratingController< FsConcurrentModel,
                         final BitField<FsOutputOption> options,
                         final Entry template)
     throws IOException {
-        assert getModel().writeLock().isHeldByCurrentThread();
+        assert getModel().isWriteLockedByCurrentThread();
 
         final EntryCache cache = caches.get(name);
         if (null != cache) {
@@ -205,7 +205,8 @@ extends FsDecoratingController< FsConcurrentModel,
     @Override
     public void unlink(final FsEntryName name)
     throws IOException {
-        assert getModel().writeLock().isHeldByCurrentThread();
+        assert getModel().isWriteLockedByCurrentThread();
+
         final EntryCache cache = caches.get(name);
         if (null != cache) {
             //cache.flush(); // redundant
@@ -230,7 +231,7 @@ extends FsDecoratingController< FsConcurrentModel,
             final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
-        assert getModel().writeLock().isHeldByCurrentThread();
+        assert getModel().isWriteLockedByCurrentThread();
 
         if (0 >= caches.size())
             return;
@@ -313,7 +314,6 @@ extends FsDecoratingController< FsConcurrentModel,
             return null != input ? input : (this.input = cache.getInputSocket());
         }
 
-        /** An input socket proxy. */
         /*private class ProxyInputSocket
         extends DecoratingInputSocket<Entry> {
             ProxyInputSocket(InputSocket <?> input) {
@@ -357,7 +357,7 @@ extends FsDecoratingController< FsConcurrentModel,
 
             @Override
             public OutputStream newOutputStream() throws IOException {
-                assert getModel().writeLock().isHeldByCurrentThread();
+                assert getModel().isWriteLockedByCurrentThread();
 
                 makeEntry();
                 final OutputStream out = getBoundSocket().newOutputStream();
@@ -365,7 +365,11 @@ extends FsDecoratingController< FsConcurrentModel,
                 return out;
             }
 
-            /** Ensure the existence of an entry in the file system. */
+            /**
+             * Ensures the existence of an entry in the file system.
+             * 
+             * @throws IOException on any I/O error.
+             */
             void makeEntry() throws IOException {
                 boolean mknod = null != template;
                 if (!mknod) {

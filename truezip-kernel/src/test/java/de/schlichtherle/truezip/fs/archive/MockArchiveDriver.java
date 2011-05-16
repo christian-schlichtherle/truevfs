@@ -17,27 +17,30 @@ package de.schlichtherle.truezip.fs.archive;
 
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Type;
-import de.schlichtherle.truezip.fs.FsConcurrentModel;
+import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.ByteArrayIOPool;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.OutputSocket;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
 /**
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class DummyArchiveDriver extends FsCharsetArchiveDriver<FsArchiveEntry> {
+@DefaultAnnotation(NonNull.class)
+public class MockArchiveDriver extends FsCharsetArchiveDriver<FsArchiveEntry> {
 
-    private static final IOPool<?> pool = new ByteArrayIOPool();
+    private static final IOPool<?> pool = new ByteArrayIOPool(2048);
     private static final Charset charset = Charset.forName("UTF-8");
 
-    public DummyArchiveDriver() {
+    public MockArchiveDriver() {
         super(charset);
     }
 
@@ -45,10 +48,10 @@ public class DummyArchiveDriver extends FsCharsetArchiveDriver<FsArchiveEntry> {
     public IOPool<?> getPool() {
         return pool;
     }
-    
+
     @Override
     public InputShop<FsArchiveEntry> newInputShop(
-            FsConcurrentModel model,
+            FsModel model,
             InputSocket<?> input)
     throws IOException {
         throw new UnsupportedOperationException("This is a dummy archive driver!");
@@ -56,7 +59,7 @@ public class DummyArchiveDriver extends FsCharsetArchiveDriver<FsArchiveEntry> {
 
     @Override
     public OutputShop<FsArchiveEntry> newOutputShop(
-            FsConcurrentModel model,
+            FsModel model,
             OutputSocket<?> output,
             InputShop<FsArchiveEntry> source)
     throws IOException {
@@ -66,6 +69,6 @@ public class DummyArchiveDriver extends FsCharsetArchiveDriver<FsArchiveEntry> {
     @Override
     public FsArchiveEntry newEntry(String name, Type type, Entry template)
     throws CharConversionException {
-        return new DummyArchiveEntry(name, type, template);
+        return new MockArchiveEntry(name, type, template);
     }
 }

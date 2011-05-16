@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.fs.archive.zip;
 
-import de.schlichtherle.truezip.fs.FsConcurrentModel;
+import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 import java.io.IOException;
@@ -49,7 +49,7 @@ public class CheckedJarDriver extends JarDriver {
     }
 
     @Override
-    protected ZipInputShop newZipInputShop(FsConcurrentModel model, ReadOnlyFile rof)
+    protected ZipInputShop newZipInputShop(FsModel model, ReadOnlyFile rof)
     throws IOException {
         return new CheckedZipInputShop(rof, this);
     }

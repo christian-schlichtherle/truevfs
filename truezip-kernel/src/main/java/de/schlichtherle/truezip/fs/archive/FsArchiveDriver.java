@@ -107,7 +107,7 @@ implements EntryFactory<E> {
      * Creates a new input shop for reading the archive entries for the
      * given {@code model} from the given {@code input} socket's target.
      * 
-     * @param  model the concurrent file system model.
+     * @param  model the file system model.
      * @param  input the input socket for reading the contents of the archive
      *         from its target.
      * @return A new input shop.
@@ -130,7 +130,7 @@ implements EntryFactory<E> {
      *         file system is synchronized with its parent file system.
      */
     public abstract InputShop<E>
-    newInputShop(   FsConcurrentModel model,
+    newInputShop(   FsModel model,
                     InputSocket<?> input)
     throws IOException;
 
@@ -138,7 +138,7 @@ implements EntryFactory<E> {
      * Creates a new output shop for writing archive entries for the
      * given {@code model} to the given {@code output} socket's target.
      * 
-     * @param  model the concurrent file system model.
+     * @param  model the file system model.
      * @param  output the output socket for writing the contents of the
      *         archive to its target.
      * @param  source the {@link InputShop} if {@code archive} is going to get
@@ -161,7 +161,7 @@ implements EntryFactory<E> {
      *         file system is synchronized with its parent file system.
      */
     public abstract OutputShop<E>
-    newOutputShop(  FsConcurrentModel model,
+    newOutputShop(  FsModel model,
                     OutputSocket<?> output,
                     @CheckForNull InputShop<E> source)
     throws IOException;
@@ -173,12 +173,12 @@ implements EntryFactory<E> {
      * The implementation in the abstract class {@code FsArchiveDriver} simply
      * returns {@code null}.
      *
-     * @param  model the concurrent file system model.
+     * @param  model the file system model.
      * @return The icon that should be displayed for the given archive file
      *         if it's open/expanded in the view.
      *         If {@code null} is returned, a default icon should be displayed.
      */
-    public @CheckForNull Icon getOpenIcon(FsConcurrentModel model) {
+    public @CheckForNull Icon getOpenIcon(FsModel model) {
         return null;
     }
 
@@ -189,12 +189,12 @@ implements EntryFactory<E> {
      * The implementation in the abstract class {@code FsArchiveDriver} simply
      * returns {@code null}.
      *
-     * @param  model the concurrent file system model.
+     * @param  model the file system model.
      * @return The icon that should be displayed for the given archive file
      *         if it's closed/collapsed in the view.
      *         If {@code null} is returned, a default icon should be displayed.
      */
-    public @CheckForNull Icon getClosedIcon(FsConcurrentModel model) {
+    public @CheckForNull Icon getClosedIcon(FsModel model) {
         return null;
     }
 }

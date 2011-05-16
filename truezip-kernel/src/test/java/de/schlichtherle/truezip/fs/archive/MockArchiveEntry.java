@@ -17,24 +17,26 @@ package de.schlichtherle.truezip.fs.archive;
 
 import de.schlichtherle.truezip.entry.Entry;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.EnumMap;
 import java.util.EnumSet;
 
 /**
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class DummyArchiveEntry implements FsArchiveEntry {
+@DefaultAnnotation(NonNull.class)
+final class MockArchiveEntry implements FsArchiveEntry {
 
     private final String name;
     private final Type type;
     private final EnumMap<Size, Long> sizes = new EnumMap<Size, Long>(Size.class);
     private final EnumMap<Access, Long> times = new EnumMap<Access, Long>(Access.class);
 
-    public DummyArchiveEntry(   final @NonNull String name,
-                                final @NonNull Type type,
-                                final @CheckForNull Entry template) {
+    MockArchiveEntry(   final String name,
+                        final Type type,
+                        final @CheckForNull Entry template) {
         assert null != name;
         assert null != type;
         this.name = name;

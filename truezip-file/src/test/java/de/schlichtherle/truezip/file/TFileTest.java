@@ -22,7 +22,7 @@ import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.logging.Level;
-import de.schlichtherle.truezip.fs.archive.DummyArchiveDriver;
+import de.schlichtherle.truezip.fs.archive.MockArchiveDriver;
 import de.schlichtherle.truezip.fs.FsPath;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -54,7 +54,7 @@ public class TFileTest {
     private static final TArchiveDetector DETECTOR
             = new TArchiveDetector(
                 "ear|exe|jar|odb|odf|odg|odm|odp|ods|odt|otg|oth|otp|ots|ott|tar|tar.bz2|tar.gz|tbz2|tgz|tzp|war|zip|zip.rae|zip.raes",
-                new DummyArchiveDriver());
+                new MockArchiveDriver());
 
     private TFile archive;
     private String scheme;

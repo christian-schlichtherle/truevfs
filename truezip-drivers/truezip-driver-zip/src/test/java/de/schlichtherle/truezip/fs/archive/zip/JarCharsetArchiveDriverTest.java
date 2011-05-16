@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
-import de.schlichtherle.truezip.fs.archive.CharsetArchiveDriverTestSuite;
+import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriverTestSuite;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 
 /**
@@ -23,7 +23,7 @@ import de.schlichtherle.truezip.socket.IOPoolProvider;
  * @version $Id$
  */
 public class JarCharsetArchiveDriverTest
-extends CharsetArchiveDriverTestSuite {
+extends FsCharsetArchiveDriverTestSuite {
 
     @Override
     protected JarDriver newArchiveDriver(IOPoolProvider provider) {

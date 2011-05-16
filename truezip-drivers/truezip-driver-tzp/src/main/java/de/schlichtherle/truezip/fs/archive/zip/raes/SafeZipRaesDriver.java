@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip.raes;
 
-import de.schlichtherle.truezip.fs.FsConcurrentModel;
+import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.archive.zip.CheckedZipInputShop;
 import de.schlichtherle.truezip.fs.archive.zip.ZipInputShop;
 import de.schlichtherle.truezip.key.KeyManagerProvider;
@@ -44,9 +44,9 @@ import net.jcip.annotations.Immutable;
  * small output size.
  * It's the ZIP inflation algorithm which actually comes to our rescue!
  * 
- * @author Christian Schlichtherle
+ * @see     ParanoidZipRaesDriver
+ * @author  Christian Schlichtherle
  * @version $Id$
- * @see ParanoidZipRaesDriver
  */
 @Immutable
 public class SafeZipRaesDriver extends ZipRaesDriver {
@@ -88,7 +88,7 @@ public class SafeZipRaesDriver extends ZipRaesDriver {
      */
     @Override
     protected final ZipInputShop
-    newZipInputShop(FsConcurrentModel model, ReadOnlyFile rof)
+    newZipInputShop(FsModel model, ReadOnlyFile rof)
     throws IOException {
         // Optimization: If the read-only file is smaller than the
         // authentication trigger, then its entire cipher text has already

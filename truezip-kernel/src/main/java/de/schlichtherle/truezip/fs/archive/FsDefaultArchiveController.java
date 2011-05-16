@@ -189,15 +189,21 @@ extends FsFileSystemArchiveController<E> {
         getFileSystem().addFsArchiveFileSystemTouchListener(touchListener);
     }
 
-    /** Ensures that {@link #output} is not {@code null}. */
-    void makeOutput(final BitField<FsOutputOption> options,
-                    final Entry rootTemplate)
+    /**
+     * Ensures that {@link #output} is not {@code null}.
+     * 
+     * @param  options a bit field of output options.
+     * @param  root the root entry of the file system to use as a template for
+     *         the output entry in the parent file system controller.
+     * @throws IOException on any I/O error.
+     */
+    void makeOutput(final BitField<FsOutputOption> options, final Entry root)
     throws IOException {
         if (null != output)
             return;
         final OutputSocket<?> socket = parent.getOutputSocket(
                 parentName, options.set(FsOutputOption.CACHE),
-                useRootTemplate ? rootTemplate : null);
+                useRootTemplate ? root : null);
         final Input input = this.input;
         output = new Output(driver.newOutputShop(getModel(), socket,
                     null != input ? input.getDelegate() : null));
@@ -263,7 +269,7 @@ extends FsFileSystemArchiveController<E> {
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         assert !isTouched() || null != output; // file system touched => output archive
-        assert getModel().writeLock().isHeldByCurrentThread();
+        assert getModel().isWriteLockedByCurrentThread();
 
         if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT))
             throw new IllegalArgumentException();
@@ -289,10 +295,14 @@ extends FsFileSystemArchiveController<E> {
      * Waits for all entry input and entry output streams to close or forces
      * them to close, dependending on the {@code options}.
      *
-     * @param  options the output options.
-     * @param  handler the exception handler.
-     * @throws FsSyncException If any exceptional condition occurs
-     *         throughout the processing of the container archive file.
+     * @param  options a bit field of synchronization options.
+     * @param  handler the exception handling strategy for consuming input
+     *         {@code FsSyncException}s and/or assembling output
+     *         {@code IOException}s.
+     * @param  <X> The type of the {@code IOException} to throw at the
+     *         discretion of the exception {@code handler}.
+     * @throws IOException at the discretion of the exception {@code handler}
+     *         upon the occurence of an {@link FsSyncException}.
      */
     private <X extends IOException> void awaitSync(
             final BitField<FsSyncOption> options,
@@ -334,9 +344,13 @@ extends FsFileSystemArchiveController<E> {
      * Closes and disconnects all entry streams of the output and input
      * archive.
      *
-     * @param  handler the exception handler.
-     * @throws FsSyncException If any exceptional condition occurs
-     *         throughout the processing of the container archive file.
+     * @param  handler the exception handling strategy for consuming input
+     *         {@code FsSyncException}s and/or assembling output
+     *         {@code IOException}s.
+     * @param  <X> The type of the {@code IOException} to throw at the
+     *         discretion of the exception {@code handler}.
+     * @throws IOException at the discretion of the exception {@code handler}
+     *         upon the occurence of an {@link FsSyncException}.
      */
     private <X extends IOException> void commenceSync(
             final ExceptionHandler<? super FsSyncException, X> handler)
@@ -367,9 +381,13 @@ extends FsFileSystemArchiveController<E> {
      * Synchronizes all entries in the (virtual) archive file system with the
      * (temporary) output archive file.
      *
-     * @param  handler the exception handler.
-     * @throws IOException If any exceptional condition occurs throughout the
-     *         processing of the container archive file.
+     * @param  handler the exception handling strategy for consuming input
+     *         {@code FsSyncException}s and/or assembling output
+     *         {@code IOException}s.
+     * @param  <X> The type of the {@code IOException} to throw at the
+     *         discretion of the exception {@code handler}.
+     * @throws IOException at the discretion of the exception {@code handler}
+     *         upon the occurence of an {@link FsSyncException}.
      */
     private <X extends IOException> void performSync(
             final ExceptionHandler<? super FsSyncException, X> handler)
@@ -442,9 +460,13 @@ extends FsFileSystemArchiveController<E> {
     /**
      * Discards the file system and closes the output and input archive.
      *
-     * @param  handler the exception handler.
-     * @throws FsSyncException If any exceptional condition occurs
-     *         throughout the processing of the container archive file.
+     * @param  handler the exception handling strategy for consuming input
+     *         {@code FsSyncException}s and/or assembling output
+     *         {@code IOException}s.
+     * @param  <X> The type of the {@code IOException} to throw at the
+     *         discretion of the exception {@code handler}.
+     * @throws IOException at the discretion of the exception {@code handler}
+     *         upon the occurence of an {@link FsSyncException}.
      */
     private <X extends IOException> void commitSync(
             final ExceptionHandler<? super FsSyncException, X> handler)
@@ -479,7 +501,11 @@ extends FsFileSystemArchiveController<E> {
         return null != fileSystem && fileSystem.isTouched();
     }
 
-    /** A dummy input service to substitute for {@code null}. */
+    /**
+     * A dummy input service to substitute for {@code null}.
+     * 
+     * @param <E> The type of the entries.
+     */
     private static final class DummyInputService<E extends Entry>
     implements InputShop<E> {
 

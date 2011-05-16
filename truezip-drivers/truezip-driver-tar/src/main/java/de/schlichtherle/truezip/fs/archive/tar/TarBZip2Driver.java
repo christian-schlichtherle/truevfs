@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
-import de.schlichtherle.truezip.fs.FsConcurrentModel;
+import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -58,6 +58,8 @@ public class TarBZip2Driver extends TarDriver {
      * <p>
      * The implementation in the class {@link TarBZip2Driver} returns
      * {@link CBZip2OutputStream#MAX_BLOCKSIZE}.
+     * 
+     * @return The compression level to use when writing a BZIP2 output stream.
      */
     public int getLevel() {
         return CBZip2OutputStream.MAX_BLOCKSIZE;
@@ -72,7 +74,7 @@ public class TarBZip2Driver extends TarDriver {
      */
     @Override
     protected TarInputShop newTarInputShop(
-            final FsConcurrentModel model, final InputStream in)
+            final FsModel model, final InputStream in)
     throws IOException {
         // Consume and check the first two magic bytes. This is required for
         // the CBZip2InputStream class.
@@ -89,7 +91,7 @@ public class TarBZip2Driver extends TarDriver {
 
     @Override
     protected TarOutputShop newTarOutputShop(
-            final FsConcurrentModel model,
+            final FsModel model,
             final OutputStream out,
             final TarInputShop source)
     throws IOException {
