@@ -20,7 +20,6 @@ import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.key.KeyManagerProvider;
 import de.schlichtherle.truezip.key.spi.KeyManagerService;
 import de.schlichtherle.truezip.util.ServiceLocator;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Iterator;
@@ -54,14 +53,10 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 @DefaultAnnotation(NonNull.class)
-@edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
 public final class KeyManagerLocator implements KeyManagerProvider {
 
     /** The singleton instance of this class. */
-    public static final KeyManagerLocator
-            SINGLETON = new KeyManagerLocator();
-
-    private volatile @CheckForNull KeyManagerService service;
+    public static final KeyManagerLocator SINGLETON = new KeyManagerLocator();
 
     /** You cannot instantiate this class. */
     private KeyManagerLocator() {
@@ -69,13 +64,14 @@ public final class KeyManagerLocator implements KeyManagerProvider {
 
     @Override
     public <K> KeyManager<K> get(Class<K> type) {
-        KeyManagerService service = this.service;
-        if (null != service) // DCL does work with volatile fields since JSE 5!
-            return service.get(type);
-        synchronized (this) {
-            service = this.service;
-            if (null != service)
-                return service.get(type);
+        return Holder.SERVICE.get(type);
+    }
+
+    /** A static data utility class used for lazy initialization. */
+    private static class Holder {
+        static final KeyManagerService SERVICE;
+        static {
+            KeyManagerService service;
             final Logger
                     logger = Logger.getLogger(  KeyManagerLocator.class.getName(),
                                                 KeyManagerLocator.class.getName());
@@ -94,7 +90,11 @@ public final class KeyManagerLocator implements KeyManagerProvider {
                 service = new PromptingKeyManagerService();
                 logger.log(Level.CONFIG, "default", service);
             }
-            return (this.service = service).get(type);
+            SERVICE = service;
         }
-    }
+
+        /** You cannot instantiate this class. */
+        Holder() {
+        }
+    } // class Holder
 }

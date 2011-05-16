@@ -20,7 +20,6 @@ import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.fs.FsDriverProvider;
 import de.schlichtherle.truezip.fs.spi.FsDriverService;
 import de.schlichtherle.truezip.util.ServiceLocator;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Collections;
@@ -47,13 +46,10 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 @DefaultAnnotation(NonNull.class)
-@edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
 public final class FsDriverLocator implements FsDriverProvider {
 
     /** The singleton instance of this class. */
     public static final FsDriverLocator SINGLETON = new FsDriverLocator();
-
-    private volatile @CheckForNull Map<FsScheme, FsDriver> drivers;
 
     /** You cannot instantiate this class. */
     private FsDriverLocator() {
@@ -61,13 +57,14 @@ public final class FsDriverLocator implements FsDriverProvider {
 
     @Override
     public Map<FsScheme, FsDriver> get() {
-        Map<FsScheme, FsDriver> drivers = this.drivers;
-        if (null != drivers) // DCL does work with volatile fields since JSE 5!
-            return drivers;
-        synchronized (this) {
-            drivers = this.drivers;
-            if (null != drivers)
-                return drivers;
+        return Holder.DRIVERS;
+    }
+
+    /** A static data utility class used for lazy initialization. */
+    private static class Holder {
+        static final Map<FsScheme, FsDriver> DRIVERS;
+        static {
+            Map<FsScheme, FsDriver> drivers;
             final Logger
                     logger = Logger.getLogger(  FsDriverLocator.class.getName(),
                                                 FsDriverLocator.class.getName());
@@ -92,7 +89,11 @@ public final class FsDriverLocator implements FsDriverProvider {
                     }
                 }
             }
-            return this.drivers = Collections.unmodifiableMap(drivers);
+            DRIVERS = Collections.unmodifiableMap(drivers);
         }
-    }
+
+        /** You cannot instantiate this class. */
+        Holder() {
+        }
+    } // class Holder
 }

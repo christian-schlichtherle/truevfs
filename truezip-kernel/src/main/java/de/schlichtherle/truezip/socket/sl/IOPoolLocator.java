@@ -19,7 +19,6 @@ import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.socket.spi.IOPoolService;
 import de.schlichtherle.truezip.util.ServiceLocator;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Iterator;
@@ -51,13 +50,10 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 @DefaultAnnotation(NonNull.class)
-@edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
 public final class IOPoolLocator implements IOPoolProvider {
 
     /** The singleton instance of this class. */
     public static final IOPoolLocator SINGLETON = new IOPoolLocator();
-
-    private volatile @CheckForNull IOPoolService service;
 
     /** You cannot instantiate this class. */
     private IOPoolLocator() {
@@ -71,13 +67,14 @@ public final class IOPoolLocator implements IOPoolProvider {
      */
     @Override
     public IOPool<?> get() {
-        IOPoolService service = this.service;
-        if (null != service) // DCL does work with volatile fields since JSE 5!
-            return service.get();
-        synchronized (this) {
-            service = this.service;
-            if (null != service)
-                return service.get();
+        return Holder.SERVICE.get();
+    }
+
+    /** A static data utility class used for lazy initialization. */
+    private static class Holder {
+        static final IOPoolService SERVICE;
+        static {
+            IOPoolService service;
             final ServiceLocator locator = new ServiceLocator(
                     IOPoolLocator.class.getClassLoader());
             service = locator.getService(IOPoolService.class, null);
@@ -93,7 +90,11 @@ public final class IOPoolLocator implements IOPoolProvider {
             Logger  .getLogger( IOPoolLocator.class.getName(),
                                 IOPoolLocator.class.getName())
                     .log(Level.CONFIG, "located", service);
-            return (this.service = service).get();
+            SERVICE = service;
         }
-    }
+
+        /** You cannot instantiate this class. */
+        Holder() {
+        }
+    } // class Holder
 }
