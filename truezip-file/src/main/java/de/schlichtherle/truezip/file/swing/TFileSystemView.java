@@ -26,12 +26,13 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.text.MessageFormat;
 import javax.swing.Icon;
+import javax.swing.JFileChooser;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileSystemView;
 
 /**
  * A custom file system view required to browse archive files like (virtual)
- * directories with a JFileChooser.
+ * directories with a {@link JFileChooser}.
  * This class is used by {@link TFileTreeCellRenderer}
  * to render files and directories in a {@link TFileTree}.
  *

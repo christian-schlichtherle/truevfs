@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.file.swing;
 import javax.swing.filechooser.FileView;
 
 /**
- * Extends its super class in order to make it instantiable.
+ * Extends {@link FileView} in order to make it instantiable.
  *
  * @author Christian Schlichtherle
  * @version $Id$

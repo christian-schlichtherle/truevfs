@@ -27,7 +27,7 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileSystemView;
 
 /**
- * A custom {@code TFileChooser} which supports browsing archive files
+ * A custom {@link JFileChooser} which supports browsing archive files
  * like (virtual) directories.
  *
  * @author Christian Schlichtherle

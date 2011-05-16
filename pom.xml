@@ -33,16 +33,17 @@
 
     <name>TrueZIP</name>
     <description>
-        TrueZIP is a plug-in framework for virtual file systems and a
-        library for transparent access to archive files as if they were
-        just plain directories.
+        TrueZIP is a plug-in framework for virtual file systems which
+        provides transparent access to archive files as if they were just
+        plain directories.
 
-        As a framework, TrueZIP provides the interfaces and classes to write
-        file system drivers which plug-in to its federated file system space.
+        As an API, TrueZIP provides uniform, transparent, thread-safe,
+        read/write access to archive files as if they were just plain
+        directories in a file system path.
 
-        As a library, TrueZIP provides convenient multi-threaded read/write
-        access to archive files as if they were just plain directories in a
-        file system path.
+        As a framework, TrueZIP provides the interfaces and classes to
+        write file system drivers which plug-in to its federated file
+        system space.
     </description>
     <url>http://truezip.java.net</url>
     <inceptionYear>2005</inceptionYear>

@@ -6,68 +6,62 @@
 
 About TrueZIP
 
-    TrueZIP is a plug-in framework for virtual file systems and a
-    library for transparent access to archive files as if they were
-    just plain directories.
+    TrueZIP is a plug-in framework for virtual file systems which
+    provides transparent access to archive files as if they were just
+    plain directories.
 
-    As a framework, TrueZIP provides the interfaces and classes to write
-    file system drivers which plug-in to its federated file system space.
+    As an API, TrueZIP provides uniform, transparent, thread-safe,
+    read/write access to archive files as if they were just plain
+    directories in a file system path.
+    Writing a {{{./truezip-file/index.html}TrueZIP File*}} application
+    is really easy:
+    Have a look at the {{{./usecases/index.html}Use Cases}} and the
+    TrueZIP File* API {{{./truezip-file/apidocs/index.html}Javadoc}}
+    to check yourself!
 
-    As a library, TrueZIP provides convenient multi-threaded read/write
-    access to archive files as if they were just plain directories in a
-    file system path.
+    As a framework, TrueZIP provides the interfaces and classes to
+    write file system drivers which plug-in to its federated file
+    system space.
 
 * Key Claims
 
     [[1]] <<{Archive files are virtual directories}!>>
 
-    [[2]] <<{Make simple things easy and complex things possible}!>>
+    [[1]] <<{Make simple things easy and complex things possible}!>>
 
-    [[3]] <<{Quality matters}!>>
+    [[1]] <<{Quality matters}!>>
 
 Getting Started
 
-    First, you need to read and understand every single line of documentation
-    that I've carefully crafted for you on this site - I mean it!
-    ... OK, I was just kidding.
-    Of course the more you read the more you understand, but to get started,
-    you should really (not kidding this time):
-
-    [[1]] Quickly skim over the
-          {{{./usecases/index.html}Use Cases}} section to get an idea if using
-          TrueZIP would benefit your application and how it all works.
-          If you're still not sure then, please have a look at the
-          {{{./features.html}Key Features}}.
-
-    [[2]] Read the
+    [[1]] Read the
           {{{./kick-start/index.html}Kick-Starting}} section in order to
           generate, build and run a {{{./truezip-file/index.html}TrueZIP File*}}
           application in about ten minutes!
 
-    [[3]] If you are looking for more sample code and applications,
+    [[1]] If you are looking for more sample code and applications,
           please check the
           {{{http://java.net/projects/truezip/sources/v7/show/truezip-samples/}source code}}
           of the
           {{{./truezip-samples/index.html}TrueZIP Samples}} module.
 
-    [[4]] If you encounter issues, please read the
+    [[1]] If you encounter issues, please read the
           {{{./faq.html}FAQ}}
           before subscribing and posting to the
           {{{./mail-lists.html}User Mailing List}}.
 
-    [[5]] Last, but not least, please check the comprehensive
+    [[1]] Last, but not least, please check the comprehensive
           {{{./apidocs/index.html}Javadoc}}.
 
     []
-
-    Note that the documentation on this site is generally split across modules,
-    so please check the section <Project Modules> in the navigation bar on
-    this page, too.
 
     If you're still not fed up, you might also want to check out
     {{{http://truezip.schlichtherle.de}The TrueZIP Blog}}
     or the
     {{{http://java.net/projects/truezip}TrueZIP Developer Website}}.
+
+    Note that the documentation on this site is generally split across modules,
+    so please check the section <Project Modules> in the navigation bar on
+    this page, too.
 
 * Migrating from TrueZIP 6
 
