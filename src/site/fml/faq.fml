@@ -237,14 +237,23 @@ TFile.umount();
     </part>
     <part id="general">
         <title>General Questions</title>
+        <faq id="no-maven">
+            <question>Do I have to use Maven to use TrueZIP?</question>
+            <answer>
+                <p>
+                    Absolutely not!
+                    To learn about your options, please read the article
+                    <a href="kick-start/no-maven.html">Using TrueZIP Without Maven</a>.
+                </p>
+            </answer>
+        </faq>
         <faq id="whereAreNews">
             <question>Where are the latest News?</question>
             <answer>
                 <p>
-                    Starting from version 7.0, the TrueZIP project uses it's own
-                    blog for announcements, release notes, feature show cases
-                    and more.
-                    You can find it at
+                    Starting from version 7.0, the TrueZIP project has it's
+                    own blog for announcements, release notes, feature show
+                    cases and more at
                     <a href="http://truezip.schlichtherle.de">http://truezip.schlichtherle.de</a>.
                 </p>
             </answer>
@@ -254,10 +263,8 @@ TFile.umount();
             <answer>
                 <p>
                     You can find the Javadoc for the entire TrueZIP API
-                    including all modules in the navigation bar by following
-                    <i>Project Reports</i>, then 
-                    <i>Project Reports</i> again
-                    and then 
+                    including all modules in the navigation bar by clicking
+                    <i>Project Reports</i> -> <i>Project Reports</i> ->
                     <i>JavaDocs</i>, or you could simply click
                     <a href="apidocs/index.html">here</a>.
                 </p>

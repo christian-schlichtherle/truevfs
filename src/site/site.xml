@@ -23,10 +23,11 @@
                 <item name="Search Engine" href="usecases/se.html"/>
                 <item name="Software Build Tool" href="usecases/sbt.html"/>
             </item>
-            <item name="Kick-Start" href="kick-start/index.html">
-                <item name="Shell" href="kick-start/file/shell.html"/>
-                <item name="Eclipse" href="kick-start/file/eclipse.html"/>
-                <item name="NetBeans" href="kick-start/file/netbeans.html"/>
+            <item name="Kick-Starting" href="kick-start/index.html" collapse="true">
+                <item name="Using a Shell" href="kick-start/file/shell.html"/>
+                <item name="Using Eclipse" href="kick-start/file/eclipse.html"/>
+                <item name="Using NetBeans" href="kick-start/file/netbeans.html"/>
+                <item name="Without Maven" href="kick-start/no-maven.html"/>
             </item>
             <item name="Key Features" href="features.html"/>
             <item name="Concept" href="concept.html"/>

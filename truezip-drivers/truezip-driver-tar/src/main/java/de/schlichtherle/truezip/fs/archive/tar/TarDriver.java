@@ -39,7 +39,7 @@ import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
 import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 
 /**
- * An archive driver which builds TAR files.
+ * An archive driver which builds Tape Archive files (TAR).
  * 
  * @author Christian Schlichtherle
  * @version $Id$

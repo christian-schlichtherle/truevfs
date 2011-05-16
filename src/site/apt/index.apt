@@ -33,30 +33,30 @@ Getting Started
     Of course the more you read the more you understand, but to get started,
     you should really (not kidding this time):
 
-    [[1]] Quickly skim over the section
-        {{{./usecases/index.html}Use Cases}} to get an idea if using TrueZIP would
-        benefit your client application and how it all works.
-        If you're still not sure afterwards, then please have a look at the
-        {{{./features.html}Key Features}}.
+    [[1]] Quickly skim over the
+          {{{./usecases/index.html}Use Cases}} section to get an idea if using
+          TrueZIP would benefit your application and how it all works.
+          If you're still not sure then, please have a look at the
+          {{{./features.html}Key Features}}.
 
-    [[2]] Read the page about
-        {{{./kick-start/index.html}kick-starting TrueZIP}}
-        in order to help you setup your project environment and build an
-        application in about ten minutes!
+    [[2]] Read the
+          {{{./kick-start/index.html}Kick-Starting}} section in order to
+          generate, build and run a {{{./truezip-file/index.html}TrueZIP File*}}
+          application in about ten minutes!
 
     [[3]] If you are looking for more sample code and applications,
-        please check the
-        {{{http://java.net/projects/truezip/sources/v7/show/truezip-samples/}source code}}
-        of the module
-        {{{./truezip-samples/index.html}TrueZIP Samples}}.
+          please check the
+          {{{http://java.net/projects/truezip/sources/v7/show/truezip-samples/}source code}}
+          of the
+          {{{./truezip-samples/index.html}TrueZIP Samples}} module.
 
     [[4]] If you encounter issues, please read the
-        {{{./faq.html}FAQ}}
-        before subscribing and posting to the
-        {{{./mail-lists.html}User Mailing List}}.
+          {{{./faq.html}FAQ}}
+          before subscribing and posting to the
+          {{{./mail-lists.html}User Mailing List}}.
 
     [[5]] Last, but not least, please check the comprehensive
-        {{{./apidocs/index.html}Javadoc}}.
+          {{{./apidocs/index.html}Javadoc}}.
 
     []
 
