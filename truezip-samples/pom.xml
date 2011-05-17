@@ -140,16 +140,6 @@
         <plugins>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>de.schlichtherle.truezip.sample.file.app.Nzip</mainClass>
-                        </manifest>
-                    </archive>
-                    <descriptors>
-                        <descriptor>src/assembly/jar-with-dependencies.xml</descriptor>
-                    </descriptors>
-                </configuration>
                 <executions>
                     <execution>
                         <id>make-assembly</id>
@@ -157,6 +147,16 @@
                         <goals>
                             <goal>single</goal>
                         </goals>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>de.schlichtherle.truezip.sample.file.app.Nzip</mainClass>
+                                </manifest>
+                            </archive>
+                            <descriptors>
+                                <descriptor>src/assembly/jar-with-dependencies.xml</descriptor>
+                            </descriptors>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
