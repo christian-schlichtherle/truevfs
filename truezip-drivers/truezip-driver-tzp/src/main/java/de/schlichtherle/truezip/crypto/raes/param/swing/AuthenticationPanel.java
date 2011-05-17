@@ -150,10 +150,12 @@ public class AuthenticationPanel extends JPanel {
 
         keyFilePanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
         keyFilePanel.addPanelListener(new de.schlichtherle.truezip.swing.PanelListener() {
-            public void ancestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {
+            @Override
+			public void ancestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {
                 keyFilePanelAncestorWindowShown(evt);
             }
-            public void ancestorWindowHidden(de.schlichtherle.truezip.swing.PanelEvent evt) {
+            @Override
+			public void ancestorWindowHidden(de.schlichtherle.truezip.swing.PanelEvent evt) {
             }
         });
         keyFilePanel.setLayout(new java.awt.GridBagLayout());
@@ -178,7 +180,8 @@ public class AuthenticationPanel extends JPanel {
         keyFileChooser.setToolTipText(resources.getString("selectKeyFile.toolTip")); // NOI18N
         keyFileChooser.setName("keyFileChooser"); // NOI18N
         keyFileChooser.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 keyFileChooserActionPerformed(evt);
             }
         });

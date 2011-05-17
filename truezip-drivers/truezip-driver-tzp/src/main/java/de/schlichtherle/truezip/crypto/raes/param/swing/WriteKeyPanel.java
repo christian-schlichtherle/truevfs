@@ -275,10 +275,12 @@ public class WriteKeyPanel extends KeyPanel {
         error = new javax.swing.JLabel();
 
         passwdPanel.addPanelListener(new de.schlichtherle.truezip.swing.PanelListener() {
-            public void ancestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {
+            @Override
+			public void ancestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {
                 passwdPanelAncestorWindowShown(evt);
             }
-            public void ancestorWindowHidden(de.schlichtherle.truezip.swing.PanelEvent evt) {
+            @Override
+			public void ancestorWindowHidden(de.schlichtherle.truezip.swing.PanelEvent evt) {
             }
         });
         passwdPanel.setLayout(new java.awt.GridBagLayout());
