@@ -95,5 +95,3 @@ TFile file = new TFile("archive.zip", TArchiveDetector.NULL);
     In case you need the opposite, you could inject
     {{{../apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html#ALL}<<<TArchiveDetector.ALL>>>}}
     instead.
-
-    Enjoy TrueZIP!

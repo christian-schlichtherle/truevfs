@@ -209,5 +209,3 @@ $ mvn exec:java -Dexec.mainClass=com.company.project.Tree
     Finally, don't forget to configure the run time dependencies in the
     <<<pom.xml>>> unless your application explicitly configures the archive
     detection in its setup phase.
-
-    Enjoy TrueZIP!

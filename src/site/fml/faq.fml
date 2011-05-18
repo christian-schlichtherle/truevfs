@@ -289,17 +289,6 @@ TFile.setDefaultArchiveDetector(
                 </p>
             </answer>
         </faq>
-        <faq id="whereAreNews">
-            <question>Where are the latest News?</question>
-            <answer>
-                <p>
-                    Starting from version 7.0, the TrueZIP project has it's
-                    own blog for announcements, release notes, feature show
-                    cases and more at
-                    <a href="http://truezip.schlichtherle.de">http://truezip.schlichtherle.de</a>.
-                </p>
-            </answer>
-        </faq>
         <faq id="whereIsJavadoc">
             <question>Where is the Javadoc?</question>
             <answer>
@@ -309,6 +298,54 @@ TFile.setDefaultArchiveDetector(
                     <i>Project Reports</i> -> <i>Project Reports</i> ->
                     <i>JavaDocs</i>, or you could simply click
                     <a href="apidocs/index.html">here</a>.
+                </p>
+            </answer>
+        </faq>
+        <faq id="binaryCompatibility">
+            <question>
+                How does TrueZIP deal with binary compatibility?
+            </question>
+            <answer>
+                <p>
+                    TrueZIP uses the same version numbering scheme like Maven,
+                    i.e.
+                    <code>&lt;major&gt;.&lt;minor&gt;.&lt;incremental&gt;-&lt;qualifier&gt;</code>.
+                    Within the same major version number, binary compatibility
+                    should be retained so that recompilation of a client
+                    application should not be necessary.
+                </p>
+                <p>
+                    However, there is one exception:
+                    Binary compatibility may be broken in a subsquent release
+                    if all of the following conditions apply:
+                </p>
+                <ol>
+                <li>A feature's design is broken.</li>
+                <li>The feature is assumed to be rarely used by client
+                    applications or the implications of not changing it are
+                    considered to be unacceptable.</li>
+                <li>This issue is documented as a ticket in the project's
+                    <a href="http://java.net/jira/browse/TRUEZIP">Issue Tracking System</a>
+                    (ITS).</li>
+                <li>A workaround is explained in the ITS ticket.</li>
+                <li>The ITS ticket is referenced in the Release Notes.</li>
+                </ol>
+                <p>
+                    In case your client application is affected by a change and
+                    the documented workaround is unacceptable for any reason,
+                    please address this using the ITS at
+                    <a href="http://java.net/jira/browse/TRUEZIP">http://java.net/jira/browse/TRUEZIP</a>.
+                </p>
+            </answer>
+        </faq>
+        <faq id="whereAreNews">
+            <question>Where are the latest News?</question>
+            <answer>
+                <p>
+                    Starting from version 7.0, the TrueZIP project has it's
+                    own blog for announcements, release notes, feature show
+                    cases and more named
+                    <a href="http://truezip.schlichtherle.de">The TrueZIP Blog</a>.
                 </p>
             </answer>
         </faq>

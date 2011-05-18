@@ -77,5 +77,3 @@ try {
 +--+
 new TFile("archive.jar/META-INF/MANIFEST.MF").rm();
 +--+
-
-    Enjoy TrueZIP!

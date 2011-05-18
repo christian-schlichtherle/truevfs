@@ -1,10 +1,10 @@
     -----------------------
-    Migrating from TrueZIP 6
+    Migration from TrueZIP 6
     -----------------------
     Christian Schlichtherle
     -----------------------
 
-Migrating from TrueZIP 6
+Migration from TrueZIP 6
 
     This is an outline of the required steps to migrate a TrueZIP 6
     application to TrueZIP 7.
@@ -68,6 +68,10 @@ Migrating from TrueZIP 6
 |2.|<<<ArchiveDetector>>>|<<<TArchiveDetector>>>|
 *--+--+--+
 |3.|<<<File>>>|<<<TFile>>>|
+*--+--+--+
+|4.|<<<ArchiveWarningException>>>|<<<FsSyncWarningException>>>|
+*--+--+--+
+|5.|<<<ArchiveException>>>|<<<FsSyncException>>>|
 *--+--+--+
 
     Do not yet fix compilation errors.
@@ -156,5 +160,3 @@ Migrating from TrueZIP 6
     really changed between TrueZIP 6 and 7:
     After all, a recursive archive copy operation (once <<<archiveCopyAll>>>)
     is still a recursive archive copy operation (now <<<cp_rp>>>).
-
-    Enjoy TrueZIP!
