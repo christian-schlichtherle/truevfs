@@ -18,5 +18,3 @@ About TrueZIP Samples
     scanning the class path - see the Javadoc for the TrueZIP Kernel class
     {{{../apidocs/de/schlichtherle/truezip/fs/sl/FsDriverLocator.html}<<<FsDriverLocator>>>}}
     for more information.
-
-    Enjoy TrueZIP!

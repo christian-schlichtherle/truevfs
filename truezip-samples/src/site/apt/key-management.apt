@@ -107,5 +107,3 @@ Setting Passwords for All ZIP.RAES files Using a KeyManager
     {{{../apidocs/de/schlichtherle/truezip/key/KeyManager.html#getKeyProvider(java.net.URI)}<<<KeyManager.getKeyProvider(URI)>>>}}
     which uses the URI parameter to identify the prospective archive file so
     that an application could set individual passwords, too.
-
-    Enjoy TrueZIP!
