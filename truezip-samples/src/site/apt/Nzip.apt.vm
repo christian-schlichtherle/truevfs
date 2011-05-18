@@ -72,5 +72,3 @@ $ java -cp truezip-${project.version}-jar-with-dependencies.jar Nzip cp src safe
     application, you could create a convenient batch script named <<<nzip>>>
     which removes the need to type <<<java -jar <path to truezip-${project.version}-jar-with-dependencies.jar>>>>
     all the time - I leave this as an exercise for you.
-
-    Enjoy TrueZIP!
