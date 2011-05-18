@@ -1,8 +1,18 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2011 Schlichtherle IT Services
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package de.schlichtherle.truezip.fs;
 
 import java.beans.*;
@@ -30,12 +40,12 @@ public class FsSchemeBeanInfo extends SimpleBeanInfo {
             protected Expression instantiate(Object oldInstance, Encoder out) {
                 final FsScheme scheme = (FsScheme) oldInstance;
                 return new Expression(
-                    scheme,
-                    scheme.getClass(),
-                    "new", // NOI18N
-                    new Object[] {
-                        scheme.toString(),
-                    });
+                        scheme,
+                        scheme.getClass(),
+                        "new", // NOI18N
+                        new Object[] {
+                            scheme.toString(),
+                        });
             }
         };
         beanDescriptor.setValue("persistenceDelegate", pd);
@@ -93,8 +103,9 @@ public class FsSchemeBeanInfo extends SimpleBeanInfo {
      * properties of this bean.  May return null if the
      * information should be obtained by automatic analysis.
      */
+    @Override
     public BeanDescriptor getBeanDescriptor() {
-	return getBdescriptor();
+        return getBdescriptor();
     }
 
     /**
@@ -109,8 +120,9 @@ public class FsSchemeBeanInfo extends SimpleBeanInfo {
      * A client of getPropertyDescriptors can use "instanceof" to check
      * if a given PropertyDescriptor is an IndexedPropertyDescriptor.
      */
+    @Override
     public PropertyDescriptor[] getPropertyDescriptors() {
-	return getPdescriptor();
+        return getPdescriptor();
     }
 
     /**
@@ -120,8 +132,9 @@ public class FsSchemeBeanInfo extends SimpleBeanInfo {
      * events fired by this bean.  May return null if the information
      * should be obtained by automatic analysis.
      */
+    @Override
     public EventSetDescriptor[] getEventSetDescriptors() {
-	return getEdescriptor();
+        return getEdescriptor();
     }
 
     /**
@@ -131,8 +144,9 @@ public class FsSchemeBeanInfo extends SimpleBeanInfo {
      * implemented by this bean.  May return null if the information
      * should be obtained by automatic analysis.
      */
+    @Override
     public MethodDescriptor[] getMethodDescriptors() {
-	return getMdescriptor();
+        return getMdescriptor();
     }
 
     /**
@@ -143,6 +157,7 @@ public class FsSchemeBeanInfo extends SimpleBeanInfo {
      * 		returned by getPropertyDescriptors.
      * <P>	Returns -1 if there is no default property.
      */
+    @Override
     public int getDefaultPropertyIndex() {
         return defaultPropertyIndex;
     }
@@ -154,6 +169,7 @@ public class FsSchemeBeanInfo extends SimpleBeanInfo {
      *		returned by getEventSetDescriptors.
      * <P>	Returns -1 if there is no default event.
      */
+    @Override
     public int getDefaultEventIndex() {
         return defaultEventIndex;
     }
@@ -179,43 +195,42 @@ public class FsSchemeBeanInfo extends SimpleBeanInfo {
      * @return  An image object representing the requested icon.  May
      *    return null if no suitable icon is available.
      */
+    @Override
     public java.awt.Image getIcon(int iconKind) {
         switch ( iconKind ) {
-        case ICON_COLOR_16x16:
+            case ICON_COLOR_16x16:
             if ( iconNameC16 == null )
-                return null;
-            else {
+                    return null;
+                else {
                 if( iconColor16 == null )
                     iconColor16 = loadImage( iconNameC16 );
-                return iconColor16;
-            }
-        case ICON_COLOR_32x32:
+                    return iconColor16;
+                }
+            case ICON_COLOR_32x32:
             if ( iconNameC32 == null )
-                return null;
-            else {
+                    return null;
+                else {
                 if( iconColor32 == null )
                     iconColor32 = loadImage( iconNameC32 );
-                return iconColor32;
-            }
-        case ICON_MONO_16x16:
+                    return iconColor32;
+                }
+            case ICON_MONO_16x16:
             if ( iconNameM16 == null )
-                return null;
-            else {
+                    return null;
+                else {
                 if( iconMono16 == null )
                     iconMono16 = loadImage( iconNameM16 );
-                return iconMono16;
-            }
-        case ICON_MONO_32x32:
+                    return iconMono16;
+                }
+            case ICON_MONO_32x32:
             if ( iconNameM32 == null )
-                return null;
-            else {
+                    return null;
+                else {
                 if( iconMono32 == null )
                     iconMono32 = loadImage( iconNameM32 );
-                return iconMono32;
-            }
+                    return iconMono32;
+                }
 	default: return null;
         }
     }
-
 }
-
