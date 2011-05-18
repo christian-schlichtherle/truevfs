@@ -6,7 +6,7 @@
 
 Using TrueZIP Without Maven
 
-    This article shows how to use TrueZIP without Maven and why this is really
+    This guide shows how to use TrueZIP without Maven and why this is really
     only a second best choice when compared to kick-starting a TrueZIP File*
     application with Eclipse or NetBeans.
 

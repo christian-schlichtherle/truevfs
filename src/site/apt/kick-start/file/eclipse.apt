@@ -1,18 +1,18 @@
     -----------------------
-    Kick-Starting TrueZIP File* Applications With Maven In Eclipse
+    Kick-Starting TrueZIP File* Applications From a Maven Archetype In Eclipse
     -----------------------
     Christian Schlichtherle
     -----------------------
 
-Kick-Starting TrueZIP File* Applications With Maven In Eclipse
+Kick-Starting TrueZIP File* Applications From a Maven Archetype In Eclipse
 
-    This article shows how to kick-start a TrueZIP File* application in
+    This guide shows how to kick-start a TrueZIP File* application in
     Eclipse
     with the help of the TrueZIP File* Application Archetype.
-    If you are using NetBeans, then please read the article for
+    If you are using NetBeans, then please read the guide for
     {{{./netbeans.html}NetBeans}}
     instead.
-    If you are using none of these, then please read the article for the
+    If you are using none of these, then please read the guide for the
     {{{./shell.html}Command Line Shell}}
     instead.
 
