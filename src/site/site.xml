@@ -5,7 +5,7 @@
     <skin>
         <groupId>${project.groupId}</groupId>
         <artifactId>truezip-skin</artifactId>
-        <version>2-SNAPSHOT</version>
+        <version>2</version>
     </skin>
     <bannerRight>
         <name>Archive files are virtual directories!</name>
