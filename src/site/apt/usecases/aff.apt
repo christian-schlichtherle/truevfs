@@ -90,5 +90,3 @@ new TFile("file.foo").rm_r();
     the application file because the <<<TFile>>> object refers to a virtual
     directory, which cannot get deleted using similar methods like
     <<<delete()>>> or <<<rm()>>> unless it's empty.
-
-    Enjoy TrueZIP!

@@ -67,5 +67,3 @@ Glossary
     started as a small library for accessing archive files like directories.
     Of course, this is still true and in virtually all use cases a federated
     file system is persisted in an archive file.
-
-    Enjoy TrueZIP!

@@ -1,10 +1,10 @@
     -----------------------
-    About TrueZIP
+    About
     -----------------------
     Christian Schlichtherle
     -----------------------
 
-About TrueZIP
+Welcome to the TrueZIP user website!
 
     TrueZIP is a plug-in framework for virtual file systems which
     provides transparent access to archive files as if they were just
@@ -62,8 +62,6 @@ Getting Started
     so please check the section <Project Modules> in the navigation bar on
     this page, too.
 
-* Migrating from TrueZIP 6
+* Migration from TrueZIP 6
 
-    There's an {{{./migrating.html}article}} for this here, too!
-
-    Enjoy TrueZIP!
+    There's an {{{./migration.html}article}} for this here, too!

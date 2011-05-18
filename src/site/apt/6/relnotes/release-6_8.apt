@@ -30,7 +30,7 @@ Release Notes for TrueZIP 6.8
 *--+--+
 | <<Enhanced>> | Introduces the enhancement of an existing feature. This is fully backwards compatible. |
 *--+--+
-| <<Changed>> | Introduces the change of an existing feature. This may cause {{{../compatibility.html}backwards incompatibilities}}. |
+| <<Changed>> | Introduces the change of an existing feature. This may cause {{{../../faq.html#binaryCompatibility}backwards incompatibilities}}. |
 *--+--+
 | <<Deprecated>> | Introduces the deprecation of an existing feature. |
 *--+--+
