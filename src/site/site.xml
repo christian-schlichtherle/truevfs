@@ -5,15 +5,21 @@
     <skin>
         <groupId>${project.groupId}</groupId>
         <artifactId>truezip-skin</artifactId>
-        <version>1</version>
+        <version>2-SNAPSHOT</version>
     </skin>
+    <bannerRight>
+        <name>Archive files are virtual directories!</name>
+    </bannerRight>
+    <publishDate position="bottom"/>
+    <version position="none"/>
     <body>
         <links>
             <item name="The TrueZIP Blog" href="http://truezip.schlichtherle.de"/>
             <item name="TrueZIP Developer Website" href="http://java.net/projects/truezip"/>
         </links>
-        <menu name="Parent Project / Module" ref="parent" inherit="top"/>
-        <menu name="Project Modules" ref="modules" inherit="top"/>
+        <breadcrumbs>
+            <item name="TrueZIP" href="index.html"/>
+        </breadcrumbs>
         <menu name="Project Documentation">
             <item name="About" href="index.html"/>
             <item name="Use Cases" href="usecases/index.html" collapse="true">
@@ -23,18 +29,17 @@
                 <item name="Search Engine" href="usecases/se.html"/>
                 <item name="Software Build Tool" href="usecases/sbt.html"/>
             </item>
-            <item name="Kick-Starting" href="kick-start/index.html" collapse="true">
+            <item name="Kick-Start" href="kick-start/index.html" collapse="true">
                 <item name="Using a Shell" href="kick-start/file/shell.html"/>
                 <item name="Using Eclipse" href="kick-start/file/eclipse.html"/>
                 <item name="Using NetBeans" href="kick-start/file/netbeans.html"/>
                 <item name="Without Maven" href="kick-start/no-maven.html"/>
             </item>
+            <item name="Migration" href="migration.html"/>
             <item name="Key Features" href="features.html"/>
             <item name="Concept" href="concept.html"/>
             <item name="Glossary" href="glossary.html"/>
-            <item name="Compatibility" href="compatibility.html"/>
             <item name="FAQ" href="faq.html"/>
-            <item name="Migrating from TrueZIP 6" href="migrating.html"/>
             <item name="TrueZIP 6 (Obsolete)" href="6/index.html" collapse="true">
                 <item name="Tutorial" href="6/tutorial.html"/>
                 <item name="News Archive" href="6/news/index.html" collapse="true">
@@ -77,5 +82,7 @@
             </item>
         </menu>
         <menu name="Project Reports" ref="reports" inherit="bottom"/>
+        <menu name="Project Modules" ref="modules" inherit="bottom"/>
+        <menu name="Parent Module" ref="parent" inherit="bottom"/>
     </body>
 </project>
