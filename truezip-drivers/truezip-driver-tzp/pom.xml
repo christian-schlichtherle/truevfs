@@ -29,10 +29,10 @@
     </parent>
 
     <artifactId>truezip-driver-tzp</artifactId>
-    <name>TrueZIP Driver TZP (ZIP.RAES)</name>
+    <name>TrueZIP Driver ZIP.RAES (TZP)</name>
     <description>
-        The file system driver family for the TZP (RAES encrypted ZIP) archive
-        file type.
+        The file system driver family for RAES encrypted ZIP alias
+        ZIP.RAES alias TZP files.
 
         Add the JAR artifact of this module to the compile-time class path for
         dependency injection to the TrueZIP Kernel module or to the run-time
