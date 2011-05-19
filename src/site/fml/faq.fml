@@ -154,8 +154,8 @@ src.cp_rp(dst);
             <answer>
                 <p>
                     Most likely the TrueZIP File* module is not set up
-                    correctly in order to recognize the file suffix of the
-                    archive type you want to access.
+                    correctly in order to detect the file suffix of the archive
+                    type you want to access.
                     To make sure it does, call the following somewhere at the
                     start of your application:
                 </p>
@@ -228,57 +228,43 @@ TFile.setDefaultArchiveDetector(
         </faq>
         <faq id="accessAbsoluteEntries">
             <question>
-                How can I access entries with an absolute path name in an
-                archive file?
+                How can I access entries with absolute path names in
+                archive files?
             </question>
             <answer>
                 <p>
-                    You can't because there is no addressing scheme for entries
-                    with absolute path names in archive files.
-                </p>
-                <p>
+                    You can't because there is no addressing scheme for this.
                     For example, the expression
                     <code>new TFile("archive.zip/entry")</code> gets decomposed
                     into the path <code>archive.zip</code> as the mount point
                     of the archive file and the relative path name
-                    <code>entry</code> as the entry name within this archive.
+                    <code>entry</code> as the entry name within this archive
+                    file.
                     There's no expression to address the absolute path name
                     <code>/entry</code> within the archive file instead.
-                    Even if you would use the expression
-                    <code>new TFile("archive.zip//entry")</code> instead, it
-                    would just get normalized to the previous expression.
-                </p>
-            </answer>
-        </faq>
-        <faq id="treatAbsoluteEntries">
-            <question>
-                How does TrueZIP handle entries with absolute path names in
-                an archive file?
-            </question>
-            <answer>
-                <p>
-                    As answered <a href="#accessAbsoluteEntries">here</a>,
-                    you cannot access entries with absolute path names in
-                    archive files.
-                    This implies that you cannot create an archive file which
-                    contains entries with absolute path names.
+                    Even if you would try
+                    <code>new TFile("archive.zip//entry")</code>, it would
+                    just get normalized to the previous expression.
                 </p>
                 <p>
-                    However, you can use TrueZIP to read, modify or delete
-                    archive files which contain entries with absolute path
-                    names.
-                    So if you use TrueZIP to modify an archive file which
-                    contains entries with absolute path names, these entries
-                    are preserved.
-                    Likewise, an archive file can get deleted like any empty
-                    directory if it contains entries with absolute path names
-                    only.
+                    See also <a href="#treatAbsoluteEntries">here</a>.
                 </p>
             </answer>
         </faq>
     </part>
     <part id="general">
         <title>General Questions</title>
+        <faq id="whereAreNews">
+            <question>Where are the latest News?</question>
+            <answer>
+                <p>
+                    Starting from version 7.0, the TrueZIP project has it's
+                    own blog for announcements, release notes, feature show
+                    cases and more named
+                    <a href="http://truezip.schlichtherle.de">The TrueZIP Blog</a>.
+                </p>
+            </answer>
+        </faq>
         <faq id="no-maven">
             <question>Do I have to use Maven to use TrueZIP?</question>
             <answer>
@@ -338,14 +324,59 @@ TFile.setDefaultArchiveDetector(
                 </p>
             </answer>
         </faq>
-        <faq id="whereAreNews">
-            <question>Where are the latest News?</question>
+        <faq id="treatAbsoluteEntries">
+            <question>
+                How does TrueZIP deal with entries with absolute path names in
+                archive files?
+            </question>
             <answer>
                 <p>
-                    Starting from version 7.0, the TrueZIP project has it's
-                    own blog for announcements, release notes, feature show
-                    cases and more named
-                    <a href="http://truezip.schlichtherle.de">The TrueZIP Blog</a>.
+                    As answered <a href="#accessAbsoluteEntries">here</a>,
+                    you cannot access entries with absolute path names in
+                    archive files.
+                    This implies that you cannot create archive files which
+                    contain entries with absolute path names.
+                </p>
+                <p>
+                    However, you can use TrueZIP to read, modify or delete
+                    archive files which contain entries with absolute path
+                    names:
+                    If you use TrueZIP to modify an archive file which
+                    contains entries with absolute path names, these entries
+                    are preserved.
+                    Likewise, an archive file can get deleted like any empty
+                    directory if it contains only entries with absolute path
+                    names.
+                </p>
+            </answer>
+        </faq>
+        <faq id="support">
+            <question>
+                I have another question or issue.
+                How do I get it responded and resolved?
+            </question>
+            <answer>
+                <p>
+                    For any bug report, improvement request, feature request,
+                    task request, help request etc. please
+                    <a href="mailto:users@truezip.java.net">post</a>
+                    it to the User Mailing List once you have
+                    <a href="mailto:sympa@truezip.java.net?subject=subscribe%20users">subscribed</a>
+                    to it.
+                    The User Mailing List is your direct connection to the
+                    community.
+                    My response time is usually less than a day - without
+                    warranties!
+                </p>
+                <p>
+                    Once your question or issue has been approved as a bug
+                    report, improvement request, feature request or task
+                    request it gets tracked in
+                    <a href="http://java.net/jira/browse/TRUEZIP">JIRA</a>.
+                    You can then use JIRA to monitor and discuss its progress,
+                    vote for it, add file attachments to it etc.
+                    JIRA is now also used to schedule new TrueZIP versions and
+                    prepare their Release Notes.
                 </p>
             </answer>
         </faq>
