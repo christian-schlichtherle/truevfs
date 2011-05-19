@@ -1628,9 +1628,12 @@ public final class TFile extends File {
     /**
      * Returns a file system controller if and only if the path denotes an
      * archive file, or {@code null} otherwise.
+     * <p>
+     * TODO: Consider making this public in order to enable applications to
+     * call {@link FsController#getEntry(FsEntryName)}.{@link FsEntry# and then use instanceof
      * 
      * @return A file system controller if and only if the path denotes an
-     * archive file, or {@code null} otherwise.
+     *         archive file, or {@code null} otherwise.
      */
     @Nullable FsController<?> getController() {
         if (this != innerArchive || null != controller)

@@ -28,8 +28,9 @@ import net.jcip.annotations.NotThreadSafe;
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
 
 /**
- * An abstract archive file system entry which adapts an
- * {@link FsArchiveEntry archive entry} to a {@link FsEntry file system entry}.
+ * An abstract archive file system entry which decorates an
+ * {@link FsArchiveEntry archive entry} in order to implement a
+ * {@link FsEntry file system entry}.
  * 
  * @param   <E> The type of the decorated archive entries.
  * @author  Christian Schlichtherle
@@ -87,16 +88,21 @@ extends FsDecoratingEntry<E> {
         super(entry);
     }
 
+    /**
+     * Returns a deep clone of this archive file system entry.
+     * 
+     * @param  fileSystem the archive file system to use for cloning the
+     *         decorated archive entry.
+     * @return A deep clone of this archive file system entry.
+     */
     FsArchiveFileSystemEntry<E> clone(FsArchiveFileSystem<E> fileSystem) {
         return create(getName(), getType(), fileSystem.copy(delegate));
     }
 
     /**
-     * Returns the archive entry which is adapted by this archive file system
-     * entry.
+     * Returns the decorated archive entry.
      *
-     * @return The archive entry which is adapted by this archive file system
-     *         entry.
+     * @return The decorated archive entry.
      */
     public final E getEntry() {
         return delegate;
