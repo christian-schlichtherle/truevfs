@@ -2,16 +2,16 @@
 <project    xmlns="http://maven.apache.org/DECORATION/1.0.0"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xsi:schemaLocation="http://maven.apache.org/DECORATION/1.0.0 http://maven.apache.org/xsd/decoration-1.0.0.xsd">
-    <skin>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>truezip-skin</artifactId>
-        <version>2</version>
-    </skin>
     <bannerRight>
         <name>Archive files are virtual directories!</name>
     </bannerRight>
     <publishDate position="bottom"/>
     <version position="none"/>
+    <skin>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>truezip-skin</artifactId>
+        <version>2</version>
+    </skin>
     <body>
         <links>
             <item name="The TrueZIP Blog" href="http://truezip.schlichtherle.de"/>
