@@ -1,0 +1,54 @@
+    -----------------------
+    Concept
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+Concept 
+
+    At its heart, TrueZIP is an extensible library for accessing archive files
+    or any other (virtual) file system through a set of uniform client APIs.
+    Each API is contained within its own module and includes:
+
+    [{{{./truezip-file/index.html}TrueZIP File*}}]
+        The API of this module is the first choice for most applications:
+        It's designed to be easy to learn and convenient to use while
+        providing a great level of flexibility.
+
+        However, due to its file-based addressing scheme, it can only access
+        the OS file system and any federated file systems (i.e. archive files)
+        within the OS file system.
+        In particular, it cannot access virtual HTTP(S) file systems or any
+        member file systems (i.e. archive files) within an HTTP(S) file system.
+
+    [{{{./truezip-kernel/index.html}TrueZIP Kernel}}]
+        As the name implies, this module is the core of it all.
+        As an API, it's somewhat more complex to use, but very versatile
+        because of its extensible architecture, e.g. it uses Dependency
+        Injection wherever reasonable.
+
+        Using this API directly allows you to access non-federated file systems
+        other than the OS file system and any member file systems.
+        E.g. you could access an entry within an archive file which is located
+        at a web site like this: <<<zip:http://acme.com/archive.zip!/entry>>>.
+        Note that the HTTP(S) file system driver is still in its infancy,
+        so don't expect too much of it.
+
+    []
+
+* Benefits
+
+    * Regardless of the API your application is using you don't have to know
+        how to access a specific archive type using its custom API.
+
+    * If your application is using the TrueZIP File* API it doesn't even need
+        to know that it's accessing an archive file at all.
+
+    * A future release should implement the class
+        {{{http://download.oracle.com/javase/7/docs/api/java/nio/file/spi/FileSystemProvider.html}<<<FileSystemProvider>>>}}
+        of the JSR 203 alias NIO.2 API on top of the TrueZIP Kernel.
+        This would enable NIO.2 applications in Java SE 7 to access any file
+        system supported by TrueZIP.
+        See {{{http://java.net/jira/browse/TRUEZIP-48}issue #48}}.
+
+    []

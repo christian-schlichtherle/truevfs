@@ -1,0 +1,109 @@
+    ---
+    TrueZIP Key Management
+    ---
+    Christian Schlichtherle
+    ---
+
+%{toc}
+
+Abstract
+
+    This article shows how to set passwords for RAES encrypted ZIP files
+    programmatically.
+    Use whatever approach fits your needs best when you want to set the
+    password programmatically instead of prompting the user for a key by means
+    of the default Swing or Console based user interfaces.
+
+    All examples in this article are copied from the static utility methods
+    class
+    {{{../apidocs/de/schlichtherle/truezip/sample/zip/raes/KeyManagement.html}<<<KeyManagement>>>}}.
+
+Introduction
+
+    At runtime, all RAES encrypted ZIP files are managed by an instance of a
+    sub-class of the abstract archive driver implementation class
+    {{{../apidocs/de/schlichtherle/truezip/fs/archive/zip/raes/ZipRaesDriver.html}<<<ZipRaesDriver>>>}}
+    - typically an instance of the class
+    {{{../apidocs/de/schlichtherle/truezip/fs/archive/zip/raes/SafeZipRaesDriver.html}<<<SafeZipRaesDriver>>>}}
+
+    Whenever the archive driver reads or writes an RAES encrypted ZIP file,
+    it uses an instance of an implementation of the generic interface
+    {{{../apidocs/de/schlichtherle/truezip/key/KeyManagerProvider.html}<<<KeyManagerProvider>>>}}
+    in order to obtain an instance of an implementation of the generic interface
+    {{{../apidocs/de/schlichtherle/truezip/key/KeyManager.html}<<<KeyManager>>>}}
+    for the interface
+    {{{../apidocs/de/schlichtherle/truezip/crypto/raes/param/AesCipherParameters.html}<<<AesCipherParameters>>>}}
+    and finally obtain an instance of an implementation of the generic interface
+    {{{../apidocs/de/schlichtherle/truezip/key/KeyProvider.html}<<<KeyProvider>>>}}
+    for the prospective archive file.
+
+    Because dependency injection is used all over the place in order to resolve
+    the implementation classes of the generic interfaces
+    <<<KeyManagerProvider>>>, <<<KeyManager>>> and <<<KeyProvider>>>, this
+    architecture provides several levers to set passwords programmatically.
+
+Setting the Password for One ZIP.RAES file
+
+    Use the following approach to set the password for an individual ZIP.RAES
+    file.
+
+%{snippet|id=setPassword|file=truezip-samples/src/main/java/de/schlichtherle/truezip/sample/zip/raes/KeyManagement.java}
+
+    Note that the argument check at the beginning is a bit naive:
+    The test only ensures that the file in question appears to be a prospective
+    archive file according to the result of scanning its path name in the
+    constructor.
+    However, it does not check if the prospective archive file is a ZIP.RAES
+    file or any other configured archive type, e.g. ZIP, TAR etc.
+    In addition, it does <not> check whether the archive file is a true archive
+    file or just a false positive according to its file name pattern.
+    To check for this, an application would normally have to call
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#isDirectory()}<<<TFile.isDirectory()>>>}}.
+    However, you <must not> do so in this case because this would already
+    prompt the user for the password before it could have been set
+    programmatically!
+
+    This means there is a slight chance the application sets a password for a
+    false positive archive file. If this is an issue, then the application
+    could call
+    {{{../apidocs/de/schlichtherle/truezip/key/KeyProvider.html#setKey(java.lang.Object)}<<<KeyProvider.setKey(null)>>>}}
+    after a negative
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#isDirectory()}<<<TFile.isDirectory()>>>}}.
+    check.
+
+Setting Passwords for All ZIP.RAES files Using a View
+
+    If you need to set passwords for <all> RAES encrypted ZIP files,
+    then the following is the simplest approach:
+
+%{snippet|id=setAllPasswords1|file=truezip-samples/src/main/java/de/schlichtherle/truezip/sample/zip/raes/KeyManagement.java}
+
+    This example utilizes the class
+    {{{../apidocs/de/schlichtherle/truezip/fs/archive/zip/raes/PromptingKeyManagerService.html}<<<PromptingKeyManagerService>>>}}
+    which uses a Model-View-Controller pattern for its key providers.
+    Here I simply substitute the default view class with a custom
+    implementation.
+
+    Note that the <<<controller>>> parameter provides the method
+    {{{../apidocs/de/schlichtherle/truezip/key/PromptingKeyProvider.Controller.html#getResource()}<<<Controller.getResource()>>>}}
+    which identifies the prospective archive file so that an application
+    could set individual passwords, too.
+
+Setting Passwords for All ZIP.RAES files Using a KeyManager
+
+    In case you want to provide your own implementation of the interface
+    {{{../apidocs/de/schlichtherle/truezip/key/KeyManager.html}<<<KeyManager>>>}},
+    then the following approach is required.
+
+%{snippet|id=setAllPasswords2|file=truezip-samples/src/main/java/de/schlichtherle/truezip/sample/zip/raes/KeyManagement.java}
+
+    This example installs an instance of the class
+    {{{../apidocs/de/schlichtherle/truezip/key/SafeKeyManager.html}<<<SafeKeyManager>>>}}
+    for brevity only.
+    In a real application, this would typically be an instance of a custom
+    implementation class instead.
+
+    Note that the <<<KeyManager>>> interface provides the method
+    {{{../apidocs/de/schlichtherle/truezip/key/KeyManager.html#getKeyProvider(java.net.URI)}<<<KeyManager.getKeyProvider(URI)>>>}}
+    which uses the URI parameter to identify the prospective archive file so
+    that an application could set individual passwords, too.

@@ -1,0 +1,211 @@
+    -----------------------
+    Kick-Starting TrueZIP File* Applications From a Maven Archetype In a Shell
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+Kick-Starting TrueZIP File* Applications From a Maven Archetype In a Shell
+
+    This guide shows how to kick-start a TrueZIP File* application in
+    a command line shell
+    with the help of the TrueZIP File* Application Archetype.
+    If you are using Eclipse, then please read the guide for
+    {{{./eclipse.html}Eclipse}}
+    instead.
+    If you are using NetBeans, then please read the guide for
+    {{{./netbeans.html}NetBeans}}
+    instead.
+
+* Motivation
+
+    A typical issue for beginners is understanding the dependency of TrueZIP 7
+    on
+    {{{../../truezip-driver/index.html}file system driver modules}}
+    at run time:
+    The module {{{../../truezip-file/index.html}TrueZIP File*}} uses a
+    {{{../../apidocs/de/schlichtherle/truezip/fs/sl/FsDriverLocator.html#SINGLETON}file system driver service locator singleton}}
+    which scans the class path for
+    {{{../../apidocs/de/schlichtherle/truezip/fs/spi/FsDriverService.html}file system driver services}}
+    .
+    These file system driver services are contained in
+    {{{../../truezip-driver/index.html}file system driver modules}}.
+    By adding a file system driver module to the run time dependencies of your
+    application, you enable the TrueZIP File* module to add its file system
+    drivers to the
+    {{{../../apidocs/de/schlichtherle/truezip/file/TFile.html#getDefaultArchiveDetector()}initial set up}}
+    of its
+    {{{../../apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html#ALL}archive detection}}
+    .
+
+    Although it's straightforward, setting up the class path can be a daunting
+    task for TrueZIP beginners, so a Maven archetype is provided as a template
+    for TrueZIP File* applications.
+    This archetype shows how to setup the run time dependencies and, as an
+    alternative, how to avoid using the service locator by using dependency
+    injection instead.
+
+* Prerequisites
+
+    You need to have the following software installed:
+
+    * {{{http://maven.apache.org}Apache Maven 3.0.3}}
+
+    []
+
+* Generate Maven Archetype
+
+    To generate the application archetype, type the following command in a
+    shell while setting the <<<groupId>>>, <<<artifactId>>> and
+    <<<package>>> properties to the appropriate values for your project:
+
++--+
+$ mvn archetype:generate -B \
+    -DarchetypeGroupId=de.schlichtherle.truezip \
+    -DarchetypeArtifactId=truezip-archetype-file \
+    -DarchetypeVersion=RELEASE \
+    -DgroupId=com.company \
+    -DartifactId=project \
+    -Dversion=0.1-SNAPSHOT \
+    -Dpackage=com.company.project
++--+
+
+    Upon successful execution, a new directory with the value of the
+    <<<artifactId>>> property as its name will have been created in the current
+    directory.
+    If you copy/paste the above command literally to a shell this would result
+    in the following directory structure:
+
++--+
+project
+|-- pom.xml
+`-- src
+    `-- main
+        `-- java
+            `-- com
+                `-- company
+                    `-- project
+                        |-- Application.java
+                        |-- Copy.java
+                        `-- Tree.java
++--+
+
+* Explore Your Application
+
+    The project directory contains the following files:
+
+    [<<<pom.xml>>>]
+    This is the Maven Project Object Model (POM).
+    The POM declares the properties of your project to Maven so that it can
+    build, install and run it.
+    Within the \<project\>/\<dependencies\> element is the declaration of the
+    dependencies of your application, i.e. the libraries required to compile
+    and run it.
+    Each driver module on the run time class path adds to the initial set up
+    of detected archive types by the TrueZIP File* API as explained above,
+    so please edit it
+    {{{Edit_Your_Application}later}} to meet your application requirements.
+    For now, please leave this file alnonw.
+
+    [<<<src/main/java/com/company/project/Application.java>>>]
+    This is an abstract base class which runs the setup-work-sync life cycle
+    of a typical TrueZIP File* application.
+    Subclass or edit this template class to meet your requirements.
+
+    [<<<src/main/java/com/company/project/Copy.java>>>]
+    This is a command line utility to recursively copy the first file or
+    directory argument to the second file or directory argument.
+    Instead of a directory, you can name any configured archive file type in
+    the path names, too.
+    If you name any archive files in the destination path name, they get
+    automatically created.
+
+    [<<<src/main/java/com/company/project/Tree.java>>>]
+    This is a command line utility to print an ASCII graph of the directory
+    tree for its file or directory arguments to the standard output.
+    Instead of a directory, you can name any configured archive file type as an
+    argument, too.
+
+    []
+
+* Build And Run Your Application
+
+    To build and install your application in your local Maven repository,
+    enter:
+
++--+
+$ cd project
+$ mvn clean install
++--+
+
+    Close to the end of the output of the Maven command, it should read
+    <<<[INFO] BUILD SUCCESS>>>:
+
+    To run the main class <<<Tree>>>, enter:
+
++--+
+$ mvn exec:java -Dexec.mainClass=com.company.project.Tree
++--+
+
+    This should produce a similar output to the following in the Console view:
+
++--+
+.
+|-- pom.xml
+|-- src
+|   `-- main
+|       `-- java
+|           `-- com
+|               `-- company
+|                   `-- project
+|                       |-- Application.java
+|                       |-- Copy.java
+|                       `-- Tree.java
+`-- target
+    |-- classes
+    |   `-- com
+    |       `-- company
+    |           `-- project
+    |               |-- Application.class
+    |               |-- Copy.class
+    |               `-- Tree.class
+    |-- generated-sources
+    |   `-- annotations
+    |-- maven-archiver
+    |   `-- pom.properties
+    |-- project-0.1-SNAPSHOT.jar
+    |   |-- META-INF
+    |   |   |-- MANIFEST.MF
+    |   |   `-- maven
+    |   |       `-- com.company
+    |   |           `-- project
+    |   |               |-- pom.xml
+    |   |               `-- pom.properties
+    |   `-- com
+    |       `-- company
+    |           `-- project
+    |               |-- Application.class
+    |               |-- Copy.class
+    |               `-- Tree.class
+    `-- surefire
++--+
+
+    Note that the contents of the JAR file
+    <<<target/project-0.1-SNAPSHOT.jar>>> get listed, too!
+    This is because the configuration file <<<pom.xml>>> is set up to recognize
+    JAR files as virtual directories by adding the module TrueZIP Driver ZIP
+    with the artifactId <<<truezip-driver-zip>>> to the run time class path.
+    You can change this by editing the configuration file <<<pom.xml>>> or the
+    method <<<setup()>>> of the class <<<Application>>>.
+
+* Edit Your Application
+
+    Now you're ready and set to edit your application to meet your requirements.
+
+    Mind that the class <<<Application>>> is just a template to show the
+    general setup-work-sync life cycle:
+    You don't need to use this class at all as long as your application
+    implements this life cycle somehow.
+
+    Finally, don't forget to configure the run time dependencies in the
+    <<<pom.xml>>> unless your application explicitly configures the archive
+    detection in its setup phase.

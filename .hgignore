@@ -1,0 +1,8 @@
+\.orig$
+\.orig\..*$
+\.chg\..*$
+\.rej$
+\.conflict\~$
+glob:**/*.log
+glob:**/*.log.xml
+glob:target/
