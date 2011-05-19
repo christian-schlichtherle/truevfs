@@ -21,9 +21,9 @@ Key Features
         The API of the {{{./truezip-file/index.html}TrueZIP File*}} module
         provides convenient and powerful methods for fast bulk I/O operations
         like recursive copying, moving or deleting of directory trees and files.
-        E.g. using the multi-threaded method
+        For example, by using the multi-threaded method
         {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#cat(java.io.InputStream, java.io.OutputStream)}<<<TFile.cat(InputStream, OutputStream)>>>}},
-        you'll never have to write a naive read-then-write copy loop again.
+        you'll never have to write a naive read-then-write loop again.
 
     [File System Federation]
         TrueZIP supports virtual file system federation.
