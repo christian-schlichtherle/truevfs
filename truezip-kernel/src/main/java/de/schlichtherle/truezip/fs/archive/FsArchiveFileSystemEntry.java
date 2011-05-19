@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.archive;
 
+import de.schlichtherle.truezip.entry.EntryFactory;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsDecoratingEntry;
 import java.util.Collections;
@@ -23,6 +24,9 @@ import java.util.Set;
 import de.schlichtherle.truezip.fs.FsEntry;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import java.io.CharConversionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.jcip.annotations.NotThreadSafe;
 
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
@@ -58,13 +62,11 @@ extends FsDecoratingEntry<E> {
                                         final E      entry) {
         switch (type) {
             case FILE:
-                assert FILE == entry.getType();
                 return path.equals(entry.getName())
                         ? new      FileEntry<E>(entry)
                         : new NamedFileEntry<E>(entry, path);
 
             case DIRECTORY:
-                assert DIRECTORY == entry.getType();
                 return path.equals(entry.getName())
                         ? new      DirectoryEntry<E>(entry)
                         : new NamedDirectoryEntry<E>(entry, path);
@@ -95,8 +97,15 @@ extends FsDecoratingEntry<E> {
      *         decorated archive entry.
      * @return A deep clone of this archive file system entry.
      */
-    FsArchiveFileSystemEntry<E> clone(FsArchiveFileSystem<E> fileSystem) {
-        return create(getName(), getType(), fileSystem.copy(delegate));
+    FsArchiveFileSystemEntry<E> clone(EntryFactory<E> factory) {
+        try {
+            return create(getName(), getType(),
+                    factory.newEntry(   delegate.getName(),
+                                        delegate.getType(),
+                                        delegate));
+        } catch (CharConversionException ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     /**
@@ -212,8 +221,8 @@ extends FsDecoratingEntry<E> {
         }
 
         @Override
-        FsArchiveFileSystemEntry<E> clone(FsArchiveFileSystem<E> fileSystem) {
-            DirectoryEntry<E> clone = (DirectoryEntry<E>) super.clone(fileSystem);
+        FsArchiveFileSystemEntry<E> clone(EntryFactory<E> factory) {
+            DirectoryEntry<E> clone = (DirectoryEntry<E>) super.clone(factory);
             clone.members = Collections.unmodifiableSet(members);
             return clone;
         }
@@ -297,8 +306,17 @@ extends FsDecoratingEntry<E> {
         }
 
         @Override
-        FsArchiveFileSystemEntry<E> clone(FsArchiveFileSystem<E> fileSystem) {
-            return new HybridEntry<E>(fileSystem.copy(delegate), file, directory);
+        FsArchiveFileSystemEntry<E> clone(EntryFactory<E> factory) {
+            try {
+                return new HybridEntry<E>(
+                        factory.newEntry(   delegate.getName(),
+                                            delegate.getType(),
+                                            delegate),
+                        file,
+                        directory);
+            } catch (CharConversionException ex) {
+                throw new AssertionError(ex);
+            }
         }
 
         @Override

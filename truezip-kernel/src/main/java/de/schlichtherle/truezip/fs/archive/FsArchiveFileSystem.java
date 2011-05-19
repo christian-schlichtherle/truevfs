@@ -325,7 +325,7 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
     final FsArchiveFileSystemEntry<E> getEntry(FsEntryName name) {
         assert null != name;
         FsArchiveFileSystemEntry<E> entry = master.get(name, null);
-        return null == entry ? null : entry.clone(this);
+        return null == entry ? null : entry.clone(factory);
     }
 
     /**
@@ -383,14 +383,6 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
                     name, type, factory.newEntry(name.getPath(), type, template));
         } catch (CharConversionException ex) {
             throw new FsArchiveFileSystemException(name.toString(), ex);
-        }
-    }
-
-    final E copy(E entry) {
-        try {
-            return factory.newEntry(entry.getName(), entry.getType(), entry);
-        } catch (CharConversionException ex) {
-            throw new AssertionError(ex);
         }
     }
 
