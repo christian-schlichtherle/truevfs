@@ -161,8 +161,9 @@ Kick-Starting TrueZIP File* Applications From a Maven Archetype In NetBeans
     This is because the configuration file <<<pom.xml>>> is set up to recognize
     JAR files as virtual directories by adding the module TrueZIP Driver ZIP
     with the artifactId <<<truezip-driver-zip>>> to the run time class path.
-    You can change this by editing the configuration file <<<pom.xml>>> or the
-    method <<<setup()>>> of the class <<<Application>>>.
+    You can change this by editing the configuration file <<<pom.xml>>> or 
+    overriding the method
+    {{{../../apidocs/de/schlichtherle/truezip/file/TApplication.html#setup()}<<<TApplication.setup()>>>}}.
 
 * Edit Your Application
 

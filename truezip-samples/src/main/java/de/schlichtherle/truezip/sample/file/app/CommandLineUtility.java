@@ -43,7 +43,7 @@ abstract class CommandLineUtility extends TApplication<RuntimeException> {
     /** The print stream for error output. */
     protected final PrintStream err;
 
-    /** The command line progress monitor. */
+    /** A progress monitor for {@link TFile#umount()}. */
     protected final ProgressMonitor monitor;
 
     /**
