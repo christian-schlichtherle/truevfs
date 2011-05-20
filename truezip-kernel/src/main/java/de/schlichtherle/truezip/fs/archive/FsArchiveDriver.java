@@ -67,7 +67,7 @@ implements EntryFactory<E> {
      *
      * @return The I/O pool to use for allocating temporary I/O entries.
      */
-    public abstract IOPool<?> getPool();
+    protected abstract IOPool<?> getPool();
 
     /**
      * Returns a new thread-safe file system controller for the given mount
