@@ -65,10 +65,10 @@ public class HurlingWindowFeedback extends BasicInvalidKeyFeedback {
      * @param duration millisecons of duration of quake.
      * @param fps frames per second for animation.
      */
-    protected HurlingWindowFeedback(  final int amplitude,
-                                                final int cycle,
-                                                final int duration,
-                                                final int fps) {
+    protected HurlingWindowFeedback(    final int amplitude,
+                                        final int cycle,
+                                        final int duration,
+                                        final int fps) {
         super(duration > MIN_KEY_RETRY_DELAY ? duration : MIN_KEY_RETRY_DELAY);
         this.amplitude = amplitude;
         this.cycle     = cycle;
