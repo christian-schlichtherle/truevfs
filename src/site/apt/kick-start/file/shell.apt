@@ -84,8 +84,8 @@ project
             `-- com
                 `-- company
                     `-- project
-                        |-- Application.java
                         |-- Copy.java
+                        |-- Pickr.java
                         `-- Tree.java
 +--+
 
@@ -172,16 +172,16 @@ $ mvn exec:java -Dexec.mainClass=com.company.project.Tree
 |           `-- com
 |               `-- company
 |                   `-- project
-|                       |-- Application.java
 |                       |-- Copy.java
+|                       |-- Pickr.java
 |                       `-- Tree.java
 `-- target
     |-- classes
     |   `-- com
     |       `-- company
     |           `-- project
-    |               |-- Application.class
     |               |-- Copy.class
+    |               |-- Pickr.class
     |               `-- Tree.class
     |-- generated-sources
     |   `-- annotations
@@ -198,8 +198,8 @@ $ mvn exec:java -Dexec.mainClass=com.company.project.Tree
     |   `-- com
     |       `-- company
     |           `-- project
-    |               |-- Application.class
     |               |-- Copy.class
+    |               |-- Pickr.class
     |               `-- Tree.class
     `-- surefire
 +--+
@@ -209,15 +209,16 @@ $ mvn exec:java -Dexec.mainClass=com.company.project.Tree
     This is because the configuration file <<<pom.xml>>> is set up to recognize
     JAR files as virtual directories by adding the module TrueZIP Driver ZIP
     with the artifactId <<<truezip-driver-zip>>> to the run time class path.
-    You can change this by editing the configuration file <<<pom.xml>>> or the
-    method <<<setup()>>> of the class <<<Application>>>.
+    You can change this by editing the configuration file <<<pom.xml>>> or 
+    overriding the method
+    {{{../../apidocs/de/schlichtherle/truezip/file/TApplication.html#setup()}<<<TApplication.setup()>>>}}.
 
 * Edit Your Application
 
     Now you're ready and set to edit your application to meet your requirements.
 
-    Mind that the class <<<Application>>> is just a template to show the
-    general setup-work-sync life cycle:
+    Mind that the class <<<TApplication>>> is just a template to show the
+    setup-work-sync life cycle of a typical TrueZIP File* application:
     You don't need to use this class at all as long as your application
     implements this life cycle somehow.
 

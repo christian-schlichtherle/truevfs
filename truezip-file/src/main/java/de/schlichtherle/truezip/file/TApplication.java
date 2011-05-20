@@ -82,8 +82,7 @@ public abstract class TApplication<E extends Exception> {
     /**
      * Runs the setup phase.
      * <p>
-     * This method is {@link #run run} only once at the start of the life
-     * cycle.
+     * This method is called by {@link #run} at the start of the life cycle.
      * Its task is to configure the default behavior of the TrueZIP File* API
      * in order to answer the following questions:
      * <ul>
@@ -92,6 +91,9 @@ public abstract class TApplication<E extends Exception> {
      * <li>Shall missing archive files and directory entries get automatically
      *     created whenever required?
      * </ul>
+     * Alternatively, the setup phase may get run in a sub class constructor.
+     * This would ensure it's run exactly only once and not on every call to
+     * {@link #run}.
      * <p>
      * The implementation in the class {@link TApplication} does nothing.
      * 
@@ -207,11 +209,10 @@ public abstract class TApplication<E extends Exception> {
     /**
      * Runs the work phase.
      * <p>
-     * This method is {@link #run run} at least once and repeatedly called
-     * until it returns a non-negative integer for use as the
+     * This method is called by {@link #run} at least once and repeatedly
+     * called until it returns a non-negative integer for use as the
      * {@link System#exit(int) exist status} of the VM.
-     * After this method, the {@link #sync} method is called in a
-     * finally-block.
+     * After this method, the {@link #sync} method is called in a finally-block.
      * <p>
      * Avoid repeating this method and updating the same archive file upon
      * each call!
@@ -230,8 +231,8 @@ public abstract class TApplication<E extends Exception> {
     /**
      * Runs the sync phase.
      * <p>
-     * This method is {@link #run run} in a finally-block after each call to
-     * the {@link #work} method.
+     * This method is called by {@link #run} in a finally-block after each call
+     * to {@link #work}.
      * Its task is to commit any unsynchronized changes to the contents of
      * archive files and purge all cached data so that third parties can safely
      * interact with these archive files until the next access by this TrueZIP
