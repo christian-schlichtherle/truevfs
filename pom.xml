@@ -161,13 +161,15 @@
         <site>
             <id>truezip-website</id>
             <name>TrueZIP Website</name>
-            <!-- java.net doesn't support scp, so you need to provide an
-                 active-by-default profile in your settings.xml which sets the
+            <!-- java.net doesn't support scp, so you need to provide a profile
+                 in your settings.xml which is active by default and sets the
                  following property to a file URL which refers to a directory
-                 which is controlled by Mercurial so that any updates to this
+                 which is a Mercurial repository so that any updates to this
                  directory can be pushed to the Mercurial repository for
-                 TrueZIP's website at java.net, which is located at
-                 https://hg.java.net/hg/truezip~web.
+                 TrueZIP's website at java.net.
+                 This Mercurial repository is located at
+                 https://hg.java.net/hg/truezip~web or
+                 ssh://hg.java.net/truezip~web .
                  -->
             <url>${truezip-website.url}</url>
         </site>
