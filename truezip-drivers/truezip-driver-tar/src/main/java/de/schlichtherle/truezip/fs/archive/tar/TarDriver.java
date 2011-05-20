@@ -62,7 +62,7 @@ public class TarDriver extends FsCharsetArchiveDriver<TarArchiveEntry> {
     }
 
     @Override
-    public final IOPool<?> getPool() {
+    protected final IOPool<?> getPool() {
         return pool;
     }
 

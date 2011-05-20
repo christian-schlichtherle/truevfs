@@ -91,7 +91,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
     }
 
     @Override
-    public final IOPool<?> getPool() {
+    protected final IOPool<?> getPool() {
         return pool;
     }
 
