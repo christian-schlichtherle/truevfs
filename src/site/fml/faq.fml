@@ -312,7 +312,7 @@ TFile.setDefaultArchiveDetector(
                     considered to be unacceptable.</li>
                 <li>This issue is documented as a ticket in the project's
                     <a href="http://java.net/jira/browse/TRUEZIP">Issue Tracking System</a>
-                    (ITS).</li>
+                    (ITS) with the tag <code>binary-compatibility</code>.</li>
                 <li>A workaround is explained in the ITS ticket.</li>
                 <li>The ITS ticket is referenced in the Release Notes.</li>
                 </ol>
