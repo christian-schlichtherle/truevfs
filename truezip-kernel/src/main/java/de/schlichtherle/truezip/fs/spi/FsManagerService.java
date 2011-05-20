@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.spi;
 
-import de.schlichtherle.truezip.fs.*;
+import de.schlichtherle.truezip.fs.FsManagerProvider;
 import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 
 /**
@@ -26,7 +26,7 @@ import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
  * Implementations must be thread-safe.
  *
  * @author Christian Schlichtherle
- * @version $Id: FsManagers$
+ * @version $Id$
  */
 public abstract class FsManagerService implements FsManagerProvider {
 
@@ -36,8 +36,6 @@ public abstract class FsManagerService implements FsManagerProvider {
      */
     @Override
     public String toString() {
-        return new StringBuilder()
-                .append(getClass().getName())
-                .toString();
+        return getClass().getName();
     }
 }
