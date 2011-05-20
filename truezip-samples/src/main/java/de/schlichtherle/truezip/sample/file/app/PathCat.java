@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.sample.file.app;
 
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.TFileInputStream;
+import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.io.Streams;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,12 +33,12 @@ import java.io.InputStream;
 public class PathCat extends CommandLineUtility {
 
     /** Equivalent to {@code System.exit(new PathCat().run(args));}. */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FsSyncException {
         System.exit(new PathCat().run(args));
     }
 
     @Override
-    public int runChecked(String[] args) throws IOException {
+    protected int runChecked(String[] args) throws IOException {
         for (String path : args)
             pathCat(path);
         return 0;
@@ -50,8 +51,7 @@ public class PathCat extends CommandLineUtility {
      * @param  resource the path name string of the resource to copy.
      * @throws IOException if accessing the resource results in an I/O error.
      */
-    static void pathCat(String resource)
-    throws IOException {
+    static void pathCat(String resource) throws IOException {
         // Unless an explicit call to TFile.setDefaultArchiveDetector() has
         // been made, the TFile class will recognize any canonical archive file
         // suffix in a path name for which a file system driver is available on

@@ -18,26 +18,27 @@
  */
 package ${package};
 
+import de.schlichtherle.truezip.file.TApplication;
 import de.schlichtherle.truezip.file.TFile;
 import java.io.IOException;
 
 /**
- * Command line utility to recursively copy the first file or directory
+ * This command line utility recursively copies the first file or directory
  * argument to the second file or directory argument.
  * Instead of a directory, you can name any configured archive file type in
  * the path names, too.
  * If you name any archive files in the destination path name, they get
  * automatically created.
- * E.g. if the JAR for the module {@code truezip-driver-zip} is present on the
- * run time class path and the destination path name is {@code archive.zip} a
- * ZIP file with this name gets created unless it already exists.
+ * <p>
+ * For example, if the JAR for the module {@code truezip-driver-zip} is
+ * present on the run time class path and the destination path name is
+ * {@code archive.zip}, a ZIP file with this name gets created unless it
+ * already exists.
  * 
- * @param <E> the {@link Exception} class to throw by {@link #work} and
- *       {@link #run}.
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class Copy extends Application<IOException> {
+public class Copy extends TApplication<IOException> {
 
     public static void main(String[] args) throws IOException {
         System.exit(new Copy().run(args));
@@ -67,6 +68,7 @@ public class Copy extends Application<IOException> {
 
         // Perform a recursive archive copy.
         src.cp_rp(dst);
+
         return 0;
     }
 }

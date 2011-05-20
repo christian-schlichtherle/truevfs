@@ -19,6 +19,7 @@ import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.TFileComparator;
 import de.schlichtherle.truezip.file.TFileInputStream;
+import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.fs.archive.tar.TarBZip2Driver;
 import de.schlichtherle.truezip.fs.archive.tar.TarDriver;
 import de.schlichtherle.truezip.fs.archive.tar.TarGZipDriver;
@@ -135,7 +136,7 @@ public class Nzip extends CommandLineUtility {
     }
 
     /** Equivalent to {@code System.exit(new Nzip().run(args));}. */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FsSyncException {
         System.exit(new Nzip().run(args));
     }
 
@@ -152,7 +153,7 @@ public class Nzip extends CommandLineUtility {
      * @throws IOException On any I/O related exception.
      */
     @Override
-    public int runChecked(String[] args)
+    protected int runChecked(String[] args)
     throws IllegalUsageException, IOException {
         if (args.length < 1)
             throw new IllegalUsageException();
@@ -528,11 +529,11 @@ public class Nzip extends CommandLineUtility {
         return true;
     }
 
-    public class IllegalUsageException
-            extends CommandLineUtility.IllegalUsageException {
+    protected static class IllegalUsageException
+    extends CommandLineUtility.IllegalUsageException {
         private static final long serialVersionUID = 2660653252314854276L;
 
-        private IllegalUsageException() {
+        protected IllegalUsageException() {
             super(resources.getString("usage")); // use Resource Bundle
         }
     }

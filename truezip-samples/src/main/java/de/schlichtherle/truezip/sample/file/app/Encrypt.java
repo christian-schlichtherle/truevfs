@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.sample.file.app;
 
 import de.schlichtherle.truezip.sample.file.RaesFiles;
 import de.schlichtherle.truezip.file.TFile;
+import de.schlichtherle.truezip.fs.FsSyncException;
 import java.io.IOException;
 import java.util.ResourceBundle;
 
@@ -45,19 +46,17 @@ public class Encrypt extends CommandLineUtility {
             = ResourceBundle.getBundle(CLASS_NAME);
 
     /** Equivalent to {@code System.exit(new Encrypt().run(args));}. */
-    public static void main(final String[] args) {
+    public static void main(final String[] args) throws FsSyncException {
         System.exit(new Encrypt().run(args));
     }
 
     @Override
-    public int runChecked(final String[] args)
+    protected int runChecked(final String[] args)
     throws IllegalUsageException, IOException {
         if (args.length != 2)
             throw new IllegalUsageException(resources.getString("usage"));
-
         if (new TFile(args[1]).isEntry())
             monitor.start();
-
         RaesFiles.encrypt(args[0], args[1]);
         return 0;
     }

@@ -19,8 +19,11 @@ import de.schlichtherle.truezip.crypto.raes.param.swing.HurlingWindowFeedback;
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.fs.FsStatistics;
 import de.schlichtherle.truezip.crypto.raes.param.swing.InvalidKeyFeedback;
+import de.schlichtherle.truezip.file.TApplication;
+import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.fs.spi.FsManagerService;
-import java.io.IOException;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.text.MessageFormat;
@@ -31,7 +34,8 @@ import java.text.MessageFormat;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-abstract class CommandLineUtility {
+@DefaultAnnotation(NonNull.class)
+abstract class CommandLineUtility extends TApplication<RuntimeException> {
 
     /** The print stream for standard output. */
     protected final PrintStream out;
@@ -74,8 +78,6 @@ abstract class CommandLineUtility {
             final OutputStream out,
             final OutputStream err,
             final boolean autoFlush) {
-        if (null == out || null == err)
-            throw new NullPointerException();
         this.out = out instanceof PrintStream
                 ? (PrintStream) out
                 : new PrintStream(out, autoFlush);
@@ -83,53 +85,63 @@ abstract class CommandLineUtility {
                 ? (PrintStream) err
                 : new PrintStream(err, autoFlush);
         this.monitor = new ProgressMonitor(this.err);
-        configureFeedback();
-        configureManagerService();
-    }
-
-    /**
-     * Configure the type of the feedback when prompting the user for keys for
-     * RAES encrypted ZIP files using the Swing based prompting key manager.
-     * If this JVM is running in headless mode, then the configuration is
-     * ignored.
-     */
-    private static void configureFeedback() {
-        String spec = InvalidKeyFeedback.class.getName();
-        String impl = HurlingWindowFeedback.class.getName();
-        System.setProperty(spec, System.getProperty(spec, impl));
-    }
-
-    private static void configureManagerService() {
         String spec = FsManagerService.class.getName();
         String impl = SampleManagerService.class.getName();
         System.setProperty(spec, System.getProperty(spec, impl));
     }
 
     /**
-     * Runs this command line utility.
-     * Prints a user readable error message to the error output stream
-     * which was provided to the constructor if an error occurs.
-     *
-     * @param args A non-empty array of Unix-like commands and optional
-     *        parameters.
-     * @return {@code 1} iff the command fails,
-     *         {@code 0} otherwise.
+     * Runs the setup phase.
+     * <p>
+     * This method is {@link #run run} only once at the start of the life
+     * cycle.
+     * Its task is to configure the default behavior of the TrueZIP File* API
+     * in order to answer the following questions:
+     * <ul>
+     * <li>What are the file suffixes which shall be recognized as archive
+     *     files and hence as virtual directories?
+     * <li>Shall missing archive files and directory entries get automatically
+     *     created whenever required?
+     * </ul>
+     * <p>
+     * The implementation in the class {@link CommandLineUtility} configures
+     * the type of the feedback when prompting the user for keys for RAES
+     * encrypted ZIP files using the Swing based prompting key manager.
+     * If this JVM is running in headless mode, then this configuration is
+     * ignored.
      */
-    public final int run(final String[] args) {
+    @Override
+    protected void setup() {
+        String spec = InvalidKeyFeedback.class.getName();
+        String impl = HurlingWindowFeedback.class.getName();
+        System.setProperty(spec, System.getProperty(spec, impl));
+    }
+
+    /**
+     * Runs the work phase by calling {@link #runChecked}.
+     * Prints a user readable error message to the error output stream
+     * which was provided to the constructor if an {@link Exception occurs}.
+     * <p>
+     * This method is {@link #run run} at least once and repeatedly called
+     * until {@link #runChecked} returns a non-negative integer for use as the
+     * {@link System#exit(int) exist status} of the VM.
+     * After this method, the {@link #sync} method is called in a
+     * finally-block.
+     * 
+     * @param  args an array of arguments for this command line utility.
+     * @return A negative integer in order to continue calling this method
+     *         in a loop.
+     *         Otherwise, the return value is used as the
+     *         {@link System#exit(int) exit status} of the VM.
+     * @throws RuntimeException at the discretion of {@link #runChecked}.
+     */
+    @Override
+    protected final int work(final String[] args) {
         try {
-            try {
-                return runChecked(args);
-            } finally {
-                try {
-                    TFile.umount();
-                } finally {
-                    monitor.shutdown();
-                }
-            }
-        } catch (IllegalUsageException ex) {
-            err.println(ex.getLocalizedMessage());
-            return 1;
-        } catch (IOException ex) {
+            return runChecked(args);
+        } catch (RuntimeException ex) {
+            throw ex;
+        } catch (Exception ex) {
             err.println(ex.getLocalizedMessage());
             return 1;
         }
@@ -138,21 +150,36 @@ abstract class CommandLineUtility {
     /**
      * Runs this command line utility.
      * Throws an exception if an error occurs.
+     * <p>
+     * Avoid repeating this method and updating the same archive file upon
+     * each call!
+     * This would degrade the overall performance from O(n) to O(m*n),
+     * where m is the number of new or modified entries and n is the number
+     * of all entries in the archive file!
      *
-     * @param  args a non-{@code null} array of command line parameters.
-     * @return the return code for {@link System#exit}.
-     * @throws IllegalUsageException If {@code args} does not contain
-     *         correct commands or parameters.
-     * @throws IOException On any I/O related exception.
+     * @param  args an array of arguments for this command line utility.
+     * @return A negative integer in order to continue calling this method
+     *         in a loop.
+     *         Otherwise, the return value is used as the
+     *         {@link System#exit(int) exit status} of the VM.
+     * @throws Exception on any exception.
      */
-    public abstract int runChecked(String[] args)
-    throws IllegalUsageException, IOException;
+    protected abstract int runChecked(String[] args) throws Exception;
+
+    @Override
+    protected void sync() throws FsSyncException {
+        try {
+            TFile.umount();
+        } finally {
+            monitor.shutdown();
+        }
+    }
 
     /** Indicates illegal application parameters. */
     protected static class IllegalUsageException extends Exception {
         private static final long serialVersionUID = 1985623981423542464L;
 
-        public IllegalUsageException(String msg) {
+        protected IllegalUsageException(String msg) {
             super(msg);
         }
     } // class IllegalUsageException
@@ -166,7 +193,7 @@ abstract class CommandLineUtility {
         private final Long[] args = new Long[2];
         private final FsStatistics stats;
 
-        ProgressMonitor(final PrintStream err) {
+        private ProgressMonitor(final PrintStream err) {
             setDaemon(true);
             setPriority(Thread.MAX_PRIORITY);
             this.err = err;
@@ -180,7 +207,6 @@ abstract class CommandLineUtility {
         }
 
         @Override
-        @SuppressWarnings("SleepWhileHoldingLock")
         public void run() {
             boolean run = false;
             for (long sleep = 2000; ; sleep = 200, run = true) {

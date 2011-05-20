@@ -1630,7 +1630,9 @@ public final class TFile extends File {
      * archive file, or {@code null} otherwise.
      * <p>
      * TODO: Consider making this public in order to enable applications to
-     * call {@link FsController#getEntry(FsEntryName)}.{@link FsEntry# and then use instanceof
+     * get access to archive entry properties like this:
+     * <pre><code>
+     * </code></pre>
      * 
      * @return A file system controller if and only if the path denotes an
      *         archive file, or {@code null} otherwise.

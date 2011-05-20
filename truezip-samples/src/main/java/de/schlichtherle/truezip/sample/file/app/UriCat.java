@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.sample.file.app;
 
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.TFileInputStream;
+import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.io.Streams;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,18 +36,15 @@ import java.net.URISyntaxException;
 public class UriCat extends CommandLineUtility {
 
     /** Equivalent to {@code System.exit(new CatPath().run(args));}. */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FsSyncException {
         System.exit(new UriCat().run(args));
     }
 
     @Override
-    public int runChecked(String[] args) throws IOException {
-        try {
-            for (String path : args)
-                uriCat(path);
-        } catch (URISyntaxException ex) {
-            throw new IOException(ex);
-        }
+    protected int runChecked(String[] args)
+    throws IOException, URISyntaxException {
+        for (String path : args)
+            uriCat(path);
         return 0;
     }
 
@@ -58,11 +56,10 @@ public class UriCat extends CommandLineUtility {
      *         The URI must be file-based, i.e. the top level file system
      *         scheme must be {@code file}.
      * @throws IOException if accessing the resource results in an I/O error.
-     * @throws IllegalArgumentException if {@code resource} does not
+     * @throws URISyntaxException if {@code resource} does not
      *         conform to the syntax constraints for {@link URI}s.
      */
-    static void uriCat(String resource)
-    throws IOException, URISyntaxException {
+    static void uriCat(String resource) throws IOException, URISyntaxException {
         URI uri = new URI(resource);
         TFile file = uri.isAbsolute() ? new TFile(uri) : new TFile(resource);
         InputStream in = new TFileInputStream(file);
