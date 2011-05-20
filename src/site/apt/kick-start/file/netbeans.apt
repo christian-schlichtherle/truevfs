@@ -105,24 +105,39 @@ Kick-Starting TrueZIP File* Applications From a Maven Archetype In NetBeans
     {{{Edit_Your_Application}later}} to meet your application requirements.
     For now, please leave this file alnonw.
 
-    [<<<src/main/java/com/company/project/Application.java>>>]
-    This is an abstract base class which runs the setup-work-sync life cycle
-    of a typical TrueZIP File* application.
-    Subclass or edit this template class to meet your requirements.
-
     [<<<src/main/java/com/company/project/Copy.java>>>]
-    This is a command line utility to recursively copy the first file or
+    This command line utility recursively copies the first file or
     directory argument to the second file or directory argument.
     Instead of a directory, you can name any configured archive file type in
     the path names, too.
     If you name any archive files in the destination path name, they get
     automatically created.
 
+    For example, if the JAR for the module <<<truezip-driver-zip>>> is
+    present on the run time class path and the destination path name is
+    <<<archive.zip>>>, a ZIP file with this name gets created unless it
+    already exists.
+
+    [<<<src/main/java/com/company/project/Pickr.java>>>]
+    Lets you pick a file using a
+    {{{../../apidocs/de/schlichtherle/truezip/file/swing/TFileChooser.html}<<<TFileChooser>>>}}
+    and prints it's path.
+    Of course, <<<TFileChooser>>> can browse archive files, too.
+
+    For example, if the JAR for the module <<<truezip-driver-zip>>> is present
+    on the run time class path and a ZIP file <<<archive.zip>>> exists, then
+    you can double click it to browse its entries.
+    
     [<<<src/main/java/com/company/project/Tree.java>>>]
-    This is a command line utility to print an ASCII graph of the directory
-    tree for its file or directory arguments to the standard output.
+    This command line utility prints the tree graph of the directory structure
+    of its file or directory arguments to the standard output.
     Instead of a directory, you can name any configured archive file type as an
     argument, too.
+
+    For example, if the JAR for the module <<<truezip-driver-zip>>> is present
+    on the run time class path and the path name argument is <<<archive.zip>>>
+    and this file actually exists as a ZIP file, then the tree graph of the
+    directory structure of this ZIP file gets printed.
 
     []
 

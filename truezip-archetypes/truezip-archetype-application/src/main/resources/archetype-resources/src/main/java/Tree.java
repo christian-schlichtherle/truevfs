@@ -18,26 +18,26 @@
  */
 package ${package};
 
+import de.schlichtherle.truezip.file.TApplication;
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import java.io.PrintStream;
 
 /**
- * Command line utility to print the tree graph of the directory structure of
- * its file or directory arguments to the standard output.
+ * This command line utility prints the tree graph of the directory structure
+ * of its file or directory arguments to the standard output.
  * Instead of a directory, you can name any configured archive file type as an
  * argument, too.
- * E.g. if the JAR for the module {@code truezip-driver-zip} is present on the
- * run time class path and the path name argument is {@code archive.zip} and
- * this file actually exists as a ZIP file, then the tree graph of the
- * directory structure of this ZIP file will get printed.
+ * <p>
+ * For example, if the JAR for the module {@code truezip-driver-zip} is present
+ * on the run time class path and the path name argument is {@code archive.zip}
+ * and this file actually exists as a ZIP file, then the tree graph of the
+ * directory structure of this ZIP file gets printed.
  * 
- * @param <E> the {@link Exception} class to throw by {@link #work} and
- *       {@link #run}.
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class Tree extends Application<RuntimeException> {
+public class Tree extends TApplication<RuntimeException> {
 
     private static final String DEFAULT_PREFIX  = "|-- ";
     private static final String LAST_PREFIX     = "`-- ";
