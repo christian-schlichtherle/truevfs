@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.socket.spi;
 
-import de.schlichtherle.truezip.socket.*;
+import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.socket.sl.IOPoolLocator;
 
 /**
@@ -36,8 +36,6 @@ public abstract class IOPoolService implements IOPoolProvider {
      */
     @Override
     public String toString() {
-        return new StringBuilder()
-                .append(getClass().getName())
-                .toString();
+        return getClass().getName();
     }
 }
