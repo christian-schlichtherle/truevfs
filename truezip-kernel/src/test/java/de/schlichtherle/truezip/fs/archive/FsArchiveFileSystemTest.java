@@ -19,7 +19,6 @@ import de.schlichtherle.truezip.util.UriBuilder;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveEntry;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.fs.FsEntryName;
-import static de.schlichtherle.truezip.fs.FsUriModifier.*;
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
@@ -36,7 +35,7 @@ import static org.junit.Assert.*;
 public class FsArchiveFileSystemTest {
 
     @Test
-    public void testAddRemoveArchiveFileSystemListeners() {
+    public void testListeners() {
         final FsArchiveFileSystem<?> fileSystem
                 = FsArchiveFileSystem.newArchiveFileSystem(new MockArchiveDriver());
 
@@ -102,43 +101,71 @@ public class FsArchiveFileSystemTest {
 
     @Test
     public void testPopulation() throws Exception {
-        final MockArchiveDriver driver = new MockArchiveDriver();
-        final MockArchiveEntryContainer container = new MockArchiveEntryContainer();
-        final Object[][] params = new Object[][] {
-            { "sh:t", },
-            { "foo/", },
-            { "foo/bar", },
-            { "bar", },
+        final String[][] paramss = new String[][] {
+            // { $ARCHIVE_ENTRY_NAME [, $FILE_SYSTEM_ENTRY_NAME]* },
+            { ".", "" }, // in case an adversary puts in a FILE entry with this name, then we could read it.
+            { "\\t:st", null }, // illegal absolute Windows path
+            { "/test", null }, // illegal absolute path
+            { "f:ck" }, // strange, but legal
+            { "täscht" }, // URI encoding test
+            { "foo/", "foo" }, // directory
+            { "foo/bar", "foo", "foo/bar" },
+            { "foo//bar2", "foo", "foo/bar2" }, // strange, but legal
+            { "foo/./bar3", "foo", "foo/bar3" }, // dito
+            { "foo/../bar4", "bar4" }, // dito
+            { "foo\\..\\bar5", "bar5" }, // dito from Windows
+            { "./bar6", "bar6"}, // strange, but legal
+            { ".\\bar7", "bar7" }, // dito from Windows
+            { "../bar8", null }, // strange, but legal
+            { "..\\bar9", null }, // dito from Windows
         };
 
         // Populate and check container.
-        for (final Object[] param : params) {
-            final String entryName = param[0].toString();
-            final Type type = entryName.endsWith(SEPARATOR) ? DIRECTORY : FILE;
-            final MockArchiveEntry
-                    entry = driver.newEntry(entryName, type, null);
+        final MockArchiveEntryContainer container = new MockArchiveEntryContainer();
+        final MockArchiveDriver driver = new MockArchiveDriver();
+        for (final String[] params : paramss) {
+            final String aen = params[0];
+            final Type type = aen.endsWith(SEPARATOR) ? DIRECTORY : FILE;
+            final MockArchiveEntry entry = driver.newEntry(aen, type, null);
+            assertEquals(aen, entry.getName());
             container   .new Output()
                         .getOutputSocket(entry)
                         .newOutputStream()
                         .close();
-            assertNotNull(container.getEntry(entryName));
+            assertSame(entry, container.getEntry(aen));
         }
-        assertEquals(params.length, container.getSize());
+        assertEquals(paramss.length, container.getSize());
 
-        // Populate and check file system.
+        // Populate file system.
         final FsArchiveFileSystem<MockArchiveEntry>
                 fileSystem = FsArchiveFileSystem.newArchiveFileSystem(
                     driver, container, null, false);
-        assert params.length <= fileSystem.getSize();
+
+        // Check file system.
+        assert paramss.length <= fileSystem.getSize();
         assertNotNull(fileSystem.getEntry(ROOT));
-        for (final Object[] param : params) {
-            final FsEntryName entryName = new FsEntryName(
-                    new UriBuilder().path(param[0].toString()).getUri(),
-                    CANONICALIZE);
-            final FsArchiveFileSystemEntry<MockArchiveEntry>
-                    entry = fileSystem.getEntry(entryName);
-            assertEquals(entryName.getPath(), entry.getName());
-            assertEquals(param[0], entry.getEntry().getName());
+        params: for (String[] params : paramss) {
+            final String aen = params[0];
+            if (1 == params.length)
+                params = new String[] { aen, aen };
+
+            // Test if a file system entry for any given name is present.
+            for (int i = 1; i < params.length; i++) {
+                final String fsen = params[i];
+                if (null == fsen)
+                    continue;
+                final FsEntryName entryName = new FsEntryName(
+                        new UriBuilder().path(fsen).getUri());
+                assertEquals(fsen, entryName.getPath());
+                assertEquals(fsen, fileSystem.getEntry(entryName).getName());
+            }
+
+            // Test if an archive entry with a name matching path is present when iterating
+            // the file system.
+            for (FsArchiveFileSystemEntry<MockArchiveEntry> entry : fileSystem)
+                if (aen.equals(entry.getEntry().getName()))
+                    continue params;
+            assert false : "No entry found with this name: " + aen;
         }
     }
 }

@@ -226,28 +226,28 @@ TFile.setDefaultArchiveDetector(
                 </p>
             </answer>
         </faq>
-        <faq id="accessAbsoluteEntries">
+        <faq id="accessAbsoluteEntryName">
             <question>
-                How can I access entries with absolute path names in
-                archive files?
+                How can I access entries with absolute entry names in archive
+                files?
             </question>
             <answer>
                 <p>
                     You can't because there is no addressing scheme for this.
                     For example, the expression
                     <code>new TFile("archive.zip/entry")</code> gets decomposed
-                    into the path <code>archive.zip</code> as the mount point
-                    of the archive file and the relative path name
+                    into the file system path <code>archive.zip</code> as the
+                    mount point of the archive file and the relative entry name
                     <code>entry</code> as the entry name within this archive
                     file.
-                    There's no expression to address the absolute path name
+                    There's no expression to address the absolute entry name
                     <code>/entry</code> within the archive file instead.
                     Even if you would try
                     <code>new TFile("archive.zip//entry")</code>, it would
                     just get normalized to the previous expression.
                 </p>
                 <p>
-                    See also <a href="#treatAbsoluteEntries">here</a>.
+                    See also <a href="#manageAbsoluteEntryName">here</a>.
                 </p>
             </answer>
         </faq>
@@ -324,29 +324,92 @@ TFile.setDefaultArchiveDetector(
                 </p>
             </answer>
         </faq>
-        <faq id="treatAbsoluteEntries">
+        <faq id="manageAbsoluteEntryName">
             <question>
-                How does TrueZIP deal with entries with absolute path names in
+                How does TrueZIP deal with entries with absolute entry names in
                 archive files?
             </question>
             <answer>
                 <p>
-                    As answered <a href="#accessAbsoluteEntries">here</a>,
-                    you cannot access entries with absolute path names in
+                    As answered <a href="#accessAbsoluteEntryName">here</a>,
+                    you cannot access entries with absolute entry names in
                     archive files.
                     This implies that you cannot create archive files which
-                    contain entries with absolute path names.
+                    contain entries with absolute entry names.
                 </p>
                 <p>
                     However, you can use TrueZIP to read, modify or delete
-                    archive files which contain entries with absolute path
+                    archive files which contain entries with absolute entry
                     names:
                     If you use TrueZIP to modify an archive file which
-                    contains entries with absolute path names, these entries
-                    are preserved.
+                    contains entries with absolute entry names, these entry 
+                    names are preserved.
                     Likewise, an archive file can get deleted like any empty
-                    directory if it contains only entries with absolute path
+                    directory if it contains only entries with absolute entry
                     names.
+                </p>
+            </answer>
+        </faq>
+        <faq id="normalizeEntryName">
+            <question>
+                How does TrueZIP deal with entries with dot <code>"."</code>
+                or dot-dot <code>".."</code> segments in archive files?
+            </question>
+            <answer>
+                <p>
+                    Wherever possible, redundant segments are removed by a
+                    normalization of the entry name
+                    before the corresponding archive entry is mounted into the
+                    file system.
+                    When updating the archive file however, the original
+                    archive entry name is preserved.
+                    If a dot-dot segment remains at the start of the entry name,
+                    the corresponding entry will not be accessible by the
+                    application, but preserved with its original entry name
+                    upon an update of its archive file.
+                </p>
+            </answer>
+        </faq>
+        <faq id="manageWindowsSeparator">
+            <question>
+                How does TrueZIP deal with entries which use <code>"\"</code>
+                as the separator character in archive files?
+            </question>
+            <answer>
+                <p>
+                    Any occurence of this illegal separator character is
+                    replaced by the correct separator character <code>"/"</code>
+                    before the entry name is
+                    <a href="#normalizeEntryName">normalized</a> and the
+                    corresponding archive entry is mounted into the file system.
+                    When updating the archive file however, the original
+                    archive entry name is preserved.
+                </p>
+            </answer>
+        </faq>
+        <faq id="manageDuplicateEntry">
+            <question>
+                How does TrueZIP deal with duplicate entries in archive files?
+            </question>
+            <answer>
+                <p>
+                    If, after
+                    <a href="#normalizeEntryName">normalization</a> of the entry name,
+                    two or more entries in an archive file are sharing an equal
+                    entry name, only the last archive entry will get mounted
+                    into the archive file system.
+                </p>
+                <p>
+                    Some archive file formats, e.g. ZIP and TAR, use a trailing
+                    slash <code>'/'</code> character to indicate a directory
+                    entry.
+                    In case an archive file contains two entries which, after
+                    normalization of their name, differ only in a trailing
+                    slash, then a hybrid entry is mounted into the file system.
+                    This hybrid entry will be accessible as if it were both a
+                    file and a directory entry at the same time, e.g. you
+                    can read and write its content and you can list or change
+                    its members.
                 </p>
             </answer>
         </faq>
