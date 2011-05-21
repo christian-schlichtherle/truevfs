@@ -22,7 +22,7 @@ import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.logging.Level;
-import de.schlichtherle.truezip.fs.archive.MockArchiveDriver;
+import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
 import de.schlichtherle.truezip.fs.FsPath;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

@@ -13,12 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.fs.archive;
+package de.schlichtherle.truezip.fs.archive.mock;
 
 import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.fs.archive.FsArchiveEntry;
+import de.schlichtherle.truezip.socket.IOPool;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.EnumMap;
 import java.util.EnumSet;
 
@@ -27,16 +30,19 @@ import java.util.EnumSet;
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-final class MockArchiveEntry implements FsArchiveEntry {
+public final class MockArchiveEntry implements FsArchiveEntry {
 
     private final String name;
     private final Type type;
-    private final EnumMap<Size, Long> sizes = new EnumMap<Size, Long>(Size.class);
-    private final EnumMap<Access, Long> times = new EnumMap<Access, Long>(Access.class);
+    private final EnumMap<Size, Long>
+            sizes = new EnumMap<Size, Long>(Size.class);
+    private final EnumMap<Access, Long>
+            times = new EnumMap<Access, Long>(Access.class);
+    @Nullable IOPool.Entry<?> io;
 
-    MockArchiveEntry(   final String name,
-                        final Type type,
-                        final @CheckForNull Entry template) {
+    public MockArchiveEntry(final String name,
+                            final Type type,
+                            final @CheckForNull Entry template) {
         assert null != name;
         assert null != type;
         this.name = name;
@@ -66,25 +72,25 @@ final class MockArchiveEntry implements FsArchiveEntry {
     }
 
     @Override
-    public long getSize(Size type) {
+    public long getSize(final Size type) {
         final Long size = sizes.get(type);
-        return null == size ? UNKNOWN : size;
+        return null != size ? size : UNKNOWN;
     }
 
     @Override
-    public boolean setSize(Size type, long value) {
+    public boolean setSize(final Size type, final long value) {
         sizes.put(type, value);
         return true;
     }
 
     @Override
-    public long getTime(Access type) {
+    public long getTime(final Access type) {
         final Long time = times.get(type);
-        return null == time ? UNKNOWN : time;
+        return null != time ? time : UNKNOWN;
     }
 
     @Override
-    public boolean setTime(Access type, long value) {
+    public boolean setTime(final Access type, final long value) {
         times.put(type, value);
         return true;
     }

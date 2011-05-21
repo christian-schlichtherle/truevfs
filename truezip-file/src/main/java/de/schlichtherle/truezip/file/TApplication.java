@@ -27,7 +27,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 //import de.schlichtherle.truezip.fs.archive.zip.raes.ParanoidZipRaesDriver;
 //import de.schlichtherle.truezip.fs.archive.zip.raes.SafeZipRaesDriver;
 //import de.schlichtherle.truezip.key.sl.KeyManagerLocator;
-//import de.schlichtherle.truezip.socket.ByteArrayIOPoolProvider;
+//import de.schlichtherle.truezip.socket.spi.ByteArrayIOPoolService;
 //import de.schlichtherle.truezip.socket.sl.IOPoolLocator;
 
 /**
@@ -193,7 +193,7 @@ public abstract class TApplication<E extends Exception> {
      *         new TArchiveDetector(
      *             "bar",
      *             new ParanoidZipRaesDriver(
-     *                 new ByteArrayIOPoolProvider(2048),
+     *                 new ByteArrayIOPoolService(2048),
      *                 KeyManagerLocator.SINGLETON)));
      * </code></pre>
      * The following class property controls whether archive files and their

@@ -13,15 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.socket;
+package de.schlichtherle.truezip.socket.spi;
+
+import de.schlichtherle.truezip.socket.ByteArrayIOEntry;
+import de.schlichtherle.truezip.socket.ByteArrayIOPool;
+import de.schlichtherle.truezip.socket.IOPool;
+import net.jcip.annotations.Immutable;
 
 /**
- * A provider for {@link ByteArrayIOPool byte array I/O pools}.
+ * An immutable container of a {@link ByteArrayIOPool byte array I/O pool}.
  * 
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class ByteArrayIOPoolProvider implements IOPoolProvider {
+@Immutable
+public final class ByteArrayIOPoolService extends IOPoolService {
 
     private final ByteArrayIOPool pool;
 
@@ -33,7 +39,7 @@ public final class ByteArrayIOPoolProvider implements IOPoolProvider {
      * 
      * @param initialCapacity the initial capacity in bytes.
      */
-    public ByteArrayIOPoolProvider(int initialCapacity) {
+    public ByteArrayIOPoolService(int initialCapacity) {
         pool = new ByteArrayIOPool(initialCapacity);
     }
 
