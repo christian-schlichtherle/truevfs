@@ -26,7 +26,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.EnumMap;
 import net.jcip.annotations.NotThreadSafe;
+
+import static de.schlichtherle.truezip.entry.Entry.Type.*;
+import static de.schlichtherle.truezip.entry.Entry.Access.*;
 
 /**
  * An I/O entry which uses a byte array.
@@ -40,6 +44,8 @@ public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
 
     private final String name;
     private @CheckForNull byte[] data;
+    private final EnumMap<Access, Long>
+            times = new EnumMap<Access, Long>(Access.class);
     private int reads;
     private int writes;
     int initialCapacity;
@@ -102,22 +108,6 @@ public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
         this.data = data;
     }
 
-    /**
-     * @return The number of times a read only file or an input stream for this
-     *         I/O entry has been opened.
-     */
-    public int getReads() {
-        return reads;
-    }
-
-    /**
-     * @return The number of times an output stream for this I/O entry has been
-     *         opened.
-     */
-    public int getWrites() {
-        return writes;
-    }
-
     @Override
     public final String getName() {
         return name;
@@ -125,17 +115,31 @@ public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
 
     @Override
     public Type getType() {
-        return Type.FILE;
+        return FILE;
     }
 
     @Override
     public long getSize(Size type) {
-        return null == data ? UNKNOWN : data.length;
+        return null != data ? data.length : UNKNOWN;
     }
 
+    /**
+     * @return The number of times an input or output socket has been used to
+     *         open a connection to the backing byte array.
+     */
+    // http://java.net/jira/browse/TRUEZIP-83
+    public int getCount(Access type) {
+        return type == WRITE ? writes : reads;
+    }
+
+    /**
+     * @return The last time an input or output connection to the backing byte
+     *         array has been closed.
+     */
     @Override
     public long getTime(Access type) {
-        return System.currentTimeMillis();
+        final Long time = times.get(type);
+        return null != time ? time : UNKNOWN;
     }
 
     @Override
@@ -154,7 +158,6 @@ public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
     }
 
     private final class ByteArrayInputSocket extends InputSocket<ByteArrayIOEntry> {
-
         @Override
         public ByteArrayIOEntry getLocalTarget() throws IOException {
             return ByteArrayIOEntry.this;
@@ -166,7 +169,7 @@ public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
             if (null == data)
                 throw new FileNotFoundException();
             reads++;
-            return new ByteArrayReadOnlyFile(data);
+            return new DataReadOnlyFile(data);
         }
 
         @Override
@@ -175,12 +178,35 @@ public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
             if (null == data)
                 throw new FileNotFoundException();
             reads++;
-            return new ByteArrayInputStream(data);
+            return new DataInputStream(data);
         }
     } // class ByteArrayInputSocket
 
-    private class ByteArrayOutputSocket extends OutputSocket<ByteArrayIOEntry> {
+    private class DataReadOnlyFile extends ByteArrayReadOnlyFile {
+        DataReadOnlyFile(byte[] data) {
+            super(data);
+        }
 
+        @Override
+        public void close() throws IOException {
+            times.put(READ, System.currentTimeMillis());
+            super.close();
+        }
+    } // class DataReadOnlyFile
+
+    private class DataInputStream extends ByteArrayInputStream {
+        DataInputStream(byte[] data) {
+            super(data);
+        }
+
+        @Override
+        public void close() throws IOException {
+            times.put(READ, System.currentTimeMillis());
+            super.close();
+        }
+    } // class DataInputStream
+
+    private class ByteArrayOutputSocket extends OutputSocket<ByteArrayIOEntry> {
         @Override
         public ByteArrayIOEntry getLocalTarget() throws IOException {
             return ByteArrayIOEntry.this;
@@ -194,13 +220,13 @@ public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
     } // class ByteArrayOutputSocket
 
     private class DataOutputStream extends ByteArrayOutputStream {
-
         DataOutputStream() {
             super(initialCapacity);
         }
 
         @Override
         public void close() throws IOException {
+            times.put(WRITE, System.currentTimeMillis());
             super.close();
             data = toByteArray();
         }
