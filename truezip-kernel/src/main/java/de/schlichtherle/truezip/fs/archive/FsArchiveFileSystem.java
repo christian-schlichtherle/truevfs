@@ -15,9 +15,6 @@
  */
 package de.schlichtherle.truezip.fs.archive;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.EntryContainer;
@@ -33,10 +30,12 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.CharConversionException;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import net.jcip.annotations.NotThreadSafe;
@@ -46,13 +45,15 @@ import static de.schlichtherle.truezip.entry.Entry.Access.*;
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
-import static de.schlichtherle.truezip.fs.FsUriModifier.*;
 import static de.schlichtherle.truezip.io.Paths.*;
 
 /**
  * A read/write virtual file system for archive entries.
+ * Have a look at the online <a href="http://truezip.java.net/FAQ.html">FAQ</a>
+ * to get the concept of how this works.
  * 
  * @param   <E> The type of the archive entries.
+ * @see     http://truezip.java.net/FAQ.html
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -157,24 +158,15 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
         this.master = newMasterEntryTable(root, (int) (archive.getSize() / .7f) + 1);
 
         // Load entries from input archive.
-        final List<FsEntryName>
-                names = new ArrayList<FsEntryName>(archive.getSize());
-        final UriBuilder uri = new UriBuilder(); // http://java.net/jira/browse/TRUEZIP-68
+        final List<String> paths = new ArrayList<String>(archive.getSize());
+        final Normalizer normalizer = new Normalizer(SEPARATOR_CHAR);
         for (final E entry : archive) {
-            try {
-                final FsEntryName name = new FsEntryName(
-                        uri .path(
-                                cutTrailingSeparators(
-                                    entry   .getName()
-                                            .replace('\\', SEPARATOR_CHAR),
-                                    SEPARATOR_CHAR))
-                            .getUri(),
-                        CANONICALIZE);
-                master.add(FsArchiveFileSystemEntry.create(name, entry.getType(), entry));
-                names.add(name);
-            } catch (URISyntaxException ex) {
-                throw new AssertionError(ex);
-            }
+            final String path = cutTrailingSeparators(
+                normalizer.normalize(
+                    entry.getName().replace('\\', SEPARATOR_CHAR)),
+                SEPARATOR_CHAR);
+            master.add(FsArchiveFileSystemEntry.create(path, entry.getType(), entry));
+            paths.add(path);
         }
 
         // Setup root file system entry, potentially replacing its previous
@@ -184,9 +176,13 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
         // Now perform a file system check to create missing parent directories
         // and populate directories with their members - this needs to be done
         // separately!
-        // entries = Collections.enumeration(master.values()); // concurrent modification!
-        for (FsEntryName name : names)
-            fix(name);
+        final UriBuilder uri = new UriBuilder();
+        for (final String path : paths) {
+            try {
+                fix(new FsEntryName(uri.path(path).getUri()));
+            } catch (URISyntaxException dontFix) {
+            }
+        }
     }
 
     private static <E extends FsArchiveEntry> MasterEntryTable<E>
@@ -347,13 +343,14 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
             final FsEntryName name,
             final Type type,
             @CheckForNull final Entry template) {
+        final String path = name.getPath();
         assert null != type;
-        assert !isRoot(name.getPath()) || DIRECTORY == type;
+        assert !isRoot(path) || DIRECTORY == type;
         assert !(template instanceof FsArchiveFileSystemEntry<?>);
 
         try {
             return FsArchiveFileSystemEntry.create(
-                    name, type, factory.newEntry(name.getPath(), type, template));
+                    path, type, factory.newEntry(path, type, template));
         } catch (CharConversionException ex) {
             throw new AssertionError(ex);
         }
@@ -378,13 +375,14 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
             final Type type,
             @CheckForNull final Entry template)
     throws FsArchiveFileSystemException {
+        final String path = name.getPath();
         assert null != type;
-        assert !isRoot(name.getPath()) || DIRECTORY == type;
+        assert !isRoot(path) || DIRECTORY == type;
         assert !(template instanceof FsArchiveFileSystemEntry<?>);
 
         try {
             return FsArchiveFileSystemEntry.create(
-                    name, type, factory.newEntry(name.getPath(), type, template));
+                    path, type, factory.newEntry(path, type, template));
         } catch (CharConversionException ex) {
             throw new FsArchiveFileSystemException(name.toString(), ex);
         }
@@ -666,14 +664,15 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
 
         @Override
         void add(FsArchiveFileSystemEntry<E> entry) {
-            String fsName = entry.getName();
-            String aeName = entry.getEntry().getName();
-            if (aeName.startsWith(fsName))
-                table.put(aeName, entry);
+            String fsen = entry.getName();
+            String aen = entry.getEntry().getName();
+            if (aen.startsWith(fsen)
+                    && SEPARATOR.startsWith(aen.substring(fsen.length())))
+                table.put(aen, entry);
             else if (DIRECTORY == entry.getType())
-                table.put(fsName + SEPARATOR_CHAR, entry);
+                table.put(fsen + SEPARATOR_CHAR, entry);
             else
-                table.put(fsName, entry);
+                table.put(fsen, entry);
         }
 
         @Override
@@ -796,7 +795,7 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
             try {
                 return null == path
                         ? ROOT
-                        : new FsEntryName(  new URI(null, null, path, null),
+                        : new FsEntryName(  new UriBuilder().path(path).getUri(),
                                             FsUriModifier.NULL);
             } catch (URISyntaxException ex) {
                 throw new AssertionError(ex);
