@@ -29,6 +29,8 @@ import net.jcip.annotations.Immutable;
 @Immutable
 public final class ByteArrayIOPoolService extends IOPoolService {
 
+    // Don't make this static. Having multiple instances is good for debugging
+    // the allocation and release of resources in a more isolated context.
     private final ByteArrayIOPool pool;
 
     /**
