@@ -64,7 +64,7 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
 
     private final Splitter splitter = new Splitter();
     private final EntryFactory<E> factory;
-    private final MasterEntryTable<E> master;
+    private final EntryTable<E> master;
 
     /** Whether or not this file system has been modified (touched). */
     private boolean touched;
@@ -185,12 +185,12 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
         }
     }
 
-    private static <E extends FsArchiveEntry> MasterEntryTable<E>
+    private static <E extends FsArchiveEntry> EntryTable<E>
     newMasterEntryTable(final FsArchiveFileSystemEntry<E> root, final int initialCapacity) {
-        final MasterEntryTable<E>
+        final EntryTable<E>
                 master = root.getEntry().getName().endsWith(SEPARATOR)
                     ? new ZipOrTarEntryTable<E>(initialCapacity)
-                    : new DefaultEntryTable<E>(initialCapacity);
+                    : new EntryTable<E>(initialCapacity);
         master.add(root);
         return master;
     }
@@ -217,7 +217,7 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
         splitter.split(name);
         final FsEntryName parentName = splitter.getParentName();
         final String memberName = splitter.getMemberName();
-        FsArchiveFileSystemEntry<E> parent = master.get(parentName, DIRECTORY);
+        FsArchiveFileSystemEntry<E> parent = master.get(DIRECTORY, parentName);
         if (null == parent) {
             parent = newEntryUnchecked(parentName, DIRECTORY, null);
             master.add(parent);
@@ -324,7 +324,7 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
     @Nullable
     final FsArchiveFileSystemEntry<E> getEntry(FsEntryName name) {
         assert null != name;
-        FsArchiveFileSystemEntry<E> entry = master.get(name, null);
+        FsArchiveFileSystemEntry<E> entry = master.get(name);
         return null == entry ? null : entry.clone(factory);
     }
 
@@ -443,7 +443,7 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
         if (FILE != type && DIRECTORY != type) // TODO: Add support for other types.
             throw new FsArchiveFileSystemException(name.toString(),
                     "only FILE and DIRECTORY entries are currently supported");
-        final FsArchiveFileSystemEntry<E> oldEntry = master.get(name, null);
+        final FsArchiveFileSystemEntry<E> oldEntry = master.get(name);
         if (null != oldEntry) {
             if (options.get(EXCLUSIVE))
                 throw new FsArchiveFileSystemException(name.toString(),
@@ -498,7 +498,7 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
 
             // Lookup parent entry, creating it where necessary and allowed.
             final FsArchiveFileSystemEntry<E>
-                    parentEntry = master.get(parentName, null);
+                    parentEntry = master.get(parentName);
             final FsArchiveFileSystemEntry<E> newEntry;
             if (parentEntry != null) {
                 if (DIRECTORY != parentEntry.getType())
@@ -602,7 +602,7 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
         if (name.isRoot())
             throw new FsArchiveFileSystemException(name.toString(),
                     "root directory cannot get unlinked");
-        final FsArchiveFileSystemEntry<E> entry = master.get(name, null);
+        final FsArchiveFileSystemEntry<E> entry = master.get(name);
         if (entry == null)
             throw new FsArchiveFileSystemException(name.toString(),
                     "archive entry does not exist");
@@ -611,10 +611,10 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
                     "directory is not empty");
         }
         touch();
-        master.remove(name, entry.getType());
+        master.remove(entry.getType(), name);
         splitter.split(name);
         final FsEntryName parentName = splitter.getParentName();
-        final FsArchiveFileSystemEntry<E> parent = master.get(parentName, DIRECTORY);
+        final FsArchiveFileSystemEntry<E> parent = master.get(DIRECTORY, parentName);
         assert parent != null : "The parent directory of \"" + name.toString()
                     + "\" is missing - archive file system is corrupted!";
         final boolean ok = parent.remove(splitter.getMemberName());
@@ -633,7 +633,7 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
         if (0 > value)
             throw new IllegalArgumentException(name.toString()
                     + " (negative access time)");
-        final FsArchiveFileSystemEntry<E> entry = master.get(name, null);
+        final FsArchiveFileSystemEntry<E> entry = master.get(name);
         if (null == entry)
             throw new FsArchiveFileSystemException(name.toString(),
                     "archive entry not found");
@@ -656,82 +656,12 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
                 "cannot set read-only state");
     }
 
-    private static final class ZipOrTarEntryTable<E extends FsArchiveEntry>
-    extends MasterEntryTable<E> {
-        ZipOrTarEntryTable(int initialCapacity) {
-            super(initialCapacity);
-        }
-
-        @Override
-        void add(FsArchiveFileSystemEntry<E> entry) {
-            String fsen = entry.getName();
-            String aen = entry.getEntry().getName();
-            if (aen.startsWith(fsen)
-                    && SEPARATOR.startsWith(aen.substring(fsen.length())))
-                table.put(aen, entry);
-            else if (DIRECTORY == entry.getType())
-                table.put(fsen + SEPARATOR_CHAR, entry);
-            else
-                table.put(fsen, entry);
-        }
-
-        @Override
-        FsArchiveFileSystemEntry<E> get(FsEntryName name, Type type) {
-            String path = name.getPath();
-            if (null == type) {
-                final FsArchiveFileSystemEntry<E> file = table.get(path);
-                final FsArchiveFileSystemEntry<E> directory = table.get(path + SEPARATOR_CHAR);
-                return null == file
-                        ? null == directory
-                            ? null
-                            : directory
-                        : null == directory
-                            ? file
-                            : new FsArchiveFileSystemEntry.HybridEntry<E>(
-                                file.getEntry(), file, directory);
-            } else if (DIRECTORY == type) {
-                return table.get(path + SEPARATOR_CHAR);
-            } else {
-                return table.get(path);
-            }
-        }
-
-        @Override
-        void remove(FsEntryName name, Type type) {
-            assert null != type;
-            String path = name.getPath();
-            table.remove(DIRECTORY == type ? path + SEPARATOR_CHAR : path);
-        }
-    } // class ZipOrTarEntryTable
-
-    private static final class DefaultEntryTable<E extends FsArchiveEntry>
-    extends MasterEntryTable<E> {
-        DefaultEntryTable(int initialCapacity) {
-            super(initialCapacity);
-        }
-
-        @Override
-        void add(FsArchiveFileSystemEntry<E> entry) {
-            table.put(entry.getName(), entry);
-        }
-
-        @Override
-        FsArchiveFileSystemEntry<E> get(FsEntryName name, Type type) {
-            return table.get(name.getPath());
-        }
-
-        @Override
-        void remove(FsEntryName name, Type type) {
-            table.remove(name.getPath());
-        }
-    } // class DefaultEntryTable
-
     /**
      * Splits a given path name into its parent path name and base name.
      * 
      * @param <E> The type of the archive entries.
      */
-    private static abstract class MasterEntryTable<E extends FsArchiveEntry> {
+    private static class EntryTable<E extends FsArchiveEntry> {
 
         /**
          * The map of archive file system entries.
@@ -740,20 +670,20 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
          * {@link EntryContainer} object provided to the constructor of
          * this class.
          */
-        final Map<String, FsArchiveFileSystemEntry<E>> table;
+        final Map<String, FsArchiveFileSystemEntry<E>> map;
 
-        MasterEntryTable(int initialCapacity) {
-            this.table = new LinkedHashMap<String, FsArchiveFileSystemEntry<E>>(
+        EntryTable(int initialCapacity) {
+            this.map = new LinkedHashMap<String, FsArchiveFileSystemEntry<E>>(
                     initialCapacity);
         }
 
         final int getSize() {
-            return table.size();
+            return map.size();
         }
 
         final Iterator<FsArchiveFileSystemEntry<E>> iterator() {
             class ArchiveEntryIterator implements Iterator<FsArchiveFileSystemEntry<E>> {
-                final Iterator<FsArchiveFileSystemEntry<E>> it = table.values().iterator();
+                final Iterator<FsArchiveFileSystemEntry<E>> it = map.values().iterator();
 
                 @Override
                 public boolean hasNext() {
@@ -774,13 +704,71 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
             return new ArchiveEntryIterator();
         }
 
-        abstract void add(FsArchiveFileSystemEntry<E> entry);
+        void add(FsArchiveFileSystemEntry<E> entry) {
+            map.put(entry.getName(), entry);
+        }
 
-        abstract @CheckForNull FsArchiveFileSystemEntry<E>
-        get(FsEntryName name, @CheckForNull Type type);
+        @CheckForNull FsArchiveFileSystemEntry<E> get(FsEntryName name) {
+            return map.get(name.getPath());
+        }
 
-        abstract void remove(FsEntryName name, @CheckForNull Type type);
-    } // class MasterEntryTable
+        @CheckForNull FsArchiveFileSystemEntry<E> get(Type type, FsEntryName name) {
+            return map.get(name.getPath());
+        }
+
+        void remove(Type type, FsEntryName name) {
+            map.remove(name.getPath());
+        }
+    } // class EntryTable
+
+    private static final class ZipOrTarEntryTable<E extends FsArchiveEntry>
+    extends EntryTable<E> {
+        ZipOrTarEntryTable(int initialCapacity) {
+            super(initialCapacity);
+        }
+
+        @Override
+        void add(FsArchiveFileSystemEntry<E> entry) {
+            String fsen = entry.getName();
+            String aen = entry.getEntry().getName();
+            if (aen.startsWith(fsen)
+                    && SEPARATOR.startsWith(aen.substring(fsen.length())))
+                map.put(aen, entry);
+            else if (DIRECTORY == entry.getType())
+                map.put(fsen + SEPARATOR_CHAR, entry);
+            else
+                map.put(fsen, entry);
+        }
+
+        @Override
+        FsArchiveFileSystemEntry<E> get(final FsEntryName name) {
+            final String path = name.getPath();
+            final FsArchiveFileSystemEntry<E> file = map.get(path);
+            final FsArchiveFileSystemEntry<E> directory = map.get(path + SEPARATOR_CHAR);
+            return null == file
+                    ? null == directory
+                        ? null
+                        : directory
+                    : null == directory
+                        ? file
+                        : new FsArchiveFileSystemEntry.HybridEntry<E>(
+                            file.getEntry(), file, directory);
+        }
+
+        @Override
+        FsArchiveFileSystemEntry<E> get(final Type type, final FsEntryName name) {
+            assert null != type;
+            final String path = name.getPath();
+            return map.get(DIRECTORY == type ? path + SEPARATOR_CHAR : path);
+        }
+
+        @Override
+        void remove(final Type type, final FsEntryName name) {
+            assert null != type;
+            final String path = name.getPath();
+            map.remove(DIRECTORY == type ? path + SEPARATOR_CHAR : path);
+        }
+    } // class ZipOrTarEntryTable
 
     private static final class Splitter {
         private final de.schlichtherle.truezip.io.Paths.Splitter
