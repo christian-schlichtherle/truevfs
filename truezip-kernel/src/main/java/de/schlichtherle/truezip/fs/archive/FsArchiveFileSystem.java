@@ -26,6 +26,7 @@ import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.fs.FsUriModifier;
 import de.schlichtherle.truezip.util.Link;
+import de.schlichtherle.truezip.util.UriBuilder;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -45,6 +46,7 @@ import static de.schlichtherle.truezip.entry.Entry.Access.*;
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
+import static de.schlichtherle.truezip.fs.FsUriModifier.*;
 import static de.schlichtherle.truezip.io.Paths.*;
 
 /**
@@ -157,15 +159,17 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
         // Load entries from input archive.
         final List<FsEntryName>
                 names = new ArrayList<FsEntryName>(archive.getSize());
+        final UriBuilder uri = new UriBuilder(); // http://java.net/jira/browse/TRUEZIP-68
         for (final E entry : archive) {
             try {
                 final FsEntryName name = new FsEntryName(
-                        new URI(null,
-                                null,
-                                cutTrailingSeparators(entry.getName().replace('\\', SEPARATOR_CHAR), SEPARATOR_CHAR),
-                                //entry.getName().replace('\\', SEPARATOR_CHAR),
-                                null),
-                        FsUriModifier.CANONICALIZE);
+                        uri .path(
+                                cutTrailingSeparators(
+                                    entry   .getName()
+                                            .replace('\\', SEPARATOR_CHAR),
+                                    SEPARATOR_CHAR))
+                            .getUri(),
+                        CANONICALIZE);
                 master.add(FsArchiveFileSystemEntry.create(name, entry.getType(), entry));
                 names.add(name);
             } catch (URISyntaxException ex) {

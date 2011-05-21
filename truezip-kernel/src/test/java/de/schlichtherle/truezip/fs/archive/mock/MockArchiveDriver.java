@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.fs.archive;
+package de.schlichtherle.truezip.fs.archive.mock;
 
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.fs.FsModel;
+import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriver;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.socket.InputSocket;
-import de.schlichtherle.truezip.socket.ByteArrayIOPool;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
@@ -35,9 +35,9 @@ import java.nio.charset.Charset;
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-public class MockArchiveDriver extends FsCharsetArchiveDriver<FsArchiveEntry> {
+public final class MockArchiveDriver
+extends FsCharsetArchiveDriver<MockArchiveEntry> {
 
-    private static final IOPool<?> pool = new ByteArrayIOPool(2048);
     private static final Charset charset = Charset.forName("UTF-8");
 
     public MockArchiveDriver() {
@@ -45,29 +45,29 @@ public class MockArchiveDriver extends FsCharsetArchiveDriver<FsArchiveEntry> {
     }
 
     @Override
-    public IOPool<?> getPool() {
-        return pool;
+    protected IOPool<?> getPool() {
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public InputShop<FsArchiveEntry> newInputShop(
+    public InputShop<MockArchiveEntry> newInputShop(
             FsModel model,
             InputSocket<?> input)
     throws IOException {
-        throw new UnsupportedOperationException("This is a dummy archive driver!");
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public OutputShop<FsArchiveEntry> newOutputShop(
+    public OutputShop<MockArchiveEntry> newOutputShop(
             FsModel model,
             OutputSocket<?> output,
-            InputShop<FsArchiveEntry> source)
+            InputShop<MockArchiveEntry> source)
     throws IOException {
-        throw new UnsupportedOperationException("This is a dummy archive driver!");
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public FsArchiveEntry newEntry(String name, Type type, Entry template)
+    public MockArchiveEntry newEntry(String name, Type type, Entry template)
     throws CharConversionException {
         return new MockArchiveEntry(name, type, template);
     }

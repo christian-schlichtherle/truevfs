@@ -15,7 +15,15 @@
  */
 package de.schlichtherle.truezip.fs.archive;
 
+import de.schlichtherle.truezip.util.UriBuilder;
+import de.schlichtherle.truezip.fs.archive.mock.MockArchiveEntry;
+import de.schlichtherle.truezip.entry.Entry.Type;
+import de.schlichtherle.truezip.fs.FsEntryName;
+import static de.schlichtherle.truezip.fs.FsUriModifier.*;
+import static de.schlichtherle.truezip.entry.Entry.Type.*;
+import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
+import de.schlichtherle.truezip.fs.archive.mock.MockArchiveEntryContainer;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -65,13 +73,6 @@ public class FsArchiveFileSystemTest {
         assertThat(fileSystem.getFsArchiveFileSystemTouchListeners().size(), is(0));
     }
 
-    /*@Test
-    public void testPopulation() {
-        final FsArchiveFileSystem<?> fileSystem
-                = FsArchiveFileSystem.newArchiveFileSystem(new MockArchiveDriver(), null, null, false);
-        
-    }*/
-
     private static class Listener
     implements FsArchiveFileSystemTouchListener<FsArchiveEntry> {
         final FsArchiveFileSystem<?> fileSystem;
@@ -96,6 +97,48 @@ public class FsArchiveFileSystemTest {
             assertThat(event, notNullValue());
             assertThat(event.getSource(), sameInstance((Object) fileSystem));
             after++;
+        }
+    }
+
+    @Test
+    public void testPopulation() throws Exception {
+        final MockArchiveDriver driver = new MockArchiveDriver();
+        final MockArchiveEntryContainer container = new MockArchiveEntryContainer();
+        final Object[][] params = new Object[][] {
+            { "sh:t", },
+            { "foo/", },
+            { "foo/bar", },
+            { "bar", },
+        };
+
+        // Populate and check container.
+        for (final Object[] param : params) {
+            final String entryName = param[0].toString();
+            final Type type = entryName.endsWith(SEPARATOR) ? DIRECTORY : FILE;
+            final MockArchiveEntry
+                    entry = driver.newEntry(entryName, type, null);
+            container   .new Output()
+                        .getOutputSocket(entry)
+                        .newOutputStream()
+                        .close();
+            assertNotNull(container.getEntry(entryName));
+        }
+        assertEquals(params.length, container.getSize());
+
+        // Populate and check file system.
+        final FsArchiveFileSystem<MockArchiveEntry>
+                fileSystem = FsArchiveFileSystem.newArchiveFileSystem(
+                    driver, container, null, false);
+        assert params.length <= fileSystem.getSize();
+        assertNotNull(fileSystem.getEntry(ROOT));
+        for (final Object[] param : params) {
+            final FsEntryName entryName = new FsEntryName(
+                    new UriBuilder().path(param[0].toString()).getUri(),
+                    CANONICALIZE);
+            final FsArchiveFileSystemEntry<MockArchiveEntry>
+                    entry = fileSystem.getEntry(entryName);
+            assertEquals(entryName.getPath(), entry.getName());
+            assertEquals(param[0], entry.getEntry().getName());
         }
     }
 }

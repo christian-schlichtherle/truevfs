@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.file;
 
-import de.schlichtherle.truezip.socket.ByteArrayIOPoolProvider;
+import de.schlichtherle.truezip.socket.spi.ByteArrayIOPoolService;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.util.ArrayHelper;
 import de.schlichtherle.truezip.fs.FsSyncException;
@@ -76,7 +76,7 @@ public abstract class TFileTestSuite {
     }
 
     protected static final IOPoolProvider
-            IO_POOL_PROVIDER = new ByteArrayIOPoolProvider(2048);
+            IO_POOL_PROVIDER = new ByteArrayIOPoolService(2048);
     
     private final FsScheme scheme;
     private final FsArchiveDriver<?> driver;
