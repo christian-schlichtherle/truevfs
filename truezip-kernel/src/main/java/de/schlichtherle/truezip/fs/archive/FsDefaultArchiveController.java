@@ -429,9 +429,9 @@ extends FsFileSystemArchiveController<E> {
             final ExceptionHandler<IOException, X> handler)
     throws X {
         for (final FsArchiveFileSystemEntry<E> fse : fileSystem) {
-            final E e = fse.getEntry();
-            final String n = e.getName();
-            if (null != output.getEntry(n))
+            final E ae = fse.getEntry();
+            final String aen = ae.getName();
+            if (null != output.getEntry(aen))
                 continue; // we have already written this entry
             try {
                 if (DIRECTORY == fse.getType()) {
@@ -439,17 +439,17 @@ extends FsFileSystemArchiveController<E> {
                         continue; // never write the root directory
                     if (UNKNOWN == fse.getTime(Access.WRITE))
                         continue; // never write ghost directories
-                    output.getOutputSocket(e).newOutputStream().close();
-                } else if (null != input.getEntry(n)) {
-                    IOSocket.copy(  input.getInputSocket(n),
-                                    output.getOutputSocket(e));
+                    output.getOutputSocket(ae).newOutputStream().close();
+                } else if (null != input.getEntry(aen)) {
+                    IOSocket.copy(  input.getInputSocket(aen),
+                                    output.getOutputSocket(ae));
                 } else {
                     // The file system entry is a newly created non-directory
                     // entry which hasn't received any content yet.
                     // Write an empty file system entry now as a marker in
                     // order to recreate the file system entry when the file
                     // system gets remounted from the container archive file.
-                    output.getOutputSocket(e).newOutputStream().close();
+                    output.getOutputSocket(ae).newOutputStream().close();
                 }
             } catch (IOException ex) {
                 handler.warn(ex);
