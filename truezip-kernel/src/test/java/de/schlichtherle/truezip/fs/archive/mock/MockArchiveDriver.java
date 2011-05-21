@@ -69,6 +69,8 @@ extends FsCharsetArchiveDriver<MockArchiveEntry> {
     @Override
     public MockArchiveEntry newEntry(String name, Type type, Entry template)
     throws CharConversionException {
-        return new MockArchiveEntry(name, type, template);
+        return new MockArchiveEntry(toZipOrTarEntryName(name, type),
+                                    type,
+                                    template);
     }
 }
