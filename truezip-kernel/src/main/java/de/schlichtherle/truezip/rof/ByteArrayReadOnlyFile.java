@@ -33,7 +33,7 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-public final class ByteArrayReadOnlyFile extends AbstractReadOnlyFile {
+public class ByteArrayReadOnlyFile extends AbstractReadOnlyFile {
 
     private final byte[] data;
     private int offset;
@@ -111,6 +111,6 @@ public final class ByteArrayReadOnlyFile extends AbstractReadOnlyFile {
     }
 
     @Override
-    public void close() {
+    public void close() throws IOException {
     }
 }
