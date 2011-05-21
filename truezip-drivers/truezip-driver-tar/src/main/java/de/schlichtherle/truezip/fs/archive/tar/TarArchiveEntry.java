@@ -127,9 +127,17 @@ implements FsArchiveEntry, Releasable<IOException> {
         return super.hashCode(); // make FindBugs happy!
     }
 
-    /** Returns {@link #getName()}. */
+    /** Returns a string representation of this object. */
     @Override
     public final String toString() {
-        return getName();
+        return new StringBuilder(getClass().getName())
+                .append("[name=")
+                .append(getName())
+                .append(",size=")
+                .append(getSize())
+                .append(",modTime=")
+                .append(getModTime())
+                .append("]")
+                .toString();
     }
 }
