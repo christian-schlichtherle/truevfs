@@ -34,8 +34,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -47,7 +47,7 @@ public class MockArchiveEntryContainer
 implements EntryContainer<MockArchiveEntry> {
 
     private final Map<String, MockArchiveEntry>
-            map = new HashMap<String, MockArchiveEntry>();
+            map = new LinkedHashMap<String, MockArchiveEntry>();
     private final IOPool<?> pool = new ByteArrayIOPool(2048);
 
     @Override
