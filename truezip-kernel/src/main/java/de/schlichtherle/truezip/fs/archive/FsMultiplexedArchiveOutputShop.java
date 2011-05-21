@@ -21,7 +21,6 @@ import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.entry.Entry.Size;
 import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
-import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.entry.Entry.Access;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.DecoratingOutputShop;
@@ -37,6 +36,7 @@ import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -252,10 +252,10 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
                 } finally {
                     final Entry src = input.getLocalTarget();
                     final AE dst = output.getLocalTarget();
-                    for (final Size type : BitField.allOf(Size.class))
+                    for (Size type : EnumSet.allOf(Size.class))
                         if (UNKNOWN == dst.getSize(type))
                             dst.setSize(type, src.getSize(type));
-                    for (final Access type : BitField.allOf(Access.class))
+                    for (Access type : EnumSet.allOf(Access.class))
                         if (UNKNOWN == dst.getTime(type))
                             dst.setTime(type, src.getTime(type));
                 }

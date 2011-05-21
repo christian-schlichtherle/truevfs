@@ -20,7 +20,6 @@ import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
@@ -73,7 +72,7 @@ public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
      *        the next output to this I/O entry.
      */
     public final void setInitialCapacity(final int initialCapacity) {
-        if (initialCapacity < 0)
+        if (0 > initialCapacity) // Yoda conditions, I like!
             throw new IllegalArgumentException("Negative initial capacity: " + initialCapacity);
         this.initialCapacity = initialCapacity;
     }
@@ -99,7 +98,7 @@ public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
      * @param data the byte array for input from this I/O entry.
      */
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("EI_EXPOSE_REP2")
-    public void setData(final @Nullable byte[] data) {
+    public void setData(final @CheckForNull byte[] data) {
         this.data = data;
     }
 
