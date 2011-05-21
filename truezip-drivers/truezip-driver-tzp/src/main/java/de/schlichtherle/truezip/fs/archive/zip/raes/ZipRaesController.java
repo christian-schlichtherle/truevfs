@@ -50,6 +50,8 @@ import static de.schlichtherle.truezip.fs.FsEntryName.*;
 final class ZipRaesController
 extends FsDecoratingController<FsModel, FsController<?>> {
 
+    private static final String ROOT_PATH = ROOT.getPath();
+
     private final ZipRaesDriver driver;
 
     /**
@@ -87,8 +89,8 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             while (entry instanceof FsArchiveFileSystemEntry<?>)
                 entry = ((FsArchiveFileSystemEntry<?>) entry).getEntry();
             try {
-                return FsArchiveFileSystemEntry.create(ROOT, SPECIAL,
-                        driver.newEntry(ROOT.getPath(), SPECIAL, entry));
+                return FsArchiveFileSystemEntry.create(ROOT_PATH, SPECIAL,
+                        driver.newEntry(ROOT_PATH, SPECIAL, entry));
             } catch (CharConversionException cannotHappen) {
                 throw new AssertionError(cannotHappen);
             }

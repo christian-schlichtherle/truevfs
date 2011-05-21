@@ -16,7 +16,6 @@
 package de.schlichtherle.truezip.fs.archive;
 
 import de.schlichtherle.truezip.entry.EntryFactory;
-import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsDecoratingEntry;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -25,8 +24,6 @@ import de.schlichtherle.truezip.fs.FsEntry;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.CharConversionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import net.jcip.annotations.NotThreadSafe;
 
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
@@ -50,13 +47,6 @@ extends FsDecoratingEntry<E> {
      * archive entry.
      */
     public static <E extends FsArchiveEntry>
-    FsArchiveFileSystemEntry<E> create( final FsEntryName name,
-                                        final Type        type,
-                                        final E           entry) {
-        return create(name.getPath(), type, entry);
-    }
-
-    private static <E extends FsArchiveEntry>
     FsArchiveFileSystemEntry<E> create( final String path,
                                         final Type   type,
                                         final E      entry) {
@@ -185,7 +175,7 @@ extends FsDecoratingEntry<E> {
     } // class NamedFileEntry
 
     /** A named special file entry. */
-    private static class SpecialFileEntry<E extends FsArchiveEntry>
+    private static final class SpecialFileEntry<E extends FsArchiveEntry>
     extends FileEntry<E> {
         SpecialFileEntry(E entry) {
             super(entry);
@@ -198,7 +188,7 @@ extends FsDecoratingEntry<E> {
     } // class SpecialFileEntry
 
     /** A named special file entry. */
-    private static class NamedSpecialFileEntry<E extends FsArchiveEntry>
+    private static final class NamedSpecialFileEntry<E extends FsArchiveEntry>
     extends NamedFileEntry<E> {
         NamedSpecialFileEntry(E entry, String path) {
             super(entry, path);
@@ -267,7 +257,7 @@ extends FsDecoratingEntry<E> {
     } // class NamedDirectoryEntry
 
     /** A named special directory entry. */
-    private static class SpecialDirectoryEntry<E extends FsArchiveEntry>
+    private static final class SpecialDirectoryEntry<E extends FsArchiveEntry>
     extends DirectoryEntry<E> {
         SpecialDirectoryEntry(E entry) {
             super(entry);
@@ -280,7 +270,7 @@ extends FsDecoratingEntry<E> {
     } // class SpecialDirectoryEntry
 
     /** A named special file entry. */
-    private static class NamedSpecialDirectoryEntry<E extends FsArchiveEntry>
+    private static final class NamedSpecialDirectoryEntry<E extends FsArchiveEntry>
     extends NamedDirectoryEntry<E> {
         NamedSpecialDirectoryEntry(E entry, String path) {
             super(entry, path);
@@ -293,7 +283,7 @@ extends FsDecoratingEntry<E> {
     } // class NamedSpecialDirectoryEntry
 
     /** A hybrid file entry. */
-    static class HybridEntry<E extends FsArchiveEntry>
+    static final class HybridEntry<E extends FsArchiveEntry>
     extends FsArchiveFileSystemEntry<E> {
         final FsArchiveFileSystemEntry<E> file, directory;
 
