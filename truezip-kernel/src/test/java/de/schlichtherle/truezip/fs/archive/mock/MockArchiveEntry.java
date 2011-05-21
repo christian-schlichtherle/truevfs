@@ -94,4 +94,17 @@ public final class MockArchiveEntry implements FsArchiveEntry {
         times.put(type, value);
         return true;
     }
+
+    /** Returns a string representation of this object. */
+    @Override
+    public String toString() {
+        final StringBuilder s = new StringBuilder(getClass().getName())
+                .append("[name=").append(getName())
+                .append(",type=").append(getType());
+        for (Size type : EnumSet.allOf(Size.class))
+            s.append(",size(").append(type).append(")=").append(getSize(type));
+        for (Access type : EnumSet.allOf(Access.class))
+            s.append(",time(").append(type).append(")=").append(getTime(type));
+        return s.append("]").toString();
+    }
 }
