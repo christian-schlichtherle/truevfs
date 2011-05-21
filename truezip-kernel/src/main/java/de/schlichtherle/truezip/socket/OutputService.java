@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.entry.EntryContainer;
 import de.schlichtherle.truezip.entry.Entry;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
@@ -31,13 +32,16 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public interface OutputService<E extends Entry> extends EntryContainer<E> {
 
     /**
-     * Returns an output socket for write access to the given entry.
+     * Returns an output socket for writing to the given entry.
      *
-     * @param  entry the non-{@code null} local target.
-     * @return An output socket for writing to the local target.
+     * @param  entry the entry, which will be the
+     *         {@link OutputSocket#getLocalTarget local target} of the returned
+     *         output socket.
+     * @return An output socket for writing to the given entry.
      */
-    @NonNull OutputSocket<? extends E> getOutputSocket(@NonNull E entry);
+    OutputSocket<? extends E> getOutputSocket(E entry);
 }

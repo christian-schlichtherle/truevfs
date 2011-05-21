@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.entry;
 
 import de.schlichtherle.truezip.entry.Entry.Type;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.CharConversionException;
 
@@ -27,6 +28,7 @@ import java.io.CharConversionException;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public interface EntryFactory<E extends Entry> {
 
     /**
@@ -51,9 +53,6 @@ public interface EntryFactory<E extends Entry> {
      * @throws CharConversionException if {@code name} contains characters
      *         which are invalid.
      */
-    @NonNull E
-    newEntry(   @NonNull String name,
-                @NonNull Type type,
-                @CheckForNull Entry template)
+    E newEntry(String name, Type type, @CheckForNull Entry template)
     throws CharConversionException;
 }

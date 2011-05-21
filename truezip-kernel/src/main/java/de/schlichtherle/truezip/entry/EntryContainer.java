@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.entry;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Iterator;
 
@@ -26,6 +27,7 @@ import java.util.Iterator;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public interface EntryContainer<E extends Entry>
 extends Iterable<E> {
 
@@ -44,8 +46,7 @@ extends Iterable<E> {
      * For example, if this container represents an archive file, the iteration
      * should reflect the natural order of the entries in the archive file.
      *
-     * @return A new non-{@code null} iterator over all entries in this
-     *         container.
+     * @return A new iterator over all entries in this container.
      */
     @Override
     Iterator<E> iterator();
@@ -58,5 +59,5 @@ extends Iterable<E> {
      * @return The entry for the given {@link Entry#getName() name} or
      *         {@code null} if no entry with this name exists in this container.
      */
-    @CheckForNull E getEntry(@NonNull String name);
+    @CheckForNull E getEntry(String name);
 }

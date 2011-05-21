@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.entry.EntryContainer;
 import de.schlichtherle.truezip.entry.Entry;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
@@ -27,13 +28,14 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public interface InputService<E extends Entry> extends EntryContainer<E> {
 
     /**
-     * Returns an input socket for read access to the given entry.
+     * Returns an input socket for reading from the entry with the given name.
      *
-     * @param  name a non-{@code null} {@link Entry#getName() entry name}.
-     * @return An input socket for reading from the local target.
+     * @param  name an {@link Entry#getName() entry name}.
+     * @return An input socket for reading from the entry with the given name.
      */
-    @NonNull InputSocket<? extends E> getInputSocket(@NonNull String name);
+    InputSocket<? extends E> getInputSocket(String name);
 }

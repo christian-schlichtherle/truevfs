@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.archive;
 
+import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.*;
