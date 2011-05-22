@@ -4,13 +4,15 @@
     Christian Schlichtherle
     -----------------------
 
-Welcome to the TrueZIP User Website!
+About TrueZIP
+
+* Welcome to the TrueZIP User Website!
 
     TrueZIP is a plug-in framework for virtual file systems which
     provides transparent access to archive files as if they were just
     plain directories.
 
-    As an API, TrueZIP provides transparent, uniform, thread-safe,
+    As an API, TrueZIP provides uniform, transparent, thread-safe,
     read/write access to archive files as if they were just plain
     directories in a file system path.
     Writing a {{{./truezip-file/index.html}TrueZIP File*}} application
@@ -22,7 +24,7 @@ Welcome to the TrueZIP User Website!
     write file system drivers which plug-in to its federated file
     system space.
 
-* Key Claims
+** Key Claims
 
     [[1]] <<{Archive files are virtual directories}!>>
 
@@ -30,7 +32,7 @@ Welcome to the TrueZIP User Website!
 
     [[1]] <<{Quality matters}!>>
 
-Getting Started
+* Getting Started
 
     [[1]] Read the
           {{{./kick-start/index.html}Kick-Starting}} section in order to
