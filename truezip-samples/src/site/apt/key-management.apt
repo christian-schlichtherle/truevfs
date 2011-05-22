@@ -42,7 +42,7 @@ Introduction
     <<<KeyManagerProvider>>>, <<<KeyManager>>> and <<<KeyProvider>>>, this
     architecture provides several levers to set passwords programmatically.
 
-Setting the Password for One ZIP.RAES file
+Setting The Password For One ZIP.RAES file
 
     Use the following approach to set the password for an individual ZIP.RAES
     file.
@@ -71,7 +71,7 @@ Setting the Password for One ZIP.RAES file
     {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#isDirectory()}<<<TFile.isDirectory()>>>}}.
     check.
 
-Setting Passwords for All ZIP.RAES files Using a View
+Setting Passwords For All ZIP.RAES Files Using a View
 
     If you need to set passwords for <all> RAES encrypted ZIP files,
     then the following is the simplest approach:
@@ -89,7 +89,7 @@ Setting Passwords for All ZIP.RAES files Using a View
     which identifies the prospective archive file so that an application
     could set individual passwords, too.
 
-Setting Passwords for All ZIP.RAES files Using a KeyManager
+Setting Passwords For All ZIP.RAES Files Using a KeyManager
 
     In case you want to provide your own implementation of the interface
     {{{../apidocs/de/schlichtherle/truezip/key/KeyManager.html}<<<KeyManager>>>}},
