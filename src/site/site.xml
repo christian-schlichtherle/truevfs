@@ -31,9 +31,9 @@
                 <item name="Software Build Tool" href="usecases/sbt.html"/>
             </item>
             <item name="Kick-Start" href="kick-start/index.html" collapse="true">
-                <item name="Using Eclipse" href="kick-start/file/eclipse.html"/>
-                <item name="Using NetBeans" href="kick-start/file/netbeans.html"/>
-                <item name="Using a Shell" href="kick-start/file/shell.html"/>
+                <item name="In Eclipse" href="kick-start/file/eclipse.html"/>
+                <item name="In NetBeans" href="kick-start/file/netbeans.html"/>
+                <item name="In a Shell" href="kick-start/file/shell.html"/>
                 <item name="Without Maven" href="kick-start/no-maven.html"/>
             </item>
             <item name="Migration" href="migration.html"/>

@@ -19,14 +19,27 @@
     <head><title>Overview Summary</title></head>
     <body>
         <p>
-            This module provides uniform, transparent, thread-safe,
+            This API provides uniform, transparent, thread-safe,
             read/write access to archive files as if they were just plain
             directories in a file system path by means of the
             <code>TFile*</code> classes and their dependent classes.
         </p>
         <p>
-            This module also provides Swing GUI classes for viewing file trees
+            This API also provides Swing GUI classes for viewing file trees
             and choosing entries in archive files.
+        </p>
+        <p>
+            This API is the first choice for most applications:
+            It's designed to be easy to learn and convenient to use while
+            providing a great level of flexibility.
+            However, due to its file-based addressing scheme, it can only
+            access the OS file system and any archive files within the OS file
+            system.
+        </p>
+        <p>
+            If you need to access archive files within other non-federated
+            virtual file systems, e.g. HTTP(S), then you should directly use
+            the TrueZIP Kernel API instead.
         </p>
     </body>
 </html>

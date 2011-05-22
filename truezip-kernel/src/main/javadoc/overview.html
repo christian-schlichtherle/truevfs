@@ -18,11 +18,23 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
     <head><title>Overview Summary</title></head>
     <body>
-        <p>This module is the nexus between federated file system applications
-            and providers.</p>
-        <p>It establishes virtual file systems from arbitrary sources,
-            maintains state and commits unsynchronized changes to the contents
-            of federated file systems if required or requested.</p>
-        <p>This module does not depend on other TrueZIP modules.</p>
+        <p>
+            This API implements virtual file systems for contents from
+            arbitrary sources, maintains their state and commits unsynchronized
+            changes of the contents to federated file systems if required or
+            requested.
+            It's also the nexus between federated file system applications and
+            providers.
+        </p>
+        <p>
+            This API is more complex to use than the TrueZIP File* API, but
+            very versatile because of its extensible architecture, e.g. it uses
+            Dependency Injection wherever reasonable.
+            It enables applications to access non-federated file systems other
+            than the OS file system and any member file systems.
+            For example, an application could access an entry within an archive
+            file which is located at a web site using a URI like this:
+            {@code zip:http://acme.com/archive.zip!/entry}.
+        </p>
     </body>
 </html>

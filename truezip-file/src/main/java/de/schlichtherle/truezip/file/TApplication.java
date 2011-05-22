@@ -91,6 +91,7 @@ public abstract class TApplication<E extends Exception> {
      * <li>Shall missing archive files and directory entries get automatically
      *     created whenever required?
      * </ul>
+     * <p>
      * Alternatively, the setup phase may get run in a sub class constructor.
      * This would ensure it's run exactly only once and not on every call to
      * {@link #run}.
@@ -98,6 +99,7 @@ public abstract class TApplication<E extends Exception> {
      * The implementation in the class {@link TApplication} does nothing.
      * 
      * <h3>Examples</h3>
+     * <p>
      * Mind that using any of the following code might require to edit the
      * file {@code pom.xml} so that the respective modules get added to the
      * compile time class path, too.
@@ -133,6 +135,7 @@ public abstract class TApplication<E extends Exception> {
      *                 { "zip", new ZipDriver(IOPoolLocator.SINGLETON)},
      *             }));
      * </code></pre>
+     * <p>
      * Another typical use case is to recognize only Java artifacts.
      * <pre><code>
      * TFile.setDefaultArchiveDetector(
@@ -140,6 +143,7 @@ public abstract class TApplication<E extends Exception> {
      *             "ear|jar|war",
      *             new JarDriver(IOPoolLocator.SINGLETON)));
      * </code></pre>
+     * <p>
      * ... or an application file format.
      * <pre><code>
      * TFile.setDefaultArchiveDetector(
@@ -147,6 +151,7 @@ public abstract class TApplication<E extends Exception> {
      *             "foo",
      *             new JarDriver(IOPoolLocator.SINGLETON)));
      * </code></pre>
+     * <p>
      * ... or an encrypted application file format.
      * This driver authenticates input archive files up to 512 KB using the
      * Message Authentication Code (MAC) specified by the RAES file format.
@@ -164,6 +169,7 @@ public abstract class TApplication<E extends Exception> {
      *                 IOPoolLocator.SINGLETON,
      *                 KeyManagerLocator.SINGLETON)));
      * </code></pre>
+     * <p>
      * If you're a bit paranoid, then you could use the following driver
      * instead:
      * This driver authenticates every input archive file using the Message
@@ -179,6 +185,7 @@ public abstract class TApplication<E extends Exception> {
      *                 IOPoolLocator.SINGLETON,
      *                 KeyManagerLocator.SINGLETON)));
      * </code></pre>
+     * <p>
      * And finally, if you're quite paranoid, then this driver is for you:
      * This driver authenticates every input archive file using the Message
      * Authentication Code (MAC) specified by the RAES file format, which
@@ -196,6 +203,7 @@ public abstract class TApplication<E extends Exception> {
      *                 new ByteArrayIOPoolService(2048),
      *                 KeyManagerLocator.SINGLETON)));
      * </code></pre>
+     * <p>
      * The following class property controls whether archive files and their
      * member directories get automatically created whenever required.
      * By default, the value of this class property is {@code true}!
