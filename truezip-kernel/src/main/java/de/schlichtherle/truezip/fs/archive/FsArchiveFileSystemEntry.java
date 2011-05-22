@@ -15,8 +15,8 @@
  */
 package de.schlichtherle.truezip.fs.archive;
 
+import java.util.EnumMap;
 import de.schlichtherle.truezip.entry.EntryFactory;
-import de.schlichtherle.truezip.fs.FsDecoratingEntry;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -29,8 +29,9 @@ import net.jcip.annotations.NotThreadSafe;
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
 
 /**
- * An abstract archive file system entry which decorates an
- * {@link FsArchiveEntry archive entry} in order to implement a
+ * An abstract archive file system entry which contains one or more
+ * {@link FsArchiveEntry archive entries} of different
+ * {@link FsArchiveEntry#isType(Type) types} in order to implement a
  * {@link FsEntry file system entry}.
  * 
  * @param   <E> The type of the decorated archive entries.
@@ -40,51 +41,33 @@ import static de.schlichtherle.truezip.entry.Entry.Type.*;
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
 public abstract class FsArchiveFileSystemEntry<E extends FsArchiveEntry>
-extends FsDecoratingEntry<E> {
+extends FsEntry implements Cloneable {
 
-    /**
-     * Constructs a new archive file system entry which decorates the given
-     * archive entry.
-     */
-    public static <E extends FsArchiveEntry>
-    FsArchiveFileSystemEntry<E> create( final String path,
-                                        final Type   type,
-                                        final E      entry) {
-        switch (type) {
-            case FILE:
-                return path.equals(entry.getName())
-                        ? new      FileEntry<E>(entry)
-                        : new NamedFileEntry<E>(entry, path);
+    private final String name;
+    private Type type;
+    private final EnumMap<Type, FsEntry> entries = new EnumMap<Type, FsEntry>(Type.class);
 
-            case DIRECTORY:
-                return path.equals(entry.getName())
-                        ? new      DirectoryEntry<E>(entry)
-                        : new NamedDirectoryEntry<E>(entry, path);
+    public FsArchiveFileSystemEntry(final String name) {
+        if (null == name)
+            throw new NullPointerException();
+        this.name = name;
+    }
 
-            case SPECIAL:
-                return path.equals(entry.getName())
-                        ? DIRECTORY == entry.getType()
-                            ? new      SpecialDirectoryEntry<E>(entry)
-                            : new           SpecialFileEntry<E>(entry)
-                        : DIRECTORY == entry.getType()
-                            ? new NamedSpecialDirectoryEntry<E>(entry, path)
-                            : new      NamedSpecialFileEntry<E>(entry, path);
-
-            default:
-                throw new UnsupportedOperationException(entry + " (type not supported)");
+    @Override
+    @SuppressWarnings("unchecked")
+    public FsArchiveFileSystemEntry<E> clone() {
+        try {
+            return (FsArchiveFileSystemEntry<E>) super.clone();
+        } catch (CloneNotSupportedException ex) {
+            throw new AssertionError(ex);
         }
     }
 
-    /** Constructs a new instance of {@code Entry}. */
-    private FsArchiveFileSystemEntry(E entry) {
-        super(entry);
-    }
-
     /**
-     * Returns a deep clone of this archive file system entry.
+     * Returns a <em>deep</em> clone of this archive file system entry.
      * 
-     * @param  fileSystem the archive file system to use for cloning the
-     *         decorated archive entry.
+     * @param  factory the archive entry factory to use for cloning the
+     *         contained archive entries.
      * @return A deep clone of this archive file system entry.
      */
     FsArchiveFileSystemEntry<E> clone(EntryFactory<E> factory) {
@@ -98,13 +81,33 @@ extends FsDecoratingEntry<E> {
         }
     }
 
-    /**
-     * Returns the decorated archive entry.
-     *
-     * @return The decorated archive entry.
-     */
-    public final E getEntry() {
-        return delegate;
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    void setType(Type type) {
+        this.type = type;
+    }
+
+    @Override
+    public Set<String> getMembers() {
+        return entries.get(type).getMembers();
+    }
+
+    @Override
+    public boolean isType(Type type) {
+        return entries.containsKey(type);
+    }
+
+    @Override
+    public long getSize(Size type) {
+        return entries.get(this.type).getSize(type);
+    }
+
+    @Override
+    public long getTime(Access type) {
+        return entries.get(this.type).getTime(type);
     }
 
     /**

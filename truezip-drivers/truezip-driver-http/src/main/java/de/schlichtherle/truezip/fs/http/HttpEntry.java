@@ -15,30 +15,31 @@
  */
 package de.schlichtherle.truezip.fs.http;
 
-import java.io.IOException;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.fs.FsOutputOption;
-import de.schlichtherle.truezip.socket.IOEntry;
-import de.schlichtherle.truezip.socket.InputSocket;
-import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.entry.Entry;
+import static de.schlichtherle.truezip.entry.Entry.Access.*;
+import static de.schlichtherle.truezip.entry.Entry.Size.*;
+import static de.schlichtherle.truezip.entry.Entry.Type.*;
 import de.schlichtherle.truezip.entry.EntryName;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsMountPoint;
+import de.schlichtherle.truezip.fs.FsOutputOption;
+import de.schlichtherle.truezip.socket.InputSocket;
+import de.schlichtherle.truezip.socket.IOEntry;
+import de.schlichtherle.truezip.socket.OutputSocket;
+import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.Set;
 import net.jcip.annotations.Immutable;
-
-import static de.schlichtherle.truezip.entry.Entry.Access.*;
-import static de.schlichtherle.truezip.entry.Entry.Size.*;
-import static de.schlichtherle.truezip.entry.Entry.Type.*;
 
 /**
  * An HTTP entry.
@@ -53,6 +54,10 @@ final class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
 
     private static final BitField<FsOutputOption> NO_OUTPUT_OPTIONS
             = BitField.noneOf(FsOutputOption.class);
+    private static final Set<Type>
+            FILE_SET = Collections.unmodifiableSet(EnumSet.of(FILE));
+    private static final Set<Type>
+            EMPTY_SET = Collections.unmodifiableSet(EnumSet.noneOf(Type.class));
 
     private HttpController controller;
     private final EntryName name;
@@ -92,12 +97,24 @@ final class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
     }
 
     @Override
-    public Entry.Type getType() {
+    public Set<Type> getTypes() {
         try {
             getConnection();
-            return FILE;
+            return FILE_SET;
         } catch (IOException failure) {
-            return null;
+            return EMPTY_SET;
+        }
+    }
+
+    @Override
+    public boolean isType(final Type type) {
+        if (FILE != type)
+            return false;
+        try {
+            getConnection();
+            return true;
+        } catch (IOException failure) {
+            return false;
         }
     }
 

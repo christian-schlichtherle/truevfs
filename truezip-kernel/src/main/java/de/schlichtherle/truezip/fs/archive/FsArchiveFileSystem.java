@@ -93,7 +93,7 @@ implements Iterable<FsArchiveFileSystemEntry<E>> {
         final FsArchiveFileSystemEntry<E>
                 root = newEntryUnchecked(ROOT, DIRECTORY, null);
         final E rootEntry = root.getEntry();
-        for (Access access : BitField.allOf(Access.class))
+        for (Access access : ACCESS_SET)
             rootEntry.setTime(access, System.currentTimeMillis());
         this.master = newMasterEntryTable(root, 64);
         try {

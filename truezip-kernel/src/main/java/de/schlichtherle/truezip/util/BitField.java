@@ -19,9 +19,11 @@ import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Iterator;
+import java.util.Set;
 import net.jcip.annotations.Immutable;
 
 /**
@@ -116,8 +118,8 @@ implements Iterable<E>, Serializable {
      * where {@code bits} is an {@code EnumSet<Option>}.
      */
     public static <E extends Enum<E>> BitField<E>
-    of(EnumSet<E> bits) {
-        return new BitField<E>(bits.clone());
+    copyOf(Collection<E> bits) {
+        return new BitField<E>(bits);
     }
 
     public static <E extends Enum<E>> BitField<E>
@@ -154,8 +156,8 @@ implements Iterable<E>, Serializable {
      *
      * @param bits the set of enums to share with this instance.
      */
-    private BitField(final EnumSet<E> bits) {
-        this.bits = bits;
+    private BitField(final Collection<E> bits) {
+        this.bits = EnumSet.copyOf(bits);
     }
 
     /**

@@ -49,7 +49,7 @@ public class BitFieldTest {
         assertThat(bits.cardinality(), is(1));
         assertTrue(bits.get(ONE));
         assertTrue(bits.is(ONE));
-        assertThat(BitField.of(bits.toEnumSet()), equalTo(bits));
+        assertThat(BitField.copyOf(bits.toEnumSet()), equalTo(bits));
     }
 
     @Test
@@ -59,7 +59,7 @@ public class BitFieldTest {
         assertThat(bits.cardinality(), is(0));
         assertFalse(bits.get(ONE));
         assertFalse(bits.is(ONE));
-        assertThat(BitField.of(bits.toEnumSet()), equalTo(bits));
+        assertThat(BitField.copyOf(bits.toEnumSet()), equalTo(bits));
     }
 
     @Test
@@ -71,7 +71,7 @@ public class BitFieldTest {
         assertTrue(bits.is(ONE));
         assertTrue(bits.get(TWO));
         assertTrue(bits.is(TWO));
-        assertThat(BitField.of(bits.toEnumSet()), equalTo(bits));
+        assertThat(BitField.copyOf(bits.toEnumSet()), equalTo(bits));
     }
 
     @Test
@@ -83,7 +83,7 @@ public class BitFieldTest {
         assertFalse(bits.is(ONE));
         assertFalse(bits.get(TWO));
         assertFalse(bits.is(TWO));
-        assertThat(BitField.of(bits.toEnumSet()), equalTo(bits));
+        assertThat(BitField.copyOf(bits.toEnumSet()), equalTo(bits));
     }
 
     @Test
@@ -134,7 +134,7 @@ public class BitFieldTest {
             { ONE, TWO, THREE, },
         }) {
             final BitField<Dummy> original
-                    = BitField.of(EnumSet.copyOf(java.util.Arrays.asList(params)));
+                    = BitField.copyOf(EnumSet.copyOf(java.util.Arrays.asList(params)));
 
             {
                 final ByteArrayOutputStream bos = new ByteArrayOutputStream();

@@ -20,6 +20,9 @@ import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.entry.Entry.Access;
+import de.schlichtherle.truezip.entry.Entry.Type;
+import static de.schlichtherle.truezip.entry.Entry.Type.*;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.FsInputOption;
 import de.schlichtherle.truezip.fs.FsOutputOption;
@@ -33,8 +36,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import javax.swing.Icon;
 import net.jcip.annotations.ThreadSafe;
-
-import static de.schlichtherle.truezip.entry.Entry.*;
 
 /**
  * A file system controller for the HTTP(S) schemes.
@@ -89,7 +90,7 @@ final class HttpController extends FsController<FsModel>  {
     @Override
     public HttpEntry getEntry(FsEntryName name) throws IOException {
         HttpEntry entry = new HttpEntry(model.getMountPoint(), name, this);
-        return null != entry.getType() ? entry : null;
+        return entry.isType(FILE) ? entry : null;
     }
 
     @Override

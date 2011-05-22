@@ -15,16 +15,21 @@
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
-import de.schlichtherle.truezip.util.Pool.Releasable;
-import de.schlichtherle.truezip.socket.IOPool.Entry;
-import de.schlichtherle.truezip.fs.archive.FsArchiveEntry;
-import java.io.IOException;
-import org.apache.tools.tar.TarEntry;
-
 import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
 import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
+import de.schlichtherle.truezip.fs.archive.FsArchiveEntry;
+import de.schlichtherle.truezip.socket.IOPool.Entry;
+import de.schlichtherle.truezip.util.Pool.Releasable;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.Iterator;
+import java.util.Set;
+import org.apache.tools.tar.TarEntry;
 
 /**
  * An entry in a TAR archive which implements the {@code FsArchiveEntry}
@@ -33,9 +38,15 @@ import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public class TarArchiveEntry
 extends TarEntry
 implements FsArchiveEntry, Releasable<IOException> {
+
+    private static final Set<Type>
+            FILE_SET = Collections.unmodifiableSet(EnumSet.of(FILE));
+    private static final Set<Type>
+            DIRECTORY_SET = Collections.unmodifiableSet(EnumSet.of(DIRECTORY));
 
     private Entry<?> temp;
 
@@ -77,8 +88,8 @@ implements FsArchiveEntry, Releasable<IOException> {
     }
 
     @Override
-    public Type getType() {
-        return isDirectory() ? DIRECTORY : FILE;
+    public Set<Type> getTypes() {
+        return isDirectory() ? DIRECTORY_SET : FILE_SET;
     }
 
     @Override
@@ -127,17 +138,24 @@ implements FsArchiveEntry, Releasable<IOException> {
         return super.hashCode(); // make FindBugs happy!
     }
 
-    /** Returns a string representation of this object. */
+    /**
+     * Returns a string representation of this object for debugging and logging
+     * purposes.
+     */
     @Override
-    public final String toString() {
-        return new StringBuilder(getClass().getName())
-                .append("[name=")
-                .append(getName())
-                .append(",size=")
-                .append(getSize())
-                .append(",modTime=")
-                .append(getModTime())
-                .append("]")
-                .toString();
+    public String toString() {
+        final StringBuilder s = new StringBuilder(getClass().getName())
+                .append("[name=").append(getName())
+                .append(",type=");//.append(BitField.copyOf(getTypes()));
+        for (Iterator<Type> i = getTypes().iterator(); i.hasNext(); ) {
+            s.append(i.next());
+            if (i.hasNext())
+                s.append('|');
+        }
+        for (Size type : SIZE_SET)
+            s.append(",size(").append(type).append(")=").append(getSize(type));
+        for (Access type : ACCESS_SET)
+            s.append(",time(").append(type).append(")=").append(getTime(type));
+        return s.append("]").toString();
     }
 }

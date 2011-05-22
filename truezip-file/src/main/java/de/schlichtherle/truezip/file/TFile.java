@@ -1997,8 +1997,7 @@ public final class TFile extends File {
                         .getEntry(getInnerEntryName0());
                 if (null == entry)
                     return false;
-                final Type type = entry.getType();
-                return FILE == type || HYBRID == type;
+                return entry.isType(FILE);
             } catch (IOException ex) {
                 return false;
             }
@@ -2029,8 +2028,7 @@ public final class TFile extends File {
                         .getEntry(getInnerEntryName0());
                 if (null == entry)
                     return false;
-                final Type type = entry.getType();
-                return DIRECTORY == type || HYBRID == type;
+                return entry.isType(DIRECTORY);
             } catch (IOException ex) {
                 return false;
             }
@@ -2145,7 +2143,7 @@ public final class TFile extends File {
             } catch (IOException ex) {
                 return 0;
             }
-            if (null == entry || entry.getType() == DIRECTORY)
+            if (null == entry || !entry.isType(DIRECTORY))
                 return 0;
             final long length = entry.getSize(DATA);
             return length >= 0 ? length : 0;
@@ -2555,10 +2553,7 @@ public final class TFile extends File {
                         null);
             } catch (IOException ex) {
                 final FsEntry entry = controller.getEntry(innerEntryName);
-                if (null == entry)
-                    throw ex;
-                final Type type = entry.getType();
-                if (DIRECTORY != type && HYBRID != type)
+                if (null == entry || !entry.isType(DIRECTORY))
                     throw ex;
             }
         } else {
