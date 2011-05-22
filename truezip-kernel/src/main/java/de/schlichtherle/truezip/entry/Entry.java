@@ -15,8 +15,11 @@
  */
 package de.schlichtherle.truezip.entry;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.Set;
 
 /**
  * Represents an entry in an entry container, e.g. an archive file or a file
@@ -28,95 +31,11 @@ import edu.umd.cs.findbugs.annotations.Nullable;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public interface Entry {
 
-    /**
-     * The {@code NULL} entry is a dummy entry which may be useful in
-     * situations where a non-{@code null} entry is expected but none is
-     * available.
-     * <p>
-     * The {@code NULL} entry has {@code "/dev/random"} as its name,
-     * {@link Type#NULL} as its type and {@link #UNKNOWN} for any other
-     * property.
-     */
-    Entry NULL = new Entry() {
-        @Override
-        public String getName() {
-            return "/dev/null";
-        }
-
-        @Override
-        public Type getType() {
-            return null;
-        }
-
-        @Override
-        public long getSize(Size type) {
-            return UNKNOWN;
-        }
-
-        @Override
-        public long getTime(Access type) {
-            return UNKNOWN;
-        }
-    };
-
-    /**
-     * The unknown value for numeric properties,
-     * which is {@value}.
-     */
+    /** The unknown value for numeric properties, which is {@value}. */
     byte UNKNOWN = -1;
-
-    /** Defines the type of file system entry. */
-    enum Type {
-
-        /**
-         * Regular file.
-         * A file usually has some content associated to it which can be read
-         * and written using a stream.
-         */
-        FILE,
-
-        /**
-         * Regular directory.
-         * A directory can have other file system entries as members.
-         */
-        DIRECTORY,
-
-        /**
-         * File AND directory at the same time.
-         * A hybrid file behaves like a regular file when reading or writing
-         * its content and like a regular directory when reading or writing its
-         * members.
-         */
-        HYBRID,
-
-        /**
-         * Symbolic (named) link.
-         * A symbolic link refers to another file system entry which could even
-         * be located outside the current file system.
-         */
-        SYMLINK,
-
-        /**
-         * Special file.
-         * A special file is a byte or block oriented interface to an arbitrary
-         * I/O device, e.g. a hard disk or a network service.
-         */
-        SPECIAL
-    }
-
-    /** Defines the types of size information for an entry. */
-    enum Size {
-        DATA,
-        STORAGE
-    }
-
-    /** Defines the types of access information for an entry. */
-    enum Access {
-        WRITE,
-        READ, // TODO: This is not yet fully supported!
-    }
 
     /**
      * Returns the <i>entry name</i>.
@@ -142,32 +61,114 @@ public interface Entry {
      * @return The entry name.
      * @see    EntryName#create(String)
      */
-    @NonNull String getName();
+    String getName();
+
+    /** Defines the type of entry. */
+    enum Type {
+
+        /**
+         * Regular file.
+         * A file usually has some content associated to it which can be read
+         * and written using a stream.
+         */
+        FILE,
+
+        /**
+         * Regular directory.
+         * A directory can have other file system entries as members.
+         */
+        DIRECTORY,
+
+        /**
+         * Symbolic (named) link.
+         * A symbolic link refers to another file system entry which could even
+         * be located outside the current file system.
+         */
+        SYMLINK,
+
+        /**
+         * Special file.
+         * A special file is a byte or block oriented interface to an arbitrary
+         * I/O device, e.g. a hard disk or a network service.
+         */
+        SPECIAL
+    }
 
     /**
-     * Returns the type of this entry or {@code null} if and only if this entry
-     * does not exist.
-     *
-     * @return The type of this entry or {@code null} if and only if this entry
-     *         does not exist.
+     * An unmodifiable set of all enums in {@link Type}.
+     * This is convenient to use for loops like this:
+     * <pre><code>
+     * for (Type type : TYPE_SET)
+     *     ...;
+     * </code></pre>
      */
-    @Nullable Type getType();
+    Set<Type> TYPE_SET = Collections.unmodifiableSet(EnumSet.allOf(Type.class));
+
+    /**
+     * Returns an unmodifiable set of types implemented by this entry.
+     * Note that some file system types allow an entry to implement multiple
+     * entry types!
+     * <p>
+     * For example, a ZIP or TAR file may contain a file entry with the name
+     * {@code foo} and a directory entry with the name {@code foo/}.
+     * Yes, this is strange, but shit happens!
+     * In this case then, a virtual file system should collapse this into one
+     * file system entry which returns {@code true} for both
+     * {@code isType(FILE)} and {@code isType(DIRECTORY)}.
+     * 
+     * @return An unmodifiable set of types implemented by this entry.
+     */
+    Set<Type> getTypes();
+
+    /** Defines the type of size information for an entry. */
+    enum Size {
+        DATA,
+        STORAGE
+    }
+
+    /**
+     * An unmodifiable set of all enums in {@link Size}.
+     * This is convenient to use for loops like this:
+     * <pre><code>
+     * for (Size size : SIZE_SET)
+     *     ...;
+     * </code></pre>
+     */
+    Set<Size> SIZE_SET = Collections.unmodifiableSet(EnumSet.allOf(Size.class));
 
     /**
      * Returns the size of this entry.
+     * This method may not be meaningful for non-{@link Type#FILE} entries.
      *
+     * @param type the type of the size to return.
      * @return The size of the given size type for this entry in bytes,
      * or {@link #UNKNOWN} if not specified or the type is unsupported.
-     * This method may not be meaningful for non-file entries.
      */
-    long getSize(@NonNull Size type);
+    long getSize(Size type);
+
+    /** Defines the type of access information for an entry. */
+    enum Access {
+        WRITE,
+        READ, // TODO: This is not yet fully supported!
+    }
+
+    /**
+     * An unmodifiable set of all enums in {@link Access}.
+     * This is convenient to use for loops like this:
+     * <pre><code>
+     * for (Access access : ACCESS_SET)
+     *     ...;
+     * </code></pre>
+     */
+    Set<Access> ACCESS_SET = Collections.unmodifiableSet(EnumSet.allOf(Access.class));
 
     /**
      * Returns the last access time of this entry.
      *
+     * @param type the type of the access time to return.
      * @return The last time of the given access type for this entry in
      * milliseconds since the epoch or {@value #UNKNOWN} if not specified or
      * the type is unsupported.
      */
-    long getTime(@NonNull Access type);
+    long getTime(Access type);
 }

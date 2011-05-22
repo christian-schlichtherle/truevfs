@@ -375,7 +375,7 @@ extends FsDecoratingController< FsConcurrentModel,
                 if (!mknod) {
                     try {
                         final FsEntry entry = delegate.getEntry(name);
-                        mknod = null == entry || entry.getType() != FILE;
+                        mknod = null == entry || !entry.isType(FILE);
                     } catch (FsFalsePositiveException ex) {
                         mknod = true;
                     }
@@ -393,7 +393,7 @@ extends FsDecoratingController< FsConcurrentModel,
     private static class CacheEntry extends FsDecoratingEntry<Entry> {
         CacheEntry(Entry entry) {
             super(entry);
-            assert DIRECTORY != entry.getType();
+            assert entry.getTypes().contains(FILE);
         }
 
         @Override

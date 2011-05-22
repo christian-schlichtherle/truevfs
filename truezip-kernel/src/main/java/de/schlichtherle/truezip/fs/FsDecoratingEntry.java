@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.entry.Entry;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import java.util.Set;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -51,8 +52,8 @@ extends FsEntry {
     }
 
     @Override
-    public Type getType() {
-        return delegate.getType();
+    public Set<Type> getTypes() {
+        return delegate.getTypes();
     }
 
     @Override

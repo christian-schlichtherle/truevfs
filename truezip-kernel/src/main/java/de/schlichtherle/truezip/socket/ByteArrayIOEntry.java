@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.socket;
 
+import static de.schlichtherle.truezip.entry.Entry.Access.*;
+import static de.schlichtherle.truezip.entry.Entry.Type.*;
 import de.schlichtherle.truezip.rof.ByteArrayReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -26,11 +28,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collections;
 import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.Set;
 import net.jcip.annotations.NotThreadSafe;
-
-import static de.schlichtherle.truezip.entry.Entry.Type.*;
-import static de.schlichtherle.truezip.entry.Entry.Access.*;
 
 /**
  * An I/O entry which uses a byte array.
@@ -41,6 +43,9 @@ import static de.schlichtherle.truezip.entry.Entry.Access.*;
 @DefaultAnnotation(NonNull.class)
 @NotThreadSafe
 public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
+
+    private static final Set<Type>
+            FILE_SET = Collections.unmodifiableSet(EnumSet.of(FILE));
 
     private final String name;
     private @CheckForNull byte[] data;
@@ -114,8 +119,8 @@ public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
     }
 
     @Override
-    public Type getType() {
-        return FILE;
+    public Set<Type> getTypes() {
+        return FILE_SET;
     }
 
     @Override

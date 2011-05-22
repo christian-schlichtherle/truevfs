@@ -434,7 +434,7 @@ extends FsFileSystemArchiveController<E> {
             if (null != output.getEntry(aen))
                 continue; // we have already written this entry
             try {
-                if (DIRECTORY == fse.getType()) {
+                if (fse.isType(DIRECTORY)) {
                     if (isRoot(fse.getName()))
                         continue; // never write the root directory
                     if (UNKNOWN == fse.getTime(Access.WRITE))

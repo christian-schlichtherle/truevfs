@@ -15,8 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.archive.mock;
 
-import de.schlichtherle.truezip.entry.Entry.Access;
-import de.schlichtherle.truezip.entry.Entry.Size;
+import static de.schlichtherle.truezip.entry.Entry.*;
 import de.schlichtherle.truezip.entry.EntryContainer;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
@@ -33,7 +32,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -155,9 +153,9 @@ implements EntryContainer<MockArchiveEntry> {
                             try {
                                 super.close();
                             } finally {
-                                for (Size type : EnumSet.allOf(Size.class))
+                                for (Size type : SIZE_SET)
                                     entry.setSize(type, io.getSize(type));
-                                for (Access type : EnumSet.allOf(Access.class))
+                                for (Access type : ACCESS_SET)
                                     entry.setTime(type, io.getTime(type));
                             }
                         }

@@ -16,8 +16,10 @@
 package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.entry.Entry;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -28,6 +30,7 @@ import java.util.Set;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public abstract class FsEntry implements Entry {
 
     /**
@@ -38,7 +41,20 @@ public abstract class FsEntry implements Entry {
      *         {@link FsEntryName file system entry name}.
      */
     @Override
-    public abstract @NonNull String getName();
+    public abstract String getName();
+
+    /**
+     * Returns {@code true} if and only if this file system entry implements
+     * the given type.
+     *
+     * @param  type the type to test.
+     * @return {@code true} if and only if this file system entry implements
+     *         the given type.
+     * @see    #getTypes()
+     */
+    public boolean isType(Type type) {
+        return getTypes().contains(type);
+    }
 
     /**
      * If this is not a directory entry, {@code null} is returned.
@@ -73,11 +89,19 @@ public abstract class FsEntry implements Entry {
      */
     @Override
     public String toString() {
-        return new StringBuilder()
-                .append(getClass().getName())
-                .append("[name=")
-                .append(getName())
-                .append(']')
+        final StringBuilder s = new StringBuilder(getClass().getName())
+                .append("[name=").append(getName())
+                .append(",type=");//.append(BitField.copyOf(getTypes()));
+        for (Iterator<Type> i = getTypes().iterator(); i.hasNext(); ) {
+            s.append(i.next());
+            if (i.hasNext())
+                s.append('|');
+        }
+        for (Size type : SIZE_SET)
+            s.append(",size(").append(type).append(")=").append(getSize(type));
+        for (Access type : ACCESS_SET)
+            s.append(",time(").append(type).append(")=").append(getTime(type));
+        return s.append(",members=").append(getMembers()).append(']')
                 .toString();
     }
 }

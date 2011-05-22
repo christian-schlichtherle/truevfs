@@ -197,7 +197,7 @@ extends FsController<FsConcurrentModel> {
 
         InputSocket<?> getBoundSocket() throws IOException {
             final Entry entry = getLocalTarget();
-            if (DIRECTORY == entry.getType())
+            if (entry.isType(DIRECTORY))
                 throw new FsEntryNotFoundException(getModel(),
                         name, "cannot read directories");
             return FsArchiveController

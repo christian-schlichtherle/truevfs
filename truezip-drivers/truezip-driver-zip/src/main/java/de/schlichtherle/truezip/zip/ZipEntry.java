@@ -15,13 +15,12 @@
  */
 package de.schlichtherle.truezip.zip;
 
+import static de.schlichtherle.truezip.zip.ZipConstants.*;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.nio.charset.Charset;
 import net.jcip.annotations.NotThreadSafe;
-
-import static de.schlichtherle.truezip.zip.ZipConstants.*;
 
 /**
  * Drop-in replacement for {@link java.util.zip.ZipEntry java.util.zip.ZipEntry}.
@@ -592,7 +591,7 @@ public class ZipEntry implements Cloneable {
 
     /** Returns a string representation of this object. */
     @Override
-    public final String toString() {
+    public String toString() {
         return new StringBuilder(getClass().getName())
                 .append("[name=")
                 .append(getName())
