@@ -440,7 +440,7 @@ implements Iterable<FsCovariantEntry<E>> {
         }
         while (template instanceof FsCovariantEntry<?>)
             template = ((FsCovariantEntry<?>) template).getEntry();
-        return new PathLink(path, type, options.get(CREATE_PARENTS), template);
+        return new PathLink(path, type, options, template);
     }
 
     /**
@@ -453,16 +453,16 @@ implements Iterable<FsCovariantEntry<E>> {
      * happen, however.
      */
     private final class PathLink implements FsArchiveFileSystemOperation<E> {
-        final boolean createParents;
+        final BitField<FsOutputOption> options;
         final SegmentLink<E>[] links;
         long time = -1;
 
         PathLink(   final String path,
                     final Entry.Type type,
-                    final boolean createParents,
+                    final BitField<FsOutputOption> options,
                     @CheckForNull final Entry template)
         throws FsArchiveFileSystemException {
-            this.createParents = createParents;
+            this.options = options;
             links = newSegmentLinks(path, type, template, 1);
         }
 
@@ -474,7 +474,7 @@ implements Iterable<FsCovariantEntry<E>> {
                 final int level)
         throws FsArchiveFileSystemException {
             splitter.split(entryName);
-            final String parentPath = splitter.getParentPath(); // could equal ROOT
+            final String parentPath = splitter.getParentPath(); // could equal ROOT_PATH
             final String memberName = splitter.getMemberName();
             final SegmentLink<E>[] elements;
 
@@ -488,13 +488,15 @@ implements Iterable<FsCovariantEntry<E>> {
                 elements = new SegmentLink[level + 1];
                 elements[0] = new SegmentLink<E>(null, parentEntry);
                 newEntry = new FsCovariantEntry<E>(entryName);
-                newEntry.putEntry(entryType, newEntryChecked(entryName, entryType, template));
+                newEntry.putEntry(entryType,
+                        newEntryChecked(entryName, entryType, template));
                 elements[1] = new SegmentLink<E>(memberName, newEntry);
-            } else if (createParents) {
+            } else if (options.get(CREATE_PARENTS)) {
                 elements = newSegmentLinks(
                         parentPath, DIRECTORY, null, level + 1);
                 newEntry = new FsCovariantEntry<E>(entryName);
-                newEntry.putEntry(entryType, newEntryChecked(entryName, entryType, template));
+                newEntry.putEntry(entryType,
+                        newEntryChecked(entryName, entryType, template));
                 elements[elements.length - level]
                         = new SegmentLink<E>(memberName, newEntry);
             } else {
