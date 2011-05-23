@@ -68,7 +68,7 @@ import java.util.ResourceBundle;
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-public class Nzip extends CommandLineUtility {
+public class Nzip extends Application {
 
     private static final String CLASS_NAME = Nzip.class.getName();
     private static final ResourceBundle resources
@@ -530,7 +530,7 @@ public class Nzip extends CommandLineUtility {
     }
 
     protected static class IllegalUsageException
-    extends CommandLineUtility.IllegalUsageException {
+    extends Application.IllegalUsageException {
         private static final long serialVersionUID = 2660653252314854276L;
 
         protected IllegalUsageException() {

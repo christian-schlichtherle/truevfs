@@ -18,7 +18,6 @@
  */
 package ${package};
 
-import de.schlichtherle.truezip.file.TApplication;
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import java.io.PrintStream;
@@ -37,7 +36,7 @@ import java.io.PrintStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class Tree extends TApplication<RuntimeException> {
+public class Tree extends Application<RuntimeException> {
 
     private static final String DEFAULT_PREFIX  = "|-- ";
     private static final String LAST_PREFIX     = "`-- ";

@@ -30,7 +30,7 @@ import java.io.InputStream;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class PathCat extends CommandLineUtility {
+public class PathCat extends Application {
 
     /** Equivalent to {@code System.exit(new PathCat().run(args));}. */
     public static void main(String[] args) throws FsSyncException {
