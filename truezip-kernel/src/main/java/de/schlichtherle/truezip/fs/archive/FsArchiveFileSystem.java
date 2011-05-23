@@ -487,7 +487,7 @@ implements Iterable<FsCovariantEntry<E>> {
             // Lookup parent entry, creating it where necessary and allowed.
             final FsCovariantEntry<E> parentEntry = master.get(parentPath);
             final FsCovariantEntry<E> newEntry;
-            if (parentEntry != null) {
+            if (null != parentEntry) {
                 if (!parentEntry.isType(DIRECTORY))
                     throw new FsArchiveFileSystemException(entryName,
                             "parent entry must be a directory");
