@@ -16,7 +16,6 @@
 package de.schlichtherle.truezip.fs.archive;
 
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
-import de.schlichtherle.truezip.entry.EntryFactory;
 import de.schlichtherle.truezip.fs.FsEntry;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -65,12 +64,12 @@ implements Cloneable {
     /**
      * Returns a deep clone of this covariant file system entry.
      * 
-     * @param  factory the archive entry factory to use for cloning the
-     *         mapped archive entries.
+     * @param  driver the archive driver to use for cloning the mapped archive
+     *         entries.
      * @return A deep clone of this covariant file system entry.
      */
     @SuppressWarnings("unchecked")
-    public FsCovariantEntry<E> clone(EntryFactory<E> factory) {
+    public FsCovariantEntry<E> clone(FsArchiveDriver<E> driver) {
         final FsCovariantEntry<E> that;
         try {
             that = (FsCovariantEntry<E>) super.clone();
@@ -82,7 +81,7 @@ implements Cloneable {
             for (final Map.Entry<Type, E> entry : this.map.entrySet()) {
                 final FsArchiveEntry delegate = entry.getValue();
                 thatMap.put(entry.getKey(),
-                            factory.newEntry(   delegate.getName(),
+                            driver.newEntry(   delegate.getName(),
                                                 delegate.getType(),
                                                 delegate));
             }

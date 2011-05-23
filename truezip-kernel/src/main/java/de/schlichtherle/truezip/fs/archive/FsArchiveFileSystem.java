@@ -18,7 +18,6 @@ package de.schlichtherle.truezip.fs.archive;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.EntryContainer;
-import de.schlichtherle.truezip.entry.EntryFactory;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.util.Link;
@@ -62,7 +61,7 @@ implements Iterable<FsCovariantEntry<E>> {
     private static final String ROOT_PATH = ROOT.getPath();
 
     private final Splitter splitter = new Splitter();
-    private final EntryFactory<E> factory;
+    private final FsArchiveDriver<E> factory;
     private final EntryTable<E> master;
 
     /** Whether or not this file system has been modified (touched). */
@@ -78,17 +77,17 @@ implements Iterable<FsCovariantEntry<E>> {
      * The file system is modifiable and marked as touched!
      *
      * @param  <E> The type of the archive entries.
-     * @param  factory the archive entry factory to use.
+     * @param  driver the archive driver to use.
      * @return A new archive file system.
      * @throws NullPointerException If {@code factory} is {@code null}.
      */
     static <E extends FsArchiveEntry> FsArchiveFileSystem<E>
-    newArchiveFileSystem(EntryFactory<E> factory) {
-        return new FsArchiveFileSystem<E>(factory);
+    newArchiveFileSystem(FsArchiveDriver<E> driver) {
+        return new FsArchiveFileSystem<E>(driver);
     }
 
-    private FsArchiveFileSystem(final EntryFactory<E> factory) {
-        this.factory = factory;
+    private FsArchiveFileSystem(final FsArchiveDriver<E> driver) {
+        this.factory = driver;
         final E root = newEntryUnchecked(ROOT_PATH, DIRECTORY, null);
         final long time = System.currentTimeMillis();
         for (Access access : ALL_ACCESS_SET)
@@ -121,7 +120,7 @@ implements Iterable<FsCovariantEntry<E>> {
      * archive entry {@code container}.
      *
      * @param  <E> The type of the archive entries.
-     * @param  factory the archive entry factory to use.
+     * @param  driver the archive driver to use.
      * @param  archive The archive entry container to read the entries for
      *         the population of the archive file system.
      * @param  rootTemplate The nullable template to use for the root entry of
@@ -136,21 +135,21 @@ implements Iterable<FsCovariantEntry<E>> {
      *         of {@link FsCovariantEntry}.
      */
     static <E extends FsArchiveEntry> FsArchiveFileSystem<E>
-    newArchiveFileSystem(   EntryFactory<E> factory,
+    newArchiveFileSystem(   FsArchiveDriver<E> driver,
                             EntryContainer<E> archive,
                             @CheckForNull Entry rootTemplate,
                             boolean readOnly) {
         return readOnly
-            ? new FsReadOnlyArchiveFileSystem<E>(archive, factory, rootTemplate)
-            : new FsArchiveFileSystem<E>(factory, archive, rootTemplate);
+            ? new FsReadOnlyArchiveFileSystem<E>(archive, driver, rootTemplate)
+            : new FsArchiveFileSystem<E>(driver, archive, rootTemplate);
     }
 
-    FsArchiveFileSystem(final EntryFactory<E> factory,
+    FsArchiveFileSystem(final FsArchiveDriver<E> driver,
                         final EntryContainer<E> archive,
                         final @CheckForNull Entry rootTemplate) {
         if (rootTemplate instanceof FsCovariantEntry<?>)
             throw new IllegalArgumentException();
-        this.factory = factory;
+        this.factory = driver;
         // Allocate some extra capacity to create missing parent directories.
         final EntryTable<E> master = new EntryTable<E>((int) (archive.getSize() / .7f) + 1);
         // Load entries from input archive.

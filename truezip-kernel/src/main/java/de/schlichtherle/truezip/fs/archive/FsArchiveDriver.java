@@ -15,10 +15,11 @@
  */
 package de.schlichtherle.truezip.fs.archive;
 
+import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.fs.FsConcurrentModel;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.InputShop;
-import de.schlichtherle.truezip.entry.EntryFactory;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsCachingController;
 import de.schlichtherle.truezip.fs.FsConcurrentController;
@@ -30,6 +31,7 @@ import de.schlichtherle.truezip.socket.OutputSocket;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import java.io.CharConversionException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import javax.swing.Icon;
@@ -47,8 +49,7 @@ import net.jcip.annotations.Immutable;
 @Immutable
 @DefaultAnnotation(NonNull.class)
 public abstract class FsArchiveDriver<E extends FsArchiveEntry>
-extends FsDriver
-implements EntryFactory<E> {
+extends FsDriver {
 
     /**
      * {@inheritDoc}
@@ -165,6 +166,32 @@ implements EntryFactory<E> {
                     OutputSocket<?> output,
                     @CheckForNull InputShop<E> source)
     throws IOException;
+
+    /**
+     * Returns a new archive entry for the given name.
+     * The implementation may need to fix this name in order to 
+     * form a valid {@link Entry#getName() entry name} for their
+     * particular requirements.
+     * <p>
+     * If {@code template} is not {@code null}, then the returned entry shall
+     * inherit as much properties from this template as possible - with the
+     * exception of its name and type.
+     * Furthermore, if {@code name} and {@code type} are equal to the name and
+     * type of this template, then the returned entry shall be a (deep) clone
+     * of the template which shares no mutable objects with the template.
+     *
+     * @param  name an entry name.
+     * @param  type an entry type.
+     * @param  template if not {@code null}, then the new entry shall inherit
+     *         as much properties from this entry as possible - with the
+     *         exception of its name and type.
+     * @return A new entry for the given name.
+     * @throws CharConversionException if {@code name} contains characters
+     *         which are invalid.
+     */
+    public abstract E
+    newEntry(String name, Type type, @CheckForNull Entry template)
+    throws CharConversionException;
 
     /**
      * Returns the icon that should be displayed for the given archive file
