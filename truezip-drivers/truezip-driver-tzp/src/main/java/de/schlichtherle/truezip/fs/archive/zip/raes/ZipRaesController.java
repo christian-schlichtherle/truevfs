@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.fs.archive.zip.raes;
 import de.schlichtherle.truezip.crypto.raes.RaesKeyException;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.fs.FsSyncOption;
-import de.schlichtherle.truezip.fs.archive.FsArchiveFileSystemEntry;
+import de.schlichtherle.truezip.fs.archive.FsCovariantEntry;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.fs.FsDecoratingController;
 import de.schlichtherle.truezip.fs.FsController;
@@ -26,6 +26,7 @@ import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsFalsePositiveException;
 import de.schlichtherle.truezip.fs.FsModel;
+import de.schlichtherle.truezip.fs.archive.FsArchiveEntry;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
@@ -86,14 +87,12 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             // The entry is inaccessible for some reason.
             // This may be because the cipher key is not available.
             // Now mask the entry as a special file.
-            while (entry instanceof FsArchiveFileSystemEntry<?>)
-                entry = ((FsArchiveFileSystemEntry<?>) entry).getEntry();
-            try {
-                return FsArchiveFileSystemEntry.create(ROOT_PATH, SPECIAL,
-                        driver.newEntry(ROOT_PATH, SPECIAL, entry));
-            } catch (CharConversionException cannotHappen) {
-                throw new AssertionError(cannotHappen);
-            }
+            while (entry instanceof FsCovariantEntry<?>)
+                entry = ((FsCovariantEntry<?>) entry).getEntry();
+            final FsCovariantEntry<FsArchiveEntry>
+                    special = new FsCovariantEntry<FsArchiveEntry>(ROOT_PATH);
+            special.putEntry(SPECIAL, driver.newEntry(ROOT_PATH, SPECIAL, entry));
+            return special;
         }
     }
 

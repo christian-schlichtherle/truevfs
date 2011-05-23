@@ -22,11 +22,7 @@ import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
-import java.util.Collections;
 import java.util.EnumMap;
-import java.util.EnumSet;
-import java.util.Iterator;
-import java.util.Set;
 
 /**
  * @author  Christian Schlichtherle
@@ -51,12 +47,12 @@ public final class MockArchiveEntry implements FsArchiveEntry {
         this.name = name;
         this.type = type;
         if (null != template) {
-            for (final Size size : SIZE_SET) {
+            for (final Size size : ALL_SIZE_SET) {
                 final long value = template.getSize(size);
                 if (UNKNOWN != value)
                     sizes.put(size, value);
             }
-            for (final Access access : ACCESS_SET) {
+            for (final Access access : ALL_ACCESS_SET) {
                 final long value = template.getTime(access);
                 if (UNKNOWN != value)
                     times.put(access, value);
@@ -70,8 +66,8 @@ public final class MockArchiveEntry implements FsArchiveEntry {
     }
 
     @Override
-    public Set<Type> getTypes() {
-        return Collections.unmodifiableSet(EnumSet.of(type));
+    public Type getType() {
+        return type;
     }
 
     @Override
@@ -106,15 +102,10 @@ public final class MockArchiveEntry implements FsArchiveEntry {
     public String toString() {
         final StringBuilder s = new StringBuilder(getClass().getName())
                 .append("[name=").append(getName())
-                .append(",type=");//.append(BitField.copyOf(getTypes()));
-        for (Iterator<Type> i = getTypes().iterator(); i.hasNext(); ) {
-            s.append(i.next());
-            if (i.hasNext())
-                s.append('|');
-        }
-        for (Size type : SIZE_SET)
+                .append(",type=").append(getType());
+        for (Size type : ALL_SIZE_SET)
             s.append(",size(").append(type).append(")=").append(getSize(type));
-        for (Access type : ACCESS_SET)
+        for (Access type : ALL_ACCESS_SET)
             s.append(",time(").append(type).append(")=").append(getTime(type));
         return s.append("]").toString();
     }

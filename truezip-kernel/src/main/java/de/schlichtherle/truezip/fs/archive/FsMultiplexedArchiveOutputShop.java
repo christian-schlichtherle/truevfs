@@ -251,10 +251,10 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
                 } finally {
                     final Entry src = input.getLocalTarget();
                     final AE dst = output.getLocalTarget();
-                    for (Size type : SIZE_SET)
+                    for (Size type : ALL_SIZE_SET)
                         if (UNKNOWN == dst.getSize(type))
                             dst.setSize(type, src.getSize(type));
-                    for (Access type : ACCESS_SET)
+                    for (Access type : ALL_ACCESS_SET)
                         if (UNKNOWN == dst.getTime(type))
                             dst.setTime(type, src.getTime(type));
                 }

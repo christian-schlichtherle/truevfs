@@ -119,11 +119,6 @@ public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
     }
 
     @Override
-    public Set<Type> getTypes() {
-        return FILE_SET;
-    }
-
-    @Override
     public long getSize(Size type) {
         return null != data ? data.length : UNKNOWN;
     }

@@ -175,7 +175,7 @@ extends FsController<FsConcurrentModel> {
         return new Input(name);
     }
 
-    private class Input extends InputSocket<Entry> {
+    private class Input extends InputSocket<FsArchiveEntry> {
         final FsEntryName name;
 
         Input(final FsEntryName name) {
@@ -183,12 +183,12 @@ extends FsController<FsConcurrentModel> {
         }
 
         @Override
-        public Entry getLocalTarget() throws IOException {
+        public FsArchiveEntry getLocalTarget() throws IOException {
             if (!autoSync(name, READ)) {
                 autoMount();        // detect false positives
                 getPeerTarget();    // triggers autoSync() if in same file system
             }
-            final FsArchiveFileSystemEntry<E> entry = autoMount().getEntry(name);
+            final FsCovariantEntry<E> entry = autoMount().getEntry(name);
             if (null == entry)
                 throw new FsEntryNotFoundException(getModel(),
                         name, "no such file or directory");
@@ -196,8 +196,8 @@ extends FsController<FsConcurrentModel> {
         }
 
         InputSocket<?> getBoundSocket() throws IOException {
-            final Entry entry = getLocalTarget();
-            if (entry.isType(DIRECTORY))
+            final FsArchiveEntry entry = getLocalTarget();
+            if (FILE != entry.getType())
                 throw new FsEntryNotFoundException(getModel(),
                         name, "cannot read directories");
             return FsArchiveController
@@ -227,7 +227,7 @@ extends FsController<FsConcurrentModel> {
         return new Output(name, options, template);
     }
 
-    private class Output extends OutputSocket<Entry> {
+    private class Output extends OutputSocket<FsArchiveEntry> {
         final FsEntryName name;
         final BitField<FsOutputOption> options;
         final @CheckForNull Entry template;
@@ -250,8 +250,8 @@ extends FsController<FsConcurrentModel> {
         }
 
         @Override
-        public Entry getLocalTarget() throws IOException {
-            final Entry entry = mknod().getTarget().getEntry();
+        public FsArchiveEntry getLocalTarget() throws IOException {
+            final E entry = mknod().getTarget().getEntry();
             if (options.get(APPEND)) {
                 // A proxy entry must get returned here in order to inhibit
                 // a peer target to recognize the type of this entry and
@@ -299,9 +299,26 @@ extends FsController<FsConcurrentModel> {
         }
     } // class Output
 
-    private static class ProxyEntry extends DecoratingEntry<Entry> {
-        ProxyEntry(Entry entry) {
+    private static class ProxyEntry
+    extends DecoratingEntry<FsArchiveEntry>
+    implements FsArchiveEntry {
+        ProxyEntry(FsArchiveEntry entry) {
             super(entry);
+        }
+
+        @Override
+        public Type getType() {
+            return delegate.getType();
+        }
+
+        @Override
+        public boolean setSize(Size type, long value) {
+            return delegate.setSize(type, value);
+        }
+
+        @Override
+        public boolean setTime(Access type, long value) {
+            return delegate.setTime(type, value);
         }
     } // class ProxyEntry
 

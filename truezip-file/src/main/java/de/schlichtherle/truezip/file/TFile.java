@@ -1993,11 +1993,9 @@ public final class TFile extends File {
     public boolean isFile() {
         if (null != innerArchive) {
             try {
-                final FsEntry entry = innerArchive.getController()
+                FsEntry entry = innerArchive.getController()
                         .getEntry(getInnerEntryName0());
-                if (null == entry)
-                    return false;
-                return entry.isType(FILE);
+                return null != entry && entry.isType(FILE);
             } catch (IOException ex) {
                 return false;
             }
@@ -2024,11 +2022,9 @@ public final class TFile extends File {
     public boolean isDirectory() {
         if (null != innerArchive) {
             try {
-                final FsEntry entry = innerArchive.getController()
+                FsEntry entry = innerArchive.getController()
                         .getEntry(getInnerEntryName0());
-                if (null == entry)
-                    return false;
-                return entry.isType(DIRECTORY);
+                return null != entry && entry.isType(DIRECTORY);
             } catch (IOException ex) {
                 return false;
             }
@@ -2143,7 +2139,7 @@ public final class TFile extends File {
             } catch (IOException ex) {
                 return 0;
             }
-            if (null == entry || !entry.isType(DIRECTORY))
+            if (null == entry || entry.isType(DIRECTORY))
                 return 0;
             final long length = entry.getSize(DATA);
             return length >= 0 ? length : 0;

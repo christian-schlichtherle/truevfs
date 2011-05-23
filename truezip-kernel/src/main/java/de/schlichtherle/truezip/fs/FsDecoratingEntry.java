@@ -52,11 +52,6 @@ extends FsEntry {
     }
 
     @Override
-    public Set<Type> getTypes() {
-        return delegate.getTypes();
-    }
-
-    @Override
     public long getSize(Size type) {
         return delegate.getSize(type);
     }
