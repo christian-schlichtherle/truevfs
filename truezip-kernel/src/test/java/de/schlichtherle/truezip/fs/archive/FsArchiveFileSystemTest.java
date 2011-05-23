@@ -19,7 +19,6 @@ import de.schlichtherle.truezip.entry.Entry.Type;
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
-import static de.schlichtherle.truezip.fs.archive.FsArchiveDriver.*;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveEntry;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveEntryContainer;
@@ -127,7 +126,7 @@ public class FsArchiveFileSystemTest {
         for (final String[] params : paramss) {
             final String aen = params[0];
             final Type type = aen.endsWith(SEPARATOR) ? DIRECTORY : FILE;
-            final MockArchiveEntry ae = driver.newEntry(aen, type, null, NO_OUTPUT_OPTION);
+            final MockArchiveEntry ae = driver.newEntry(aen, type, null);
             assertEquals(aen, ae.getName());
             container   .new Output()
                         .getOutputSocket(ae)

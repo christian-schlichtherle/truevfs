@@ -19,8 +19,11 @@ import de.schlichtherle.truezip.entry.Entry;
 import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
 import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 import de.schlichtherle.truezip.entry.Entry.Type;
+import de.schlichtherle.truezip.fs.FsController;
+import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.FsOutputOption;
+import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriver;
 import de.schlichtherle.truezip.fs.archive.FsMultiplexedArchiveOutputShop;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
@@ -32,6 +35,7 @@ import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.zip.ZipEntry;
+import static de.schlichtherle.truezip.zip.ZipEntry.*;
 import de.schlichtherle.truezip.zip.ZipEntryFactory;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
@@ -149,7 +153,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
      * @return The value of the property {@code method}.
      */
     public int getMethod() {
-        return ZipEntry.DEFLATED;
+        return DEFLATED;
     }
 
     /**
@@ -166,8 +170,23 @@ implements ZipEntryFactory<ZipArchiveEntry> {
         return Deflater.BEST_COMPRESSION;
     }
 
+    /**
+     * Sets {@link FsOutputOption#STORE} in {@code options} before
+     * forwarding the call to {@code controller}.
+     */
     @Override
-    protected ZipArchiveEntry newEntry(
+    public OutputSocket<?> getOutputSocket( FsController<?> controller,
+                                            FsEntryName name,
+                                            BitField<FsOutputOption> options,
+                                            @CheckForNull Entry template) {
+        // Leave FsOutputOption.COMPRESS untouched - the driver shall be given
+        // opportunity to use its internal preferences to sort out such a
+        // conflict.
+        return controller.getOutputSocket(name, options.set(STORE), template);
+    }
+
+    @Override
+    public ZipArchiveEntry newEntry(
             String name,
             final Type type,
             final Entry template,
@@ -184,6 +203,14 @@ implements ZipEntryFactory<ZipArchiveEntry> {
                 entry.setTime(template.getTime(WRITE));
                 entry.setSize(template.getSize(DATA));
             }
+        }
+        if (mknod.get(COMPRESS)) { // #1 priority
+            if (DEFLATED != entry.getMethod()) {
+                entry.setMethod(DEFLATED);
+                entry.setCompressedSize(UNKNOWN);
+            }
+        } else if (mknod.get(STORE)) { // #2 priority
+            entry.setMethod(STORED);
         }
         return entry;
     }
@@ -251,4 +278,3 @@ implements ZipEntryFactory<ZipArchiveEntry> {
         return new ZipOutputShop(this, out, source);
     }
 }
-

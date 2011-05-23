@@ -62,4 +62,16 @@ public enum FsOutputOption {
      * locking.
      */
     EXCLUSIVE,
+    
+    /**
+     * Expresses a preference to store an entry uncompressed within its archive.
+     * This may get used or ignored by archive drivers.
+     */
+    STORE,
+
+    /**
+     * Expresses a preference to compress an entry within its archive.
+     * This may get used or ignored by archive drivers.
+     */
+    COMPRESS,
 }

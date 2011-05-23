@@ -15,8 +15,16 @@
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
+import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.fs.FsController;
+import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsModel;
+import de.schlichtherle.truezip.fs.FsOutputOption;
+import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
+import de.schlichtherle.truezip.socket.OutputSocket;
+import de.schlichtherle.truezip.util.BitField;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -63,6 +71,18 @@ public class TarBZip2Driver extends TarDriver {
      */
     public int getLevel() {
         return CBZip2OutputStream.MAX_BLOCKSIZE;
+    }
+
+    /**
+     * Sets {@link FsOutputOption#STORE} in {@code options} before
+     * forwarding the call to {@code controller}.
+     */
+    @Override
+    public OutputSocket<?> getOutputSocket( FsController<?> controller,
+                                            FsEntryName name,
+                                            BitField<FsOutputOption> options,
+                                            @CheckForNull Entry template) {
+        return controller.getOutputSocket(name, options.set(STORE), template);
     }
 
     /**

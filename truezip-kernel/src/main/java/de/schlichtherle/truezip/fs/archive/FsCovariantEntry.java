@@ -81,9 +81,9 @@ implements Cloneable {
             for (final Map.Entry<Type, E> entry : this.map.entrySet()) {
                 final FsArchiveEntry delegate = entry.getValue();
                 thatMap.put(entry.getKey(),
-                            driver.newEntry(   delegate.getName(),
-                                                delegate.getType(),
-                                                delegate));
+                            driver.newEntry(delegate.getName(),
+                                            delegate.getType(),
+                                            delegate));
             }
         } catch (CharConversionException ex) {
             throw new AssertionError(ex);

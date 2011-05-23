@@ -75,13 +75,10 @@ extends FsFileSystemArchiveController<E> {
 
     private static final BitField<FsOutputOption>
             MOUNT_MASK = BitField.of(CREATE_PARENTS);
-
     private static final BitField<FsInputOption>
             MOUNT_INPUT_OPTIONS = BitField.of(FsInputOption.CACHE);
-
     private static final BitField<FsOutputOption>
             MAKE_OUTPUT_OPTIONS = BitField.noneOf(FsOutputOption.class);
-
     private static final BitField<FsSyncOption>
             SYNC_OPTIONS = BitField.of( WAIT_CLOSE_INPUT,
                                         WAIT_CLOSE_OUTPUT,
@@ -90,7 +87,6 @@ extends FsFileSystemArchiveController<E> {
     private final FsArchiveDriver<E> driver;
     private final FsController<?> parent;
     private final FsEntryName parentName;
-    private final boolean useRootTemplate;
 
     /**
      * An {@link Input} object used to mount the (virtual) archive file system
@@ -110,8 +106,7 @@ extends FsFileSystemArchiveController<E> {
     public FsDefaultArchiveController(
             final FsConcurrentModel model,
             final FsArchiveDriver<E> driver,
-            final FsController<?> parent,
-            final boolean useRootTemplate) {
+            final FsController<?> parent) {
         super(model);
         if (null == driver)
             throw new NullPointerException();
@@ -121,7 +116,6 @@ extends FsFileSystemArchiveController<E> {
         this.parent = parent;
         this.parentName = getModel().getMountPoint().getPath().resolve(ROOT)
                 .getEntryName();
-        this.useRootTemplate = useRootTemplate;
 
         assert invariants();
     }
@@ -159,8 +153,8 @@ extends FsFileSystemArchiveController<E> {
             // could be a FileController and on Windows this property turns to
             // TRUE once a file is opened for reading!
             final boolean readOnly = !parent.isWritable(parentName);
-            final InputSocket<?> socket = parent.getInputSocket(
-                    parentName, MOUNT_INPUT_OPTIONS);
+            final InputSocket<?> socket = driver.getInputSocket(
+                    parent, parentName, MOUNT_INPUT_OPTIONS);
             input = new Input(driver.newInputShop(getModel(), socket));
             setFileSystem(newArchiveFileSystem(driver,
                     input.getDelegate(), socket.getLocalTarget(), readOnly));
@@ -177,12 +171,10 @@ extends FsFileSystemArchiveController<E> {
             // file, but we may create it automatically.
             final FsArchiveFileSystem<E> fileSystem
                     = newArchiveFileSystem(driver);
-            final FsCovariantEntry<E> root
-                    = fileSystem.getEntry(ROOT);
             // This may fail if e.g. the container file is an RAES
             // encrypted ZIP file and the user cancels password
             // prompting.
-            makeOutput(options, root);
+            makeOutput(options);
             setFileSystem(fileSystem);
             getModel().setTouched(true);
         }
@@ -197,13 +189,12 @@ extends FsFileSystemArchiveController<E> {
      *         the output entry in the parent file system controller.
      * @throws IOException on any I/O error.
      */
-    void makeOutput(final BitField<FsOutputOption> options, final Entry root)
+    void makeOutput(final BitField<FsOutputOption> options)
     throws IOException {
         if (null != output)
             return;
-        final OutputSocket<?> socket = parent.getOutputSocket(
-                parentName, options.set(FsOutputOption.CACHE),
-                useRootTemplate ? root : null);
+        final OutputSocket<?> socket = driver.getOutputSocket(
+                parent, parentName, options.set(FsOutputOption.CACHE), null);
         final Input input = this.input;
         output = new Output(driver.newOutputShop(getModel(), socket,
                     null != input ? input.getDelegate() : null));
@@ -217,7 +208,7 @@ extends FsFileSystemArchiveController<E> {
     @Override
     OutputSocket<?> getOutputSocket(final E entry) throws IOException {
         if (null == output)
-            makeOutput(MAKE_OUTPUT_OPTIONS, getFileSystem().getEntry(ROOT));
+            makeOutput(MAKE_OUTPUT_OPTIONS);
         return output.getOutputSocket(entry);
     }
 
@@ -582,7 +573,7 @@ extends FsFileSystemArchiveController<E> {
         public void beforeTouch(FsArchiveFileSystemEvent<? extends E> event)
         throws IOException {
             assert event.getSource() == getFileSystem();
-            makeOutput(MAKE_OUTPUT_OPTIONS, getFileSystem().getEntry(ROOT));
+            makeOutput(MAKE_OUTPUT_OPTIONS);
         }
 
         @Override
