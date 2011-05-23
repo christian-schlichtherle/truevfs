@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.fs.archive;
 
-import de.schlichtherle.truezip.entry.EntryFactory;
 import java.io.CharConversionException;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
@@ -92,7 +91,7 @@ extends FsArchiveDriver<E> {
      * Ensures that the given entry name can be encoded by this driver's
      * character set.
      * Should be called by sub classes in their implementation of the method
-     * {@link EntryFactory#newEntry}.
+     * {@link FsArchiveDriver#newEntry}.
      * 
      * @param  name an entry name.
      * @see    #getCharset

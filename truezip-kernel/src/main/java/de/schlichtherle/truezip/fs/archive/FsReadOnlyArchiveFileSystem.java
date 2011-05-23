@@ -17,7 +17,6 @@ package de.schlichtherle.truezip.fs.archive;
 
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.entry.EntryContainer;
-import de.schlichtherle.truezip.entry.EntryFactory;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Access;
 import de.schlichtherle.truezip.fs.FsEntryName;
@@ -42,9 +41,9 @@ final class FsReadOnlyArchiveFileSystem<E extends FsArchiveEntry>
 extends FsArchiveFileSystem<E> {
 
     FsReadOnlyArchiveFileSystem(final EntryContainer<E> archive,
-                                final EntryFactory<E> factory,
+                                final FsArchiveDriver<E> driver,
                                 final Entry rootTemplate) {
-        super(factory, archive, rootTemplate);
+        super(driver, archive, rootTemplate);
     }
 
     /**
