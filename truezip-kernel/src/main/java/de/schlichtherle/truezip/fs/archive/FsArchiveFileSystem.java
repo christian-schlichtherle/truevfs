@@ -312,8 +312,7 @@ implements Iterable<FsCovariantEntry<E>> {
      */
     @Nullable
     final FsCovariantEntry<E> getEntry(FsEntryName name) {
-        assert null != name;
-        FsCovariantEntry<E> entry = master.get(name);
+        FsCovariantEntry<E> entry = master.get(name.getPath());
         return null == entry ? null : entry.clone(factory);
     }
 
@@ -426,7 +425,8 @@ implements Iterable<FsCovariantEntry<E>> {
         if (FILE != type && DIRECTORY != type) // TODO: Add support for other types.
             throw new FsArchiveFileSystemException(name.toString(),
                     "only FILE and DIRECTORY entries are supported");
-        final FsCovariantEntry<E> oldEntry = master.get(name);
+        final String path = name.getPath();
+        final FsCovariantEntry<E> oldEntry = master.get(path);
         if (null != oldEntry) {
             if (!oldEntry.isType(FILE))
                 throw new FsArchiveFileSystemException(name.toString(),
@@ -440,7 +440,7 @@ implements Iterable<FsCovariantEntry<E>> {
         }
         while (template instanceof FsCovariantEntry<?>)
             template = ((FsCovariantEntry<?>) template).getEntry();
-        return new PathLink(name, type, options.get(CREATE_PARENTS), template);
+        return new PathLink(path, type, options.get(CREATE_PARENTS), template);
     }
 
     /**
@@ -457,13 +457,13 @@ implements Iterable<FsCovariantEntry<E>> {
         final SegmentLink<E>[] links;
         long time = -1;
 
-        PathLink(   final FsEntryName name,
+        PathLink(   final String path,
                     final Entry.Type type,
                     final boolean createParents,
                     @CheckForNull final Entry template)
         throws FsArchiveFileSystemException {
             this.createParents = createParents;
-            links = newSegmentLinks(name.getPath(), type, template, 1);
+            links = newSegmentLinks(path, type, template, 1);
         }
 
         @SuppressWarnings({ "unchecked", "all" })
@@ -510,19 +510,21 @@ implements Iterable<FsCovariantEntry<E>> {
 
             touch();
             final int l = links.length;
-            FsCovariantEntry<E> parent = links[0].entry;
+            FsCovariantEntry<E> parentCE = links[0].entry;
+            E parentAE = parentCE.getEntry(DIRECTORY);
             for (int i = 1; i < l ; i++) {
                 final SegmentLink<E> link = links[i];
-                final FsCovariantEntry<E> entry = link.entry;
+                final FsCovariantEntry<E> entryCE = link.entry;
+                final E entryAE = entryCE.getEntry();
                 final String member = link.base;
-                master.add(entry.getName(), entry.getEntry());
-                if (master.get(parent.getName()).add(member) && UNKNOWN != parent.getTime(Access.WRITE)) // never touch ghosts!
-                    parent.getEntry(DIRECTORY).setTime(Access.WRITE, getCurrentTimeMillis());
-                parent = entry;
+                master.add(entryCE.getName(), entryAE);
+                if (master.get(parentCE.getName()).add(member) && UNKNOWN != parentAE.getTime(Access.WRITE)) // never touch ghosts!
+                    parentAE.setTime(Access.WRITE, getCurrentTimeMillis());
+                parentCE = entryCE;
+                parentAE = entryAE;
             }
-            final FsCovariantEntry<E> entry = getTarget();
-            if (UNKNOWN == entry.getTime(WRITE))
-                entry.setTime(WRITE, getCurrentTimeMillis());
+            if (UNKNOWN == parentAE.getTime(WRITE))
+                parentAE.setTime(WRITE, getCurrentTimeMillis());
         }
 
         private long getCurrentTimeMillis() {
@@ -543,7 +545,7 @@ implements Iterable<FsCovariantEntry<E>> {
      */
     private static final class SegmentLink<E extends FsArchiveEntry>
     implements Link<FsCovariantEntry<E>> {
-        final @CheckForNull String base;
+        final @Nullable String base;
         final FsCovariantEntry<E> entry;
 
         /**
@@ -614,7 +616,7 @@ implements Iterable<FsCovariantEntry<E>> {
         if (0 > value)
             throw new IllegalArgumentException(name.toString()
                     + " (negative access time)");
-        final FsCovariantEntry<E> entry = master.get(name);
+        final FsCovariantEntry<E> entry = master.get(name.getPath());
         if (null == entry)
             throw new FsArchiveFileSystemException(name.toString(),
                     "archive entry not found");
@@ -672,11 +674,7 @@ implements Iterable<FsCovariantEntry<E>> {
             return ce;
         }
 
-        @CheckForNull FsCovariantEntry<E> get(FsEntryName name) {
-            return map.get(name.getPath());
-        }
-
-        @CheckForNull FsCovariantEntry<E> get(String path) {
+        @Nullable FsCovariantEntry<E> get(String path) {
             return map.get(path);
         }
 
