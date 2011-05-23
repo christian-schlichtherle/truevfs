@@ -25,9 +25,11 @@ import de.schlichtherle.truezip.fs.FsCachingController;
 import de.schlichtherle.truezip.fs.FsConcurrentController;
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsModel;
+import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
+import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -50,6 +52,9 @@ import net.jcip.annotations.Immutable;
 @DefaultAnnotation(NonNull.class)
 public abstract class FsArchiveDriver<E extends FsArchiveEntry>
 extends FsDriver {
+
+    public static final BitField<FsOutputOption>
+            NO_OUTPUT_OPTION = BitField.noneOf(FsOutputOption.class);
 
     /**
      * {@inheritDoc}
@@ -167,6 +172,11 @@ extends FsDriver {
                     @CheckForNull InputShop<E> source)
     throws IOException;
 
+    public final E newEntry(String name, Type type, @CheckForNull Entry template)
+    throws CharConversionException {
+        return newEntry(name, type, template, NO_OUTPUT_OPTION);
+    }
+
     /**
      * Returns a new archive entry for the given name.
      * The implementation may need to fix this name in order to 
@@ -185,12 +195,15 @@ extends FsDriver {
      * @param  template if not {@code null}, then the new entry shall inherit
      *         as much properties from this entry as possible - with the
      *         exception of its name and type.
+     * @param  mknod when called from {@link FsArchiveController#mknod}, this
+     *         is its {@code options} parameter, otherwise it's typically an
+     *         empty set.
      * @return A new entry for the given name.
      * @throws CharConversionException if {@code name} contains characters
      *         which are invalid.
      */
-    public abstract E
-    newEntry(String name, Type type, @CheckForNull Entry template)
+    protected abstract E
+    newEntry(String name, Type type, @CheckForNull Entry template, BitField<FsOutputOption> mknod)
     throws CharConversionException;
 
     /**

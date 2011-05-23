@@ -15,11 +15,18 @@
  */
 package de.schlichtherle.truezip.fs.archive;
 
-import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.entry.Entry;
+import static de.schlichtherle.truezip.entry.Entry.*;
+import static de.schlichtherle.truezip.entry.Entry.Access.*;
+import static de.schlichtherle.truezip.entry.Entry.Type.*;
 import de.schlichtherle.truezip.entry.EntryContainer;
 import de.schlichtherle.truezip.fs.FsEntryName;
+import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import de.schlichtherle.truezip.fs.FsOutputOption;
+import static de.schlichtherle.truezip.fs.FsOutputOption.*;
+import static de.schlichtherle.truezip.fs.archive.FsArchiveDriver.*;
+import static de.schlichtherle.truezip.io.Paths.*;
+import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.Link;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
@@ -35,13 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import net.jcip.annotations.NotThreadSafe;
-
-import static de.schlichtherle.truezip.entry.Entry.*;
-import static de.schlichtherle.truezip.entry.Entry.Access.*;
-import static de.schlichtherle.truezip.entry.Entry.Type.*;
-import static de.schlichtherle.truezip.fs.FsEntryName.*;
-import static de.schlichtherle.truezip.fs.FsOutputOption.*;
-import static de.schlichtherle.truezip.io.Paths.*;
 
 /**
  * A read/write virtual file system for archive entries.
@@ -88,7 +88,7 @@ implements Iterable<FsCovariantEntry<E>> {
 
     private FsArchiveFileSystem(final FsArchiveDriver<E> driver) {
         this.factory = driver;
-        final E root = newEntryUnchecked(ROOT_PATH, DIRECTORY, null);
+        final E root = newEntryUnchecked(ROOT_PATH, DIRECTORY, NO_OUTPUT_OPTION, null);
         final long time = System.currentTimeMillis();
         for (Access access : ALL_ACCESS_SET)
             root.setTime(access, time);
@@ -165,7 +165,8 @@ implements Iterable<FsCovariantEntry<E>> {
         }
         // Setup root file system entry, potentially replacing its previous
         // mapping from the input archive.
-        master.add(ROOT_PATH, newEntryUnchecked(ROOT_PATH, DIRECTORY, rootTemplate));
+        master.add(ROOT_PATH, newEntryUnchecked(
+                ROOT_PATH, DIRECTORY, NO_OUTPUT_OPTION, rootTemplate));
         this.master = master;
         // Now perform a file system check to create missing parent directories
         // and populate directories with their members - this needs to be done
@@ -198,7 +199,8 @@ implements Iterable<FsCovariantEntry<E>> {
         final String memberName = splitter.getMemberName();
         FsCovariantEntry<E> parent = master.get(parentPath);
         if (null == parent)
-            parent = master.add(parentPath, newEntryUnchecked(parentPath, DIRECTORY, null));
+            parent = master.add(parentPath, newEntryUnchecked(
+                    parentPath, DIRECTORY, NO_OUTPUT_OPTION, null));
         parent.add(memberName);
         fix(parentPath);
     }
@@ -328,13 +330,14 @@ implements Iterable<FsCovariantEntry<E>> {
     private E newEntryUnchecked(
             final String name,
             final Type type,
+            final BitField<FsOutputOption> mknod,
             @CheckForNull final Entry template) {
         assert null != type;
         assert !isRoot(name) || DIRECTORY == type;
         assert !(template instanceof FsCovariantEntry<?>);
 
         try {
-            return factory.newEntry(name, type, template);
+            return factory.newEntry(name, type, template, mknod);
         } catch (CharConversionException ex) {
             throw new AssertionError(ex);
         }
@@ -356,6 +359,7 @@ implements Iterable<FsCovariantEntry<E>> {
     private E newEntryChecked(
             final String name,
             final Type type,
+            final BitField<FsOutputOption> mknod,
             @CheckForNull final Entry template)
     throws FsArchiveFileSystemException {
         assert null != type;
@@ -363,7 +367,7 @@ implements Iterable<FsCovariantEntry<E>> {
         assert !(template instanceof FsCovariantEntry<?>);
 
         try {
-            return factory.newEntry(name, type, template);
+            return factory.newEntry(name, type, template, mknod);
         } catch (CharConversionException ex) {
             throw new FsArchiveFileSystemException(name.toString(), ex);
         }
@@ -488,14 +492,14 @@ implements Iterable<FsCovariantEntry<E>> {
                 elements[0] = new SegmentLink<E>(null, parentEntry);
                 newEntry = new FsCovariantEntry<E>(entryName);
                 newEntry.putEntry(entryType,
-                        newEntryChecked(entryName, entryType, template));
+                        newEntryChecked(entryName, entryType, options, template));
                 elements[1] = new SegmentLink<E>(memberName, newEntry);
             } else if (options.get(CREATE_PARENTS)) {
                 elements = newSegmentLinks(
                         parentPath, DIRECTORY, null, level + 1);
                 newEntry = new FsCovariantEntry<E>(entryName);
                 newEntry.putEntry(entryType,
-                        newEntryChecked(entryName, entryType, template));
+                        newEntryChecked(entryName, entryType, options, template));
                 elements[elements.length - level]
                         = new SegmentLink<E>(memberName, newEntry);
             } else {

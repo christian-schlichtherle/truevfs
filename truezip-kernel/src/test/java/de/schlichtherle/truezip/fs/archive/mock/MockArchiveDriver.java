@@ -18,12 +18,14 @@ package de.schlichtherle.truezip.fs.archive.mock;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.fs.FsModel;
+import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriver;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.OutputSocket;
+import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.CharConversionException;
@@ -67,7 +69,10 @@ extends FsCharsetArchiveDriver<MockArchiveEntry> {
     }
 
     @Override
-    public MockArchiveEntry newEntry(String name, Type type, Entry template)
+    public MockArchiveEntry newEntry(   String name,
+                                        Type type,
+                                        Entry template,
+                                        BitField<FsOutputOption> mknod)
     throws CharConversionException {
         return new MockArchiveEntry(toZipOrTarEntryName(name, type),
                                     type,

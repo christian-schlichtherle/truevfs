@@ -15,18 +15,19 @@
  */
 package de.schlichtherle.truezip.fs.archive;
 
-import de.schlichtherle.truezip.util.UriBuilder;
-import de.schlichtherle.truezip.fs.archive.mock.MockArchiveEntry;
 import de.schlichtherle.truezip.entry.Entry.Type;
-import de.schlichtherle.truezip.fs.FsEntryName;
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
+import de.schlichtherle.truezip.fs.FsEntryName;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
+import static de.schlichtherle.truezip.fs.archive.FsArchiveDriver.*;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
+import de.schlichtherle.truezip.fs.archive.mock.MockArchiveEntry;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveEntryContainer;
-import org.junit.Test;
-
+import de.schlichtherle.truezip.fs.archive.mock.MockArchiveEntryContainer.Output;
+import de.schlichtherle.truezip.util.UriBuilder;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  * @author  Christian Schlichtherle
@@ -126,7 +127,7 @@ public class FsArchiveFileSystemTest {
         for (final String[] params : paramss) {
             final String aen = params[0];
             final Type type = aen.endsWith(SEPARATOR) ? DIRECTORY : FILE;
-            final MockArchiveEntry ae = driver.newEntry(aen, type, null);
+            final MockArchiveEntry ae = driver.newEntry(aen, type, null, NO_OUTPUT_OPTION);
             assertEquals(aen, ae.getName());
             container   .new Output()
                         .getOutputSocket(ae)
