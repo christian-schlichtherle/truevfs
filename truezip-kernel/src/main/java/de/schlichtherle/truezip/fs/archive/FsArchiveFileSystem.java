@@ -21,16 +21,13 @@ import de.schlichtherle.truezip.entry.EntryContainer;
 import de.schlichtherle.truezip.entry.EntryFactory;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsOutputOption;
-import de.schlichtherle.truezip.fs.FsUriModifier;
 import de.schlichtherle.truezip.util.Link;
-import de.schlichtherle.truezip.util.UriBuilder;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.CharConversionException;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -174,13 +171,8 @@ implements Iterable<FsCovariantEntry<E>> {
         // Now perform a file system check to create missing parent directories
         // and populate directories with their members - this needs to be done
         // separately!
-        final UriBuilder uri = new UriBuilder();
-        for (final String path : paths) {
-            try {
-                fix(new FsEntryName(uri.path(path).getUri()));
-            } catch (URISyntaxException dontFix) {
-            }
-        }
+        for (final String path : paths)
+            fix(path);
     }
 
     /**
@@ -196,21 +188,20 @@ implements Iterable<FsCovariantEntry<E>> {
      *
      * @param name the archive file system entry name.
      */
-    private void fix(final FsEntryName name) {
+    private void fix(final String name) {
         // When recursing into this method, it may be called with the root
         // directory as its parameter, so we may NOT skip the following test.
-        if (isRoot(name.getPath()))
+        if (isRoot(name))
             return; // never fix root or empty or absolute pathnames
 
         splitter.split(name);
-        final FsEntryName parentName = splitter.getParentName();
-        final String parentPath = parentName.getPath();
+        final String parentPath = splitter.getParentPath();
         final String memberName = splitter.getMemberName();
-        FsCovariantEntry<E> parent = master.get(parentName);
+        FsCovariantEntry<E> parent = master.get(parentPath);
         if (null == parent)
             parent = master.add(parentPath, newEntryUnchecked(parentPath, DIRECTORY, null));
         parent.add(memberName);
-        fix(parentName);
+        fix(parentPath);
     }
 
     /**
@@ -472,42 +463,42 @@ implements Iterable<FsCovariantEntry<E>> {
                     @CheckForNull final Entry template)
         throws FsArchiveFileSystemException {
             this.createParents = createParents;
-            links = newSegmentLinks(name, type, template, 1);
+            links = newSegmentLinks(name.getPath(), type, template, 1);
         }
 
         @SuppressWarnings({ "unchecked", "all" })
         private SegmentLink<E>[] newSegmentLinks(
-                final FsEntryName entryName,
+                final String entryName,
                 final Entry.Type entryType,
                 @CheckForNull final Entry template,
                 final int level)
         throws FsArchiveFileSystemException {
             splitter.split(entryName);
-            final FsEntryName parentName = splitter.getParentName(); // could equal ROOT
+            final String parentPath = splitter.getParentPath(); // could equal ROOT
             final String memberName = splitter.getMemberName();
             final SegmentLink<E>[] elements;
 
             // Lookup parent entry, creating it where necessary and allowed.
-            final FsCovariantEntry<E> parentEntry = master.get(parentName);
+            final FsCovariantEntry<E> parentEntry = master.get(parentPath);
             final FsCovariantEntry<E> newEntry;
             if (parentEntry != null) {
                 if (!parentEntry.isType(DIRECTORY))
-                    throw new FsArchiveFileSystemException(entryName.toString(),
+                    throw new FsArchiveFileSystemException(entryName,
                             "parent entry must be a directory");
                 elements = new SegmentLink[level + 1];
                 elements[0] = new SegmentLink<E>(null, parentEntry);
-                newEntry = new FsCovariantEntry<E>(entryName.getPath());
-                newEntry.putEntry(entryType, newEntryChecked(entryName.getPath(), entryType, template));
+                newEntry = new FsCovariantEntry<E>(entryName);
+                newEntry.putEntry(entryType, newEntryChecked(entryName, entryType, template));
                 elements[1] = new SegmentLink<E>(memberName, newEntry);
             } else if (createParents) {
                 elements = newSegmentLinks(
-                        parentName, DIRECTORY, null, level + 1);
-                newEntry = new FsCovariantEntry<E>(entryName.getPath());
-                newEntry.putEntry(entryType, newEntryChecked(entryName.getPath(), entryType, template));
+                        parentPath, DIRECTORY, null, level + 1);
+                newEntry = new FsCovariantEntry<E>(entryName);
+                newEntry.putEntry(entryType, newEntryChecked(entryName, entryType, template));
                 elements[elements.length - level]
                         = new SegmentLink<E>(memberName, newEntry);
             } else {
-                throw new FsArchiveFileSystemException(entryName.toString(),
+                throw new FsArchiveFileSystemException(entryName,
                         "missing parent directory entry");
             }
             return elements;
@@ -592,7 +583,8 @@ implements Iterable<FsCovariantEntry<E>> {
         if (name.isRoot())
             throw new FsArchiveFileSystemException(name.toString(),
                     "root directory cannot get unlinked");
-        final FsCovariantEntry<E> entry = master.get(name);
+        final String path = name.getPath();
+        final FsCovariantEntry<E> entry = master.get(path);
         if (entry == null)
             throw new FsArchiveFileSystemException(name.toString(),
                     "archive entry does not exist");
@@ -600,10 +592,10 @@ implements Iterable<FsCovariantEntry<E>> {
             throw new FsArchiveFileSystemException(name.toString(),
                     "directory is not empty");
         touch();
-        master.remove(name);
-        splitter.split(name);
-        final FsEntryName parentName = splitter.getParentName();
-        final FsCovariantEntry<E> ce = master.get(parentName);
+        master.remove(path);
+        splitter.split(path);
+        final String parentPath = splitter.getParentPath();
+        final FsCovariantEntry<E> ce = master.get(parentPath);
         assert null != ce : "The parent directory of \"" + name.toString()
                     + "\" is missing - archive file system is corrupted!";
         final boolean ok = ce.remove(splitter.getMemberName());
@@ -672,10 +664,10 @@ implements Iterable<FsCovariantEntry<E>> {
             return map.values().iterator();
         }
 
-        FsCovariantEntry<E> add(final String name, final E ae) {
-            FsCovariantEntry<E> ce = map.get(name);
+        FsCovariantEntry<E> add(final String path, final E ae) {
+            FsCovariantEntry<E> ce = map.get(path);
             if (null == ce)
-                map.put(name, ce = new FsCovariantEntry<E>(name));
+                map.put(path, ce = new FsCovariantEntry<E>(path));
             ce.putEntry(ae.getType(), ae);
             return ce;
         }
@@ -684,38 +676,26 @@ implements Iterable<FsCovariantEntry<E>> {
             return map.get(name.getPath());
         }
 
-        @CheckForNull FsCovariantEntry<E> get(String name) {
-            return map.get(name);
+        @CheckForNull FsCovariantEntry<E> get(String path) {
+            return map.get(path);
         }
 
-        @Nullable FsCovariantEntry<E> remove(FsEntryName name) {
-            return map.remove(name.getPath());
+        @Nullable FsCovariantEntry<E> remove(String path) {
+            return map.remove(path);
         }
     } // class EntryTable
 
     /** Splits a given path name into its parent path name and base name. */
-    private static final class Splitter {
-        private final de.schlichtherle.truezip.io.Paths.Splitter
-                splitter = new de.schlichtherle.truezip.io.Paths.Splitter(SEPARATOR_CHAR, false);
-
-        void split(FsEntryName name) {
-            splitter.split(name.getPath());
+    private static final class Splitter
+    extends de.schlichtherle.truezip.io.Paths.Splitter {
+        Splitter() {
+            super(SEPARATOR_CHAR, false);
         }
 
-        FsEntryName getParentName() {
-            String path = splitter.getParentPath();
-            try {
-                return null == path
-                        ? ROOT
-                        : new FsEntryName(  new UriBuilder().path(path).getUri(),
-                                            FsUriModifier.NULL);
-            } catch (URISyntaxException ex) {
-                throw new AssertionError(ex);
-            }
-        }
-
-        String getMemberName() {
-            return splitter.getMemberName();
+        @Override
+        public String getParentPath() {
+            String path = super.getParentPath();
+            return null != path ? path : ROOT_PATH;
         }
     } // class Splitter
 }
