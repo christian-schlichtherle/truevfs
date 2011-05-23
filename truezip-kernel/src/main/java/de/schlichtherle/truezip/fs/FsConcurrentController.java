@@ -36,7 +36,9 @@ import javax.swing.Icon;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * Supports multiple concurrent reader threads.
+ * A concurrent file system controller is a proxy for its decorated file system
+ * controller which provides read/write lock features for multi-threaded access
+ * by its clients.
  * 
  * @see     FsConcurrentModel
  * @author  Christian Schlichtherle

@@ -83,11 +83,10 @@ extends FsController<FsConcurrentModel> {
             logger = Logger.getLogger(  FsArchiveController.class.getName(),
                                         FsArchiveController.class.getName());
 
-    private static final BitField<FsOutputOption> AUTO_MOUNT_OPTIONS
-            = BitField.noneOf(FsOutputOption.class);
-
-    private static final BitField<FsSyncOption> UNLINK_SYNC_OPTIONS
-            = BitField.of(ABORT_CHANGES);
+    private static final BitField<FsOutputOption>
+            AUTO_MOUNT_OPTIONS = BitField.noneOf(FsOutputOption.class);
+    private static final BitField<FsSyncOption>
+            UNLINK_SYNC_OPTIONS = BitField.of(ABORT_CHANGES);
 
     private final FsConcurrentModel model;
 
@@ -266,16 +265,17 @@ extends FsController<FsConcurrentModel> {
         public OutputStream newOutputStream() throws IOException {
             final FsArchiveFileSystemOperation<E> mknod = mknod();
             final E entry = mknod.getTarget().getEntry();
-            final OutputSocket<?> output = getOutputSocket(entry);
+            final OutputSocket<?> socket = getOutputSocket(entry);
             InputStream in = null;
             if (options.get(APPEND)) {
                 try {
                     in = getInputSocket(entry.getName()).newInputStream();
-                } catch (FileNotFoundException ignore) {
+                } catch (FileNotFoundException ex) {
+                    logger.log(Level.WARNING, ex.toString(), ex);
                 }
             }
             try {
-                final OutputStream out = output
+                final OutputStream out = socket
                         .bind(null == in ? this : null)
                         .newOutputStream();
                 try {
@@ -288,7 +288,7 @@ extends FsController<FsConcurrentModel> {
                 }
                 return out;
             } finally {
-                if (in != null) {
+                if (null != in) {
                     try {
                         in.close();
                     } catch (IOException ex) {

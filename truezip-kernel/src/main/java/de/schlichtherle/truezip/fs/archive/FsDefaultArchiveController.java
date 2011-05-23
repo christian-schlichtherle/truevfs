@@ -210,14 +210,12 @@ extends FsFileSystemArchiveController<E> {
     }
 
     @Override
-    InputSocket<?> getInputSocket(final String name)
-    throws IOException {
+    InputSocket<?> getInputSocket(final String name) throws IOException {
         return input.getInputSocket(name);
     }
 
     @Override
-    OutputSocket<?> getOutputSocket(final E entry)
-    throws IOException {
+    OutputSocket<?> getOutputSocket(final E entry) throws IOException {
         if (null == output)
             makeOutput(MAKE_OUTPUT_OPTIONS, getFileSystem().getEntry(ROOT));
         return output.getOutputSocket(entry);
@@ -550,7 +548,7 @@ extends FsFileSystemArchiveController<E> {
             super(input);
         }
 
-        /** Returns the product of the archive driver this input is wrapping. */
+        /** Exposes the product of the archive driver this input is wrapping. */
         InputShop<E> getDelegate() {
             return delegate;
         }
@@ -568,7 +566,7 @@ extends FsFileSystemArchiveController<E> {
             super(output);
         }
 
-        /** Returns the product of the archive driver this output is wrapping. */
+        /** Exposes the product of the archive driver this output is wrapping. */
         OutputShop<E> getDelegate() {
             return delegate;
         }
