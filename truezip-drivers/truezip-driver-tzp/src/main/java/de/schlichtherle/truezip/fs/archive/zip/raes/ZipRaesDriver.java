@@ -25,6 +25,7 @@ import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.FsOutputOption;
+import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import de.schlichtherle.truezip.fs.archive.zip.JarArchiveEntry;
 import de.schlichtherle.truezip.fs.archive.zip.JarDriver;
 import de.schlichtherle.truezip.fs.archive.zip.ZipArchiveEntry;
@@ -43,7 +44,6 @@ import de.schlichtherle.truezip.socket.LazyOutputSocket;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import static de.schlichtherle.truezip.zip.ZipEntry.*;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -137,13 +137,8 @@ public abstract class ZipRaesDriver extends JarDriver {
                 final @CheckForNull Entry template,
                 final BitField<FsOutputOption> mknod)
     throws CharConversionException {
-        final JarArchiveEntry entry = super.newEntry(path, type, template, NO_OUTPUT_OPTION);
-        if (DEFLATED != entry.getMethod()) {
-            // Enforce deflation for enhanced authentication security.
-            entry.setMethod(DEFLATED);
-            entry.setCompressedSize(UNKNOWN);
-        }
-        return entry;
+        // Enforce deflation to strengthen the authentication security level.
+        return super.newEntry(path, type, template, mknod.set(COMPRESS));
     }
 
     /**

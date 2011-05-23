@@ -90,7 +90,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                 entry = ((FsCovariantEntry<?>) entry).getEntry();
             final FsCovariantEntry<FsArchiveEntry>
                     special = new FsCovariantEntry<FsArchiveEntry>(ROOT_PATH);
-            special.putEntry(SPECIAL, driver.newEntry(ROOT_PATH, SPECIAL, entry, NO_OUTPUT_OPTION));
+            special.putEntry(SPECIAL, driver.newEntry(ROOT_PATH, SPECIAL, entry));
             return special;
         }
     }

@@ -413,6 +413,48 @@ TFile.setDefaultArchiveDetector(
                 </p>
             </answer>
         </faq>
+        <faq id="nestedArchiveCompression">
+            <question>
+                How does TrueZIP deal with the compression of nested archive
+                files like e.g. <code>app.war/WEB-INF/lib/lib.jar</code>?
+            </question>
+            <answer>
+                <p>
+                    With the advent of release 7.1, TrueZIP implements a new
+                    strategy to avoid compressing already compressed archive
+                    files in an enclosing archive file again.
+                    In contrast, the old stragegy of TrueZIP 7.0 and earlier
+                    was to compress everything - even if it was already
+                    compressed.
+                </p>
+                <p>
+                    The new strategy results in a better overall compression
+                    ratio than the old strategy because compressing already
+                    compressed data again just inflates the data a bit because
+                    of some algorithm specific overhead.
+                </p>
+                <p>
+                    For the example in the question, the new strategy uses the
+                    DEFLATE method to compress the entries of the inner archive
+                    file <code>lib.jar</code> while it uses the STORE method
+                    for the corresponding entry <code>WEB-INF/lib/lib.jar</code>
+                    within the outer archive file <code>app.war</code>.
+                    This behavior is in conformance to the JEE specs.
+                </p>
+                <p>
+                    The new strategy is implemented by the archive drivers, so
+                    it works best with all supported archive types.
+                    For example, when storing a TAR file within a ZIP file,
+                    the ZIP entry for the TAR file would use the DEFLATE
+                    method because the TAR driver knows that plain TAR
+                    files are not compressed.
+                    In contrast, when storing a TAR.GZ file within a ZIP file,
+                    the ZIP entry for the TAR.GZ file would use the STORE
+                    method because the TAR.GZ driver knows that TAR.GZ
+                    files are already compressed.
+                </p>
+            </answer>
+        </faq>
         <faq id="support">
             <question>
                 I have another question or issue.

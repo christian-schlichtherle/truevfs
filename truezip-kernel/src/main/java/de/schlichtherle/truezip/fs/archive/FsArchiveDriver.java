@@ -24,6 +24,8 @@ import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsCachingController;
 import de.schlichtherle.truezip.fs.FsConcurrentController;
 import de.schlichtherle.truezip.fs.FsDriver;
+import de.schlichtherle.truezip.fs.FsEntryName;
+import de.schlichtherle.truezip.fs.FsInputOption;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.socket.IOPool;
@@ -53,8 +55,13 @@ import net.jcip.annotations.Immutable;
 public abstract class FsArchiveDriver<E extends FsArchiveEntry>
 extends FsDriver {
 
+    /** A bit field with no output options set. */
     public static final BitField<FsOutputOption>
             NO_OUTPUT_OPTION = BitField.noneOf(FsOutputOption.class);
+
+    /** A bit field with no output options set. */
+    public static final BitField<FsInputOption>
+            NO_INPUT_OPTION = BitField.noneOf(FsInputOption.class);
 
     /**
      * {@inheritDoc}
@@ -74,6 +81,82 @@ extends FsDriver {
      * @return The I/O pool to use for allocating temporary I/O entries.
      */
     protected abstract IOPool<?> getPool();
+
+    /**
+     * Returns the icon that should be displayed for the given archive file
+     * if it's open/expanded in the view.
+     * <p>
+     * The implementation in the abstract class {@code FsArchiveDriver} simply
+     * returns {@code null}.
+     *
+     * @param  model the file system model.
+     * @return The icon that should be displayed for the given archive file
+     *         if it's open/expanded in the view.
+     *         If {@code null} is returned, a default icon should be displayed.
+     */
+    public @CheckForNull Icon getOpenIcon(FsModel model) {
+        return null;
+    }
+
+    /**
+     * Returns the icon that should be displayed for the given archive file
+     * if it's closed/collapsed in the view.
+     * <p>
+     * The implementation in the abstract class {@code FsArchiveDriver} simply
+     * returns {@code null}.
+     *
+     * @param  model the file system model.
+     * @return The icon that should be displayed for the given archive file
+     *         if it's closed/collapsed in the view.
+     *         If {@code null} is returned, a default icon should be displayed.
+     */
+    public @CheckForNull Icon getClosedIcon(FsModel model) {
+        return null;
+    }
+
+    /**
+     * Called to prepare reading an archive file artifact of this driver from
+     * {@code name} in {@code controller} using {@code options}.
+     * <p>
+     * This method should be overridden in order to modify the given options
+     * before forwarding the call to the given controller.
+     * The implementation in the class {@link FsArchiveDriver} simply forwards
+     * the call to the given controller with the given options unaltered.
+     * 
+     * @param  controller the controller to use for reading an artifact of this
+     *         driver.
+     * @param  name the entry name.
+     * @param  options the options to use.
+     * @return An input socket for reading an artifact of this driver.
+     */
+    public InputSocket<?> getInputSocket(   FsController<?> controller,
+                                            FsEntryName name,
+                                            BitField<FsInputOption> options) {
+        return controller.getInputSocket(name, options);
+    }
+
+    /**
+     * Called to prepare writing an archive file artifact of this driver to
+     * {@code name} in {@code controller} using {@code options} and {@code template}.
+     * <p>
+     * This method should be overridden in order to modify the given options
+     * before forwarding the call to the given controller.
+     * The implementation in the class {@link FsArchiveDriver} simply forwards
+     * the call to the given controller with the given options unaltered.
+     * 
+     * @param  controller the controller to use for writing an artifact of this
+     *         driver.
+     * @param  name the entry name.
+     * @param  options the options to use.
+     * @param  template the template to use.
+     * @return An output socket for writing an artifact of this driver.
+     */
+    public OutputSocket<?> getOutputSocket( FsController<?> controller,
+                                            FsEntryName name,
+                                            BitField<FsOutputOption> options,
+                                            @CheckForNull Entry template) {
+        return controller.getOutputSocket(name, options, template);
+    }
 
     /**
      * Returns a new thread-safe file system controller for the given mount
@@ -105,7 +188,7 @@ extends FsDriver {
                    new FsCachingController(
                         new FsDefaultArchiveController<E>(
                             new FsConcurrentModel(model),
-                            this, parent, false),
+                            this, parent),
                         getPool()));
     }
 
@@ -172,6 +255,10 @@ extends FsDriver {
                     @CheckForNull InputShop<E> source)
     throws IOException;
 
+    /**
+     * Equivalent to {@link #newEntry(java.lang.String, de.schlichtherle.truezip.entry.Entry.Type, de.schlichtherle.truezip.entry.Entry, de.schlichtherle.truezip.util.BitField)
+     * newEntry(name, type, template, NO_OUTPUT_OPTION)}.
+     */
     public final E newEntry(String name, Type type, @CheckForNull Entry template)
     throws CharConversionException {
         return newEntry(name, type, template, NO_OUTPUT_OPTION);
@@ -202,39 +289,10 @@ extends FsDriver {
      * @throws CharConversionException if {@code name} contains characters
      *         which are invalid.
      */
-    protected abstract E
-    newEntry(String name, Type type, @CheckForNull Entry template, BitField<FsOutputOption> mknod)
+    public abstract E
+    newEntry(   String name,
+                Type type,
+                @CheckForNull Entry template,
+                BitField<FsOutputOption> mknod)
     throws CharConversionException;
-
-    /**
-     * Returns the icon that should be displayed for the given archive file
-     * if it's open/expanded in the view.
-     * <p>
-     * The implementation in the abstract class {@code FsArchiveDriver} simply
-     * returns {@code null}.
-     *
-     * @param  model the file system model.
-     * @return The icon that should be displayed for the given archive file
-     *         if it's open/expanded in the view.
-     *         If {@code null} is returned, a default icon should be displayed.
-     */
-    public @CheckForNull Icon getOpenIcon(FsModel model) {
-        return null;
-    }
-
-    /**
-     * Returns the icon that should be displayed for the given archive file
-     * if it's closed/collapsed in the view.
-     * <p>
-     * The implementation in the abstract class {@code FsArchiveDriver} simply
-     * returns {@code null}.
-     *
-     * @param  model the file system model.
-     * @return The icon that should be displayed for the given archive file
-     *         if it's closed/collapsed in the view.
-     *         If {@code null} is returned, a default icon should be displayed.
-     */
-    public @CheckForNull Icon getClosedIcon(FsModel model) {
-        return null;
-    }
 }

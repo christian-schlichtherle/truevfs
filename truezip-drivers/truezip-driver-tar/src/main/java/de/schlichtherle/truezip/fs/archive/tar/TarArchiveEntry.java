@@ -15,15 +15,19 @@
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
-import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
-import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
-import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
+import de.schlichtherle.truezip.entry.Entry.Access;
+import static de.schlichtherle.truezip.entry.Entry.Access.*;
+import de.schlichtherle.truezip.entry.Entry.Size;
+import static de.schlichtherle.truezip.entry.Entry.Size.*;
+import de.schlichtherle.truezip.entry.Entry.Type;
+import static de.schlichtherle.truezip.entry.Entry.Type.*;
 import de.schlichtherle.truezip.fs.archive.FsArchiveEntry;
 import de.schlichtherle.truezip.socket.IOPool.Entry;
 import de.schlichtherle.truezip.util.Pool.Releasable;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import org.apache.tools.tar.TarEntry;
 
@@ -39,7 +43,7 @@ public class TarArchiveEntry
 extends TarEntry
 implements FsArchiveEntry, Releasable<IOException> {
 
-    private Entry<?> temp;
+    private @CheckForNull Entry<?> temp;
 
     public TarArchiveEntry(final String name) {
         super(name, true);
@@ -62,11 +66,11 @@ implements FsArchiveEntry, Releasable<IOException> {
         super.setGroupName(template.getGroupName());
     }
 
-    Entry<?> getTemp() {
+    @Nullable Entry<?> getTemp() {
         return temp;
     }
 
-    void setTemp(Entry<?> temp) {
+    void setTemp(@CheckForNull Entry<?> temp) {
         this.temp = temp;
     }
 

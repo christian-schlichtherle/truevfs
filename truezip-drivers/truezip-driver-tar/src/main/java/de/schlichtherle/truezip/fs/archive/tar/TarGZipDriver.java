@@ -15,9 +15,17 @@
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
+import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.fs.FsController;
+import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsModel;
+import de.schlichtherle.truezip.fs.FsOutputOption;
+import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import java.util.zip.Deflater;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
+import de.schlichtherle.truezip.socket.OutputSocket;
+import de.schlichtherle.truezip.util.BitField;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -61,6 +69,18 @@ public class TarGZipDriver extends TarDriver {
      */
     public final int getLevel() {
         return Deflater.BEST_COMPRESSION;
+    }
+
+    /**
+     * Sets {@link FsOutputOption#STORE} in {@code options} before
+     * forwarding the call to {@code controller}.
+     */
+    @Override
+    public OutputSocket<?> getOutputSocket( FsController<?> controller,
+                                            FsEntryName name,
+                                            BitField<FsOutputOption> options,
+                                            @CheckForNull Entry template) {
+        return controller.getOutputSocket(name, options.set(STORE), template);
     }
 
     @Override

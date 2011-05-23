@@ -49,7 +49,7 @@ import net.jcip.annotations.NotThreadSafe;
  * to get the concept of how this works.
  * 
  * @param   <E> The type of the archive entries.
- * @see     http://truezip.java.net/FAQ.html
+ * @see     <a href="http://truezip.java.net/FAQ.html">Frequently Asked Questions</a>
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -456,6 +456,7 @@ implements Iterable<FsCovariantEntry<E>> {
      * happen, however.
      */
     private final class PathLink implements FsArchiveFileSystemOperation<E> {
+        final boolean createParents;
         final BitField<FsOutputOption> options;
         final SegmentLink<E>[] links;
         long time = -1;
@@ -465,16 +466,18 @@ implements Iterable<FsCovariantEntry<E>> {
                     final BitField<FsOutputOption> options,
                     @CheckForNull final Entry template)
         throws FsArchiveFileSystemException {
-            this.options = options;
-            links = newSegmentLinks(path, type, template, 1);
+            // Consume FsOutputOption.CREATE_PARENTS.
+            this.createParents = options.get(CREATE_PARENTS);
+            this.options = options.clear(CREATE_PARENTS);
+            links = newSegmentLinks(1, path, type, template);
         }
 
         @SuppressWarnings({ "unchecked", "all" })
         private SegmentLink<E>[] newSegmentLinks(
+                final int level,
                 final String entryName,
                 final Entry.Type entryType,
-                @CheckForNull final Entry template,
-                final int level)
+                @CheckForNull final Entry template)
         throws FsArchiveFileSystemException {
             splitter.split(entryName);
             final String parentPath = splitter.getParentPath(); // could equal ROOT_PATH
@@ -494,9 +497,9 @@ implements Iterable<FsCovariantEntry<E>> {
                 newEntry.putEntry(entryType,
                         newEntryChecked(entryName, entryType, options, template));
                 elements[1] = new SegmentLink<E>(memberName, newEntry);
-            } else if (options.get(CREATE_PARENTS)) {
+            } else if (createParents) {
                 elements = newSegmentLinks(
-                        parentPath, DIRECTORY, null, level + 1);
+                        level + 1, parentPath, DIRECTORY, null);
                 newEntry = new FsCovariantEntry<E>(entryName);
                 newEntry.putEntry(entryType,
                         newEntryChecked(entryName, entryType, options, template));
