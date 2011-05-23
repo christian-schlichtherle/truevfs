@@ -402,7 +402,7 @@ extends FsDecoratingController< FsConcurrentModel,
 
         @Override
         public Set<Type> getTypes() {
-            return null;
+            return FILE_TYPE_SET;
         }
     } // CacheEntry
 }
