@@ -31,7 +31,6 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.io.File;
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 import net.jcip.annotations.Immutable;
@@ -51,14 +50,6 @@ class FileEntry extends FsEntry implements IOEntry<FileEntry> {
 
     private static final BitField<FsOutputOption> NO_OUTPUT_OPTIONS
             = BitField.noneOf(FsOutputOption.class);
-    private static final Set<Type>
-            FILE_SET = Collections.unmodifiableSet(EnumSet.of(FILE));
-    private static final Set<Type>
-            DIRECTORY_SET = Collections.unmodifiableSet(EnumSet.of(DIRECTORY));
-    private static final Set<Type>
-            SPECIAL_SET = Collections.unmodifiableSet(EnumSet.of(SPECIAL));
-    private static final Set<Type>
-            EMPTY_SET = Collections.unmodifiableSet(EnumSet.noneOf(Type.class));
 
     private final File file;
     private final EntryName name;
@@ -86,15 +77,16 @@ class FileEntry extends FsEntry implements IOEntry<FileEntry> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public final Set<Type> getTypes() {
         if (file.isFile())
-            return FILE_SET;
+            return FILE_TYPE_SET;
         else if (file.isDirectory())
-            return DIRECTORY_SET;
+            return DIRECTORY_TYPE_SET;
         else if (file.exists())
-            return SPECIAL_SET;
+            return SPECIAL_TYPE_SET;
         else
-            return EMPTY_SET;
+            return Collections.EMPTY_SET;
     }
 
     @Override
@@ -132,8 +124,7 @@ class FileEntry extends FsEntry implements IOEntry<FileEntry> {
         final String[] list = file.list();
         return null == list
                 ? null
-                : Collections.unmodifiableSet(
-                    new HashSet<String>(Arrays.asList(list)));
+                : new HashSet<String>(Arrays.asList(list));
     }
 
     @Override

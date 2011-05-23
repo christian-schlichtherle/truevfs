@@ -126,13 +126,13 @@ public class FsArchiveFileSystemTest {
         for (final String[] params : paramss) {
             final String aen = params[0];
             final Type type = aen.endsWith(SEPARATOR) ? DIRECTORY : FILE;
-            final MockArchiveEntry entry = driver.newEntry(aen, type, null);
-            assertEquals(aen, entry.getName());
+            final MockArchiveEntry ae = driver.newEntry(aen, type, null);
+            assertEquals(aen, ae.getName());
             container   .new Output()
-                        .getOutputSocket(entry)
+                        .getOutputSocket(ae)
                         .newOutputStream()
                         .close();
-            assertSame(entry, container.getEntry(aen));
+            assertSame(ae, container.getEntry(aen));
         }
         assertEquals(paramss.length, container.getSize());
 
@@ -151,20 +151,21 @@ public class FsArchiveFileSystemTest {
 
             // Test if a file system entry for any given name is present.
             for (int i = 1; i < params.length; i++) {
-                final String fsen = params[i];
-                if (null == fsen)
+                final String cen = params[i];
+                if (null == cen)
                     continue;
                 final FsEntryName entryName = new FsEntryName(
-                        new UriBuilder().path(fsen).getUri());
-                assertEquals(fsen, entryName.getPath());
-                assertEquals(fsen, fileSystem.getEntry(entryName).getName());
+                        new UriBuilder().path(cen).getUri());
+                assertEquals(cen, entryName.getPath());
+                assertEquals(cen, fileSystem.getEntry(entryName).getName());
             }
 
             // Test if an archive entry with a name matching path is present when iterating
             // the file system.
-            for (FsArchiveFileSystemEntry<MockArchiveEntry> entry : fileSystem)
-                if (aen.equals(entry.getEntry().getName()))
-                    continue params;
+            for (FsCovariantEntry<MockArchiveEntry> ce : fileSystem)
+                for (MockArchiveEntry ae : ce.getEntries())
+                    if (aen.equals(ae.getName()))
+                        continue params;
             assert false : "No entry found with this name: " + aen;
         }
     }

@@ -18,8 +18,7 @@ package de.schlichtherle.truezip.fs.archive;
 import de.schlichtherle.truezip.util.Link;
 
 /**
- * Represents an operation on a chain of one or more archive file system
- * entries.
+ * Represents an operation on a chain of one or more archive entries.
  * The operation is run by its {@link #run} method and the head of the
  * chain can be obtained by its {@link #getTarget} method.
  * <p>
@@ -34,7 +33,7 @@ import de.schlichtherle.truezip.util.Link;
  * @version $Id$
  */
 interface FsArchiveFileSystemOperation<E extends FsArchiveEntry>
-extends Link<FsArchiveFileSystemEntry<E>> {
+extends Link<FsCovariantEntry<E>> {
 
     /** Executes this archive file system operation. */
     void run() throws FsArchiveFileSystemException;

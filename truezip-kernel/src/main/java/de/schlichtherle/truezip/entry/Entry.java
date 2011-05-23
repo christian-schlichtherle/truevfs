@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.entry;
 
+import static de.schlichtherle.truezip.entry.Entry.Type.*;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Collections;
@@ -27,6 +28,13 @@ import java.util.Set;
  * <p>
  * In general, if a property has an unknown value, its getter method must
  * return the value {@link #UNKNOWN} or {@code null} respectively.
+ * <p>
+ * Some constants of this interface are unmodifiable sets of enums.
+ * These are convenient to use for loops like this:
+ * <pre><code>
+ * for (Type type : ALL_TYPE_SET)
+ *     ...;
+ * </code></pre>
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -94,31 +102,18 @@ public interface Entry {
         SPECIAL
     }
 
-    /**
-     * An unmodifiable set of all enums in {@link Type}.
-     * This is convenient to use for loops like this:
-     * <pre><code>
-     * for (Type type : TYPE_SET)
-     *     ...;
-     * </code></pre>
-     */
-    Set<Type> TYPE_SET = Collections.unmodifiableSet(EnumSet.allOf(Type.class));
+    /** An unmodifiable set of just {@link Type#FILE}. */
+    Set<Type> FILE_TYPE_SET = Collections.unmodifiableSet(EnumSet.of(FILE));
 
-    /**
-     * Returns an unmodifiable set of types implemented by this entry.
-     * Note that some file system types allow an entry to implement multiple
-     * entry types!
-     * <p>
-     * For example, a ZIP or TAR file may contain a file entry with the name
-     * {@code foo} and a directory entry with the name {@code foo/}.
-     * Yes, this is strange, but shit happens!
-     * In this case then, a virtual file system should collapse this into one
-     * file system entry which returns {@code true} for both
-     * {@code isType(FILE)} and {@code isType(DIRECTORY)}.
-     * 
-     * @return An unmodifiable set of types implemented by this entry.
-     */
-    Set<Type> getTypes();
+    /** An unmodifiable set of just {@link Type#DIRECTORY}. */
+    Set<Type> DIRECTORY_TYPE_SET = Collections.unmodifiableSet(EnumSet.of(DIRECTORY));
+    /** An unmodifiable set of just {@link Type#SYMLINK}. */
+    Set<Type> SYMLINK_TYPE_SET = Collections.unmodifiableSet(EnumSet.of(SYMLINK));
+    /** An unmodifiable set of just {@link Type#SPECIAL}. */
+    Set<Type> SPECIAL_TYPE_SET = Collections.unmodifiableSet(EnumSet.of(SPECIAL));
+    
+    /** An unmodifiable set of all enums in {@link Type}. */
+    Set<Type> ALL_TYPE_SET = Collections.unmodifiableSet(EnumSet.allOf(Type.class));
 
     /** Defines the type of size information for an entry. */
     enum Size {
@@ -126,15 +121,8 @@ public interface Entry {
         STORAGE
     }
 
-    /**
-     * An unmodifiable set of all enums in {@link Size}.
-     * This is convenient to use for loops like this:
-     * <pre><code>
-     * for (Size size : SIZE_SET)
-     *     ...;
-     * </code></pre>
-     */
-    Set<Size> SIZE_SET = Collections.unmodifiableSet(EnumSet.allOf(Size.class));
+    /** An unmodifiable set of all enums in {@link Size}. */
+    Set<Size> ALL_SIZE_SET = Collections.unmodifiableSet(EnumSet.allOf(Size.class));
 
     /**
      * Returns the size of this entry.
@@ -152,15 +140,8 @@ public interface Entry {
         READ, // TODO: This is not yet fully supported!
     }
 
-    /**
-     * An unmodifiable set of all enums in {@link Access}.
-     * This is convenient to use for loops like this:
-     * <pre><code>
-     * for (Access access : ACCESS_SET)
-     *     ...;
-     * </code></pre>
-     */
-    Set<Access> ACCESS_SET = Collections.unmodifiableSet(EnumSet.allOf(Access.class));
+    /** An unmodifiable set of all enums in {@link Access}. */
+    Set<Access> ALL_ACCESS_SET = Collections.unmodifiableSet(EnumSet.allOf(Access.class));
 
     /**
      * Returns the last access time of this entry.

@@ -24,10 +24,6 @@ import de.schlichtherle.truezip.zip.DateTimeConverter;
 import de.schlichtherle.truezip.zip.ZipEntry;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.Iterator;
-import java.util.Set;
 
 /**
  * An adapter class to make the {@link ZipEntry} class implement the
@@ -40,11 +36,6 @@ import java.util.Set;
 @DefaultAnnotation(NonNull.class)
 public class ZipArchiveEntry extends ZipEntry implements FsArchiveEntry {
 
-    private static final Set<Type>
-            FILE_SET = Collections.unmodifiableSet(EnumSet.of(FILE));
-    private static final Set<Type>
-            DIRECTORY_SET = Collections.unmodifiableSet(EnumSet.of(DIRECTORY));
-
     ZipArchiveEntry(String name) {
         super(name);
     }
@@ -54,8 +45,8 @@ public class ZipArchiveEntry extends ZipEntry implements FsArchiveEntry {
     }
 
     @Override
-    public Set<Type> getTypes() {
-        return isDirectory() ? DIRECTORY_SET : FILE_SET;
+    public Type getType() {
+        return isDirectory() ? DIRECTORY : FILE;
     }
 
     @Override
@@ -107,15 +98,10 @@ public class ZipArchiveEntry extends ZipEntry implements FsArchiveEntry {
     public String toString() {
         final StringBuilder s = new StringBuilder(getClass().getName())
                 .append("[name=").append(getName())
-                .append(",type=");//.append(BitField.copyOf(getTypes()));
-        for (Iterator<Type> i = getTypes().iterator(); i.hasNext(); ) {
-            s.append(i.next());
-            if (i.hasNext())
-                s.append('|');
-        }
-        for (Size type : SIZE_SET)
+                .append(",type=").append(getType());
+        for (Size type : ALL_SIZE_SET)
             s.append(",size(").append(type).append(")=").append(getSize(type));
-        for (Access type : ACCESS_SET)
+        for (Access type : ALL_ACCESS_SET)
             s.append(",time(").append(type).append(")=").append(getTime(type));
         return s.append("]").toString();
     }

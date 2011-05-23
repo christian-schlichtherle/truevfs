@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.fs.archive;
 
 import de.schlichtherle.truezip.entry.Entry;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
@@ -29,7 +30,15 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public interface FsArchiveEntry extends Entry {
+
+    /**
+     * Returns the type of this archive entry.
+     *
+     * @return The type of this archive entry.
+     */
+    Type getType();
 
     /**
      * Sets the size of this archive entry.
@@ -44,7 +53,7 @@ public interface FsArchiveEntry extends Entry {
      * @throws IllegalArgumentException if {@code value} is negative and not
      *         {@value de.schlichtherle.truezip.entry.Entry#UNKNOWN}.
      */
-    boolean setSize(@NonNull Size type, long value);
+    boolean setSize(Size type, long value);
 
     /**
      * Sets the last access time of this archive entry.
@@ -59,5 +68,5 @@ public interface FsArchiveEntry extends Entry {
      * @throws IllegalArgumentException if {@code value} is negative and not
      *         {@value de.schlichtherle.truezip.entry.Entry#UNKNOWN}.
      */
-    boolean setTime(@NonNull Access type, long value);
+    boolean setTime(Access type, long value);
 }

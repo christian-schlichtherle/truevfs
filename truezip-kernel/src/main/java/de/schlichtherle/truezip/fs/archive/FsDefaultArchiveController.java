@@ -177,7 +177,7 @@ extends FsFileSystemArchiveController<E> {
             // file, but we may create it automatically.
             final FsArchiveFileSystem<E> fileSystem
                     = newArchiveFileSystem(driver);
-            final FsArchiveFileSystemEntry<E> root
+            final FsCovariantEntry<E> root
                     = fileSystem.getEntry(ROOT);
             // This may fail if e.g. the container file is an RAES
             // encrypted ZIP file and the user cancels password
@@ -240,7 +240,7 @@ extends FsFileSystemArchiveController<E> {
                         final @CheckForNull Access intention)
     throws FsSyncException, FsException {
         final FsArchiveFileSystem<E> fileSystem;
-        final FsArchiveFileSystemEntry<E> entry;
+        final FsCovariantEntry<E> entry;
         if (null == (fileSystem = getFileSystem())
                 || null == (entry = fileSystem.getEntry(name)))
             return false;
@@ -428,31 +428,32 @@ extends FsFileSystemArchiveController<E> {
             final OutputService<E> output,
             final ExceptionHandler<IOException, X> handler)
     throws X {
-        for (final FsArchiveFileSystemEntry<E> fse : fileSystem) {
-            final E ae = fse.getEntry();
-            final String aen = ae.getName();
-            if (null != output.getEntry(aen))
-                continue; // we have already written this entry
-            try {
-                if (fse.isType(DIRECTORY)) {
-                    if (isRoot(fse.getName()))
-                        continue; // never write the root directory
-                    if (UNKNOWN == fse.getTime(Access.WRITE))
-                        continue; // never write ghost directories
-                    output.getOutputSocket(ae).newOutputStream().close();
-                } else if (null != input.getEntry(aen)) {
-                    IOSocket.copy(  input.getInputSocket(aen),
-                                    output.getOutputSocket(ae));
-                } else {
-                    // The file system entry is a newly created non-directory
-                    // entry which hasn't received any content yet.
-                    // Write an empty file system entry now as a marker in
-                    // order to recreate the file system entry when the file
-                    // system gets remounted from the container archive file.
-                    output.getOutputSocket(ae).newOutputStream().close();
+        for (final FsCovariantEntry<E> ce : fileSystem) {
+            for (final E ae : ce.getEntries()) {
+                final String aen = ae.getName();
+                if (null != output.getEntry(aen))
+                    continue; // we have already written this entry
+                try {
+                    if (DIRECTORY == ae.getType()) {
+                        if (isRoot(ce.getName()))
+                            continue; // never write the root directory, but preserve covariant root files
+                        if (UNKNOWN == ae.getTime(Access.WRITE))
+                            continue; // never write ghost directories
+                        output.getOutputSocket(ae).newOutputStream().close();
+                    } else if (null != input.getEntry(aen)) {
+                        IOSocket.copy(  input.getInputSocket(aen),
+                                        output.getOutputSocket(ae));
+                    } else {
+                        // The file system entry is a newly created non-directory
+                        // entry which hasn't received any content yet.
+                        // Write an empty file system entry now as a marker in
+                        // order to recreate the file system entry when the file
+                        // system gets remounted from the container archive file.
+                        output.getOutputSocket(ae).newOutputStream().close();
+                    }
+                } catch (IOException ex) {
+                    handler.warn(ex);
                 }
-            } catch (IOException ex) {
-                handler.warn(ex);
             }
         }
     }

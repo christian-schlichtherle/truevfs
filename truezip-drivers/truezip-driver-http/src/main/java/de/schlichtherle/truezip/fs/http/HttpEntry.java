@@ -37,7 +37,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.Set;
 import net.jcip.annotations.Immutable;
 
@@ -54,10 +53,6 @@ final class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
 
     private static final BitField<FsOutputOption> NO_OUTPUT_OPTIONS
             = BitField.noneOf(FsOutputOption.class);
-    private static final Set<Type>
-            FILE_SET = Collections.unmodifiableSet(EnumSet.of(FILE));
-    private static final Set<Type>
-            EMPTY_SET = Collections.unmodifiableSet(EnumSet.noneOf(Type.class));
 
     private HttpController controller;
     private final EntryName name;
@@ -97,12 +92,13 @@ final class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Set<Type> getTypes() {
         try {
             getConnection();
-            return FILE_SET;
+            return FILE_TYPE_SET;
         } catch (IOException failure) {
-            return EMPTY_SET;
+            return Collections.EMPTY_SET;
         }
     }
 

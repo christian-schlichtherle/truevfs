@@ -153,9 +153,9 @@ implements EntryContainer<MockArchiveEntry> {
                             try {
                                 super.close();
                             } finally {
-                                for (Size type : SIZE_SET)
+                                for (Size type : ALL_SIZE_SET)
                                     entry.setSize(type, io.getSize(type));
-                                for (Access type : ACCESS_SET)
+                                for (Access type : ALL_ACCESS_SET)
                                     entry.setTime(type, io.getTime(type));
                             }
                         }

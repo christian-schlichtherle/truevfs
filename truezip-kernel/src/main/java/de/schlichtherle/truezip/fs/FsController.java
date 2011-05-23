@@ -82,6 +82,18 @@ public abstract class FsController<M extends FsModel> {
     public abstract boolean isReadOnly()
     throws IOException;
 
+    /**
+     * Returns a file system entry or {@code null} if no file system entry
+     * exists for the given name.
+     * Modifying the returned object graph is either not supported (i.e. throws
+     * an {@link UnsupportedOperationException}) or does not show any
+     * effect on the file system.
+     * 
+     * @param  name the name of the file system entry to look up.
+     * @return A file system entry or {@code null} if no file system entry
+     *         exists for the given name.
+     * @throws IOException on any I/O error.
+     */
     public abstract @CheckForNull FsEntry getEntry(FsEntryName name)
     throws IOException;
 

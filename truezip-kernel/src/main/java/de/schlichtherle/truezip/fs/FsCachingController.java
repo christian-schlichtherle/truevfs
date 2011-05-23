@@ -393,12 +393,16 @@ extends FsDecoratingController< FsConcurrentModel,
     private static class CacheEntry extends FsDecoratingEntry<Entry> {
         CacheEntry(Entry entry) {
             super(entry);
-            assert entry.getTypes().contains(FILE);
         }
 
         @Override
         public Set<String> getMembers() {
             return null;
         }
-    } // ProxyFileSystemEntry
+
+        @Override
+        public Set<Type> getTypes() {
+            return null;
+        }
+    } // CacheEntry
 }
