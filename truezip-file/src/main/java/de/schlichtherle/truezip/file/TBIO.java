@@ -49,10 +49,9 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 final class TBIO {
 
     private static final BitField<FsInputOption>
-            NONEOF_INPUT_OPTIONS = BitField.noneOf(FsInputOption.class);
-
+            NO_INPUT_OPTIONS = BitField.noneOf(FsInputOption.class);
     private static final BitField<FsOutputOption>
-            NONEOF_OUTPUT_OPTIONS = BitField.noneOf(FsOutputOption.class);
+            NO_OUTPUT_OPTIONS = BitField.noneOf(FsOutputOption.class);
 
     /** You cannot instantiate this class. */
     private TBIO() {
@@ -227,9 +226,9 @@ final class TBIO {
     private static void
     cp0(final boolean preserve, final File src, final File dst)
     throws IOException {
-        final InputSocket<?> input = getInputSocket(src, NONEOF_INPUT_OPTIONS);
+        final InputSocket<?> input = getInputSocket(src, NO_INPUT_OPTIONS);
         final OutputSocket<?> output = getOutputSocket(dst,
-                NONEOF_OUTPUT_OPTIONS.set(CREATE_PARENTS, TFile.isLenient()),
+                NO_OUTPUT_OPTIONS.set(CREATE_PARENTS, TFile.isLenient()),
                 preserve ? input.getLocalTarget() : null);
         IOSocket.copy(input, output);
     }

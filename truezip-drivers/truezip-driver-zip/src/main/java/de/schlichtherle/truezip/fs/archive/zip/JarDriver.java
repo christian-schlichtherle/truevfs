@@ -17,7 +17,9 @@ package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
+import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -54,9 +56,9 @@ public class JarDriver extends ZipDriver {
     @Override
     public JarArchiveEntry newEntry(String path,
                                     Type type,
-                                    @CheckForNull Entry template)
+                                    @CheckForNull Entry template, BitField<FsOutputOption> mknod)
     throws CharConversionException {
-        return (JarArchiveEntry) super.newEntry(path, type, template);
+        return (JarArchiveEntry) super.newEntry(path, type, template, mknod);
     }
 
     @Override

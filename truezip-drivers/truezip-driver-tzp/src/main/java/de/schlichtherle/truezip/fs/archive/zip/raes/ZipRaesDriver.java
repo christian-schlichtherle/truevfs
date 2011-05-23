@@ -15,43 +15,44 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip.raes;
 
-import de.schlichtherle.truezip.key.KeyManager;
-import edu.umd.cs.findbugs.annotations.NonNull;
-import de.schlichtherle.truezip.key.KeyProvider;
-import de.schlichtherle.truezip.key.PromptingKeyProvider;
-import de.schlichtherle.truezip.crypto.raes.param.KeyManagerRaesParameters;
-import de.schlichtherle.truezip.fs.FsModel;
-import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.socket.LazyOutputSocket;
-import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
-import de.schlichtherle.truezip.socket.OutputSocket;
-import de.schlichtherle.truezip.socket.DecoratingInputSocket;
-import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.socket.InputSocket;
-import de.schlichtherle.truezip.socket.InputShop;
-import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.crypto.raes.RaesOutputStream;
 import de.schlichtherle.truezip.crypto.raes.RaesParameters;
 import de.schlichtherle.truezip.crypto.raes.RaesReadOnlyFile;
 import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
-import de.schlichtherle.truezip.socket.OutputShop;
-import de.schlichtherle.truezip.fs.archive.zip.JarDriver;
+import de.schlichtherle.truezip.crypto.raes.param.KeyManagerRaesParameters;
+import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.entry.Entry.Type;
+import de.schlichtherle.truezip.fs.FsController;
+import de.schlichtherle.truezip.fs.FsModel;
+import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.fs.archive.zip.JarArchiveEntry;
+import de.schlichtherle.truezip.fs.archive.zip.JarDriver;
 import de.schlichtherle.truezip.fs.archive.zip.ZipArchiveEntry;
 import de.schlichtherle.truezip.fs.archive.zip.ZipInputShop;
+import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.key.KeyManagerProvider;
+import de.schlichtherle.truezip.key.KeyProvider;
+import de.schlichtherle.truezip.key.PromptingKeyProvider;
+import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.socket.DecoratingInputSocket;
+import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
+import de.schlichtherle.truezip.socket.InputShop;
+import de.schlichtherle.truezip.socket.InputSocket;
+import de.schlichtherle.truezip.socket.LazyOutputSocket;
+import de.schlichtherle.truezip.socket.OutputShop;
+import de.schlichtherle.truezip.socket.OutputSocket;
+import de.schlichtherle.truezip.util.BitField;
+import static de.schlichtherle.truezip.zip.ZipEntry.*;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import net.jcip.annotations.Immutable;
-
-import static de.schlichtherle.truezip.zip.ZipEntry.*;
 
 /**
  * An abstract archive driver which builds RAES encrypted ZIP files
@@ -133,9 +134,10 @@ public abstract class ZipRaesDriver extends JarDriver {
     public final JarArchiveEntry
     newEntry(   final String path,
                 final Type type,
-                final @CheckForNull Entry template)
+                final @CheckForNull Entry template,
+                final BitField<FsOutputOption> mknod)
     throws CharConversionException {
-        final JarArchiveEntry entry = super.newEntry(path, type, template);
+        final JarArchiveEntry entry = super.newEntry(path, type, template, NO_OUTPUT_OPTION);
         if (DEFLATED != entry.getMethod()) {
             // Enforce deflation for enhanced authentication security.
             entry.setMethod(DEFLATED);

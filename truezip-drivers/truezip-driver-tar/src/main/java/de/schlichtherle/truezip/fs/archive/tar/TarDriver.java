@@ -15,18 +15,22 @@
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
-import de.schlichtherle.truezip.fs.FsModel;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriver;
 import de.schlichtherle.truezip.entry.Entry;
+import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
+import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 import de.schlichtherle.truezip.entry.Entry.Type;
+import de.schlichtherle.truezip.fs.FsModel;
+import de.schlichtherle.truezip.fs.FsOutputOption;
+import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriver;
 import de.schlichtherle.truezip.fs.archive.FsMultiplexedArchiveOutputShop;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
-import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.socket.InputSocket;
+import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.OutputSocket;
+import de.schlichtherle.truezip.util.BitField;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.CharConversionException;
 import java.io.IOException;
@@ -34,9 +38,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import net.jcip.annotations.Immutable;
-
-import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
-import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 
 /**
  * An archive driver which builds Tape Archive files (TAR).
@@ -67,10 +68,11 @@ public class TarDriver extends FsCharsetArchiveDriver<TarArchiveEntry> {
     }
 
     @Override
-    public TarArchiveEntry newEntry(
+    protected TarArchiveEntry newEntry(
             String name,
             final Type type,
-            final Entry template)
+            final Entry template,
+            final BitField<FsOutputOption> mknod)
     throws CharConversionException {
         assertEncodable(name);
         name = toZipOrTarEntryName(name, type);
