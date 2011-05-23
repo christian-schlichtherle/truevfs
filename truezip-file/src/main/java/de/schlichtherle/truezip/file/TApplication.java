@@ -96,7 +96,7 @@ public abstract class TApplication<E extends Exception> {
      * This would ensure it's run exactly only once and not on every call to
      * {@link #run}.
      * <p>
-     * The implementation in the class {@link TApplication} does nothing.
+     * The implementation in the class {@link TApplication} does nothing!
      * 
      * <h3>Examples</h3>
      * <p>

@@ -39,7 +39,7 @@ import java.util.ResourceBundle;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class Decrypt extends CommandLineUtility {
+public class Decrypt extends Application {
 
     private static final String CLASS_NAME = Decrypt.class.getName();
     private static final ResourceBundle resources

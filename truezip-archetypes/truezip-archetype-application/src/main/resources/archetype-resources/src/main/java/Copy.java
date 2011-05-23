@@ -18,7 +18,6 @@
  */
 package ${package};
 
-import de.schlichtherle.truezip.file.TApplication;
 import de.schlichtherle.truezip.file.TFile;
 import java.io.IOException;
 
@@ -38,7 +37,7 @@ import java.io.IOException;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class Copy extends TApplication<IOException> {
+public class Copy extends Application<IOException> {
 
     public static void main(String[] args) throws IOException {
         System.exit(new Copy().run(args));

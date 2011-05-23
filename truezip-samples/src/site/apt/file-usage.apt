@@ -186,10 +186,9 @@ Committing Unsynchronized Changes To The Contents Of Archive Files
     the class
     <<<de.schlichtherle.truezip.kernel.fs.FsStatisticsManager>>>.
     Please check the Javadoc for the TrueZIP Kernel module class
-    <<<de.schlichtherle.truezip.kernel.fs.sl.FsManagerLocator>>> or the TrueZIP
-    Sample module class
-    <<<de.schlichtherle.truezip.sample.file.app.CommandLineUtility>>> to see
-    how to instrument the kernel to use the class
+    <<<de.schlichtherle.truezip.kernel.fs.sl.FsManagerLocator>>> or the class
+    <<<de.schlichtherle.truezip.sample.file.app.Application>>> in the TrueZIP
+    Samples module to see how to instrument the kernel to use the class
     <<<de.schlichtherle.truezip.kernel.fs.FsStatisticsManager>>>.
 
 * Third Party Access

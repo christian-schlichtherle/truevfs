@@ -94,7 +94,7 @@
             <groupId>de.schlichtherle.truezip</groupId>
             <artifactId>truezip-driver-tzp</artifactId>
             <version>${truezip.version}</version>
-            <scope>runtime</scope>
+            <!--scope>runtime</scope-->
         </dependency>
 
         <!-- This driver provides access to the following URI schemes and

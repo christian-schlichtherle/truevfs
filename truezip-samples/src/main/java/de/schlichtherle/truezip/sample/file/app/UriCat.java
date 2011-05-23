@@ -33,7 +33,7 @@ import java.net.URISyntaxException;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class UriCat extends CommandLineUtility {
+public class UriCat extends Application {
 
     /** Equivalent to {@code System.exit(new CatPath().run(args));}. */
     public static void main(String[] args) throws FsSyncException {

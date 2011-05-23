@@ -35,7 +35,7 @@ import java.text.MessageFormat;
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-abstract class CommandLineUtility extends TApplication<RuntimeException> {
+abstract class Application extends TApplication<RuntimeException> {
 
     /** The print stream for standard output. */
     protected final PrintStream out;
@@ -48,10 +48,10 @@ abstract class CommandLineUtility extends TApplication<RuntimeException> {
 
     /**
      * Equivalent to
-     * {@link #CommandLineUtility(OutputStream, OutputStream, boolean)
-     * CommandLineUtility(System.out, System.err, true)}.
+     * {@link #Application(OutputStream, OutputStream, boolean)
+     * Application(System.out, System.err, true)}.
      */
-    protected CommandLineUtility() {
+    protected Application() {
         this(System.out, System.err, true);
     }
 
@@ -74,7 +74,7 @@ abstract class CommandLineUtility extends TApplication<RuntimeException> {
      *        then they are wrapped in a new {@code PrintStream} with
      *        this as the additional constructor parameter.
      */
-    protected CommandLineUtility(
+    protected Application(
             final OutputStream out,
             final OutputStream err,
             final boolean autoFlush) {
@@ -104,11 +104,13 @@ abstract class CommandLineUtility extends TApplication<RuntimeException> {
      *     created whenever required?
      * </ul>
      * <p>
-     * The implementation in the class {@link CommandLineUtility} configures
+     * The implementation in the class {@link Application} configures
      * the type of the feedback when prompting the user for keys for RAES
-     * encrypted ZIP files using the Swing based prompting key manager.
+     * encrypted ZIP alias ZIP.RAES alias TZP files by the Swing based
+     * prompting key manager.
      * If this JVM is running in headless mode, then this configuration is
-     * ignored.
+     * ignored and the user is prompted by the console I/O based prompting
+     * key manager.
      */
     @Override
     protected void setup() {

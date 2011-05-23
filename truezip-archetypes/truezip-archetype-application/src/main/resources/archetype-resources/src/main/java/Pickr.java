@@ -18,7 +18,6 @@
  */
 package ${package};
 
-import de.schlichtherle.truezip.file.TApplication;
 import de.schlichtherle.truezip.file.swing.TFileChooser;
 import javax.swing.SwingUtilities;
 
@@ -33,7 +32,7 @@ import javax.swing.SwingUtilities;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class Pickr extends TApplication<Exception> {
+public class Pickr extends Application<Exception> {
 
     /** Equivalent to {@code System.exit(new Pickr().run(args));}. */
     public static void main(String[] args) throws Exception {
