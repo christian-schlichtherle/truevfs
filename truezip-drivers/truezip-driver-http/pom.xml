@@ -27,6 +27,7 @@
     </parent>
 
     <artifactId>truezip-driver-http</artifactId>
+
     <name>TrueZIP Driver HTTP(S)</name>
     <description>
         The file system driver for the HTTP(S) scheme.

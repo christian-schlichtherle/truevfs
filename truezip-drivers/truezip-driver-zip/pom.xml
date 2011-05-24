@@ -27,6 +27,7 @@
     </parent>
 
     <artifactId>truezip-driver-zip</artifactId>
+
     <name>TrueZIP Driver ZIP</name>
     <description>
         The file system driver family for ZIP and related archive file types.

@@ -28,6 +28,7 @@
 
     <artifactId>truezip-archetype</artifactId>
     <packaging>pom</packaging>
+
     <name>TrueZIP Archetype</name>
     <description>TrueZIP Maven archetypes.</description>
 
