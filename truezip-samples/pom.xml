@@ -27,6 +27,7 @@
     </parent>
 
     <artifactId>truezip-samples</artifactId>
+
     <name>TrueZIP Samples</name>
     <description>
         Sample applications to demonstrate the usage of various TrueZIP module

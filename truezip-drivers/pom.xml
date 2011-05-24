@@ -28,6 +28,7 @@
 
     <artifactId>truezip-driver</artifactId>
     <packaging>pom</packaging>
+
     <name>TrueZIP Driver</name>
     <description>Pluggable file system drivers.</description>
 

@@ -27,6 +27,7 @@
     </parent>
 
     <artifactId>truezip-kernel</artifactId>
+
     <name>TrueZIP Kernel</name>
     <description>
         This module implements virtual file systems for contents from

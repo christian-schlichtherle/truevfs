@@ -27,6 +27,7 @@
     </parent>
 
     <artifactId>truezip-swing</artifactId>
+
     <name>TrueZIP Swing</name>
     <description>
         General Swing GUI classes.

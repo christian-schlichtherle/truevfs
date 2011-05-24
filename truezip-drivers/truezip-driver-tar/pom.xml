@@ -27,6 +27,7 @@
     </parent>
 
     <artifactId>truezip-driver-tar</artifactId>
+
     <name>TrueZIP Driver TAR</name>
     <description>
         The file system driver family for TAR and related archive file types.

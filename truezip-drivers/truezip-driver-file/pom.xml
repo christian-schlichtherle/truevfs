@@ -27,6 +27,7 @@
     </parent>
 
     <artifactId>truezip-driver-file</artifactId>
+
     <name>TrueZIP Driver FILE</name>
     <description>
         The file system driver for the FILE scheme.

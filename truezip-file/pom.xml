@@ -27,6 +27,7 @@
     </parent>
 
     <artifactId>truezip-file</artifactId>
+
     <name>TrueZIP File*</name>
     <description>
         This module provides uniform, transparent, thread-safe,

@@ -27,6 +27,7 @@
     </parent>
 
     <artifactId>truezip-driver-tzp</artifactId>
+
     <name>TrueZIP Driver ZIP.RAES (TZP)</name>
     <description>
         The file system driver family for RAES encrypted ZIP alias
