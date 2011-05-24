@@ -1,0 +1,85 @@
+    -----------------------
+    Key Features
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+Key Features
+
+    [Easy To Use]
+        The API of the {{{./truezip-file/index.html}TrueZIP File*}} module
+        provides convenient read/write access to archive files as if they were
+        just plain directories in a file system path.
+        Using the classes
+        {{{./apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}},
+        {{{./apidocs/de/schlichtherle/truezip/file/TFileInputStream.html}<<<TFileInputStream>>>}},
+        {{{./apidocs/de/schlichtherle/truezip/file/TFileOutputStream.html}<<<TFileOutputStream>>>}}
+        et al, you can instantly access ZIP files, TAR files and their
+        relatives or your own custom archive file format.
+
+    [Fast Bulk I/O]
+        The API of the {{{./truezip-file/index.html}TrueZIP File*}} module
+        provides convenient and powerful methods for fast bulk I/O operations
+        like recursive copying, moving or deleting of directory trees and files.
+        For example, by using the multi-threaded method
+        {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#cat(java.io.InputStream, java.io.OutputStream)}<<<TFile.cat(InputStream, OutputStream)>>>}},
+        you'll never have to write a naive read-then-write loop again.
+
+    [File System Federation]
+        TrueZIP supports virtual file system federation.
+        This enables an application to access archive files within any other
+        virtual file systems, e.g. you could read the contents of a ZIP file
+        which is accessed via HTTP(S) instead of reading it from a file.
+        Archive files may also be nested, i.e. contained in another archive
+        file.
+
+    [Modular Architecture]
+        TrueZIP's architecture is split into separate modules for the
+        {{{./truezip-kernel/index.html}TrueZIP Kernel}},
+        a set of File System Drivers and some user APIs like e.g. the
+        {{{./truezip-file/index.html}TrueZIP File*}} module.
+        Each module is implemented as a JAR.
+        To configure the set of file system types which shall be accessible by
+        the application, you simply add the desired file system driver JARs
+        to the application's run time class path.
+
+    [Pluggable File System Driver Architecture]
+        TrueZIP supports any virtual file system type via its pluggable
+        {{{./apidocs/de/schlichtherle/truezip/fs/FsDriver.html}file system driver}}
+        architecture.
+        TrueZIP ships with file system drivers for the file system schemes
+        FILE, HTTP(S), ZIP, TAR and their relatives like JAR, TGZ, TBZ2 etc.
+
+    [Encrypted Archive File Format]
+        The {{{./truezip-driver-tzp/index.html}TrueZIP Driver TZP}} module
+        provides support for TrueZIP's custom encrypted ZIP.RAES (or TZP for
+        short) file format.
+        A TZP file is a ZIP file with UTF-8 character set which is wrapped in
+        a RAES file envelope.
+        RAES is TrueZIP's custom Random Access Encryption Specification which
+        supports SHA-256 authentication and AES-256 decryption in CTR block
+        mode for transparent, read/write access to its encrypted payload.
+        By using CTR mode, RAES supports transparent <random> read access to
+        its encrypted payload, which makes reading a TZP pretty fast.
+
+    [ZIP64 Support]
+        The {{{./truezip-driver-zip/index.html}TrueZIP Driver ZIP}} module
+        provides read/write support for ZIP64 files.
+        This is fully transparent, so the application does not have to do
+        anything - even when using the class
+        {{{./apidocs/de/schlichtherle/truezip/zip/ZipOutputStream.html}<<<ZipOutputStream>>>}}
+        directly.
+
+    [Thread-Safe]
+        Multiple threads can read and write the same archive file at the same
+        time.
+
+    [Robust]
+        TrueZIP recognizes false positive archive files, so it cannot
+        get confused by an arbitrary file which inadvertenly uses a suffix of
+        a supported archive file type.
+        TrueZIP code uses assertions, JUnit tests and static code analysis
+        tools like FindBugs and JDepend in order to achieve its high
+        reliability standards.
+
+    []
