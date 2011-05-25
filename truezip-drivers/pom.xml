@@ -40,6 +40,18 @@
         <module>truezip-driver-zip</module>
     </modules>
 
+    <profiles>
+        <profile>
+            <id>truezip-driver-file-jse7</id>
+            <activation>
+                <jdk>1.7</jdk>
+            </activation>
+            <modules>
+                <module>truezip-driver-file-jse7</module>
+            </modules>
+        </profile>
+    </profiles>
+
     <dependencyManagement>
         <dependencies>
             <dependency>

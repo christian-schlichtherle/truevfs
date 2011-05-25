@@ -41,7 +41,7 @@ public interface FsArchiveEntry extends Entry {
     Type getType();
 
     /**
-     * Sets the size of this archive entry.
+     * Sets the size of the given type for this archive entry.
      *
      * @param  type the size type.
      * @param  value the size of the given size type for this archive entry in
@@ -56,7 +56,7 @@ public interface FsArchiveEntry extends Entry {
     boolean setSize(Size type, long value);
 
     /**
-     * Sets the last access time of this archive entry.
+     * Sets the last access time of the given type for this archive entry.
      *
      * @param  type the access type.
      * @param  value the last time of the given access type for this archive

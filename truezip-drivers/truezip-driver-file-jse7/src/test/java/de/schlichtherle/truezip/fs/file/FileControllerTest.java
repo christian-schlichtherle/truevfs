@@ -15,11 +15,14 @@
  */
 package de.schlichtherle.truezip.fs.file;
 
-import java.io.InputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.RandomAccessFile;
+import java.nio.file.Files;
+import static java.nio.file.Files.*;
+import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.junit.Test;
@@ -42,28 +45,22 @@ public class FileControllerTest {
      */
     @Test
     public void testIsWritableOrCreatable() throws IOException {
-        final File file = File.createTempFile("tzp-test", null);
+        final Path file = createTempFile("tzp-test", null);
         boolean result = isCreatableOrWritable(file);
         assertTrue(result);
         boolean total = true;
-        final InputStream in = new FileInputStream(file);
-        try {
+        try (InputStream in = newInputStream(file)) {
             result = isCreatableOrWritable(file);
             total &= result;
-        } finally {
-            in.close();
         }
         if (!result)
             logger.finer("Overwriting a file which has an open FileInputStream is not tolerated!");
         final String[] modes = { "r", "rw", "rws", "rwd" };
         for (int i = 0, l = modes.length; i < l; i++) {
             final String mode = modes[i];
-            final RandomAccessFile raf = new RandomAccessFile(file, mode);
-            try {
+            try (RandomAccessFile raf = new RandomAccessFile(file.toFile(), mode)) {
                 result = isCreatableOrWritable(file);
                 total &= result;
-            } finally {
-                raf.close();
             }
             if (!result)
                 logger.log(Level.FINER, "Overwriting a file which has an open RandomAccessFile in \"{0}\" mode is not tolerated!", mode);
@@ -72,7 +69,6 @@ public class FileControllerTest {
             logger.finer(
                     "Applications should ALWAYS close their streams or you may face strange 'errors'.\n"
                     + "Note that this issue is NOT AT ALL specific to TrueZIP, but rather imposed by this platform!");
-
-        assertTrue(file.delete());
+        delete(file);
     }
 }

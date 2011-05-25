@@ -106,17 +106,34 @@ public abstract class FsController<M extends FsModel> {
     public abstract void setReadOnly(FsEntryName name)
     throws IOException;
 
+    /**
+     * Makes an attempt to set the last access time of all types in the given
+     * bit field for the file system entry with the given name.
+     * If {@code false} is returned or an {@link IOException} is thrown, then
+     * still some of the last access times may have been set.
+     * In other words, this is not an atomic operation if multiple access types
+     * are given.
+     * To make this operation atomic, set the last access time for a single
+     * type only.
+     * 
+     * @param  name the file system entry name.
+     * @param  types the access types
+     * @param  value the last access time.
+     * @return {@code true} if and only if setting the access time for all
+     *         types in {@code types} succeeded.
+     * @throws IOException on any I/O error.
+     */
     public abstract boolean setTime(FsEntryName name,
                                     BitField<Access> types,
                                     long value)
     throws IOException;
 
     /**
-     * Returns an input socket for reading the contents of the entry addressed
-     * by the given name from the file system.
+     * Returns an input socket for reading the contents of the file system
+     * entry addressed by the given name from the file system.
      *
-     * @param  name a file system entry name.
-     * @param  options a bit field of input options.
+     * @param  name the file system entry name.
+     * @param  options the input options.
      * @return An {@code InputSocket}.
      */
     public abstract InputSocket<?>

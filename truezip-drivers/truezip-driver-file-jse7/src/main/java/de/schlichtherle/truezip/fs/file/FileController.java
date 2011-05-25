@@ -37,6 +37,17 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
+import java.nio.channels.SeekableByteChannel;
+import java.nio.file.AccessDeniedException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.OpenOption;
+import static java.nio.file.Files.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.FileTime;
 import javax.swing.Icon;
 import net.jcip.annotations.ThreadSafe;
 
@@ -56,8 +67,14 @@ import static java.io.File.separatorChar;
 @DefaultAnnotation(NonNull.class)
 final class FileController extends FsController<FsModel>  {
 
+    private static final OpenOption[] RWD_OPTIONS = {
+        StandardOpenOption.READ,
+        StandardOpenOption.WRITE,
+        StandardOpenOption.DSYNC,
+    };
+
     private final FsModel model;
-    private final File target;
+    private final Path target;
 
     FileController(final FsModel model) {
         if (null != model.getParent())
@@ -79,7 +96,7 @@ final class FileController extends FsController<FsModel>  {
             }
         }
         this.model = model;
-        this.target = new File(uri);
+        this.target = Paths.get(uri);
     }
 
     @Override
@@ -110,18 +127,18 @@ final class FileController extends FsController<FsModel>  {
     @Override
     public FileEntry getEntry(FsEntryName name) throws IOException {
         FileEntry entry = new FileEntry(target, name);
-        return entry.getFile().exists() ? entry : null;
+        return exists(entry.getPath()) ? entry : null;
     }
 
     @Override
     public boolean isReadable(FsEntryName name) throws IOException {
-        File file = new File(target, name.getPath());
-        return file.canRead();
+        Path file = target.resolve(name.getPath());
+        return Files.isReadable(file);
     }
 
     @Override
     public boolean isWritable(FsEntryName name) throws IOException {
-        File file = new File(target, name.getPath());
+        Path file = target.resolve(name.getPath());
         return isCreatableOrWritable(file);
     }
 
@@ -131,83 +148,88 @@ final class FileController extends FsController<FsModel>  {
      * restored to its previous state afterwards.
      * This is a much stronger test than {@link File#canWrite()}.
      */
-    static boolean isCreatableOrWritable(final File file) {
+    static boolean isCreatableOrWritable(final Path file) {
         try {
-            if (file.createNewFile()) {
-                return isCreatableOrWritable(file) && file.delete();
-            } else if (file.canWrite()) {
-                // Some operating and file system combinations make File.canWrite()
-                // believe that the file is writable although it's not.
-                // We are not that gullible, so let's test this...
-                final long time = file.lastModified();
-                if (time < 0) {
-                    // lastModified() may return negative values but setLastModified()
-                    // throws an IAE for negative values, so we are conservative.
-                    // See issue #18.
-                    return false;
-                }
-                if (!file.setLastModified(time + 1)) {
-                    // This may happen on Windows and normally means that
-                    // somebody else has opened this file
-                    // (regardless of read or write mode).
-                    // Be conservative: We don't allow writing to this file!
-                    return false;
-                }
-                boolean ok;
+            try {
+                createFile(file);
                 try {
-                    // Open the file for reading and writing, requiring any
-                    // update to its contents to be written to the filesystem
-                    // synchronously.
-                    // As Dr. Simon White from Catalysoft, Cambridge, UK
-                    // reported, "rws" does NOT work on Mac OS X with Apple's
-                    // Java 1.5 Release 1 (equivalent to Sun's Java 1.5.0_02),
-                    // however it DOES work with Apple's Java 1.5 Release 3.
-                    // He also confirmed that "rwd" works on Apple's
-                    // Java 1.5 Release 1, so we use this instead.
-                    // Thank you very much for spending the time to fix this
-                    // issue, Dr. White!
-                    final RandomAccessFile
-                            raf = new RandomAccessFile(file, "rwd");
+                    return isCreatableOrWritable(file);
+                } finally {
+                    delete(file);
+                }
+            } catch (FileAlreadyExistsException ex) {
+                if (Files.isWritable(file)) {
+                    // Some operating and file system combinations make File.canWrite()
+                    // believe that the file is writable although it's not.
+                    // We are not that gullible, so let's test this...
+                    final long time = getLastModifiedTime(file).toMillis();
+                    if (0 > time) {
+                        // lastModified() may return negative values but setLastModified()
+                        // throws an IAE for negative values, so we are conservative.
+                        // See issue #18.
+                        return false;
+                    }
                     try {
-                        final boolean empty;
-                        int octet = raf.read();
-                        if (octet == -1) {
-                            octet = 0; // assume first byte is 0
-                            empty = true;
-                        } else {
-                            empty = false;
-                        }
-                        // Let's test if we can overwrite the first byte.
-                        // See issue #29.
-                        raf.seek(0);
-                        raf.write(octet);
-                        try {
-                            // Rewrite original content and check success.
-                            raf.seek(0);
-                            final int check = raf.read();
-                            // This should always return true unless the storage
-                            // device is faulty.
-                            ok = octet == check;
-                        } finally {
-                            if (empty)
-                                raf.setLength(0);
+                        setLastModifiedTime(file, FileTime.fromMillis(time + 1));
+                    } catch (IOException ex2) {
+                        // This may happen on Windows and normally means that
+                        // somebody else has opened this file
+                        // (regardless of read or write mode).
+                        // Be conservative: We don't allow writing to this file!
+                        return false;
+                    }
+                    boolean ok;
+                    try {
+                        // Open the file for reading and writing, requiring any
+                        // update to its contents to be written to the filesystem
+                        // synchronously.
+                        try (final SeekableByteChannel
+                                raf = newByteChannel(file, RWD_OPTIONS)) {
+                            final ByteBuffer buf = ByteBuffer.allocate(1);
+                            final boolean empty;
+                            byte octet;
+                            if (-1 == raf.read(buf)) {
+                                octet = (byte) 0; // assume first byte is 0
+                                empty = true;
+                            } else {
+                                octet = buf.get(0);
+                                empty = false;
+                            }
+                            // Let's test if we can overwrite the first byte.
+                            // See issue #29.
+                            raf.position(0);
+                            buf.rewind();
+                            raf.write(buf);
+                            try {
+                                // Rewrite original content and check success.
+                                raf.position(0);
+                                buf.rewind();
+                                raf.read(buf);
+                                final byte check = buf.get(0);
+                                // This should always return true unless the storage
+                                // device is faulty.
+                                ok = octet == check;
+                            } finally {
+                                if (empty)
+                                    raf.truncate(0);
+                            }
                         }
                     } finally {
-                        raf.close();
+                        try {
+                            setLastModifiedTime(file, FileTime.fromMillis(time));
+                        } catch (IOException ex2) {
+                            // This may happen on Windows and normally means that
+                            // somebody else has opened this file meanwhile
+                            // (regardless of read or write mode).
+                            // Be conservative: We don't allow (further) writing to
+                            // this file!
+                            ok = false;
+                        }
                     }
-                } finally {
-                    if (!file.setLastModified(time)) {
-                        // This may happen on Windows and normally means that
-                        // somebody else has opened this file meanwhile
-                        // (regardless of read or write mode).
-                        // Be conservative: We don't allow (further) writing to
-                        // this file!
-                        ok = false;
-                    }
+                    return ok;
+                } else { // if (!Files.isWritable(file)) {
+                    return false;
                 }
-                return ok;
-            } else { // if (!file.canWrite()) {
-                return false;
             }
         } catch (IOException ex) {
             return false;
@@ -216,10 +238,11 @@ final class FileController extends FsController<FsModel>  {
 
     @Override
     public void setReadOnly(FsEntryName name) throws IOException {
-        final File file = new File(target, name.getPath());
-        if (!file.setReadOnly())
-            if (file.exists()) // just guessing here
-                throw new IOException(file + " (access denied)");
+        Path file = target.resolve(name.getPath());
+        // TODO: Check NIO.2 method.
+        if (file.toFile().setReadOnly())
+            if (exists(file)) // just guessing here
+                throw new AccessDeniedException(file.toString());
             else
                 throw new FileNotFoundException(file.toString());
     }
@@ -227,10 +250,13 @@ final class FileController extends FsController<FsModel>  {
     @Override
     public boolean setTime(FsEntryName name, BitField<Access> types, long value)
     throws IOException {
-        final File file = new File(target, name.getPath());
+        final Path file = target.resolve(name.getPath());
         boolean ok = true;
         for (final Access type : types)
-            ok &= WRITE == type ? file.setLastModified(value) : false;
+            if (WRITE == type)
+                setLastModifiedTime(file, FileTime.fromMillis(value));
+            else
+                ok = false;
         return ok;
     }
 
@@ -255,20 +281,17 @@ final class FileController extends FsController<FsModel>  {
                         final BitField<FsOutputOption> options,
                         final @CheckForNull Entry template)
     throws IOException {
-        final File file = new File(target, name.getPath());
+        final Path file = target.resolve(name.getPath());
         switch (type) {
             case FILE:
-                if (options.get(EXCLUSIVE)) {
-                    if (!file.createNewFile())
-                        throw new IOException(file + " (file exists already)");
-                } else {
-                    new FileOutputStream(file).close();
-                }
+                if (options.get(EXCLUSIVE))
+                    createFile(file);
+                else
+                    newOutputStream(file).close();
                 break;
 
             case DIRECTORY:
-                if (!file.mkdir())
-                    throw new IOException(file + " (directory exists already)");
+                createDirectory(file);
                 break;
 
             default:
@@ -276,17 +299,16 @@ final class FileController extends FsController<FsModel>  {
         }
         if (null != template) {
             final long time = template.getTime(WRITE);
-            if (UNKNOWN != time && !file.setLastModified(time))
-                throw new IOException(file + " (cannot set last modification time)");
+            if (UNKNOWN != time)
+                setLastModifiedTime(file, FileTime.fromMillis(time));
         }
     }
 
     @Override
     public void unlink(FsEntryName name)
     throws IOException {
-        final File file = new File(target, name.getPath());
-        if (!file.delete())
-            throw new IOException(file + " (cannot delete)");
+        Path file = target.resolve(name.getPath());
+        delete(file);
     }
 
     @Override
