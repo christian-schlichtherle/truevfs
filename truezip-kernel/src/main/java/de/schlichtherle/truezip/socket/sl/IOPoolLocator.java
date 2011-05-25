@@ -67,34 +67,42 @@ public final class IOPoolLocator implements IOPoolProvider {
      */
     @Override
     public IOPool<?> get() {
-        return Holder.SERVICE.get();
+        return Init.SERVICE.get();
     }
 
     /** A static data utility class used for lazy initialization. */
-    private static class Holder {
+    private static class Init {
         static final IOPoolService SERVICE;
         static {
-            IOPoolService service;
+            final Logger
+                    logger = Logger.getLogger(  IOPoolLocator.class.getName(),
+                                                IOPoolLocator.class.getName());
             final ServiceLocator locator = new ServiceLocator(
                     IOPoolLocator.class.getClassLoader());
-            service = locator.getService(IOPoolService.class, null);
+            IOPoolService service = locator.getService(IOPoolService.class, null);
             if (null == service) {
-                final Iterator<IOPoolService>
-                        i = locator.getServices(IOPoolService.class);
-                if (i.hasNext())
+                IOPoolService oldService = null;
+                for (   final Iterator<IOPoolService>
+                            i = locator.getServices(IOPoolService.class);
+                        i.hasNext();
+                        oldService = service) {
                     service = i.next();
-                else
-                    throw new ServiceConfigurationError(
-                            "No provider available for " + IOPoolService.class);
+                    logger.log(Level.CONFIG, "located", service);
+                    if (null != oldService
+                            && oldService.getPriority() > service.getPriority())
+                        service = oldService;
+                }
             }
-            Logger  .getLogger( IOPoolLocator.class.getName(),
-                                IOPoolLocator.class.getName())
-                    .log(Level.CONFIG, "located", service);
+            if (null != service)
+                logger.log(Level.CONFIG, "provided", service);
+            else
+                throw new ServiceConfigurationError(
+                        "No provider available for " + IOPoolService.class);
             SERVICE = service;
         }
 
         /** You cannot instantiate this class. */
-        Holder() {
+        Init() {
         }
     } // class Holder
 }

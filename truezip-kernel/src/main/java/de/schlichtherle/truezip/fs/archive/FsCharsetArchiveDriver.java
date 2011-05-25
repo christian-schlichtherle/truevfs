@@ -130,6 +130,8 @@ extends FsArchiveDriver<E> {
                 .append(getCharset())
                 .append(",federated=")
                 .append(isFederated())
+                .append(",priority=")
+                .append(getPriority())
                 .append(']')
                 .toString();
     }
