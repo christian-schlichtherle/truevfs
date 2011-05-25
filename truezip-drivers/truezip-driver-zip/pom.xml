@@ -47,9 +47,5 @@
             <artifactId>truezip-file</artifactId>
             <type>test-jar</type>
         </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truezip-driver-file</artifactId>
-        </dependency>
     </dependencies>
 </project>

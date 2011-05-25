@@ -52,15 +52,42 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-        <!-- Without this run-time dependency an application couldn't resolve
-             the file scheme in URIs like "zip:file:/archive.zip!/entry" etc. -->
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truezip-driver-file</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.netbeans</groupId>
             <artifactId>jemmy</artifactId>
         </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>truezip-driver-file</id>
+            <activation>
+                <jdk>(,1.7)</jdk>
+            </activation>
+            <dependencies>
+                <!-- Without this run-time dependency an application couldn't
+                     resolve the file scheme in URIs like
+                     "zip:file:/archive.zip!/entry" etc. -->
+                <dependency>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>truezip-driver-file</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>truezip-driver-file-jse7</id>
+            <activation>
+                <jdk>1.7</jdk>
+            </activation>
+            <dependencies>
+                <!-- Without this run-time dependency an application couldn't
+                     resolve the file scheme in URIs like
+                     "zip:file:/archive.zip!/entry" etc. -->
+                <dependency>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>truezip-driver-file-jse7</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 </project>

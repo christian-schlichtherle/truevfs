@@ -15,23 +15,27 @@
  */
 package de.schlichtherle.truezip.fs.file;
 
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.socket.IOEntry;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.entry.Entry;
+import static de.schlichtherle.truezip.entry.Entry.Size.*;
 import de.schlichtherle.truezip.entry.EntryName;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
-import java.util.Arrays;
+import java.io.IOException;
 import java.util.Collections;
-import java.io.File;
-import java.util.HashSet;
+import java.lang.reflect.UndeclaredThrowableException;
+import java.nio.file.DirectoryStream;
+import static java.nio.file.Files.*;
+import java.nio.file.Path;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import net.jcip.annotations.Immutable;
 
@@ -39,7 +43,7 @@ import static de.schlichtherle.truezip.entry.Entry.Type.*;
 import static de.schlichtherle.truezip.entry.Entry.Access.*;
 
 /**
- * Adapts a {@link File} instance to a {@link FsEntry}.
+ * Adapts a {@link Path} instance to a {@link FsEntry}.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -51,24 +55,24 @@ public class FileEntry extends FsEntry implements IOEntry<FileEntry> {
     private static final BitField<FsOutputOption> NO_OUTPUT_OPTIONS
             = BitField.noneOf(FsOutputOption.class);
 
-    private final File file;
+    private final Path path;
     private final EntryName name;
 
-    FileEntry(final File file) {
-        assert null != file;
-        this.file = file;
-        this.name = EntryName.create(file.getName());
+    FileEntry(final Path path) {
+        assert null != path;
+        this.path = path;
+        this.name = EntryName.create(path.getFileName().toUri());
     }
 
-    FileEntry(final File file, final FsEntryName name) {
-        assert null != file;
-        this.file = new File(file, name.getPath());
+    FileEntry(final Path path, final FsEntryName name) {
+        assert null != path;
+        this.path = path.resolve(name.getPath());
         this.name = name;
     }
 
     /** Returns the decorated file. */
-    final File getFile() {
-        return file;
+    final Path getPath() {
+        return path;
     }
 
     @Override
@@ -79,11 +83,11 @@ public class FileEntry extends FsEntry implements IOEntry<FileEntry> {
     @Override
     @SuppressWarnings("unchecked")
     public final Set<Type> getTypes() {
-        if (file.isFile())
+        if (isRegularFile(path))
             return FILE_TYPE_SET;
-        else if (file.isDirectory())
+        else if (isDirectory(path))
             return DIRECTORY_TYPE_SET;
-        else if (file.exists())
+        else if (exists(path))
             return SPECIAL_TYPE_SET;
         else
             return Collections.EMPTY_SET;
@@ -93,11 +97,11 @@ public class FileEntry extends FsEntry implements IOEntry<FileEntry> {
     public final boolean isType(final Type type) {
         switch (type) {
         case FILE:
-            return file.isFile();
+            return isRegularFile(path);
         case DIRECTORY:
-            return file.isDirectory();
+            return isDirectory(path);
         case SPECIAL:
-            return file.exists() && !file.isFile() && !file.isDirectory();
+            return exists(path) && !isRegularFile(path) && !isDirectory(path);
         default:
             return false;
         }
@@ -105,26 +109,38 @@ public class FileEntry extends FsEntry implements IOEntry<FileEntry> {
 
     @Override
     public final long getSize(final Size type) {
-        switch (type) {
-            case DATA:
-            case STORAGE:
-                return file.exists() ? file.length() : UNKNOWN;
-            default:
-                return UNKNOWN;
+        try {
+            return (DATA == type || STORAGE == type) && exists(path)
+                    ? size(path)
+                    : UNKNOWN;
+        } catch (IOException ex) {
+            throw new UndeclaredThrowableException(ex);
         }
     }
 
     @Override
     public final long getTime(Access type) {
-        return WRITE == type && file.exists() ? file.lastModified() : UNKNOWN;
+        try {
+            return WRITE == type && exists(path)
+                    ? getLastModifiedTime(path).toMillis()
+                    : UNKNOWN;
+        } catch (IOException ex) {
+            throw new UndeclaredThrowableException(ex);
+        }
     }
 
     @Override
     public final @Nullable Set<String> getMembers() {
-        final String[] list = file.list();
-        return null == list
-                ? null
-                : new HashSet<String>(Arrays.asList(list));
+        if (!isDirectory(path))
+            return null;
+        final Set<String> result = new LinkedHashSet<>();
+        try (final DirectoryStream<Path> stream = newDirectoryStream(path)) {
+            for (final Path member : stream)
+                result.add(member.toString());
+        } catch (IOException ex) {
+            throw new UndeclaredThrowableException(ex);
+        }
+        return result;
     }
 
     @Override

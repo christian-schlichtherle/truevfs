@@ -25,11 +25,15 @@ import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import static java.nio.file.Files.*;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.FileTime;
 import net.jcip.annotations.ThreadSafe;
 
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
@@ -48,6 +52,10 @@ import static de.schlichtherle.truezip.entry.Entry.*;
 final class FileOutputSocket extends OutputSocket<FileEntry> {
 
     private static final String FILE_POOL_PREFIX = ".tzp";
+    private static final StandardOpenOption[] 
+            NO_STANDARD_OPEN_OPTION = { };
+    private static final StandardOpenOption[]
+            APPEND_STANDARD_OPEN_OPTION = { StandardOpenOption.APPEND };
 
     private final                  FileEntry                entry;
     private final                  BitField<FsOutputOption> options;
@@ -69,7 +77,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
         return null != pool
                 ? pool
                 : (this.pool = new TempFilePool(FILE_POOL_PREFIX, null,
-                                                entry.getFile().getParentFile()));
+                                                entry.getPath().getParent()));
     }
 
     @Override
@@ -78,24 +86,35 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
     }
 
     @SuppressWarnings("unchecked")
-	@Override
+    @Override
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
     public OutputStream newOutputStream() throws IOException {
-        final File entryFile = entry.getFile();
-        if (options.get(EXCLUSIVE) && entryFile.exists())
+        final Path entryFile = entry.getPath();
+        if (options.get(EXCLUSIVE) && exists(entryFile))
             throw new IOException(entryFile + " (file exists already)"); // this is obviously not atomic
         if (options.get(CREATE_PARENTS))
-            entryFile.getParentFile().mkdirs();
-        final FileEntry temp = options.get(CACHE) && !entryFile.createNewFile()
+            createDirectories(entryFile.getParent());
+        FileAlreadyExistsException exists = null;
+        if (options.get(CACHE)) {
+            try {
+                createFile(entryFile);
+            } catch (FileAlreadyExistsException ex) {
+                exists = ex;
+            }
+        }
+        final FileEntry temp = null != exists
                 ? getTempFilePool().allocate()
                 : entry;
-        final File tempFile = temp.getFile();
+        final Path tempFile = temp.getPath();
 
         class OutputStream extends DecoratingOutputStream {
             boolean closed;
 
-            OutputStream() throws FileNotFoundException {
-                super(new FileOutputStream(tempFile, options.get(APPEND))); // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
+            OutputStream() throws IOException {
+                super(newOutputStream(tempFile,
+                        options.get(APPEND)
+                            ? APPEND_STANDARD_OPEN_OPTION
+                            : NO_STANDARD_OPEN_OPTION));
             }
 
             @Override
@@ -110,10 +129,13 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
                         if (temp != entry) {
                             IOException cause = null;
                             try {
-                                if (!tempFile.renameTo(entryFile)
-                                        && (!entryFile.delete() || !tempFile.renameTo(entryFile)))
-                                    IOSocket.copy(  temp.getInputSocket(),
-                                                    entry.getOutputSocket());
+                                try {
+                                    move(tempFile, entryFile,
+                                            StandardCopyOption.REPLACE_EXISTING);
+                                } catch (IOException ex) {
+                                    Files.copy(tempFile, entryFile,
+                                            StandardCopyOption.REPLACE_EXISTING);
+                                }
                             } catch (IOException ex) {
                                 throw cause = ex;
                             } finally {
@@ -128,9 +150,9 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
                         final Entry template = FileOutputSocket.this.template;
                         if (null != template) {
                             final long time = template.getTime(WRITE);
-                            if (UNKNOWN != time
-                                    && !entryFile.setLastModified(time))
-                                throw new IOException(entryFile + " (cannot preserve last modification time)");
+                            if (UNKNOWN != time)
+                                Files.setLastModifiedTime(
+                                        entryFile, FileTime.fromMillis(time));
                         }
                     }
                 }

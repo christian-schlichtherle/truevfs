@@ -125,7 +125,7 @@ public interface Entry {
     Set<Size> ALL_SIZE_SET = Collections.unmodifiableSet(EnumSet.allOf(Size.class));
 
     /**
-     * Returns the size of this entry.
+     * Returns the size of the given type for this entry.
      * This method may not be meaningful for non-{@link Type#FILE} entries.
      *
      * @param type the type of the size to return.
@@ -144,7 +144,7 @@ public interface Entry {
     Set<Access> ALL_ACCESS_SET = Collections.unmodifiableSet(EnumSet.allOf(Access.class));
 
     /**
-     * Returns the last access time of this entry.
+     * Returns the last access time of the given type for this entry
      *
      * @param type the type of the access time to return.
      * @return The last time of the given access type for this entry in
