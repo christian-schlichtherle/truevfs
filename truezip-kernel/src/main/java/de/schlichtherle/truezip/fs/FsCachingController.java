@@ -102,9 +102,9 @@ extends FsDecoratingController< FsConcurrentModel,
     throws IOException {
         final FsEntry entry;
         final EntryCache cache = caches.get(name);
-        return null != cache && null != (entry = cache.getEntry())
-                ? entry
-                : delegate.getEntry(name);
+        if (null != cache && (entry = cache.getEntry()) != null)
+            return entry;
+        return delegate.getEntry(name);
     }
 
     @Override
