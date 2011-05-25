@@ -16,9 +16,6 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <prerequisites>
-        <maven>3.0.3</maven>
-    </prerequisites>
 
     <parent>
         <groupId>de.schlichtherle.truezip</groupId>
@@ -65,7 +62,8 @@
                 <jdk>(,1.7)</jdk>
             </activation>
             <dependencies>
-                <!-- Without this run-time dependency an application couldn't
+                <!-- The file system driver for the file scheme in JSE 6.
+                     Without this run-time dependency an application couldn't
                      resolve the file scheme in URIs like
                      "zip:file:/archive.zip!/entry" etc. -->
                 <dependency>
@@ -77,10 +75,11 @@
         <profile>
             <id>truezip-driver-file-jse7</id>
             <activation>
-                <jdk>1.7</jdk>
+                <jdk>[1.7,)</jdk>
             </activation>
             <dependencies>
-                <!-- Without this run-time dependency an application couldn't
+                <!-- The file system driver for the file scheme in JSE 7+.
+                     Without this run-time dependency an application couldn't
                      resolve the file scheme in URIs like
                      "zip:file:/archive.zip!/entry" etc. -->
                 <dependency>

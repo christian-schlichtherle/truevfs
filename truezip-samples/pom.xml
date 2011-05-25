@@ -16,9 +16,6 @@
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <prerequisites>
-        <maven>3.0.3</maven>
-    </prerequisites>
 
     <parent>
         <groupId>de.schlichtherle.truezip</groupId>
@@ -77,16 +74,23 @@
              however because they configure and inject some drivers directly.
              -->
 
-        <!-- This driver provides access to the following URI schemes:
+        <!-- The file system driver for the file scheme in JSE 6.
+             This driver provides access to the following URI schemes:
              file: OS file system.
-             This dependency is already added by the TrueZIP File* module.
              -->
-        <!--dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truezip-driver-file</artifactId>
-            <version>${project.version}</version>
-            <scope>runtime</scope>
-        </dependency-->
+        </dependency>
+
+        <!-- The file system driver for the file scheme in JSE 7+.
+             This driver provides access to the following URI schemes:
+             file: OS file system.
+             -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truezip-driver-file-jse7</artifactId>
+        </dependency>
 
         <!-- This driver provides access to the following URI schemes:
              http|https: Hyper Text Transport protocol.

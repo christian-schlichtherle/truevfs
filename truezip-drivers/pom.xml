@@ -16,9 +16,6 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <prerequisites>
-        <maven>3.0.3</maven>
-    </prerequisites>
 
     <parent>
         <groupId>de.schlichtherle.truezip</groupId>
@@ -34,23 +31,12 @@
 
     <modules>
         <module>truezip-driver-file</module>
+        <module>truezip-driver-file-jse7</module>
         <module>truezip-driver-http</module>
         <module>truezip-driver-tar</module>
         <module>truezip-driver-tzp</module>
         <module>truezip-driver-zip</module>
     </modules>
-
-    <profiles>
-        <profile>
-            <id>truezip-driver-file-jse7</id>
-            <activation>
-                <jdk>1.7</jdk>
-            </activation>
-            <modules>
-                <module>truezip-driver-file-jse7</module>
-            </modules>
-        </profile>
-    </profiles>
 
     <dependencyManagement>
         <dependencies>

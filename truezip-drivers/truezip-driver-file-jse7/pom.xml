@@ -16,9 +16,6 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <prerequisites>
-        <maven>3.0.3</maven>
-    </prerequisites>
 
     <parent>
         <groupId>de.schlichtherle.truezip</groupId>
@@ -36,9 +33,4 @@
         dependency injection to the TrueZIP Kernel module or to the run-time
         class path for service location in the TrueZIP File* module.
     </description>
-
-    <properties>
-        <compiler.source>1.7</compiler.source>
-        <compiler.target>1.7</compiler.target>
-    </properties>
 </project>
