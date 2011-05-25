@@ -23,10 +23,11 @@ import de.schlichtherle.truezip.util.ServiceLocator;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.ServiceConfigurationError;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.jcip.annotations.Immutable;
@@ -57,21 +58,21 @@ public final class FsDriverLocator implements FsDriverProvider {
 
     @Override
     public Map<FsScheme, FsDriver> get() {
-        return Holder.DRIVERS;
+        return Init.DRIVERS;
     }
 
     /** A static data utility class used for lazy initialization. */
-    private static class Holder {
+    private static class Init {
         static final Map<FsScheme, FsDriver> DRIVERS;
         static {
-            Map<FsScheme, FsDriver> drivers;
             final Logger
                     logger = Logger.getLogger(  FsDriverLocator.class.getName(),
                                                 FsDriverLocator.class.getName());
             final Iterator<FsDriverService>
                     i = new ServiceLocator(FsDriverLocator.class.getClassLoader())
                         .getServices(FsDriverService.class);
-            drivers = new HashMap<FsScheme, FsDriver>();
+            final Map<FsScheme, FsDriver>
+                    sorted = new TreeMap<FsScheme, FsDriver>();
             if (!i.hasNext())
                 throw new ServiceConfigurationError(
                         "No provider available for " + FsDriverService.class);
@@ -81,19 +82,30 @@ public final class FsDriverLocator implements FsDriverProvider {
                 for (final Map.Entry<FsScheme, FsDriver> entry
                         : service.get().entrySet()) {
                     final FsScheme scheme = entry.getKey();
-                    final FsDriver driver = entry.getValue();
-                    if (null != scheme && null != driver) {
-                        drivers.put(scheme, driver);
-                        logger.log(Level.CONFIG, "mapped",
-                                new Object[] { scheme, driver });
+                    final FsDriver newDriver = entry.getValue();
+                    if (null != scheme && null != newDriver) {
+                        final FsDriver oldDriver = sorted.put(scheme, newDriver);
+                        if (null != oldDriver
+                                && oldDriver.getPriority() > newDriver.getPriority())
+                            sorted.put(scheme, oldDriver);
                     }
                 }
             }
-            DRIVERS = Collections.unmodifiableMap(drivers);
+            final Map<FsScheme, FsDriver>
+                    fast = new LinkedHashMap<FsScheme, FsDriver>(
+                        sorted.size() * 4 / 3 + 1);
+            for (final Map.Entry<FsScheme, FsDriver> entry : sorted.entrySet()) {
+                final FsScheme scheme = entry.getKey();
+                final FsDriver driver = entry.getValue();
+                logger.log(Level.CONFIG, "mapping",
+                        new Object[] { scheme, driver });
+                fast.put(scheme, driver);
+            }
+            DRIVERS = Collections.unmodifiableMap(fast);
         }
 
         /** You cannot instantiate this class. */
-        Holder() {
+        Init() {
         }
     } // class Holder
 }

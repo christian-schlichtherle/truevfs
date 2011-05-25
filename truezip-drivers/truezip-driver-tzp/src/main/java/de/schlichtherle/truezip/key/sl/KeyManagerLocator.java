@@ -64,28 +64,35 @@ public final class KeyManagerLocator implements KeyManagerProvider {
 
     @Override
     public <K> KeyManager<K> get(Class<K> type) {
-        return Holder.SERVICE.get(type);
+        return Init.SERVICE.get(type);
     }
 
     /** A static data utility class used for lazy initialization. */
-    private static class Holder {
+    private static class Init {
         static final KeyManagerService SERVICE;
         static {
-            KeyManagerService service;
             final Logger
                     logger = Logger.getLogger(  KeyManagerLocator.class.getName(),
                                                 KeyManagerLocator.class.getName());
             final ServiceLocator locator = new ServiceLocator(
                     KeyManagerLocator.class.getClassLoader());
-            service = locator.getService(KeyManagerService.class, null);
+            KeyManagerService
+                    service = locator.getService(KeyManagerService.class, null);
             if (null == service) {
-                final Iterator<KeyManagerService>
-                        i = locator.getServices(KeyManagerService.class);
-                if (i.hasNext())
+                KeyManagerService oldService = null;
+                for (   final Iterator<KeyManagerService>
+                            i = locator.getServices(KeyManagerService.class);
+                        i.hasNext();
+                        oldService = service) {
                     service = i.next();
+                    logger.log(Level.CONFIG, "located", service);
+                    if (null != oldService
+                            && oldService.getPriority() > service.getPriority())
+                        service = oldService;
+                }
             }
             if (null != service) {
-                logger.log(Level.CONFIG, "located", service);
+                logger.log(Level.CONFIG, "provided", service);
             } else {
                 service = new PromptingKeyManagerService();
                 logger.log(Level.CONFIG, "default", service);
@@ -94,7 +101,7 @@ public final class KeyManagerLocator implements KeyManagerProvider {
         }
 
         /** You cannot instantiate this class. */
-        Holder() {
+        Init() {
         }
     } // class Holder
 }

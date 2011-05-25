@@ -66,14 +66,13 @@ public final class FsManagerLocator implements FsManagerProvider {
 
     @Override
     public FsManager get() {
-        return Holder.MANAGER;
+        return Init.MANAGER;
     }
 
     /** A static data utility class used for lazy initialization. */
-    private static class Holder {
+    private static class Init {
         static final FsManager MANAGER;
         static {
-            FsManager manager;
             final Logger
                     logger = Logger.getLogger(  FsManagerLocator.class.getName(),
                                                 FsManagerLocator.class.getName());
@@ -82,13 +81,20 @@ public final class FsManagerLocator implements FsManagerProvider {
             FsManagerService
                     service = locator.getService(FsManagerService.class, null);
             if (null == service) {
-                final Iterator<FsManagerService>
-                        i = locator.getServices(FsManagerService.class);
-                if (i.hasNext())
+                FsManagerService oldService = null;
+                for (   final Iterator<FsManagerService>
+                            i = locator.getServices(FsManagerService.class);
+                        i.hasNext();
+                        oldService = service) {
                     service = i.next();
+                    logger.log(Level.CONFIG, "located", service);
+                    if (null != oldService
+                            && oldService.getPriority() > service.getPriority())
+                        service = oldService;
+                }
             }
+            FsManager manager;
             if (null != service) {
-                logger.log(Level.CONFIG, "located", service);
                 manager = service.get();
                 logger.log(Level.CONFIG, "provided", manager);
             } else {
@@ -99,7 +105,7 @@ public final class FsManagerLocator implements FsManagerProvider {
         }
 
         /** You cannot instantiate this class. */
-        Holder() {
+        Init() {
         }
     } // class Holder
 }

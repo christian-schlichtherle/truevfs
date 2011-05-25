@@ -31,11 +31,27 @@ import de.schlichtherle.truezip.socket.sl.IOPoolLocator;
 public abstract class IOPoolService implements IOPoolProvider {
 
     /**
+     * Returns a priority to help the I/O pool service locator.
+     * The higher number wins!
+     * 
+     * @return {@code 0}, as by the implementation in the class
+     *         {@link IOPoolService}.
+     */
+    public int getPriority() {
+        return 0;
+    }
+
+    /**
      * Returns a string representation of this object for debugging and logging
      * purposes.
      */
     @Override
     public String toString() {
-        return getClass().getName();
+        return new StringBuilder()
+                .append(getClass().getName())
+                .append("[priority=")
+                .append(getPriority())
+                .append(']')
+                .toString();
     }
 }

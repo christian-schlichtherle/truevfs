@@ -65,6 +65,17 @@ public abstract class FsDriver {
     }
 
     /**
+     * Returns a priority to help the file system driver service locator.
+     * The higher number wins!
+     * 
+     * @return {@code 0}, as by the implementation in the class
+     *         {@link FsDriver}.
+     */
+    public int getPriority() {
+        return 0;
+    }
+
+    /**
      * Returns a string representation of this object for debugging and logging
      * purposes.
      */
@@ -74,6 +85,8 @@ public abstract class FsDriver {
                 .append(getClass().getName())
                 .append("[federated=")
                 .append(isFederated())
+                .append(",priority=")
+                .append(getPriority())
                 .append(']')
                 .toString();
     }
