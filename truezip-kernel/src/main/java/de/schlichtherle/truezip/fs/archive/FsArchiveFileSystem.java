@@ -151,7 +151,8 @@ implements Iterable<FsCovariantEntry<E>> {
             throw new IllegalArgumentException();
         this.factory = driver;
         // Allocate some extra capacity to create missing parent directories.
-        final EntryTable<E> master = new EntryTable<E>((int) (archive.getSize() / .7f) + 1);
+        final EntryTable<E> master = new EntryTable<E>(
+                archive.getSize() * 4 / 3 + 1);
         // Load entries from input archive.
         final List<String> paths = new ArrayList<String>(archive.getSize());
         final Normalizer normalizer = new Normalizer(SEPARATOR_CHAR);
