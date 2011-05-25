@@ -200,14 +200,6 @@ extends FsDriver {
      * @param  input the input socket for reading the contents of the archive
      *         from its target.
      * @return A new input shop.
-     * @throws TabuFileException if the target archive file is temporarily not
-     *         accessible, e.g. if a key for decryption is currently not
-     *         available.
-     *         The client application will recognize the target archive file
-     *         as a <i>tabu file</i> until a subsequent repetition of this
-     *         method call succeeds.
-     *         A tabu file will not be accessible through the API although it
-     *         exists.
      * @throws FileNotFoundException if the target archive file does not exist
      *         or is (temporarily) not accessible.
      *         An exception of this type marks a <em>transient</em> cause,
