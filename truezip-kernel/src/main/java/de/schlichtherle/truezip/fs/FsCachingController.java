@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import java.io.InputStream;
 import de.schlichtherle.truezip.socket.IOCache.Strategy;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.entry.Entry;
@@ -134,6 +136,34 @@ extends FsDecoratingController< FsConcurrentModel,
             }
             return cache.configure(options).getInputSocket().bind(this);
         }
+
+        @Override
+        public Entry getLocalTarget() throws IOException {
+            // This is the same as the code in the super class, so overriding
+            // is redundant, but it makes the stack trace much easier to digest.
+            return getBoundSocket().getLocalTarget();
+        }
+
+        @Override
+        public Entry getPeerTarget() throws IOException {
+            // This is the same as the code in the super class, so overriding
+            // is redundant, but it makes the stack trace much easier to digest.
+            return getBoundSocket().getPeerTarget();
+        }
+
+        @Override
+        public ReadOnlyFile newReadOnlyFile() throws IOException {
+            // This is the same as the code in the super class, so overriding
+            // is redundant, but it makes the stack trace much easier to digest.
+            return getBoundSocket().newReadOnlyFile();
+        }
+
+        @Override
+        public InputStream newInputStream() throws IOException {
+            // This is the same as the code in the super class, so overriding
+            // is redundant, but it makes the stack trace much easier to digest.
+            return getBoundSocket().newInputStream();
+        }
     } // class Input
 
     @Override
@@ -180,6 +210,27 @@ extends FsDecoratingController< FsConcurrentModel,
                 }
             }
             return cache.configure(options, template).getOutputSocket().bind(this);
+        }
+
+        @Override
+        public Entry getLocalTarget() throws IOException {
+            // This is the same as the code in the super class, so overriding
+            // is redundant, but it makes the stack trace much easier to digest.
+            return getBoundSocket().getLocalTarget();
+        }
+
+        @Override
+        public Entry getPeerTarget() throws IOException {
+            // This is the same as the code in the super class, so overriding
+            // is redundant, but it makes the stack trace much easier to digest.
+            return getBoundSocket().getPeerTarget();
+        }
+
+        @Override
+        public OutputStream newOutputStream() throws IOException {
+            // This is the same as the code in the super class, so overriding
+            // is redundant, but it makes the stack trace much easier to digest.
+            return getBoundSocket().newOutputStream();
         }
     } // class Output
 
