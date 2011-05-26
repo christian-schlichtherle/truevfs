@@ -47,15 +47,15 @@ import net.jcip.annotations.ThreadSafe;
 @DefaultAnnotation(NonNull.class)
 final class HttpController extends FsController<FsModel>  {
 
-    private final HttpDriver driver;
     private final FsModel model;
+    private final HttpDriver driver;
 
     HttpController(final FsModel model, final HttpDriver driver) {
         if (null != model.getParent())
             throw new IllegalArgumentException();
+        this.model = model;
         assert null != driver;
         this.driver = driver;
-        this.model = model;
     }
 
     @Override
