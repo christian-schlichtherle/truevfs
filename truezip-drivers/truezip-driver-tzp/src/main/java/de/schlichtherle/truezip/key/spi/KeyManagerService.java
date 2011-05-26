@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.key.spi;
 
-import de.schlichtherle.truezip.key.*;
+import de.schlichtherle.truezip.key.KeyManagerProvider;
 import de.schlichtherle.truezip.key.sl.KeyManagerLocator;
 
 /**
@@ -26,13 +26,13 @@ import de.schlichtherle.truezip.key.sl.KeyManagerLocator;
  * Implementations must be thread-safe.
  *
  * @author Christian Schlichtherle
- * @version $Id: FsManagers$
+ * @version $Id$
  */
 public abstract class KeyManagerService implements KeyManagerProvider {
 
     /**
      * Returns a priority to help the key manager service locator.
-     * The higher number wins!
+     * The greater number wins!
      * 
      * @return {@code 0}, as by the implementation in the class
      *         {@link KeyManagerService}.

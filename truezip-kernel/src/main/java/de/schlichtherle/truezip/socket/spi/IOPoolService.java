@@ -32,7 +32,7 @@ public abstract class IOPoolService implements IOPoolProvider {
 
     /**
      * Returns a priority to help the I/O pool service locator.
-     * The higher number wins!
+     * The greater number wins!
      * 
      * @return {@code 0}, as by the implementation in the class
      *         {@link IOPoolService}.
