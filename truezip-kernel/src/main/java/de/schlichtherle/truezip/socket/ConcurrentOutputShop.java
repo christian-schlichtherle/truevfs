@@ -186,8 +186,8 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
                 synchronized (ConcurrentOutputShop.this) {
                     assertNotShopClosed();
                     return new SynchronizedConcurrentOutputStream(
-                            new ConcurrentOutputStream(
-                                getBoundSocket().newOutputStream()));
+                        new ConcurrentOutputStream(
+                            getBoundSocket().newOutputStream()));
                 }
             }
         } // class Output
@@ -201,12 +201,15 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
         @SuppressWarnings("LeakingThisInConstructor")
         SynchronizedConcurrentOutputStream(final OutputStream out) {
             super(out, ConcurrentOutputShop.this);
-            threads.put(out, Thread.currentThread());
+            assert lock == ConcurrentOutputShop.this;
+            //synchronized (lock) {
+                //assertNotShopClosed();
+                threads.put(out, Thread.currentThread());
+            //}
         }
 
         @Override
         public void close() throws IOException {
-            assert ConcurrentOutputShop.this == lock;
             synchronized (lock) {
                 if (closed)
                     return;
@@ -249,7 +252,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
         }
 
         @Override
-        public final void close() throws IOException {
+        public void close() throws IOException {
             if (!closed) {
                 try {
                     delegate.flush();

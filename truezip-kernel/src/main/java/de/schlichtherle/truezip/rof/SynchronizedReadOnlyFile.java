@@ -56,49 +56,49 @@ public class SynchronizedReadOnlyFile extends DecoratingReadOnlyFile {
     @Override
     public long length() throws IOException {
         synchronized (lock) {
-            return super.length();
+            return delegate.length();
         }
     }
 
     @Override
     public long getFilePointer() throws IOException {
         synchronized (lock) {
-            return super.getFilePointer();
+            return delegate.getFilePointer();
         }
     }
 
     @Override
     public void seek(long pos) throws IOException {
         synchronized (lock) {
-            super.seek(pos);
+            delegate.seek(pos);
         }
     }
 
     @Override
 	public int read() throws IOException {
         synchronized (lock) {
-            return super.read();
+            return delegate.read();
         }
     }
 
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
         synchronized (lock) {
-            return super.read(b, off, len);
+            return delegate.read(b, off, len);
         }
     }
 
     /*@Override
     public void readFully(byte[] b, int off, int len) throws IOException {
         synchronized (lock) {
-            super.readFully(b, off, len);
+            delegate.readFully(b, off, len);
         }
     }*/
 
     @Override
     public void close() throws IOException {
         synchronized (lock) {
-            super.close();
+            delegate.close();
         }
     }
 }

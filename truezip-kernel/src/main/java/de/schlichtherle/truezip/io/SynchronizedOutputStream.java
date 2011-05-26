@@ -56,28 +56,28 @@ public class SynchronizedOutputStream extends DecoratingOutputStream {
     @Override
 	public void write(int b) throws IOException {
         synchronized (lock) {
-            super.write(b);
+            delegate.write(b);
         }
     }
 
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
         synchronized (lock) {
-            super.write(b, off, len);
+            delegate.write(b, off, len);
         }
     }
 
     @Override
     public void flush() throws IOException {
         synchronized (lock) {
-            super.flush();
+            delegate.flush();
         }
     }
 
     @Override
     public void close() throws IOException {
         synchronized (lock) {
-            super.close();
+            delegate.close();
         }
     }
 }
