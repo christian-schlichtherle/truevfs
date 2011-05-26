@@ -25,9 +25,11 @@ import de.schlichtherle.truezip.fs.FsCachingController;
 import de.schlichtherle.truezip.fs.FsConcurrentController;
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsEntryName;
+import de.schlichtherle.truezip.fs.FsException;
 import de.schlichtherle.truezip.fs.FsInputOption;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.FsOutputOption;
+import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
@@ -38,6 +40,8 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.CharConversionException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import javax.swing.Icon;
 import net.jcip.annotations.Immutable;
 
@@ -216,6 +220,62 @@ extends FsDriver {
     throws IOException;
 
     /**
+     * Returns a read only file obtained from the given socket and wraps a
+     * plain {@link IOException} in a {@link FileNotFoundException} unless
+     * it's an {@link FsException}.
+     * This method is useful for driver implementations to ensure that an
+     * expection from opening a socket is <em>not</em> recognized as a false
+     * positive archive file.
+     * 
+     * @param  model the file system model.
+     * @param  input the input socket
+     * @return A new read only file obtained from the socket.
+     * @throws FsException at the discretion of the socket.
+     * @throws FileNotFoundException on any I/O error.
+     */
+    protected static ReadOnlyFile newReadOnlyFile(FsModel model, InputSocket<?> input)
+    throws FsException, FileNotFoundException {
+        try {
+            return input.newReadOnlyFile();
+        } catch (FsException ex) {
+            throw ex;
+        } catch (FileNotFoundException ex) {
+            throw ex;
+        } catch (IOException ex) {
+            throw (FileNotFoundException) new FileNotFoundException(
+                    model.getMountPoint().toString()).initCause(ex);
+        }
+    }
+
+    /**
+     * Returns an input stream obtained from the given socket and wraps a
+     * plain {@link IOException} in a {@link FileNotFoundException} unless
+     * it's an {@link FsException}.
+     * This method is useful for driver implementations to ensure that an
+     * expection from opening a socket is <em>not</em> recognized as a false
+     * positive archive file.
+     * 
+     * @param  model the file system model.
+     * @param  input the input socket
+     * @return A new input stream obtained from the socket.
+     * @throws FsException at the discretion of the socket.
+     * @throws FileNotFoundException on any I/O error.
+     */
+    protected static InputStream newInputStream(FsModel model, InputSocket<?> input)
+    throws FsException, FileNotFoundException {
+        try {
+            return input.newInputStream();
+        } catch (FsException ex) {
+            throw ex;
+        } catch (FileNotFoundException ex) {
+            throw ex;
+        } catch (IOException ex) {
+            throw (FileNotFoundException) new FileNotFoundException(
+                    model.getMountPoint().toString()).initCause(ex);
+        }
+    }
+
+    /**
      * Creates a new output shop for writing archive entries for the
      * given {@code model} to the given {@code output} socket's target.
      * 
@@ -246,6 +306,34 @@ extends FsDriver {
                     OutputSocket<?> output,
                     @CheckForNull InputShop<E> source)
     throws IOException;
+
+    /**
+     * Returns an output stream obtained from the given socket and wraps a
+     * plain {@link IOException} in a {@link FileNotFoundException} unless
+     * it's an {@link FsException}.
+     * This method is useful for driver implementations to ensure that an
+     * expection from opening a socket is <em>not</em> recognized as a false
+     * positive archive file.
+     * 
+     * @param  model the file system model.
+     * @param  output the output socket
+     * @return A new output stream obtained from the socket.
+     * @throws FsException at the discretion of the socket.
+     * @throws FileNotFoundException on any I/O error.
+     */
+    protected static OutputStream newOutputStream(FsModel model, OutputSocket<?> output)
+    throws FsException, FileNotFoundException {
+        try {
+            return output.newOutputStream();
+        } catch (FsException ex) {
+            throw ex;
+        } catch (FileNotFoundException ex) {
+            throw ex;
+        } catch (IOException ex) {
+            throw (FileNotFoundException) new FileNotFoundException(
+                    model.getMountPoint().toString()).initCause(ex);
+        }
+    }
 
     /**
      * Equivalent to {@link #newEntry(java.lang.String, de.schlichtherle.truezip.entry.Entry.Type, de.schlichtherle.truezip.entry.Entry, de.schlichtherle.truezip.util.BitField)
