@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.fs.file;
+package de.schlichtherle.truezip.fs.file.nio;
 
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.spi.IOPoolService;
@@ -34,5 +34,15 @@ public final class TempFilePoolService extends IOPoolService {
     @Override
     public IOPool<?> get() {
         return TempFilePool.INSTANCE;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @return {@code 10}
+     */
+    @Override
+    public int getPriority() {
+        return NIO2.AVAILABLE ? 10 : -10;
     }
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.fs.file;
+package de.schlichtherle.truezip.fs.file.nio;
 
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import de.schlichtherle.truezip.entry.Entry;
@@ -51,16 +51,14 @@ import static de.schlichtherle.truezip.entry.Entry.*;
 @DefaultAnnotation(NonNull.class)
 final class FileOutputSocket extends OutputSocket<FileEntry> {
 
-    private static final String FILE_POOL_PREFIX = ".tzp";
     private static final StandardOpenOption[] 
             NO_STANDARD_OPEN_OPTION = { };
     private static final StandardOpenOption[]
             APPEND_STANDARD_OPEN_OPTION = { StandardOpenOption.APPEND };
 
-    private final                  FileEntry                entry;
-    private final                  BitField<FsOutputOption> options;
-    private final    @CheckForNull Entry                    template;
-    private volatile @CheckForNull TempFilePool             pool;
+    private final               FileEntry                entry;
+    private final               BitField<FsOutputOption> options;
+    private final @CheckForNull Entry                    template;
 
     FileOutputSocket(   final               FileEntry                entry,
                         final               BitField<FsOutputOption> options,
@@ -70,14 +68,6 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
         this.entry    = entry;
         this.options  = options;
         this.template = template;
-    }
-
-    private TempFilePool getTempFilePool() {
-        final TempFilePool pool = this.pool;
-        return null != pool
-                ? pool
-                : (this.pool = new TempFilePool(FILE_POOL_PREFIX, null,
-                                                entry.getPath().getParent()));
     }
 
     @Override
@@ -103,7 +93,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
             }
         }
         final FileEntry temp = null != exists
-                ? getTempFilePool().allocate()
+                ? entry.createTempFile()
                 : entry;
         final Path tempFile = temp.getPath();
 

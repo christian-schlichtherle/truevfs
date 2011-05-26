@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.fs.file;
+package de.schlichtherle.truezip.fs.file.nio;
 
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.fs.FsOutputOption;
@@ -25,6 +25,7 @@ import static de.schlichtherle.truezip.entry.Entry.Size.*;
 import de.schlichtherle.truezip.entry.EntryName;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
+import de.schlichtherle.truezip.util.UriBuilder;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -50,24 +51,38 @@ import static de.schlichtherle.truezip.entry.Entry.Access.*;
  */
 @Immutable
 @DefaultAnnotation(NonNull.class)
+@edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
 public class FileEntry extends FsEntry implements IOEntry<FileEntry> {
 
+    private static final String FILE_POOL_PREFIX = ".tzp";
     private static final BitField<FsOutputOption> NO_OUTPUT_OPTIONS
             = BitField.noneOf(FsOutputOption.class);
 
     private final Path path;
     private final EntryName name;
+    private volatile @CheckForNull TempFilePool pool;
 
     FileEntry(final Path path) {
         assert null != path;
         this.path = path;
-        this.name = EntryName.create(path.getFileName().toUri());
+        this.name = EntryName.create(
+                new UriBuilder()
+                    .path(path.getFileName().toString())
+                    .toUri());
     }
 
     FileEntry(final Path path, final FsEntryName name) {
         assert null != path;
         this.path = path.resolve(name.getPath());
         this.name = name;
+    }
+
+    final TempFilePool.Entry createTempFile() throws IOException {
+        TempFilePool pool = this.pool;
+        if (null == pool)
+            pool = this.pool = new TempFilePool(
+                    FILE_POOL_PREFIX, null, path.getParent());
+        return pool.allocate();
     }
 
     /** Returns the decorated file. */
@@ -133,10 +148,15 @@ public class FileEntry extends FsEntry implements IOEntry<FileEntry> {
     public final @Nullable Set<String> getMembers() {
         if (!isDirectory(path))
             return null;
-        final Set<String> result = new LinkedHashSet<>();
-        try (final DirectoryStream<Path> stream = newDirectoryStream(path)) {
-            for (final Path member : stream)
-                result.add(member.toString());
+        final Set<String> result = new LinkedHashSet<String>();
+        try {
+            final DirectoryStream<Path> stream = newDirectoryStream(path);
+            try {
+                for (final Path member : stream)
+                    result.add(member.getFileName().toString());
+            } finally {
+                stream.close();
+            }
         } catch (IOException ex) {
             throw new UndeclaredThrowableException(ex);
         }

@@ -13,21 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.fs.file;
+package de.schlichtherle.truezip.fs.file.nio;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
-import java.nio.file.Files;
 import static java.nio.file.Files.*;
 import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.junit.Test;
 
-import static de.schlichtherle.truezip.fs.file.FileController.isCreatableOrWritable;
+import static de.schlichtherle.truezip.fs.file.nio.FileController.isCreatableOrWritable;
 import static org.junit.Assert.*;
 
 /**
@@ -49,18 +46,24 @@ public class FileControllerTest {
         boolean result = isCreatableOrWritable(file);
         assertTrue(result);
         boolean total = true;
-        try (InputStream in = newInputStream(file)) {
+        final InputStream in = newInputStream(file);
+        try {
             result = isCreatableOrWritable(file);
             total &= result;
+        } finally {
+            in.close();
         }
         if (!result)
             logger.finer("Overwriting a file which has an open FileInputStream is not tolerated!");
         final String[] modes = { "r", "rw", "rws", "rwd" };
         for (int i = 0, l = modes.length; i < l; i++) {
             final String mode = modes[i];
-            try (RandomAccessFile raf = new RandomAccessFile(file.toFile(), mode)) {
+            final RandomAccessFile raf = new RandomAccessFile(file.toFile(), mode);
+            try {
                 result = isCreatableOrWritable(file);
                 total &= result;
+            } finally {
+                raf.close();
             }
             if (!result)
                 logger.log(Level.FINER, "Overwriting a file which has an open RandomAccessFile in \"{0}\" mode is not tolerated!", mode);

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.fs.file;
+package de.schlichtherle.truezip.fs.file.nio;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
@@ -32,9 +32,7 @@ import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
@@ -183,12 +181,13 @@ final class FileController extends FsController<FsModel>  {
                         // Open the file for reading and writing, requiring any
                         // update to its contents to be written to the filesystem
                         // synchronously.
-                        try (final SeekableByteChannel
-                                raf = newByteChannel(file, RWD_OPTIONS)) {
+                        final SeekableByteChannel
+                                sbc = newByteChannel(file, RWD_OPTIONS);
+                        try {
                             final ByteBuffer buf = ByteBuffer.allocate(1);
                             final boolean empty;
                             byte octet;
-                            if (-1 == raf.read(buf)) {
+                            if (-1 == sbc.read(buf)) {
                                 octet = (byte) 0; // assume first byte is 0
                                 empty = true;
                             } else {
@@ -197,22 +196,24 @@ final class FileController extends FsController<FsModel>  {
                             }
                             // Let's test if we can overwrite the first byte.
                             // See issue #29.
-                            raf.position(0);
+                            sbc.position(0);
                             buf.rewind();
-                            raf.write(buf);
+                            sbc.write(buf);
                             try {
                                 // Rewrite original content and check success.
-                                raf.position(0);
+                                sbc.position(0);
                                 buf.rewind();
-                                raf.read(buf);
+                                sbc.read(buf);
                                 final byte check = buf.get(0);
                                 // This should always return true unless the storage
                                 // device is faulty.
                                 ok = octet == check;
                             } finally {
                                 if (empty)
-                                    raf.truncate(0);
+                                    sbc.truncate(0);
                             }
+                        } finally {
+                            sbc.close();
                         }
                     } finally {
                         try {
