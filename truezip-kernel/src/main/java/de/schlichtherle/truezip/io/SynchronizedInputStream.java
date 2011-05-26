@@ -56,56 +56,56 @@ public class SynchronizedInputStream extends DecoratingInputStream {
     @Override
 	public int read() throws IOException {
         synchronized (lock) {
-            return super.read();
+            return delegate.read();
         }
     }
 
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
         synchronized (lock) {
-            return super.read(b, off, len);
+            return delegate.read(b, off, len);
         }
     }
 
     @Override
     public long skip(long n) throws IOException {
         synchronized (lock) {
-            return super.skip(n);
+            return delegate.skip(n);
         }
     }
 
     @Override
     public int available() throws IOException {
         synchronized (lock) {
-            return super.available();
+            return delegate.available();
         }
     }
 
     @Override
     public void close() throws IOException {
         synchronized (lock) {
-            super.close();
+            delegate.close();
         }
     }
 
     @Override
     public void mark(int readlimit) {
         synchronized (lock) {
-            super.mark(readlimit);
+            delegate.mark(readlimit);
         }
     }
 
     @Override
     public void reset() throws IOException {
         synchronized (lock) {
-            super.reset();
+            delegate.reset();
         }
     }
 
     @Override
     public boolean markSupported() {
         synchronized (lock) {
-            return super.markSupported();
+            return delegate.markSupported();
         }
     }
 }

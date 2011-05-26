@@ -185,16 +185,6 @@ extends DecoratingInputShop<E, InputShop<E>> {
             }
 
             @Override
-            public InputStream newInputStream() throws IOException {
-                synchronized (ConcurrentInputShop.this) {
-                    assertNotShopClosed();
-                    return new SynchronizedConcurrentInputStream(
-                            new ConcurrentInputStream(
-                                getBoundSocket().newInputStream()));
-                }
-            }
-
-            @Override
             public ReadOnlyFile newReadOnlyFile() throws IOException {
                 synchronized (ConcurrentInputShop.this) {
                     assertNotShopClosed();
@@ -203,10 +193,48 @@ extends DecoratingInputShop<E, InputShop<E>> {
                                 getBoundSocket().newReadOnlyFile()));
                 }
             }
+
+            @Override
+            public InputStream newInputStream() throws IOException {
+                synchronized (ConcurrentInputShop.this) {
+                    assertNotShopClosed();
+                    return new SynchronizedConcurrentInputStream(
+                            new ConcurrentInputStream(
+                                getBoundSocket().newInputStream()));
+                }
+            }
         } // class Input
 
         return new Input();
     }
+
+    @ThreadSafe
+    private final class SynchronizedConcurrentReadOnlyFile
+    extends SynchronizedReadOnlyFile {
+        @SuppressWarnings("LeakingThisInConstructor")
+        private SynchronizedConcurrentReadOnlyFile(final ReadOnlyFile rof) {
+            super(rof, ConcurrentInputShop.this);
+            assert lock == ConcurrentInputShop.this;
+            //synchronized (lock) {
+                //assertNotShopClosed();
+                threads.put(rof, Thread.currentThread());
+            //}
+        }
+
+        @Override
+        public void close() throws IOException {
+            synchronized (lock) {
+                if (closed)
+                    return;
+                try {
+                    delegate.close();
+                } finally {
+                    threads.remove(delegate);
+                    lock.notify(); // there can be only one waiting thread!
+                }
+            }
+        }
+    } // class SynchronizedConcurrentReadOnlyFile
 
     @ThreadSafe
     private final class SynchronizedConcurrentInputStream
@@ -214,12 +242,15 @@ extends DecoratingInputShop<E, InputShop<E>> {
         @SuppressWarnings("LeakingThisInConstructor")
         SynchronizedConcurrentInputStream(final InputStream in) {
             super(in, ConcurrentInputShop.this);
-            threads.put(in, Thread.currentThread());
+            assert lock == ConcurrentInputShop.this;
+            //synchronized (lock) {
+                //assertNotShopClosed();
+                threads.put(in, Thread.currentThread());
+            //}
         }
 
         @Override
         public void close() throws IOException {
-            assert ConcurrentInputShop.this == lock;
             synchronized (lock) {
                 if (closed)
                     return;
@@ -233,30 +264,70 @@ extends DecoratingInputShop<E, InputShop<E>> {
         }
     } // class SynchronizedConcurrentInputStream
 
-    @ThreadSafe
-    private final class SynchronizedConcurrentReadOnlyFile
-    extends SynchronizedReadOnlyFile {
-        @SuppressWarnings("LeakingThisInConstructor")
-        private SynchronizedConcurrentReadOnlyFile(final ReadOnlyFile rof) {
-            super(rof, ConcurrentInputShop.this);
-            threads.put(rof, Thread.currentThread());
+    @NotThreadSafe
+    private final class ConcurrentReadOnlyFile extends DecoratingReadOnlyFile {
+        ConcurrentReadOnlyFile(ReadOnlyFile rof) {
+            super(rof);
         }
 
         @Override
+        public long length() throws IOException {
+            assertNotShopClosed();
+            return delegate.length();
+        }
+
+        @Override
+        public long getFilePointer() throws IOException {
+            assertNotShopClosed();
+            return delegate.getFilePointer();
+        }
+
+        @Override
+        public void seek(long pos) throws IOException {
+            assertNotShopClosed();
+            delegate.seek(pos);
+        }
+
+        @Override
+        public int read() throws IOException {
+            assertNotShopClosed();
+            return delegate.read();
+        }
+
+        @Override
+        public int read(byte[] b, int off, int len) throws IOException {
+            assertNotShopClosed();
+            return delegate.read(b, off, len);
+        }
+
+        /*@Override
+        public void readFully(byte[] b, int off, int len) throws IOException {
+            assertNotShopClosed();
+            delegate.readFully(b, off, len);
+        }*/
+
+        @Override
         public void close() throws IOException {
-            assert ConcurrentInputShop.this == lock;
-            synchronized (lock) {
-                if (closed)
-                    return;
-                try {
-                    delegate.close();
-                } finally {
-                    threads.remove(delegate);
-                    lock.notify(); // there can be only one waiting thread!
-                }
+            if (!closed)
+                delegate.close();
+        }
+
+        /**
+         * The finalizer in this class forces this input read only file to
+         * close.
+         * This ensures that an input target can be updated although the
+         * client application may have "forgot" to close this instance before.
+         */
+        @Override
+        @SuppressWarnings("FinalizeDeclaration")
+        protected void finalize() throws Throwable {
+            try {
+                close();
+            } finally {
+                super.finalize();
             }
         }
-    } // class SynchronizedConcurrentReadOnlyFile
+    } // class ConcurrentReadOnlyFile
 
     @NotThreadSafe
     private final class ConcurrentInputStream extends DecoratingInputStream {
@@ -326,69 +397,4 @@ extends DecoratingInputShop<E, InputShop<E>> {
             }
         }
     } // class ConcurrentInputStream
-
-    @NotThreadSafe
-    private final class ConcurrentReadOnlyFile extends DecoratingReadOnlyFile {
-        ConcurrentReadOnlyFile(ReadOnlyFile rof) {
-            super(rof);
-        }
-
-        @Override
-        public long length() throws IOException {
-            assertNotShopClosed();
-            return delegate.length();
-        }
-
-        @Override
-        public long getFilePointer() throws IOException {
-            assertNotShopClosed();
-            return delegate.getFilePointer();
-        }
-
-        @Override
-        public void seek(long pos) throws IOException {
-            assertNotShopClosed();
-            delegate.seek(pos);
-        }
-
-        @Override
-        public int read() throws IOException {
-            assertNotShopClosed();
-            return delegate.read();
-        }
-
-        @Override
-        public int read(byte[] b, int off, int len) throws IOException {
-            assertNotShopClosed();
-            return delegate.read(b, off, len);
-        }
-
-        /*@Override
-        public void readFully(byte[] b, int off, int len) throws IOException {
-            assertNotShopClosed();
-            delegate.readFully(b, off, len);
-        }*/
-
-        @Override
-        public void close() throws IOException {
-            if (!closed)
-                delegate.close();
-        }
-
-        /**
-         * The finalizer in this class forces this input read only file to
-         * close.
-         * This ensures that an input target can be updated although the
-         * client application may have "forgot" to close this instance before.
-         */
-        @Override
-        @SuppressWarnings("FinalizeDeclaration")
-        protected void finalize() throws Throwable {
-            try {
-                close();
-            } finally {
-                super.finalize();
-            }
-        }
-    } // class ConcurrentReadOnlyFile
 }
