@@ -260,11 +260,11 @@ public class FsMountPointTest {
         }) {
             final URI uri = URI.create(param);
             final FsMountPoint mountPoint = FsMountPoint.create(uri);
-            assertThat(mountPoint.getUri(), sameInstance(uri));
+            assertThat(mountPoint.toUri(), sameInstance(uri));
             assertThat(mountPoint.getPath(), nullValue());
-            assertThat(mountPoint.toString(), equalTo(mountPoint.getUri().toString()));
-            assertThat(mountPoint, equalTo(FsMountPoint.create(mountPoint.getUri().toString())));
-            assertThat(mountPoint.hashCode(), equalTo(FsMountPoint.create(mountPoint.getUri().toString()).hashCode()));
+            assertThat(mountPoint.toString(), equalTo(mountPoint.toUri().toString()));
+            assertThat(mountPoint, equalTo(FsMountPoint.create(mountPoint.toUri().toString())));
+            assertThat(mountPoint.hashCode(), equalTo(FsMountPoint.create(mountPoint.toUri().toString()).hashCode()));
         }
 
         for (final String[] params : new String[][] {
@@ -284,14 +284,14 @@ public class FsMountPointTest {
 
             assertThat(mountPoint.getScheme(), equalTo(scheme));
             assertThat(mountPoint.getPath(), equalTo(path));
-            assertThat(mountPoint.toString(), equalTo(mountPoint.getUri().toString()));
+            assertThat(mountPoint.toString(), equalTo(mountPoint.toUri().toString()));
             assertThat(FsMountPoint.create(mountPoint.toString()), equalTo(mountPoint));
-            assertThat(FsMountPoint.create(mountPoint.getUri().getScheme() + ":" + mountPoint.getPath() + "!/"), equalTo(mountPoint));
+            assertThat(FsMountPoint.create(mountPoint.toUri().getScheme() + ":" + mountPoint.getPath() + "!/"), equalTo(mountPoint));
             assertThat(FsMountPoint.create(mountPoint.getScheme(), mountPoint.getPath()), equalTo(mountPoint));
-            assertThat(FsMountPoint.create(mountPoint.getUri().toString()), equalTo(mountPoint));
-            assertThat(FsMountPoint.create(mountPoint.getUri().toString()).hashCode(), equalTo(mountPoint.hashCode()));
+            assertThat(FsMountPoint.create(mountPoint.toUri().toString()), equalTo(mountPoint));
+            assertThat(FsMountPoint.create(mountPoint.toUri().toString()).hashCode(), equalTo(mountPoint.hashCode()));
             //assertThat(FsMountPoint.create(mountPoint.getScheme(), new FsPath(mountPoint.getParent(), mountPoint.resolveParentEntryName(ROOT))), equalTo(mountPoint));
-            assertThat(FsMountPoint.create(mountPoint.resolve(ROOT).getUri()), equalTo(mountPoint));
+            assertThat(FsMountPoint.create(mountPoint.resolve(ROOT).toUri()), equalTo(mountPoint));
         }
     }
 
@@ -317,7 +317,7 @@ public class FsMountPointTest {
             if (null != parentEntryName)
                 assertThat(mountPoint.getPath().resolve(entryName).getEntryName(), equalTo(parentEntryName));
             assertThat(mountPoint.resolve(entryName), equalTo(path));
-            assertThat(mountPoint.resolve(entryName).getUri().isAbsolute(), is(true));
+            assertThat(mountPoint.resolve(entryName).toUri().isAbsolute(), is(true));
         }
     }
 
@@ -334,9 +334,9 @@ public class FsMountPointTest {
             { "foo:/bar/", "foo:/bar/" },
         }) {
             final FsMountPoint mp = FsMountPoint.create(params[0]);
-            final URI hmp = mp.getHierarchicalUri();
+            final URI hmp = mp.toHierarchicalUri();
             final FsPath p = FsPath.create(params[0]);
-            final URI hp = p.getHierarchicalUri();
+            final URI hp = p.toHierarchicalUri();
             assertThat(hmp, equalTo(URI.create(params[1])));
             assertThat(hmp, equalTo(hp));
         }

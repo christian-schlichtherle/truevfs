@@ -77,7 +77,7 @@ final class FileController extends FsController<FsModel>  {
     FileController(final FsModel model) {
         if (null != model.getParent())
             throw new IllegalArgumentException();
-        URI uri = model.getMountPoint().getUri();
+        URI uri = model.getMountPoint().toUri();
         if ('\\' == separatorChar && null != uri.getRawAuthority()) {
             try {
                 // Postfix: Move Windows UNC host from authority to path

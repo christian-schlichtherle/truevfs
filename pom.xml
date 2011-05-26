@@ -73,6 +73,7 @@
         <module>truezip-archetypes</module>
         <module>truezip-drivers</module>
         <module>truezip-file</module>
+        <module>truezip-fsp-jse7</module>
         <module>truezip-kernel</module>
         <module>truezip-samples</module>
         <module>truezip-swing</module>

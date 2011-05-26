@@ -214,8 +214,8 @@ public class EntryNameTest {
             final EntryName parent = EntryName.create(URI.create(params[0]));
             final EntryName member = EntryName.create(URI.create(params[1]));
             final EntryName result = new EntryName(parent, member);
-            assertThat(result.getUri(), equalTo(URI.create(params[2])));
-            assertThat(EntryName.create(result.getUri()), equalTo(result));
+            assertThat(result.toUri(), equalTo(URI.create(params[2])));
+            assertThat(EntryName.create(result.toUri()), equalTo(result));
         }
     }
 }

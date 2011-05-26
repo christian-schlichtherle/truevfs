@@ -73,7 +73,7 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
  * <table border="2" cellpadding="4">
  * <thead>
  * <tr>
- *   <th>{@link #getUri() uri} property</th>
+ *   <th>{@link #toUri() uri} property</th>
  *   <th>{@link #getMountPoint() mountPoint} URI</th>
  *   <th>{@link #getEntryName() entryName} URI</th>
  * </tr>
@@ -133,7 +133,7 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
  * <a name="identities"/><h3>Identities</h3>
  * <p>
  * For any path {@code p}, it's generally true that
- * {@code new FsPath(p.getUri()).equals(p)}.
+ * {@code new FsPath(p.toUri()).equals(p)}.
  * <p>
  * Furthermore, it's generally true that
  * {@code new FsPath(p.getMountPoint(), p.getEntryName()).equals(p)}.
@@ -156,7 +156,7 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
 
     private static final long serialVersionUID = 5798435461242930648L;
 
-    private static final URI DOT = URI.create(".");
+    private static final URI DOT_URI = URI.create(".");
 
     private URI uri; // not final for serialization only!
 
@@ -212,7 +212,7 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
      * and wraps any thrown {@link URISyntaxException} in an
      * {@link IllegalArgumentException}.
      *
-     * @param  uri the {@link #getUri() URI}.
+     * @param  uri the {@link #toUri() URI}.
      * @param  modifier the URI modifier.
      * @throws IllegalArgumentException if {@code uri} does not conform to the
      *         syntax constraints for paths.
@@ -270,7 +270,7 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
     /**
      * Constructs a new path by parsing the given URI.
      *
-     * @param  uri the non-{@code null} {@link #getUri() URI}.
+     * @param  uri the non-{@code null} {@link #toUri() URI}.
      * @param  modifier the URI modifier.
      * @throws URISyntaxException if {@code uri} does not conform to the
      *         syntax constraints for paths.
@@ -293,15 +293,15 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
                     final FsEntryName entryName) {
         URI mountPointUri;
         if (null == mountPoint) {
-            this.uri = entryName.getUri();
-        } else if ((mountPointUri = mountPoint.getUri()).isOpaque()) {
+            this.uri = entryName.toUri();
+        } else if ((mountPointUri = mountPoint.toUri()).isOpaque()) {
             try {
                 this.uri = new URI(mountPointUri.toString() + entryName);
             } catch (URISyntaxException ex) {
                 throw new AssertionError(ex);
             }
         } else {
-            this.uri = mountPointUri.resolve(entryName.getUri());
+            this.uri = mountPointUri.resolve(entryName.toUri());
         }
         this.mountPoint = mountPoint;
         this.entryName = entryName;
@@ -345,12 +345,12 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
                     uri = nuri;
             }
         } else if (uri.isAbsolute()) {
-            mountPoint = new FsMountPoint(uri.resolve(DOT), NULL);
-            entryName = new FsEntryName(mountPoint.getUri().relativize(uri), NULL);
+            mountPoint = new FsMountPoint(uri.resolve(DOT_URI), NULL);
+            entryName = new FsEntryName(mountPoint.toUri().relativize(uri), NULL);
         } else {
             mountPoint = null;
             entryName = new FsEntryName(uri, NULL);
-            uri = entryName.getUri();
+            uri = entryName.toUri();
         }
         this.uri = uri;
 
@@ -362,28 +362,37 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
     }
 
     private boolean invariants() {
-        assert null != getUri();
-        assert (null != getMountPoint()) == getUri().isAbsolute();
+        assert null != toUri();
+        assert (null != getMountPoint()) == toUri().isAbsolute();
         assert null != getEntryName();
-        if (getUri().isOpaque()) {
-            assert getUri().getRawSchemeSpecificPart().contains(FsMountPoint.SEPARATOR);
-            assert getUri().equals(URI.create(  getMountPoint().getUri().toString()
-                                                + getEntryName().getUri().toString()));
-        } else if (getUri().isAbsolute()) {
-            assert getUri().normalize() == getUri();
-            assert getUri().equals(getMountPoint().getUri().resolve(getEntryName().getUri()));
+        if (toUri().isOpaque()) {
+            assert toUri().getRawSchemeSpecificPart().contains(FsMountPoint.SEPARATOR);
+            assert toUri().equals(URI.create(  getMountPoint().toUri().toString()
+                                                + getEntryName().toUri().toString()));
+        } else if (toUri().isAbsolute()) {
+            assert toUri().normalize() == toUri();
+            assert toUri().equals(getMountPoint().toUri().resolve(getEntryName().toUri()));
         } else {
-            assert getUri().normalize() == getUri();
-            assert getEntryName().getUri() == getUri();
+            assert toUri().normalize() == toUri();
+            assert getEntryName().toUri() == toUri();
         }
         return true;
     }
 
     /**
-     * Returns the URI of this path.
+     * Returns the URI for this path.
      *
-     * @return The URI of this path.
+     * @return The URI for this path.
      */
+    public URI toUri() {
+        return uri;
+    }
+
+    /**
+     * @deprecated
+     * @see #toUri()
+     */
+    @Deprecated
     public URI getUri() {
         return uri;
     }
@@ -400,12 +409,12 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
      * @return A URI which is recursively transformed from the URI of this
      *         path so that it's absolute and hierarchical.
      */
-    public URI getHierarchicalUri() {
+    public URI toHierarchicalUri() {
         if (null != hierarchical)
             return hierarchical;
         if (uri.isOpaque()) {
-            final URI mpu = mountPoint.getHierarchicalUri();
-            final URI enu = entryName.getUri();
+            final URI mpu = mountPoint.toHierarchicalUri();
+            final URI enu = entryName.toUri();
             try {
                 return hierarchical = enu.toString().isEmpty()
                         ? mpu
@@ -422,8 +431,17 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
     }
 
     /**
+     * @deprecated
+     * @see #toHierarchicalUri()
+     */
+    @Deprecated
+    public URI getHierarchicalUri() {
+        return toHierarchicalUri();
+    }
+
+    /**
      * Returns the mount point component or {@code null} iff this path's
-     * {@link #getUri() URI} is not absolute.
+     * {@link #toUri() URI} is not absolute.
      *
      * @return The nullable mount point.
      */
@@ -484,7 +502,7 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
     }
 
     /**
-     * Equivalent to calling {@link URI#toString()} on {@link #getUri()}.
+     * Equivalent to calling {@link URI#toString()} on {@link #toUri()}.
      */
     @Override
     public String toString() {

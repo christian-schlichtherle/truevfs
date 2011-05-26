@@ -51,7 +51,7 @@ import net.jcip.annotations.Immutable;
  * <table border="2" cellpadding="4">
  * <thead>
  * <tr>
- *   <th>{@link #getUri() uri} property</th>
+ *   <th>{@link #toUri() uri} property</th>
  *   <th>{@link #getPath() path} property</th>
  *   <th>{@link #getQuery() query} property</th>
  *   <th>{@link #getFragment() fragment} property</th>
@@ -114,7 +114,7 @@ import net.jcip.annotations.Immutable;
  * <a name="identities"/><h3>Identities</h3>
  * <p>
  * For any entry name {@code e}, it's generally true that
- * {@code new EntryName(e.getUri()).equals(e)}.
+ * {@code new EntryName(e.toUri()).equals(e)}.
  * 
  * <a name="serialization"/><h3>Serialization</h3>
  * <p>
@@ -179,7 +179,7 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      * and wraps any thrown {@link URISyntaxException} in an
      * {@link IllegalArgumentException}.
      *
-     * @param  uri the {@link #getUri() URI}.
+     * @param  uri the {@link #toUri() URI}.
      * @throws IllegalArgumentException if {@code uri} does not conform to the
      *         syntax constraints for entry names.
      * @return A new entry name.
@@ -208,7 +208,7 @@ public class EntryName implements Serializable, Comparable<EntryName> {
     /**
      * Constructs a new entry name by parsing the given URI.
      *
-     * @param  uri the {@link #getUri() URI}.
+     * @param  uri the {@link #toUri() URI}.
      * @throws URISyntaxException if {@code uri} does not conform to the
      *         syntax constraints for entry names.
      */
@@ -288,17 +288,25 @@ public class EntryName implements Serializable, Comparable<EntryName> {
     }
 
     private boolean invariants() {
-        assert null != getUri();
-        assert !getUri().isAbsolute();
-        assert null == getUri().getRawAuthority();
-        //assert null == getUri().getRawFragment();
+        assert null != toUri();
+        assert !toUri().isAbsolute();
+        assert null == toUri().getRawAuthority();
+        //assert null == toUri().getRawFragment();
         return true;
     }
 
     /**
-     * Returns the URI of this entry name.
+     * Returns the URI for this entry name.
      *
-     * @return The URI of this entry name.
+     * @return The URI for this entry name.
+     */
+    public final URI toUri() {
+        return uri;
+    }
+
+    /**
+     * @deprecated
+     * @see #toUri()
      */
     public final URI getUri() {
         return uri;
@@ -306,7 +314,7 @@ public class EntryName implements Serializable, Comparable<EntryName> {
 
     /**
      * Returns the path of this entry name.
-     * Equivalent to {@link #getUri() getUri()}{@code .getPath()}.
+     * Equivalent to {@link #toUri() toUri()}{@code .getPath()}.
      *
      * @return The path of this entry name.
      */
@@ -316,7 +324,7 @@ public class EntryName implements Serializable, Comparable<EntryName> {
 
     /**
      * Returns the query of this entry name.
-     * Equivalent to {@link #getUri() getUri()}{@code .getQuery()}.
+     * Equivalent to {@link #toUri() toUri()}{@code .getQuery()}.
      *
      * @return The query of this entry name.
      */
@@ -326,7 +334,7 @@ public class EntryName implements Serializable, Comparable<EntryName> {
 
     /**
      * Returns the fragment of this entry name.
-     * Equivalent to {@link #getUri() getUri()}{@code .getFragment()}.
+     * Equivalent to {@link #toUri() toUri()}{@code .getFragment()}.
      *
      * @return The fragment of this entry name.
      */
@@ -363,7 +371,7 @@ public class EntryName implements Serializable, Comparable<EntryName> {
     }
 
     /**
-     * Equivalent to calling {@link URI#toString()} on {@link #getUri()}.
+     * Equivalent to calling {@link URI#toString()} on {@link #toUri()}.
      */
     @Override
     public final String toString() {

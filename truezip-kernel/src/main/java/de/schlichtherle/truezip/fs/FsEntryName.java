@@ -59,7 +59,7 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
  * <table border="2" cellpadding="4">
  * <thead>
  * <tr>
- *   <th>{@link #getUri() uri} property</th>
+ *   <th>{@link #toUri() uri} property</th>
  *   <th>{@link #getPath() path} property</th>
  *   <th>{@link #getQuery() query} property</th>
  *   <th>{@link #getFragment() fragment} property</th>
@@ -128,7 +128,7 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
  * <a name="identities"/><h3>Identities</h3>
  * <p>
  * For any entry name {@code e}, it's generally true that
- * {@code new FsEntryName(e.getUri()).equals(e)}.
+ * {@code new FsEntryName(e.toUri()).equals(e)}.
  * 
  * <a name="serialization"/><h3>Serialization</h3>
  * <p>
@@ -198,7 +198,7 @@ public final class FsEntryName extends EntryName {
      * and wraps any thrown {@link URISyntaxException} in an
      * {@link IllegalArgumentException}.
      *
-     * @param  uri the {@link #getUri() URI}.
+     * @param  uri the {@link #toUri() URI}.
      * @param  modifier the URI modifier.
      * @throws IllegalArgumentException if {@code uri} does not conform to the
      *         syntax constraints for entry names.
@@ -244,7 +244,7 @@ public final class FsEntryName extends EntryName {
     /**
      * Constructs a new file system entry name by parsing the given URI.
      *
-     * @param  uri the {@link #getUri() URI}.
+     * @param  uri the {@link #toUri() URI}.
      * @param  modifier the URI modifier.
      * @throws NullPointerException if {@code uri} is {@code null}.
      * @throws URISyntaxException if {@code uri} does not conform to the
@@ -260,7 +260,7 @@ public final class FsEntryName extends EntryName {
     throws IOException, ClassNotFoundException {
         in.defaultReadObject();
         try {
-            parse(getUri()); // protect against manipulation
+            parse(toUri()); // protect against manipulation
         } catch (URISyntaxException ex) {
             throw (InvalidObjectException) new InvalidObjectException(ex.toString())
                     .initCause(ex);
@@ -307,12 +307,12 @@ public final class FsEntryName extends EntryName {
     }
 
     private boolean invariants() {
-        assert null != getUri();
-        //assert !getUri().isAbsolute();
-        //assert null == getUri().getRawAuthority();
-        //assert null == getUri().getRawFragment();
-        assert getUri().normalize() == getUri();
-        String p = getUri().getRawPath();
+        assert null != toUri();
+        //assert !toUri().isAbsolute();
+        //assert null == toUri().getRawAuthority();
+        //assert null == toUri().getRawFragment();
+        assert toUri().normalize() == toUri();
+        String p = toUri().getRawPath();
         assert !"..".equals(p);
         assert !p.startsWith(SEPARATOR);
         assert !p.startsWith("." + SEPARATOR);
@@ -322,8 +322,8 @@ public final class FsEntryName extends EntryName {
     }
 
     public boolean isRoot() {
-        //return getUri().toString().isEmpty();
-        final URI uri = getUri();
+        //return toUri().toString().isEmpty();
+        final URI uri = toUri();
         final String path = uri.getRawPath();
         if (null != path && !path.isEmpty())
             return false;
