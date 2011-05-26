@@ -66,7 +66,7 @@ public abstract class FsDriver {
 
     /**
      * Returns a priority to help the file system driver service locator.
-     * The higher number wins!
+     * The greater number wins!
      * 
      * @return {@code 0}, as by the implementation in the class
      *         {@link FsDriver}.

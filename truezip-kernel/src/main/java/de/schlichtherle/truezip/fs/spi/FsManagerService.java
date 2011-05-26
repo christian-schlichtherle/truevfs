@@ -32,7 +32,7 @@ public abstract class FsManagerService implements FsManagerProvider {
 
     /**
      * Returns a priority to help the file system manager service locator.
-     * The higher number wins!
+     * The greater number wins!
      * 
      * @return {@code 0}, as by the implementation in the class
      *         {@link FsManagerService}.
