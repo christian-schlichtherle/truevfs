@@ -210,8 +210,8 @@ public class FsEntryNameTest {
             final FsEntryName parent = FsEntryName.create(URI.create(params[0]));
             final FsEntryName member = FsEntryName.create(URI.create(params[1]));
             final FsEntryName result = new FsEntryName(parent, member);
-            assertThat(result.getUri(), equalTo(URI.create(params[2])));
-            assertThat(FsEntryName.create(result.getUri()), equalTo(result));
+            assertThat(result.toUri(), equalTo(URI.create(params[2])));
+            assertThat(FsEntryName.create(result.toUri()), equalTo(result));
         }
     }
 }

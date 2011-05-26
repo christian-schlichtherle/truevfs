@@ -64,7 +64,7 @@ final class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
                 final HttpController controller) {
         this.name = name;
         try {
-            this.url = mountPoint.resolve(name).getUri().toURL();
+            this.url = mountPoint.resolve(name).toUri().toURL();
         } catch (MalformedURLException ex) {
             throw new IllegalArgumentException(ex);
         }

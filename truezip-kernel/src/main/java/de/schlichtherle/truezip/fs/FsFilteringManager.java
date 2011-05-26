@@ -49,7 +49,7 @@ extends FsDecoratingManager<FsManager> {
             @NonNull final FsManager manager,
             @NonNull final FsMountPoint prefix) {
         super(manager);
-        this.prefix = prefix.getHierarchicalUri();
+        this.prefix = prefix.toHierarchicalUri();
     }
 
     @Override
@@ -68,7 +68,7 @@ extends FsDecoratingManager<FsManager> {
                     (int) (delegate.getSize() / .75f) + 1);
         for (FsController<?> controller : delegate) {
             final URI mountPoint
-                    = controller.getModel().getMountPoint().getHierarchicalUri();
+                    = controller.getModel().getMountPoint().toHierarchicalUri();
             if (mountPoint.getScheme().equals(prefix.getScheme())
                     && mountPoint.getPath().startsWith(prefix.getPath()))
                 snapshot.add(controller);

@@ -626,7 +626,7 @@ public final class TFile extends File {
     }
 
     private TFile(FsPath path, TArchiveDetector detector) {
-        super(path.getHierarchicalUri());
+        super(path.toHierarchicalUri());
         parse(path, detector);
     }
 
@@ -640,13 +640,13 @@ public final class TFile extends File {
         final FsEntryName entryName;
 
         if (null == mountPointPath) {
-            assert !path.getUri().isOpaque();
+            assert !path.toUri().isOpaque();
             this.enclArchive = null;
             this.enclEntryName = null;
             this.innerArchive = null;
         } else if ((entryName = path.getEntryName()).isRoot()) {
-            assert path.getUri().isOpaque();
-            if (mountPointPath.getUri().isOpaque()) {
+            assert path.toUri().isOpaque();
+            if (mountPointPath.toUri().isOpaque()) {
                 this.enclArchive
                         = new TFile(mountPointPath.getMountPoint(), detector);
                 this.enclEntryName = mountPointPath.getEntryName();
@@ -656,7 +656,7 @@ public final class TFile extends File {
             }
             this.innerArchive = this;
         } else {
-            assert path.getUri().isOpaque();
+            assert path.toUri().isOpaque();
             this.enclArchive = new TFile(mountPoint, detector);
             this.enclEntryName = entryName;
             this.innerArchive = this.enclArchive;
@@ -668,7 +668,7 @@ public final class TFile extends File {
     @SuppressWarnings("LeakingThisInConstructor")
     private TFile(  final FsMountPoint mountPoint,
                     TArchiveDetector detector) {
-        super(mountPoint.getHierarchicalUri());
+        super(mountPoint.toHierarchicalUri());
 
         this.delegate = new File(super.getPath());
         this.detector = detector;
@@ -676,13 +676,13 @@ public final class TFile extends File {
         final FsPath mountPointPath = mountPoint.getPath();
 
         if (null == mountPointPath) {
-            assert !mountPoint.getUri().isOpaque();
+            assert !mountPoint.toUri().isOpaque();
             this.enclArchive = null;
             this.enclEntryName = null;
             this.innerArchive = null;
         } else {
-            assert mountPoint.getUri().isOpaque();
-            if (mountPointPath.getUri().isOpaque()) {
+            assert mountPoint.toUri().isOpaque();
+            if (mountPointPath.toUri().isOpaque()) {
                 this.enclArchive
                         = new TFile(mountPointPath.getMountPoint(), detector);
                 this.enclEntryName = mountPointPath.getEntryName();
@@ -1795,13 +1795,13 @@ public final class TFile extends File {
      * <p>
      * More formally, let {@code a} and {@code b} be two TFile objects.
      * Then if the expression
-     * {@code a.toFsPath().getHierarchicalUri().equals(b.toFsPath().getHierarchicalUri())}
+     * {@code a.toFsPath().toHierarchicalUri().equals(b.toFsPath().toHierarchicalUri())}
      * is true, the expression {@code a.equals(b)} is also true.
      * <p>
      * Note that this does <em>not</em> work vice versa:
      * E.g. on Windows, the expression
      * {@code new TFile("file").equals(new TFile("FILE"))} is true, but
-     * {@code new TFile("file").toFsPath().getHierarchicalUri().equals(new TFile("FILE").toFsPath().getHierarchicalUri())}
+     * {@code new TFile("file").toFsPath().toHierarchicalUri().equals(new TFile("FILE").toFsPath().toHierarchicalUri())}
      * is false because {@link FsPath#equals(Object)} is case sensitive.
      *
      * @see #hashCode()
@@ -1827,13 +1827,13 @@ public final class TFile extends File {
      * <p>
      * More formally, let {@code a} and {@code b} be two TFile objects.
      * Then if the expression
-     * {@code a.toFsPath().getHierarchicalUri().compareTo(b.toFsPath().getHierarchicalUri()) == 0}
+     * {@code a.toFsPath().toHierarchicalUri().compareTo(b.toFsPath().toHierarchicalUri()) == 0}
      * is true, the expression {@code a.compareTo(b) == 0} is also true.
      * <p>
      * Note that this does <em>not</em> work vice versa:
      * E.g. on Windows, the expression
      * {@code new TFile("file").compareTo(new TFile("FILE")) == 0} is true, but
-     * {@code new TFile("file").toFsPath().getHierarchicalUri().compareTo(new TFile("FILE").toFsPath().getHierarchicalUri()) == 0}
+     * {@code new TFile("file").toFsPath().toHierarchicalUri().compareTo(new TFile("FILE").toFsPath().toHierarchicalUri()) == 0}
      * is false because {@link FsPath#equals(Object)} is case sensitive.
      *
      * @see   #equals(Object)
@@ -1930,14 +1930,14 @@ public final class TFile extends File {
                             scheme,
                             new FsPath(
                                 new FsMountPoint(enclArchive.toURI(), CANONICALIZE),
-                                enclEntryName)).getUri();
+                                enclEntryName)).toUri();
                 } else {
-                    return new FsMountPoint(scheme, new FsPath(delegate)).getUri();
+                    return new FsMountPoint(scheme, new FsPath(delegate)).toUri();
                 }
             } else if (null != enclArchive) {
                 return new FsPath(
                         new FsMountPoint(enclArchive.toURI(), CANONICALIZE),
-                        enclEntryName).getUri();
+                        enclEntryName).toUri();
             } else {
                 return delegate.toURI();
             }

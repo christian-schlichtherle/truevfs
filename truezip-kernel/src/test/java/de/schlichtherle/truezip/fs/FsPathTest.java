@@ -353,17 +353,17 @@ public class FsPathTest {
                             final FsMountPoint mountPoint,
                             final FsEntryName entryName) {
         if (null != mountPoint) {
-            assertThat(path.getUri(), equalTo(URI.create(
+            assertThat(path.toUri(), equalTo(URI.create(
                     mountPoint.toString() + entryName)));
             assertThat(path.getMountPoint(), equalTo(mountPoint));
         } else {
-            assertThat(path.getUri(), equalTo(entryName.getUri()));
+            assertThat(path.toUri(), equalTo(entryName.toUri()));
             assertThat(path.getMountPoint(), nullValue());
         }
-        assertThat(path.getEntryName().getUri(), equalTo(entryName.getUri()));
-        assertThat(path.toString(), equalTo(path.getUri().toString()));
-        assertThat(FsPath.create(path.getUri().toString()), equalTo(path));
-        assertThat(FsPath.create(path.getUri().toString()).hashCode(), equalTo(path.hashCode()));
+        assertThat(path.getEntryName().toUri(), equalTo(entryName.toUri()));
+        assertThat(path.toString(), equalTo(path.toUri().toString()));
+        assertThat(FsPath.create(path.toUri().toString()), equalTo(path));
+        assertThat(FsPath.create(path.toUri().toString()).hashCode(), equalTo(path.hashCode()));
     }
 
     @Test
@@ -404,7 +404,7 @@ public class FsPathTest {
             { "bar", "bar" },
         }) {
             final FsPath path = FsPath.create(params[0]);
-            final URI hierarchical = path.getHierarchicalUri();
+            final URI hierarchical = path.toHierarchicalUri();
             assertThat(hierarchical, equalTo(URI.create(params[1])));
         }
     }
