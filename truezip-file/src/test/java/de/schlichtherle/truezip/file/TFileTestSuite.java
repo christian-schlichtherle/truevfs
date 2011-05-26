@@ -1312,7 +1312,7 @@ public abstract class TFileTestSuite {
             final CheckAllEntriesThread thread = threads[i];
             thread.join();
             if (thread.failure != null)
-                throw new Exception(thread.failure);
+                throw new IOException(thread.failure);
         }
         
         TFile.rm_r(archive);
