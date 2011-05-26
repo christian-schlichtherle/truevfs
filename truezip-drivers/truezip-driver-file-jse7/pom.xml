@@ -25,7 +25,7 @@
 
     <artifactId>truezip-driver-file-jse7</artifactId>
 
-    <name>TrueZIP Driver FILE NIO.2</name>
+    <name>TrueZIP Driver FILE JSE7</name>
     <description>
         The file system driver for the FILE scheme based on NIO.2 in JSE7.
 
