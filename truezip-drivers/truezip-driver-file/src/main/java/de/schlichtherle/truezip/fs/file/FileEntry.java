@@ -31,6 +31,7 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.io.File;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import net.jcip.annotations.Immutable;
@@ -46,13 +47,16 @@ import static de.schlichtherle.truezip.entry.Entry.Access.*;
  */
 @Immutable
 @DefaultAnnotation(NonNull.class)
+@edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
 public class FileEntry extends FsEntry implements IOEntry<FileEntry> {
 
+    private static final String FILE_POOL_PREFIX = ".tzp";
     private static final BitField<FsOutputOption> NO_OUTPUT_OPTIONS
             = BitField.noneOf(FsOutputOption.class);
 
     private final File file;
     private final EntryName name;
+    private volatile @CheckForNull TempFilePool pool;
 
     FileEntry(final File file) {
         assert null != file;
@@ -64,6 +68,14 @@ public class FileEntry extends FsEntry implements IOEntry<FileEntry> {
         assert null != file;
         this.file = new File(file, name.getPath());
         this.name = name;
+    }
+
+    final TempFilePool.Entry createTempFile() throws IOException {
+        TempFilePool pool = this.pool;
+        if (null == pool)
+            pool = this.pool = new TempFilePool(
+                    FILE_POOL_PREFIX, null, file.getParentFile());
+        return pool.allocate();
     }
 
     /** Returns the decorated file. */
