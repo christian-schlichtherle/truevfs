@@ -21,6 +21,9 @@ import net.jcip.annotations.ThreadSafe;
 /**
  * Thrown to indicate that an operation was trying to modify a read-only
  * file system.
+ * 
+ * @author  Christian Schlichtherle
+ * @version $Id$
  */
 @ThreadSafe
 public final class ReadOnlyFileSystemTypeException extends IOException {

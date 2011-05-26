@@ -54,22 +54,22 @@ final class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
     private static final BitField<FsOutputOption> NO_OUTPUT_OPTIONS
             = BitField.noneOf(FsOutputOption.class);
 
-    private HttpController controller;
     private final EntryName name;
     private final URL url;
+    private HttpController controller;
     private volatile @CheckForNull URLConnection connection;
 
     HttpEntry(  final FsMountPoint mountPoint,
                 final FsEntryName name,
                 final HttpController controller) {
-        assert null != controller;
-        this.controller = controller;
         this.name = name;
         try {
             this.url = mountPoint.resolve(name).getUri().toURL();
         } catch (MalformedURLException ex) {
             throw new IllegalArgumentException(ex);
         }
+        assert null != controller;
+        this.controller = controller;
     }
 
     HttpController getController() {
