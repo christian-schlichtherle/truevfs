@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.file;
 
+import de.schlichtherle.truezip.util.UriBuilder;
 import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
@@ -717,12 +718,11 @@ public final class TFile extends File {
                 this.innerArchive = this.enclArchive = innerArchive;
                 try {
                     this.enclEntryName = new FsEntryName(
-                            new URI(
-                                null,
-                                null,
-                                path.substring(innerArchivePathLength + 1) // cut off leading separatorChar
-                                    .replace(separatorChar, SEPARATOR_CHAR),
-                                null),
+                            new UriBuilder()
+                                .path(
+                                    path.substring(innerArchivePathLength + 1) // cut off leading separatorChar
+                                        .replace(separatorChar, SEPARATOR_CHAR))
+                                .getUri(),
                             CANONICALIZE);
                 } catch (URISyntaxException ex) {
                     throw new AssertionError(ex);
@@ -754,7 +754,7 @@ public final class TFile extends File {
             enclEntryName = 0 >= enclEntryNameBuf.length()
                     ? null
                     : new FsEntryName(
-                        new URI(null, null, enclEntryNameBuf.toString(), null),
+                        new UriBuilder().path(enclEntryNameBuf.toString()).getUri(),
                         CANONICALIZE);
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
