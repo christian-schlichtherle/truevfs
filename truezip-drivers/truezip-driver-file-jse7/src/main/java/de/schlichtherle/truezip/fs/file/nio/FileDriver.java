@@ -47,7 +47,8 @@ public final class FileDriver extends FsDriver {
     /**
      * {@inheritDoc}
      * 
-     * @return {@code 10}
+     * @return {@code 10} or {@code -10}, depending on the availability of the
+     *         NIO.2 API.
      */
     @Override
     public int getPriority() {

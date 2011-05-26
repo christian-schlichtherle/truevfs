@@ -36,7 +36,7 @@ final class NIO2 {
         try {
             Files.class.getName();
             available = true;
-        } catch (NoClassDefFoundError error) {
+        } catch (NoClassDefFoundError notAvailable) {
             available = false;
         }
         AVAILABLE = available;
