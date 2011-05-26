@@ -71,6 +71,8 @@ final class FileController extends FsController<FsModel>  {
                 // you cannot use the UriBuilder class - using either of these
                 // would result in the authority property of the new URI object
                 // being equal to the original value again.
+                // Note that the use of the buggy URI constructor is authorized
+                // in this case!
                 uri = new URI(  uri.getScheme(), "",
                                 SEPARATOR + SEPARATOR + uri.getAuthority() + uri.getPath(),
                                 uri.getQuery(), uri.getFragment());
