@@ -130,7 +130,7 @@ public final class TFileInputStream extends DecoratingInputStream {
             throw ex;
         } catch (IOException ex) {
             throw (FileNotFoundException) new FileNotFoundException(
-                    ex.toString()).initCause(ex);
+                    src.toString()).initCause(ex);
         }
     }
 }

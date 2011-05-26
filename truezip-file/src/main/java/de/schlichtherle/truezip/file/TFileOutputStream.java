@@ -177,7 +177,7 @@ public final class TFileOutputStream extends DecoratingOutputStream {
             throw ex;
         } catch (IOException ex) {
             throw (FileNotFoundException) new FileNotFoundException(
-                    ex.toString()).initCause(ex);
+                    dst.toString()).initCause(ex);
         }
     }
 }
