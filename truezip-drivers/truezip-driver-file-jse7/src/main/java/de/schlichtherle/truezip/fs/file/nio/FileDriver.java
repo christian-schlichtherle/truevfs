@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.fs.file;
+package de.schlichtherle.truezip.fs.file.nio;
 
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsDriver;
@@ -42,5 +42,15 @@ public final class FileDriver extends FsDriver {
         if (null != parent)
             throw new IllegalArgumentException();
         return new FileController(model);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @return {@code 10}
+     */
+    @Override
+    public int getPriority() {
+        return NIO2.AVAILABLE ? 10 : -10;
     }
 }
