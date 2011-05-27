@@ -30,7 +30,6 @@ import net.jcip.annotations.Immutable;
 
 /**
  * Addresses an entry in an entry container.
- * <p>
  * Although this class is declared to be immutable, it's not declared to be
  * final solely for the purpose of adding more constraints in subclass
  * constructors  so that their instances can be safely used as polymorphic
