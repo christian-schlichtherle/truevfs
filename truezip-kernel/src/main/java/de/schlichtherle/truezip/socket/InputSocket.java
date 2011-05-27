@@ -127,6 +127,9 @@ extends IOSocket<E, Entry> {
      * The implementation in the class {@link InputSocket} calls
      * {@link #newReadOnlyFile()} and wraps the resulting object in a new
      * {@link ReadOnlyFileInputStream} as an adapter.
+     * Note that this may <em>violate</em> the contract for this method because
+     * {@link #newReadOnlyFile()} is allowed to throw an
+     * {@link UnsupportedOperationException} while this method is not!
      *
      * @throws FileNotFoundException if the local target does not exist or is
      *         not accessible for some reason.
