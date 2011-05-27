@@ -212,13 +212,6 @@ public final class Paths {
         /**
          * Splits the given path name into its parent path name and member name,
          * recognizing platform specific file system roots.
-         * The returned array will hold the following strings:
-         * <ol>
-         * <li>At index zero: The parent path name with a single trailing
-         *     {@code separatorChar} or {@code null} if the path name does not
-         *     specify a parent.</li>
-         * <li>At index one: The member name without a {@code separatorChar}.</li>
-         * </ol>
          *
          * @param  path the name of the path which's parent path name and
          *         member name are to be returned.
