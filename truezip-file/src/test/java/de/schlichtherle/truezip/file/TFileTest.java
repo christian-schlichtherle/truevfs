@@ -103,7 +103,7 @@ public class TFileTest {
     }
 
     @Test
-    public void testURIConstructor() throws Exception {
+    public void testUriConstructor() throws Exception {
         TFile file;
         final String fs = separator;
 
@@ -435,7 +435,7 @@ public class TFileTest {
     }
 
     @Test
-    public void testURIandFsPath() {
+    public void testUriandFsPath() {
         for (final String[] params : new String[][] {
             { "/file", "file:/file" },
             { "/archive.zip", "zip:file:/archive.zip!/" },
