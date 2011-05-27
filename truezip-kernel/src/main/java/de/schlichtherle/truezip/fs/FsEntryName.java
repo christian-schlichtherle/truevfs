@@ -29,7 +29,8 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.*;
 import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
 
 /**
- * Addresses an entry in a file system relative to its mount point.
+ * Addresses an entry in a file system relative to its
+ * {@link FsMountPoint mount point}.
  * 
  * <a name="specification"/><h3>Specification</h3>
  * <p>
