@@ -35,6 +35,9 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
 
 /**
  * Addresses an entry in a file system.
+ * The purpose of a file system path is to parse a {@link URI} and decompose it
+ * into a {@link #getMountPoint() mount point} of a file system and its
+ * relative {@link #getEntryName() entry name}.
  * 
  * <a name="specification"/><h3>Specification</h3>
  * <p>
