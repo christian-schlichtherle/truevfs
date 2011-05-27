@@ -42,22 +42,26 @@ import static de.schlichtherle.truezip.util.UriEncoder.Encoding.*;
  * URI can be composed by calling any of the methods {@link #getUri()},
  * {@link #toUri()}, {@link #getString()} or {@link #toString()}.
  * <p>
- * This class quotes illegal characters wherever required for the
- * respective URI component.
+ * This class quotes illegal characters wherever required for the respective
+ * URI component.
  * As a deviation from RFC&nbsp;2396, non-US-ASCII characters get preserved
  * when encoding.
+ * <p>
+ * Note that using this class is superior to the five argument URI constructor
+ * <code>new {@link URI#URI(String, String, String, String, String) URI(scheme, authority, path, query, fragment)}</code>
+ * because the URI constructor does not quote all paths correctly.
+ * For example, {@code new URI(null, null, "foo:bar", null, null)} does not
+ * quote the colon before parsing so the resulting URI will have a scheme
+ * component {@code foo} and a path component {@code bar} instead of just a
+ * path component {@code foo:bar}.
  * 
  * <h3>Identities</h3>
  * For any {@link URI} {@code u} it is generally true that
- * <code><pre>
- * new UriBuilder(u).getUri().equals(u);
- * </pre></code>
+ * <pre>{@code new UriBuilder(u).getUri().equals(u);}</pre>
  * and
- * <code><pre>
- * new UriBuilder().uri(u).getUri().equals(u);
- * </pre></code>
+ * <pre>{@code new UriBuilder().uri(u).getUri().equals(u);}</pre>
  * and
- * <code><pre>
+ * <pre>{@code
  * new UriBuilder()
  *     .scheme(u.getScheme())
  *     .authority(u.getAuthority())
@@ -66,7 +70,7 @@ import static de.schlichtherle.truezip.util.UriEncoder.Encoding.*;
  *     .fragment(u.getFragment())
  *     .getUri()
  *     .equals(u);
- * </pre></code>
+ * }</pre>
  * These identity productions still apply even if the method {@link #getUri()}
  * is substituted with the method {@link #toUri()}.
  * 
