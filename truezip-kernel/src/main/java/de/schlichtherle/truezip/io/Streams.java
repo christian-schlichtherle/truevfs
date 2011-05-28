@@ -99,14 +99,19 @@ public final class Streams {
     /**
      * Copies the data from the given input stream to the given output stream
      * <em>without</em> closing them.
-     * The name of this method is inspired by the Unix command line utility
-     * {@code cat} because you could use it to con<i>cat</i>enate the contents
-     * of multiple streams.
+     * This method calls {@link OutputStream#flush()} unless an
+     * {@link IOException} occurs when writing to the output stream.
+     * This hold true even if an {@link IOException} occurs when reading from
+     * the input stream.
      * <p>
      * This is a high performance implementation which uses a pooled background
      * thread to fill a FIFO of pooled buffers which is concurrently flushed by
      * the current thread.
      * It performs best when used with <em>unbuffered</em> streams.
+     * <p>
+     * The name of this method is inspired by the Unix command line utility
+     * {@code cat} because you could use it to con<i>cat</i>enate the contents
+     * of multiple streams.
      *
      * @param  in the input stream.
      * @param  out the output stream.
@@ -269,6 +274,7 @@ public final class Streams {
                     reader.notify(); // only the reader could be waiting now!
                 }
             }
+            out.flush();
 
             if (reader.exception != null)
                 throw reader.exception;
