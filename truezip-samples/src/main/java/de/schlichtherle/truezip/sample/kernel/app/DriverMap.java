@@ -23,7 +23,9 @@ import de.schlichtherle.truezip.util.SuffixSet;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -38,10 +40,10 @@ import java.util.TreeMap;
 public class DriverMap implements Runnable {
 
     private static final String TABLE_ATTRIBUTES = " border=\"2\" cellpadding=\"4\""; //"";
-    private static final String BEGIN_CODE = "{@code "; //"<code>";
-    private static final String END_CODE   = "}"; //"</code>";
-    private static final String BEGIN_LINK = "{@link "; //"<code>";
-    private static final String END_LINK   = "}"; //"</code>";
+    private static final String BEGIN_CODE = "<code>"; //"{@code "
+    private static final String END_CODE   = "</code>"; //"}"
+    private static final String BEGIN_LINK = "<code>"; //"{@link "
+    private static final String END_LINK   = "</code>"; //"}"
 
     private final PrintStream out;
     private final FsDriverProvider provider;
@@ -76,7 +78,7 @@ public class DriverMap implements Runnable {
                 .append("      <caption>File System Driver Provider Class ").append(BEGIN_LINK).append(provider.getClass().getName()).append(END_LINK).append("</caption>\n")
                 .append("      <thead>\n")
                 .append("        <tr>\n")
-                .append("          <th>URI Schemes Regular Expression</th>\n")
+                .append("          <th>URI Schemes</th>\n")
                 .append("          <th>Archive File System?</th>\n")
                 .append("          <th>File System Driver Class</th>\n")
                 .append("        </tr>\n")
@@ -84,13 +86,18 @@ public class DriverMap implements Runnable {
                 .append("      <tbody>\n");
         for (Entry<String, SuffixSet> entry : compact.entrySet()) {
             String clazz = entry.getKey();
-            SuffixSet set = entry.getValue();
+            List<String> set = new ArrayList<String>(entry.getValue());
             String federated = Boolean.toString(
                     map .get(FsScheme.create(set.iterator().next()))
                         .isFederated());
-            String suffixes = set.toString();
             out .append("        <tr>\n")
-                .append("          <td>").append(BEGIN_CODE).append(suffixes).append(END_CODE).append("</td>\n")
+                .append("          <td>");
+            for (int i = 0; i < set.size(); i++) {
+                if (0 < i)
+                    out.append(", ");
+                out.append(BEGIN_CODE).append(set.get(i)).append(END_CODE);
+            }
+            out .append("</td>\n")
                 .append("          <td>").append(BEGIN_CODE).append(federated).append(END_CODE).append("</td>\n")
                 .append("          <td>").append(BEGIN_LINK).append(clazz).append(END_LINK).append("</td>\n")
                 .append("        </tr>\n");
