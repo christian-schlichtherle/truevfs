@@ -57,9 +57,9 @@ import static de.schlichtherle.truezip.util.UriEncoder.Encoding.*;
  * 
  * <h3>Identities</h3>
  * For any {@link URI} {@code u} it is generally true that
- * <pre>{@code new UriBuilder(u).getUri().equals(u);}</pre>
+ * <pre>{@code new UriBuilder(u).toUri().equals(u);}</pre>
  * and
- * <pre>{@code new UriBuilder().uri(u).getUri().equals(u);}</pre>
+ * <pre>{@code new UriBuilder().uri(u).toUri().equals(u);}</pre>
  * and
  * <pre>{@code
  * new UriBuilder()
@@ -68,7 +68,7 @@ import static de.schlichtherle.truezip.util.UriEncoder.Encoding.*;
  *     .path(u.isOpaque() ? u.getSchemeSpecificPart() : u.getPath())
  *     .query(u.getQuery())
  *     .fragment(u.getFragment())
- *     .getUri()
+ *     .toUri()
  *     .equals(u);
  * }</pre>
  * These identity productions still apply even if the method {@link #getUri()}
@@ -139,6 +139,7 @@ public final class UriBuilder {
      * @return A valid URI string which is composed from the properties of
      *         this URI builder.
      * @throws IllegalStateException if composing a valid URI is not possible.
+     * @see    #getString()
      */
     @Override
     public String toString() {
@@ -161,6 +162,7 @@ public final class UriBuilder {
      *         this URI builder.
      * @throws URISyntaxException if composing a valid URI is not possible due
      *         to an invalid scheme.
+     * @see    #toString()
      */
     public String getString() throws URISyntaxException {
         StringBuilder b = builder;
@@ -295,6 +297,7 @@ public final class UriBuilder {
      * @return A valid URI which is composed from the properties of
      *         this URI builder.
      * @throws IllegalStateException if composing a valid URI is not possible.
+     * @see    #getUri()
      */
     public URI toUri() {
         try {
@@ -315,6 +318,7 @@ public final class UriBuilder {
      * @return A valid URI which is composed from the properties of
      *         this URI builder.
      * @throws URISyntaxException if composing a valid URI is not possible.
+     * @see    #toUri()
      */
     public URI getUri() throws URISyntaxException {
         String u = getString();
