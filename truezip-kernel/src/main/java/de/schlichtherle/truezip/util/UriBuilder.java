@@ -86,7 +86,7 @@ import static de.schlichtherle.truezip.util.UriEncoder.Encoding.*;
 @NotThreadSafe
 public final class UriBuilder {
 
-    private final UriEncoder encoder;
+    private final UriEncoder encoder = new UriEncoder(null);
     private @CheckForNull StringBuilder builder;
     private @CheckForNull String scheme;
     private @CheckForNull String authority;
@@ -98,7 +98,6 @@ public final class UriBuilder {
      * Constructs a new URI builder.
      */
     public UriBuilder() {
-        encoder = new UriEncoder(null);
     }
 
     /**
@@ -107,7 +106,6 @@ public final class UriBuilder {
      * @param uri the uri for initializing the initial state.
      */
     public UriBuilder(URI uri) {
-        this();
         setUri(uri); // OK - class is final!
     }
 
