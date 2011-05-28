@@ -71,9 +71,9 @@ public final class KeyManagerLocator implements KeyManagerProvider {
     private static class Init {
         static final KeyManagerService SERVICE;
         static {
-            final Logger
-                    logger = Logger.getLogger(  KeyManagerLocator.class.getName(),
-                                                KeyManagerLocator.class.getName());
+            final Logger logger = Logger.getLogger(
+                    KeyManagerLocator.class.getName(),
+                    KeyManagerLocator.class.getName());
             final ServiceLocator locator = new ServiceLocator(
                     KeyManagerLocator.class.getClassLoader());
             KeyManagerService

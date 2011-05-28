@@ -73,9 +73,9 @@ public final class FsManagerLocator implements FsManagerProvider {
     private static class Init {
         static final FsManager MANAGER;
         static {
-            final Logger
-                    logger = Logger.getLogger(  FsManagerLocator.class.getName(),
-                                                FsManagerLocator.class.getName());
+            final Logger logger = Logger.getLogger(
+                    FsManagerLocator.class.getName(),
+                    FsManagerLocator.class.getName());
             final ServiceLocator locator = new ServiceLocator(
                     FsManagerLocator.class.getClassLoader());
             FsManagerService

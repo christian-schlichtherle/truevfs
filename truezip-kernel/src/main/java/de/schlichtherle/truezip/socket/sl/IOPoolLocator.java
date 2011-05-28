@@ -74,9 +74,9 @@ public final class IOPoolLocator implements IOPoolProvider {
     private static class Init {
         static final IOPoolService SERVICE;
         static {
-            final Logger
-                    logger = Logger.getLogger(  IOPoolLocator.class.getName(),
-                                                IOPoolLocator.class.getName());
+            final Logger logger = Logger.getLogger(
+                    IOPoolLocator.class.getName(),
+                    IOPoolLocator.class.getName());
             final ServiceLocator locator = new ServiceLocator(
                     IOPoolLocator.class.getClassLoader());
             IOPoolService service = locator.getService(IOPoolService.class, null);

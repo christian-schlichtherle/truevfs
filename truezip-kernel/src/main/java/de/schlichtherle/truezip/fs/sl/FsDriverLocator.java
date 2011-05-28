@@ -65,9 +65,9 @@ public final class FsDriverLocator implements FsDriverProvider {
     private static class Init {
         static final Map<FsScheme, FsDriver> DRIVERS;
         static {
-            final Logger
-                    logger = Logger.getLogger(  FsDriverLocator.class.getName(),
-                                                FsDriverLocator.class.getName());
+            final Logger logger = Logger.getLogger(
+                    FsDriverLocator.class.getName(),
+                    FsDriverLocator.class.getName());
             final Iterator<FsDriverService>
                     i = new ServiceLocator(FsDriverLocator.class.getClassLoader())
                         .getServices(FsDriverService.class);
