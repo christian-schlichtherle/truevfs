@@ -38,6 +38,8 @@ import java.nio.file.spi.FileSystemProvider;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.ServiceConfigurationError;
 import java.util.Set;
 import static java.util.logging.Level.*;
 import java.util.logging.Logger;
@@ -49,7 +51,9 @@ import java.util.logging.Logger;
 @DefaultAnnotation(NonNull.class)
 public class TFileSystemProvider extends FileSystemProvider {
 
-    private static final int NUM_PROVIDERS = 30; // match number of SCHEMEXX classes here!
+    private static final ResourceBundle resources = ResourceBundle.getBundle(
+            TFileSystemProvider.class.getName());
+    private static final int MAX_PROVIDERS = 30; // match number of SCHEMEXX classes here!
     private static final String[] SCHEMES;
     static {
         final Logger logger = Logger.getLogger(
@@ -57,18 +61,29 @@ public class TFileSystemProvider extends FileSystemProvider {
                 TFileSystemProvider.class.getName());
         final SuffixSet set = new SuffixSet(TArchiveDetector.ALL.toString());
         final int total = set.size();
+        if (0 == total)
+            throw new ServiceConfigurationError(resources.getString("no_drivers"));
         final List<String> subset = new ArrayList<>(set)
-                .subList(0, Math.min(total, NUM_PROVIDERS));
+                .subList(0, Math.min(total, MAX_PROVIDERS));
         SCHEMES = subset.toArray(new String[subset.size()]);
-        final boolean changed;
-        if (total < NUM_PROVIDERS) {
-            changed = set.retainAll(subset.subList(0, NUM_PROVIDERS % total));
-            assert changed;
-            logger.log(CONFIG, "too_few", new Object[] { total, NUM_PROVIDERS, set.toString() });
-        } else if (NUM_PROVIDERS < total) {
-            changed = set.removeAll(subset);
-            assert changed;
-            logger.log(WARNING, "too_many", new Object[] { total, NUM_PROVIDERS, set.toString() });
+        if (total < MAX_PROVIDERS) {
+            final int max = Math.min(total, MAX_PROVIDERS - total);
+            set.retainAll(subset.subList(0, max));
+            logger.log(CONFIG, "too_few", new Object[] {
+                total,
+                MAX_PROVIDERS,
+                MAX_PROVIDERS - total,
+                max,
+                set.toString().replace("|", ", "),
+            });
+        } else if (MAX_PROVIDERS < total) {
+            set.removeAll(subset);
+            logger.log(WARNING, "too_many", new Object[] {
+                total,
+                MAX_PROVIDERS,
+                total - MAX_PROVIDERS,
+                set.toString().replace("|", ", "),
+            });
         }
     }
 
@@ -79,7 +94,9 @@ public class TFileSystemProvider extends FileSystemProvider {
     }
 
     protected TFileSystemProvider(final String scheme) {
-        if (null == TArchiveDetector.ALL.getScheme("." + scheme))
+        // Don't check the scheme yet - this would inhibit the use of arbitrary
+        // schemes for custom application file formats!
+        if (null == scheme)
             throw new IllegalArgumentException();
         this.scheme = scheme;
     }
