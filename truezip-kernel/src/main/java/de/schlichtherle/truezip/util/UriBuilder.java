@@ -165,11 +165,7 @@ public final class UriBuilder {
      * @see    #toString()
      */
     public String getString() throws URISyntaxException {
-        StringBuilder b = builder;
-        if (null == b)
-            b = builder = new StringBuilder();
-        else
-            b.setLength(0);
+        final StringBuilder b = resetBuilder();
         int errIdx = -1;            // error index
         String errMsg = null;       // error message
         final String    s = scheme,
@@ -219,6 +215,15 @@ public final class UriBuilder {
         if (0 <= errIdx)
             throw new URISyntaxException(quote(u), errMsg, errIdx);
         return u;
+    }
+
+    private StringBuilder resetBuilder() {
+        StringBuilder builder = this.builder;
+        if (null == builder)
+            this.builder = builder = new StringBuilder();
+        else
+            builder.setLength(0);
+        return builder;
     }
 
     /**
