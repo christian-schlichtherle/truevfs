@@ -15,8 +15,12 @@
  */
 package de.schlichtherle.truezip.nio.fsp;
 
+import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
+import org.junit.Before;
+import de.schlichtherle.truezip.file.TArchiveDetector;
 import java.io.File;
 import java.net.URI;
+import org.junit.After;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
@@ -26,6 +30,16 @@ import static org.hamcrest.CoreMatchers.*;
  * @version $Id$
  */
 public class TPathTest {
+
+    @Before
+    public void setUp() {
+        TPath.setDefaultArchiveDetector(
+                new TArchiveDetector("mok", new MockArchiveDriver()));
+    }
+    @After
+    public void tearDown() {
+        TPath.setDefaultArchiveDetector(TArchiveDetector.ALL);
+    }
 
     @Test
     public void testInvalidUriConstructor() {
@@ -86,8 +100,8 @@ public class TPathTest {
             { root + "foo/bar", "/foo/bar", null, "/foo", new String[] { "/bar" } },
             { root + "foo/bar/baz", "/foo/bar/baz", null, "/foo", new String[] { "bar", "baz" } },
             { root + "foo/bar/baz", "/foo/bar/baz", null, "/foo", new String[] { "/bar", "/baz" } },
-            { "zip:" + cd + "archive.zip!/", "archive.zip", null, "archive.zip", new String[0] },
-            { "zip:" + root + "archive.zip!/", "/archive.zip", null, "/archive.zip", new String[0] },
+            { "mok:" + cd + "archive.mok!/", "archive.mok", null, "archive.mok", new String[0] },
+            { "mok:" + root + "archive.mok!/", "/archive.mok", null, "/archive.mok", new String[0] },
         }) {
             URI expectedFsPath = URI.create(params[0].toString());
             URI expectedUri = URI.create(params[1].toString());
