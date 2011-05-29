@@ -90,6 +90,8 @@ public class TPathTest {
         final String cd = new File("").toURI().toString();
         for (Object[] params : new Object[][] {
             // { $expectedFsPath, $expectedUri, $parent, $first, $more },
+            { cd + "foo/bar", "foo/bar", "foo", "bar", new String[0] },
+            //{ "mok:" + cd + "foo.mok!/bar", "foo.mok/bar", "foo.mok", "bar", new String[0] },
             { cd + "foo", "foo", null, "foo", new String[0] },
             { cd + "foo/bar", "foo/bar", null, "foo", new String[] { "bar" } },
             { cd + "foo/bar", "foo/bar", null, "foo", new String[] { "/bar" } },
@@ -100,8 +102,10 @@ public class TPathTest {
             { root + "foo/bar", "/foo/bar", null, "/foo", new String[] { "/bar" } },
             { root + "foo/bar/baz", "/foo/bar/baz", null, "/foo", new String[] { "bar", "baz" } },
             { root + "foo/bar/baz", "/foo/bar/baz", null, "/foo", new String[] { "/bar", "/baz" } },
-            { "mok:" + cd + "archive.mok!/", "archive.mok", null, "archive.mok", new String[0] },
-            { "mok:" + root + "archive.mok!/", "/archive.mok", null, "/archive.mok", new String[0] },
+            { "mok:" + cd + "foo.mok!/", "foo.mok", null, "foo.mok", new String[0] },
+            { "mok:mok:" + cd + "foo.mok!/bar.mok!/", "foo.mok/bar.mok", null, "foo.mok", new String[] { "bar.mok" } },
+            { "mok:" + root + "foo.mok!/", "/foo.mok", null, "/foo.mok", new String[0] },
+            { "mok:mok:" + root + "foo.mok!/bar.mok!/", "/foo.mok/bar.mok", null, "/foo.mok", new String[] { "bar.mok" } },
         }) {
             URI expectedFsPath = URI.create(params[0].toString());
             URI expectedUri = URI.create(params[1].toString());
