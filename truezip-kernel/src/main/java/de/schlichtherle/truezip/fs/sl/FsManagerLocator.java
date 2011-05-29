@@ -24,7 +24,7 @@ import de.schlichtherle.truezip.util.ServiceLocator;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Iterator;
-import java.util.logging.Level;
+import static java.util.logging.Level.*;
 import java.util.logging.Logger;
 import net.jcip.annotations.Immutable;
 
@@ -87,7 +87,7 @@ public final class FsManagerLocator implements FsManagerProvider {
                         i.hasNext();
                         oldService = service) {
                     service = i.next();
-                    logger.log(Level.CONFIG, "located", service);
+                    logger.log(CONFIG, "located", service);
                     if (null != oldService
                             && oldService.getPriority() > service.getPriority())
                         service = oldService;
@@ -96,15 +96,15 @@ public final class FsManagerLocator implements FsManagerProvider {
             FsManager manager;
             if (null != service) {
                 manager = service.get();
-                logger.log(Level.CONFIG, "provided", manager);
+                logger.log(CONFIG, "provided", manager);
             } else {
                 manager = new FsFailSafeManager(new FsDefaultManager());
-                logger.log(Level.CONFIG, "default", manager);
+                logger.log(CONFIG, "default", manager);
             }
             MANAGER = manager;
         }
 
-        /** You cannot instantiate this class. */
+        /** Make NetBeans happy. */
         Init() {
         }
     } // class Holder

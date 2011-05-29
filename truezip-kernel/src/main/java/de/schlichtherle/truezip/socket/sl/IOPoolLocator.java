@@ -21,9 +21,11 @@ import de.schlichtherle.truezip.socket.spi.IOPoolService;
 import de.schlichtherle.truezip.util.ServiceLocator;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import java.text.MessageFormat;
 import java.util.Iterator;
+import java.util.ResourceBundle;
 import java.util.ServiceConfigurationError;
-import java.util.logging.Level;
+import static java.util.logging.Level.*;
 import java.util.logging.Logger;
 import net.jcip.annotations.Immutable;
 
@@ -87,17 +89,21 @@ public final class IOPoolLocator implements IOPoolProvider {
                         i.hasNext();
                         oldService = service) {
                     service = i.next();
-                    logger.log(Level.CONFIG, "located", service);
+                    logger.log(CONFIG, "located", service);
                     if (null != oldService
                             && oldService.getPriority() > service.getPriority())
                         service = oldService;
                 }
             }
             if (null != service)
-                logger.log(Level.CONFIG, "provided", service);
+                logger.log(CONFIG, "provided", service);
             else
                 throw new ServiceConfigurationError(
-                        "No provider available for " + IOPoolService.class);
+                        MessageFormat.format(
+                            ResourceBundle
+                                .getBundle(IOPoolLocator.class.getName())
+                                .getString("none"),
+                            IOPoolService.class));
             SERVICE = service;
         }
 
