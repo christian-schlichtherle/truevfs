@@ -36,7 +36,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ServiceConfigurationError;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import net.jcip.annotations.Immutable;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * Detects a <em>prospective</em> archive file by matching its path name
@@ -347,5 +349,42 @@ implements FsCompositeDriver, FsDriverProvider {
     @Override
     public String toString() {
         return suffixes;
+    }
+
+    /**
+     * A thread local {@link Matcher}.
+     * This class is intended to be used in multithreaded environments for high
+     * performance pattern matching.
+     *
+     * @see #reset(CharSequence)
+     */
+    @ThreadSafe
+    @DefaultAnnotation(NonNull.class)
+    private static final class ThreadLocalMatcher extends ThreadLocal<Matcher> {
+        private final Pattern pattern;
+
+        /**
+         * Constructs a new thread local matcher by using the given pattern.
+         *
+         * @param  pattern the pattern to be used.
+         */
+        ThreadLocalMatcher(Pattern pattern) {
+            if (null == pattern)
+                throw new NullPointerException();
+            this.pattern = pattern;
+        }
+
+        @Override
+        protected Matcher initialValue() {
+            return pattern.matcher(""); // NOI18N
+        }
+
+        /**
+         * Resets the thread local matcher with the given character sequence and
+         * returns it.
+         */
+        Matcher reset(CharSequence input) {
+            return get().reset(input);
+        }
     }
 }
