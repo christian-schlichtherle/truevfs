@@ -99,27 +99,27 @@ public final class TPath implements Path {
                     ? parent.detector
                     : defaultDetector;
 
-        // Compute the URI.
-        final UriBuilder ub = new UriBuilder();
-        final StringBuilder pb = new StringBuilder();
-        if (null != parent) {
-            final URI parentUri = parent.toUri();
-            ub.setUri(parent.toUri());
-            pb.append(parentUri.getPath()).append(SEPARATOR);
-        }
-        pb.append(first);
+        // Concatenate the URI path.
+        final StringBuilder pb = new StringBuilder(first);
         for (final String m : more)
             pb      .append(SEPARATOR_CHAR)
                     .append(m.replace(separatorChar, SEPARATOR_CHAR));
-        uri = ub.path(pb.toString()).toUri().normalize();
+        uri = new UriBuilder().path(pb.toString()).toUri().normalize();
 
-        // Compute $path and $uri;
-        if (null != parent)
-            path = parent.toFsPath();
-        else if (uri.getPath().startsWith(SEPARATOR))
+        // Now resolve it to the parent, if any.
+        if (null != parent) {
+            while (SEPARATOR_CHAR == pb.charAt(0))
+                pb.deleteCharAt(0);
+            UriBuilder ub = new UriBuilder(parent.toUri());
+            if (!ub.getPath().endsWith(SEPARATOR))
+                ub.path(ub.getPath() + SEPARATOR);
+            path = parent.toFsPath().resolve(FsEntryName.create(uri));
+            uri = ub.toUri().resolve(uri);
+        } else if (SEPARATOR_CHAR == pb.charAt(0)) {
             path = ROOT_DIRECTORY.toFsPath();
-        else
+        } else {
             path = CURRENT_DIRECTORY.toFsPath();
+        }
         for (String p; "../".startsWith((p = uri.getPath()).substring(0, 3)); ) {
             if (1 >= p.length())
                 break; // path component is "" or ".".
