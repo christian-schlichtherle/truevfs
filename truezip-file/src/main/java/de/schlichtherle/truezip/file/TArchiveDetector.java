@@ -306,11 +306,6 @@ implements FsCompositeDriver, FsDriverProvider {
                 : null;
     }
 
-    /** Reserved for unit testing only. */
-    @CheckForNull FsDriver getDriver(FsScheme scheme) {
-        return drivers.get(scheme);
-    }
-
     @Override
     public FsController<?>
     newController(  final FsModel model,

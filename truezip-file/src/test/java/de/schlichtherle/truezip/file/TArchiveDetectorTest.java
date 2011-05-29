@@ -413,9 +413,9 @@ public class TArchiveDetectorTest {
 
         if (null != result) {
             assertThat(detector.getScheme(lpath), equalTo(detector.getScheme(upath)));
-            assertThat(detector.getDriver(detector.getScheme(lpath)),
+            assertThat(detector.get().get(detector.getScheme(lpath)),
                     sameInstance(result));
-            assertThat(detector.getDriver(detector.getScheme(upath)),
+            assertThat(detector.get().get(detector.getScheme(upath)),
                     sameInstance(result));
         } else {
             assertThat(detector.getScheme(lpath), nullValue());
