@@ -28,7 +28,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.ServiceConfigurationError;
 import java.util.TreeMap;
-import java.util.logging.Level;
+import static java.util.logging.Level.*;
 import java.util.logging.Logger;
 import net.jcip.annotations.Immutable;
 
@@ -74,11 +74,10 @@ public final class FsDriverLocator implements FsDriverProvider {
             final Map<FsScheme, FsDriver>
                     sorted = new TreeMap<FsScheme, FsDriver>();
             if (!i.hasNext())
-                throw new ServiceConfigurationError(
-                        "No provider available for " + FsDriverService.class);
+                logger.log(WARNING, "none", FsDriverService.class);
             while (i.hasNext()) {
                 FsDriverService service = i.next();
-                logger.log(Level.CONFIG, "located", service);
+                logger.log(CONFIG, "located", service);
                 for (final Map.Entry<FsScheme, FsDriver> entry
                         : service.get().entrySet()) {
                     final FsScheme scheme = entry.getKey();
@@ -97,14 +96,14 @@ public final class FsDriverLocator implements FsDriverProvider {
             for (final Map.Entry<FsScheme, FsDriver> entry : sorted.entrySet()) {
                 final FsScheme scheme = entry.getKey();
                 final FsDriver driver = entry.getValue();
-                logger.log(Level.CONFIG, "mapping",
+                logger.log(CONFIG, "mapping",
                         new Object[] { scheme, driver });
                 fast.put(scheme, driver);
             }
             DRIVERS = Collections.unmodifiableMap(fast);
         }
 
-        /** You cannot instantiate this class. */
+        /** Make NetBeans happy. */
         Init() {
         }
     } // class Holder

@@ -23,7 +23,7 @@ import de.schlichtherle.truezip.util.ServiceLocator;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Iterator;
-import java.util.logging.Level;
+import static java.util.logging.Level.*;
 import java.util.logging.Logger;
 import net.jcip.annotations.Immutable;
 
@@ -85,17 +85,17 @@ public final class KeyManagerLocator implements KeyManagerProvider {
                         i.hasNext();
                         oldService = service) {
                     service = i.next();
-                    logger.log(Level.CONFIG, "located", service);
+                    logger.log(CONFIG, "located", service);
                     if (null != oldService
                             && oldService.getPriority() > service.getPriority())
                         service = oldService;
                 }
             }
             if (null != service) {
-                logger.log(Level.CONFIG, "provided", service);
+                logger.log(CONFIG, "provided", service);
             } else {
                 service = new PromptingKeyManagerService();
-                logger.log(Level.CONFIG, "default", service);
+                logger.log(CONFIG, "default", service);
             }
             SERVICE = service;
         }
