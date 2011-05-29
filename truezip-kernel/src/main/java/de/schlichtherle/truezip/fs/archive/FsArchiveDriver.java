@@ -29,6 +29,7 @@ import de.schlichtherle.truezip.fs.FsException;
 import de.schlichtherle.truezip.fs.FsInputOption;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.FsOutputOption;
+import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.InputSocket;
@@ -58,14 +59,6 @@ import net.jcip.annotations.Immutable;
 @DefaultAnnotation(NonNull.class)
 public abstract class FsArchiveDriver<E extends FsArchiveEntry>
 extends FsDriver {
-
-    /** A bit field with no output options set. */
-    public static final BitField<FsOutputOption>
-            NO_OUTPUT_OPTION = BitField.noneOf(FsOutputOption.class);
-
-    /** A bit field with no output options set. */
-    public static final BitField<FsInputOption>
-            NO_INPUT_OPTION = BitField.noneOf(FsInputOption.class);
 
     /**
      * {@inheritDoc}

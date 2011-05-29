@@ -81,10 +81,7 @@ implements Iterable<FsController<?>> {
      * Equivalent to
      * {@code BitField.of(FsSyncOption.FORCE_CLOSE_INPUT, FsSyncOption.FORCE_CLOSE_OUTPUT, FsSyncOption.CLEAR_CACHE)}.
      */
-    public static final BitField<FsSyncOption>
-            UMOUNT = BitField.of(   FORCE_CLOSE_INPUT,
-                                    FORCE_CLOSE_OUTPUT,
-                                    CLEAR_CACHE);
+    public static final BitField<FsSyncOption> UMOUNT = FsSyncOptions.UMOUNT;
 
     /**
      * Commits all unsynchronized changes to the contents of all federated file

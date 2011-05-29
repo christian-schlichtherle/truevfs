@@ -28,6 +28,7 @@ import net.jcip.annotations.Immutable;
  * If an option is not available, an {@link IOException} must be thrown.
  *
  * @see     FsInputOption
+ * @see     FsOutputOptions
  * @author  Christian Schlichtherle
  * @version $Id$
  */

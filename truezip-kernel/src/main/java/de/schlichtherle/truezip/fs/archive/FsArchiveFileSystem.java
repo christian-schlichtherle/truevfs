@@ -24,7 +24,7 @@ import de.schlichtherle.truezip.fs.FsEntryName;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
-import static de.schlichtherle.truezip.fs.archive.FsArchiveDriver.*;
+import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
 import static de.schlichtherle.truezip.io.Paths.*;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.Link;
