@@ -123,9 +123,8 @@ implements FsCompositeDriver, FsDriverProvider {
     }
 
     /**
-     * Constructs a new {@code TArchiveDetector} by filtering the given
-     * driver provider for all canonicalized suffixes in the {@code suffixes}
-     * list.
+     * Constructs a new {@code TArchiveDetector} by filtering the given driver
+     * provider for all canonicalized suffixes in the {@code suffixes} list.
      *
      * @param  provider the file system driver provider to filter.
      * @param  suffixes A list of suffixes which shall identify prospective
@@ -140,35 +139,40 @@ implements FsCompositeDriver, FsDriverProvider {
      */
     public TArchiveDetector(final FsDriverProvider provider,
                             final @CheckForNull String suffixes) {
-        final Map<FsScheme, FsDriver> drivers = provider.get();
-        final SuffixSet known = getSuffixes(provider);
-        final SuffixSet given;
+        final Map<FsScheme, FsDriver> inDrivers = provider.get();
+        final SuffixSet inSuffixes;
+        final Map<FsScheme, FsDriver> outDrivers;
         if (null != suffixes) {
-            given = new SuffixSet(suffixes);
-            if (given.retainAll(known)) {
-                final SuffixSet unknown = new SuffixSet(suffixes);
-                unknown.removeAll(known);
-                throw new IllegalArgumentException(
-                        "\"" + unknown + "\" (no archive driver installed for these suffixes)");
-            }
+            inSuffixes = new SuffixSet(suffixes);
+            outDrivers = new HashMap<FsScheme, FsDriver>(inDrivers.size() * 4 / 3 + 1);
         } else {
-            given = known;
+            inSuffixes = null;
+            outDrivers = inDrivers;
         }
-        this.drivers = drivers;
-        this.suffixes = given.toString();
-        this.matcher = new ThreadLocalMatcher(given.toPattern());
-    }
-
-    private static SuffixSet getSuffixes(FsDriverProvider provider) {
-        if (provider instanceof TArchiveDetector)
-            return new SuffixSet(((TArchiveDetector) provider).toString());
-        SuffixSet set = new SuffixSet();
-        for (Map.Entry<FsScheme, FsDriver> entry : provider.get().entrySet()) {
-            FsDriver driver = entry.getValue();
-            if (null != driver && driver.isFederated())
-                set.add(entry.getKey().toString());
+        final SuffixSet outSuffixes = new SuffixSet();
+        for (final Map.Entry<FsScheme, FsDriver> entry : inDrivers.entrySet()) {
+            final FsDriver driver = entry.getValue();
+            if (null == driver)
+                continue;
+            final FsScheme scheme = entry.getKey();
+            final boolean federated = driver.isFederated();
+            if (null != inSuffixes) {
+                final boolean accepted = inSuffixes.contains(scheme.toString());
+                if (!federated || accepted)
+                    outDrivers.put(scheme, driver);
+                if (federated && accepted)
+                    outSuffixes.add(scheme.toString());
+            } else {
+                if (federated)
+                    outSuffixes.add(scheme.toString());
+            }
         }
-        return set;
+        if (null != inSuffixes && inSuffixes.retainAll(outSuffixes))
+            throw new IllegalArgumentException(
+                    "\"" + inSuffixes + "\" (no archive driver installed for these suffixes)");
+        this.drivers = Collections.unmodifiableMap(outDrivers);
+        this.suffixes = outSuffixes.toString();
+        this.matcher = new ThreadLocalMatcher(outSuffixes.toPattern());
     }
 
     /**
@@ -237,14 +241,13 @@ implements FsCompositeDriver, FsDriverProvider {
     }
 
     /**
-     * Constructs a new {@code TArchiveDetector} by
-     * decorating the configuration of {@code delegate} with
-     * mappings for all entries in {@code config}.
+     * Constructs a new {@code TArchiveDetector} by decorating the given driver
+     * provider with mappings for all entries in {@code config}.
      * 
-     * @param  delegate the file system driver provider to decorate.
+     * @param  provider the file system driver provider to decorate.
      * @param  config a map of file system schemes to file system drivers.
      *         {@code null} may be used to <i>shadow</i> a mapping for an equal
-     *         file system scheme in {@code delegate} by removing it from the
+     *         file system scheme in {@code provider} by removing it from the
      *         resulting map for this detector.
      * @throws NullPointerException if a required configuration element is
      *         {@code null}.
@@ -254,25 +257,35 @@ implements FsCompositeDriver, FsDriverProvider {
      *         does not hold.
      * @see    SuffixSet Syntax contraints for suffix lists.
      */
-    public TArchiveDetector(final FsDriverProvider delegate,
+    public TArchiveDetector(final FsDriverProvider provider,
                             final Map<FsScheme, FsDriver> config) {
-        final Map<FsScheme, FsDriver>
-                drivers = new HashMap<FsScheme, FsDriver>(delegate.get());
-        final SuffixSet suffixes = getSuffixes(delegate);
+        final Map<FsScheme, FsDriver> inDrivers = provider.get();
+        final Map<FsScheme, FsDriver> 
+                outDrivers = new HashMap<FsScheme, FsDriver>(inDrivers.size() * 4 / 3 + 1);
+        final SuffixSet outSuffixes = new SuffixSet();
+        for (final Map.Entry<FsScheme, FsDriver> entry : inDrivers.entrySet()) {
+            final FsDriver driver = entry.getValue();
+            if (null == driver)
+                continue;
+            final FsScheme scheme = entry.getKey();
+            outDrivers.put(scheme, driver);
+            if (driver.isFederated())
+                outSuffixes.add(scheme.toString());
+        }
         for (final Map.Entry<FsScheme, FsDriver> entry : config.entrySet()) {
             final FsScheme scheme = entry.getKey();
             final FsDriver driver = entry.getValue();
             if (null != driver) {
-                suffixes.add(scheme.toString());
-                drivers.put(scheme, driver);
+                outDrivers.put(scheme, driver);
+                outSuffixes.add(scheme.toString());
             } else {
-                suffixes.remove(scheme.toString());
-                drivers.remove(scheme);
+                outDrivers.remove(scheme);
+                outSuffixes.remove(scheme.toString());
             }
         }
-        this.drivers = Collections.unmodifiableMap(drivers);
-        this.suffixes = suffixes.toString();
-        this.matcher = new ThreadLocalMatcher(suffixes.toPattern());
+        this.drivers = Collections.unmodifiableMap(outDrivers);
+        this.suffixes = outSuffixes.toString();
+        this.matcher = new ThreadLocalMatcher(outSuffixes.toPattern());
     }
 
     @Override
