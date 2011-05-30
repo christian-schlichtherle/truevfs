@@ -298,6 +298,7 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      * Returns the URI for this entry name.
      *
      * @return The URI for this entry name.
+     * @since  TrueZIP 7.1.1
      */
     public final URI toUri() {
         return uri;

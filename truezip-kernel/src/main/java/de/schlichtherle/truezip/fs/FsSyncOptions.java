@@ -22,7 +22,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * @see     FsSyncOption
- * @since   TrueZIP 7.2
+ * @since   TrueZIP 7.1.1
  * @author  Christian Schlichtherle
  * @version $Id$
  */
