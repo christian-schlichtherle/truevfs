@@ -27,7 +27,7 @@ import java.io.InputStream;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * An input socket for HTTP entries.
+ * An input socket for HTTP(S) entries.
  * 
  * @see     HttpOutputSocket
  * @author  Christian Schlichtherle

@@ -19,7 +19,6 @@ import de.schlichtherle.truezip.entry.Entry;
 import static de.schlichtherle.truezip.entry.Entry.Access.*;
 import static de.schlichtherle.truezip.entry.Entry.Size.*;
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
-import de.schlichtherle.truezip.entry.EntryName;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsMountPoint;
@@ -41,7 +40,7 @@ import java.util.Set;
 import net.jcip.annotations.Immutable;
 
 /**
- * An HTTP entry.
+ * An HTTP(S) entry.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -54,7 +53,7 @@ final class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
     private static final BitField<FsOutputOption> NO_OUTPUT_OPTIONS
             = BitField.noneOf(FsOutputOption.class);
 
-    private final EntryName name;
+    private final String name;
     private final URL url;
     private HttpController controller;
     private volatile @CheckForNull URLConnection connection;
@@ -62,7 +61,7 @@ final class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
     HttpEntry(  final FsMountPoint mountPoint,
                 final FsEntryName name,
                 final HttpController controller) {
-        this.name = name;
+        this.name = name.toString();
         try {
             this.url = mountPoint.resolve(name).toUri().toURL();
         } catch (MalformedURLException ex) {
@@ -88,7 +87,7 @@ final class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
 
     @Override
     public String getName() {
-        return name.toString();
+        return name;
     }
 
     @Override
