@@ -24,7 +24,6 @@
     </parent>
 
     <artifactId>truezip-driver-file-jse7</artifactId>
-    <version>7.2-SNAPSHOT</version>
 
     <name>TrueZIP Driver FILE JSE7</name>
     <description>
