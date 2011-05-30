@@ -24,6 +24,7 @@
     </parent>
 
     <artifactId>truezip-fsp-jse7</artifactId>
+    <version>7.2-SNAPSHOT</version>
 
     <name>TrueZIP FSP JSE7</name>
     <description>
