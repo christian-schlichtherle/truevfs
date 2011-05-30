@@ -19,7 +19,6 @@ import de.schlichtherle.truezip.util.UriBuilder;
 import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
-import java.io.InvalidObjectException;
 import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.fs.FsController;
@@ -64,8 +63,8 @@ import net.jcip.annotations.Immutable;
 
 import static de.schlichtherle.truezip.fs.FsEntry.*;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
-import static de.schlichtherle.truezip.fs.FsManager.*;
 import static de.schlichtherle.truezip.fs.FsSyncOption.*;
+import static de.schlichtherle.truezip.fs.FsSyncOptions.*;
 import static de.schlichtherle.truezip.fs.FsUriModifier.*;
 import static de.schlichtherle.truezip.entry.Entry.Size.*;
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
@@ -388,7 +387,7 @@ public final class TFile extends File {
      * to enable the broken implementation in
      * {@link javax.swing.JFileChooser} to browse archive files.
      */
-    private transient File delegate; // TODO: Revision this: Still required?
+    private transient File delegate;
 
     private transient TArchiveDetector detector;
     private transient @Nullable TFile innerArchive;
@@ -576,17 +575,16 @@ public final class TFile extends File {
     }
 
     /**
-     * Constructs a new {@code TFile} instance from the given
-     * {@code uri}.
+     * Constructs a new {@code TFile} instance from the given {@code uri}.
      * This method behaves similar to the super class constructor
      * {@link File#File(URI)} with the following amendment:
      * If the URI matches the pattern {@code scheme:file:path!/entry},
      * then the constructed file object treats the URI like an entry in the
      * federated file system of the type named {@code scheme}.
-     * This can be applied recursively to access the entries of archive files
-     * within other archive files.
+     * This may be recursively applied to access archive entries within other
+     * archive files.
      * <p>
-     * Note that the newly created {@code TFile} instance uses the
+     * Note that the constructed {@code TFile} instance uses the
      * {@link #getDefaultArchiveDetector() default archive detector} to look
      * up archive drivers for the named scheme(s).
      *
@@ -601,17 +599,16 @@ public final class TFile extends File {
     }
 
     /**
-     * Constructs a new {@code TFile} instance from the given
-     * {@code path}.
+     * Constructs a new {@code TFile} instance from the given {@code path}.
      * This method behaves similar to the super class constructor
      * {@link File#File(URI)} with the following amendment:
      * If the path matches the pattern {@code scheme:file:path!/entry},
      * then the constructed file object treats the URI like an entry in the
      * federated file system of the type named {@code scheme}.
-     * This may be applied unlimitedly recursively to access archive entries
-     * within other archive files.
+     * This may be recursively applied to access archive entries within other
+     * archive files.
      * <p>
-     * Note that the newly created {@code TFile} instance uses the
+     * Note that the constructed {@code TFile} instance uses the
      * {@link #getDefaultArchiveDetector() default archive detector} to look
      * up archive drivers for the named scheme(s).
      *
@@ -635,21 +632,21 @@ public final class TFile extends File {
         this.delegate = new File(super.getPath());
         this.detector = detector;
 
-        final FsMountPoint mountPoint = path.getMountPoint();
-        final FsPath mountPointPath = mountPoint.getPath();
-        final FsEntryName entryName;
+        final FsMountPoint mp = path.getMountPoint();
+        final FsPath mpp = mp.getPath();
+        final FsEntryName en;
 
-        if (null == mountPointPath) {
+        if (null == mpp) {
             assert !path.toUri().isOpaque();
             this.enclArchive = null;
             this.enclEntryName = null;
             this.innerArchive = null;
-        } else if ((entryName = path.getEntryName()).isRoot()) {
+        } else if ((en = path.getEntryName()).isRoot()) {
             assert path.toUri().isOpaque();
-            if (mountPointPath.toUri().isOpaque()) {
+            if (mpp.toUri().isOpaque()) {
                 this.enclArchive
-                        = new TFile(mountPointPath.getMountPoint(), detector);
-                this.enclEntryName = mountPointPath.getEntryName();
+                        = new TFile(mpp.getMountPoint(), detector);
+                this.enclEntryName = mpp.getEntryName();
             } else {
                 this.enclArchive = null;
                 this.enclEntryName = null;
@@ -657,8 +654,8 @@ public final class TFile extends File {
             this.innerArchive = this;
         } else {
             assert path.toUri().isOpaque();
-            this.enclArchive = new TFile(mountPoint, detector);
-            this.enclEntryName = entryName;
+            this.enclArchive = new TFile(mp, detector);
+            this.enclEntryName = en;
             this.innerArchive = this.enclArchive;
         }
 
@@ -667,7 +664,7 @@ public final class TFile extends File {
 
     @SuppressWarnings("LeakingThisInConstructor")
     private TFile(  final FsMountPoint mountPoint,
-                    TArchiveDetector detector) {
+                    final TArchiveDetector detector) {
         super(mountPoint.toHierarchicalUri());
 
         this.delegate = new File(super.getPath());
@@ -868,15 +865,11 @@ public final class TFile extends File {
      * any is violated even if assertion checking is disabled.
      * <p>
      * The constructors call this method like this:
-     * <pre>{@code assert invariants(); }</pre>
+     * <pre>{@code assert invariants();}</pre>
      * This calls the method if and only if assertions are enabled in order
      * to assert that the instance invariants are properly obeyed.
      * If assertions are disabled, the call to this method is thrown away by
      * the HotSpot compiler, so there is no performance penalty.
-     * <p>
-     * When deserializing however, this method is called regardless of the
-     * assertion status. On error, the {@link AssertionError} is wrapped
-     * in an {@link InvalidObjectException} and thrown instead.
      *
      * @throws AssertionError If any invariant is violated even if assertions
      *         are disabled.
@@ -887,8 +880,8 @@ public final class TFile extends File {
         assert !(delegate instanceof TFile);
         assert delegate.getPath().equals(super.getPath());
         assert null != detector;
-        assert (innerArchive != null) == (getInnerEntryName() != null);
-        assert (enclArchive != null) == (enclEntryName != null);
+        assert (null != innerArchive) == (getInnerEntryName() != null);
+        assert (null != enclArchive) == (enclEntryName != null);
         assert this != enclArchive;
         assert (this == innerArchive)
                 ^ (innerArchive == enclArchive && null == controller);
@@ -896,7 +889,7 @@ public final class TFile extends File {
                 || Paths.contains(  enclArchive.getPath(),
                                     delegate.getParentFile().getPath(),
                                     separatorChar)
-                    && 0 < enclEntryName.toString().length();
+                    && !enclEntryName.toString().isEmpty();
         return true;
     }
 
@@ -1288,14 +1281,13 @@ public final class TFile extends File {
      * Sets the {@link TArchiveDetector} to use if no archive detector is
      * explicitly passed to the constructor of a {@code TFile} instance.
      * When a new {@code TFile} instance is constructed, but no archive
-     * detector parameter is provided, then the value of this class property
-     * is used.
+     * detector is provided, then the value of this class property is used.
      * So changing the value of this class property affects only subsequently
      * constructed {@code TFile} instances - not any existing ones.
      *
      * @param detector the {@link TArchiveDetector} to use for subsequently
      *        constructed {@code TFile} instances if no archive detector is
-     *        explicitly passed to the constructor
+     *        explicitly provided to the constructor
      * @see   #getDefaultArchiveDetector()
      */
     public static void setDefaultArchiveDetector(TArchiveDetector detector) {
@@ -1463,88 +1455,72 @@ public final class TFile extends File {
      * Returns {@code true} if and only if the path represented by this
      * instance denotes an archive file.
      * Whether or not this is true solely depends on the
-     * {@link TArchiveDetector} which was used to construct this {@code TFile}
-     * instance.
-     * <p>
-     * Please note that no I/O is performed by this method!
-     * If you need to know whether this file really exists as an archive file
-     * in the file system (and the correct password has been entered in case
-     * it's a RAES encrypted ZIP file),
-     * you should call {@link #isDirectory}, too.
+     * {@link TArchiveDetector} which was used to construct this file object
+     * - no file system tests are performed by this method!
      *
      * @return {@code true} if and only if the path represented by this
      *         instance denotes an archive file.
-     * @see    <a href="#falsePositives">Detecting Archive Paths and False Positives</a>
-     * @see    #isDirectory
      * @see    #isEntry
+     * @see    #isDirectory
+     * @see    <a href="#falsePositives">Detecting Archive Paths and False Positives</a>
      */
     public boolean isArchive() {
         return this == innerArchive;
     }
 
     /**
-     * Returns {@code true} if and only if the path represented by this
-     * instance names an archive file as its ancestor.
+     * Returns {@code true} if and only if this file object addresses an
+     * entry located within an archive file.
      * Whether or not this is true solely depends on the
-     * {@link TArchiveDetector} which was used to construct this {@code TFile}
-     * instance.
-     * <p>
-     * Please note that no file system tests are performed!
-     * If you need to know whether this file is really an entry in an archive
-     * file (and the correct password has been entered in case it's a RAES
-     * encrypted ZIP file),
-     * you should call
-     * {@link #getParentFile getParentFile()}.{@link #isDirectory isDirectory()}, too.
-     * This will automount the (virtual) file system from the archive file and
-     * return {@code true} if and only if it's a valid archive file.
+     * {@link TArchiveDetector} which was used to construct this file object
+     * - no file system tests are performed by this method!
      *
-     * @return {@code true} if and only if the path represented by this
-     *         instance names an archive file as its ancestor.
-     * @see <a href="#falsePositives">Detecting Archive Paths and False Positives</a>
+     * @return {@code true} if and only if this file object addresses an
+     *         entry located within an archive file.
      * @see #isArchive
      * @see #isDirectory
+     * @see <a href="#falsePositives">Detecting Archive Paths and False Positives</a>
      */
     public boolean isEntry() {
         return enclEntryName != null;
     }
 
     /**
-     * Returns the innermost archive file in this path.
-     * I.e. if this object is an archive file, then this method returns
-     * this object.
-     * If this object is a file or directory located within a
-     * archive file, then this methods returns the file representing the
-     * enclosing archive file, or {@code null} otherwise.
+     * Returns the innermost archive file object for this file object.
+     * That is, if this object addresses an archive file, then this method
+     * returns {@code this}.
+     * If this object addresses an entry located within an archive file, then
+     * this methods returns the file object representing the enclosing archive
+     * file, or {@code null} otherwise.
      * <p>
      * This method always returns a normalized path, i.e. all occurences of
      * {@code "."} and {@code ".."} in the path name are removed according to
      * their meaning wherever possible.
      * <p>
      * In order to support unlimited nesting levels, this method returns
-     * a {@code TFile} instance which again could be an entry within
+     * a {@code TFile} instance which may recursively address an entry within
      * another archive file.
      * 
-     * @return The innermost archive file in this path.
+     * @return The innermost archive path object for this path object.
      */
     public @CheckForNull TFile getInnerArchive() {
         return innerArchive;
     }
 
     /**
-     * Returns the entry name in the innermost archive file.
-     * I.e. if this object is a archive file, then this method returns the
-     * empty string {@code ""}.
-     * If this object is a file or directory located within an
-     * archive file, then this method returns the relative path of
-     * the entry in the enclosing archive file separated by the entry
-     * separator character {@code '/'}, or {@code null}
-     * otherwise.
+     * Returns the entry name relative to the innermost archive file.
+     * That is, if this object addresses an archive file, then this method
+     * returns the empty string {@code ""}.
+     * If this object addresses an entry located within an archive file,
+     * then this method returns the relative path of the entry in the
+     * enclosing archive file separated by the entry separator character
+     * {@code '/'}, or {@code null} otherwise.
      * <p>
-     * This method always returns an undotified path, i.e. all occurences of
-     * {@code "."} and {@code ".."} in the path name are removed according to
-     * their meaning wherever possible.
+     * This method always returns an undotified path, i.e. all redundant
+     * occurences of {@code "."} and {@code ".."} in the path are removed
+     * wherever possible.
      * 
-     * @return The entry name in the innermost archive file.
+     * @return The entry name relative to the innermost archive file.
      */
     public @Nullable String getInnerEntryName() {
         return this == innerArchive
@@ -1559,17 +1535,17 @@ public final class TFile extends File {
     }
 
     /**
-     * Returns the enclosing archive file in this path.
-     * I.e. if this object is an entry located within an archive file,
-     * then this method returns the file representing the enclosing archive
-     * file, or {@code null} otherwise.
+     * Returns the enclosing archive file object for this file object.
+     * That is, if this object addresses an entry located within an archive
+     * file, then this method returns the file object representing the
+     * enclosing archive file, or {@code null} otherwise.
      * <p>
      * This method always returns a normalized path, i.e. all occurences of
      * {@code "."} and {@code ".."} in the path name are removed according to
      * their meaning wherever possible.
      * <p>
      * In order to support unlimited nesting levels, this method returns
-     * a {@code TFile} instance which again could be an entry within
+     * a {@code TFile} instance which may recursively address an entry within
      * another archive file.
      * 
      * @return The enclosing archive file in this path.
@@ -1579,17 +1555,17 @@ public final class TFile extends File {
     }
 
     /**
-     * Returns the entry path in the enclosing archive file.
-     * I.e. if this object is an entry located within a archive file,
-     * then this method returns the relative path of the entry in the
+     * Returns the entry name relative to the enclosing archive file.
+     * That is, if this object addresses an entry located within an archive
+     * file, then this method returns the relative path of the entry in the
      * enclosing archive file separated by the entry separator character
      * {@code '/'}, or {@code null} otherwise.
      * <p>
-     * This method always returns an undotified path, i.e. all occurences of
-     * {@code "."} and {@code ".."} in the path are removed according to their
-     * meaning wherever possible.
+     * This method always returns an undotified path, i.e. all redundant
+     * occurences of {@code "."} and {@code ".."} in the path are removed
+     * wherever possible.
      * 
-     * @return The entry path in the enclosing archive file.
+     * @return The entry name relative to the enclosing archive file.
      */
     public @Nullable String getEnclEntryName() {
         return null == enclEntryName ? null : enclEntryName.getPath();
