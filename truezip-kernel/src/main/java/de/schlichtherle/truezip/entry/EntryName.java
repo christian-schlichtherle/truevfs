@@ -40,8 +40,8 @@ import net.jcip.annotations.Immutable;
  * An entry name adds the following syntax constraints to a
  * {@link URI Uniform Resource Identifier}:
  * <ol>
- * <li>The URI must be relative, i.e. it must not name a scheme.
- * <li>The URI must not have an authority.
+ * <li>The URI must be relative, i.e. it must not have a scheme component.
+ * <li>The URI must not have an authority component.
  * </ol>
  * 
  * <a name="examples"/><h3>Examples</h3>
@@ -161,7 +161,11 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      * @throws IllegalArgumentException if {@code uri} does not conform to the
      *         syntax constraints for entry names.
      * @return A new entry name.
+     * @deprecated This method does not quote characters with a special meaning
+     *             in a URI - use the method variant with the URI parameter
+     *             instead.
      */
+    @Deprecated
     public static EntryName
     create(String uri) {
         try {
@@ -199,7 +203,11 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      * @param  uri the URI string representation.
      * @throws URISyntaxException if {@code uri} does not conform to the
      *         syntax constraints for entry names.
+     * @deprecated This constructor does not quote characters with a special
+     *             meaning in a URI - use the constructor variant with the URI
+     *             parameter instead.
      */
+    @Deprecated
     public EntryName(String uri) throws URISyntaxException {
         parse(new URI(uri));
     }
@@ -272,11 +280,9 @@ public class EntryName implements Serializable, Comparable<EntryName> {
 
     private void parse(final URI uri) throws URISyntaxException {
         if (uri.isAbsolute())
-            throw new URISyntaxException(quote(uri), "Scheme defined");
-        if (uri.getRawAuthority() != null)
-            throw new URISyntaxException(quote(uri), "Authority defined");
-        /*if (null != uri.getRawFragment())
-            throw new URISyntaxException(quote(uri), "Fragment defined");*/
+            throw new URISyntaxException(quote(uri), "Scheme component not allowed");
+        if (null != uri.getRawAuthority())
+            throw new URISyntaxException(quote(uri), "Authority component not allowed");
         this.uri = uri;
 
         assert invariants();

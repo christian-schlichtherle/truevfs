@@ -72,7 +72,7 @@ public class EntryNameTest {
             { "/..", },
             { "/../", },
         }) {
-            final EntryName original = EntryName.create(params[0]);
+            final EntryName original = EntryName.create(URI.create(params[0]));
 
             {
                 final ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -115,7 +115,6 @@ public class EntryNameTest {
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testConstructorWithInvalidUri() {
         for (final String param : new String[] {
-            "foo bar",
             "foo:bar",
             "foo:bar:",
             "foo:bar:/",
@@ -174,14 +173,16 @@ public class EntryNameTest {
 
             "//authority/defined",
         }) {
+            final URI uri = URI.create(param);
+
             try {
-                EntryName.create(param);
+                EntryName.create(uri);
                 fail(param);
             } catch (IllegalArgumentException ex) {
             }
 
             try {
-                new EntryName(param);
+                new EntryName(uri);
                 fail(param);
             } catch (URISyntaxException ex) {
             }

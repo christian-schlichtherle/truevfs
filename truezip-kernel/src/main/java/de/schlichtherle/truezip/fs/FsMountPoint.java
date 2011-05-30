@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.entry.EntryName;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -40,19 +39,20 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
  * A mount point adds the following syntax constraints to a
  * {@link URI Uniform Resource Identifier}:
  * <ol>
- * <li>The URI must be absolute.
- * <li>The URI must not have a fragment.
+ * <li>The URI must be absolute, i.e. it must have a scheme component.
+ * <li>The URI must not have a query component.
+ * <li>The URI must not have a fragment component.
  * <li>If the URI is opaque, its scheme specific part must end with the mount
  *     point separator {@code "!/"}.
  *     The scheme specific part <em>before</em> the mount point separator is
  *     parsed according the syntax constraints for a {@link FsPath} and the
  *     following additional syntax constraints:
- *     The path must be absolute.
+ *     The path component must be absolute.
  *     If its opaque, it's entry name must not be empty.
- *     Finally, its set as the value of the component property
- *     {@link #getPath() path}.
- * <li>Otherwise, if the URI is hierarchical, its path must be in normal form
- *     and end with a {@code "/"}.
+ *     Finally, its set as the value of the {@link #getPath() path} component
+ *     property.
+ * <li>Otherwise, if the URI is hierarchical, its path component must be in
+ *     normal form and end with a {@code "/"}.
  *     The {@link #getPath() path} component property of the mount point is set
  *     to {@code null} in this case.
  * </ol>
@@ -154,7 +154,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
 
     /**
      * The separator which is used to split opaque path names into
-     * {@link FsMountPoint mount points} and {@link EntryName entry names}.
+     * {@link FsMountPoint mount points} and {@link FsEntryName entry names}.
      * This is identical to the separator in the class
      * {@link java.net.JarURLConnection}.
      */
@@ -170,7 +170,12 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
 
     /**
      * Equivalent to {@link #create(URI, FsUriModifier) create(uri, FsUriModifier.NULL)}.
+     * 
+     * @deprecated This method does not quote characters with a special meaning
+     *             in a URI - use the method variant with the URI parameter
+     *             instead.
      */
+    @Deprecated
     public static FsMountPoint
     create(String uri) {
         return create(uri, NULL);
@@ -189,7 +194,11 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
      * @throws IllegalArgumentException if {@code uri} does not conform to the
      *         syntax constraints for mount points.
      * @return A new mount point.
+     * @deprecated This method does not quote characters with a special meaning
+     *             in a URI - use the method variant with the URI parameter
+     *             instead.
      */
+    @Deprecated
     public static FsMountPoint
     create(String uri, FsUriModifier modifier) {
         try {
@@ -254,7 +263,12 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
 
     /**
      * Equivalent to {@link #FsMountPoint(String, FsUriModifier) new FsMountPoint(uri, FsUriModifier.NULL)}.
+     * 
+     * @deprecated This constructor does not quote characters with a special
+     *             meaning in a URI - use the constructor variant with the URI
+     *             parameter instead.
      */
+    @Deprecated
     public FsMountPoint(String uri) throws URISyntaxException {
         parse(new URI(uri), NULL);
     }
@@ -267,7 +281,11 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
      * @param  modifier the URI modifier.
      * @throws URISyntaxException if {@code uri} does not conform to the
      *         syntax constraints for mount points.
+     * @deprecated This constructor does not quote characters with a special
+     *             meaning in a URI - use the constructor variant with the URI
+     *             parameter instead.
      */
+    @Deprecated
     public FsMountPoint(String uri, FsUriModifier modifier)
     throws URISyntaxException {
         parse(new URI(uri), modifier);
@@ -340,6 +358,8 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
     private void parse(URI uri, final FsUriModifier modifier)
     throws URISyntaxException {
         uri = modifier.modify(uri, MOUNT_POINT);
+        if (null != uri.getRawQuery())
+            throw new URISyntaxException(quote(uri), "Query not allowed");
         if (null != uri.getRawFragment())
             throw new URISyntaxException(quote(uri), "Fragment not allowed");
         if (uri.isOpaque()) {
@@ -348,7 +368,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
             if (ssp.length() - 2 != i)
                 throw new URISyntaxException(quote(uri),
                         "Doesn't end with mount point separator \"" + SEPARATOR + '"');
-            path = new FsPath(ssp.substring(0, i), modifier);
+            path = new FsPath(new URI(ssp.substring(0, i)), modifier);
             final URI pathUri = path.toUri();
             if (!pathUri.isAbsolute())
                 throw new URISyntaxException(quote(uri), "Path not absolute");
@@ -383,6 +403,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
     private boolean invariants() {
         assert null != toUri();
         assert toUri().isAbsolute();
+        assert null == toUri().getRawQuery();
         assert null == toUri().getRawFragment();
         if (toUri().isOpaque()) {
             assert toUri().getRawSchemeSpecificPart().endsWith(SEPARATOR);

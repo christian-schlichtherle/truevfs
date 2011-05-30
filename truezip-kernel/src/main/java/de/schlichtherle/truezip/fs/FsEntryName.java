@@ -37,17 +37,18 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
  * An entry name adds the following syntax constraints to a
  * {@link URI Uniform Resource Identifier}:
  * <ol>
- * <li>The URI must be relative, i.e. it must not name a scheme.
- * <li>The URI must not have an authority.
- * <li>The URI's path must be in normal form, i.e. its path must not contain
- *     redundant {@code "."} and {@code ".."} segments.
- * <li>The URI's path must not equal {@code "."}.
- * <li>The URI's path must not equal {@code ".."}.
- * <li>The URI's path must not start with {@code "/"}.
- * <li>The URI's path must not start with {@code "./"}
+ * <li>The URI must be relative, i.e. it must not have a scheme component.
+ * <li>The URI must not have an authority component.
+ * <li>The URI must not have a fragment component.
+ * <li>The URI's path must be in normal form, i.e. its path component must not
+ *     contain redundant {@code "."} and {@code ".."} segments.
+ * <li>The URI's path component must not equal {@code "."}.
+ * <li>The URI's path component must not equal {@code ".."}.
+ * <li>The URI's path component must not start with {@code "/"}.
+ * <li>The URI's path component must not start with {@code "./"}
  *     (this rule is actually redundant - see #3).
- * <li>The URI's path must not start with {@code "../"}.
- * <li>The URI's path must not end with {@code "/"}.
+ * <li>The URI's path component must not start with {@code "../"}.
+ * <li>The URI's path component must not end with {@code "/"}.
  * </ol>
  * 
  * <a name="examples"/><h3>Examples</h3>
@@ -148,6 +149,8 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
 public final class FsEntryName extends EntryName {
     private static final long serialVersionUID = 2212342253466752478L;
 
+    private static final String ILLEGAL_PREFIX = ".." + SEPARATOR;
+
     /**
      * The file system entry name of the root directory,
      * which is an empty URI.
@@ -163,7 +166,12 @@ public final class FsEntryName extends EntryName {
 
     /**
      * Equivalent to {@link #create(String, FsUriModifier) create(uri, FsUriModifier.NULL)}.
+     * 
+     * @deprecated This method does not quote characters with a special meaning
+     *             in a URI - use the method variant with the URI parameter
+     *             instead.
      */
+    @Deprecated
     public static FsEntryName
     create(String uri) {
         return create(uri, NULL);
@@ -182,7 +190,11 @@ public final class FsEntryName extends EntryName {
      * @throws IllegalArgumentException if {@code uri} does not conform to the
      *         syntax constraints for entry names.
      * @return A new file system entry name.
+     * @deprecated This method does not quote characters with a special meaning
+     *             in a URI - use the method variant with the URI parameter
+     *             instead.
      */
+    @Deprecated
     public static FsEntryName
     create(String uri, FsUriModifier modifier) {
         try {
@@ -226,7 +238,12 @@ public final class FsEntryName extends EntryName {
 
     /**
      * Equivalent to {@link #FsEntryName(String, FsUriModifier) new FsEntryName(uri, FsUriModifier.NULL)}.
+     * 
+     * @deprecated This constructor does not quote characters with a special
+     *             meaning in a URI - use the constructor variant with the URI
+     *             parameter instead.
      */
+    @Deprecated
     public FsEntryName(String uri) throws URISyntaxException {
         this(uri, NULL);
     }
@@ -239,7 +256,11 @@ public final class FsEntryName extends EntryName {
      * @param  modifier the URI modifier.
      * @throws URISyntaxException if {@code uri} does not conform to the
      *         syntax constraints for entry names.
+     * @deprecated This constructor does not quote characters with a special
+     *             meaning in a URI - use the constructor variant with the URI
+     *             parameter instead.
      */
+    @Deprecated
     public FsEntryName(String uri, FsUriModifier modifier)
     throws URISyntaxException {
         this(new URI(uri), modifier);
@@ -280,15 +301,18 @@ public final class FsEntryName extends EntryName {
 
     private void parse(final URI uri) throws URISyntaxException {
         final String p = uri.getRawPath();
-        if (       "..".equals(p)
-                || p.startsWith(SEPARATOR)
-                || p.startsWith("." + SEPARATOR)
-                || p.startsWith(".." + SEPARATOR))
+        if (p.startsWith(SEPARATOR))
             throw new URISyntaxException(quote(uri),
-                    "Illegal start of URI path");
+                    "Illegal start of URI path component");
+        if (!p.isEmpty() && ILLEGAL_PREFIX.startsWith(p.substring(0,
+                Math.min(p.length(), ILLEGAL_PREFIX.length()))))
+            throw new URISyntaxException(quote(uri),
+                    "Illegal start of URI path component");
         if (p.endsWith(SEPARATOR))
             throw new URISyntaxException(quote(uri),
                     "Illegal separator \"" + SEPARATOR + "\" at end of URI path");
+        if (null != uri.getRawFragment())
+            throw new URISyntaxException(quote(uri), "Fragment component not allowed");
 
         assert invariants();
     }
@@ -300,18 +324,17 @@ public final class FsEntryName extends EntryName {
     /**
      * Constructs a new file system entry name by resolving the given member
      * file system entry name against the given parent file system entry name.
-     * Note that the URI of the parent file system entry name is considered to
-     * name a directory even if it's not ending with a
-     * {@link FsEntryName#SEPARATOR}, so calling this constructor with
+     * Note that the URI of the parent file system entry name is always
+     * considered to name a directory, so calling this constructor with
      * {@code "foo"} and {@code "bar"} as the URIs for the parent and member
-     * file system entry names respectively will result in the URI
-     * {@code "foo/bar"} for the resulting file system entry name.
+     * file system entry names results in {@code "foo/bar"} as the file system
+     * entry name URI.
      *
      * @param  parent an entry name for the parent.
      * @param  member an entry name for the member.
      */
-    FsEntryName(final FsEntryName parent,
-                final FsEntryName member) {
+    public FsEntryName( final FsEntryName parent,
+                        final FsEntryName member) {
         super(parent, member);
 
         assert invariants();
@@ -321,7 +344,7 @@ public final class FsEntryName extends EntryName {
         assert null != toUri();
         //assert !toUri().isAbsolute();
         //assert null == toUri().getRawAuthority();
-        //assert null == toUri().getRawFragment();
+        assert null == toUri().getRawFragment();
         assert toUri().normalize() == toUri();
         String p = toUri().getRawPath();
         assert !"..".equals(p);
