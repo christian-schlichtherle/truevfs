@@ -30,7 +30,6 @@ import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
-import static de.schlichtherle.truezip.file.TArchiveDetector.*;
 
 /**
  * @author Christian Schlichtherle
@@ -40,16 +39,32 @@ import static de.schlichtherle.truezip.file.TArchiveDetector.*;
 public class TArchiveDetectorTest {
 
     private FsArchiveDriver<?> driver;
-    private TArchiveDetector ALL;
+    private TArchiveDetector ALL, NULL;
 
     @Before
     public void setUp() {
         driver = new MockArchiveDriver();
         ALL = new TArchiveDetector("jar|zip", driver);
+        NULL = TArchiveDetector.NULL;
     }
 
     @Test
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testIllegalConstructors() {
+        for (TArchiveDetector delegate : new TArchiveDetector[] {
+            NULL,
+            ALL,
+        }) {
+            try {
+                new TArchiveDetector(delegate, new Object[][] {
+                    { "foo", "java.lang.Object", },
+                    { "bar", "java.io.FilterInputStream", },
+                });
+                fail("Expected IllegalArgumentException");
+            } catch (IllegalArgumentException expected) {
+            }
+        }
+
         testIllegalConstructors(NullPointerException.class,
                 new Object[][] {
                     { null, null },
@@ -301,73 +316,57 @@ public class TArchiveDetectorTest {
 
     @Test
     public void testGetDriver() {
-        assertScheme(NULL, new String[] {
-            null, "",
-            null, ".",
-            null, ".all",
-            null, ".default",
-            null, ".ear",
-            null, ".exe",
-            null, ".jar",
-            null, ".null",
-            null, ".z",
-            null, ".zip",
-            null, "test",
-            null, "test.",
-            null, "test.all",
-            null, "test.default",
-            null, "test.jar",
-            null, "test.null",
-            null, "test.z",
-            null, "test.zip",
-        });
+        assertScheme(new String[][] {
+            { null, "" },
+            { null, "." },
+            { null, ".all" },
+            { null, ".default" },
+            { null, ".ear" },
+            { null, ".exe" },
+            { null, ".null" },
+            { null, ".z" },
+            { null, "test" },
+            { null, "test." },
+            { null, "test.all" },
+            { null, "test.default" },
+            { null, "test.null" },
+            { null, "test.z" },
+        }, NULL, ALL);
 
-        assertScheme(ALL, new String[] {
-            null, "",
-            null, ".",
-            null, ".all",
-            null, ".default",
-            "jar", ".jar",
-            null, ".null",
-            null, ".z",
-            "zip", ".zip",
-            null, "test",
-            null, "test.",
-            null, "test.all",
-            null, "test.default",
-            "jar", "test.jar",
-            null, "test.null",
-            null, "test.z",
-            "zip", "test.zip",
-        });
+        assertScheme(new String[][] {
+            { null, ".jar" },
+            { null, ".zip" },
+            { null, "test.jar" },
+            { null, "test.zip" },
+        }, NULL);
+
+        assertScheme(new String[][] {
+            { "jar", ".jar" },
+            { "jar", "test.jar" },
+            { "zip", ".zip" },
+            { "zip", "test.zip" },
+        }, ALL);
     }
 
     private void assertScheme(
-            TArchiveDetector detector,
-            final String[] tests) {
-        try {
-            detector.getScheme(null);
-            fail("Expected NullPointerException!");
-        } catch (NullPointerException expected) {
-        }
+            final String[][] tests,
+            final TArchiveDetector... detectors) {
+        for (TArchiveDetector detector : detectors) {
+            try {
+                detector.getScheme(null);
+                fail("Expected NullPointerException!");
+            } catch (NullPointerException expected) {
+            }
 
-        try {
-            detector = new TArchiveDetector(detector, new Object[][] {
-                { "foo", "java.lang.Object", },
-                { "bar", "java.io.FilterInputStream", },
-            });
-            fail("Expected IllegalArgumentException");
-        } catch (IllegalArgumentException expected) {
-        }
+            for (String[] test : tests) {
+                final FsScheme scheme = test[0] == null ? null : FsScheme.create(test[0]);
+                final String path = test[1];
+                assertScheme(detector, scheme, path);
 
-        for (int i = 0; i < tests.length; i++) {
-            final FsScheme scheme = tests[i] == null ? null : FsScheme.create(tests[i]);
-            final String path = tests[++i];
-            assertScheme(detector, scheme, path);
-
-            // Add level of indirection in order to test caching.
-            detector = new TArchiveDetector(detector, new Object[0][0]);
-            assertScheme(detector, scheme, path);
+                // Add level of indirection in order to test caching.
+                detector = new TArchiveDetector(detector, new Object[0][0]);
+                assertScheme(detector, scheme, path);
+            }
         }
     }
 
