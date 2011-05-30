@@ -83,7 +83,7 @@ public class TFileTest {
             { "file:/foo", "/foo", null, null, null, },
             { "file:/", "/", null, null, null, },
         }) {
-            final TFile file = new TFile(FsPath.create(params[0]));
+            final TFile file = new TFile(FsPath.create(URI.create(params[0])));
             assertThat(file.getPath(), equalTo(params[1].replace('/', separatorChar)));
             if (null != params[2]) {
                 assertThat(file.getInnerArchive().getPath(), equalTo(params[2].replace('/', separatorChar)));
@@ -445,7 +445,7 @@ public class TFileTest {
         }) {
             final String name = params[0];
             final URI uri = URI.create(params[1]);
-            final FsPath path = FsPath.create(params[1]);
+            final FsPath path = FsPath.create(URI.create(params[1]));
             final TFile file = new TFile(name);
             assertThat(new TFile(name), equalTo(file));
             assertThat(new TFile(uri), equalTo(file));
