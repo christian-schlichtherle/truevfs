@@ -45,7 +45,7 @@ public class TArchiveDetectorTest {
     public void setUp() {
         driver = new MockArchiveDriver();
         ALL = new TArchiveDetector("jar|zip", driver);
-        NULL = TArchiveDetector.NULL;
+        NULL = new TArchiveDetector(ALL, ""); // test decoration
     }
 
     @Test
