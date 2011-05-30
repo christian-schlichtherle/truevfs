@@ -152,8 +152,14 @@ public final class FsEntryName extends EntryName {
      * The file system entry name of the root directory,
      * which is an empty URI.
      */
-    public static final FsEntryName ROOT
-            = FsEntryName.create(URI.create(""));
+    public static final FsEntryName ROOT;
+    static {
+        try {
+            ROOT = new FsEntryName(new URI(""));
+        } catch (URISyntaxException ex) {
+            throw new AssertionError(ex);
+        }
+    }
 
     /**
      * Equivalent to {@link #create(String, FsUriModifier) create(uri, FsUriModifier.NULL)}.
@@ -180,7 +186,9 @@ public final class FsEntryName extends EntryName {
     public static FsEntryName
     create(String uri, FsUriModifier modifier) {
         try {
-            return new FsEntryName(uri, modifier);
+            return uri.isEmpty()
+                    ? ROOT
+                    : new FsEntryName(uri, modifier);
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
@@ -208,7 +216,9 @@ public final class FsEntryName extends EntryName {
     public static FsEntryName
     create(URI uri, FsUriModifier modifier) {
         try {
-            return new FsEntryName(uri, modifier);
+            return uri.toString().isEmpty()
+                    ? ROOT
+                    : new FsEntryName(uri, modifier);
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
