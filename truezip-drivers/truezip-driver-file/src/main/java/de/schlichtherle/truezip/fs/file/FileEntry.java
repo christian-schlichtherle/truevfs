@@ -22,7 +22,6 @@ import de.schlichtherle.truezip.socket.IOEntry;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.entry.EntryName;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -55,19 +54,19 @@ public class FileEntry extends FsEntry implements IOEntry<FileEntry> {
             = BitField.noneOf(FsOutputOption.class);
 
     private final File file;
-    private final EntryName name;
+    private final String name;
     private volatile @CheckForNull TempFilePool pool;
 
     FileEntry(final File file) {
         assert null != file;
         this.file = file;
-        this.name = EntryName.create(file.getName());
+        this.name = file.getName();
     }
 
     FileEntry(final File file, final FsEntryName name) {
         assert null != file;
         this.file = new File(file, name.getPath());
-        this.name = name;
+        this.name = name.toString();
     }
 
     final TempFilePool.Entry createTempFile() throws IOException {
@@ -85,7 +84,7 @@ public class FileEntry extends FsEntry implements IOEntry<FileEntry> {
 
     @Override
     public final String getName() {
-        return name.toString();
+        return name;
     }
 
     @Override
