@@ -219,9 +219,10 @@ final class FileController extends FsController<FsModel>  {
     @Override
     public void setReadOnly(FsEntryName name) throws IOException {
         Path file = target.resolve(name.getPath());
-        // TODO: Check NIO.2 method.
-        //setAttribute(file, "readOnly", Boolean.TRUE, null);
-        if (file.toFile().setReadOnly())
+        // Confirmed: There is no equivalent NIO.2 method, e.g. something like
+        //   setAttribute(file, "readOnly", Boolean.TRUE, null);
+        // is not available!
+        if (!file.toFile().setReadOnly())
             if (exists(file)) // just guessing here
                 throw new AccessDeniedException(file.toString());
             else
