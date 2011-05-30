@@ -20,7 +20,7 @@
     <parent>
         <groupId>de.schlichtherle.truezip</groupId>
         <artifactId>truezip</artifactId>
-        <version>7.2-SNAPSHOT</version>
+        <version>7.1.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>truezip-driver</artifactId>
@@ -31,7 +31,7 @@
 
     <modules>
         <module>truezip-driver-file</module>
-        <module>truezip-driver-file-jse7</module>
+        <!--module>truezip-driver-file-jse7</module-->
         <module>truezip-driver-http</module>
         <module>truezip-driver-tar</module>
         <module>truezip-driver-tzp</module>
