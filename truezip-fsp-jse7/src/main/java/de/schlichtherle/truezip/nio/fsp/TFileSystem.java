@@ -15,37 +15,60 @@
  */
 package de.schlichtherle.truezip.nio.fsp;
 
+import static de.schlichtherle.truezip.file.TFile.*;
+import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.file.TArchiveDetector;
+import de.schlichtherle.truezip.fs.FsCompositeDriver;
+import de.schlichtherle.truezip.fs.FsEntryName;
+import de.schlichtherle.truezip.fs.FsInputOption;
 import de.schlichtherle.truezip.fs.FsManager;
+import de.schlichtherle.truezip.fs.FsMountPoint;
+import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.fs.FsSyncException;
+import de.schlichtherle.truezip.fs.FsUriModifier;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import static de.schlichtherle.truezip.fs.FsManager.*;
 import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
+import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.UriBuilder;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URI;
 import java.nio.file.FileStore;
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.WatchService;
 import java.nio.file.attribute.UserPrincipalLookupService;
-import java.nio.file.spi.FileSystemProvider;
 import java.util.Set;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-final class TFileSystem extends FileSystem {
+public final class TFileSystem extends FileSystem {
 
-    static final TFileSystem SINGLETON = new TFileSystem();
+    private static final FsManager manager = FsManagerLocator.SINGLETON.get();
+    private static final FsCompositeDriver driver = TArchiveDetector.ALL; // new FsDefaultDriver(FsDriverLocator.SINGLETON);
 
-    private final FsManager manager = FsManagerLocator.SINGLETON.get();
+    private final TFileSystemProvider provider;
+    private final FsMountPoint mountPoint;
 
-    private TFileSystem() {
+    TFileSystem(TFileSystemProvider provider, FsMountPoint mountPoint) {
+        if (null == provider || null == mountPoint)
+            throw new NullPointerException();
+        this.provider = provider;
+        this.mountPoint = mountPoint;
     }
 
     @Override
-    public FileSystemProvider provider() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public TFileSystemProvider provider() {
+        return provider;
+    }
+
+    public FsMountPoint getMountPoint() {
+        return mountPoint;
     }
 
     @Override
@@ -85,7 +108,17 @@ final class TFileSystem extends FileSystem {
 
     @Override
     public TPath getPath(String first, String... more) {
-        return new TPath(first, more);
+        return new TPath(this, FsEntryName.create(
+                toUri(first, more),
+                FsUriModifier.CANONICALIZE));
+    }
+
+    static URI toUri(final String first, final String... more) {
+        final StringBuilder pb = new StringBuilder(first);
+        for (final String m : more)
+            pb      .append(SEPARATOR_CHAR)
+                    .append(m.replace(separatorChar, SEPARATOR_CHAR));
+        return new UriBuilder().path(pb.toString()).toUri();
     }
 
     @Override
@@ -102,5 +135,25 @@ final class TFileSystem extends FileSystem {
     public WatchService newWatchService() throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-    
+
+    InputStream newInputStream( TPath path,
+                                BitField<FsInputOption> options)
+    throws IOException {
+        FsEntryName entryName = path.getEntryName();
+        return manager
+                .getController(mountPoint, driver)
+                .getInputSocket(entryName, options)
+                .newInputStream();
+    }
+
+    OutputStream newOutputStream(   TPath path,
+                                    BitField<FsOutputOption> options,
+                                    Entry template)
+    throws IOException {
+        FsEntryName entryName = path.getEntryName();
+        return manager
+                .getController(mountPoint, driver)
+                .getOutputSocket(entryName, options, template)
+                .newOutputStream();
+    }
 }

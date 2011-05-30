@@ -16,10 +16,20 @@
 package de.schlichtherle.truezip.nio.fsp;
 
 import de.schlichtherle.truezip.file.TArchiveDetector;
-import de.schlichtherle.truezip.util.SuffixSet;
+import de.schlichtherle.truezip.fs.FsEntryName;
+import de.schlichtherle.truezip.fs.FsInputOptions;
+import static de.schlichtherle.truezip.fs.FsEntryName.*;
+import de.schlichtherle.truezip.fs.FsMountPoint;
+import de.schlichtherle.truezip.fs.FsOutputOptions;
+import de.schlichtherle.truezip.fs.FsPath;
+import de.schlichtherle.truezip.fs.FsScheme;
+import de.schlichtherle.truezip.io.Paths.Splitter;
+import de.schlichtherle.truezip.util.UriBuilder;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.AccessMode;
@@ -27,22 +37,17 @@ import java.nio.file.CopyOption;
 import java.nio.file.DirectoryStream;
 import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.FileStore;
-import java.nio.file.FileSystem;
 import java.nio.file.LinkOption;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.ProviderMismatchException;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileAttributeView;
 import java.nio.file.spi.FileSystemProvider;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.ServiceConfigurationError;
 import java.util.Set;
-import static java.util.logging.Level.*;
-import java.util.logging.Logger;
 
 /**
  * @author  Christian Schlichtherle
@@ -51,79 +56,118 @@ import java.util.logging.Logger;
 @DefaultAnnotation(NonNull.class)
 public class TFileSystemProvider extends FileSystemProvider {
 
-    private static final ResourceBundle resources = ResourceBundle.getBundle(
-            TFileSystemProvider.class.getName());
-    private static final int MAX_PROVIDERS = 30; // match number of SCHEMEXX classes here!
-    private static final String[] SCHEMES;
-    static {
-        final Logger logger = Logger.getLogger(
-                TFileSystemProvider.class.getName(),
-                TFileSystemProvider.class.getName());
-        final SuffixSet set = new SuffixSet(TArchiveDetector.ALL.toString());
-        final int total = set.size();
-        if (0 == total)
-            throw new ServiceConfigurationError(resources.getString("no_drivers"));
-        final List<String> subset = new ArrayList<>(set)
-                .subList(0, Math.min(total, MAX_PROVIDERS));
-        SCHEMES = subset.toArray(new String[subset.size()]);
-        if (total < MAX_PROVIDERS) {
-            final int max = Math.min(total, MAX_PROVIDERS - total);
-            set.retainAll(subset.subList(0, max));
-            logger.log(CONFIG, "too_few", new Object[] {
-                total,
-                MAX_PROVIDERS,
-                MAX_PROVIDERS - total,
-                max,
-                set.toString().replace("|", ", "),
-            });
-        } else if (MAX_PROVIDERS < total) {
-            set.removeAll(subset);
-            logger.log(WARNING, "too_many", new Object[] {
-                total,
-                MAX_PROVIDERS,
-                total - MAX_PROVIDERS,
-                set.toString().replace("|", ", "),
-            });
-        }
-    }
-
-    private final String scheme;
-
-    TFileSystemProvider(final int scheme) {
-        this.scheme = SCHEMES[scheme % SCHEMES.length];
-    }
-
-    protected TFileSystemProvider(final String scheme) {
-        // Don't check the scheme yet - this would inhibit the use of arbitrary
-        // schemes for custom application file formats!
-        if (null == scheme)
-            throw new IllegalArgumentException();
+    private final FsScheme scheme;
+    private final FsMountPoint mountPoint;
+    
+    TFileSystemProvider(final FsScheme scheme,
+                        final FsMountPoint mountPoint) {
+        if (null == scheme || null == mountPoint)
+            throw new NullPointerException();
         this.scheme = scheme;
+        this.mountPoint = mountPoint;
     }
 
+    /**
+     * Returns the URI scheme that identifies this provider.
+     *
+     * @return The URI scheme that identifies this provider.
+     */
     @Override
     public String getScheme() {
-        return scheme;
+        return scheme.toString();
+    }
+
+    public FsMountPoint getMountPoint() {
+        return mountPoint;
     }
 
     @Override
-    public FileSystem newFileSystem(URI uri, Map<String, ?> env) throws IOException {
+    public TFileSystem newFileSystem(   final Path path,
+                                        final Map<String, ?> environment) {
+        final URI uri = path.normalize().toUri();
+        final FsMountPoint inMp = getMountPoint();
+        if (!uri.toString().startsWith(inMp.toString()))
+            throw new UnsupportedOperationException();
+        if (uri.isOpaque())
+            throw new UnsupportedOperationException();
+        final FsMountPoint outMp = new Scanner(getArchiveDetector(environment))
+                .scan(uri)
+                .getMountPoint();
+        if (inMp.equals(outMp))
+            throw new UnsupportedOperationException(); // don't be greedy!
+        return new TFileSystem(this, outMp);
+    }
+
+    private final class Scanner {
+        final TArchiveDetector detector;
+        final Splitter splitter = new Splitter(SEPARATOR_CHAR, false);
+        final UriBuilder uri = new UriBuilder();
+        final String mpusspop = getSspOrPath(getMountPoint().toUri());
+
+        Scanner(TArchiveDetector detector) {
+            this.detector = detector;
+        }
+
+        FsPath scan(final URI uri) {
+            this.uri.path(getSspOrPath(uri)).query(uri.getQuery());
+            return scan(uri.getPath());
+        }
+
+        FsPath scan(final String input) {
+            splitter.split(input);
+            final String parent = splitter.getParentPath();
+            final FsEntryName member = FsEntryName.create(
+                    uri.path(splitter.getMemberName()).toUri());
+            if (null == parent || mpusspop.startsWith(parent))
+                return new FsPath(getMountPoint(), member);
+            FsPath path = scan(parent).resolve(member);
+            final FsScheme scheme = detector.getScheme(member.toString());
+            if (null != scheme)
+                path = new FsPath(FsMountPoint.create(scheme, path), ROOT);
+            return path;
+        }
+    } // class Scanner
+
+    private static String getSspOrPath(URI uri) {
+        return uri.isOpaque() ? uri.getSchemeSpecificPart() : uri.getPath();
+    }
+
+    private static TArchiveDetector getArchiveDetector(Map<String, ?> env) {
+        TArchiveDetector detector = (TArchiveDetector) env.get(
+                Parameter.ARCHIVE_DETECTOR);
+        return null != detector ? detector : TArchiveDetector.ALL;
+    }
+
+    @Override
+    public TFileSystem newFileSystem(URI uri, Map<String, ?> env) throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public FileSystem getFileSystem(URI uri) {
-        return TFileSystem.SINGLETON;
+    public TFileSystem getFileSystem(URI uri) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public Path getPath(URI uri) {
-        return new TPath(uri);
+    public TPath getPath(URI uri) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public SeekableByteChannel newByteChannel(Path path, Set<? extends OpenOption> options, FileAttribute<?>... attrs) throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public InputStream newInputStream(Path path, OpenOption... options)
+    throws IOException {
+        return toPath(path).newInputStream(FsInputOptions.NO_INPUT_OPTION);
+    }
+
+    @Override
+    public OutputStream newOutputStream(Path path, OpenOption... options)
+    throws IOException {
+        return toPath(path).newOutputStream(FsOutputOptions.NO_OUTPUT_OPTION, null);
     }
 
     @Override
@@ -191,123 +235,22 @@ public class TFileSystemProvider extends FileSystemProvider {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public static class SCHEME00 extends TFileSystemProvider {
-        public SCHEME00() { super(0); }
+    private static TPath toPath(Path path) {
+        if (path == null)
+            throw new NullPointerException();
+        if (!(path instanceof TPath))
+            throw new ProviderMismatchException();
+        return (TPath) path;
     }
 
-    public static class SCHEME01 extends TFileSystemProvider {
-        public SCHEME01() { super(1); }
+    public interface Parameter {
+        String ARCHIVE_DETECTOR = "ARCHIVE_DETECTOR";
     }
 
-    public static class SCHEME02 extends TFileSystemProvider {
-        public SCHEME02() { super(2); }
-    }
-
-    public static class SCHEME03 extends TFileSystemProvider {
-        public SCHEME03() { super(3); }
-    }
-
-    public static class SCHEME04 extends TFileSystemProvider {
-        public SCHEME04() { super(4); }
-    }
-
-    public static class SCHEME05 extends TFileSystemProvider {
-        public SCHEME05() { super(5); }
-    }
-
-    public static class SCHEME06 extends TFileSystemProvider {
-        public SCHEME06() { super(6); }
-    }
-
-    public static class SCHEME07 extends TFileSystemProvider {
-        public SCHEME07() { super(7); }
-    }
-
-    public static class SCHEME08 extends TFileSystemProvider {
-        public SCHEME08() { super(8); }
-    }
-
-    public static class SCHEME09 extends TFileSystemProvider {
-        public SCHEME09() { super(9); }
-    }
-
-    public static class SCHEME10 extends TFileSystemProvider {
-        public SCHEME10() { super(10); }
-    }
-
-    public static class SCHEME11 extends TFileSystemProvider {
-        public SCHEME11() { super(11); }
-    }
-
-    public static class SCHEME12 extends TFileSystemProvider {
-        public SCHEME12() { super(12); }
-    }
-
-    public static class SCHEME13 extends TFileSystemProvider {
-        public SCHEME13() { super(13); }
-    }
-
-    public static class SCHEME14 extends TFileSystemProvider {
-        public SCHEME14() { super(14); }
-    }
-
-    public static class SCHEME15 extends TFileSystemProvider {
-        public SCHEME15() { super(15); }
-    }
-
-    public static class SCHEME16 extends TFileSystemProvider {
-        public SCHEME16() { super(16); }
-    }
-
-    public static class SCHEME17 extends TFileSystemProvider {
-        public SCHEME17() { super(17); }
-    }
-
-    public static class SCHEME18 extends TFileSystemProvider {
-        public SCHEME18() { super(18); }
-    }
-
-    public static class SCHEME19 extends TFileSystemProvider {
-        public SCHEME19() { super(19); }
-    }
-
-    public static class SCHEME20 extends TFileSystemProvider {
-        public SCHEME20() { super(20); }
-    }
-
-    public static class SCHEME21 extends TFileSystemProvider {
-        public SCHEME21() { super(21); }
-    }
-
-    public static class SCHEME22 extends TFileSystemProvider {
-        public SCHEME22() { super(22); }
-    }
-
-    public static class SCHEME23 extends TFileSystemProvider {
-        public SCHEME23() { super(23); }
-    }
-
-    public static class SCHEME24 extends TFileSystemProvider {
-        public SCHEME24() { super(24); }
-    }
-
-    public static class SCHEME25 extends TFileSystemProvider {
-        public SCHEME25() { super(25); }
-    }
-
-    public static class SCHEME26 extends TFileSystemProvider {
-        public SCHEME26() { super(26); }
-    }
-
-    public static class SCHEME27 extends TFileSystemProvider {
-        public SCHEME27() { super(27); }
-    }
-
-    public static class SCHEME28 extends TFileSystemProvider {
-        public SCHEME28() { super(28); }
-    }
-
-    public static class SCHEME29 extends TFileSystemProvider {
-        public SCHEME29() { super(29); }
+    public static final class File extends TFileSystemProvider {
+        public File() {
+            super(  FsScheme.create("tzp"),
+                    FsMountPoint.create(Paths.get("/").toUri()));
+        }
     }
 }
