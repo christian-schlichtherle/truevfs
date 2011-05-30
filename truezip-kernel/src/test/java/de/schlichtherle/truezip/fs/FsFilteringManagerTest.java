@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.fs.spi.DummyDriverService;
+import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 import org.junit.Test;
@@ -33,7 +34,7 @@ public class FsFilteringManagerTest extends FsManagerTestSuite {
     protected FsManager newManager() {
         return new FsFilteringManager(
                 new FsDefaultManager(),
-                FsMountPoint.create("file:/"));
+                FsMountPoint.create(URI.create("file:/")));
     }
 
     @Test
@@ -52,17 +53,17 @@ public class FsFilteringManagerTest extends FsManagerTestSuite {
             final FsManager manager = new FsDefaultManager(STRONG);
             for (String param : params[1])
                 manager.getController(
-                    FsMountPoint.create(param),
+                    FsMountPoint.create(URI.create(param)),
                     new FsDefaultDriver(
                         new DummyDriverService("file|tar|zip")));
             assertThat(manager.getSize(), is(params[1].length));
 
             final Set<FsMountPoint> set = new HashSet<FsMountPoint>();
             for (String param : params[2])
-                set.add(FsMountPoint.create(param));
+                set.add(FsMountPoint.create(URI.create(param)));
 
             final FsManager filter = new FsFilteringManager(
-                    manager, FsMountPoint.create(params[0][0]));
+                    manager, FsMountPoint.create(URI.create(params[0][0])));
             assertThat(filter.getSize(), is(params[2].length));
             for (FsController<?> controller : filter)
                 assertTrue(set.contains(controller.getModel().getMountPoint()));

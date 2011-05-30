@@ -44,27 +44,25 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
  * A path adds the following syntax constraints to a
  * {@link URI Uniform Resource Identifier}:
  * <ol>
+ * <li>The URI must not have a fragment component.
  * <li>If the URI is opaque, its scheme specific part must contain at least
  *     one mount point separator {@code "!/"}.
  *     The part <em>up to</em> the last mount point separator is parsed
  *     according to the syntax constraints for an {@link FsMountPoint} and set
- *     as the value of the component property
- *     {@link #getMountPoint() mountPoint}.
+ *     as the value of the {@link #getMountPoint() mountPoint} property.
  *     The part <em>after</em> the last mount point separator is parsed
  *     according to the syntax constraints for an {@link FsEntryName} and set
- *     as the value of the component property {@link #getEntryName() entryName}.
+ *     as the value of the {@link #getEntryName() entryName} property.
  * <li>Otherwise, if the URI is absolute, it's resolved with {@code "."},
  *     parsed according to the syntax constraints for an {@link FsMountPoint}
- *     and set as the value of the component property
- *     {@link #getMountPoint() mountPoint}.
+ *     and set as the value of the {@link #getMountPoint() mountPoint} property.
  *     The URI relativized to this mount point is parsed according to the
  *     syntax constraints for an {@link FsEntryName} and set as the value of
- *     the component property {@link #getEntryName() entryName}.
- * <li>Otherwise, the value of the component property
- *     {@link #getMountPoint() mountPoint} is set to {@code null} and the URI
- *     is parsed according to the syntax constraints for an {@link FsEntryName}
- *     and set as the value of the component property
- *     {@link #getEntryName() entryName}.
+ *     the {@link #getEntryName() entryName} property.
+ * <li>Otherwise, the value of the {@link #getMountPoint() mountPoint} property
+ *     is set to {@code null} and the URI is parsed according to the syntax
+ *     constraints for an {@link FsEntryName} and set as the value of the
+ *     {@link #getEntryName() entryName} property.
  * </ol>
  * For opaque URIs of the form {@code jar:<url>!/<entry>}, these constraints
  * build a close subset of the syntax allowed by a
@@ -171,7 +169,12 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
 
     /**
      * Equivalent to {@link #create(String, FsUriModifier) create(uri, FsUriModifier.NULL)}.
+     * 
+     * @deprecated This method does not quote characters with a special meaning
+     *             in a URI - use the method variant with the URI parameter
+     *             instead.
      */
+    @Deprecated
     public static FsPath
     create(String uri) {
         return create(uri, NULL);
@@ -190,7 +193,11 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
      * @throws IllegalArgumentException if {@code uri} does not conform to the
      *         syntax constraints for paths.
      * @return A new path.
+     * @deprecated This method does not quote characters with a special meaning
+     *             in a URI - use the method variant with the URI parameter
+     *             instead.
      */
+    @Deprecated
     public static FsPath
     create(String uri, FsUriModifier modifier) {
         try {
@@ -232,7 +239,12 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
 
     /**
      * Equivalent to {@link #FsPath(String, FsUriModifier) new FsPath(uri, FsUriModifier.NULL)}.
+     * 
+     * @deprecated This constructor does not quote characters with a special
+     *             meaning in a URI - use the constructor variant with the URI
+     *             parameter instead.
      */
+    @Deprecated
     public FsPath(String uri) throws URISyntaxException {
         parse(new URI(uri), NULL);
     }
@@ -245,7 +257,11 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
      * @param  modifier the URI modifier.
      * @throws URISyntaxException if {@code uri} does not conform to the
      *         syntax constraints for paths.
+     * @deprecated This constructor does not quote characters with a special
+     *             meaning in a URI - use the constructor variant with the URI
+     *             parameter instead.
      */
+    @Deprecated
     public FsPath(String uri, FsUriModifier modifier)
     throws URISyntaxException {
         parse(new URI(uri), modifier);
@@ -294,17 +310,36 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
      */
     public FsPath(  final @CheckForNull FsMountPoint mountPoint,
                     final FsEntryName entryName) {
-        URI mountPointUri;
+        URI mpu;
         if (null == mountPoint) {
             this.uri = entryName.toUri();
-        } else if ((mountPointUri = mountPoint.toUri()).isOpaque()) {
+        } else if ((mpu = mountPoint.toUri()).isOpaque()) {
             try {
-                this.uri = new URI(mountPointUri.toString() + entryName);
+                // Compute mountPoint + entryName, but ensure that all URI
+                // components are properly quoted.
+                final String mpussp = mpu.getSchemeSpecificPart();
+                final int mpusspl = mpussp.length();
+                final URI enu = entryName.toUri();
+                final String enup = enu.getPath();
+                final int enupl = enup.length();
+                final String enuq = enu.getQuery();
+                final int enuql = null == enuq ? 0 : enuq.length() + 1;
+                final StringBuilder ssp = 
+                        new StringBuilder(mpusspl + enupl + enuql)
+                        .append(mpussp)
+                        .append(enup);
+                if (null != enuq)
+                    ssp.append('?').append(enuq);
+                this.uri = new UriBuilder()
+                        .scheme(mpu.getScheme())
+                        .path(ssp.toString())
+                        .fragment(enu.getFragment())
+                        .getUri();
             } catch (URISyntaxException ex) {
                 throw new AssertionError(ex);
             }
         } else {
-            this.uri = mountPointUri.resolve(entryName.toUri());
+            this.uri = mpu.resolve(entryName.toUri());
         }
         this.mountPoint = mountPoint;
         this.entryName = entryName;
@@ -330,6 +365,8 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
     private void parse(URI uri, final FsUriModifier modifier)
     throws URISyntaxException {
         uri = modifier.modify(uri, PATH);
+        if (null != uri.getRawFragment())
+            throw new URISyntaxException(quote(uri), "Fragment not allowed");
         if (uri.isOpaque()) {
             final String ssp = uri.getSchemeSpecificPart();
             final int i = ssp.lastIndexOf(FsMountPoint.SEPARATOR);
@@ -366,6 +403,7 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
 
     private boolean invariants() {
         assert null != toUri();
+        assert null == toUri().getRawFragment();
         assert (null != getMountPoint()) == toUri().isAbsolute();
         assert null != getEntryName();
         if (toUri().isOpaque()) {

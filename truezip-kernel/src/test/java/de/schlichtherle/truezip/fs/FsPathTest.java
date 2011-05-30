@@ -64,7 +64,7 @@ public class FsPathTest {
             { "föö?bär", },
             { "", },
         }) {
-            final FsPath original = FsPath.create(params[0]);
+            final FsPath original = FsPath.create(URI.create(params[0]));
             assertThat(original.toString(), equalTo(params[0]));
 
             {
@@ -110,18 +110,6 @@ public class FsPathTest {
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testConstructorWithInvalidUri() throws URISyntaxException {
         try {
-            FsPath.create((String) null);
-            fail();
-        } catch (NullPointerException expected) {
-        }
-
-        try {
-            new FsPath((String) null);
-            fail();
-        } catch (NullPointerException expected) {
-        }
-
-        try {
             FsPath.create((URI) null);
             fail();
         } catch (NullPointerException expected) {
@@ -134,18 +122,6 @@ public class FsPathTest {
         }
 
         try {
-            FsPath.create((String) null, FsUriModifier.NULL);
-            fail();
-        } catch (NullPointerException expected) {
-        }
-
-        try {
-            new FsPath((String) null, FsUriModifier.NULL);
-            fail();
-        } catch (NullPointerException expected) {
-        }
-
-        try {
             FsPath.create((URI) null, FsUriModifier.NULL);
             fail();
         } catch (NullPointerException expected) {
@@ -153,18 +129,6 @@ public class FsPathTest {
 
         try {
             new FsPath((URI) null, FsUriModifier.NULL);
-            fail();
-        } catch (NullPointerException expected) {
-        }
-
-        try {
-            FsPath.create((String) null, FsUriModifier.CANONICALIZE);
-            fail();
-        } catch (NullPointerException expected) {
-        }
-
-        try {
-            new FsPath((String) null, FsUriModifier.CANONICALIZE);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -197,6 +161,7 @@ public class FsPathTest {
             "/foo/bar",
             "/foo/bar/",
             "/",
+            "foo#fragmentDefined",
             "foo/",
             "foo//",
             "foo/.",
@@ -299,10 +264,7 @@ public class FsPathTest {
             { "foo:bar:/baz!/./", "foo:bar:/baz!/", "" },
             { "foo:bar:/baz!/.", "foo:bar:/baz!/", "" },
             { "foo:bar:/baz!/", "foo:bar:/baz!/", "" },
-            { "foo:bar:/baz!/#", "foo:bar:/baz!/", "#", },
-            { "foo:bar:/baz!/#bang", "foo:bar:/baz!/", "#bang", },
             { "foo:bar:/baz?bang!/?plonk", "foo:bar:/baz?bang!/", "?plonk" },
-            { "foo:bar:/baz?bang!/?plonk#frag", "foo:bar:/baz?bang!/", "?plonk#frag" },
 
             //{ "foo:bar:/baz!/bang//", "foo:bar:/baz!/", "bang/" },
             //{ "foo:bar:/baz!/bang/.", "foo:bar:/baz!/", "bang/" },
@@ -311,9 +273,7 @@ public class FsPathTest {
             { "foo:bar:/baz!/bang/../", "foo:bar:/baz!/", "" },
 
             { "", null, "", },
-            { "#foo", null, "#foo", },
             { "foo", null, "foo" },
-            { "foo#bar", null, "foo#bar", },
             //{ "foo/", null, "foo/" },
             //{ "foo//", null, "foo/" },
             //{ "foo/.", null, "foo/" },
@@ -323,11 +283,7 @@ public class FsPathTest {
             { "foo/bar", null, "foo/bar" },
             //{ "foo/bar/", null, "foo/bar/" },
             { "foo:/", "foo:/", "" },
-            { "foo:/#", "foo:/", "#" },
-            { "foo:/#bar", "foo:/", "#bar" },
             { "foo:/bar", "foo:/", "bar" },
-            { "foo:/bar#", "foo:/", "bar#" },
-            { "foo:/bar#frag", "foo:/", "bar#frag" },
             { "foo:/bar/", "foo:/", "bar" },
             { "foo:/bar//", "foo:/", "bar" },
             { "foo:/bar/.", "foo:/", "bar" },
@@ -339,9 +295,9 @@ public class FsPathTest {
             { "foo:/bar/baz/", "foo:/bar/", "baz" },
             { "foo:/bar/baz/?bang", "foo:/bar/", "baz?bang" },
         }) {
-            FsPath path = FsPath.create(params[0], FsUriModifier.CANONICALIZE);
-            final FsMountPoint mountPoint = null == params[1] ? null : FsMountPoint.create(params[1]);
-            final FsEntryName entryName = FsEntryName.create(params[2]);
+            FsPath path = FsPath.create(URI.create(params[0]), FsUriModifier.CANONICALIZE);
+            final FsMountPoint mountPoint = null == params[1] ? null : FsMountPoint.create(URI.create(params[1]));
+            final FsEntryName entryName = FsEntryName.create(URI.create(params[2]));
             assertPath(path, mountPoint, entryName);
 
             path = new FsPath(mountPoint, entryName);
@@ -362,8 +318,8 @@ public class FsPathTest {
         }
         assertThat(path.getEntryName().toUri(), equalTo(entryName.toUri()));
         assertThat(path.toString(), equalTo(path.toUri().toString()));
-        assertThat(FsPath.create(path.toUri().toString()), equalTo(path));
-        assertThat(FsPath.create(path.toUri().toString()).hashCode(), equalTo(path.hashCode()));
+        assertThat(FsPath.create(path.toUri()), equalTo(path));
+        assertThat(FsPath.create(path.toUri()).hashCode(), equalTo(path.hashCode()));
     }
 
     @Test
@@ -372,7 +328,7 @@ public class FsPathTest {
             { "foo:bar:baz:/%20!/%20/%20!/%20/%20", " ", " / ", " / ", },
             { "foo:bar:baz:/%20a%20!/%20b%20!/%20c%20", " a ", " b ", " c ", },
         }) {
-            FsPath path = FsPath.create(params[0]);
+            FsPath path = FsPath.create(URI.create(params[0]));
             for (int i = params.length; 0 < --i; ) {
                 assertThat(path.getEntryName().getPath(), equalTo(params[i]));
                 path = path.getMountPoint().getPath();
@@ -403,7 +359,7 @@ public class FsPathTest {
             { "foo:/bar/", "foo:/bar/" },
             { "bar", "bar" },
         }) {
-            final FsPath path = FsPath.create(params[0]);
+            final FsPath path = FsPath.create(URI.create(params[0]));
             final URI hierarchical = path.toHierarchicalUri();
             assertThat(hierarchical, equalTo(URI.create(params[1])));
         }
