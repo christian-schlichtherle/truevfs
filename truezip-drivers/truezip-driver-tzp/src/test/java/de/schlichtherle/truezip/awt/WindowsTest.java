@@ -26,7 +26,6 @@ import static org.junit.Assert.*;
 
 /**
  * @author Christian Schlichtherle
- * @since TrueZIP 6.1
  * @version $Id$
  */
 public class WindowsTest {
