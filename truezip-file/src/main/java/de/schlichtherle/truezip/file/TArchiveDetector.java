@@ -160,6 +160,8 @@ implements FsCompositeDriver, FsDriverProvider {
     }
 
     private static SuffixSet getSuffixes(FsDriverProvider provider) {
+        if (provider instanceof TArchiveDetector)
+            return new SuffixSet(((TArchiveDetector) provider).toString());
         SuffixSet set = new SuffixSet();
         for (Map.Entry<FsScheme, FsDriver> entry : provider.get().entrySet()) {
             FsDriver driver = entry.getValue();
