@@ -24,7 +24,6 @@
     </parent>
 
     <artifactId>truezip-fsp-jse7</artifactId>
-    <version>7.2-SNAPSHOT</version>
 
     <name>TrueZIP FSP JSE7</name>
     <description>
@@ -43,74 +42,6 @@
             <artifactId>truezip-kernel</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- The file system driver for the file scheme in JSE 6.
-             This driver provides access to the following URI schemes:
-             file: OS file system.
-             -->
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truezip-driver-file</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- The file system driver for the file scheme in JSE 7+.
-             This driver provides access to the following URI schemes:
-             file: OS file system.
-             -->
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truezip-driver-file-jse7</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- This driver provides access to the following URI schemes:
-             http|https: Hyper Text Transport protocol.
-             -->
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truezip-driver-http</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- This driver provides access to the following URI schemes and
-             archive file suffixes:
-             tar: TAR file format.
-             tgz|tar.gz: GZIP compressed TAR file format.
-             tbz|tb2|tar.bz2: BZIP2 compressed TAR file format.
-             -->
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truezip-driver-tar</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- This driver provides access to the following URI schemes and
-             archive file suffixes:
-             tzp|zip.rae|zip.raes: RAES encrypted ZIP file format.
-             -->
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truezip-driver-tzp</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- This driver provides access to the following URI schemes and
-             archive file suffixes:
-             zip: ZIP file format.
-             ear|jar|war: JAR file format.
-             odg|odp|ods|odt|otg|otp|ots|ott|odb|odf|odm|oth: Open Document File format.
-             exe: Self extracting ZIP file format.
-             -->
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truezip-driver-zip</artifactId>
-            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
