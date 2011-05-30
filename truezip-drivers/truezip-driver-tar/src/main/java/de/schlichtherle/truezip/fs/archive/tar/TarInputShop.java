@@ -15,9 +15,9 @@
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
+import de.schlichtherle.truezip.fs.FsEntryName;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import de.schlichtherle.truezip.entry.EntryName;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.InputSocket;
@@ -40,14 +40,8 @@ import org.apache.tools.tar.TarEntry;
 import org.apache.tools.tar.TarInputStream;
 import org.apache.tools.tar.TarUtils;
 
-import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR;
-import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR_CHAR;
-import static org.apache.tools.tar.TarConstants.GIDLEN;
-import static org.apache.tools.tar.TarConstants.MODELEN;
-import static org.apache.tools.tar.TarConstants.MODTIMELEN;
-import static org.apache.tools.tar.TarConstants.NAMELEN;
-import static org.apache.tools.tar.TarConstants.SIZELEN;
-import static org.apache.tools.tar.TarConstants.UIDLEN;
+import static de.schlichtherle.truezip.fs.FsEntryName.*;
+import static org.apache.tools.tar.TarConstants.*;
 
 /**
  * Presents a {@link TarInputStream} as a randomly accessible archive.
@@ -126,7 +120,7 @@ implements InputShop<TarArchiveEntry> {
 
     /**
      * Returns the fixed name of the given TAR entry, ensuring that it ends
-     * with a {@link EntryName#SEPARATOR} if it's a directory.
+     * with a {@link FsEntryName#SEPARATOR} if it's a directory.
      *
      * @param entry the TAR entry.
      * @return the fixed name of the given TAR entry.
