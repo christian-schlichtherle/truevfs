@@ -19,6 +19,10 @@ import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
 import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
+import de.schlichtherle.truezip.util.SuffixSet;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Locale;
 import java.util.Map;
 import org.junit.Before;
@@ -26,22 +30,22 @@ import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
-import static de.schlichtherle.truezip.file.TArchiveDetector.NULL;
+import static de.schlichtherle.truezip.file.TArchiveDetector.*;
 
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public class TArchiveDetectorTest {
 
-    private static final FsArchiveDriver<?> DRIVER = new MockArchiveDriver();
-    private TArchiveDetector detector;
+    private FsArchiveDriver<?> driver;
+    private TArchiveDetector ALL;
 
     @Before
     public void setUp() {
-        detector = new TArchiveDetector(
-                "ear|exe|jar|odb|odf|odg|odm|odp|ods|odt|otg|oth|otp|ots|ott|tar|tar.bz2|tar.gz|tbz2|tgz|tzp|war|zip|zip.rae|zip.raes",
-                DRIVER);
+        driver = new MockArchiveDriver();
+        ALL = new TArchiveDetector("jar|zip", driver);
     }
 
     @Test
@@ -49,14 +53,14 @@ public class TArchiveDetectorTest {
         testIllegalConstructors(NullPointerException.class,
                 new Object[][] {
                     { null, null },
-                    { null, DRIVER },
+                    { null, driver },
                     //{ "xyz", null },
                     { null, null, null },
-                    { null, null, DRIVER },
+                    { null, null, driver },
                     { null, "xyz", null },
-                    { null, "xyz", DRIVER },
+                    { null, "xyz", driver },
                     { NULL, null, null },
-                    { NULL, null, DRIVER },
+                    { NULL, null, driver },
                     //{ TArchiveDetector.NULL, "xyz", null },
                     { null, new Object[][] {{ "xyz", MockArchiveDriver.class }} },
                     { NULL, null },
@@ -73,34 +77,34 @@ public class TArchiveDetectorTest {
                     { "NULL" },
                     { "ALL" },
                     { "unknownSuffix" },
-                    { "", DRIVER }, // empty suffix set
-                    { ".", DRIVER }, // empty suffix set
-                    { "|", DRIVER }, // empty suffix set
-                    { "|.", DRIVER }, // empty suffix set
-                    { "||", DRIVER }, // empty suffix set
-                    { "||.", DRIVER }, // empty suffix set
-                    { "|.|", DRIVER }, // empty suffix set
-                    { "|.|.", DRIVER }, // empty suffix set
-                    { NULL, "", DRIVER }, // empty suffix set
-                    { NULL, ".", DRIVER }, // empty suffix set
-                    { NULL, "|", DRIVER }, // empty suffix set
-                    { NULL, "|.", DRIVER }, // empty suffix set
-                    { NULL, "||", DRIVER }, // empty suffix set
-                    { NULL, "||.", DRIVER }, // empty suffix set
-                    { NULL, "|.|", DRIVER }, // empty suffix set
-                    { NULL, "|.|.", DRIVER }, // empty suffix set
-                    { NULL, new Object[][] {{ "", DRIVER }} }, // empty suffix set
-                    { NULL, new Object[][] {{ ".", DRIVER }} }, // empty suffix set
-                    { NULL, new Object[][] {{ "|", DRIVER }} }, // empty suffix set
-                    { NULL, new Object[][] {{ "|.", DRIVER }} }, // empty suffix set
-                    { NULL, new Object[][] {{ "||", DRIVER }} }, // empty suffix set
-                    { NULL, new Object[][] {{ "||.", DRIVER }} }, // empty suffix set
-                    { NULL, new Object[][] {{ "|.|", DRIVER }} }, // empty suffix set
-                    { NULL, new Object[][] {{ "|.|.", DRIVER }} }, // empty suffix set
+                    { "", driver }, // empty suffix set
+                    { ".", driver }, // empty suffix set
+                    { "|", driver }, // empty suffix set
+                    { "|.", driver }, // empty suffix set
+                    { "||", driver }, // empty suffix set
+                    { "||.", driver }, // empty suffix set
+                    { "|.|", driver }, // empty suffix set
+                    { "|.|.", driver }, // empty suffix set
+                    { NULL, "", driver }, // empty suffix set
+                    { NULL, ".", driver }, // empty suffix set
+                    { NULL, "|", driver }, // empty suffix set
+                    { NULL, "|.", driver }, // empty suffix set
+                    { NULL, "||", driver }, // empty suffix set
+                    { NULL, "||.", driver }, // empty suffix set
+                    { NULL, "|.|", driver }, // empty suffix set
+                    { NULL, "|.|.", driver }, // empty suffix set
+                    { NULL, new Object[][] {{ "", driver }} }, // empty suffix set
+                    { NULL, new Object[][] {{ ".", driver }} }, // empty suffix set
+                    { NULL, new Object[][] {{ "|", driver }} }, // empty suffix set
+                    { NULL, new Object[][] {{ "|.", driver }} }, // empty suffix set
+                    { NULL, new Object[][] {{ "||", driver }} }, // empty suffix set
+                    { NULL, new Object[][] {{ "||.", driver }} }, // empty suffix set
+                    { NULL, new Object[][] {{ "|.|", driver }} }, // empty suffix set
+                    { NULL, new Object[][] {{ "|.|.", driver }} }, // empty suffix set
                     { NULL, new Object[][] {{ "anySuffix", "" }} }, // empty class name
                     { NULL, new Object[][] {{ "anySuffix", "xyz" }} }, // not a class name
-                    { NULL, new Object[][] {{ MockArchiveDriver.class, DRIVER }} }, // not a suffix list
-                    { NULL, new Object[][] {{ DRIVER, DRIVER }} }, // not a suffix list
+                    { NULL, new Object[][] {{ MockArchiveDriver.class, driver }} }, // not a suffix list
+                    { NULL, new Object[][] {{ driver, driver }} }, // not a suffix list
                     { NULL, new Object[][] {{ "anySuffix", new Object() }} }, // not an archive driver
                     { NULL, new Object[][] {{ "anySuffix", Object.class }} }, // not an archive driver class
                 });
@@ -271,28 +275,33 @@ public class TArchiveDetectorTest {
             final String result = args[i++];
             final String suffixes = args[i];
             TArchiveDetector
-            detector = new TArchiveDetector(suffixes, DRIVER);
+            detector = new TArchiveDetector(suffixes, driver);
             assertEquals(result, detector.toString());
-            detector = new TArchiveDetector(NULL, suffixes, DRIVER);
+            detector = new TArchiveDetector(NULL, suffixes, driver);
             assertEquals(result, detector.toString());
-            detector = new TArchiveDetector(NULL, new Object[][] {{ suffixes, DRIVER }});
+            detector = new TArchiveDetector(NULL, new Object[][] {{ suffixes, driver }});
             assertEquals(result, detector.toString());
         }
     }
 
     @Test
-    public void testGetSuffixesForNullDrivers() {
-        TArchiveDetector detector = new TArchiveDetector(
-                NULL, "zip", null); // remove zip suffix
-        assertEquals("", detector.toString());
-        detector = new TArchiveDetector(
-                NULL, ".ZIP", null); // remove zip suffix
-        assertEquals("", detector.toString());
+    public void testNullMapping() {
+        for (TArchiveDetector delegate : new TArchiveDetector[] {
+            NULL,
+            ALL,
+        }) {
+            TArchiveDetector detector = new TArchiveDetector(
+                    delegate, "zip", null); // remove zip suffix
+            assertFalse(new SuffixSet(detector.toString()).contains("zip"));
+            detector = new TArchiveDetector(
+                    delegate, ".ZIP", null); // remove zip suffix
+            assertFalse(new SuffixSet(detector.toString()).contains("zip"));
+        }
     }
 
     @Test
-    public void testGetArchiveDriver() {
-        assertDefaultArchiveDetector(NULL, new Object[] {
+    public void testGetDriver() {
+        assertScheme(NULL, new String[] {
             null, "",
             null, ".",
             null, ".all",
@@ -301,83 +310,41 @@ public class TArchiveDetectorTest {
             null, ".exe",
             null, ".jar",
             null, ".null",
-            null, ".tar",
-            null, ".tar.bz2",
-            null, ".tar.gz",
-            null, ".tbz2",
-            null, ".tgz",
-            null, ".tzp",
-            null, ".war",
             null, ".z",
             null, ".zip",
-            null, ".zip.rae",
-            null, ".zip.raes",
             null, "test",
             null, "test.",
             null, "test.all",
             null, "test.default",
-            null, "test.ear",
-            null, "test.exe",
             null, "test.jar",
             null, "test.null",
-            null, "test.tar",
-            null, "test.tar.bz2",
-            null, "test.tar.gz",
-            null, "test.tbz2",
-            null, "test.tgz",
-            null, "test.tzp",
-            null, "test.war",
             null, "test.z",
             null, "test.zip",
-            null, "test.zip.rae",
-            null, "test.zip.raes",
         });
 
-        assertDefaultArchiveDetector(detector, new Object[] {
+        assertScheme(ALL, new String[] {
             null, "",
             null, ".",
             null, ".all",
             null, ".default",
-            DRIVER, ".ear",
-            DRIVER, ".exe",
-            DRIVER, ".jar",
+            "jar", ".jar",
             null, ".null",
-            DRIVER, ".tar",
-            DRIVER, ".tar.bz2",
-            DRIVER, ".tar.gz",
-            DRIVER, ".tbz2",
-            DRIVER, ".tgz",
-            DRIVER, ".tzp",
-            DRIVER, ".war",
             null, ".z",
-            DRIVER, ".zip",
-            DRIVER, ".zip.rae",
-            DRIVER, ".zip.raes",
+            "zip", ".zip",
             null, "test",
             null, "test.",
             null, "test.all",
             null, "test.default",
-            DRIVER, "test.ear",
-            DRIVER, "test.exe",
-            DRIVER, "test.jar",
+            "jar", "test.jar",
             null, "test.null",
-            DRIVER, "test.tar",
-            DRIVER, "test.tar.bz2",
-            DRIVER, "test.tar.gz",
-            DRIVER, "test.tbz2",
-            DRIVER, "test.tgz",
-            DRIVER, "test.tzp",
-            DRIVER, "test.war",
             null, "test.z",
-            DRIVER, "test.zip",
-            DRIVER, "test.zip.rae",
-            DRIVER, "test.zip.raes",
+            "zip", "test.zip",
         });
     }
 
-    private void assertDefaultArchiveDetector(
+    private void assertScheme(
             TArchiveDetector detector,
-            final Object[] args) {
+            final String[] tests) {
         try {
             detector.getScheme(null);
             fail("Expected NullPointerException!");
@@ -393,33 +360,25 @@ public class TArchiveDetectorTest {
         } catch (IllegalArgumentException expected) {
         }
 
-        for (int i = 0; i < args.length; i++) {
-            final FsArchiveDriver<?> result = (FsArchiveDriver<?>) args[i++];
-            final String path = (String) args[i];
-            assertDefaultArchiveDetector(detector, result, path);
+        for (int i = 0; i < tests.length; i++) {
+            final FsScheme scheme = tests[i] == null ? null : FsScheme.create(tests[i]);
+            final String path = tests[++i];
+            assertScheme(detector, scheme, path);
 
             // Add level of indirection in order to test caching.
             detector = new TArchiveDetector(detector, new Object[0][0]);
-            assertDefaultArchiveDetector(detector, result, path);
+            assertScheme(detector, scheme, path);
         }
     }
 
-    private void assertDefaultArchiveDetector(
+    private void assertScheme(
             final TArchiveDetector detector,
-            final FsDriver result,
+            final @Nullable FsScheme scheme,
             final String path) {
         final String lpath = path.toLowerCase(Locale.ENGLISH);
         final String upath = path.toUpperCase(Locale.ENGLISH);
 
-        if (null != result) {
-            assertThat(detector.getScheme(lpath), equalTo(detector.getScheme(upath)));
-            assertThat(detector.get().get(detector.getScheme(lpath)),
-                    sameInstance(result));
-            assertThat(detector.get().get(detector.getScheme(upath)),
-                    sameInstance(result));
-        } else {
-            assertThat(detector.getScheme(lpath), nullValue());
-            assertThat(detector.getScheme(upath), nullValue());
-        }
+        assertThat(detector.getScheme(lpath), equalTo(scheme));
+        assertThat(detector.getScheme(upath), equalTo(scheme));
     }
 }
