@@ -30,11 +30,8 @@ import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.AccessDeniedException;
@@ -51,9 +48,7 @@ import net.jcip.annotations.ThreadSafe;
 
 import static de.schlichtherle.truezip.entry.Entry.*;
 import static de.schlichtherle.truezip.entry.Entry.Access.*;
-import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
-import static java.io.File.separatorChar;
 
 /**
  * A controller for a mount point of the operating system's file system.
@@ -77,24 +72,8 @@ final class FileController extends FsController<FsModel>  {
     FileController(final FsModel model) {
         if (null != model.getParent())
             throw new IllegalArgumentException();
-        URI uri = model.getMountPoint().toUri();
-        if ('\\' == separatorChar && null != uri.getRawAuthority()) {
-            try {
-                // Postfix: Move Windows UNC host from authority to path
-                // component because the File class can't deal with this.
-                // Note that the authority parameter must not be null and that
-                // you cannot use the UriBuilder class - using either of these
-                // would result in the authority property of the new URI object
-                // being equal to the original value again.
-                uri = new URI(  uri.getScheme(), "",
-                                SEPARATOR + SEPARATOR + uri.getAuthority() + uri.getPath(),
-                                uri.getQuery(), uri.getFragment());
-            } catch (URISyntaxException ex) {
-                throw new AssertionError(ex);
-            }
-        }
         this.model = model;
-        this.target = Paths.get(uri);
+        this.target = Paths.get(model.getMountPoint().toUri());
     }
 
     @Override
@@ -144,7 +123,7 @@ final class FileController extends FsController<FsModel>  {
      * Returns {@code true} if the given file can be created or exists
      * and at least one byte can be successfully written to it - the file is
      * restored to its previous state afterwards.
-     * This is a much stronger test than {@link File#canWrite()}.
+     * This is a much stronger test than {@link java.io.File#canWrite()}.
      */
     static boolean isCreatableOrWritable(final Path file) {
         try {
@@ -241,6 +220,7 @@ final class FileController extends FsController<FsModel>  {
     public void setReadOnly(FsEntryName name) throws IOException {
         Path file = target.resolve(name.getPath());
         // TODO: Check NIO.2 method.
+        //setAttribute(file, "readOnly", Boolean.TRUE, null);
         if (file.toFile().setReadOnly())
             if (exists(file)) // just guessing here
                 throw new AccessDeniedException(file.toString());
