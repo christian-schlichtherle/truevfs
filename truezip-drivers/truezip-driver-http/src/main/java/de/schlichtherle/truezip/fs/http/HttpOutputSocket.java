@@ -28,7 +28,7 @@ import net.jcip.annotations.ThreadSafe;
 
 
 /**
- * An output socket for HTTP entries.
+ * An output socket for HTTP(S) entries.
  * 
  * @see     HttpInputSocket
  * @author  Christian Schlichtherle
