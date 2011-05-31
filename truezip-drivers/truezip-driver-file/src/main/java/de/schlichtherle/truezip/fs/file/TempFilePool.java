@@ -43,7 +43,8 @@ final class TempFilePool implements IOPool<FileEntry> {
      * Use this if you don't have special requirements regarding the temp file
      * prefix, suffix or directory.
      */
-    public static final TempFilePool INSTANCE = new TempFilePool("tzp", null, null);
+    public static final TempFilePool
+            INSTANCE = new TempFilePool("tzp", null, null);
 
     private final           String prefix;
     private final @Nullable String suffix;

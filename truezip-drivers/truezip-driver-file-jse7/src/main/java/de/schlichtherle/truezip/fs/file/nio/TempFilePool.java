@@ -23,6 +23,7 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import static java.nio.file.Files.*;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import net.jcip.annotations.NotThreadSafe;
 import net.jcip.annotations.ThreadSafe;
 
@@ -39,12 +40,16 @@ import net.jcip.annotations.ThreadSafe;
 @DefaultAnnotation(NonNull.class)
 final class TempFilePool implements IOPool<FileEntry> {
 
+    private static final Path TEMP_DIR
+            = Paths.get(System.getProperty("java.io.tmpdir"));
+
     /**
      * A default instance of this pool.
      * Use this if you don't have special requirements regarding the temp file
      * prefix, suffix or directory.
      */
-    public static final TempFilePool INSTANCE = new TempFilePool("tzp", null, null);
+    public static final TempFilePool
+            INSTANCE = new TempFilePool("tzp", null, null);
 
     private final           String prefix;
     private final @Nullable String suffix;
@@ -58,7 +63,7 @@ final class TempFilePool implements IOPool<FileEntry> {
             throw new NullPointerException();
         this.prefix = prefix;
         this.suffix = suffix;
-        this.dir    = dir;
+        this.dir    = null != dir ? dir : TEMP_DIR;
     }
 
     @Override
