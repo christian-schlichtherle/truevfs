@@ -37,7 +37,7 @@ import net.jcip.annotations.Immutable;
 <tbody>
 <tr>
 <td>{@code file}</td>
-<td>{@link de.schlichtherle.truezip.fs.file.FileDriver}</td>
+<td>{@link de.schlichtherle.truezip.fs.file.nio.FileDriver}</td>
 </tr>
 </tbody>
 </table>

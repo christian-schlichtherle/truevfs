@@ -27,7 +27,8 @@
 
     <name>TrueZIP Driver FILE</name>
     <description>
-        The file system driver for the FILE scheme based on the java.io.File* API.
+        The file system driver for the FILE scheme
+        based on the java.io.File* API for JSE 6.
 
         Add the JAR artifact of this module to the compile-time class path for
         dependency injection to the TrueZIP Kernel module or to the run-time

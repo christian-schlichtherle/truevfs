@@ -37,7 +37,7 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-public final class TempFilePool implements IOPool<FileEntry> {
+final class TempFilePool implements IOPool<FileEntry> {
 
     /**
      * A default instance of this pool.
@@ -51,9 +51,9 @@ public final class TempFilePool implements IOPool<FileEntry> {
     private final @Nullable Path   dir;
 
     /** Constructs a new temp file pool. */
-    public TempFilePool(final           String prefix,
-                        final @Nullable String suffix,
-                        final @Nullable Path dir) {
+    TempFilePool(   final           String prefix,
+                    final @Nullable String suffix,
+                    final @Nullable Path dir) {
         if (null == prefix)
             throw new NullPointerException();
         this.prefix = prefix;

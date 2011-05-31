@@ -4,7 +4,7 @@
     Christian Schlichtherle
     -----------------------
 
-About TrueZIP Driver FILE
+About TrueZIP Driver FILE JSE7
 
     This module contains the file system driver service class
     {{{../../apidocs/de/schlichtherle/truezip/fs/file/FileDriverService.html}<<<FileDriverService>>>}}
