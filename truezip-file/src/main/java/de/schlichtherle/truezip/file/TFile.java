@@ -368,13 +368,13 @@ public final class TFile extends File {
             ROOTS = Collections.unmodifiableSet(
                 new TreeSet<File>(Arrays.asList(listRoots())));
 
+    private static boolean lenient = true;
+
     /** The file system manager to use within this package. */
     static final FsManager manager = FsManagerLocator.SINGLETON.get();
 
     private static TArchiveDetector
             defaultDetector = TArchiveDetector.ALL;
-
-    private static boolean lenient = true;
 
     /**
      * The delegate is used to implement the behaviour of the file system
