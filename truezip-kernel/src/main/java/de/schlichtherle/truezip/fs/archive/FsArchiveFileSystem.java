@@ -199,7 +199,7 @@ implements Iterable<FsCovariantEntry<E>> {
         final String parentPath = splitter.getParentPath();
         final String memberName = splitter.getMemberName();
         FsCovariantEntry<E> parent = master.get(parentPath);
-        if (null == parent)
+        if (null == parent || !parent.isType(DIRECTORY))
             parent = master.add(parentPath, newEntryUnchecked(
                     parentPath, DIRECTORY, NO_OUTPUT_OPTION, null));
         parent.add(memberName);
@@ -606,15 +606,15 @@ implements Iterable<FsCovariantEntry<E>> {
         master.remove(path);
         splitter.split(path);
         final String parentPath = splitter.getParentPath();
-        final FsCovariantEntry<E> ce = master.get(parentPath);
-        assert null != ce : "The parent directory of \"" + name.toString()
+        final FsCovariantEntry<E> parentCE = master.get(parentPath);
+        assert null != parentCE : "The parent directory of \"" + name.toString()
                     + "\" is missing - archive file system is corrupted!";
-        final boolean ok = ce.remove(splitter.getMemberName());
+        final boolean ok = parentCE.remove(splitter.getMemberName());
         assert ok : "The parent directory of \"" + name.toString()
                     + "\" does not contain this entry - archive file system is corrupted!";
-        final E ae = ce.getEntry(DIRECTORY);
-        if (ae.getTime(Access.WRITE) != UNKNOWN) // never touch ghosts!
-            ae.setTime(Access.WRITE, System.currentTimeMillis());
+        final E parentAE = parentCE.getEntry(DIRECTORY);
+        if (parentAE.getTime(Access.WRITE) != UNKNOWN) // never touch ghosts!
+            parentAE.setTime(Access.WRITE, System.currentTimeMillis());
     }
 
     public boolean setTime(
