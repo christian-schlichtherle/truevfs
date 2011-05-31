@@ -43,12 +43,9 @@ public interface Pool<R, E extends Exception> {
      * {@link IllegalStateException} upon the conditions explained below.
      *
      * @param  resource a resource.
-     * @throws IllegalArgumentException if the given resource has not been
-     *         allocated by this pool
-     *         and the implementation doesn't tolerate this.
-     * @throws IllegalStateException if the given resource has already been
-     *         released to this pool
-     *         and the implementation doesn't tolerate this.
+     * @throws RuntimeException if the given resource has not been allocated
+     *         by this pool or has already been released to this pool and the
+     *         implementation cannot tolerate this.
      * @throws Exception if releasing the resource failed for any other reason.
      */
     void release(@NonNull R resource) throws E;
@@ -65,8 +62,8 @@ public interface Pool<R, E extends Exception> {
          * conditions explained below.
          *
          * @throws IllegalStateException if this resource has already been
-         *         released to its pool
-         *         and the implementation doesn't tolerate this.
+         *         released to its pool and the implementation cannot tolerate
+         *         this.
          */
         void release() throws E;
     }
