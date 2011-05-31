@@ -50,7 +50,7 @@ import static de.schlichtherle.truezip.entry.Entry.Access.*;
 @Immutable
 @DefaultAnnotation(NonNull.class)
 @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
-public class FileEntry extends FsEntry implements IOEntry<FileEntry> {
+class FileEntry extends FsEntry implements IOEntry<FileEntry> {
 
     private static final String FILE_POOL_PREFIX = ".tzp";
     private static final BitField<FsOutputOption> NO_OUTPUT_OPTIONS

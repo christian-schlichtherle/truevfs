@@ -27,7 +27,8 @@
 
     <name>TrueZIP Driver FILE JSE7</name>
     <description>
-        The file system driver for the FILE scheme based on NIO.2 in JSE7.
+        The file system driver for the FILE scheme
+        based on the NIO.2 API for JSE 7.
 
         Add the JAR artifact of this module to the compile-time class path for
         dependency injection to the TrueZIP Kernel module or to the run-time
