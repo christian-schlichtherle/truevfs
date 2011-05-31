@@ -34,8 +34,8 @@ public final class FsDefaultDriver implements FsCompositeDriver {
 
     /**
      * Constructs a new file system default driver which will query the given
-     * file system driver service for an appropriate file system driver for the
-     * scheme of a given mount point.
+     * file system driver provider for an appropriate file system driver for
+     * the scheme of a given mount point.
      */
     public FsDefaultDriver(final @NonNull FsDriverProvider provider) {
         this.drivers = provider.get(); // immutable map!
