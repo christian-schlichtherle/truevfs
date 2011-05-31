@@ -64,11 +64,11 @@ public final class KeyManagerLocator implements KeyManagerProvider {
 
     @Override
     public <K> KeyManager<K> get(Class<K> type) {
-        return Init.SERVICE.get(type);
+        return Boot.SERVICE.get(type);
     }
 
     /** A static data utility class used for lazy initialization. */
-    private static class Init {
+    private static class Boot {
         static final KeyManagerService SERVICE;
         static {
             final Logger logger = Logger.getLogger(
@@ -101,7 +101,7 @@ public final class KeyManagerLocator implements KeyManagerProvider {
         }
 
         /** You cannot instantiate this class. */
-        Init() {
+        Boot() {
         }
-    } // class Holder
+    } // class Boot
 }

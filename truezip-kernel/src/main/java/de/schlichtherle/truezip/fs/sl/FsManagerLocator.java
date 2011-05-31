@@ -66,11 +66,11 @@ public final class FsManagerLocator implements FsManagerProvider {
 
     @Override
     public FsManager get() {
-        return Init.MANAGER;
+        return Boot.MANAGER;
     }
 
     /** A static data utility class used for lazy initialization. */
-    private static class Init {
+    private static class Boot {
         static final FsManager MANAGER;
         static {
             final Logger logger = Logger.getLogger(
@@ -105,7 +105,7 @@ public final class FsManagerLocator implements FsManagerProvider {
         }
 
         /** Make NetBeans happy. */
-        Init() {
+        Boot() {
         }
-    } // class Holder
+    } // class Boot
 }

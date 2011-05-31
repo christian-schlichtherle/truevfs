@@ -69,11 +69,11 @@ public final class IOPoolLocator implements IOPoolProvider {
      */
     @Override
     public IOPool<?> get() {
-        return Init.SERVICE.get();
+        return Boot.SERVICE.get();
     }
 
     /** A static data utility class used for lazy initialization. */
-    private static class Init {
+    private static class Boot {
         static final IOPoolService SERVICE;
         static {
             final Logger logger = Logger.getLogger(
@@ -108,7 +108,7 @@ public final class IOPoolLocator implements IOPoolProvider {
         }
 
         /** You cannot instantiate this class. */
-        Init() {
+        Boot() {
         }
-    } // class Holder
+    } // class Boot
 }

@@ -58,11 +58,11 @@ public final class FsDriverLocator implements FsDriverProvider {
 
     @Override
     public Map<FsScheme, FsDriver> get() {
-        return Init.DRIVERS;
+        return Boot.DRIVERS;
     }
 
     /** A static data utility class used for lazy initialization. */
-    private static class Init {
+    private static class Boot {
         static final Map<FsScheme, FsDriver> DRIVERS;
         static {
             final Logger logger = Logger.getLogger(
@@ -104,7 +104,7 @@ public final class FsDriverLocator implements FsDriverProvider {
         }
 
         /** Make NetBeans happy. */
-        Init() {
+        Boot() {
         }
-    } // class Holder
+    } // class Boot
 }
