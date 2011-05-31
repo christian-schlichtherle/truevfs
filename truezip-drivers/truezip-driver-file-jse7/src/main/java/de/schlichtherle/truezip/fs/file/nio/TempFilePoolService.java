@@ -43,6 +43,6 @@ public final class TempFilePoolService extends IOPoolService {
      */
     @Override
     public int getPriority() {
-        return NIO2.AVAILABLE ? 10 : -10;
+        return NIO2.AVAILABLE ? 100 : -100;
     }
 }

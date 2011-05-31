@@ -52,6 +52,6 @@ public final class FileDriver extends FsDriver {
      */
     @Override
     public int getPriority() {
-        return NIO2.AVAILABLE ? 10 : -10;
+        return NIO2.AVAILABLE ? 100 : -100;
     }
 }
