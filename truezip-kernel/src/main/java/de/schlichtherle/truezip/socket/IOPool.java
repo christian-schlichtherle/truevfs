@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.socket;
 
-import de.schlichtherle.truezip.socket.IOPool.Entry;
 import de.schlichtherle.truezip.util.Pool;
 import java.io.IOException;
 
@@ -31,7 +30,7 @@ import java.io.IOException;
  * @version $Id$
  */
 public interface IOPool<E extends IOEntry<E>>
-extends Pool<Entry<E>, IOException> {
+extends Pool<IOPool.Entry<E>, IOException> {
 
     /**
      * A releasable I/O entry.
