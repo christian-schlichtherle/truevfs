@@ -113,11 +113,11 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
                     return;
                 closed = true;
                 try {
-                    super.close();
+                    delegate.close();
                 } finally {
+                    IOException cause = null;
                     try {
                         if (temp != entry) {
-                            IOException cause = null;
                             try {
                                 try {
                                     move(tempFile, entryFile,
@@ -140,9 +140,14 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
                         final Entry template = FileOutputSocket.this.template;
                         if (null != template) {
                             final long time = template.getTime(WRITE);
-                            if (UNKNOWN != time)
-                                Files.setLastModifiedTime(
-                                        entryFile, FileTime.fromMillis(time));
+                            if (UNKNOWN != time) {
+                                try {
+                                    setLastModifiedTime(
+                                            entryFile, FileTime.fromMillis(time));
+                                } catch (IOException ex) {
+                                    throw (IOException) ex.initCause(cause);
+                                }
+                            }
                         }
                     }
                 }
