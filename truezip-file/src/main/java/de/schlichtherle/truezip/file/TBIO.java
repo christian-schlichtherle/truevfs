@@ -114,8 +114,8 @@ final class TBIO {
             if (dst.exists() && !dst.isFile())
                 throw new IOException(dst + " (not a file)");
             cp0(true, src, dst);
-        } else if (src.isFile()) {
-            throw new IOException(src + " (cannot copy special file)");
+        } else if (src.exists()) {
+            throw new IOException(src + " (cannot move special file)");
         } else {
             throw new IOException(src + " (missing file)");
         }
@@ -154,7 +154,7 @@ final class TBIO {
         cp_r0(preserve, src, dst, srcDetector, dstDetector);
     }
 
-    /* Unchecked parameters version. */
+    /** Unchecked parameters version. */
     private static void
     cp_r0(  final boolean preserve,
             final File src,
@@ -191,7 +191,7 @@ final class TBIO {
             if (dst.exists() && !dst.isFile())
                 throw new IOException(dst + " (not a file)");
             cp0(preserve, src, dst);
-        } else if (src.isFile()) {
+        } else if (src.exists()) {
             throw new IOException(src + " (cannot copy special file)");
         } else {
             throw new IOException(src + " (missing file)");
@@ -222,7 +222,7 @@ final class TBIO {
         cp0(preserve, src, dst);
     }
 
-    /* Unchecked parameters version. */
+    /** Unchecked parameters version. */
     private static void
     cp0(final boolean preserve, final File src, final File dst)
     throws IOException {
@@ -268,6 +268,13 @@ final class TBIO {
             throw new IOException(b + " (contained in " + a + ")");
     }
 
+    /**
+     * Returns an input socket for the given file.
+     * 
+     * @param  src the file to read.
+     * @param  options the options for accessing the file.
+     * @return An input socket for the given file.
+     */
     static InputSocket<?>
     getInputSocket(final File src, final BitField<FsInputOption> options) {
         if (src instanceof TFile) {
@@ -286,6 +293,15 @@ final class TBIO {
                 .getInputSocket(path.getEntryName(), options);
     }
 
+    /**
+     * Returns an output socket for the given file.
+     * 
+     * @param  dst the file to write.
+     * @param  options the options for accessing the file.
+     * @param  template a nullable template from which file attributes shall
+     *         get copied.
+     * @return An output socket for the given file.
+     */
     static OutputSocket<?>
     getOutputSocket(final File dst,
                     final BitField<FsOutputOption> options,
