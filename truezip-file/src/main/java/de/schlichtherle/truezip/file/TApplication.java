@@ -204,9 +204,10 @@ public abstract class TApplication<E extends Exception> {
      *                 KeyManagerLocator.SINGLETON)));
      * </code></pre>
      * <p>
-     * The following class property controls whether archive files and their
-     * member directories get automatically created whenever required.
-     * By default, the value of this class property is {@code true}!
+     * Last but not least, the following class property controls whether
+     * archive files and their member directories get automatically created
+     * whenever required.
+     * The default value of this class property is {@code true}!
      * <pre><code>
      * TFile.setLenient(false);
      * </code></pre>
