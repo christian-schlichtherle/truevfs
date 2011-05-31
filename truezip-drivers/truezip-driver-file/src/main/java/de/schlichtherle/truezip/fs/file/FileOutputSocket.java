@@ -76,7 +76,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
         if (options.get(CREATE_PARENTS))
             entryFile.getParentFile().mkdirs();
         final FileEntry temp = options.get(CACHE) && !entryFile.createNewFile()
-                ? entry.createTempFile()
+                ? entry.allocate()
                 : entry;
         final File tempFile = temp.getFile();
 
@@ -107,7 +107,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
                                 throw cause = ex;
                             } finally {
                                 try {
-                                    ((IOPool.Entry<FileEntry>) temp).release();
+                                    temp.release();
                                 } catch (IOException ex) {
                                     throw (IOException) ex.initCause(cause);
                                 }

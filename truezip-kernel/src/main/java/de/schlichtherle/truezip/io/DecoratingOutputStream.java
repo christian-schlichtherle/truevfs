@@ -41,8 +41,7 @@ public abstract class DecoratingOutputStream extends OutputStream {
     protected OutputStream delegate;
 
     /**
-     * Constructs a new synchronized output stream.
-     * This object will synchronize on itself.
+     * Constructs a new decorating output stream.
      *
      * @param out the output stream to wrap in this decorator.
      */

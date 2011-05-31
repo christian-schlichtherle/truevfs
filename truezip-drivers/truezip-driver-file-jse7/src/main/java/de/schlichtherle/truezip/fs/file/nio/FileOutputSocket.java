@@ -93,7 +93,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
             }
         }
         final FileEntry temp = null != exists
-                ? entry.createTempFile()
+                ? entry.allocate()
                 : entry;
         final Path tempFile = temp.getPath();
 
@@ -130,7 +130,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
                                 throw cause = ex;
                             } finally {
                                 try {
-                                    ((IOPool.Entry<FileEntry>) temp).release();
+                                    temp.release();
                                 } catch (IOException ex) {
                                     throw (IOException) ex.initCause(cause);
                                 }
