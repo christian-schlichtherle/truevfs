@@ -151,7 +151,7 @@ implements EntryContainer<MockArchiveEntry> {
                         @Override
                         public void close() throws IOException {
                             try {
-                                super.close();
+                                delegate.close();
                             } finally {
                                 for (Size type : ALL_SIZE_SET)
                                     entry.setSize(type, io.getSize(type));

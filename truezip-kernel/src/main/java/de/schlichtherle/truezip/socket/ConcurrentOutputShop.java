@@ -214,11 +214,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
                 if (closed)
                     return;
                 try {
-                    try {
-                        flush();
-                    } finally {
-                        delegate.close();
-                    }
+                    delegate.close();
                 } finally {
                     threads.remove(delegate);
                     lock.notify(); // there can be only one waiting thread!
@@ -253,13 +249,8 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
 
         @Override
         public void close() throws IOException {
-            if (!closed) {
-                try {
-                    delegate.flush();
-                } finally {
-                    delegate.close();
-                }
-            }
+            if (!closed)
+                delegate.close();
         }
 
         /**
