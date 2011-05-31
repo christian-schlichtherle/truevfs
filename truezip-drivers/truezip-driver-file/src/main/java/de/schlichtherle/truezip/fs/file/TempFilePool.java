@@ -81,8 +81,8 @@ public final class TempFilePool implements IOPool<FileEntry> {
 
         private Entry(File file, final TempFilePool pool) {
             super(file);
-            assert null != pool;
             assert null != file;
+            assert null != pool;
             this.pool = pool;
         }
 
