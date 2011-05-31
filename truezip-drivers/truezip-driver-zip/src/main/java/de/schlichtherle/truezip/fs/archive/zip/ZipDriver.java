@@ -72,7 +72,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
      */
     private static final Charset ZIP_CHARSET = Charset.forName("IBM437");
 
-    private final IOPool<?> pool;
+    private final IOPoolProvider provider;
 
     /**
      * Equivalent to
@@ -91,12 +91,14 @@ implements ZipEntryFactory<ZipArchiveEntry> {
      */
     protected ZipDriver(final IOPoolProvider provider, Charset charset) {
         super(charset);
-        this.pool = provider.get();
+        if (null == provider)
+            throw new NullPointerException();
+        this.provider = provider;
     }
 
     @Override
     protected final IOPool<?> getPool() {
-        return pool;
+        return provider.get();
     }
 
     /**

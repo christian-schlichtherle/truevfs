@@ -59,16 +59,18 @@ public class TarDriver extends FsCharsetArchiveDriver<TarArchiveEntry> {
      */
     public static final Charset TAR_CHARSET = Charset.forName("US-ASCII");
 
-    private final IOPool<?> pool;
+    private final IOPoolProvider provider;
 
     public TarDriver(final IOPoolProvider provider) {
         super(TAR_CHARSET);
-        this.pool = provider.get();
+        if (null == provider)
+            throw new NullPointerException();
+        this.provider = provider;
     }
 
     @Override
     protected final IOPool<?> getPool() {
-        return pool;
+        return provider.get();
     }
 
     /**
@@ -154,7 +156,11 @@ public class TarDriver extends FsCharsetArchiveDriver<TarArchiveEntry> {
                     newTarOutputShop(model, out, (TarInputShop) source),
                     getPool());
         } catch (IOException ex) {
-            out.close();
+            try {
+                out.close();
+            } catch (IOException ex2) {
+                throw (IOException) ex2.initCause(ex);
+            }
             throw ex;
         }
     }
