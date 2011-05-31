@@ -180,7 +180,7 @@ public class CipherOutputStream extends DecoratingOutputStream {
                 finish();
             } finally {
                 cipher = null;
-                super.close();
+                delegate.close();
             }
         }
     }

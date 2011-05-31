@@ -84,7 +84,7 @@ implements OutputShop<ZipArchiveEntry> {
                 }
             }
             if (0 < source.getPostambleLength()) {
-                postamble = driver.getPool().allocate();
+                postamble = pool.allocate();
                 Streams.copy(   source.getPostambleInputStream(),
                                 postamble.getOutputSocket().newOutputStream());
             } else {

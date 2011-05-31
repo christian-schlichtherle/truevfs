@@ -838,7 +838,7 @@ implements Iterable<E> {
             finish();
         } finally {
             entries.clear();
-            super.close();
+            delegate.close();
         }
     }
 

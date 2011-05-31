@@ -140,19 +140,15 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
             throws IOException {
                 if (isBusy()) {
                     final IOPool.Entry<?> temp = pool.allocate();
-                    IOException cause = null;
                     try {
                         return new TempEntryOutputStream(getBoundSocket(), temp);
                     } catch (IOException ex) {
-                        throw cause = ex;
-                    } finally {
-                        if (null != cause) {
-                            try {
-                                temp.release();
-                            } catch (IOException ex) {
-                                throw (IOException) ex.initCause(cause);
-                            }
+                        try {
+                            temp.release();
+                        } catch (IOException ex2) {
+                            throw (IOException) ex2.initCause(ex);
                         }
+                        throw ex;
                     }
                 } else {
                     return new EntryOutputStream(getBoundSocket().newOutputStream());
@@ -187,7 +183,7 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
             closed = true;
             busy = false;
             try {
-                super.close();
+                delegate.close();
             } finally {
                 storeTemps();
             }
@@ -247,7 +243,7 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
             closed = true;
             try {
                 try {
-                    super.close();
+                    delegate.close();
                 } finally {
                     final Entry src = input.getLocalTarget();
                     final AE dst = output.getLocalTarget();

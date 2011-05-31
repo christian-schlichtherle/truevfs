@@ -194,7 +194,7 @@ class Type0RaesOutputStream extends RaesOutputStream {
 
                 assert dos.size() - trailer == buf.length;
             } finally {
-                super.close();
+                delegate.close();
             }
         }
     }
