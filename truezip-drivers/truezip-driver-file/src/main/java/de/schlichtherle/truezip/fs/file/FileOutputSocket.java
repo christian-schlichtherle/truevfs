@@ -93,11 +93,11 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
                     return;
                 closed = true;
                 try {
-                    super.close();
+                    delegate.close();
                 } finally {
+                    IOException cause = null;
                     try {
                         if (temp != entry) {
-                            IOException cause = null;
                             try {
                                 if (!tempFile.renameTo(entryFile)
                                         && (!entryFile.delete() || !tempFile.renameTo(entryFile)))
@@ -119,7 +119,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
                             final long time = template.getTime(WRITE);
                             if (UNKNOWN != time
                                     && !entryFile.setLastModified(time))
-                                throw new IOException(entryFile + " (cannot preserve last modification time)");
+                                throw new IOException(entryFile + " (cannot preserve last modification time)", cause);
                         }
                     }
                 }
