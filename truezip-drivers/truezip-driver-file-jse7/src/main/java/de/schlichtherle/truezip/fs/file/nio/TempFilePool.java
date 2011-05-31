@@ -24,7 +24,6 @@ import java.io.IOException;
 import static java.nio.file.Files.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.rmi.UnexpectedException;
 import net.jcip.annotations.NotThreadSafe;
 import net.jcip.annotations.ThreadSafe;
 
