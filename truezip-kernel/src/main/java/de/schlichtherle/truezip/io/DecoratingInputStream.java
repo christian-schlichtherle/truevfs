@@ -41,7 +41,7 @@ public abstract class DecoratingInputStream extends InputStream {
     protected InputStream delegate;
 
     /**
-     * Constructs a new filter input stream.
+     * Constructs a new decorating input stream.
      *
      * @param in the input stream to wrap in this decorator.
      */

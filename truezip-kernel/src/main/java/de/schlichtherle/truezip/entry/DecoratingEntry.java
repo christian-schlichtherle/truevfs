@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.entry;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.ThreadSafe;
 
@@ -26,11 +27,11 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
+@DefaultAnnotation(NonNull.class)
 public abstract class DecoratingEntry<E extends Entry>
 implements Entry {
 
     /** The decorated entry. */
-    @NonNull
     protected final E delegate;
 
     /**
@@ -38,7 +39,7 @@ implements Entry {
      *
      * @param entry the decorated entry.
      */
-    protected DecoratingEntry(@NonNull final E entry) {
+    protected DecoratingEntry(final E entry) {
         if (null == entry)
             throw new NullPointerException();
         this.delegate = entry;

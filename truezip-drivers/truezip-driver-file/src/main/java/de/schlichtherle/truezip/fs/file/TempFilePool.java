@@ -21,6 +21,7 @@ import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.File;
+import static java.io.File.*;
 import java.io.IOException;
 import net.jcip.annotations.NotThreadSafe;
 import net.jcip.annotations.ThreadSafe;
@@ -38,53 +39,54 @@ import net.jcip.annotations.ThreadSafe;
 @DefaultAnnotation(NonNull.class)
 final class TempFilePool implements IOPool<FileEntry> {
 
+    private static final File TEMP_DIR
+            = new File(System.getProperty("java.io.tmpdir"));
+
     /**
      * A default instance of this pool.
      * Use this if you don't have special requirements regarding the temp file
      * prefix, suffix or directory.
      */
-    public static final TempFilePool
-            INSTANCE = new TempFilePool("tzp", null, null);
+    static final TempFilePool INSTANCE = new TempFilePool(null);
 
-    private final           String prefix;
-    private final @Nullable String suffix;
-    private final @Nullable File   dir;
+    private final @Nullable File dir;
 
     /** Constructs a new temp file pool. */
-    TempFilePool(   final           String prefix,
-                    final @Nullable String suffix,
-                    final @Nullable File dir) {
-        if (null == prefix)
-            throw new NullPointerException();
-        this.prefix = prefix;
-        this.suffix = suffix;
-        this.dir    = dir;
+    TempFilePool(final @CheckForNull File dir) {
+        this.dir = null != dir ? dir : TEMP_DIR;
     }
 
     @Override
-    public Entry allocate() throws IOException {
-        return new Entry(File.createTempFile(prefix, suffix, dir), this);
+    public PoolEntry allocate() throws IOException {
+        return new PoolEntry(createTempFile(".tzp", null, dir), this);
     }
 
     @Override
-    public void release(IOPool.Entry<FileEntry> resource) throws IOException {
+    public void release(Entry<FileEntry> resource) throws IOException {
         resource.release();
     }
 
     /** A temp file pool entry. */
     @NotThreadSafe
     @DefaultAnnotation(NonNull.class)
-    public static final class Entry
+    private static final class PoolEntry
     extends FileEntry
-    implements IOPool.Entry<FileEntry> {
-
-        private @CheckForNull TempFilePool pool;
-
-        private Entry(File file, final TempFilePool pool) {
+    implements Entry<FileEntry> {
+        PoolEntry(File file, final TempFilePool pool) {
             super(file);
             assert null != file;
             assert null != pool;
             this.pool = pool;
+        }
+
+        @Override
+        public FileEntry allocate() throws IOException {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void release(Entry<FileEntry> resource) throws IOException {
+            throw new UnsupportedOperationException();
         }
 
         @Override

@@ -15,13 +15,14 @@
  */
 package de.schlichtherle.truezip.fs.file;
 
+import de.schlichtherle.truezip.socket.IOPool.Entry;
+import de.schlichtherle.truezip.socket.IOPool;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.fs.FsOutputOption;
-import de.schlichtherle.truezip.socket.IOEntry;
+import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
-import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -47,15 +48,13 @@ import static de.schlichtherle.truezip.entry.Entry.Access.*;
 @Immutable
 @DefaultAnnotation(NonNull.class)
 @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
-class FileEntry extends FsEntry implements IOEntry<FileEntry> {
-
-    private static final String FILE_POOL_PREFIX = ".tzp";
-    private static final BitField<FsOutputOption> NO_OUTPUT_OPTIONS
-            = BitField.noneOf(FsOutputOption.class);
+class FileEntry
+extends FsEntry
+implements IOPool<FileEntry>, Entry<FileEntry> {
 
     private final File file;
     private final String name;
-    private volatile @CheckForNull TempFilePool pool;
+    volatile @CheckForNull TempFilePool pool;
 
     FileEntry(final File file) {
         assert null != file;
@@ -69,12 +68,22 @@ class FileEntry extends FsEntry implements IOEntry<FileEntry> {
         this.name = name.toString();
     }
 
-    final TempFilePool.Entry createTempFile() throws IOException {
+    @Override
+    public FileEntry allocate() throws IOException {
         TempFilePool pool = this.pool;
         if (null == pool)
-            pool = this.pool = new TempFilePool(
-                    FILE_POOL_PREFIX, null, file.getParentFile());
+            pool = this.pool = new TempFilePool(file.getParentFile());
         return pool.allocate();
+    }
+
+    @Override
+    public void release(Entry<FileEntry> resource) throws IOException {
+        resource.release();
+    }
+
+    @Override
+    public void release() throws IOException {
+        throw new UnsupportedOperationException();
     }
 
     /** Returns the decorated file. */
@@ -145,12 +154,12 @@ class FileEntry extends FsEntry implements IOEntry<FileEntry> {
 
     @Override
     public final OutputSocket<FileEntry> getOutputSocket() {
-        return new FileOutputSocket(this, NO_OUTPUT_OPTIONS, null);
+        return new FileOutputSocket(this, NO_OUTPUT_OPTION, null);
     }
 
     final OutputSocket<FileEntry> getOutputSocket(
             BitField<FsOutputOption> options,
-            @CheckForNull Entry template) {
+            @CheckForNull de.schlichtherle.truezip.entry.Entry template) {
         return new FileOutputSocket(this, options, template);
     }
 }

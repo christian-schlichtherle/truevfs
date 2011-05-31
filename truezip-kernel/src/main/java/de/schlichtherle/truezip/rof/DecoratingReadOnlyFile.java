@@ -73,8 +73,9 @@ public abstract class DecoratingReadOnlyFile extends AbstractReadOnlyFile {
     protected ReadOnlyFile delegate;
 
     /**
-     * Creates a new instance of {@code DecoratingReadOnlyFile},
-     * which filters the given read only file.
+     * Constructs a new decorating read only file.
+     *
+     * @param rof the read only file to wrap in this decorator.
      */
     protected DecoratingReadOnlyFile(@CheckForNull ReadOnlyFile rof) {
         this.delegate = rof;

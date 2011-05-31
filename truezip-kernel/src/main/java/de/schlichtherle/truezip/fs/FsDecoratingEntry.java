@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.entry.Entry;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Set;
 import net.jcip.annotations.ThreadSafe;
@@ -28,11 +29,10 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-public abstract class FsDecoratingEntry<E extends Entry>
-extends FsEntry {
+@DefaultAnnotation(NonNull.class)
+public abstract class FsDecoratingEntry<E extends Entry> extends FsEntry {
 
     /** The decorated entry. */
-    @NonNull
     protected final E delegate;
 
     /**
@@ -40,7 +40,7 @@ extends FsEntry {
      *
      * @param entry the decorated entry.
      */
-    protected FsDecoratingEntry(final @NonNull E entry) {
+    protected FsDecoratingEntry(final E entry) {
         if (null == entry)
             throw new NullPointerException();
         this.delegate = entry;
