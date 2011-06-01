@@ -52,7 +52,7 @@ extends FsArchiveDriver<E> {
      *
      * @param charset the character set to use for encoding entry names and
      *        probably other meta data when writing an archive file.
-     *        Depending on the archive file format, this may be required for
+     *        Depending on the archive file format, this may get used for
      *        reading an archive file, too.
      */
     protected FsCharsetArchiveDriver(Charset charset) {
@@ -66,10 +66,10 @@ extends FsArchiveDriver<E> {
      * This can be safely overriden, but must return the same object on every
      * call.
      *
-     * @param charset the character set to use for encoding entry names and
-     *        probably other meta data when writing an archive file.
-     *        Depending on the archive file format, this may be required for
-     *        reading an archive file, too.
+     * @return The character set to use for encoding entry names and
+     *         probably other meta data when writing an archive file.
+     *         Depending on the archive file format, this may get used for
+     *         reading an archive file, too.
      */
     public Charset getCharset() {
         return charset;
