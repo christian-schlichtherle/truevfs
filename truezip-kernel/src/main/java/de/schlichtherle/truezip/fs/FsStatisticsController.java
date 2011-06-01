@@ -64,7 +64,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         return new Input(name, options);
     }
 
-    private class Input extends DecoratingInputSocket<Entry> {
+    private final class Input extends DecoratingInputSocket<Entry> {
         Input(FsEntryName name, BitField<FsInputOption> options) {
             super(delegate.getInputSocket(name, options));
         }
@@ -90,7 +90,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         return new Output(name, options, template);
     }
 
-    private class Output extends DecoratingOutputSocket<Entry> {
+    private final class Output extends DecoratingOutputSocket<Entry> {
         Output(FsEntryName name, BitField<FsOutputOption> options, Entry template) {
             super(delegate.getOutputSocket(name, options, template));
         }
