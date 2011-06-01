@@ -30,7 +30,7 @@
     <packaging>pom</packaging>
 
     <name>TrueZIP Archetype</name>
-    <description>TrueZIP Maven archetypes.</description>
+    <description>Parent POM for Maven archetypes.</description>
 
     <modules>
         <module>truezip-archetype-application</module>

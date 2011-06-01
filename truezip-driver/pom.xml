@@ -27,7 +27,7 @@
     <packaging>pom</packaging>
 
     <name>TrueZIP Driver</name>
-    <description>Pluggable file system drivers.</description>
+    <description>Parent POM for pluggable file system drivers.</description>
 
     <modules>
         <module>truezip-driver-file</module>
