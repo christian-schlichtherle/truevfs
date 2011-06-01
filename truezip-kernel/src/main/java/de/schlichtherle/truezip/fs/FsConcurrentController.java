@@ -231,7 +231,7 @@ extends FsDecoratingController< FsConcurrentModel,
         return new Input(delegate.getInputSocket(name, options));
     }
 
-    private class Input extends DecoratingInputSocket<Entry> {
+    private final class Input extends DecoratingInputSocket<Entry> {
         Input(InputSocket<?> input) {
             super(input);
         }
@@ -304,7 +304,7 @@ extends FsDecoratingController< FsConcurrentModel,
         return new Output(delegate.getOutputSocket(name, options, template));
     }
 
-    private class Output extends DecoratingOutputSocket<Entry> {
+    private final class Output extends DecoratingOutputSocket<Entry> {
         Output(OutputSocket<?> output) {
             super(output);
         }

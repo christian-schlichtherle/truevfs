@@ -174,7 +174,7 @@ extends FsController<FsConcurrentModel> {
         return new Input(name);
     }
 
-    private class Input extends InputSocket<FsArchiveEntry> {
+    private final class Input extends InputSocket<FsArchiveEntry> {
         final FsEntryName name;
 
         Input(final FsEntryName name) {
@@ -226,7 +226,7 @@ extends FsController<FsConcurrentModel> {
         return new Output(name, options, template);
     }
 
-    private class Output extends OutputSocket<FsArchiveEntry> {
+    private final class Output extends OutputSocket<FsArchiveEntry> {
         final FsEntryName name;
         final BitField<FsOutputOption> options;
         final @CheckForNull Entry template;

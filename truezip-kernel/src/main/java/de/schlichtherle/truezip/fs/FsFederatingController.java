@@ -148,7 +148,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         return new Input(name, options);
     }
 
-    private class Input extends DecoratingInputSocket<Entry> {
+    private final class Input extends DecoratingInputSocket<Entry> {
         final FsEntryName name;
         final BitField<FsInputOption> options;
 
@@ -203,7 +203,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         return new Output(name, options, template);
     }
 
-    private class Output extends DecoratingOutputSocket<Entry> {
+    private final class Output extends DecoratingOutputSocket<Entry> {
         final FsEntryName name;
         final BitField<FsOutputOption> options;
         final Entry template;

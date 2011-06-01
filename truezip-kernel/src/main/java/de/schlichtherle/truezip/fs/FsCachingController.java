@@ -116,7 +116,7 @@ extends FsDecoratingController< FsConcurrentModel,
         return new Input(name, options);
     }
 
-    private class Input extends DecoratingInputSocket<Entry> {
+    private final class Input extends DecoratingInputSocket<Entry> {
         final FsEntryName name;
         final BitField<FsInputOption> options;
 
@@ -132,7 +132,9 @@ extends FsDecoratingController< FsConcurrentModel,
             if (null == cache) {
                 if (!options.get(FsInputOption.CACHE))
                     return super.getBoundSocket(); // don't cache
+                //getModel().assertWriteLockedByCurrentThread();
                 cache = new EntryCache(name);
+                //caches.put(name, cache);
             }
             return cache.configure(options).getInputSocket().bind(this);
         }
@@ -174,7 +176,7 @@ extends FsDecoratingController< FsConcurrentModel,
         return new Output(name, options, template);
     }
 
-    private class Output extends DecoratingOutputSocket<Entry> {
+    private final class Output extends DecoratingOutputSocket<Entry> {
         final FsEntryName name;
         final BitField<FsOutputOption> options;
         final @CheckForNull Entry template;
@@ -194,7 +196,9 @@ extends FsDecoratingController< FsConcurrentModel,
             if (null == cache) {
                 if (!options.get(FsOutputOption.CACHE))
                     return super.getBoundSocket(); // don't cache
+                //getModel().assertWriteLockedByCurrentThread();
                 cache = new EntryCache(name);
+                //caches.put(name, cache);
             } else {
                 if (options.get(APPEND)) {
                     // This combination of features would be expected to work
