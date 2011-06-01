@@ -33,6 +33,7 @@ import static java.nio.file.Files.*;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.FileTime;
 import net.jcip.annotations.ThreadSafe;
 
@@ -93,7 +94,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
             }
         }
         final FileEntry temp = null != exists
-                ? entry.allocate()
+                ? entry.createTempFile()
                 : entry;
         final Path tempFile = temp.getPath();
 
@@ -115,38 +116,37 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
                 try {
                     delegate.close();
                 } finally {
-                    IOException cause = null;
+                    IOException ex = null;
                     try {
                         if (temp != entry) {
                             try {
                                 try {
                                     move(tempFile, entryFile,
                                             StandardCopyOption.REPLACE_EXISTING);
-                                } catch (IOException ex) {
+                                } catch (IOException ex2) {
                                     Files.copy(tempFile, entryFile,
                                             StandardCopyOption.REPLACE_EXISTING);
                                 }
-                            } catch (IOException ex) {
-                                throw cause = ex;
+                            } catch (IOException ex2) {
+                                throw ex = ex2;
                             } finally {
                                 try {
                                     temp.release();
-                                } catch (IOException ex) {
-                                    throw (IOException) ex.initCause(cause);
+                                } catch (IOException ex2) {
+                                    throw (IOException) ex2.initCause(ex);
                                 }
                             }
                         }
                     } finally {
                         final Entry template = FileOutputSocket.this.template;
                         if (null != template) {
-                            final long time = template.getTime(WRITE);
-                            if (UNKNOWN != time) {
-                                try {
-                                    setLastModifiedTime(
-                                            entryFile, FileTime.fromMillis(time));
-                                } catch (IOException ex) {
-                                    throw (IOException) ex.initCause(cause);
-                                }
+                            try {
+                                getFileAttributeView(entryFile, BasicFileAttributeView.class)
+                                        .setTimes(  getTime(template, WRITE),
+                                                    getTime(template, READ),
+                                                    getTime(template, CREATE));
+                            } catch (IOException ex2) {
+                                throw (IOException) ex2.initCause(ex);
                             }
                         }
                     }
@@ -169,5 +169,10 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
             }
             throw cause;
         }
+    }
+
+    private static FileTime getTime(Entry entry, Access type) {
+        long time = entry.getTime(type);
+        return UNKNOWN == time ? null : FileTime.fromMillis(time);
     }
 }
