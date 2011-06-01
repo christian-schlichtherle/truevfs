@@ -11,7 +11,7 @@ About TrueZIP Driver ZIP
     which provides the following map of file system drivers:
 
 *--*--*
-||URI Schemes Regular Expression||File System Driver Class|
+||URI Schemes||File System Driver Class|
 *--+--+
 |<<<ear>>>, <<<jar>>>, <<<war>>>|{{{../../apidocs/de/schlichtherle/truezip/fs/archive/zip/JarDriver.html}<<<JarDriver>>>}}|
 *--+--+

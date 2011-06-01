@@ -11,7 +11,7 @@ About TrueZIP Driver TZP
     which provides the following map of file system drivers:
 
 *--*--*
-||URI Schemes Regular Expression||File System Driver Class|
+||URI Schemes||File System Driver Class|
 *--+--+
 |<<<tzp>>>, <<<zip.rae>>>, <<<zip.raes>>>|{{{../../apidocs/de/schlichtherle/truezip/fs/archive/zip/raes/SafeZipRaesDriver.html}<<<SafeZipRaesDriver>>>}}|
 *--+--+
