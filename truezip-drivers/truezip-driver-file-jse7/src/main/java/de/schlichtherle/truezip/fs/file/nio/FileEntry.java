@@ -15,26 +15,28 @@
  */
 package de.schlichtherle.truezip.fs.file.nio;
 
+import de.schlichtherle.truezip.socket.IOEntry;
+import de.schlichtherle.truezip.util.Pool.Releasable;
 import de.schlichtherle.truezip.socket.IOPool.Entry;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
-import static de.schlichtherle.truezip.entry.Entry.Size.*;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
-import de.schlichtherle.truezip.socket.IOPool;
+import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.util.Collections;
-import java.lang.reflect.UndeclaredThrowableException;
 import java.nio.file.DirectoryStream;
 import static java.nio.file.Files.*;
 import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+import static java.io.File.*;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import net.jcip.annotations.Immutable;
@@ -53,7 +55,7 @@ import static de.schlichtherle.truezip.entry.Entry.Access.*;
 @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
 class FileEntry
 extends FsEntry
-implements IOPool<FileEntry>, Entry<FileEntry> {
+implements IOEntry<FileEntry>, Releasable<IOException> {
 
     private final Path path;
     private final String name;
@@ -62,7 +64,7 @@ implements IOPool<FileEntry>, Entry<FileEntry> {
     FileEntry(final Path path) {
         assert null != path;
         this.path = path;
-        this.name = path.getFileName().toString();
+        this.name = path.toString(); // deliberately breaks contract for FsEntry.getName()
     }
 
     FileEntry(final Path path, final FsEntryName name) {
@@ -71,8 +73,7 @@ implements IOPool<FileEntry>, Entry<FileEntry> {
         this.name = name.toString();
     }
 
-    @Override
-    public FileEntry allocate() throws IOException {
+    public final FileEntry createTempFile() throws IOException {
         TempFilePool pool = this.pool;
         if (null == pool)
             pool = this.pool = new TempFilePool(path.getParent());
@@ -80,13 +81,7 @@ implements IOPool<FileEntry>, Entry<FileEntry> {
     }
 
     @Override
-    public void release(Entry<FileEntry> resource) throws IOException {
-        resource.release();
-    }
-
-    @Override
     public void release() throws IOException {
-        throw new UnsupportedOperationException();
     }
 
     /** Returns the decorated file. */
@@ -96,7 +91,7 @@ implements IOPool<FileEntry>, Entry<FileEntry> {
 
     @Override
     public final String getName() {
-        return name;
+        return name.replace(separatorChar, SEPARATOR_CHAR); // postfix
     }
 
     @Override
@@ -129,29 +124,36 @@ implements IOPool<FileEntry>, Entry<FileEntry> {
     @Override
     public final long getSize(final Size type) {
         try {
-            return (DATA == type || STORAGE == type) && exists(path)
-                    ? size(path)
-                    : UNKNOWN;
-        } catch (IOException ex) {
-            throw new UndeclaredThrowableException(ex);
+            return size(path);
+        } catch (IOException ignore) {
+            // This doesn't exist or may be inaccessible. In either case...
+            return UNKNOWN;
         }
     }
 
     @Override
     public final long getTime(Access type) {
+        final BasicFileAttributes attr;
         try {
-            return WRITE == type && exists(path)
-                    ? getLastModifiedTime(path).toMillis()
-                    : UNKNOWN;
-        } catch (IOException ex) {
-            throw new UndeclaredThrowableException(ex);
+            attr = readAttributes(path, BasicFileAttributes.class);
+        } catch (IOException ignore) {
+            // This doesn't exist or may be inaccessible. In either case...
+            return UNKNOWN;
+        }
+        switch (type) {
+            case WRITE:
+                return attr.lastModifiedTime().toMillis();
+            case READ:
+                return attr.lastAccessTime().toMillis();
+            case CREATE:
+                return attr.creationTime().toMillis();
+            default:
+                return UNKNOWN;
         }
     }
 
     @Override
     public final @Nullable Set<String> getMembers() {
-        if (!isDirectory(path))
-            return null;
         final Set<String> result = new LinkedHashSet<String>();
         try {
             final DirectoryStream<Path> stream = newDirectoryStream(path);
@@ -161,8 +163,9 @@ implements IOPool<FileEntry>, Entry<FileEntry> {
             } finally {
                 stream.close();
             }
-        } catch (IOException ex) {
-            throw new UndeclaredThrowableException(ex);
+        } catch (IOException ignore) {
+            // This isn't a directory or may be inaccessible. In either case...
+            return null;
         }
         return result;
     }

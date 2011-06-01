@@ -42,7 +42,10 @@ import static java.nio.file.Files.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.BasicFileAttributeView;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
+import java.util.concurrent.TimeUnit;
 import javax.swing.Icon;
 import net.jcip.annotations.ThreadSafe;
 
@@ -230,16 +233,17 @@ final class FileController extends FsController<FsModel>  {
     }
 
     @Override
-    public boolean setTime(FsEntryName name, BitField<Access> types, long value)
+    public boolean setTime( final FsEntryName name,
+                            final BitField<Access> types,
+                            final long value)
     throws IOException {
         final Path file = target.resolve(name.getPath());
-        boolean ok = true;
-        for (final Access type : types)
-            if (WRITE == type)
-                setLastModifiedTime(file, FileTime.fromMillis(value));
-            else
-                ok = false;
-        return ok;
+        final FileTime time = FileTime.fromMillis(value);
+        getFileAttributeView(file, BasicFileAttributeView.class).setTimes(
+                types.get(WRITE)  ? time : null,
+                types.get(READ)   ? time : null,
+                types.get(CREATE) ? time : null);
+        return types.clear(WRITE).clear(READ).clear(CREATE).isEmpty();
     }
 
     @Override
