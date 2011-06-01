@@ -76,7 +76,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
         if (options.get(CREATE_PARENTS))
             entryFile.getParentFile().mkdirs();
         final FileEntry temp = options.get(CACHE) && !entryFile.createNewFile()
-                ? entry.allocate()
+                ? entry.createTempFile()
                 : entry;
         final File tempFile = temp.getFile();
 
@@ -95,7 +95,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
                 try {
                     delegate.close();
                 } finally {
-                    IOException cause = null;
+                    IOException ex = null;
                     try {
                         if (temp != entry) {
                             try {
@@ -103,13 +103,13 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
                                         && (!entryFile.delete() || !tempFile.renameTo(entryFile)))
                                     IOSocket.copy(  temp.getInputSocket(),
                                                     entry.getOutputSocket());
-                            } catch (IOException ex) {
-                                throw cause = ex;
+                            } catch (IOException ex2) {
+                                throw ex = ex2;
                             } finally {
                                 try {
                                     temp.release();
-                                } catch (IOException ex) {
-                                    throw (IOException) ex.initCause(cause);
+                                } catch (IOException ex2) {
+                                    throw (IOException) ex2.initCause(ex);
                                 }
                             }
                         }
@@ -119,7 +119,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
                             final long time = template.getTime(WRITE);
                             if (UNKNOWN != time
                                     && !entryFile.setLastModified(time))
-                                throw new IOException(entryFile + " (cannot preserve last modification time)", cause);
+                                throw new IOException(entryFile + " (cannot preserve last modification time)", ex);
                         }
                     }
                 }

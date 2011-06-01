@@ -15,8 +15,10 @@
  */
 package de.schlichtherle.truezip.fs.file;
 
-import de.schlichtherle.truezip.socket.IOPool.Entry;
 import de.schlichtherle.truezip.socket.IOPool;
+import de.schlichtherle.truezip.util.Pool.Releasable;
+import de.schlichtherle.truezip.socket.IOEntry;
+import de.schlichtherle.truezip.socket.IOPool.Entry;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.fs.FsOutputOption;
@@ -25,12 +27,14 @@ import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
+import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.io.File;
+import static java.io.File.*;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
@@ -50,7 +54,7 @@ import static de.schlichtherle.truezip.entry.Entry.Access.*;
 @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
 class FileEntry
 extends FsEntry
-implements IOPool<FileEntry>, Entry<FileEntry> {
+implements IOEntry<FileEntry>, Releasable<IOException> {
 
     private final File file;
     private final String name;
@@ -59,7 +63,7 @@ implements IOPool<FileEntry>, Entry<FileEntry> {
     FileEntry(final File file) {
         assert null != file;
         this.file = file;
-        this.name = file.getName();
+        this.name = file.toString(); // deliberately breaks contract for FsEntry.getName()
     }
 
     FileEntry(final File file, final FsEntryName name) {
@@ -68,8 +72,7 @@ implements IOPool<FileEntry>, Entry<FileEntry> {
         this.name = name.toString();
     }
 
-    @Override
-    public FileEntry allocate() throws IOException {
+    public final FileEntry createTempFile() throws IOException {
         TempFilePool pool = this.pool;
         if (null == pool)
             pool = this.pool = new TempFilePool(file.getParentFile());
@@ -77,13 +80,7 @@ implements IOPool<FileEntry>, Entry<FileEntry> {
     }
 
     @Override
-    public void release(Entry<FileEntry> resource) throws IOException {
-        resource.release();
-    }
-
-    @Override
     public void release() throws IOException {
-        throw new UnsupportedOperationException();
     }
 
     /** Returns the decorated file. */
@@ -93,7 +90,7 @@ implements IOPool<FileEntry>, Entry<FileEntry> {
 
     @Override
     public final String getName() {
-        return name;
+        return name.replace(separatorChar, SEPARATOR_CHAR); // postfix
     }
 
     @Override
@@ -125,13 +122,7 @@ implements IOPool<FileEntry>, Entry<FileEntry> {
 
     @Override
     public final long getSize(final Size type) {
-        switch (type) {
-            case DATA:
-            case STORAGE:
-                return file.exists() ? file.length() : UNKNOWN;
-            default:
-                return UNKNOWN;
-        }
+        return file.exists() ? file.length() : UNKNOWN;
     }
 
     @Override
