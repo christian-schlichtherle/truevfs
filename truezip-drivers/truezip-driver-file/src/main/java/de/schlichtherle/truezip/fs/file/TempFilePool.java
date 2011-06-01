@@ -57,7 +57,7 @@ final class TempFilePool implements IOPool<FileEntry> {
     }
 
     @Override
-    public FileEntry allocate() throws IOException {
+    public PoolEntry allocate() throws IOException {
         return new PoolEntry(createTempFile(".tzp", null, dir), this);
     }
 
@@ -77,16 +77,6 @@ final class TempFilePool implements IOPool<FileEntry> {
             assert null != file;
             assert null != pool;
             this.pool = pool;
-        }
-
-        @Override
-        public FileEntry allocate() throws IOException {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public void release(Entry<FileEntry> resource) throws IOException {
-            throw new UnsupportedOperationException();
         }
 
         @Override
