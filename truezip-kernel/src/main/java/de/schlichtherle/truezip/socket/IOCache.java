@@ -222,10 +222,10 @@ public final class IOCache {
 
     public @Nullable Entry getEntry() {
         Buffer buffer = getBuffer();
-        return null == buffer ? null : new CacheEntry(buffer.data);
+        return null == buffer ? null : buffer.data;
     }
 
-    /** Proxies the decorated entry to hide socket connections. */
+    /** Hides backing store entries. */
     private static class CacheEntry extends DecoratingEntry<Entry> {
         CacheEntry(Entry entry) {
             super(entry);
@@ -248,7 +248,9 @@ public final class IOCache {
         @Override
         public Entry getLocalTarget() throws IOException {
             Buffer buffer = this.buffer;
-            return new CacheEntry(null != buffer ? buffer.data : input.getLocalTarget());
+            return null != buffer
+                    ? buffer.data
+                    : new CacheEntry(input.getLocalTarget());
         }
 
         @Override
@@ -286,7 +288,9 @@ public final class IOCache {
         @Override
         public Entry getLocalTarget() throws IOException {
             Buffer buffer = this.buffer;
-            return new CacheEntry(null != buffer ? buffer.data : output.getLocalTarget());
+            return null != buffer
+                    ? buffer.data
+                    : new CacheEntry(output.getLocalTarget());
         }
 
         @Override
