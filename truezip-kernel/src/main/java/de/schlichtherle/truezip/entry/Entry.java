@@ -104,14 +104,12 @@ public interface Entry {
 
     /** An unmodifiable set of just {@link Type#FILE}. */
     Set<Type> FILE_TYPE_SET = Collections.unmodifiableSet(EnumSet.of(FILE));
-
     /** An unmodifiable set of just {@link Type#DIRECTORY}. */
     Set<Type> DIRECTORY_TYPE_SET = Collections.unmodifiableSet(EnumSet.of(DIRECTORY));
     /** An unmodifiable set of just {@link Type#SYMLINK}. */
     Set<Type> SYMLINK_TYPE_SET = Collections.unmodifiableSet(EnumSet.of(SYMLINK));
     /** An unmodifiable set of just {@link Type#SPECIAL}. */
     Set<Type> SPECIAL_TYPE_SET = Collections.unmodifiableSet(EnumSet.of(SPECIAL));
-    
     /** An unmodifiable set of all enums in {@link Type}. */
     Set<Type> ALL_TYPE_SET = Collections.unmodifiableSet(EnumSet.allOf(Type.class));
 
@@ -136,20 +134,26 @@ public interface Entry {
 
     /** Defines the type of access information for an entry. */
     enum Access {
+        /** Last modification. */
         WRITE,
-        READ, // TODO: This is not yet fully supported!
+
+        /** Last access. */
+        READ,
+        
+        /** Creation. */
+        CREATE,
     }
 
     /** An unmodifiable set of all enums in {@link Access}. */
     Set<Access> ALL_ACCESS_SET = Collections.unmodifiableSet(EnumSet.allOf(Access.class));
 
     /**
-     * Returns the last access time of the given type for this entry
+     * Returns the time of the given access type for this entry.
      *
      * @param type the type of the access time to return.
-     * @return The last time of the given access type for this entry in
-     * milliseconds since the epoch or {@value #UNKNOWN} if not specified or
-     * the type is unsupported.
+     * @return The time of the given access type for this entry in
+     *         milliseconds since the epoch or {@value #UNKNOWN} if not
+     *         specified or the type is unsupported.
      */
     long getTime(Access type);
 }
