@@ -85,11 +85,15 @@ public abstract class FsDriverService implements FsDriverProvider {
         final Map<FsScheme, FsDriver> drivers = new HashMap<FsScheme, FsDriver>();
         for (final Object[] param : config) {
             final Collection<FsScheme> schemes = toSchemes(param[0]);
-            final FsDriver driver = toDriver(param[1]);
+            final FsDriver newDriver = toDriver(param[1]);
             if (schemes.isEmpty())
-                throw new IllegalArgumentException("No schemes for " + driver);
-            for (FsScheme scheme : schemes)
-                drivers.put(scheme, driver);
+                throw new IllegalArgumentException("No schemes for " + newDriver);
+            for (final FsScheme scheme : schemes) {
+                final FsDriver oldDriver = drivers.put(scheme, newDriver);
+                if (null != oldDriver
+                        && oldDriver.getPriority() > newDriver.getPriority())
+                    drivers.put(scheme, oldDriver);
+            }
         }
         return Collections.unmodifiableMap(drivers);
     }
