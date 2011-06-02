@@ -142,9 +142,9 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
                         if (null != template) {
                             try {
                                 getFileAttributeView(entryFile, BasicFileAttributeView.class)
-                                        .setTimes(  getTime(template, WRITE),
-                                                    getTime(template, READ),
-                                                    getTime(template, CREATE));
+                                        .setTimes(  getFileTime(template, WRITE),
+                                                    getFileTime(template, READ),
+                                                    getFileTime(template, CREATE));
                             } catch (IOException ex2) {
                                 throw (IOException) ex2.initCause(ex);
                             }
@@ -171,7 +171,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
         }
     }
 
-    private static FileTime getTime(Entry entry, Access type) {
+    private static FileTime getFileTime(Entry entry, Access type) {
         long time = entry.getTime(type);
         return UNKNOWN == time ? null : FileTime.fromMillis(time);
     }

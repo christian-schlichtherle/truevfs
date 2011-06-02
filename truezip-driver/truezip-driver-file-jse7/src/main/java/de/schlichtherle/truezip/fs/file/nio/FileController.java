@@ -43,9 +43,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributeView;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
-import java.util.concurrent.TimeUnit;
 import javax.swing.Icon;
 import net.jcip.annotations.ThreadSafe;
 
@@ -275,19 +273,23 @@ final class FileController extends FsController<FsModel>  {
                 else
                     newOutputStream(file).close();
                 break;
-
             case DIRECTORY:
                 createDirectory(file);
                 break;
-
             default:
                 throw new IOException(file + " (entry type not supported: " + type + ")");
         }
         if (null != template) {
-            final long time = template.getTime(WRITE);
-            if (UNKNOWN != time)
-                setLastModifiedTime(file, FileTime.fromMillis(time));
+            getFileAttributeView(file, BasicFileAttributeView.class)
+                    .setTimes(  getFileTime(template, WRITE),
+                                getFileTime(template, READ),
+                                getFileTime(template, CREATE));
         }
+    }
+
+    private static FileTime getFileTime(Entry entry, Access type) {
+        long time = entry.getTime(type);
+        return UNKNOWN == time ? null : FileTime.fromMillis(time);
     }
 
     @Override

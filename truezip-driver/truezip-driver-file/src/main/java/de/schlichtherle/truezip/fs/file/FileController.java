@@ -267,12 +267,10 @@ final class FileController extends FsController<FsModel>  {
                     new FileOutputStream(file).close();
                 }
                 break;
-
             case DIRECTORY:
                 if (!file.mkdir())
                     throw new IOException(file + " (directory exists already)");
                 break;
-
             default:
                 throw new IOException(file + " (entry type not supported: " + type + ")");
         }
