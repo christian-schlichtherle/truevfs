@@ -367,8 +367,10 @@ extends FsDecoratingController< FsConcurrentModel,
 
             @Override
             public ReadOnlyFile newReadOnlyFile() throws IOException {
+                assert false : "The IOCache is expected to never use this method!";
                 assert getModel().isWriteLockedByCurrentThread();
                 final ReadOnlyFile rof = getBoundSocket().newReadOnlyFile();
+                //getModel().setTouched(true);
                 caches.put(name, EntryCache.this);
                 return rof;
             }
@@ -377,6 +379,7 @@ extends FsDecoratingController< FsConcurrentModel,
             public InputStream newInputStream() throws IOException {
                 assert getModel().isWriteLockedByCurrentThread();
                 final InputStream in = getBoundSocket().newInputStream();
+                //getModel().setTouched(true);
                 caches.put(name, EntryCache.this);
                 return in;
             }
@@ -400,9 +403,9 @@ extends FsDecoratingController< FsConcurrentModel,
             public OutputStream newOutputStream() throws IOException {
                 assert getModel().isWriteLockedByCurrentThread();
                 delegate.mknod(name, FILE, outputOptions, template);
+                assert getModel().isTouched();
                 final OutputStream out = getBoundSocket().newOutputStream();
                 caches.put(name, EntryCache.this);
-                assert getModel().isTouched();
                 return new ProxyOutputStream(out);
             }
         } // class ProxyOutputSocket
