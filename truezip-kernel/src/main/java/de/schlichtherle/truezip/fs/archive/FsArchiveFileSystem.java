@@ -443,7 +443,7 @@ implements Iterable<FsCovariantEntry<E>> {
                         "entry exists already");
         }
         while (template instanceof FsCovariantEntry<?>)
-            template = ((FsCovariantEntry<?>) template).getEntry();
+            template = ((FsCovariantEntry<?>) template).getEntry(type);
         return new PathLink(path, type, options, template);
     }
 
