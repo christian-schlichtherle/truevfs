@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.util;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
@@ -27,15 +28,19 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public interface Pool<R, E extends Exception> {
 
     /**
      * Allocates a resource from this pool.
+     * <p>
+     * Mind that a pool implementation should not hold references to its
+     * allocated resources because this could cause a memory leak.
      *
      * @return A resource.
      * @throws Exception if allocating the resource failed for any reason.
      */
-    @NonNull R allocate() throws E;
+    R allocate() throws E;
 
     /**
      * Releases a previously allocated resource to this pool.
@@ -48,7 +53,7 @@ public interface Pool<R, E extends Exception> {
      *         implementation cannot tolerate this.
      * @throws Exception if releasing the resource failed for any other reason.
      */
-    void release(@NonNull R resource) throws E;
+    void release(R resource) throws E;
 
     /**
      * This interface is designed to be used with Pools which enable their
