@@ -26,6 +26,8 @@ import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import java.io.Closeable;
+import java.io.Flushable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -59,7 +61,7 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-public final class IOCache {
+public final class IOCache implements Flushable, Closeable {
 
     /** Provides different cache strategies. */
     public enum Strategy {
@@ -194,30 +196,41 @@ public final class IOCache {
      * strategy.
      * E.g. the caching strategy {@link Strategy#WRITE_THROUGH} writes any
      * changed entry data immediately, so calling this method has no effect.
-     *
-     * @return {@code this}
      */
-    public IOCache flush() throws IOException {
+    @Override
+    public void flush() throws IOException {
         if (null == getBuffer()) // DCL does work with volatile fields since JSE 5!
-            return this;
+            return;
         synchronized (lock) {
             final Buffer buffer = getBuffer();
             if (null != buffer)
                 getOutputBufferPool().release(buffer);
         }
-        return this;
     }
 
     /**
      * Discards the entry data in this buffer.
-     *
-     * @return {@code this}
      */
-    public IOCache clear() throws IOException {
+    public void clear() throws IOException {
         synchronized (lock) {
             setBuffer(null);
         }
-        return this;
+    }
+
+    /**
+     * {@link #flush() Flushes} and finally {@link #clear() clears} this cache.
+     */
+    @Override
+    public void close() throws IOException {
+        synchronized (lock) {
+            try {
+                final Buffer buffer = getBuffer();
+                if (null != buffer)
+                    getOutputBufferPool().release(buffer);
+            } finally {
+                setBuffer(null);
+            }
+        }
     }
 
     public @Nullable Entry getEntry() {
@@ -225,12 +238,18 @@ public final class IOCache {
         return null == buffer ? null : buffer.data;
     }
 
-    /** Hides backing store entries. */
-    private static class CacheEntry extends DecoratingEntry<Entry> {
-        CacheEntry(Entry entry) {
-            super(entry);
+    /*@Override
+    @SuppressWarnings("FinalizeDeclaration")
+    protected void finalize() throws Throwable {
+        try {
+            //setBuffer(null);
+            final Buffer oldBuffer = this.buffer;
+            if (null != oldBuffer)
+                oldBuffer.release();
+        } finally {
+            super.finalize();
         }
-    } // class CacheEntry
+    }*/
 
     /**
      * Returns an input socket for reading the cached entry data.
@@ -239,6 +258,45 @@ public final class IOCache {
      */
     public InputSocket<?> getInputSocket() {
         return new CacheInputSocket();
+    }
+
+    /**
+     * Returns an output socket for writing the cached entry data.
+     *
+     * @return An output socket for writing the cached entry data.
+     */
+    public OutputSocket<?> getOutputSocket() {
+        return new CacheOutputSocket();
+    }
+
+    private InputBufferPool getInputBufferPool() {
+        InputBufferPool ibp = inputBufferPool;
+        return null != ibp
+                ? ibp
+                : (inputBufferPool = strategy.newInputBufferPool(this));
+    }
+
+    private OutputBufferPool getOutputBufferPool() {
+        OutputBufferPool obp = this.outputBufferPool;
+        return null != obp
+                ? obp
+                : (outputBufferPool = strategy.newOutputBufferPool(this));
+    }
+
+    private @CheckForNull Buffer getBuffer() {
+        return buffer;
+    }
+
+    private void setBuffer(final @CheckForNull Buffer newBuffer)
+    throws IOException {
+        final Buffer oldBuffer = this.buffer;
+        if (oldBuffer != newBuffer) {
+            this.buffer = newBuffer;
+            if (null != oldBuffer
+                    && oldBuffer.writers == 0
+                    && oldBuffer.readers == 0)
+                oldBuffer.release();
+        }
     }
 
     private final class CacheInputSocket extends InputSocket<Entry> {
@@ -272,15 +330,6 @@ public final class IOCache {
         }
     } // class CacheInputSocket
 
-    /**
-     * Returns an output socket for writing the cached entry data.
-     *
-     * @return An output socket for writing the cached entry data.
-     */
-    public OutputSocket<?> getOutputSocket() {
-        return new CacheOutputSocket();
-    }
-
     private final class CacheOutputSocket extends OutputSocket<Entry> {
         @CheckForNull
         private volatile Buffer buffer;
@@ -307,12 +356,12 @@ public final class IOCache {
         }
     } // class CacheOutputSocket
 
-    private InputBufferPool getInputBufferPool() {
-        InputBufferPool ibp = inputBufferPool;
-        return null != ibp
-                ? ibp
-                : (inputBufferPool = strategy.newInputBufferPool(this));
-    }
+    /** Hides backing store entries. */
+    private static class CacheEntry extends DecoratingEntry<Entry> {
+        CacheEntry(Entry entry) {
+            super(entry);
+        }
+    } // class CacheEntry
 
     private final class InputBufferPool implements Pool<Buffer, IOException> {
         @Override
@@ -343,14 +392,7 @@ public final class IOCache {
                     buffer.release();
             }
         }
-    } // class InputPool
-
-    private OutputBufferPool getOutputBufferPool() {
-        OutputBufferPool obp = this.outputBufferPool;
-        return null != obp
-                ? obp
-                : (outputBufferPool = strategy.newOutputBufferPool(this));
-    }
+    } // class InputBufferPool
 
     private abstract class OutputBufferPool implements Pool<Buffer, IOException> {
         @Override
@@ -402,32 +444,6 @@ public final class IOCache {
             }
         }
     } // class WriteBackOutputBufferPool
-
-    private @CheckForNull Buffer getBuffer() {
-        return buffer;
-    }
-
-    private void setBuffer(final @CheckForNull Buffer newBuffer)
-    throws IOException {
-        final Buffer oldBuffer = this.buffer;
-        if (oldBuffer != newBuffer) {
-            this.buffer = newBuffer;
-            if (oldBuffer != null
-                    && oldBuffer.writers == 0
-                    && oldBuffer.readers == 0)
-                oldBuffer.release();
-        }
-    }
-
-    @Override
-    @SuppressWarnings("FinalizeDeclaration")
-    protected void finalize() throws Throwable {
-        try {
-            setBuffer(null);
-        } finally {
-            super.finalize();
-        }
-    }
 
     private final class Buffer {
         private final IOPool.Entry<?> data;
