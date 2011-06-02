@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.util;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.lang.ref.SoftReference;
@@ -30,6 +32,7 @@ import java.lang.ref.WeakReference;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public interface Link<T> {
 
     /**
@@ -79,7 +82,7 @@ public interface Link<T> {
         };
 
         /** Returns a new typed link to the given nullable target. */
-        public abstract @NonNull <T> Link<T> newLink(@Nullable T target);
+        public abstract <T> Link<T> newLink(@CheckForNull T target);
 
         /** A strong reference. */
         private static class StrongLink<T> implements Link<T> {
