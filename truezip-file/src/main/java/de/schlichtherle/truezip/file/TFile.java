@@ -1834,11 +1834,11 @@ public final class TFile extends File {
 
     /**
      * Returns The top level archive file in the path or {@code null}
-     * if this path does not denote an archive.
+     * if this file object does not name an archive file.
      * A top level archive is not enclosed in another archive.
      * If this does not return {@code null}, this denotes the longest
      * part of the path which actually may (but does not need to) exist
-     * as a plain file in the real file system.
+     * as a plain file in the OS file system.
      */
     public TFile getTopLevelArchive() {
         final TFile enclArchive = this.enclArchive;
