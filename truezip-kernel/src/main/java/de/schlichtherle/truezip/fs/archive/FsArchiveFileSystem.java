@@ -158,7 +158,9 @@ implements Iterable<FsCovariantEntry<E>> {
                     entry.getName().replace('\\', SEPARATOR_CHAR)),
                 SEPARATOR_CHAR);
             master.add(path, entry);
-            paths.add(path);
+            if (!path.startsWith(SEPARATOR)
+                    && !(".." + SEPARATOR).startsWith(path.substring(0, Math.min(3, path.length()))))
+                paths.add(path);
         }
         // Setup root file system entry, potentially replacing its previous
         // mapping from the input archive.
@@ -697,7 +699,7 @@ implements Iterable<FsCovariantEntry<E>> {
 
         @Override
         public String getParentPath() {
-            String path = super.getParentPath();
+            final String path = super.getParentPath();
             return null != path ? path : ROOT_PATH;
         }
     } // class Splitter
