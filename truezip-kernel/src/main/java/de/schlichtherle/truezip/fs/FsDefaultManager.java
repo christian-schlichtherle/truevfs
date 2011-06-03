@@ -15,20 +15,19 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import de.schlichtherle.truezip.util.Link.Type;
-import java.util.Iterator;
+import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.Link;
+import de.schlichtherle.truezip.util.Link.Type;
+import static de.schlichtherle.truezip.util.Link.Type.*;
 import de.schlichtherle.truezip.util.Links;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.WeakHashMap;
 import net.jcip.annotations.ThreadSafe;
-
-import static de.schlichtherle.truezip.util.Link.Type.STRONG;
-import static de.schlichtherle.truezip.util.Link.Type.WEAK;
 
 /**
  * The default implementation of a file system manager.
@@ -116,10 +115,10 @@ public final class FsDefaultManager extends FsManager {
             schedule(touched);
         }
 
-        void schedule(boolean unconditional) {
+        void schedule(boolean mandatory) {
             synchronized (FsDefaultManager.this) {
                 schedulers.put(getMountPoint(),
-                        (unconditional ? STRONG : optionalScheduleType)
+                        (mandatory ? STRONG : optionalScheduleType)
                             .newLink(this));
             }
         }
