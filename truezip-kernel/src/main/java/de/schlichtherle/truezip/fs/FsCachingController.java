@@ -370,7 +370,7 @@ extends FsDecoratingController< FsConcurrentModel,
                 assert false : "The IOCache is expected to never use this method!";
                 assert getModel().isWriteLockedByCurrentThread();
                 final ReadOnlyFile rof = getBoundSocket().newReadOnlyFile();
-                getModel().setTouched(true);
+                assert getModel().isTouched();
                 caches.put(name, EntryCache.this);
                 return rof;
             }
@@ -379,7 +379,7 @@ extends FsDecoratingController< FsConcurrentModel,
             public InputStream newInputStream() throws IOException {
                 assert getModel().isWriteLockedByCurrentThread();
                 final InputStream in = getBoundSocket().newInputStream();
-                getModel().setTouched(true);
+                assert getModel().isTouched();
                 caches.put(name, EntryCache.this);
                 return in;
             }
