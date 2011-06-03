@@ -396,7 +396,7 @@ public final class TFile extends File {
 
     /**
      * This refers to the file system controller if and only if this file
-     * is located within a federated file system, otherwise it's {@code null}.
+     * refers to a prospective archive file, otherwise it's {@code null}.
      * This field should be considered to be {@code final}!
      *
      * @see #readObject
@@ -580,7 +580,8 @@ public final class TFile extends File {
      * {@link File#File(URI)} with the following amendment:
      * If the URI matches the pattern {@code scheme:file:path!/entry},
      * then the constructed file object treats the URI like an entry in the
-     * federated file system of the type named {@code scheme}.
+     * federated file system (i.e. prospective archive file) of the type named
+     * {@code scheme}.
      * This may be recursively applied to access archive entries within other
      * archive files.
      * <p>
@@ -604,7 +605,8 @@ public final class TFile extends File {
      * {@link File#File(URI)} with the following amendment:
      * If the path matches the pattern {@code scheme:file:path!/entry},
      * then the constructed file object treats the URI like an entry in the
-     * federated file system of the type named {@code scheme}.
+     * federated file system (i.e. prospective archive file) of the type named
+     * {@code scheme}.
      * This may be recursively applied to access archive entries within other
      * archive files.
      * <p>
@@ -895,10 +897,11 @@ public final class TFile extends File {
 
     /**
      * Commits all unsynchronized changes to the contents of all federated file
-     * systems (i.e. archive files) to their respective parent file system,
-     * releases the associated resources (i.e. target archive files) for
-     * access by third parties (e.g. other processes), cleans up any temporary
-     * allocated resources (e.g. temporary files) and purges any cached data.
+     * systems (i.e. prospective archive files) to their respective parent file
+     * system, releases the associated resources (i.e. target archive files)
+     * for access by third parties (e.g. other processes), cleans up any
+     * temporary allocated resources (e.g. temporary files) and purges any
+     * cached data.
      * Note that temporary files may get used even if the archive files where
      * accessed read-only.
      *
@@ -924,11 +927,12 @@ public final class TFile extends File {
 
     /**
      * Commits all unsynchronized changes to the contents of all federated file
-     * systems (i.e. archive files) identified by {@code archive} and all its
-     * member federated file systems to their respective parent file system,
-     * releases the associated resources (i.e. target archive files) for
-     * access by third parties (e.g. other processes), cleans up any temporary
-     * allocated resources (e.g. temporary files) and purges any cached data.
+     * systems (i.e. prospective archive files) identified by {@code archive}
+     * and all its member federated file systems to their respective parent
+     * file system, releases the associated resources (i.e. target archive
+     * files) for access by third parties (e.g. other processes), cleans up any
+     * temporary allocated resources (e.g. temporary files) and purges any
+     * cached data.
      * Note that temporary files may get used even if the archive files where
      * accessed read-only.
      * <p>
@@ -965,9 +969,9 @@ public final class TFile extends File {
             final BitField<FsSyncOption> options)
     throws FsSyncException {
         if (!archive.isArchive())
-            throw new IllegalArgumentException(archive.getPath() + " (not a federated file system)");
+            throw new IllegalArgumentException(archive + " (not an archive file)");
         if (null != archive.getEnclArchive())
-            throw new IllegalArgumentException(archive.getPath() + " (not a top level federated file system)");
+            throw new IllegalArgumentException(archive + " (not a top level archive file)");
         new FsFilteringManager(
                 manager,
                 archive .getController()
@@ -978,10 +982,11 @@ public final class TFile extends File {
 
     /**
      * Commits all unsynchronized changes to the contents of all federated file
-     * systems (i.e. archive files) to their respective parent file system,
-     * releases the associated resources (i.e. target archive files) for
-     * access by third parties (e.g. other processes), cleans up any temporary
-     * allocated resources (e.g. temporary files) and purges any cached data.
+     * systems (i.e. prospective archive files) to their respective parent file
+     * system, releases the associated resources (i.e. target archive files)
+     * for access by third parties (e.g. other processes), cleans up any
+     * temporary allocated resources (e.g. temporary files) and purges any
+     * cached data.
      * Note that temporary files may get used even if the archive files where
      * accessed read-only.
      * <p>
@@ -1005,10 +1010,11 @@ public final class TFile extends File {
 
     /**
      * Commits all unsynchronized changes to the contents of all federated file
-     * systems (i.e. archive files) to their respective parent file system,
-     * releases the associated resources (i.e. target archive files) for
-     * access by third parties (e.g. other processes), cleans up any temporary
-     * allocated resources (e.g. temporary files) and purges any cached data.
+     * systems (i.e. prospective archive files) to their respective parent file
+     * system, releases the associated resources (i.e. target archive files)
+     * for access by third parties (e.g. other processes), cleans up any
+     * temporary allocated resources (e.g. temporary files) and purges any
+     * cached data.
      * Note that temporary files may get used even if the archive files where
      * accessed read-only.
      * <p>
@@ -1026,7 +1032,7 @@ public final class TFile extends File {
      *         This implies that the respective parent file system has been
      *         updated with constraints, such as a failure to set the last
      *         modification time of the entry for the federated file system
-     *         (i.e. archive file) in its parent file system.
+     *         (i.e. prospective archive file) in its parent file system.
      * @throws FsSyncException if any error conditions occur.
      *         This implies loss of data!
      * @see #sync(BitField)
@@ -1040,10 +1046,11 @@ public final class TFile extends File {
 
     /**
      * Commits all unsynchronized changes to the contents of all federated file
-     * systems (i.e. archive files) to their respective parent file system,
-     * releases the associated resources (i.e. target archive files) for
-     * access by third parties (e.g. other processes), cleans up any temporary
-     * allocated resources (e.g. temporary files) and purges any cached data.
+     * systems (i.e. prospective archive files) to their respective parent file
+     * system, releases the associated resources (i.e. target archive files)
+     * for access by third parties (e.g. other processes), cleans up any
+     * temporary allocated resources (e.g. temporary files) and purges any
+     * cached data.
      * Note that temporary files may get used even if the archive files where
      * accessed read-only.
      * <p>
@@ -1065,7 +1072,7 @@ public final class TFile extends File {
      *         This implies that the respective parent file system has been
      *         updated with constraints, such as a failure to set the last
      *         modification time of the entry for the federated file system
-     *         (i.e. archive file) in its parent file system.
+     *         (i.e. prospective archive file) in its parent file system.
      * @throws FsSyncException if any error conditions occur.
      *         This implies loss of data!
      * @see #sync(BitField)
@@ -1083,10 +1090,11 @@ public final class TFile extends File {
 
     /**
      * Commits all unsynchronized changes to the contents of all federated file
-     * systems (i.e. archive files) to their respective parent file system,
-     * releases the associated resources (i.e. target archive files) for
-     * access by third parties (e.g. other processes), cleans up any temporary
-     * allocated resources (e.g. temporary files) and purges any cached data.
+     * systems (i.e. prospective archive files) to their respective parent file
+     * system, releases the associated resources (i.e. target archive files)
+     * for access by third parties (e.g. other processes), cleans up any
+     * temporary allocated resources (e.g. temporary files) and purges any
+     * cached data.
      * Note that temporary files may get used even if the archive files where
      * accessed read-only.
      * <p>
@@ -1095,13 +1103,14 @@ public final class TFile extends File {
         sync(archive, FsManager.UMOUNT)
      * }.
      *
-     * @param  archive a top level federated file system, i.e. archive file.
+     * @param  archive a top level federated file system, i.e. prospective
+     *         archive file.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         occur.
      *         This implies that the respective parent file system has been
      *         updated with constraints, such as a failure to set the last
      *         modification time of the entry for the federated file system
-     *         (i.e. archive file) in its parent file system.
+     *         (i.e. prospective archive file) in its parent file system.
      * @throws FsSyncException if any error conditions occur.
      *         This implies loss of data!
      * @see #sync(TFile, BitField)
@@ -1113,10 +1122,11 @@ public final class TFile extends File {
 
     /**
      * Commits all unsynchronized changes to the contents of all federated file
-     * systems (i.e. archive files) to their respective parent file system,
-     * releases the associated resources (i.e. target archive files) for
-     * access by third parties (e.g. other processes), cleans up any temporary
-     * allocated resources (e.g. temporary files) and purges any cached data.
+     * systems (i.e. prospective archive files) to their respective parent file
+     * system, releases the associated resources (i.e. target archive files)
+     * for access by third parties (e.g. other processes), cleans up any
+     * temporary allocated resources (e.g. temporary files) and purges any
+     * cached data.
      * Note that temporary files may get used even if the archive files where
      * accessed read-only.
      * <p>
@@ -1128,7 +1138,8 @@ public final class TFile extends File {
                 .set(FsSyncOption.FORCE_CLOSE_OUTPUT, closeStreams))
      * }.
      *
-     * @param  archive a top level federated file system, i.e. archive file.
+     * @param  archive a top level federated file system, i.e. prospective
+     *         archive file.
      * @param  closeStreams see {@link FsSyncOption#FORCE_CLOSE_INPUT} and
      *         {@link FsSyncOption#FORCE_CLOSE_OUTPUT}.
      * @throws IllegalArgumentException if {@code archive} is not a top level
@@ -1142,7 +1153,7 @@ public final class TFile extends File {
      *         This implies that the respective parent file system has been
      *         updated with constraints, such as a failure to set the last
      *         modification time of the entry for the federated file system
-     *         (i.e. archive file) in its parent file system.
+     *         (i.e. prospective archive file) in its parent file system.
      * @throws FsSyncException if any error conditions occur.
      *         This implies loss of data!
      * @see #sync(TFile, BitField)
@@ -1157,10 +1168,11 @@ public final class TFile extends File {
 
     /**
      * Commits all unsynchronized changes to the contents of all federated file
-     * systems (i.e. archive files) to their respective parent file system,
-     * releases the associated resources (i.e. target archive files) for
-     * access by third parties (e.g. other processes), cleans up any temporary
-     * allocated resources (e.g. temporary files) and purges any cached data.
+     * systems (i.e. prospective archive files) to their respective parent file
+     * system, releases the associated resources (i.e. target archive files)
+     * for access by third parties (e.g. other processes), cleans up any
+     * temporary allocated resources (e.g. temporary files) and purges any
+     * cached data.
      * Note that temporary files may get used even if the archive files where
      * accessed read-only.
      * <p>
@@ -1174,7 +1186,8 @@ public final class TFile extends File {
                 .set(FsSyncOption.FORCE_CLOSE_OUTPUT, closeOutputStreams))
      * }.
      *
-     * @param  archive a top level federated file system, i.e. archive file.
+     * @param  archive a top level federated file system, i.e. prospective
+     *         archive file.
      * @param  waitForInputStreams see {@link FsSyncOption#WAIT_CLOSE_INPUT}.
      * @param  closeInputStreams see {@link FsSyncOption#FORCE_CLOSE_INPUT}.
      * @param  waitForOutputStreams see {@link FsSyncOption#WAIT_CLOSE_OUTPUT}.
@@ -1190,7 +1203,7 @@ public final class TFile extends File {
      *         This implies that the respective parent file system has been
      *         updated with constraints, such as a failure to set the last
      *         modification time of the entry for the federated file system
-     *         (i.e. archive file) in its parent file system.
+     *         (i.e. prospective archive file) in its parent file system.
      * @throws FsSyncException if any error conditions occur.
      *         This implies loss of data!
      * @see    #sync(TFile, BitField)
