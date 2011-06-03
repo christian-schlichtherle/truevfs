@@ -55,15 +55,15 @@ public abstract class FsModel {
     public abstract FsModel getParent();
 
     /**
-     * Returns {@code true} if and only if the contents of the federated file
-     * system have been modified so that it needs
-     * {@link FsController#sync synchronization} with its parent file
-     * system.
+     * Returns {@code true} if and only if some state associated with the
+     * federated file system has been modified so that the
+     * corresponding {@link FsController} must not get discarded until
+     * the next {@link FsController#sync sync}.
      * 
-     * @return {@code true} if and only if the contents of the federated file
-     *         system have been modified so that it needs
-     *         {@link FsController#sync synchronization} with its parent file
-     *         system.
+     * @return {@code true} if and only if some state associated with the
+     *         federated file system has been modified so that the
+     *         corresponding {@link FsController} must not get discarded until
+     *         the next {@link FsController#sync sync}.
      */
     public abstract boolean isTouched();
 

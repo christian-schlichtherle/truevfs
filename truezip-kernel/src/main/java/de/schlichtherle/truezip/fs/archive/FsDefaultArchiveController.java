@@ -156,6 +156,7 @@ extends FsFileSystemArchiveController<E> {
             final InputSocket<?> socket = driver.getInputSocket(
                     parent, parentName, MOUNT_INPUT_OPTIONS);
             input = new Input(driver.newInputShop(getModel(), socket));
+            getModel().setTouched(true);
             setFileSystem(newArchiveFileSystem(driver,
                     input.getDelegate(), socket.getLocalTarget(), readOnly));
         } catch (FsException ex) {
@@ -176,7 +177,6 @@ extends FsFileSystemArchiveController<E> {
             // prompting.
             makeOutput(options);
             setFileSystem(fileSystem);
-            getModel().setTouched(true);
         }
         getFileSystem().addFsArchiveFileSystemTouchListener(touchListener);
     }
@@ -189,15 +189,17 @@ extends FsFileSystemArchiveController<E> {
      *         the output entry in the parent file system controller.
      * @throws IOException on any I/O error.
      */
-    void makeOutput(final BitField<FsOutputOption> options)
+    Output makeOutput(final BitField<FsOutputOption> options)
     throws IOException {
         if (null != output)
-            return;
+            return output;
         final OutputSocket<?> socket = driver.getOutputSocket(
                 parent, parentName, options.set(FsOutputOption.CACHE), null);
         final Input input = this.input;
         output = new Output(driver.newOutputShop(getModel(), socket,
                     null != input ? input.getDelegate() : null));
+        getModel().setTouched(true);
+        return output;
     }
 
     @Override
@@ -207,9 +209,7 @@ extends FsFileSystemArchiveController<E> {
 
     @Override
     OutputSocket<?> getOutputSocket(final E entry) throws IOException {
-        if (null == output)
-            makeOutput(MAKE_OUTPUT_OPTIONS);
-        return output.getOutputSocket(entry);
+        return makeOutput(MAKE_OUTPUT_OPTIONS).getOutputSocket(entry);
     }
 
     @Override
