@@ -132,7 +132,7 @@ public class TFileTest {
         // One ZIP file in path.
         file = new TFile(new URI(scheme, "file:/a ." + scheme + "/b ." + scheme + "!/", null));
         assertSame(file, file.getInnerArchive());
-        assertSame(ROOT, file.getInnerEntryName0());
+        assertSame(ROOT, file.getInnerFsEntryName());
         assertNull(file.getEnclArchive());
         assertNull(file.getEnclEntryName());
 
@@ -198,7 +198,7 @@ public class TFileTest {
 
         file = new TFile(new URI(scheme, scheme + ":file:/a ." + scheme + "!/b ." + scheme + "!/", null));
         assertSame(file, file.getInnerArchive());
-        assertSame(ROOT, file.getInnerEntryName0());
+        assertSame(ROOT, file.getInnerFsEntryName());
         assertEquals(fs + "a ." + scheme + "", file.getEnclArchive().getPath());
         assertEquals("b ." + scheme + "", file.getEnclEntryName());
 
@@ -206,7 +206,7 @@ public class TFileTest {
 
         file = new TFile(new URI(scheme, "file:/a ." + scheme + "!/b ." + scheme + "!/", null));
         assertSame(file, file.getInnerArchive());
-        assertSame(ROOT, file.getInnerEntryName0());
+        assertSame(ROOT, file.getInnerFsEntryName());
         assertNull(file.getEnclArchive());
         assertNull(file.getEnclEntryName());
 
