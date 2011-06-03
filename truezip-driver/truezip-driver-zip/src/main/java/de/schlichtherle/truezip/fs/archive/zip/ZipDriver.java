@@ -76,10 +76,10 @@ implements ZipEntryFactory<ZipArchiveEntry> {
 
     /**
      * Equivalent to
-     * {@link ZipDriver#ZipDriver(IOPoolProvider, Charset) new ZipDriver(pool, ZIP_CHARSET)}.
+     * {@link ZipDriver#ZipDriver(IOPoolProvider, Charset) new ZipDriver(provider, ZIP_CHARSET)}.
      */
-    public ZipDriver(final IOPoolProvider service) {
-        this(service, ZIP_CHARSET);
+    public ZipDriver(final IOPoolProvider provider) {
+        this(provider, ZIP_CHARSET);
     }
 
     /**
