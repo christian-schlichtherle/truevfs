@@ -185,9 +185,8 @@ extends FsFileSystemArchiveController<E> {
      * Ensures that {@link #output} is not {@code null}.
      * 
      * @param  options a bit field of output options.
-     * @param  root the root entry of the file system to use as a template for
-     *         the output entry in the parent file system controller.
      * @throws IOException on any I/O error.
+     * @return The output.
      */
     Output makeOutput(final BitField<FsOutputOption> options)
     throws IOException {
