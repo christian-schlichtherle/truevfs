@@ -18,12 +18,13 @@ package de.schlichtherle.truezip.util;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 
 /**
- * A link has a nullable {@link #get() target} property.
+ * A link has a nullable {@link #getTarget() target} property.
  * This interface is useful if a class is decorating or adapting another class
  * and access to the decorated or adapted object should be provided as part of
  * the public API of the decorating or adapting class.
@@ -79,18 +80,18 @@ public interface Link<T> {
             <T> Link<T> newLink(T target, ReferenceQueue<? super T> queue) {
                 return new Weak<T>(target, queue);
             }
-        };
+        },
 
         /**
          * This reference type clears the target of a link according to the
          * terms and conditions for a {@link PhantomReference}.
          */
-        /*PHANTOM {
+        PHANTOM {
             @Override
             public <T> Link<T> newLink(T target, ReferenceQueue<? super T> queue) {
                 return new Phantom<T>(target, queue);
             }
-        };*/
+        };
 
         /** Returns a new typed link to the given nullable target. */
         public <T> Link<T> newLink(@CheckForNull T target) {
@@ -171,7 +172,7 @@ public interface Link<T> {
         }
 
         /** Adapts its subclass to the {@link Link} interface. */
-        /*private static final class Phantom<T> extends PhantomReference<T>
+        private static final class Phantom<T> extends PhantomReference<T>
         implements Link<T> {
             Phantom(T target, ReferenceQueue<? super T> queue) {
                 super(target, queue);
@@ -191,6 +192,6 @@ public interface Link<T> {
                         .append(']')
                         .toString();
             }
-        }*/
+        }
     }
 }
