@@ -89,7 +89,7 @@ final class TempFilePool implements IOPool<FileEntry> {
 
         private TempFilePool pool(final @CheckForNull TempFilePool newPool)
         throws IOException {
-            final TempFilePool oldPool = pool;
+            final TempFilePool oldPool = this.pool;
             this.pool = newPool;
             if (oldPool != newPool)
                 deleteIfExists(getPath());
@@ -105,5 +105,5 @@ final class TempFilePool implements IOPool<FileEntry> {
                 super.finalize();
             }
         }
-    } // class Entry
+    } // class PoolEntry
 }
