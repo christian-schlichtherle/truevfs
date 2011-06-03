@@ -238,19 +238,6 @@ public final class IOCache implements Flushable, Closeable {
         return null == buffer ? null : buffer.data;
     }
 
-    /*@Override
-    @SuppressWarnings("FinalizeDeclaration")
-    protected void finalize() throws Throwable {
-        try {
-            //setBuffer(null);
-            final Buffer oldBuffer = this.buffer;
-            if (null != oldBuffer)
-                oldBuffer.release();
-        } finally {
-            super.finalize();
-        }
-    }*/
-
     /**
      * Returns an input socket for reading the cached entry data.
      *
