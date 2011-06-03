@@ -285,7 +285,7 @@ final class TBIO {
             final TFile archive = file.getInnerArchive();
             if (null != archive)
                 return archive.getController()
-                        .getInputSocket(file.getInnerEntryName0(), options);
+                        .getInputSocket(file.getInnerFsEntryName(), options);
         }
         final FsPath path = new FsPath(src);
         return TFile.manager
@@ -314,7 +314,7 @@ final class TBIO {
             final TFile archive = file.getInnerArchive();
             if (null != archive)
                 return archive.getController()
-                        .getOutputSocket(file.getInnerEntryName0(), options, template);
+                        .getOutputSocket(file.getInnerFsEntryName(), options, template);
         }
         final FsPath path = new FsPath(dst);
         return TFile.manager
