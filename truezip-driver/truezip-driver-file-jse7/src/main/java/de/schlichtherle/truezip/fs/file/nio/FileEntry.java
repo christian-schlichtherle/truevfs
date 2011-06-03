@@ -17,7 +17,6 @@ package de.schlichtherle.truezip.fs.file.nio;
 
 import de.schlichtherle.truezip.socket.IOEntry;
 import de.schlichtherle.truezip.util.Pool.Releasable;
-import de.schlichtherle.truezip.socket.IOPool.Entry;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
@@ -73,6 +72,10 @@ implements IOEntry<FileEntry>, Releasable<IOException> {
         this.name = name.toString();
     }
 
+    private BasicFileAttributes readBasicFileAttributes() throws IOException {
+        return readAttributes(path, BasicFileAttributes.class);
+    }
+
     public final FileEntry createTempFile() throws IOException {
         TempFilePool pool = this.pool;
         if (null == pool)
@@ -97,34 +100,44 @@ implements IOEntry<FileEntry>, Releasable<IOException> {
     @Override
     @SuppressWarnings("unchecked")
     public final Set<Type> getTypes() {
-        if (isRegularFile(path))
-            return FILE_TYPE_SET;
-        else if (isDirectory(path))
-            return DIRECTORY_TYPE_SET;
-        else if (exists(path))
-            return SPECIAL_TYPE_SET;
-        else
-            return Collections.EMPTY_SET;
+        try {
+            final BasicFileAttributes attr = readBasicFileAttributes();
+            if (attr.isRegularFile())
+                return FILE_TYPE_SET;
+            else if (attr.isDirectory())
+                return DIRECTORY_TYPE_SET;
+            else if (attr.isSymbolicLink())
+                return SYMLINK_TYPE_SET;
+            else if (attr.isOther())
+                return SPECIAL_TYPE_SET;
+        } catch (IOException ignore) {
+            // This doesn't exist or may be inaccessible. In either case...
+        }
+        return Collections.EMPTY_SET;
     }
 
     @Override
     public final boolean isType(final Type type) {
-        switch (type) {
-        case FILE:
-            return isRegularFile(path);
-        case DIRECTORY:
-            return isDirectory(path);
-        case SPECIAL:
-            return exists(path) && !isRegularFile(path) && !isDirectory(path);
-        default:
-            return false;
+        try {
+            switch (type) {
+            case FILE:
+                return readBasicFileAttributes().isRegularFile();
+            case DIRECTORY:
+                return readBasicFileAttributes().isDirectory();
+            case SYMLINK:
+                return readBasicFileAttributes().isSymbolicLink();
+            case SPECIAL:
+                return readBasicFileAttributes().isOther();
+            }
+        } catch (IOException ignored) {
         }
+        return false;
     }
 
     @Override
     public final long getSize(final Size type) {
         try {
-            return size(path);
+            return readBasicFileAttributes().size();
         } catch (IOException ignore) {
             // This doesn't exist or may be inaccessible. In either case...
             return UNKNOWN;
@@ -133,33 +146,31 @@ implements IOEntry<FileEntry>, Releasable<IOException> {
 
     @Override
     public final long getTime(Access type) {
-        final BasicFileAttributes attr;
         try {
-            attr = readAttributes(path, BasicFileAttributes.class);
+            final BasicFileAttributes attr = readBasicFileAttributes();
+            switch (type) {
+                case WRITE:
+                    return attr.lastModifiedTime().toMillis();
+                case READ:
+                    return attr.lastAccessTime().toMillis();
+                case CREATE:
+                    return attr.creationTime().toMillis();
+            }
         } catch (IOException ignore) {
             // This doesn't exist or may be inaccessible. In either case...
-            return UNKNOWN;
         }
-        switch (type) {
-            case WRITE:
-                return attr.lastModifiedTime().toMillis();
-            case READ:
-                return attr.lastAccessTime().toMillis();
-            case CREATE:
-                return attr.creationTime().toMillis();
-            default:
-                return UNKNOWN;
-        }
+        return UNKNOWN;
     }
 
     @Override
     public final @Nullable Set<String> getMembers() {
-        final Set<String> result = new LinkedHashSet<String>();
         try {
             final DirectoryStream<Path> stream = newDirectoryStream(path);
             try {
+                final Set<String> result = new LinkedHashSet<String>();
                 for (final Path member : stream)
                     result.add(member.getFileName().toString());
+                return result;
             } finally {
                 stream.close();
             }
@@ -167,7 +178,6 @@ implements IOEntry<FileEntry>, Releasable<IOException> {
             // This isn't a directory or may be inaccessible. In either case...
             return null;
         }
-        return result;
     }
 
     @Override

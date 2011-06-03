@@ -77,6 +77,10 @@ final class FileController extends FsController<FsModel>  {
         this.target = Paths.get(model.getMountPoint().toUri());
     }
 
+    private BasicFileAttributeView getBasicFileAttributeView(Path file) {
+        return getFileAttributeView(file, BasicFileAttributeView.class);
+    }
+
     @Override
     public FsModel getModel() {
         return model;
@@ -237,7 +241,7 @@ final class FileController extends FsController<FsModel>  {
     throws IOException {
         final Path file = target.resolve(name.getPath());
         final FileTime time = FileTime.fromMillis(value);
-        getFileAttributeView(file, BasicFileAttributeView.class).setTimes(
+        getBasicFileAttributeView(file).setTimes(
                 types.get(WRITE)  ? time : null,
                 types.get(READ)   ? time : null,
                 types.get(CREATE) ? time : null);
@@ -280,7 +284,7 @@ final class FileController extends FsController<FsModel>  {
                 throw new IOException(file + " (entry type not supported: " + type + ")");
         }
         if (null != template) {
-            getFileAttributeView(file, BasicFileAttributeView.class)
+            getBasicFileAttributeView(file)
                     .setTimes(  getFileTime(template, WRITE),
                                 getFileTime(template, READ),
                                 getFileTime(template, CREATE));
