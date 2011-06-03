@@ -18,12 +18,12 @@ package de.schlichtherle.truezip.util;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 
 /**
- * A link has a nullable {@link #getTarget() target} property.
+ * A link has a nullable {@link #get() target} property.
  * This interface is useful if a class is decorating or adapting another class
  * and access to the decorated or adapted object should be provided as part of
  * the public API of the decorating or adapting class.
@@ -43,52 +43,68 @@ public interface Link<T> {
      * 
      * @return The target of this link.
      */
-    @Nullable T getTarget();
+    @CheckForNull T getTarget();
 
     /**
-     * A link type defines the terms and conditions for clearing its target
-     * and is a factory for
+     * A factory for links which defines the terms and conditions for clearing
+     * their target.
      */
     enum Type {
 
         /** This reference type never clears the target of a link. */
         STRONG {
             @Override
-            public <T> Link<T> newLink(T target) {
-                return new StrongLink<T>(target);
+            <T> Link<T> newLink(T target, ReferenceQueue<? super T> queue) {
+                return new Strong<T>(target);
             }
         },
 
         /**
          * This reference type clears the target of a link according to the
-         * terms and conditions of a {@link SoftReference}.
+         * terms and conditions for a {@link SoftReference}.
          */
         SOFT {
             @Override
-            public <T> Link<T> newLink(T target) {
-                return new SoftLink<T>(target);
+            <T> Link<T> newLink(T target, ReferenceQueue<? super T> queue) {
+                return new Soft<T>(target, queue);
             }
         },
 
         /**
          * This reference type clears the target of a link according to the
-         * terms and conditions of a {@link WeakReference}.
+         * terms and conditions for a {@link WeakReference}.
          */
         WEAK {
             @Override
-            public <T> Link<T> newLink(T target) {
-                return new WeakLink<T>(target);
+            <T> Link<T> newLink(T target, ReferenceQueue<? super T> queue) {
+                return new Weak<T>(target, queue);
             }
         };
 
+        /**
+         * This reference type clears the target of a link according to the
+         * terms and conditions for a {@link PhantomReference}.
+         */
+        /*PHANTOM {
+            @Override
+            public <T> Link<T> newLink(T target, ReferenceQueue<? super T> queue) {
+                return new Phantom<T>(target, queue);
+            }
+        };*/
+
         /** Returns a new typed link to the given nullable target. */
-        public abstract <T> Link<T> newLink(@CheckForNull T target);
+        public <T> Link<T> newLink(@CheckForNull T target) {
+            return newLink(target, null);
+        }
+
+        /** Returns a new typed link to the given nullable target. */
+        abstract <T> Link<T> newLink(@CheckForNull T target, ReferenceQueue<? super T> queue);
 
         /** A strong reference. */
-        private static class StrongLink<T> implements Link<T> {
+        private static final class Strong<T> implements Link<T> {
             private final T target;
 
-            StrongLink(final T target) {
+            Strong(final T target) {
                 this.target = target;
             }
 
@@ -109,15 +125,15 @@ public interface Link<T> {
         }
 
         /** Adapts its subclass to the {@link Link} interface. */
-        private static class SoftLink<T> extends SoftReference<T>
+        private static final class Soft<T> extends SoftReference<T>
         implements Link<T> {
-            SoftLink(T target) {
-                super(target);
+            Soft(T target, ReferenceQueue<? super T> queue) {
+                super(target, queue);
             }
 
             @Override
             public T getTarget() {
-                return get();
+                return super.get();
             }
 
             @Override
@@ -132,15 +148,15 @@ public interface Link<T> {
         }
 
         /** Adapts its subclass to the {@link Link} interface. */
-        private static class WeakLink<T> extends WeakReference<T>
+        private static final class Weak<T> extends WeakReference<T>
         implements Link<T> {
-            WeakLink(T target) {
-                super(target);
+            Weak(T target, ReferenceQueue<? super T> queue) {
+                super(target, queue);
             }
 
             @Override
             public T getTarget() {
-                return get();
+                return super.get();
             }
 
             @Override
@@ -153,5 +169,28 @@ public interface Link<T> {
                         .toString();
             }
         }
+
+        /** Adapts its subclass to the {@link Link} interface. */
+        /*private static final class Phantom<T> extends PhantomReference<T>
+        implements Link<T> {
+            Phantom(T target, ReferenceQueue<? super T> queue) {
+                super(target, queue);
+            }
+
+            @Override
+            public T getTarget() {
+                return super.get();
+            }
+
+            @Override
+            public String toString() {
+                return new StringBuilder()
+                        .append(getClass().getName())
+                        .append("[target=")
+                        .append(getTarget())
+                        .append(']')
+                        .toString();
+            }
+        }*/
     }
 }
