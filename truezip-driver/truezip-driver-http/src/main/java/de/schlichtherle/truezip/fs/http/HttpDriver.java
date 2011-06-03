@@ -37,7 +37,7 @@ public final class HttpDriver extends FsDriver {
 
     private final IOPool<?> pool;
 
-    HttpDriver(final IOPoolProvider provider) {
+    public HttpDriver(final IOPoolProvider provider) {
         this.pool = provider.get();
     }
 
