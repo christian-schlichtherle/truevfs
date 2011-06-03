@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Iterator;
-import java.util.Set;
 import net.jcip.annotations.Immutable;
 
 /**
@@ -31,9 +30,6 @@ import net.jcip.annotations.Immutable;
  * field, i.e. a set of predefined bits.
  * As an immutable class, it's inherently thread-safe.
  * All modifying methods return a modified clone of this instance.
- * <p>
- * In general, passing {@code null} as a method parameter results in a
- * {@link NullPointerException} and methods return non-{@code null}.
  * <p>
  * <b>TODO:</b> Add more modifying methods.
  *
