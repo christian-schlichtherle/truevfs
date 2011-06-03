@@ -35,9 +35,9 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -67,8 +67,8 @@ implements Iterable<FsCovariantEntry<E>> {
     /** Whether or not this file system has been modified (touched). */
     private boolean touched;
 
-    private LinkedHashSet<FsArchiveFileSystemTouchListener<? super E>>
-            touchListeners = new LinkedHashSet<FsArchiveFileSystemTouchListener<? super E>>();
+    private Set<FsArchiveFileSystemTouchListener<? super E>>
+            touchListeners = new HashSet<FsArchiveFileSystemTouchListener<? super E>>();
 
     /**
      * Returns a new archive file system and ensures its integrity.
@@ -95,11 +95,7 @@ implements Iterable<FsCovariantEntry<E>> {
         final EntryTable<E> master = new EntryTable<E>(64);
         master.add(ROOT_PATH, root);
         this.master = master;
-        try {
-            touch();
-        } catch (FsArchiveFileSystemException ex) {
-            throw new AssertionError("veto without a listener!?");
-        }
+        this.touched = true;
     }
 
     /**
@@ -267,7 +263,7 @@ implements Iterable<FsCovariantEntry<E>> {
     @SuppressWarnings("unchecked")
     Set<FsArchiveFileSystemTouchListener<? super E>>
     getFsArchiveFileSystemTouchListeners() {
-        return (Set<FsArchiveFileSystemTouchListener<? super E>>) touchListeners.clone();
+        return new HashSet<FsArchiveFileSystemTouchListener<? super E>>(touchListeners);
     }
 
     /**
