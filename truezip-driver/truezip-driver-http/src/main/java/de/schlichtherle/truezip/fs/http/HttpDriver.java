@@ -35,14 +35,16 @@ import net.jcip.annotations.Immutable;
 @DefaultAnnotation(NonNull.class)
 public final class HttpDriver extends FsDriver {
 
-    private final IOPool<?> pool;
+    private final IOPoolProvider provider;
 
     public HttpDriver(final IOPoolProvider provider) {
-        this.pool = provider.get();
+        if (null == provider)
+            throw new NullPointerException();
+        this.provider = provider;
     }
 
     IOPool<?> getPool() {
-        return pool;
+        return provider.get();
     }
 
     @Override
