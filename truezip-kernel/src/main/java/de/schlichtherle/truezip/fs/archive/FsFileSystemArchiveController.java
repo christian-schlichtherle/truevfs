@@ -196,6 +196,7 @@ extends FsArchiveController<E> {
 
 /** A cacheable false positive exception. */
 @DefaultAnnotation(NonNull.class)
+@SuppressWarnings("MultipleTopLevelClassesInFile")
 class FsCacheableFalsePositiveException extends FsFalsePositiveException {
     private static final long serialVersionUID = 5436924103910446876L;
 
