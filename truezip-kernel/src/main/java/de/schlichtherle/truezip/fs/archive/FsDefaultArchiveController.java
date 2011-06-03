@@ -127,6 +127,26 @@ extends FsFileSystemArchiveController<E> {
         return true;
     }
 
+    private Input getInput() {
+        return input;
+    }
+
+    private void setInput(final Input input) {
+        this.input = input;
+        if (null != input)
+            getModel().setTouched(true);
+    }
+
+    private Output getOutput() {
+        return output;
+    }
+
+    private void setOutput(final Output output) {
+        this.output = output;
+        if (null != output)
+            getModel().setTouched(true);
+    }
+
     @Override
     public FsController<?> getParent() {
         return parent;
@@ -155,10 +175,9 @@ extends FsFileSystemArchiveController<E> {
             final boolean readOnly = !parent.isWritable(parentName);
             final InputSocket<?> socket = driver.getInputSocket(
                     parent, parentName, MOUNT_INPUT_OPTIONS);
-            input = new Input(driver.newInputShop(getModel(), socket));
-            getModel().setTouched(true);
+            setInput(new Input(driver.newInputShop(getModel(), socket)));
             setFileSystem(newArchiveFileSystem(driver,
-                    input.getDelegate(), socket.getLocalTarget(), readOnly));
+                    getInput().getDelegate(), socket.getLocalTarget(), readOnly));
         } catch (FsException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -190,20 +209,20 @@ extends FsFileSystemArchiveController<E> {
      */
     Output makeOutput(final BitField<FsOutputOption> options)
     throws IOException {
+        Output output = getOutput();
         if (null != output)
             return output;
         final OutputSocket<?> socket = driver.getOutputSocket(
                 parent, parentName, options.set(FsOutputOption.CACHE), null);
-        final Input input = this.input;
-        output = new Output(driver.newOutputShop(getModel(), socket,
-                    null != input ? input.getDelegate() : null));
-        getModel().setTouched(true);
+        final Input input = getInput();
+        setOutput(output = new Output(driver.newOutputShop(getModel(), socket,
+                     null != input ? input.getDelegate() : null)));
         return output;
     }
 
     @Override
     InputSocket<?> getInputSocket(final String name) throws IOException {
-        return input.getInputSocket(name);
+        return getInput().getInputSocket(name);
     }
 
     @Override
@@ -233,10 +252,12 @@ extends FsFileSystemArchiveController<E> {
                 || null == (entry = fileSystem.getEntry(name)))
             return false;
         String n = null;
+        final Output output = getOutput();
         if (null != output && null != output.getEntry(
                 n = entry.getEntry().getName()))
             //if (READ == intention || !output.canAppend(entry.getEntry()))
                 return sync();
+        final Input input = getInput();
         if (null != input && null != input.getEntry(
                 null != n ? n : (n = entry.getEntry().getName())))
             return false;
@@ -256,7 +277,7 @@ extends FsFileSystemArchiveController<E> {
             final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
-        assert !isTouched() || null != output; // file system touched => output archive
+        assert !isTouched() || null != getOutput(); // file system touched => output archive
         assert getModel().isWriteLockedByCurrentThread();
 
         if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT))
@@ -272,8 +293,8 @@ extends FsFileSystemArchiveController<E> {
                 commitSync(handler);
             } finally {
                 assert null == getFileSystem();
-                assert null == input;
-                assert null == output;
+                assert null == getInput();
+                assert null == getOutput();
                 getModel().setTouched(false);
             }
         }
@@ -300,8 +321,8 @@ extends FsFileSystemArchiveController<E> {
         // set and FORCE_CLOSE_OUTPUT may be unset in which case we
         // don't even need to check open input streams if there are
         // some open output streams.
-        if (output != null) {
-            final int outStreams = output.waitCloseOthers(
+        if (getOutput() != null) {
+            final int outStreams = getOutput().waitCloseOthers(
                     options.get(WAIT_CLOSE_OUTPUT) ? 0 : 50);
             if (outStreams > 0) {
                 final String message =  "Number of open output streams: "
@@ -313,8 +334,8 @@ extends FsFileSystemArchiveController<E> {
                                     new OutputBusyException(message)));
             }
         }
-        if (input != null) {
-            final int inStreams = input.waitCloseOthers(
+        if (getInput() != null) {
+            final int inStreams = getInput().waitCloseOthers(
                     options.get(WAIT_CLOSE_INPUT) ? 0 : 50);
             if (inStreams > 0) {
                 final String message =  "Number of open input streams: "
@@ -359,9 +380,11 @@ extends FsFileSystemArchiveController<E> {
         } // class FilterExceptionHandler
 
         final FilterExceptionHandler decoratorHandler = new FilterExceptionHandler();
-        if (output != null)
+        final Output output = getOutput();
+        if (null != output)
             output.closeAll((ExceptionHandler<IOException, X>) decoratorHandler);
-        if (input != null)
+        final Input input = getInput();
+        if (null != input)
             input.closeAll((ExceptionHandler<IOException, X>) decoratorHandler);
     }
 
@@ -381,7 +404,7 @@ extends FsFileSystemArchiveController<E> {
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         assert isTouched();
-        assert null != output;
+        assert null != getOutput();
 
         class FilterExceptionHandler
         implements ExceptionHandler<IOException, X> {
@@ -404,9 +427,10 @@ extends FsFileSystemArchiveController<E> {
             }
         } // class FilterExceptionHandler
 
+        final Input input = getInput();
         copy(   getFileSystem(),
                 null != input ? input.getDelegate() : new DummyInputService<E>(),
-                output.getDelegate(),
+                getOutput().getDelegate(),
                 (ExceptionHandler<IOException, X>) new FilterExceptionHandler());
     }
 
@@ -463,8 +487,8 @@ extends FsFileSystemArchiveController<E> {
         setFileSystem(null);
 
         try {
-            final Input input = this.input;
-            this.input = null;
+            final Input input = getInput();
+            setInput(null);
             if (input != null) {
                 try {
                     input.close();
@@ -473,8 +497,8 @@ extends FsFileSystemArchiveController<E> {
                 }
             }
         } finally {
-            final Output output = this.output;
-            this.output = null;
+            final Output output = getOutput();
+            setOutput(null);
             if (output != null) {
                 try {
                     output.close();
