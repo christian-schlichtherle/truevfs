@@ -73,7 +73,7 @@
         <module>truezip-archetypes</module>
         <module>truezip-driver</module>
         <module>truezip-file</module>
-        <!--module>truezip-fsp-jse7</module-->
+        <module>truezip-fsp-jse7</module>
         <module>truezip-kernel</module>
         <module>truezip-samples</module>
         <module>truezip-swing</module>
@@ -87,12 +87,12 @@
                 <version>${project.version}</version>
                 <scope>runtime</scope>
             </dependency>
-            <!--dependency>
+            <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>truezip-driver-file-jse7</artifactId>
                 <version>${project.version}</version>
                 <scope>runtime</scope>
-            </dependency-->
+            </dependency>
             <dependency>
                 <groupId>org.netbeans</groupId>
                 <artifactId>jemmy</artifactId>
