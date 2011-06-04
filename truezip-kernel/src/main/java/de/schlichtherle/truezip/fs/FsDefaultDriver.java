@@ -51,7 +51,7 @@ public final class FsDefaultDriver implements FsCompositeDriver {
         final FsScheme scheme = model.getMountPoint().getScheme();
         final FsDriver driver = drivers.get(scheme);
         if (null == driver)
-            throw new ServiceConfigurationError(scheme + "(unknown file system scheme)");
+            throw new ServiceConfigurationError(scheme + " (unknown file system scheme)");
         return driver.newController(model, parent);
     }
 }
