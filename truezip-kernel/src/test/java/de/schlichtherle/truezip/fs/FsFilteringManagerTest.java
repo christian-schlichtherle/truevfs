@@ -40,15 +40,17 @@ public class FsFilteringManagerTest extends FsManagerTestSuite {
     @Test
     public void testFiltering() {
         final FsCompositeDriver driver = new FsDefaultDriver(
-                new DummyDriverService("file|tar|zip"));
+                new DummyDriverService("file|tar|tar.gz|zip"));
         for (final String[][] params : new String[][][] {
             // { { /* filter */ }, { /* test set */ }, { /* result set */ } },
-            { { "tar:zip:file:/foo!/bar!/" }, { "zip:file:/foo!/", "tar:file:/bar!/" }, { } },
-            { { "file:/foo/bar/" }, { "zip:file:/foo!/", "tar:file:/bar!/" }, { } },
+            { { "file:/" }, { "zip:file:/foo.zip!/", "tar:file:/bar.tar!/" }, { "zip:file:/foo.zip!/", "tar:file:/bar.tar!/" } },
+            { { "tar:file:/bar.tar!/" }, { "tar:file:/bar.tar!/", "tar.gz:file:/bar.tar.gz!/" }, { "tar:file:/bar.tar!/" } },
+            { { "tar:zip:file:/foo.zip!/bar.tar!/" }, { "zip:file:/foo.zip!/", "tar:file:/bar.tar!/" }, { } },
+            { { "file:/foo.zip/bar.tar/" }, { "zip:file:/foo.zip!/", "tar:file:/bar.tar!/" }, { } },
             { { "tar:file:/foo!/" }, { "zip:file:/foo!/", "tar:file:/bar!/" }, { "zip:file:/foo!/" } },
-            { { "zip:file:/foo!/" }, { "zip:file:/foo!/", "tar:file:/bar!/" }, { "zip:file:/foo!/" } },
-            { { "file:/foo/" }, { "zip:file:/foo!/", "tar:file:/bar!/" }, { } },
-            { { "file:/" }, { "zip:file:/foo!/", "tar:file:/bar!/" }, { "zip:file:/foo!/", "tar:file:/bar!/" } },
+            { { "zip:file:/foo.zip!/" }, { "zip:file:/foo.zip!/", "tar:file:/bar.tar!/" }, { "zip:file:/foo.zip!/" } },
+            { { "file:/foo.zip/" }, { "zip:file:/foo.zip!/", "tar:file:/bar.tar!/" }, { } },
+            { { "file:/" }, { "zip:file:/foo.zip!/", "tar:file:/bar.tar!/" }, { "zip:file:/foo.zip!/", "tar:file:/bar.tar!/" } },
         }) {
             assert params[0].length == 1;
 

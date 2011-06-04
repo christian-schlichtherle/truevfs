@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URI;
 import java.util.ArrayList;
@@ -65,11 +66,21 @@ extends FsDecoratingManager<FsManager> {
     private Collection<FsController<?>> getControllers() {
         final List<FsController<?>> snapshot
                 = new ArrayList<FsController<?>>(delegate.getSize());
+        final URI p = prefix;
+        final String ps = p.getScheme();
+        final String pp = p.getPath();
+        final int ppl = pp.length();
+        assert 0 < ppl;
+        final boolean pps = SEPARATOR_CHAR == pp.charAt(ppl - 1);
+        URI mp;
+        String mpp;
         for (final FsController<?> controller : delegate) {
-            final URI mountPoint
-                    = controller.getModel().getMountPoint().toHierarchicalUri();
-            if (mountPoint.getScheme().equals(prefix.getScheme())
-                    && mountPoint.getPath().startsWith(prefix.getPath()))
+            mp = controller.getModel().getMountPoint().toHierarchicalUri();
+            if (mp.getScheme().equals(ps)
+                    && (mpp = mp.getPath()).startsWith(pp)
+                    && (pps 
+                        || mpp.length() == ppl
+                        || SEPARATOR_CHAR == mpp.charAt(ppl)))
                 snapshot.add(controller);
         }
         return snapshot;
