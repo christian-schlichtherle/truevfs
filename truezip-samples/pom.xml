@@ -86,15 +86,11 @@
         <!-- The file system driver for the file scheme in JSE 7+.
              This driver provides access to the following URI schemes:
              file: OS file system.
-             If both truezip-driver-file and truezip-driver-file-jse7 are
-             present on the class path, the TrueZIP Kernel will resolve this
-             conflict by evaluating their priorities, so you will always get
-             the best option.
              -->
-        <dependency>
+        <!--dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truezip-driver-file-jse7</artifactId>
-        </dependency>
+        </dependency-->
 
         <!-- This driver provides access to the following URI schemes:
              http|https: Hyper Text Transport protocol.
