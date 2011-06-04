@@ -339,7 +339,7 @@ implements FsCompositeDriver, FsDriverProvider {
         final FsDriver driver = drivers.get(declaredScheme);
         if (null == driver)
             throw new ServiceConfigurationError(declaredScheme
-                    + "(unknown file system scheme - check run time class path configuration)");
+                    + " (unknown file system scheme - check run time class path configuration)");
         return driver.newController(model, parent);
     }
 
