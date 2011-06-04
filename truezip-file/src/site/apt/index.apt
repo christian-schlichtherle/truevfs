@@ -1,0 +1,28 @@
+    -----------------------
+    About
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+About TrueZIP File*
+
+    This module provides uniform, transparent, thread-safe,
+    read/write access to archive files as if they were just plain
+    directories in a file system path by means of the
+    <<<TFile*>>> classes and their dependent classes.
+
+    This module also provides Swing GUI classes for viewing file trees
+    and choosing entries in archive files.
+
+    The API of this module is the first choice for most applications:
+    It's designed to be easy to learn and convenient to use while
+    providing a great level of flexibility.
+    However, due to its file-based addressing scheme, it can only
+    access the OS file system and any archive files within the OS file
+    system.
+
+    If you need to access archive files within other non-federated
+    virtual file systems, e.g. HTTP(S), then you should directly use
+    the
+    {{{../truezip-kernel/index.html}TrueZIP Kernel}}
+    module instead.
