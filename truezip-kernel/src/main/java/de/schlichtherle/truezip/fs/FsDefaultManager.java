@@ -52,6 +52,7 @@ public final class FsDefaultManager extends FsManager {
         this(WEAK);
     }
 
+    /** Provided for unit testing. */
     FsDefaultManager(final Type optionalScheduleType) {
         assert null != optionalScheduleType;
         this.optionalScheduleType = optionalScheduleType;
