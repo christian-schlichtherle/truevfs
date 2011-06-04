@@ -131,7 +131,7 @@ extends FsFileSystemArchiveController<E> {
         return input;
     }
 
-    private void setInput(final Input input) {
+    private void setInput(final @CheckForNull Input input) {
         this.input = input;
         if (null != input)
             getModel().setTouched(true);
@@ -141,7 +141,7 @@ extends FsFileSystemArchiveController<E> {
         return output;
     }
 
-    private void setOutput(final Output output) {
+    private void setOutput(final @CheckForNull Output output) {
         this.output = output;
         if (null != output)
             getModel().setTouched(true);
