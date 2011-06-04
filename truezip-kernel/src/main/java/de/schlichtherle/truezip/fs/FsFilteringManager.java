@@ -64,9 +64,8 @@ extends FsDecoratingManager<FsManager> {
 
     private Collection<FsController<?>> getControllers() {
         final List<FsController<?>> snapshot
-                = new ArrayList<FsController<?>>(
-                    (int) (delegate.getSize() / .75f) + 1);
-        for (FsController<?> controller : delegate) {
+                = new ArrayList<FsController<?>>(delegate.getSize());
+        for (final FsController<?> controller : delegate) {
             final URI mountPoint
                     = controller.getModel().getMountPoint().toHierarchicalUri();
             if (mountPoint.getScheme().equals(prefix.getScheme())
