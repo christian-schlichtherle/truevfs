@@ -39,23 +39,23 @@ public class FsFilteringManagerTest extends FsManagerTestSuite {
 
     @Test
     public void testFiltering() {
+        final FsCompositeDriver driver = new FsDefaultDriver(
+                new DummyDriverService("file|tar|zip"));
         for (final String[][] params : new String[][][] {
             // { { /* filter */ }, { /* test set */ }, { /* result set */ } },
-            { { "tar:zip:file:/foo!/bar!/" }, { "zip:file:/foo!/" }, { } },
-            { { "file:/foo/bar/" }, { "zip:file:/foo!/" }, { } },
-            { { "tar:file:/foo!/" }, { "zip:file:/foo!/" }, { "zip:file:/foo!/" } },
-            { { "zip:file:/foo!/" }, { "zip:file:/foo!/" }, { "zip:file:/foo!/" } },
-            { { "file:/foo/" }, { "zip:file:/foo!/" }, { } },
-            { { "file:/" }, { "zip:file:/foo!/" }, { "zip:file:/foo!/" } },
+            { { "tar:zip:file:/foo!/bar!/" }, { "zip:file:/foo!/", "tar:file:/bar!/" }, { } },
+            { { "file:/foo/bar/" }, { "zip:file:/foo!/", "tar:file:/bar!/" }, { } },
+            { { "tar:file:/foo!/" }, { "zip:file:/foo!/", "tar:file:/bar!/" }, { "zip:file:/foo!/" } },
+            { { "zip:file:/foo!/" }, { "zip:file:/foo!/", "tar:file:/bar!/" }, { "zip:file:/foo!/" } },
+            { { "file:/foo/" }, { "zip:file:/foo!/", "tar:file:/bar!/" }, { } },
+            { { "file:/" }, { "zip:file:/foo!/", "tar:file:/bar!/" }, { "zip:file:/foo!/", "tar:file:/bar!/" } },
         }) {
             assert params[0].length == 1;
 
             final FsManager manager = new FsDefaultManager(STRONG);
             for (String param : params[1])
-                manager.getController(
-                    FsMountPoint.create(URI.create(param)),
-                    new FsDefaultDriver(
-                        new DummyDriverService("file|tar|zip")));
+                manager.getController(  FsMountPoint.create(URI.create(param)),
+                                        driver);
             assertThat(manager.getSize(), is(params[1].length));
 
             final Set<FsMountPoint> set = new HashSet<FsMountPoint>();

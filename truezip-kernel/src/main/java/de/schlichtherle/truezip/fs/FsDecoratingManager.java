@@ -15,10 +15,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import java.io.IOException;
 import java.util.Iterator;
 import net.jcip.annotations.ThreadSafe;
 
@@ -34,7 +31,7 @@ public abstract class FsDecoratingManager<M extends FsManager>
 extends FsManager {
 
     protected final M delegate;
-    
+
     /**
      * Constructs a new decorating file system manager.
      *
@@ -60,14 +57,6 @@ extends FsManager {
     @Override
     public Iterator<FsController<?>> iterator() {
         return delegate.iterator();
-    }
-
-    @Override
-    public <X extends IOException> void
-    sync(   BitField<FsSyncOption> options,
-            ExceptionHandler<? super IOException, X> handler)
-    throws X {
-        delegate.sync(options, handler);
     }
 
     /**
