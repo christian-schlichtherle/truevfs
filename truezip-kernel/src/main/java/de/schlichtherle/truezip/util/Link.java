@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.util;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
@@ -44,7 +45,7 @@ public interface Link<T> {
      * 
      * @return The target of this link.
      */
-    @CheckForNull T getTarget();
+    @Nullable T getTarget();
 
     /**
      * A factory for links which defines the terms and conditions for clearing
@@ -99,7 +100,7 @@ public interface Link<T> {
         }
 
         /** Returns a new typed link to the given nullable target. */
-        abstract <T> Link<T> newLink(@CheckForNull T target, ReferenceQueue<? super T> queue);
+        abstract <T> Link<T> newLink(@CheckForNull T target, @CheckForNull ReferenceQueue<? super T> queue);
 
         /** A strong reference. */
         private static final class Strong<T> implements Link<T> {
