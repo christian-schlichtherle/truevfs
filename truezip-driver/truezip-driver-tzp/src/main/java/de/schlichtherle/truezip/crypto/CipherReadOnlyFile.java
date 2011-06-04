@@ -138,7 +138,7 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
      *        This may be {@code null}, but must be properly initialized
      *        <em>before</em> a call to {@link #init}.
      */
-    public CipherReadOnlyFile(@CheckForNull ReadOnlyFile rof) {
+    protected CipherReadOnlyFile(@CheckForNull ReadOnlyFile rof) {
         super(rof);
     }
 
