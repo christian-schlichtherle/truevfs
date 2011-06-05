@@ -1,0 +1,159 @@
+/*
+ * Copyright (C) 2011 Schlichtherle IT Services
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.schlichtherle.truezip.nio.fsp;
+
+import static de.schlichtherle.truezip.file.TFile.*;
+import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.file.TArchiveDetector;
+import de.schlichtherle.truezip.fs.FsCompositeDriver;
+import de.schlichtherle.truezip.fs.FsEntryName;
+import de.schlichtherle.truezip.fs.FsInputOption;
+import de.schlichtherle.truezip.fs.FsManager;
+import de.schlichtherle.truezip.fs.FsMountPoint;
+import de.schlichtherle.truezip.fs.FsOutputOption;
+import de.schlichtherle.truezip.fs.FsSyncException;
+import de.schlichtherle.truezip.fs.FsUriModifier;
+import static de.schlichtherle.truezip.fs.FsEntryName.*;
+import static de.schlichtherle.truezip.fs.FsManager.*;
+import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
+import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.UriBuilder;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URI;
+import java.nio.file.FileStore;
+import java.nio.file.FileSystem;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.nio.file.WatchService;
+import java.nio.file.attribute.UserPrincipalLookupService;
+import java.util.Set;
+
+/**
+ * @author  Christian Schlichtherle
+ * @version $Id$
+ */
+public final class TFileSystem extends FileSystem {
+
+    private static final FsManager manager = FsManagerLocator.SINGLETON.get();
+    private static final FsCompositeDriver driver = TArchiveDetector.ALL; // new FsDefaultDriver(FsDriverLocator.SINGLETON);
+
+    private final TFileSystemProvider provider;
+    private final FsMountPoint mountPoint;
+
+    TFileSystem(TFileSystemProvider provider, FsMountPoint mountPoint) {
+        if (null == provider || null == mountPoint)
+            throw new NullPointerException();
+        this.provider = provider;
+        this.mountPoint = mountPoint;
+    }
+
+    @Override
+    public TFileSystemProvider provider() {
+        return provider;
+    }
+
+    public FsMountPoint getMountPoint() {
+        return mountPoint;
+    }
+
+    @Override
+    public void close() throws FsSyncException {
+        manager.sync(UMOUNT);
+    }
+
+    @Override
+    public boolean isOpen() {
+        return true;
+    }
+
+    @Override
+    public boolean isReadOnly() {
+        return false;
+    }
+
+    @Override
+    public String getSeparator() {
+        return SEPARATOR;
+    }
+
+    @Override
+    public Iterable<Path> getRootDirectories() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Iterable<FileStore> getFileStores() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Set<String> supportedFileAttributeViews() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public TPath getPath(String first, String... more) {
+        return new TPath(this, FsEntryName.create(
+                toUri(first, more),
+                FsUriModifier.CANONICALIZE));
+    }
+
+    static URI toUri(final String first, final String... more) {
+        final StringBuilder pb = new StringBuilder(first);
+        for (final String m : more)
+            pb      .append(SEPARATOR_CHAR)
+                    .append(m.replace(separatorChar, SEPARATOR_CHAR));
+        return new UriBuilder().path(pb.toString()).toUri();
+    }
+
+    @Override
+    public PathMatcher getPathMatcher(String syntaxAndPattern) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public UserPrincipalLookupService getUserPrincipalLookupService() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public WatchService newWatchService() throws IOException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    InputStream newInputStream( TPath path,
+                                BitField<FsInputOption> options)
+    throws IOException {
+        FsEntryName entryName = path.getEntryName();
+        return manager
+                .getController(mountPoint, driver)
+                .getInputSocket(entryName, options)
+                .newInputStream();
+    }
+
+    OutputStream newOutputStream(   TPath path,
+                                    BitField<FsOutputOption> options,
+                                    Entry template)
+    throws IOException {
+        FsEntryName entryName = path.getEntryName();
+        return manager
+                .getController(mountPoint, driver)
+                .getOutputSocket(entryName, options, template)
+                .newOutputStream();
+    }
+}

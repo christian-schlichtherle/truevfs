@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project    xmlns="http://maven.apache.org/DECORATION/1.0.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://maven.apache.org/DECORATION/1.0.0 http://maven.apache.org/xsd/decoration-1.0.0.xsd">
+    <bannerLeft>
+        <name>TrueZIP</name>
+    </bannerLeft>
+    <bannerRight>
+        <name>Archive files are virtual directories!</name>
+    </bannerRight>
+    <publishDate position="bottom"/>
+    <version position="none"/>
+    <skin>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>truezip-skin</artifactId>
+        <version>2</version>
+    </skin>
+    <body>
+        <links>
+            <item name="The TrueZIP Blog" href="http://truezip.schlichtherle.de"/>
+            <item name="Version Information" href="http://java.net/jira/browse/TRUEZIP#selectedTab=com.atlassian.jira.plugin.system.project:versions-panel"/>
+            <item name="Developer Website" href="http://java.net/projects/truezip"/>
+        </links>
+        <breadcrumbs>
+            <item name="TrueZIP" href="http://truezip.java.net"/>
+            <item name="TrueZIP NIO.2 FSP" href="index.html"/>
+        </breadcrumbs>
+        <menu name="Project Documentation">
+            <item name="About" href="index.html"/>
+        </menu>
+        <menu name="Project Reports" ref="reports" inherit="bottom"/>
+        <menu name="Project Modules" ref="modules" inherit="bottom"/>
+        <menu name="Parent Module" ref="parent" inherit="bottom"/>
+    </body>
+</project>
