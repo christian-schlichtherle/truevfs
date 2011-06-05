@@ -51,7 +51,7 @@
              -->
 
         <!-- This driver provides access to the following URI schemes:
-             file: OS file system.
+             file: platform file system.
              This dependency is already added by the TrueZIP File* module.
              -->
         <!--dependency>

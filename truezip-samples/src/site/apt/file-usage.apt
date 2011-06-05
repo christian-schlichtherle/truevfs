@@ -216,7 +216,7 @@ Committing Unsynchronized Changes To The Contents Of Archive Files
     [[3]] Other definitions of the classes in this package which have been
         loaded by different class loaders.
 
-    [[4]] Other OS processes.
+    [[4]] Other platform processes.
 
     []
 
@@ -471,8 +471,8 @@ Atomicity of File System Operations
     These conditions apply regardless of whether the
     {{{../apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}
     instances are used by different threads or not.
-    In other words, TrueZIP is thread safe as much as you could expect from an
-    OS file system.
+    In other words, TrueZIP is thread safe as much as you could expect from a
+    platform file system.
 
 Miscellaneous
 
@@ -540,7 +540,7 @@ Miscellaneous
     the documented contract of the respective operation.
     This is to protect an application from creating archive entries which cannot
     get encoded and decoded again correctly.
-    For example, the Euro sign (ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬) does not have a representation in the IBM437
+    For example, the Euro sign (ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬) does not have a representation in the IBM437
     character set and hence cannot be used for entries in ordinary ZIP files
     unless TrueZIP's configuration is customized to use another charset.
 

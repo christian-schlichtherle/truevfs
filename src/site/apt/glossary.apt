@@ -17,9 +17,9 @@ Glossary
         A persistent container for file and directory objects which can be used
         in order to structure, store and retrieve arbitrary data.
 
-    [OS File System]
-        Normally, the operating system provides an application with the means
-        to access a set of one or more file system types like NTFS or ext4.
+    [Platform File System]
+        Normally, the JVM provides an application with the means to access a
+        set of one or more operating system file system types like NTFS or ext4.
         This includes network file system types like CIFS or NFS.
 
     [Virtual File System]
