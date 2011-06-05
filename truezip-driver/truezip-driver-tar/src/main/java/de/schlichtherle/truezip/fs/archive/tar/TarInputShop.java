@@ -248,10 +248,8 @@ implements InputShop<TarArchiveEntry> {
     }
 
     private void close0() throws IOException {
-        final Collection<TarArchiveEntry> values = entries.values();
-        for (final Iterator<TarArchiveEntry> i = values.iterator(); i.hasNext(); i.remove()) {
-            final TarArchiveEntry entry = i.next();
-            entry.release();
-        }
+        Collection<TarArchiveEntry> values = entries.values();
+        for (Iterator<TarArchiveEntry> i = values.iterator(); i.hasNext(); i.remove())
+            i.next().release();
     }
 }

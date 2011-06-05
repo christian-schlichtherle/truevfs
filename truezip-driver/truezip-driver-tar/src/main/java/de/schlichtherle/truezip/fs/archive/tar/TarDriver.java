@@ -21,9 +21,9 @@ import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsEntryName;
+import de.schlichtherle.truezip.fs.FsInputOption;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.FsOutputOption;
-import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriver;
 import de.schlichtherle.truezip.fs.archive.FsMultiplexedArchiveOutputShop;
 import de.schlichtherle.truezip.socket.IOPool;
@@ -74,6 +74,19 @@ public class TarDriver extends FsCharsetArchiveDriver<TarArchiveEntry> {
     }
 
     /**
+     * Clears {@link FsInputOption#CACHE} in {@code options} before
+     * forwarding the call to {@code controller}.
+     */
+    @Override
+    public InputSocket<?> getInputSocket(   FsController<?> controller,
+                                            FsEntryName name,
+                                            BitField<FsInputOption> options) {
+        return controller.getInputSocket(
+                name,
+                options.clear(FsInputOption.CACHE));
+    }
+
+    /**
      * Sets {@link FsOutputOption#COMPRESS} in {@code options} before
      * forwarding the call to {@code controller}.
      */
@@ -82,7 +95,10 @@ public class TarDriver extends FsCharsetArchiveDriver<TarArchiveEntry> {
                                             FsEntryName name,
                                             BitField<FsOutputOption> options,
                                             @CheckForNull Entry template) {
-        return controller.getOutputSocket(name, options.set(COMPRESS), template);
+        return controller.getOutputSocket(
+                name,
+                options.set(FsOutputOption.COMPRESS),
+                template);
     }
 
     @Override
@@ -118,8 +134,8 @@ public class TarDriver extends FsCharsetArchiveDriver<TarArchiveEntry> {
     /**
      * {@inheritDoc}
      * <p>
-     * The implementation in the class {@link TarDriver} acquires a read only
-     * file from the given socket and forwards the call to
+     * The implementation in the class {@link TarDriver} acquires an input
+     * stream from the given socket and forwards the call to
      * {@link #newTarInputShop}.
      */
     @Override
@@ -141,8 +157,10 @@ public class TarDriver extends FsCharsetArchiveDriver<TarArchiveEntry> {
     /**
      * {@inheritDoc}
      * <p>
-     * This implementation forwards the call to {@link #newTarOutputShop}
-     * and wraps the result in a new {@link FsMultiplexedArchiveOutputShop}.
+     * The implementation in the class {@link TarDriver} acquires an output
+     * stream from the given socket, forwards the call to
+     * {@link #newTarOutputShop} and wraps the result in a new
+     * {@link FsMultiplexedArchiveOutputShop}.
      */
     @Override
     public OutputShop<TarArchiveEntry> newOutputShop(
