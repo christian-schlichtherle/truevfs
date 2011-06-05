@@ -909,8 +909,8 @@ public abstract class TFileTestSuite {
 
     private void assertCopyDelete0(TFile a, TFile b) throws IOException {
         // This must be the granularity of the tested file system type PLUS
-        // the granularity of the parent file system, i.e. the OS file system!
-        // Note that older OS file systems and even ext4 (!) have a granularity
+        // the granularity of the parent file system, i.e. the platform file system!
+        // Note that older platform file systems and even ext4 (!) have a granularity
         // of two seconds.
         // Plus the worst case of another two seconds for ZIP files results in
         // four seconds!

@@ -160,7 +160,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  * the corresponding file or directory as a <i>prospective archive file</i>.
  * The word &quot;prospective&quot; suggests that just because a file is named
  * <i>archive.zip</i> it isn't necessarily a valid ZIP file.
- * In fact, it could be anything, even a plain directory in the OS file system!
+ * In fact, it could be anything, even a plain directory in the platform file system!
  * <p>
  * Such an invalid archive file is called a <i>false positive</i> archive file.
  * TrueZIP correctly identifies all types of false positive archive files by
@@ -1238,7 +1238,7 @@ public final class TFile extends File {
      * By default, the value of this class property is {@code true}!
      * <p>
      * Consider the following path: {@code a/outer.zip/b/inner.zip/c}.
-     * Now let's assume that {@code a} exists as a plain directory in the OS
+     * Now let's assume that {@code a} exists as a plain directory in the platform
      * file system, while all other parts of this path don't, and that the
      * module TrueZIP Driver ZIP is present on the run-time class path in order
      * to recognize {@code outer.zip} and {@code inner.zip} as ZIP files by
@@ -1252,7 +1252,7 @@ public final class TFile extends File {
      * More formally, before an application could access an entry in a
      * federated file system, all its parent directories would need to exist,
      * including archive files.
-     * This emulates the behaviour of any OS file system type.
+     * This emulates the behaviour of any platform file system type.
      * <p>
      * If this class property is set to {@code true} however, then any missing
      * parent directories (including archive files) up to the outermost archive
@@ -1266,7 +1266,7 @@ public final class TFile extends File {
      * <p>
      * Note that in either case the parent directory of the outermost archive
      * file {@code a} must exist - TrueZIP does not automatically create
-     * directories in the OS file system!
+     * directories in the platform file system!
      *
      * @param lenient the value of the class property {@code lenient}.
      * @see   #isLenient()
@@ -1838,7 +1838,7 @@ public final class TFile extends File {
      * A top level archive is not enclosed in another archive.
      * If this does not return {@code null}, this denotes the longest
      * part of the path which actually may (but does not need to) exist
-     * as a plain file in the OS file system.
+     * as a plain file in the platform file system.
      */
     public TFile getTopLevelArchive() {
         final TFile enclArchive = this.enclArchive;

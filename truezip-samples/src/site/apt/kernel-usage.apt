@@ -27,7 +27,7 @@ TrueZIP Kernel versus TrueZIP File*
         system drivers which are available on the class path at run-time.
 
     * If the type of the top level file system your application needs to
-        access is not an OS file system (adressed by the "file" scheme),
+        access is not a platform file system (adressed by the "file" scheme),
         but any other file system type, e.g. a web service
         (adressed by the "http" scheme).
 
