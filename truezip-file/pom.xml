@@ -59,7 +59,8 @@
         <profile>
             <id>truezip-driver-file</id>
             <activation>
-                <jdk>(,1.7)</jdk>
+                <!--jdk>(,1.7)</jdk-->
+                <jdk>[1.6,)</jdk>
             </activation>
             <dependencies>
                 <!-- The file system driver for the file scheme in JSE 6.
@@ -82,10 +83,10 @@
                      Without this run-time dependency an application couldn't
                      resolve the file scheme in URIs like
                      "zip:file:/archive.zip!/entry" etc. -->
-                <dependency>
+                <!--dependency>
                     <groupId>${project.groupId}</groupId>
                     <artifactId>truezip-driver-file-jse7</artifactId>
-                </dependency>
+                </dependency-->
             </dependencies>
         </profile>
     </profiles>
