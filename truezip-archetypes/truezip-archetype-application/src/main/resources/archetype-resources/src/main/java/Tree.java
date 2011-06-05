@@ -21,6 +21,7 @@ package ${package};
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import java.io.PrintStream;
+import java.util.Arrays;
 
 /**
  * This command line utility prints the tree graph of the directory structure
@@ -70,6 +71,7 @@ public class Tree extends Application<RuntimeException> {
                         ? LAST_PADDING
                         : DEFAULT_PADDING;
             final TFile[] entries = file.listFiles();
+            Arrays.sort(entries);
             final int l = entries.length - 1;
             if (0 <= l) {
                 int i = 0;
