@@ -58,6 +58,7 @@ public interface Pool<R, E extends Exception> {
     /**
      * This interface is designed to be used with Pools which enable their
      * resources to release itself.
+     * TODO for TrueZIP 8: This should be named "Resource".
      */
     interface Releasable<E extends Exception> {
 
