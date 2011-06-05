@@ -86,23 +86,46 @@ public abstract class TApplication<E extends Exception> {
      * Its task is to configure the default behavior of the TrueZIP File* API
      * in order to answer the following questions:
      * <ul>
-     * <li>What are the file suffixes which shall be recognized as archive
+     * <li>Which file suffixes shall get detected to indicate archive
      *     files and hence as virtual directories?
+     * <li>Which kind of temporary buffers shall get used?
      * <li>Shall missing archive files and directory entries get automatically
      *     created whenever required?
      * </ul>
      * <p>
-     * Alternatively, the setup phase may get run in a sub class constructor.
-     * This would ensure it's run exactly only once and not on every call to
-     * {@link #run}.
+     * Note that the method body of the implementation in the class
+     * {@link TApplication} is empty!
+     * This means that the initial setup is not changed.
+     * The initial setup is determined by loading service classes from the
+     * class path and applying reasonable defaults if nothing is found.
      * <p>
-     * The implementation in the class {@link TApplication} does nothing!
+     * As an alternative to overriding this method, the setup may get changed
+     * in a sub class constructor.
+     * This would ensure it's changed exactly only once and not on every call
+     * to {@link #run}.
      * 
      * <h3>Examples</h3>
      * <p>
-     * Mind that using any of the following code might require to edit the
-     * file {@code pom.xml} so that the respective modules get added to the
-     * compile time class path, too.
+     * As the most simple use case, a client application might want to filter
+     * the initial setup for the archive file suffixes it wants to detect.
+     * This is done as follows:
+     * <pre><code>
+     * TFile.setDefaultArchiveDetector(
+     *         new TArchiveDetector("ear|jar|war"));
+     * </code></pre>
+     * <p>
+     * This will filter all file system drivers found on the class path in the
+     * initial setup so that only files with the pattern <code>*.ear</code>,
+     * <code>*.jar</code> or <code>*.war</code> (case ignoring) are detected
+     * as prospective archive files.
+     * If no file system driver is present for a named suffix in the initial
+     * setup, an {@link IllegalArgumentException} is thrown.
+     * <p>
+     * The beauty of this simple example is that it does not require to change
+     * the compile time class path.
+     * For more advanced examples however, the file {@code pom.xml} needs to
+     * get edited so that the respective modules get added to the compile time
+     * class path.
      * <p>
      * The constructors of the {@link TFile} class use the
      * {@link TArchiveDetector} class to scan a path name for suffixes of
