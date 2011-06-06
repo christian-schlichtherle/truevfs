@@ -15,8 +15,9 @@
  */
 package de.schlichtherle.truezip.nio.fsp;
 
-import de.schlichtherle.truezip.file.TArchiveDetector;
+import de.schlichtherle.truezip.fs.archive.FsArchiveDetector;
 import de.schlichtherle.truezip.fs.FsMountPoint;
+import static de.schlichtherle.truezip.fs.FsUriModifier.*;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
 import static de.schlichtherle.truezip.nio.fsp.TFileSystemProvider.Parameter.*;
 import java.net.URI;
@@ -36,15 +37,18 @@ import org.junit.Test;
 public class TFileSystemProviderTest {
 
     private static final FsMountPoint
-            CURRENT_DIRECTORY = FsMountPoint.create(Paths.get("").toUri());
+            ROOT_DIRECTORY = FsMountPoint.create(TFileSystemProvider.fix(Paths.get("/").toUri()));
+    private static final FsMountPoint
+            CURRENT_DIRECTORY = FsMountPoint.create(TFileSystemProvider.fix(Paths.get("").toUri()));
+    private static final String[] NO_MORE = new String[0];
 
     private Map<String, Object> environment;
     private TFileSystemProvider provider;
     
     @Before
     public void setUp() throws Exception {
-        final TArchiveDetector
-                detector = new TArchiveDetector("mok", new MockArchiveDriver());
+        final FsArchiveDetector
+                detector = new FsArchiveDetector("mok", new MockArchiveDriver());
         environment = new HashMap<>();
         environment.put(ARCHIVE_DETECTOR, detector);
         provider = TFileSystemProvider.File.class.newInstance();
@@ -54,20 +58,51 @@ public class TFileSystemProviderTest {
     public void testNewFileSystemFromPath() {
         for (final Object[] params : new Object[][] {
             // $first, $more, $mountPoint
-            //{ "foo.mok", new String[0], "mok:" + CURRENT_DIRECTORY + "foo.mok!/" },
-            { "foo", new String[0], null },
+            { "foo.mok", new String[] { "x", "bar.mok", "y" }, "mok:mok:" + CURRENT_DIRECTORY + "foo.mok!/x/bar.mok!/" },
+            { "foo.mok", new String[] { "bar.mok" }, "mok:mok:" + CURRENT_DIRECTORY + "foo.mok!/bar.mok!/" },
+            { "foo.mok", new String[] { "x" }, "mok:" + CURRENT_DIRECTORY + "foo.mok!/" },
+            { "foo.mok", NO_MORE, "mok:" + CURRENT_DIRECTORY + "foo.mok!/" },
+            { "foo", new String[] { "x" }, null },
+            { "foo", NO_MORE, null },
         }) {
-            Path path = Paths.get(params[0].toString(), (String[]) params[1]);
-            FsMountPoint mp = null == params[2]
+            final Path path = Paths.get(params[0].toString(), (String[]) params[1]);
+            final FsMountPoint mountPoint = null == params[2]
                     ? null
-                    : FsMountPoint.create(URI.create(params[2].toString()));
+                    : FsMountPoint.create(URI.create(params[2].toString()), CANONICALIZE);
             try {
-                TFileSystem fs = provider.newFileSystem(path, environment);
-                if (null == mp)
+                final TFileSystem fs = provider.newFileSystem(path, environment);
+                if (null == mountPoint)
                     fail();
-                assertThat(fs.getMountPoint(), is(mp));
+                assertThat(fs.getMountPoint(), is(mountPoint));
             } catch (UnsupportedOperationException ex) {
-                if (null != mp)
+                if (null != mountPoint)
+                    throw ex;
+            }
+        }
+    }
+
+    @Test
+    public void testNewFileSystemFromUri() {
+        for (final String[] params : new String[][] {
+            // $uri, $mountPoint
+            { provider.getScheme() + ":/foo.mok/x/bar.mok/y", "mok:mok:" + ROOT_DIRECTORY + "foo.mok!/x/bar.mok!/" },
+            { provider.getScheme() + ":/foo.mok/bar.mok", "mok:mok:" + ROOT_DIRECTORY + "foo.mok!/bar.mok!/" },
+            { provider.getScheme() + ":/foo.mok/x", "mok:" + ROOT_DIRECTORY + "foo.mok!/" },
+            { provider.getScheme() + ":/foo.mok", "mok:" + ROOT_DIRECTORY + "foo.mok!/" },
+            { provider.getScheme() + ":/foo/x", ROOT_DIRECTORY.toString() },
+            { provider.getScheme() + ":/foo", ROOT_DIRECTORY.toString() },
+        }) {
+            final URI uri = URI.create(params[0]);
+            final FsMountPoint mountPoint = null == params[1]
+                    ? null
+                    : FsMountPoint.create(URI.create(params[1]));
+            try {
+                final TFileSystem fs = provider.newFileSystem(uri, environment);
+                if (null == mountPoint)
+                    fail();
+                assertThat(fs.getMountPoint(), is(mountPoint));
+            } catch (UnsupportedOperationException ex) {
+                if (null != mountPoint)
                     throw ex;
             }
         }

@@ -16,26 +16,31 @@
 package de.schlichtherle.truezip.nio.fsp;
 
 import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.file.TFile;
+import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import de.schlichtherle.truezip.fs.FsInputOption;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.fs.FsPath;
+import de.schlichtherle.truezip.socket.InputSocket;
+import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
+import java.nio.file.DirectoryStream;
+import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.WatchEvent.Kind;
 import java.nio.file.WatchEvent.Modifier;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.nio.file.attribute.FileAttribute;
 import java.util.Iterator;
 import net.jcip.annotations.Immutable;
 
@@ -51,13 +56,13 @@ import net.jcip.annotations.Immutable;
 public final class TPath implements Path {
 
     private final TFileSystem fileSystem;
-    private final FsEntryName entryName;
+    private final FsEntryName name;
 
     TPath(final TFileSystem fileSystem, final FsEntryName entryName) {
         if (null == fileSystem || null == entryName)
             throw new NullPointerException();
         this.fileSystem = fileSystem;
-        this.entryName = entryName;
+        this.name = entryName;
 
         assert invariants();
     }
@@ -88,8 +93,8 @@ public final class TPath implements Path {
         return fileSystem;
     }
 
-    public FsEntryName getEntryName() {
-        return entryName;
+    FsEntryName getEntryName() {
+        return name;
     }
 
     @Override
@@ -136,11 +141,11 @@ public final class TPath implements Path {
 
     @Override
     public boolean startsWith(String other) {
-        final String entryName = this.getEntryName().toString();
+        final String name = this.getEntryName().toString();
         final int ol = other.length();
-        return entryName.startsWith(other)
-                && (entryName.length() == ol
-                    || entryName.charAt(ol) == SEPARATOR_CHAR);
+        return name.startsWith(other)
+                && (name.length() == ol
+                    || name.charAt(ol) == SEPARATOR_CHAR);
     }
 
     @Override
@@ -152,11 +157,11 @@ public final class TPath implements Path {
 
     @Override
     public boolean endsWith(String other) {
-        final String entryName = this.getEntryName().toString();
+        final String name = this.getEntryName().toString();
         final int ol = other.length(), tl;
-        return entryName.endsWith(other)
-                && ((tl = entryName.length()) == ol
-                    || entryName.charAt(tl - ol) == SEPARATOR_CHAR);
+        return name.endsWith(other)
+                && ((tl = name.length()) == ol
+                    || name.charAt(tl - ol) == SEPARATOR_CHAR);
     }
 
     @Override
@@ -190,11 +195,14 @@ public final class TPath implements Path {
     }
 
     @Override
-    public TFile toFile() {
-        return new TFile(toFsPath());
+    public File toFile() {
+        throw new UnsupportedOperationException();
     }
+    /*public TFile toFile() {
+        return new TFile(toFsPath());
+    }*/
 
-    public FsPath toFsPath() {
+    FsPath toFsPath() {
         return new FsPath(getFileSystem().getMountPoint(), getEntryName());
     }
 
@@ -263,13 +271,29 @@ public final class TPath implements Path {
         return getEntryName().toString();
     }
 
-    InputStream newInputStream(BitField<FsInputOption> options)
-    throws IOException {
-        return getFileSystem().newInputStream(this, options);
+    FsEntry getEntry() throws IOException {
+        return getFileSystem().getEntry(this);
     }
 
-    OutputStream newOutputStream(BitField<FsOutputOption> options, Entry template)
+    InputSocket<?> getInputSocket(BitField<FsInputOption> options) {
+        return getFileSystem().getInputSocket(this, options);
+    }
+
+    OutputSocket<?> getOutputSocket(BitField<FsOutputOption> options,
+                                    @CheckForNull Entry template) {
+        return getFileSystem().getOutputSocket(this, options, template);
+    }
+
+    DirectoryStream<Path> newDirectoryStream(Filter<? super Path> filter)
     throws IOException {
-        return getFileSystem().newOutputStream(this, options, template);
+        return getFileSystem().newDirectoryStream(this, filter);
+    }
+
+    void createDirectory(FileAttribute<?>... attrs) throws IOException {
+        getFileSystem().createDirectory(this, attrs);
+    }
+
+    void delete() throws IOException {
+        getFileSystem().delete(this);
     }
 }
