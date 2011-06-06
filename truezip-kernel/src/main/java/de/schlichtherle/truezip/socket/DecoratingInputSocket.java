@@ -19,6 +19,7 @@ import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.channels.SeekableByteChannel;
 
 /**
  * An abstract decorator for an input socket.
@@ -56,6 +57,14 @@ extends InputSocket<E> {
     @Override
     public Entry getPeerTarget() throws IOException {
         return getBoundSocket().getPeerTarget();
+    }
+
+    /**
+     * @since  TrueZIP 7.2
+     */
+    @Override
+    public SeekableByteChannel newSeekableByteChannel() throws IOException {
+        return getBoundSocket().newSeekableByteChannel();
     }
 
     @Override
