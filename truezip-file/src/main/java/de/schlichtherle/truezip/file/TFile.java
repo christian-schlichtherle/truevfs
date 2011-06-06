@@ -339,9 +339,9 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  *     For regular directories on Windows/NTFS for example, the return value
  *     would be {@code 0}.
  * <li>This example assumes that the TrueZIP Driver ZIP module is
- *     present on the run-time class path.</li>
- * <li>This example assumes that the TrueZIP Driver TZP (ZIP.RAES) module is
- *     present on the run-time class path.</li>
+ *     present on the run time class path.</li>
+ * <li>This example assumes that the TrueZIP Driver ZIP.RAES (TZP) module is
+ *     present on the run time class path.</li>
  * <li>The methods behave exactly the same for both <i>archive.zip</i> and
  *    <i>archive.tzp</i> with one exception: If the key for a RAES encrypted
  *    ZIP file remains unknown (e.g. because the user cancelled password
