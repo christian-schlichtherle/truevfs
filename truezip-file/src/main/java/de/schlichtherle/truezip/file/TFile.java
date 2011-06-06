@@ -335,7 +335,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  * <li>{@link #length} always returns {@code 0} if the path denotes a
  *     valid archive file.
  *     Otherwise, the return value of {@code length()} depends on the
- *     platform and file system, which is indicated by <i>{@code ?}</i>.
+ *     platform file system, which is indicated by <i>{@code ?}</i>.
  *     For regular directories on Windows/NTFS for example, the return value
  *     would be {@code 0}.
  * <li>This example assumes that the TrueZIP Driver ZIP module is
