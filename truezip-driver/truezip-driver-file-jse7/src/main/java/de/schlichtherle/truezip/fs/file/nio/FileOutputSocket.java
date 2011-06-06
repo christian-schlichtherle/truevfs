@@ -15,11 +15,15 @@
  */
 package de.schlichtherle.truezip.fs.file.nio;
 
+import java.nio.file.OpenOption;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.fs.FsOutputOption;
-import de.schlichtherle.truezip.socket.IOPool;
+import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
 import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
@@ -27,6 +31,7 @@ import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.channels.SeekableByteChannel;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import static java.nio.file.Files.*;
@@ -52,10 +57,14 @@ import static de.schlichtherle.truezip.entry.Entry.*;
 @DefaultAnnotation(NonNull.class)
 final class FileOutputSocket extends OutputSocket<FileEntry> {
 
+    private static final int
+            INITIAL_CAPACITY = FsOutputOption.values().length * 4 / 3;
     private static final StandardOpenOption[] 
-            NO_STANDARD_OPEN_OPTION = { };
-    private static final StandardOpenOption[]
-            APPEND_STANDARD_OPEN_OPTION = { StandardOpenOption.APPEND };
+            WRITE_STANDARD_OPEN_OPTION = {
+                StandardOpenOption.WRITE,
+                StandardOpenOption.TRUNCATE_EXISTING,
+                StandardOpenOption.CREATE,
+            };
 
     private final               FileEntry                entry;
     private final               BitField<FsOutputOption> options;
@@ -76,19 +85,17 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
         return entry;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
-    public OutputStream newOutputStream() throws IOException {
+    public SeekableByteChannel newSeekableByteChannel() throws IOException {
         final Path entryFile = entry.getPath();
-        if (options.get(EXCLUSIVE) && exists(entryFile))
-            throw new IOException(entryFile + " (file exists already)"); // this is obviously not atomic
         if (options.get(CREATE_PARENTS))
             createDirectories(entryFile.getParent());
         FileAlreadyExistsException exists = null;
         if (options.get(CACHE)) {
             try {
                 createFile(entryFile);
+                if (options.get(EXCLUSIVE))
+                    throw new IOException(entryFile + " (file exists already)"); // this is obviously not atomic
             } catch (FileAlreadyExistsException ex) {
                 exists = ex;
             }
@@ -98,14 +105,118 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
                 : entry;
         final Path tempFile = temp.getPath();
 
+        final Set<OpenOption> set = new HashSet<OpenOption>(INITIAL_CAPACITY);
+        Collections.addAll(set, WRITE_STANDARD_OPEN_OPTION);
+        if (options.get(APPEND))
+            set.add(StandardOpenOption.APPEND);
+        if (options.get(EXCLUSIVE))
+            set.add(StandardOpenOption.CREATE_NEW);
+
+        class SeekableByteChannel extends DecoratingSeekableByteChannel {
+            boolean closed;
+
+            SeekableByteChannel() throws IOException {
+                super(newByteChannel(tempFile, set));
+            }
+
+            @Override
+            public void close() throws IOException {
+                if (closed)
+                    return;
+                closed = true;
+                try {
+                    delegate.close();
+                } finally {
+                    IOException ex = null;
+                    try {
+                        if (temp != entry) {
+                            try {
+                                try {
+                                    move(tempFile, entryFile,
+                                            StandardCopyOption.REPLACE_EXISTING);
+                                } catch (IOException ex2) {
+                                    Files.copy(tempFile, entryFile,
+                                            StandardCopyOption.REPLACE_EXISTING);
+                                }
+                            } catch (IOException ex2) {
+                                throw ex = ex2;
+                            } finally {
+                                try {
+                                    temp.release();
+                                } catch (IOException ex2) {
+                                    throw (IOException) ex2.initCause(ex);
+                                }
+                            }
+                        }
+                    } finally {
+                        final Entry template = FileOutputSocket.this.template;
+                        if (null != template) {
+                            try {
+                                getFileAttributeView(entryFile, BasicFileAttributeView.class)
+                                        .setTimes(  getFileTime(template, WRITE),
+                                                    getFileTime(template, READ),
+                                                    getFileTime(template, CREATE));
+                            } catch (IOException ex2) {
+                                throw (IOException) ex2.initCause(ex);
+                            }
+                        }
+                    }
+                }
+            }
+        } // class OutputStream
+
+        try {
+            if (temp != entry && options.get(APPEND))
+                IOSocket.copy(  entry.getInputSocket(),
+                                temp.getOutputSocket());
+            return new SeekableByteChannel();
+        } catch (IOException cause) {
+            if (temp != entry) {
+                try {
+                    temp.release();
+                } catch (IOException ex) {
+                    throw (IOException) ex.initCause(cause);
+                }
+            }
+            throw cause;
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
+    public OutputStream newOutputStream() throws IOException {
+        final Path entryFile = entry.getPath();
+        if (options.get(CREATE_PARENTS))
+            createDirectories(entryFile.getParent());
+        FileAlreadyExistsException exists = null;
+        if (options.get(CACHE)) {
+            try {
+                createFile(entryFile);
+                if (options.get(EXCLUSIVE))
+                    throw new IOException(entryFile + " (file exists already)"); // this is obviously not atomic
+            } catch (FileAlreadyExistsException ex) {
+                exists = ex;
+            }
+        }
+        final FileEntry temp = null != exists
+                ? entry.createTempFile()
+                : entry;
+        final Path tempFile = temp.getPath();
+
+        final Set<OpenOption> set = new HashSet<OpenOption>(INITIAL_CAPACITY);
+        Collections.addAll(set, WRITE_STANDARD_OPEN_OPTION);
+        if (options.get(APPEND))
+            set.add(StandardOpenOption.APPEND);
+        if (options.get(EXCLUSIVE))
+            set.add(StandardOpenOption.CREATE_NEW);
+
         class OutputStream extends DecoratingOutputStream {
             boolean closed;
 
             OutputStream() throws IOException {
                 super(newOutputStream(tempFile,
-                        options.get(APPEND)
-                            ? APPEND_STANDARD_OPEN_OPTION
-                            : NO_STANDARD_OPEN_OPTION));
+                        set.toArray(new StandardOpenOption[set.size()])));
             }
 
             @Override
@@ -162,7 +273,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
         } catch (IOException cause) {
             if (temp != entry) {
                 try {
-                    ((IOPool.Entry<FileEntry>) temp).release();
+                    temp.release();
                 } catch (IOException ex) {
                     throw (IOException) ex.initCause(cause);
                 }

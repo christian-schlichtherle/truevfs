@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.file.nio;
 
+import de.schlichtherle.truezip.io.NIO2;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsModel;

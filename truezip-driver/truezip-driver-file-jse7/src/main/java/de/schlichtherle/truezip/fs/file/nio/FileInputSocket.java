@@ -22,6 +22,7 @@ import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.channels.SeekableByteChannel;
 import static java.nio.file.Files.*;
 import net.jcip.annotations.ThreadSafe;
 
@@ -46,6 +47,11 @@ final class FileInputSocket extends InputSocket<FileEntry> {
     @Override
     public FileEntry getLocalTarget() {
         return entry;
+    }
+
+    @Override
+    public SeekableByteChannel newSeekableByteChannel() throws IOException {
+        return newByteChannel(entry.getPath());
     }
 
     @Override

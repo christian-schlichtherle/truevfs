@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.file.nio;
 
+import de.schlichtherle.truezip.io.NIO2;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.spi.IOPoolService;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;

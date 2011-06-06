@@ -23,6 +23,7 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.channels.SeekableByteChannel;
 import net.jcip.annotations.NotThreadSafe;
 
 /**
@@ -93,6 +94,15 @@ extends IOSocket<E, Entry> {
                 newPeer.connect(this);
         }
         return this;
+    }
+
+    /**
+     * @throws UnsupportedOperationException if this operation is not supported
+     *         by the implementation.
+     * @since  TrueZIP 7.2
+     */
+    public SeekableByteChannel newSeekableByteChannel() throws IOException {
+        throw new UnsupportedOperationException();
     }
 
     /**

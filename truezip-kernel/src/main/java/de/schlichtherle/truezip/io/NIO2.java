@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.fs.file.nio;
+package de.schlichtherle.truezip.io;
 
 import java.nio.file.Files;
 
@@ -24,13 +24,13 @@ import java.nio.file.Files;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class NIO2 {
+public final class NIO2 {
 
     /**
      * {@code true} if and only if the class {@link Files} is available to
      * the JRE.
      */
-    static final boolean AVAILABLE;
+    public static final boolean AVAILABLE;
     static {
         boolean available;
         try {
@@ -42,6 +42,6 @@ final class NIO2 {
         AVAILABLE = available;
     }
 
-    private NIO2() {
+    private NIO2() { // make lint shut up!
     }
 }

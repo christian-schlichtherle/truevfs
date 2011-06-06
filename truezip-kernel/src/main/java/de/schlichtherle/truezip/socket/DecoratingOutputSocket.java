@@ -19,6 +19,7 @@ import de.schlichtherle.truezip.entry.Entry;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.channels.SeekableByteChannel;
 
 /**
  * An abstract decorator for an output socket.
@@ -57,6 +58,14 @@ extends OutputSocket<E> {
     @Override
     public Entry getPeerTarget() throws IOException {
         return getBoundSocket().getPeerTarget();
+    }
+
+    /**
+     * @since  TrueZIP 7.2
+     */
+    @Override
+    public SeekableByteChannel newSeekableByteChannel() throws IOException {
+        return getBoundSocket().newSeekableByteChannel();
     }
 
     @Override
