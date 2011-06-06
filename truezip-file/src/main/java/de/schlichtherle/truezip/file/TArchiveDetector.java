@@ -18,32 +18,24 @@ package de.schlichtherle.truezip.file;
 import de.schlichtherle.truezip.fs.FsCompositeDriver;
 import de.schlichtherle.truezip.fs.sl.FsDriverLocator;
 import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.util.SuffixSet;
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsDriverProvider;
 import de.schlichtherle.truezip.fs.FsModel;
-import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.fs.FsScheme;
+import de.schlichtherle.truezip.fs.archive.FsArchiveDetector;
 import de.schlichtherle.truezip.fs.spi.FsDriverService;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
-import java.util.ServiceConfigurationError;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import net.jcip.annotations.Immutable;
-import net.jcip.annotations.ThreadSafe;
 
 /**
- * Detects a <em>prospective</em> archive file by matching its path name
+ * Detects <em>prospective</em> archive files by matching their path name
  * against a pattern of file name suffixes like <i>.zip</i> et al
- * and looks up its corresponding file system driver by using a file system
+ * and looks up their corresponding file system driver by using a file system
  * driver provider.
  * <p>
  * There are basically two types of constructors available in this class:
@@ -98,20 +90,7 @@ implements FsCompositeDriver, FsDriverProvider {
     public static final TArchiveDetector
             ALL = new TArchiveDetector(null);
 
-    private final Map<FsScheme, FsDriver> drivers;
-
-    /**
-     * The canonical string respresentation of the set of suffixes recognized
-     * by this archive detector.
-     * This set is used to filter the registered archive file suffixes in
-     * {@link #drivers}.
-     */
-    private final String suffixes;
-
-    /**
-     * The thread local matcher used to match archive file suffixes.
-     */
-    private final ThreadLocalMatcher matcher;
+    private final FsArchiveDetector delegate;
 
     /**
      * Equivalent to
@@ -139,40 +118,7 @@ implements FsCompositeDriver, FsDriverProvider {
      */
     public TArchiveDetector(final FsDriverProvider provider,
                             final @CheckForNull String suffixes) {
-        final Map<FsScheme, FsDriver> inDrivers = provider.get();
-        final SuffixSet inSuffixes;
-        final Map<FsScheme, FsDriver> outDrivers;
-        if (null != suffixes) {
-            inSuffixes = new SuffixSet(suffixes);
-            outDrivers = new HashMap<FsScheme, FsDriver>(inDrivers.size() * 4 / 3 + 1);
-        } else {
-            inSuffixes = null;
-            outDrivers = inDrivers;
-        }
-        final SuffixSet outSuffixes = new SuffixSet();
-        for (final Map.Entry<FsScheme, FsDriver> entry : inDrivers.entrySet()) {
-            final FsDriver driver = entry.getValue();
-            if (null == driver)
-                continue;
-            final FsScheme scheme = entry.getKey();
-            final boolean federated = driver.isFederated();
-            if (null != inSuffixes) {
-                final boolean accepted = inSuffixes.contains(scheme.toString());
-                if (!federated || accepted)
-                    outDrivers.put(scheme, driver);
-                if (federated && accepted)
-                    outSuffixes.add(scheme.toString());
-            } else {
-                if (federated)
-                    outSuffixes.add(scheme.toString());
-            }
-        }
-        if (null != inSuffixes && inSuffixes.retainAll(outSuffixes))
-            throw new IllegalArgumentException(
-                    "\"" + inSuffixes + "\" (no archive driver installed for these suffixes)");
-        this.drivers = Collections.unmodifiableMap(outDrivers);
-        this.suffixes = outSuffixes.toString();
-        this.matcher = new ThreadLocalMatcher(outSuffixes.toPattern());
+        delegate = new FsArchiveDetector(provider, suffixes);
     }
 
     /**
@@ -259,38 +205,12 @@ implements FsCompositeDriver, FsDriverProvider {
      */
     public TArchiveDetector(final FsDriverProvider provider,
                             final Map<FsScheme, FsDriver> config) {
-        final Map<FsScheme, FsDriver> inDrivers = provider.get();
-        final Map<FsScheme, FsDriver> 
-                outDrivers = new HashMap<FsScheme, FsDriver>(inDrivers.size() * 4 / 3 + 1);
-        final SuffixSet outSuffixes = new SuffixSet();
-        for (final Map.Entry<FsScheme, FsDriver> entry : inDrivers.entrySet()) {
-            final FsDriver driver = entry.getValue();
-            if (null == driver)
-                continue;
-            final FsScheme scheme = entry.getKey();
-            outDrivers.put(scheme, driver);
-            if (driver.isFederated())
-                outSuffixes.add(scheme.toString());
-        }
-        for (final Map.Entry<FsScheme, FsDriver> entry : config.entrySet()) {
-            final FsScheme scheme = entry.getKey();
-            final FsDriver driver = entry.getValue();
-            if (null != driver) {
-                outDrivers.put(scheme, driver);
-                outSuffixes.add(scheme.toString());
-            } else {
-                outDrivers.remove(scheme);
-                outSuffixes.remove(scheme.toString());
-            }
-        }
-        this.drivers = Collections.unmodifiableMap(outDrivers);
-        this.suffixes = outSuffixes.toString();
-        this.matcher = new ThreadLocalMatcher(outSuffixes.toPattern());
+        delegate = new FsArchiveDetector(provider, config);
     }
 
     @Override
     public Map<FsScheme, FsDriver> get() {
-        return drivers;
+        return delegate.get();
     }
 
     /**
@@ -315,32 +235,14 @@ implements FsCompositeDriver, FsDriverProvider {
      *         unknown.
      */
     public @CheckForNull FsScheme getScheme(String path) {
-        Matcher m = matcher.reset(path);
-        return m.matches()
-                ? FsScheme.create(m.group(1).toLowerCase(Locale.ENGLISH))
-                : null;
+        return delegate.getScheme(path);
     }
 
     @Override
     public FsController<?>
     newController(  final FsModel model,
                     final @CheckForNull FsController<?> parent) {
-        assert null == model.getParent()
-                ? null == parent
-                : model.getParent().equals(parent.getModel());
-        final FsMountPoint mountPoint = model.getMountPoint();
-        final FsScheme declaredScheme = mountPoint.getScheme();
-        final FsPath path = mountPoint.getPath();
-        if (null != path) {
-            final FsScheme detectedScheme = getScheme(path.getEntryName().getPath()); // may be null!
-            if (!declaredScheme.equals(detectedScheme))
-                throw new IllegalArgumentException(mountPoint.toString() + " (declared/detected scheme mismatch)");
-        }
-        final FsDriver driver = drivers.get(declaredScheme);
-        if (null == driver)
-            throw new ServiceConfigurationError(declaredScheme
-                    + " (unknown file system scheme - check run time class path configuration)");
-        return driver.newController(model, parent);
+        return delegate.newController(model, parent);
     }
 
     /**
@@ -358,43 +260,6 @@ implements FsCompositeDriver, FsDriverProvider {
      */
     @Override
     public String toString() {
-        return suffixes;
-    }
-
-    /**
-     * A thread local {@link Matcher}.
-     * This class is intended to be used in multithreaded environments for high
-     * performance pattern matching.
-     *
-     * @see #reset(CharSequence)
-     */
-    @ThreadSafe
-    @DefaultAnnotation(NonNull.class)
-    private static final class ThreadLocalMatcher extends ThreadLocal<Matcher> {
-        private final Pattern pattern;
-
-        /**
-         * Constructs a new thread local matcher by using the given pattern.
-         *
-         * @param  pattern the pattern to be used.
-         */
-        ThreadLocalMatcher(Pattern pattern) {
-            if (null == pattern)
-                throw new NullPointerException();
-            this.pattern = pattern;
-        }
-
-        @Override
-        protected Matcher initialValue() {
-            return pattern.matcher(""); // NOI18N
-        }
-
-        /**
-         * Resets the thread local matcher with the given character sequence and
-         * returns it.
-         */
-        Matcher reset(CharSequence input) {
-            return get().reset(input);
-        }
+        return delegate.toString();
     }
 }
