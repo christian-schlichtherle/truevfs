@@ -59,7 +59,7 @@ public class Tree extends Application<RuntimeException> {
 
     private void graph(final TFile file, final String padding, final String prefix) {
         if (!file.exists())
-            throw new IllegalArgumentException(file.getPath() + " (file or directory does not exist)");
+            throw new IllegalArgumentException(file + " (file or directory does not exist)");
         final PrintStream out = System.out;
         out.print(padding);
         out.print(prefix);
