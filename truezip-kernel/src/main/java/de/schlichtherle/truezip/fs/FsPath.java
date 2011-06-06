@@ -510,6 +510,8 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
      */
     public FsPath
     resolve(final FsEntryName entryName) {
+        if (entryName.isRoot() && null == this.uri.getQuery())
+            return this;
         return new FsPath(
                 this.mountPoint,
                 new FsEntryName(this.entryName, entryName));
