@@ -20,9 +20,11 @@ import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.fs.FsInputOption;
+import static de.schlichtherle.truezip.fs.FsInputOptions.*;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.fs.FsOutputOption;
+import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -47,11 +49,6 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 @DefaultAnnotation(NonNull.class)
 @Immutable
 final class TBIO {
-
-    private static final BitField<FsInputOption>
-            NO_INPUT_OPTIONS = BitField.noneOf(FsInputOption.class);
-    private static final BitField<FsOutputOption>
-            NO_OUTPUT_OPTIONS = BitField.noneOf(FsOutputOption.class);
 
     /** You cannot instantiate this class. */
     private TBIO() {
@@ -226,9 +223,9 @@ final class TBIO {
     private static void
     cp0(final boolean preserve, final File src, final File dst)
     throws IOException {
-        final InputSocket<?> input = getInputSocket(src, NO_INPUT_OPTIONS);
+        final InputSocket<?> input = getInputSocket(src, NO_INPUT_OPTION);
         final OutputSocket<?> output = getOutputSocket(dst,
-                NO_OUTPUT_OPTIONS.set(CREATE_PARENTS, TFile.isLenient()),
+                NO_OUTPUT_OPTION.set(CREATE_PARENTS, TFile.isLenient()),
                 preserve ? input.getLocalTarget() : null);
         IOSocket.copy(input, output);
     }
