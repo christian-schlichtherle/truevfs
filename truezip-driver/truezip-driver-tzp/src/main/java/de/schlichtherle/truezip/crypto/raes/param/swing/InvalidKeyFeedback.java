@@ -22,5 +22,6 @@ package de.schlichtherle.truezip.crypto.raes.param.swing;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@SuppressWarnings("MarkerInterface")
 public interface InvalidKeyFeedback extends Feedback {
 }
