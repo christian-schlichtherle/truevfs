@@ -17,8 +17,7 @@ package de.schlichtherle.truezip.nio.fsp;
 
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Type;
-import de.schlichtherle.truezip.file.TArchiveDetector;
-import de.schlichtherle.truezip.fs.FsCompositeDriver;
+import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
@@ -60,8 +59,8 @@ import java.util.Set;
  */
 public final class TFileSystem extends FileSystem {
 
+    /** The file system manager to use within this package. */
     private static final FsManager manager = FsManagerLocator.SINGLETON.get();
-    private static final FsCompositeDriver driver = TArchiveDetector.ALL; // new FsDefaultDriver(FsDriverLocator.SINGLETON);
 
     private final TFileSystemProvider provider;
     private final FsMountPoint mountPoint;
@@ -264,6 +263,8 @@ public final class TFileSystem extends FileSystem {
         final FsController<?> controller = this.controller;
         return null != controller
                 ? controller
-                : (this.controller = manager.getController(mountPoint, driver));
+                : (this.controller = manager.getController(
+                    mountPoint,
+                    TFile.getDefaultArchiveDetector())); // FIXME: Should use TPath.getArchiveDetector();
     }
 }
