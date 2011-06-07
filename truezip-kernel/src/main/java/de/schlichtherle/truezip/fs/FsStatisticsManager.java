@@ -58,8 +58,8 @@ extends FsDecoratingManager<FsManager> {
                         controller = driver.newController(model, parent);
                 return null != parent && null == parent.getParent() // controller is top level federated file system?
                         ? new FsStatisticsController(
-                            controller,
-                            FsStatisticsManager.this)
+                            FsStatisticsManager.this,
+                            controller)
                         : controller;
             }
         } // class StatisticsDriver

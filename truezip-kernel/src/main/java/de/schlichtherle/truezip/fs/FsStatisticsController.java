@@ -50,8 +50,8 @@ extends FsDecoratingController<FsModel, FsController<?>> {
      * @param manager the statistics file system manager.
      */
     FsStatisticsController(
-            @NonNull FsController<?> controller,
-            @NonNull FsStatisticsManager manager) {
+            @NonNull FsStatisticsManager manager,
+            @NonNull FsController<?> controller) {
         super(controller);
         assert null != manager;
         this.manager = manager;
