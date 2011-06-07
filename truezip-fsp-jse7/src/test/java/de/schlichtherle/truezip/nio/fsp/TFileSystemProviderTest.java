@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.nio.fsp;
 
-import de.schlichtherle.truezip.fs.archive.FsArchiveDetector;
+import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import static de.schlichtherle.truezip.fs.FsUriModifier.*;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
@@ -47,8 +47,8 @@ public class TFileSystemProviderTest {
     
     @Before
     public void setUp() throws Exception {
-        final FsArchiveDetector
-                detector = new FsArchiveDetector("mok", new MockArchiveDriver());
+        final TArchiveDetector
+                detector = new TArchiveDetector("mok", new MockArchiveDriver());
         environment = new HashMap<>();
         environment.put(ARCHIVE_DETECTOR, detector);
         provider = TFileSystemProvider.class.newInstance();

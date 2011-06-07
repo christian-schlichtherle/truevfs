@@ -33,12 +33,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truezip-kernel</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truezip-driver-file-jse7</artifactId>
+            <artifactId>truezip-file</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

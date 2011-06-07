@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.nio.fsp;
 
 import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
@@ -29,7 +30,6 @@ import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.DirectoryStream;
@@ -211,12 +211,9 @@ public final class TPath implements Path {
     }
 
     @Override
-    public File toFile() {
-        throw new UnsupportedOperationException();
-    }
-    /*public TFile toFile() {
+    public TFile toFile() {
         return new TFile(toFsPath());
-    }*/
+    }
 
     FsPath toFsPath() {
         return new FsPath(fileSystem.getMountPoint(), entryName);
