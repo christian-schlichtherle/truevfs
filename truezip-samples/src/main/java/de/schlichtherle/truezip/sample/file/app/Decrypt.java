@@ -16,7 +16,6 @@
 package de.schlichtherle.truezip.sample.file.app;
 
 import de.schlichtherle.truezip.sample.file.RaesFiles;
-import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import java.io.IOException;
 import java.util.ResourceBundle;
@@ -55,8 +54,6 @@ public class Decrypt extends Application {
     throws IllegalUsageException, IOException {
         if (args.length != 2)
             throw new IllegalUsageException(resources.getString("usage"));
-        if (new TFile(args[1]).isEntry())
-            monitor.start();
         RaesFiles.decrypt(args[0], args[1], true);
         return 0;
     }

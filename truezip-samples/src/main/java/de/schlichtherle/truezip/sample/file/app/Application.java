@@ -16,17 +16,12 @@
 package de.schlichtherle.truezip.sample.file.app;
 
 import de.schlichtherle.truezip.crypto.raes.param.swing.HurlingWindowFeedback;
-import de.schlichtherle.truezip.file.TFile;
-import de.schlichtherle.truezip.fs.FsStatistics;
 import de.schlichtherle.truezip.crypto.raes.param.swing.InvalidKeyFeedback;
 import de.schlichtherle.truezip.file.TApplication;
-import de.schlichtherle.truezip.fs.FsSyncException;
-import de.schlichtherle.truezip.fs.spi.FsManagerService;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.text.MessageFormat;
 
 /**
  * Abstract base class for command line utilities.
@@ -42,9 +37,6 @@ abstract class Application extends TApplication<RuntimeException> {
 
     /** The print stream for error output. */
     protected final PrintStream err;
-
-    /** A progress monitor for {@link TFile#umount()}. */
-    protected final ProgressMonitor monitor;
 
     /**
      * Equivalent to
@@ -84,10 +76,6 @@ abstract class Application extends TApplication<RuntimeException> {
         this.err = err instanceof PrintStream
                 ? (PrintStream) err
                 : new PrintStream(err, autoFlush);
-        this.monitor = new ProgressMonitor(this.err);
-        String spec = FsManagerService.class.getName();
-        String impl = SampleManagerService.class.getName();
-        System.setProperty(spec, System.getProperty(spec, impl));
     }
 
     /**
@@ -168,15 +156,6 @@ abstract class Application extends TApplication<RuntimeException> {
      */
     protected abstract int runChecked(String[] args) throws Exception;
 
-    @Override
-    protected void sync() throws FsSyncException {
-        try {
-            TFile.umount();
-        } finally {
-            monitor.shutdown();
-        }
-    }
-
     /** Indicates illegal application parameters. */
     protected static class IllegalUsageException extends Exception {
         private static final long serialVersionUID = 1985623981423542464L;
@@ -185,67 +164,4 @@ abstract class Application extends TApplication<RuntimeException> {
             super(msg);
         }
     } // class IllegalUsageException
-
-    /**
-     * Monitors progress when committing unsynchronized changes to the
-     * contents of archive files.
-     */
-    protected static final class ProgressMonitor extends Thread {
-        private final PrintStream err;
-        private final Long[] args = new Long[2];
-        private final FsStatistics stats;
-
-        private ProgressMonitor(final PrintStream err) {
-            setDaemon(true);
-            setPriority(Thread.MAX_PRIORITY);
-            this.err = err;
-            this.stats = SampleManagerService.manager.getStatistics();
-        }
-
-        @Override
-        public void start() {
-            if (err == System.err || err == System.out)
-                super.start();
-        }
-
-        @Override
-        public void run() {
-            boolean run = false;
-            for (long sleep = 2000; ; sleep = 200, run = true) {
-                try {
-                    Thread.sleep(sleep);
-                } catch (InterruptedException shutdown) {
-                    break;
-                }
-                showProgress();
-            }
-            if (run) {
-                showProgress();
-                err.println();
-            }
-        }
-
-        /**
-         * Prints statistics about the amount of data read and written by
-         * {@link TFile#umount()} on standard output.
-         */
-        private void showProgress() {
-            // Round up to kilobytes.
-            args[0] = (stats.getTopLevelRead() + 1023) / 1024;
-            args[1] = (stats.getTopLevelWritten() + 1023) / 1024;
-            err.print(MessageFormat.format(
-                    "Top level archive I/O: {0}/{1} KB        \r", (Object[]) args));
-            err.flush();
-        }
-
-        @SuppressWarnings("CallToThreadDumpStack")
-        private void shutdown() {
-            interrupt();
-            try {
-                join();
-            } catch (InterruptedException interrupted) {
-                interrupted.printStackTrace();
-            }
-        }
-    } // class ProgressMonitor
 }

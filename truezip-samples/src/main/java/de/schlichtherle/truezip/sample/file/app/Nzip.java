@@ -377,9 +377,6 @@ public class Nzip extends Application {
                 && !dst.isArchive() && !dst.isDirectory()))
             throw new IllegalUsageException();
 
-        if (dst.isArchive() || dst.isEntry())
-            monitor.start();
-
         for (int i = srcI; i < dstI; i++) {
             final TFile src = new TFile(args[i], srcDetector);
             final TFile tmp = dstI - srcI > 1 || dst.isDirectory()
