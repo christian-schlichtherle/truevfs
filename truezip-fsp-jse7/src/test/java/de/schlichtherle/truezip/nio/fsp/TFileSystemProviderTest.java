@@ -37,7 +37,7 @@ import org.junit.Test;
 public class TFileSystemProviderTest {
 
     private static final FsMountPoint
-            ROOT_DIRECTORY = FsMountPoint.create(TFileSystemProvider.fix(Paths.get("/").toUri()));
+            ROOT_DIRECTORY = FsMountPoint.create(URI.create("file:/"));
     private static final FsMountPoint
             CURRENT_DIRECTORY = FsMountPoint.create(TFileSystemProvider.fix(Paths.get("").toUri()));
     private static final String[] NO_MORE = new String[0];
@@ -93,9 +93,7 @@ public class TFileSystemProviderTest {
             { provider.getScheme() + ":/foo", ROOT_DIRECTORY.toString() },
         }) {
             final URI uri = URI.create(params[0]);
-            final FsMountPoint mountPoint = null == params[1]
-                    ? null
-                    : FsMountPoint.create(URI.create(params[1]));
+            final FsMountPoint mountPoint = FsMountPoint.create(URI.create(params[1]));
             try {
                 final TFileSystem fs = provider.newFileSystem(uri, environment);
                 if (null == mountPoint)
