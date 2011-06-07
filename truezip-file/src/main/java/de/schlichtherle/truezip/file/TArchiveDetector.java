@@ -15,15 +15,11 @@
  */
 package de.schlichtherle.truezip.file;
 
-import de.schlichtherle.truezip.fs.FsCompositeDriver;
+import de.schlichtherle.truezip.fs.FsAbstractCompositeDriver;
 import de.schlichtherle.truezip.fs.sl.FsDriverLocator;
-import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.util.SuffixSet;
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsDriverProvider;
-import de.schlichtherle.truezip.fs.FsModel;
-import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.fs.spi.FsDriverService;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -34,7 +30,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.ServiceConfigurationError;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.jcip.annotations.Immutable;
@@ -76,8 +71,7 @@ import net.jcip.annotations.ThreadSafe;
  */
 @Immutable
 @DefaultAnnotation(NonNull.class)
-public final class TArchiveDetector
-implements FsCompositeDriver, FsDriverProvider {
+public final class TArchiveDetector extends FsAbstractCompositeDriver {
 
     /**
      * This instance never recognizes any archive files in a path.
@@ -319,28 +313,6 @@ implements FsCompositeDriver, FsDriverProvider {
         return m.matches()
                 ? FsScheme.create(m.group(1).toLowerCase(Locale.ENGLISH))
                 : null;
-    }
-
-    @Override
-    public FsController<?>
-    newController(  final FsModel model,
-                    final @CheckForNull FsController<?> parent) {
-        assert null == model.getParent()
-                ? null == parent
-                : model.getParent().equals(parent.getModel());
-        final FsMountPoint mountPoint = model.getMountPoint();
-        final FsScheme declaredScheme = mountPoint.getScheme();
-        final FsPath path = mountPoint.getPath();
-        if (null != path) {
-            final FsScheme detectedScheme = getScheme(path.getEntryName().getPath()); // may be null!
-            if (!declaredScheme.equals(detectedScheme))
-                throw new IllegalArgumentException(mountPoint.toString() + " (declared/detected scheme mismatch)");
-        }
-        final FsDriver driver = drivers.get(declaredScheme);
-        if (null == driver)
-            throw new ServiceConfigurationError(declaredScheme
-                    + " (unknown file system scheme - check run time class path configuration)");
-        return driver.newController(model, parent);
     }
 
     /**
