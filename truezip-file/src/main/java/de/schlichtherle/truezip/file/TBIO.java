@@ -286,8 +286,14 @@ final class TBIO {
         }
         final FsPath path = new FsPath(src);
         return TFile.manager
-                .getController(path.getMountPoint(), TFile.getDefaultArchiveDetector())
+                .getController(path.getMountPoint(), getDetector(src))
                 .getInputSocket(path.getEntryName(), options);
+    }
+
+    private static TArchiveDetector getDetector(File file) {
+        return file instanceof TFile
+                ? ((TFile) file).getArchiveDetector()
+                : TFile.getDefaultArchiveDetector();
     }
 
     /**
@@ -315,7 +321,7 @@ final class TBIO {
         }
         final FsPath path = new FsPath(dst);
         return TFile.manager
-                .getController(path.getMountPoint(), TFile.getDefaultArchiveDetector())
+                .getController(path.getMountPoint(), getDetector(dst))
                 .getOutputSocket(path.getEntryName(), options, template);
     }
 }
