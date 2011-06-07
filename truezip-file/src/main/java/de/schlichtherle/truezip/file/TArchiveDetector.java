@@ -41,11 +41,11 @@ import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * Detects a <em>prospective</em> archive file by matching its path name
+ * Detects <em>prospective</em> archive files by matching their path name
  * against a pattern of file name suffixes like <i>.zip</i> et al
- * and looks up its corresponding file system driver by using a file system
+ * and looks up their corresponding file system driver by using a file system
  * driver provider.
- * <p>
+  * <p>
  * There are basically two types of constructors available in this class:
  * <ol>
  * <li>Constructors which filter the drivers of a given file system driver

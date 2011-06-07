@@ -21,7 +21,7 @@ import static de.schlichtherle.truezip.entry.Entry.Size.*;
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsEntry;
-import de.schlichtherle.truezip.fs.archive.FsArchiveDetector;
+import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import de.schlichtherle.truezip.fs.FsInputOption;
@@ -146,9 +146,9 @@ public class TFileSystemProvider extends FileSystemProvider {
     /**
      * {@inheritDoc}
      * 
-     * @param env If {@code null} or does not contain a {@link FsArchiveDetector}
+     * @param env If {@code null} or does not contain a {@link TArchiveDetector}
      *        for the key {@link Parameter#ARCHIVE_DETECTOR}, then
-     *        {@link FsArchiveDetector#ALL} is used to detect prospective
+     *        {@link TArchiveDetector#ALL} is used to detect prospective
      *        archive files.
      */
     @Override
@@ -167,20 +167,20 @@ public class TFileSystemProvider extends FileSystemProvider {
         return newFileSystem(uri, null);
     }
 
-    private static FsArchiveDetector getArchiveDetector(@CheckForNull Map<String, ?> env) {
+    private static TArchiveDetector getArchiveDetector(@CheckForNull Map<String, ?> env) {
         if (null == env)
-            return FsArchiveDetector.ALL;
-        FsArchiveDetector detector = (FsArchiveDetector) env.get(
+            return TArchiveDetector.ALL;
+        TArchiveDetector detector = (TArchiveDetector) env.get(
                 Parameter.ARCHIVE_DETECTOR);
-        return null != detector ? detector : FsArchiveDetector.ALL;
+        return null != detector ? detector : TArchiveDetector.ALL;
     }
 
     private final class Scanner {
-        final FsArchiveDetector detector;
+        final TArchiveDetector detector;
         final Splitter splitter = new Splitter(SEPARATOR_CHAR, false);
         final UriBuilder uri = new UriBuilder();
 
-        Scanner(FsArchiveDetector detector) {
+        Scanner(TArchiveDetector detector) {
             this.detector = detector;
         }
 
@@ -488,7 +488,7 @@ public class TFileSystemProvider extends FileSystemProvider {
 
     /** Keys for environment maps. */
     public interface Parameter {
-        /** The key for the {@link FsArchiveDetector} parameter. */
+        /** The key for the {@link TArchiveDetector} parameter. */
         String ARCHIVE_DETECTOR = "ARCHIVE_DETECTOR";
     }
 }

@@ -17,7 +17,7 @@ package de.schlichtherle.truezip.nio.fsp;
 
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Type;
-import de.schlichtherle.truezip.fs.archive.FsArchiveDetector;
+import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.fs.FsCompositeDriver;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsEntry;
@@ -31,7 +31,6 @@ import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.fs.FsUriModifier;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import static de.schlichtherle.truezip.fs.FsManager.*;
-import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
@@ -62,7 +61,7 @@ import java.util.Set;
 public final class TFileSystem extends FileSystem {
 
     private static final FsManager manager = FsManagerLocator.SINGLETON.get();
-    private static final FsCompositeDriver driver = FsArchiveDetector.ALL; // new FsDefaultDriver(FsDriverLocator.SINGLETON);
+    private static final FsCompositeDriver driver = TArchiveDetector.ALL; // new FsDefaultDriver(FsDriverLocator.SINGLETON);
 
     private final TFileSystemProvider provider;
     private final FsMountPoint mountPoint;
