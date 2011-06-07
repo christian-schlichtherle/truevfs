@@ -56,7 +56,6 @@ import java.nio.file.LinkOption;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -75,21 +74,18 @@ import java.util.Set;
 @DefaultAnnotation(NonNull.class)
 public class TFileSystemProvider extends FileSystemProvider {
 
-    private final FsScheme scheme;
-    private final FsMountPoint mountPoint;
-    //private volatile IOPool<?> pool;
+    private final String scheme;
+    private final FsMountPoint root;
 
     public TFileSystemProvider() {
-        this(   FsScheme.create("tzp"),
-                FsMountPoint.create(fix(Paths.get("/").toUri())));
+        this("tzp", FsMountPoint.create(URI.create("file:/")));
     }
 
-    TFileSystemProvider(final FsScheme scheme,
-                        final FsMountPoint mountPoint) {
-        if (null == scheme || null == mountPoint)
+    TFileSystemProvider(final String scheme, final FsMountPoint root) {
+        if (null == root)
             throw new NullPointerException();
-        this.scheme = scheme;
-        this.mountPoint = mountPoint;
+        this.scheme = FsScheme.create(scheme).toString(); // check syntax
+        this.root = root;
     }
 
     /**
@@ -99,11 +95,11 @@ public class TFileSystemProvider extends FileSystemProvider {
      */
     @Override
     public String getScheme() {
-        return scheme.toString();
+        return scheme;
     }
 
-    public FsMountPoint getMountPoint() {
-        return mountPoint;
+    public FsMountPoint getRoot() {
+        return root;
     }
 
     /**
@@ -127,7 +123,7 @@ public class TFileSystemProvider extends FileSystemProvider {
     public TFileSystem newFileSystem(   final Path path,
                                         final Map<String, ?> env) {
         final URI pnu = fix(path.normalize().toUri());
-        final FsMountPoint fspmp = getMountPoint();
+        final FsMountPoint fspmp = getRoot();
         final URI enu = fspmp.toUri().relativize(pnu);
         if (enu == pnu)
             throw new UnsupportedOperationException("path not relative to mount point");
@@ -197,7 +193,7 @@ public class TFileSystemProvider extends FileSystemProvider {
             final FsEntryName member = FsEntryName.create(
                     uri.path(splitter.getMemberName()).toUri());
             if (null == parent)
-                return new FsPath(getMountPoint(), member);
+                return new FsPath(getRoot(), member);
             FsPath path = scan(parent).resolve(member);
             final FsScheme scheme = detector.getScheme(member.toString());
             if (null != scheme)
