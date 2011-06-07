@@ -15,9 +15,9 @@
  */
 package de.schlichtherle.truezip.fs.file.nio;
 
-import de.schlichtherle.truezip.io.NIO2;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.spi.IOPoolService;
+import de.schlichtherle.truezip.util.JSE7;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.Immutable;
@@ -44,6 +44,6 @@ public final class TempFilePoolService extends IOPoolService {
      */
     @Override
     public int getPriority() {
-        return NIO2.AVAILABLE ? 100 : -100;
+        return JSE7.AVAILABLE ? 100 : -100;
     }
 }

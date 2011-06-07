@@ -15,10 +15,10 @@
  */
 package de.schlichtherle.truezip.fs.file.nio;
 
-import de.schlichtherle.truezip.io.NIO2;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsModel;
+import de.schlichtherle.truezip.util.JSE7;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -53,6 +53,6 @@ public final class FileDriver extends FsDriver {
      */
     @Override
     public int getPriority() {
-        return NIO2.AVAILABLE ? 100 : -100;
+        return JSE7.AVAILABLE ? 100 : -100;
     }
 }
