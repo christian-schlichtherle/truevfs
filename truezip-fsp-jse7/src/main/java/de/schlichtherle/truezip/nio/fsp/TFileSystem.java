@@ -166,13 +166,13 @@ public final class TFileSystem extends FileSystem {
     }*/
 
     FsEntry getEntry(TPath path) throws IOException {
-        FsEntryName name = path.getEntryName();
+        FsEntryName name = path.toPath().getEntryName();
         return getController().getEntry(name);
     }
 
     InputSocket<?> getInputSocket(  TPath path,
                                     BitField<FsInputOption> options) {
-        FsEntryName name = path.getEntryName();
+        FsEntryName name = path.toPath().getEntryName();
         return getController()
                 .getInputSocket(name, options);
     }
@@ -180,7 +180,7 @@ public final class TFileSystem extends FileSystem {
     OutputSocket<?> getOutputSocket(TPath path,
                                     BitField<FsOutputOption> options,
                                     @CheckForNull Entry template) {
-        FsEntryName name = path.getEntryName();
+        FsEntryName name = path.toPath().getEntryName();
         return getController()
                 .getOutputSocket(name, options, template);
     }
@@ -188,7 +188,7 @@ public final class TFileSystem extends FileSystem {
     DirectoryStream<Path> newDirectoryStream(   final TPath path,
                                                 final Filter<? super Path> filter)
     throws IOException {
-        final FsEntryName name = path.getEntryName();
+        final FsEntryName name = path.toPath().getEntryName();
         final FsEntry entry = getController().getEntry(name);
         final Set<String> set;
         if (null == entry || null == (set = entry.getMembers()))
@@ -203,7 +203,7 @@ public final class TFileSystem extends FileSystem {
             public boolean hasNext() {
                 while (i.hasNext()) {
                     next = new TPath(TFileSystem.this, new FsEntryName(
-                            path.getEntryName(),
+                            path.toPath().getEntryName(),
                             FsEntryName.create(uri.path(i.next()).toUri())));
                     try {
                         if (filter.accept(next))
@@ -247,13 +247,13 @@ public final class TFileSystem extends FileSystem {
     throws IOException {
         if (0 < attrs.length)
             throw new UnsupportedOperationException();
-        FsEntryName name = path.getEntryName();
+        FsEntryName name = path.toPath().getEntryName();
         getController()
                 .mknod(name, Type.DIRECTORY, FsOutputOptions.NO_OUTPUT_OPTION, null);
     }
 
     void delete(TPath path) throws IOException {
-        FsEntryName name = path.getEntryName();
+        FsEntryName name = path.toPath().getEntryName();
         getController()
                 .unlink(name);
     }
