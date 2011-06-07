@@ -51,7 +51,7 @@ public class TFileSystemProviderTest {
                 detector = new FsArchiveDetector("mok", new MockArchiveDriver());
         environment = new HashMap<>();
         environment.put(ARCHIVE_DETECTOR, detector);
-        provider = TFileSystemProvider.File.class.newInstance();
+        provider = TFileSystemProvider.class.newInstance();
     }
 
     @Test

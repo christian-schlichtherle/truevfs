@@ -56,13 +56,21 @@ import net.jcip.annotations.Immutable;
 public final class TPath implements Path {
 
     private final TFileSystem fileSystem;
-    private final FsEntryName name;
+    private final FsEntryName entryName;
+    private volatile URI pathName;
 
     TPath(final TFileSystem fileSystem, final FsEntryName entryName) {
+        this(fileSystem, entryName, null);
+    }
+
+    private TPath(  final TFileSystem fileSystem,
+                    final FsEntryName entryName,
+                    final URI pathName) {
         if (null == fileSystem || null == entryName)
             throw new NullPointerException();
         this.fileSystem = fileSystem;
-        this.name = entryName;
+        this.entryName = entryName;
+        this.pathName = pathName;
 
         assert invariants();
     }
@@ -84,7 +92,7 @@ public final class TPath implements Path {
      */
     private boolean invariants() {
         assert null != getFileSystem();
-        assert null != toUri();
+        assert null != getEntryName();
         return true;
     }
 
@@ -94,7 +102,12 @@ public final class TPath implements Path {
     }
 
     FsEntryName getEntryName() {
-        return name;
+        return entryName;
+    }
+
+    URI getPathName() {
+        final URI pathName = this.pathName;
+        return null != pathName ? pathName : (this.pathName = entryName.toUri());
     }
 
     @Override
@@ -109,7 +122,10 @@ public final class TPath implements Path {
 
     @Override
     public TPath getFileName() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        final URI apn = toUri();
+        final URI ppn = apn.resolve(".");
+        final URI fn = ppn.relativize(apn);
+        return new TPath(fileSystem, entryName, fn);
     }
 
     @Override
@@ -203,22 +219,22 @@ public final class TPath implements Path {
     }*/
 
     FsPath toFsPath() {
-        return new FsPath(getFileSystem().getMountPoint(), getEntryName());
+        return new FsPath(fileSystem.getMountPoint(), entryName);
     }
 
     @Override
     public URI toUri() {
-        return getEntryName().toUri();
+        return toFsPath().toHierarchicalUri();
     }
 
     @Override
     public TPath toAbsolutePath() {
-        return this;
+        return new TPath(fileSystem, entryName, toUri());
     }
 
     @Override
     public TPath toRealPath(LinkOption... options) throws IOException {
-        return this;
+        return new TPath(fileSystem, entryName, toUri());
     }
 
     @Override
@@ -243,14 +259,11 @@ public final class TPath implements Path {
         if (!(other instanceof Path))
             return false;
         final Path that = (Path) other;
-        return this.getFileSystem() == that.getFileSystem()
-                && this.toUri().equals(that.toUri());
+        return this.toUri().equals(that.toUri());
     }
 
     @Override
     public int compareTo(Path that) {
-        if (this.getFileSystem() != that.getFileSystem())
-            throw new ClassCastException("contract is contract - even if it's nonsense!"); // TODO
         return this.toUri().compareTo(that.toUri());
     }
 
@@ -258,12 +271,8 @@ public final class TPath implements Path {
     
     @Override
     public int hashCode() {
-        if (null != hashCode)
-            return hashCode;
-        int hc = 17;
-        hc = 37 * hc + getFileSystem().hashCode();
-        hc = 37 * hc + toUri().hashCode();
-        return hashCode = hc;
+        final Integer hashCode = this.hashCode;
+        return null != hashCode ? hashCode : (this.hashCode = toUri().hashCode());
     }
 
     @Override
