@@ -13,28 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io;
+package de.schlichtherle.truezip.util;
 
-import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
- * Holds a static boolean telling us if {@link Files} is
- * available to the JRE.
+ * Holds a static boolean telling us if the JSE 7 API is availabe for this JVM.
  * 
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class NIO2 {
+public final class JSE7 {
 
     /**
-     * {@code true} if and only if the class {@link Files} is available to
-     * the JRE.
+     * {@code true} if and only if the JSE 7 API is available for this JVM.
      */
     public static final boolean AVAILABLE;
     static {
         boolean available;
         try {
-            Files.class.getName();
+            Path.class.getName();
             available = true;
         } catch (NoClassDefFoundError notAvailable) {
             available = false;
@@ -42,6 +40,6 @@ public final class NIO2 {
         AVAILABLE = available;
     }
 
-    private NIO2() { // make lint shut up!
+    private JSE7() { // make lint shut up!
     }
 }
