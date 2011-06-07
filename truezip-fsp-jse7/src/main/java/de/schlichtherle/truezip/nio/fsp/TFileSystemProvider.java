@@ -15,6 +15,12 @@
  */
 package de.schlichtherle.truezip.nio.fsp;
 
+import static de.schlichtherle.truezip.entry.Entry.*;
+import static de.schlichtherle.truezip.entry.Entry.Access.*;
+import static de.schlichtherle.truezip.entry.Entry.Size.*;
+import static de.schlichtherle.truezip.entry.Entry.Type.*;
+import de.schlichtherle.truezip.fs.FsController;
+import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.archive.FsArchiveDetector;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
@@ -39,6 +45,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.nio.channels.SeekableByteChannel;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.AccessMode;
 import java.nio.file.CopyOption;
 import java.nio.file.DirectoryStream;
@@ -46,6 +53,7 @@ import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileStore;
 import java.nio.file.LinkOption;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -54,6 +62,7 @@ import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileAttributeView;
+import java.nio.file.attribute.FileTime;
 import java.nio.file.spi.FileSystemProvider;
 import java.util.EnumSet;
 import java.util.Map;
@@ -64,12 +73,17 @@ import java.util.Set;
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-public abstract class TFileSystemProvider extends FileSystemProvider {
+public class TFileSystemProvider extends FileSystemProvider {
 
     private final FsScheme scheme;
     private final FsMountPoint mountPoint;
     //private volatile IOPool<?> pool;
-    
+
+    public TFileSystemProvider() {
+        this(   FsScheme.create("tzp"),
+                FsMountPoint.create(fix(Paths.get("/").toUri())));
+    }
+
     TFileSystemProvider(final FsScheme scheme,
                         final FsMountPoint mountPoint) {
         if (null == scheme || null == mountPoint)
@@ -125,6 +139,10 @@ public abstract class TFileSystemProvider extends FileSystemProvider {
         return new TFileSystem(this, fsmp);
     }
 
+    private FsPath toFsPath(URI uri, @CheckForNull Map<String, ?> env) {
+        return new Scanner(getArchiveDetector(env)).scan(uri.normalize());
+    }
+
     /**
      * {@inheritDoc}
      * 
@@ -136,10 +154,6 @@ public abstract class TFileSystemProvider extends FileSystemProvider {
     @Override
     public TFileSystem newFileSystem(URI uri, @CheckForNull final Map<String, ?> env) {
         return new TFileSystem(this, toFsPath(uri, env).getMountPoint());
-    }
-
-    private FsPath toFsPath(URI uri, @CheckForNull Map<String, ?> env) {
-        return new Scanner(getArchiveDetector(env)).scan(uri.normalize());
     }
 
     /**
@@ -362,7 +376,25 @@ public abstract class TFileSystemProvider extends FileSystemProvider {
 
     @Override
     public void checkAccess(Path path, AccessMode... modes) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        final TPath p = toTPath(path);
+        final FsEntryName n = p.getEntryName();
+        final FsController<?> c = p.getFileSystem().getController();
+        if (null == c.getEntry(n))
+            throw new NoSuchFileException(path.toString());
+        for (final AccessMode m : modes) {
+            switch (m) {
+                case READ:
+                    if (!c.isReadable(n))
+                        throw new AccessDeniedException(path.toString());
+                    break;
+                case WRITE:
+                    if (!c.isWritable(n))
+                        throw new AccessDeniedException(path.toString());
+                    break;
+                default:
+                    throw new UnsupportedOperationException();
+            }
+        }
     }
 
     @Override
@@ -371,8 +403,69 @@ public abstract class TFileSystemProvider extends FileSystemProvider {
     }
 
     @Override
-    public <A extends BasicFileAttributes> A readAttributes(Path path, Class<A> type, LinkOption... options) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    @SuppressWarnings("unchecked")
+    public <A extends BasicFileAttributes> A readAttributes(
+            Path path,
+            Class<A> type,
+            LinkOption... options)
+    throws IOException {
+        if (!type.isAssignableFrom(BasicFileAttributes.class))
+            throw new UnsupportedOperationException();
+        return (A) readAttributes0(toTPath(path));
+    }
+
+    private BasicFileAttributes readAttributes0(final TPath path)
+    throws IOException {
+        final FsEntry e = path.getEntry();
+
+        class Attributes implements BasicFileAttributes {
+            @Override
+            public FileTime lastModifiedTime() {
+                return e == null ? null : FileTime.fromMillis(e.getTime(WRITE));
+            }
+
+            @Override
+            public FileTime lastAccessTime() {
+                return e == null ? null : FileTime.fromMillis(e.getTime(READ));
+            }
+
+            @Override
+            public FileTime creationTime() {
+                return e == null ? null : FileTime.fromMillis(e.getTime(CREATE));
+            }
+
+            @Override
+            public boolean isRegularFile() {
+                return e == null ? false : e.isType(FILE);
+            }
+
+            @Override
+            public boolean isDirectory() {
+                return e == null ? false : e.isType(DIRECTORY);
+            }
+
+            @Override
+            public boolean isSymbolicLink() {
+                return e == null ? false : e.isType(SYMLINK);
+            }
+
+            @Override
+            public boolean isOther() {
+                return e == null ? false : e.isType(SPECIAL);
+            }
+
+            @Override
+            public long size() {
+                return e == null ? UNKNOWN : e.getSize(DATA);
+            }
+
+            @Override
+            public Object fileKey() {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+        }
+
+        return new Attributes();
     }
 
     @Override
@@ -397,12 +490,5 @@ public abstract class TFileSystemProvider extends FileSystemProvider {
     public interface Parameter {
         /** The key for the {@link FsArchiveDetector} parameter. */
         String ARCHIVE_DETECTOR = "ARCHIVE_DETECTOR";
-    }
-
-    public static final class File extends TFileSystemProvider {
-        public File() {
-            super(  FsScheme.create("tzp"),
-                    FsMountPoint.create(fix(Paths.get("/").toUri())));
-        }
     }
 }

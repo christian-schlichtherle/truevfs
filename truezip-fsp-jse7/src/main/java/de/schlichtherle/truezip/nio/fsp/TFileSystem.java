@@ -31,6 +31,7 @@ import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.fs.FsUriModifier;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import static de.schlichtherle.truezip.fs.FsManager.*;
+import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
@@ -71,6 +72,10 @@ public final class TFileSystem extends FileSystem {
             throw new NullPointerException();
         this.provider = provider;
         this.mountPoint = mountPoint;
+    }
+
+    FsEntryName resolveParent(FsEntryName name) {
+        return mountPoint.getPath().resolve(name).getEntryName();
     }
 
     @Override
@@ -256,7 +261,7 @@ public final class TFileSystem extends FileSystem {
 
     private volatile FsController<?> controller;
 
-    private FsController<?> getController() {
+    FsController<?> getController() {
         final FsController<?> controller = this.controller;
         return null != controller
                 ? controller
