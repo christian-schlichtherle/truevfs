@@ -350,8 +350,8 @@ public class TFileSystemProvider extends FileSystemProvider {
 
     private static void checkContains(TPath a, TPath b) throws IOException {
         // toAbsolutePath() is redundant, but kept for comprehensibility.
-        URI ua = a.toAbsolutePath().toFsPath().toHierarchicalUri();
-        URI ub = b.toAbsolutePath().toFsPath().toHierarchicalUri();
+        URI ua = a.toAbsolutePath().toPath().toHierarchicalUri();
+        URI ub = b.toAbsolutePath().toPath().toHierarchicalUri();
         if (ua.resolve(ub) != ub)
             throw new IOException(b + " (contained in " + a + ")");
     }
@@ -359,8 +359,8 @@ public class TFileSystemProvider extends FileSystemProvider {
     @Override
     public boolean isSameFile(Path a, Path b) throws IOException {
         // toAbsolutePath() is redundant, but kept for comprehensibility.
-        URI ua = toTPath(a).toAbsolutePath().toFsPath().toHierarchicalUri();
-        URI ub = toTPath(b).toAbsolutePath().toFsPath().toHierarchicalUri();
+        URI ua = toTPath(a).toAbsolutePath().toPath().toHierarchicalUri();
+        URI ub = toTPath(b).toAbsolutePath().toPath().toHierarchicalUri();
         return ua.equals(ub);
     }
 
@@ -377,7 +377,7 @@ public class TFileSystemProvider extends FileSystemProvider {
     @Override
     public void checkAccess(Path path, AccessMode... modes) throws IOException {
         final TPath p = toTPath(path);
-        final FsEntryName n = p.getEntryName();
+        final FsEntryName n = p.toPath().getEntryName();
         final FsController<?> c = p.getFileSystem().getController();
         if (null == c.getEntry(n))
             throw new NoSuchFileException(path.toString());
