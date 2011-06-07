@@ -15,9 +15,9 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Map;
-import java.util.ServiceConfigurationError;
 import net.jcip.annotations.Immutable;
 
 /**
@@ -28,7 +28,8 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-public final class FsDefaultDriver implements FsCompositeDriver {
+@DefaultAnnotation(NonNull.class)
+public final class FsDefaultDriver extends FsAbstractCompositeDriver {
 
     private final Map<FsScheme, FsDriver> drivers;
 
@@ -37,21 +38,13 @@ public final class FsDefaultDriver implements FsCompositeDriver {
      * file system driver provider for an appropriate file system driver for
      * the scheme of a given mount point.
      */
-    public FsDefaultDriver(final @NonNull FsDriverProvider provider) {
+    public FsDefaultDriver(final FsDriverProvider provider) {
         this.drivers = provider.get(); // immutable map!
         assert null != drivers;
     }
 
     @Override
-    public FsController<?>
-    newController(FsModel model, FsController<?> parent) {
-        assert null == model.getParent()
-                    ? null == parent
-                    : model.getParent().equals(parent.getModel());
-        final FsScheme scheme = model.getMountPoint().getScheme();
-        final FsDriver driver = drivers.get(scheme);
-        if (null == driver)
-            throw new ServiceConfigurationError(scheme + " (unknown file system scheme)");
-        return driver.newController(model, parent);
+    public Map<FsScheme, FsDriver> get() {
+        return drivers;
     }
 }
