@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import de.schlichtherle.truezip.util.UriBuilder;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -323,17 +324,20 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
     public FsMountPoint(final FsScheme scheme,
                         final FsPath path)
     throws URISyntaxException {
-        final URI pathUri = path.toUri();
-        if (!pathUri.isAbsolute())
-            throw new URISyntaxException(quote(pathUri), "Path not absolute");
-        final String pathEntryNameUriPath = path.getEntryName().toUri().getPath();
-        if (0 == pathEntryNameUriPath.length())
-            throw new URISyntaxException(quote(pathUri), "Empty entry name");
-        this.uri = new URI(new StringBuilder(scheme.toString())
-                .append(':')
-                .append(path.toString())
-                .append(SEPARATOR)
-                .toString());
+        final URI pu = path.toUri();
+        if (!pu.isAbsolute())
+            throw new URISyntaxException(quote(pu), "Path not absolute");
+        final String penup = path.getEntryName().toUri().getPath();
+        if (0 == penup.length())
+            throw new URISyntaxException(quote(pu), "Empty entry name");
+        this.uri = new UriBuilder()
+                .scheme(scheme.toString())
+                .path(new StringBuilder(pu.getScheme())
+                    .append(':')
+                    .append(pu.getSchemeSpecificPart())
+                    .append(SEPARATOR)
+                    .toString())
+                .toUri();
         this.scheme = scheme;
         this.path = path;
 
@@ -369,17 +373,20 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
                 throw new URISyntaxException(quote(uri),
                         "Doesn't end with mount point separator \"" + SEPARATOR + '"');
             path = new FsPath(new URI(ssp.substring(0, i)), modifier);
-            final URI pathUri = path.toUri();
-            if (!pathUri.isAbsolute())
+            final URI pu = path.toUri();
+            if (!pu.isAbsolute())
                 throw new URISyntaxException(quote(uri), "Path not absolute");
             if (0 == path.getEntryName().getPath().length())
                 throw new URISyntaxException(quote(uri), "Empty URI path of entry name of path");
             if (NULL != modifier) {
-                URI nuri = new URI(new StringBuilder(uri.getScheme())
-                        .append(':')
-                        .append(pathUri.toString())
-                        .append(SEPARATOR)
-                        .toString());
+                URI nuri = new UriBuilder()
+                        .scheme(uri.getScheme())
+                        .path(new StringBuilder(pu.getScheme())
+                            .append(':')
+                            .append(pu.getSchemeSpecificPart())
+                            .append(SEPARATOR)
+                            .toString())
+                        .toUri();
                 if (!uri.equals(nuri))
                     uri = nuri;
             }

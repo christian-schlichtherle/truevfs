@@ -380,7 +380,8 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
                     new URI(null, ssp.substring(i + 2), uri.getFragment()),
                     modifier);
             if (NULL != modifier) {
-                URI nuri = new URI(mountPoint.toString() + entryName);
+                URI mpu = mountPoint.toUri();
+                URI nuri = new URI(mpu.getScheme(), mpu.getSchemeSpecificPart() + toDecodedUri(entryName), null);
                 if (!uri.equals(nuri))
                     uri = nuri;
             }
@@ -401,6 +402,16 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
         return "\"" + s + "\"";
     }
 
+    private static String toDecodedUri(final FsEntryName entryName) {
+        final URI u = entryName.toUri();
+        assert null == u.getScheme();
+        assert null == u.getAuthority();
+        assert null == u.getFragment();
+        final String p = u.getPath();
+        final String q = u.getQuery();
+        return q == null ? p : p + "?" + q;
+    }
+
     private boolean invariants() {
         assert null != toUri();
         assert null == toUri().getRawFragment();
@@ -408,8 +419,11 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
         assert null != getEntryName();
         if (toUri().isOpaque()) {
             assert toUri().getRawSchemeSpecificPart().contains(FsMountPoint.SEPARATOR);
-            assert toUri().equals(URI.create(  getMountPoint().toUri().toString()
-                                                + getEntryName().toUri().toString()));
+            try {
+                assert toUri().equals(new URI(getMountPoint().toUri().getScheme(), mountPoint.toUri().getSchemeSpecificPart() + toDecodedUri(getEntryName()), null));
+            } catch (URISyntaxException ex) {
+                throw new AssertionError(ex);
+            }
         } else if (toUri().isAbsolute()) {
             assert toUri().normalize() == toUri();
             assert toUri().equals(getMountPoint().toUri().resolve(getEntryName().toUri()));
