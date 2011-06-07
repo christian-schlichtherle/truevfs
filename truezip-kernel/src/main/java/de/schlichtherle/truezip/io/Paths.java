@@ -292,14 +292,14 @@ public final class Paths {
      * <ol>
      * <li>A letter followed by a colon and an optional separator.
      *     On Windows, this is the notation for a drive.
+     *     This is only recognized if {@code separatorChar} is {@code '\\'}.
      * <li>Two leading separators.
      *     On Windows, this is the notation for a UNC.
+     *     This is recognized for any {@code separatorChar}.
      * <li>A single leading separator.
      *     On Windows and POSIX, this is the notation for an absolute path.
+     *     This is recognized for any {@code separatorChar}.
      * </ol>
-     * This method works identical on all platforms, so even if the separator
-     * is {@code '/'}, two leading separators would be considered to
-     * be a UNC and hence the return value would be {@code 2}.
      *
      * @param  path The file system path.
      * @param  separatorChar The file name separator character.
@@ -310,7 +310,7 @@ public final class Paths {
         int len = 0; // default prefix length
         if (pathLength > 0 && path.charAt(0) == separatorChar) {
             len++; // leading separator or first character of a UNC.
-        } else if (pathLength > 1 && path.charAt(1) == ':') {
+        } else if ('\\' == separatorChar && pathLength > 1 && path.charAt(1) == ':') {
             final char drive = path.charAt(0);
             if ('A' <= drive && drive <= 'Z'
                     || 'a' <= drive && drive <= 'z') { // US-ASCII letters only
