@@ -216,8 +216,8 @@ public class FsMountPointTest {
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testConstructorWithValidUri() {
         for (final String param : new String[] {
-            "foo:/bär/bäz/",
-            "foo:/bär/",
+            "foo:/bÃ¤r/bÃ¤z/",
+            "foo:/bÃ¤r/",
             "foo:/",
         }) {
             final URI uri = URI.create(param);
@@ -261,7 +261,7 @@ public class FsMountPointTest {
     public void testResolve() {
         for (final String[] params : new String[][] {
             { "foo:bar:/baz?plonk!/", "", "baz", "foo:bar:/baz?plonk!/" },
-            { "foo:bar:/bäz?bööm!/", "bäng?plönk", "bäz/bäng?plönk", "foo:bar:/bäz?bööm!/bäng?plönk" },
+            { "foo:bar:/bÃ¤z?bÃ¶Ã¶m!/", "bÃ¤ng?plÃ¶nk", "bÃ¤z/bÃ¤ng?plÃ¶nk", "foo:bar:/bÃ¤z?bÃ¶Ã¶m!/bÃ¤ng?plÃ¶nk" },
             { "foo:bar:/baz!/", "bang?boom", "baz/bang?boom", "foo:bar:/baz!/bang?boom" },
             { "foo:bar:/baz!/", "bang", "baz/bang", "foo:bar:/baz!/bang" },
             { "foo:bar:/baz!/", "", "baz", "foo:bar:/baz!/" },
