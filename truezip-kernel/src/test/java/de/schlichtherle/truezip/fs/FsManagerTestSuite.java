@@ -91,15 +91,15 @@ public abstract class FsManagerTestSuite {
     public void testBackward() {
         for (final String[] params : new String[][] {
             {
-                "zip:zip:zip:file:/öuter.zip!/inner.zip!/nüts.zip!/",
-                "zip:zip:file:/öuter.zip!/inner.zip!/",
-                "zip:file:/öuter.zip!/",
+                "zip:zip:zip:file:/Ã¶uter.zip!/inner.zip!/nÃ¼ts.zip!/",
+                "zip:zip:file:/Ã¶uter.zip!/inner.zip!/",
+                "zip:file:/Ã¶uter.zip!/",
                 //"file:/", // does NOT get mapped!
             },
             {
-                "zip:zip:zip:file:/föo.zip!/bär.zip!/bäz.zip!/",
-                "zip:zip:file:/föo.zip!/bär.zip!/",
-                "zip:file:/föo.zip!/",
+                "zip:zip:zip:file:/fÃ¶o.zip!/bÃ¤r.zip!/bÃ¤z.zip!/",
+                "zip:zip:file:/fÃ¶o.zip!/bÃ¤r.zip!/",
+                "zip:file:/fÃ¶o.zip!/",
                 //"file:/", // does NOT get mapped!
             },
         }) {

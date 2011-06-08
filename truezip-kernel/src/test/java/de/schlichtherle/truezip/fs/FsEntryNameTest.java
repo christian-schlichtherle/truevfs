@@ -199,12 +199,12 @@ public class FsEntryNameTest {
             { "foo", "bar%3Abaz", "foo/bar%3Abaz" },
             { "foo", "", "foo", },
             { "", "", "", },
-            { "föö", "?bär", "föö?bär" },
-            { "föö?bär", "", "föö" },
-            { "föö?bär", "?tüü", "föö?tüü" },
-            { "föö", "", "föö" },
-            { "", "föö", "föö" },
-            { "föö", "bär", "föö/bär" },
+            { "fÃ¶Ã¶", "?bÃ¤r", "fÃ¶Ã¶?bÃ¤r" },
+            { "fÃ¶Ã¶?bÃ¤r", "", "fÃ¶Ã¶" },
+            { "fÃ¶Ã¶?bÃ¤r", "?tÃ¼Ã¼", "fÃ¶Ã¶?tÃ¼Ã¼" },
+            { "fÃ¶Ã¶", "", "fÃ¶Ã¶" },
+            { "", "fÃ¶Ã¶", "fÃ¶Ã¶" },
+            { "fÃ¶Ã¶", "bÃ¤r", "fÃ¶Ã¶/bÃ¤r" },
         }) {
             final FsEntryName parent = FsEntryName.create(URI.create(params[0]));
             final FsEntryName member = FsEntryName.create(URI.create(params[1]));

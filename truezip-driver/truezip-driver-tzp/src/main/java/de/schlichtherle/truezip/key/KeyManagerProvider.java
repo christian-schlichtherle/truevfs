@@ -24,7 +24,7 @@ import java.util.ServiceConfigurationError;
  * Implementations must be thread-safe.
  *
  * @author Christian Schlichtherle
- * @version $Id: FsManagers$
+ * @version $Id$
  */
 public interface KeyManagerProvider {
 
