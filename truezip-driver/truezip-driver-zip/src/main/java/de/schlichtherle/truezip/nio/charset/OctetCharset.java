@@ -43,9 +43,10 @@ public abstract class OctetCharset extends Charset {
     private final char[][] char2byte;
 
     protected OctetCharset( final String cname,
-                            final String[] aliases,
-                            final char[] byte2char) {
-        super(cname, aliases);
+                            String[] aliases,
+                            char[] byte2char) {
+        super(cname, aliases = aliases.clone());
+        byte2char = byte2char.clone();
 
         // Construct sparse inverse lookup table.
         final char[][] char2byte = new char[256][];
