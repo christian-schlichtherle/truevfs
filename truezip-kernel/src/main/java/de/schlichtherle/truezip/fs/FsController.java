@@ -94,7 +94,7 @@ public abstract class FsController<M extends FsModel> {
      *         exists for the given name.
      * @throws IOException on any I/O error.
      */
-    public abstract @CheckForNull FsEntry getEntry(FsEntryName name)
+    public abstract @Nullable FsEntry getEntry(FsEntryName name)
     throws IOException;
 
     public abstract boolean isReadable(FsEntryName name)
