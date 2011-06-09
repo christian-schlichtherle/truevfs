@@ -24,6 +24,7 @@ import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import java.util.Map;
 import net.jcip.annotations.NotThreadSafe;
 
 /**
@@ -81,6 +82,12 @@ extends FsArchiveFileSystem<E> {
 
     @Override
     public boolean setTime(FsEntryName path, BitField<Access> types, long value)
+    throws FsArchiveFileSystemException {
+        throw new FsReadOnlyArchiveFileSystemException();
+    }
+
+    @Override
+    public boolean setTime(FsEntryName path, Map<Access, Long> times)
     throws FsArchiveFileSystemException {
         throw new FsReadOnlyArchiveFileSystemException();
     }

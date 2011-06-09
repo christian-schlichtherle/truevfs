@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.archive;
 
+import java.util.Map;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import de.schlichtherle.truezip.entry.DecoratingEntry;
 import de.schlichtherle.truezip.fs.FsEntryNotFoundException;
@@ -165,6 +166,14 @@ extends FsController<FsConcurrentModel> {
     throws IOException {
         autoSync(name, null);
         return autoMount().setTime(name, types, value);
+    }
+
+    @Override
+    public final boolean setTime(   FsEntryName name,
+                                    Map<Access, Long> times)
+    throws IOException {
+        autoSync(name, null);
+        return autoMount().setTime(name, times);
     }
 
     @Override
