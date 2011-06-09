@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.file.nio;
 
+import java.util.Map;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import de.schlichtherle.truezip.entry.Entry;
@@ -44,6 +45,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.FileTime;
+import java.util.EnumMap;
 import javax.swing.Icon;
 import net.jcip.annotations.ThreadSafe;
 
@@ -253,6 +255,22 @@ final class FileController extends FsController<FsModel>  {
                 types.get(READ)   ? time : null,
                 types.get(CREATE) ? time : null);
         return types.clear(WRITE).clear(READ).clear(CREATE).isEmpty();
+    }
+
+    @Override
+    public boolean setTime(FsEntryName name, Map<Access, Long> times)
+    throws IOException {
+        final Path file = target.resolve(name.getPath());
+        final Map<Access, Long> t = new EnumMap<Access, Long>(times);
+        getBasicFileAttributeView(file).setTimes(
+                toFileTime(t.remove(WRITE)),
+                toFileTime(t.remove(READ)),
+                toFileTime(t.remove(CREATE)));
+        return t.isEmpty();
+    }
+
+    private static FileTime toFileTime(long time) {
+        return UNKNOWN == time ? null : FileTime.fromMillis(time);
     }
 
     @Override

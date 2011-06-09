@@ -25,6 +25,7 @@ import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
+import java.util.Map;
 import javax.swing.Icon;
 import net.jcip.annotations.ThreadSafe;
 
@@ -108,10 +109,16 @@ extends FsController<M> {
 
     @Override
     public boolean
-    setTime(FsEntryName name,
-            BitField<Access> types, long value)
+    setTime(FsEntryName name, BitField<Access> types, long value)
     throws IOException {
         return delegate.setTime(name, types, value);
+    }
+
+    @Override
+    public boolean
+    setTime(FsEntryName name, Map<Access, Long> times)
+    throws IOException {
+        return delegate.setTime(name, times);
     }
 
     @Override

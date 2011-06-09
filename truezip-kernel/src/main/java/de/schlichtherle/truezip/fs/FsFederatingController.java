@@ -29,6 +29,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Map;
 import javax.swing.Icon;
 import net.jcip.annotations.ThreadSafe;
 
@@ -141,6 +142,16 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             return delegate.setTime(name, types, value);
         } catch (FsFalsePositiveException ex) {
             return getParent().setTime(resolveParent(name), types, value);
+        }
+    }
+
+    @Override
+    public boolean setTime(FsEntryName name, Map<Access, Long> times)
+    throws IOException {
+        try {
+            return delegate.setTime(name, times);
+        } catch (FsFalsePositiveException ex) {
+            return getParent().setTime(resolveParent(name), times);
         }
     }
 

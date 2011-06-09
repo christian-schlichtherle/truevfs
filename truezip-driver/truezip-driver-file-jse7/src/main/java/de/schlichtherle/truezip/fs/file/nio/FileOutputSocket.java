@@ -153,9 +153,9 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
                         if (null != template) {
                             try {
                                 getFileAttributeView(entryFile, BasicFileAttributeView.class)
-                                        .setTimes(  getFileTime(template, WRITE),
-                                                    getFileTime(template, READ),
-                                                    getFileTime(template, CREATE));
+                                        .setTimes(  toFileTime(template.getTime(WRITE)),
+                                                    toFileTime(template.getTime(READ)),
+                                                    toFileTime(template.getTime(CREATE)));
                             } catch (IOException ex2) {
                                 throw (IOException) ex2.initCause(ex);
                             }
@@ -253,9 +253,9 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
                         if (null != template) {
                             try {
                                 getFileAttributeView(entryFile, BasicFileAttributeView.class)
-                                        .setTimes(  getFileTime(template, WRITE),
-                                                    getFileTime(template, READ),
-                                                    getFileTime(template, CREATE));
+                                        .setTimes(  toFileTime(template.getTime(WRITE)),
+                                                    toFileTime(template.getTime(READ)),
+                                                    toFileTime(template.getTime(CREATE)));
                             } catch (IOException ex2) {
                                 throw (IOException) ex2.initCause(ex);
                             }
@@ -282,8 +282,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
         }
     }
 
-    private static FileTime getFileTime(Entry entry, Access type) {
-        long time = entry.getTime(type);
+    private static FileTime toFileTime(long time) {
         return UNKNOWN == time ? null : FileTime.fromMillis(time);
     }
 }
