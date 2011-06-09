@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.file;
 
+import java.util.Map;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import de.schlichtherle.truezip.entry.Entry;
@@ -239,7 +240,17 @@ final class FileController extends FsController<FsModel>  {
         final File file = new File(target, name.getPath());
         boolean ok = true;
         for (final Access type : types)
-            ok &= WRITE == type ? file.setLastModified(value) : false;
+            ok &= WRITE == type && file.setLastModified(value);
+        return ok;
+    }
+
+    @Override
+    public boolean setTime(FsEntryName name, Map<Access, Long> times)
+    throws IOException {
+        final File file = new File(target, name.getPath());
+        boolean ok = true;
+        for (Map.Entry<Access, Long> time : times.entrySet())
+            ok &= WRITE == time.getKey() && file.setLastModified(time.getValue());
         return ok;
     }
 

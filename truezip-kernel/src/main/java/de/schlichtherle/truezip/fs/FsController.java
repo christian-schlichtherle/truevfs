@@ -27,6 +27,7 @@ import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
+import java.util.Map;
 import javax.swing.Icon;
 
 /**
@@ -120,13 +121,11 @@ public abstract class FsController<M extends FsModel> {
      * bit field for the file system entry with the given name.
      * If {@code false} is returned or an {@link IOException} is thrown, then
      * still some of the last access times may have been set.
-     * In other words, this is not an atomic operation if multiple access types
-     * are given.
-     * To make this operation atomic, set the last access time for a single
-     * type only.
+     * Whether or not this is an atomic operation is specific to the
+     * implementation.
      * 
      * @param  name the file system entry name.
-     * @param  types the access types
+     * @param  types the access types.
      * @param  value the last access time.
      * @return {@code true} if and only if setting the access time for all
      *         types in {@code types} succeeded.
@@ -136,6 +135,28 @@ public abstract class FsController<M extends FsModel> {
                                     BitField<Access> types,
                                     long value)
     throws IOException;
+
+    /**
+     * Makes an attempt to set the last access time of all types in the given
+     * map for the file system entry with the given name.
+     * If {@code false} is returned or an {@link IOException} is thrown, then
+     * still some of the last access times may have been set.
+     * Whether or not this is an atomic operation is specific to the
+     * implementation.
+     * 
+     * @param  name the file system entry name.
+     * @param  time the access times.
+     * @return {@code true} if and only if setting the access time for all
+     *         types in {@code times} succeeded.
+     * @throws IOException on any I/O error.
+     */
+    public boolean setTime(FsEntryName name, Map<Access, Long> times)
+    throws IOException {
+        boolean ok = true;
+        for (Map.Entry<Access, Long> time : times.entrySet())
+            ok &= setTime(name, BitField.of(time.getKey()), time.getValue());
+        return ok;
+    }
 
     /**
      * Returns an input socket for reading the contents of the file system

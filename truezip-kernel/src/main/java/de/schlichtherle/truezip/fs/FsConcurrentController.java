@@ -30,6 +30,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import javax.swing.Icon;
@@ -220,6 +221,18 @@ extends FsDecoratingController< FsConcurrentModel,
         writeLock().lock();
         try {
             return delegate.setTime(name, types, value);
+        } finally {
+            writeLock().unlock();
+        }
+    }
+
+    @Override
+    public boolean setTime(FsEntryName name, Map<Access, Long> times)
+    throws IOException {
+        assertNotReadLockedByCurrentThread(null);
+        writeLock().lock();
+        try {
+            return delegate.setTime(name, times);
         } finally {
             writeLock().unlock();
         }
