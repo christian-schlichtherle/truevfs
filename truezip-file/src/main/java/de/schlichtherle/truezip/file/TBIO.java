@@ -223,7 +223,8 @@ final class TBIO {
     private static void
     cp0(final boolean preserve, final File src, final File dst)
     throws IOException {
-        final InputSocket<?> input = getInputSocket(src, NO_INPUT_OPTION);
+        final InputSocket<?> input = getInputSocket(src,
+                NO_INPUT_OPTION);
         final OutputSocket<?> output = getOutputSocket(dst,
                 NO_OUTPUT_OPTION.set(CREATE_PARENTS, TFile.isLenient()),
                 preserve ? input.getLocalTarget() : null);
