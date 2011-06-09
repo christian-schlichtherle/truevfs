@@ -121,7 +121,13 @@ final class FileController extends FsController<FsModel>  {
     @Override
     public boolean isWritable(FsEntryName name) throws IOException {
         Path file = target.resolve(name.getPath());
-        return isCreatableOrWritable(file);
+        return Files.isWritable(file);
+    }
+
+    @Override
+    public boolean isExecutable(FsEntryName name) throws IOException {
+        Path file = target.resolve(name.getPath());
+        return Files.isReadable(file);
     }
 
     /**
@@ -130,6 +136,7 @@ final class FileController extends FsController<FsModel>  {
      * restored to its previous state afterwards.
      * This is a much stronger test than {@link java.io.File#canWrite()}.
      */
+    @Deprecated
     static boolean isCreatableOrWritable(final Path file) {
         try {
             try {
