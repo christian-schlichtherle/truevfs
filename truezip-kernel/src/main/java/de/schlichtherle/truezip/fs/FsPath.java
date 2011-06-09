@@ -313,6 +313,8 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
         URI mpu;
         if (null == mountPoint) {
             this.uri = entryName.toUri();
+        } else if (entryName.isRoot()) {
+            this.uri = mountPoint.toUri();
         } else if ((mpu = mountPoint.toUri()).isOpaque()) {
             try {
                 // Compute mountPoint + entryName, but ensure that all URI
