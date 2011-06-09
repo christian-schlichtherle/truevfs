@@ -873,8 +873,8 @@ public final class TFile extends File {
      * If assertions are disabled, the call to this method is thrown away by
      * the HotSpot compiler, so there is no performance penalty.
      *
-     * @throws AssertionError If any invariant is violated even if assertions
-     *         are disabled.
+     * @throws AssertionError If assertions are enabled and any invariant is
+     *         violated.
      * @return {@code true}
      */
     private boolean invariants() {
@@ -926,8 +926,8 @@ public final class TFile extends File {
     }
 
     /**
-     * Commits all unsynchronized changes to the contents of all federated file
-     * systems (i.e. prospective archive files) identified by {@code archive}
+     * Commits all unsynchronized changes to the contents of the federated file
+     * system (i.e. prospective archive files) identified by {@code archive}
      * and all its member federated file systems to their respective parent
      * file system, releases the associated resources (i.e. target archive
      * files) for access by third parties (e.g. other processes), cleans up any
@@ -946,7 +946,8 @@ public final class TFile extends File {
      * Again, this will also sync all federated file systems which are
      * located within the file system referred to by {@code file}.
      *
-     * @param  archive a top level federated file system, i.e. archive file.
+     * @param  archive a top level federated file system, i.e. a prospective
+     *         archive file.
      * @param  options a bit field of synchronization options.
      * @throws IllegalArgumentException if {@code archive} is not a top level
      *         federated file system or the combination of synchronization
@@ -991,7 +992,7 @@ public final class TFile extends File {
      * accessed read-only.
      * <p>
      * This method is equivalent to calling
-     * {@link #sync(BitField) sync(FsManager.UMOUNT)}.
+     * {@link #sync(BitField) sync(FsSyncOptions.UMOUNT)}.
      *
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         occur.
@@ -1089,8 +1090,9 @@ public final class TFile extends File {
     }
 
     /**
-     * Commits all unsynchronized changes to the contents of all federated file
-     * systems (i.e. prospective archive files) to their respective parent file
+     * Commits all unsynchronized changes to the contents of the federated file
+     * system (i.e. prospective archive files) identified by {@code archive}
+     * and all its member federated file systems to their respective parent
      * system, releases the associated resources (i.e. target archive files)
      * for access by third parties (e.g. other processes), cleans up any
      * temporary allocated resources (e.g. temporary files) and purges any
@@ -1100,10 +1102,10 @@ public final class TFile extends File {
      * <p>
      * This method is equivalent to calling
      * {@link #sync(BitField)
-        sync(archive, FsManager.UMOUNT)
+        sync(archive, FsSyncOptions.UMOUNT)
      * }.
      *
-     * @param  archive a top level federated file system, i.e. prospective
+     * @param  archive a top level federated file system, i.e. a prospective
      *         archive file.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         occur.
@@ -1121,8 +1123,9 @@ public final class TFile extends File {
     }
 
     /**
-     * Commits all unsynchronized changes to the contents of all federated file
-     * systems (i.e. prospective archive files) to their respective parent file
+     * Commits all unsynchronized changes to the contents of the federated file
+     * system (i.e. prospective archive files) identified by {@code archive}
+     * and all its member federated file systems to their respective parent
      * system, releases the associated resources (i.e. target archive files)
      * for access by third parties (e.g. other processes), cleans up any
      * temporary allocated resources (e.g. temporary files) and purges any
@@ -1138,7 +1141,7 @@ public final class TFile extends File {
                 .set(FsSyncOption.FORCE_CLOSE_OUTPUT, closeStreams))
      * }.
      *
-     * @param  archive a top level federated file system, i.e. prospective
+     * @param  archive a top level federated file system, i.e. a prospective
      *         archive file.
      * @param  closeStreams see {@link FsSyncOption#FORCE_CLOSE_INPUT} and
      *         {@link FsSyncOption#FORCE_CLOSE_OUTPUT}.
@@ -1167,8 +1170,9 @@ public final class TFile extends File {
     }
 
     /**
-     * Commits all unsynchronized changes to the contents of all federated file
-     * systems (i.e. prospective archive files) to their respective parent file
+     * Commits all unsynchronized changes to the contents of the federated file
+     * system (i.e. prospective archive files) identified by {@code archive}
+     * and all its member federated file systems to their respective parent
      * system, releases the associated resources (i.e. target archive files)
      * for access by third parties (e.g. other processes), cleans up any
      * temporary allocated resources (e.g. temporary files) and purges any
@@ -1186,7 +1190,7 @@ public final class TFile extends File {
                 .set(FsSyncOption.FORCE_CLOSE_OUTPUT, closeOutputStreams))
      * }.
      *
-     * @param  archive a top level federated file system, i.e. prospective
+     * @param  archive a top level federated file system, i.e. a prospective
      *         archive file.
      * @param  waitForInputStreams see {@link FsSyncOption#WAIT_CLOSE_INPUT}.
      * @param  closeInputStreams see {@link FsSyncOption#FORCE_CLOSE_INPUT}.
@@ -1238,26 +1242,26 @@ public final class TFile extends File {
      * By default, the value of this class property is {@code true}!
      * <p>
      * Consider the following path: {@code a/outer.zip/b/inner.zip/c}.
-     * Now let's assume that {@code a} exists as a plain directory in the platform
-     * file system, while all other parts of this path don't, and that the
-     * module TrueZIP Driver ZIP is present on the run-time class path in order
-     * to recognize {@code outer.zip} and {@code inner.zip} as ZIP files by
-     * default.
+     * Now let's assume that {@code a} exists as a plain directory in the
+     * platform file system, while all other segments of this path don't, and
+     * that the module TrueZIP Driver ZIP is present on the run-time class path
+     * in order to detect {@code outer.zip} and {@code inner.zip} as ZIP files
+     * according to the initial setup.
      * <p>
      * Now, if this class property is set to {@code false}, then an application
-     * would have to call {@code new TFile("a/outer.zip/b/inner.zip").mkdirs()}
-     * before it could actually create the innermost {@code c} entry as a file
+     * needs to call {@code new TFile("a/outer.zip/b/inner.zip").mkdirs()}
+     * before it can actually create the innermost {@code c} entry as a file
      * or directory.
      * <p>
-     * More formally, before an application could access an entry in a
-     * federated file system, all its parent directories would need to exist,
-     * including archive files.
-     * This emulates the behaviour of any platform file system type.
+     * More formally, before an application can access an entry in a federated
+     * file system, all its parent directories need to exist, including archive
+     * files.
+     * This emulates the behaviour of the platform file system.
      * <p>
      * If this class property is set to {@code true} however, then any missing
      * parent directories (including archive files) up to the outermost archive
-     * file {@code outer.zip} would get automatically created when using
-     * operations to create the innermost element of the path {@code c}.
+     * file {@code outer.zip} get automatically created when using operations
+     * to create the innermost element of the path {@code c}.
      * <p>
      * This allows applications to succeed with doing this:
      * {@code new TFile("a/outer.zip/b/inner.zip/c").createNewFile()},
