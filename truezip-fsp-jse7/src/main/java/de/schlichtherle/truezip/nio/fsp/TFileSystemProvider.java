@@ -24,10 +24,12 @@ import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsInputOption;
+import static de.schlichtherle.truezip.fs.FsInputOption.*;
 import de.schlichtherle.truezip.fs.FsInputOptions;
 import static de.schlichtherle.truezip.fs.FsInputOptions.*;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsOutputOption;
+import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import de.schlichtherle.truezip.fs.FsOutputOptions;
 import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
 import de.schlichtherle.truezip.fs.FsScheme;
@@ -194,7 +196,7 @@ public class TFileSystemProvider extends FileSystemProvider {
     private static BitField<FsInputOption> mapInput(Set<? extends OpenOption> options) {
         int s = options.size();
         if (0 == s || 1 == s && options.contains(StandardOpenOption.READ))
-            return FsInputOptions.NO_INPUT_OPTION;
+            return NO_INPUT_OPTION;
         throw new IllegalArgumentException(options.toString());
     }
 
@@ -206,7 +208,7 @@ public class TFileSystemProvider extends FileSystemProvider {
 
     private static BitField<FsOutputOption> mapOutput(Set<? extends OpenOption> options) {
         if (options.isEmpty())
-            return FsOutputOptions.NO_OUTPUT_OPTION;
+            return NO_OUTPUT_OPTION;
         EnumSet<FsOutputOption> set = EnumSet.noneOf(FsOutputOption.class);
         for (OpenOption option : options) {
             if (!(option instanceof StandardOpenOption))
@@ -229,7 +231,7 @@ public class TFileSystemProvider extends FileSystemProvider {
             }
         }
         return set.isEmpty()
-                ? FsOutputOptions.NO_OUTPUT_OPTION
+                ? NO_OUTPUT_OPTION
                 : BitField.copyOf(set);
     }
 
@@ -246,7 +248,9 @@ public class TFileSystemProvider extends FileSystemProvider {
                     .newSeekableByteChannel();
         else
             return p.getOutputSocket(
-                        mapOutput(options).set(FsOutputOption.CACHE),
+                        mapOutput(options)
+                            .set(FsOutputOption.CACHE)
+                            .set(CREATE_PARENTS, TFileSystem.isLenient()),
                         null)
                     .newSeekableByteChannel();
     }
@@ -263,7 +267,10 @@ public class TFileSystemProvider extends FileSystemProvider {
     public OutputStream newOutputStream(Path path, OpenOption... options)
     throws IOException {
         return promote(path)
-                .getOutputSocket(mapOutput(options), null)
+                .getOutputSocket(
+                    mapOutput(options)
+                        .set(CREATE_PARENTS, TFileSystem.isLenient()),
+                    null)
                 .newOutputStream();
     }
 
@@ -314,8 +321,10 @@ public class TFileSystemProvider extends FileSystemProvider {
                 }
             }
         }
-        final InputSocket<?> input = source.getInputSocket(NO_INPUT_OPTION);
-        final OutputSocket<?> output = target.getOutputSocket(NO_OUTPUT_OPTION,
+        final InputSocket<?> input = source.getInputSocket(
+                NO_INPUT_OPTION);
+        final OutputSocket<?> output = target.getOutputSocket(
+                NO_OUTPUT_OPTION.set(CREATE_PARENTS, TFileSystem.isLenient()),
                 preserve ? input.getLocalTarget() : null);
         IOSocket.copy(input, output);
     }
