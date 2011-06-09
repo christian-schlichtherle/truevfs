@@ -29,6 +29,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.channels.SeekableByteChannel;
 import java.util.Map;
 import javax.swing.Icon;
 import net.jcip.annotations.ThreadSafe;
@@ -185,6 +186,18 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         }
 
         @Override
+        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            try {
+                return getBoundSocket().newSeekableByteChannel();
+            } catch (FsFalsePositiveException ex) {
+                return getParent()
+                        .getInputSocket(resolveParent(name), options)
+                        .bind(this)
+                        .newSeekableByteChannel();
+            }
+        }
+
+        @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
             try {
                 return getBoundSocket().newReadOnlyFile();
@@ -240,6 +253,18 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                         .getOutputSocket(resolveParent(name), options, template)
                         .bind(this)
                         .getLocalTarget();
+            }
+        }
+
+        @Override
+        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            try {
+                return getBoundSocket().newSeekableByteChannel();
+            } catch (FsFalsePositiveException ex) {
+                return getParent()
+                        .getOutputSocket(resolveParent(name), options, template)
+                        .bind(this)
+                        .newSeekableByteChannel();
             }
         }
 

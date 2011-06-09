@@ -19,8 +19,10 @@ import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.DecoratingEntry;
+import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.util.JSE7;
 import de.schlichtherle.truezip.util.Pool;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
@@ -31,6 +33,7 @@ import java.io.Flushable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.channels.SeekableByteChannel;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -286,7 +289,8 @@ public final class IOCache implements Flushable, Closeable {
         }
     }
 
-    private final class CacheInputSocket extends InputSocket<Entry> {
+    private final class CacheInputSocket
+    extends InputSocket<Entry> {
         @CheckForNull
         private volatile Buffer buffer;
 
@@ -296,6 +300,11 @@ public final class IOCache implements Flushable, Closeable {
             return null != buffer
                     ? buffer.data
                     : new CacheEntry(input.getLocalTarget());
+        }
+
+        @Override
+        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            return getBoundSocket().newSeekableByteChannel();
         }
 
         @Override
@@ -317,7 +326,8 @@ public final class IOCache implements Flushable, Closeable {
         }
     } // class CacheInputSocket
 
-    private final class CacheOutputSocket extends OutputSocket<Entry> {
+    private final class CacheOutputSocket
+    extends OutputSocket<Entry> {
         @CheckForNull
         private volatile Buffer buffer;
 
@@ -327,6 +337,11 @@ public final class IOCache implements Flushable, Closeable {
             return null != buffer
                     ? buffer.data
                     : new CacheEntry(output.getLocalTarget());
+        }
+
+        @Override
+        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            return getBoundSocket().newSeekableByteChannel();
         }
 
         @Override
@@ -350,7 +365,8 @@ public final class IOCache implements Flushable, Closeable {
         }
     } // class CacheEntry
 
-    private final class InputBufferPool implements Pool<Buffer, IOException> {
+    private final class InputBufferPool
+    implements Pool<Buffer, IOException> {
         @Override
         public Buffer allocate() throws IOException {
             synchronized (lock) {
@@ -381,7 +397,8 @@ public final class IOCache implements Flushable, Closeable {
         }
     } // class InputBufferPool
 
-    private abstract class OutputBufferPool implements Pool<Buffer, IOException> {
+    private abstract class OutputBufferPool
+    implements Pool<Buffer, IOException> {
         @Override
         public Buffer allocate() throws IOException {
             final Buffer buffer = new Buffer();
@@ -402,7 +419,8 @@ public final class IOCache implements Flushable, Closeable {
         }
     } // class OutputBufferPool
 
-    private class WriteThroughOutputBufferPool extends OutputBufferPool {
+    private class WriteThroughOutputBufferPool
+    extends OutputBufferPool {
         @Override
         public void release(Buffer buffer) throws IOException {
             if (0 == buffer.writers) // DCL does work with volatile fields since JSE 5!
@@ -415,7 +433,8 @@ public final class IOCache implements Flushable, Closeable {
         }
     } // class WriteThroughOutputBufferPool
 
-    private final class WriteBackOutputBufferPool extends OutputBufferPool {
+    private final class WriteBackOutputBufferPool
+    extends OutputBufferPool {
         @Override
         public void release(final Buffer buffer) throws IOException {
             if (0 == buffer.writers) // DCL does work with volatile fields since JSE 5!
@@ -432,6 +451,28 @@ public final class IOCache implements Flushable, Closeable {
         }
     } // class WriteBackOutputBufferPool
 
+    private static final BufferInputSocketFactory factory = JSE7.AVAILABLE
+            ? BufferInputSocketFactory.NIO
+            : BufferInputSocketFactory.OIO;
+
+    private enum BufferInputSocketFactory {
+        OIO() {
+            @Override
+            InputSocket<?> newInputSocket(Buffer buffer) {
+                return buffer.new BufferInputSocket();
+            }
+        },
+
+        NIO() {
+            @Override
+            InputSocket<?> newInputSocket(Buffer buffer) {
+                return buffer.new Nio2BufferInputSocket();
+            }
+        };
+        
+        abstract InputSocket<?> newInputSocket(Buffer buffer);
+    }
+
     private final class Buffer {
         private final IOPool.Entry<?> data;
 
@@ -442,7 +483,7 @@ public final class IOCache implements Flushable, Closeable {
         }
 
         private InputSocket<?> getInputSocket() {
-            return new BufferInputSocket();
+            return factory.newInputSocket(this);
         }
 
         private OutputSocket<?> getOutputSocket() {
@@ -455,23 +496,33 @@ public final class IOCache implements Flushable, Closeable {
             data.release();
         }
 
-        private final class BufferInputSocket extends DecoratingInputSocket<Entry> {
-            private BufferInputSocket() {
+        private final class Nio2BufferInputSocket
+        extends BufferInputSocket {
+            @Override
+            public SeekableByteChannel newSeekableByteChannel() throws IOException {
+                return new BufferSeekableByteChannel(getBoundSocket().newSeekableByteChannel());
+            }
+        } // class Nio2BufferInputSocket
+
+        private class BufferInputSocket
+        extends DecoratingInputSocket<Entry> {
+            BufferInputSocket() {
                 super(data.getInputSocket());
             }
 
             @Override
-            public ReadOnlyFile newReadOnlyFile() throws IOException {
+            public final ReadOnlyFile newReadOnlyFile() throws IOException {
                 return new BufferReadOnlyFile(getBoundSocket().newReadOnlyFile());
             }
 
             @Override
-            public InputStream newInputStream() throws IOException {
+            public final InputStream newInputStream() throws IOException {
                 return new BufferInputStream(getBoundSocket().newInputStream());
             }
-        }
+        } // class BufferInputSocket
 
-        private final class BufferReadOnlyFile extends DecoratingReadOnlyFile {
+        private final class BufferReadOnlyFile
+        extends DecoratingReadOnlyFile {
             private boolean closed;
 
             BufferReadOnlyFile(ReadOnlyFile rof) {
@@ -491,7 +542,29 @@ public final class IOCache implements Flushable, Closeable {
             }
         } // class BufferReadOnlyFile
 
-        private final class BufferInputStream extends DecoratingInputStream {
+        private final class BufferSeekableByteChannel
+        extends DecoratingSeekableByteChannel {
+            private boolean closed;
+
+            BufferSeekableByteChannel(SeekableByteChannel sbc) {
+                super(sbc);
+            }
+
+            @Override
+            public void close() throws IOException {
+                if (closed)
+                    return;
+                closed = true;
+                try {
+                    delegate.close();
+                } finally {
+                    getInputBufferPool().release(Buffer.this);
+                }
+            }
+        } // class BufferReadOnlyFile
+
+        private final class BufferInputStream
+        extends DecoratingInputStream {
             private boolean closed;
 
             BufferInputStream(InputStream in) {
@@ -511,18 +584,25 @@ public final class IOCache implements Flushable, Closeable {
             }
         } // class BufferInputStream
 
-        private final class BufferOutputSocket extends DecoratingOutputSocket<Entry> {
-            private BufferOutputSocket() {
+        private class BufferOutputSocket
+        extends DecoratingOutputSocket<Entry> {
+            BufferOutputSocket() {
                 super(data.getOutputSocket());
+            }
+
+            @Override
+            public SeekableByteChannel newSeekableByteChannel() throws IOException {
+                throw new AssertionError();
             }
 
             @Override
             public OutputStream newOutputStream() throws IOException {
                 return new BufferOutputStream(getBoundSocket().newOutputStream());
             }
-        }
+        } // class BufferOutputSocket
 
-        private final class BufferOutputStream extends DecoratingOutputStream {
+        private final class BufferOutputStream
+        extends DecoratingOutputStream {
             private boolean closed;
 
             BufferOutputStream(OutputStream out) {
