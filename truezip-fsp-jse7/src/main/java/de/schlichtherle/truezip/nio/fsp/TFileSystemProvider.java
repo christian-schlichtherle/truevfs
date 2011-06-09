@@ -23,20 +23,16 @@ import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.fs.FsEntryName;
-import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import de.schlichtherle.truezip.fs.FsInputOption;
 import static de.schlichtherle.truezip.fs.FsInputOptions.*;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
-import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.fs.FsScheme;
-import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.UriBuilder;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -74,18 +70,34 @@ import java.util.Set;
 @DefaultAnnotation(NonNull.class)
 public class TFileSystemProvider extends FileSystemProvider {
 
+    private static volatile TFileSystemProvider
+            DEFAULT = new TFileSystemProvider();
+
     private final String scheme;
     private final FsMountPoint root;
 
-    public TFileSystemProvider() {
-        this("tzp", FsMountPoint.create(URI.create("file:/")));
+    // TODO: Don't ignore path!
+    public static TFileSystemProvider get(final TPath path) {
+        final TFileSystemProvider provider = DEFAULT;
+        return null != provider ? provider : new TFileSystemProvider();
     }
 
-    TFileSystemProvider(final String scheme, final FsMountPoint root) {
+    @SuppressWarnings("LeakingThisInConstructor")
+    public TFileSystemProvider() {
+        this("truezip", FsMountPoint.create(URI.create("file:/")));
+        DEFAULT = this;
+    }
+
+    private TFileSystemProvider(final String scheme, final FsMountPoint root) {
+        this.scheme = FsScheme.create(scheme).toString(); // check syntax
         if (null == root)
             throw new NullPointerException();
-        this.scheme = FsScheme.create(scheme).toString(); // check syntax
         this.root = root;
+    }
+
+    private static TPath promote(Path path) {
+        //return path instanceof TPath ? (TPath) path : new TPath(path);
+        return (TPath) path;
     }
 
     /**
@@ -102,41 +114,12 @@ public class TFileSystemProvider extends FileSystemProvider {
         return root;
     }
 
-    /**
-     * Rewrites URIs of the form {@code [scheme:]///path[?query][#fragment]} to
-     * {@code [scheme:]/path[?query][#fragment]} in order to fix the broken
-     * identity provision for hierarchical URIs with an empty authority in the
-     * URI class.
-     * All other URIs are returned unchanged.
-     * 
-     * @return A URI with no empty authority in its scheme specific part.
-     */
-    static URI fix(URI uri) {
-        return !uri.isOpaque()
-                && null == uri.getAuthority()
-                && uri.getSchemeSpecificPart().startsWith(SEPARATOR + SEPARATOR + SEPARATOR)
-                    ? new UriBuilder(uri).toUri()
-                    : uri;
-    }
-
-    @Override
-    public TFileSystem newFileSystem(   final Path path,
-                                        final Map<String, ?> env) {
-        final URI pnu = fix(path.normalize().toUri());
-        final FsMountPoint fspmp = getRoot();
-        final URI enu = fspmp.toUri().relativize(pnu);
-        if (enu == pnu)
-            throw new UnsupportedOperationException("path not relative to mount point");
-        final FsMountPoint fsmp = new Scanner(getArchiveDetector(env))
-                .scan(enu)
-                .getMountPoint();
-        if (fspmp.equals(fsmp))
-            throw new UnsupportedOperationException("no prospective archive file detected"); // don't be greedy!
-        return new TFileSystem(this, fsmp);
-    }
-
-    private FsPath toFsPath(URI uri, @CheckForNull Map<String, ?> env) {
-        return new Scanner(getArchiveDetector(env)).scan(uri.normalize());
+    private static TArchiveDetector getArchiveDetector(@CheckForNull Map<String, ?> env) {
+        if (null == env)
+            return TPath.getDefaultArchiveDetector();
+        TArchiveDetector detector = (TArchiveDetector) env.get(
+                Parameter.ARCHIVE_DETECTOR);
+        return null != detector ? detector : TPath.getDefaultArchiveDetector();
     }
 
     /**
@@ -144,12 +127,28 @@ public class TFileSystemProvider extends FileSystemProvider {
      * 
      * @param env If {@code null} or does not contain a {@link TArchiveDetector}
      *        for the key {@link Parameter#ARCHIVE_DETECTOR}, then
-     *        {@link TArchiveDetector#ALL} is used to detect prospective
+     *        {@link TPath#getDefaultArchiveDetector()} is used to detect prospective
      *        archive files.
      */
     @Override
-    public TFileSystem newFileSystem(URI uri, @CheckForNull final Map<String, ?> env) {
-        return new TFileSystem(this, toFsPath(uri, env).getMountPoint());
+    public TFileSystem newFileSystem(Path path, Map<String, ?> env) {
+        TPath p = new TPath(getArchiveDetector(env), path);
+        if (null == p.getPath().getMountPoint().getParent())
+            throw new UnsupportedOperationException("no prospective archive file detected"); // don't be greedy!
+        return p.getFileSystem();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @param env If {@code null} or does not contain a {@link TArchiveDetector}
+     *        for the key {@link Parameter#ARCHIVE_DETECTOR}, then
+     *        {@link TPath#getDefaultArchiveDetector()} is used to detect prospective
+     *        archive files.
+     */
+    @Override
+    public TFileSystem newFileSystem(URI uri, @CheckForNull Map<String, ?> env) {
+        return new TPath(getArchiveDetector(env), uri).getFileSystem();
     }
 
     /**
@@ -163,50 +162,9 @@ public class TFileSystemProvider extends FileSystemProvider {
         return newFileSystem(uri, null);
     }
 
-    private static TArchiveDetector getArchiveDetector(@CheckForNull Map<String, ?> env) {
-        if (null == env)
-            return TArchiveDetector.ALL;
-        TArchiveDetector detector = (TArchiveDetector) env.get(
-                Parameter.ARCHIVE_DETECTOR);
-        return null != detector ? detector : TArchiveDetector.ALL;
-    }
-
-    private final class Scanner {
-        final TArchiveDetector detector;
-        final Splitter splitter = new Splitter(SEPARATOR_CHAR, false);
-        final UriBuilder uri = new UriBuilder();
-
-        Scanner(TArchiveDetector detector) {
-            this.detector = detector;
-        }
-
-        FsPath scan(final URI uri) {
-            assert !uri.isOpaque();
-            final String p = uri.getPath();
-            this.uri.path(p).query(uri.getQuery());
-            return scan(p);
-        }
-
-        FsPath scan(final String input) {
-            splitter.split(input);
-            final String parent = splitter.getParentPath();
-            final FsEntryName member = FsEntryName.create(
-                    uri.path(splitter.getMemberName()).toUri());
-            if (null == parent)
-                return new FsPath(getRoot(), member);
-            FsPath path = scan(parent).resolve(member);
-            final FsScheme scheme = detector.getScheme(member.toString());
-            if (null != scheme)
-                path = new FsPath(FsMountPoint.create(scheme, path), ROOT);
-            return path;
-        }
-    } // class Scanner
-
     @Override
-    public TPath getPath(final URI uri) {
-        final FsPath path = toFsPath(uri, null);
-        return new TFileSystem(this, path.getMountPoint())
-                .getPath(path.getEntryName());
+    public TPath getPath(URI uri) {
+        return new TPath(uri);
     }
 
     @Override
@@ -239,7 +197,7 @@ public class TFileSystemProvider extends FileSystemProvider {
         } else {
             inputOptions = NO_INPUT_OPTION;
         }
-        return toTPath(path)
+        return promote(path)
                 .getInputSocket(inputOptions)
                 .newInputStream();
     }
@@ -275,7 +233,7 @@ public class TFileSystemProvider extends FileSystemProvider {
         } else {
             outputOptions = NO_OUTPUT_OPTION;
         }
-        return toTPath(path)
+        return promote(path)
                 .getOutputSocket(outputOptions, null)
                 .newOutputStream();
     }
@@ -283,27 +241,27 @@ public class TFileSystemProvider extends FileSystemProvider {
     @Override
     public DirectoryStream<Path> newDirectoryStream(Path dir, Filter<? super Path> filter)
     throws IOException {
-        return toTPath(dir).newDirectoryStream(filter);
+        return promote(dir).newDirectoryStream(filter);
     }
 
     @Override
     public void createDirectory(Path dir, FileAttribute<?>... attrs) throws IOException {
-        toTPath(dir).createDirectory(attrs);
+        promote(dir).createDirectory(attrs);
     }
 
     @Override
     public void delete(Path path) throws IOException {
-        delete0(toTPath(path));
+        delete0(promote(path));
     }
 
     private void delete0(TPath path) throws IOException {
-        toTPath(path).delete();
+        promote(path).delete();
     }
 
     @Override
     public void copy(Path source, Path target, CopyOption... options)
     throws IOException {
-        copy0(toTPath(source), toTPath(target), options);
+        copy0(promote(source), promote(target), options);
     }
 
     private void copy0( final TPath source,
@@ -336,8 +294,8 @@ public class TFileSystemProvider extends FileSystemProvider {
     @Override
     public void move(Path source, Path target, CopyOption... options)
     throws IOException {
-        TPath s = toTPath(source);
-        TPath t = toTPath(target);
+        TPath s = promote(source);
+        TPath t = promote(target);
         if (null != t.getEntry())
             throw new FileAlreadyExistsException(target.toString());
         copy0(s, t, StandardCopyOption.COPY_ATTRIBUTES);
@@ -345,24 +303,22 @@ public class TFileSystemProvider extends FileSystemProvider {
     }
 
     private static void checkContains(TPath a, TPath b) throws IOException {
-        // toAbsolutePath() is redundant, but kept for comprehensibility.
-        URI ua = a.toAbsolutePath().toPath().toHierarchicalUri();
-        URI ub = b.toAbsolutePath().toPath().toHierarchicalUri();
+        URI ua = a.toRealPath().getPath().toHierarchicalUri();
+        URI ub = b.toRealPath().getPath().toHierarchicalUri();
         if (ua.resolve(ub) != ub)
             throw new IOException(b + " (contained in " + a + ")");
     }
 
     @Override
     public boolean isSameFile(Path a, Path b) throws IOException {
-        // toAbsolutePath() is redundant, but kept for comprehensibility.
-        URI ua = toTPath(a).toAbsolutePath().toPath().toHierarchicalUri();
-        URI ub = toTPath(b).toAbsolutePath().toPath().toHierarchicalUri();
+        URI ua = promote(a).toRealPath().getPath().toHierarchicalUri();
+        URI ub = promote(b).toRealPath().getPath().toHierarchicalUri();
         return ua.equals(ub);
     }
 
     @Override
     public boolean isHidden(Path path) throws IOException {
-        return toTPath(path).getFileName().startsWith(".");
+        return promote(path).getFileName().startsWith(".");
     }
 
     @Override
@@ -372,9 +328,9 @@ public class TFileSystemProvider extends FileSystemProvider {
 
     @Override
     public void checkAccess(Path path, AccessMode... modes) throws IOException {
-        final TPath p = toTPath(path);
-        final FsEntryName n = p.toPath().getEntryName();
-        final FsController<?> c = p.getFileSystem().getController();
+        final TPath p = promote(path);
+        final FsEntryName n = p.getPath().getEntryName();
+        final FsController<?> c = p.getFileSystem().getController(p.getArchiveDetector());
         if (null == c.getEntry(n))
             throw new NoSuchFileException(path.toString());
         for (final AccessMode m : modes) {
@@ -407,7 +363,7 @@ public class TFileSystemProvider extends FileSystemProvider {
     throws IOException {
         if (!type.isAssignableFrom(BasicFileAttributes.class))
             throw new UnsupportedOperationException();
-        return (A) readAttributes0(toTPath(path));
+        return (A) readAttributes0(promote(path));
     }
 
     private BasicFileAttributes readAttributes0(final TPath path)
@@ -472,14 +428,6 @@ public class TFileSystemProvider extends FileSystemProvider {
     @Override
     public void setAttribute(Path path, String attribute, Object value, LinkOption... options) throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    private static TPath toTPath(Path path) {
-        /*if (path == null)
-            throw new NullPointerException();
-        if (!(path instanceof TPath))
-            throw new ProviderMismatchException();*/
-        return (TPath) path;
     }
 
     /** Keys for environment maps. */

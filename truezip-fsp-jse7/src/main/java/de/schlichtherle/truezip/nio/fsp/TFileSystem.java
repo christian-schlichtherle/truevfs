@@ -17,7 +17,7 @@ package de.schlichtherle.truezip.nio.fsp;
 
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Type;
-import de.schlichtherle.truezip.file.TFile;
+import de.schlichtherle.truezip.fs.FsCompositeDriver;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
@@ -27,9 +27,9 @@ import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.fs.FsOutputOptions;
 import de.schlichtherle.truezip.fs.FsSyncException;
-import de.schlichtherle.truezip.fs.FsUriModifier;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import static de.schlichtherle.truezip.fs.FsManager.*;
+import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
@@ -37,8 +37,6 @@ import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.UriBuilder;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import java.io.IOException;
-import static java.io.File.*;
-import java.net.URI;
 import java.nio.file.DirectoryStream;
 import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.FileStore;
@@ -52,6 +50,8 @@ import java.nio.file.attribute.UserPrincipalLookupService;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author  Christian Schlichtherle
@@ -62,27 +62,30 @@ public final class TFileSystem extends FileSystem {
     /** The file system manager to use within this package. */
     private static final FsManager manager = FsManagerLocator.SINGLETON.get();
 
-    private final TFileSystemProvider provider;
     private final FsMountPoint mountPoint;
+    private final TFileSystemProvider provider;
 
-    TFileSystem(TFileSystemProvider provider, FsMountPoint mountPoint) {
-        if (null == provider || null == mountPoint)
-            throw new NullPointerException();
-        this.provider = provider;
-        this.mountPoint = mountPoint;
+    static TFileSystem get(TPath path) {
+        // TODO: Consider caching in WeakHashMap.
+        return new TFileSystem(
+                path.getPath().getMountPoint(),
+                TFileSystemProvider.get(path));
     }
 
-    FsEntryName resolveParent(FsEntryName name) {
-        return mountPoint.getPath().resolve(name).getEntryName();
+    private TFileSystem(
+            final FsMountPoint mountPoint,
+            final TFileSystemProvider provider) {
+        this.mountPoint = mountPoint;
+        this.provider = provider;
+    }
+
+    public FsMountPoint getMountPoint() {
+        return mountPoint;
     }
 
     @Override
     public TFileSystemProvider provider() {
         return provider;
-    }
-
-    public FsMountPoint getMountPoint() {
-        return mountPoint;
     }
 
     @Override
@@ -122,21 +125,7 @@ public final class TFileSystem extends FileSystem {
 
     @Override
     public TPath getPath(String first, String... more) {
-        return new TPath(this, FsEntryName.create(
-                toUri(first, more),
-                FsUriModifier.CANONICALIZE));
-    }
-
-    public TPath getPath(FsEntryName name) {
-        return new TPath(this, name);
-    }
-
-    static URI toUri(final String first, final String... more) {
-        final StringBuilder pb = new StringBuilder(first);
-        for (final String m : more)
-            pb      .append(SEPARATOR_CHAR)
-                    .append(m.replace(separatorChar, SEPARATOR_CHAR));
-        return new UriBuilder().path(pb.toString()).toUri();
+        return new TPath(new FsPath(getMountPoint(), ROOT), null, first, more);
     }
 
     @Override
@@ -154,41 +143,31 @@ public final class TFileSystem extends FileSystem {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    /*ReadOnlyFile newReadOnlyFile(   TPath path,
-                                    BitField<FsInputOption> options)
-    throws IOException {
-        FsEntryName entryName = path.getEntryName();
-        return manager
-                .getController(mountPoint, driver)
-                .getInputSocket(entryName, options)
-                .newReadOnlyFile();
-    }*/
-
     FsEntry getEntry(TPath path) throws IOException {
-        FsEntryName name = path.toPath().getEntryName();
-        return getController().getEntry(name);
+        FsEntryName name = path.getPath().getEntryName();
+        return getController(path).getEntry(name);
     }
 
     InputSocket<?> getInputSocket(  TPath path,
                                     BitField<FsInputOption> options) {
-        FsEntryName name = path.toPath().getEntryName();
-        return getController()
+        FsEntryName name = path.getPath().getEntryName();
+        return getController(path)
                 .getInputSocket(name, options);
     }
 
     OutputSocket<?> getOutputSocket(TPath path,
                                     BitField<FsOutputOption> options,
                                     @CheckForNull Entry template) {
-        FsEntryName name = path.toPath().getEntryName();
-        return getController()
+        FsEntryName name = path.getPath().getEntryName();
+        return getController(path)
                 .getOutputSocket(name, options, template);
     }
 
     DirectoryStream<Path> newDirectoryStream(   final TPath path,
                                                 final Filter<? super Path> filter)
     throws IOException {
-        final FsEntryName name = path.toPath().getEntryName();
-        final FsEntry entry = getController().getEntry(name);
+        final FsEntryName name = path.getPath().getEntryName();
+        final FsEntry entry = getController(path).getEntry(name);
         final Set<String> set;
         if (null == entry || null == (set = entry.getMembers()))
             throw new NotDirectoryException(path.toString());
@@ -201,13 +180,13 @@ public final class TFileSystem extends FileSystem {
             @Override
             public boolean hasNext() {
                 while (i.hasNext()) {
-                    next = new TPath(TFileSystem.this, new FsEntryName(
-                            path.toPath().getEntryName(),
-                            FsEntryName.create(uri.path(i.next()).toUri())));
+                    next = new TPath(path, i.next());
                     try {
                         if (filter.accept(next))
                             return true;
-                    } catch (IOException ignored) {
+                    } catch (IOException ex) {
+                        Logger  .getLogger(TFileSystem.class.getName())
+                                .log(Level.WARNING, ex.toString(), ex);
                     }
                 }
                 next = null;
@@ -246,25 +225,29 @@ public final class TFileSystem extends FileSystem {
     throws IOException {
         if (0 < attrs.length)
             throw new UnsupportedOperationException();
-        FsEntryName name = path.toPath().getEntryName();
-        getController()
+        FsEntryName name = path.getPath().getEntryName();
+        getController(path)
                 .mknod(name, Type.DIRECTORY, FsOutputOptions.NO_OUTPUT_OPTION, null);
     }
 
     void delete(TPath path) throws IOException {
-        FsEntryName name = path.toPath().getEntryName();
-        getController()
+        FsEntryName name = path.getPath().getEntryName();
+        getController(path)
                 .unlink(name);
     }
 
     private volatile FsController<?> controller;
 
-    FsController<?> getController() {
+    private FsController<?> getController(TPath path) {
+        return getController(path.getArchiveDetector());
+    }
+
+    FsController<?> getController(FsCompositeDriver driver) {
         final FsController<?> controller = this.controller;
         return null != controller
                 ? controller
                 : (this.controller = manager.getController(
-                    mountPoint,
-                    TFile.getDefaultArchiveDetector())); // FIXME: Should use TPath.getArchiveDetector();
+                    getMountPoint(),
+                    driver));
     }
 }
