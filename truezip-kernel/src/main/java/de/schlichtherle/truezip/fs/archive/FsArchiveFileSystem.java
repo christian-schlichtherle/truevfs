@@ -623,15 +623,35 @@ implements Iterable<FsCovariantEntry<E>> {
         if (0 > value)
             throw new IllegalArgumentException(name.toString()
                     + " (negative access time)");
-        final FsCovariantEntry<E> entry = master.get(name.getPath());
-        if (null == entry)
+        final FsCovariantEntry<E> ce = master.get(name.getPath());
+        if (null == ce)
             throw new FsArchiveFileSystemException(name.toString(),
                     "archive entry not found");
         // Order is important here!
         touch();
+        final E ae = ce.getEntry();
         boolean ok = true;
         for (Access type : types)
-            ok &= entry.getEntry().setTime(type, value);
+            ok &= ae.setTime(type, value);
+        return ok;
+    }
+
+    public boolean setTime(
+            final FsEntryName name,
+            final Map<Access, Long> times)
+    throws FsArchiveFileSystemException {
+        final FsCovariantEntry<E> ce = master.get(name.getPath());
+        if (null == ce)
+            throw new FsArchiveFileSystemException(name.toString(),
+                    "archive entry not found");
+        // Order is important here!
+        touch();
+        final E ae = ce.getEntry();
+        boolean ok = true;
+        for (Map.Entry<Access, Long> time : times.entrySet()) {
+            final long value = time.getValue();
+            ok &= 0 <= value && ae.setTime(time.getKey(), value);
+        }
         return ok;
     }
 
