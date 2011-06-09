@@ -362,7 +362,7 @@ public final class FsEntryName extends EntryName {
         if (null != path && !path.isEmpty())
             return false;
         final String query = uri.getRawQuery();
-        if (null != query && !query.isEmpty())
+        if (null != query)
             return false;
         return true;
     }

@@ -213,4 +213,14 @@ public class FsEntryNameTest {
             assertThat(FsEntryName.create(result.toUri()), equalTo(result));
         }
     }
+
+    @Test
+    public void testIsRoot() {
+        for (final Object params[] : new Object[][] {
+            { "", true },
+            { "?", false, },
+        }) {
+            assertThat(FsEntryName.create(URI.create(params[0].toString())).isRoot(), is(params[1]));
+        }
+    }
 }
