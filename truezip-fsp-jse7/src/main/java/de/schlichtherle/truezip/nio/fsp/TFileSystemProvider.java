@@ -24,9 +24,11 @@ import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsInputOption;
+import de.schlichtherle.truezip.fs.FsInputOptions;
 import static de.schlichtherle.truezip.fs.FsInputOptions.*;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsOutputOption;
+import de.schlichtherle.truezip.fs.FsOutputOptions;
 import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.socket.IOSocket;
@@ -54,12 +56,16 @@ import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileAttributeView;
 import java.nio.file.attribute.FileTime;
 import java.nio.file.spi.FileSystemProvider;
+import java.util.Collections;
+import java.util.EnumMap;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -76,13 +82,25 @@ public class TFileSystemProvider extends FileSystemProvider {
     private final String scheme;
     private final FsMountPoint root;
 
-    // TODO: Don't ignore path!
+    /**
+     * Obtains a file system provider for the given path.
+     * 
+     * @param  path a path.
+     * @return A file system provider.
+     */
     public static TFileSystemProvider get(final TPath path) {
         final TFileSystemProvider provider = DEFAULT;
         return null != provider ? provider : new TFileSystemProvider();
     }
 
+    /**
+     * @deprecated This constructor is solely provided in order to use this
+     *             file system provider class with the service loading feature
+     *             of NIO.2.
+     * @see        #get(TPath) 
+     */
     @SuppressWarnings("LeakingThisInConstructor")
+    @Deprecated
     public TFileSystemProvider() {
         this("truezip", FsMountPoint.create(URI.create("file:/")));
         DEFAULT = this;
@@ -167,74 +185,85 @@ public class TFileSystemProvider extends FileSystemProvider {
         return new TPath(uri);
     }
 
-    @Override
-    public SeekableByteChannel newByteChannel(Path path, Set<? extends OpenOption> options, FileAttribute<?>... attrs) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    private static BitField<FsInputOption> mapInput(OpenOption... options) {
+        HashSet<OpenOption> set = new HashSet<>(options.length * 4 / 3 + 1);
+        Collections.addAll(set, options);
+        return mapInput(set);
     }
 
-    /*private IOPool<?> getPool() {
-        final IOPool<?> pool = this.pool;
-        return null != pool ? pool : (this.pool = IOPoolLocator.SINGLETON.get());
-    }*/
+    private static BitField<FsInputOption> mapInput(Set<? extends OpenOption> options) {
+        int s = options.size();
+        if (0 == s || 1 == s && options.contains(StandardOpenOption.READ))
+            return FsInputOptions.NO_INPUT_OPTION;
+        throw new IllegalArgumentException(options.toString());
+    }
+
+    private static BitField<FsOutputOption> mapOutput(OpenOption... options) {
+        HashSet<OpenOption> set = new HashSet<>(options.length * 4 / 3 + 1);
+        Collections.addAll(set, options);
+        return mapOutput(set);
+    }
+
+    private static BitField<FsOutputOption> mapOutput(Set<? extends OpenOption> options) {
+        if (options.isEmpty())
+            return FsOutputOptions.NO_OUTPUT_OPTION;
+        EnumSet<FsOutputOption> set = EnumSet.noneOf(FsOutputOption.class);
+        for (OpenOption option : options) {
+            if (!(option instanceof StandardOpenOption))
+                throw new UnsupportedOperationException(option.toString());
+            switch ((StandardOpenOption) option) {
+                case READ:
+                    throw new IllegalArgumentException(option.toString());
+                case WRITE:
+                case TRUNCATE_EXISTING:
+                case CREATE:
+                    break;
+                case APPEND:
+                    set.add(FsOutputOption.APPEND);
+                    break;
+                case CREATE_NEW:
+                    set.add(FsOutputOption.EXCLUSIVE);
+                    break;
+                default:
+                    throw new UnsupportedOperationException(option.toString());
+            }
+        }
+        return set.isEmpty()
+                ? FsOutputOptions.NO_OUTPUT_OPTION
+                : BitField.copyOf(set);
+    }
+
+    @Override
+    public SeekableByteChannel newByteChannel(
+            final Path path,
+            final Set<? extends OpenOption> options,
+            final FileAttribute<?>... attrs)
+    throws IOException {
+        final TPath p = promote(path);
+        if (options.isEmpty() || options.contains(StandardOpenOption.READ))
+            return p.getInputSocket(
+                        mapInput(options).set(FsInputOption.CACHE))
+                    .newSeekableByteChannel();
+        else
+            return p.getOutputSocket(
+                        mapOutput(options).set(FsOutputOption.CACHE),
+                        null)
+                    .newSeekableByteChannel();
+    }
 
     @Override
     public InputStream newInputStream(Path path, OpenOption... options)
     throws IOException {
-        final BitField<FsInputOption> inputOptions;
-        if (0 < options.length) {
-            final EnumSet<FsInputOption> set = EnumSet.noneOf(FsInputOption.class);
-            for (final OpenOption option : options) {
-                if (!(option instanceof StandardOpenOption))
-                    throw new UnsupportedOperationException(option.toString());
-                switch ((StandardOpenOption) option) {
-                    case READ:
-                        break;
-                    default:
-                        throw new IllegalArgumentException(option.toString());
-                }
-            }
-            inputOptions = BitField.copyOf(set);
-        } else {
-            inputOptions = NO_INPUT_OPTION;
-        }
         return promote(path)
-                .getInputSocket(inputOptions)
+                .getInputSocket(mapInput(options))
                 .newInputStream();
     }
 
     @Override
     public OutputStream newOutputStream(Path path, OpenOption... options)
     throws IOException {
-        final BitField<FsOutputOption> outputOptions;
-        if (0 < options.length) {
-            final EnumSet<FsOutputOption> set = EnumSet.noneOf(FsOutputOption.class);
-            for (final OpenOption option : options) {
-                if (!(option instanceof StandardOpenOption))
-                    throw new UnsupportedOperationException(option.toString());
-                switch ((StandardOpenOption) option) {
-                    case READ:
-                        throw new IllegalArgumentException(option.toString());
-                    case WRITE:
-                    case TRUNCATE_EXISTING:
-                    case CREATE:
-                        break;
-                    case APPEND:
-                        set.add(FsOutputOption.APPEND);
-                        break;
-                    case CREATE_NEW:
-                        // Note that EXCLUSIVE is usually NOT atomic.
-                        set.add(FsOutputOption.EXCLUSIVE);
-                        break;
-                    default:
-                        throw new UnsupportedOperationException(option.toString());
-                }
-            }
-            outputOptions = BitField.copyOf(set);
-        } else {
-            outputOptions = NO_OUTPUT_OPTION;
-        }
         return promote(path)
-                .getOutputSocket(outputOptions, null)
+                .getOutputSocket(mapOutput(options), null)
                 .newOutputStream();
     }
 
@@ -330,7 +359,7 @@ public class TFileSystemProvider extends FileSystemProvider {
     public void checkAccess(Path path, AccessMode... modes) throws IOException {
         final TPath p = promote(path);
         final FsEntryName n = p.getPath().getEntryName();
-        final FsController<?> c = p.getFileSystem().getController(p.getArchiveDetector());
+        final FsController<?> c = p.getController();
         if (null == c.getEntry(n))
             throw new NoSuchFileException(path.toString());
         for (final AccessMode m : modes) {
@@ -343,6 +372,10 @@ public class TFileSystemProvider extends FileSystemProvider {
                     if (!c.isWritable(n))
                         throw new AccessDeniedException(path.toString());
                     break;
+                case EXECUTE:
+                    if (!c.isExecutable(n))
+                        throw new AccessDeniedException(path.toString());
+                    break;
                 default:
                     throw new UnsupportedOperationException();
             }
@@ -350,8 +383,14 @@ public class TFileSystemProvider extends FileSystemProvider {
     }
 
     @Override
-    public <V extends FileAttributeView> V getFileAttributeView(Path path, Class<V> type, LinkOption... options) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    @SuppressWarnings("unchecked")
+    public <V extends FileAttributeView> V getFileAttributeView(
+            Path path,
+            Class<V> type,
+            LinkOption... options) {
+        if (!type.isAssignableFrom(BasicFileAttributeView.class))
+            throw new UnsupportedOperationException();
+        return (V) new FsEntryAttributeView(promote(path));
     }
 
     @Override
@@ -363,61 +402,7 @@ public class TFileSystemProvider extends FileSystemProvider {
     throws IOException {
         if (!type.isAssignableFrom(BasicFileAttributes.class))
             throw new UnsupportedOperationException();
-        return (A) readAttributes0(promote(path));
-    }
-
-    private BasicFileAttributes readAttributes0(final TPath path)
-    throws IOException {
-        final FsEntry e = path.getEntry();
-
-        class Attributes implements BasicFileAttributes {
-            @Override
-            public FileTime lastModifiedTime() {
-                return e == null ? null : FileTime.fromMillis(e.getTime(WRITE));
-            }
-
-            @Override
-            public FileTime lastAccessTime() {
-                return e == null ? null : FileTime.fromMillis(e.getTime(READ));
-            }
-
-            @Override
-            public FileTime creationTime() {
-                return e == null ? null : FileTime.fromMillis(e.getTime(CREATE));
-            }
-
-            @Override
-            public boolean isRegularFile() {
-                return e == null ? false : e.isType(FILE);
-            }
-
-            @Override
-            public boolean isDirectory() {
-                return e == null ? false : e.isType(DIRECTORY);
-            }
-
-            @Override
-            public boolean isSymbolicLink() {
-                return e == null ? false : e.isType(SYMLINK);
-            }
-
-            @Override
-            public boolean isOther() {
-                return e == null ? false : e.isType(SPECIAL);
-            }
-
-            @Override
-            public long size() {
-                return e == null ? UNKNOWN : e.getSize(DATA);
-            }
-
-            @Override
-            public Object fileKey() {
-                throw new UnsupportedOperationException("Not supported yet.");
-            }
-        }
-
-        return new Attributes();
+        return (A) new FsEntryAttributes(promote(path));
     }
 
     @Override
@@ -435,4 +420,94 @@ public class TFileSystemProvider extends FileSystemProvider {
         /** The key for the {@link TArchiveDetector} parameter. */
         String ARCHIVE_DETECTOR = "ARCHIVE_DETECTOR";
     }
+
+    private static final class FsEntryAttributeView
+    implements BasicFileAttributeView {
+        private final TPath path;
+
+        FsEntryAttributeView(final TPath path) {
+            this.path = path;
+        }
+
+        @Override
+        public String name() {
+            return "basic";
+        }
+
+        @Override
+        public BasicFileAttributes readAttributes() throws IOException {
+            return new FsEntryAttributes(path);
+        }
+
+        @Override
+        public void setTimes(   final FileTime lastModifiedTime,
+                                final FileTime lastAccessTime,
+                                final FileTime createTime)
+        throws IOException {
+            final FsController<?> c = path.getController();
+            final Map<Access, Long> t = new EnumMap<>(Access.class);
+            t.put(WRITE, toMillis(lastModifiedTime));
+            t.put(READ, toMillis(lastAccessTime));
+            t.put(CREATE, toMillis(createTime));
+            c.setTime(path.getPath().getEntryName(), t);
+        }
+
+        private static long toMillis(FileTime time) {
+            return time == null ? null : time.toMillis();
+        }
+    } // class FsEntryAttributeView
+
+    private static final class FsEntryAttributes
+    implements BasicFileAttributes {
+        private final FsEntry e;
+
+        FsEntryAttributes(TPath path) throws IOException {
+            e = path.getEntry();
+        }
+
+        @Override
+        public FileTime lastModifiedTime() {
+            return e == null ? null : FileTime.fromMillis(e.getTime(WRITE));
+        }
+
+        @Override
+        public FileTime lastAccessTime() {
+            return e == null ? null : FileTime.fromMillis(e.getTime(READ));
+        }
+
+        @Override
+        public FileTime creationTime() {
+            return e == null ? null : FileTime.fromMillis(e.getTime(CREATE));
+        }
+
+        @Override
+        public boolean isRegularFile() {
+            return e == null ? false : e.isType(FILE);
+        }
+
+        @Override
+        public boolean isDirectory() {
+            return e == null ? false : e.isType(DIRECTORY);
+        }
+
+        @Override
+        public boolean isSymbolicLink() {
+            return e == null ? false : e.isType(SYMLINK);
+        }
+
+        @Override
+        public boolean isOther() {
+            return e == null ? false : e.isType(SPECIAL);
+        }
+
+        @Override
+        public long size() {
+            return e == null ? UNKNOWN : e.getSize(DATA);
+        }
+
+        @Override
+        public Object fileKey() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+    } // class FsEntryAttributes
 }

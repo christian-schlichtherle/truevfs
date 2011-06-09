@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.nio.fsp;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.file.TFile;
+import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsEntry;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import de.schlichtherle.truezip.fs.FsInputOption;
@@ -91,7 +92,7 @@ public final class TPath implements Path {
         this.detector = null != detector ? detector : getDefaultArchiveDetector();
         final URI uri = uri(first, more);
         this.uri = parent.toUri().resolve(uri);
-        this.path = toPath(parent, uri);
+        this.path = new Scanner(parent, detector).toPath(uri);
 
         assert invariants();
     }
@@ -145,8 +146,8 @@ public final class TPath implements Path {
      * If assertions are disabled, the call to this method is thrown away by
      * the HotSpot compiler, so there is no performance penalty.
      *
-     * @throws AssertionError If any invariant is violated even if assertions
-     *         are disabled.
+     * @throws AssertionError If assertions are enabled and any invariant is
+     *         violated.
      * @return {@code true}
      */
     private boolean invariants() {
@@ -155,10 +156,6 @@ public final class TPath implements Path {
         assert null != getPath();
         assert null != getFileSystem();
         return true;
-    }
-
-    URI getUri() {
-        return this.uri;
     }
 
     /**
@@ -170,6 +167,10 @@ public final class TPath implements Path {
      */
     public TArchiveDetector getArchiveDetector() {
         return detector;
+    }
+
+    URI getUri() {
+        return this.uri;
     }
 
     /**
@@ -215,10 +216,6 @@ public final class TPath implements Path {
                     ? TFileSystemProvider.get(this).getRoot()
                     : CURRENT_DIRECTORY,
                 detector).toPath(uri);
-    }
-
-    private FsPath toPath(FsPath parent, URI member) {
-        return new Scanner(parent, detector).toPath(member);
     }
 
     @Override
@@ -390,15 +387,19 @@ public final class TPath implements Path {
         return getUri().toString();
     }
 
+    FsController<?> getController() throws IOException {
+        return getFileSystem().getController(getArchiveDetector());
+    }
+
     FsEntry getEntry() throws IOException {
         return getFileSystem().getEntry(this);
     }
 
-    InputSocket<?> getInputSocket(BitField<FsInputOption> options) {
+    public InputSocket<?> getInputSocket(BitField<FsInputOption> options) {
         return getFileSystem().getInputSocket(this, options);
     }
 
-    OutputSocket<?> getOutputSocket(BitField<FsOutputOption> options,
+    public OutputSocket<?> getOutputSocket(BitField<FsOutputOption> options,
                                     @CheckForNull Entry template) {
         return getFileSystem().getOutputSocket(this, options, template);
     }
