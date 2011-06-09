@@ -59,9 +59,7 @@ extends InputSocket<E> {
         return getBoundSocket().getPeerTarget();
     }
 
-    /**
-     * @since  TrueZIP 7.2
-     */
+    /** @since TrueZIP 7.2 */
     @Override
     public SeekableByteChannel newSeekableByteChannel() throws IOException {
         return getBoundSocket().newSeekableByteChannel();

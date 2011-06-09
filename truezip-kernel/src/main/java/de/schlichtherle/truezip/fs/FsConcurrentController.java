@@ -30,6 +30,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.channels.SeekableByteChannel;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
@@ -270,6 +271,26 @@ extends FsDecoratingController< FsConcurrentModel,
         }
 
         @Override
+        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            try {
+                readLock().lock();
+                try {
+                    return getBoundSocket().newSeekableByteChannel();
+                } finally {
+                    readLock().unlock();
+                }
+            } catch (FsNotWriteLockedException ex) {
+                assertNotReadLockedByCurrentThread(ex);
+                writeLock().lock();
+                try {
+                    return getBoundSocket().newSeekableByteChannel();
+                } finally {
+                    writeLock().unlock();
+                }
+            }
+        }
+
+        @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
             try {
                 readLock().lock();
@@ -328,6 +349,17 @@ extends FsDecoratingController< FsConcurrentModel,
             writeLock().lock();
             try {
                 return getBoundSocket().getLocalTarget();
+            } finally {
+                writeLock().unlock();
+            }
+        }
+
+        @Override
+        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            assertNotReadLockedByCurrentThread(null);
+            writeLock().lock();
+            try {
+                return getBoundSocket().newSeekableByteChannel();
             } finally {
                 writeLock().unlock();
             }

@@ -15,12 +15,14 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import de.schlichtherle.truezip.util.JSE7;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import java.io.InputStream;
 import de.schlichtherle.truezip.socket.IOCache.Strategy;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
 import de.schlichtherle.truezip.socket.DecoratingInputSocket;
 import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.socket.IOCache;
@@ -35,6 +37,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.channels.SeekableByteChannel;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -144,6 +147,13 @@ extends FsDecoratingController< FsConcurrentModel,
         }
 
         @Override
+        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            // This is the same as the code in the super class, so overriding
+            // is redundant, but it makes the stack trace much easier to digest.
+            return getBoundSocket().newSeekableByteChannel();
+        }
+
+        @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
             // This is the same as the code in the super class, so overriding
             // is redundant, but it makes the stack trace much easier to digest.
@@ -217,6 +227,13 @@ extends FsDecoratingController< FsConcurrentModel,
             // This is the same as the code in the super class, so overriding
             // is redundant, but it makes the stack trace much easier to digest.
             return getBoundSocket().getPeerTarget();
+        }
+
+        @Override
+        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            // This is the same as the code in the super class, so overriding
+            // is redundant, but it makes the stack trace much easier to digest.
+            return getBoundSocket().newSeekableByteChannel();
         }
 
         @Override
@@ -302,6 +319,28 @@ extends FsDecoratingController< FsConcurrentModel,
         }
     }
 
+    private static final ProxyOutputSocketFactory factory = JSE7.AVAILABLE
+            ? ProxyOutputSocketFactory.NIO
+            : ProxyOutputSocketFactory.OIO;
+
+    private enum ProxyOutputSocketFactory {
+        OIO() {
+            @Override
+            OutputSocket<?> newOutputSocket(EntryCache cache, OutputSocket <?> output) {
+                return cache.new ProxyOutputSocket(output);
+            }
+        },
+
+        NIO() {
+            @Override
+            OutputSocket<?> newOutputSocket(EntryCache cache, OutputSocket <?> output) {
+                return cache.new Nio2ProxyOutputSocket(output);
+            }
+        };
+        
+        abstract OutputSocket<?> newOutputSocket(EntryCache cache, OutputSocket <?> output);
+    }
+
     /** A cache for the contents of an individual file system entry. */
     private class EntryCache {
         private final FsEntryName name;
@@ -366,13 +405,13 @@ extends FsDecoratingController< FsConcurrentModel,
             }
 
             @Override
+            public SeekableByteChannel newSeekableByteChannel() throws IOException {
+                throw new AssertionError();
+            }
+
+            @Override
             public ReadOnlyFile newReadOnlyFile() throws IOException {
-                assert false : "The IOCache is expected to never use this method!";
-                assert getModel().isWriteLockedByCurrentThread();
-                final ReadOnlyFile rof = getBoundSocket().newReadOnlyFile();
-                assert getModel().isTouched();
-                caches.put(name, EntryCache.this);
-                return rof;
+                throw new AssertionError();
             }
 
             @Override
@@ -389,18 +428,36 @@ extends FsDecoratingController< FsConcurrentModel,
             final OutputSocket<?> output = this.output;
             return null != output
                     ? output
-                    : (this.output = new ProxyOutputSocket(cache.getOutputSocket()));
+                    : (this.output = factory.newOutputSocket(this, cache.getOutputSocket()));
         }
 
         /** An output socket proxy. */
-        private final class ProxyOutputSocket
+        private final class Nio2ProxyOutputSocket
+        extends ProxyOutputSocket {
+            Nio2ProxyOutputSocket(OutputSocket <?> output) {
+                super(output);
+            }
+
+            @Override
+            public SeekableByteChannel newSeekableByteChannel() throws IOException {
+                assert getModel().isWriteLockedByCurrentThread();
+                delegate.mknod(name, FILE, outputOptions, template);
+                assert getModel().isTouched();
+                final SeekableByteChannel sbc = getBoundSocket().newSeekableByteChannel();
+                caches.put(name, EntryCache.this);
+                return new ProxySeekableByteChannel(sbc);
+            }
+        } // class ProxyOutputSocket
+
+        /** An output socket proxy. */
+        private class ProxyOutputSocket
         extends DecoratingOutputSocket<Entry> {
             ProxyOutputSocket(OutputSocket <?> output) {
                 super(output);
             }
 
             @Override
-            public OutputStream newOutputStream() throws IOException {
+            public final OutputStream newOutputStream() throws IOException {
                 assert getModel().isWriteLockedByCurrentThread();
                 delegate.mknod(name, FILE, outputOptions, template);
                 assert getModel().isTouched();
@@ -409,6 +466,24 @@ extends FsDecoratingController< FsConcurrentModel,
                 return new ProxyOutputStream(out);
             }
         } // class ProxyOutputSocket
+
+        /** An output stream proxy. */
+        private final class ProxySeekableByteChannel
+        extends DecoratingSeekableByteChannel {
+            ProxySeekableByteChannel(SeekableByteChannel sbc) {
+                super(sbc);
+            }
+
+            @Override
+            public void close() throws IOException {
+                try {
+                    if (null == template)
+                        FsCachingController.this.delegate.mknod(name, FILE, outputOptions, cache.getEntry());
+                } finally {
+                    delegate.close();
+                }
+            }
+        } // class ProxyOutputStream
 
         /** An output stream proxy. */
         private final class ProxyOutputStream
