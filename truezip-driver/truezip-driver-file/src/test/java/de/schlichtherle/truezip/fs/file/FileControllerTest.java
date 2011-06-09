@@ -41,6 +41,7 @@ public class FileControllerTest {
      * operating system rather than the method.
      */
     @Test
+    @Deprecated
     public void testIsWritableOrCreatable() throws IOException {
         final File file = File.createTempFile("tzp-test", null);
         boolean result = isCreatableOrWritable(file);
