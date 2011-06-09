@@ -17,7 +17,7 @@ package de.schlichtherle.truezip.nio.fsp;
 
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.entry.Entry.Type;
+import static de.schlichtherle.truezip.entry.Entry.Type.*;
 import de.schlichtherle.truezip.fs.FsCompositeDriver;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsEntry;
@@ -26,7 +26,8 @@ import de.schlichtherle.truezip.fs.FsInputOption;
 import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsOutputOption;
-import de.schlichtherle.truezip.fs.FsOutputOptions;
+import static de.schlichtherle.truezip.fs.FsOutputOption.*;
+import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import de.schlichtherle.truezip.fs.FsFilteringManager;
@@ -361,7 +362,10 @@ public final class TFileSystem extends FileSystem {
             throw new UnsupportedOperationException();
         FsEntryName name = path.getPath().getEntryName();
         getController(path.getArchiveDetector())
-                .mknod(name, Type.DIRECTORY, FsOutputOptions.NO_OUTPUT_OPTION, null);
+                .mknod( name,
+                        DIRECTORY,
+                        NO_OUTPUT_OPTION.set(CREATE_PARENTS, isLenient()),
+                        null);
     }
 
     void delete(TPath path) throws IOException {
