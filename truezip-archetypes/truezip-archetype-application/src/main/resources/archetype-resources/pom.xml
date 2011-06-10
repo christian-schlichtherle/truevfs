@@ -149,7 +149,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <truezip.version>
-            RELEASE <!-- TODO: Enter version number to enhance build stability! -->
+            LATEST <!-- TODO: Enter version number to enhance build stability! -->
         </truezip.version>
     </properties>
 </project>
