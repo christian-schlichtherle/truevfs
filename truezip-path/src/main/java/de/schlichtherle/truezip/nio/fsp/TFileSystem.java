@@ -220,7 +220,7 @@ public final class TFileSystem extends FileSystem {
      *         (i.e. prospective archive file) in its parent file system.
      * @throws FsSyncException if any error conditions occur.
      *         This implies loss of data!
-     * @see #sync(TFile, BitField)
+     * @see    #sync(BitField)
      */
     @Override
     public void close() throws FsSyncException {

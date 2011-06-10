@@ -99,6 +99,7 @@ public class TFileSystemProvider extends FileSystemProvider {
      *             of NIO.2.
      * @see        #get(TPath) 
      */
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
     @SuppressWarnings("LeakingThisInConstructor")
     @Deprecated
     public TFileSystemProvider() {

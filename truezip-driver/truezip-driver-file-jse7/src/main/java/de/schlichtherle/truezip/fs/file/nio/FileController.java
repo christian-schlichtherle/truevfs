@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.file.nio;
 
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Map;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
@@ -139,6 +140,7 @@ final class FileController extends FsController<FsModel>  {
      * This is a much stronger test than {@link java.io.File#canWrite()}.
      */
     @Deprecated
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("IL_INFINITE_RECURSIVE_LOOP")
     static boolean isCreatableOrWritable(final Path file) {
         try {
             try {
@@ -269,10 +271,6 @@ final class FileController extends FsController<FsModel>  {
         return t.isEmpty();
     }
 
-    private static FileTime toFileTime(long time) {
-        return UNKNOWN == time ? null : FileTime.fromMillis(time);
-    }
-
     @Override
     public InputSocket<?> getInputSocket(
             FsEntryName name,
@@ -310,14 +308,13 @@ final class FileController extends FsController<FsModel>  {
         }
         if (null != template) {
             getBasicFileAttributeView(file)
-                    .setTimes(  getFileTime(template, WRITE),
-                                getFileTime(template, READ),
-                                getFileTime(template, CREATE));
+                    .setTimes(  toFileTime(template.getTime(WRITE)),
+                                toFileTime(template.getTime(READ)),
+                                toFileTime(template.getTime(CREATE)));
         }
     }
 
-    private static FileTime getFileTime(Entry entry, Access type) {
-        long time = entry.getTime(type);
+    private static @Nullable FileTime toFileTime(long time) {
         return UNKNOWN == time ? null : FileTime.fromMillis(time);
     }
 

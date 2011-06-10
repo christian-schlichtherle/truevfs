@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.file.nio;
 
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.nio.file.OpenOption;
 import java.util.Collections;
 import java.util.HashSet;
@@ -282,7 +283,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
         }
     }
 
-    private static FileTime toFileTime(long time) {
+    private static @Nullable FileTime toFileTime(long time) {
         return UNKNOWN == time ? null : FileTime.fromMillis(time);
     }
 }
