@@ -30,17 +30,17 @@ import java.net.URI;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-final class Scanner {
+final class TScanner {
     private final FsPath root;
     private final TArchiveDetector detector;
     private final Splitter splitter = new Splitter(EntryName.SEPARATOR_CHAR, false);
     private final UriBuilder uri = new UriBuilder();
 
-    Scanner(FsMountPoint root, TArchiveDetector detector) {
+    TScanner(FsMountPoint root, TArchiveDetector detector) {
         this(new FsPath(root, ROOT), detector);
     }
 
-    Scanner(FsPath parent, TArchiveDetector detector) {
+    TScanner(FsPath parent, TArchiveDetector detector) {
         assert null != parent;
         assert null != detector;
         this.root = parent;
