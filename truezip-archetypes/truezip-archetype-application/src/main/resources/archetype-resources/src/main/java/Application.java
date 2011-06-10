@@ -58,4 +58,15 @@ abstract class Application<E extends Exception> extends TApplication<E> {
         String impl = HurlingWindowFeedback.class.getName();
         System.setProperty(spec, System.getProperty(spec, impl));
     }
+
+    /*@Override
+    protected void sync() throws FsSyncException {
+        try {
+            Thread.sleep(Long.MAX_VALUE);
+        } catch (InterruptedException ex) {
+            Logger  .getLogger(Application.class.getName())
+                    .log(Level.SEVERE, null, ex);
+        }
+        super.sync();
+    }*/
 }
