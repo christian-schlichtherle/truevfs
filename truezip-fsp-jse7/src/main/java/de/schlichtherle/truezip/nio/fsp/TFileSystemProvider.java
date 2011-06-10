@@ -24,15 +24,13 @@ import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsInputOption;
-import static de.schlichtherle.truezip.fs.FsInputOption.*;
-import de.schlichtherle.truezip.fs.FsInputOptions;
 import static de.schlichtherle.truezip.fs.FsInputOptions.*;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
-import de.schlichtherle.truezip.fs.FsOutputOptions;
 import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
 import de.schlichtherle.truezip.fs.FsScheme;
+import static de.schlichtherle.truezip.nio.fsp.TPath.*;
 import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
@@ -113,11 +111,6 @@ public class TFileSystemProvider extends FileSystemProvider {
         if (null == root)
             throw new NullPointerException();
         this.root = root;
-    }
-
-    private static TPath promote(Path path) {
-        //return path instanceof TPath ? (TPath) path : new TPath(path);
-        return (TPath) path;
     }
 
     /**
@@ -306,12 +299,16 @@ public class TFileSystemProvider extends FileSystemProvider {
     throws IOException {
         checkContains(source, target);
         boolean preserve = false;
+        BitField<FsOutputOption> outputOptions = BitField
+                .of(EXCLUSIVE)
+                .set(CREATE_PARENTS, TFileSystem.isLenient());
         if (0 < options.length) {
             for (final CopyOption option : options) {
                 if (!(option instanceof StandardCopyOption))
                     throw new UnsupportedOperationException(option.toString());
                 switch ((StandardCopyOption) option) {
                     case REPLACE_EXISTING:
+                        outputOptions = outputOptions.clear(EXCLUSIVE);
                         break;
                     case COPY_ATTRIBUTES:
                         preserve = true;
@@ -324,7 +321,7 @@ public class TFileSystemProvider extends FileSystemProvider {
         final InputSocket<?> input = source.getInputSocket(
                 NO_INPUT_OPTION);
         final OutputSocket<?> output = target.getOutputSocket(
-                NO_OUTPUT_OPTION.set(CREATE_PARENTS, TFileSystem.isLenient()),
+                outputOptions,
                 preserve ? input.getLocalTarget() : null);
         IOSocket.copy(input, output);
     }

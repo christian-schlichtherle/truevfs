@@ -102,15 +102,18 @@ public final class TPath implements Path {
     }
 
     public TPath(final @CheckForNull TArchiveDetector detector, final URI uri) {
-        if (null == uri)
-            throw new NullPointerException();
         this.detector = null != detector ? detector : getDefaultArchiveDetector();
-        this.uri = uri;
+        String p = uri.getPath();
+        while (p.endsWith(SEPARATOR))
+            p = p.substring(0, p.length() - 1);
+        this.uri = uri.getPath().equals(p)
+                ? uri
+                : new UriBuilder(uri).path(p).toUri();
 
         assert invariants();
     }
 
-    private TPath(final TArchiveDetector detector, final URI uri, final FsPath path) {
+    private TPath(final TArchiveDetector detector, final URI uri, final @CheckForNull FsPath path) {
         this.detector = detector;
         this.uri = uri;
         this.path = path;
@@ -151,8 +154,8 @@ public final class TPath implements Path {
      * @return {@code true}
      */
     private boolean invariants() {
-        assert null != getUri();
         assert null != getArchiveDetector();
+        assert null != getUri();
         assert null != getPath();
         assert null != getFileSystem();
         return true;
@@ -169,8 +172,41 @@ public final class TPath implements Path {
         return detector;
     }
 
-    URI getUri() {
-        return this.uri;
+    /**
+     * Returns {@code true} if and only if this {@code TPath} addresses an
+     * archive file.
+     * Whether or not this is true solely depends on the
+     * {@link TArchiveDetector} which was used to construct this {@code TPath}
+     * - no file system tests are performed by this method!
+     *
+     * @return {@code true} if and only if this {@code TPath} addresses an
+     *         archive file.
+     * @see    #isEntry
+     */
+    public boolean isArchive() {
+        final FsPath path = getPath();
+        final boolean root = path.getEntryName().isRoot();
+        final FsMountPoint parent = path.getMountPoint().getParent();
+        return root && null != parent;
+    }
+
+    /**
+     * Returns {@code true} if and only if this {@code TPath} addresses an
+     * entry located within an archive file.
+     * Whether or not this is true solely depends on the
+     * {@link TArchiveDetector} which was used to construct this {@code TPath}
+     * - no file system tests are performed by this method!
+     *
+     * @return {@code true} if and only if this {@code TPath} addresses an
+     *         entry located within an archive file.
+     * @see #isArchive
+     */
+    public boolean isEntry() {
+        final FsPath path = getPath();
+        final boolean root = path.getEntryName().isRoot();
+        final FsMountPoint parent = path.getMountPoint().getParent();
+        return !root    ? null != parent
+                        : null != parent && null != parent.getParent();
     }
 
     /**
@@ -205,6 +241,10 @@ public final class TPath implements Path {
         TFile.setDefaultArchiveDetector(detector);
     }
 
+    URI getUri() {
+        return this.uri;
+    }
+
     FsPath getPath() {
         final FsPath p = this.path;
         return null != p ? p : (this.path = toPath(uri));
@@ -226,12 +266,13 @@ public final class TPath implements Path {
 
     @Override
     public boolean isAbsolute() {
-        return true;
+        final URI u = getUri();
+        return u.isAbsolute() || u.getSchemeSpecificPart().startsWith(SEPARATOR);
     }
 
     @Override
     public @Nullable TPath getRoot() {
-        return new TPath("/");
+        return new TPath(getArchiveDetector(), toUri().resolve("/"), null);
     }
 
     @Override
@@ -239,12 +280,12 @@ public final class TPath implements Path {
         final URI uri = getUri();
         final URI parent = uri.resolve(".");
         final URI member = parent.relativize(uri);
-        return new TPath(getArchiveDetector(), member);
+        return new TPath(getArchiveDetector(), member, path); // don't use getPath()!
     }
 
     @Override
     public TPath getParent() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new TPath(getArchiveDetector(), getUri().resolve("."));
     }
 
     @Override
@@ -262,11 +303,16 @@ public final class TPath implements Path {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    static TPath promote(Path path) {
+        //return path instanceof TPath ? (TPath) path : new TPath(path);
+        return (TPath) path;
+    }
+    
     @Override
     public boolean startsWith(Path that) {
         if (this.getFileSystem() != that.getFileSystem())
             return false;
-        return startsWith(((TPath) that).getPath().getEntryName().toString());
+        return startsWith(promote(that).getPath().getEntryName().toString());
     }
 
     @Override
@@ -282,7 +328,7 @@ public final class TPath implements Path {
     public boolean endsWith(Path that) {
         if (this.getFileSystem() != that.getFileSystem())
             return false;
-        return endsWith(((TPath) that).getPath().getEntryName().toString());
+        return endsWith(promote(that).getPath().getEntryName().toString());
     }
 
     @Override
@@ -296,17 +342,17 @@ public final class TPath implements Path {
 
     @Override
     public TPath normalize() {
-        return this;
+        return new TPath(getArchiveDetector(), getUri().normalize(), path); // don't use getPath()!
     }
 
     @Override
     public Path resolve(Path other) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return resolve(other.toString());
     }
 
     @Override
     public TPath resolve(String other) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new TPath(getArchiveDetector(), getUri().resolve(other));
     }
 
     @Override
@@ -321,13 +367,15 @@ public final class TPath implements Path {
 
     @Override
     public TPath relativize(Path other) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new TPath(getArchiveDetector(), toUri().relativize(other.toUri()));
     }
 
     @Override
     public TFile toFile() {
         final URI uri = getUri();
-        return uri.isAbsolute() ? new TFile(getPath()) : new TFile(uri);
+        return uri.isAbsolute()
+                ? new TFile(getPath())
+                : new TFile(uri.getSchemeSpecificPart(), getArchiveDetector());
     }
 
     @Override
