@@ -42,12 +42,17 @@
 
     <dependencies>
         <!-- A TrueZIP application typically has a compile time dependency on
-             either the TrueZIP File* module or the TrueZIP Kernel module.
-             However, these sample applications demonstrate using both APIs.
+             one or more of the modules TrueZIP File*, TrueZIP Path or TrueZIP
+             Kernel.
              -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truezip-file</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truezip-path</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

@@ -13,9 +13,9 @@
     <description>TrueZIP Application Project</description>
 
     <dependencies>
-        <!-- An application typically has a compile time dependency on
-             either the TrueZIP FSP JSE module or the TrueZIP File* module
-             or the TrueZIP Kernel module.
+        <!-- A TrueZIP application typically has a compile time dependency on
+             one or more of the modules TrueZIP File*, TrueZIP Path or TrueZIP
+             Kernel.
              -->
         <dependency>
             <groupId>de.schlichtherle.truezip</groupId>
