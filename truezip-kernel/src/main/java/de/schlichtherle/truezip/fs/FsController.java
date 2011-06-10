@@ -145,7 +145,7 @@ public abstract class FsController<M extends FsModel> {
      * implementation.
      * 
      * @param  name the file system entry name.
-     * @param  time the access times.
+     * @param  times the access times.
      * @return {@code true} if and only if setting the access time for all
      *         types in {@code times} succeeded.
      * @throws IOException on any I/O error.
