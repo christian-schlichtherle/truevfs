@@ -19,7 +19,7 @@
              -->
         <dependency>
             <groupId>de.schlichtherle.truezip</groupId>
-            <artifactId>truezip-fsp-jse7</artifactId>
+            <artifactId>truezip-path</artifactId>
             <version>${truezip.version}</version>
         </dependency>
 
