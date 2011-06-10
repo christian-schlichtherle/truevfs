@@ -1470,14 +1470,14 @@ public final class TFile extends File {
     }
 
     /**
-     * Returns {@code true} if and only if the path represented by this
-     * instance denotes an archive file.
+     * Returns {@code true} if and only if this {@code TFile} addresses an
+     * archive file.
      * Whether or not this is true solely depends on the
-     * {@link TArchiveDetector} which was used to construct this file object
+     * {@link TArchiveDetector} which was used to construct this {@code TFile}
      * - no file system tests are performed by this method!
      *
-     * @return {@code true} if and only if the path represented by this
-     *         instance denotes an archive file.
+     * @return {@code true} if and only if this {@code TFile} addresses an
+     *         archive file.
      * @see    #isEntry
      * @see    #isDirectory
      * @see    <a href="#falsePositives">Detecting Archive Paths and False Positives</a>
@@ -1487,13 +1487,13 @@ public final class TFile extends File {
     }
 
     /**
-     * Returns {@code true} if and only if this file object addresses an
+     * Returns {@code true} if and only if this {@code TPath} addresses an
      * entry located within an archive file.
      * Whether or not this is true solely depends on the
-     * {@link TArchiveDetector} which was used to construct this file object
+     * {@link TArchiveDetector} which was used to construct this {@code TPath}
      * - no file system tests are performed by this method!
      *
-     * @return {@code true} if and only if this file object addresses an
+     * @return {@code true} if and only if this {@code TPath} addresses an
      *         entry located within an archive file.
      * @see #isArchive
      * @see #isDirectory
