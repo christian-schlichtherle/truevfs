@@ -23,9 +23,9 @@
         <version>7.2-SNAPSHOT</version>
     </parent>
 
-    <artifactId>truezip-fsp-jse7</artifactId>
+    <artifactId>truezip-path</artifactId>
 
-    <name>TrueZIP FSP JSE7</name>
+    <name>TrueZIP Path</name>
     <description>
         Implements a TrueZIP FileSystemProvider for NIO.2 in JSE 7.
     </description>
