@@ -22,15 +22,6 @@
             <version>${truezip.version}</version>
         </dependency>
 
-        <!-- The TrueZIP Kernel module is usually just an indirect dependency
-             unless the application calls it directly.
-             -->
-        <!--dependency>
-            <groupId>de.schlichtherle.truezip</groupId>
-            <artifactId>truezip-kernel</artifactId>
-            <version>${truezip.version}</version>
-        </dependency-->
-
         <!-- This optional dependency provides some nice swing classes. -->
         <!--dependency>
             <groupId>de.schlichtherle.truezip</groupId>
