@@ -447,7 +447,25 @@ extends FsDecoratingController< FsConcurrentModel,
                 caches.put(name, EntryCache.this);
                 return new ProxySeekableByteChannel(sbc);
             }
-        } // class ProxyOutputSocket
+        } // class Nio2ProxyOutputSocket
+
+        /** An output stream proxy. */
+        private final class ProxySeekableByteChannel
+        extends DecoratingSeekableByteChannel {
+            ProxySeekableByteChannel(SeekableByteChannel sbc) {
+                super(sbc);
+            }
+
+            @Override
+            public void close() throws IOException {
+                try {
+                    if (null == template)
+                        FsCachingController.this.delegate.mknod(name, FILE, outputOptions, cache.getEntry());
+                } finally {
+                    delegate.close();
+                }
+            }
+        } // class ProxySeekableByteChannel
 
         /** An output socket proxy. */
         private class ProxyOutputSocket
@@ -466,24 +484,6 @@ extends FsDecoratingController< FsConcurrentModel,
                 return new ProxyOutputStream(out);
             }
         } // class ProxyOutputSocket
-
-        /** An output stream proxy. */
-        private final class ProxySeekableByteChannel
-        extends DecoratingSeekableByteChannel {
-            ProxySeekableByteChannel(SeekableByteChannel sbc) {
-                super(sbc);
-            }
-
-            @Override
-            public void close() throws IOException {
-                try {
-                    if (null == template)
-                        FsCachingController.this.delegate.mknod(name, FILE, outputOptions, cache.getEntry());
-                } finally {
-                    delegate.close();
-                }
-            }
-        } // class ProxyOutputStream
 
         /** An output stream proxy. */
         private final class ProxyOutputStream
