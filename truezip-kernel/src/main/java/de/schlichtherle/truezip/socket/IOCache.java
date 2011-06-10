@@ -504,6 +504,27 @@ public final class IOCache implements Flushable, Closeable {
             }
         } // class Nio2BufferInputSocket
 
+        private final class BufferSeekableByteChannel
+        extends DecoratingSeekableByteChannel {
+            private boolean closed;
+
+            BufferSeekableByteChannel(SeekableByteChannel sbc) {
+                super(sbc);
+            }
+
+            @Override
+            public void close() throws IOException {
+                if (closed)
+                    return;
+                closed = true;
+                try {
+                    delegate.close();
+                } finally {
+                    getInputBufferPool().release(Buffer.this);
+                }
+            }
+        } // class BufferSeekableByteChannel
+
         private class BufferInputSocket
         extends DecoratingInputSocket<Entry> {
             BufferInputSocket() {
@@ -527,27 +548,6 @@ public final class IOCache implements Flushable, Closeable {
 
             BufferReadOnlyFile(ReadOnlyFile rof) {
                 super(rof);
-            }
-
-            @Override
-            public void close() throws IOException {
-                if (closed)
-                    return;
-                closed = true;
-                try {
-                    delegate.close();
-                } finally {
-                    getInputBufferPool().release(Buffer.this);
-                }
-            }
-        } // class BufferReadOnlyFile
-
-        private final class BufferSeekableByteChannel
-        extends DecoratingSeekableByteChannel {
-            private boolean closed;
-
-            BufferSeekableByteChannel(SeekableByteChannel sbc) {
-                super(sbc);
             }
 
             @Override
