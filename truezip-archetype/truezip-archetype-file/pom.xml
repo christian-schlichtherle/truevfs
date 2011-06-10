@@ -16,33 +16,16 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <prerequisites>
-        <maven>3.0.3</maven>
-    </prerequisites>
 
     <parent>
         <groupId>de.schlichtherle.truezip</groupId>
-        <artifactId>truezip</artifactId>
+        <artifactId>truezip-archetype</artifactId>
         <version>7.2-SNAPSHOT</version>
     </parent>
 
-    <artifactId>truezip-archetype</artifactId>
-    <packaging>pom</packaging>
+    <artifactId>truezip-archetype-file</artifactId>
+    <packaging>maven-archetype</packaging>
 
-    <name>TrueZIP Archetype</name>
-    <description>Parent POM for Maven archetypes.</description>
-
-    <modules>
-        <module>truezip-archetype-application</module>
-    </modules>
-
-    <build>
-        <extensions>
-            <extension>
-                <groupId>org.apache.maven.archetype</groupId>
-                <artifactId>archetype-packaging</artifactId>
-                <version>2.0</version>
-            </extension>
-        </extensions>
-    </build>
+    <name>TrueZIP Archetype File*</name>
+    <description>TrueZIP File* module application archetype</description>
 </project>
