@@ -9,7 +9,7 @@
     <artifactId>${artifactId}</artifactId>
     <version>${version}</version>
 
-    <name>project</name>
+    <name>${artifactId}</name>
     <description>TrueZIP Application Project</description>
 
     <dependencies>
@@ -142,6 +142,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <truezip.version>7.2-SNAPSHOT</truezip.version>
+        <truezip.version>
+            LATEST <!-- TODO: Enter version number to enhance build stability! -->
+        </truezip.version>
     </properties>
 </project>
