@@ -13,6 +13,11 @@
       <directory></directory>
       <includes>
         <include>nb-configuration.xml</include>
+      </includes>
+    </fileSet>
+    <fileSet filtered="false" encoding="UTF-8">
+      <directory></directory>
+      <includes>
         <include>test.jar</include>
       </includes>
     </fileSet>
