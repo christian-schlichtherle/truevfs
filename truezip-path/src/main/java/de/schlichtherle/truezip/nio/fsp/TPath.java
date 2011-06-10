@@ -65,9 +65,9 @@ public final class TPath implements Path {
 
     private final TArchiveDetector detector;
     private final URI uri;
-    private volatile FsPath path;
-    private volatile TFileSystem fileSystem;
-    private volatile Integer hashCode;
+    private volatile @CheckForNull FsPath path;
+    private volatile @CheckForNull TFileSystem fileSystem;
+    private volatile @CheckForNull Integer hashCode;
 
     public TPath(String first, String... more) {
         this((TArchiveDetector) null, first, more);

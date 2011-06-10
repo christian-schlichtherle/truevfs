@@ -68,7 +68,6 @@ final class TempFilePool implements IOPool<FileEntry> {
 
     /** A temp file pool entry. */
     @NotThreadSafe
-    @DefaultAnnotation(NonNull.class)
     private static final class TempEntry
     extends FileEntry
     implements Entry<FileEntry> {
@@ -87,7 +86,7 @@ final class TempFilePool implements IOPool<FileEntry> {
             pool(null);
         }
 
-        private TempFilePool pool(final @CheckForNull TempFilePool newPool)
+        private void pool(final @CheckForNull TempFilePool newPool)
         throws IOException {
             final TempFilePool oldPool = this.pool;
             this.pool = newPool;
@@ -96,7 +95,6 @@ final class TempFilePool implements IOPool<FileEntry> {
                 if (!file.delete() && file.exists())
                     throw new IOException(file + " (cannot delete temporary file)");
             }
-            return oldPool;
         }
 
         @Override
