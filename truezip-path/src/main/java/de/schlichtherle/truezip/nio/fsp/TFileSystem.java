@@ -74,7 +74,7 @@ public final class TFileSystem extends FileSystem {
     private final TFileSystemProvider provider;
 
     static synchronized TFileSystem get(TPath path) {
-        final FsMountPoint mp = path.getPath().getMountPoint();
+        final FsMountPoint mp = path.getAddress().getMountPoint();
         TFileSystem fs = fileSystems.get(mp);
         if (null != fs)
             return fs;
@@ -279,13 +279,13 @@ public final class TFileSystem extends FileSystem {
     }
 
     FsEntry getEntry(TPath path) throws IOException {
-        FsEntryName name = path.getPath().getEntryName();
+        FsEntryName name = path.getAddress().getEntryName();
         return getController(path.getArchiveDetector()).getEntry(name);
     }
 
     InputSocket<?> getInputSocket(  TPath path,
                                     BitField<FsInputOption> options) {
-        FsEntryName name = path.getPath().getEntryName();
+        FsEntryName name = path.getAddress().getEntryName();
         return getController(path.getArchiveDetector())
                 .getInputSocket(name, options);
     }
@@ -293,7 +293,7 @@ public final class TFileSystem extends FileSystem {
     OutputSocket<?> getOutputSocket(TPath path,
                                     BitField<FsOutputOption> options,
                                     @CheckForNull Entry template) {
-        FsEntryName name = path.getPath().getEntryName();
+        FsEntryName name = path.getAddress().getEntryName();
         return getController(path.getArchiveDetector())
                 .getOutputSocket(name, options, template);
     }
@@ -301,7 +301,7 @@ public final class TFileSystem extends FileSystem {
     DirectoryStream<Path> newDirectoryStream(   final TPath path,
                                                 final Filter<? super Path> filter)
     throws IOException {
-        final FsEntryName name = path.getPath().getEntryName();
+        final FsEntryName name = path.getAddress().getEntryName();
         final FsEntry entry = getController(path.getArchiveDetector())
                 .getEntry(name);
         final Set<String> set;
@@ -360,7 +360,7 @@ public final class TFileSystem extends FileSystem {
     throws IOException {
         if (0 < attrs.length)
             throw new UnsupportedOperationException();
-        FsEntryName name = path.getPath().getEntryName();
+        FsEntryName name = path.getAddress().getEntryName();
         getController(path.getArchiveDetector())
                 .mknod( name,
                         DIRECTORY,
@@ -369,7 +369,7 @@ public final class TFileSystem extends FileSystem {
     }
 
     void delete(TPath path) throws IOException {
-        FsEntryName name = path.getPath().getEntryName();
+        FsEntryName name = path.getAddress().getEntryName();
         getController(path.getArchiveDetector())
                 .unlink(name);
     }

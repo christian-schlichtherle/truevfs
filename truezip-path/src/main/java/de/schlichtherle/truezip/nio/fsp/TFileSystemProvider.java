@@ -147,7 +147,7 @@ public class TFileSystemProvider extends FileSystemProvider {
     @Override
     public TFileSystem newFileSystem(Path path, Map<String, ?> env) {
         TPath p = new TPath(getArchiveDetector(env), path);
-        if (null == p.getPath().getMountPoint().getParent())
+        if (null == p.getAddress().getMountPoint().getParent())
             throw new UnsupportedOperationException("no prospective archive file detected"); // don't be greedy!
         return p.getFileSystem();
     }
@@ -339,16 +339,16 @@ public class TFileSystemProvider extends FileSystemProvider {
     }
 
     private static void checkContains(TPath a, TPath b) throws IOException {
-        URI ua = a.toRealPath().getPath().toHierarchicalUri();
-        URI ub = b.toRealPath().getPath().toHierarchicalUri();
+        URI ua = a.toRealPath().getAddress().toHierarchicalUri();
+        URI ub = b.toRealPath().getAddress().toHierarchicalUri();
         if (ua.resolve(ub) != ub)
             throw new IOException(b + " (contained in " + a + ")");
     }
 
     @Override
     public boolean isSameFile(Path a, Path b) throws IOException {
-        URI ua = promote(a).toRealPath().getPath().toHierarchicalUri();
-        URI ub = promote(b).toRealPath().getPath().toHierarchicalUri();
+        URI ua = promote(a).toRealPath().getAddress().toHierarchicalUri();
+        URI ub = promote(b).toRealPath().getAddress().toHierarchicalUri();
         return ua.equals(ub);
     }
 
@@ -365,7 +365,7 @@ public class TFileSystemProvider extends FileSystemProvider {
     @Override
     public void checkAccess(Path path, AccessMode... modes) throws IOException {
         final TPath p = promote(path);
-        final FsEntryName n = p.getPath().getEntryName();
+        final FsEntryName n = p.getAddress().getEntryName();
         final FsController<?> c = p.getController();
         if (null == c.getEntry(n))
             throw new NoSuchFileException(path.toString());
@@ -456,7 +456,7 @@ public class TFileSystemProvider extends FileSystemProvider {
             t.put(WRITE, toMillis(lastModifiedTime));
             t.put(READ, toMillis(lastAccessTime));
             t.put(CREATE, toMillis(createTime));
-            c.setTime(path.getPath().getEntryName(), t);
+            c.setTime(path.getAddress().getEntryName(), t);
         }
 
         private static long toMillis(FileTime time) {
