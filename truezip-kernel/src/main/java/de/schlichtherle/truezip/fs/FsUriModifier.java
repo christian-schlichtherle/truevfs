@@ -35,10 +35,13 @@ import static de.schlichtherle.truezip.fs.FsEntryName.*;
 @DefaultAnnotation(NonNull.class)
 public enum FsUriModifier {
 
-    /** The null modifier does nothing but ensure that the URI is normalized. */
+    /**
+     * The null modifier does nothing but ensure that the URI path is in normal
+     * form.
+     */
     NULL {
         @Override
-        URI modify(URI uri, PostFix fix) throws URISyntaxException {
+        public URI modify(URI uri, PostFix fix) throws URISyntaxException {
             if (uri.normalize() != uri)
                 throw new URISyntaxException("\"" + uri + "\"", "URI path not in normal form");
             return uri;
@@ -46,12 +49,12 @@ public enum FsUriModifier {
     },
 
     /**
-     * The canonicalize modifier normalizes a URI and applies a
-     * {@link PostFix post-fix} which depends on the class to parse.
+     * The canonicalize modifier normalizes the URI path and applies a
+     * {@link PostFix post-fix} which depends on the class specific URI syntax.
      */
     CANONICALIZE {
         @Override
-        URI modify(URI uri, PostFix fix) throws URISyntaxException {
+        public URI modify(URI uri, PostFix fix) throws URISyntaxException {
             return fix.modify(uri.normalize());
         }
     };
@@ -63,7 +66,7 @@ public enum FsUriModifier {
      * @param  fix the post-fix to apply if required.
      * @return the modified URI.
      */
-    abstract URI modify(URI uri, PostFix fix) throws URISyntaxException;
+    public abstract URI modify(URI uri, PostFix fix) throws URISyntaxException;
 
     /**
      * Post-fixes a URI when it gets
@@ -74,85 +77,89 @@ public enum FsUriModifier {
 
         /**
          * The post-fix for an {@link FsPath} depends on the URI type:
-         * For an opaque URI, nothing is modified.
-         * For a hierarchical URI, its path is truncated so that it does not
-         * end with a
-         * {@value de.schlichtherle.truezip.entry.EntryName#SEPARATOR}
-         * separator.
-         * In addition, if the path starts with two separators, the substring
-         * following until the next separator is moved to the authority part
-         * of the URI.
-         * This behavior is intended to fix URIs returned by
-         * {@link java.io.File#toURI()}.
+         * For the URI is opaque or has a fragment component defined, nothing
+         * is modified.
+         * Otherwise, the following modifications are conducted:
+         * <ol>
+         * <li>If the URI path component starts with two separators, the
+         *     substring following until the next separator is moved to the
+         *     authority part of the URI.
+         *     This behavior is intended to fix URIs returned by
+         *     {@link java.io.File#toURI()}.
+         * <li>The URI path component gets truncated so that it does not end
+         *     with {@value de.schlichtherle.truezip.entry.EntryName#SEPARATOR}
+         *     whereby a trailing separator after a Windows-like drive letter
+         *     is preserved.
+         * <li>An undefined authority in the scheme specific part gets
+         *     truncated.
+         * </ol>
+         * <p>
+         * Note that this fix is not limited to Windows in order to make
+         * this function work identically on all platforms.
          */
         PATH {
             @Override
-            URI modify(URI uri) throws URISyntaxException {
-                if (uri.isOpaque())
+            public URI modify(final URI uri) throws URISyntaxException {
+                if (uri.isOpaque() || null != uri.getRawFragment())
                     return uri;
-
-                // Note that these fixes are not limited to Windows in order
-                // to make this function work identically on all platforms!
-
-                // Move Windows-like UNC host from path to authority.
-                if (uri.getRawPath().startsWith(SEPARATOR + SEPARATOR)) {
-                    final String s = uri.getPath();
-                    final int i = s.indexOf(SEPARATOR_CHAR, 2);
-                    if (0 <= i) {
-                        uri = new UriBuilder(uri)
-                                .authority(s.substring(2, i))
-                                .path(s.substring(i))
-                                .getUri();
+                String s = uri.getScheme();
+                String a = uri.getAuthority();
+                String p = uri.getPath(), q = p;
+                if (p.startsWith(SEPARATOR + SEPARATOR)) {
+                    int i = p.indexOf(SEPARATOR_CHAR, 2);
+                    if (2 <= i) {
+                        a = p.substring(2, i);
+                        p = p.substring(i);
                     }
                 }
-
-                // Delete trailing slash separator from directory URI and mind
-                // Windoze paths with drive letters.
-                for (String s; (s = uri.getPath()).endsWith(SEPARATOR)
-                        && 2 <= s.length()
-                        && (':' != s.charAt(s.length() - 2)); ) {
-                    uri = new UriBuilder(uri)
-                            .path(s.substring(0, s.length() - 1))
-                            .getUri();
-                }
-
-                return uri;
+                for (int l; p.endsWith(SEPARATOR)
+                        && (   1 <=(l = p.length()) && null == s
+                            || 2 <= l && ':' != p.charAt(l - 2)
+                            || 3 <= l && !p.startsWith(SEPARATOR)
+                            || 4 <  l && p.startsWith(SEPARATOR)
+                            || null != a); )
+                    p = p.substring(0, l - 1);
+                String ssp;
+                return p == q
+                        && (null != a
+                            || null == (ssp = uri.getRawSchemeSpecificPart()) // cover for URI bug
+                            || !ssp.startsWith(SEPARATOR + SEPARATOR))
+                        ? uri
+                        : new UriBuilder(uri).authority(a).path(p).getUri();
             }
         },
 
         /** The post-fix for an {@link FsMountPoint} does nothing. */
         MOUNT_POINT {
             @Override
-            URI modify(URI uri) {
+            public URI modify(URI uri) {
                 return uri;
             }
         },
 
         /**
          * The post-fix for an {@link FsEntryName} depends on the URI type:
-         * For an opaque URI, nothing is modified.
-         * For a hierarchical URI, its path is truncated so that it does not
-         * end with a
-         * {@value de.schlichtherle.truezip.entry.EntryName#SEPARATOR}
-         * separator.
+         * If the URI is absolute or has an authority or a fragment component
+         * defined, nothing is modified.
+         * Otherwise, the URI path component gets truncated so that it does not
+         * start or end with
+         * {@value de.schlichtherle.truezip.entry.EntryName#SEPARATOR}.
          */
         ENTRY_NAME {
             @Override
-            URI modify(URI uri) throws URISyntaxException {
-                if (uri.isOpaque())
+            public URI modify(final URI uri) throws URISyntaxException {
+                if (uri.isAbsolute()
+                        || null != uri.getRawAuthority()
+                        || null != uri.getRawFragment())
                     return uri;
-
-                // Delete trailing slash separator from directory URI and mind
-                // Windoze paths with drive letters.
-                for (String s; (s = uri.getPath()).endsWith(SEPARATOR)
-                        && 2 <= s.length()
-                        && (':' != s.charAt(s.length() - 2)); ) {
-                    uri = new UriBuilder(uri)
-                            .path(s.substring(0, s.length() - 1))
-                            .getUri();
-                }
-
-                return uri;
+                String p = uri.getPath(), q = p;
+                while (p.startsWith(SEPARATOR))
+                    p = p.substring(1);
+                while (p.endsWith(SEPARATOR))
+                    p = p.substring(0, p.length() - 1);
+                return p == q
+                        ? uri
+                        : new UriBuilder(uri).path(p).getUri();
             }
         };
 
@@ -162,6 +169,6 @@ public enum FsUriModifier {
          * @param  uri the URI to modify.
          * @return the modified URI.
          */
-        abstract URI modify(URI uri) throws URISyntaxException;
+        public abstract URI modify(URI uri) throws URISyntaxException;
     }
 }

@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import static de.schlichtherle.truezip.fs.FsUriModifier.*;
 import java.beans.ExceptionListener;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
@@ -115,25 +116,25 @@ public class FsMountPointTest {
         }
 
         try {
-            FsMountPoint.create((URI) null, FsUriModifier.NULL);
+            FsMountPoint.create((URI) null, NULL);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FsMountPoint((URI) null, FsUriModifier.NULL);
+            new FsMountPoint((URI) null, NULL);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            FsMountPoint.create((URI) null, FsUriModifier.CANONICALIZE);
+            FsMountPoint.create((URI) null, CANONICALIZE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FsMountPoint((URI) null, FsUriModifier.CANONICALIZE);
+            new FsMountPoint((URI) null, CANONICALIZE);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -216,8 +217,8 @@ public class FsMountPointTest {
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testConstructorWithValidUri() {
         for (final String param : new String[] {
-            "foo:/bÃ¤r/bÃ¤z/",
-            "foo:/bÃ¤r/",
+            "foo:/bär/bäz/",
+            "foo:/bär/",
             "foo:/",
         }) {
             final URI uri = URI.create(param);
@@ -261,7 +262,7 @@ public class FsMountPointTest {
     public void testResolve() {
         for (final String[] params : new String[][] {
             { "foo:bar:/baz?plonk!/", "", "baz", "foo:bar:/baz?plonk!/" },
-            { "foo:bar:/bÃ¤z?bÃ¶Ã¶m!/", "bÃ¤ng?plÃ¶nk", "bÃ¤z/bÃ¤ng?plÃ¶nk", "foo:bar:/bÃ¤z?bÃ¶Ã¶m!/bÃ¤ng?plÃ¶nk" },
+            { "foo:bar:/bäz?bööm!/", "bäng?plönk", "bäz/bäng?plönk", "foo:bar:/bäz?bööm!/bäng?plönk" },
             { "foo:bar:/baz!/", "bang?boom", "baz/bang?boom", "foo:bar:/baz!/bang?boom" },
             { "foo:bar:/baz!/", "bang", "baz/bang", "foo:bar:/baz!/bang" },
             { "foo:bar:/baz!/", "", "baz", "foo:bar:/baz!/" },
