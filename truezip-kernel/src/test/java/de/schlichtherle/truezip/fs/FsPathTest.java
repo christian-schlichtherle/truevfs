@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import static de.schlichtherle.truezip.fs.FsUriModifier.*;
 import java.beans.ExceptionListener;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
@@ -122,25 +123,25 @@ public class FsPathTest {
         }
 
         try {
-            FsPath.create((URI) null, FsUriModifier.NULL);
+            FsPath.create((URI) null, NULL);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FsPath((URI) null, FsUriModifier.NULL);
+            new FsPath((URI) null, NULL);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            FsPath.create((URI) null, FsUriModifier.CANONICALIZE);
+            FsPath.create((URI) null, CANONICALIZE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FsPath((URI) null, FsUriModifier.CANONICALIZE);
+            new FsPath((URI) null, CANONICALIZE);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -246,6 +247,7 @@ public class FsPathTest {
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testConstructorWithValidUri() {
         for (final String[] params : new String[][] {
+            //{ $path, $mountPoint, $entryName },
             { "foo:/", "foo:/", "" },
             { "foo:bar:baz:/bä%20ng!/bö%20öm!/plö%20nk", "foo:bar:baz:/bä%20ng!/bö%20öm!/", "plö%20nk" },
             { "foo:bar:baz:/bäng!/bööm!/plönk", "foo:bar:baz:/bäng!/bööm!/", "plönk" },
@@ -295,7 +297,7 @@ public class FsPathTest {
             { "foo:/bar/baz/", "foo:/bar/", "baz" },
             { "foo:/bar/baz/?bang", "foo:/bar/", "baz?bang" },
         }) {
-            FsPath path = FsPath.create(URI.create(params[0]), FsUriModifier.CANONICALIZE);
+            FsPath path = FsPath.create(URI.create(params[0]), CANONICALIZE);
             final FsMountPoint mountPoint = null == params[1] ? null : FsMountPoint.create(URI.create(params[1]));
             final FsEntryName entryName = FsEntryName.create(URI.create(params[2]));
             assertPath(path, mountPoint, entryName);
@@ -362,6 +364,30 @@ public class FsPathTest {
             final FsPath path = FsPath.create(URI.create(params[0]));
             final URI hierarchical = path.toHierarchicalUri();
             assertThat(hierarchical, equalTo(URI.create(params[1])));
+        }
+    }
+
+    @Test
+    public void testCanonicalization() {
+        for (final String[] params : new String[][] {
+            // { $uri, $expected },
+            { "file:///foo/c://", "file:/foo/c:" },
+            { "file:/foo/c://", "file:/foo/c:" },
+            { "file:////c://", "file:/c:/" },
+            { "file:///c://", "file:/c:/" },
+            { "file:/c://", "file:/c:/" },
+            { "file:/c:", "file:/c:" },
+            { "föö/", "föö" },
+            { "/föö", "föö" },
+            { "/föö/", "föö" },
+            { "/C:/", "C%3A" },
+            { "C%3A/", "C%3A" },
+        }) {
+            final URI uri = URI.create(params[0]);
+            final URI expected = URI.create(params[1]);
+            final FsPath name = FsPath.create(uri, CANONICALIZE);
+            final URI result = name.toUri();
+            assertThat(result, equalTo(expected));
         }
     }
 }

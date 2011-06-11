@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import static de.schlichtherle.truezip.fs.FsUriModifier.*;
 import java.beans.ExceptionListener;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
@@ -199,18 +200,36 @@ public class FsEntryNameTest {
             { "foo", "bar%3Abaz", "foo/bar%3Abaz" },
             { "foo", "", "foo", },
             { "", "", "", },
-            { "fÃ¶Ã¶", "?bÃ¤r", "fÃ¶Ã¶?bÃ¤r" },
-            { "fÃ¶Ã¶?bÃ¤r", "", "fÃ¶Ã¶" },
-            { "fÃ¶Ã¶?bÃ¤r", "?tÃ¼Ã¼", "fÃ¶Ã¶?tÃ¼Ã¼" },
-            { "fÃ¶Ã¶", "", "fÃ¶Ã¶" },
-            { "", "fÃ¶Ã¶", "fÃ¶Ã¶" },
-            { "fÃ¶Ã¶", "bÃ¤r", "fÃ¶Ã¶/bÃ¤r" },
+            { "föö", "?bär", "föö?bär" },
+            { "föö?bär", "", "föö" },
+            { "föö?bär", "?täscht", "föö?täscht" },
+            { "föö", "", "föö" },
+            { "", "föö", "föö" },
+            { "föö", "bär", "föö/bär" },
         }) {
             final FsEntryName parent = FsEntryName.create(URI.create(params[0]));
             final FsEntryName member = FsEntryName.create(URI.create(params[1]));
             final FsEntryName result = new FsEntryName(parent, member);
             assertThat(result.toUri(), equalTo(URI.create(params[2])));
             assertThat(FsEntryName.create(result.toUri()), equalTo(result));
+        }
+    }
+
+    @Test
+    public void testCanonicalization() {
+        for (final String[] params : new String[][] {
+            // { $uri, $expected },
+            { "föö/", "föö" },
+            { "/föö", "föö" },
+            { "/föö/", "föö" },
+            { "/C:/", "C%3A" },
+            { "C%3A/", "C%3A" },
+        }) {
+            final URI uri = URI.create(params[0]);
+            final URI expected = URI.create(params[1]);
+            final FsEntryName name = FsEntryName.create(uri, CANONICALIZE);
+            final URI result = name.toUri();
+            assertThat(result, equalTo(expected));
         }
     }
 

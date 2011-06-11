@@ -388,11 +388,11 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
                     uri = nuri;
             }
         } else if (uri.isAbsolute()) {
-            mountPoint = new FsMountPoint(uri.resolve(DOT_URI), NULL);
-            entryName = new FsEntryName(mountPoint.toUri().relativize(uri), NULL);
+            mountPoint = new FsMountPoint(uri.resolve(DOT_URI), modifier);
+            entryName = new FsEntryName(mountPoint.toUri().relativize(uri), modifier);
         } else {
             mountPoint = null;
-            entryName = new FsEntryName(uri, NULL);
+            entryName = new FsEntryName(uri, modifier);
             uri = entryName.toUri();
         }
         this.uri = uri;
