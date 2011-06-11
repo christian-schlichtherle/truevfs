@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.file;
 
+import org.junit.BeforeClass;
 import java.io.File;
 import java.util.logging.Logger;
 import java.beans.ExceptionListener;
@@ -51,23 +52,28 @@ public class TFileTest {
     private static final Logger logger
             = Logger.getLogger(TFileTest.class.getName());
 
-    private static final TArchiveDetector DETECTOR
-            = new TArchiveDetector(
-                "ear|exe|jar|odb|odf|odg|odm|odp|ods|odt|otg|oth|otp|ots|ott|tar|tar.bz2|tar.gz|tbz2|tgz|tzp|war|zip|zip.rae|zip.raes",
-                new MockArchiveDriver());
+    private static TArchiveDetector detectorBackup;
 
     private TFile archive;
     private String scheme;
 
+    @BeforeClass
+    public static void setUpClass() {
+        detectorBackup = TFile.getDefaultArchiveDetector();
+    }
+
     @Before
     public void setUp() {
-        TFile.setDefaultArchiveDetector(DETECTOR);
+        TFile.setDefaultArchiveDetector(new TArchiveDetector(
+                "ear|exe|jar|odb|odf|odg|odm|odp|ods|odt|otg|oth|otp|ots|ott|tar|tar.bz2|tar.gz|tbz2|tgz|tzp|war|zip|zip.rae|zip.raes",
+                new MockArchiveDriver()));
         scheme = "zip";
         archive = new TFile("archive.zip");
     }
 
     @After
     public void tearDown() {
+        TFile.setDefaultArchiveDetector(detectorBackup);
         assertFalse(new File("archive.zip").exists());
     }
 
