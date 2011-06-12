@@ -706,9 +706,8 @@ public final class TFile extends File {
 
         final String path = delegate.getPath();
         if (null != innerArchive) {
-            final int innerArchivePathLength
-                    = innerArchive.getPath().length();
-            if (path.length() == innerArchivePathLength) {
+            final int iapl = innerArchive.getPath().length();
+            if (path.length() == iapl) {
                 this.detector = innerArchive.detector;
                 this.innerArchive = this;
                 this.enclArchive = innerArchive.enclArchive;
@@ -720,7 +719,7 @@ public final class TFile extends File {
                     this.enclEntryName = new FsEntryName(
                             new UriBuilder()
                                 .path(
-                                    path.substring(innerArchivePathLength + 1) // cut off leading separatorChar
+                                    path.substring(iapl + 1) // cut off leading separatorChar
                                         .replace(separatorChar, SEPARATOR_CHAR))
                                 .getUri(),
                             CANONICALIZE);
