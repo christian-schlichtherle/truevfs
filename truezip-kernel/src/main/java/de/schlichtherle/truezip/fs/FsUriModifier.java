@@ -41,7 +41,7 @@ public enum FsUriModifier {
      */
     NULL {
         @Override
-        public URI modify(URI uri, PostFix fix) throws URISyntaxException {
+        URI modify(URI uri, PostFix fix) throws URISyntaxException {
             if (uri.normalize() != uri)
                 throw new URISyntaxException("\"" + uri + "\"", "URI path not in normal form");
             return uri;
@@ -54,7 +54,7 @@ public enum FsUriModifier {
      */
     CANONICALIZE {
         @Override
-        public URI modify(URI uri, PostFix fix) throws URISyntaxException {
+        URI modify(URI uri, PostFix fix) throws URISyntaxException {
             return fix.modify(uri.normalize());
         }
     };
@@ -66,7 +66,7 @@ public enum FsUriModifier {
      * @param  fix the post-fix to apply if required.
      * @return the modified URI.
      */
-    public abstract URI modify(URI uri, PostFix fix) throws URISyntaxException;
+    abstract URI modify(URI uri, PostFix fix) throws URISyntaxException;
 
     /**
      * Post-fixes a URI when it gets
@@ -77,8 +77,8 @@ public enum FsUriModifier {
 
         /**
          * The post-fix for an {@link FsPath} depends on the URI type:
-         * For the URI is opaque or has a fragment component defined, nothing
-         * is modified.
+         * For the URI is opaque or not absolute or has a fragment component
+         * defined, nothing is modified.
          * Otherwise, the following modifications are conducted:
          * <ol>
          * <li>If the URI path component starts with two separators, the
@@ -90,7 +90,7 @@ public enum FsUriModifier {
          *     with {@value de.schlichtherle.truezip.entry.EntryName#SEPARATOR}
          *     whereby a trailing separator after a Windows-like drive letter
          *     is preserved.
-         * <li>An undefined authority in the scheme specific part gets
+         * <li>An empty authority component in the scheme specific part gets
          *     truncated.
          * </ol>
          * <p>
@@ -99,12 +99,12 @@ public enum FsUriModifier {
          */
         PATH {
             @Override
-            public URI modify(final URI uri) throws URISyntaxException {
-                if (uri.isOpaque() || null != uri.getRawFragment())
+            URI modify(final URI uri) throws URISyntaxException {
+                if (uri.isOpaque() || !uri.isAbsolute() || null != uri.getRawFragment())
                     return uri;
                 String s = uri.getScheme();
-                String a = uri.getAuthority();
-                String p = uri.getPath(), q = p;
+                String a = uri.getRawAuthority();
+                String p = uri.getRawPath(), q = p;
                 if (p.startsWith(SEPARATOR + SEPARATOR)) {
                     int i = p.indexOf(SEPARATOR_CHAR, 2);
                     if (2 <= i) {
@@ -125,14 +125,14 @@ public enum FsUriModifier {
                             || null == (ssp = uri.getRawSchemeSpecificPart()) // cover for URI bug
                             || !ssp.startsWith(SEPARATOR + SEPARATOR))
                         ? uri
-                        : new UriBuilder(uri).authority(a).path(p).getUri();
+                        : new UriBuilder(uri, true).authority(a).path(p).getUri();
             }
         },
 
         /** The post-fix for an {@link FsMountPoint} does nothing. */
         MOUNT_POINT {
             @Override
-            public URI modify(URI uri) {
+            URI modify(URI uri) {
                 return uri;
             }
         },
@@ -147,19 +147,19 @@ public enum FsUriModifier {
          */
         ENTRY_NAME {
             @Override
-            public URI modify(final URI uri) throws URISyntaxException {
+            URI modify(final URI uri) throws URISyntaxException {
                 if (uri.isAbsolute()
                         || null != uri.getRawAuthority()
                         || null != uri.getRawFragment())
                     return uri;
-                String p = uri.getPath(), q = p;
+                String p = uri.getRawPath(), q = p;
                 while (p.startsWith(SEPARATOR))
                     p = p.substring(1);
                 while (p.endsWith(SEPARATOR))
                     p = p.substring(0, p.length() - 1);
                 return p == q
                         ? uri
-                        : new UriBuilder(uri).path(p).getUri();
+                        : new UriBuilder(uri, true).path(p).getUri();
             }
         };
 
@@ -169,6 +169,6 @@ public enum FsUriModifier {
          * @param  uri the URI to modify.
          * @return the modified URI.
          */
-        public abstract URI modify(URI uri) throws URISyntaxException;
+        abstract URI modify(URI uri) throws URISyntaxException;
     }
 }
