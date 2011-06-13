@@ -49,7 +49,7 @@ final class TScanner {
         this.detector = detector;
     }
 
-    FsPath toPath(URI parent, URI member) {
+    FsPath toFsPath(URI parent, URI member) {
         assert !parent.isOpaque();
         assert parent == parent.normalize();
         assert !member.isOpaque();

@@ -30,7 +30,6 @@ import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
 import de.schlichtherle.truezip.fs.FsScheme;
-import static de.schlichtherle.truezip.nio.fsp.TPath.*;
 import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
@@ -254,7 +253,7 @@ public class TFileSystemProvider extends FileSystemProvider {
             final Set<? extends OpenOption> options,
             final FileAttribute<?>... attrs)
     throws IOException {
-        final TPath p = promote(path);
+        final TPath p = (TPath) path;
         if (options.isEmpty() || options.contains(StandardOpenOption.READ))
             return p.getInputSocket(
                         mapInput(options).set(FsInputOption.CACHE))
@@ -271,7 +270,7 @@ public class TFileSystemProvider extends FileSystemProvider {
     @Override
     public InputStream newInputStream(Path path, OpenOption... options)
     throws IOException {
-        return promote(path)
+        return ((TPath) path)
                 .getInputSocket(mapInput(options))
                 .newInputStream();
     }
@@ -279,7 +278,7 @@ public class TFileSystemProvider extends FileSystemProvider {
     @Override
     public OutputStream newOutputStream(Path path, OpenOption... options)
     throws IOException {
-        return promote(path)
+        return ((TPath) path)
                 .getOutputSocket(
                     mapOutput(options)
                         .set(CREATE_PARENTS, TFileSystem.isLenient()),
@@ -290,27 +289,27 @@ public class TFileSystemProvider extends FileSystemProvider {
     @Override
     public DirectoryStream<Path> newDirectoryStream(Path dir, Filter<? super Path> filter)
     throws IOException {
-        return promote(dir).newDirectoryStream(filter);
+        return ((TPath) dir).newDirectoryStream(filter);
     }
 
     @Override
     public void createDirectory(Path dir, FileAttribute<?>... attrs) throws IOException {
-        promote(dir).createDirectory(attrs);
+        ((TPath) dir).createDirectory(attrs);
     }
 
     @Override
     public void delete(Path path) throws IOException {
-        delete0(promote(path));
+        delete0(((TPath) path));
     }
 
     private void delete0(TPath path) throws IOException {
-        promote(path).delete();
+        path.delete();
     }
 
     @Override
     public void copy(Path source, Path target, CopyOption... options)
     throws IOException {
-        copy0(promote(source), promote(target), options);
+        copy0((TPath) source, (TPath) target, options);
     }
 
     private void copy0( final TPath source,
@@ -349,8 +348,8 @@ public class TFileSystemProvider extends FileSystemProvider {
     @Override
     public void move(Path source, Path target, CopyOption... options)
     throws IOException {
-        TPath s = promote(source);
-        TPath t = promote(target);
+        TPath s = (TPath) source;
+        TPath t = (TPath) target;
         if (null != t.getEntry())
             throw new FileAlreadyExistsException(target.toString());
         copy0(s, t, StandardCopyOption.COPY_ATTRIBUTES);
@@ -366,14 +365,14 @@ public class TFileSystemProvider extends FileSystemProvider {
 
     @Override
     public boolean isSameFile(Path a, Path b) throws IOException {
-        URI ua = promote(a).toRealPath().getAddress().toHierarchicalUri();
-        URI ub = promote(b).toRealPath().getAddress().toHierarchicalUri();
+        URI ua = ((TPath) a).toRealPath().getAddress().toHierarchicalUri();
+        URI ub = ((TPath) b).toRealPath().getAddress().toHierarchicalUri();
         return ua.equals(ub);
     }
 
     @Override
     public boolean isHidden(Path path) throws IOException {
-        return promote(path).getFileName().startsWith(".");
+        return ((TPath) path).getFileName().startsWith(".");
     }
 
     @Override
@@ -383,7 +382,7 @@ public class TFileSystemProvider extends FileSystemProvider {
 
     @Override
     public void checkAccess(Path path, AccessMode... modes) throws IOException {
-        final TPath p = promote(path);
+        final TPath p = ((TPath) path);
         final FsEntryName n = p.getAddress().getEntryName();
         final FsController<?> c = p.getController();
         if (null == c.getEntry(n))
@@ -416,7 +415,7 @@ public class TFileSystemProvider extends FileSystemProvider {
             LinkOption... options) {
         if (!type.isAssignableFrom(BasicFileAttributeView.class))
             throw new UnsupportedOperationException();
-        return (V) new FsEntryAttributeView(promote(path));
+        return (V) new FsEntryAttributeView(((TPath) path));
     }
 
     @Override
@@ -428,7 +427,7 @@ public class TFileSystemProvider extends FileSystemProvider {
     throws IOException {
         if (!type.isAssignableFrom(BasicFileAttributes.class))
             throw new UnsupportedOperationException();
-        return (A) new FsEntryAttributes(promote(path));
+        return (A) new FsEntryAttributes(((TPath) path));
     }
 
     @Override

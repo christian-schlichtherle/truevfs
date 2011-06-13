@@ -33,7 +33,6 @@ import de.schlichtherle.truezip.fs.FsSyncException;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import de.schlichtherle.truezip.fs.FsFilteringManager;
 import static de.schlichtherle.truezip.fs.FsManager.*;
-import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.fs.FsSyncOption;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
@@ -53,6 +52,7 @@ import java.nio.file.PathMatcher;
 import java.nio.file.WatchService;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.UserPrincipalLookupService;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -132,7 +132,7 @@ public final class TFileSystem extends FileSystem {
         TFile.setLenient(lenient);
     }
 
-    public FsMountPoint getMountPoint() {
+    FsMountPoint getMountPoint() {
         return path.getAddress().getMountPoint();
     }
 
@@ -228,12 +228,21 @@ public final class TFileSystem extends FileSystem {
         sync(UMOUNT);
     }
 
-    /** @return true */
+    /**
+     * Returns {@code true}.
+     * 
+     * @return {@code true}.
+     */
     @Override
     public boolean isOpen() {
         return true;
     }
 
+    /**
+     * Returns {@code false}.
+     * 
+     * @return {@code false}.
+     */
     @Override
     public boolean isReadOnly() {
         return false;
@@ -246,7 +255,7 @@ public final class TFileSystem extends FileSystem {
 
     @Override
     public Iterable<Path> getRootDirectories() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return Collections.singleton((Path) path.getRoot());
     }
 
     @Override
@@ -256,13 +265,13 @@ public final class TFileSystem extends FileSystem {
 
     @Override
     public Set<String> supportedFileAttributeViews() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return Collections.singleton("basic");
     }
 
     @Override
     public TPath getPath(String first, String... more) {
         throw new UnsupportedOperationException("Not supported yet.");
-        //return new TPath(new FsPath(getMountPoint(), ROOT), getArchiveDetector(), first, more);
+        //return path.resolve(new TPath(getArchiveDetector(), first, more));
     }
 
     @Override
