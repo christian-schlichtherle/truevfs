@@ -157,7 +157,7 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
 
     private static final long serialVersionUID = 5798435461242930648L;
 
-    private static final URI DOT_URI = URI.create(".");
+    private static final URI DOT = URI.create(".");
 
     private URI uri; // not final for serialization only!
 
@@ -388,7 +388,7 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
                     uri = nuri;
             }
         } else if (uri.isAbsolute()) {
-            mountPoint = new FsMountPoint(uri.resolve(DOT_URI), modifier);
+            mountPoint = new FsMountPoint(uri.resolve(DOT), modifier);
             entryName = new FsEntryName(mountPoint.toUri().relativize(uri), modifier);
         } else {
             mountPoint = null;
