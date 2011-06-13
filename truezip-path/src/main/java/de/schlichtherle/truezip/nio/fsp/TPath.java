@@ -62,7 +62,7 @@ import net.jcip.annotations.Immutable;
 public final class TPath implements Path {
 
     private final TArchiveDetector detector;
-    private final URI label;
+    private final URI uri;
     private volatile @CheckForNull FsPath address;
     private volatile @CheckForNull TFileSystem fileSystem;
     private volatile @CheckForNull Integer hashCode;
@@ -73,49 +73,32 @@ public final class TPath implements Path {
 
     public TPath(final @CheckForNull TArchiveDetector detector, final String first, final String... more) {
         this.detector = null != detector ? detector : getDefaultArchiveDetector();
-        this.label = toUri(first, more);
+        this.uri = toUri(first, more);
 
         assert invariants();
     }
 
-    /*public TPath(TPath parent, String first, String... more) {
-        this(parent, null, first, more);
+    TPath(URI uri) {
+        this(null, uri);
     }
 
-    public TPath(TPath parent, @CheckForNull TArchiveDetector detector, String first, String... more) {
-        this(parent.getAddress(), null != detector ? detector : parent.getArchiveDetector(), first, more);
-    }
-
-    TPath(final FsPath parent, final @CheckForNull TArchiveDetector detector, final String first, final String... more) {
+    TPath(final @CheckForNull TArchiveDetector detector, final URI uri) {
         this.detector = null != detector ? detector : getDefaultArchiveDetector();
-        final URI label = toUri(first, more);
-        this.label = parent.toUri().resolve(label);
-        this.address = new TScanner(detector).toPath(parent, label);
-
-        assert invariants();
-    }*/
-
-    public TPath(URI label) {
-        this(null, label);
-    }
-
-    public TPath(final @CheckForNull TArchiveDetector detector, final URI label) {
-        this.detector = null != detector ? detector : getDefaultArchiveDetector();
-        String p = label.getRawPath(), q = p;
+        String p = uri.getRawPath(), q = p;
         p = cutTrailingSeparators(p, SEPARATOR_CHAR);
-        this.label = p == q
-                ? label
-                : new UriBuilder(label, true).path(p).toUri();
+        this.uri = p == q
+                ? uri
+                : new UriBuilder(uri, true).path(p).toUri();
 
         assert invariants();
     }
 
     private TPath(
             final TArchiveDetector detector,
-            final URI label,
+            final URI uri,
             final @CheckForNull FsPath address) {
         this.detector = detector;
-        this.label = label;
+        this.uri = uri;
         this.address = address;
 
         assert invariants();
@@ -127,7 +110,7 @@ public final class TPath implements Path {
 
     TPath(final @CheckForNull TArchiveDetector detector, final Path path) {
         this.detector = null != detector ? detector : getDefaultArchiveDetector();
-        this.label = new UriBuilder().path(path.toString().replace(path.getFileSystem().getSeparator(), SEPARATOR)).toUri();
+        this.uri = new UriBuilder().path(path.toString().replace(path.getFileSystem().getSeparator(), SEPARATOR)).toUri();
     }
 
     private static URI toUri(final String first, final String... more) {
@@ -193,7 +176,7 @@ public final class TPath implements Path {
      */
     private boolean invariants() {
         assert null != getArchiveDetector();
-        assert null != getLabel();
+        assert null != getUri();
         assert null != getAddress();
         assert null != getFileSystem();
         return true;
@@ -279,19 +262,19 @@ public final class TPath implements Path {
         TFile.setDefaultArchiveDetector(detector);
     }
 
-    URI getLabel() {
-        return this.label;
+    URI getUri() {
+        return this.uri;
     }
 
     FsPath getAddress() {
         final FsPath address = this.address;
         return null != address
                 ? address
-                : (this.address = toPath(getLabel()));
+                : (this.address = toFsPath(getUri()));
     }
 
-    private FsPath toPath(URI uri) {
-        return new TScanner(detector).toPath(
+    private FsPath toFsPath(URI uri) {
+        return new TScanner(detector).toFsPath(
                 uri.isAbsolute() || null != uri.getAuthority() || uri.getPath().startsWith(SEPARATOR)
                     ? TFileSystemProvider.get(this).getRoot().toUri()
                     : TFileSystemProvider.get(this).getCurrent().toUri(),
@@ -308,27 +291,27 @@ public final class TPath implements Path {
 
     @Override
     public boolean isAbsolute() {
-        final URI label = getLabel();
-        return label.isAbsolute()
-                || label.getSchemeSpecificPart().startsWith(SEPARATOR);
+        final URI uri = getUri();
+        return uri.isAbsolute()
+                || uri.getSchemeSpecificPart().startsWith(SEPARATOR);
     }
 
     @Override
     public @Nullable TPath getRoot() {
-        return new TPath(getArchiveDetector(), toUri().resolve("/"), null); // don't use getAddress()!
+        return new TPath(getArchiveDetector(), toUri().resolve(SEPARATOR), null); // don't use getAddress()!
     }
 
     @Override
     public TPath getFileName() {
-        final URI label = getLabel();
-        final URI parent = label.resolve(".");
-        final URI member = parent.relativize(label);
+        final URI uri = getUri();
+        final URI parent = uri.resolve(".");
+        final URI member = parent.relativize(uri);
         return new TPath(getArchiveDetector(), member, null); // don't use getAddress()!
     }
 
     @Override
     public TPath getParent() {
-        return new TPath(getArchiveDetector(), getLabel().resolve("."));
+        return new TPath(getArchiveDetector(), getUri().resolve("."));
     }
 
     @Override
@@ -345,17 +328,12 @@ public final class TPath implements Path {
     public TPath subpath(int beginIndex, int endIndex) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-
-    static TPath promote(Path path) {
-        //return path instanceof TPath ? (TPath) path : new TPath(path);
-        return (TPath) path;
-    }
     
     @Override
     public boolean startsWith(Path that) {
         if (this.getFileSystem() != that.getFileSystem())
             return false;
-        return startsWith(promote(that).getAddress().getEntryName().toString());
+        return startsWith(((TPath) that).getAddress().getEntryName().toString());
     }
 
     @Override
@@ -371,7 +349,7 @@ public final class TPath implements Path {
     public boolean endsWith(Path that) {
         if (this.getFileSystem() != that.getFileSystem())
             return false;
-        return endsWith(promote(that).getAddress().getEntryName().toString());
+        return endsWith(((TPath) that).getAddress().getEntryName().toString());
     }
 
     @Override
@@ -385,12 +363,15 @@ public final class TPath implements Path {
 
     @Override
     public TPath normalize() {
-        return new TPath(getArchiveDetector(), getLabel().normalize(), address); // don't use getAddress()!
+        return new TPath(getArchiveDetector(), getUri().normalize(), address); // don't use getAddress()!
     }
 
     @Override
     public TPath resolve(final Path member) {
         return resolve(
+                member instanceof TPath
+                    ? ((TPath) member).getArchiveDetector()
+                    : getArchiveDetector(),
                 member  .toString()
                         .replace(   member.getFileSystem().getSeparator(),
                                     SEPARATOR));
@@ -398,23 +379,27 @@ public final class TPath implements Path {
 
     @Override
     public TPath resolve(final String member) {
-        URI lu = getLabel();
-        final String lup = lu.getPath();
+        return resolve(getArchiveDetector(), member);
+    }
+
+    private TPath resolve(final TArchiveDetector detector, final String member) {
+        URI u = getUri();
+        final String up = u.getPath();
         try {
-            lu = lup.isEmpty()
+            u = up.isEmpty()
                     ? new UriBuilder().path(member).getUri()
-                    : lup.endsWith(SEPARATOR)
-                        ? lu.resolve(member)
+                    : up.endsWith(SEPARATOR)
+                        ? u.resolve(member)
                         : member.isEmpty()
-                            ? lu
+                            ? u
                             : new UriBuilder()
-                                .path(lup + SEPARATOR_CHAR)
+                                .path(up + SEPARATOR_CHAR)
                                 .getUri()
                                 .resolve(member);
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
-        return new TPath(getArchiveDetector(), lu);
+        return new TPath(detector, u);
     }
 
     @Override
@@ -434,7 +419,7 @@ public final class TPath implements Path {
 
     @Override
     public TFile toFile() {
-        final URI uri = getLabel();
+        final URI uri = getUri();
         return uri.isAbsolute()
                 ? new TFile(getAddress())
                 : new TFile(uri.getSchemeSpecificPart(), getArchiveDetector());
@@ -472,29 +457,35 @@ public final class TPath implements Path {
     }
 
     @Override
+    public int compareTo(Path that) {
+        return this.toUri().compareTo(that.toUri());
+    }
+
+    @Override
     public boolean equals(final Object other) {
         if (this == other)
             return true;
         if (!(other instanceof Path))
             return false;
         final Path that = (Path) other;
-        return this.toUri().equals(that.toUri());
+        return this.getFileSystem().equals(that.getFileSystem())
+                && this.toUri().equals(that.toUri());
     }
 
     @Override
-    public int compareTo(Path that) {
-        return this.toUri().compareTo(that.toUri());
-    }
-    
-    @Override
     public int hashCode() {
         final Integer hashCode = this.hashCode;
-        return null != hashCode ? hashCode : (this.hashCode = toUri().hashCode());
+        if (null != hashCode)
+            return hashCode;
+        int result = 17;
+        result = 37 * result + getFileSystem().hashCode();
+        result = 37 * result + toUri().hashCode();
+        return this.hashCode = result;
     }
 
     @Override
     public String toString() {
-        return getLabel().toString();
+        return getUri().toString();
     }
 
     FsController<?> getController() throws IOException {

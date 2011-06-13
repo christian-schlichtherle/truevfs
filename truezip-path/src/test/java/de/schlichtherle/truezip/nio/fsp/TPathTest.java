@@ -21,7 +21,6 @@ import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
 import static de.schlichtherle.truezip.nio.fsp.TestUtils.*;
 import java.net.URI;
-import java.nio.file.Paths;
 import static org.hamcrest.CoreMatchers.*;
 import org.junit.After;
 import static org.junit.Assert.*;
@@ -56,7 +55,7 @@ public class TPathTest {
     @Test
     public void testConstructorWithStrings() {
         for (Object[] params : new Object[][] {
-            // { $detector, $first, $more, $label, $address },
+            // { $detector, $first, $more, $path, $address },
             { null, "/", NO_MORE, "/", ROOT_DIRECTORY },
             { null, "/foo", NO_MORE, "/foo", ROOT_DIRECTORY + "foo" },
             { null, "/foo", new String[] { "" }, "/foo", ROOT_DIRECTORY + "foo"},
@@ -88,10 +87,10 @@ public class TPathTest {
             final TArchiveDetector detector = (TArchiveDetector) params[0];
             final String first = params[1].toString();
             final String[] more = (String[]) params[2];
-            final URI label = URI.create(params[3].toString());
+            final URI uri = URI.create(params[3].toString());
             final FsPath address = FsPath.create(URI.create(params[4].toString()));
             final TPath path = new TPath(detector, first, more);
-            assertThat(path.getLabel(), equalTo(label));
+            assertThat(path.getUri(), equalTo(uri));
             assertThat(path.getAddress(), equalTo(address));
             assertThat(path.getFileSystem().getMountPoint(), equalTo(path.getAddress().getMountPoint()));
         }
@@ -141,7 +140,7 @@ public class TPathTest {
             final FsPath address = FsPath.create(URI.create(params[5].toString()));
             final TPath member = new TPath(detector, first, more);
             final TPath path = parent.resolve(member);
-            assertThat(path.getLabel(), equalTo(label));
+            assertThat(path.getUri(), equalTo(label));
             assertThat(path.getAddress(), equalTo(address));
             assertThat(path.getFileSystem().getMountPoint(), equalTo(path.getAddress().getMountPoint()));
         }
