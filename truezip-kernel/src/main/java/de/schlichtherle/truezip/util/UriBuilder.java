@@ -86,7 +86,8 @@ import static de.schlichtherle.truezip.util.UriEncoder.Encoding.*;
 @NotThreadSafe
 public final class UriBuilder {
 
-    private final UriEncoder encoder = new UriEncoder(null);
+    private final boolean raw;
+    private final UriEncoder encoder;
     private @CheckForNull StringBuilder builder;
     private @CheckForNull String scheme;
     private @CheckForNull String authority;
@@ -96,16 +97,41 @@ public final class UriBuilder {
 
     /**
      * Constructs a new URI builder.
+     * Equivalent to {@link #UriBuilder(boolean) UriBuilder(false)}.
      */
     public UriBuilder() {
+        this(false);
+    }
+
+    /**
+     * Constructs a new URI builder.
+     * 
+     * @param raw If {@code true}, then the {@code '%'} character doesn't get
+     *        quoted.
+     */
+    public UriBuilder(boolean raw) {
+        this.raw = raw;
+        this.encoder = new UriEncoder(null, raw);
+    }
+
+    /**
+     * Constructs a new URI builder.
+     * Equivalent to {@link #UriBuilder(URI, boolean) UriBuilder(uri, false)}.
+     */
+    public UriBuilder(URI uri) {
+        this(uri, false);
     }
 
     /**
      * Constructs a new URI builder.
      * 
      * @param uri the uri for initializing the initial state.
+     * @param raw If {@code true}, then the {@code '%'} character doesn't get
+     *        quoted.
      */
-    public UriBuilder(URI uri) {
+    public UriBuilder(URI uri, boolean raw) {
+        this.raw = raw;
+        this.encoder = new UriEncoder(null, raw);
         setUri(uri); // OK - class is final!
     }
 
@@ -338,11 +364,19 @@ public final class UriBuilder {
      * @param  uri the URI.
      */
     public void setUri(final URI uri) {
-        setScheme(uri.getScheme());
-        setAuthority(uri.getAuthority());
-        setPath(uri.isOpaque() ? uri.getSchemeSpecificPart() : uri.getPath());
-        setQuery(uri.getQuery());
-        setFragment(uri.getFragment());
+        if (raw) {
+            setScheme(uri.getScheme());
+            setAuthority(uri.getRawAuthority());
+            setPath(uri.isOpaque() ? uri.getRawSchemeSpecificPart() : uri.getRawPath());
+            setQuery(uri.getRawQuery());
+            setFragment(uri.getRawFragment());
+        } else {
+            setScheme(uri.getScheme());
+            setAuthority(uri.getAuthority());
+            setPath(uri.isOpaque() ? uri.getSchemeSpecificPart() : uri.getPath());
+            setQuery(uri.getQuery());
+            setFragment(uri.getFragment());
+        }
     }
 
     /**
