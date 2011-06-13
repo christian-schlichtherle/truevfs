@@ -16,12 +16,11 @@
 package de.schlichtherle.truezip.nio.fsp;
 
 import de.schlichtherle.truezip.file.TArchiveDetector;
-import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import static de.schlichtherle.truezip.fs.FsUriModifier.*;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
+import static de.schlichtherle.truezip.nio.fsp.TestUtils.*;
 import static de.schlichtherle.truezip.nio.fsp.TFileSystemProvider.Parameter.*;
-import de.schlichtherle.truezip.util.UriBuilder;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -38,12 +37,6 @@ import org.junit.Test;
  */
 public class TFileSystemProviderTest {
 
-    private static final FsMountPoint
-            ROOT_DIRECTORY = FsMountPoint.create(URI.create("file:/"));
-    private static final FsMountPoint
-            CURRENT_DIRECTORY = FsMountPoint.create(fix(Paths.get("").toUri()));
-    private static final String[] NO_MORE = new String[0];
-
     private Map<String, Object> environment;
     private TFileSystemProvider provider;
     
@@ -54,23 +47,6 @@ public class TFileSystemProviderTest {
         environment = new HashMap<>();
         environment.put(ARCHIVE_DETECTOR, detector);
         provider = TFileSystemProvider.class.newInstance();
-    }
-
-    /**
-     * Rewrites URIs of the form {@code [scheme:]///path[?query][#fragment]} to
-     * {@code [scheme:]/path[?query][#fragment]} in order to fix the broken
-     * identity provision for hierarchical URIs with an empty authority in the
-     * URI class.
-     * All other URIs are returned unchanged.
-     * 
-     * @return A URI with no empty authority in its scheme specific part.
-     */
-    private static URI fix(URI uri) {
-        return !uri.isOpaque()
-                && null == uri.getAuthority()
-                && uri.getSchemeSpecificPart().startsWith(SEPARATOR + SEPARATOR + SEPARATOR)
-                    ? new UriBuilder(uri).toUri()
-                    : uri;
     }
 
     @Test

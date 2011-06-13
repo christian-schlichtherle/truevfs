@@ -38,6 +38,7 @@ import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -81,6 +82,7 @@ public class TFileSystemProvider extends FileSystemProvider {
 
     private final String scheme;
     private final FsMountPoint root;
+    private final FsMountPoint current;
 
     /**
      * Obtains a file system provider for the given path.
@@ -103,15 +105,28 @@ public class TFileSystemProvider extends FileSystemProvider {
     @SuppressWarnings("LeakingThisInConstructor")
     @Deprecated
     public TFileSystemProvider() {
-        this("truezip", FsMountPoint.create(URI.create("file:/")));
+        this(   FsScheme.create("truezip"),
+                FsMountPoint.create(URI.create("file:/")),
+                FsMountPoint.create(new File("").toURI()));
         DEFAULT = this;
     }
 
-    private TFileSystemProvider(final String scheme, final FsMountPoint root) {
-        this.scheme = FsScheme.create(scheme).toString(); // check syntax
-        if (null == root)
-            throw new NullPointerException();
+    private TFileSystemProvider(
+            final FsScheme scheme,
+            final FsMountPoint root,
+            final FsMountPoint current) {
+        this.scheme = scheme.toString();
         this.root = root;
+        this.current = current;
+
+        assert invariants();
+    }
+
+    private boolean invariants() {
+        assert null != getScheme();
+        assert !getRoot().toUri().isOpaque();
+        assert !getCurrent().toUri().isOpaque();
+        return true;
     }
 
     /**
@@ -124,8 +139,12 @@ public class TFileSystemProvider extends FileSystemProvider {
         return scheme;
     }
 
-    public FsMountPoint getRoot() {
+    FsMountPoint getRoot() {
         return root;
+    }
+
+    FsMountPoint getCurrent() {
+        return current;
     }
 
     private static TArchiveDetector getArchiveDetector(@CheckForNull Map<String, ?> env) {

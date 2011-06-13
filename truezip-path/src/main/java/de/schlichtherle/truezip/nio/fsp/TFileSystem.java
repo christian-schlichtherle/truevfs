@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.nio.fsp;
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.entry.Entry;
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
+import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.fs.FsCompositeDriver;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsEntry;
@@ -39,9 +40,9 @@ import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.UriBuilder;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import java.io.IOException;
+import java.nio.file.DirectoryIteratorException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.FileStore;
@@ -53,12 +54,8 @@ import java.nio.file.WatchService;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.UserPrincipalLookupService;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.WeakHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author  Christian Schlichtherle
@@ -68,26 +65,16 @@ public final class TFileSystem extends FileSystem {
 
     /** The file system manager to use within this package. */
     private static final FsManager manager = FsManagerLocator.SINGLETON.get();
-    private static final Map<FsMountPoint, TFileSystem> fileSystems = new WeakHashMap<>();
 
-    private final FsMountPoint mountPoint;
-    private final TFileSystemProvider provider;
+    private final TPath path;
 
-    static synchronized TFileSystem get(TPath path) {
-        final FsMountPoint mp = path.getAddress().getMountPoint();
-        TFileSystem fs = fileSystems.get(mp);
-        if (null != fs)
-            return fs;
-        fs = new TFileSystem(mp, TFileSystemProvider.get(path));
-        fileSystems.put(mp, fs);
-        return fs;
+    static TFileSystem get(final TPath path) {
+        return new TFileSystem(path);
     }
 
-    private TFileSystem(
-            final FsMountPoint mountPoint,
-            final TFileSystemProvider provider) {
-        this.mountPoint = mountPoint;
-        this.provider = provider;
+    private TFileSystem(final TPath path) {
+        assert null != path;
+        this.path = path;
     }
 
     /**
@@ -146,12 +133,26 @@ public final class TFileSystem extends FileSystem {
     }
 
     public FsMountPoint getMountPoint() {
-        return mountPoint;
+        return path.getAddress().getMountPoint();
+    }
+
+    TArchiveDetector getArchiveDetector() {
+        return path.getArchiveDetector();
     }
 
     @Override
     public TFileSystemProvider provider() {
-        return provider;
+        return TFileSystemProvider.get(path);
+    }
+
+    private volatile FsController<?> controller;
+
+    FsController<?> getController(FsCompositeDriver driver) {
+        final FsController<?> controller = this.controller;
+        return null != controller
+                ? controller
+                : (this.controller = manager.getController(
+                    getMountPoint(), getArchiveDetector()));
     }
 
     /**
@@ -260,7 +261,8 @@ public final class TFileSystem extends FileSystem {
 
     @Override
     public TPath getPath(String first, String... more) {
-        return new TPath(new FsPath(getMountPoint(), ROOT), null, first, more);
+        throw new UnsupportedOperationException("Not supported yet.");
+        //return new TPath(new FsPath(getMountPoint(), ROOT), getArchiveDetector(), first, more);
     }
 
     @Override
@@ -309,20 +311,18 @@ public final class TFileSystem extends FileSystem {
             throw new NotDirectoryException(path.toString());
 
         class Adapter implements Iterator<Path> {
-            final UriBuilder uri = new UriBuilder();
             final Iterator<String> i = set.iterator();
             Path next;
 
             @Override
             public boolean hasNext() {
                 while (i.hasNext()) {
-                    next = new TPath(path, i.next());
+                    next = path.resolve(i.next());
                     try {
                         if (filter.accept(next))
                             return true;
                     } catch (IOException ex) {
-                        Logger  .getLogger(TFileSystem.class.getName())
-                                .log(Level.WARNING, ex.toString(), ex);
+                        throw new DirectoryIteratorException(ex);
                     }
                 }
                 next = null;
@@ -372,16 +372,5 @@ public final class TFileSystem extends FileSystem {
         FsEntryName name = path.getAddress().getEntryName();
         getController(path.getArchiveDetector())
                 .unlink(name);
-    }
-
-    private volatile FsController<?> controller;
-
-    FsController<?> getController(FsCompositeDriver driver) {
-        final FsController<?> controller = this.controller;
-        return null != controller
-                ? controller
-                : (this.controller = manager.getController(
-                    getMountPoint(),
-                    driver));
     }
 }

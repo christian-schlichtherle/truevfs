@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.nio.fsp;
 
-import de.schlichtherle.truezip.entry.EntryName;
 import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
@@ -24,35 +23,57 @@ import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.util.UriBuilder;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URI;
+import java.net.URISyntaxException;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
+@DefaultAnnotation(NonNull.class)
 final class TScanner {
-    private final FsPath root;
+    private static final String DOT_DOT_SEPARATOR = ".." + SEPARATOR_CHAR;
+    private static final URI DOT_DOT = URI.create("..");
+
     private final TArchiveDetector detector;
-    private final Splitter splitter = new Splitter(EntryName.SEPARATOR_CHAR, false);
-    private final UriBuilder uri = new UriBuilder();
+    private final Splitter splitter = new Splitter(SEPARATOR_CHAR, false);
+    private FsPath root;
+    private final UriBuilder uri = new UriBuilder(true);
 
-    TScanner(FsMountPoint root, TArchiveDetector detector) {
-        this(new FsPath(root, ROOT), detector);
-    }
-
-    TScanner(FsPath parent, TArchiveDetector detector) {
-        assert null != parent;
+    TScanner(TArchiveDetector detector) {
         assert null != detector;
-        this.root = parent;
         this.detector = detector;
     }
 
-    FsPath toPath(URI uri) {
-        assert !uri.isOpaque();
-        uri = uri.normalize();
-        final String path = uri.getPath();
-        this.uri.path(path).query(uri.getQuery());
-        return scan(path);
+    FsPath toPath(URI parent, URI member) {
+        assert !parent.isOpaque();
+        assert parent == parent.normalize();
+        assert !member.isOpaque();
+        member = member.normalize();
+        try {
+            while (member.getRawPath().startsWith(DOT_DOT_SEPARATOR)) {
+                parent = parent.resolve(DOT_DOT);
+                member = new UriBuilder(member, true).path(member.getRawPath().substring(3)).getUri();
+            }
+            if ("..".equals(member.getRawPath())) {
+                parent = parent.resolve(DOT_DOT);
+                member = new UriBuilder(member, true).path(null).getUri();
+            }
+            final String authority = member.getRawAuthority();
+            final String path = member.getRawPath();
+            if (null != authority && null == parent.getRawAuthority())
+                this.root = FsPath.create(new UriBuilder(parent, true).authority(authority).getUri());
+            else
+                this.root = FsPath.create(parent);
+            this.uri.path(path).query(member.getRawQuery());
+            return scan(path);
+        } catch (URISyntaxException ex) {
+            throw new IllegalArgumentException(ex);
+        }
     }
 
     private FsPath scan(final String input) {
