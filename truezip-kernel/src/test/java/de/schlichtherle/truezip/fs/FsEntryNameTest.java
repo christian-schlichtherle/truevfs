@@ -196,6 +196,7 @@ public class FsEntryNameTest {
     @Test
     public void testConstructorWithValidUri() {
         for (final String[] params : new String[][] {
+            // { $parent, $member, $result },
             { "foo%3Abar", "baz", "foo%3Abar/baz" },
             { "foo", "bar%3Abaz", "foo/bar%3Abaz" },
             { "foo", "", "foo", },

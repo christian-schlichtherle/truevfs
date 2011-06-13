@@ -239,23 +239,23 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      */
     public EntryName(   final EntryName parent,
                         final EntryName member) {
-        final URI parentUri = parent.uri;
-        final String parentUriPath = parentUri.getPath();
-        final URI memberUri = member.uri;
+        final URI pu = parent.uri;
+        final String pup = pu.getRawPath();
+        final URI mu = member.uri;
         try {
-            uri = parentUriPath.isEmpty()
-                    ? memberUri
-                    : parentUriPath.endsWith(SEPARATOR)
-                        ? parentUri.resolve(memberUri)
-                        : memberUri.getPath().isEmpty()
-                            ? new UriBuilder(parentUri)
-                                .query(memberUri.getQuery())
-                                .fragment(memberUri.getFragment())
+            uri = pup.isEmpty()
+                    ? mu
+                    : pup.endsWith(SEPARATOR)
+                        ? pu.resolve(mu)
+                        : mu.getPath().isEmpty()
+                            ? new UriBuilder(pu, true)
+                                .query(mu.getRawQuery())
+                                .fragment(mu.getRawFragment())
                                 .getUri()
-                            : new UriBuilder()
-                                .path(parentUriPath + SEPARATOR_CHAR)
+                            : new UriBuilder(true)
+                                .path(pup + SEPARATOR_CHAR)
                                 .getUri()
-                                .resolve(memberUri);
+                                .resolve(mu);
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
         }
