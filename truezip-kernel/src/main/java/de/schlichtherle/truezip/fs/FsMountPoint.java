@@ -461,9 +461,9 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
     public URI toHierarchicalUri() {
         return null != hierarchical
                 ? hierarchical
-                : (hierarchical = !uri.isOpaque()
-                    ? uri
-                    : path.toHierarchicalUri());
+                : (hierarchical = uri.isOpaque()
+                    ? path.toHierarchicalUri()
+                    : uri);
     }
 
     /**
