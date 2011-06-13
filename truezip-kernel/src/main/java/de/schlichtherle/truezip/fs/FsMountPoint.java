@@ -330,11 +330,11 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
         final String penup = path.getEntryName().toUri().getPath();
         if (0 == penup.length())
             throw new URISyntaxException(quote(pu), "Empty entry name");
-        this.uri = new UriBuilder()
+        this.uri = new UriBuilder(true)
                 .scheme(scheme.toString())
                 .path(new StringBuilder(pu.getScheme())
                     .append(':')
-                    .append(pu.getSchemeSpecificPart())
+                    .append(pu.getRawSchemeSpecificPart())
                     .append(SEPARATOR)
                     .toString())
                 .toUri();
@@ -379,11 +379,11 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
             if (0 == path.getEntryName().getPath().length())
                 throw new URISyntaxException(quote(uri), "Empty URI path of entry name of path");
             if (NULL != modifier) {
-                URI nuri = new UriBuilder()
+                URI nuri = new UriBuilder(true)
                         .scheme(uri.getScheme())
                         .path(new StringBuilder(pu.getScheme())
                             .append(':')
-                            .append(pu.getSchemeSpecificPart())
+                            .append(pu.getRawSchemeSpecificPart())
                             .append(SEPARATOR)
                             .toString())
                         .toUri();

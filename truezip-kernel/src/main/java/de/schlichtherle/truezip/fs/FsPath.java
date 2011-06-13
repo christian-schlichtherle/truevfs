@@ -250,8 +250,8 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
     }
 
     /**
-     * Constructs a new path by calling
-     * {@link URI#URI(String) new URI(uri)} and parsing the resulting URI.
+     * Constructs a new path by calling {@link URI#URI(String) new URI(uri)}
+     * and parsing the resulting URI.
      *
      * @param  uri the URI string representation.
      * @param  modifier the URI modifier.
@@ -319,12 +319,12 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
             try {
                 // Compute mountPoint + entryName, but ensure that all URI
                 // components are properly quoted.
-                final String mpussp = mpu.getSchemeSpecificPart();
+                final String mpussp = mpu.getRawSchemeSpecificPart();
                 final int mpusspl = mpussp.length();
                 final URI enu = entryName.toUri();
-                final String enup = enu.getPath();
+                final String enup = enu.getRawPath();
                 final int enupl = enup.length();
-                final String enuq = enu.getQuery();
+                final String enuq = enu.getRawQuery();
                 final int enuql = null == enuq ? 0 : enuq.length() + 1;
                 final StringBuilder ssp = 
                         new StringBuilder(mpusspl + enupl + enuql)
@@ -332,10 +332,10 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
                         .append(enup);
                 if (null != enuq)
                     ssp.append('?').append(enuq);
-                this.uri = new UriBuilder()
+                this.uri = new UriBuilder(true)
                         .scheme(mpu.getScheme())
                         .path(ssp.toString())
-                        .fragment(enu.getFragment())
+                        .fragment(enu.getRawFragment())
                         .getUri();
             } catch (URISyntaxException ex) {
                 throw new AssertionError(ex);
@@ -393,7 +393,8 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
         } else {
             mountPoint = null;
             entryName = new FsEntryName(uri, modifier);
-            uri = entryName.toUri();
+            if (NULL != modifier)
+                uri = entryName.toUri();
         }
         this.uri = uri;
 
@@ -477,8 +478,8 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
             try {
                 return hierarchical = enu.toString().isEmpty()
                         ? mpu
-                        : new UriBuilder(mpu)
-                            .path(mpu.getPath() + FsEntryName.SEPARATOR)
+                        : new UriBuilder(mpu, true)
+                            .path(mpu.getRawPath() + FsEntryName.SEPARATOR)
                             .getUri()
                             .resolve(enu);
             } catch (URISyntaxException ex) {
