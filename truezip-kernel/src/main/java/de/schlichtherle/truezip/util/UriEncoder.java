@@ -48,7 +48,8 @@ import static java.nio.charset.CoderResult.*;
 @NotThreadSafe
 public final class UriEncoder {
 
-    private static final Charset UTF8 = Charset.forName("UTF-8");
+    /** The default character set. */
+    public static final Charset UTF8 = Charset.forName("UTF-8");
 
     private static final char[] HEX = {
         '0', '1', '2', '3', '4', '5', '6', '7',
@@ -62,15 +63,25 @@ public final class UriEncoder {
             DEFAULT_LEGAL_CHARS = ALPHANUM_CHARS + MARK_CHARS + ",;$&+=@";
 
     private final @CheckForNull CharsetEncoder encoder;
-
+    private final boolean quotePercent;
     private @CheckForNull StringBuilder stringBuilder;
 
     /**
      * Constructs a new URI codec which uses the UTF-8 character set to encode
      * non-US-ASCII characters.
+     * Equivalent to {@link #UriEncoder(Charset, boolean) UriEncoder(UTF8, false)}.
      */
     public UriEncoder() {
-        this(UTF8);
+        this(UTF8, false);
+    }
+
+    /**
+     * Constructs a new URI codec which uses the given character set to encode
+     * non-US-ASCII characters.
+     * Equivalent to {@link #UriEncoder(Charset, boolean) UriEncoder(charset, false)}.
+     */
+    public UriEncoder(final @CheckForNull Charset charset) {
+        this(charset, false);
     }
 
     /**
@@ -84,9 +95,12 @@ public final class UriEncoder {
      *        characters.
      *        Note that using any other character set than UTF-8 should void
      *        interoperability with most applications!
+     * @param raw If {@code true}, then the {@code '%'} character doesn't get
+     *        quoted.
      */
-    public UriEncoder(final @CheckForNull Charset charset) {
+    public UriEncoder(final @CheckForNull Charset charset, final boolean raw) {
         this.encoder = null == charset ? null : charset.newEncoder();
+        this.quotePercent = !raw;
     }
 
     private static void quote(final char dc, final StringBuilder eS) {
@@ -156,7 +170,7 @@ public final class UriEncoder {
     public @CheckForNull StringBuilder encode(
             final String dS,
             final Encoding comp,
-            @CheckForNull StringBuilder eS)
+            @CheckForNull StringBuilder eS)         // encoded String
     throws URISyntaxException {
         final String[] escapes = comp.escapes;
         final CharBuffer dC = CharBuffer.wrap(dS);  // decoded characters
@@ -166,8 +180,8 @@ public final class UriEncoder {
             dC.mark();
             final char dc = dC.get();               // decoded character
             if (dc < 0x80) {
-                final String es = escapes[dc];
-                if (null != es) {
+                final String es = escapes[dc];      // escape sequence
+                if (null != es && (quotePercent || '%' != dc)) {
                     if (null == eB) {
                         if (null == eS) {
                             if (null == (eS = stringBuilder))
