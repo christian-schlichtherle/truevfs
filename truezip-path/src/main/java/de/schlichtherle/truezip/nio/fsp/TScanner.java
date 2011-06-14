@@ -31,6 +31,9 @@ import java.net.URISyntaxException;
 import net.jcip.annotations.NotThreadSafe;
 
 /**
+ * Scans {@link URI}s for prospective archive files with the help of a
+ * {@link TArchiveDetector}.
+ * 
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -46,19 +49,64 @@ final class TScanner {
     private FsPath root;
     private final UriBuilder uri = new UriBuilder(true);
 
+    /**
+     * Constructs a new URI scanner which uses the given
+     * {@link TArchiveDetector}.
+     * 
+     * @param detector the archive detector to use.
+     */
     TScanner(TArchiveDetector detector) {
         assert null != detector;
         this.detector = detector;
     }
 
-    FsPath toFsPath(FsMountPoint parent, URI member) {
-        return toFsPath(new FsPath(parent, ROOT), member);
+    /**
+     * Constructs a new {@link FsPath} from the given mount point and scans
+     * the given {@code member} for prospective archive files.
+     * 
+     * @param  parent the file system mount point to use as the parent.
+     * @param  member the URI to scan for prospective archive files.
+     * @return the file system path combined from the given {@code parent} and
+     *         {@code member}, possibly decorated as an opaque URI to address
+     *         prospective archive files.
+     * @throws IllegalArgumentException if any precondition is violated.
+     * @see    #toPath(FsPath, URI) 
+     */
+    FsPath toPath(FsMountPoint parent, URI member) {
+        return toPath(new FsPath(parent, ROOT), member);
     }
 
-    FsPath toFsPath(FsPath parent, URI member) {
-        assert !member.isOpaque();
-        member = member.normalize();
+    /**
+     * Constructs a new {@link FsPath} from the given mount point and scans
+     * the given {@code member} for prospective archive files.
+     * <p>
+     * {@code member} must not be opaque and must not defined a fragment
+     * component.
+     * A scheme component is ignored.
+     * An authority component is copied to the result unless the URI of
+     * {@code parent} is opaque or defines an authority component.
+     * A path component is normalized and scanned for prospective archive files
+     * using the {@link TArchiveDetector} provided to the constructor and
+     * rewritten to the opaque syntax for federated file systems in an
+     * {@link FsPath}.
+     * {@code ".."} segments at the beginning of the normalized path component
+     * are resolved against the given {@code parent}.
+     * A query component is copied to the result.
+     * 
+     * @param  parent the file system path to use as the parent.
+     * @param  member the URI to scan for prospective archive files.
+     * @return the file system path combined from the given {@code parent} and
+     *         {@code member}, possibly decorated as an opaque URI to address
+     *         prospective archive files.
+     * @throws IllegalArgumentException if any precondition is violated.
+     */
+    FsPath toPath(FsPath parent, URI member) {
         try {
+            if (member.isOpaque())
+                throw new URISyntaxException(quote(member), "Opaque URI.");
+            if (null != member.getRawFragment())
+                throw new URISyntaxException(quote(member), "Fragment component defined.");
+            member = member.normalize();
             String memberPath;
             while ((memberPath = member.getRawPath()).startsWith(DOT_DOT_SEPARATOR)) {
                 parent = parent(parent);
@@ -88,6 +136,13 @@ final class TScanner {
         }
     }
 
+    /**
+     * Returns the parent file system path for the given path.
+     * 
+     * @param  path a file system path.
+     * @return 
+     * @throws URISyntaxException 
+     */
     private static FsPath parent(FsPath path)
     throws URISyntaxException {
         while (true) {
@@ -95,7 +150,8 @@ final class TScanner {
             FsEntryName  pen = path.getEntryName();
             if (pen.isRoot()) {
                 if (null == pmp)
-                    throw new IllegalArgumentException("An empty path has no parent.");
+                    throw new URISyntaxException(quote(path),
+                            "An empty path has no parent.");
                 path = pmp.getPath();
                 if (null == path)
                     return new FsPath(pmp.toUri().resolve(DOT_DOT));
@@ -110,6 +166,10 @@ final class TScanner {
                 return new FsPath(pmp, pen);
             }
         }
+    }
+
+    private static String quote(Object s) {
+        return "\"" + s + "\"";
     }
 
     private FsPath scan(final String path) throws URISyntaxException {
