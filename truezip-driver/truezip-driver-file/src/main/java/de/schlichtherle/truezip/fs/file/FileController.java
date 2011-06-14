@@ -63,6 +63,7 @@ final class FileController extends FsController<FsModel>  {
     FileController(final FsModel model) {
         if (null != model.getParent())
             throw new IllegalArgumentException();
+        this.model = model;
         URI uri = model.getMountPoint().toUri();
         if ('\\' == separatorChar && null != uri.getRawAuthority()) {
             try {
@@ -81,7 +82,6 @@ final class FileController extends FsController<FsModel>  {
                 throw new AssertionError(ex);
             }
         }
-        this.model = model;
         this.target = new File(uri);
     }
 
