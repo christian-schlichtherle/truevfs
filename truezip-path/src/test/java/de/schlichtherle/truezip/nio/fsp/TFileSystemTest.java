@@ -63,15 +63,15 @@ public class TFileSystemTest {
     public void testNewFileSystem() throws IOException {
         for (String[] params : new String[][] {
             // { $uri, $mountPoint },
-            { "truezip:/", "file:/" },
-            { "truezip:///", "file:/" },
-            { "truezip:/foo", "file:/" },
-            { "truezip:/foo/", "file:/" },
-            { "truezip:/foo/bar", "file:/foo/" },
-            { "truezip:/foo/bar/", "file:/foo/" },
-            { "truezip:/foo/bar.mok/", "mok:file:/foo/bar.mok!/" },
-            { "truezip:/foo.mok/bar", "mok:file:/foo.mok!/" },
-            { "truezip:/foo.mok/bar.mok", "mok:mok:file:/foo.mok!/bar.mok!/" },
+            { "tpath:/", "file:/" },
+            { "tpath:///", "file:/" },
+            { "tpath:/foo", "file:/" },
+            { "tpath:/foo/", "file:/" },
+            { "tpath:/foo/bar", "file:/foo/" },
+            { "tpath:/foo/bar/", "file:/foo/" },
+            { "tpath:/foo/bar.mok/", "mok:file:/foo/bar.mok!/" },
+            { "tpath:/foo.mok/bar", "mok:file:/foo.mok!/" },
+            { "tpath:/foo.mok/bar.mok", "mok:mok:file:/foo.mok!/bar.mok!/" },
         }) {
             final URI uri = URI.create(params[0]);
             final FsMountPoint mountPoint = FsMountPoint.create(URI.create(params[1]));
