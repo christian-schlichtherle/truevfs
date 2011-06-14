@@ -21,6 +21,7 @@ import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.fs.FsScheme;
+import static de.schlichtherle.truezip.fs.FsUriModifier.*;
 import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.util.UriBuilder;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
@@ -37,6 +38,7 @@ import net.jcip.annotations.NotThreadSafe;
 @DefaultAnnotation(NonNull.class)
 final class TScanner {
     private static final String DOT_DOT_SEPARATOR = ".." + SEPARATOR_CHAR;
+    private static final URI DOT = URI.create(".");
     private static final URI DOT_DOT = URI.create("..");
 
     private final TArchiveDetector detector;
@@ -49,33 +51,64 @@ final class TScanner {
         this.detector = detector;
     }
 
-    FsPath toFsPath(URI parent, URI member) {
-        assert !parent.isOpaque();
-        parent = parent.normalize();
+    FsPath toFsPath(FsMountPoint parent, URI member) {
+        return toFsPath(new FsPath(parent, ROOT), member);
+    }
+
+    FsPath toFsPath(FsPath parent, URI member) {
         assert !member.isOpaque();
         member = member.normalize();
         try {
-            String path;
-            while ((path = member.getRawPath()).startsWith(DOT_DOT_SEPARATOR)) {
-                parent = parent.resolve(DOT_DOT);
+            String memberPath;
+            while ((memberPath = member.getRawPath()).startsWith(DOT_DOT_SEPARATOR)) {
+                parent = parent(parent);
                 member = new UriBuilder(member, true)
-                        .path(path.substring(3))
+                        .path(memberPath.substring(3))
                         .getUri();
             }
-            if ("..".equals(path))
-                return new FsPath(parent.resolve(DOT_DOT));
-            final String authority = member.getRawAuthority();
-            if (null != authority && null == parent.getRawAuthority())
+            if ("..".equals(memberPath))
+                return parent(parent);
+            if ("".equals(memberPath))
+                return parent;
+            final String memberAuthority = member.getRawAuthority();
+            final URI parentUri = parent.toUri();
+            if (null != memberAuthority
+                    && !parentUri.isOpaque()
+                    && null == parentUri.getRawAuthority())
                 this.root = new FsPath(
-                        new UriBuilder(parent, true)
-                            .authority(authority)
+                        new UriBuilder(parentUri, true)
+                            .authority(memberAuthority)
                             .getUri());
             else
-                this.root = new FsPath(parent);
-            this.uri.path(path).query(member.getRawQuery());
-            return scan(path);
+                this.root = parent;
+            this.uri.path(memberPath).query(member.getRawQuery());
+            return scan(memberPath);
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
+        }
+    }
+
+    private static FsPath parent(FsPath path)
+    throws URISyntaxException {
+        while (true) {
+            FsMountPoint pmp = path.getMountPoint();
+            FsEntryName  pen = path.getEntryName();
+            if (pen.isRoot()) {
+                if (null == pmp)
+                    throw new IllegalArgumentException("An empty path has no parent.");
+                path = pmp.getPath();
+                if (null == path)
+                    return new FsPath(pmp.toUri().resolve(DOT_DOT));
+                continue;
+            } else {
+                pen = new FsEntryName(pen.toUri().resolve(DOT), CANONICALIZE);
+                if (pen.isRoot() && null != pmp) {
+                    path = pmp.getPath();
+                    if (null == path)
+                        return new FsPath(pmp.toUri(), CANONICALIZE);
+                }
+                return new FsPath(pmp, pen);
+            }
         }
     }
 
