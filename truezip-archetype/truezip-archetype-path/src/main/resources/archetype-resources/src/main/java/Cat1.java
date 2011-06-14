@@ -23,10 +23,11 @@ import de.schlichtherle.truezip.nio.fsp.TPath;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * @author  Christian Schlichtherle
- * @version ${symbol_dollar}Id${symbol_dollar}
+ * @version $Id$
  */
 public class Cat1 extends Application<IOException> {
 
@@ -37,8 +38,9 @@ public class Cat1 extends Application<IOException> {
     @Override
     protected int work(String[] args) throws IOException {
         for (String arg : args) {
-            //Files.copy(new TPath(arg), System.out); // naive read-then-write loop implementation
-            try (InputStream in = Files.newInputStream(new TPath(arg))) {
+            Path path = new TPath(arg);
+            //Files.copy(path, System.out); // naive read-then-write loop implementation
+            try (InputStream in = Files.newInputStream(path)) {
                 Streams.cat(in, System.out); // much better: asynchronous I/O!
             }
             

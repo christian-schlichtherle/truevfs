@@ -38,7 +38,7 @@ import static java.nio.file.StandardCopyOption.*;
  * already exists.
  * 
  * @author  Christian Schlichtherle
- * @version ${symbol_dollar}Id${symbol_dollar}
+ * @version $Id$
  */
 public class Copy extends Application<IOException> {
 
@@ -55,18 +55,18 @@ public class Copy extends Application<IOException> {
         // TFile  doesn't do path name completion, so we do it manually in
         // order to emulate the behavior of many copy command line utilities.
         if (TFileSystem.isLenient() && dst.isArchive() || Files.isDirectory(dst))
-            dst = new TPath(dst, src.getFileName().toString());
+            dst = dst.resolve(src.getFileName());
 
         // If TFile.setLenient(false) is never called in your application,
         // then you could shorten this to...
         /*if (dst.isArchive() || Files.isDirectory(dst))
-            dst = new TPath(dst, src.getFileName().toString());*/
+            dst = dst.resolve(src.getFileName());*/
 
         // If you don't like path name completion for non-existent files which
         // just look like archive files according to their path name,
         // then you could even shorten this to...
         /*if (Files.isDirectory(dst))
-            dst = new TPath(dst, src.getFileName().toString());*/
+            dst = dst.resolve(src.getFileName());*/
 
         // Perform a non-recursive archive copy.
         Files.copy(src, dst, COPY_ATTRIBUTES);
