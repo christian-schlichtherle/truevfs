@@ -40,9 +40,9 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
  * A mount point adds the following syntax constraints to a
  * {@link URI Uniform Resource Identifier}:
  * <ol>
- * <li>The URI must be absolute, that is it must have a scheme component.
- * <li>The URI must not have a query component.
- * <li>The URI must not have a fragment component.
+ * <li>The URI must be absolute, that is it must define a scheme component.
+ * <li>The URI must not define a query component.
+ * <li>The URI must not define a fragment component.
  * <li>If the URI is opaque, its scheme specific part must end with the mount
  *     point separator {@code "!/"}.
  *     The scheme specific part <em>before</em> the mount point separator is

@@ -40,8 +40,10 @@ import net.jcip.annotations.Immutable;
  * An entry name adds the following syntax constraints to a
  * {@link URI Uniform Resource Identifier}:
  * <ol>
- * <li>The URI must be relative, that is it must not have a scheme component.
- * <li>The URI must not have an authority component.
+ * <li>The URI must be relative, that is it must not define a scheme component.
+ * <li>The URI must not define an authority component.
+ * <li>The URI must define a path component.
+ * <li>The URI must not define a fragment component.
  * </ol>
  * 
  * <a name="examples"/><h3>Examples</h3>
@@ -53,7 +55,6 @@ import net.jcip.annotations.Immutable;
  *   <th>{@link #toUri() uri} property</th>
  *   <th>{@link #getPath() path} property</th>
  *   <th>{@link #getQuery() query} property</th>
- *   <th>{@link #getFragment() fragment} property</th>
  * </tr>
  * </thead>
  * <tbody>
@@ -61,31 +62,21 @@ import net.jcip.annotations.Immutable;
  *   <td>{@code foo}</td>
  *   <td>{@code foo}</td>
  *   <td>(null)</td>
- *   <td>(null)</td>
  * </tr>
  * <tr>
  *   <td>{@code foo/bar}</td>
  *   <td>{@code foo/bar}</td>
- *   <td>(null)</td>
  *   <td>(null)</td>
  * </tr>
  * <tr>
  *   <td>{@code foo?bar}</td>
  *   <td>{@code foo}</td>
  *   <td>{@code bar}</td>
- *   <td>(null)</td>
  * </tr>
  * <tr>
- *   <td>{@code foo#bar}</td>
- *   <td>{@code foo}</td>
- *   <td>(null)</td>
- *   <td>{@code bar}</td>
- * </tr>
- * <tr>
- *   <td>{@code ../foo/./#bar}</td>
+ *   <td>{@code ../foo/./}</td>
  *   <td>{@code ../foo/./}</td>
  *   <td>(null)</td>
- *   <td>{@code bar}</td>
  * </tr>
  * </tbody>
  * </table>
@@ -101,11 +92,15 @@ import net.jcip.annotations.Immutable;
  * <tbody>
  * <tr>
  *   <td>{@code foo:/bar}</td>
- *   <td>not a relative URI</td>
+ *   <td>scheme component defined</td>
  * </tr>
  * <tr>
  *   <td>{@code //foo/bar}</td>
  *   <td>authority component defined</td>
+ * </tr>
+ * <tr>
+ *   <td>{@code foo#bar}</td>
+ *   <td>fragment component defined</td>
  * </tr>
  * </tbody>
  * </table>
@@ -280,9 +275,13 @@ public class EntryName implements Serializable, Comparable<EntryName> {
 
     private void parse(final URI uri) throws URISyntaxException {
         if (uri.isAbsolute())
-            throw new URISyntaxException(quote(uri), "Scheme component not allowed");
+            throw new URISyntaxException(quote(uri), "Scheme component defined.");
         if (null != uri.getRawAuthority())
-            throw new URISyntaxException(quote(uri), "Authority component not allowed");
+            throw new URISyntaxException(quote(uri), "Authority component defined.");
+        if (null == uri.getRawPath())
+            throw new URISyntaxException(quote(uri), "Path component undefined.");
+        if (null != uri.getRawFragment())
+            throw new URISyntaxException(quote(uri), "Fragment component defined.");
         this.uri = uri;
 
         assert invariants();
@@ -295,8 +294,8 @@ public class EntryName implements Serializable, Comparable<EntryName> {
     private boolean invariants() {
         assert null != toUri();
         assert !toUri().isAbsolute();
-        assert null == toUri().getRawAuthority();
-        //assert null == toUri().getRawFragment();
+        assert null != toUri().getRawPath();
+        assert null == toUri().getRawFragment();
         return true;
     }
 
