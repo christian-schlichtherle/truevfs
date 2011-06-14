@@ -61,8 +61,6 @@ import net.jcip.annotations.Immutable;
 @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
 public final class TPath implements Path {
 
-    private static final URI EMPTY = URI.create("");
-
     private final TArchiveDetector detector;
     private final URI uri;
     private volatile @CheckForNull FsPath address;
@@ -83,7 +81,7 @@ public final class TPath implements Path {
     TPath(final FsMountPoint mountPoint, final String first, final String... more) {
         this.detector = getDefaultArchiveDetector();
         this.uri = toUri(first, more);
-        this.address = new TScanner(detector).toFsPath(mountPoint, uri);
+        this.address = new TScanner(detector).toPath(mountPoint, uri);
 
         assert invariants();
     }
@@ -284,7 +282,7 @@ public final class TPath implements Path {
     }
 
     private FsPath toFsPath(URI uri) {
-        return new TScanner(detector).toFsPath(
+        return new TScanner(detector).toPath(
                 uri.isAbsolute() || null != uri.getAuthority() || uri.getPath().startsWith(SEPARATOR)
                     ? TFileSystemProvider.get(this).getRoot()
                     : TFileSystemProvider.get(this).getCurrent(),
