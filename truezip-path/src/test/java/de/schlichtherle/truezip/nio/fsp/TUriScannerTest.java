@@ -32,7 +32,7 @@ import static org.hamcrest.CoreMatchers.*;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class TScannerTest {
+public class TUriScannerTest {
     
     private TArchiveDetector detector;
 
@@ -65,7 +65,7 @@ public class TScannerTest {
             final FsPath parent = FsPath.create(URI.create(params[0]));
             final URI member = URI.create(params[1]);
             final FsPath path = FsPath.create(URI.create(params[2]));
-            final FsPath result = new TScanner(detector).toPath(parent, member);
+            final FsPath result = new TUriScanner(detector).toPath(parent, member);
             assertThat(result, equalTo(path));
         }
     }

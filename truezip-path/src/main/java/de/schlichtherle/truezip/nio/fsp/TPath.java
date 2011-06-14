@@ -81,7 +81,7 @@ public final class TPath implements Path {
     TPath(final FsMountPoint mountPoint, final String first, final String... more) {
         this.detector = getDefaultArchiveDetector();
         this.uri = toUri(first, more);
-        this.address = new TScanner(detector).toPath(mountPoint, uri);
+        this.address = new TUriScanner(detector).toPath(mountPoint, uri);
 
         assert invariants();
     }
@@ -282,7 +282,7 @@ public final class TPath implements Path {
     }
 
     private FsPath toFsPath(URI uri) {
-        return new TScanner(detector).toPath(
+        return new TUriScanner(detector).toPath(
                 uri.isAbsolute() || null != uri.getAuthority() || uri.getPath().startsWith(SEPARATOR)
                     ? TFileSystemProvider.get(this).getRoot()
                     : TFileSystemProvider.get(this).getCurrent(),

@@ -39,7 +39,7 @@ import net.jcip.annotations.NotThreadSafe;
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
-final class TScanner {
+final class TUriScanner {
     private static final String DOT_DOT_SEPARATOR = ".." + SEPARATOR_CHAR;
     private static final URI DOT = URI.create(".");
     private static final URI DOT_DOT = URI.create("..");
@@ -55,7 +55,7 @@ final class TScanner {
      * 
      * @param detector the archive detector to use.
      */
-    TScanner(TArchiveDetector detector) {
+    TUriScanner(TArchiveDetector detector) {
         assert null != detector;
         this.detector = detector;
     }
