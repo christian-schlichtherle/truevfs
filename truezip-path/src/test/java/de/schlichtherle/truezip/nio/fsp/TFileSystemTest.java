@@ -18,9 +18,7 @@ package de.schlichtherle.truezip.nio.fsp;
 import java.io.IOException;
 import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.fs.FsMountPoint;
-import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
-import static de.schlichtherle.truezip.nio.fsp.TestUtils.*;
 import java.net.URI;
 import java.nio.file.FileSystems;
 import java.util.HashMap;
@@ -69,15 +67,15 @@ public class TFileSystemTest {
             { "truezip:///", "file:/" },
             { "truezip:/foo", "file:/" },
             { "truezip:/foo/", "file:/" },
-            { "truezip:/foo/bar", "file:/" },
-            { "truezip:/foo/bar/", "file:/" },
+            { "truezip:/foo/bar", "file:/foo/" },
+            { "truezip:/foo/bar/", "file:/foo/" },
         }) {
             final URI uri = URI.create(params[0]);
             final FsMountPoint mountPoint = FsMountPoint.create(URI.create(params[1]));
             final TFileSystem fs = (TFileSystem) FileSystems.newFileSystem(uri, map);
             fs.close();
             assertThat(fs.isOpen(), is(true));
-            assertThat(fs.getMountPoint(), is(mountPoint));
+            assertThat(fs.getController().getModel().getMountPoint(), is(mountPoint));
         }
     }
 }

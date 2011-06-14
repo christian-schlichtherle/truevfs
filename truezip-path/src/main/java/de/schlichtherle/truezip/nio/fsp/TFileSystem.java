@@ -18,8 +18,6 @@ package de.schlichtherle.truezip.nio.fsp;
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.entry.Entry;
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
-import de.schlichtherle.truezip.file.TArchiveDetector;
-import de.schlichtherle.truezip.fs.FsCompositeDriver;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
@@ -66,7 +64,9 @@ public final class TFileSystem extends FileSystem {
     /** The file system manager to use within this package. */
     private static final FsManager manager = FsManagerLocator.SINGLETON.get();
 
-    private final TPath path;
+    private final FsMountPoint mountPoint;
+    private final FsController<?> controller;
+    private final TFileSystemProvider provider;
 
     static TFileSystem get(final TPath path) {
         return new TFileSystem(path);
@@ -74,7 +74,19 @@ public final class TFileSystem extends FileSystem {
 
     private TFileSystem(final TPath path) {
         assert null != path;
-        this.path = path;
+        this.mountPoint = path.getAddress().getMountPoint();
+        this.controller = manager.getController(
+                path.getAddress().getMountPoint(),
+                path.getArchiveDetector());
+        this.provider = TFileSystemProvider.get(path);
+
+        assert invariants();
+    }
+
+    private boolean invariants() {
+        assert null != getController();
+        assert null != provider();
+        return true;
     }
 
     /**
@@ -132,27 +144,13 @@ public final class TFileSystem extends FileSystem {
         TFile.setLenient(lenient);
     }
 
-    FsMountPoint getMountPoint() {
-        return path.getAddress().getMountPoint();
-    }
-
-    TArchiveDetector getArchiveDetector() {
-        return path.getArchiveDetector();
+    FsController<?> getController() {
+        return controller;
     }
 
     @Override
     public TFileSystemProvider provider() {
-        return TFileSystemProvider.get(path);
-    }
-
-    private volatile FsController<?> controller;
-
-    FsController<?> getController(FsCompositeDriver driver) {
-        final FsController<?> controller = this.controller;
-        return null != controller
-                ? controller
-                : (this.controller = manager.getController(
-                    getMountPoint(), getArchiveDetector()));
+        return provider;
     }
 
     /**
@@ -194,7 +192,9 @@ public final class TFileSystem extends FileSystem {
      * @see    #sync(BitField)
      */
     public void sync(BitField<FsSyncOption> options) throws FsSyncException {
-        new FsFilteringManager(manager, getMountPoint()).sync(options);
+        new FsFilteringManager( manager,
+                                getController().getModel().getMountPoint())
+                .sync(options);
     }
 
     /**
@@ -255,7 +255,8 @@ public final class TFileSystem extends FileSystem {
 
     @Override
     public Iterable<Path> getRootDirectories() {
-        return Collections.singleton((Path) path.getRoot());
+        return Collections.singleton((Path)
+                new TPath(mountPoint.toHierarchicalUri().resolve(SEPARATOR)));
     }
 
     @Override
@@ -270,8 +271,13 @@ public final class TFileSystem extends FileSystem {
 
     @Override
     public TPath getPath(String first, String... more) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        int i = 0;
+        while (SEPARATOR_CHAR == first.charAt(i))
+            i++;
+        if (0 < i)
+            first = first.substring(i);
         //return path.resolve(new TPath(getArchiveDetector(), first, more));
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -291,30 +297,27 @@ public final class TFileSystem extends FileSystem {
 
     FsEntry getEntry(TPath path) throws IOException {
         FsEntryName name = path.getAddress().getEntryName();
-        return getController(path.getArchiveDetector()).getEntry(name);
+        return getController().getEntry(name);
     }
 
     InputSocket<?> getInputSocket(  TPath path,
                                     BitField<FsInputOption> options) {
         FsEntryName name = path.getAddress().getEntryName();
-        return getController(path.getArchiveDetector())
-                .getInputSocket(name, options);
+        return getController().getInputSocket(name, options);
     }
 
     OutputSocket<?> getOutputSocket(TPath path,
                                     BitField<FsOutputOption> options,
                                     @CheckForNull Entry template) {
         FsEntryName name = path.getAddress().getEntryName();
-        return getController(path.getArchiveDetector())
-                .getOutputSocket(name, options, template);
+        return getController().getOutputSocket(name, options, template);
     }
 
     DirectoryStream<Path> newDirectoryStream(   final TPath path,
                                                 final Filter<? super Path> filter)
     throws IOException {
         final FsEntryName name = path.getAddress().getEntryName();
-        final FsEntry entry = getController(path.getArchiveDetector())
-                .getEntry(name);
+        final FsEntry entry = getController().getEntry(name);
         final Set<String> set;
         if (null == entry || null == (set = entry.getMembers()))
             throw new NotDirectoryException(path.toString());
@@ -370,16 +373,15 @@ public final class TFileSystem extends FileSystem {
         if (0 < attrs.length)
             throw new UnsupportedOperationException();
         FsEntryName name = path.getAddress().getEntryName();
-        getController(path.getArchiveDetector())
-                .mknod( name,
-                        DIRECTORY,
-                        NO_OUTPUT_OPTION.set(CREATE_PARENTS, isLenient()),
-                        null);
+        getController().mknod(
+                name,
+                DIRECTORY,
+                NO_OUTPUT_OPTION.set(CREATE_PARENTS, isLenient()),
+                null);
     }
 
     void delete(TPath path) throws IOException {
         FsEntryName name = path.getAddress().getEntryName();
-        getController(path.getArchiveDetector())
-                .unlink(name);
+        getController().unlink(name);
     }
 }
