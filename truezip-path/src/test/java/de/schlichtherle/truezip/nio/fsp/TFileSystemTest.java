@@ -69,6 +69,9 @@ public class TFileSystemTest {
             { "truezip:/foo/", "file:/" },
             { "truezip:/foo/bar", "file:/foo/" },
             { "truezip:/foo/bar/", "file:/foo/" },
+            { "truezip:/foo/bar.mok/", "mok:file:/foo/bar.mok!/" },
+            { "truezip:/foo.mok/bar", "mok:file:/foo.mok!/" },
+            { "truezip:/foo.mok/bar.mok", "mok:mok:file:/foo.mok!/bar.mok!/" },
         }) {
             final URI uri = URI.create(params[0]);
             final FsMountPoint mountPoint = FsMountPoint.create(URI.create(params[1]));

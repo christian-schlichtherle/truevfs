@@ -277,16 +277,7 @@ public final class TFileSystem extends FileSystem {
 
     @Override
     public TPath getPath(String first, String... more) {
-        {
-            int i = 0;
-            while (SEPARATOR_CHAR == first.charAt(i))
-                i++;
-            if (0 < i)
-                first = first.substring(i);
-        }
-        //return path.resolve(new TPath(getArchiveDetector(), first, more));
-        new TPath(getMountPoint().toUri());
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new TPath(getMountPoint(), first, more);
     }
 
     @Override

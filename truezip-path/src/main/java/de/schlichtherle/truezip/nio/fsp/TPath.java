@@ -25,7 +25,7 @@ import de.schlichtherle.truezip.fs.FsInputOption;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.fs.FsPath;
-import static de.schlichtherle.truezip.io.Paths.*;
+import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
@@ -78,9 +78,9 @@ public final class TPath implements Path {
         assert invariants();
     }
 
-    TPath(final FsMountPoint mountPoint, final String first, final String... more) {
+    TPath(final FsMountPoint mountPoint, String first, final String... more) {
         this.detector = getDefaultArchiveDetector();
-        this.uri = toUri(first, more);
+        this.uri = toUri(cutLeadingSeparators(first), more);
         this.address = new TUriScanner(detector).toPath(mountPoint, uri);
 
         assert invariants();
@@ -93,7 +93,7 @@ public final class TPath implements Path {
     TPath(final @CheckForNull TArchiveDetector detector, final URI uri) {
         this.detector = null != detector ? detector : getDefaultArchiveDetector();
         String p = uri.getRawPath(), q = p;
-        p = cutTrailingSeparators(p, SEPARATOR_CHAR);
+        p = cutTrailingSeparators(p);
         this.uri = p == q
                 ? uri
                 : new UriBuilder(uri, true).path(p).toUri();
@@ -132,8 +132,7 @@ public final class TPath implements Path {
         int i = -1;
         {
             String s = cutTrailingSeparators(
-                    first.replace(File.separatorChar, SEPARATOR_CHAR),
-                    SEPARATOR_CHAR);
+                    first.replace(File.separatorChar, SEPARATOR_CHAR));
             int l = s.length();
             for (int k = 0; k < l; k++) {
                 char c = s.charAt(k);
@@ -147,8 +146,7 @@ public final class TPath implements Path {
         }
         for (String s : more) {
             s = cutTrailingSeparators(
-                    s.replace(File.separatorChar, SEPARATOR_CHAR),
-                    SEPARATOR_CHAR);
+                    s.replace(File.separatorChar, SEPARATOR_CHAR));
             int l = s.length();
             for (int j = 0, k = 0; k < l; k++) {
                 char c = s.charAt(k);
@@ -165,6 +163,17 @@ public final class TPath implements Path {
         return 0 == path.length() || SEPARATOR_CHAR == path.charAt(0)
                 ? URI.create(path.toString())
                 : new UriBuilder().path(path.toString()).toUri();
+    }
+
+    private static String cutLeadingSeparators(final String p) {
+        int i = 0;
+        while (SEPARATOR_CHAR == p.charAt(i))
+            i++;
+        return 0 == i ? p : p.substring(i);
+    }
+
+    private static String cutTrailingSeparators(String p) {
+        return Paths.cutTrailingSeparators(p, SEPARATOR_CHAR);
     }
 
     /**
