@@ -70,6 +70,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * A {@link FileSystemProvider} implementation based on the TrueZIP Kernel
+ * module.
+ * 
  * @author  Christian Schlichtherle
  * @version $Id$
  */

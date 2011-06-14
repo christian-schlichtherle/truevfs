@@ -51,7 +51,7 @@ import java.util.Iterator;
 import net.jcip.annotations.Immutable;
 
 /**
- * A path implementation for the TrueZIP FileSystemProvider.
+ * A {@link Path} implementation based on the TrueZIP Kernel module.
  * 
  * @author  Christian Schlichtherle
  * @version $Id$
