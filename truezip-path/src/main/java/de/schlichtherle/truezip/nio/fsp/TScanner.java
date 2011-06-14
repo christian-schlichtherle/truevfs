@@ -51,24 +51,27 @@ final class TScanner {
 
     FsPath toFsPath(URI parent, URI member) {
         assert !parent.isOpaque();
-        assert parent == parent.normalize();
+        parent = parent.normalize();
         assert !member.isOpaque();
         member = member.normalize();
         try {
-            while (member.getRawPath().startsWith(DOT_DOT_SEPARATOR)) {
+            String path;
+            while ((path = member.getRawPath()).startsWith(DOT_DOT_SEPARATOR)) {
                 parent = parent.resolve(DOT_DOT);
-                member = new UriBuilder(member, true).path(member.getRawPath().substring(3)).getUri();
+                member = new UriBuilder(member, true)
+                        .path(path.substring(3))
+                        .getUri();
             }
-            if ("..".equals(member.getRawPath())) {
-                parent = parent.resolve(DOT_DOT);
-                member = new UriBuilder(member, true).path(null).getUri();
-            }
+            if ("..".equals(path))
+                return new FsPath(parent.resolve(DOT_DOT));
             final String authority = member.getRawAuthority();
-            final String path = member.getRawPath();
             if (null != authority && null == parent.getRawAuthority())
-                this.root = FsPath.create(new UriBuilder(parent, true).authority(authority).getUri());
+                this.root = new FsPath(
+                        new UriBuilder(parent, true)
+                            .authority(authority)
+                            .getUri());
             else
-                this.root = FsPath.create(parent);
+                this.root = new FsPath(parent);
             this.uri.path(path).query(member.getRawQuery());
             return scan(path);
         } catch (URISyntaxException ex) {
@@ -76,11 +79,11 @@ final class TScanner {
         }
     }
 
-    private FsPath scan(final String input) {
-        splitter.split(input);
+    private FsPath scan(final String path) throws URISyntaxException {
+        splitter.split(path);
         final String parent = splitter.getParentPath();
         final FsEntryName member = FsEntryName
-                .create(uri.path(splitter.getMemberName()).toUri());
+                .create(uri.path(splitter.getMemberName()).getUri());
         final FsPath parentPath = null != parent ? scan(parent) : root;
         URI parentUri = parentPath.toUri();
         FsPath memberPath;
@@ -89,12 +92,15 @@ final class TScanner {
         } else {
             final String parentUriPath = parentUri.getRawPath();
             if (!parentUriPath.endsWith(SEPARATOR))
-                parentUri = new UriBuilder(parentUri, true).path(parentUriPath + SEPARATOR_CHAR).toUri();
+                parentUri = new UriBuilder(parentUri, true)
+                        .path(parentUriPath + SEPARATOR_CHAR)
+                        .getUri();
             memberPath = new FsPath(FsMountPoint.create(parentUri), member);
         }
         final FsScheme scheme = detector.getScheme(member.toString());
         if (null != scheme)
-            memberPath = new FsPath(FsMountPoint.create(scheme, memberPath), ROOT);
+            memberPath = new FsPath(    FsMountPoint.create(scheme, memberPath),
+                                        ROOT);
         return memberPath;
     }
 }
