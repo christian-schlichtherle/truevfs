@@ -112,13 +112,11 @@ public final class TPath implements Path {
         assert invariants();
     }
 
-    TPath(Path path) {
-        this(null, path);
-    }
-
     TPath(final @CheckForNull TArchiveDetector detector, final Path path) {
         this.detector = null != detector ? detector : getDefaultArchiveDetector();
         this.uri = new UriBuilder().path(path.toString().replace(path.getFileSystem().getSeparator(), SEPARATOR)).toUri();
+
+        assert invariants();
     }
 
     private static URI toUri(final String first, final String... more) {
@@ -400,23 +398,23 @@ public final class TPath implements Path {
     }
 
     private TPath resolve(final TArchiveDetector detector, final String member) {
-        URI u = getUri();
-        final String up = u.getPath();
+        URI uri = getUri();
+        final String path = uri.getPath();
         try {
-            u = up.isEmpty()
+            uri = path.isEmpty()
                     ? new UriBuilder().path(member).getUri()
-                    : up.endsWith(SEPARATOR)
-                        ? u.resolve(member)
+                    : path.endsWith(SEPARATOR)
+                        ? uri.resolve(member)
                         : member.isEmpty()
-                            ? u
+                            ? uri
                             : new UriBuilder()
-                                .path(up + SEPARATOR_CHAR)
+                                .path(path + SEPARATOR_CHAR)
                                 .getUri()
                                 .resolve(member);
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
-        return new TPath(detector, u);
+        return new TPath(detector, uri);
     }
 
     @Override
