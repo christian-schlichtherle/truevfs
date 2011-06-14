@@ -148,6 +148,10 @@ public final class TFileSystem extends FileSystem {
         return controller;
     }
 
+    FsMountPoint getMountPoint() {
+        return getController().getModel().getMountPoint();
+    }
+
     @Override
     public TFileSystemProvider provider() {
         return provider;

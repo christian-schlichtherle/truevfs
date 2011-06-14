@@ -68,7 +68,7 @@ public class TFileSystemProviderTest {
                 final TFileSystem fs = provider.newFileSystem(path, environment);
                 if (null == mountPoint)
                     fail();
-                assertThat(fs.getController().getModel().getMountPoint(), is(mountPoint));
+                assertThat(fs.getMountPoint(), is(mountPoint));
             } catch (UnsupportedOperationException ex) {
                 if (null != mountPoint)
                     throw ex;
@@ -93,7 +93,7 @@ public class TFileSystemProviderTest {
                 final TFileSystem fs = provider.newFileSystem(uri, environment);
                 if (null == mountPoint)
                     fail();
-                assertThat(fs.getController().getModel().getMountPoint(), is(mountPoint));
+                assertThat(fs.getMountPoint(), is(mountPoint));
             } catch (UnsupportedOperationException ex) {
                 if (null != mountPoint)
                     throw ex;
@@ -102,7 +102,7 @@ public class TFileSystemProviderTest {
     }
 
     /*@Test
-    public void testgetPath() {
+    public void testGetPath() {
         for (final String[] params : new String[][] {
             { "foo", },
         }) {

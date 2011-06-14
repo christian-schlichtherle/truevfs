@@ -90,7 +90,7 @@ public class TPathTest {
             final TPath path = new TPath(detector, first, more);
             assertThat(path.getUri(), equalTo(uri));
             assertThat(path.getAddress(), equalTo(address));
-            assertThat(path.getFileSystem().getController().getModel().getMountPoint(), equalTo(path.getAddress().getMountPoint()));
+            assertThat(path.getFileSystem().getMountPoint(), equalTo(path.getAddress().getMountPoint()));
         }
     }
 
@@ -138,7 +138,7 @@ public class TPathTest {
             final TPath path = parent.resolve(member);
             assertThat(path.getUri(), equalTo(label));
             assertThat(path.getAddress(), equalTo(address));
-            assertThat(path.getFileSystem().getController().getModel().getMountPoint(), equalTo(path.getAddress().getMountPoint()));
+            assertThat(path.getFileSystem().getMountPoint(), equalTo(path.getAddress().getMountPoint()));
         }
     }
 }
