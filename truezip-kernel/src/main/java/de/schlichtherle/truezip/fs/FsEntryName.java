@@ -37,11 +37,11 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
  * An entry name adds the following syntax constraints to a
  * {@link URI Uniform Resource Identifier}:
  * <ol>
- * <li>The URI must be relative, i.e. it must not have a scheme component.
+ * <li>The URI must be relative, that is it must not have a scheme component.
  * <li>The URI must not have an authority component.
  * <li>The URI must not have a fragment component.
- * <li>The URI's path must be in normal form, i.e. its path component must not
- *     contain redundant {@code "."} and {@code ".."} segments.
+ * <li>The URI's path must be in normal form, that is its path component must
+ *     not contain redundant {@code "."} and {@code ".."} segments.
  * <li>The URI's path component must not equal {@code "."}.
  * <li>The URI's path component must not equal {@code ".."}.
  * <li>The URI's path component must not start with {@code "/"}.

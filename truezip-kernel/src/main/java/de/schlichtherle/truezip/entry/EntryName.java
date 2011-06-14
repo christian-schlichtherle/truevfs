@@ -40,7 +40,7 @@ import net.jcip.annotations.Immutable;
  * An entry name adds the following syntax constraints to a
  * {@link URI Uniform Resource Identifier}:
  * <ol>
- * <li>The URI must be relative, i.e. it must not have a scheme component.
+ * <li>The URI must be relative, that is it must not have a scheme component.
  * <li>The URI must not have an authority component.
  * </ol>
  * 
