@@ -417,7 +417,7 @@ public class TFileSystemProvider extends FileSystemProvider {
             Class<V> type,
             LinkOption... options) {
         if (!type.isAssignableFrom(BasicFileAttributeView.class))
-            throw new UnsupportedOperationException();
+            return null;
         return (V) new FsEntryAttributeView(((TPath) path));
     }
 
@@ -447,6 +447,14 @@ public class TFileSystemProvider extends FileSystemProvider {
     public interface Parameter {
         /** The key for the {@link TArchiveDetector} parameter. */
         String ARCHIVE_DETECTOR = "ARCHIVE_DETECTOR";
+    }
+
+    private static FileTime toFileTime(long time) {
+        return time == UNKNOWN ? null : FileTime.fromMillis(time);
+    }
+
+    private static long toMillis(FileTime time) {
+        return time == null ? null : time.toMillis();
     }
 
     private static final class FsEntryAttributeView
@@ -479,58 +487,55 @@ public class TFileSystemProvider extends FileSystemProvider {
             t.put(CREATE, toMillis(createTime));
             c.setTime(path.getAddress().getEntryName(), t);
         }
-
-        private static long toMillis(FileTime time) {
-            return time == null ? null : time.toMillis();
-        }
     } // class FsEntryAttributeView
 
     private static final class FsEntryAttributes
     implements BasicFileAttributes {
         private final FsEntry e;
 
-        FsEntryAttributes(TPath path) throws IOException {
-            e = path.getEntry();
+        FsEntryAttributes(final TPath path) throws IOException {
+            if (null == (e = path.getEntry()))
+                throw new NoSuchFileException(path.toString());
         }
 
         @Override
         public FileTime lastModifiedTime() {
-            return e == null ? null : FileTime.fromMillis(e.getTime(WRITE));
+            return toFileTime(e.getTime(WRITE));
         }
 
         @Override
         public FileTime lastAccessTime() {
-            return e == null ? null : FileTime.fromMillis(e.getTime(READ));
+            return toFileTime(e.getTime(READ));
         }
 
         @Override
         public FileTime creationTime() {
-            return e == null ? null : FileTime.fromMillis(e.getTime(CREATE));
+            return toFileTime(e.getTime(CREATE));
         }
 
         @Override
         public boolean isRegularFile() {
-            return e == null ? false : e.isType(FILE);
+            return e.isType(FILE);
         }
 
         @Override
         public boolean isDirectory() {
-            return e == null ? false : e.isType(DIRECTORY);
+            return e.isType(DIRECTORY);
         }
 
         @Override
         public boolean isSymbolicLink() {
-            return e == null ? false : e.isType(SYMLINK);
+            return e.isType(SYMLINK);
         }
 
         @Override
         public boolean isOther() {
-            return e == null ? false : e.isType(SPECIAL);
+            return e.isType(SPECIAL);
         }
 
         @Override
         public long size() {
-            return e == null ? UNKNOWN : e.getSize(DATA);
+            return e.getSize(DATA);
         }
 
         @Override
