@@ -56,7 +56,6 @@ final class TScanner {
     }
 
     FsPath toFsPath(FsPath parent, URI member) {
-        //assert !member.isAbsolute();
         assert !member.isOpaque();
         member = member.normalize();
         try {
