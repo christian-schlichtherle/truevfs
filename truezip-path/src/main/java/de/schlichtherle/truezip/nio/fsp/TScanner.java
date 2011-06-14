@@ -56,6 +56,7 @@ final class TScanner {
     }
 
     FsPath toFsPath(FsPath parent, URI member) {
+        //assert !member.isAbsolute();
         assert !member.isOpaque();
         member = member.normalize();
         try {
@@ -68,8 +69,8 @@ final class TScanner {
             }
             if ("..".equals(memberPath))
                 return parent(parent);
-            if ("".equals(memberPath))
-                return parent;
+            /*if ("".equals(memberPath))
+                return parent;*/
             final String memberAuthority = member.getRawAuthority();
             final URI parentUri = parent.toUri();
             if (null != memberAuthority
@@ -118,9 +119,9 @@ final class TScanner {
         final FsEntryName member = FsEntryName
                 .create(uri.path(splitter.getMemberName()).getUri());
         final FsPath parentPath = null != parent ? scan(parent) : root;
-        URI parentUri = parentPath.toUri();
+        URI parentUri;
         FsPath memberPath;
-        if (parentUri.isOpaque()) {
+        if (member.isRoot() || (parentUri = parentPath.toUri()).isOpaque()) {
             memberPath = parentPath.resolve(member);
         } else {
             final String parentUriPath = parentUri.getRawPath();
