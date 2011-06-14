@@ -107,7 +107,7 @@ public class TFileSystemProvider extends FileSystemProvider {
     @SuppressWarnings("LeakingThisInConstructor")
     @Deprecated
     public TFileSystemProvider() {
-        this(   FsScheme.create("truezip"),
+        this(   FsScheme.create("tpath"),
                 FsMountPoint.create(URI.create("file:/")),
                 FsMountPoint.create(new File("").toURI()));
         DEFAULT = this;
