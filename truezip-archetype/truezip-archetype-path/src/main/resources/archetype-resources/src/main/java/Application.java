@@ -26,7 +26,7 @@ import de.schlichtherle.truezip.file.TApplication;
  * An abstract class which configures the TrueZIP FSP JSE7 module.
  * 
  * @author  Christian Schlichtherle
- * @version ${symbol_dollar}Id${symbol_dollar}
+ * @version $Id$
  */
 abstract class Application<E extends Exception> extends TApplication<E> {
 

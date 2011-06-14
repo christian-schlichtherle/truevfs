@@ -25,10 +25,11 @@ import java.nio.channels.Channels;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * @author  Christian Schlichtherle
- * @version ${symbol_dollar}Id${symbol_dollar}
+ * @version $Id$
  */
 public class Cat2 extends Application<IOException> {
 
@@ -41,11 +42,12 @@ public class Cat2 extends Application<IOException> {
         final ByteBuffer buf = ByteBuffer.allocate(8096);
         final WritableByteChannel dst = Channels.newChannel(System.out);
         for (String arg : args) {
+            Path path = new TPath(arg);
             // If the path refers to an entry in an archive file, the TrueZIP
             // Kernel will create a cache entry for it.
             // This is inefficient in comparison with copying an input stream.
             // Don't use in production code!
-            try (SeekableByteChannel src = Files.newByteChannel(new TPath(arg))) {
+            try (SeekableByteChannel src = Files.newByteChannel(path)) {
                 // Naive read-then-write loop.
                 // Don't use in production code!
                 while (-1 != src.read(buf)) {
