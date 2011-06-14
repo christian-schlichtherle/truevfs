@@ -56,6 +56,8 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 /**
+ * A {@link FileSystem} implementation based on the TrueZIP Kernel module.
+ * 
  * @author  Christian Schlichtherle
  * @version $Id$
  */
