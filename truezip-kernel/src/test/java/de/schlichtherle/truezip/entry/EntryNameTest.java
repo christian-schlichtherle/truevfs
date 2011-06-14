@@ -58,8 +58,8 @@ public class EntryNameTest {
             { "föö/", },
             { "föö", },
             { "föö?bär", },
-            { "föö#bär", },
-            { "#bär", },
+            //{ "föö#bär", },
+            //{ "#bär", },
             { "", },
             { "/", },
             { "/föö", },
@@ -115,63 +115,9 @@ public class EntryNameTest {
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testConstructorWithInvalidUri() {
         for (final String param : new String[] {
-            "foo:bar",
-            "foo:bar:",
-            "foo:bar:/",
-            "foo:bar:/baz",
-            "foo:bar:/baz!",
-            "foo:bar:/baz/",
-            "foo:bar:/baz!//",
-            "foo:bar:/baz!/#",
-            "foo:bar:/baz!/#bang",
-            "foo:bar:/baz!/.",
-            "foo:bar:/baz!/./",
-            "foo:bar:/baz!/..",
-            "foo:bar:/baz!/../",
-            "foo:bar:/baz!/bang/.",
-            "foo:bar:/baz!/bang/./",
-            "foo:bar:/baz!/bang/..",
-            "foo:bar:/baz!/bang/../",
-            "foo:bar:baz:/bang",
-            "foo:bar:baz:/bang!",
-            "foo:bar:baz:/bang/",
-            "foo:bar:baz:/bang!/",
-            "foo:bar:baz:/bang!/boom",
-            "foo:bar:/baz/.!/",
-            "foo:bar:/baz/./!/",
-            "foo:bar:/baz/..!/",
-            "foo:bar:/baz/../!/",
-
-            "foo:bar:/baz/../!/bang/",
-            "foo:bar:/baz/..!/bang/",
-            "foo:bar:/baz/./!/bang/",
-            "foo:bar:/baz/.!/bang/",
-            "foo:bar:/../baz/!/bang/",
-            "foo:bar:/./baz/!/bang/",
-            "foo:bar://baz/!/bang/", // baz is authority!
-            "foo:bar://baz!/bang/", // baz is authority!
-
-            "foo:bar:/!/bang/",
-
-            "foo:bar:/baz/../!/bang",
-            "foo:bar:/baz/..!/bang",
-            "foo:bar:/baz/./!/bang",
-            "foo:bar:/baz/.!/bang",
-            "foo:bar:/../baz/!/bang",
-            "foo:bar:/./baz/!/bang",
-            "foo:bar://baz/!/bang", // baz is authority!
-            "foo:bar://baz!/bang", // baz is authority!
-
-            "foo:bar:/!/bang",
-
-            "foo:bar:/baz/!/",
-            "foo:bar:/baz/?bang!/?plonk",
-            "foo:bar:/baz//!/",
-            "foo:bar:/baz/./!/",
-            "foo:bar:/baz/..!/",
-            "foo:bar:/baz/../!/",
-
-            "//authority/defined",
+            "scheme:defined",
+            "//authority/defined/",
+            "fragment#defined",
         }) {
             final URI uri = URI.create(param);
 
@@ -192,14 +138,15 @@ public class EntryNameTest {
     @Test
     public void testConstructorWithValidUri() {
         for (final String[] params : new String[][] {
+            //{ $parent, $member, $result },
             { "foo%3Abar", "baz", "foo%3Abar/baz" },
             { "foo", "bar%3Abaz", "foo/bar%3Abaz" },
-            { "/../foo", "#bar", "/../foo#bar", },
-            { "/../foo", "#", "/../foo#", },
-            { "foo", "#bar", "foo#bar", },
-            { "foo", "#", "foo#", },
-            { "", "#foo", "#foo", },
-            { "", "#", "#", },
+            //{ "/../foo", "#bar", "/../foo#bar", },
+            //{ "/../foo", "#", "/../foo#", },
+            //{ "foo", "#bar", "foo#bar", },
+            //{ "foo", "#", "foo#", },
+            //{ "", "#foo", "#foo", },
+            //{ "", "#", "#", },
             { "föö/", "?bär", "föö/?bär" },
             { "föö", "?bär", "föö?bär" },
             { "föö/?bär", "", "föö/" },

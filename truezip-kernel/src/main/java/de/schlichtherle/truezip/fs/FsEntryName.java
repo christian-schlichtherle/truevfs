@@ -37,9 +37,9 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
  * An entry name adds the following syntax constraints to a
  * {@link URI Uniform Resource Identifier}:
  * <ol>
- * <li>The URI must be relative, that is it must not have a scheme component.
- * <li>The URI must not have an authority component.
- * <li>The URI must not have a fragment component.
+ * <li>The URI must be relative, that is it must not define a scheme component.
+ * <li>The URI must not define an authority component.
+ * <li>The URI must define a path component.
  * <li>The URI's path must be in normal form, that is its path component must
  *     not contain redundant {@code "."} and {@code ".."} segments.
  * <li>The URI's path component must not equal {@code "."}.
@@ -49,6 +49,7 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
  *     (this rule is actually redundant - see #3).
  * <li>The URI's path component must not start with {@code "../"}.
  * <li>The URI's path component must not end with {@code "/"}.
+ * <li>The URI must not define a fragment component.
  * </ol>
  * 
  * <a name="examples"/><h3>Examples</h3>
@@ -311,8 +312,6 @@ public final class FsEntryName extends EntryName {
         if (p.endsWith(SEPARATOR))
             throw new URISyntaxException(quote(uri),
                     "Illegal separator \"" + SEPARATOR + "\" at end of URI path");
-        if (null != uri.getRawFragment())
-            throw new URISyntaxException(quote(uri), "Fragment component not allowed");
 
         assert invariants();
     }
@@ -344,7 +343,7 @@ public final class FsEntryName extends EntryName {
         assert null != toUri();
         //assert !toUri().isAbsolute();
         //assert null == toUri().getRawAuthority();
-        assert null == toUri().getRawFragment();
+        //assert null == toUri().getRawFragment();
         assert toUri().normalize() == toUri();
         String p = toUri().getRawPath();
         assert !"..".equals(p);
@@ -355,6 +354,13 @@ public final class FsEntryName extends EntryName {
         return true;
     }
 
+    /**
+     * Returns {@code true} if and only if the path component of this file
+     *         system entry name is empty and no query component is defined.
+     * 
+     * @return {@code true} if and only if the path component of this file
+     *         system entry name is empty and no query component is defined.
+     */
     public boolean isRoot() {
         //return toUri().toString().isEmpty();
         final URI uri = toUri();

@@ -44,7 +44,7 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
  * A path adds the following syntax constraints to a
  * {@link URI Uniform Resource Identifier}:
  * <ol>
- * <li>The URI must not have a fragment component.
+ * <li>The URI must not define a fragment component.
  * <li>If the URI is opaque, its scheme specific part must contain at least
  *     one mount point separator {@code "!/"}.
  *     The part <em>up to</em> the last mount point separator is parsed
