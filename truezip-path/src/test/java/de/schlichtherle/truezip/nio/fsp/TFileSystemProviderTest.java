@@ -68,7 +68,7 @@ public class TFileSystemProviderTest {
                 final TFileSystem fs = provider.newFileSystem(path, environment);
                 if (null == mountPoint)
                     fail();
-                assertThat(fs.getMountPoint(), is(mountPoint));
+                assertThat(fs.getController().getModel().getMountPoint(), is(mountPoint));
             } catch (UnsupportedOperationException ex) {
                 if (null != mountPoint)
                     throw ex;
@@ -84,7 +84,7 @@ public class TFileSystemProviderTest {
             { provider.getScheme() + ":/foo.mok/bar.mok", "mok:mok:" + ROOT_DIRECTORY + "foo.mok!/bar.mok!/" },
             { provider.getScheme() + ":/foo.mok/x", "mok:" + ROOT_DIRECTORY + "foo.mok!/" },
             { provider.getScheme() + ":/foo.mok", "mok:" + ROOT_DIRECTORY + "foo.mok!/" },
-            { provider.getScheme() + ":/foo/x", ROOT_DIRECTORY.toString() },
+            { provider.getScheme() + ":/foo/x", ROOT_DIRECTORY + "foo/" },
             { provider.getScheme() + ":/foo", ROOT_DIRECTORY.toString() },
         }) {
             final URI uri = URI.create(params[0]);
@@ -93,7 +93,7 @@ public class TFileSystemProviderTest {
                 final TFileSystem fs = provider.newFileSystem(uri, environment);
                 if (null == mountPoint)
                     fail();
-                assertThat(fs.getMountPoint(), is(mountPoint));
+                assertThat(fs.getController().getModel().getMountPoint(), is(mountPoint));
             } catch (UnsupportedOperationException ex) {
                 if (null != mountPoint)
                     throw ex;

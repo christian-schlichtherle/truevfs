@@ -61,11 +61,9 @@ public class TPathTest {
             { null, "/foo", new String[] { "" }, "/foo", ROOT_DIRECTORY + "foo"},
             { null, "/foo", new String[] { "bar" }, "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
             { null, "//", NO_MORE, "/", ROOT_DIRECTORY },
-            { null, "//foo", new String[] { "bar" }, "//foo/bar", ROOT_DIRECTORY + "/foo/bar" },
-            { null, "//foo//", NO_MORE, "//foo", ROOT_DIRECTORY + "/foo/" },
             { null, "///", NO_MORE, "/", ROOT_DIRECTORY },
-            { null, "///foo", new String[] { "bar" }, "//foo/bar", ROOT_DIRECTORY + "/foo/bar" },
-            { null, "///foo//", NO_MORE, "//foo", ROOT_DIRECTORY + "/foo/" },
+            { null, "//foo", new String[] { "bar", "baz" }, "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
+            { null, "///foo//", new String[] { "//bar//", "//", "//baz//" }, "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
             { null, "/foo", new String[] { "/bar" }, "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
             { null, "/foo//", new String[] { "//", "//bar//", "" }, "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
             { null, "/foo", new String[] { "" }, "/foo", ROOT_DIRECTORY + "foo"},
@@ -92,7 +90,7 @@ public class TPathTest {
             final TPath path = new TPath(detector, first, more);
             assertThat(path.getUri(), equalTo(uri));
             assertThat(path.getAddress(), equalTo(address));
-            assertThat(path.getFileSystem().getMountPoint(), equalTo(path.getAddress().getMountPoint()));
+            assertThat(path.getFileSystem().getController().getModel().getMountPoint(), equalTo(path.getAddress().getMountPoint()));
         }
     }
 
@@ -105,11 +103,9 @@ public class TPathTest {
             { "x", null, "/foo", new String[] { "" }, "/foo", ROOT_DIRECTORY + "foo"},
             { "x", null, "/foo", new String[] { "bar" }, "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
             { "x", null, "//", NO_MORE, "/", ROOT_DIRECTORY },
-            { "x", null, "//foo", new String[] { "bar" }, "//foo/bar", ROOT_DIRECTORY + "/foo/bar" },
-            { "x", null, "//foo//", NO_MORE, "//foo", ROOT_DIRECTORY + "/foo/" },
             { "x", null, "///", NO_MORE, "/", ROOT_DIRECTORY },
-            { "x", null, "///foo", new String[] { "bar" }, "//foo/bar", ROOT_DIRECTORY + "/foo/bar" },
-            { "x", null, "///foo//", NO_MORE, "//foo", ROOT_DIRECTORY + "/foo/" },
+            { "x", null, "//foo", new String[] { "bar", "baz" }, "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
+            { "x", null, "///foo//", new String[] { "//bar//", "//", "//baz//" }, "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
             { "x", null, "/foo", new String[] { "/bar" }, "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
             { "x", null, "/foo//", new String[] { "//", "//bar//", "" }, "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
             { "x", null, "/foo", new String[] { "" }, "/foo", ROOT_DIRECTORY + "foo"},
@@ -142,7 +138,7 @@ public class TPathTest {
             final TPath path = parent.resolve(member);
             assertThat(path.getUri(), equalTo(label));
             assertThat(path.getAddress(), equalTo(address));
-            assertThat(path.getFileSystem().getMountPoint(), equalTo(path.getAddress().getMountPoint()));
+            assertThat(path.getFileSystem().getController().getModel().getMountPoint(), equalTo(path.getAddress().getMountPoint()));
         }
     }
 }

@@ -81,10 +81,20 @@ final class TScanner {
         final String parent = splitter.getParentPath();
         final FsEntryName member = FsEntryName
                 .create(uri.path(splitter.getMemberName()).toUri());
-        FsPath path = (null != parent ? scan(parent) : root).resolve(member);
+        final FsPath parentPath = null != parent ? scan(parent) : root;
+        URI parentUri = parentPath.toUri();
+        FsPath memberPath;
+        if (parentUri.isOpaque()) {
+            memberPath = parentPath.resolve(member);
+        } else {
+            final String parentUriPath = parentUri.getRawPath();
+            if (!parentUriPath.endsWith(SEPARATOR))
+                parentUri = new UriBuilder(parentUri, true).path(parentUriPath + SEPARATOR_CHAR).toUri();
+            memberPath = new FsPath(FsMountPoint.create(parentUri), member);
+        }
         final FsScheme scheme = detector.getScheme(member.toString());
         if (null != scheme)
-            path = new FsPath(FsMountPoint.create(scheme, path), ROOT);
-        return path;
+            memberPath = new FsPath(FsMountPoint.create(scheme, memberPath), ROOT);
+        return memberPath;
     }
 }

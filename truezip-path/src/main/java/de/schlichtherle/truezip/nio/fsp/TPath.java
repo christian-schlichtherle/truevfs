@@ -489,7 +489,7 @@ public final class TPath implements Path {
     }
 
     FsController<?> getController() throws IOException {
-        return getFileSystem().getController(getArchiveDetector());
+        return getFileSystem().getController();
     }
 
     FsEntry getEntry() throws IOException {
