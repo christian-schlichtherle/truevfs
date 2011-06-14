@@ -54,6 +54,7 @@ import java.nio.file.LinkOption;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
+import java.nio.file.ProviderMismatchException;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributeView;
@@ -93,8 +94,13 @@ public class TFileSystemProvider extends FileSystemProvider {
      * @return A file system provider.
      */
     public static TFileSystemProvider get(final TPath path) {
-        final TFileSystemProvider provider = DEFAULT;
-        return null != provider ? provider : new TFileSystemProvider();
+        TFileSystemProvider provider = DEFAULT;
+        if (null == provider)
+            provider = new TFileSystemProvider();
+        final URI uri = path.getUri();
+        if (!provider.getScheme().equalsIgnoreCase(uri.getScheme()))
+            throw new ProviderMismatchException(uri.getScheme() + " (unknown scheme)");
+        return provider;
     }
 
     /**
