@@ -62,7 +62,7 @@ public class TFileSystemTest {
     @Test
     public void testNewFileSystem() throws IOException {
         for (String[] params : new String[][] {
-            // { $uri, $mountPoint },
+            // $uri, $mountPoint
             { "tpath:/", "file:/" },
             { "tpath:///", "file:/" },
             { "tpath:/foo", "file:/" },

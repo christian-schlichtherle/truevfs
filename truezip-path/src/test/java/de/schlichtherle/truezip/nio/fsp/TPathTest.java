@@ -55,7 +55,7 @@ public class TPathTest {
     @Test
     public void testConstructorWithStrings() {
         for (Object[] params : new Object[][] {
-            // { $detector, $first, $more, $path, $address },
+            // $detector, $first, $more, $path, $address
             { null, "/", NO_MORE, "/", ROOT_DIRECTORY },
             { null, "/foo", NO_MORE, "/foo", ROOT_DIRECTORY + "foo" },
             { null, "/foo", new String[] { "" }, "/foo", ROOT_DIRECTORY + "foo"},
@@ -97,7 +97,7 @@ public class TPathTest {
     @Test
     public void testResolve() {
         for (Object[] params : new Object[][] {
-            // { $parent, $detector, $first, $more, $label, $address },
+            // $parent, $detector, $first, $more, $label, $address
             { "", null, "/", NO_MORE, "/", ROOT_DIRECTORY },
             { "x", null, "/foo", NO_MORE, "/foo", ROOT_DIRECTORY + "foo" },
             { "x", null, "/foo", new String[] { "" }, "/foo", ROOT_DIRECTORY + "foo"},

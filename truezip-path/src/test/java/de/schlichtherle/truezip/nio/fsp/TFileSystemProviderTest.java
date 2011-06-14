@@ -86,7 +86,7 @@ public class TFileSystemProviderTest {
             { provider.getScheme() + ":/foo.mok", "mok:" + ROOT_DIRECTORY + "foo.mok!/" },
             { provider.getScheme() + ":/foo/bar/x", ROOT_DIRECTORY + "foo/bar/" },
             { provider.getScheme() + ":/foo/x", ROOT_DIRECTORY + "foo/" },
-            { provider.getScheme() + ":/foo", ROOT_DIRECTORY.toString() },
+            { provider.getScheme() + ":/x", ROOT_DIRECTORY.toString() },
         }) {
             final URI uri = URI.create(params[0]);
             final FsMountPoint mountPoint = FsMountPoint.create(URI.create(params[1]));
@@ -94,7 +94,7 @@ public class TFileSystemProviderTest {
                 final TFileSystem fs = provider.newFileSystem(uri, environment);
                 if (null == mountPoint)
                     fail();
-                assertThat(fs.getMountPoint(), is(mountPoint));
+                assertThat(fs.getMountPoint(), equalTo(mountPoint));
             } catch (UnsupportedOperationException ex) {
                 if (null != mountPoint)
                     throw ex;
@@ -102,14 +102,16 @@ public class TFileSystemProviderTest {
         }
     }
 
-    /*@Test
+    @Test
     public void testGetPath() {
         for (final String[] params : new String[][] {
-            { "foo", },
+            // $uri
+            { "foo" },
+            { "tpath:/foo" },
         }) {
             URI uri = URI.create(params[0]);
             TPath path = provider.getPath(uri);
             assertThat(path.getFileSystem().provider(), is(provider));
         }
-    }*/
+    }
 }
