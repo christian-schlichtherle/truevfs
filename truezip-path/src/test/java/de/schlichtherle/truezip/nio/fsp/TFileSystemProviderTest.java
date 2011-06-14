@@ -84,6 +84,7 @@ public class TFileSystemProviderTest {
             { provider.getScheme() + ":/foo.mok/bar.mok", "mok:mok:" + ROOT_DIRECTORY + "foo.mok!/bar.mok!/" },
             { provider.getScheme() + ":/foo.mok/x", "mok:" + ROOT_DIRECTORY + "foo.mok!/" },
             { provider.getScheme() + ":/foo.mok", "mok:" + ROOT_DIRECTORY + "foo.mok!/" },
+            { provider.getScheme() + ":/foo/bar/x", ROOT_DIRECTORY + "foo/bar/" },
             { provider.getScheme() + ":/foo/x", ROOT_DIRECTORY + "foo/" },
             { provider.getScheme() + ":/foo", ROOT_DIRECTORY.toString() },
         }) {
