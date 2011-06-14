@@ -75,7 +75,7 @@ public class TFileSystemTest {
             final TFileSystem fs = (TFileSystem) FileSystems.newFileSystem(uri, map);
             fs.close();
             assertThat(fs.isOpen(), is(true));
-            assertThat(fs.getController().getModel().getMountPoint(), is(mountPoint));
+            assertThat(fs.getMountPoint(), is(mountPoint));
         }
     }
 }
