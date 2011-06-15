@@ -1280,13 +1280,15 @@ public final class TFile extends File {
     }
 
     /**
-     * Returns the {@link TArchiveDetector} to use if no archive detector is
+     * Returns the {@link TArchiveDetector} to use for scanning a path
+     * for prospective archive files if no archive detector is
      * explicitly passed to the constructor of a {@code TFile} instance.
      * <p>
      * This class property is initially set to
      * {@link TArchiveDetector#ALL}
      *
-     * @return The {@link TArchiveDetector} to use if no archive detector is
+     * @return The {@link TArchiveDetector} to use for scanning a path
+     *         for prospective archive files if no archive detector is
      *         explicitly passed to the constructor of a {@code TFile} instance.
      * @see #setDefaultArchiveDetector
      */
@@ -1295,16 +1297,17 @@ public final class TFile extends File {
     }
 
     /**
-     * Sets the {@link TArchiveDetector} to use if no archive detector is
+     * Sets the {@link TArchiveDetector} to use for scanning a path
+     * for prospective archive files if no archive detector is
      * explicitly passed to the constructor of a {@code TFile} instance.
      * When a new {@code TFile} instance is constructed, but no archive
      * detector is provided, then the value of this class property is used.
      * So changing the value of this class property affects only subsequently
      * constructed {@code TFile} instances - not any existing ones.
      *
-     * @param detector the {@link TArchiveDetector} to use for subsequently
-     *        constructed {@code TFile} instances if no archive detector is
-     *        explicitly provided to the constructor
+     * @param detector the {@link TArchiveDetector} to use for scanning a path
+     *        for prospective archive files if no archive detector is
+     *        explicitly passed to the constructor of a {@code TFile} instance.
      * @see   #getDefaultArchiveDetector()
      */
     public static void setDefaultArchiveDetector(TArchiveDetector detector) {
