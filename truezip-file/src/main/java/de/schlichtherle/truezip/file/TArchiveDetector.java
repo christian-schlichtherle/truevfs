@@ -161,9 +161,12 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
                     outSuffixes.add(scheme.toString());
             }
         }
-        if (null != inSuffixes && inSuffixes.retainAll(outSuffixes))
-            throw new IllegalArgumentException(
-                    "\"" + inSuffixes + "\" (no archive driver installed for these suffixes)");
+        if (null != inSuffixes) {
+            inSuffixes.removeAll(outSuffixes);
+            if (!inSuffixes.isEmpty())
+                throw new IllegalArgumentException(
+                        "\"" + inSuffixes + "\" (no archive driver installed for these suffixes)");
+        }
         this.drivers = Collections.unmodifiableMap(outDrivers);
         this.suffixes = outSuffixes.toString();
         this.matcher = new ThreadLocalMatcher(outSuffixes.toPattern());
