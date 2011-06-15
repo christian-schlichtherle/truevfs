@@ -15,42 +15,18 @@
  */
 package de.schlichtherle.truezip.nio.fsp;
 
-import java.io.IOException;
 import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.fs.FsPath;
-import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
-import static de.schlichtherle.truezip.nio.fsp.TestUtils.*;
 import java.net.URI;
 import static org.hamcrest.CoreMatchers.*;
-import org.junit.After;
 import static org.junit.Assert.*;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class TPathTest {
-
-    private static TArchiveDetector detectorBackup;
-
-    @BeforeClass
-    public static void setUpClass() {
-        detectorBackup = TPath.getDefaultArchiveDetector();
-    }
-
-    @Before
-    public void setUp() throws IOException {
-        TPath.setDefaultArchiveDetector(
-                new TArchiveDetector("mok", new MockArchiveDriver()));
-    }
-
-    @After
-    public void tearDown() {
-        TPath.setDefaultArchiveDetector(detectorBackup);
-    }
+public class TPathTest extends TestBase {
 
     @Test
     public void testConstructorWithStrings() {

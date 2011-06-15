@@ -15,15 +15,8 @@
  */
 package de.schlichtherle.truezip.nio.fsp;
 
-import java.io.IOException;
-import de.schlichtherle.truezip.file.TArchiveDetector;
-import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsPath;
-import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
 import java.net.URI;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
@@ -32,15 +25,7 @@ import static org.hamcrest.CoreMatchers.*;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class TUriScannerTest {
-    
-    private TArchiveDetector detector;
-
-    @Before
-    public void setUp() throws IOException {
-        detector = new TArchiveDetector("mok", new MockArchiveDriver());
-    }
-
+public class TUriScannerTest extends TestBase {
     @Test
     public void testToFsPath() {
         for (final String[] params : new String[][] {
