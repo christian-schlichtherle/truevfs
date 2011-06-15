@@ -1228,8 +1228,8 @@ public final class TFile extends File {
      * Returns the value of the class property {@code lenient}.
      * By default, the value of this class property is {@code true}.
      *
-     * @see #setLenient(boolean)
      * @return The value of the class property {@code lenient}.
+     * @see    #setLenient(boolean)
      */
     public static boolean isLenient() {
         return lenient;
