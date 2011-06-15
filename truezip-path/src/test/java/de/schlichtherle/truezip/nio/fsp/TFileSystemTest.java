@@ -34,31 +34,7 @@ import org.junit.Test;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class TFileSystemTest {
-
-    private static TArchiveDetector detectorBackup;
-    
-    private Map<String, Object> map;
-
-    @BeforeClass
-    public static void setUpClass() {
-        detectorBackup = TPath.getDefaultArchiveDetector();
-    }
-
-    @Before
-    public void setUp() throws IOException {
-        final TArchiveDetector
-                detector = new TArchiveDetector("mok", new MockArchiveDriver());
-        TPath.setDefaultArchiveDetector(detector);
-        map = new HashMap<>();
-        map.put(TFileSystemProvider.Parameter.ARCHIVE_DETECTOR, detector);
-    }
-
-    @After
-    public void tearDown() {
-        TPath.setDefaultArchiveDetector(detectorBackup);
-    }
-
+public class TFileSystemTest extends TestBase {
     @Test
     public void testNewFileSystem() throws IOException {
         for (String[] params : new String[][] {
@@ -75,7 +51,7 @@ public class TFileSystemTest {
         }) {
             final URI uri = URI.create(params[0]);
             final FsMountPoint mountPoint = FsMountPoint.create(URI.create(params[1]));
-            final TFileSystem fs = (TFileSystem) FileSystems.newFileSystem(uri, map);
+            final TFileSystem fs = (TFileSystem) FileSystems.newFileSystem(uri, environment);
             fs.close();
             assertThat(fs.isOpen(), is(true));
             assertThat(fs.getMountPoint(), is(mountPoint));

@@ -15,17 +15,11 @@
  */
 package de.schlichtherle.truezip.nio.fsp;
 
-import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import static de.schlichtherle.truezip.fs.FsUriModifier.*;
-import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
-import static de.schlichtherle.truezip.nio.fsp.TestUtils.*;
-import static de.schlichtherle.truezip.nio.fsp.TFileSystemProvider.Parameter.*;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -35,17 +29,12 @@ import org.junit.Test;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class TFileSystemProviderTest {
+public class TFileSystemProviderTest extends TestBase {
 
-    private Map<String, Object> environment;
     private TFileSystemProvider provider;
     
     @Before
-    public void setUp() throws Exception {
-        final TArchiveDetector
-                detector = new TArchiveDetector("mok", new MockArchiveDriver());
-        environment = new HashMap<>();
-        environment.put(ARCHIVE_DETECTOR, detector);
+    public void setUpProvider() throws Exception {
         provider = TFileSystemProvider.class.newInstance();
     }
 
@@ -68,7 +57,7 @@ public class TFileSystemProviderTest {
                 final TFileSystem fs = provider.newFileSystem(path, environment);
                 if (null == mountPoint)
                     fail();
-                assertThat(fs.getMountPoint(), is(mountPoint));
+                assertThat(fs.getMountPoint(), equalTo(mountPoint));
             } catch (UnsupportedOperationException ex) {
                 if (null != mountPoint)
                     throw ex;
@@ -111,7 +100,7 @@ public class TFileSystemProviderTest {
         }) {
             URI uri = URI.create(params[0]);
             TPath path = provider.getPath(uri);
-            assertThat(path.getFileSystem().provider(), is(provider));
+            assertThat(path.getFileSystem().provider(), sameInstance(provider));
         }
     }
 }
