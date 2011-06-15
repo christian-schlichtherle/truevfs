@@ -91,59 +91,12 @@ public final class TFileSystem extends FileSystem {
         return true;
     }
 
-    /**
-     * Returns the value of the class property {@code lenient}.
-     * By default, the value of this class property is {@code true}.
-     *
-     * @see #setLenient(boolean)
-     * @return The value of the class property {@code lenient}.
-     */
-    public static boolean isLenient() {
-        return TFile.isLenient();
+    static boolean isLenient() {
+        return TSession.getSession().isLenient();
     }
 
-    /**
-     * Sets the value of the class property {@code lenient}.
-     * This class property controls whether archive files and their member
-     * directories get automatically created whenever required.
-     * By default, the value of this class property is {@code true}!
-     * <p>
-     * Consider the following path: {@code a/outer.zip/b/inner.zip/c}.
-     * Now let's assume that {@code a} exists as a plain directory in the
-     * platform file system, while all other segments of this path don't, and
-     * that the module TrueZIP Driver ZIP is present on the run-time class path
-     * in order to detect {@code outer.zip} and {@code inner.zip} as ZIP files
-     * according to the initial setup.
-     * <p>
-     * Now, if this class property is set to {@code false}, then an application
-     * needs to call {@code new TFile("a/outer.zip/b/inner.zip").mkdirs()}
-     * before it can actually create the innermost {@code c} entry as a file
-     * or directory.
-     * <p>
-     * More formally, before an application can access an entry in a federated
-     * file system, all its parent directories need to exist, including archive
-     * files.
-     * This emulates the behaviour of the platform file system.
-     * <p>
-     * If this class property is set to {@code true} however, then any missing
-     * parent directories (including archive files) up to the outermost archive
-     * file {@code outer.zip} get automatically created when using operations
-     * to create the innermost element of the path {@code c}.
-     * <p>
-     * This allows applications to succeed with doing this:
-     * {@code new TFile("a/outer.zip/b/inner.zip/c").createNewFile()},
-     * or that:
-     * {@code new TFileOutputStream("a/outer.zip/b/inner.zip/c")}.
-     * <p>
-     * Note that in either case the parent directory of the outermost archive
-     * file {@code a} must exist - TrueZIP does not automatically create
-     * directories in the platform file system!
-     *
-     * @param lenient the value of the class property {@code lenient}.
-     * @see   #isLenient()
-     */
-    public static void setLenient(boolean lenient) {
-        TFile.setLenient(lenient);
+    static void setLenient(boolean lenient) {
+        TSession.getSession().setLenient(lenient);
     }
 
     FsController<?> getController() {

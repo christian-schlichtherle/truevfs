@@ -71,7 +71,7 @@ public final class TPath implements Path {
         this((TArchiveDetector) null, first, more);
     }
 
-    public TPath(final @CheckForNull TArchiveDetector detector, final String first, final String... more) {
+    TPath(final @CheckForNull TArchiveDetector detector, final String first, final String... more) {
         this.detector = null != detector ? detector : getDefaultArchiveDetector();
         this.uri = toUri(first, more);
 
@@ -245,36 +245,12 @@ public final class TPath implements Path {
                         : null != parent && null != parent.getParent();
     }
 
-    /**
-     * Returns the {@link TArchiveDetector} to use if no archive detector is
-     * explicitly passed to the constructor of a {@code TPath} instance.
-     * <p>
-     * This class property is initially set to
-     * {@link TArchiveDetector#ALL}
-     *
-     * @return The {@link TArchiveDetector} to use if no archive detector is
-     *         explicitly passed to the constructor of a {@code TPath} instance.
-     * @see #setDefaultArchiveDetector
-     */
-    public static TArchiveDetector getDefaultArchiveDetector() {
-        return TFile.getDefaultArchiveDetector();
+    static TArchiveDetector getDefaultArchiveDetector() {
+        return TSession.getSession().getArchiveDetector();
     }
 
-    /**
-     * Sets the {@link TArchiveDetector} to use if no archive detector is
-     * explicitly passed to the constructor of a {@code TPath} instance.
-     * When a new {@code TPath} instance is constructed, but no archive
-     * detector is provided, then the value of this class property is used.
-     * So changing the value of this class property affects only subsequently
-     * constructed {@code TPath} instances - not any existing ones.
-     *
-     * @param detector the {@link TArchiveDetector} to use for subsequently
-     *        constructed {@code TPath} instances if no archive detector is
-     *        explicitly provided to the constructor
-     * @see   #getDefaultArchiveDetector()
-     */
-    public static void setDefaultArchiveDetector(TArchiveDetector detector) {
-        TFile.setDefaultArchiveDetector(detector);
+    static void setDefaultArchiveDetector(TArchiveDetector detector) {
+        TSession.getSession().setArchiveDetector(detector);
     }
 
     URI getUri() {
