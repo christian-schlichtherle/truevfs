@@ -16,18 +16,11 @@
 package de.schlichtherle.truezip.nio.fsp;
 
 import java.io.IOException;
-import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.fs.FsMountPoint;
-import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
 import java.net.URI;
 import java.nio.file.FileSystems;
-import java.util.HashMap;
-import java.util.Map;
 import static org.hamcrest.CoreMatchers.*;
-import org.junit.After;
 import static org.junit.Assert.*;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**

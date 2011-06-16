@@ -369,13 +369,8 @@ public final class TFile extends File {
             ROOTS = Collections.unmodifiableSet(
                 new TreeSet<File>(Arrays.asList(listRoots())));
 
-    private static boolean lenient = true;
-
     /** The file system manager to use within this package. */
     static final FsManager manager = FsManagerLocator.SINGLETON.get();
-
-    private static TArchiveDetector
-            defaultDetector = TArchiveDetector.ALL;
 
     /**
      * The delegate is used to implement the behaviour of the file system
@@ -412,7 +407,7 @@ public final class TFile extends File {
      * @param file a file object.
      */
     public TFile(File file) {
-        this(file, defaultDetector);
+        this(file, TConfig.get().getArchiveDetector());
     }
 
     /**
@@ -444,7 +439,7 @@ public final class TFile extends File {
             this.controller = tfile.controller;
         } else {
             this.delegate = file;
-            this.detector = null != detector ? detector : defaultDetector;
+            this.detector = null != detector ? detector : TConfig.get().getArchiveDetector();
             scan(null);
         }
 
@@ -458,7 +453,7 @@ public final class TFile extends File {
      * @param path a file path.
      */
     public TFile(String path) {
-        this(path, defaultDetector);
+        this(path, TConfig.get().getArchiveDetector());
     }
 
     /**
@@ -477,7 +472,7 @@ public final class TFile extends File {
         super(path);
 
         this.delegate = new File(path);
-        this.detector = null != detector ? detector : defaultDetector;
+        this.detector = null != detector ? detector : TConfig.get().getArchiveDetector();
         scan(null);
 
         assert invariants();
@@ -494,7 +489,7 @@ public final class TFile extends File {
      * @param member The child path as a {@link String}.
      */
     public TFile(String parent, String member) {
-        this(parent, member, defaultDetector);
+        this(parent, member, TConfig.get().getArchiveDetector());
     }
 
     /**
@@ -516,7 +511,7 @@ public final class TFile extends File {
         super(parent, member);
 
         this.delegate = new File(parent, member);
-        this.detector = null != detector ? detector : defaultDetector;
+        this.detector = null != detector ? detector : TConfig.get().getArchiveDetector();
         scan(null);
 
         assert invariants();
@@ -568,7 +563,7 @@ public final class TFile extends File {
             this.detector = null != detector ? detector : tparent.detector;
             scan(tparent);
         } else {
-            this.detector = null != detector ? detector : defaultDetector;
+            this.detector = null != detector ? detector : TConfig.get().getArchiveDetector();
             scan(null);
         }
 
@@ -597,7 +592,7 @@ public final class TFile extends File {
      *         {@link File#File(URI)}.
      */
     public TFile(URI uri) {
-        this(FsPath.create(uri, CANONICALIZE), defaultDetector);
+        this(FsPath.create(uri, CANONICALIZE), TConfig.get().getArchiveDetector());
     }
 
     /**
@@ -622,7 +617,7 @@ public final class TFile extends File {
      *         {@link File#File(URI)}.
      */
     public TFile(FsPath path) {
-        this(path, defaultDetector);
+        this(path, TConfig.get().getArchiveDetector());
     }
 
     private TFile(FsPath path, TArchiveDetector detector) {
@@ -859,7 +854,7 @@ public final class TFile extends File {
     private void readObject(ObjectInputStream in)
     throws IOException, ClassNotFoundException {
         parse(  FsPath.create((URI) in.readObject(), CANONICALIZE),
-                defaultDetector);
+                TConfig.get().getArchiveDetector());
     }
 
     /**
@@ -1225,95 +1220,35 @@ public final class TFile extends File {
     }
 
     /**
-     * Returns the value of the class property {@code lenient}.
-     * By default, the value of this class property is {@code true}.
-     *
-     * @return The value of the class property {@code lenient}.
-     * @see    #setLenient(boolean)
+     * Equivalent to
+     * {@link TConfig#isLenient TConfig.get().isLenient()}.
      */
     public static boolean isLenient() {
-        return lenient;
+        return TConfig.get().isLenient();
     }
 
     /**
-     * Sets the value of the class property {@code lenient}.
-     * This class property controls whether archive files and their member
-     * directories get automatically created whenever required.
-     * By default, the value of this class property is {@code true}!
-     * <p>
-     * Consider the following path: {@code a/outer.zip/b/inner.zip/c}.
-     * Now let's assume that {@code a} exists as a plain directory in the
-     * platform file system, while all other segments of this path don't, and
-     * that the module TrueZIP Driver ZIP is present on the run-time class path
-     * in order to detect {@code outer.zip} and {@code inner.zip} as ZIP files
-     * according to the initial setup.
-     * <p>
-     * Now, if this class property is set to {@code false}, then an application
-     * needs to call {@code new TFile("a/outer.zip/b/inner.zip").mkdirs()}
-     * before it can actually create the innermost {@code c} entry as a file
-     * or directory.
-     * <p>
-     * More formally, before an application can access an entry in a federated
-     * file system, all its parent directories need to exist, including archive
-     * files.
-     * This emulates the behaviour of the platform file system.
-     * <p>
-     * If this class property is set to {@code true} however, then any missing
-     * parent directories (including archive files) up to the outermost archive
-     * file {@code outer.zip} get automatically created when using operations
-     * to create the innermost element of the path {@code c}.
-     * <p>
-     * This allows applications to succeed with doing this:
-     * {@code new TFile("a/outer.zip/b/inner.zip/c").createNewFile()},
-     * or that:
-     * {@code new TFileOutputStream("a/outer.zip/b/inner.zip/c")}.
-     * <p>
-     * Note that in either case the parent directory of the outermost archive
-     * file {@code a} must exist - TrueZIP does not automatically create
-     * directories in the platform file system!
-     *
-     * @param lenient the value of the class property {@code lenient}.
-     * @see   #isLenient()
+     * Equivalent to
+     * {@link TConfig#setLenient TConfig.get().setLenient(lenient)}.
      */
     public static void setLenient(boolean lenient) {
-        TFile.lenient = lenient;
+        TConfig.get().setLenient(lenient);
     }
 
     /**
-     * Returns the {@link TArchiveDetector} to use for scanning a path
-     * for prospective archive files if no archive detector is
-     * explicitly passed to the constructor of a {@code TFile} instance.
-     * <p>
-     * This class property is initially set to
-     * {@link TArchiveDetector#ALL}
-     *
-     * @return The {@link TArchiveDetector} to use for scanning a path
-     *         for prospective archive files if no archive detector is
-     *         explicitly passed to the constructor of a {@code TFile} instance.
-     * @see #setDefaultArchiveDetector
+     * Equivalent to
+     * {@link TConfig#getArchiveDetector TConfig.get().getArchiveDetector()}.
      */
     public static TArchiveDetector getDefaultArchiveDetector() {
-        return defaultDetector;
+        return TConfig.get().getArchiveDetector();
     }
 
     /**
-     * Sets the {@link TArchiveDetector} to use for scanning a path
-     * for prospective archive files if no archive detector is
-     * explicitly passed to the constructor of a {@code TFile} instance.
-     * When a new {@code TFile} instance is constructed, but no archive
-     * detector is provided, then the value of this class property is used.
-     * So changing the value of this class property affects only subsequently
-     * constructed {@code TFile} instances - not any existing ones.
-     *
-     * @param detector the {@link TArchiveDetector} to use for scanning a path
-     *        for prospective archive files if no archive detector is
-     *        explicitly passed to the constructor of a {@code TFile} instance.
-     * @see   #getDefaultArchiveDetector()
+     * Equivalent to
+     * {@link TConfig#setArchiveDetector TConfig.get().setArchiveDetector(detector)}.
      */
     public static void setDefaultArchiveDetector(TArchiveDetector detector) {
-        if (null == detector)
-            throw new NullPointerException();
-        TFile.defaultDetector = detector;
+        TConfig.get().setArchiveDetector(detector);
     }
 
     /**
@@ -2460,7 +2395,7 @@ public final class TFile extends File {
             controller.mknod(
                     entryName,
                     FILE,
-                    BitField.of(EXCLUSIVE).set(CREATE_PARENTS, isLenient()),
+                    BitField.of(EXCLUSIVE).set(CREATE_PARENTS, TConfig.get().isLenient()),
                     null);
             return true;
         }
@@ -2507,7 +2442,7 @@ public final class TFile extends File {
                 innerArchive.getController().mknod(
                         getInnerFsEntryName(),
                         DIRECTORY,
-                        NO_OUTPUT_OPTION.set(CREATE_PARENTS, isLenient()),
+                        NO_OUTPUT_OPTION.set(CREATE_PARENTS, TConfig.get().isLenient()),
                         null);
                 return true;
             } catch (IOException ex) {
@@ -2539,7 +2474,7 @@ public final class TFile extends File {
                 controller.mknod(
                         innerEntryName,
                         DIRECTORY,
-                        NO_OUTPUT_OPTION.set(CREATE_PARENTS, isLenient()),
+                        NO_OUTPUT_OPTION.set(CREATE_PARENTS, TConfig.get().isLenient()),
                         null);
             } catch (IOException ex) {
                 final FsEntry entry = controller.getEntry(innerEntryName);

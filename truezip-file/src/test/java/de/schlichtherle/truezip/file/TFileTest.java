@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.file;
 
-import org.junit.BeforeClass;
 import java.io.File;
 import java.util.logging.Logger;
 import java.beans.ExceptionListener;
@@ -47,45 +46,34 @@ import static org.junit.Assert.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class TFileTest {
+public class TFileTest extends TestBase {
 
     private static final Logger logger
             = Logger.getLogger(TFileTest.class.getName());
 
-    private static TArchiveDetector detectorBackup;
-
     private TFile archive;
-    private String scheme;
-
-    @BeforeClass
-    public static void setUpClass() {
-        detectorBackup = TFile.getDefaultArchiveDetector();
-    }
 
     @Before
-    public void setUp() {
-        TFile.setDefaultArchiveDetector(new TArchiveDetector(
-                "ear|exe|jar|odb|odf|odg|odm|odp|ods|odt|otg|oth|otp|ots|ott|tar|tar.bz2|tar.gz|tbz2|tgz|tzp|war|zip|zip.rae|zip.raes",
-                new MockArchiveDriver()));
-        scheme = "zip";
-        archive = new TFile("archive.zip");
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        archive = new TFile("archive.mok");
     }
 
     @After
     public void tearDown() {
-        TFile.setDefaultArchiveDetector(detectorBackup);
         assertFalse(new File("archive.zip").exists());
     }
 
     @Test
     public void testValidPathConstructor() {
         for (final String[] params : new String[][] {
-            { "jar:tar.gz:file:/app.tar.gz!/app.jar!/META-INF/MANIFEST.MF", "/app.tar.gz/app.jar/META-INF/MANIFEST.MF", "/app.tar.gz/app.jar", "/app.tar.gz/app.jar", "META-INF/MANIFEST.MF", },
-            { "jar:tar.gz:file:/app.tar.gz!/app.jar!/", "/app.tar.gz/app.jar", "/app.tar.gz/app.jar", "/app.tar.gz", "app.jar", },
-            { "tar.gz:file:/archive.tar.gz!/META-INF/MANIFEST.MF", "/archive.tar.gz/META-INF/MANIFEST.MF", "/archive.tar.gz", "/archive.tar.gz", "META-INF/MANIFEST.MF", },
-            { "tar.gz:file:/archive.tar.gz!/", "/archive.tar.gz", "/archive.tar.gz", null, null, },
-            { "zip:file:/archive.zip!/META-INF/MANIFEST.MF", "/archive.zip/META-INF/MANIFEST.MF", "/archive.zip", "/archive.zip", "META-INF/MANIFEST.MF", },
-            { "zip:file:/archive.zip!/", "/archive.zip", "/archive.zip", null, null, },
+            { "mok2:mok1:file:/foo.mok1!/bar.mok2!/META-INF/MANIFEST.MF", "/foo.mok1/bar.mok2/META-INF/MANIFEST.MF", "/foo.mok1/bar.mok2", "/foo.mok1/bar.mok2", "META-INF/MANIFEST.MF", },
+            { "mok2:mok1:file:/foo.mok1!/bar.mok2!/", "/foo.mok1/bar.mok2", "/foo.mok1/bar.mok2", "/foo.mok1", "bar.mok2", },
+            { "mok1:file:/foo.mok1!/META-INF/MANIFEST.MF", "/foo.mok1/META-INF/MANIFEST.MF", "/foo.mok1", "/foo.mok1", "META-INF/MANIFEST.MF", },
+            { "mok1:file:/foo.mok1!/", "/foo.mok1", "/foo.mok1", null, null, },
+            { "mok2:file:/foo.mok2!/META-INF/MANIFEST.MF", "/foo.mok2/META-INF/MANIFEST.MF", "/foo.mok2", "/foo.mok2", "META-INF/MANIFEST.MF", },
+            { "mok2:file:/foo.mok2!/", "/foo.mok2", "/foo.mok2", null, null, },
             { "file:/foo", "/foo", null, null, null, },
             { "file:/", "/", null, null, null, },
         }) {
@@ -123,110 +111,110 @@ public class TFileTest {
 
         // No ZIP file in path.
 
-        file = new TFile(new URI("file", "/a ." + scheme + "/b ." + scheme + "/", null));
+        file = new TFile(new URI("file", "/a .mok/b .mok/", null));
         assertNull(file.getInnerArchive());
         assertNull(file.getInnerEntryName());
         assertNull(file.getEnclArchive());
         assertNull(file.getEnclEntryName());
 
-        file = new TFile(new URI("file", "/a ." + scheme + "/b ." + scheme + "", null));
+        file = new TFile(new URI("file", "/a .mok/b .mok", null));
         assertNull(file.getInnerArchive());
         assertNull(file.getInnerEntryName());
         assertNull(file.getEnclArchive());
         assertNull(file.getEnclEntryName());
 
         // One ZIP file in path.
-        file = new TFile(new URI(scheme, "file:/a ." + scheme + "/b ." + scheme + "!/", null));
+        file = new TFile(new URI("mok", "file:/a .mok/b .mok!/", null));
         assertSame(file, file.getInnerArchive());
         assertSame(ROOT, file.getInnerFsEntryName());
         assertNull(file.getEnclArchive());
         assertNull(file.getEnclEntryName());
 
-        file = new TFile(new URI(scheme, "file:/a ." + scheme + "!/b ." + scheme + "", null));
+        file = new TFile(new URI("mok", "file:/a .mok!/b .mok", null));
         assertSame(file.getInnerArchive(), file.getEnclArchive());
         assertSame(file.getInnerEntryName(), file.getEnclEntryName());
-        assertEquals(fs + "a ." + scheme + "", file.getEnclArchive().getPath());
-        assertEquals("b ." + scheme + "", file.getEnclEntryName());
+        assertEquals(fs + "a .mok", file.getEnclArchive().getPath());
+        assertEquals("b .mok", file.getEnclEntryName());
 
-        // One ZIP file in path with one redundant jar: scheme.
+        // One ZIP file in path with one redundant mok: scheme.
 
         try {
-            file = new TFile(new URI(scheme, scheme + ":file:/a ." + scheme + "/b ." + scheme + "!/", null));
+            file = new TFile(new URI("mok", "mok:file:/a .mok/b .mok!/", null));
             fail();
         } catch (IllegalArgumentException ex) {
         }
 
         try {
-            file = new TFile(new URI(scheme, scheme + ":file:/a ." + scheme + "/b ." + scheme + "!", null));
+            file = new TFile(new URI("mok", "mok:file:/a .mok/b .mok!", null));
             fail();
         } catch (IllegalArgumentException ex) {
         }
 
         try {
-            file = new TFile(new URI(scheme, scheme + ":file:/a ." + scheme + "!/b ." + scheme + "/", null));
+            file = new TFile(new URI("mok", "mok:file:/a .mok!/b .mok/", null));
             fail();
         } catch (IllegalArgumentException ex) {
         }
 
         try {
-            file = new TFile(new URI(scheme, scheme + ":file:/a ." + scheme + "!/b ." + scheme + "", null));
+            file = new TFile(new URI("mok", "mok:file:/a .mok!/b .mok", null));
             fail();
         } catch (IllegalArgumentException ex) {
         }
 
-        // One ZIP file in path with two redundant jar: schemes.
+        // One ZIP file in path with two redundant mok: schemes.
 
         try {
-            file = new TFile(new URI(scheme, scheme + ":" + scheme + ":file:/a ." + scheme + "/b ." + scheme + "!/", null));
-            fail();
-        } catch (IllegalArgumentException ex) {
-        }
-
-        try {
-            file = new TFile(new URI(scheme, scheme + ":" + scheme + ":file:/a ." + scheme + "/b ." + scheme + "!", null));
+            file = new TFile(new URI("mok", "mok:mok:file:/a .mok/b .mok!/", null));
             fail();
         } catch (IllegalArgumentException ex) {
         }
 
         try {
-            file = new TFile(new URI(scheme, scheme + ":" + scheme + ":file:/a ." + scheme + "!/b ." + scheme + "/", null));
+            file = new TFile(new URI("mok", "mok:mok:file:/a .mok/b .mok!", null));
             fail();
         } catch (IllegalArgumentException ex) {
         }
 
         try {
-            file = new TFile(new URI(scheme, scheme + ":" + scheme + ":file:/a ." + scheme + "!/b ." + scheme + "", null));
+            file = new TFile(new URI("mok", "mok:mok:file:/a .mok!/b .mok/", null));
+            fail();
+        } catch (IllegalArgumentException ex) {
+        }
+
+        try {
+            file = new TFile(new URI("mok", "mok:mok:file:/a .mok!/b .mok", null));
             fail();
         } catch (IllegalArgumentException ex) {
         }
 
         // Two ZIP files in path.
 
-        file = new TFile(new URI(scheme, scheme + ":file:/a ." + scheme + "!/b ." + scheme + "!/", null));
+        file = new TFile(new URI("mok", "mok:file:/a .mok!/b .mok!/", null));
         assertSame(file, file.getInnerArchive());
         assertSame(ROOT, file.getInnerFsEntryName());
-        assertEquals(fs + "a ." + scheme + "", file.getEnclArchive().getPath());
-        assertEquals("b ." + scheme + "", file.getEnclEntryName());
+        assertEquals(fs + "a .mok", file.getEnclArchive().getPath());
+        assertEquals("b .mok", file.getEnclEntryName());
 
         // One ZIP file in path with one misleading '!' in path.
 
-        file = new TFile(new URI(scheme, "file:/a ." + scheme + "!/b ." + scheme + "!/", null));
+        file = new TFile(new URI("mok", "file:/a .mok!/b .mok!/", null));
         assertSame(file, file.getInnerArchive());
         assertSame(ROOT, file.getInnerFsEntryName());
         assertNull(file.getEnclArchive());
         assertNull(file.getEnclEntryName());
 
         // Three ZIP files in path with one ZIP file removed by normalization
-        // and hence one redundant jar: scheme.
+        // and hence one redundant mok: scheme.
 
         try {
-            file = new TFile(new URI(scheme, scheme + ":" + scheme + ":file:/a ." + scheme + "!/b ." + scheme + "!/../c ." + scheme + "!/", null));
+            file = new TFile(new URI("mok", "mok:mok:file:/a .mok!/b .mok!/../c .mok!/", null));
             fail();
         } catch (IllegalArgumentException ex) {
         }
 
         try {
-            file = new TFile(new URI(scheme, scheme + ":" + scheme + ":file:/a ." + scheme + "!/b ." + scheme + "!/../c ." + scheme + "!", null));
+            file = new TFile(new URI("mok", "mok:mok:file:/a .mok!/b .mok!/../c .mok!", null));
             fail();
         } catch (IllegalArgumentException ex) {
         }
@@ -234,13 +222,13 @@ public class TFileTest {
         // One ZIP file in path which is removed by normalization.
 
         try {
-            file = new TFile(new URI(scheme, "file:/a ." + scheme + "!/../b ." + scheme + "/", null));
+            file = new TFile(new URI("mok", "file:/a .mok!/../b .mok/", null));
             fail();
         } catch (IllegalArgumentException ex) {
         }
 
         try {
-            file = new TFile(new URI(scheme, "file:/a ." + scheme + "!/../b ." + scheme + "", null));
+            file = new TFile(new URI("mok", "file:/a .mok!/../b .mok", null));
             fail();
         } catch (IllegalArgumentException ex) {
         }
@@ -287,7 +275,7 @@ public class TFileTest {
         }
 
         {
-            final String innerName = "inner." + scheme;
+            final String innerName = "inner.mok";
             final TFile inner = new TFile(archive, innerName);
             final TFile[] files = {
                 new TFile(inner, ""),
@@ -326,43 +314,43 @@ public class TFileTest {
             }
         }
 
-        final TFile a = new TFile("outer." + scheme + "/removed." + scheme);
+        final TFile a = new TFile("outer.mok/removed.mok");
         TFile b, c;
 
-        b = new TFile("../removed.dir/removed.dir/../../dir/./inner." + scheme);
+        b = new TFile("../removed.dir/removed.dir/../../dir/./inner.mok");
         c = new TFile(a, b.getPath());
         assertTrue(c.isArchive());
         assertTrue(c.isEntry());
-        assertEquals("outer." + scheme,
+        assertEquals("outer.mok",
                 c.getEnclArchive().getPath());
-        assertEquals("dir/inner." + scheme,
+        assertEquals("dir/inner.mok",
                 c.getEnclEntryName());
 
-        b = new TFile("../removed.dir/removed.dir/../../dir/./inner." + scheme);
+        b = new TFile("../removed.dir/removed.dir/../../dir/./inner.mok");
         c = new TFile(a, b.getPath(), NULL);
         assertFalse(c.isArchive());
         assertTrue(c.isEntry());
-        assertEquals("outer." + scheme,
+        assertEquals("outer.mok",
                 c.getInnerArchive().getPath());
-        assertEquals("dir/inner." + scheme,
+        assertEquals("dir/inner.mok",
                 c.getInnerEntryName());
 
-        b = new TFile("../removed.dir/removed.dir/../../dir/./inner."
-                + scheme + "/removed.dir/removed.dir/../../dir/./test.txt");
+        b = new TFile("../removed.dir/removed.dir/../../dir/./inner.mok"
+                + "/removed.dir/removed.dir/../../dir/./test.txt");
         c = new TFile(a, b.getPath());
         assertFalse(c.isArchive());
         assertTrue(c.isEntry());
-        assertEquals("outer." + scheme + fs + "removed." + scheme + fs + ".."
+        assertEquals("outer.mok" + fs + "removed.mok" + fs + ".."
                 + fs + "removed.dir" + fs + "removed.dir" + fs + ".." + fs
-                + ".." + fs + "dir" + fs + "." + fs + "inner." + scheme,
+                + ".." + fs + "dir" + fs + "." + fs + "inner.mok",
                 c.getInnerArchive().getPath());
-        assertEquals("dir/inner." + scheme,
+        assertEquals("dir/inner.mok",
                 c.getInnerArchive().getEnclEntryName());
     }
 
     @Test
     public void testGetParentFile() {
-        TFile abcdefgh = new TFile("a/b." + scheme + "/c/d/e." + scheme + "/f." + scheme + "/g/h." + scheme + "");
+        TFile abcdefgh = new TFile("a/b.mok/c/d/e.mok/f.mok/g/h.mok");
         TFile abcdefg  = abcdefgh.getParentFile();
         TFile abcdef   = abcdefg .getParentFile();
         TFile abcde    = abcdef  .getParentFile();
@@ -436,18 +424,18 @@ public class TFileTest {
 
     @Test
     public void testGetTopLevelArchive() {
-        TFile file = new TFile("abc/def." + scheme + "/efg." + scheme + "/hij." + scheme + "/test.txt");
-        assertEquals(new File("abc/def." + scheme), file.getTopLevelArchive());
+        TFile file = new TFile("abc/def.mok/efg.mok/hij.mok/test.txt");
+        assertEquals(new File("abc/def.mok"), file.getTopLevelArchive());
     }
 
     @Test
     public void testUriandFsPath() {
         for (final String[] params : new String[][] {
             { "/file", "file:/file" },
-            { "/archive.zip", "zip:file:/archive.zip!/" },
-            { "/archive.zip/entry", "zip:file:/archive.zip!/entry" },
-            { "/app.tar.gz/app.jar", "jar:tar.gz:file:/app.tar.gz!/app.jar!/" },
-            { "/app.tar.gz/app.jar/META-INF/MANIFEST.MF", "jar:tar.gz:file:/app.tar.gz!/app.jar!/META-INF/MANIFEST.MF" },
+            { "/archive.mok", "mok:file:/archive.mok!/" },
+            { "/archive.mok/entry", "mok:file:/archive.mok!/entry" },
+            { "/foo.mok1/bar.mok2", "mok2:mok1:file:/foo.mok1!/bar.mok2!/" },
+            { "/dist.mok1/app.mok2/META-INF/MANIFEST.MF", "mok1:mok2:file:/dist.mok1!/app.mok2!/META-INF/MANIFEST.MF" },
         }) {
             final String name = params[0];
             final URI uri = URI.create(params[1]);
@@ -482,14 +470,14 @@ public class TFileTest {
 
         for (final String[] params : new String[][] {
             { "file:/file" },
-            { "zip:file:/archive.zip!/" },
-            { "zip:file:/archive.zip!/entry" },
-            { "jar:tar.gz:file:/app.tar.gz!/app.jar!/" },
-            { "jar:tar.gz:file:/app.tar.gz!/app.jar!/META-INF/MANIFEST.MF" },
-            { "zip:zip:file:/föö%20bär.zip!/föö%20bär.zip!/föö%20bär" },
-            { "zip:file:/föö%20bär.zip!/föö%20bär" },
+            { "mok:file:/archive.mok!/" },
+            { "mok:file:/archive.mok!/entry" },
+            { "mok2:mok1:file:/foo.mok1!/bar.mok2!/" },
+            { "mok2:mok1:file:/foo.mok1!/bar.mok2!/META-INF/MANIFEST.MF" },
+            { "mok2:mok1:file:/föö%20bär.mok1!/föö%20bär.mok2!/föö%20bär" },
+            { "mok:file:/föö%20bär.mok!/föö%20bär" },
             { "file:/föö%20bär/föö%20bär" },
-            { "zip:file:/foo.zip!/bar" },
+            { "mok:file:/foo.mok!/bar" },
             { "file:/foo/bar" },
             { "file:/foo/bar" },
         }) {

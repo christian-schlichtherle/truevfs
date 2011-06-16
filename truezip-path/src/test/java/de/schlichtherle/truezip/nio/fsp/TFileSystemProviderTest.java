@@ -32,9 +32,10 @@ import org.junit.Test;
 public class TFileSystemProviderTest extends TestBase {
 
     private TFileSystemProvider provider;
-    
+
     @Before
-    public void setUpProvider() throws Exception {
+    public void setUp() throws Exception {
+        super.setUp();
         provider = TFileSystemProvider.class.newInstance();
     }
 

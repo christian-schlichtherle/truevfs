@@ -91,7 +91,7 @@ final class TBIO {
                     && null != ((TFile) dst).getInnerArchive();
             final boolean srcIsGhost = srcIsArchived
                     && 0 >= srcLastModified;
-            if (!srcIsGhost || !dstIsArchived || !TFile.isLenient())
+            if (!srcIsGhost || !dstIsArchived || !TConfig.get().isLenient())
                 if (!dst.mkdir() && !dst.isDirectory())
                     throw new IOException(dst + " (not a directory)");
             final String[] members = src.list();
@@ -167,7 +167,7 @@ final class TBIO {
                     && null != ((TFile) dst).getInnerArchive();
             final boolean srcIsGhost = srcArchived
                     && 0 >= srcLastModified;
-            if (!srcIsGhost || !dstArchived || !TFile.isLenient())
+            if (!srcIsGhost || !dstArchived || !TConfig.get().isLenient())
                 if (!dst.mkdir() && !dst.isDirectory())
                     throw new IOException(dst + " (not a directory)");
             final String[] members = src.list();
@@ -226,7 +226,7 @@ final class TBIO {
         final InputSocket<?> input = getInputSocket(src,
                 NO_INPUT_OPTION);
         final OutputSocket<?> output = getOutputSocket(dst,
-                NO_OUTPUT_OPTION.set(CREATE_PARENTS, TFile.isLenient()),
+                NO_OUTPUT_OPTION.set(CREATE_PARENTS, TConfig.get().isLenient()),
                 preserve ? input.getLocalTarget() : null);
         IOSocket.copy(input, output);
     }
@@ -294,7 +294,7 @@ final class TBIO {
     private static TArchiveDetector getDetector(File file) {
         return file instanceof TFile
                 ? ((TFile) file).getArchiveDetector()
-                : TFile.getDefaultArchiveDetector();
+                : TConfig.get().getArchiveDetector();
     }
 
     /**

@@ -44,7 +44,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -57,13 +56,10 @@ import static org.junit.Assert.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class TFileTestSuite {
+public abstract class TFileTestSuite extends TestBase {
 
     private static final Logger logger = Logger.getLogger(
             TFileTestSuite.class.getName());
-
-    private static boolean lenientBackup;
-    private static TArchiveDetector detectorBackup;
 
     private static final String TEMP_FILE_PREFIX = "tzp";
 
@@ -76,10 +72,11 @@ public abstract class TFileTestSuite {
     }
 
     protected static final IOPoolProvider
-            IO_POOL_PROVIDER = new ByteArrayIOPoolService(2048);
+            IO_POOL_PROVIDER = new ByteArrayIOPoolService(4 * DATA.length / 3); // account for archive file type specific overhead
     
     private final FsScheme scheme;
     private final FsArchiveDriver<?> driver;
+    private final TArchiveDetector detector;
 
     private File temp;
     private TFile archive;
@@ -91,18 +88,14 @@ public abstract class TFileTestSuite {
             throw new NullPointerException();
         this.scheme = scheme;
         this.driver = driver;
-    }
-
-    @BeforeClass
-    public static void setUpClass() {
-        lenientBackup = TFile.isLenient();
-        detectorBackup = TFile.getDefaultArchiveDetector();
+        this.detector = new TArchiveDetector(scheme.toString(), driver);
     }
 
     @Before
-    public void setUp() throws IOException {
-        TFile.setDefaultArchiveDetector(
-                new TArchiveDetector(scheme.toString(), driver));
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        TFile.setDefaultArchiveDetector(detector);
         temp = createTempFile();
         TFile.rm(temp);
         archive = new TFile(temp);
@@ -139,9 +132,6 @@ public abstract class TFileTestSuite {
 
         if (temp.exists() && !temp.delete())
             logger.log(Level.WARNING, "{0} (could not delete)", temp);
-
-        TFile.setDefaultArchiveDetector(detectorBackup);
-        TFile.setLenient(lenientBackup);
     }
 
     private static TFile newNonArchiveFile(TFile file) {
@@ -1282,20 +1272,10 @@ public abstract class TFileTestSuite {
         createTestArchive(nEntries);
         
         // Define thread class to enumerate and read all entries.
-        class CheckAllEntriesThread extends Thread {
-            Throwable failure;
-
-            CheckAllEntriesThread() {
-                setDaemon(true);
-            }
-            
+        class CheckAllEntriesThread extends IOThread {
             @Override
-            public void run() {
-                try {
-                    assertArchiveEntries(archive, nEntries);
-                } catch (Throwable t) {
-                    failure = t;
-                }
+            public void work() throws IOException {
+                assertArchiveEntries(archive, nEntries);
             }
         } // class CheckAllEntriesThread
         
@@ -1374,51 +1354,45 @@ public abstract class TFileTestSuite {
             throws Exception {
         assertTrue(TFile.isLenient());
         
-        class WritingThread extends Thread {
+        class WritingThread extends IOThread {
             final int i;
-            Throwable failure;
             
             WritingThread(int i) {
-                setDaemon(true);
                 this.i = i;
             }
             
             @Override
-            public void run() {
+            public void work() throws IOException {
+                final TFile file = new TFile(archive, i + "");
+                OutputStream out;
+                while (true) {
+                    try {
+                        out = new TFileOutputStream(file);
+                        break;
+                    } catch (FileBusyException busy) {
+                        continue;
+                    }
+                }
                 try {
-                    final TFile file = new TFile(archive, i + "");
-                    OutputStream out;
-                    while (true) {
-                        try {
-                            out = new TFileOutputStream(file);
-                            break;
-                        } catch (FileBusyException busy) {
-                            continue;
-                        }
-                    }
-                    try {
-                        out.write(data);
-                    } finally {
-                        out.close();
-                    }
-                    try {
-                        TFile.umount(wait, false, wait, false);
-                    } catch (FsSyncException ex) {
-                        if (!(ex.getCause() instanceof FileBusyException))
-                            throw ex;
-                        // Some other thread is busy updating an archive.
-                        // If we are waiting, then this could never happen.
-                        // Otherwise, silently ignore this exception and
-                        // accept that the archive may not have been
-                        // updated to disk.
-                        // Note that no data is lost, this exception just
-                        // signals that the corresponding archive hasn't
-                        // been updated - a future call may still succeed.
-                        if (wait)
-                            throw new AssertionError(ex);
-                    }
-                } catch (Throwable exception) {
-                    failure = exception;
+                    out.write(data);
+                } finally {
+                    out.close();
+                }
+                try {
+                    TFile.umount(wait, false, wait, false);
+                } catch (FsSyncException ex) {
+                    if (!(ex.getCause() instanceof FileBusyException))
+                        throw ex;
+                    // Some other thread is busy updating an archive.
+                    // If we are waiting, then this could never happen.
+                    // Otherwise, silently ignore this exception and
+                    // accept that the archive may not have been
+                    // updated to disk.
+                    // Note that no data is lost, this exception just
+                    // signals that the corresponding archive hasn't
+                    // been updated - a future call may still succeed.
+                    if (wait)
+                        throw new AssertionError(ex);
                 }
             }
         } // class WritingThread
@@ -1456,51 +1430,41 @@ public abstract class TFileTestSuite {
     throws Exception {
         assertTrue(TFile.isLenient());
         
-        class WritingThread extends Thread {
-            Throwable failure;
-
-            WritingThread() {
-                setDaemon(true);
-            }
-
+        class WritingThread extends IOThread {
             @Override
-            public void run() {
+            public void work() throws IOException {
+                final TFile archive = new TFile(createTempFile());
+                archive.rm();
+                final TFile file = new TFile(archive, "entry");
                 try {
-                    final TFile archive = new TFile(createTempFile());
-                    archive.rm();
-                    final TFile file = new TFile(archive, "entry");
+                    final OutputStream out = new TFileOutputStream(file);
                     try {
-                        final OutputStream out = new TFileOutputStream(file);
-                        try {
-                            out.write(data);
-                        } finally {
-                            out.close();
-                        }
-                        try {
-                            if (updateIndividually)
-                                TFile.umount(archive);
-                            else
-                                TFile.umount(false);
-                        } catch (FsSyncException ex) {
-                            if (!(ex.getCause() instanceof FileBusyException))
-                                throw ex;
-                            // Some other thread is busy updating an archive.
-                            // If we are updating individually, then this
-                            // could never happen.
-                            // Otherwise, silently ignore this exception and
-                            // accept that the archive may not have been
-                            // updated to disk.
-                            // Note that no data is lost, this exception just
-                            // signals that the corresponding archive hasn't
-                            // been updated - a future call may still succeed.
-                            if (updateIndividually)
-                                throw new AssertionError(ex);
-                        }
+                        out.write(data);
                     } finally {
-                        TFile.rm_r(archive);
+                        out.close();
                     }
-                } catch (Throwable exception) {
-                    failure = exception;
+                    try {
+                        if (updateIndividually)
+                            TFile.umount(archive);
+                        else
+                            TFile.umount(false);
+                    } catch (FsSyncException ex) {
+                        if (!(ex.getCause() instanceof FileBusyException))
+                            throw ex;
+                        // Some other thread is busy updating an archive.
+                        // If we are updating individually, then this
+                        // could never happen.
+                        // Otherwise, silently ignore this exception and
+                        // accept that the archive may not have been
+                        // updated to disk.
+                        // Note that no data is lost, this exception just
+                        // signals that the corresponding archive hasn't
+                        // been updated - a future call may still succeed.
+                        if (updateIndividually)
+                            throw new AssertionError(ex);
+                    }
+                } finally {
+                    TFile.rm_r(archive);
                 }
             }
         } // class WritingThread
@@ -1520,5 +1484,24 @@ public abstract class TFileTestSuite {
             if (thread.failure != null)
                 throw new Exception(thread.failure);
         }
+    }
+
+    private abstract class IOThread extends Thread {
+        Throwable failure;
+
+        IOThread() {
+            setDaemon(true);
+        }
+
+        @Override
+        public final void run() {
+            try {
+                work();
+            } catch (Throwable exception) {
+                failure = exception;
+            }
+        }
+
+        abstract void work() throws IOException;
     }
 }

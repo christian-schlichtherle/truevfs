@@ -18,8 +18,8 @@
  */
 package ${package};
 
-import de.schlichtherle.truezip.nio.fsp.TFileSystem;
 import de.schlichtherle.truezip.nio.fsp.TPath;
+import de.schlichtherle.truezip.file.TConfig;
 import java.io.IOException;
 import java.nio.file.Files;
 import static java.nio.file.StandardCopyOption.*;
@@ -54,7 +54,7 @@ public class Copy extends Application<IOException> {
 
         // TFile  doesn't do path name completion, so we do it manually in
         // order to emulate the behavior of many copy command line utilities.
-        if (TFileSystem.isLenient() && dst.isArchive() || Files.isDirectory(dst))
+        if (TConfig.get().isLenient() && dst.isArchive() || Files.isDirectory(dst))
             dst = dst.resolve(src.getFileName());
 
         // If TFile.setLenient(false) is never called in your application,

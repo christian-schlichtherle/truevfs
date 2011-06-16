@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.nio.fsp;
 
+import de.schlichtherle.truezip.file.TConfig;
 import static de.schlichtherle.truezip.entry.Entry.*;
 import static de.schlichtherle.truezip.entry.Entry.Access.*;
 import static de.schlichtherle.truezip.entry.Entry.Size.*;
@@ -183,7 +184,7 @@ public class TFileSystemProvider extends FileSystemProvider {
      *        If any key is present and the respective value differs from the
      *        {@link TConfig#get() current configuration}, then a new
      *        configuration is {@link TConfig#push() pushed} on the thread
-     *        local stack of configurations.
+     *        local configuration stack.
      */
     @Override
     public TFileSystem newFileSystem(Path path, @CheckForNull Map<String, ?> env) {
@@ -197,10 +198,13 @@ public class TFileSystemProvider extends FileSystemProvider {
     /**
      * {@inheritDoc}
      * 
-     * @param env If {@code null} or does not contain a {@link TArchiveDetector}
-     *        for the key {@link Parameter#ARCHIVE_DETECTOR}, then
-     *        {@link TPath#getDefaultArchiveDetector()} is used to detect prospective
-     *        archive files.
+     * @param env May contain a {@link TArchiveDetector} for the key
+     *        {@link Parameter#ARCHIVE_DETECTOR} or a {@link Boolean} for the
+     *        key {@link Parameter#LENIENT} for subsequent use.
+     *        If any key is present and the respective value differs from the
+     *        {@link TConfig#get() current configuration}, then a new
+     *        configuration is {@link TConfig#push() pushed} on the thread
+     *        local configuration stack.
      */
     @Override
     public TFileSystem newFileSystem(URI uri, @CheckForNull Map<String, ?> env) {

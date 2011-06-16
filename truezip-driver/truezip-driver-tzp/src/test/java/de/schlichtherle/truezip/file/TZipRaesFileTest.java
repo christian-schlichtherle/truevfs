@@ -48,12 +48,12 @@ public final class TZipRaesFileTest extends TFileTestSuite {
     }
 
     @Override
-    public void setUp() throws IOException {
+    public void setUp() throws Exception {
+        super.setUp();
         final AesCipherParameters key = new AesCipherParameters();
         key.setPassword("secret".toCharArray());
         view.setKey(key);
         view.setAction(ENTER);
-        super.setUp();
     }
 
     @Test
