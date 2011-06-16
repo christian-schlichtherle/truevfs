@@ -140,7 +140,7 @@ final class TUriScanner {
      * Returns the parent file system path for the given path.
      * 
      * @param  path a file system path.
-     * @return 
+     * @return The parent file system path.
      * @throws URISyntaxException 
      */
     private static FsPath parent(FsPath path)
