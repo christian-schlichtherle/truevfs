@@ -155,12 +155,23 @@ public class TFileSystemProvider extends FileSystemProvider {
         return current;
     }
 
-    private static TArchiveDetector getArchiveDetector(@CheckForNull Map<String, ?> env) {
+    private static void pushEnvironmentMap(final @CheckForNull Map<String, ?> env) {
         if (null == env)
-            return TPath.getDefaultArchiveDetector();
-        TArchiveDetector detector = (TArchiveDetector) env.get(
+            return;
+        final TArchiveDetector detector = (TArchiveDetector) env.get(
                 Parameter.ARCHIVE_DETECTOR);
-        return null != detector ? detector : TPath.getDefaultArchiveDetector();
+        final Boolean lenient = (Boolean) env.get(Parameter.LENIENT);
+        if (null == detector && null == lenient)
+            return;
+        TConfig session = TConfig.get();
+        if ((null == detector || detector == session.getArchiveDetector())
+                && (null == lenient || lenient == session.isLenient()))
+            return;
+        session = TConfig.push();
+        if (null != detector)
+            session.setArchiveDetector(detector);
+        if (null != lenient)
+            session.setLenient(lenient);
     }
 
     /**
@@ -173,7 +184,8 @@ public class TFileSystemProvider extends FileSystemProvider {
      */
     @Override
     public TFileSystem newFileSystem(Path path, Map<String, ?> env) {
-        TPath p = new TPath(getArchiveDetector(env), path);
+        pushEnvironmentMap(env);
+        TPath p = new TPath(path);
         if (null == p.getAddress().getMountPoint().getParent())
             throw new UnsupportedOperationException("no prospective archive file detected"); // don't be greedy!
         return p.getFileSystem();
@@ -189,7 +201,8 @@ public class TFileSystemProvider extends FileSystemProvider {
      */
     @Override
     public TFileSystem newFileSystem(URI uri, @CheckForNull Map<String, ?> env) {
-        return new TPath(getArchiveDetector(env), uri).getFileSystem();
+        pushEnvironmentMap(env);
+        return new TPath(uri).getFileSystem();
     }
 
     /**
@@ -271,7 +284,7 @@ public class TFileSystemProvider extends FileSystemProvider {
             return p.getOutputSocket(
                         mapOutput(options)
                             .set(FsOutputOption.CACHE)
-                            .set(CREATE_PARENTS, TFileSystem.isLenient()),
+                            .set(CREATE_PARENTS, TConfig.get().isLenient()),
                         null)
                     .newSeekableByteChannel();
     }
@@ -290,7 +303,7 @@ public class TFileSystemProvider extends FileSystemProvider {
         return ((TPath) path)
                 .getOutputSocket(
                     mapOutput(options)
-                        .set(CREATE_PARENTS, TFileSystem.isLenient()),
+                        .set(CREATE_PARENTS, TConfig.get().isLenient()),
                     null)
                 .newOutputStream();
     }
@@ -329,7 +342,7 @@ public class TFileSystemProvider extends FileSystemProvider {
         boolean preserve = false;
         BitField<FsOutputOption> outputOptions = BitField
                 .of(EXCLUSIVE)
-                .set(CREATE_PARENTS, TFileSystem.isLenient());
+                .set(CREATE_PARENTS, TConfig.get().isLenient());
         if (0 < options.length) {
             for (final CopyOption option : options) {
                 if (!(option instanceof StandardCopyOption))
@@ -451,8 +464,10 @@ public class TFileSystemProvider extends FileSystemProvider {
 
     /** Keys for environment maps. */
     public interface Parameter {
-        /** The key for the {@link TArchiveDetector} parameter. */
-        String ARCHIVE_DETECTOR = "ARCHIVE_DETECTOR";
+        /** The key for the {@code archiveDetector} parameter. */
+        String ARCHIVE_DETECTOR = "archiveDetector";
+        /** The key for the {@code lenient} parameter. */
+        String LENIENT = "lenient";
     }
 
     private static FileTime toFileTime(long time) {

@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.nio.fsp;
 
-import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.entry.Entry;
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
 import de.schlichtherle.truezip.fs.FsController;
@@ -79,7 +78,7 @@ public final class TFileSystem extends FileSystem {
         this.mountPoint = path.getAddress().getMountPoint();
         this.controller = manager.getController(
                 path.getAddress().getMountPoint(),
-                path.getArchiveDetector());
+                TConfig.get().getArchiveDetector());
         this.provider = TFileSystemProvider.get(path);
 
         assert invariants();
@@ -89,14 +88,6 @@ public final class TFileSystem extends FileSystem {
         assert null != getController();
         assert null != provider();
         return true;
-    }
-
-    static boolean isLenient() {
-        return TSession.getSession().isLenient();
-    }
-
-    static void setLenient(boolean lenient) {
-        TSession.getSession().setLenient(lenient);
     }
 
     FsController<?> getController() {
@@ -329,7 +320,7 @@ public final class TFileSystem extends FileSystem {
         getController().mknod(
                 name,
                 DIRECTORY,
-                NO_OUTPUT_OPTION.set(CREATE_PARENTS, isLenient()),
+                NO_OUTPUT_OPTION.set(CREATE_PARENTS, TConfig.get().isLenient()),
                 null);
     }
 

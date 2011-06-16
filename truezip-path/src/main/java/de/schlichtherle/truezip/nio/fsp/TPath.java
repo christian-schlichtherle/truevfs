@@ -61,37 +61,29 @@ import net.jcip.annotations.Immutable;
 @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
 public final class TPath implements Path {
 
-    private final TArchiveDetector detector;
     private final URI uri;
     private volatile @CheckForNull FsPath address;
     private volatile @CheckForNull TFileSystem fileSystem;
     private volatile @CheckForNull Integer hashCode;
 
-    public TPath(String first, String... more) {
-        this((TArchiveDetector) null, first, more);
-    }
-
-    TPath(final @CheckForNull TArchiveDetector detector, final String first, final String... more) {
-        this.detector = null != detector ? detector : getDefaultArchiveDetector();
+    public TPath(final String first, final String... more) {
         this.uri = toUri(first, more);
 
         assert invariants();
     }
 
     TPath(final FsMountPoint mountPoint, String first, final String... more) {
-        this.detector = getDefaultArchiveDetector();
         this.uri = toUri(cutLeadingSeparators(first), more);
-        this.address = new TUriScanner(detector).toPath(mountPoint, uri);
+        this.address = newUriScanner().toPath(mountPoint, uri);
 
         assert invariants();
     }
 
-    TPath(URI uri) {
-        this(null, uri);
+    private static TUriScanner newUriScanner() {
+        return new TUriScanner(TConfig.get().getArchiveDetector());
     }
 
-    TPath(final @CheckForNull TArchiveDetector detector, final URI uri) {
-        this.detector = null != detector ? detector : getDefaultArchiveDetector();
+    TPath(final URI uri) {
         String p = uri.getRawPath(), q = p;
         p = cutTrailingSeparators(p);
         this.uri = p == q
@@ -102,18 +94,15 @@ public final class TPath implements Path {
     }
 
     private TPath(
-            final TArchiveDetector detector,
             final URI uri,
             final @CheckForNull FsPath address) {
-        this.detector = detector;
         this.uri = uri;
         this.address = address;
 
         assert invariants();
     }
 
-    TPath(final @CheckForNull TArchiveDetector detector, final Path path) {
-        this.detector = null != detector ? detector : getDefaultArchiveDetector();
+    TPath(final Path path) {
         this.uri = new UriBuilder().path(path.toString().replace(path.getFileSystem().getSeparator(), SEPARATOR)).toUri();
 
         assert invariants();
@@ -190,23 +179,11 @@ public final class TPath implements Path {
      * @return {@code true}
      */
     private boolean invariants() {
-        assert null != getArchiveDetector();
         assert null != getUri();
         assert null != getAddress();
         assert getAddress().toUri().isAbsolute();
         assert null != getFileSystem();
         return true;
-    }
-
-    /**
-     * Returns the {@link TArchiveDetector} that was used to detect any archive
-     * files in the path of this {@code TPath} object at construction time.
-     * 
-     * @return The {@link TArchiveDetector} that was used to detect any archive
-     *         files in the path of this file object at construction time.
-     */
-    public TArchiveDetector getArchiveDetector() {
-        return detector;
     }
 
     /**
@@ -246,14 +223,6 @@ public final class TPath implements Path {
                         : null != parent && null != parent.getParent();
     }
 
-    static TArchiveDetector getDefaultArchiveDetector() {
-        return TSession.getSession().getArchiveDetector();
-    }
-
-    static void setDefaultArchiveDetector(TArchiveDetector detector) {
-        TSession.getSession().setArchiveDetector(detector);
-    }
-
     URI getUri() {
         return this.uri;
     }
@@ -271,11 +240,13 @@ public final class TPath implements Path {
     }
 
     private FsPath toFsPath(URI uri) {
-        return new TUriScanner(detector).toPath(
-                uri.isAbsolute() || null != uri.getAuthority() || uri.getPath().startsWith(SEPARATOR)
-                    ? TFileSystemProvider.get(this).getRoot()
-                    : TFileSystemProvider.get(this).getCurrent(),
-                uri);
+        return newUriScanner()
+                .toPath(   uri.isAbsolute()
+                        || uri.getPath().startsWith(SEPARATOR)
+                        || null != uri.getAuthority()
+                        ? TFileSystemProvider.get(this).getRoot()
+                        : TFileSystemProvider.get(this).getCurrent(),
+                    uri);
     }
 
     @Override
@@ -295,7 +266,7 @@ public final class TPath implements Path {
 
     @Override
     public @Nullable TPath getRoot() {
-        return new TPath(getArchiveDetector(), toUri().resolve(SEPARATOR), null); // don't use getAddress()!
+        return new TPath(toUri().resolve(SEPARATOR), null); // don't use getAddress()!
     }
 
     @Override
@@ -303,12 +274,12 @@ public final class TPath implements Path {
         final URI uri = getUri();
         final URI parent = uri.resolve(".");
         final URI member = parent.relativize(uri);
-        return new TPath(getArchiveDetector(), member, null); // don't use getAddress()!
+        return new TPath(member, null); // don't use getAddress()!
     }
 
     @Override
     public TPath getParent() {
-        return new TPath(getArchiveDetector(), getUri().resolve("."));
+        return new TPath(getUri().resolve("."));
     }
 
     @Override
@@ -360,15 +331,12 @@ public final class TPath implements Path {
 
     @Override
     public TPath normalize() {
-        return new TPath(getArchiveDetector(), getUri().normalize(), address); // don't use getAddress()!
+        return new TPath(getUri().normalize(), address); // don't use getAddress()!
     }
 
     @Override
     public TPath resolve(final Path member) {
         return resolve(
-                member instanceof TPath
-                    ? ((TPath) member).getArchiveDetector()
-                    : getArchiveDetector(),
                 member  .toString()
                         .replace(   member.getFileSystem().getSeparator(),
                                     SEPARATOR));
@@ -376,10 +344,6 @@ public final class TPath implements Path {
 
     @Override
     public TPath resolve(final String member) {
-        return resolve(getArchiveDetector(), member);
-    }
-
-    private TPath resolve(final TArchiveDetector detector, final String member) {
         URI uri = getUri();
         final String path = uri.getPath();
         try {
@@ -396,7 +360,7 @@ public final class TPath implements Path {
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
-        return new TPath(detector, uri);
+        return new TPath(uri);
     }
 
     @Override
@@ -411,15 +375,16 @@ public final class TPath implements Path {
 
     @Override
     public TPath relativize(Path other) {
-        return new TPath(getArchiveDetector(), toUri().relativize(other.toUri()));
+        return new TPath(toUri().relativize(other.toUri()));
     }
 
     @Override
     public TFile toFile() {
         final URI uri = getUri();
         return uri.isAbsolute()
-                ? new TFile(getAddress())
-                : new TFile(uri.getSchemeSpecificPart(), getArchiveDetector());
+                ? new TFile(    getAddress())
+                : new TFile(    uri.getSchemeSpecificPart(),
+                                TConfig.get().getArchiveDetector());
     }
 
     @Override
@@ -429,13 +394,13 @@ public final class TPath implements Path {
 
     @Override
     public TPath toAbsolutePath() {
-        return new TPath(getArchiveDetector(), toUri(), address); // don't use getAddress()!
+        return new TPath(toUri(), address); // don't use getAddress()!
     }
 
     @Override
     public TPath toRealPath(LinkOption... options) throws IOException {
         // FIXME: resolve symlinks!
-        return new TPath(getArchiveDetector(), toUri(), address); // don't use getAddress()!
+        return new TPath(toUri(), address); // don't use getAddress()!
     }
 
     @Override
