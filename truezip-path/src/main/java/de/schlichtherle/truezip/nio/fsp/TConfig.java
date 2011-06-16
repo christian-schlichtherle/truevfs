@@ -19,44 +19,47 @@ import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.file.TFile;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 
 /**
- * An interface to the global TrueZIP configuration or a thread local 
- * configuration of this package.
+ * An interface to the global TrueZIP configuration or a thread local stack of
+ * configurations.
  * 
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class TSession implements AutoCloseable {
+public class TConfig implements AutoCloseable {
 
-    private static final ThreadLocalSessions
-            sessions = new ThreadLocalSessions();
+    private static final ThreadLocalSessionStack
+            sessions = new ThreadLocalSessionStack();
 
     /**
-     * Peeks the current session on top of the thread local stack of sessions.
-     * If no session has been pushed yet, an adapter for the global
-     * configuration is returned.
+     * Peeks the current configuration on top of the thread local stack of
+     * configurations.
+     * If no configuration has been {@link #push() pushed} yet, an adapter for
+     * the global configuration is returned.
      * 
-     * @return The current session.
-     * @see    #newSession()
+     * @return The current configuration.
+     * @see    #push()
      */
-    public static TSession getSession() {
-        final Local session = sessions.get().peek();
-        return null != session ? session : Global.SINGLETON;
+    public static TConfig get() {
+        final Session session = sessions.get().peek();
+        return null != session ? session : Holder.GLOBAL;
     }
 
     /**
-     * Pushes a new session on the thread local stack of sessions.
+     * Pushes a new configuration on the thread local stack of configurations.
+     * The new configuration will have 
      * 
-     * @return The new session.
-     * @see    #getSession()
+     * @return The new configuration.
+     * @see    #get()
      */
-    public static TSession newSession() {
-        return new Local();
+    public static TConfig push() {
+        return new Session();
     }
 
     /** You cannot instantiate this class. */
-    private TSession() {
+    private TConfig() {
     }
 
     /**
@@ -67,7 +70,9 @@ public abstract class TSession implements AutoCloseable {
      *         for prospective archive files.
      * @see #setArchiveDetector
      */
-    public abstract TArchiveDetector getArchiveDetector();
+    public TArchiveDetector getArchiveDetector() {
+        return TFile.getDefaultArchiveDetector();
+    }
 
     /**
      * Sets the {@link TArchiveDetector} to use for scanning a URI
@@ -79,7 +84,9 @@ public abstract class TSession implements AutoCloseable {
      *        for prospective archive files.
      * @see   #getArchiveDetector()
      */
-    public abstract void setArchiveDetector(TArchiveDetector detector);
+    public void setArchiveDetector(TArchiveDetector detector) {
+        TFile.setDefaultArchiveDetector(detector);
+    }
 
     /**
      * Returns the value of the property {@code lenient}.
@@ -87,7 +94,9 @@ public abstract class TSession implements AutoCloseable {
      * @return The value of the property {@code lenient}.
      * @see    #setLenient(boolean)
      */
-    public abstract boolean isLenient();
+    public boolean isLenient() {
+        return TFile.isLenient();
+    }
 
     /**
      * Sets the value of the property {@code lenient}.
@@ -104,7 +113,7 @@ public abstract class TSession implements AutoCloseable {
      * <p>
      * Now, if this property is set to {@code false}, then an application
      * needs to call {@code new TFile("a/outer.zip/b/inner.zip").mkdirs()}
-     * before it can actually create the innermost {@code c} entry as a file
+     * before it can actually push the innermost {@code c} entry as a file
      * or directory.
      * <p>
      * More formally, before an application can access an entry in a federated
@@ -115,7 +124,7 @@ public abstract class TSession implements AutoCloseable {
      * If this property is set to {@code true} however, then any missing
      * parent directories (including archive files) up to the outermost archive
      * file {@code outer.zip} get automatically created when using operations
-     * to create the innermost element of the path {@code c}.
+     * to push the innermost element of the path {@code c}.
      * <p>
      * This allows applications to succeed with doing this:
      * {@code new TFile("a/outer.zip/b/inner.zip/c").createNewFile()},
@@ -123,68 +132,54 @@ public abstract class TSession implements AutoCloseable {
      * {@code new TFileOutputStream("a/outer.zip/b/inner.zip/c")}.
      * <p>
      * Note that in either case the parent directory of the outermost archive
-     * file {@code a} must exist - TrueZIP does not automatically create
+     * file {@code a} must exist - TrueZIP does not automatically push
      * directories in the platform file system!
      *
      * @param lenient the value of the property {@code lenient}.
      * @see   #isLenient()
      */
-    public abstract void setLenient(boolean lenient);
+    public void setLenient(boolean lenient) {
+        TFile.setLenient(lenient);
+    }
 
     /**
-     * Pops this session from the thread local stack of sessions.
+     * Pops this configuration from the thread local stack of configurations.
      * 
-     * @throws IllegalStateException
+     * @throws UnsupportedOperationException If this configuration is the
+     *         global configuration.
+     * @throws IllegalStateException If this configuration is not the top
+     *         element of the thread local stack of configurations.
      */
-    public abstract void close();
+    public void close() {
+        throw new UnsupportedOperationException();
+    }
 
-    private static final class ThreadLocalSessions
-    extends ThreadLocal<Deque<Local>> {
+    private static final class ThreadLocalSessionStack
+    extends ThreadLocal<Deque<Session>> {
         @Override
-        protected Deque<Local> initialValue() {
+        protected Deque<Session> initialValue() {
             return new LinkedList<>();
         }
-    } // class ThreadLocalSessions
+    } // class ThreadLocalSessionStack
 
-    private static final class Global extends TSession {
-        static final Global SINGLETON = new Global();
+    private static final class Holder {
+        static final TConfig GLOBAL = new TConfig();
 
-        @Override
-        public TArchiveDetector getArchiveDetector() {
-            return TFile.getDefaultArchiveDetector();
-        }
-
-        @Override
-        public void setArchiveDetector(TArchiveDetector detector) {
-            TFile.setDefaultArchiveDetector(detector);
-        }
-
-        @Override
-        public boolean isLenient() {
-            return TFile.isLenient();
-        }
-
-        @Override
-        public void setLenient(boolean lenient) {
-            TFile.setLenient(lenient);
-        }
-
-        @Override
-        public void close() {
+        /** Make lint happy. */
+        private Holder() {
         }
     } // class Global
 
-    private static final class Local extends TSession {
-        boolean closed;
+    private static final class Session extends TConfig {
         private TArchiveDetector detector;
         private boolean lenient;
 
         @SuppressWarnings("LeakingThisInConstructor")
-        Local() {
-            final TSession config = getSession();
+        Session() {
+            final TConfig config = get();
             this.detector = config.getArchiveDetector();
             this.lenient = config.isLenient();
-            TSession.sessions.get().push(this);
+            TConfig.sessions.get().push(this);
         }
 
         @Override
@@ -211,15 +206,17 @@ public abstract class TSession implements AutoCloseable {
 
         @Override
         public void close() {
-            if (closed)
-                return;
-            closed = true;
-            final Deque<Local> locals = sessions.get();
-            final Local session = locals.pop();
+            final Deque<Session> locals = sessions.get();
+            final Session session;
+            try {
+                session = locals.pop();
+            } catch (NoSuchElementException ex) {
+                throw new IllegalStateException(ex);
+            }
             if (this != session) {
                 locals.push(session);
-                throw new IllegalStateException();
+                throw new IllegalStateException("Not the top element of the thread local stack of configurations.");
             }
         }
-    } // class Local
+    } // class Session
 }
