@@ -344,7 +344,6 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
      * @see #reset(CharSequence)
      */
     @ThreadSafe
-    @DefaultAnnotation(NonNull.class)
     private static final class ThreadLocalMatcher extends ThreadLocal<Matcher> {
         private final Pattern pattern;
 

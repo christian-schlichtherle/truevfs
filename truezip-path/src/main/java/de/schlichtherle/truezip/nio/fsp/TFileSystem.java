@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.nio.fsp;
 
+import de.schlichtherle.truezip.file.TConfig;
 import de.schlichtherle.truezip.entry.Entry;
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
 import de.schlichtherle.truezip.fs.FsController;

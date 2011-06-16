@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.nio.fsp;
 
+import de.schlichtherle.truezip.file.TConfig;
 import de.schlichtherle.truezip.fs.FsPath;
 import java.net.URI;
 import org.junit.Test;
@@ -50,7 +51,7 @@ public class TUriScannerTest extends TestBase {
             final FsPath parent = FsPath.create(URI.create(params[0]));
             final URI member = URI.create(params[1]);
             final FsPath path = FsPath.create(URI.create(params[2]));
-            final FsPath result = new TUriScanner(detector).toPath(parent, member);
+            final FsPath result = new TUriScanner(TConfig.get().getArchiveDetector()).toPath(parent, member);
             assertThat(result, equalTo(path));
         }
     }

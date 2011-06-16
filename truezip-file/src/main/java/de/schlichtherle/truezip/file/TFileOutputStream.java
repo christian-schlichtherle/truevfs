@@ -169,7 +169,7 @@ public final class TFileOutputStream extends DecoratingOutputStream {
                 dst,
                 DEFAULT_OPTIONS
                     .set(APPEND, append)
-                    .set(CREATE_PARENTS, TFile.isLenient()),
+                    .set(CREATE_PARENTS, TConfig.get().isLenient()),
                 null);
         try {
             return output.newOutputStream();
