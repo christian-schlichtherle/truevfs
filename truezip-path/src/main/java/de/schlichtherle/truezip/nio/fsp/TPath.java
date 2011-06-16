@@ -83,6 +83,7 @@ public final class TPath implements Path {
         return new TUriScanner(TConfig.get().getArchiveDetector());
     }
 
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("ES_COMPARING_STRINGS_WITH_EQ")
     TPath(final URI uri) {
         String p = uri.getRawPath(), q = p;
         p = cutTrailingSeparators(p);

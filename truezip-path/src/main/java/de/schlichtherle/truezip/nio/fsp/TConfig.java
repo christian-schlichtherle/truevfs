@@ -17,9 +17,13 @@ package de.schlichtherle.truezip.nio.fsp;
 
 import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.file.TFile;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * An interface to the global TrueZIP configuration or a thread local stack of
@@ -28,10 +32,11 @@ import java.util.NoSuchElementException;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
+@DefaultAnnotation(NonNull.class)
 public class TConfig implements AutoCloseable {
 
-    private static final ThreadLocalSessionStack
-            sessions = new ThreadLocalSessionStack();
+    private static volatile @CheckForNull ThreadLocalSessionStack sessions;
 
     /**
      * Peeks the current configuration on top of the thread local stack of
@@ -43,6 +48,9 @@ public class TConfig implements AutoCloseable {
      * @see    #push()
      */
     public static TConfig get() {
+        final ThreadLocalSessionStack sessions = TConfig.sessions;
+        if (null == sessions)
+            return Holder.GLOBAL;
         final Session session = sessions.get().peek();
         return null != session ? session : Holder.GLOBAL;
     }
@@ -55,7 +63,35 @@ public class TConfig implements AutoCloseable {
      * @see    #get()
      */
     public static TConfig push() {
-        return new Session();
+        ThreadLocalSessionStack sessions;
+        synchronized (TConfig.class) {
+            sessions = TConfig.sessions;
+            if (null == sessions)
+                sessions = TConfig.sessions = new ThreadLocalSessionStack();
+        }
+        final Deque<Session> stack = sessions.get();
+        TConfig template = stack.peek();
+        if (null == template)
+            template = Holder.GLOBAL;
+        final Session session = new Session(template);
+        stack.push(session);
+        return session;
+    }
+
+    private static void pop(final Session session) {
+        final ThreadLocalSessionStack sessions = TConfig.sessions;
+        assert null != sessions;
+        final Deque<Session> locals = sessions.get();
+        final Session found;
+        try {
+            found = locals.pop();
+        } catch (NoSuchElementException ex) {
+            throw new IllegalStateException(ex);
+        }
+        if (session != found) {
+            locals.push(found);
+            throw new IllegalStateException("Not the top element of the thread local stack of configurations.");
+        }
     }
 
     /** You cannot instantiate this class. */
@@ -168,18 +204,15 @@ public class TConfig implements AutoCloseable {
         /** Make lint happy. */
         private Holder() {
         }
-    } // class Global
+    } // class Holder
 
     private static final class Session extends TConfig {
         private TArchiveDetector detector;
         private boolean lenient;
 
-        @SuppressWarnings("LeakingThisInConstructor")
-        Session() {
-            final TConfig config = get();
-            this.detector = config.getArchiveDetector();
-            this.lenient = config.isLenient();
-            TConfig.sessions.get().push(this);
+        Session(final TConfig template) {
+            this.detector = template.getArchiveDetector();
+            this.lenient = template.isLenient();
         }
 
         @Override
@@ -206,17 +239,7 @@ public class TConfig implements AutoCloseable {
 
         @Override
         public void close() {
-            final Deque<Session> locals = sessions.get();
-            final Session session;
-            try {
-                session = locals.pop();
-            } catch (NoSuchElementException ex) {
-                throw new IllegalStateException(ex);
-            }
-            if (this != session) {
-                locals.push(session);
-                throw new IllegalStateException("Not the top element of the thread local stack of configurations.");
-            }
+            pop(this);
         }
     } // class Session
 }
