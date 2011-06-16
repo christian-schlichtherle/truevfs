@@ -37,6 +37,7 @@ import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -155,7 +156,7 @@ public class TFileSystemProvider extends FileSystemProvider {
         return current;
     }
 
-    private static void pushEnvironmentMap(final @CheckForNull Map<String, ?> env) {
+    private static void pushConfiguration(final @CheckForNull Map<String, ?> env) {
         if (null == env)
             return;
         final TArchiveDetector detector = (TArchiveDetector) env.get(
@@ -183,8 +184,8 @@ public class TFileSystemProvider extends FileSystemProvider {
      *        archive files.
      */
     @Override
-    public TFileSystem newFileSystem(Path path, Map<String, ?> env) {
-        pushEnvironmentMap(env);
+    public TFileSystem newFileSystem(Path path, @CheckForNull Map<String, ?> env) {
+        pushConfiguration(env);
         TPath p = new TPath(path);
         if (null == p.getAddress().getMountPoint().getParent())
             throw new UnsupportedOperationException("no prospective archive file detected"); // don't be greedy!
@@ -201,7 +202,7 @@ public class TFileSystemProvider extends FileSystemProvider {
      */
     @Override
     public TFileSystem newFileSystem(URI uri, @CheckForNull Map<String, ?> env) {
-        pushEnvironmentMap(env);
+        pushConfiguration(env);
         return new TPath(uri).getFileSystem();
     }
 
@@ -471,7 +472,7 @@ public class TFileSystemProvider extends FileSystemProvider {
     }
 
     private static FileTime toFileTime(long time) {
-        return time == UNKNOWN ? null : FileTime.fromMillis(time);
+        return FileTime.fromMillis(time);
     }
 
     private static long toMillis(FileTime time) {
