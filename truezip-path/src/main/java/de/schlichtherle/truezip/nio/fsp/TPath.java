@@ -193,6 +193,7 @@ public final class TPath implements Path {
         assert null != getArchiveDetector();
         assert null != getUri();
         assert null != getAddress();
+        assert getAddress().toUri().isAbsolute();
         assert null != getFileSystem();
         return true;
     }
@@ -257,6 +258,11 @@ public final class TPath implements Path {
         return this.uri;
     }
 
+    /**
+     * Returns an {@link FsPath} for this path with an absolute URI.
+     * 
+     * @return An {@link FsPath} for this path with an absolute URI.
+     */
     FsPath getAddress() {
         final FsPath address = this.address;
         return null != address
