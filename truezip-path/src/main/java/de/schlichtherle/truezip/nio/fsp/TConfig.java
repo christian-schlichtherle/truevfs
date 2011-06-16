@@ -20,10 +20,10 @@ import de.schlichtherle.truezip.file.TFile;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import java.io.Closeable;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
-import net.jcip.annotations.ThreadSafe;
 
 /**
  * An interface to the global TrueZIP configuration or a thread local stack of
@@ -32,17 +32,17 @@ import net.jcip.annotations.ThreadSafe;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@ThreadSafe
+//@ThreadSafe
 @DefaultAnnotation(NonNull.class)
-public class TConfig implements AutoCloseable {
+public class TConfig implements Closeable {
 
     private static volatile @CheckForNull ThreadLocalSessionStack sessions;
 
     /**
      * Peeks the current configuration on top of the thread local stack of
      * configurations.
-     * If no configuration has been {@link #push() pushed} yet, an adapter for
-     * the global configuration is returned.
+     * If no configuration has been {@link #push() pushed} yet, the global
+     * configuration is returned.
      * 
      * @return The current configuration.
      * @see    #push()
@@ -56,8 +56,10 @@ public class TConfig implements AutoCloseable {
     }
 
     /**
-     * Pushes a new configuration on the thread local stack of configurations.
-     * The new configuration will have 
+     * Pushes a new configuration on the thread local stack of configurations
+     * and sets it as the {@link #get() current configuration}.
+     * The new configuration will have its properties initialized from the
+     * current configuration before the call to this method.
      * 
      * @return The new configuration.
      * @see    #get()
