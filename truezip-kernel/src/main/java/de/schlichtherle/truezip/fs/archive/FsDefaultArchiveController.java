@@ -234,12 +234,7 @@ extends FsFileSystemArchiveController<E> {
     public void unlink(FsEntryName name) throws IOException {
         super.unlink(name);
         if (name.isRoot())
-            getParent().unlink(
-                    getModel()
-                        .getMountPoint()
-                        .getPath()
-                        .resolve(name)
-                        .getEntryName());
+            parent.unlink(parentName);
     }
 
     @Override
