@@ -28,6 +28,7 @@ import java.nio.channels.SeekableByteChannel;
  * This is optimized for performance and <em>without</em> multithreading
  * support.
  *
+ * @since   TrueZIP 7.2
  * @author  Christian Schlichtherle
  * @version $Id$
  */
