@@ -215,7 +215,7 @@ public final class UriEncoder {
                     if (UNDERFLOW != (cr = enc.reset().encode(dC, eB, true))
                             || UNDERFLOW != (cr = enc.flush(eB))) {
                         assert OVERFLOW != cr;
-                        throw new URISyntaxException(dS, cr.toString());
+                        throw new QuotedInputUriSyntaxException(dS, cr.toString());
                     }
                 }
                 eB.flip();

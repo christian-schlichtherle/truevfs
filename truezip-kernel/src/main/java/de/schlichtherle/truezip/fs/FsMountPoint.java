@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import de.schlichtherle.truezip.util.QuotedInputUriSyntaxException;
 import de.schlichtherle.truezip.util.UriBuilder;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import java.io.IOException;
@@ -326,10 +327,10 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
     throws URISyntaxException {
         final URI pu = path.toUri();
         if (!pu.isAbsolute())
-            throw new URISyntaxException(quote(pu), "Path not absolute");
+            throw new QuotedInputUriSyntaxException(pu, "Path not absolute");
         final String penup = path.getEntryName().toUri().getPath();
         if (0 == penup.length())
-            throw new URISyntaxException(quote(pu), "Empty entry name");
+            throw new QuotedInputUriSyntaxException(pu, "Empty entry name");
         this.uri = new UriBuilder(true)
                 .scheme(scheme.toString())
                 .path(new StringBuilder(pu.getScheme())
@@ -363,21 +364,21 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
     throws URISyntaxException {
         uri = modifier.modify(uri, MOUNT_POINT);
         if (null != uri.getRawQuery())
-            throw new URISyntaxException(quote(uri), "Query not allowed");
+            throw new QuotedInputUriSyntaxException(uri, "Query not allowed");
         if (null != uri.getRawFragment())
-            throw new URISyntaxException(quote(uri), "Fragment not allowed");
+            throw new QuotedInputUriSyntaxException(uri, "Fragment not allowed");
         if (uri.isOpaque()) {
             final String ssp = uri.getRawSchemeSpecificPart();
             final int i = ssp.lastIndexOf(SEPARATOR);
             if (ssp.length() - 2 != i)
-                throw new URISyntaxException(quote(uri),
+                throw new QuotedInputUriSyntaxException(uri,
                         "Doesn't end with mount point separator \"" + SEPARATOR + '"');
             path = new FsPath(new URI(ssp.substring(0, i)), modifier);
             final URI pu = path.toUri();
             if (!pu.isAbsolute())
-                throw new URISyntaxException(quote(uri), "Path not absolute");
+                throw new QuotedInputUriSyntaxException(uri, "Path not absolute");
             if (0 == path.getEntryName().getPath().length())
-                throw new URISyntaxException(quote(uri), "Empty URI path of entry name of path");
+                throw new QuotedInputUriSyntaxException(uri, "Empty URI path of entry name of path");
             if (NULL != modifier) {
                 URI nuri = new UriBuilder(true)
                         .scheme(uri.getScheme())
@@ -392,19 +393,15 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
             }
         } else {
             if (!uri.isAbsolute())
-                throw new URISyntaxException(quote(uri), "Not absolute");
+                throw new QuotedInputUriSyntaxException(uri, "Not absolute");
             if (!uri.getRawPath().endsWith(FsEntryName.SEPARATOR))
-                throw new URISyntaxException(quote(uri),
+                throw new QuotedInputUriSyntaxException(uri,
                         "URI path doesn't end with separator \"" + FsEntryName.SEPARATOR + '"');
             path = null;
         }
         this.uri = uri;
 
         assert invariants();
-    }
-
-    private static String quote(Object s) {
-        return "\"" + s + "\"";
     }
 
     private boolean invariants() {
