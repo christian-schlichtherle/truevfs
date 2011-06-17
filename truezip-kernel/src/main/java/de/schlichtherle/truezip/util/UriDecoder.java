@@ -177,7 +177,7 @@ public final class UriDecoder {
                         if (UNDERFLOW != (cr = dec.reset().decode(eB, dC, true))
                                 || UNDERFLOW != (cr = dec.flush(dC))) {
                             assert OVERFLOW != cr;
-                            throw new URISyntaxException(eS, cr.toString());
+                            throw new QuotedInputUriSyntaxException(eS, cr.toString());
                         }
                     }
                     eB.clear();
