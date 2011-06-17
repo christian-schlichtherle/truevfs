@@ -92,29 +92,29 @@ public class PathsTest {
         assertSplit("d" + fs + fs + fs + "f" + fs + fs);
         assertSplit("d" + fs + fs + fs + "f" + fs + fs + fs);
 
-        if (File.separatorChar == '\\') { // Windoze?
-            assertSplit("\\\\\\h");
-            assertSplit("\\\\\\\\h");
-            assertSplit("\\\\\\\\\\h");
+        if ('\\' == File.separatorChar) { // Windoze?
+            //assertSplit("\\\\\\host");
+            //assertSplit("\\\\\\\\host");
+            //assertSplit("\\\\\\\\\\host");
 
-            assertSplit("\\\\h\\share\\\\f\\\\");
-            assertSplit("\\\\h\\share\\f\\");
-            assertSplit("\\\\h\\share\\f");
-            assertSplit("\\\\h\\share\\");
-            assertSplit("\\\\h\\share");
-            assertSplit("\\\\h\\");
-            assertSplit("\\\\h");
-            assertSplit("\\\\h");
+            assertSplit("\\\\host\\share\\\\path\\\\");
+            assertSplit("\\\\host\\share\\path\\");
+            assertSplit("\\\\host\\share\\path");
+            assertSplit("\\\\host\\share\\");
+            assertSplit("\\\\host\\share");
+            assertSplit("\\\\host\\");
+            assertSplit("\\\\host");
+            assertSplit("\\\\host");
             assertSplit("\\\\");
 
-            /*assertSplit("\\\\\\h\\share\\\\f\\\\");
-            assertSplit("\\\\\\h\\share\\f\\");
-            assertSplit("\\\\\\h\\share\\f");
-            assertSplit("\\\\\\h\\share\\");
-            assertSplit("\\\\\\h\\share");
-            assertSplit("\\\\\\h\\");
-            assertSplit("\\\\\\h");
-            assertSplit("\\\\\\h");*/
+            /*assertSplit("\\\\\\host\\share\\\\path\\\\");
+            assertSplit("\\\\\\host\\share\\path\\");
+            assertSplit("\\\\\\host\\share\\path");
+            assertSplit("\\\\\\host\\share\\");
+            assertSplit("\\\\\\host\\share");
+            assertSplit("\\\\\\host\\");
+            assertSplit("\\\\\\host");
+            assertSplit("\\\\\\host");*/
             assertSplit("\\\\\\");
 
             assertSplit("C:\\d\\\\f\\\\");

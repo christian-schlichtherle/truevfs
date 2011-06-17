@@ -19,6 +19,7 @@ import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import java.io.File;
 import java.util.Locale;
 import net.jcip.annotations.NotThreadSafe;
 import net.jcip.annotations.ThreadSafe;
@@ -39,7 +40,7 @@ public final class Paths {
 
     /**
      * Equivalent to
-     * {@code new Normalizer(separatorChar).}{@link Normalizer#normalize(String) normalize(path)}.
+     * <code>new {@link Normalizer#Paths.Normalizer(char) Normalizer(separatorChar)}&#x2e;{@link Normalizer#normalize(String) normalize(path)}</code>.
      */
     public static String normalize(String path, char separatorChar) {
         return new Normalizer(separatorChar).normalize(path);
@@ -179,7 +180,7 @@ public final class Paths {
 
     /**
      * Equivalent to
-     * <code>return new {@link Splitter#Paths.Splitter(char, boolean) Splitter(separatorChar, keepTrailingSeparator)}.{@link Splitter#split(String) split(path)};</code>.
+     * <code>new {@link Splitter#Paths.Splitter(char, boolean) Splitter(separatorChar, keepTrailingSeparator)}&#x2e;{@link Splitter#split(String) split(path)}</code>.
      */
     public static Splitter split(   String path,
                                     char separatorChar,
@@ -206,47 +207,47 @@ public final class Paths {
         public Splitter(final char separatorChar,
                         final boolean keepTrailingSeparator) {
             this.separatorChar = separatorChar;
-            this.fixum = keepTrailingSeparator ? 2 : 1;
+            this.fixum = keepTrailingSeparator ? 1 : 0;
         }
 
         /**
          * Splits the given path name into its parent path name and member name,
          * recognizing platform specific file system roots.
          *
-         * @param  path the name of the path which's parent path name and
-         *         member name are to be returned.
+         * @param  path the path name which's parent path name and member name
+         *         are to be returned.
          * @return {@code this}
          */
         public Splitter split(final String path) {
-            final int prefixLength = prefixLength(path, separatorChar);
+            final int prefixLen = prefixLength(path, separatorChar);
             int memberEnd = path.length() - 1;
-            if (memberEnd < prefixLength) {
+            if (prefixLen > memberEnd) {
                 parentPath = null;
                 memberName = "";
                 return this;
             }
             memberEnd = lastIndexNot(path, separatorChar, memberEnd);
-            int memberBegin = path.lastIndexOf(separatorChar, memberEnd);
+            final int memberInd = path.lastIndexOf(separatorChar, memberEnd) + 1;
             memberEnd++;
-            if (prefixLength <= memberBegin) {
-                final int parentEnd = lastIndexNot(path, separatorChar, memberBegin);
-                parentPath = path.substring(0, prefixLength <= parentEnd ? parentEnd + fixum : prefixLength);
-                memberName = path.substring(memberBegin + 1, memberEnd);
-            } else if (0 < prefixLength && prefixLength <= memberEnd) {
-                parentPath = path.substring(0, prefixLength);
-                memberName = path.substring(prefixLength, memberEnd);
-            } else if (prefixLength <= memberEnd) {
-                parentPath = null;
-                memberName = path.substring(memberBegin + 1, memberEnd);
-            } else {
+            final int parentEnd;
+            if (prefixLen >= memberEnd) {
                 parentPath = null;
                 memberName = "";
+            } else if (prefixLen >= memberInd) {
+                parentPath = 0 >= prefixLen ? null : path.substring(0, prefixLen);
+                memberName = path.substring(prefixLen, memberEnd);
+            } else if (prefixLen >= (parentEnd = lastIndexNot(path, separatorChar, memberInd - 1) + 1)) {
+                parentPath = path.substring(0, prefixLen);
+                memberName = path.substring(memberInd, memberEnd);
+            } else {
+                parentPath = path.substring(0, parentEnd + fixum);
+                memberName = path.substring(memberInd, memberEnd);
             }
             return this;
         }
 
         private static int lastIndexNot(String path, char separatorChar, int last) {
-            while (path.charAt(last) == separatorChar && --last >= 0) {
+            while (separatorChar == path.charAt(last) && --last >= 0) {
             }
             return last;
         }
@@ -273,8 +274,8 @@ public final class Paths {
 
     /**
      * Returns {@code true} iff the given path name is absolute.
-     * Windows drives and UNC's are always recognized by this method, even
-     * on non-Windows platforms in order to ease interoperability.
+     * Windows drives and UNC's are recognized if and only if this JVM is
+     * running on Windows.
      *
      * @param  path the path name to test.
      * @param  separatorChar the file name separator character.
@@ -283,7 +284,7 @@ public final class Paths {
      */
     public static boolean isAbsolute(String path, char separatorChar) {
         final int prefixLen = prefixLength(path, separatorChar);
-        return prefixLen > 0 && path.charAt(prefixLen - 1) == separatorChar;
+        return 0 < prefixLen && separatorChar == path.charAt(prefixLen - 1);
     }
 
     /**
@@ -291,41 +292,54 @@ public final class Paths {
      * File system prefixes are:
      * <ol>
      * <li>A letter followed by a colon and an optional separator.
-     *     On Windows, this is the notation for a drive.
-     *     This is only recognized if {@code separatorChar} is {@code '\\'}.
+     *     This indicates a Windows Drive and is only recognized if this
+     *     JVM is running on Windows.
      * <li>Two leading separators.
-     *     On Windows, this is the notation for a UNC.
-     *     This is recognized for any {@code separatorChar}.
+     *     This indicates a Windows UNC and is only recognized if this
+     *     JVM is running on Windows.
      * <li>A single leading separator.
      *     On Windows and POSIX, this is the notation for an absolute path.
-     *     This is recognized for any {@code separatorChar}.
+     *     This is recognized on any OS.
      * </ol>
      *
      * @param  path The file system path.
      * @param  separatorChar The file name separator character.
      * @return The number of characters in the prefix.
      */
-    private static int prefixLength(final String path, final char separatorChar) {
-        final int pathLength = path.length();
-        int len = 0; // default prefix length
-        if (pathLength > 0 && path.charAt(0) == separatorChar) {
-            len++; // leading separator or first character of a UNC.
-        } else if ('\\' == separatorChar && pathLength > 1 && path.charAt(1) == ':') {
-            final char drive = path.charAt(0);
-            if ('A' <= drive && drive <= 'Z'
-                    || 'a' <= drive && drive <= 'z') { // US-ASCII letters only
-                // Path is prefixed with drive, e.g. "C:\\Programs".
-                len = 2;
+    public static int prefixLength(final String path, final char separatorChar) {
+        final int pathLen = path.length();
+        if (0 >= pathLen)
+            return 0;
+        char c = path.charAt(0);
+        if ('\\' == File.separatorChar) {
+            if (separatorChar == c) {
+                if (2 <= pathLen && separatorChar == path.charAt(1)) {
+                    // Windows UNC.
+                    return 2;
+                } else {
+                    // Absolute path.
+                    return 1;
+                }
+            } else if (2 <= pathLen
+                    && ':' == path.charAt(1)
+                    && ('a' <= c && c <= 'z' || 'A' <= c && c <= 'Z')) {
+                // Windows Drive.
+                return 3 <= pathLen && separatorChar == path.charAt(2) ? 3 : 2;
+            } else {
+                return 0;
             }
+        } else {
+            // Absolute or relative path.
+            return separatorChar == c ? 1 : 0;
         }
-        if (pathLength > len && path.charAt(len) == separatorChar)
-            len++; // next separator is considered part of prefix
-        return len;
     }
 
     /**
      * Returns true if and only if the path name represented by {@code a}
      * contains the path name represented by {@code b}.
+     * If and only if this JVM is running on Windows, the comparison is case
+     * insensitive with respect to the
+     * {@link Locale#getDefault() default locale}.
      *
      * @param a A non-{@code null} {@link String} reference.
      * @param b A non-{@code null} {@link String} reference.
@@ -333,9 +347,9 @@ public final class Paths {
      */
     public static boolean contains(String a, String b, char separatorChar) {
         // Windows is just case preserving, all others are case sensitive.
-        if (separatorChar == '\\') {
-            a = a.toLowerCase(Locale.ENGLISH);
-            b = b.toLowerCase(Locale.ENGLISH);
+        if ('\\' == File.separatorChar) {
+            a = a.toLowerCase();
+            b = b.toLowerCase();
         }
         if (!b.startsWith(a)) {
             return false;
