@@ -62,7 +62,7 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
  * <a name="examples"/><h3>Examples</h3>
  * <p>
  * Examples for valid mount point URIs are:
- * <table border="2" cellpadding="4">
+ * <table border=1 cellpadding=5 summary="">
  * <thead>
  * <tr>
  *   <th>{@link #toUri() uri} property</th>
@@ -97,7 +97,7 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
  * available.
  * <p>
  * Examples for invalid mount point URIs are:
- * <table border="2" cellpadding="4">
+ * <table border=1 cellpadding=5 summary="">
  * <thead>
  * <tr>
  *   <th>URI</th>

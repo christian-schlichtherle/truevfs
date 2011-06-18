@@ -50,7 +50,7 @@ import net.jcip.annotations.Immutable;
  * <a name="examples"/><h3>Examples</h3>
  * <p>
  * Examples for valid entry name URIs are:
- * <table border="2" cellpadding="4">
+ * <table border=1 cellpadding=5 summary="">
  * <thead>
  * <tr>
  *   <th>{@link #toUri() uri} property</th>
@@ -83,7 +83,7 @@ import net.jcip.annotations.Immutable;
  * </table>
  * <p>
  * Examples for invalid entry name URIs are:
- * <table border="2" cellpadding="4">
+ * <table border=1 cellpadding=5 summary="">
  * <thead>
  * <tr>
  *   <th>URI</th>
@@ -246,7 +246,6 @@ public class EntryName implements Serializable, Comparable<EntryName> {
                         : mu.getPath().isEmpty()
                             ? new UriBuilder(pu, true)
                                 .query(mu.getRawQuery())
-                                .fragment(mu.getRawFragment())
                                 .getUri()
                             : new UriBuilder(true)
                                 .path(pup + SEPARATOR_CHAR)
