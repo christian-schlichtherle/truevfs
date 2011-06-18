@@ -31,8 +31,8 @@ import net.jcip.annotations.ThreadSafe;
 public class DefaultReadOnlyFile
 extends RandomAccessFile
 implements ReadOnlyFile {
-    public DefaultReadOnlyFile(File file)
-    throws FileNotFoundException {
+
+    public DefaultReadOnlyFile(File file) throws FileNotFoundException {
         super(file, "r");
     }
 }
