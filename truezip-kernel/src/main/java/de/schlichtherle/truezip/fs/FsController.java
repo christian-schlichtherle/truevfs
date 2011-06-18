@@ -195,9 +195,10 @@ public abstract class FsController<M extends FsModel> {
      * @param  name the file system entry name.
      * @param  type the file system entry type.
      * @param  options the file system output options.
-     *         If {@code CREATE_PARENTS} is set, any missing parent directories
-     *         will be created and linked into this file system with its last
-     *         modification time set to the system's current time.
+     *         If {@link FsOutputOption#CREATE_PARENTS} is set, any missing
+     *         parent directories will be created and linked into the file
+     *         system with its last modification time set to the system's
+     *         current time.
      * @param  template if not {@code null}, then the file system entry
      *         at the end of the chain shall inherit as much properties from
      *         this entry as possible - with the exception of its name and type.
