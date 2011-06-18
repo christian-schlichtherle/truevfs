@@ -173,7 +173,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  * depending upon an archive file's path and its <i>true state</i> in the
  * first parent file system where it actually exists.
  * <p>
- * <table border="2" cellpadding="4">
+ * <table border=1 cellpadding=5 summary="">
  * <thead>
  * <tr>
  *   <th>Path</th>
@@ -2526,6 +2526,9 @@ public final class TFile extends File {
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      *
      * @param  node the file or directory.
+     *         Note that although this just needs to be a plain {@code File},
+     *         archive files and entries are only supported for instances of
+     *         this class.
      * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
@@ -2568,6 +2571,9 @@ public final class TFile extends File {
      * This file system operation is <em>not</em> atomic.
      * 
      * @param  node the file or directory tree.
+     *         Note that although this just needs to be a plain {@code File},
+     *         archive files and entries are only supported for instances of
+     *         this class.
      * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      * @see    <a href="#traversal">Traversing Directory Trees</a>
@@ -2595,6 +2601,9 @@ public final class TFile extends File {
      * {@inheritDoc}
      * 
      * @param  dst the destination file or directory tree.
+     *         Note that although this just needs to be a plain {@code File},
+     *         archive files and entries are only supported for instances of
+     *         this class.
      * @return {@code true} on success or {@code false} otherwise.
      * @deprecated This method just returns a boolean value to indicate failure,
      *             which is hard to analyze.
@@ -2615,6 +2624,9 @@ public final class TFile extends File {
      * Equivalent to {@link #mv(File, File, TArchiveDetector) mv(this, dst, getArchiveDetector())}.
      * 
      * @param  dst the destination file or directory tree.
+     *         Note that although this just needs to be a plain {@code File},
+     *         archive files and entries are only supported for instances of
+     *         this class.
      * @return {@code this}
      * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
@@ -2631,11 +2643,20 @@ public final class TFile extends File {
      * <p>
      * In certain cases, this method might perform a recursive copy-then-delete
      * operation rather than an atomic move operation.
-     * This method uses the given archive detector to detect any
-     * archive files when traversing a directory tree.
+     * In these cases, an attempt is made to copy all attributes of each
+     * source file to the destination file, too.
+     * Which attributes are actually copied is specific to the destination
+     * file system driver implementation, but the minimum guarantee is to
+     * copy the last modification time.
      * 
      * @param  src the source file or directory tree.
+     *         Note that although this just needs to be a plain {@code File},
+     *         archive files and entries are only supported for instances of
+     *         this class.
      * @param  dst the destination file or directory tree.
+     *         Note that although this just needs to be a plain {@code File},
+     *         archive files and entries are only supported for instances of
+     *         this class.
      * @param  detector the archive detector to use for detecting any archive
      *         files in the source directory tree.
      * @throws IOException if any I/O error occurs.
@@ -2684,7 +2705,8 @@ public final class TFile extends File {
      * thread to fill a FIFO of pooled buffers which is concurrently flushed by
      * the current thread.
      * It performs best when used with <em>unbuffered</em> streams.
-     * <table border="2" cellpadding="4">
+     * 
+     * <table border=1 cellpadding=5 summary="">
      * <thead>
      * <tr>
      *   <th>Feature</th>
@@ -2741,7 +2763,8 @@ public final class TFile extends File {
     /**
      * Copies the input stream {@code in} to the file {@code dst} and
      * closes the stream - even if an exception occurs.
-     * <table border="2" cellpadding="4">
+     * 
+     * <table border=1 cellpadding=5 summary="">
      * <thead>
      * <tr>
      *   <th>Feature</th>
@@ -2785,9 +2808,10 @@ public final class TFile extends File {
      * </table>
      *
      * @param  in the input stream.
-     * @param  dst the destination file. Note that although this just needs to
-     *         be a plain {@code File}, archive entries are only
-     *         supported for instances of this class.
+     * @param  dst the destination file.
+     *         Note that although this just needs to be a plain {@code File},
+     *         archive files and entries are only supported for instances of
+     *         this class.
      * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
@@ -2805,7 +2829,8 @@ public final class TFile extends File {
     /**
      * Copies the file {@code src} to the output stream {@code out} and
      * closes the stream - even if an exception occurs.
-     * <table border="2" cellpadding="4">
+     * 
+     * <table border=1 cellpadding=5 summary="">
      * <thead>
      * <tr>
      *   <th>Feature</th>
@@ -2848,9 +2873,10 @@ public final class TFile extends File {
      * </tbody>
      * </table>
      *
-     * @param  src the source file. Note that although this just needs to
-     *         be a plain {@code File}, archive entries are only
-     *         supported for instances of this class.
+     * @param  src the source file.
+     *         Note that although this just needs to be a plain {@code File},
+     *         archive files and entries are only supported for instances of
+     *         this class.
      * @param  out the output stream.
      * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
@@ -2864,6 +2890,9 @@ public final class TFile extends File {
      * Equivalent to {@link #cp(File, File) cp(this, dst)}.
      * 
      * @param  dst the destination file.
+     *         Note that although this just needs to be a plain {@code File},
+     *         archive files and entries are only supported for instances of
+     *         this class.
      * @return {@code this}
      * @throws IOException if any I/O error occurs.
      */
@@ -2874,7 +2903,8 @@ public final class TFile extends File {
 
     /**
      * Copies the file {@code src} to the file {@code dst}.
-     * <table border="2" cellpadding="4">
+     * 
+     * <table border=1 cellpadding=5 summary="">
      * <thead>
      * <tr>
      *   <th>Feature</th>
@@ -2917,12 +2947,14 @@ public final class TFile extends File {
      * </tbody>
      * </table>
      * 
-     * @param  src the source file. Note that although this just needs to
-     *         be a plain {@code File}, archive entries are only
-     *         supported for instances of this class.
-     * @param  dst the destination file. Note that although this just needs to
-     *         be a plain {@code File}, archive entries are only
-     *         supported for instances of this class.
+     * @param  src the source file.
+     *         Note that although this just needs to be a plain {@code File},
+     *         archive files and entries are only supported for instances of
+     *         this class.
+     * @param  dst the destination file.
+     *         Note that although this just needs to be a plain {@code File},
+     *         archive files and entries are only supported for instances of
+     *         this class.
      * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
@@ -2935,6 +2967,9 @@ public final class TFile extends File {
      * Equivalent to {@link #cp_p(File, File) cp_p(this, dst)}.
      * 
      * @param  dst the destination file.
+     *         Note that although this just needs to be a plain {@code File},
+     *         archive files and entries are only supported for instances of
+     *         this class.
      * @return {@code this}
      * @throws IOException if any I/O error occurs.
      */
@@ -2944,10 +2979,13 @@ public final class TFile extends File {
     }
 
     /**
-     * Copies the file {@code src} to the file {@code dst} and tries to
-     * preserve all attributes of the source file to the destination file, too.
-     * Currently, only the last modification time is preserved.
-     * <table border="2" cellpadding="4">
+     * Copies the file {@code src} to the file {@code dst} and attempts to
+     * copy all attributes of the source file to the destination file, too.
+     * Which attributes are actually copied is specific to the destination
+     * file system driver implementation, but the minimum guarantee is to
+     * copy the last modification time.
+     * 
+     * <table border=1 cellpadding=5 summary="">
      * <thead>
      * <tr>
      *   <th>Feature</th>
@@ -2990,12 +3028,14 @@ public final class TFile extends File {
      * </tbody>
      * </table>
      * 
-     * @param  src the source file. Note that although this just needs to
-     *         be a plain {@code File}, archive entries are only
-     *         supported for instances of this class.
-     * @param  dst the destination file. Note that although this just needs to
-     *         be a plain {@code File}, archive entries are only
-     *         supported for instances of this class.
+     * @param  src the source file.
+     *         Note that although this just needs to be a plain {@code File},
+     *         archive files and entries are only supported for instances of
+     *         this class.
+     * @param  dst the destination file.
+     *         Note that although this just needs to be a plain {@code File},
+     *         archive files and entries are only supported for instances of
+     *         this class.
      * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
@@ -3008,6 +3048,9 @@ public final class TFile extends File {
      * Equivalent to {@link #cp_r(File, File, TArchiveDetector, TArchiveDetector) cp_r(this, dst, getArchiveDetector(), getArchiveDetector())}.
      * 
      * @param  dst the destination file or directory tree.
+     *         Note that although this just needs to be a plain {@code File},
+     *         archive files and entries are only supported for instances of
+     *         this class.
      * @return {@code this}
      * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
@@ -3019,12 +3062,34 @@ public final class TFile extends File {
     }
 
     /**
+     * Equivalent to {@link #cp_r(File, File, TArchiveDetector, TArchiveDetector) cp_r(this, dst, detector, detector)}.
+     * 
+     * @param  src the source file or directory tree.
+     *         Note that although this just needs to be a plain {@code File},
+     *         archive files and entries are only supported for instances of
+     *         this class.
+     * @param  dst the destination file or directory tree.
+     *         Note that although this just needs to be a plain {@code File},
+     *         archive files and entries are only supported for instances of
+     *         this class.
+     * @param  detector the archive detector to use for detecting any
+     *         archive files in the source and destination directory tree.
+     * @throws IOException if any I/O error occurs.
+     * @since  TrueZIP 7.2
+     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
+     * @see    <a href="#traversal">Traversing Directory Trees</a>
+     */
+    public static void cp_r(   File src, File dst,
+                                TArchiveDetector detector)
+    throws IOException {
+        TBIO.cp_r(false, src, dst, detector, detector);
+    }
+
+    /**
      * Recursively copies the file or directory {@code src}
      * to the file or directory {@code dst}.
-     * <p>
-     * This method uses the given archive detectors to detect any
-     * archive files in the source and destination directory trees.
-     * <table border="2" cellpadding="4">
+     * 
+     * <table border=1 cellpadding=5 summary="">
      * <thead>
      * <tr>
      *   <th>Feature</th>
@@ -3067,12 +3132,14 @@ public final class TFile extends File {
      * </tbody>
      * </table>
      *
-     * @param  src the source file. Note that although this just needs to
-     *         be a plain {@code File}, archive files and entries
-     *         are only supported for instances of this class.
-     * @param  dst the destination file. Note that although this just needs to
-     *         be a plain {@code File}, archive files and entries
-     *         are only supported for instances of this class.
+     * @param  src the source file or directory tree.
+     *         Note that although this just needs to be a plain {@code File},
+     *         archive files and entries are only supported for instances of
+     *         this class.
+     * @param  dst the destination file or directory tree.
+     *         Note that although this just needs to be a plain {@code File},
+     *         archive files and entries are only supported for instances of
+     *         this class.
      * @param  srcDetector the archive detector to use for detecting any
      *         archive files in the source directory tree.
      * @param  dstDetector the archive detector to use for detecting any
@@ -3092,6 +3159,9 @@ public final class TFile extends File {
      * Equivalent to {@link #cp_rp(File, File, TArchiveDetector, TArchiveDetector) cp_rp(this, dst, getArchiveDetector(), getArchiveDetector())}.
      * 
      * @param  dst the destination file or directory tree.
+     *         Note that although this just needs to be a plain {@code File},
+     *         archive files and entries are only supported for instances of
+     *         this class.
      * @return {@code this}
      * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
@@ -3103,15 +3173,38 @@ public final class TFile extends File {
     }
 
     /**
+     * Equivalent to {@link #cp_rp(File, File, TArchiveDetector, TArchiveDetector) cp_rp(this, dst, detector, detector)}.
+     * 
+     * @param  src the source file or directory tree.
+     *         Note that although this just needs to be a plain {@code File},
+     *         archive files and entries are only supported for instances of
+     *         this class.
+     * @param  dst the destination file or directory tree.
+     *         Note that although this just needs to be a plain {@code File},
+     *         archive files and entries are only supported for instances of
+     *         this class.
+     * @param  detector the archive detector to use for detecting any
+     *         archive files in the source and destination directory tree.
+     * @throws IOException if any I/O error occurs.
+     * @since  TrueZIP 7.2
+     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
+     * @see    <a href="#traversal">Traversing Directory Trees</a>
+     */
+    public static void cp_rp(   File src, File dst,
+                                TArchiveDetector detector)
+    throws IOException {
+        TBIO.cp_r(true, src, dst, detector, detector);
+    }
+
+    /**
      * Recursively copies the file or directory {@code src} to the file or
-     * directory {@code dst} and tries to preserve all attributes of each
+     * directory {@code dst} and attempts to copy all attributes of each
      * source file to the destination file, too.
-     * Note that the current implementation only preserves the last
-     * modification time.
-     * <p>
-     * This method uses the given archive detectors to detect any
-     * archive files when traversing a directory tree.
-     * <table border="2" cellpadding="4">
+     * Which attributes are actually copied is specific to the destination
+     * file system driver implementation, but the minimum guarantee is to
+     * copy the last modification time.
+     * 
+     * <table border=1 cellpadding=5 summary="">
      * <thead>
      * <tr>
      *   <th>Feature</th>
@@ -3154,12 +3247,14 @@ public final class TFile extends File {
      * </tbody>
      * </table>
      *
-     * @param  src the source file. Note that although this just needs to
-     *         be a plain {@code File}, archive files and entries
-     *         are only supported for instances of this class.
-     * @param  dst the destination file. Note that although this just needs to
-     *         be a plain {@code File}, archive files and entries
-     *         are only supported for instances of this class.
+     * @param  src the source file or directory tree.
+     *         Note that although this just needs to be a plain {@code File},
+     *         archive files and entries are only supported for instances of
+     *         this class.
+     * @param  dst the destination file or directory tree.
+     *         Note that although this just needs to be a plain {@code File},
+     *         archive files and entries are only supported for instances of
+     *         this class.
      * @param  srcDetector the archive detector to use for detecting any
      *         archive files in the source directory tree.
      * @param  dstDetector the archive detector to use for detecting any
@@ -3179,7 +3274,8 @@ public final class TFile extends File {
      * Copies the input stream {@code in} to this file or entry in an archive
      * file
      * <em>without</em> closing it.
-     * <table border="2" cellpadding="4">
+     * 
+     * <table border=1 cellpadding=5 summary="">
      * <thead>
      * <tr>
      *   <th>Feature</th>
@@ -3244,7 +3340,8 @@ public final class TFile extends File {
      * Copies this file or entry in an archive file to the output stream
      * {@code out}
      * <em>without</em> closing it.
-     * <table border="2" cellpadding="4">
+     * 
+     * <table border=1 cellpadding=5 summary="">
      * <thead>
      * <tr>
      *   <th>Feature</th>
@@ -3311,7 +3408,8 @@ public final class TFile extends File {
      * thread to fill a FIFO of data buffers which is concurrently flushed by
      * the current thread.
      * It performs best when used with <em>unbuffered</em> streams.
-     * <table border="2" cellpadding="4">
+     * 
+     * <table border=1 cellpadding=5 summary="">
      * <thead>
      * <tr>
      *   <th>Feature</th>
