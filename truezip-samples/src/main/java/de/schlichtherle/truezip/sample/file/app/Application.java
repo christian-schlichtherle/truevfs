@@ -49,16 +49,6 @@ abstract class Application extends TApplication<RuntimeException> {
 
     /**
      * Constructs a new command line utility instance.
-     * <p>
-     * Note that this constructor has side effects:
-     * <ul>
-     * <li>If Swing based prompting is used, the Hurling Window Feedback is
-     *     set for feedback on wrong key entry unless the respective system
-     *     properties have been explicitly set.
-     * <li>Similarly, the {@link SampleManagerService} class is set for
-     *     obtaining statistics when synchronizing any uncommitted changes to
-     *     the contents of archive files.
-     * </ul>
      *
      * @param out the standard output stream.
      * @param err the error output stream.
@@ -79,23 +69,9 @@ abstract class Application extends TApplication<RuntimeException> {
     }
 
     /**
-     * Runs the setup phase.
-     * <p>
-     * This method is {@link #run run} only once at the start of the life
-     * cycle.
-     * Its task is to configure the default behavior of the TrueZIP File* API
-     * in order to answer the following questions:
-     * <ul>
-     * <li>What are the file suffixes which shall be recognized as archive
-     *     files and hence as virtual directories?
-     * <li>Shall missing archive files and directory entries get automatically
-     *     created whenever required?
-     * </ul>
-     * <p>
-     * The implementation in the class {@link Application} configures
-     * the type of the feedback when prompting the user for keys for RAES
-     * encrypted ZIP alias ZIP.RAES alias TZP files by the Swing based
-     * prompting key manager.
+     * Configures the type of the feedback when prompting the user for keys
+     * for RAES encrypted ZIP alias ZIP.RAES alias TZP files by the Swing
+     * based prompting key manager.
      * If this JVM is running in headless mode, then this configuration is
      * ignored and the user is prompted by the console I/O based prompting
      * key manager.
