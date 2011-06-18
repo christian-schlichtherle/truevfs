@@ -28,7 +28,7 @@ import net.jcip.annotations.Immutable;
  * An immutable container of a map with a driver for accessing the {@code http}
  * and {@code https} schemes.
  * The map provided by this service consists of the following entries:
-<table border="2" cellpadding="4">
+<table border=1 cellpadding=5 summary="">
 <thead>
 <tr>
 <th>URI Schemes</th>

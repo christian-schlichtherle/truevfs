@@ -72,7 +72,7 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
  * <a name="examples"/><h3>Examples</h3>
  * <p>
  * Examples for valid path URIs are:
- * <table border="2" cellpadding="4">
+ * <table border=1 cellpadding=5 summary="">
  * <thead>
  * <tr>
  *   <th>{@link #toUri() uri} property</th>
@@ -105,7 +105,7 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
  * </table>
  * <p>
  * Examples for invalid path URIs are:
- * <table border="2" cellpadding="4">
+ * <table border=1 cellpadding=5 summary="">
  * <thead>
  * <tr>
  *   <th>URI</th>

@@ -60,7 +60,7 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
  * <li>{@code "foo"}
  * <li>{@code "foo/bar"}
  * </ul>
- * <table border="2" cellpadding="4">
+ * <table border=1 cellpadding=5 summary="">
  * <thead>
  * <tr>
  *   <th>{@link #toUri() uri} property</th>
@@ -98,7 +98,7 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
  * </table>
  * <p>
  * Examples for invalid entry name URIs are:
- * <table border="2" cellpadding="4">
+ * <table border=1 cellpadding=5 summary="">
  * <thead>
  * <tr>
  *   <th>URI</th>
