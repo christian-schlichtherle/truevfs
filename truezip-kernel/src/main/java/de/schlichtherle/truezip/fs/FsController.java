@@ -149,6 +149,8 @@ public abstract class FsController<M extends FsModel> {
      * @return {@code true} if and only if setting the access time for all
      *         types in {@code times} succeeded.
      * @throws IOException on any I/O error.
+     * @throws NullPointerException if any key or value in the map is
+     *         {@code null}.
      */
     public boolean setTime(FsEntryName name, Map<Access, Long> times)
     throws IOException {
