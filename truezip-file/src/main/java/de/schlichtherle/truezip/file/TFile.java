@@ -2705,7 +2705,7 @@ public final class TFile extends File {
      * thread to fill a FIFO of pooled buffers which is concurrently flushed by
      * the current thread.
      * It performs best when used with <em>unbuffered</em> streams.
-     * 
+     * <p>
      * <table border=1 cellpadding=5 summary="">
      * <thead>
      * <tr>
@@ -2763,7 +2763,7 @@ public final class TFile extends File {
     /**
      * Copies the input stream {@code in} to the file {@code dst} and
      * closes the stream - even if an exception occurs.
-     * 
+     * <p>
      * <table border=1 cellpadding=5 summary="">
      * <thead>
      * <tr>
@@ -2829,7 +2829,7 @@ public final class TFile extends File {
     /**
      * Copies the file {@code src} to the output stream {@code out} and
      * closes the stream - even if an exception occurs.
-     * 
+     * <p>
      * <table border=1 cellpadding=5 summary="">
      * <thead>
      * <tr>
@@ -2903,7 +2903,7 @@ public final class TFile extends File {
 
     /**
      * Copies the file {@code src} to the file {@code dst}.
-     * 
+     * <p>
      * <table border=1 cellpadding=5 summary="">
      * <thead>
      * <tr>
@@ -2984,7 +2984,7 @@ public final class TFile extends File {
      * Which attributes are actually copied is specific to the destination
      * file system driver implementation, but the minimum guarantee is to
      * copy the last modification time.
-     * 
+     * <p>
      * <table border=1 cellpadding=5 summary="">
      * <thead>
      * <tr>
@@ -3088,7 +3088,7 @@ public final class TFile extends File {
     /**
      * Recursively copies the file or directory {@code src}
      * to the file or directory {@code dst}.
-     * 
+     * <p>
      * <table border=1 cellpadding=5 summary="">
      * <thead>
      * <tr>
@@ -3203,7 +3203,7 @@ public final class TFile extends File {
      * Which attributes are actually copied is specific to the destination
      * file system driver implementation, but the minimum guarantee is to
      * copy the last modification time.
-     * 
+     * <p>
      * <table border=1 cellpadding=5 summary="">
      * <thead>
      * <tr>
@@ -3274,7 +3274,7 @@ public final class TFile extends File {
      * Copies the input stream {@code in} to this file or entry in an archive
      * file
      * <em>without</em> closing it.
-     * 
+     * <p>
      * <table border=1 cellpadding=5 summary="">
      * <thead>
      * <tr>
@@ -3340,7 +3340,7 @@ public final class TFile extends File {
      * Copies this file or entry in an archive file to the output stream
      * {@code out}
      * <em>without</em> closing it.
-     * 
+     * <p>
      * <table border=1 cellpadding=5 summary="">
      * <thead>
      * <tr>
@@ -3408,7 +3408,7 @@ public final class TFile extends File {
      * thread to fill a FIFO of data buffers which is concurrently flushed by
      * the current thread.
      * It performs best when used with <em>unbuffered</em> streams.
-     * 
+     * <p>
      * <table border=1 cellpadding=5 summary="">
      * <thead>
      * <tr>
