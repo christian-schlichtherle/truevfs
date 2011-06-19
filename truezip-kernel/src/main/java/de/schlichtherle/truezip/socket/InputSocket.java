@@ -22,7 +22,6 @@ import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
@@ -99,8 +98,18 @@ extends IOSocket<E, Entry> {
     }
 
     /**
+     * <b>Optional:</b> Returns a new seekable byte channel for reading bytes
+     * from the {@link #getLocalTarget() local target} in arbitrary order.
+     * <p>
+     * If this method is supported, implementations must enable calling it
+     * any number of times.
+     * Furthermore, the returned seekable byte channel should <em>not</em> be
+     * buffered.
+     * Buffering should be addressed by client applications instead.
+     * 
      * @throws UnsupportedOperationException if this operation is not supported
      *         by the implementation.
+     * @throws IOException on any I/O error.
      * @since  TrueZIP 7.2
      */
     public SeekableByteChannel newSeekableByteChannel() throws IOException {
@@ -118,9 +127,7 @@ extends IOSocket<E, Entry> {
      *
      * @throws UnsupportedOperationException if this operation is not supported
      *         by the implementation.
-     * @throws FileNotFoundException if the local target does not exist or is
-     *         not accessible for some reason.
-     * @throws IOException on any other exceptional condition.
+     * @throws IOException on any I/O error.
      * @return A new read only file.
      */
     public abstract ReadOnlyFile newReadOnlyFile() throws IOException;
@@ -141,9 +148,7 @@ extends IOSocket<E, Entry> {
      * {@link #newReadOnlyFile()} is allowed to throw an
      * {@link UnsupportedOperationException} while this method is not!
      *
-     * @throws FileNotFoundException if the local target does not exist or is
-     *         not accessible for some reason.
-     * @throws IOException on any other exceptional condition.
+     * @throws IOException on any I/O error.
      * @return A new input stream.
      */
     public InputStream newInputStream() throws IOException {
