@@ -36,8 +36,8 @@ public class QuotedInputUriSyntaxException extends URISyntaxException {
      *        {@link Object#toString() string representation} to put in quotes.
      * @param reason a string explaining why the input could not be parsed.
      */
-    public QuotedInputUriSyntaxException(Object input, String message) {
-        this(input, message, -1);
+    public QuotedInputUriSyntaxException(Object input, String reason) {
+        this(input, reason, -1);
     }
 
     /**
@@ -49,7 +49,7 @@ public class QuotedInputUriSyntaxException extends URISyntaxException {
      * @param index the index at which the parse error occurred,
      *        or {@code -1} if unknown.
      */
-    public QuotedInputUriSyntaxException(Object input, String message, int index) {
-        super("\"" + input + "\"", message, index);
+    public QuotedInputUriSyntaxException(Object input, String reason, int index) {
+        super("\"" + input + "\"", reason, index);
     }
 }
