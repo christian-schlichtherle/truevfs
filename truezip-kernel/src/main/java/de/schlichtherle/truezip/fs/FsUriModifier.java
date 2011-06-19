@@ -100,6 +100,7 @@ public enum FsUriModifier {
          */
         PATH {
             @Override
+            @edu.umd.cs.findbugs.annotations.SuppressWarnings("ES_COMPARING_STRINGS_WITH_EQ")
             URI modify(final URI uri) throws URISyntaxException {
                 if (uri.isOpaque() || !uri.isAbsolute() || null != uri.getRawFragment())
                     return uri;
@@ -148,6 +149,7 @@ public enum FsUriModifier {
          */
         ENTRY_NAME {
             @Override
+            @edu.umd.cs.findbugs.annotations.SuppressWarnings("ES_COMPARING_STRINGS_WITH_EQ")
             URI modify(final URI uri) throws URISyntaxException {
                 if (uri.isAbsolute()
                         || null != uri.getRawAuthority()
