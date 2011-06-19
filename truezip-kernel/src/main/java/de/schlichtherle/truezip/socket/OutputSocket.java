@@ -20,7 +20,6 @@ import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
@@ -97,8 +96,18 @@ extends IOSocket<E, Entry> {
     }
 
     /**
+     * <b>Optional:</b> Returns a new seekable byte channel for writing bytes
+     * to the {@link #getLocalTarget() local target} in arbitrary order.
+     * <p>
+     * If this method is supported, implementations must enable calling it
+     * any number of times.
+     * Furthermore, the returned seekable byte channel should <em>not</em> be
+     * buffered.
+     * Buffering should be addressed by client applications instead.
+     * 
      * @throws UnsupportedOperationException if this operation is not supported
      *         by the implementation.
+     * @throws IOException on any I/O error.
      * @since  TrueZIP 7.2
      */
     public SeekableByteChannel newSeekableByteChannel() throws IOException {
@@ -114,9 +123,7 @@ extends IOSocket<E, Entry> {
      * Buffering should be addressed by the caller instead - see
      * {@link IOSocket#copy}.
      *
-     * @throws FileNotFoundException if the local target is not accessible
-     *         for some reason.
-     * @throws IOException on any other exceptional condition.
+     * @throws IOException on any I/O error.
      * @return A new output stream.
      */
     public abstract OutputStream newOutputStream() throws IOException;
