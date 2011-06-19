@@ -77,9 +77,9 @@ public final class Streams {
      * @param  in the input stream.
      * @param  out the output stream.
      * @throws InputException if copying the data fails because of an
-     *         {@code IOException} in the <em>input</em> stream.
+     *         {@code IOException} in the <em>input stream</em>.
      * @throws IOException if copying the data fails because of an
-     *         {@code IOException} in the <em>output</em> stream.
+     *         {@code IOException} in the <em>output stream</em>.
      */
     public static void copy(final InputStream in, final OutputStream out)
     throws IOException {
@@ -116,9 +116,9 @@ public final class Streams {
      * @param  in the input stream.
      * @param  out the output stream.
      * @throws InputException if copying the data fails because of an
-     *         {@code IOException} in the <em>input</em> stream.
+     *         {@code IOException} in the <em>input stream</em>.
      * @throws IOException if copying the data fails because of an
-     *         {@code IOException} in the <em>output</em> stream.
+     *         {@code IOException} in the <em>output stream</em>.
      */
     public static void cat(final InputStream in, final OutputStream out)
     throws IOException {

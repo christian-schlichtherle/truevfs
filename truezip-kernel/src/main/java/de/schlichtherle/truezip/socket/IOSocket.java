@@ -90,9 +90,9 @@ public abstract class IOSocket<LT, PT> {
      * @param  input an input socket for the input target.
      * @param  output an output socket for the output target.
      * @throws InputException if copying the data fails because of an
-     *         {@code IOException} thrown by the <em>input</em> stream.
+     *         {@code IOException} thrown by the <em>input stream</em>.
      * @throws IOException if copying the data fails because of an
-     *         {@code IOException} thrown by the <em>output</em> stream.
+     *         {@code IOException} thrown by the <em>output stream</em>.
      */
     public static void copy(final InputSocket <?> input,
                             final OutputSocket<?> output)
