@@ -28,7 +28,7 @@ import java.io.RandomAccessFile;
  * Though not strictly required, implementations should be thread-safe.
  * At least they should document their level of thread-safety.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public interface ReadOnlyFile extends Closeable {
@@ -77,9 +77,9 @@ public interface ReadOnlyFile extends Closeable {
      * the given array.
      * This method blocks until at least one byte of input is available.
      *
-     * @param b The buffer to fill with data.
-     * @param off The start offset of the data.
-     * @param len The maximum number of bytes to read.
+     * @param  b The buffer to fill with data.
+     * @param  off The start offset of the data.
+     * @param  len The maximum number of bytes to read.
      * @return The total number of bytes read, or {@code -1} if there is
      *         no more data because the end of the file has been reached.
      * @throws IOException On any I/O related issue.
@@ -94,9 +94,9 @@ public interface ReadOnlyFile extends Closeable {
     /**
      * Reads {@code len} bytes into the given buffer at the given position.
      *
-     * @param b The buffer to fill with data.
-     * @param off The start offset of the data.
-     * @param len The number of bytes to read.
+     * @param  b The buffer to fill with data.
+     * @param  off The start offset of the data.
+     * @param  len The number of bytes to read.
      * @throws EOFException If less than {@code len} bytes are available
      *         before the end of the file is reached.
      * @throws IOException On any I/O related issue.

@@ -1,9 +1,4 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
  * Copyright 2011 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +18,7 @@ package de.schlichtherle.truezip.rof;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
-import net.jcip.annotations.ThreadSafe;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * A read only file which reads from a byte array provided to its constructor.
@@ -31,83 +26,78 @@ import net.jcip.annotations.ThreadSafe;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-@ThreadSafe
+@NotThreadSafe
 @DefaultAnnotation(NonNull.class)
 public class ByteArrayReadOnlyFile extends AbstractReadOnlyFile {
 
-    private final byte[] data;
-    private int offset;
-    private int length;
+    private final byte[] buffer;
+    private final int start;
+    private int position;
+    private int limit;
 
     /**
      * Constructs a new byte array read only file.
      * 
-     * @param data the array to read from.
+     * @param buf the array to read from.
      *        Note that this array is <em>not</em> copied, so beware of
      *        concurrent modifications!
      */
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("EI_EXPOSE_REP2")
-    public ByteArrayReadOnlyFile(final byte [] data) {
-        if (null == data)
-            throw new NullPointerException();
-	this.data = data;
-        this.offset = 0;
-	this.length = data.length;
+    public ByteArrayReadOnlyFile(final byte[] buf) {
+        this(buf, 0, buf.length);
     }
 
     /**
      * Constructs a new byte array read only file.
      *
-     * @param data the array to read from.
+     * @param buffer the array to read from.
      *        Note that this array is <em>not</em> copied, so beware of
      *        concurrent modifications!
      * @param offset the start of the window to read from the array.
      * @param length the length of the window to read from the array.
      */
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("EI_EXPOSE_REP2")
-    public ByteArrayReadOnlyFile(byte data[], int offset, int length) {
-        if (null == data)
-            throw new NullPointerException();
-	this.data = data;
-        this.offset = offset;
-	this.length = Math.min(offset + length, data.length);
+    public ByteArrayReadOnlyFile(byte buffer[], int offset, int length) {
+	this.buffer = buffer;
+        this.position = this.start = offset;
+	this.limit = Math.min(offset + length, buffer.length);
     }
 
     @Override
-    public synchronized long length() {
-        return length;
+    public long length() {
+        return limit - start;
     }
 
     @Override
-    public synchronized long getFilePointer() {
-        return offset;
+    public long getFilePointer() {
+        return position - start;
     }
 
     @Override
-    public synchronized void seek(long pos) throws IOException {
-        if (0 > pos)
+    public void seek(long pos) throws IOException {
+        if (pos < 0)
             throw new IOException();
-        this.offset = pos < length ? (int) pos : length;
+        pos += start;
+        this.position = pos < limit ? (int) pos : limit;
     }
 
     @Override
-    public synchronized int read() {
-	return offset < length ? data[offset++] & 0xFF : -1;
+    public int read() {
+	return position < limit ? buffer[position++] & 0xFF : -1;
     }
 
     @Override
-    public synchronized int read(byte[] b, int off, int len) {
-	if (0 > (off | len | b.length - off - len))
-	    throw new IndexOutOfBoundsException();
-	if (0 >= len)
+    public int read(final byte[] buffer, final int offset, int remaining) {
+	if (remaining <= 0)
 	    return 0;
-        if (offset + len > length)
-	    len = length - offset;
-        if (offset >= length)
+        final int position = this.position;
+        final int available = limit - position;
+        if (available <= 0)
             return -1;
-	System.arraycopy(data, offset, b, off, len);
-	offset += len;
-	return len;
+        if (remaining > available)
+	    remaining = available;
+	System.arraycopy(this.buffer, position, buffer, offset, remaining);
+	this.position += remaining;
+	return remaining;
     }
 
     @Override
