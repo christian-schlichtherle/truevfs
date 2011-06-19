@@ -2070,10 +2070,10 @@ public final class TFile extends File {
             } catch (IOException ex) {
                 return 0;
             }
-            if (null == entry || entry.isType(DIRECTORY))
+            if (null == entry)
                 return 0;
-            final long length = entry.getSize(DATA);
-            return length >= 0 ? length : 0;
+            final long size = entry.getSize(DATA);
+            return UNKNOWN == size ? 0 : size;
         }
         return delegate.length();
     }
@@ -2727,7 +2727,7 @@ public final class TFile extends File {
      *   <td>n/a</td>
      * </tr>
      * <tr>
-     *   <td>Closes parameter streams</td>
+     *   <td>Closes parameter stream(s)</td>
      *   <td>Always</td>
      * </tr>
      * <tr>
@@ -2785,7 +2785,7 @@ public final class TFile extends File {
      *   <td>Yes</td>
      * </tr>
      * <tr>
-     *   <td>Closes parameter streams</td>
+     *   <td>Closes parameter stream(s)</td>
      *   <td>Always</td>
      * </tr>
      * <tr>
@@ -2851,7 +2851,7 @@ public final class TFile extends File {
      *   <td>Yes</td>
      * </tr>
      * <tr>
-     *   <td>Closes parameter streams</td>
+     *   <td>Closes parameter stream(s)</td>
      *   <td>Always</td>
      * </tr>
      * <tr>
@@ -2925,7 +2925,7 @@ public final class TFile extends File {
      *   <td>Yes</td>
      * </tr>
      * <tr>
-     *   <td>Closes parameter streams</td>
+     *   <td>Closes parameter stream(s)</td>
      *   <td>n/a</td>
      * </tr>
      * <tr>
@@ -3006,7 +3006,7 @@ public final class TFile extends File {
      *   <td>Yes</td>
      * </tr>
      * <tr>
-     *   <td>Closes parameter streams</td>
+     *   <td>Closes parameter stream(s)</td>
      *   <td>n/a</td>
      * </tr>
      * <tr>
@@ -3110,7 +3110,7 @@ public final class TFile extends File {
      *   <td>No</td>
      * </tr>
      * <tr>
-     *   <td>Closes parameter streams</td>
+     *   <td>Closes parameter stream(s)</td>
      *   <td>n/a</td>
      * </tr>
      * <tr>
@@ -3225,7 +3225,7 @@ public final class TFile extends File {
      *   <td>No</td>
      * </tr>
      * <tr>
-     *   <td>Closes parameter streams</td>
+     *   <td>Closes parameter stream(s)</td>
      *   <td>n/a</td>
      * </tr>
      * <tr>
@@ -3296,7 +3296,7 @@ public final class TFile extends File {
      *   <td>Yes</td>
      * </tr>
      * <tr>
-     *   <td>Closes parameter streams</td>
+     *   <td>Closes parameter stream(s)</td>
      *   <td>Never</td>
      * </tr>
      * <tr>
@@ -3362,7 +3362,7 @@ public final class TFile extends File {
      *   <td>Yes</td>
      * </tr>
      * <tr>
-     *   <td>Closes parameter streams</td>
+     *   <td>Closes parameter stream(s)</td>
      *   <td>Never</td>
      * </tr>
      * <tr>
@@ -3430,7 +3430,7 @@ public final class TFile extends File {
      *   <td>n/a</td>
      * </tr>
      * <tr>
-     *   <td>Closes parameter streams</td>
+     *   <td>Closes parameter stream(s)</td>
      *   <td>Never</td>
      * </tr>
      * <tr>
