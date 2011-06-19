@@ -194,7 +194,7 @@ implements Iterable<E>, Closeable {
     implements Pool<ReadOnlyFile, IOException> {
         final ReadOnlyFile rof;
 
-        public SingletonReadOnlyFilePool(ReadOnlyFile rof) {
+        SingletonReadOnlyFilePool(ReadOnlyFile rof) {
             this.rof = rof;
         }
 
@@ -860,7 +860,7 @@ implements Iterable<E>, Closeable {
             extends InflaterInputStream {
         private boolean closed;
 
-        public PooledInflaterInputStream(InputStream in, int size) {
+        PooledInflaterInputStream(InputStream in, int size) {
             super(in, InflaterPool.fetch(), size);
         }
 
@@ -886,7 +886,7 @@ implements Iterable<E>, Closeable {
         private final ZipEntry entry;
         private final int size;
 
-        public CheckedInputStream(
+        CheckedInputStream(
                 final InputStream in,
                 final ZipEntry entry,
                 final int size) {
@@ -949,7 +949,7 @@ implements Iterable<E>, Closeable {
         private final ZipEntry entry;
         private boolean closed;
 
-        public RawCheckedInputStream(
+        RawCheckedInputStream(
                 final InputStream in,
                 final ZipEntry entry,
                 final int size) {
@@ -1196,7 +1196,7 @@ implements Iterable<E>, Closeable {
     private abstract class AccountedInputStream extends InputStream {
         private boolean closed;
 
-        public AccountedInputStream() {
+        AccountedInputStream() {
             openStreams++;
         }
 
