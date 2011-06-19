@@ -216,6 +216,8 @@ implements Cloneable {
      */
     @Override
     public long getSize(Size type) {
+        if (DIRECTORY == this.type)
+            return UNKNOWN; // TODO: Evaluate 0
         return map.get(this.type).getSize(type);
     }
 
