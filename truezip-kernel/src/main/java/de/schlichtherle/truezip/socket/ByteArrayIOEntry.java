@@ -16,9 +16,10 @@
 package de.schlichtherle.truezip.socket;
 
 import static de.schlichtherle.truezip.entry.Entry.Access.*;
-import static de.schlichtherle.truezip.entry.Entry.Type.*;
+import de.schlichtherle.truezip.io.SeekableByteBufferChannel;
 import de.schlichtherle.truezip.rof.ByteArrayReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.util.JSE7;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -28,10 +29,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Collections;
+import java.nio.ByteBuffer;
+import java.nio.channels.SeekableByteChannel;
+import java.util.Arrays;
 import java.util.EnumMap;
-import java.util.EnumSet;
-import java.util.Set;
+import net.jcip.annotations.Immutable;
 import net.jcip.annotations.NotThreadSafe;
 
 /**
@@ -43,9 +45,6 @@ import net.jcip.annotations.NotThreadSafe;
 @DefaultAnnotation(NonNull.class)
 @NotThreadSafe
 public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
-
-    private static final Set<Type>
-            FILE_SET = Collections.unmodifiableSet(EnumSet.of(FILE));
 
     private final String name;
     private @CheckForNull byte[] data;
@@ -144,12 +143,12 @@ public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
 
     @Override
     public InputSocket<ByteArrayIOEntry> getInputSocket() {
-        return new ByteArrayInputSocket();
+        return FACTORY.newInputSocket(this);
     }
 
     @Override
     public OutputSocket<ByteArrayIOEntry> getOutputSocket() {
-        return new ByteArrayOutputSocket();
+        return FACTORY.newOutputSocket(this);
     }
 
     @Override
@@ -157,33 +156,88 @@ public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
         return name;
     }
 
-    private final class ByteArrayInputSocket extends InputSocket<ByteArrayIOEntry> {
+    private static final SocketFactory FACTORY = JSE7.AVAILABLE
+            ? SocketFactory.NIO
+            : SocketFactory.OIO;
+
+    @Immutable
+    private enum SocketFactory {
+        OIO() {
+            @Override
+            InputSocket<ByteArrayIOEntry> newInputSocket(ByteArrayIOEntry entry) {
+                return entry.new ByteArrayInputSocket();
+            }
+
+            @Override
+            OutputSocket<ByteArrayIOEntry> newOutputSocket(ByteArrayIOEntry entry) {
+                return entry.new ByteArrayOutputSocket();
+            }
+        },
+
+        NIO() {
+            @Override
+            InputSocket<ByteArrayIOEntry> newInputSocket(ByteArrayIOEntry entry) {
+                return entry.new Nio2ByteArrayInputSocket();
+            }
+
+            @Override
+            OutputSocket<ByteArrayIOEntry> newOutputSocket(ByteArrayIOEntry entry) {
+                return entry.new Nio2ByteArrayOutputSocket();
+            }
+        };
+        
+        abstract InputSocket<ByteArrayIOEntry> newInputSocket(ByteArrayIOEntry entry);
+        abstract OutputSocket<ByteArrayIOEntry> newOutputSocket(ByteArrayIOEntry entry);
+    } // enum SocketFactory
+
+    private final class Nio2ByteArrayInputSocket
+    extends ByteArrayInputSocket {
         @Override
-        public ByteArrayIOEntry getLocalTarget() throws IOException {
+        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            count();
+            return new DataInputChannel();
+        }
+    } // class Nio2ByteArrayInputSocket
+
+    private class ByteArrayInputSocket extends InputSocket<ByteArrayIOEntry> {
+        @Override
+        public final ByteArrayIOEntry getLocalTarget() throws IOException {
             return ByteArrayIOEntry.this;
         }
 
-        @Override
-        public ReadOnlyFile newReadOnlyFile() throws IOException {
-            final byte[] data = ByteArrayIOEntry.this.data;
+        final void count() throws FileNotFoundException {
             if (null == data)
                 throw new FileNotFoundException();
             reads++;
-            return new DataReadOnlyFile(data);
         }
 
         @Override
-        public InputStream newInputStream() throws IOException {
-            final byte[] data = ByteArrayIOEntry.this.data;
-            if (null == data)
-                throw new FileNotFoundException();
-            reads++;
-            return new DataInputStream(data);
+        public final ReadOnlyFile newReadOnlyFile() throws IOException {
+            count();
+            return new DataReadOnlyFile();
+        }
+
+        @Override
+        public final InputStream newInputStream() throws IOException {
+            count();
+            return new DataInputStream();
         }
     } // class ByteArrayInputSocket
 
+    private class DataInputChannel extends SeekableByteBufferChannel {
+        DataInputChannel() {
+            super(ByteBuffer.wrap(data).asReadOnlyBuffer());
+        }
+
+        @Override
+        public void close() throws IOException {
+            times.put(READ, System.currentTimeMillis());
+            super.close();
+        }
+    } // class DataInputChannel
+
     private class DataReadOnlyFile extends ByteArrayReadOnlyFile {
-        DataReadOnlyFile(byte[] data) {
+        DataReadOnlyFile() {
             super(data);
         }
 
@@ -195,7 +249,7 @@ public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
     } // class DataReadOnlyFile
 
     private class DataInputStream extends ByteArrayInputStream {
-        DataInputStream(byte[] data) {
+        DataInputStream() {
             super(data);
         }
 
@@ -206,18 +260,45 @@ public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
         }
     } // class DataInputStream
 
+    private final class Nio2ByteArrayOutputSocket
+    extends ByteArrayOutputSocket {
+        @Override
+        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            count();
+            return new DataOutputChannel();
+        }
+    } // class Nio2ByteArrayOutputSocket
+
     private class ByteArrayOutputSocket extends OutputSocket<ByteArrayIOEntry> {
         @Override
-        public ByteArrayIOEntry getLocalTarget() throws IOException {
+        public final ByteArrayIOEntry getLocalTarget() throws IOException {
             return ByteArrayIOEntry.this;
         }
 
-        @Override
-        public OutputStream newOutputStream() throws IOException {
+        final void count() {
             writes++;
+        }
+
+        @Override
+        public final OutputStream newOutputStream() throws IOException {
+            count();
             return new DataOutputStream();
         }
     } // class ByteArrayOutputSocket
+
+    private class DataOutputChannel extends SeekableByteBufferChannel {
+        DataOutputChannel() {
+            super((ByteBuffer) ByteBuffer.allocate(initialCapacity).limit(0));
+        }
+
+        @Override
+        public void close() throws IOException {
+            times.put(WRITE, System.currentTimeMillis());
+            super.close();
+            final ByteBuffer buffer = getByteBuffer();
+            data = Arrays.copyOf(buffer.array(), buffer.limit());
+        }
+    }
 
     private class DataOutputStream extends ByteArrayOutputStream {
         DataOutputStream() {
