@@ -62,6 +62,13 @@
             <post>users@truezip.java.net</post>
             <archive>http://java.net/projects/truezip/lists/users/archive</archive>
         </mailingList>
+        <mailingList>
+            <name>Developers Mailing List</name>
+            <subscribe>mailto:sympa@truezip.java.net?subject=subscribe%20dev</subscribe>
+            <unsubscribe>mailto:sympa@truezip.java.net?subject=unsubscribe%20dev</unsubscribe>
+            <post>dev@truezip.java.net</post>
+            <archive>http://java.net/projects/truezip/lists/dev/archive</archive>
+        </mailingList>
     </mailingLists>
     <scm>
         <connection>scm:hg:https://hg.java.net/hg/truezip~v7</connection>
