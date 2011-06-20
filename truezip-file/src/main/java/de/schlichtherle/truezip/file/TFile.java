@@ -1997,7 +1997,6 @@ public final class TFile extends File {
         return null;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean canRead() {
         if (null != innerArchive) {
@@ -2011,7 +2010,6 @@ public final class TFile extends File {
         return delegate.canRead();
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean canWrite() {
         if (null != innerArchive) {
@@ -2023,6 +2021,19 @@ public final class TFile extends File {
             }
         }
         return delegate.canWrite();
+    }
+
+    @Override
+    public boolean canExecute() {
+        if (null != innerArchive) {
+            try {
+                return innerArchive.getController()
+                        .isExecutable(getInnerFsEntryName());
+            } catch (IOException ex) {
+                return false;
+            }
+        }
+        return delegate.canExecute();
     }
 
     /**
