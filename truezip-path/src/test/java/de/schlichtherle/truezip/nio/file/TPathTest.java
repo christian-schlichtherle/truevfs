@@ -36,7 +36,7 @@ public class TPathTest extends TestBase {
                 // $first, $more, $uri, $address
                 //{ "c:foo", NO_MORE, "c%3Afoo", "file:/c:foo" },
                 { "c:\\foo", NO_MORE, "c%3A/foo", "file:/c:/foo" },
-                { "//", NO_MORE, "/", ROOT_DIRECTORY },
+                //{ "//", NO_MORE, "/", ROOT_DIRECTORY },
                 { "//foo", new String[] { "bar", "baz" }, "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
                 { "///foo//", new String[] { "//bar//", "//", "//baz//" }, "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
             })
@@ -48,7 +48,7 @@ public class TPathTest extends TestBase {
             { "/foo", NO_MORE, "/foo", ROOT_DIRECTORY + "foo" },
             { "/foo", new String[] { "" }, "/foo", ROOT_DIRECTORY + "foo"},
             { "/foo", new String[] { "bar" }, "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
-            { "///", NO_MORE, "/", ROOT_DIRECTORY },
+            //{ "///", NO_MORE, "/", ROOT_DIRECTORY },
             { "/foo", new String[] { "/bar" }, "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
             { "/foo//", new String[] { "//", "//bar//", "" }, "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
             { "/foo", new String[] { "" }, "/foo", ROOT_DIRECTORY + "foo"},
@@ -97,8 +97,8 @@ public class TPathTest extends TestBase {
             { "x", "/foo", NO_MORE, "/foo", ROOT_DIRECTORY + "foo" },
             { "x", "/foo", new String[] { "" }, "/foo", ROOT_DIRECTORY + "foo"},
             { "x", "/foo", new String[] { "bar" }, "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
-            { "x", "//", NO_MORE, "/", ROOT_DIRECTORY },
-            { "x", "///", NO_MORE, "/", ROOT_DIRECTORY },
+            //{ "x", "//", NO_MORE, "/", ROOT_DIRECTORY },
+            //{ "x", "///", NO_MORE, "/", ROOT_DIRECTORY },
             { "x", "/foo", new String[] { "/bar" }, "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
             { "x", "/foo//", new String[] { "//", "//bar//", "" }, "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
             { "x", "/foo", new String[] { "" }, "/foo", ROOT_DIRECTORY + "foo"},
@@ -135,5 +135,45 @@ public class TPathTest extends TestBase {
         assertThat(path.getUri(), equalTo(uri));
         assertThat(path.toString(), equalTo(uri.getSchemeSpecificPart().replace(SEPARATOR, path.getFileSystem().getSeparator())));
         assertThat(path.getAddress(), equalTo(address));
+    }
+
+    @Test
+    public void testGetRoot() {
+        if ('\\' == File.separatorChar) {
+            for (String[] params : new String[][] {
+                // $test, $root
+                //{ "c:", null },
+                //{ "c:foo", null },
+                { "c:\\\\", "c:\\" },
+                { "c:\\", "c:\\\\" },
+                { "c:\\foo", "c:\\" },
+            }) {
+                assertGetRoot(params);
+            }
+        }
+        for (String[] params : new String[][] {
+            // $test, $root
+            { "", null },
+            { "foo", null },
+            { "/", "/" },
+            { "/foo", "/" },
+        }) {
+            assertGetRoot(params);
+        }
+    }
+
+    private static void assertGetRoot(String... params) {
+        final String test = params[0];
+        final String root = params[1];
+        final TPath testPath = new TPath(test);
+        final TPath rootPath = root == null ? null : new TPath(root);
+        assertThat(testPath.getRoot(), is(rootPath));
+    }
+
+    @Test
+    public void testCutTrailingSeparators() {
+        assertThat(TPath.cutTrailingSeparators("c://", 3), is("c:/"));
+        assertThat(TPath.cutTrailingSeparators("///", 2), is("//"));
+        assertThat(TPath.cutTrailingSeparators("//", 1), is("/"));
     }
 }

@@ -86,8 +86,12 @@ import net.jcip.annotations.Immutable;
 
 /**
  * A {@link FileSystem} implementation based on the TrueZIP Kernel module.
+ * <p>
  * Note that {@code TFileSystem} objects are immutable and volatile because
  * all virtual file system state is managed by the TrueZIP Kernel module.
+ * As a consequence, you should never use object identity ('==') to test for
+ * equality of a {@code TFileSystem} with another object, but instead use the
+ * method {@link #equals(Object)}.
  * 
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -291,6 +295,19 @@ public final class TFileSystem extends FileSystem {
     @Override
     public WatchService newWatchService() throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public boolean equals(Object that) {
+        return this == that
+                || that instanceof TFileSystem
+                && this.getMountPoint().equals(
+                    ((TFileSystem) that).getMountPoint());
+    }
+
+    @Override
+    public int hashCode() {
+        return getMountPoint().hashCode();
     }
 
     private static BitField<FsInputOption> mapInput(
