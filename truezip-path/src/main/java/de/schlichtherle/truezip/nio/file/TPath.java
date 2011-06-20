@@ -126,12 +126,12 @@ public final class TPath implements Path {
     }
 
     private static URI toUri(final String first, final String... more) {
-        final StringBuilder pb;
+        final StringBuilder b;
         {
             int l = 1 + first.length(); // might prepend SEPARATOR
             for (String m : more)
                 l += 1 + m.length(); // dito
-            pb = new StringBuilder(l);
+            b = new StringBuilder(l);
         }
         int i = -1;
         {
@@ -141,8 +141,8 @@ public final class TPath implements Path {
                 char c = s.charAt(k);
                 if (SEPARATOR_CHAR != c
                         || i <= 0
-                        || 0 < i && SEPARATOR_CHAR != pb.charAt(i)) {
-                    pb.append(c);
+                        || 0 < i && SEPARATOR_CHAR != b.charAt(i)) {
+                    b.append(c);
                     i++;
                 }
             }
@@ -153,17 +153,17 @@ public final class TPath implements Path {
             for (int j = 0, k = 0; k < l; k++) {
                 char c = s.charAt(k);
                 final boolean n = SEPARATOR_CHAR != c;
-                final boolean o = 0 <= i && SEPARATOR_CHAR != pb.charAt(i);
+                final boolean o = 0 <= i && SEPARATOR_CHAR != b.charAt(i);
                 if (n || o) {
                     if (0 == j && n && o)
-                        pb.append(SEPARATOR_CHAR);
-                    pb.append(c);
+                        b.append(SEPARATOR_CHAR);
+                    b.append(c);
                     i++;
                     j++;
                 }
             }
         }
-        String p = pb.toString();
+        String p = b.toString();
         final int l = prefixLength(p);
         p = cutTrailingSeparators(p, l);
         try {
