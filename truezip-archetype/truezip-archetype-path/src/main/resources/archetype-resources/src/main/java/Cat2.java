@@ -18,7 +18,7 @@
  */
 package ${package};
 
-import de.schlichtherle.truezip.nio.fsp.TPath;
+import de.schlichtherle.truezip.nio.file.TPath;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
