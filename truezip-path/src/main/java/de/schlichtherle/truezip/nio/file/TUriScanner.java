@@ -21,6 +21,7 @@ import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.fs.FsScheme;
+import de.schlichtherle.truezip.io.Paths;
 import static de.schlichtherle.truezip.fs.FsUriModifier.*;
 import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.util.QuotedInputUriSyntaxException;
@@ -63,20 +64,21 @@ final class TUriScanner {
     }
 
     /**
-     * Constructs a new {@link FsPath} from the given mount point and scans
+     * Constructs a new {@link FsPath} from the given {@code parent} and scans
      * the given {@code member} for prospective archive files.
      * <p>
-     * {@code member} must not be opaque and must not defined a fragment
+     * {@code member} must not be opaque and must not define a fragment
      * component.
-     * A scheme component is ignored.
-     * An authority component is copied to the result unless the URI of
-     * {@code parent} is opaque or defines an authority component.
-     * A path component is normalized and scanned for prospective archive files
-     * using the {@link TArchiveDetector} provided to the constructor and
-     * rewritten to the opaque syntax for federated file systems in an
-     * {@link FsPath}.
+     * A scheme component gets ignored.
+     * If an authority component or an absolute path is present, the authority
+     * and path components of {@code parent} get discarded.
+     * An authority component gets copied to the result.
+     * A path component gets normalized and scanned for prospective archive
+     * files using the {@link TArchiveDetector} provided to the constructor and
+     * rewritten according to the syntax constraints for an {@link FsPath}.
      * {@code ".."} segments at the beginning of the normalized path component
-     * are resolved against the given {@code parent}.
+     * are resolved against the scheme specific part of {@code parent}
+     * according to the syntax constraints for an {@link FsPath}.
      * A query component is copied to the result.
      * 
      * @param  parent the file system path to use as the parent.
@@ -86,37 +88,41 @@ final class TUriScanner {
      *         prospective archive files.
      * @throws IllegalArgumentException if any precondition is violated.
      */
-    FsPath toPath(FsPath parent, URI member) {
+    FsPath resolve(FsPath parent, URI member) {
         try {
-            assert !member.isOpaque();
+            if (member.isOpaque())
+                throw new QuotedInputUriSyntaxException(member, "Opaque URI");
             if (null != member.getFragment())
-                throw new QuotedInputUriSyntaxException(member, "Fragment component defined.");
+                throw new QuotedInputUriSyntaxException(member, "Fragment component defined");
             member = member.normalize();
-            String memberPath;
-            while ((memberPath = member.getPath()).startsWith(DOT_DOT_SEPARATOR)) {
+            String mp;
+            while ((mp = member.getPath()).startsWith(DOT_DOT_SEPARATOR)) {
                 parent = parent(parent);
                 member = new UriBuilder(member)
-                        .path(memberPath.substring(3))
+                        .path(mp.substring(3))
                         .getUri();
             }
-            if ("..".equals(memberPath))
+            if ("..".equals(mp))
                 return parent(parent);
-            /*if ("".equals(memberPath))
-                return parent;*/
-            final String memberAuthority = member.getAuthority();
-            final URI parentUri = parent.toUri();
-            if (null != memberAuthority
-                    && !parentUri.isOpaque()
-                    && null == parentUri.getAuthority())
+            final URI pu = parent.toUri();
+            String mssp = member.getSchemeSpecificPart();
+            int mpl = Paths.prefixLength(mssp, SEPARATOR_CHAR, true);
+            if (0 < mpl) {
+                String ma = member.getAuthority();
+                if (null != ma)
+                    mpl -= 2 + ma.length();
                 this.root = new FsPath(
-                        new UriBuilder(parentUri)
-                            .authority(memberAuthority)
+                        new UriBuilder()
+                            .scheme(pu.getScheme())
+                            .authority(ma)
+                            .path(mp.substring(0, mpl))
                             .getUri());
-            else
+                mp = mp.substring(mpl);
+            } else {
                 this.root = parent;
+            }
             this.memberQuery = member.getQuery();
-            this.uri.path(memberPath);
-            return scan(memberPath);
+            return scan(mp);
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
@@ -172,7 +178,7 @@ final class TUriScanner {
         }
         URI ppu;
         FsPath mp;
-        if (men.isRoot() || (ppu = pp.toUri()).isOpaque()) {
+        if (men.isRoot() || (ppu = pp.toUri()).isOpaque() || !ppu.isAbsolute()) {
             mp = pp.resolve(men);
         } else {
             final String pup = ppu.getPath();
