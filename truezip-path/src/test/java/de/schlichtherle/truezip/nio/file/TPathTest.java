@@ -17,8 +17,11 @@ package de.schlichtherle.truezip.nio.file;
 
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import de.schlichtherle.truezip.fs.FsPath;
+import de.schlichtherle.truezip.io.Paths;
 import java.io.File;
 import java.net.URI;
+import java.nio.file.Path;
+import java.util.Iterator;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import org.junit.Test;
@@ -188,12 +191,20 @@ public class TPathTest extends TestBase {
         if ('\\' == File.separatorChar) {
             for (Object[] params : new Object[][] {
                 // $first, $more
+                { "c:/foo", NO_MORE },
+                { "c:/foo", new String[] { "bar" } },
             }) {
                 assertSegments(params);
             }
         }
         for (Object[] params : new Object[][] {
             // $first, $more
+            { "foo", NO_MORE },
+            { "foo", new String[] { "bar" } },
+            { "/foo", NO_MORE },
+            { "/foo", new String[] { "bar" } },
+            { "//foo/bar/boom", NO_MORE },
+            { "//foo/bar/boom", new String[] { "bang" } },
         }) {
             assertSegments(params);
         }
@@ -204,5 +215,19 @@ public class TPathTest extends TestBase {
         final String[] more = (String[]) params[1];
         final TPath path = new TPath(first, more);
         assertThat(path.getNameCount(), is (1 + more.length));
+        final Iterator<Path> it = path.iterator();
+        assertThat(path.getName(0).toString(), is(stripPrefix(first)));
+        assertThat(it.next().toString(), is(stripPrefix(first)));
+        for (int i = 0; i < more.length; ) {
+            final String m = more[i];
+            final String p = path.getName(++i).toString();
+            assertThat(p, is(m));
+            assertThat(it.next().toString(), is(m));
+        }
+        assertThat(it.hasNext(), is(false));
+    }
+
+    private static String stripPrefix(final String s) {
+        return s.substring(Paths.prefixLength(s, SEPARATOR_CHAR, true));
     }
 }

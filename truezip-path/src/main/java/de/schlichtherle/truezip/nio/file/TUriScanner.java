@@ -22,6 +22,7 @@ import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.io.Paths;
+import static de.schlichtherle.truezip.io.Paths.*;
 import static de.schlichtherle.truezip.fs.FsUriModifier.*;
 import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.util.QuotedInputUriSyntaxException;
@@ -104,18 +105,19 @@ final class TUriScanner {
             }
             if ("..".equals(mp))
                 return parent(parent);
-            final URI pu = parent.toUri();
-            String mssp = member.getSchemeSpecificPart();
-            int mpl = Paths.prefixLength(mssp, SEPARATOR_CHAR, true);
+            final URI pu = fix(parent.toUri());
+            member = fix(member);
+            final int mpl = pathPrefixLength(member);
             if (0 < mpl) {
-                String ma = member.getAuthority();
-                if (null != ma)
-                    mpl -= 2 + ma.length();
+                final String ma = member.getAuthority();
+                final String p = null != ma || mp.startsWith(SEPARATOR)
+                        ? mp.substring(0, mpl)
+                        : pu.getPath() + mp.substring(0, mpl);
                 this.root = new FsPath(
                         new UriBuilder()
                             .scheme(pu.getScheme())
                             .authority(ma)
-                            .path(mp.substring(0, mpl))
+                            .path(p)
                             .getUri());
                 mp = mp.substring(mpl);
             } else {
@@ -126,6 +128,24 @@ final class TUriScanner {
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
+    }
+
+    static int pathPrefixLength(final URI uri) {
+        final String ssp = uri.getSchemeSpecificPart();
+        final String a = uri.getAuthority();
+        int pl = Paths.prefixLength(ssp, SEPARATOR_CHAR, true);
+        if (null != a)
+            pl -= 2 + a.length();
+        return pl;
+    }
+
+    static URI fix(final URI uri) {
+        final String ssp = uri.getSchemeSpecificPart();
+        final String a = uri.getAuthority();
+        if (null == ssp // fix bug: null == new URI("foo").resolve(neAw URI("..")).getRawSchemeSpecificPart()
+                || null == a && ssp.startsWith(SEPARATOR + SEPARATOR)) // fix empty authority
+            return new UriBuilder(uri).toUri();
+        return uri;
     }
 
     /**
