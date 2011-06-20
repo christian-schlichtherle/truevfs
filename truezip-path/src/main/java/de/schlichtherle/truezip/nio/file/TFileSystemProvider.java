@@ -405,7 +405,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
 
     @Override
     public boolean isHidden(Path path) throws IOException {
-        return promote(path).getFileName().startsWith(".");
+        return promote(path).getFileName().toString().startsWith(".");
     }
 
     @Override
