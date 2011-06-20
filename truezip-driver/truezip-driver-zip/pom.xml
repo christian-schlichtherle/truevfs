@@ -29,9 +29,10 @@
     <description>
         The file system driver family for ZIP and related archive file types.
 
-        Add the JAR artifact of this module to the compile-time class path for
-        dependency injection to the TrueZIP Kernel module or to the run-time
-        class path for service location in the TrueZIP File* module.
+        Add the JAR artifact of this module to the compile time class path for
+        dependency injection to the TrueZIP Kernel module or to the run time
+        class path for service location in the TrueZIP File* and TrueZIP Path
+        modules.
     </description>
 
     <dependencies>
@@ -42,6 +43,15 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truezip-file</artifactId>
+            <type>test-jar</type>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truezip-path</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truezip-path</artifactId>
             <type>test-jar</type>
         </dependency>
     </dependencies>
