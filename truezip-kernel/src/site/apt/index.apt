@@ -21,4 +21,6 @@ About TrueZIP Kernel
     than the platform file system and any member file systems.
     For example, an application could access an entry within an archive
     file which is located at a web site using a URI like this:
-    <<<zip:http://acme.com/archive.zip!/entry>>>.
+    <<<tar.gz:http://acme.com/archive.tar.gz!/entry>>>, provided that
+    the respective file system driver modules TrueZIP Driver HTTP(S)
+    and TrueZIP Driver TAR are available on the class path.
