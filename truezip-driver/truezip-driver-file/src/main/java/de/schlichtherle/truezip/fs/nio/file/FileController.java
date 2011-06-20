@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.fs.file.nio;
+package de.schlichtherle.truezip.fs.nio.file;
 
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Map;
@@ -81,7 +81,10 @@ final class FileController extends FsController<FsModel>  {
     }
 
     private BasicFileAttributeView getBasicFileAttributeView(Path file) {
-        return getFileAttributeView(file, BasicFileAttributeView.class);
+        BasicFileAttributeView view = getFileAttributeView(
+                file, BasicFileAttributeView.class);
+        assert null != view;
+        return view;
     }
 
     @Override
@@ -260,7 +263,7 @@ final class FileController extends FsController<FsModel>  {
     }
 
     @Override
-    public boolean setTime(FsEntryName name, Map<Access, Long> times)
+    public boolean setTime(final FsEntryName name, final Map<Access, Long> times)
     throws IOException {
         final Path file = target.resolve(name.getPath());
         final Map<Access, Long> t = new EnumMap<Access, Long>(times);
@@ -312,6 +315,10 @@ final class FileController extends FsController<FsModel>  {
                                 toFileTime(template.getTime(READ)),
                                 toFileTime(template.getTime(CREATE)));
         }
+    }
+
+    private static @Nullable FileTime toFileTime(Long time) {
+        return null == time ? null : toFileTime((long) time);
     }
 
     private static @Nullable FileTime toFileTime(long time) {
