@@ -39,8 +39,9 @@ public class TPathTest extends TestBase {
                 //{ "//", NO_MORE, "/", ROOT_DIRECTORY },
                 { "//foo", new String[] { "bar", "baz" }, "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
                 { "///foo//", new String[] { "//bar//", "//", "//baz//" }, "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
-            })
+            }) {
                 assertConstructorWithStrings(params);
+            }
         }
         for (Object[] params : new Object[][] {
             // $first, $more, $uri, $address
@@ -57,6 +58,8 @@ public class TPathTest extends TestBase {
             { "/foo.mok", new String[] { "/bar" }, "/foo.mok/bar", "mok:" + ROOT_DIRECTORY + "foo.mok!/bar" },
             { "/foo", new String[] { "/bar.mok" }, "/foo/bar.mok", "mok:" + ROOT_DIRECTORY + "foo/bar.mok!/" },
             { "/foo.mok", new String[] { "/bar.mok" }, "/foo.mok/bar.mok", "mok:mok:" + ROOT_DIRECTORY + "foo.mok!/bar.mok!/" },
+            { "", new String[] { "/foo" }, "foo", CURRENT_DIRECTORY + "foo" },
+            { "", new String[] { "foo" }, "foo", CURRENT_DIRECTORY + "foo" },
             { "", NO_MORE, "", CURRENT_DIRECTORY },
             { ".", NO_MORE, ".", CURRENT_DIRECTORY },
             { "foo", NO_MORE, "foo", CURRENT_DIRECTORY + "foo" },
@@ -66,8 +69,9 @@ public class TPathTest extends TestBase {
             { "foo.mok", new String[] { "bar" }, "foo.mok/bar", "mok:" + CURRENT_DIRECTORY + "foo.mok!/bar" },
             { "foo", new String[] { "bar.mok" }, "foo/bar.mok", "mok:" + CURRENT_DIRECTORY + "foo/bar.mok!/" },
             { "foo.mok", new String[] { "bar.mok" }, "foo.mok/bar.mok", "mok:mok:" + CURRENT_DIRECTORY + "foo.mok!/bar.mok!/" },
-        })
+        }) {
             assertConstructorWithStrings(params);
+        }
     }
 
     private static void assertConstructorWithStrings(Object... params) {
@@ -88,8 +92,9 @@ public class TPathTest extends TestBase {
                 // $parent, $first, $more, $uri, $address
                 { "x", "//foo", new String[] { "bar", "baz" }, "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
                 { "x", "///foo//", new String[] { "//bar//", "//", "//baz//" }, "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
-            })
+            }) {
                 assertResolve(params);
+            }
         }
         for (Object[] params : new Object[][] {
             // $parent, $first, $more, $uri, $address
@@ -120,8 +125,9 @@ public class TPathTest extends TestBase {
             { "foo.mok", "bar.mok", NO_MORE, "foo.mok/bar.mok", "mok:mok:" + CURRENT_DIRECTORY + "foo.mok!/bar.mok!/" },
             { "foo.mok", "..", NO_MORE, "", CURRENT_DIRECTORY },
             { "foo.mok", "..", new String[] { "bar.mok" }, "bar.mok", "mok:" + CURRENT_DIRECTORY + "bar.mok!/"},
-        })
+        }) {
             assertResolve(params);
+        }
     }
 
     private static void assertResolve(Object... params) {
@@ -175,5 +181,28 @@ public class TPathTest extends TestBase {
         assertThat(TPath.cutTrailingSeparators("c://", 3), is("c:/"));
         assertThat(TPath.cutTrailingSeparators("///", 2), is("//"));
         assertThat(TPath.cutTrailingSeparators("//", 1), is("/"));
+    }
+
+    @Test
+    public void testSegments() {
+        if ('\\' == File.separatorChar) {
+            for (Object[] params : new Object[][] {
+                // $first, $more
+            }) {
+                assertSegments(params);
+            }
+        }
+        for (Object[] params : new Object[][] {
+            // $first, $more
+        }) {
+            assertSegments(params);
+        }
+    }
+
+    private static void assertSegments(Object... params) {
+        final String first = params[0].toString();
+        final String[] more = (String[]) params[1];
+        final TPath path = new TPath(first, more);
+        assertThat(path.getNameCount(), is (1 + more.length));
     }
 }

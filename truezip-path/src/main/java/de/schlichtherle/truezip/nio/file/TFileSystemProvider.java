@@ -64,14 +64,22 @@ import java.util.Set;
 import net.jcip.annotations.Immutable;
 
 /**
- * A {@link FileSystemProvider} implementation based on the TrueZIP Kernel
+ * A {@link FileSystemProvider} implementation
+ * based on the TrueZIP Kernel module.
+ * <p>
+ * Note that objects of this class are immutable and inherently volatile
+ * because all virtual file system state is managed by the TrueZIP Kernel
  * module.
+ * As a consequence, you should never use object identity ('==') to test for
+ * equality of objects of this class with another object, but instead use the
+ * method {@link #equals(Object)}.
  * 
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @Immutable
 @DefaultAnnotation(NonNull.class)
+@edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
 public final class TFileSystemProvider extends FileSystemProvider {
 
     private static volatile TFileSystemProvider
@@ -105,6 +113,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
         this(   FsScheme.create("tpath"),
                 FsMountPoint.create(URI.create("file:/")),
                 FsMountPoint.create(new File("").toURI()));
+                //FsMountPoint.create(Paths.get("").toUri())); // TUriScanner will remove redundant empty authority component
         DEFAULT = this;
     }
 
@@ -381,6 +390,12 @@ public final class TFileSystemProvider extends FileSystemProvider {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    /**
+     * Returns {@code true} iff the given object is a
+     * {@code TFileSystemProvider} and its {@link #getScheme() scheme}
+     * {@link String#equalsIgnoreCase(String) equals} the scheme of this file
+     * system provider, whereby case is ignored.
+     */
     @Override
     public boolean equals(Object that) {
         return this == that
@@ -389,6 +404,10 @@ public final class TFileSystemProvider extends FileSystemProvider {
                         ((TFileSystemProvider) that).getScheme());
     }
 
+    /**
+     * Returns a hash code which is consistent with {@link #equals(Object)}.
+     */
+    @Override
     public int hashCode() {
         return getScheme().hashCode();
     }
