@@ -3323,15 +3323,19 @@ public final class TFile extends File {
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
     public void input(final InputStream in) throws IOException {
-        final OutputStream out = new TFileOutputStream(this, false);
         try {
+            final OutputStream out = new TFileOutputStream(this, false);
             try {
                 Streams.cat(in, out);
             } finally {
                 out.close();
             }
         } catch (IOException ex) {
-            delete();
+            try {
+                rm();
+            } catch (IOException ex2) {
+                throw (IOException) ex2.initCause(ex);
+            }
             throw ex;
         }
     }
