@@ -69,11 +69,11 @@ public class Copy extends Application<IOException> {
             dst = dst.resolve(src.getFileName());*/
 
         // Perform a non-recursive archive copy.
-        Files.copy(src, dst, COPY_ATTRIBUTES);
+        Files.copy(src, dst, COPY_ATTRIBUTES, REPLACE_EXISTING);
         
         // Okay, if this example should demonstrate a recursive copy, I'ld back
         // out to the TrueZIP File* API as follows because a recursive copy
-        // with the NIO.2 API is insanely complex for its most prominent use
+        // with the NIO.2 API is way too complex for this most prominent use
         // case.
         //src.toFile().cp_rp(dst.toFile()); // give power to the people!
 
