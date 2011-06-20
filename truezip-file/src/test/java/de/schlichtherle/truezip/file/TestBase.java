@@ -25,9 +25,9 @@ import org.junit.Before;
  */
 public abstract class TestBase {
 
-    private final TArchiveDetector detector;
+    protected TArchiveDetector detector;
 
-    TestBase() {
+    protected TestBase() {
         detector = new TArchiveDetector("mok|mok1|mok2", new MockArchiveDriver());
     }
 
