@@ -52,7 +52,8 @@
 
         <!-- This driver provides access to the following URI schemes:
              file: platform file system.
-             This dependency is already added by the TrueZIP File* module.
+             This dependency is already added by the modules TrueZIP File* and
+             TrueZIP Path.
              -->
         <!--dependency>
             <groupId>de.schlichtherle.truezip</groupId>
