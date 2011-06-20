@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.nio.fsp;
+package de.schlichtherle.truezip.nio.file;
 
 import de.schlichtherle.truezip.file.TConfig;
 import de.schlichtherle.truezip.fs.FsPath;
@@ -35,7 +35,7 @@ public class TUriScannerTest extends TestBase {
             { "foo/bar", "../..", "" },
             { "scheme:/foo", "..", "scheme:/" },
             { "scheme:/foo/bar", "", "scheme:/foo/bar" },
-            { "scheme:/foo/bar", "..", "scheme:/foo" },
+            { "scheme:/foo/bar", "..", "scheme:/foo/" },
             { "scheme:/foo/bar", "../..", "scheme:/" },
             { "scheme:/foo.mok/bar.mok", "../..", "scheme:/" },
             { "mok:mok:scheme:/foo.mok!/bar.mok!/", "", "mok:mok:scheme:/foo.mok!/bar.mok!/" },
