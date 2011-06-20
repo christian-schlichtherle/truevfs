@@ -69,7 +69,7 @@ public final class KeyManagement {
      * @param password the password char array to be copied for subsequent use.
      */
 // START SNIPPET: setPassword
-    public static void setPassword(final TFile file, final char[] password) {
+    public static void setPassword(TFile file, char[] password) {
         if (!file.isArchive())
             throw new IllegalArgumentException(file + " (not an archive file)");
         AesCipherParameters params = new AesCipherParameters();
@@ -106,7 +106,7 @@ public final class KeyManagement {
      * @param password the password char array to be copied for subsequent use.
      */
 // START SNIPPET: setAllPasswords1
-    public static void setAllPasswords1(final char[] password) {
+    public static void setAllPasswords1(char[] password) {
         TFile.setDefaultArchiveDetector(
                 new TArchiveDetector(
                     TArchiveDetector.ALL,
@@ -117,11 +117,11 @@ public final class KeyManagement {
                             new SimpleView(password)))));
     }
     
-    private static final class SimpleView
+    private static class SimpleView
     implements PromptingKeyProvider.View<AesCipherParameters> {
-        private final AesCipherParameters params = new AesCipherParameters();
+        private AesCipherParameters params = new AesCipherParameters();
         
-        public SimpleView(char[] password) {
+        SimpleView(char[] password) {
             if (null == password)
                 throw new NullPointerException();
             params.setPassword(password);
@@ -164,7 +164,7 @@ public final class KeyManagement {
      * @param password the password char array to be copied for subsequent use.
      */
 // START SNIPPET: setAllPasswords2
-    public static void setAllPasswords2(final char[] password) {
+    public static void setAllPasswords2(char[] password) {
         TFile.setDefaultArchiveDetector(
                 new TArchiveDetector(
                     TArchiveDetector.ALL,
@@ -174,11 +174,11 @@ public final class KeyManagement {
                         new SimpleKeyManagerService(password))));
     }
     
-    private static final class SimpleKeyManagerService
+    private static class SimpleKeyManagerService
     extends KeyManagerService {
-        private final KeyManager<AesCipherParameters> manager;
+        private KeyManager<AesCipherParameters> manager;
     
-        SimpleKeyManagerService(final char[] password) {
+        SimpleKeyManagerService(char[] password) {
             manager = new SafeKeyManager<AesCipherParameters, SimpleKeyProvider>(
                     new SimpleKeyProviderFactory(password));
         }
@@ -192,11 +192,11 @@ public final class KeyManagement {
         }
     } // SimpleKeyManagerService
     
-    private static final class SimpleKeyProviderFactory
+    private static class SimpleKeyProviderFactory
     implements KeyProvider.Factory<SimpleKeyProvider> {
-        private final char[] password;
+        private char[] password;
     
-        SimpleKeyProviderFactory(final char[] password) {
+        SimpleKeyProviderFactory(char[] password) {
             this.password = password.clone();
         }
     
@@ -206,11 +206,11 @@ public final class KeyManagement {
         }
     } // class SimpleKeyProviderFactory
     
-    private static final class SimpleKeyProvider
+    private static class SimpleKeyProvider
     extends SafeKeyProvider<AesCipherParameters> {
         private AesCipherParameters key = new AesCipherParameters();
     
-        SimpleKeyProvider(final char[] password) {
+        SimpleKeyProvider(char[] password) {
             key.setPassword(password);
         }
     
@@ -225,7 +225,7 @@ public final class KeyManagement {
         }
     
         @Override
-        public void setKey(final AesCipherParameters key) {
+        public void setKey(AesCipherParameters key) {
             this.key = key.clone();
         }
     } // class SimpleKeyProvider

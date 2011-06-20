@@ -19,11 +19,11 @@ import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.fs.FsDefaultDriver;
 import de.schlichtherle.truezip.fs.sl.FsDriverLocator;
 import de.schlichtherle.truezip.fs.FsCompositeDriver;
-import de.schlichtherle.truezip.fs.FsDefaultManager;
 import de.schlichtherle.truezip.fs.FsInputOption;
 import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.fs.FsUriModifier;
+import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.util.BitField;
@@ -44,6 +44,10 @@ import java.net.URISyntaxException;
  */
 public final class Cat {
 
+    /** You cannot instantiate this class. */
+    private Cat() {
+    }
+
     public static void main(String[] args)
     throws IOException, URISyntaxException {
         for (String path : args)
@@ -61,10 +65,10 @@ public final class Cat {
      */
     static void cat(String resource)
     throws IOException, URISyntaxException {
-        // Create a manager for the life cycle of controllers for federated
+        // Get a manager for the life cycle of controllers for federated
         // file systems.
-        // Alternatively, we could use FsManagerLocator.SINGLETON.get();
-        FsManager manager = new FsDefaultManager();
+        // Alternatively, we could use new FsDefaultManager();
+        FsManager manager = FsManagerLocator.SINGLETON.get();
         try {
             // Search the class path for the set of all supported file system
             // drivers and build a composite driver from it.
