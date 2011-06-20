@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.nio.fsp;
+package de.schlichtherle.truezip.nio.file;
 
+import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import de.schlichtherle.truezip.fs.FsPath;
+import java.io.File;
 import java.net.URI;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
@@ -29,16 +31,24 @@ public class TPathTest extends TestBase {
 
     @Test
     public void testConstructorWithStrings() {
+        if ('\\' == File.separatorChar) {
+            for (Object[] params : new Object[][] {
+                // $first, $more, $uri, $address
+                //{ "c:foo", NO_MORE, "c%3Afoo", "file:/c:foo" },
+                { "c:\\foo", NO_MORE, "c%3A/foo", "file:/c:/foo" },
+                { "//", NO_MORE, "/", ROOT_DIRECTORY },
+                { "//foo", new String[] { "bar", "baz" }, "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
+                { "///foo//", new String[] { "//bar//", "//", "//baz//" }, "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
+            })
+                assertConstructorWithStrings(params);
+        }
         for (Object[] params : new Object[][] {
-            // $first, $more, $path, $address
+            // $first, $more, $uri, $address
             { "/", NO_MORE, "/", ROOT_DIRECTORY },
             { "/foo", NO_MORE, "/foo", ROOT_DIRECTORY + "foo" },
             { "/foo", new String[] { "" }, "/foo", ROOT_DIRECTORY + "foo"},
             { "/foo", new String[] { "bar" }, "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
-            { "//", NO_MORE, "/", ROOT_DIRECTORY },
             { "///", NO_MORE, "/", ROOT_DIRECTORY },
-            { "//foo", new String[] { "bar", "baz" }, "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
-            { "///foo//", new String[] { "//bar//", "//", "//baz//" }, "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
             { "/foo", new String[] { "/bar" }, "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
             { "/foo//", new String[] { "//", "//bar//", "" }, "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
             { "/foo", new String[] { "" }, "/foo", ROOT_DIRECTORY + "foo"},
@@ -56,30 +66,39 @@ public class TPathTest extends TestBase {
             { "foo.mok", new String[] { "bar" }, "foo.mok/bar", "mok:" + CURRENT_DIRECTORY + "foo.mok!/bar" },
             { "foo", new String[] { "bar.mok" }, "foo/bar.mok", "mok:" + CURRENT_DIRECTORY + "foo/bar.mok!/" },
             { "foo.mok", new String[] { "bar.mok" }, "foo.mok/bar.mok", "mok:mok:" + CURRENT_DIRECTORY + "foo.mok!/bar.mok!/" },
-        }) {
-            final String first = params[0].toString();
-            final String[] more = (String[]) params[1];
-            final URI uri = URI.create(params[2].toString());
-            final FsPath address = FsPath.create(URI.create(params[3].toString()));
-            final TPath path = new TPath(first, more);
-            assertThat(path.getUri(), equalTo(uri));
-            assertThat(path.getAddress(), equalTo(address));
-            assertThat(path.getFileSystem().getMountPoint(), equalTo(path.getAddress().getMountPoint()));
-        }
+        })
+            assertConstructorWithStrings(params);
+    }
+
+    private static void assertConstructorWithStrings(Object... params) {
+        final String first = params[0].toString();
+        final String[] more = (String[]) params[1];
+        final URI uri = URI.create(params[2].toString());
+        final FsPath address = FsPath.create(URI.create(params[3].toString()));
+        final TPath path = new TPath(first, more);
+        assertThat(path.getUri(), equalTo(uri));
+        assertThat(path.toString(), equalTo(uri.getSchemeSpecificPart().replace(SEPARATOR, path.getFileSystem().getSeparator())));
+        assertThat(path.getAddress(), equalTo(address));
     }
 
     @Test
     public void testResolve() {
+        if ('\\' == File.separatorChar) {
+            for (Object[] params : new Object[][] {
+                // $parent, $first, $more, $uri, $address
+                { "x", "//foo", new String[] { "bar", "baz" }, "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
+                { "x", "///foo//", new String[] { "//bar//", "//", "//baz//" }, "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
+            })
+                assertResolve(params);
+        }
         for (Object[] params : new Object[][] {
-            // $parent, $first, $more, $label, $address
+            // $parent, $first, $more, $uri, $address
             { "", "/", NO_MORE, "/", ROOT_DIRECTORY },
             { "x", "/foo", NO_MORE, "/foo", ROOT_DIRECTORY + "foo" },
             { "x", "/foo", new String[] { "" }, "/foo", ROOT_DIRECTORY + "foo"},
             { "x", "/foo", new String[] { "bar" }, "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
             { "x", "//", NO_MORE, "/", ROOT_DIRECTORY },
             { "x", "///", NO_MORE, "/", ROOT_DIRECTORY },
-            { "x", "//foo", new String[] { "bar", "baz" }, "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
-            { "x", "///foo//", new String[] { "//bar//", "//", "//baz//" }, "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
             { "x", "/foo", new String[] { "/bar" }, "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
             { "x", "/foo//", new String[] { "//", "//bar//", "" }, "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
             { "x", "/foo", new String[] { "" }, "/foo", ROOT_DIRECTORY + "foo"},
@@ -101,17 +120,20 @@ public class TPathTest extends TestBase {
             { "foo.mok", "bar.mok", NO_MORE, "foo.mok/bar.mok", "mok:mok:" + CURRENT_DIRECTORY + "foo.mok!/bar.mok!/" },
             { "foo.mok", "..", NO_MORE, "", CURRENT_DIRECTORY },
             { "foo.mok", "..", new String[] { "bar.mok" }, "bar.mok", "mok:" + CURRENT_DIRECTORY + "bar.mok!/"},
-        }) {
-            final TPath parent = new TPath(params[0].toString());
-            final String first = params[1].toString();
-            final String[] more = (String[]) params[2];
-            final URI label = URI.create(params[3].toString());
-            final FsPath address = FsPath.create(URI.create(params[4].toString()));
-            final TPath member = new TPath(first, more);
-            final TPath path = parent.resolve(member);
-            assertThat(path.getUri(), equalTo(label));
-            assertThat(path.getAddress(), equalTo(address));
-            assertThat(path.getFileSystem().getMountPoint(), equalTo(path.getAddress().getMountPoint()));
-        }
+        })
+            assertResolve(params);
+    }
+
+    private static void assertResolve(Object... params) {
+        final TPath parent = new TPath(params[0].toString());
+        final String first = params[1].toString();
+        final String[] more = (String[]) params[2];
+        final URI uri = URI.create(params[3].toString());
+        final FsPath address = FsPath.create(URI.create(params[4].toString()));
+        final TPath member = new TPath(first, more);
+        final TPath path = parent.resolve(member);
+        assertThat(path.getUri(), equalTo(uri));
+        assertThat(path.toString(), equalTo(uri.getSchemeSpecificPart().replace(SEPARATOR, path.getFileSystem().getSeparator())));
+        assertThat(path.getAddress(), equalTo(address));
     }
 }

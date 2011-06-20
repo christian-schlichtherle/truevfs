@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.nio.fsp;
+package de.schlichtherle.truezip.nio.file;
 
 import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.fs.FsEntryName;
@@ -23,6 +23,7 @@ import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.fs.FsScheme;
 import static de.schlichtherle.truezip.fs.FsUriModifier.*;
 import de.schlichtherle.truezip.io.Paths.Splitter;
+import de.schlichtherle.truezip.util.QuotedInputUriSyntaxException;
 import de.schlichtherle.truezip.util.UriBuilder;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -47,7 +48,8 @@ final class TUriScanner {
     private final TArchiveDetector detector;
     private final Splitter splitter = new Splitter(SEPARATOR_CHAR, false);
     private FsPath root;
-    private final UriBuilder uri = new UriBuilder(true);
+    private String memberQuery;
+    private final UriBuilder uri = new UriBuilder();
 
     /**
      * Constructs a new URI scanner which uses the given
@@ -58,22 +60,6 @@ final class TUriScanner {
     TUriScanner(TArchiveDetector detector) {
         assert null != detector;
         this.detector = detector;
-    }
-
-    /**
-     * Constructs a new {@link FsPath} from the given mount point and scans
-     * the given {@code member} for prospective archive files.
-     * 
-     * @param  parent the file system mount point to use as the parent.
-     * @param  member the URI to scan for prospective archive files.
-     * @return the file system path combined from the given {@code parent} and
-     *         {@code member}, possibly decorated as an opaque URI to address
-     *         prospective archive files.
-     * @throws IllegalArgumentException if any precondition is violated.
-     * @see    #toPath(FsPath, URI) 
-     */
-    FsPath toPath(FsMountPoint parent, URI member) {
-        return toPath(new FsPath(parent, ROOT), member);
     }
 
     /**
@@ -102,15 +88,14 @@ final class TUriScanner {
      */
     FsPath toPath(FsPath parent, URI member) {
         try {
-            if (member.isOpaque())
-                throw new URISyntaxException(quote(member), "Opaque URI.");
-            if (null != member.getRawFragment())
-                throw new URISyntaxException(quote(member), "Fragment component defined.");
+            assert !member.isOpaque();
+            if (null != member.getFragment())
+                throw new QuotedInputUriSyntaxException(member, "Fragment component defined.");
             member = member.normalize();
             String memberPath;
-            while ((memberPath = member.getRawPath()).startsWith(DOT_DOT_SEPARATOR)) {
+            while ((memberPath = member.getPath()).startsWith(DOT_DOT_SEPARATOR)) {
                 parent = parent(parent);
-                member = new UriBuilder(member, true)
+                member = new UriBuilder(member)
                         .path(memberPath.substring(3))
                         .getUri();
             }
@@ -118,18 +103,19 @@ final class TUriScanner {
                 return parent(parent);
             /*if ("".equals(memberPath))
                 return parent;*/
-            final String memberAuthority = member.getRawAuthority();
+            final String memberAuthority = member.getAuthority();
             final URI parentUri = parent.toUri();
             if (null != memberAuthority
                     && !parentUri.isOpaque()
-                    && null == parentUri.getRawAuthority())
+                    && null == parentUri.getAuthority())
                 this.root = new FsPath(
-                        new UriBuilder(parentUri, true)
+                        new UriBuilder(parentUri)
                             .authority(memberAuthority)
                             .getUri());
             else
                 this.root = parent;
-            this.uri.path(memberPath).query(member.getRawQuery());
+            this.memberQuery = member.getQuery();
+            this.uri.path(memberPath);
             return scan(memberPath);
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
@@ -143,14 +129,14 @@ final class TUriScanner {
      * @return The parent file system path.
      * @throws URISyntaxException 
      */
-    private static FsPath parent(FsPath path)
+    static FsPath parent(FsPath path)
     throws URISyntaxException {
         while (true) {
             FsMountPoint pmp = path.getMountPoint();
             FsEntryName  pen = path.getEntryName();
             if (pen.isRoot()) {
                 if (null == pmp)
-                    throw new URISyntaxException(quote(path),
+                    throw new QuotedInputUriSyntaxException(path,
                             "An empty path has no parent.");
                 path = pmp.getPath();
                 if (null == path)
@@ -158,42 +144,45 @@ final class TUriScanner {
                 continue;
             } else {
                 pen = new FsEntryName(pen.toUri().resolve(DOT), CANONICALIZE);
-                if (pen.isRoot() && null != pmp) {
+                /*if (pen.isRoot() && null != pmp) {
                     path = pmp.getPath();
                     if (null == path)
                         return new FsPath(pmp.toUri(), CANONICALIZE);
-                }
+                }*/
                 return new FsPath(pmp, pen);
             }
         }
     }
 
-    private static String quote(Object s) {
-        return "\"" + s + "\"";
-    }
-
     private FsPath scan(final String path) throws URISyntaxException {
         splitter.split(path);
-        final String parent = splitter.getParentPath();
-        final FsEntryName member = FsEntryName
-                .create(uri.path(splitter.getMemberName()).getUri());
-        final FsPath parentPath = null != parent ? scan(parent) : root;
-        URI parentUri;
-        FsPath memberPath;
-        if (member.isRoot() || (parentUri = parentPath.toUri()).isOpaque()) {
-            memberPath = parentPath.resolve(member);
+        final String ps = splitter.getParentPath();
+        final FsEntryName men;
+        final FsPath pp;
+        if (null != ps) {
+            men = FsEntryName.create(
+                    uri.path(splitter.getMemberName()).getUri(),
+                    NULL);
+            pp = scan(ps);
         } else {
-            final String parentUriPath = parentUri.getRawPath();
-            if (!parentUriPath.endsWith(SEPARATOR))
-                parentUri = new UriBuilder(parentUri, true)
-                        .path(parentUriPath + SEPARATOR_CHAR)
-                        .getUri();
-            memberPath = new FsPath(FsMountPoint.create(parentUri), member);
+            men = FsEntryName.create(
+                    uri.path(path).query(memberQuery).getUri(),
+                    CANONICALIZE);
+            pp = root;
         }
-        final FsScheme scheme = detector.getScheme(member.toString());
-        if (null != scheme)
-            memberPath = new FsPath(    FsMountPoint.create(scheme, memberPath),
-                                        ROOT);
-        return memberPath;
+        URI ppu;
+        FsPath mp;
+        if (men.isRoot() || (ppu = pp.toUri()).isOpaque()) {
+            mp = pp.resolve(men);
+        } else {
+            final String pup = ppu.getPath();
+            if (!pup.endsWith(SEPARATOR))
+                ppu = new UriBuilder(ppu).path(pup + SEPARATOR_CHAR).getUri();
+            mp = new FsPath(FsMountPoint.create(ppu), men);
+        }
+        final FsScheme s = detector.getScheme(men.toString());
+        if (null != s)
+            mp = new FsPath(FsMountPoint.create(s, mp), ROOT);
+        return mp;
     }
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.nio.fsp;
+package de.schlichtherle.truezip.nio.file;
 
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import static de.schlichtherle.truezip.fs.FsUriModifier.*;
@@ -50,7 +50,9 @@ public class TFileSystemProviderTest extends TestBase {
             { "foo", new String[] { "x" }, null },
             { "foo", NO_MORE, null },
         }) {
-            final Path path = Paths.get(params[0].toString(), (String[]) params[1]);
+            final String first = params[0].toString();
+            final String[] more = (String[]) params[1];
+            final Path path = Paths.get(first, more);
             final FsMountPoint mountPoint = null == params[2]
                     ? null
                     : FsMountPoint.create(URI.create(params[2].toString()), CANONICALIZE);
