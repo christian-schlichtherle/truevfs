@@ -60,37 +60,37 @@ public final class TZipRaesFileTest extends TFileTestSuite {
     public void testCancelling() throws IOException {
         view.setAction(CANCEL);
 
-        final TFile archive = new TFile(getArchive().getPath()); // recreate with passwdCancellingDetector
+        final TFile archive = getArchive();
         final TFile entry1 = new TFile(archive, "entry1");
 
-        assertFalse(new File(archive.getPath()).exists());
+        assertFalse(newNonArchiveFile(archive).exists());
 
         assertFalse(entry1.mkdirs());
-        assertFalse(new File(entry1.getPath()).exists());
-        assertFalse(new File(archive.getPath()).exists());
+        assertFalse(newNonArchiveFile(entry1).exists());
+        assertFalse(newNonArchiveFile(archive).exists());
 
         try {
             assertFalse(entry1.createNewFile());
             fail("An IOException should have been thrown because password prompting has been disabled!");
         } catch (IOException expected) {
         }
-        assertFalse(new File(entry1.getPath()).exists());
-        assertFalse(new File(archive.getPath()).exists());
+        assertFalse(newNonArchiveFile(entry1).exists());
+        assertFalse(newNonArchiveFile(archive).exists());
 
         final TFile entry2 = new TFile(entry1, "entry2");
         assertFalse(entry2.mkdirs());
-        assertFalse(new File(entry2.getPath()).exists());
-        assertFalse(new File(entry1.getPath()).exists());
-        assertFalse(new File(archive.getPath()).exists());
+        assertFalse(newNonArchiveFile(entry2).exists());
+        assertFalse(newNonArchiveFile(entry1).exists());
+        assertFalse(newNonArchiveFile(archive).exists());
 
         try {
             assertFalse(entry2.createNewFile());
             fail("An IOException should have been thrown because password prompting has been disabled!");
         } catch (IOException expected) {
         }
-        assertFalse(new File(entry2.getPath()).exists());
-        assertFalse(new File(entry1.getPath()).exists());
-        assertFalse(new File(archive.getPath()).exists());
+        assertFalse(newNonArchiveFile(entry2).exists());
+        assertFalse(newNonArchiveFile(entry1).exists());
+        assertFalse(newNonArchiveFile(archive).exists());
     }
 
     @Test
