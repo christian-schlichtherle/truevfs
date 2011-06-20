@@ -72,13 +72,21 @@ public class TFileSystemProviderTest extends TestBase {
     public void testNewFileSystemFromUri() {
         for (final String[] params : new String[][] {
             // $uri, $mountPoint
+            { provider.getScheme() + ":/foo.mok/x/bar.mok/y/", "mok:mok:" + ROOT_DIRECTORY + "foo.mok!/x/bar.mok!/" },
             { provider.getScheme() + ":/foo.mok/x/bar.mok/y", "mok:mok:" + ROOT_DIRECTORY + "foo.mok!/x/bar.mok!/" },
+            { provider.getScheme() + ":/foo.mok/bar.mok/", "mok:mok:" + ROOT_DIRECTORY + "foo.mok!/bar.mok!/" },
             { provider.getScheme() + ":/foo.mok/bar.mok", "mok:mok:" + ROOT_DIRECTORY + "foo.mok!/bar.mok!/" },
+            { provider.getScheme() + ":/foo.mok/x/", "mok:" + ROOT_DIRECTORY + "foo.mok!/" },
             { provider.getScheme() + ":/foo.mok/x", "mok:" + ROOT_DIRECTORY + "foo.mok!/" },
+            { provider.getScheme() + ":/foo.mok/", "mok:" + ROOT_DIRECTORY + "foo.mok!/" },
             { provider.getScheme() + ":/foo.mok", "mok:" + ROOT_DIRECTORY + "foo.mok!/" },
+            { provider.getScheme() + ":/foo/bar/x/", ROOT_DIRECTORY + "foo/bar/" },
             { provider.getScheme() + ":/foo/bar/x", ROOT_DIRECTORY + "foo/bar/" },
+            { provider.getScheme() + ":/foo/x/", ROOT_DIRECTORY + "foo/" },
             { provider.getScheme() + ":/foo/x", ROOT_DIRECTORY + "foo/" },
+            { provider.getScheme() + ":/x/", ROOT_DIRECTORY.toString() },
             { provider.getScheme() + ":/x", ROOT_DIRECTORY.toString() },
+            { provider.getScheme() + ":/", ROOT_DIRECTORY.toString() },
         }) {
             final URI uri = URI.create(params[0]);
             final FsMountPoint mountPoint = FsMountPoint.create(URI.create(params[1]));
@@ -99,7 +107,12 @@ public class TFileSystemProviderTest extends TestBase {
         for (final String[] params : new String[][] {
             // $uri
             { "foo" },
+            { "bar" },
             { "tpath:/foo" },
+            { "tpath:/bar" },
+            { "cheating:/foo" }, // gets mapped to the provider's scheme.
+            { "cheating:/bar" },
+            { "yes-this-works-as-excepted:/c:/Users/christian/" },
         }) {
             URI uri = URI.create(params[0]);
             TPath path = provider.getPath(uri);

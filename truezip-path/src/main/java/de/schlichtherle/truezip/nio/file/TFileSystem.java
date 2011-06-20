@@ -81,23 +81,16 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import net.jcip.annotations.Immutable;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * A {@link FileSystem} implementation
  * based on the TrueZIP Kernel module.
- * <p>
- * Note that objects of this class are immutable and inherently volatile
- * because all virtual file system state is managed by the TrueZIP Kernel
- * module.
- * As a consequence, you should never use object identity ('==') to test for
- * equality of objects of this class with another object, but instead use the
- * method {@link #equals(Object)}.
  * 
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@Immutable
+@ThreadSafe
 @DefaultAnnotation(NonNull.class)
 public final class TFileSystem extends FileSystem {
 
@@ -107,17 +100,7 @@ public final class TFileSystem extends FileSystem {
     private final FsController<?> controller;
     private final TFileSystemProvider provider;
 
-    /**
-     * Obtains a file system for the given path.
-     * 
-     * @param  path a path.
-     * @return A file system.
-     */
-    static TFileSystem get(final TPath path) {
-        return new TFileSystem(path);
-    }
-
-    private TFileSystem(final TPath path) {
+    TFileSystem(final TPath path) {
         assert null != path;
         this.controller = manager.getController(
                 path.getAddress().getMountPoint(),
@@ -263,6 +246,11 @@ public final class TFileSystem extends FileSystem {
         return false;
     }
 
+    /** 
+     * Returns {@link File#separator}.
+     * 
+     * @return {@link File#separator}.
+     */
     @Override
     public String getSeparator() {
         return File.separator;
@@ -302,28 +290,6 @@ public final class TFileSystem extends FileSystem {
     @Override
     public WatchService newWatchService() throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    /**
-     * Returns {@code true} iff the given object is a
-     * {@code TFileSystem} and its mount point
-     * {@link FsMountPoint#equals(Object) equals} the mount point of this file
-     * system.
-     */
-    @Override
-    public boolean equals(Object that) {
-        return this == that
-                || that instanceof TFileSystem
-                    && this.getMountPoint().equals(
-                        ((TFileSystem) that).getMountPoint());
-    }
-
-    /**
-     * Returns a hash code which is consistent with {@link #equals(Object)}.
-     */
-    @Override
-    public int hashCode() {
-        return getMountPoint().hashCode();
     }
 
     private static BitField<FsInputOption> mapInput(
