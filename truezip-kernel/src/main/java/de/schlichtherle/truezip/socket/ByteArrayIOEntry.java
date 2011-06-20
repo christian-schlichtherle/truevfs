@@ -23,6 +23,7 @@ import de.schlichtherle.truezip.util.JSE7;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
@@ -47,7 +48,7 @@ import net.jcip.annotations.NotThreadSafe;
 public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
 
     private final String name;
-    private @CheckForNull byte[] data;
+    private @Nullable byte[] data;
     private final EnumMap<Access, Long>
             times = new EnumMap<Access, Long>(Access.class);
     private int reads;
