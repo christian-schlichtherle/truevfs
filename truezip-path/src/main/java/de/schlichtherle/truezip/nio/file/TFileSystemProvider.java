@@ -24,7 +24,6 @@ import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import de.schlichtherle.truezip.fs.FsScheme;
-import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
@@ -32,6 +31,7 @@ import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -353,6 +353,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
     }
 
     @Override
+    @Nullable
     @SuppressWarnings("unchecked")
     public <V extends FileAttributeView> V getFileAttributeView(
             Path path,
