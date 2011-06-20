@@ -95,7 +95,7 @@ public final class TPath implements Path {
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("ES_COMPARING_STRINGS_WITH_EQ")
     private TPath(
             final URI uri,
-            final TArchiveDetector detector,
+            final @CheckForNull TArchiveDetector detector,
             final @CheckForNull FsPath address) {
         if (uri.isOpaque())
             throw new IllegalArgumentException(
@@ -560,6 +560,7 @@ public final class TPath implements Path {
         getFileSystem().checkAccess(this, modes);
     }
 
+    @Nullable
     <V extends FileAttributeView> V getFileAttributeView(
             Class<V> type,
             LinkOption... options) {

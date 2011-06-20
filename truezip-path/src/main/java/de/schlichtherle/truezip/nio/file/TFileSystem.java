@@ -46,6 +46,7 @@ import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -516,6 +517,7 @@ public final class TFileSystem extends FileSystem {
     }
 
     @SuppressWarnings("unchecked")
+    @Nullable
     <V extends FileAttributeView> V getFileAttributeView(
             TPath path,
             Class<V> type,
