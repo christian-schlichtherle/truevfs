@@ -18,7 +18,7 @@
  */
 package ${package};
 
-import de.schlichtherle.truezip.nio.fsp.TPath;
+import de.schlichtherle.truezip.nio.file.TPath;
 import de.schlichtherle.truezip.file.TConfig;
 import java.io.IOException;
 import java.nio.file.Files;

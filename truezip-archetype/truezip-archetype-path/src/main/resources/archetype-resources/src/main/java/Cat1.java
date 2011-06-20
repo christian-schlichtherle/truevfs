@@ -19,7 +19,7 @@
 package ${package};
 
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.nio.fsp.TPath;
+import de.schlichtherle.truezip.nio.file.TPath;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
