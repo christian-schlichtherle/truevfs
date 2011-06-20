@@ -97,6 +97,34 @@ public final class TPath implements Path {
                 null);
     }
 
+    /**
+     * Constructs a new path from the given file.
+     * If this is an instance of {@link TFile}, its
+     * {@link TFile#getArchiveDetector() archive detector} and
+     * {@link TFile#toFsPath() address} get shared with this instance.
+     * 
+     * @param file the file.
+     */
+    public TPath(File file) {
+        this.uri = uri(file.getPath());
+        if (file instanceof TFile) {
+            final TFile tfile = (TFile) file;
+            this.detector = tfile.getArchiveDetector();
+            this.address = tfile.toFsPath();
+        } else {
+            this.detector = TConfig.get().getArchiveDetector();
+        }
+
+        assert invariants();
+    }
+
+    /**
+     * Constructs a new path from the given sub path strings.
+     * The supported separators are {@link File#separator} and {@code "/"}.
+     * 
+     * @param first the first sub path string.
+     * @param more optional sub path strings.
+     */
     public TPath(String first, String... more) {
         this(uri(first, more), null, null);
     }
@@ -137,7 +165,7 @@ public final class TPath implements Path {
         }
         int i = -1;
         {
-            String s = first.replace(File.separatorChar, SEPARATOR_CHAR);
+            String s = first.replace(separatorChar, SEPARATOR_CHAR);
             int l = s.length();
             for (int k = 0; k < l; k++) {
                 char c = s.charAt(k);
@@ -150,7 +178,7 @@ public final class TPath implements Path {
             }
         }
         for (String s : more) {
-            s = s.replace(File.separatorChar, SEPARATOR_CHAR);
+            s = s.replace(separatorChar, SEPARATOR_CHAR);
             int l = s.length();
             for (int j = 0, k = 0; k < l; k++) {
                 char c = s.charAt(k);
