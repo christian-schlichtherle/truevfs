@@ -116,11 +116,12 @@ public final class TPath implements Path {
         assert invariants();
     }
 
-    TPath(final FsPath parent, String first, final String... more) {
+    TPath(final TFileSystem fileSystem, String first, final String... more) {
         this.uri = toUri(cutLeadingSeparators(first), more);
         final TArchiveDetector detector = TConfig.get().getArchiveDetector();
         this.detector = detector;
-        this.address = new TUriScanner(detector).toPath(parent, uri);
+        this.address = new TUriScanner(detector)
+                .toPath(new FsPath(fileSystem.getMountPoint(), ROOT), uri);
 
         assert invariants();
     }
@@ -290,11 +291,9 @@ public final class TPath implements Path {
     private FsPath newAddress() {
         final URI uri = getUri();
         return new TUriScanner(getArchiveDetector()).toPath(
-                new FsPath(
-                    isAbsolute(uri)
-                        ? TFileSystemProvider.get(this).getRoot()
-                        : TFileSystemProvider.get(this).getCurrent(),
-                    ROOT),
+                isAbsolute(uri)
+                    ? TFileSystemProvider.get(this).getRoot()
+                    : TFileSystemProvider.get(this).getCurrent(),
                 uri);
     }
 
@@ -436,7 +435,7 @@ public final class TPath implements Path {
         final TArchiveDetector d = TConfig.get().getArchiveDetector();
         return new TPath(u, d, new TUriScanner(d).toPath(
                 isAbsolute(member)
-                    ? new FsPath(TFileSystemProvider.get(this).getRoot(), ROOT)
+                    ? TFileSystemProvider.get(this).getRoot()
                     : getAddress(),
                 member));
     }

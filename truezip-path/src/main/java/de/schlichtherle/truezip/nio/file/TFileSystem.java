@@ -36,7 +36,6 @@ import de.schlichtherle.truezip.fs.FsSyncException;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import de.schlichtherle.truezip.fs.FsFilteringManager;
 import static de.schlichtherle.truezip.fs.FsManager.*;
-import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.fs.FsSyncOption;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
@@ -279,7 +278,7 @@ public final class TFileSystem extends FileSystem {
 
     @Override
     public TPath getPath(String first, String... more) {
-        return new TPath(new FsPath(getMountPoint(), ROOT), first, more);
+        return new TPath(this, first, more);
     }
 
     @Override
@@ -301,8 +300,8 @@ public final class TFileSystem extends FileSystem {
     public boolean equals(Object that) {
         return this == that
                 || that instanceof TFileSystem
-                && this.getMountPoint().equals(
-                    ((TFileSystem) that).getMountPoint());
+                    && this.getMountPoint().equals(
+                        ((TFileSystem) that).getMountPoint());
     }
 
     @Override
