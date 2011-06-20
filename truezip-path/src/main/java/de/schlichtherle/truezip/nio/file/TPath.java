@@ -58,7 +58,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileAttributeView;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -182,6 +181,7 @@ public final class TPath implements Path {
         }
     }
 
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("ES_COMPARING_STRINGS_WITH_EQ")
     private static URI fix(URI uri) {
         if (uri.isOpaque())
             throw new IllegalArgumentException(

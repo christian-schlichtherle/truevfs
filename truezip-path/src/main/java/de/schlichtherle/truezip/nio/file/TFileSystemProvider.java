@@ -260,7 +260,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
     }
 
     /**
-     * Returns a {@TPath} for the given hierarchical {@code uri}.
+     * Returns a {@code TPath} for the given hierarchical {@code uri}.
      * <p>
      * The {@code uri} is scanned for prospective archive files using the
      * {@link TConfig#get() current configuration}.
