@@ -31,7 +31,6 @@
 
     <modules>
         <module>truezip-driver-file</module>
-        <module>truezip-driver-file-jse7</module>
         <module>truezip-driver-http</module>
         <module>truezip-driver-tar</module>
         <module>truezip-driver-tzp</module>
@@ -53,6 +52,19 @@
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truezip-path</artifactId>
+                <version>${project.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truezip-path</artifactId>
+                <version>${project.version}</version>
+                <type>test-jar</type>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -60,14 +72,11 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truezip-kernel</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truezip-kernel</artifactId>
-            <version>${project.version}</version>
             <type>test-jar</type>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

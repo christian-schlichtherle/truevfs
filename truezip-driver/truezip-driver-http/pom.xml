@@ -29,44 +29,9 @@
     <description>
         The file system driver for the HTTP(S) scheme.
 
-        Add the JAR artifact of this module to the compile-time class path for
-        dependency injection to the TrueZIP Kernel module or to the run-time
-        class path for service location in the TrueZIP File* module.
+        Add the JAR artifact of this module to the compile time class path for
+        dependency injection to the TrueZIP Kernel module or to the run time
+        class path for service location in the TrueZIP File* and TrueZIP Path
+        modules.
     </description>
-
-    <profiles>
-        <profile>
-            <id>truezip-driver-file</id>
-            <activation>
-                <!--jdk>(,1.7)</jdk-->
-                <jdk>[1.6,)</jdk>
-            </activation>
-            <dependencies>
-                <!-- The file system driver for the file scheme in JSE 6.
-                     Without this run-time dependency an application couldn't
-                     resolve the file scheme in URIs like
-                     "zip:file:/archive.zip!/entry" etc. -->
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>truezip-driver-file</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>truezip-driver-file-jse7</id>
-            <activation>
-                <jdk>[1.7,)</jdk>
-            </activation>
-            <dependencies>
-                <!-- The file system driver for the file scheme in JSE 7+.
-                     Without this run-time dependency an application couldn't
-                     resolve the file scheme in URIs like
-                     "zip:file:/archive.zip!/entry" etc. -->
-                <!--dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>truezip-driver-file-jse7</artifactId>
-                </dependency-->
-            </dependencies>
-        </profile>
-    </profiles>
 </project>

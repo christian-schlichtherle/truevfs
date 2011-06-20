@@ -20,6 +20,7 @@ About TrueZIP Driver TAR
 |<<<tar.gz>>>, <<<tgz>>>|{{{../../apidocs/de/schlichtherle/truezip/fs/archive/tar/TarGZipDriver.html}<<<TarGZipDriver>>>}}|
 *--+--+
 
-    Add the JAR artifact of this module to the compile-time class path for
-    dependency injection to the TrueZIP Kernel module or to the run-time
-    class path for service location in the TrueZIP File* module.
+    Add the JAR artifact of this module to the compile time class path for
+    dependency injection to the TrueZIP Kernel module or to the run time
+    class path for service location in the TrueZIP File* and TrueZIP Path
+    modules.

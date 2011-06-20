@@ -60,12 +60,6 @@
             <version>${truezip.version}</version>
             <scope>runtime</scope>
         </dependency-->
-        <!--dependency>
-            <groupId>de.schlichtherle.truezip</groupId>
-            <artifactId>truezip-driver-file-jse7</artifactId>
-            <version>${truezip.version}</version>
-            <scope>runtime</scope>
-        </dependency-->
 
         <!-- This driver provides access to the following URI schemes:
              http|https: Hyper Text Transport Protocol.

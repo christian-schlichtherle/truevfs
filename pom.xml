@@ -89,9 +89,15 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truezip-driver-file-jse7</artifactId>
+                <artifactId>truezip-kernel</artifactId>
                 <version>${project.version}</version>
-                <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truezip-kernel</artifactId>
+                <version>${project.version}</version>
+                <type>test-jar</type>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.netbeans</groupId>
@@ -162,7 +168,7 @@
                                     <version>3.0</version>
                                 </requireMavenVersion>
                                 <requireJavaVersion>
-                                    <version>1.6</version>
+                                    <version>1.7</version>
                                 </requireJavaVersion>
                             </rules>
                         </configuration>
