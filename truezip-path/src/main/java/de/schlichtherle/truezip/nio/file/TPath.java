@@ -60,7 +60,15 @@ import java.util.Set;
 import net.jcip.annotations.Immutable;
 
 /**
- * A {@link Path} implementation based on the TrueZIP Kernel module.
+ * A {@link Path} implementation
+ * based on the TrueZIP Kernel module.
+ * <p>
+ * Note that objects of this class are immutable and inherently volatile
+ * because all virtual file system state is managed by the TrueZIP Kernel
+ * module.
+ * As a consequence, you should never use object identity ('==') to test for
+ * equality of objects of this class with another object, but instead use the
+ * method {@link #equals(Object)}.
  * 
  * @author  Christian Schlichtherle
  * @version $Id$
