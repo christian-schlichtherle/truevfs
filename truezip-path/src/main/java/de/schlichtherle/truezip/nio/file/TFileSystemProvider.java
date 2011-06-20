@@ -87,9 +87,6 @@ public final class TFileSystemProvider extends FileSystemProvider {
         TFileSystemProvider provider = DEFAULT;
         if (null == provider)
             provider = new TFileSystemProvider();
-        final URI uri = path.getUri();
-        if (uri.isAbsolute() && !uri.getScheme().equalsIgnoreCase(provider.getScheme()))
-            throw new ProviderMismatchException(uri.getScheme() + " (wrong scheme - expected "+ provider.getScheme() + ")");
         return provider;
     }
 

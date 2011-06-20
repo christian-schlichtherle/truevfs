@@ -100,13 +100,13 @@ public final class TPath implements Path {
         if (uri.isOpaque())
             throw new IllegalArgumentException(
                     new QuotedInputUriSyntaxException(uri, "Opaque URI."));
-        String p = uri.getRawPath(), q = p;
+        String p = uri.getPath(), q = p;
         p = cutTrailingSeparators(p);
         if (p != q // mind contract of cutTrailingSeparators(String)
                 || null == uri.getRawSchemeSpecificPart() // fix for bug: null == new URI("foo").resolve(neAw URI("..")).getRawSchemeSpecificPart()
                 || null == uri.getRawAuthority()
                     && uri.getRawSchemeSpecificPart().startsWith(SEPARATOR + SEPARATOR)) { // fix empty authority
-            this.uri = new UriBuilder(uri, true).path(p).toUri();
+            this.uri = new UriBuilder(uri).path(p).toUri();
         } else {
             this.uri = uri;
         }
@@ -135,40 +135,40 @@ public final class TPath implements Path {
         }
         int i = -1;
         {
-            String s = cutTrailingSeparators(
-                    first.replace(File.separatorChar, SEPARATOR_CHAR));
+            String s = first.replace(File.separatorChar, SEPARATOR_CHAR);
             int l = s.length();
             for (int k = 0; k < l; k++) {
                 char c = s.charAt(k);
                 if (SEPARATOR_CHAR != c
                         || i <= 0
-                        || 0 < i && SEPARATOR_CHAR != s.charAt(i)) {
+                        || 0 < i && SEPARATOR_CHAR != pb.charAt(i)) {
                     pb.append(c);
                     i++;
                 }
             }
         }
         for (String s : more) {
-            s = cutTrailingSeparators(
-                    s.replace(File.separatorChar, SEPARATOR_CHAR));
+            s = s.replace(File.separatorChar, SEPARATOR_CHAR);
             int l = s.length();
             for (int j = 0, k = 0; k < l; k++) {
                 char c = s.charAt(k);
-                if (SEPARATOR_CHAR != c
-                        || 0 < j && 0 <= i && SEPARATOR_CHAR != s.charAt(i)) {
-                    if (0 == j)
-                        pb.append(SEPARATOR);
+                final boolean n = SEPARATOR_CHAR != c;
+                final boolean o = 0 <= i && SEPARATOR_CHAR != pb.charAt(i);
+                if (n || o) {
+                    if (0 == j && n && o)
+                        pb.append(SEPARATOR_CHAR);
                     pb.append(c);
                     i++;
                     j++;
                 }
             }
         }
-        final String p = pb.toString();
+        String p = pb.toString();
+        final int l = prefixLength(p);
+        p = cutTrailingSeparators(p, l);
         try {
-            final int ppl = Paths.prefixLength(p, SEPARATOR_CHAR);
-            if (0 < ppl) {
-                if (SEPARATOR_CHAR != p.charAt(ppl - 1))
+            if (0 < l) {
+                if (SEPARATOR_CHAR != p.charAt(l - 1))
                     throw new QuotedInputUriSyntaxException(p, "Relative path with non-empty prefix.");
                 if (SEPARATOR_CHAR == p.charAt(0))
                     return new URI(p); // may parse authority
@@ -187,7 +187,22 @@ public final class TPath implements Path {
     }
 
     private static String cutTrailingSeparators(String p) {
-        return Paths.cutTrailingSeparators(p, SEPARATOR_CHAR);
+        return cutTrailingSeparators(p, prefixLength(p));
+    }
+
+    static String cutTrailingSeparators(
+            final String p,
+            final int o) {
+        int i = p.length();
+        if (o >= i || SEPARATOR_CHAR != p.charAt(--i))
+            return p;
+        while (o <= i && SEPARATOR_CHAR == p.charAt(--i)) {
+        }
+        return p.substring(0, ++i);
+    }
+
+    private static int prefixLength(String p) {
+        return Paths.prefixLength(p, SEPARATOR_CHAR);
     }
 
     private static boolean isAbsolute(URI uri) {
@@ -304,7 +319,14 @@ public final class TPath implements Path {
 
     @Override
     public @Nullable TPath getRoot() {
-        return new TPath(toUri().resolve(SEPARATOR), getArchiveDetector(), null); // don't use getAddress()!
+        final String s = getUri().getSchemeSpecificPart();
+        final int l = prefixLength(s);
+        if (0 >= l || SEPARATOR_CHAR != s.charAt(l - 1))
+            return null;
+        return new TPath(
+                toUri(s.substring(0, l)),
+                getArchiveDetector(),
+                null);
     }
 
     @Override
@@ -312,7 +334,7 @@ public final class TPath implements Path {
         final URI uri = getUri();
         final URI parent = uri.resolve(".");
         final URI member = parent.relativize(uri);
-        return new TPath(member, getArchiveDetector(), null); // don't use getAddress()!
+        return new TPath(member, getArchiveDetector(), null);
     }
 
     @Override
@@ -449,7 +471,7 @@ public final class TPath implements Path {
     @Override
     public URI toUri() {
         return new UriBuilder(getAddress().toHierarchicalUri())
-                .scheme(getFileSystem().provider().getScheme())
+                .scheme(TFileSystemProvider.get(this).getScheme())
                 .toUri();
     }
 
@@ -481,7 +503,7 @@ public final class TPath implements Path {
 
     @Override
     public int compareTo(Path that) {
-        return this.toUri().compareTo(that.toUri());
+        return this.toString().compareTo(that.toString());
     }
 
     @Override
@@ -492,7 +514,7 @@ public final class TPath implements Path {
             return false;
         final Path that = (Path) other;
         return this.getFileSystem().equals(that.getFileSystem())
-                && this.toUri().equals(that.toUri());
+                && this.toString().equals(that.toString());
     }
 
     @Override
@@ -502,7 +524,7 @@ public final class TPath implements Path {
             return hashCode;
         int result = 17;
         result = 37 * result + getFileSystem().hashCode();
-        result = 37 * result + toUri().hashCode();
+        result = 37 * result + toString().hashCode();
         return this.hashCode = result;
     }
 
