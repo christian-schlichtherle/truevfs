@@ -19,12 +19,12 @@ import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.fs.FsDefaultDriver;
 import de.schlichtherle.truezip.fs.sl.FsDriverLocator;
 import de.schlichtherle.truezip.fs.FsCompositeDriver;
-import de.schlichtherle.truezip.fs.FsDefaultManager;
 import de.schlichtherle.truezip.fs.FsInputOption;
 import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.fs.FsUriModifier;
+import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
@@ -43,6 +43,10 @@ import java.net.URI;
  */
 public final class Copy {
 
+    /** You cannot instantiate this class. */
+    private Copy() {
+    }
+
     public static void main(String[] args) throws IOException {
         copy(args[0], args[1]);
     }
@@ -58,10 +62,10 @@ public final class Copy {
      *         conform to the syntax constraints for {@link URI}s.
      */
     static void copy(String src, String dst) throws IOException {
-        // Create a manager for the life cycle of controllers for federated
+        // Get a manager for the life cycle of controllers for federated
         // file systems.
-        // Alternatively, we could use FsManagerLocator.SINGLETON.get();
-        FsManager manager = new FsDefaultManager();
+        // Alternatively, we could use new FsDefaultManager();
+        FsManager manager = FsManagerLocator.SINGLETON.get();
         try {
             // Search the class path for the set of all supported file system
             // drivers and build a composite driver from it.

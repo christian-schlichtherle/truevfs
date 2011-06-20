@@ -32,7 +32,7 @@ import java.io.InputStream;
  * The benefit of having this class at all is that these code snippets get
  * checked by the compiler and are subject for automated refactoring.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 abstract class Usage {
