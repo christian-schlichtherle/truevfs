@@ -72,7 +72,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
     public OutputStream newOutputStream() throws IOException {
         final File entryFile = entry.getFile();
         if (options.get(EXCLUSIVE) && entryFile.exists())
-            throw new IOException(entryFile + " (file exists already)"); // this is obviously not atomic
+            throw new FileNotFoundException(entryFile + " (file exists already)"); // this is obviously not atomic
         if (options.get(CREATE_PARENTS))
             entryFile.getParentFile().mkdirs();
         final FileEntry temp = options.get(CACHE) && !entryFile.createNewFile()
