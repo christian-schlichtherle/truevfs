@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.fs.file.nio;
+package de.schlichtherle.truezip.fs.nio.file;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,7 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.junit.Test;
 
-import static de.schlichtherle.truezip.fs.file.nio.FileController.isCreatableOrWritable;
+import static de.schlichtherle.truezip.fs.nio.file.FileController.isCreatableOrWritable;
 import static org.junit.Assert.*;
 
 /**

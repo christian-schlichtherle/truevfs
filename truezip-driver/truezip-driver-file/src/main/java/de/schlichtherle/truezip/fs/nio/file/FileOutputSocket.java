@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.fs.file.nio;
+package de.schlichtherle.truezip.fs.nio.file;
 
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.nio.file.OpenOption;
@@ -95,11 +95,13 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
         if (options.get(CACHE)) {
             try {
                 createFile(entryFile);
-                if (options.get(EXCLUSIVE))
-                    throw new IOException(entryFile + " (file exists already)"); // this is obviously not atomic
             } catch (FileAlreadyExistsException ex) {
+                if (options.get(EXCLUSIVE))
+                    throw ex;
                 exists = ex;
             }
+        } else if (options.get(EXCLUSIVE) && exists(entryFile)) {
+            throw new FileAlreadyExistsException(entry.toString());
         }
         final FileEntry temp = null != exists
                 ? entry.createTempFile()
@@ -194,11 +196,13 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
         if (options.get(CACHE)) {
             try {
                 createFile(entryFile);
-                if (options.get(EXCLUSIVE))
-                    throw new IOException(entryFile + " (file exists already)"); // this is obviously not atomic
             } catch (FileAlreadyExistsException ex) {
+                if (options.get(EXCLUSIVE))
+                    throw ex;
                 exists = ex;
             }
+        } else if (options.get(EXCLUSIVE) && exists(entryFile)) {
+            throw new FileAlreadyExistsException(entry.toString());
         }
         final FileEntry temp = null != exists
                 ? entry.createTempFile()

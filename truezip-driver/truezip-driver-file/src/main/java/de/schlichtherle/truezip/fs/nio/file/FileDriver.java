@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Schlichtherle IT Services
+ * Copyright 2011 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,34 +13,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.fs.file.nio;
+package de.schlichtherle.truezip.fs.nio.file;
 
-import de.schlichtherle.truezip.socket.IOPool;
-import de.schlichtherle.truezip.socket.spi.IOPoolService;
+import de.schlichtherle.truezip.fs.FsController;
+import de.schlichtherle.truezip.fs.FsDriver;
+import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.util.JSE7;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.Immutable;
 
 /**
- * Contains {@link TempFilePool#INSTANCE}.
- *
- * @author Christian Schlichtherle
+ * A file system driver for the FILE scheme.
+ * 
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @Immutable
 @DefaultAnnotation(NonNull.class)
-public final class TempFilePoolService extends IOPoolService {
+public final class FileDriver extends FsDriver {
 
     @Override
-    public IOPool<?> get() {
-        return TempFilePool.INSTANCE;
+    public FsController<?>
+    newController(FsModel model, @CheckForNull FsController<?> parent) {
+        assert null == model.getParent()
+                ? null == parent
+                : model.getParent().equals(parent.getModel());
+        if (null != parent)
+            throw new IllegalArgumentException();
+        return new FileController(model);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @return {@code 10}
+     * @return {@code 10} or {@code -10}, depending on the availability of the
+     *         NIO.2 API.
      */
     @Override
     public int getPriority() {
