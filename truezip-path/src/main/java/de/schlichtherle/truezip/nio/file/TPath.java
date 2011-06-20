@@ -205,11 +205,6 @@ public final class TPath implements Path {
         return Paths.prefixLength(p, SEPARATOR_CHAR);
     }
 
-    private static boolean isAbsolute(URI uri) {
-        return uri.isAbsolute()
-                || Paths.isAbsolute(uri.getSchemeSpecificPart(), SEPARATOR_CHAR);
-    }
-
     /**
      * Checks the invariants of this class and throws an AssertionError if
      * any is violated even if assertion checking is disabled.
@@ -288,16 +283,15 @@ public final class TPath implements Path {
      * @return An {@link FsPath} for this path with an absolute URI.
      */
     FsPath getAddress() {
-        final FsPath address = this.address;
-        return null != address
-                ? address
-                : (this.address = toPath(getUri()));
+        final FsPath addr = this.address;
+        return null != addr ? addr : (this.address = newAddress());
     }
 
-    private FsPath toPath(URI uri) {
+    private FsPath newAddress() {
+        final URI uri = getUri();
         return new TUriScanner(getArchiveDetector()).toPath(
                 new FsPath(
-                    isAbsolute()
+                    isAbsolute(uri)
                         ? TFileSystemProvider.get(this).getRoot()
                         : TFileSystemProvider.get(this).getCurrent(),
                     ROOT),
@@ -306,15 +300,18 @@ public final class TPath implements Path {
 
     @Override
     public TFileSystem getFileSystem() {
-        final TFileSystem fileSystem = this.fileSystem;
-        return null != fileSystem
-                ? fileSystem
-                : (this.fileSystem = TFileSystem.get(this));
+        final TFileSystem fs = this.fileSystem;
+        return null != fs ? fs : (this.fileSystem = TFileSystem.get(this));
     }
 
     @Override
     public boolean isAbsolute() {
         return isAbsolute(getUri());
+    }
+
+    private static boolean isAbsolute(URI uri) {
+        return uri.isAbsolute()
+                || Paths.isAbsolute(uri.getSchemeSpecificPart(), SEPARATOR_CHAR);
     }
 
     @Override
