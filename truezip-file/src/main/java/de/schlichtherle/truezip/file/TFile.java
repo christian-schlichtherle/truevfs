@@ -50,6 +50,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -1819,6 +1820,13 @@ public final class TFile extends File {
         return delegate.toString();
     }
 
+    @Override
+    public Path toPath() {
+        if (null != innerArchive)
+            throw new UnsupportedOperationException("TPath promotion not supported in order to avoid circular dependencies.");
+        return delegate.toPath();
+    }
+    
     public FsPath toFsPath() {
         try {
             if (this == innerArchive) {
