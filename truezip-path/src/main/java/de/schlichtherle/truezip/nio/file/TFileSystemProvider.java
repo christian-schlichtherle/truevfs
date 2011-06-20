@@ -19,10 +19,12 @@ import static de.schlichtherle.truezip.entry.Entry.Type.*;
 import de.schlichtherle.truezip.file.TConfig;
 import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.fs.FsEntry;
+import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import static de.schlichtherle.truezip.fs.FsInputOptions.*;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
+import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
@@ -59,6 +61,7 @@ import java.nio.file.attribute.FileAttributeView;
 import java.nio.file.spi.FileSystemProvider;
 import java.util.Map;
 import java.util.Set;
+import net.jcip.annotations.Immutable;
 
 /**
  * A {@link FileSystemProvider} implementation based on the TrueZIP Kernel
@@ -67,6 +70,7 @@ import java.util.Set;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@Immutable
 @DefaultAnnotation(NonNull.class)
 public final class TFileSystemProvider extends FileSystemProvider {
 
@@ -74,8 +78,8 @@ public final class TFileSystemProvider extends FileSystemProvider {
             DEFAULT = new TFileSystemProvider();
 
     private final String scheme;
-    private final FsMountPoint root;
-    private final FsMountPoint current;
+    private final FsPath root;
+    private final FsPath current;
 
     /**
      * Obtains a file system provider for the given path.
@@ -83,18 +87,16 @@ public final class TFileSystemProvider extends FileSystemProvider {
      * @param  path a path.
      * @return A file system provider.
      */
-    public static TFileSystemProvider get(final TPath path) {
-        TFileSystemProvider provider = DEFAULT;
-        if (null == provider)
-            provider = new TFileSystemProvider();
-        return provider;
+    static TFileSystemProvider get(final TPath path) {
+        return DEFAULT;
     }
 
     /**
+     * Do <em>NOT</em> call this constructor!
+     * 
      * @deprecated This constructor is solely provided in order to use this
      *             file system provider class with the service loading feature
      *             of NIO.2.
-     * @see        #get(TPath) 
      */
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
     @SuppressWarnings("LeakingThisInConstructor")
@@ -111,8 +113,8 @@ public final class TFileSystemProvider extends FileSystemProvider {
             final FsMountPoint root,
             final FsMountPoint current) {
         this.scheme = scheme.toString();
-        this.root = root;
-        this.current = current;
+        this.root = new FsPath(root, ROOT);
+        this.current = new FsPath(current, ROOT);
 
         assert invariants();
     }
@@ -129,11 +131,11 @@ public final class TFileSystemProvider extends FileSystemProvider {
         return scheme;
     }
 
-    FsMountPoint getRoot() {
+    FsPath getRoot() {
         return root;
     }
 
-    FsMountPoint getCurrent() {
+    FsPath getCurrent() {
         return current;
     }
 
@@ -377,6 +379,18 @@ public final class TFileSystemProvider extends FileSystemProvider {
     @Override
     public void setAttribute(Path path, String attribute, Object value, LinkOption... options) throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public boolean equals(Object that) {
+        return this == that
+                || that instanceof TFileSystemProvider
+                    && this.getScheme().equalsIgnoreCase(
+                        ((TFileSystemProvider) that).getScheme());
+    }
+
+    public int hashCode() {
+        return getScheme().hashCode();
     }
 
     private static TPath promote(Path path) {
