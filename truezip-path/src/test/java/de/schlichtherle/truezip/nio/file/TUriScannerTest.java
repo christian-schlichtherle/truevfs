@@ -32,6 +32,7 @@ public class TUriScannerTest extends TestBase {
     public void testResolve() {
         for (final String[] params : new String[][] {
             // $parent, $member, $path, [$mountPoint]
+            { "file:/", "c%3A/foo", "file:/c:/foo", "file:/c:/" },
             { "file:/", "//foo/bar/", "file://foo/bar/", "file://foo/bar/" },
             { "file:/", "//foo/bar", "file://foo/bar", "file://foo/" },
             { "foo", "bar", "foo/bar", null },

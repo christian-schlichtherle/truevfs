@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.nio.file;
 
+import static de.schlichtherle.truezip.nio.file.TUriScanner.*;
 import de.schlichtherle.truezip.file.TConfig;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.file.TArchiveDetector;
@@ -36,6 +37,7 @@ import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.File;
+import static java.io.File.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -55,7 +57,10 @@ import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileAttributeView;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import net.jcip.annotations.Immutable;
 
@@ -83,17 +88,18 @@ public final class TPath implements Path {
     private volatile @CheckForNull FsPath address;
     private volatile @CheckForNull TFileSystem fileSystem;
     private volatile @CheckForNull Integer hashCode;
+    private volatile @CheckForNull List<String> segments;
 
     TPath(Path path) {
-        this(   toUri(path.toString().replace(
+        this(   uri(path.toString().replace(
                     path.getFileSystem().getSeparator(),
-                    File.separator)),
+                    separator)),
                 null,
                 null);
     }
 
     public TPath(String first, String... more) {
-        this(toUri(first, more), null, null);
+        this(uri(first, more), null, null);
     }
 
     TPath(URI uri) {
@@ -105,19 +111,7 @@ public final class TPath implements Path {
             final URI uri,
             final @CheckForNull TArchiveDetector detector,
             final @CheckForNull FsPath address) {
-        if (uri.isOpaque())
-            throw new IllegalArgumentException(
-                    new QuotedInputUriSyntaxException(uri, "Opaque URI."));
-        String p = uri.getPath(), q = p;
-        p = cutTrailingSeparators(p);
-        if (p != q // mind contract of cutTrailingSeparators(String)
-                || null == uri.getRawSchemeSpecificPart() // fix for bug: null == new URI("foo").resolve(neAw URI("..")).getRawSchemeSpecificPart()
-                || null == uri.getRawAuthority()
-                    && uri.getRawSchemeSpecificPart().startsWith(SEPARATOR + SEPARATOR)) { // fix empty authority
-            this.uri = new UriBuilder(uri).path(p).toUri();
-        } else {
-            this.uri = uri;
-        }
+        this.uri = fix(uri);
         this.detector = null != detector ? detector : TConfig.get().getArchiveDetector();
         this.address = address;
 
@@ -125,16 +119,16 @@ public final class TPath implements Path {
     }
 
     TPath(final TFileSystem fileSystem, String first, final String... more) {
-        this.uri = toUri(cutLeadingSeparators(first), more);
+        this.uri = uri(cutLeadingSeparators(first), more);
         final TArchiveDetector detector = TConfig.get().getArchiveDetector();
         this.detector = detector;
         this.address = new TUriScanner(detector)
-                .toPath(new FsPath(fileSystem.getMountPoint(), ROOT), uri);
+                .resolve(new FsPath(fileSystem.getMountPoint(), ROOT), uri);
 
         assert invariants();
     }
 
-    private static URI toUri(final String first, final String... more) {
+    private static URI uri(final String first, final String... more) {
         final StringBuilder b;
         {
             int l = 1 + first.length(); // might prepend SEPARATOR
@@ -188,15 +182,25 @@ public final class TPath implements Path {
         }
     }
 
+    private static URI fix(URI uri) {
+        if (uri.isOpaque())
+            throw new IllegalArgumentException(
+                    new QuotedInputUriSyntaxException(uri, "Opaque URI"));
+        uri = TUriScanner.fix(uri);
+        final int pl = pathPrefixLength(uri);
+        String p = uri.getPath();
+        final String q = p;
+        p = cutTrailingSeparators(p, pl);
+        if (p != q) // mind contract of cutTrailingSeparators(String, int)
+            return new UriBuilder(uri).path(p).toUri();
+        return uri;
+    }
+
     private static String cutLeadingSeparators(final String p) {
         int i = 0;
         while (SEPARATOR_CHAR == p.charAt(i))
             i++;
         return 0 == i ? p : p.substring(i);
-    }
-
-    private static String cutTrailingSeparators(String p) {
-        return cutTrailingSeparators(p, prefixLength(p));
     }
 
     static String cutTrailingSeparators(
@@ -211,7 +215,7 @@ public final class TPath implements Path {
     }
 
     private static int prefixLength(String p) {
-        return Paths.prefixLength(p, SEPARATOR_CHAR);
+        return Paths.prefixLength(p, SEPARATOR_CHAR, true);
     }
 
     /**
@@ -298,7 +302,7 @@ public final class TPath implements Path {
 
     private FsPath newAddress() {
         final URI uri = getUri();
-        return new TUriScanner(getArchiveDetector()).toPath(
+        return new TUriScanner(getArchiveDetector()).resolve(
                 isAbsolute(uri)
                     ? TFileSystemProvider.get(this).getRoot()
                     : TFileSystemProvider.get(this).getCurrent(),
@@ -329,7 +333,7 @@ public final class TPath implements Path {
         if (0 >= l || SEPARATOR_CHAR != s.charAt(l - 1))
             return null;
         return new TPath(
-                toUri(s.substring(0, l)),
+                uri(s.substring(0, l)),
                 getArchiveDetector(),
                 null);
     }
@@ -357,51 +361,70 @@ public final class TPath implements Path {
         }
     }
 
+    private List<String> getSegments() {
+        final List<String> segments = this.segments;
+        if (null != segments)
+            return segments;
+        final String ssp = getUri().getSchemeSpecificPart();
+        final String[] a = ssp.substring(prefixLength(ssp)).split(SEPARATOR);
+        int i = 0;
+        for (String s : a)
+            if (!s.isEmpty())
+                a[i++] = s;
+        return this.segments = //Collections.unmodifiableList(
+                Arrays.asList(a).subList(0, i);
+    }
+
     @Override
     public int getNameCount() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return getSegments().size();
     }
 
     @Override
     public TPath getName(int index) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new TPath(getSegments().get(index));
     }
 
     @Override
-    public TPath subpath(int beginIndex, int endIndex) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public TPath subpath(final int beginIndex, final int endIndex) {
+        final List<String> segments = getSegments();
+        final String first = segments.get(beginIndex);
+        final String[] more = new String[endIndex - beginIndex - 1];
+        return new TPath(
+                first,
+                segments.subList(beginIndex + 1, endIndex).toArray(more));
     }
 
     @Override
     public boolean startsWith(Path that) {
-        if (this.getFileSystem() != that.getFileSystem())
+        if (!this.getFileSystem().equals(that.getFileSystem()))
             return false;
-        return startsWith(((TPath) that).getAddress().getEntryName().toString());
+        return startsWith(that.toString());
     }
 
     @Override
     public boolean startsWith(String other) {
-        final String name = this.getAddress().getEntryName().toString();
+        final String name = toString();
         final int ol = other.length();
         return name.startsWith(other)
                 && (name.length() == ol
-                    || SEPARATOR_CHAR == name.charAt(ol));
+                    || separatorChar == name.charAt(ol));
     }
 
     @Override
     public boolean endsWith(Path that) {
-        if (this.getFileSystem() != that.getFileSystem())
+        if (!this.getFileSystem().equals(that.getFileSystem()))
             return false;
-        return endsWith(((TPath) that).getAddress().getEntryName().toString());
+        return endsWith(that.toString());
     }
 
     @Override
     public boolean endsWith(String other) {
-        final String name = this.getAddress().getEntryName().toString();
+        final String name = toString();
         final int ol = other.length(), tl;
         return name.endsWith(other)
                 && ((tl = name.length()) == ol
-                    || SEPARATOR_CHAR == name.charAt(tl - ol));
+                    || separatorChar == name.charAt(tl - ol));
     }
 
     @Override
@@ -410,17 +433,17 @@ public final class TPath implements Path {
     }
 
     @Override
-    public TPath resolve(final Path member) {
+    public TPath resolve(Path member) {
         return member instanceof TPath
                 ? resolve(((TPath) member).getUri())
                 : resolve(member.toString().replace(
                     member.getFileSystem().getSeparator(),
-                    File.separator));
+                    separator));
     }
 
     @Override
-    public TPath resolve(final String member) {
-        return resolve(toUri(member));
+    public TPath resolve(String member) {
+        return resolve(uri(member));
     }
 
     private TPath resolve(final URI member) {
@@ -442,7 +465,7 @@ public final class TPath implements Path {
             throw new IllegalArgumentException(ex);
         }
         final TArchiveDetector d = TConfig.get().getArchiveDetector();
-        return new TPath(u, d, new TUriScanner(d).toPath(
+        return new TPath(u, d, new TUriScanner(d).resolve(
                 isAbsolute(member)
                     ? TFileSystemProvider.get(this).getRoot()
                     : getAddress(),
@@ -503,7 +526,30 @@ public final class TPath implements Path {
 
     @Override
     public Iterator<Path> iterator() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new SegmentIterator(this);
+    }
+
+    private static final class SegmentIterator implements Iterator<Path> {
+        final Iterator<String> i;
+        
+        SegmentIterator(TPath path) {
+            this.i = path.getSegments().iterator();
+        }
+
+        @Override
+        public boolean hasNext() {
+            return i.hasNext();
+        }
+
+        @Override
+        public Path next() {
+            return new TPath(i.next());
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
     }
 
     @Override
@@ -537,7 +583,7 @@ public final class TPath implements Path {
     public String toString() {
         return getUri()
                 .getSchemeSpecificPart()
-                .replace(SEPARATOR, getFileSystem().getSeparator());
+                .replace(SEPARATOR_CHAR, separatorChar);
     }
 
     SeekableByteChannel newByteChannel(
