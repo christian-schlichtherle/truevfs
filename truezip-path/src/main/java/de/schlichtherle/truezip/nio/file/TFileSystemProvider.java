@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.nio.file;
 
+import net.jcip.annotations.ThreadSafe;
+import java.util.logging.Logger;
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
 import de.schlichtherle.truezip.file.TConfig;
 import de.schlichtherle.truezip.file.TArchiveDetector;
@@ -30,7 +32,6 @@ import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
@@ -61,25 +62,18 @@ import java.nio.file.attribute.FileAttributeView;
 import java.nio.file.spi.FileSystemProvider;
 import java.util.Map;
 import java.util.Set;
-import net.jcip.annotations.Immutable;
+import java.util.WeakHashMap;
+import static java.util.logging.Level.*;
 
 /**
  * A {@link FileSystemProvider} implementation
  * based on the TrueZIP Kernel module.
- * <p>
- * Note that objects of this class are immutable and inherently volatile
- * because all virtual file system state is managed by the TrueZIP Kernel
- * module.
- * As a consequence, you should never use object identity ('==') to test for
- * equality of objects of this class with another object, but instead use the
- * method {@link #equals(Object)}.
  * 
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@Immutable
+@ThreadSafe
 @DefaultAnnotation(NonNull.class)
-@edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
 public final class TFileSystemProvider extends FileSystemProvider {
 
     private static volatile TFileSystemProvider
@@ -88,6 +82,8 @@ public final class TFileSystemProvider extends FileSystemProvider {
     private final String scheme;
     private final FsPath root;
     private final FsPath current;
+
+    private Map<FsMountPoint, TFileSystem> fileSystems = new WeakHashMap<>();
 
     /**
      * Obtains a file system provider for the given path.
@@ -100,11 +96,14 @@ public final class TFileSystemProvider extends FileSystemProvider {
     }
 
     /**
-     * Do <em>NOT</em> call this constructor!
+     * Do <em>NOT</em> call this constructor - it's solely provided in order
+     * to use this file system provider class with the service loading feature
+     * of NIO.2!
+     * <p>
+     * The resulting file system provider is identified by the
+     * {@link #getScheme() scheme} {@code tpath}.
      * 
-     * @deprecated This constructor is solely provided in order to use this
-     *             file system provider class with the service loading feature
-     *             of NIO.2.
+     * @deprecated do <em>NOT</em> call this constructor!
      */
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
     @SuppressWarnings("LeakingThisInConstructor")
@@ -115,6 +114,8 @@ public final class TFileSystemProvider extends FileSystemProvider {
                 FsMountPoint.create(new File("").toURI()));
                 //FsMountPoint.create(Paths.get("").toUri())); // TUriScanner will remove redundant empty authority component
         DEFAULT = this;
+        Logger  .getLogger(TFileSystemProvider.class.getName())
+                .log(CONFIG, "Installed TrueZIP file system provider");
     }
 
     private TFileSystemProvider(
@@ -148,70 +149,127 @@ public final class TFileSystemProvider extends FileSystemProvider {
         return current;
     }
 
-    private static void pushConfiguration(final @CheckForNull Map<String, ?> env) {
-        if (null == env)
-            return;
+    private static TConfig push(Map<String, ?> env) {
         final TArchiveDetector detector = (TArchiveDetector) env.get(
                 Parameter.ARCHIVE_DETECTOR);
-        final Boolean lenient = (Boolean) env.get(Parameter.LENIENT);
-        if (null == detector && null == lenient)
-            return;
-        TConfig session = TConfig.get();
-        if ((null == detector || detector == session.getArchiveDetector())
-                && (null == lenient || lenient == session.isLenient()))
-            return;
-        session = TConfig.push();
-        if (null != detector)
+        TConfig session = TConfig.push();
+        if (null != detector && detector != session.getArchiveDetector())
             session.setArchiveDetector(detector);
-        if (null != lenient)
-            session.setLenient(lenient);
+        return session;
     }
 
     /**
-     * {@inheritDoc}
+     * Scans the given {@code path} for prospective archive files using the
+     * given {@code configuration} and returns the file system for the
+     * innermost prospective archive file or throws an
+     * {@link UnsupportedOperationException} if no prospective archive file is
+     * detected.
+     * <p>
+     * First, the {@code configuration} {@link Parameter}s get enumerated.
+     * If no value is set for a parameter key, the respective value of the
+     * {@link TConfig#get() current configuration} gets used.
+     * <p>
+     * Next, the {@code path} is scanned for prospective archive files using
+     * the configuration resulting from the first step.
+     * If one or more prospective archive files are found, the file system for
+     * the innermost prospective archive file is returned.
+     * Otherwise, an {@link UnsupportedOperationException} is thrown.
      * 
-     * @param env May contain a {@link TArchiveDetector} for the key
-     *        {@link Parameter#ARCHIVE_DETECTOR} or a {@link Boolean} for the
-     *        key {@link Parameter#LENIENT} for subsequent use.
-     *        If any key is present and the respective value differs from the
-     *        {@link TConfig#get() current configuration}, then a new
-     *        configuration is {@link TConfig#push() pushed} on the thread
-     *        local configuration stack.
+     * @param  path the path to scan for prospective archive files.
+     * @param  configuration may contain a {@link TArchiveDetector} for the key
+     *         {@link Parameter#ARCHIVE_DETECTOR}.
+     * @return the file system for the innermost prospective archive file.
+     * @throws UnsupportedOperationException if no prospective archive file has
+     *         been detected according to the configuration resulting from
+     *         merging the given {@code configuration} with the
+     *         {@link TConfig#get() current configuration}.
      */
     @Override
-    public TFileSystem newFileSystem(Path path, @CheckForNull Map<String, ?> env) {
-        pushConfiguration(env);
-        TPath p = new TPath(path);
-        if (null == p.getAddress().getMountPoint().getParent())
-            throw new UnsupportedOperationException("no prospective archive file detected"); // don't be greedy!
-        return p.getFileSystem();
+    public TFileSystem newFileSystem(Path path, Map<String, ?> configuration) {
+        try (TConfig config = push(configuration)){
+            TPath p = new TPath(path);
+            if (null == p.getAddress().getMountPoint().getParent())
+                throw new UnsupportedOperationException("no prospective archive file detected"); // don't be greedy!
+            return p.getFileSystem();
+        }
     }
 
     /**
-     * {@inheritDoc}
+     * Returns a file system for the given hierarchical {@link TPath}
+     * {@code uri}.
+     * <p>
+     * First, the {@code configuration} {@link Parameter}s get enumerated.
+     * If no value is set for a parameter key, the respective value of the
+     * {@link TConfig#get() current configuration} gets used.
+     * <p>
+     * Next, the {@code uri} is scanned for prospective archive files using
+     * the configuration resulting from the first step.
+     * Any trailing separators in {@code uri} get discarded.
+     * If one or more prospective archive files are found, the file system for
+     * the innermost prospective archive file is returned.
+     * Otherwise, the file system for the innermost directory is returned.
      * 
-     * @param env May contain a {@link TArchiveDetector} for the key
-     *        {@link Parameter#ARCHIVE_DETECTOR} or a {@link Boolean} for the
-     *        key {@link Parameter#LENIENT} for subsequent use.
-     *        If any key is present and the respective value differs from the
-     *        {@link TConfig#get() current configuration}, then a new
-     *        configuration is {@link TConfig#push() pushed} on the thread
-     *        local configuration stack.
+     * @param  uri the {@link TPath} uri to return a file system for.
+     * @param  configuration may contain a {@link TArchiveDetector} for the key
+     *         {@link Parameter#ARCHIVE_DETECTOR}.
+     * @return the file system for the innermost prospective archive file or
+     *         directory.
+     * @throws IllegalArgumentException if the given {@code uri} is opaque.
      */
     @Override
-    public TFileSystem newFileSystem(URI uri, @CheckForNull Map<String, ?> env) {
-        pushConfiguration(env);
-        return new TPath(uri).getFileSystem();
+    public TFileSystem newFileSystem(URI uri, Map<String, ?> configuration) {
+        try (TConfig config = push(configuration)){
+            return getFileSystem(uri);
+        }
     }
 
     /**
-     * Equivalent to {@link #newFileSystem(URI, Map) newFileSystem(uri, null)}.
+     * Returns a file system for the given hierarchical {@link TPath}
+     * {@code uri}.
+     * <p>
+     * The {@code uri} is scanned for prospective archive files using the
+     * {@link TConfig#get() current configuration}.
+     * Any trailing separators in {@code uri} get discarded.
+     * If one or more prospective archive files are found, the file system for
+     * the innermost prospective archive file is returned.
+     * Otherwise, the file system for the innermost directory is returned.
+     * 
+     * @param  uri the {@link TPath} uri to return a file system for.
+     * @return the file system for the innermost prospective archive file or
+     *         directory.
+     * @throws IllegalArgumentException if the given {@code uri} is opaque.
      */
     @Override
     public TFileSystem getFileSystem(URI uri) {
-        return newFileSystem(uri, null);
+        return getPath(uri).getFileSystem();
     }
 
+    /**
+     * Obtains a file system for the given path.
+     * 
+     * @param  path a path.
+     * @return A file system.
+     */
+    synchronized TFileSystem getFileSystem(final TPath path) {
+        //return new TFileSystem(path);
+        final FsMountPoint mp = path.getAddress().getMountPoint();
+        TFileSystem fs = fileSystems.get(mp);
+        if (null == fs)
+            fileSystems.put(mp, fs = new TFileSystem(path));
+        return fs;
+    }
+
+    /**
+     * Returns a {@TPath} for the given hierarchical {@code uri}.
+     * <p>
+     * The {@code uri} is scanned for prospective archive files using the
+     * {@link TConfig#get() current configuration}.
+     * Any trailing separators in {@code uri} get discarded.
+     * 
+     * @param  uri the uri to return a {@link TPath} for.
+     * @return the {@link TPath}
+     * @throws IllegalArgumentException if the given {@code uri} is opaque.
+     */
     @Override
     public TPath getPath(URI uri) {
         return new TPath(uri);
@@ -390,28 +448,6 @@ public final class TFileSystemProvider extends FileSystemProvider {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    /**
-     * Returns {@code true} iff the given object is a
-     * {@code TFileSystemProvider} and its {@link #getScheme() scheme}
-     * {@link String#equalsIgnoreCase(String) equals} the scheme of this file
-     * system provider, whereby case is ignored.
-     */
-    @Override
-    public boolean equals(Object that) {
-        return this == that
-                || that instanceof TFileSystemProvider
-                    && this.getScheme().equalsIgnoreCase(
-                        ((TFileSystemProvider) that).getScheme());
-    }
-
-    /**
-     * Returns a hash code which is consistent with {@link #equals(Object)}.
-     */
-    @Override
-    public int hashCode() {
-        return getScheme().hashCode();
-    }
-
     private static TPath promote(Path path) {
         try {
             return (TPath) path;
@@ -426,7 +462,5 @@ public final class TFileSystemProvider extends FileSystemProvider {
     public interface Parameter {
         /** The key for the {@code archiveDetector} parameter. */
         String ARCHIVE_DETECTOR = "archiveDetector";
-        /** The key for the {@code lenient} parameter. */
-        String LENIENT = "lenient";
     }
 }

@@ -308,7 +308,8 @@ public final class TPath implements Path {
     @Override
     public TFileSystem getFileSystem() {
         final TFileSystem fs = this.fileSystem;
-        return null != fs ? fs : (this.fileSystem = TFileSystem.get(this));
+        return null != fs ? fs : (this.fileSystem
+                = TFileSystemProvider.get(this).getFileSystem(this));
     }
 
     @Override
