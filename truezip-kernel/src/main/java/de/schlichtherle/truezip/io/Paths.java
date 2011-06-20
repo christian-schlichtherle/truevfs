@@ -27,7 +27,7 @@ import net.jcip.annotations.ThreadSafe;
 /**
  * Provides static utility methods for path names.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
@@ -78,7 +78,7 @@ public final class Paths {
          *         given path name.
          */
         public String normalize(final String path) {
-            final int prefixLen = prefixLength(path, separatorChar);
+            final int prefixLen = prefixLength(path, separatorChar, false);
             final int pathLen = path.length();
             this.path = path.substring(prefixLen, pathLen);
             buffer.setLength(0);
@@ -219,7 +219,7 @@ public final class Paths {
          * @return {@code this}
          */
         public Splitter split(final String path) {
-            final int prefixLen = prefixLength(path, separatorChar);
+            final int prefixLen = prefixLength(path, separatorChar, false);
             int memberEnd = path.length() - 1;
             if (prefixLen > memberEnd) {
                 parentPath = null;
@@ -283,7 +283,7 @@ public final class Paths {
      *         separator character.
      */
     public static boolean isAbsolute(String path, char separatorChar) {
-        final int prefixLen = prefixLength(path, separatorChar);
+        final int prefixLen = prefixLength(path, separatorChar, false);
         return 0 < prefixLen && separatorChar == path.charAt(prefixLen - 1);
     }
 
@@ -304,9 +304,15 @@ public final class Paths {
      *
      * @param  path The file system path.
      * @param  separatorChar The file name separator character.
+     * @param  inclUncShare whether or not a UNC host and share name should get
+     *         accounted for in the prefix length.
+     *         This will only get used if this JVM is running on Windows.
      * @return The number of characters in the prefix.
      */
-    public static int prefixLength(final String path, final char separatorChar) {
+    public static int prefixLength(
+            final String path,
+            final char separatorChar,
+            final boolean inclUncShare) {
         final int pathLen = path.length();
         if (0 >= pathLen)
             return 0;
@@ -315,7 +321,13 @@ public final class Paths {
             if (separatorChar == c) {
                 if (2 <= pathLen && separatorChar == path.charAt(1)) {
                     // Windows UNC.
-                    return 2;
+                    if (!inclUncShare)
+                        return 2;
+                    final int i = path.indexOf(separatorChar, 2) + 1;
+                    if (0 == i)
+                        return 2;
+                    final int j = path.indexOf(separatorChar, i) + 1;
+                    return 0 == j ? i : j;
                 } else {
                     // Absolute path.
                     return 1;
