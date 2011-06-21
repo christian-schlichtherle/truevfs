@@ -50,7 +50,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -575,22 +574,28 @@ public final class TFile extends File {
      * Constructs a new {@code TFile} instance from the given {@code uri}.
      * This method behaves similar to the super class constructor
      * {@link File#File(URI)} with the following amendment:
-     * If the URI matches the pattern {@code scheme:file:path!/entry},
-     * then the constructed file object treats the URI like an entry in the
-     * federated file system (i.e. prospective archive file) of the type named
-     * {@code scheme}.
-     * This may be recursively applied to access archive entries within other
-     * archive files.
+     * If the given URI is opaque, it must match the pattern
+     * {@code <scheme>:<uri>!/<entry>}.
+     * The constructed file object then parses the URI to address an entry in
+     * a federated file system (i.e. prospective archive file) with the name
+     * {@code <entry>} in the prospective archive file addressed by
+     * {@code <uri>} which is of the type identified by {@code <scheme>}  .
+     * This is recursively applied to access entries within other prospective
+     * archive files until {@code <uri>} is a hierarchical URI.
+     * The scheme component of this hierarchical URI must be {@code file}.
      * <p>
-     * Note that the constructed {@code TFile} instance uses the
+     * The constructed {@code TFile} instance uses the
      * {@link #getDefaultArchiveDetector() default archive detector} to look
-     * up archive drivers for the named scheme(s).
+     * up archive file system drivers for the named URI scheme components.
      *
-     * @param  uri an absolute URI with a scheme supported by the
+     * @param  uri an absolute URI which has a scheme component which is
+     *         supported by the
      *         {@link #getDefaultArchiveDetector() default archive detector}.
      * @throws IllegalArgumentException if the given URI does not conform to
      *         the syntax constraints for {@link FsPath}s or
      *         {@link File#File(URI)}.
+     * @see    #toURI()
+     * @see    #TFile(FsPath)
      */
     public TFile(URI uri) {
         this(FsPath.create(uri, CANONICALIZE), TConfig.get().getArchiveDetector());
@@ -598,24 +603,18 @@ public final class TFile extends File {
 
     /**
      * Constructs a new {@code TFile} instance from the given {@code path}.
-     * This method behaves similar to the super class constructor
-     * {@link File#File(URI)} with the following amendment:
-     * If the path matches the pattern {@code scheme:file:path!/entry},
-     * then the constructed file object treats the URI like an entry in the
-     * federated file system (i.e. prospective archive file) of the type named
-     * {@code scheme}.
-     * This may be recursively applied to access archive entries within other
-     * archive files.
-     * <p>
-     * Note that the constructed {@code TFile} instance uses the
-     * {@link #getDefaultArchiveDetector() default archive detector} to look
-     * up archive drivers for the named scheme(s).
+     * This constructor is consistent with {@link #TFile(URI)}.
      *
-     * @param  path an absolute path with a scheme supported by the
+     * @param  path a path with an absolute
+     *         {@link FsPath#toHierarchicalUri() hierarchical URI} which has a
+     *         scheme component which is supported by the
      *         {@link #getDefaultArchiveDetector() default archive detector}.
-     * @throws IllegalArgumentException if the given URI does not conform to
-     *         the syntax constraints for {@link FsPath}s or
+     * @throws IllegalArgumentException if the
+     *         {@link FsPath#toHierarchicalUri() hierarchical URI} of the given
+     *         path does not conform to the syntax constraints for
      *         {@link File#File(URI)}.
+     * @see    #toFsPath()
+     * @see    #TFile(URI)
      */
     public TFile(FsPath path) {
         this(path, TConfig.get().getArchiveDetector());
@@ -1820,13 +1819,82 @@ public final class TFile extends File {
         return delegate.toString();
     }
 
+    @Deprecated
     @Override
-    public Path toPath() {
-        if (null != innerArchive)
-            throw new UnsupportedOperationException("TPath promotion not supported in order to avoid circular dependencies.");
-        return delegate.toPath();
+    public URL toURL() throws MalformedURLException {
+        return null != innerArchive ? toURI().toURL() : delegate.toURL();
     }
-    
+
+    /**
+     * In case no prospective archive file has been detected in the path name
+     * at construction time, this method behaves like its super class
+     * implementation.
+     * <p>
+     * Otherwise, an opaque URI of the form {@code <scheme>:<uri>!/<entry>} is
+     * returned, where {@code <scheme>} is the URI scheme component identifying
+     * a file system driver, {@code <uri>} is the URI returned by this method
+     * for the innermost archive file and {@code <entry>} is the relative path
+     * name of the the entry addressed by this file object in the innermost
+     * archive file.
+     * If this file object addresses an archive file, then {@code <uri>} is the
+     * URI which would have been returned by this method if the file name of
+     * the archive file had not been detected as a prospective archive file
+     * and {@code entry} is an empty string.
+     * 
+     * <a name="exampleUris"/><h3>Example URIs</h3>
+     * <p>
+     * <ul>
+     * <li>{@code file:/foo} addresses a regular file</li>
+     * <li>{@code war:file:/foo.war!/} addresses the root entry of the WAR file
+     *     addressed by {@code file:/foo.war}.</li>
+     * <li>{@code war:file:/foo.war!/META-INF/MANIFEST.MF} addresses the entry
+     *     {@code META-INF/MANIFEST.MF} in the WAR file addressed by
+     *     {@code file:/foo.war}.</li>
+     * <li>{@code jar:war:file:/foo.war!/WEB-INF/lib/bar.jar!/META-INF/MANIFEST.MF}
+     *     addresses the entry {@code META-INF/MANIFEST.MF} in the JAR file
+     *     addressed by {@code war:file:/foo.war!/WEB-INF/lib/bar.jar}, which
+     *     recursively addresses the entry {@code WEB-INF/lib/bar.jar} in the
+     *     WAR file addressed by {@code file:/foo.war}.</li>
+     * </ul>
+     * 
+     * @return A URI for this file object.
+     * @see    #TFile(URI)
+     * @see    #toFsPath()
+     */
+    @Override
+    public URI toURI() {
+        try {
+            if (this == innerArchive) {
+                final FsScheme scheme = detector.getScheme(delegate.getPath());
+                assert null != scheme; // make FindBugs happy!
+                if (null != enclArchive) {
+                    return new FsMountPoint(
+                            scheme,
+                            new FsPath(
+                                new FsMountPoint(enclArchive.toURI(), CANONICALIZE),
+                                enclEntryName)).toUri();
+                } else {
+                    return new FsMountPoint(scheme, new FsPath(delegate)).toUri();
+                }
+            } else if (null != enclArchive) {
+                return new FsPath(
+                        new FsMountPoint(enclArchive.toURI(), CANONICALIZE),
+                        enclEntryName).toUri();
+            } else {
+                return delegate.toURI();
+            }
+        } catch (URISyntaxException ex) {
+            throw new AssertionError(ex);
+        }
+    }
+
+    /**
+     * Returns a file system path which is consistent with {@link #toURI()}.
+     * 
+     * @return A file system path which is consistent with {@link #toURI()}.
+     * @see    #TFile(FsPath)
+     * @see    #toURI()
+     */
     public FsPath toFsPath() {
         try {
             if (this == innerArchive) {
@@ -1857,39 +1925,57 @@ public final class TFile extends File {
         }
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public URI toURI() {
-        try {
-            if (this == innerArchive) {
-                final FsScheme scheme = detector.getScheme(delegate.getPath());
-                assert null != scheme; // make FindBugs happy!
-                if (null != enclArchive) {
-                    return new FsMountPoint(
-                            scheme,
-                            new FsPath(
-                                new FsMountPoint(enclArchive.toURI(), CANONICALIZE),
-                                enclEntryName)).toUri();
-                } else {
-                    return new FsMountPoint(scheme, new FsPath(delegate)).toUri();
-                }
-            } else if (null != enclArchive) {
-                return new FsPath(
-                        new FsMountPoint(enclArchive.toURI(), CANONICALIZE),
-                        enclEntryName).toUri();
-            } else {
-                return delegate.toURI();
-            }
-        } catch (URISyntaxException ex) {
-            throw new AssertionError(ex);
-        }
-    }
-
-    /** {@inheritDoc} */
+    /**
+     * The reasons for always throwing an {@link UnsupportedOperationException}
+     * are:
+     * <p>
+     * <ol>
+     * <li>Circular dependency issues:
+     *     This method introduces a circular dependency between the
+     *     packages {@code java.io} and {@code java.nio.file}.
+     *     Circular dependencies are the root of all evil in API design:
+     *     They limit reusability and extensibility because you cannot reuse
+     *     or exchange a package individually - it's either both or none at
+     *     all.</li>
+     * <li>Extensibility issues:
+     *     Whatever {@link java.nio.file.Path} object would be returned here,
+     *     you could not exchange its implementation.
+     *     This is because the NIO.2 API lacks a feature to create a
+     *     {@code Path} object by looking up an appropriate file
+     *     system provider from a plain path string:
+     * <ul>
+     * <li>The super class implementation of this method always uses the
+     *     {@link java.nio.file.FileSystems#getDefault() default file system provider}.</li>
+     * <li>{@link java.nio.file.Paths#get(String, String[])} always uses the
+     *     default file system provider, too.</li>
+     * </ul>
+     *     Using {@link URI}s is no alternative, too, because the various URI
+     *     schemes provided by the method {@link #toURI()} cannot be made
+     *     compatible with the singular URI scheme provided by the method
+     *     {@link java.nio.file.spi.FileSystemProvider#getScheme()} of any
+     *     NIO.2 {@link java.nio.file.spi.FileSystemProvider} implementation.
+     * </li>
+     * </ol>
+     * <p>
+     * As an alternative, you can always create a {@code Path}
+     * object from a {@link File} object {@code file} as follows:
+     * <p>
+     * <ul>
+     * <li>Associated with the default file system provider:
+     *     {@link java.nio.file.Paths#get(String, String[]) Paths.get(file.getPath())}.</li>
+     * <li>Associated with the TrueZIP file system provider:
+     *     {@code new de.schlichtherle.truezip.nio.file.TPath(file)}.
+     *     This requires the TrueZIP Path module to be present on the compile
+     *     time class path.</li>
+     * </ul>
+     * 
+     * @deprecated Throws {@link UnsupportedOperationException}.
+     * @throws UnsupportedOperationException always.
+     */
     @Deprecated
     @Override
-    public URL toURL() throws MalformedURLException {
-        return null != innerArchive ? toURI().toURL() : delegate.toURL();
+    public java.nio.file.Path toPath() {
+        throw new UnsupportedOperationException("Use a Path constructor or method instead!");
     }
 
     /**

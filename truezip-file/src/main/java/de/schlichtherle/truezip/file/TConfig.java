@@ -229,11 +229,12 @@ public final class TConfig implements Closeable {
     }
 
     /**
-     * Returns the {@link TArchiveDetector} to use for scanning a path
-     * for prospective archive files.
+     * Returns the default {@link TArchiveDetector} to use for scanning a path
+     * name for prospective archive files if no {@code TArchiveDetector} has
+     * been explicitly provided.
      *
-     * @return The {@link TArchiveDetector} to use for scanning a path
-     *         for prospective archive files.
+     * @return The default {@link TArchiveDetector} to use for scanning a path
+     *         name for prospective archive files.
      * @see #setArchiveDetector
      */
     public TArchiveDetector getArchiveDetector() {
@@ -241,13 +242,15 @@ public final class TConfig implements Closeable {
     }
 
     /**
-     * Sets the {@link TArchiveDetector} to use for scanning a path
-     * for prospective archive files.
-     * Changing the value of this class property affects only subsequently
-     * constructed {@link TFile} instances - not any existing ones.
+     * Sets the default {@link TArchiveDetector} to use for scanning a path
+     * name for prospective archive files if no {@code TArchiveDetector} has
+     * been explicitly provided.
+     * Changing the value of this property affects the scanning of path names
+     * of subsequently constructed {@link TFile} objects only.
+     * Any existing {@code TFile} objects are <em>not</em> affected.
      *
-     * @param detector the {@link TArchiveDetector} to use for scanning a path
-     *        for prospective archive files.
+     * @param detector the default {@link TArchiveDetector} to use for scanning
+     *        a path name for prospective archive files.
      * @see   #getArchiveDetector()
      */
     public void setArchiveDetector(TArchiveDetector detector) {
