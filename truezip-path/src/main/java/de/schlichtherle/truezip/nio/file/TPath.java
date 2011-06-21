@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.nio.file;
 
-import static de.schlichtherle.truezip.nio.file.TUriScanner.*;
+import static de.schlichtherle.truezip.nio.file.TPathScanner.*;
 import de.schlichtherle.truezip.file.TConfig;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.file.TArchiveDetector;
@@ -149,8 +149,8 @@ public final class TPath implements Path {
         this.uri = uri(cutLeadingSeparators(first), more);
         final TArchiveDetector detector = TConfig.get().getArchiveDetector();
         this.detector = detector;
-        this.address = new TUriScanner(detector)
-                .resolve(new FsPath(fileSystem.getMountPoint(), ROOT), uri);
+        this.address = new TPathScanner(detector)
+                .scan(new FsPath(fileSystem.getMountPoint(), ROOT), uri);
 
         assert invariants();
     }
@@ -214,7 +214,7 @@ public final class TPath implements Path {
         if (uri.isOpaque())
             throw new IllegalArgumentException(
                     new QuotedInputUriSyntaxException(uri, "Opaque URI"));
-        uri = TUriScanner.fix(uri);
+        uri = TPathScanner.fix(uri);
         final int pl = pathPrefixLength(uri);
         String p = uri.getPath();
         final String q = p;
@@ -330,7 +330,7 @@ public final class TPath implements Path {
 
     private FsPath newAddress() {
         final URI uri = getUri();
-        return new TUriScanner(getArchiveDetector()).resolve(
+        return new TPathScanner(getArchiveDetector()).scan(
                 isAbsolute(uri)
                     ? TFileSystemProvider.get(this).getRoot()
                     : TFileSystemProvider.get(this).getCurrent(),
@@ -383,7 +383,7 @@ public final class TPath implements Path {
             return new TPath(
                     parent,
                     getArchiveDetector(),
-                    TUriScanner.parent(getAddress()));
+                    TPathScanner.parent(getAddress()));
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
         }
@@ -493,7 +493,7 @@ public final class TPath implements Path {
             throw new IllegalArgumentException(ex);
         }
         final TArchiveDetector d = TConfig.get().getArchiveDetector();
-        return new TPath(u, d, new TUriScanner(d).resolve(
+        return new TPath(u, d, new TPathScanner(d).scan(
                 isAbsolute(member)
                     ? TFileSystemProvider.get(this).getRoot()
                     : getAddress(),
@@ -538,7 +538,7 @@ public final class TPath implements Path {
 
     @Override
     public TPath toRealPath(LinkOption... options) throws IOException {
-        // FIXME: resolve symlinks!
+        // FIXME: scan symlinks!
         return new TPath(toUri(), getArchiveDetector(), address); // don't use getAddress()!
     }
 

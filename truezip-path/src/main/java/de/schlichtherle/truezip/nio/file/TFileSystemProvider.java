@@ -83,7 +83,8 @@ public final class TFileSystemProvider extends FileSystemProvider {
     private final FsPath root;
     private final FsPath current;
 
-    private Map<FsMountPoint, TFileSystem> fileSystems = new WeakHashMap<>();
+    private Map<FsMountPoint, TFileSystem>
+            fileSystems = new WeakHashMap<FsMountPoint, TFileSystem>();
 
     /**
      * Obtains a file system provider for the given path.
@@ -186,11 +187,14 @@ public final class TFileSystemProvider extends FileSystemProvider {
      */
     @Override
     public TFileSystem newFileSystem(Path path, Map<String, ?> configuration) {
-        try (TConfig config = push(configuration)){
+        TConfig config = push(configuration);
+        try {
             TPath p = new TPath(path);
             if (null == p.getAddress().getMountPoint().getParent())
                 throw new UnsupportedOperationException("no prospective archive file detected"); // don't be greedy!
             return p.getFileSystem();
+        } finally {
+            config.close();
         }
     }
 
@@ -218,8 +222,11 @@ public final class TFileSystemProvider extends FileSystemProvider {
      */
     @Override
     public TFileSystem newFileSystem(URI uri, Map<String, ?> configuration) {
-        try (TConfig config = push(configuration)){
+        TConfig config = push(configuration);
+        try {
             return getFileSystem(uri);
+        } finally {
+            config.close();
         }
     }
 

@@ -64,9 +64,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <properties>
-        <compiler.source>1.7</compiler.source>
-        <compiler.target>1.7</compiler.target>
-    </properties>
 </project>
