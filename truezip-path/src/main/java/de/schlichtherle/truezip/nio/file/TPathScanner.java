@@ -22,7 +22,6 @@ import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.io.Paths;
-import static de.schlichtherle.truezip.io.Paths.*;
 import static de.schlichtherle.truezip.fs.FsUriModifier.*;
 import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.util.QuotedInputUriSyntaxException;
@@ -34,15 +33,20 @@ import java.net.URISyntaxException;
 import net.jcip.annotations.NotThreadSafe;
 
 /**
- * Scans {@link URI}s for prospective archive files with the help of a
- * {@link TArchiveDetector}.
+ * Scans hierarchical {@link URI}s for prospective archive files with the help
+ * of a {@link TArchiveDetector}.
+ * <p>
+ * TODO:
+ * This class has no dependencies on other classes in this package.
+ * So evaluate publishing it as a member of the package
+ * {@code de.schlichtherle.truezip.file} instead.
  * 
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
-final class TUriScanner {
+final class TPathScanner {
     private static final String DOT_DOT_SEPARATOR = ".." + SEPARATOR_CHAR;
     private static final URI DOT = URI.create(".");
     private static final URI DOT_DOT = URI.create("..");
@@ -59,7 +63,7 @@ final class TUriScanner {
      * 
      * @param detector the archive detector to use.
      */
-    TUriScanner(TArchiveDetector detector) {
+    TPathScanner(TArchiveDetector detector) {
         assert null != detector;
         this.detector = detector;
     }
@@ -89,7 +93,7 @@ final class TUriScanner {
      *         prospective archive files.
      * @throws IllegalArgumentException if any precondition is violated.
      */
-    FsPath resolve(FsPath parent, URI member) {
+    FsPath scan(FsPath parent, URI member) {
         try {
             if (member.isOpaque())
                 throw new QuotedInputUriSyntaxException(member, "Opaque URI");
@@ -142,7 +146,7 @@ final class TUriScanner {
     static URI fix(final URI uri) {
         final String ssp = uri.getSchemeSpecificPart();
         final String a = uri.getAuthority();
-        if (null == ssp // fix bug: null == new URI("foo").resolve(neAw URI("..")).getRawSchemeSpecificPart()
+        if (null == ssp // fix bug: null == new URI("foo").scan(neAw URI("..")).getRawSchemeSpecificPart()
                 || null == a && ssp.startsWith(SEPARATOR + SEPARATOR)) // fix empty authority
             return new UriBuilder(uri).toUri();
         return uri;

@@ -59,7 +59,7 @@ public class TUriScannerTest extends TestBase {
             final FsMountPoint mountPoint = null == params[3]
                     ? null
                     : FsMountPoint.create(URI.create(params[3]));
-            final FsPath result = new TUriScanner(TConfig.get().getArchiveDetector()).resolve(parent, member);
+            final FsPath result = new TPathScanner(TConfig.get().getArchiveDetector()).scan(parent, member);
             assertThat(result, equalTo(path));
             assertThat(result.getMountPoint(), is(mountPoint));
         }

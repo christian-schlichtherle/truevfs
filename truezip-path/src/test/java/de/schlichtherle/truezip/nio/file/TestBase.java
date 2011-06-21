@@ -38,7 +38,7 @@ public abstract class TestBase extends de.schlichtherle.truezip.file.TestBase {
     protected final Map<String, ?> environment;
 
     protected TestBase() {
-        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<String, Object>();
         map.put(ARCHIVE_DETECTOR, detector);
         environment = Collections.unmodifiableMap(map);
     }

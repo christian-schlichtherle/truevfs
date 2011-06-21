@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.LinkedList;
 import java.nio.file.DirectoryStream;
 import de.schlichtherle.truezip.file.TFile;
-import java.nio.file.Paths;
 import java.nio.file.Files;
 import static java.nio.file.Files.*;
 import java.nio.file.Path;
@@ -40,7 +39,6 @@ import de.schlichtherle.truezip.socket.OutputClosedException;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -65,7 +63,7 @@ import static org.junit.Assert.*;
  * Performs a functional test of a particular FsArchiveDriver by using the
  * API of the TrueZIP Path* module.
  *
- * @see     TFileTestSuite
+ * @see     TFileTestSuite Test suite for the TrueZIP File* API.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -154,9 +152,12 @@ public abstract class TPathTestSuite extends TestBase {
     }
 
     protected static TPath newNonArchiveFile(TPath file) {
-        try (TConfig config = TConfig.push()) {
+        TConfig config = TConfig.push();
+        try {
             config.setArchiveDetector(TArchiveDetector.NULL);
             return file.getParent().resolve(file.getFileName());
+        } finally {
+            config.close();
         }
     }
 
@@ -192,13 +193,23 @@ public abstract class TPathTestSuite extends TestBase {
         // Note that file's parent directory may be a directory in the host file system!
 
         // Create file false positive.
-        try (OutputStream out = newOutputStream(file)) {
-            out.write(data);
+        {
+            OutputStream out = newOutputStream(file);
+            try {
+                out.write(data);
+            } finally {
+                out.close();
+            }
         }
 
         // Overwrite.
-        try (OutputStream out = newOutputStream(file)) {
-            out.write(data);
+        {
+            OutputStream out = newOutputStream(file);
+            try {
+                out.write(data);
+            } finally {
+                out.close();
+            }
         }
 
         assertTrue(exists(file));
@@ -208,9 +219,14 @@ public abstract class TPathTestSuite extends TestBase {
         assertTrue(getLastModifiedTime(file).toMillis() > 0);
 
         // Read back portion
-        try (InputStream in = newInputStream(file)) {
-            byte[] buf = new byte[data.length];
-            assertTrue(ArrayHelper.equals(data, 0, buf, 0, in.read(buf)));
+        {
+            InputStream in = newInputStream(file);
+            try {
+                byte[] buf = new byte[data.length];
+                assertTrue(ArrayHelper.equals(data, 0, buf, 0, in.read(buf)));
+            } finally {
+                in.close();
+            }
         }
         assertRm(file);
 
@@ -303,7 +319,8 @@ public abstract class TPathTestSuite extends TestBase {
     private void assertCreateNewEnhancedFile() throws IOException {
         final TPath file1 = archive.resolve("test.txt");
         final TPath file2 = file1.resolve("test.txt");
-        try (TConfig config = TConfig.push()) {
+        TConfig config = TConfig.push();
+        try {
             config.setLenient(false);
             try {
                 createFile(file1);
@@ -311,6 +328,8 @@ public abstract class TPathTestSuite extends TestBase {
             } catch (IOException expected) {
             }
             assertCreateNewFile(archive, file1, file2);
+        } finally {
+            config.close();
         }
         assertCreateNewFile(archive, file1, file2);
     }
@@ -418,17 +437,19 @@ public abstract class TPathTestSuite extends TestBase {
     @Test
     public final void testStrictFileOutputStream() throws IOException {
         TPath file = archive.resolve("test.txt");
-        try (TConfig config = TConfig.push()) {
+        TConfig config = TConfig.push();
+        try {
             config.setLenient(false);
             try {
                 assertFileOutputStream(file);
                 fail("Creating ghost directories should not be allowed when Path.isLenient() is false!");
             } catch (IOException expected) {
             }
-
             createDirectory(archive);
             assertFileOutputStream(file);
             delete(archive);
+        } finally {
+            config.close();
         }
     }
     
@@ -457,15 +478,18 @@ public abstract class TPathTestSuite extends TestBase {
 
     private void assertFileOutputStream(TPath file) throws IOException {
         final byte[] message = "Hello World!\r\n".getBytes();
-        try (OutputStream fos = newOutputStream(file)) {
+        final OutputStream out = newOutputStream(file);
+        try {
             assertTrue(exists(file));
             assertFalse(isDirectory(file));
             assertTrue(isRegularFile(file));
             assertEquals(0, size(file));
-            fos.write(message);
+            out.write(message);
             assertEquals(0, size(file));
-            fos.flush();
+            out.flush();
             assertEquals(0, size(file));
+        } finally {
+            out.close();
         }
         assertTrue(exists(file));
         assertFalse(isDirectory(file));
@@ -504,19 +528,20 @@ public abstract class TPathTestSuite extends TestBase {
         createFile(file1);
         TFileSystem.umount(); // ensure file1 is really present in the archive file
         createFile(file2); // uses FsOutputOption.CACHE!
-        try (InputStream fis1 = newInputStream(file1)) {
+        final InputStream in1 = newInputStream(file1);
+        try {
             newInputStream(file2);
             gc();
 
             // This operation should complete without any exception if the garbage
             // collector did his job.
             try {
-                copy(fis1, file2, StandardCopyOption.REPLACE_EXISTING);
+                copy(in1, file2, StandardCopyOption.REPLACE_EXISTING);
             } catch (FsSyncWarningException ex) {
                 fail("The garbage collector hasn't been collecting an open stream. If this is only happening occasionally, you can safely ignore it.");
             }
 
-            // fis1 is still open!
+            // in1 is still open!
             try {
                 TFile.umount(); // forces closing of fis1
                 fail("Expected warning exception when synchronizing a busy archive file!");
@@ -526,7 +551,7 @@ public abstract class TPathTestSuite extends TestBase {
             }
             assertTrue(isRegularFile(file2));
             try {
-                copy(fis1, file2, StandardCopyOption.REPLACE_EXISTING);
+                copy(in1, file2, StandardCopyOption.REPLACE_EXISTING);
                 fail("Expected exception when reading from entry input stream of an unmounted archive file!");
             } catch (IOException expected) {
             }
@@ -544,6 +569,9 @@ public abstract class TPathTestSuite extends TestBase {
             }
 
             delete(newNonArchiveFile(archive));
+        } finally {
+            // Closing the invalidated stream explicitly should be OK.
+            in1.close();
         }
 
         // Cleanup.
@@ -702,7 +730,8 @@ public abstract class TPathTestSuite extends TestBase {
         delete(dir2);
         delete(dir1);
 
-        try (TConfig config = TConfig.push()) {
+        final TConfig config = TConfig.push();
+        try {
             config.setLenient(false);
 
             try {
@@ -737,8 +766,10 @@ public abstract class TPathTestSuite extends TestBase {
             createDirectory(dir4);
             createDirectory(dir5);
             createDirectory(dir6);
+        } finally {
+            config.close();
         }
-        
+
         delete(dir6);
         delete(dir5);
         delete(dir4);
@@ -746,7 +777,7 @@ public abstract class TPathTestSuite extends TestBase {
         delete(dir2);
         delete(dir1);
     }
-    
+
     @Test
     public final void testDirectoryTree() throws IOException {
         assertDirectoryTree(
@@ -791,7 +822,7 @@ public abstract class TPathTestSuite extends TestBase {
         }
     }
 
-    private void assertListFiles(TPath dir, String entry) throws IOException {
+    private void assertListFiles(final TPath dir, final String entry) throws IOException {
         final Path[] files = listFiles(dir);
         boolean found = false;
         for (Path file : files)
@@ -801,12 +832,17 @@ public abstract class TPathTestSuite extends TestBase {
             fail("No such entry: " + entry);
     }
 
-    private static Path[] listFiles(Path dir) throws IOException {
-        try (DirectoryStream<Path> stream = newDirectoryStream(dir)) {
-            final List<Path> list = new LinkedList<>();
-            for (Path path : stream)
-                list.add(path);
-            return list.toArray(new Path[list.size()]);
+    private static Path[] listFiles(final Path dir) throws IOException {
+        try {
+            final DirectoryStream<Path> stream = newDirectoryStream(dir);
+            try {
+                final List<Path> list = new LinkedList<Path>();
+                for (Path path : stream)
+                    list.add(path);
+                return list.toArray(new Path[list.size()]);
+            } finally {
+                stream.close();
+            }
         } catch (NotDirectoryException ex) {
             return null;
         }
@@ -832,17 +868,23 @@ public abstract class TPathTestSuite extends TestBase {
         delete(file);
     }
 
-    private void assertInput(final TPath file) throws IOException {
-        try (InputStream in = new ByteArrayInputStream(data)) {
+    private void assertInput(TPath file) throws IOException {
+        InputStream in = new ByteArrayInputStream(data);
+        try {
             copy(in, file);
+        } finally {
+            in.close();
         }
         assertEquals(data.length, size(file));
     }
     
-    private void assertOutput(final TPath file) throws IOException {
-        try (ByteArrayOutputStream out = new ByteArrayOutputStream(data.length)) {
+    private void assertOutput(TPath file) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream(data.length);
+        try {
             copy(file, out);
             assertTrue(Arrays.equals(data, out.toByteArray()));
+        } finally {
+            out.close();
         }
     }
 
@@ -967,8 +1009,13 @@ public abstract class TPathTestSuite extends TestBase {
     throws IOException {
         // Create a file with an old timestamp.
         final long time = System.currentTimeMillis();
-        try (OutputStream out = newOutputStream(a)) {
-            out.write(data);
+        {
+            final OutputStream out = newOutputStream(a);
+            try {
+                out.write(data);
+            } finally {
+                out.close();
+            }
         }
         setLastModifiedTime(a, FileTime.fromMillis(time - granularity));
 
@@ -1057,7 +1104,8 @@ public abstract class TPathTestSuite extends TestBase {
     throws IOException {
         final TPath entry1 = archive.resolve("entry1");
         final TPath entry2 = archive.resolve("entry2");
-        try (OutputStream out1 = newOutputStream(entry1)) {
+        final OutputStream out1 = newOutputStream(entry1);
+        try {
             try {
                 delete(entry1);
                 fail();
@@ -1069,8 +1117,11 @@ public abstract class TPathTestSuite extends TestBase {
                 fail();
             } catch (IOException ex) {
             }
+        } finally {
+            out1.close();
         }
-        try (OutputStream out2 = newOutputStream(entry2)) {
+        final OutputStream out2 = newOutputStream(entry2);
+        try {
             try {
                 delete(entry2);
                 fail();
@@ -1082,9 +1133,13 @@ public abstract class TPathTestSuite extends TestBase {
                 fail();
             } catch (IOException ex) {
             }
+        } finally {
+            out2.close();
         }
-        try (InputStream in1 = newInputStream(entry1)) {
-            try (InputStream in2 = newInputStream(entry2)) {
+        final InputStream in1 = newInputStream(entry1);
+        try {
+            final InputStream in2 = newInputStream(entry2);
+            try {
                 delete(entry2);
                 final ByteArrayOutputStream out = new ByteArrayOutputStream(data.length);
                 try {
@@ -1098,8 +1153,9 @@ public abstract class TPathTestSuite extends TestBase {
                     fail();
                 } catch (IOException ex) {
                 }
+            } finally {
+                in2.close();
             }
-            
             try {
                 delete(entry1);
                 fail("deleted within archive.toFile().rm_r()");
@@ -1117,17 +1173,21 @@ public abstract class TPathTestSuite extends TestBase {
                 fail();
             } catch (IOException ex) {
             }
+        } finally {
+            in1.close();
         }
-        
         archive.toFile().rm_r();
         assertFalse(exists(newNonArchiveFile(archive)));
     }
     
     @Test
     public final void testRenameValidArchive() throws IOException {
-        try (PrintStream out = new PrintStream(
-                newOutputStream(archive.resolve("entry")))) {
+        PrintStream out = new PrintStream(
+                newOutputStream(archive.resolve("entry")));
+        try {
             out.println("Hello World!");
+        } finally {
+            out.close(); // ALWAYS close streams!
         }
         assertRenameArchiveToTemp(archive);
     }
@@ -1323,8 +1383,11 @@ public abstract class TPathTestSuite extends TestBase {
     private void createTestArchive(final int nEntries) throws IOException {
         for (int i = 0; i < nEntries; i++) {
             final TPath entry = new TPath(archive + SEPARATOR + i);
-            try (OutputStream out = newOutputStream(entry)) {
+            final OutputStream out = newOutputStream(entry);
+            try {
                 out.write(data);
+            } finally {
+                out.close();
             }
         }
     }
@@ -1336,7 +1399,8 @@ public abstract class TPathTestSuite extends TestBase {
         final byte[] buf = new byte[4096];
         for (int i = 0, l = entries.length; i < l; i++) {
             final TPath entry = (TPath) entries[i];
-            try (InputStream in = newInputStream(entry)) {
+            final InputStream in = newInputStream(entry);
+            try {
                 int off = 0;
                 int read;
                 do {
@@ -1351,6 +1415,8 @@ public abstract class TPathTestSuite extends TestBase {
                 assertEquals(-1, read);
                 assertEquals(off, data.length);
                 assertTrue(0 >= in.read(new byte[0]));
+            } finally {
+                in.close();
             }
         }
     }
@@ -1431,14 +1497,14 @@ public abstract class TPathTestSuite extends TestBase {
         assertArchiveEntries(archive, nThreads);
         archive.toFile().rm_r();
     }
-    
+
     @Test
     public final void testMultithreadedMultipleArchivesSingleEntryWriting()
     throws Exception {
         assertMultithreadedMultipleArchivesSingleEntryWriting(20, false);
         assertMultithreadedMultipleArchivesSingleEntryWriting(20, true);
     }
-    
+
     private void assertMultithreadedMultipleArchivesSingleEntryWriting(
             final int nThreads,
             final boolean updateIndividually)
@@ -1452,8 +1518,11 @@ public abstract class TPathTestSuite extends TestBase {
                 delete(archive);
                 final TPath file = archive.resolve("entry");
                 try {
-                    try (OutputStream out = newOutputStream(file)) {
+                    final OutputStream out = newOutputStream(file);
+                    try {
                         out.write(data);
+                    } finally {
+                        out.close();
                     }
                     try {
                         if (updateIndividually)

@@ -294,7 +294,8 @@ public final class TFileSystem extends FileSystem {
 
     private static BitField<FsInputOption> mapInput(
             final OpenOption... options) {
-        final HashSet<OpenOption> set = new HashSet<>(options.length * 4 / 3 + 1);
+        final HashSet<OpenOption> set = new HashSet<OpenOption>(
+                options.length * 4 / 3 + 1);
         Collections.addAll(set, options);
         return mapInput(set);
     }
@@ -309,7 +310,8 @@ public final class TFileSystem extends FileSystem {
 
     private static BitField<FsOutputOption> mapOutput(
             final OpenOption... options) {
-        final HashSet<OpenOption> set = new HashSet<>(options.length * 4 / 3 + 1);
+        final HashSet<OpenOption> set = new HashSet<OpenOption>(
+                options.length * 4 / 3 + 1);
         Collections.addAll(set, options);
         return mapOutput(set);
     }
@@ -561,7 +563,8 @@ public final class TFileSystem extends FileSystem {
                                 final FileTime createTime)
         throws IOException {
             final FsController<?> controller = getController();
-            final Map<Access, Long> times = new EnumMap<>(Access.class);
+            final Map<Access, Long> times = new EnumMap<Access, Long>(
+                    Access.class);
             if (null != lastModifiedTime)
                 times.put(WRITE, lastModifiedTime.toMillis());
             if (null != lastAccessTime)
