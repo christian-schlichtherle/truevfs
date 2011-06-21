@@ -75,9 +75,9 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  * A replacement for the class {@link File} which provides transparent
  * read/write access to archive files and their entries as if they were
  * (virtual) directories and files.
- * Because this class actually extends the class {@link File} it can be used
- * with the class {@link FileSystemView} or any other classes which depend on
- * the class {@link File}.
+ * Because this class actually extends the class {@link File} it can get used
+ * polymorphically with the class {@link FileSystemView} or any other class
+ * which depends on the class {@link File}.
  *
  * <a name="bulkIOMethods"/><h3>Bulk I/O Methods</h3>
  * <p>
@@ -402,28 +402,28 @@ public final class TFile extends File {
     /**
      * Copy constructor.
      * Equivalent to {@link #TFile(File, TArchiveDetector)
-     * new TFile(template, getDefaultArchiveDetector())}.
+     * new TFile(template, (TArchiveDetector) null)}.
      * 
-     * @param file a file object.
+     * @param file the file object to decorate.
      */
     public TFile(File file) {
-        this(file, TConfig.get().getArchiveDetector());
+        this(file, (TArchiveDetector) null);
     }
 
     /**
-     * Constructs a new {@code TFile} instance which may use the given
-     * {@link TArchiveDetector} to detect any archive files in its path.
+     * Constructs a new {@code TFile} instance which may use the given archive
+     * detector to scan the path name for prospective archive files.
      * 
-     * @param file The file to decorate. If this is an instance
-     *        of this class, its fields are copied and the
-     *        {@code detector} parameter is not used to scan the path.
-     * @param detector The object to use for the detection of any archive files
-     *        in the path if necessary.
+     * @param file the file object to decorate.
+     *        If this is an instance of this class, its fields are copied and
+     *        the {@code detector} parameter is ignored.
+     * @param detector the archive detector to use for scanning the path name
+     *        for prospective archive files.
      *        This parameter is ignored if and only if {@code file} is an
      *        instance of this class.
-     *        Otherwise, if it's {@code null}, the
+     *        Otherwise, if it's {@code null}, then the
      *        {@link #getDefaultArchiveDetector() default archive detector} is
-     *        used.
+     *        used instead.
      */
     public TFile(   final File file,
                     final @CheckForNull TArchiveDetector detector) {
@@ -448,24 +448,28 @@ public final class TFile extends File {
 
     /**
      * Equivalent to {@link #TFile(String, TArchiveDetector)
-     * new TFile(path, getDefaultArchiveDetector())}.
+     * new TFile(path, (TArchiveDetector) null)}.
+     * <p>
+     * The {@link #getDefaultArchiveDetector() default archive detector}
+     * is used to scan the path name for prospective archive files.
      * 
-     * @param path a file path.
+     * @param path the path name.
      */
     public TFile(String path) {
-        this(path, TConfig.get().getArchiveDetector());
+        this(path, (TArchiveDetector) null);
     }
 
     /**
-     * Constructs a new {@code TFile} instance which uses the given
-     * {@link TArchiveDetector} to detect any archive files in its path.
+     * Constructs a new {@code TFile} instance which may use the given
+     * {@link TArchiveDetector} to scan its path name for prospective archive
+     * files.
      *
-     * @param path The path of the file.
-     * @param detector The object to use for the detection of any archive files
-     *        in the path.
-     *        If this is {@code null}, the
+     * @param path the path name.
+     * @param detector the archive detector to use for scanning the path name
+     *        for prospective archive files.
+     *        If this is {@code null}, then the
      *        {@link #getDefaultArchiveDetector() default archive detector} is
-     *        used.
+     *        used instead.
      */
     public TFile(   final String path,
                     final @CheckForNull TArchiveDetector detector) {
@@ -480,32 +484,34 @@ public final class TFile extends File {
 
     /**
      * Equivalent to {@link #TFile(String, String, TArchiveDetector)
-     * new TFile(parent, child, getDefaultArchiveDetector())}.
+     * new TFile(parent, child, null)}.
+     * <p>
+     * The {@link #getDefaultArchiveDetector() default archive detector}
+     * is used to scan the <em>entire path name</em> for prospective archive
+     * files.
      *
-     * @param parent The path of the parent directory.
-     *        The {@link #getDefaultArchiveDetector() default archive detector}
-     *        is used to detect any archive files in the path of this
-     *        {@code TFile} instance.
-     * @param member The child path as a {@link String}.
+     * @param parent the parent directory.
+     * @param member the member path name.
      */
-    public TFile(String parent, String member) {
-        this(parent, member, TConfig.get().getArchiveDetector());
+    public TFile(@CheckForNull String parent, String member) {
+        this(parent, member, null);
     }
 
     /**
-     * Constructs a new {@code TFile} instance which uses the given
-     * {@link TArchiveDetector} to detect any archive files in its path.
+     * Constructs a new {@code TFile} instance which may use the given archive
+     * detector to scan the <em>entire path name</em> for prospective archive
+     * files.
      *
-     * @param parent The parent path as a {@link String}.
-     * @param member The child path as a {@link String}.
-     * @param detector The object to use for the detection of any archive files
-     *        in the path.
-     *        If this is {@code null}, the
+     * @param parent the parent directory.
+     * @param member the member path name.
+     * @param detector the archive detector to use for scanning the path name
+     *        for prospective archive files.
+     *        If this is {@code null}, then the
      *        {@link #getDefaultArchiveDetector() default archive detector} is
-     *        used.
+     *        used instead.
      */
     public TFile(
-            final String parent,
+            final @CheckForNull String parent,
             final String member,
             final @CheckForNull TArchiveDetector detector) {
         super(parent, member);
@@ -521,47 +527,54 @@ public final class TFile extends File {
      * Equivalent to {@link #TFile(File, String, TArchiveDetector)
      * new TFile(parent, child, null)}.
      *
-     * @param parent The parent directory as a {@code TFile} instance.
-     *        If this parameter is an instance of this class, its
-     *        {@code TArchiveDetector} is used to detect any archive files
-     *        in the path of this {@code TFile} instance.
+     * @param parent the parent directory.
+     *        If this parameter is an instance of this class, its archive
+     *        detector is used to scan only the <em>member path name</em>
+     *        for prospective archive files.
      *        Otherwise, the
      *        {@link #getDefaultArchiveDetector() default archive detector}
-     *        is used.
-     * @param member The child path as a {@link String}.
+     *        is used to to scan the <em>entire path name</em>
+     *        for prospective archive files.
+     * @param member a member path name.
      */
-    public TFile(File parent, String member) {
+    public TFile(@CheckForNull File parent, String member) {
         this(parent, member, null);
     }
 
     /**
-     * Constructs a new {@code TFile} instance which uses the given
-     * {@link TArchiveDetector} to detect any archive files in its path
-     * and configure their parameters.
-     *
-     * @param parent The parent directory as a {@code TFile} instance.
-     * @param member The child path as a {@link String}.
-     * @param detector The object to use for the detection of any archive files
-     *        in the path.
-     *        If this is {@code null} and {@code parent} is an
-     *        instance of this class, the archive detector is copied from
-     *        {@code parent}.
-     *        If this is {@code null} and {@code parent} is
-     *        <em>not</em> an instance of this class, the
-     *        {@link #getDefaultArchiveDetector() default archive detector}
-     *        is used.
+     * Constructs a new {@code TFile} instance which may use the given archive
+     * detector to scan the path name for prospective archive files.
+     * <p>
+     * If {@code parent} is an instance of this class,
+     * then {@code detector} is used to scan only the <em>member path name</em>
+     * for prospective archive files.
+     * If {@code detector} is {@code null}, then the
+     * parent's archive detector
+     * is used instead.
+     * <p>
+     * Otherwise, if {@code parent} is not an instance of this class,
+     * then {@code detector} is used to scan the <em>entire path name</em>
+     * for prospective archive files.
+     * If {@code detector} is {@code null}, then the
+     * {@link #getDefaultArchiveDetector() default archive detector}
+     * is used instead.
+     * 
+     * @param parent the parent directory.
+     * @param member the member path name.
+     * @param detector the archive detector to use for scanning the path name
+     *        for prospective archive files.
      */
     public TFile(
-            final File parent,
+            final @CheckForNull File parent,
             final String member,
             final @CheckForNull TArchiveDetector detector) {
         super(parent, member);
 
         this.delegate = new File(parent, member);
         if (parent instanceof TFile) {
-            final TFile tparent = (TFile) parent;
-            this.detector = null != detector ? detector : tparent.detector;
-            scan(tparent);
+            final TFile p = (TFile) parent;
+            this.detector = null != detector ? detector : p.detector;
+            scan(p);
         } else {
             this.detector = null != detector ? detector : TConfig.get().getArchiveDetector();
             scan(null);
@@ -589,7 +602,7 @@ public final class TFile extends File {
      * up archive file system drivers for the named URI scheme components.
      *
      * @param  uri an absolute URI which has a scheme component which is
-     *         supported by the
+     *         known by the
      *         {@link #getDefaultArchiveDetector() default archive detector}.
      * @throws IllegalArgumentException if the given URI does not conform to
      *         the syntax constraints for {@link FsPath}s or
@@ -607,7 +620,7 @@ public final class TFile extends File {
      *
      * @param  path a path with an absolute
      *         {@link FsPath#toHierarchicalUri() hierarchical URI} which has a
-     *         scheme component which is supported by the
+     *         scheme component which is known by the
      *         {@link #getDefaultArchiveDetector() default archive detector}.
      * @throws IllegalArgumentException if the
      *         {@link FsPath#toHierarchicalUri() hierarchical URI} of the given
