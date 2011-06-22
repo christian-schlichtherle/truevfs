@@ -20,6 +20,7 @@ package ${package};
 
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.fs.FsSyncException;
+import java.io.File;
 import java.io.PrintStream;
 import java.util.Arrays;
 
@@ -57,10 +58,10 @@ public class Tree extends Application<RuntimeException> {
         return 0;
     }
 
-    private void graph(final TFile file, final String padding, final String prefix) {
+    private void graph(File file, String padding, String prefix) {
         if (!file.exists())
             throw new IllegalArgumentException(file + " (file or directory does not exist)");
-        final PrintStream out = System.out;
+        PrintStream out = System.out;
         out.print(padding);
         out.print(prefix);
         out.println(file.getName());
@@ -70,9 +71,9 @@ public class Tree extends Application<RuntimeException> {
                 nextPadding += LAST_PREFIX.equals(prefix)
                         ? LAST_PADDING
                         : DEFAULT_PADDING;
-            final TFile[] entries = file.listFiles();
+            File[] entries = file.listFiles();
             Arrays.sort(entries);
-            final int l = entries.length - 1;
+            int l = entries.length - 1;
             if (0 <= l) {
                 int i = 0;
                 while (i < l)

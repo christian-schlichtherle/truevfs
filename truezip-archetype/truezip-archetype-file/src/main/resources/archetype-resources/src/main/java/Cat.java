@@ -18,35 +18,23 @@
  */
 package ${package};
 
-import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.nio.file.TPath;
+import de.schlichtherle.truezip.file.TFile;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class Cat1 extends Application<IOException> {
+public class Cat extends Application<IOException> {
 
     public static void main(String[] args) throws IOException {
-        System.exit(new Cat1().run(args));
+        System.exit(new Cat().run(args));
     }
 
     @Override
     protected int work(String[] args) throws IOException {
-        for (String arg : args) {
-            Path path = new TPath(arg);
-            //Files.copy(path, System.out); // naive read-then-write loop implementation
-            try (InputStream in = Files.newInputStream(path)) {
-                // Much faster: Uses multithreaded I/O with pooled threads and
-                // ring buffers!
-                Streams.cat(in, System.out);
-            }
-            
-        }
+        for (String arg : args)
+            new TFile(arg).output(System.out);
         return 0;
     }
 }

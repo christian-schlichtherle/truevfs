@@ -64,10 +64,10 @@ public class Tree extends Application<RuntimeException> {
         return 0;
     }
 
-    private void graph(final Path file, final String padding, final String prefix) {
+    private void graph(Path file, String padding, String prefix) {
         if (!exists(file))
             throw new IllegalArgumentException(file + " (file or directory does not exist)");
-        final PrintStream out = System.out;
+        PrintStream out = System.out;
         out.print(padding);
         out.print(prefix);
         out.println(file.getFileName());
@@ -77,17 +77,17 @@ public class Tree extends Application<RuntimeException> {
                 nextPadding += LAST_PREFIX.equals(prefix)
                         ? LAST_PADDING
                         : DEFAULT_PADDING;
-            final Set<Path> entries = new TreeSet<>();
+            Set<Path> entries = new TreeSet<>();
             try (DirectoryStream<Path> stream = Files.newDirectoryStream(file)) {
                 for (Path member : stream)
                     entries.add(member);
             } catch (IOException ex) {
                 throw new AssertionError(ex); // unless someone has changed the entry type in between
             }
-            final int l = entries.size() - 1;
+            int l = entries.size() - 1;
             if (0 <= l) {
                 final Iterator<Path> it = entries.iterator();
-                for (int i = 0; i++ < l;)
+                for (int i = 0; i++ < l; )
                     graph(it.next(), nextPadding, DEFAULT_PREFIX);
                 graph(it.next(), nextPadding, LAST_PREFIX);
             }
