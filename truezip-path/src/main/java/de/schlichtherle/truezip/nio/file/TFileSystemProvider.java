@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.nio.file;
 
-import de.schlichtherle.truezip.io.Paths;
 import net.jcip.annotations.ThreadSafe;
 import java.util.logging.Logger;
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
@@ -28,7 +27,6 @@ import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import de.schlichtherle.truezip.fs.FsPath;
-import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
@@ -77,19 +75,12 @@ import static java.util.logging.Level.*;
 @DefaultAnnotation(NonNull.class)
 public final class TFileSystemProvider extends FileSystemProvider {
 
-    private static final FsScheme DEFAULT_SCHEME = FsScheme.create("tpath");
-    private static final FsMountPoint
-            ROOT_DIRECTORY_MP = FsMountPoint.create(URI.create("file:/"));
-    private static final FsMountPoint
-            CURRENT_DIRECTORY_MP = FsMountPoint.create(new File("").toURI());
-    private static volatile TFileSystemProvider
-            ROOT_DIRECTORY = new TFileSystemProvider(
-                DEFAULT_SCHEME,
-                ROOT_DIRECTORY_MP);
-    private static final TFileSystemProvider
-            CURRENT_DIRECTORY = new TFileSystemProvider(
-                DEFAULT_SCHEME,
-                CURRENT_DIRECTORY_MP);
+    private static final String DEFAULT_SCHEME = "tpath";
+    private static final FsPath
+            ROOT_DIRECTORY = FsPath.create(URI.create("file:/"));
+
+    private static final Map<String, TFileSystemProvider>
+            providers = new WeakHashMap<String, TFileSystemProvider>();
 
     private final String scheme;
     private final FsPath root;
@@ -103,10 +94,19 @@ public final class TFileSystemProvider extends FileSystemProvider {
      * @param  name a {@link TPath} URI.
      * @return A file system provider.
      */
-    static TFileSystemProvider get(final URI name) {
-        return TPathScanner.isAbsolute(name)
-                ? ROOT_DIRECTORY
-                : CURRENT_DIRECTORY;
+    static synchronized TFileSystemProvider get(URI name) {
+        if (!TPathScanner.isAbsolute(name))
+            return Holder.CURRENT_DIRECTORY;
+        if (!name.isAbsolute())
+            name = ROOT_DIRECTORY.toUri();
+        String scheme = name.getScheme();
+        TFileSystemProvider provider = providers.get(scheme);
+        if (null != provider)
+            return provider;
+        final FsPath path = FsPath.create(name.resolve(SEPARATOR));
+        provider = new TFileSystemProvider(scheme, path);
+        providers.put(scheme, provider);
+        return provider;
     }
 
     /**
@@ -123,25 +123,19 @@ public final class TFileSystemProvider extends FileSystemProvider {
     @SuppressWarnings("LeakingThisInConstructor")
     @Deprecated
     public TFileSystemProvider() {
-        this(DEFAULT_SCHEME, ROOT_DIRECTORY_MP);
-        ROOT_DIRECTORY = this;
+        this(DEFAULT_SCHEME, ROOT_DIRECTORY);
+        synchronized (TFileSystemProvider.class) {
+            providers.put(scheme, this);
+        }
         Logger  .getLogger(TFileSystemProvider.class.getName())
-                .log(CONFIG, "Installed TrueZIP file system provider");
+                .log(CONFIG, "Installed TrueZIP default file system provider");
     }
 
-    private TFileSystemProvider(
-            final FsScheme scheme,
-            final FsMountPoint root) {
-        this.scheme = scheme.toString();
-        this.root = new FsPath(root, ROOT);
-
-        assert invariants();
-    }
-
-    private boolean invariants() {
-        assert null != getScheme();
-        assert null != getRoot();
-        return true;
+    private TFileSystemProvider(final String scheme, final FsPath root) {
+        assert null != scheme;
+        assert null != root;
+        this.scheme = scheme;
+        this.root = root;
     }
 
     /**
@@ -272,7 +266,6 @@ public final class TFileSystemProvider extends FileSystemProvider {
      * @return A file system.
      */
     synchronized TFileSystem getFileSystem(final TPath path) {
-        //return new TFileSystem(path);
         final FsMountPoint mp = path.getAddress().getMountPoint();
         TFileSystem fs = fileSystems.get(mp);
         if (null == fs)
@@ -281,19 +274,21 @@ public final class TFileSystemProvider extends FileSystemProvider {
     }
 
     /**
-     * Returns a {@code TPath} for the given hierarchical {@code uri}.
+     * Returns a {@code TPath} for the given hierarchical {@code name}.
      * <p>
-     * The {@code uri} is scanned for prospective archive files using the
-     * {@link TConfig#get() current configuration}.
-     * Any trailing separators in {@code uri} get discarded.
+     * The URI path component is scanned for prospective archive files using
+     * the {@link TConfig#get() current configuration}.
+     * Any trailing separators in {@code name} get discarded.
      * 
-     * @param  uri the uri to return a {@link TPath} for.
+     * @param  name the uri to return a {@link TPath} for.
      * @return the {@link TPath}
      * @throws IllegalArgumentException if the given {@code uri} is opaque.
      */
     @Override
-    public TPath getPath(URI uri) {
-        return new TPath(uri);
+    public TPath getPath(URI name) {
+        if (!getScheme().equals(name.getScheme()))
+            throw new IllegalArgumentException();
+        return new TPath(name);
     }
 
     @Override
@@ -483,5 +478,15 @@ public final class TFileSystemProvider extends FileSystemProvider {
     public interface Parameter {
         /** The key for the {@code archiveDetector} parameter. */
         String ARCHIVE_DETECTOR = "archiveDetector";
+    }
+
+    private static final class Holder {
+        static final TFileSystemProvider
+            CURRENT_DIRECTORY = new TFileSystemProvider(
+                "file",
+                FsPath.create(new File("").toURI()));
+
+        private Holder() {
+        }
     }
 }
