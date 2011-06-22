@@ -22,6 +22,7 @@ import static java.io.File.*;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.Iterator;
+import java.util.ServiceConfigurationError;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import org.junit.Test;
@@ -102,6 +103,33 @@ public class TPathTest extends TestBase {
         final TPath path = new TPath(first, more);
         assertThat(path.toString(), equalTo(name.replace(SEPARATOR, path.getFileSystem().getSeparator())));
         assertThat(path.getAddress(), equalTo(address));
+    }
+
+    @Test
+    public void testUriConstructor() {
+        for (final Object[] params : new Object[][] {
+            // $uri, $scheme, $succeeds
+            { "", "file", true },
+            { "/", "file", true },
+            { "file:/", "file", true },
+            { "foo:/", "foo", false },
+        }) {
+            final URI uri = URI.create(params[0].toString());
+            final String scheme = params[1].toString();
+            final boolean succeeds = (Boolean) params[2];
+            final TPath path = new TPath(uri);
+            final URI result = path.toUri();
+            assertThat(result.getScheme(), is(scheme));
+            assert !result.isOpaque();
+            try {
+                assertThat(path.getFileSystem().provider().getScheme(), is(scheme));
+                if (!succeeds)
+                    fail();
+            } catch (ServiceConfigurationError ex) {
+                if (succeeds)
+                    throw ex;
+            }
+        }
     }
 
     @Test

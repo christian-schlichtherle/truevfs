@@ -155,12 +155,13 @@ public final class TPath implements Path {
 
     /**
      * Constructs a new path from the given sub path strings.
-     * The supported separators are {@link File#separator} and {@code "/"}.
      * <p>
-     * This constructor scans its
-     * {@link TPath#toString() resulting path name} to detect prospective
-     * archive files using the
-     * {@link #getDefaultArchiveDetector() default archive detector}.
+     * This constructor scans the {@link TPath#toString() path name} resulting
+     * from the segment parameters to detect prospective archive files using
+     * the {@link #getDefaultArchiveDetector() default archive detector}.
+     * <p>
+     * The supported separators are "{@link File#separator}" and "{@code /}".
+     * Any trailing separators in the resulting path name get discarded.
      * 
      * @param first the first sub path string.
      * @param more optional sub path strings.
@@ -185,15 +186,21 @@ public final class TPath implements Path {
      * Constructs a new path from the given hierarchical URI.
      * <p>
      * This constructor scans the {@link URI#getPath() path component} of
-     * the given URI to detect prospective archive files using the
+     * the URI to detect prospective archive files using the
      * {@link #getDefaultArchiveDetector() default archive detector}.
      * <p>
-     * If the {@link URI#getScheme() scheme component} of the given URI is
-     * undefined, 
+     * If the {@link URI#getScheme() scheme component} of the URI is undefined
+     * and the {@link URI#getSchemeSpecificPart() scheme specific part} does
+     * not start with a "{@code /}", then the URI gets resolved against the
+     * "{@code file:}" based URI for the current directory in the platform file
+     * system.
+     * Otherwise, if the scheme component is undefined, then the URI gets
+     * resolved against the URI "{@code file:/}".
      * 
-     * @param  name a path name.
+     * @param  name the path name.
      *         This must be a hierarchical URI with an undefined fragment
      *         component.
+     *         Any trailing separators in the path component get discarded.
      * @throws IllegalArgumentException if the preconditions for the parameter
      *         do not hold.
      */
