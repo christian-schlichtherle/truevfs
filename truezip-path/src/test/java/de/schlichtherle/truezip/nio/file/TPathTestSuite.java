@@ -134,7 +134,7 @@ public abstract class TPathTestSuite extends TestBase {
             // and removes cached data from the memory, so it helps to start on a
             // clean sheet of paper with subsequent tests.
             try {
-                TFileSystem.umount();
+                TFileSystemProvider.umount();
             } catch (FsSyncException ex) {
                 logger.log(Level.WARNING, ex.toString(), ex);
             }
@@ -467,7 +467,7 @@ public abstract class TPathTestSuite extends TestBase {
             fail("directory not empty");
         } catch (IOException expected) {
         }
-        TFileSystem.umount(); // allow external modifications!
+        TFileSystemProvider.umount(); // allow external modifications!
         delete(newNonArchiveFile(archive)); // use plain file to delete instead!
         assertFalse(exists(archive));
         assertFalse(isDirectory(archive));
@@ -529,7 +529,7 @@ public abstract class TPathTestSuite extends TestBase {
 
         // Test open output streams.
         createFile(file1);
-        TFileSystem.umount(); // ensure file1 is really present in the archive file
+        TFileSystemProvider.umount(); // ensure file1 is really present in the archive file
         createFile(file2); // uses FsOutputOption.CACHE!
         final InputStream in1 = newInputStream(file1);
         try {
@@ -566,7 +566,7 @@ public abstract class TPathTestSuite extends TestBase {
             // This operation should complete without any exception if the garbage
             // collector did his job.
             try {
-                TFileSystem.umount(); // allow external modifications!
+                TFileSystemProvider.umount(); // allow external modifications!
             } catch (FsSyncWarningException ex) {
                 fail("The garbage collector hasn't been collecting an open stream. If this is only happening occasionally, you can safely ignore it.");
             }
@@ -617,7 +617,7 @@ public abstract class TPathTestSuite extends TestBase {
             out.close();
         }
         
-        TFileSystem.umount(); // ensure two entries in the archive
+        TFileSystemProvider.umount(); // ensure two entries in the archive
         
         out = newOutputStream(file1);
         Streams.cat(new ByteArrayInputStream(data), out);
@@ -645,7 +645,7 @@ public abstract class TPathTestSuite extends TestBase {
         
         // out is still open!
         try {
-            TFileSystem.umount(); // forces closing of all streams
+            TFileSystemProvider.umount(); // forces closing of all streams
             fail("Expected warning exception when synchronizing a busy archive file!");
         } catch (FsSyncWarningException ex) {
             if (!(ex.getCause() instanceof FileBusyException))
@@ -670,7 +670,7 @@ public abstract class TPathTestSuite extends TestBase {
         // This update should complete without any exception if the garbage
         // collector did his job.
         try {
-            TFileSystem.umount();
+            TFileSystemProvider.umount();
         } catch (FsSyncWarningException ex) {
             fail("The garbage collector hasn't been collecting an open stream. If this is only happening occasionally, you can safely ignore it.");
         }
@@ -1090,7 +1090,7 @@ public abstract class TPathTestSuite extends TestBase {
             fail("directory not empty");
         } catch (IOException expected) {
         }
-        TFileSystem.umount(); // allow external modifications!
+        TFileSystemProvider.umount(); // allow external modifications!
         delete(newNonArchiveFile(archive)); // use plain file to delete instead!
         assertFalse(exists(archive));
         assertFalse(isDirectory(archive));

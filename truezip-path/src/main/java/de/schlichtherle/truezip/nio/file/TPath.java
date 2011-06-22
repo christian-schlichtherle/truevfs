@@ -178,6 +178,7 @@ public final class TPath implements Path {
         this.address = new TPathScanner(detector).scan(
                 new FsPath(fileSystem.getMountPoint(), ROOT),
                 name);
+        this.fileSystem = fileSystem;
 
         assert invariants();
     }
@@ -292,10 +293,10 @@ public final class TPath implements Path {
     }
 
     private static String cutLeadingSeparators(final String p) {
-        int i = 0;
-        while (SEPARATOR_CHAR == p.charAt(i))
-            i++;
-        return 0 == i ? p : p.substring(i);
+        for (int i = 0, l = p.length(); i < l; i++)
+            if (SEPARATOR_CHAR != p.charAt(i))
+                return p.substring(i);
+        return "";
     }
 
     static String cutTrailingSeparators(

@@ -15,6 +15,9 @@
  */
 package de.schlichtherle.truezip.nio.file;
 
+import de.schlichtherle.truezip.fs.FsManager;
+import de.schlichtherle.truezip.fs.FsSyncException;
+import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import net.jcip.annotations.ThreadSafe;
 import java.util.logging.Logger;
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
@@ -27,6 +30,8 @@ import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import de.schlichtherle.truezip.fs.FsPath;
+import static de.schlichtherle.truezip.fs.FsManager.*;
+import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
@@ -76,9 +81,8 @@ import static java.util.logging.Level.*;
 public final class TFileSystemProvider extends FileSystemProvider {
 
     private static final String DEFAULT_SCHEME = "tpath";
-    private static final FsPath
-            ROOT_DIRECTORY = FsPath.create(URI.create("file:/"));
-
+    private static final URI ROOT_DIRECTORY = URI.create("file:/");
+    private static final FsManager manager = FsManagerLocator.SINGLETON.get();
     private static final Map<String, TFileSystemProvider>
             providers = new WeakHashMap<String, TFileSystemProvider>();
 
@@ -98,13 +102,12 @@ public final class TFileSystemProvider extends FileSystemProvider {
         if (!TPathScanner.isAbsolute(name))
             return Holder.CURRENT_DIRECTORY;
         if (!name.isAbsolute())
-            name = ROOT_DIRECTORY.toUri();
+            name = ROOT_DIRECTORY;
         String scheme = name.getScheme();
         TFileSystemProvider provider = providers.get(scheme);
         if (null != provider)
             return provider;
-        final FsPath path = FsPath.create(name.resolve(SEPARATOR));
-        provider = new TFileSystemProvider(scheme, path);
+        provider = new TFileSystemProvider(scheme, name.resolve(SEPARATOR));
         providers.put(scheme, provider);
         return provider;
     }
@@ -131,11 +134,34 @@ public final class TFileSystemProvider extends FileSystemProvider {
                 .log(CONFIG, "Installed TrueZIP default file system provider");
     }
 
-    private TFileSystemProvider(final String scheme, final FsPath root) {
+    private TFileSystemProvider(final String scheme, final URI root) {
         assert null != scheme;
-        assert null != root;
         this.scheme = scheme;
-        this.root = root;
+        this.root = FsPath.create(root);
+    }
+
+    /**
+     * Commits all unsynchronized changes to the contents of all federated file
+     * systems (i.e. prospective archive files) to their respective parent file
+     * system, releases the associated resources (i.e. target archive files)
+     * for access by third parties (e.g. other processes), cleans up any
+     * temporary allocated resources (e.g. temporary files) and purges any
+     * cached data.
+     * Note that temporary files may get used even if the archive files where
+     * accessed read-only.
+     *
+     * @throws FsSyncWarningException if <em>only</em> warning conditions
+     *         occur.
+     *         This implies that the respective parent file system has been
+     *         updated with constraints, such as a failure to set the last
+     *         modification time of the entry for the federated file system
+     *         (i.e. archive file) in its parent file system.
+     * @throws FsSyncException if any error conditions occur.
+     *         This implies loss of data!
+     * @see    #sync(BitField)
+     */
+    public static void umount() throws FsSyncException {
+        manager.sync(UMOUNT);
     }
 
     /**
@@ -483,8 +509,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
     private static final class Holder {
         static final TFileSystemProvider
             CURRENT_DIRECTORY = new TFileSystemProvider(
-                "file",
-                FsPath.create(new File("").toURI()));
+                "file", new File("").toURI());
 
         private Holder() {
         }
