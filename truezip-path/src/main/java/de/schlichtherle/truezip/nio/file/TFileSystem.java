@@ -94,7 +94,6 @@ import net.jcip.annotations.ThreadSafe;
 @DefaultAnnotation(NonNull.class)
 public final class TFileSystem extends FileSystem {
 
-    /** The file system manager to use within this package. */
     private static final FsManager manager = FsManagerLocator.SINGLETON.get();
 
     private final FsController<?> controller;
@@ -200,30 +199,6 @@ public final class TFileSystem extends FileSystem {
     @Override
     public void close() throws FsSyncException {
         sync(UMOUNT);
-    }
-
-    /**
-     * Commits all unsynchronized changes to the contents of all federated file
-     * systems (i.e. prospective archive files) to their respective parent file
-     * system, releases the associated resources (i.e. target archive files)
-     * for access by third parties (e.g. other processes), cleans up any
-     * temporary allocated resources (e.g. temporary files) and purges any
-     * cached data.
-     * Note that temporary files may get used even if the archive files where
-     * accessed read-only.
-     *
-     * @throws FsSyncWarningException if <em>only</em> warning conditions
-     *         occur.
-     *         This implies that the respective parent file system has been
-     *         updated with constraints, such as a failure to set the last
-     *         modification time of the entry for the federated file system
-     *         (i.e. archive file) in its parent file system.
-     * @throws FsSyncException if any error conditions occur.
-     *         This implies loss of data!
-     * @see    #sync(BitField)
-     */
-    public static void umount() throws FsSyncException {
-        manager.sync(UMOUNT);
     }
 
     /**
