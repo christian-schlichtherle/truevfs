@@ -295,8 +295,11 @@ public final class Paths {
      *     This indicates a Windows Drive and is only recognized if this
      *     JVM is running on Windows.
      * <li>Two leading separators.
-     *     This indicates a Windows UNC and is only recognized if this
-     *     JVM is running on Windows.
+     *     This indicates an authority and is only recognized if this JVM is
+     *     running on Windows.
+     *     If {@code inclUNC} is {@code true}, then the next two segments
+     *     following the two leading separators are accounted for in the prefix
+     *     length as the UNC host and share name.
      * <li>A single leading separator.
      *     On Windows and POSIX, this is the notation for an absolute path.
      *     This is recognized on any OS.
@@ -304,40 +307,44 @@ public final class Paths {
      *
      * @param  path The file system path.
      * @param  separatorChar The file name separator character.
-     * @param  inclUncShare whether or not a UNC host and share name should get
-     *         accounted for in the prefix length.
-     *         This will only get used if this JVM is running on Windows.
+     * @param  inclUNC whether or not an authority or a UNC host and
+     *         share name should get accounted for in the prefix length.
      * @return The number of characters in the prefix.
      */
     public static int prefixLength(
             final String path,
             final char separatorChar,
-            final boolean inclUncShare) {
+            final boolean inclUNC) {
         final int pathLen = path.length();
         if (0 >= pathLen)
             return 0;
         char c = path.charAt(0);
         if ('\\' == File.separatorChar) {
-            if (separatorChar == c) {
+            if (2 <= pathLen
+                    && ':' == path.charAt(1)
+                    && ('a' <= c && c <= 'z' || 'A' <= c && c <= 'Z')) {
+                    // Windows Drive.
+                    return 3 <= pathLen && separatorChar == path.charAt(2) ? 3 : 2;
+            } else if (separatorChar == c) {
                 if (2 <= pathLen && separatorChar == path.charAt(1)) {
                     // Windows UNC.
-                    if (!inclUncShare)
+                    if (!inclUNC)
                         return 2;
                     final int i = path.indexOf(separatorChar, 2) + 1;
                     if (0 == i)
-                        return 2;
+                        return pathLen;
+                    // UNC host name.
                     final int j = path.indexOf(separatorChar, i) + 1;
-                    return 0 == j ? i : j;
+                    if (0 == j)
+                        return pathLen;
+                    // UNC share name.
+                    return j;
                 } else {
                     // Absolute path.
                     return 1;
                 }
-            } else if (2 <= pathLen
-                    && ':' == path.charAt(1)
-                    && ('a' <= c && c <= 'z' || 'A' <= c && c <= 'Z')) {
-                // Windows Drive.
-                return 3 <= pathLen && separatorChar == path.charAt(2) ? 3 : 2;
             } else {
+                // Relative path.
                 return 0;
             }
         } else {

@@ -495,7 +495,7 @@ public final class TPath implements Path {
             if (l <= pl)
                 return null;
         }
-        final URI p = n.resolve(DOT);
+        final URI p = n.resolve(DOT_URI);
         return p.getPath().isEmpty()
                 ? null
                 : new TPath(p, getArchiveDetector(), null);

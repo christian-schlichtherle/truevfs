@@ -19,6 +19,7 @@ import de.schlichtherle.truezip.file.TConfig;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsPath;
 import static de.schlichtherle.truezip.nio.file.TPathScanner.*;
+import static java.io.File.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import org.junit.Test;
@@ -32,12 +33,27 @@ import static org.hamcrest.CoreMatchers.*;
 public class TPathScannerTest extends TestBase {
     @Test
     public void testScan() throws URISyntaxException {
+        if ('\\' == separatorChar) {
+            for (final String[] params : new String[][] {
+                // $parent, $member, $path, [$mountPoint]
+                { "file:/", "//foo/bar", "file://foo/bar", "file://foo/" },
+                { "file:/", "//foo/bar/", "file://foo/bar/", "file://foo/bar/" },
+                { "file:/", "c%3A/foo", "file:/c:/foo", "file:/c:/" },
+                { "file:/", "c%3A/foo", "file:/c:/foo", "file:/c:/" },
+                { "file:///c:/", "//foo/bar", "file://foo/bar", "file://foo/" },
+                { "file:///c:/", "//foo/bar/", "file://foo/bar/", "file://foo/bar/" },
+                { "file:///c:/", "c%3A/foo", "file:/c:/foo", "file:/c:/" },
+                { "file:///c:/", "c%3A/foo", "file:/c:/foo", "file:/c:/" },
+                { "file://host/share/", "//foo/bar", "file://foo/bar", "file://foo/" },
+                { "file://host/share/", "//foo/bar/", "file://foo/bar/", "file://foo/bar/" },
+                { "file://host/share/", "c%3A/foo", "file:/c:/foo", "file:/c:/" },
+                { "file://host/share/", "c%3A/foo", "file:/c:/foo", "file:/c:/" },
+            }) {
+                assertScan(params);
+            }
+        }
         for (final String[] params : new String[][] {
-            { "foo", "..", "", null },
             // $parent, $member, $path, [$mountPoint]
-            { "file:/", "c%3A/foo", "file:/c:/foo", "file:/c:/" },
-            { "file:/", "//foo/bar/", "file://foo/bar/", "file://foo/bar/" },
-            { "file:/", "//foo/bar", "file://foo/bar", "file://foo/" },
             { "foo", "bar", "foo/bar", null },
             { "foo", "..", "", null },
             { "foo/bar", "../..", "", null },
@@ -56,18 +72,22 @@ public class TPathScannerTest extends TestBase {
             { "mok:mok:scheme:/foo.mok!/x/bar.mok!/y", "../../../..", "scheme:/", "scheme:/" },
             //{ "mok:mok:scheme:/foo.mok!/x/bar.mok!/y", "../../../../..", "null" },
         }) {
-            final FsPath parent = new FsPath(new URI(params[0]));
-            final URI member = new URI(params[1]);
-            final FsPath path = new FsPath(new URI(params[2]));
-            final FsMountPoint mountPoint = null == params[3]
-                    ? null
-                    : new FsMountPoint(new URI(params[3]));
-            final FsPath result = new TPathScanner(
-                        TConfig.get().getArchiveDetector())
-                    .scan(parent, member);
-            assertThat(result, equalTo(path));
-            assertThat(result.getMountPoint(), is(mountPoint));
+            assertScan(params);
         }
+    }
+
+    private static void assertScan(final String... params) throws URISyntaxException {
+        final FsPath parent = new FsPath(new URI(params[0]));
+        final URI member = new URI(params[1]);
+        final FsPath path = new FsPath(new URI(params[2]));
+        final FsMountPoint mountPoint = null == params[3]
+                ? null
+                : new FsMountPoint(new URI(params[3]));
+        final FsPath result = new TPathScanner(
+                    TConfig.get().getArchiveDetector())
+                .scan(parent, member);
+        assertThat(result, equalTo(path));
+        assertThat(result.getMountPoint(), is(mountPoint));
     }
 
     @Test
