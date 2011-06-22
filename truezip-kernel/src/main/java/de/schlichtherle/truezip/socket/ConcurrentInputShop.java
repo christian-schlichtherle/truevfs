@@ -35,7 +35,7 @@ import net.jcip.annotations.NotThreadSafe;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * Decorates an {@code InputShop} to add accounting and multithreading
+ * Decorates another input shop to add accounting and multithreading
  * synchronization for all input streams or read only files created by the
  * decorated input shop.
  *
