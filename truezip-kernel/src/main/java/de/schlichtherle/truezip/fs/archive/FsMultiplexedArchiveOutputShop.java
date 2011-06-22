@@ -146,7 +146,8 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
                 if (isBusy()) {
                     final IOPool.Entry<?> temp = pool.allocate();
                     try {
-                        return new BufferedEntryOutputStream(getBoundSocket(), temp);
+                        return new BufferedEntryOutputStream(
+                                temp, getBoundSocket());
                     } catch (IOException ex) {
                         try {
                             temp.release();
@@ -156,7 +157,8 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
                         throw ex;
                     }
                 } else {
-                    return new EntryOutputStream(getBoundSocket().newOutputStream());
+                    return new EntryOutputStream(
+                            getBoundSocket().newOutputStream());
                 }
             }
         } // class Output
@@ -205,29 +207,26 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
         final IOPool.Entry<?> temp;
         final OutputSocket<? extends AE> output;
         final AE local;
-        final Entry peer;
-        final InputSocket<?> input;
+        final InputSocket<Entry> input;
         boolean closed;
 
-        //@SuppressWarnings("LeakingThisInConstructor")
+        @SuppressWarnings("LeakingThisInConstructor")
         BufferedEntryOutputStream(
-                final OutputSocket<? extends AE> output,
-                final IOPool.Entry<?> temp)
+                final IOPool.Entry<?> temp,
+                final OutputSocket<? extends AE> output)
         throws IOException {
             super(temp.getOutputSocket().newOutputStream());
             this.output = output;
             this.local = output.getLocalTarget();
-            this.peer = output.getPeerTarget();
+            final Entry peer = output.getPeerTarget();
             class ProxyInput extends DecoratingInputSocket<Entry> {
-                private final Entry target = null != peer ? peer : temp;
-
                 ProxyInput() {
                     super(temp.getInputSocket());
                 }
 
                 @Override
                 public Entry getLocalTarget() {
-                    return target;
+                    return null != peer ? peer : temp;
                 }
             }
             this.temp = temp;
@@ -248,9 +247,9 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
                 return;
             closed = true;
             try {
+                delegate.close();
+            } finally {
                 try {
-                    delegate.close();
-                } finally {
                     final Entry src = input.getLocalTarget();
                     final AE dst = getTarget();
                     for (Size type : ALL_SIZE_SET)
@@ -259,9 +258,9 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
                     for (Access type : ALL_ACCESS_SET)
                         if (UNKNOWN == dst.getTime(type))
                             dst.setTime(type, src.getTime(type));
+                } finally {
+                    storeBuffers();
                 }
-            } finally {
-                storeBuffers();
             }
         }
 
