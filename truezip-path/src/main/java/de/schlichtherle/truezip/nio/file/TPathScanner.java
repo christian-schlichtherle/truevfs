@@ -47,9 +47,9 @@ import net.jcip.annotations.NotThreadSafe;
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
 final class TPathScanner {
-    private static final String DOT_DOT_SEPARATOR = ".." + SEPARATOR_CHAR;
-    private static final URI DOT = URI.create(".");
-    private static final URI DOT_DOT = URI.create("..");
+    static final String DOT_DOT_SEPARATOR = ".." + SEPARATOR_CHAR;
+    static final URI DOT = URI.create(".");
+    static final URI DOT_DOT = URI.create("..");
 
     private final TArchiveDetector detector;
     private final Splitter splitter = new Splitter(SEPARATOR_CHAR, false);
@@ -95,11 +95,7 @@ final class TPathScanner {
      */
     FsPath scan(FsPath parent, URI member) {
         try {
-            if (member.isOpaque())
-                throw new QuotedInputUriSyntaxException(member, "Opaque URI");
-            if (null != member.getFragment())
-                throw new QuotedInputUriSyntaxException(member, "Fragment component defined");
-            member = member.normalize();
+            member = checkFix(member.normalize());
             String mp;
             while ((mp = member.getPath()).startsWith(DOT_DOT_SEPARATOR)) {
                 parent = parent(parent);
@@ -109,9 +105,8 @@ final class TPathScanner {
             }
             if ("..".equals(mp))
                 return parent(parent);
-            final URI pu = fix(parent.toUri());
-            member = fix(member);
             final int mpl = pathPrefixLength(member);
+            final URI pu = fixUnchecked(parent.toUri());
             if (0 < mpl) {
                 final String ma = member.getAuthority();
                 final String p = null != ma || mp.startsWith(SEPARATOR)
@@ -143,44 +138,52 @@ final class TPathScanner {
         return pl;
     }
 
-    static URI fix(final URI uri) {
+    static URI checkFix(final URI uri) throws URISyntaxException {
+        if (uri.isOpaque())
+            throw new QuotedInputUriSyntaxException(uri, "Opaque URI");
+        if (null != uri.getFragment())
+            throw new QuotedInputUriSyntaxException(uri, "Fragment component defined");
+        return fixChecked(uri);
+    }
+
+    static URI fixUnchecked(final URI uri) {
+        return uri.isOpaque() ? uri : fixChecked(uri);
+    }
+
+    private static URI fixChecked(final URI uri) {
         final String ssp = uri.getSchemeSpecificPart();
         final String a = uri.getAuthority();
-        if (null == ssp // fix bug: null == new URI("foo").scan(neAw URI("..")).getRawSchemeSpecificPart()
-                || null == a && ssp.startsWith(SEPARATOR + SEPARATOR)) // fix empty authority
+        if (null == ssp // fixUnchecked bug: null == new URI("foo").scan(neAw URI("..")).getRawSchemeSpecificPart()
+                || null == a && ssp.startsWith(SEPARATOR + SEPARATOR)) // fixUnchecked empty authority
             return new UriBuilder(uri).toUri();
         return uri;
     }
 
     /**
-     * Returns the parent file system path for the given path.
+     * Returns the parent of the given file system path.
      * 
      * @param  path a file system path.
      * @return The parent file system path.
      * @throws URISyntaxException 
      */
-    static FsPath parent(FsPath path)
-    throws URISyntaxException {
-        while (true) {
-            FsMountPoint pmp = path.getMountPoint();
-            FsEntryName  pen = path.getEntryName();
-            if (pen.isRoot()) {
-                if (null == pmp)
-                    throw new QuotedInputUriSyntaxException(path,
-                            "An empty path has no parent.");
-                path = pmp.getPath();
-                if (null == path)
-                    return new FsPath(pmp.toUri().resolve(DOT_DOT));
-                continue;
-            } else {
-                pen = new FsEntryName(pen.toUri().resolve(DOT), CANONICALIZE);
-                /*if (pen.isRoot() && null != pmp) {
-                    path = pmp.getPath();
-                    if (null == path)
-                        return new FsPath(pmp.toUri(), CANONICALIZE);
-                }*/
-                return new FsPath(pmp, pen);
-            }
+    static FsPath parent(FsPath path) throws URISyntaxException {
+        FsMountPoint mp = path.getMountPoint();
+        FsEntryName  en = path.getEntryName();
+        if (en.isRoot()) {
+            if (null == mp)
+                return null;
+            path = mp.getPath();
+            if (null != path)
+                return parent(path);
+            URI mpu = mp.toUri();
+            URI pu = mpu.resolve(DOT_DOT);
+            if (mpu.getRawPath().length() <= pu.getRawPath().length())
+                return null;
+            return new FsPath(pu);
+        } else {
+            URI pu = en.toUri().resolve(DOT);
+            en = new FsEntryName(pu, CANONICALIZE);
+            return new FsPath(mp, en);
         }
     }
 
@@ -190,12 +193,12 @@ final class TPathScanner {
         final FsEntryName men;
         final FsPath pp;
         if (null != ps) {
-            men = FsEntryName.create(
+            men = new FsEntryName(
                     uri.path(splitter.getMemberName()).getUri(),
                     NULL);
             pp = scan(ps);
         } else {
-            men = FsEntryName.create(
+            men = new FsEntryName(
                     uri.path(path).query(memberQuery).getUri(),
                     CANONICALIZE);
             pp = root;
@@ -208,11 +211,11 @@ final class TPathScanner {
             final String pup = ppu.getPath();
             if (!pup.endsWith(SEPARATOR))
                 ppu = new UriBuilder(ppu).path(pup + SEPARATOR_CHAR).getUri();
-            mp = new FsPath(FsMountPoint.create(ppu), men);
+            mp = new FsPath(new FsMountPoint(ppu), men);
         }
         final FsScheme s = detector.getScheme(men.toString());
         if (null != s)
-            mp = new FsPath(FsMountPoint.create(s, mp), ROOT);
+            mp = new FsPath(new FsMountPoint(s, mp), ROOT);
         return mp;
     }
 }

@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.nio.file;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.io.Paths;
-import java.io.File;
+import static java.io.File.*;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.Iterator;
@@ -33,12 +33,29 @@ import org.junit.Test;
 public class TPathTest extends TestBase {
 
     @Test
-    public void testConstructorWithStrings() {
-        if ('\\' == File.separatorChar) {
+    public void testIllegalConstructorParameters() {
+        if ('\\' == separatorChar) {
             for (Object[] params : new Object[][] {
-                // $first, $more, $uri, $address
-                //{ "c:foo", NO_MORE, "c%3Afoo", "file:/c:foo" },
-                { "c:\\foo", NO_MORE, "c%3A/foo", "file:/c:/foo" },
+                // $first, $more
+                { "c:", NO_MORE },
+                { "c:foo", NO_MORE },
+            }) {
+                try {
+                    new TPath(params[0].toString(), (String[]) params[1]);
+                    fail();
+                } catch (IllegalArgumentException expected) {
+                }
+            }
+        }
+    }
+
+    @Test
+    public void testStringConstructor() {
+        if ('\\' == separatorChar) {
+            for (Object[] params : new Object[][] {
+                // $first, $more, $name, $address
+                //{ "c:foo", NO_MORE, "c:foo", "file:/c:foo" },
+                { "c:\\foo", NO_MORE, "c:/foo", "file:/c:/foo" },
                 //{ "//", NO_MORE, "/", ROOT_DIRECTORY },
                 { "//foo", new String[] { "bar", "baz" }, "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
                 { "///foo//", new String[] { "//bar//", "//", "//baz//" }, "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
@@ -47,7 +64,7 @@ public class TPathTest extends TestBase {
             }
         }
         for (Object[] params : new Object[][] {
-            // $first, $more, $uri, $address
+            // $first, $more, $name, $address
             { "/", NO_MORE, "/", ROOT_DIRECTORY },
             { "/foo", NO_MORE, "/foo", ROOT_DIRECTORY + "foo" },
             { "/foo", new String[] { "" }, "/foo", ROOT_DIRECTORY + "foo"},
@@ -80,54 +97,60 @@ public class TPathTest extends TestBase {
     private static void assertConstructorWithStrings(Object... params) {
         final String first = params[0].toString();
         final String[] more = (String[]) params[1];
-        final URI uri = URI.create(params[2].toString());
+        final String name = params[2].toString();
         final FsPath address = FsPath.create(URI.create(params[3].toString()));
         final TPath path = new TPath(first, more);
-        assertThat(path.getUri(), equalTo(uri));
-        assertThat(path.toString(), equalTo(uri.getSchemeSpecificPart().replace(SEPARATOR, path.getFileSystem().getSeparator())));
+        assertThat(path.toString(), equalTo(name.replace(SEPARATOR, path.getFileSystem().getSeparator())));
         assertThat(path.getAddress(), equalTo(address));
     }
 
     @Test
     public void testResolve() {
-        if ('\\' == File.separatorChar) {
+        if ('\\' == separatorChar) {
             for (Object[] params : new Object[][] {
-                // $parent, $first, $more, $uri, $address
-                { "x", "//foo", new String[] { "bar", "baz" }, "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
-                { "x", "///foo//", new String[] { "//bar//", "//", "//baz//" }, "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
+                // $parent, $first, $more, $name, $address
+                { "x", "//foo/bar/baz", "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
+                { "x", "///foo//bar//baz//", "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
             }) {
                 assertResolve(params);
             }
         }
         for (Object[] params : new Object[][] {
-            // $parent, $first, $more, $uri, $address
-            { "", "/", NO_MORE, "/", ROOT_DIRECTORY },
-            { "x", "/foo", NO_MORE, "/foo", ROOT_DIRECTORY + "foo" },
-            { "x", "/foo", new String[] { "" }, "/foo", ROOT_DIRECTORY + "foo"},
-            { "x", "/foo", new String[] { "bar" }, "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
-            //{ "x", "//", NO_MORE, "/", ROOT_DIRECTORY },
-            //{ "x", "///", NO_MORE, "/", ROOT_DIRECTORY },
-            { "x", "/foo", new String[] { "/bar" }, "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
-            { "x", "/foo//", new String[] { "//", "//bar//", "" }, "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
-            { "x", "/foo", new String[] { "" }, "/foo", ROOT_DIRECTORY + "foo"},
-            { "x", "/foo", new String[] { ".." }, "/foo/..", ROOT_DIRECTORY },
-            { "x", "/foo", new String[] { "/bar" }, "/foo/bar", ROOT_DIRECTORY + "foo/bar" },
-            { "x", "/foo.mok", new String[] { "/bar" }, "/foo.mok/bar", "mok:" + ROOT_DIRECTORY + "foo.mok!/bar" },
-            { "x", "/foo", new String[] { "/bar.mok" }, "/foo/bar.mok", "mok:" + ROOT_DIRECTORY + "foo/bar.mok!/" },
-            { "x", "/foo.mok", new String[] { "/bar.mok" }, "/foo.mok/bar.mok", "mok:mok:" + ROOT_DIRECTORY + "foo.mok!/bar.mok!/" },
-            { "/", "", NO_MORE, "/", ROOT_DIRECTORY },
-            { "/", "foo", NO_MORE, "/foo", ROOT_DIRECTORY + "foo" },
-            { "/", ".", NO_MORE, "/", ROOT_DIRECTORY },
-            { "", "bar", NO_MORE, "bar", CURRENT_DIRECTORY + "bar" },
-            { ".", "bar", NO_MORE, "bar", CURRENT_DIRECTORY + "bar" },
-            { "foo", "bar", NO_MORE, "foo/bar", CURRENT_DIRECTORY + "foo/bar" },
-            { "foo", "bar", new String[] { "" }, "foo/bar", CURRENT_DIRECTORY + "foo/bar"},
-            { "", "bar", new String[] { ".." }, "bar/..", CURRENT_DIRECTORY },
-            { "foo.mok", "bar", NO_MORE, "foo.mok/bar", "mok:" + CURRENT_DIRECTORY + "foo.mok!/bar" },
-            { "foo", "bar.mok", NO_MORE, "foo/bar.mok", "mok:" + CURRENT_DIRECTORY + "foo/bar.mok!/" },
-            { "foo.mok", "bar.mok", NO_MORE, "foo.mok/bar.mok", "mok:mok:" + CURRENT_DIRECTORY + "foo.mok!/bar.mok!/" },
-            { "foo.mok", "..", NO_MORE, "", CURRENT_DIRECTORY },
-            { "foo.mok", "..", new String[] { "bar.mok" }, "bar.mok", "mok:" + CURRENT_DIRECTORY + "bar.mok!/"},
+            // $parent, $first, $name, $address
+            { "", "/", "/", ROOT_DIRECTORY },
+            { "x", "/foo", "/foo", ROOT_DIRECTORY + "foo" },
+            { "x", "/foo/", "/foo", ROOT_DIRECTORY + "foo"},
+            { "x", "/foo/bar", "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
+            { "x", "/foo//bar//", "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
+            { "x", "/foo/..", "/foo/..", ROOT_DIRECTORY },
+            { "x", "/foo/../", "/foo/..", ROOT_DIRECTORY },
+            { "x", "/foo.mok/bar", "/foo.mok/bar", "mok:" + ROOT_DIRECTORY + "foo.mok!/bar" },
+            { "x", "/foo.mok/bar/", "/foo.mok/bar", "mok:" + ROOT_DIRECTORY + "foo.mok!/bar" },
+            { "x", "/foo/bar.mok", "/foo/bar.mok", "mok:" + ROOT_DIRECTORY + "foo/bar.mok!/" },
+            { "x", "/foo/bar.mok/", "/foo/bar.mok", "mok:" + ROOT_DIRECTORY + "foo/bar.mok!/" },
+            { "x", "/foo.mok/bar.mok", "/foo.mok/bar.mok", "mok:mok:" + ROOT_DIRECTORY + "foo.mok!/bar.mok!/" },
+            { "x", "/foo.mok/bar.mok/", "/foo.mok/bar.mok", "mok:mok:" + ROOT_DIRECTORY + "foo.mok!/bar.mok!/" },
+            { "/", "", "/", ROOT_DIRECTORY },
+            { "/", "foo", "/foo", ROOT_DIRECTORY + "foo" },
+            { "/", "foo/", "/foo", ROOT_DIRECTORY + "foo" },
+            { "/", ".", "/", ROOT_DIRECTORY },
+            { "/", "./", "/", ROOT_DIRECTORY },
+            { "", "bar", "bar", CURRENT_DIRECTORY + "bar" },
+            { ".", "bar/", "bar", CURRENT_DIRECTORY + "bar" },
+            { "foo", "bar", "foo/bar", CURRENT_DIRECTORY + "foo/bar" },
+            { "foo", "bar/", "foo/bar", CURRENT_DIRECTORY + "foo/bar"},
+            { "", "bar/..", "bar/..", CURRENT_DIRECTORY },
+            { "", "bar/../", "bar/..", CURRENT_DIRECTORY },
+            { "foo.mok", "bar", "foo.mok/bar", "mok:" + CURRENT_DIRECTORY + "foo.mok!/bar" },
+            { "foo.mok", "bar/", "foo.mok/bar", "mok:" + CURRENT_DIRECTORY + "foo.mok!/bar" },
+            { "foo", "bar.mok", "foo/bar.mok", "mok:" + CURRENT_DIRECTORY + "foo/bar.mok!/" },
+            { "foo", "bar.mok/", "foo/bar.mok", "mok:" + CURRENT_DIRECTORY + "foo/bar.mok!/" },
+            { "foo.mok", "bar.mok", "foo.mok/bar.mok", "mok:mok:" + CURRENT_DIRECTORY + "foo.mok!/bar.mok!/" },
+            { "foo.mok", "bar.mok/", "foo.mok/bar.mok", "mok:mok:" + CURRENT_DIRECTORY + "foo.mok!/bar.mok!/" },
+            { "foo.mok", "..", "", CURRENT_DIRECTORY },
+            { "foo.mok", "../", "", CURRENT_DIRECTORY },
+            { "foo.mok", "../bar.mok", "bar.mok", "mok:" + CURRENT_DIRECTORY + "bar.mok!/"},
+            { "foo.mok", "../bar.mok/", "bar.mok", "mok:" + CURRENT_DIRECTORY + "bar.mok!/"},
         }) {
             assertResolve(params);
         }
@@ -136,19 +159,127 @@ public class TPathTest extends TestBase {
     private static void assertResolve(Object... params) {
         final TPath parent = new TPath(params[0].toString());
         final String first = params[1].toString();
-        final String[] more = (String[]) params[2];
-        final URI uri = URI.create(params[3].toString());
-        final FsPath address = FsPath.create(URI.create(params[4].toString()));
-        final TPath member = new TPath(first, more);
+        final String name = params[2].toString();
+        final FsPath address = FsPath.create(URI.create(params[3].toString()));
+        final TPath member = new TPath(first);
         final TPath path = parent.resolve(member);
-        assertThat(path.getUri(), equalTo(uri));
-        assertThat(path.toString(), equalTo(uri.getSchemeSpecificPart().replace(SEPARATOR, path.getFileSystem().getSeparator())));
+        assertThat(path.toString(), equalTo(name.replace(SEPARATOR, path.getFileSystem().getSeparator())));
         assertThat(path.getAddress(), equalTo(address));
     }
 
     @Test
+    public void testResolveSibling() {
+        if ('\\' == separatorChar) {
+            for (Object[] params : new Object[][] {
+                // $parent, $first, $more, $name, $address
+                { "x", "//foo/bar/baz", "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
+                { "x", "///foo//bar//baz//", "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
+            }) {
+                assertResolveSibling(params);
+            }
+        }
+        for (Object[] params : new Object[][] {
+            // $parent, $first, $name, $address
+            { "", "/", "/", ROOT_DIRECTORY },
+            { "x", "/foo", "/foo", ROOT_DIRECTORY + "foo" },
+            { "x", "/foo/", "/foo", ROOT_DIRECTORY + "foo"},
+            { "x", "/foo/bar", "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
+            { "x", "/foo//bar//", "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
+            { "x", "/foo/..", "/foo/..", ROOT_DIRECTORY },
+            { "x", "/foo/../", "/foo/..", ROOT_DIRECTORY },
+            { "x", "/foo.mok/bar", "/foo.mok/bar", "mok:" + ROOT_DIRECTORY + "foo.mok!/bar" },
+            { "x", "/foo.mok/bar/", "/foo.mok/bar", "mok:" + ROOT_DIRECTORY + "foo.mok!/bar" },
+            { "x", "/foo/bar.mok", "/foo/bar.mok", "mok:" + ROOT_DIRECTORY + "foo/bar.mok!/" },
+            { "x", "/foo/bar.mok/", "/foo/bar.mok", "mok:" + ROOT_DIRECTORY + "foo/bar.mok!/" },
+            { "x", "/foo.mok/bar.mok", "/foo.mok/bar.mok", "mok:mok:" + ROOT_DIRECTORY + "foo.mok!/bar.mok!/" },
+            { "x", "/foo.mok/bar.mok/", "/foo.mok/bar.mok", "mok:mok:" + ROOT_DIRECTORY + "foo.mok!/bar.mok!/" },
+            { "/", "", "", CURRENT_DIRECTORY },
+            { "/", "foo", "foo", CURRENT_DIRECTORY + "foo" },
+            { "/", "foo/", "foo", CURRENT_DIRECTORY + "foo" },
+            { "/", ".", ".", CURRENT_DIRECTORY },
+            { "/", "./", ".", CURRENT_DIRECTORY },
+            { "", "bar", "bar", CURRENT_DIRECTORY + "bar" },
+            { ".", "bar/", "bar", CURRENT_DIRECTORY + "bar" },
+            { "foo", "bar", "bar", CURRENT_DIRECTORY + "bar" },
+            { "foo", "bar/", "bar", CURRENT_DIRECTORY + "bar"},
+            { "", "bar/..", "bar/..", CURRENT_DIRECTORY },
+            { "", "bar/../", "bar/..", CURRENT_DIRECTORY },
+            { "foo.mok", "bar", "bar", CURRENT_DIRECTORY + "bar" },
+            { "foo.mok", "bar/", "bar", CURRENT_DIRECTORY + "bar" },
+            { "foo", "bar.mok", "bar.mok", "mok:" + CURRENT_DIRECTORY + "bar.mok!/" },
+            { "foo", "bar.mok/", "bar.mok", "mok:" + CURRENT_DIRECTORY + "bar.mok!/" },
+            { "foo.mok", "bar.mok", "bar.mok", "mok:" + CURRENT_DIRECTORY + "bar.mok!/" },
+            { "foo.mok", "bar.mok/", "bar.mok", "mok:" + CURRENT_DIRECTORY + "bar.mok!/" },
+            { "foo.mok", ".", ".", CURRENT_DIRECTORY },
+            { "foo.mok", "./", ".", CURRENT_DIRECTORY },
+            { "foo.mok", "./bar.mok", "./bar.mok", "mok:" + CURRENT_DIRECTORY + "bar.mok!/"},
+            { "foo.mok", "./bar.mok/", "./bar.mok", "mok:" + CURRENT_DIRECTORY + "bar.mok!/"},
+        }) {
+            assertResolveSibling(params);
+        }
+    }
+
+    private static void assertResolveSibling(Object... params) {
+        final TPath parent = new TPath(params[0].toString());
+        final String first = params[1].toString();
+        final String name = params[2].toString();
+        final FsPath address = FsPath.create(URI.create(params[3].toString()));
+        final TPath member = new TPath(first);
+        final TPath path = parent.resolveSibling(member);
+        assertThat(path.toString(), equalTo(name.replace(SEPARATOR, path.getFileSystem().getSeparator())));
+        assertThat(path.getAddress(), equalTo(address));
+    }
+
+    @Test
+    public void testGetParent() {
+        if ('\\' == separatorChar) {
+            for (String[] params : new String[][] {
+                // $path, $parent
+                { "c:/", null },
+                { "c:/foo", "c:/" },
+                { "c:/foo/", "c:/" },
+            }) {
+                assertGetParent(params);
+            }
+        }
+        for (String[] params : new String[][] {
+            // $path, $parent
+            { "", null },
+            { ".", null },
+            { "./", null },
+            { "..", null },
+            { "../", null },
+            { "foo", null },
+            { "foo/", null },
+            { "foo/.", "foo" },
+            { "foo/./", "foo" },
+            { "foo/..", "foo" },
+            { "foo/../", "foo" },
+            { "./foo", null },
+            { "./foo/", null },
+            { "../foo", ".." },
+            { "../foo/", ".." },
+            { "/", null },
+            { "/foo", "/" },
+            { "/foo/", "/" },
+            { "/foo/..", "/foo" },
+            { "/foo/../", "/foo" },
+            //{ "/../foo", "/.." },
+            //{ "/../foo/", "/.." },
+        }) {
+            assertGetParent(params);
+        }
+    }
+
+    private static void assertGetParent(final String... params) {
+        final Path path = new TPath(params[0]);
+        final Path parent = null == params[1] ? null : new TPath(params[1]);
+        assertThat(path.getParent(), is(parent));
+    }
+
+    @Test
     public void testGetRoot() {
-        if ('\\' == File.separatorChar) {
+        if ('\\' == separatorChar) {
             for (String[] params : new String[][] {
                 // $test, $root
                 //{ "c:", null },
@@ -188,7 +319,7 @@ public class TPathTest extends TestBase {
 
     @Test
     public void testSegments() {
-        if ('\\' == File.separatorChar) {
+        if ('\\' == separatorChar) {
             for (Object[] params : new Object[][] {
                 // $first, $more
                 { "c:/foo", NO_MORE },

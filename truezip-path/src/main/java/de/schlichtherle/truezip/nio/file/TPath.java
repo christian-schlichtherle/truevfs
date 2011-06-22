@@ -58,6 +58,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileAttributeView;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -66,6 +67,10 @@ import net.jcip.annotations.Immutable;
 /**
  * A {@link Path} implementation
  * based on the TrueZIP Kernel module.
+ * <p>
+ * Unless explicitly specified, you should <em>not</em> assume that calling
+ * the same method on an instance of this class multiple times returns
+ * identical objects.
  * <p>
  * Note that objects of this class are immutable and inherently volatile
  * because all virtual file system state is managed by the TrueZIP Kernel
@@ -82,17 +87,24 @@ import net.jcip.annotations.Immutable;
 @DefaultAnnotation(NonNull.class)
 public final class TPath implements Path {
 
-    private final URI uri;
+    private static final TPathComparator COMPARATOR = '\\' == separatorChar
+            ? new WindowsTPathComparator()
+            : new TPathComparator();
+
+    private final URI name;
     private final TArchiveDetector detector;
-    private volatile @CheckForNull FsPath address;
+    private final FsPath address;
     private volatile @CheckForNull TFileSystem fileSystem;
+    private volatile @CheckForNull String string;
     private volatile @CheckForNull Integer hashCode;
     private volatile @CheckForNull List<String> segments;
 
     TPath(Path path) {
-        this(   uri(path.toString().replace(
-                    path.getFileSystem().getSeparator(),
-                    separator)),
+        this(   path instanceof TPath
+                    ? ((TPath) path).getName()
+                    : name(path.toString().replace(
+                        path.getFileSystem().getSeparator(),
+                        separator)),
                 null,
                 null);
     }
@@ -106,13 +118,16 @@ public final class TPath implements Path {
      * @param file the file.
      */
     public TPath(File file) {
-        this.uri = uri(file.getPath());
+        final URI name = name(file.getPath());
+        this.name = name;
         if (file instanceof TFile) {
-            final TFile tfile = (TFile) file;
-            this.detector = tfile.getArchiveDetector();
-            this.address = tfile.toFsPath();
+            final TFile f = (TFile) file;
+            this.detector = f.getArchiveDetector();
+            this.address = f.toFsPath();
         } else {
-            this.detector = TConfig.get().getArchiveDetector();
+            final TArchiveDetector detector = getDefaultArchiveDetector();
+            this.detector = detector;
+            this.address = address(name, detector);
         }
 
         assert invariants();
@@ -126,7 +141,7 @@ public final class TPath implements Path {
      * @param more optional sub path strings.
      */
     public TPath(String first, String... more) {
-        this(uri(first, more), null, null);
+        this(name(first, more), null, null);
     }
 
     TPath(URI uri) {
@@ -135,27 +150,29 @@ public final class TPath implements Path {
 
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("ES_COMPARING_STRINGS_WITH_EQ")
     private TPath(
-            final URI uri,
-            final @CheckForNull TArchiveDetector detector,
+            URI uri,
+            @CheckForNull TArchiveDetector detector,
             final @CheckForNull FsPath address) {
-        this.uri = fix(uri);
-        this.detector = null != detector ? detector : TConfig.get().getArchiveDetector();
-        this.address = address;
+        this.name = uri = name(uri);
+        if (null == detector)
+            detector = getDefaultArchiveDetector();
+        this.detector = detector;
+        this.address = null != address ? address : address(uri, detector);
 
         assert invariants();
     }
 
     TPath(final TFileSystem fileSystem, String first, final String... more) {
-        this.uri = uri(cutLeadingSeparators(first), more);
-        final TArchiveDetector detector = TConfig.get().getArchiveDetector();
+        this.name = name(cutLeadingSeparators(first), more);
+        final TArchiveDetector detector = getDefaultArchiveDetector();
         this.detector = detector;
         this.address = new TPathScanner(detector)
-                .scan(new FsPath(fileSystem.getMountPoint(), ROOT), uri);
+                .scan(new FsPath(fileSystem.getMountPoint(), ROOT), name);
 
         assert invariants();
     }
 
-    private static URI uri(final String first, final String... more) {
+    private static URI name(final String first, final String... more) {
         final StringBuilder b;
         {
             int l = 1 + first.length(); // might prepend SEPARATOR
@@ -210,18 +227,18 @@ public final class TPath implements Path {
     }
 
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("ES_COMPARING_STRINGS_WITH_EQ")
-    private static URI fix(URI uri) {
-        if (uri.isOpaque())
-            throw new IllegalArgumentException(
-                    new QuotedInputUriSyntaxException(uri, "Opaque URI"));
-        uri = TPathScanner.fix(uri);
-        final int pl = pathPrefixLength(uri);
-        String p = uri.getPath();
-        final String q = p;
-        p = cutTrailingSeparators(p, pl);
-        if (p != q) // mind contract of cutTrailingSeparators(String, int)
-            return new UriBuilder(uri).path(p).toUri();
-        return uri;
+    private static URI name(URI uri) {
+        try {
+            uri = checkFix(uri);
+            final int pl = pathPrefixLength(uri);
+            final String q = uri.getPath();
+            final String p = cutTrailingSeparators(q, pl);
+            if (p != q) // mind contract of cutTrailingSeparators(String, int)
+                return new UriBuilder(uri).path(p).getUri();
+            return uri;
+        } catch (URISyntaxException ex) {
+            throw new IllegalArgumentException(ex);
+        }
     }
 
     private static String cutLeadingSeparators(final String p) {
@@ -246,6 +263,14 @@ public final class TPath implements Path {
         return Paths.prefixLength(p, SEPARATOR_CHAR, true);
     }
 
+    private static FsPath address(URI name, TArchiveDetector detector) {
+        return new TPathScanner(detector).scan(
+                isAbsolute(name)
+                    ? TFileSystemProvider.get(name).getRoot()
+                    : TFileSystemProvider.get(name).getCurrent(),
+                name);
+    }
+
     /**
      * Checks the invariants of this class and throws an AssertionError if
      * any is violated even if assertion checking is disabled.
@@ -265,12 +290,26 @@ public final class TPath implements Path {
      * @return {@code true}
      */
     private boolean invariants() {
+        assert null != getName();
         assert null != getArchiveDetector();
-        assert null != getUri();
         assert null != getAddress();
-        assert getAddress().toUri().isAbsolute();
-        assert null != getFileSystem();
         return true;
+    }
+
+    /**
+     * Equivalent to
+     * {@link TConfig#getArchiveDetector TConfig.get().getArchiveDetector()}.
+     */
+    public static TArchiveDetector getDefaultArchiveDetector() {
+        return TConfig.get().getArchiveDetector();
+    }
+
+    /**
+     * Equivalent to
+     * {@link TConfig#setArchiveDetector TConfig.get().setArchiveDetector(detector)}.
+     */
+    public static void setDefaultArchiveDetector(TArchiveDetector detector) {
+        TConfig.get().setArchiveDetector(detector);
     }
 
     /**
@@ -310,12 +349,28 @@ public final class TPath implements Path {
                         : null != parent && null != parent.getParent();
     }
 
-    TArchiveDetector getArchiveDetector() {
-        return detector;
+    /**
+     * Returns the name of this path as a {@code URI}.
+     * Multiple invocations of this method will return the same object.
+     * 
+     * @return the name of this path as a {@code URI}.
+     */
+    URI getName() {
+        return this.name;
     }
 
-    URI getUri() {
-        return this.uri;
+    /**
+     * Returns the {@code TArchiveDetector} used for scanning this path's
+     * {@link #toString() name} for prospective archive files at construction
+     * time.
+     * Multiple invocations of this method will return the same object.
+     * 
+     * @return The {@code TArchiveDetector} used for scanning this path's
+     *         {@link #toString() name} for prospective archive files at
+     *         construction time.
+     */
+    TArchiveDetector getArchiveDetector() {
+        return detector;
     }
 
     /**
@@ -324,29 +379,28 @@ public final class TPath implements Path {
      * @return An {@link FsPath} for this path with an absolute URI.
      */
     FsPath getAddress() {
-        final FsPath addr = this.address;
-        return null != addr ? addr : (this.address = newAddress());
+        return this.address;
     }
 
-    private FsPath newAddress() {
-        final URI uri = getUri();
-        return new TPathScanner(getArchiveDetector()).scan(
-                isAbsolute(uri)
-                    ? TFileSystemProvider.get(this).getRoot()
-                    : TFileSystemProvider.get(this).getCurrent(),
-                uri);
-    }
-
+    /**
+     * Returns the {@code TFileSystem} for this path.
+     * Multiple invocations of this method will return the same object.
+     * 
+     * @return the {@code TFileSystem} for this path.
+     */
     @Override
     public TFileSystem getFileSystem() {
         final TFileSystem fs = this.fileSystem;
-        return null != fs ? fs : (this.fileSystem
-                = TFileSystemProvider.get(this).getFileSystem(this));
+        return null != fs ? fs : (this.fileSystem = newFileSystem());
+    }
+
+    private TFileSystem newFileSystem() {
+        return TFileSystemProvider.get(getName()).getFileSystem(this);
     }
 
     @Override
     public boolean isAbsolute() {
-        return isAbsolute(getUri());
+        return isAbsolute(getName());
     }
 
     private static boolean isAbsolute(URI uri) {
@@ -356,50 +410,56 @@ public final class TPath implements Path {
 
     @Override
     public @Nullable TPath getRoot() {
-        final String s = getUri().getSchemeSpecificPart();
+        final String s = getName().getSchemeSpecificPart();
         final int l = prefixLength(s);
         if (0 >= l || SEPARATOR_CHAR != s.charAt(l - 1))
             return null;
         return new TPath(
-                uri(s.substring(0, l)),
+                name(s.substring(0, l)),
                 getArchiveDetector(),
                 null);
     }
 
     @Override
     public TPath getFileName() {
-        final URI uri = getUri();
-        final URI parent = uri.resolve(".");
+        final URI uri = getName();
+        final URI parent = uri.resolve(DOT);
         final URI member = parent.relativize(uri);
         return new TPath(member, getArchiveDetector(), null);
     }
 
     @Override
     public TPath getParent() {
-        final URI parent = getUri().resolve(".");
-        if (parent.getRawPath().isEmpty())
+        final URI n = getName();
+        final int npl = n.getPath().length();
+        final int nppl = pathPrefixLength(n);
+        if (npl <= nppl)
             return null;
-        try {
-            return new TPath(
-                    parent,
-                    getArchiveDetector(),
-                    TPathScanner.parent(getAddress()));
-        } catch (URISyntaxException ex) {
-            throw new AssertionError(ex);
-        }
+        final URI p = n.resolve(DOT);
+        return p.getPath().isEmpty()
+                ? null
+                : new TPath(p, getArchiveDetector(), null);
     }
 
+    /**
+     * Returns the segments of this path's {@link #toString() name}.
+     * Multiple invocations of this method will return the same object.
+     * 
+     * @return The segments of this path's {@link #toString() name}.
+     */
     private List<String> getSegments() {
         final List<String> segments = this.segments;
-        if (null != segments)
-            return segments;
-        final String ssp = getUri().getSchemeSpecificPart();
+        return null != segments ? segments : (this.segments = newSegments());
+    }
+
+    private List<String> newSegments() {
+        final String ssp = getName().getSchemeSpecificPart();
         final String[] a = ssp.substring(prefixLength(ssp)).split(SEPARATOR);
         int i = 0;
         for (String s : a)
             if (!s.isEmpty())
                 a[i++] = s;
-        return this.segments = //Collections.unmodifiableList(
+        return //Collections.unmodifiableList(
                 Arrays.asList(a).subList(0, i);
     }
 
@@ -457,57 +517,73 @@ public final class TPath implements Path {
 
     @Override
     public TPath normalize() {
-        return new TPath(getUri().normalize(), getArchiveDetector(), address); // don't use getAddress()!
+        return new TPath(getName().normalize(), getArchiveDetector(), getAddress());
     }
 
     @Override
-    public TPath resolve(Path member) {
-        return member instanceof TPath
-                ? resolve(((TPath) member).getUri())
-                : resolve(member.toString().replace(
-                    member.getFileSystem().getSeparator(),
+    public TPath resolve(Path other) {
+        if (other instanceof TPath) {
+            final TPath o = (TPath) other;
+            if (o.isAbsolute())
+                return o;
+            if (o.toString().isEmpty())
+                return this;
+            return resolve(o.getName());
+        } else {
+            return resolve(other.toString().replace(
+                    other.getFileSystem().getSeparator(),
                     separator));
-    }
-
-    @Override
-    public TPath resolve(String member) {
-        return resolve(uri(member));
-    }
-
-    private TPath resolve(final URI member) {
-        URI u = getUri();
-        final String up = u.getPath();
-        try {
-            u = up.isEmpty()
-                    ? member
-                    : up.endsWith(SEPARATOR)
-                        ? u.resolve(member)
-                        : member.getRawPath().isEmpty()
-                                && null == member.getRawQuery()
-                            ? u
-                            : new UriBuilder()
-                                .path(up + SEPARATOR_CHAR)
-                                .getUri()
-                                .resolve(member);
-        } catch (URISyntaxException ex) {
-            throw new IllegalArgumentException(ex);
         }
-        final TArchiveDetector d = TConfig.get().getArchiveDetector();
-        return new TPath(u, d, new TPathScanner(d).scan(
-                isAbsolute(member)
-                    ? TFileSystemProvider.get(this).getRoot()
-                    : getAddress(),
-                member));
     }
 
     @Override
-    public TPath resolveSibling(Path other) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public TPath resolve(String other) {
+        return resolve(name(other));
+    }
+
+    private TPath resolve(final URI m) {
+        URI n;
+        final String np;
+        if (isAbsolute(m) || (n = getName()).toString().isEmpty()) {
+            n = m;
+        } else if (m.toString().isEmpty()) {
+            n = getName();
+        } else if ((np = n.getPath()).endsWith(SEPARATOR)) {
+            n = n.resolve(m);
+        } else {
+            try {
+                n = new UriBuilder(n).path(np + SEPARATOR_CHAR).getUri().resolve(m);
+            } catch (URISyntaxException ex) {
+                throw new AssertionError(ex);
+            }
+        }
+        final TArchiveDetector d = getDefaultArchiveDetector();
+        final FsPath a = new TPathScanner(d).scan(
+                isAbsolute(m)
+                    ? TFileSystemProvider.get(getName()).getRoot()
+                    : getAddress(),
+                m);
+        return new TPath(n, d, a);
+    }
+
+    @Override
+    public TPath resolveSibling(final Path other) {
+        if (!(other instanceof TPath))
+            return resolveSibling(new TPath(other));
+        final TPath o = (TPath) other;
+        if (o.isAbsolute())
+            return o;
+        final TPath p = getParent();
+        if (null == p)
+            return o;
+        if (o.toString().isEmpty())
+            return p;
+        return p.resolve(o);
     }
 
     @Override
     public TPath resolveSibling(String other) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return resolveSibling(new TPath(other));
     }
 
     @Override
@@ -516,30 +592,46 @@ public final class TPath implements Path {
     }
 
     @Override
-    public TFile toFile() {
-        final URI uri = getUri();
-        return uri.isAbsolute()
-                ? new TFile(    getAddress())
-                : new TFile(    uri.getSchemeSpecificPart(),
-                                getArchiveDetector());
-    }
-
-    @Override
     public URI toUri() {
         return new UriBuilder(getAddress().toHierarchicalUri())
-                .scheme(TFileSystemProvider.get(this).getScheme())
+                .scheme(TFileSystemProvider.get(getName()).getScheme())
                 .toUri();
     }
 
     @Override
     public TPath toAbsolutePath() {
-        return new TPath(toUri(), getArchiveDetector(), address); // don't use getAddress()!
+        return new TPath(toUri(), getArchiveDetector(), getAddress());
     }
 
     @Override
     public TPath toRealPath(LinkOption... options) throws IOException {
         // FIXME: scan symlinks!
-        return new TPath(toUri(), getArchiveDetector(), address); // don't use getAddress()!
+        return new TPath(toUri(), getArchiveDetector(), getAddress());
+    }
+
+    /**
+     * Returns a {@code TFile} object for this path.
+     * If this path was constructed by the
+     * {@link #TPath(File) file constructor}, then the returned {@code TFile}
+     * object compares {@link TFile#equals(Object) equal} with this file
+     * object, even if it was a plain {@link File} object.
+     * However, the returned {@code TFile} object is <em>not</em> identical to
+     * this object, even if it was a {@link TFile} object.
+     * 
+     * @return A {@code TFile} object for this path.
+     * @throws UnsupportedOperationException if this path is not file based,
+     *         i.e. if the scheme component of the {@link #toUri() URI} of
+     *         this path is not {@code file}.
+     */
+    @Override
+    public TFile toFile() {
+        try {
+            return getName().isAbsolute()
+                    ? new TFile(getAddress())
+                    : new TFile(toString(), getArchiveDetector());
+        } catch (IllegalArgumentException ex) {
+            throw new UnsupportedOperationException(ex);
+        }
     }
 
     @Override
@@ -580,36 +672,51 @@ public final class TPath implements Path {
         }
     }
 
+    /**
+     * The natural ordering imposed by this implementation is identical to the
+     * natural ordering of path's {@link #toString() name}.
+     * On Windows, case is ignored when comparing the path names.
+     */
     @Override
     public int compareTo(Path that) {
-        return this.toString().compareTo(that.toString());
+        return COMPARATOR.compare(this, (TPath) that);
     }
 
+    /**
+     * This path is considered equal to the given {@code other} object
+     * if and only if the other object is identical to this object or if the
+     * other object is a {@link TPath} object with a
+     * {@link #getFileSystem() file system} which is considered
+     * {@link TFileSystem#equals(Object) equal} to this path's file system and
+     * a {@link #toString() name} which is considered
+     * {@link String#equals(Object) equal} to this path's name.
+     * On Windows, case is ignored when comparing the path names.
+     */
     @Override
-    public boolean equals(final Object other) {
-        if (this == other)
-            return true;
-        if (!(other instanceof Path))
-            return false;
-        final Path that = (Path) other;
-        return this.getFileSystem().equals(that.getFileSystem())
-                && this.toString().equals(that.toString());
+    public boolean equals(final Object that) {
+        return this == that
+                || that instanceof TPath
+                    && COMPARATOR.equals(this, (TPath) that);
     }
 
+    /**
+     * Returns a hash code which is consistent with {@link #equals(Object)}.
+     * 
+     * @return A hash code which is consistent with {@link #equals(Object)}.
+     */
     @Override
     public int hashCode() {
-        final Integer hashCode = this.hashCode;
-        if (null != hashCode)
-            return hashCode;
-        int result = 17;
-        result = 37 * result + getFileSystem().hashCode();
-        result = 37 * result + toString().hashCode();
-        return this.hashCode = result;
+        return COMPARATOR.hashCode(this);
     }
 
     @Override
     public String toString() {
-        return getUri()
+        final String string = this.string;
+        return null != string ? string : (this.string = newString());
+    }
+
+    private String newString() {
+        return getName()
                 .getSchemeSpecificPart()
                 .replace(SEPARATOR_CHAR, separatorChar);
     }
@@ -673,5 +780,51 @@ public final class TPath implements Path {
             LinkOption... options)
     throws IOException {
         return getFileSystem().readAttributes(this, type, options);
+    }
+
+    private static class TPathComparator implements Comparator<TPath> {
+        @Override
+        public int compare(TPath p1, TPath p2) {
+            return p1.toString().compareTo(p2.toString());
+        }
+
+        boolean equals(TPath p1, TPath p2) {
+            return p1.getFileSystem().equals(p2.getFileSystem())
+                    && p1.toString().equals(p2.toString());
+        }
+        
+        int hashCode(TPath p) {
+            final Integer hashCode = p.hashCode;
+            if (null != hashCode)
+                return hashCode;
+            int result = 17;
+            result = 37 * result + p.getFileSystem().hashCode();
+            result = 37 * result + p.toString().hashCode();
+            return p.hashCode = result;
+        }
+    }
+
+    private static final class WindowsTPathComparator extends TPathComparator {
+        @Override
+        public int compare(TPath p1, TPath p2) {
+            return p1.toString().compareToIgnoreCase(p2.toString());
+        }
+
+        @Override
+        boolean equals(TPath p1, TPath p2) {
+            return p1.getFileSystem().equals(p2.getFileSystem())
+                    && p1.toString().equalsIgnoreCase(p2.toString());
+        }
+
+        @Override
+        int hashCode(TPath p) {
+            final Integer hashCode = p.hashCode;
+            if (null != hashCode)
+                return hashCode;
+            int result = 17;
+            result = 37 * result + p.getFileSystem().hashCode();
+            result = 37 * result + p.toString().toLowerCase().hashCode();
+            return p.hashCode = result;
+        }
     }
 }

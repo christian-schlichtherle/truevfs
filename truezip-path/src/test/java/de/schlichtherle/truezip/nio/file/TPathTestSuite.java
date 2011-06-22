@@ -151,11 +151,14 @@ public abstract class TPathTestSuite extends TestBase {
         }
     }
 
-    protected static TPath newNonArchiveFile(TPath file) {
+    protected static TPath newNonArchiveFile(TPath path) {
         TConfig config = TConfig.push();
         try {
             config.setArchiveDetector(TArchiveDetector.NULL);
-            return file.getParent().resolve(file.getFileName());
+            TPath parent = path.getParent();
+            return null == parent
+                    ? new TPath(path)
+                    : parent.resolve(path.getFileName());
         } finally {
             config.close();
         }

@@ -92,7 +92,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
      * @param  path a path.
      * @return A file system provider.
      */
-    static TFileSystemProvider get(final TPath path) {
+    static TFileSystemProvider get(final URI name) {
         return DEFAULT;
     }
 
