@@ -79,8 +79,9 @@ extends FsCharsetArchiveDriver<MockArchiveEntry> {
                                         Entry template,
                                         BitField<FsOutputOption> mknod)
     throws CharConversionException {
-        return new MockArchiveEntry(toZipOrTarEntryName(name, type),
-                                    type,
-                                    template);
+        return new MockArchiveEntry(
+                toZipOrTarEntryName(name, type),
+                type,
+                template);
     }
 }
