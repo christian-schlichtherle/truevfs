@@ -90,20 +90,20 @@ public final class TPath implements Path {
     private static final TPathComparator COMPARATOR = '\\' == separatorChar
             ? new WindowsTPathComparator()
             : new TPathComparator();
-
+    
     private final URI name;
     private final TArchiveDetector detector;
     private final FsPath address;
     private volatile @CheckForNull TFileSystem fileSystem;
     private volatile @CheckForNull String string;
     private volatile @CheckForNull Integer hashCode;
-    private volatile @CheckForNull List<String> segments;
+    private volatile @CheckForNull List<String> elements;
 
     /**
      * Constructs a new path from the given path.
      * <p>
-     * This constructor will scan the {@link Path#toString() path name} to
-     * detect prospective archive files using the
+     * This constructor scans the {@link Path#toString() path name} of the
+     * given path to detect prospective archive files using the
      * {@link #getDefaultArchiveDetector() default archive detector}.
      * 
      * @param path a path.
@@ -123,6 +123,14 @@ public final class TPath implements Path {
      * <p>
      * This constructor is required for interoperability with the {@link TFile}
      * class because it does not support {@link TFile#toPath()}.
+     * <p>
+     * If {@code file} is an instance of {@link TFile}, its
+     * {@link TFile#getArchiveDetector() archive detector} and
+     * {@link TFile#toFsPath() address} get shared with this instance.
+     * <p>
+     * Otherwise, the {@link File#getPath() path name} of the given file gets
+     * scanned to detect prospective archive files using the
+     * {@link #getDefaultArchiveDetector() default archive detector}.
      * 
      * @param file a file.
      *        If this is an instance of {@link TFile}, its
@@ -149,7 +157,7 @@ public final class TPath implements Path {
      * Constructs a new path from the given sub path strings.
      * The supported separators are {@link File#separator} and {@code "/"}.
      * <p>
-     * This constructor will scan its
+     * This constructor scans its
      * {@link TPath#toString() resulting path name} to detect prospective
      * archive files using the
      * {@link #getDefaultArchiveDetector() default archive detector}.
@@ -161,30 +169,48 @@ public final class TPath implements Path {
         this(name(first, more), null, null);
     }
 
-    TPath(URI uri) {
-        this(uri, null, null);
-    }
-
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("ES_COMPARING_STRINGS_WITH_EQ")
-    private TPath(
-            URI uri,
-            @CheckForNull TArchiveDetector detector,
-            final @CheckForNull FsPath address) {
-        this.name = uri = name(uri);
-        if (null == detector)
-            detector = getDefaultArchiveDetector();
+    TPath(final TFileSystem fileSystem, String first, final String... more) {
+        final URI name = name(cutLeadingSeparators(first), more);
+        this.name = name;
+        final TArchiveDetector detector = getDefaultArchiveDetector();
         this.detector = detector;
-        this.address = null != address ? address : address(uri, detector);
+        this.address = new TPathScanner(detector).scan(
+                new FsPath(fileSystem.getMountPoint(), ROOT),
+                name);
 
         assert invariants();
     }
 
-    TPath(final TFileSystem fileSystem, String first, final String... more) {
-        this.name = name(cutLeadingSeparators(first), more);
-        final TArchiveDetector detector = getDefaultArchiveDetector();
+    /**
+     * Constructs a new path from the given hierarchical URI.
+     * <p>
+     * This constructor scans the {@link URI#getPath() path component} of
+     * the given URI to detect prospective archive files using the
+     * {@link #getDefaultArchiveDetector() default archive detector}.
+     * <p>
+     * If the {@link URI#getScheme() scheme component} of the given URI is
+     * undefined, 
+     * 
+     * @param  name a path name.
+     *         This must be a hierarchical URI with an undefined fragment
+     *         component.
+     * @throws IllegalArgumentException if the preconditions for the parameter
+     *         do not hold.
+     */
+    public TPath(URI name) {
+        this(name, null, null);
+    }
+
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("ES_COMPARING_STRINGS_WITH_EQ")
+    private TPath(
+            URI name,
+            @CheckForNull TArchiveDetector detector,
+            final @CheckForNull FsPath address) {
+        this.name = name = name(name);
+        if (null == detector)
+            detector = getDefaultArchiveDetector();
         this.detector = detector;
-        this.address = new TPathScanner(detector)
-                .scan(new FsPath(fileSystem.getMountPoint(), ROOT), name);
+        this.address = null != address ? address : address(name, detector);
 
         assert invariants();
     }
@@ -406,10 +432,10 @@ public final class TPath implements Path {
     @Override
     public TFileSystem getFileSystem() {
         final TFileSystem fs = this.fileSystem;
-        return null != fs ? fs : (this.fileSystem = newFileSystem());
+        return null != fs ? fs : (this.fileSystem = getFileSystem0());
     }
 
-    private TFileSystem newFileSystem() {
+    private TFileSystem getFileSystem0() {
         return TFileSystemProvider.get(getName()).getFileSystem(this);
     }
 
@@ -417,34 +443,35 @@ public final class TPath implements Path {
     public boolean isAbsolute() {
         return TPathScanner.isAbsolute(getName());
     }
-
+    
     @Override
     public @Nullable TPath getRoot() {
-        final String s = getName().getSchemeSpecificPart();
-        final int l = prefixLength(s);
-        if (0 >= l || SEPARATOR_CHAR != s.charAt(l - 1))
+        final URI n = getName();
+        final String p = n.getPath();
+        final int l = pathPrefixLength(n);
+        if (l <= 0 || SEPARATOR_CHAR != p.charAt(l - 1))
             return null;
-        return new TPath(
-                name(s.substring(0, l)),
-                getArchiveDetector(),
-                null);
+        return new TPath(name(p.substring(0, l)), getArchiveDetector(), null);
     }
 
     @Override
     public TPath getFileName() {
-        final URI uri = getName();
-        final URI parent = uri.resolve(DOT);
-        final URI member = parent.relativize(uri);
-        return new TPath(member, getArchiveDetector(), null);
+        final List<String> elements = getElements();
+        final int l = elements.size();
+        if (l <= 0)
+            return null;
+        return new TPath(name(elements.get(l - 1)), getArchiveDetector(), null);
     }
 
     @Override
     public TPath getParent() {
         final URI n = getName();
-        final int npl = n.getPath().length();
-        final int nppl = pathPrefixLength(n);
-        if (npl <= nppl)
-            return null;
+        {
+            final int l = n.getPath().length();
+            final int pl = pathPrefixLength(n);
+            if (l <= pl)
+                return null;
+        }
         final URI p = n.resolve(DOT);
         return p.getPath().isEmpty()
                 ? null
@@ -457,35 +484,36 @@ public final class TPath implements Path {
      * 
      * @return The segments of this path's {@link #toString() name}.
      */
-    private List<String> getSegments() {
-        final List<String> segments = this.segments;
-        return null != segments ? segments : (this.segments = newSegments());
+    private List<String> getElements() {
+        final List<String> elements = this.elements;
+        return null != elements ? elements : (this.elements = getSegments0());
     }
 
-    private List<String> newSegments() {
-        final String ssp = getName().getSchemeSpecificPart();
-        final String[] a = ssp.substring(prefixLength(ssp)).split(SEPARATOR);
+    private List<String> getSegments0() {
+        final URI n = getName();
+        final String p = n.getPath();
+        final String[] ss = p.substring(pathPrefixLength(n)).split(SEPARATOR);
         int i = 0;
-        for (String s : a)
+        for (String s : ss)
             if (!s.isEmpty())
-                a[i++] = s;
+                ss[i++] = s;
         return //Collections.unmodifiableList(
-                Arrays.asList(a).subList(0, i);
+                Arrays.asList(ss).subList(0, i);
     }
 
     @Override
     public int getNameCount() {
-        return getSegments().size();
+        return getElements().size();
     }
 
     @Override
     public TPath getName(int index) {
-        return new TPath(getSegments().get(index));
+        return new TPath(getElements().get(index));
     }
 
     @Override
     public TPath subpath(final int beginIndex, final int endIndex) {
-        final List<String> segments = getSegments();
+        final List<String> segments = getElements();
         final String first = segments.get(beginIndex);
         final String[] more = new String[endIndex - beginIndex - 1];
         return new TPath(
@@ -603,8 +631,10 @@ public final class TPath implements Path {
 
     @Override
     public URI toUri() {
+        URI n = getName();
+        String s = n.getScheme();
         return new UriBuilder(getAddress().toHierarchicalUri())
-                .scheme(TFileSystemProvider.get(getName()).getScheme())
+                .scheme(null != s ? s : TFileSystemProvider.get(n).getScheme())
                 .toUri();
     }
 
@@ -663,7 +693,7 @@ public final class TPath implements Path {
         final Iterator<String> i;
         
         SegmentIterator(TPath path) {
-            this.i = path.getSegments().iterator();
+            this.i = path.getElements().iterator();
         }
 
         @Override
@@ -722,10 +752,10 @@ public final class TPath implements Path {
     @Override
     public String toString() {
         final String string = this.string;
-        return null != string ? string : (this.string = newString());
+        return null != string ? string : (this.string = toString0());
     }
 
-    private String newString() {
+    private String toString0() {
         return getName()
                 .getSchemeSpecificPart()
                 .replace(SEPARATOR_CHAR, separatorChar);

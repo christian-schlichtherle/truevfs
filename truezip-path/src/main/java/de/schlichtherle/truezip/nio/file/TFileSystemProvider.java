@@ -77,14 +77,19 @@ import static java.util.logging.Level.*;
 @DefaultAnnotation(NonNull.class)
 public final class TFileSystemProvider extends FileSystemProvider {
 
+    private static final FsScheme DEFAULT_SCHEME = FsScheme.create("tpath");
+    private static final FsMountPoint
+            ROOT_DIRECTORY_MP = FsMountPoint.create(URI.create("file:/"));
+    private static final FsMountPoint
+            CURRENT_DIRECTORY_MP = FsMountPoint.create(new File("").toURI());
     private static volatile TFileSystemProvider
             ROOT_DIRECTORY = new TFileSystemProvider(
-                FsScheme.create("tpath"),
-                FsMountPoint.create(URI.create("file:/")));
+                DEFAULT_SCHEME,
+                ROOT_DIRECTORY_MP);
     private static final TFileSystemProvider
             CURRENT_DIRECTORY = new TFileSystemProvider(
-                FsScheme.create("tpath"),
-                FsMountPoint.create(new File("").toURI()));
+                DEFAULT_SCHEME,
+                CURRENT_DIRECTORY_MP);
 
     private final String scheme;
     private final FsPath root;
@@ -118,8 +123,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
     @SuppressWarnings("LeakingThisInConstructor")
     @Deprecated
     public TFileSystemProvider() {
-        this(   FsScheme.create("tpath"),
-                FsMountPoint.create(URI.create("file:/")));
+        this(DEFAULT_SCHEME, ROOT_DIRECTORY_MP);
         ROOT_DIRECTORY = this;
         Logger  .getLogger(TFileSystemProvider.class.getName())
                 .log(CONFIG, "Installed TrueZIP file system provider");
@@ -136,10 +140,15 @@ public final class TFileSystemProvider extends FileSystemProvider {
 
     private boolean invariants() {
         assert null != getScheme();
-        assert !getRoot().toUri().isOpaque();
+        assert null != getRoot();
         return true;
     }
 
+    /**
+     * Returns the default scheme of this provider.
+     * 
+     * @return the default scheme of this provider.
+     */
     @Override
     public String getScheme() {
         return scheme;
@@ -257,6 +266,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
 
     /**
      * Obtains a file system for the given path.
+     * If a file system doesn't exist yet, it's created.
      * 
      * @param  path a path.
      * @return A file system.
