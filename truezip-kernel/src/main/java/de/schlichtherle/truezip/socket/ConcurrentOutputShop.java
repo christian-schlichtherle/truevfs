@@ -32,7 +32,7 @@ import net.jcip.annotations.NotThreadSafe;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * Decorates an {@code OutputShop} to add accounting and multithreading
+ * Decorates another output shop to add accounting and multithreading
  * synchronization for all output streams created by the decorated output shop.
  *
  * @see     ConcurrentInputShop
