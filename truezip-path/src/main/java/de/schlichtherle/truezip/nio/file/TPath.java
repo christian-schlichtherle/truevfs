@@ -30,7 +30,7 @@ import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.QuotedInputUriSyntaxException;
+import de.schlichtherle.truezip.util.QuotedUriSyntaxException;
 import de.schlichtherle.truezip.util.UriBuilder;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
@@ -101,6 +101,10 @@ public final class TPath implements Path {
 
     /**
      * Constructs a new path from the given path.
+     * <p>
+     * This constructor will scan the {@link Path#toString() path name} to
+     * detect prospective archive files using the
+     * {@link #getDefaultArchiveDetector() default archive detector}.
      * 
      * @param path a path.
      */
@@ -116,6 +120,9 @@ public final class TPath implements Path {
 
     /**
      * Constructs a new path from the given file.
+     * <p>
+     * This constructor is required for interoperability with the {@link TFile}
+     * class because it does not support {@link TFile#toPath()}.
      * 
      * @param file a file.
      *        If this is an instance of {@link TFile}, its
@@ -141,6 +148,11 @@ public final class TPath implements Path {
     /**
      * Constructs a new path from the given sub path strings.
      * The supported separators are {@link File#separator} and {@code "/"}.
+     * <p>
+     * This constructor will scan its
+     * {@link TPath#toString() resulting path name} to detect prospective
+     * archive files using the
+     * {@link #getDefaultArchiveDetector() default archive detector}.
      * 
      * @param first the first sub path string.
      * @param more optional sub path strings.
@@ -221,7 +233,7 @@ public final class TPath implements Path {
         try {
             if (0 < l) {
                 if (SEPARATOR_CHAR != p.charAt(l - 1))
-                    throw new QuotedInputUriSyntaxException(p, "Relative path with non-empty prefix.");
+                    throw new QuotedUriSyntaxException(p, "Relative path with non-empty prefix.");
                 if (SEPARATOR_CHAR == p.charAt(0))
                     return new URI(p); // may parse authority
             }
