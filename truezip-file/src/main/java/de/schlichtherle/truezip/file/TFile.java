@@ -1969,12 +1969,13 @@ public final class TFile extends File {
      *     {@link java.nio.file.spi.FileSystemProvider#getScheme()} of any
      *     NIO.2 {@link java.nio.file.spi.FileSystemProvider} implementation.
      * </li>
-     * <li>Behavior: {@code Path} implementations are usually <em>greedy</em>,
-     *     i.e. when creating another {@code Path} from an instance (e.g. by
-     *     using {@link java.nio.file.Path#resolve(String)}), then the returned
-     *     object is usually an instance of the same implementation class
-     *     instead of some other {@code Path} implementation class which may be
-     *     better suited for the resulting path name.
+     * <li>Behavior: A typical {@code Path} implementation is <em>greedy</em>,
+     *     i.e. when creating another {@code Path} object from an instance of
+     *     the implementation class (e.g. by calling
+     *     {@link java.nio.file.Path#resolve(String)}), then the returned
+     *     object is typically another instance of this implementation class
+     *     rather than some other {@code Path} implementation class which may
+     *     be required to do I/O on the resulting path.
      * </ol>
      * <p>
      * As an alternative, you can always create a {@code Path}
@@ -1983,7 +1984,7 @@ public final class TFile extends File {
      * <ul>
      * <li>Associated with the default file system provider:
      *     {@link java.nio.file.Paths#get(String, String[]) Paths.get(file.getPath())}.</li>
-     * <li>Associated with the TrueZIP file system provider:
+     * <li>Associated with a TrueZIP file system provider:
      *     {@code new de.schlichtherle.truezip.nio.file.TPath(file)}.
      *     This requires the TrueZIP Path module to be present on the compile
      *     time class path.</li>
