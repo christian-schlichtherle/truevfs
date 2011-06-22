@@ -237,7 +237,7 @@ public final class UriBuilder {
             validateScheme((CharBuffer) CharBuffer.wrap(b).limit(s.length()));
         final String u = b.toString();
         if (0 <= errIdx)
-            throw new QuotedInputUriSyntaxException(u, errMsg, errIdx);
+            throw new QuotedUriSyntaxException(u, errMsg, errIdx);
         return u;
     }
 
@@ -284,7 +284,7 @@ public final class UriBuilder {
 
     private static URISyntaxException newURISyntaxException(CharBuffer input, String reason) {
         int p = input.position() - 1;
-        return new QuotedInputUriSyntaxException(input.rewind().limit(input.capacity()), reason, p);
+        return new QuotedUriSyntaxException(input.rewind().limit(input.capacity()), reason, p);
     }
 
     /**

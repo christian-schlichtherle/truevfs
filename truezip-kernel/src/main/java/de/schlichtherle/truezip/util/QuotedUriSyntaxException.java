@@ -26,7 +26,7 @@ import java.net.URISyntaxException;
  * @author  Christian Schlichtherle
  */
 @DefaultAnnotation(NonNull.class)
-public class QuotedInputUriSyntaxException extends URISyntaxException {
+public class QuotedUriSyntaxException extends URISyntaxException {
     private static final long serialVersionUID = 2452323414521345231L;
 
     /**
@@ -36,7 +36,7 @@ public class QuotedInputUriSyntaxException extends URISyntaxException {
      *        {@link Object#toString() string representation} to put in quotes.
      * @param reason a string explaining why the input could not be parsed.
      */
-    public QuotedInputUriSyntaxException(Object input, String reason) {
+    public QuotedUriSyntaxException(Object input, String reason) {
         this(input, reason, -1);
     }
 
@@ -49,7 +49,7 @@ public class QuotedInputUriSyntaxException extends URISyntaxException {
      * @param index the index at which the parse error occurred,
      *        or {@code -1} if unknown.
      */
-    public QuotedInputUriSyntaxException(Object input, String reason, int index) {
+    public QuotedUriSyntaxException(Object input, String reason, int index) {
         super("\"" + input + "\"", reason, index);
     }
 }

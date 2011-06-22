@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.util.QuotedInputUriSyntaxException;
+import de.schlichtherle.truezip.util.QuotedUriSyntaxException;
 import de.schlichtherle.truezip.util.UriBuilder;
 import java.io.File;
 import java.io.IOException;
@@ -369,12 +369,12 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
     throws URISyntaxException {
         uri = modifier.modify(uri, PATH);
         if (null != uri.getRawFragment())
-            throw new QuotedInputUriSyntaxException(uri, "Fragment not allowed");
+            throw new QuotedUriSyntaxException(uri, "Fragment not allowed");
         if (uri.isOpaque()) {
             final String ssp = uri.getSchemeSpecificPart();
             final int i = ssp.lastIndexOf(FsMountPoint.SEPARATOR);
             if (0 > i)
-                throw new QuotedInputUriSyntaxException(uri,
+                throw new QuotedUriSyntaxException(uri,
                         "Missing mount point separator \"" + FsMountPoint.SEPARATOR + '"');
             mountPoint = new FsMountPoint(
                     new URI(uri.getScheme(), ssp.substring(0, i + 2), null),

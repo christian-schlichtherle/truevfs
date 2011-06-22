@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.util.QuotedInputUriSyntaxException;
+import de.schlichtherle.truezip.util.QuotedUriSyntaxException;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import java.io.IOException;
 import java.io.InvalidObjectException;
@@ -304,14 +304,14 @@ public final class FsEntryName extends EntryName {
     private void parse(final URI uri) throws URISyntaxException {
         final String p = uri.getRawPath();
         if (p.startsWith(SEPARATOR))
-            throw new QuotedInputUriSyntaxException(uri,
+            throw new QuotedUriSyntaxException(uri,
                     "Illegal start of URI path component");
         if (!p.isEmpty() && ILLEGAL_PREFIX.startsWith(p.substring(0,
                 Math.min(p.length(), ILLEGAL_PREFIX.length()))))
-            throw new QuotedInputUriSyntaxException(uri,
+            throw new QuotedUriSyntaxException(uri,
                     "Illegal start of URI path component");
         if (p.endsWith(SEPARATOR))
-            throw new QuotedInputUriSyntaxException(uri,
+            throw new QuotedUriSyntaxException(uri,
                     "Illegal separator \"" + SEPARATOR + "\" at end of URI path");
 
         assert invariants();

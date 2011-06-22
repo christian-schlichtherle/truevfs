@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.entry;
 
-import de.schlichtherle.truezip.util.QuotedInputUriSyntaxException;
+import de.schlichtherle.truezip.util.QuotedUriSyntaxException;
 import de.schlichtherle.truezip.util.UriBuilder;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
@@ -275,13 +275,13 @@ public class EntryName implements Serializable, Comparable<EntryName> {
 
     private void parse(final URI uri) throws URISyntaxException {
         if (uri.isAbsolute())
-            throw new QuotedInputUriSyntaxException(uri, "Scheme component defined.");
+            throw new QuotedUriSyntaxException(uri, "Scheme component defined.");
         if (null != uri.getRawAuthority())
-            throw new QuotedInputUriSyntaxException(uri, "Authority component defined.");
+            throw new QuotedUriSyntaxException(uri, "Authority component defined.");
         if (null == uri.getRawPath())
-            throw new QuotedInputUriSyntaxException(uri, "Path component undefined.");
+            throw new QuotedUriSyntaxException(uri, "Path component undefined.");
         if (null != uri.getRawFragment())
-            throw new QuotedInputUriSyntaxException(uri, "Fragment component defined.");
+            throw new QuotedUriSyntaxException(uri, "Fragment component defined.");
         this.uri = uri;
 
         assert invariants();
