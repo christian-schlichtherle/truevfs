@@ -115,6 +115,22 @@ public final class TFileSystem extends FileSystem {
         return true;
     }
 
+    /**
+     * Equivalent to
+     * {@link TConfig#isLenient TConfig.get().isLenient()}.
+     */
+    public static boolean isLenient() {
+        return TConfig.get().isLenient();
+    }
+
+    /**
+     * Equivalent to
+     * {@link TConfig#setLenient TConfig.get().setLenient(lenient)}.
+     */
+    public static void setLenient(boolean lenient) {
+        TConfig.get().setLenient(lenient);
+    }
+
     private FsController<?> getController() {
         return controller;
     }
