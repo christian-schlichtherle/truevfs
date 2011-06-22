@@ -159,6 +159,10 @@ final class TPathScanner {
         return uri;
     }
 
+    static boolean isAbsolute(URI uri) {
+        return Paths.isAbsolute(uri.getSchemeSpecificPart(), SEPARATOR_CHAR);
+    }
+
     /**
      * Returns the parent of the given file system path.
      * 

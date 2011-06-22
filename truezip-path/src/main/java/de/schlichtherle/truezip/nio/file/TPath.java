@@ -403,12 +403,7 @@ public final class TPath implements Path {
 
     @Override
     public boolean isAbsolute() {
-        return isAbsolute(getName());
-    }
-
-    private static boolean isAbsolute(URI uri) {
-        return uri.isAbsolute()
-                || Paths.isAbsolute(uri.getSchemeSpecificPart(), SEPARATOR_CHAR);
+        return TPathScanner.isAbsolute(getName());
     }
 
     @Override
@@ -547,7 +542,7 @@ public final class TPath implements Path {
     private TPath resolve(final URI m) {
         URI n;
         final String np;
-        if (isAbsolute(m) || (n = getName()).toString().isEmpty()) {
+        if (TPathScanner.isAbsolute(m) || (n = getName()).toString().isEmpty()) {
             n = m;
         } else if (m.toString().isEmpty()) {
             n = getName();
@@ -562,7 +557,7 @@ public final class TPath implements Path {
         }
         final TArchiveDetector d = getDefaultArchiveDetector();
         final FsPath a = new TPathScanner(d).scan(
-                isAbsolute(m)
+                TPathScanner.isAbsolute(m)
                     ? TFileSystemProvider.get(getName()).getRoot()
                     : getAddress(),
                 m);
