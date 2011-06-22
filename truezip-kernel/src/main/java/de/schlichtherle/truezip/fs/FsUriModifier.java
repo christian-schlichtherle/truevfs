@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.util.QuotedInputUriSyntaxException;
+import de.schlichtherle.truezip.util.QuotedUriSyntaxException;
 import de.schlichtherle.truezip.util.UriBuilder;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -44,7 +44,7 @@ public enum FsUriModifier {
         @Override
         URI modify(URI uri, PostFix fix) throws URISyntaxException {
             if (uri.normalize() != uri)
-                throw new QuotedInputUriSyntaxException(uri, "URI path not in normal form");
+                throw new QuotedUriSyntaxException(uri, "URI path not in normal form");
             return uri;
         }
     },
