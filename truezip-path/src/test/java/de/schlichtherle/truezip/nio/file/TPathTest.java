@@ -311,6 +311,41 @@ public class TPathTest extends TestBase {
     }
 
     @Test
+    public void testGetFileName() {
+        if ('\\' == separatorChar) {
+            for (String[] params : new String[][] {
+                // $test, $root
+                //{ "c:", null },
+                //{ "c:foo", "foo" },
+                { "c:/", null },
+                { "c:/foo", "foo" },
+                { "c:/foo/bar", "bar" },
+            }) {
+                assertGetFileName(params);
+            }
+        }
+        for (String[] params : new String[][] {
+            // $test, $root
+            { "", null },
+            { "foo", "foo" },
+            { "foo/bar", "bar" },
+            { "/", null },
+            { "/foo", "foo" },
+            { "/foo/bar", "bar" },
+        }) {
+            assertGetFileName(params);
+        }
+    }
+
+    private static void assertGetFileName(String... params) {
+        final String test = params[0];
+        final String fileName = params[1];
+        final TPath testPath = new TPath(test);
+        final TPath fileNamePath = fileName == null ? null : new TPath(fileName);
+        assertThat(testPath.getFileName(), is(fileNamePath));
+    }
+
+    @Test
     public void testCutTrailingSeparators() {
         assertThat(TPath.cutTrailingSeparators("c://", 3), is("c:/"));
         assertThat(TPath.cutTrailingSeparators("///", 2), is("//"));
@@ -318,7 +353,7 @@ public class TPathTest extends TestBase {
     }
 
     @Test
-    public void testSegments() {
+    public void testElements() {
         if ('\\' == separatorChar) {
             for (Object[] params : new Object[][] {
                 // $first, $more
@@ -330,8 +365,10 @@ public class TPathTest extends TestBase {
         }
         for (Object[] params : new Object[][] {
             // $first, $more
+            { "", null },
             { "foo", NO_MORE },
             { "foo", new String[] { "bar" } },
+            { "/", null },
             { "/foo", NO_MORE },
             { "/foo", new String[] { "bar" } },
             { "//foo/bar/boom", NO_MORE },
@@ -344,16 +381,26 @@ public class TPathTest extends TestBase {
     private static void assertSegments(Object... params) {
         final String first = params[0].toString();
         final String[] more = (String[]) params[1];
-        final TPath path = new TPath(first, more);
-        assertThat(path.getNameCount(), is (1 + more.length));
+        final TPath path;
+        int count;
+        if (null == more) {
+            path = new TPath(first);
+            count = 0;
+        } else {
+            path = new TPath(first, more);
+            count = more.length + 1;
+        }
+        assertThat(path.getNameCount(), is(count));
         final Iterator<Path> it = path.iterator();
-        assertThat(path.getName(0).toString(), is(stripPrefix(first)));
-        assertThat(it.next().toString(), is(stripPrefix(first)));
-        for (int i = 0; i < more.length; ) {
-            final String m = more[i];
-            final String p = path.getName(++i).toString();
-            assertThat(p, is(m));
-            assertThat(it.next().toString(), is(m));
+        if (0 < count--) {
+            assertThat(path.getName(0).toString(), is(stripPrefix(first)));
+            assertThat(it.next().toString(), is(stripPrefix(first)));
+            for (int i = 0; i < count; ) {
+                final String m = more[i];
+                final String p = path.getName(++i).toString();
+                assertThat(p, is(m));
+                assertThat(it.next().toString(), is(m));
+            }
         }
         assertThat(it.hasNext(), is(false));
     }
