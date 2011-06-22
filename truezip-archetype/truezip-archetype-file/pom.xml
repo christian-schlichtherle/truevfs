@@ -27,5 +27,5 @@
     <packaging>maven-archetype</packaging>
 
     <name>TrueZIP Archetype File*</name>
-    <description>TrueZIP File* module application archetype</description>
+    <description>TrueZIP File* module application archetype (requires JSE6+)</description>
 </project>
