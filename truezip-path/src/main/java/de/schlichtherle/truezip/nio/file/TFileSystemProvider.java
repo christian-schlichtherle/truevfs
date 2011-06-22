@@ -224,7 +224,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
         try {
             TPath p = new TPath(path);
             if (null == p.getAddress().getMountPoint().getParent())
-                throw new UnsupportedOperationException("no prospective archive file detected"); // don't be greedy!
+                throw new UnsupportedOperationException("No prospective archive file detected."); // don't be greedy!
             return p.getFileSystem();
         } finally {
             config.close();
@@ -450,6 +450,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
         return promote(path).getFileName().toString().startsWith(".");
     }
 
+    /** @throws UnsupportedOperationException always */
     @Override
     public FileStore getFileStore(Path path) throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -480,11 +481,13 @@ public final class TFileSystemProvider extends FileSystemProvider {
         return promote(path).readAttributes(type, options);
     }
 
+    /** @throws UnsupportedOperationException always */
     @Override
     public Map<String, Object> readAttributes(Path path, String attributes, LinkOption... options) throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    /** @throws UnsupportedOperationException always */
     @Override
     public void setAttribute(Path path, String attribute, Object value, LinkOption... options) throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
