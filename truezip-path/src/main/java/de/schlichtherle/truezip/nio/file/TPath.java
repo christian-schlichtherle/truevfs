@@ -780,6 +780,7 @@ public final class TPath implements Path {
         return getFileSystem().readAttributes(this, type, options);
     }
 
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("SE_COMPARATOR_SHOULD_BE_SERIALIZABLE")
     private static class TPathComparator implements Comparator<TPath> {
         @Override
         public int compare(TPath p1, TPath p2) {
@@ -802,6 +803,7 @@ public final class TPath implements Path {
         }
     }
 
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("SE_COMPARATOR_SHOULD_BE_SERIALIZABLE")
     private static final class WindowsTPathComparator extends TPathComparator {
         @Override
         public int compare(TPath p1, TPath p2) {
