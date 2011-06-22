@@ -170,6 +170,21 @@ public final class TPath implements Path {
         this(name(first, more), null, null);
     }
 
+    /**
+     * Constructs a new path from the given file system and sub path strings.
+     * <p>
+     * This constructor scans the {@link TPath#toString() path name} resulting
+     * from the segment parameters to detect prospective archive files using
+     * the {@link #getDefaultArchiveDetector() default archive detector}.
+     * <p>
+     * The supported separators are "{@link File#separator}" and "{@code /}".
+     * Any leading and trailing separators in the resulting path name get
+     * discarded.
+     * 
+     * @param fileSystem the file system to access.
+     * @param first the first sub path string.
+     * @param more optional sub path strings.
+     */
     TPath(final TFileSystem fileSystem, String first, final String... more) {
         final URI name = name(cutLeadingSeparators(first), more);
         this.name = name;
@@ -682,11 +697,13 @@ public final class TPath implements Path {
         }
     }
 
+    /** @throws UnsupportedOperationException always */
     @Override
     public WatchKey register(WatchService watcher, Kind<?>[] events, Modifier... modifiers) throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    /** @throws UnsupportedOperationException always */
     @Override
     public WatchKey register(WatchService watcher, Kind<?>... events) throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");

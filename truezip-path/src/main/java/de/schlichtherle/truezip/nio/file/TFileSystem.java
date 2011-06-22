@@ -51,6 +51,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
+import java.nio.channels.UnsupportedAddressTypeException;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.AccessMode;
 import java.nio.file.DirectoryIteratorException;
@@ -237,6 +238,7 @@ public final class TFileSystem extends FileSystem {
                 new TPath(getMountPoint().toHierarchicalUri().resolve(SEPARATOR)));
     }
 
+    /** @throws UnsupportedOperationException always */
     @Override
     public Iterable<FileStore> getFileStores() {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -247,21 +249,38 @@ public final class TFileSystem extends FileSystem {
         return Collections.singleton("basic");
     }
 
+    /**
+     * Constructs a new path from the given sub path strings.
+     * <p>
+     * This method scans the {@link TPath#toString() path name} resulting
+     * from the segment parameters to detect prospective archive files using
+     * the {@link #getDefaultArchiveDetector() default archive detector}.
+     * <p>
+     * The supported separators are "{@link File#separator}" and "{@code /}".
+     * Any leading and trailing separators in the resulting path name get
+     * discarded.
+     * 
+     * @param first the first sub path string.
+     * @param more optional sub path strings.
+     */
     @Override
     public TPath getPath(String first, String... more) {
         return new TPath(this, first, more);
     }
 
+    /** @throws UnsupportedOperationException always */
     @Override
     public PathMatcher getPathMatcher(String syntaxAndPattern) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    /** @throws UnsupportedOperationException always */
     @Override
     public UserPrincipalLookupService getUserPrincipalLookupService() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    /** @throws UnsupportedOperationException always */
     @Override
     public WatchService newWatchService() throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -601,6 +620,7 @@ public final class TFileSystem extends FileSystem {
             return UNKNOWN == size ? 0 : size;
         }
 
+        /** @throws UnsupportedOperationException always */
         @Override
         public Object fileKey() {
             throw new UnsupportedOperationException("Not supported yet.");
