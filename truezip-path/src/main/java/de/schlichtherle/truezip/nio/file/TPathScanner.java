@@ -24,7 +24,7 @@ import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.io.Paths;
 import static de.schlichtherle.truezip.fs.FsUriModifier.*;
 import de.schlichtherle.truezip.io.Paths.Splitter;
-import de.schlichtherle.truezip.util.QuotedInputUriSyntaxException;
+import de.schlichtherle.truezip.util.QuotedUriSyntaxException;
 import de.schlichtherle.truezip.util.UriBuilder;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -141,9 +141,9 @@ final class TPathScanner {
 
     static URI checkFix(final URI uri) throws URISyntaxException {
         if (uri.isOpaque())
-            throw new QuotedInputUriSyntaxException(uri, "Opaque URI");
+            throw new QuotedUriSyntaxException(uri, "Opaque URI");
         if (null != uri.getFragment())
-            throw new QuotedInputUriSyntaxException(uri, "Fragment component defined");
+            throw new QuotedUriSyntaxException(uri, "Fragment component defined");
         return fixChecked(uri);
     }
 
