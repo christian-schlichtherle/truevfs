@@ -103,9 +103,5 @@ public final class FsManagerLocator implements FsManagerProvider {
             }
             MANAGER = manager;
         }
-
-        /** Make NetBeans happy. */
-        Boot() {
-        }
     } // class Boot
 }

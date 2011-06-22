@@ -27,7 +27,6 @@ import de.schlichtherle.truezip.fs.FsFalsePositiveException;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.fs.FsSyncOption;
-import static de.schlichtherle.truezip.fs.archive.FsArchiveDriver.*;
 import de.schlichtherle.truezip.fs.archive.FsArchiveEntry;
 import de.schlichtherle.truezip.fs.archive.FsCovariantEntry;
 import de.schlichtherle.truezip.util.BitField;

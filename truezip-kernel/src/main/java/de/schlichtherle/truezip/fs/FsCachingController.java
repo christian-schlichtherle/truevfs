@@ -42,7 +42,6 @@ import java.nio.channels.SeekableByteChannel;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import net.jcip.annotations.NotThreadSafe;
 
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
@@ -382,17 +381,6 @@ extends FsDecoratingController< FsConcurrentModel,
             cache.clear();
         }
 
-        @CheckForNull
-        FsEntry getEntry() {
-            final Entry entry = cache.getEntry();
-            final Entry template;
-            return null == entry
-                    ? null
-                    : new CacheEntry(null == (template = this.template)
-                        ? entry
-                        : template);
-        }
-
         InputSocket<?> getInputSocket() {
             final InputSocket<?> input = this.input;
             return null != input ? input : (this.input = cache.getInputSocket());
@@ -513,21 +501,4 @@ extends FsDecoratingController< FsConcurrentModel,
             }
         } // class EntryOutputStream
     } // class EntryCache
-
-    /** Proxies backing store entries. */
-    private static final class CacheEntry extends FsDecoratingEntry<Entry> {
-        CacheEntry(Entry entry) {
-            super(entry);
-        }
-
-        @Override
-        public Set<String> getMembers() {
-            return null;
-        }
-
-        @Override
-        public Set<Type> getTypes() {
-            return FILE_TYPE_SET;
-        }
-    } // CacheEntry
 }

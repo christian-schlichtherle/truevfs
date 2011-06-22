@@ -268,7 +268,7 @@ public class AuthenticationPanel extends JPanel {
     }//GEN-LAST:event_keyFilePanelAncestorWindowShown
         
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private final javax.swing.JComboBox keyFile = new javax.swing.JComboBox();
+    private final javax.swing.JComboBox<String> keyFile = new javax.swing.JComboBox<String>();
     private final javax.swing.JButton keyFileChooser = new javax.swing.JButton();
     private final de.schlichtherle.truezip.swing.EnhancedPanel keyFilePanel = new de.schlichtherle.truezip.swing.EnhancedPanel();
     private javax.swing.JTabbedPane tabs;

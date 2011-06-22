@@ -102,9 +102,5 @@ public final class FsDriverLocator implements FsDriverProvider {
             }
             DRIVERS = Collections.unmodifiableMap(fast);
         }
-
-        /** Make NetBeans happy. */
-        Boot() {
-        }
     } // class Boot
 }

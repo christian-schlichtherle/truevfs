@@ -44,7 +44,7 @@ import javax.swing.filechooser.FileSystemView;
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-public class FileComboBoxBrowser extends AbstractComboBoxBrowser {
+public class FileComboBoxBrowser extends AbstractComboBoxBrowser<String> {
 
     private static final long serialVersionUID = -6878885832542209810L;
 
@@ -59,7 +59,7 @@ public class FileComboBoxBrowser extends AbstractComboBoxBrowser {
         this(null, null);
     }
 
-    public FileComboBoxBrowser(@CheckForNull JComboBox comboBox) {
+    public FileComboBoxBrowser(@CheckForNull JComboBox<String> comboBox) {
         this(comboBox, null);
     }
 
@@ -73,7 +73,7 @@ public class FileComboBoxBrowser extends AbstractComboBoxBrowser {
      * @param comboBox The combo box to enable browsing for auto completions.
      *        May be {@code null}.
      */
-    public FileComboBoxBrowser( final @CheckForNull JComboBox comboBox,
+    public FileComboBoxBrowser( final @CheckForNull JComboBox<String> comboBox,
                                 @CheckForNull FileSystemView fileSystemView) {
         super(comboBox);
         this.fileSystemView = fileSystemView;
@@ -259,7 +259,7 @@ public class FileComboBoxBrowser extends AbstractComboBoxBrowser {
         // Note that the list MUST be cleared and repopulated because its
         // current content does not need to reflect the status of the edited
         // initials.
-        final DefaultComboBoxModel model = (DefaultComboBoxModel) getComboBox().getModel();
+        final DefaultComboBoxModel<String> model = (DefaultComboBoxModel<String>) getComboBox().getModel();
         try {
             model.removeAllElements();
             final int l = children != null ? children.length : 0;

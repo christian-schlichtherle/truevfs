@@ -17,7 +17,6 @@ package de.schlichtherle.truezip.util;
 
 import java.util.logging.Logger;
 import de.schlichtherle.truezip.util.UriEncoder.Encoding;
-import java.util.EnumSet;
 import org.junit.Before;
 import org.junit.Test;
 

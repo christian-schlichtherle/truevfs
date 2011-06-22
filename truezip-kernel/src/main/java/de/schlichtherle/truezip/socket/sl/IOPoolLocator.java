@@ -106,9 +106,5 @@ public final class IOPoolLocator implements IOPoolProvider {
                             IOPoolService.class));
             SERVICE = service;
         }
-
-        /** You cannot instantiate this class. */
-        Boot() {
-        }
     } // class Boot
 }

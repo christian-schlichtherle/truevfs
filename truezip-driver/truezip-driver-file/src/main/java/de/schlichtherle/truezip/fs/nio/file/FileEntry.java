@@ -40,9 +40,6 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import net.jcip.annotations.Immutable;
 
-import static de.schlichtherle.truezip.entry.Entry.Type.*;
-import static de.schlichtherle.truezip.entry.Entry.Access.*;
-
 /**
  * Adapts a {@link Path} instance to a {@link FsEntry}.
  *

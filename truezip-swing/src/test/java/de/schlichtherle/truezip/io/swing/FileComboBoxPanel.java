@@ -53,8 +53,8 @@ public class FileComboBoxPanel extends JPanel implements Runnable {
         java.awt.GridBagConstraints gridBagConstraints;
 
         final javax.swing.JLabel jLabel1 = new javax.swing.JLabel();
-        final javax.swing.JComboBox box1 = new javax.swing.JComboBox();
-        final javax.swing.JComboBox box2 = new javax.swing.JComboBox();
+        final javax.swing.JComboBox<String> box1 = new javax.swing.JComboBox<String>();
+        final javax.swing.JComboBox<String> box2 = new javax.swing.JComboBox<String>();
 
         browser1.setComboBox(box1);
         browser2.setComboBox(box2);

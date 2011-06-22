@@ -17,7 +17,6 @@ package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.key.MockView;
 import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
-import java.io.File;
 import de.schlichtherle.truezip.fs.archive.zip.raes.SafeZipRaesDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.fs.archive.zip.raes.PromptingKeyManagerService;
