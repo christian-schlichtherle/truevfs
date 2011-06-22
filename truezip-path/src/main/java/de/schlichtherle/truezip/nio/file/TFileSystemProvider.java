@@ -78,7 +78,9 @@ import static java.util.logging.Level.*;
 public final class TFileSystemProvider extends FileSystemProvider {
 
     private static volatile TFileSystemProvider
-            ROOT_DIRECTORY = new TFileSystemProvider();
+            ROOT_DIRECTORY = new TFileSystemProvider(
+                FsScheme.create("tpath"),
+                FsMountPoint.create(URI.create("file:/")));
     private static final TFileSystemProvider
             CURRENT_DIRECTORY = new TFileSystemProvider(
                 FsScheme.create("tpath"),
@@ -97,11 +99,9 @@ public final class TFileSystemProvider extends FileSystemProvider {
      * @return A file system provider.
      */
     static TFileSystemProvider get(final URI name) {
-        return isAbsolute(name) ? ROOT_DIRECTORY : CURRENT_DIRECTORY;
-    }
-
-    private static boolean isAbsolute(URI uri) {
-        return Paths.isAbsolute(uri.getSchemeSpecificPart(), SEPARATOR_CHAR);
+        return TPathScanner.isAbsolute(name)
+                ? ROOT_DIRECTORY
+                : CURRENT_DIRECTORY;
     }
 
     /**
@@ -120,7 +120,6 @@ public final class TFileSystemProvider extends FileSystemProvider {
     public TFileSystemProvider() {
         this(   FsScheme.create("tpath"),
                 FsMountPoint.create(URI.create("file:/")));
-                //FsMountPoint.create(Paths.get("").toUri())); // TUriScanner will remove redundant empty authority component
         ROOT_DIRECTORY = this;
         Logger  .getLogger(TFileSystemProvider.class.getName())
                 .log(CONFIG, "Installed TrueZIP file system provider");
