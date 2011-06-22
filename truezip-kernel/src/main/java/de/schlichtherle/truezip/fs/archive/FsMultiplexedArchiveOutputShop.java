@@ -44,13 +44,13 @@ import net.jcip.annotations.NotThreadSafe;
 
 
 /**
- * Decorates an {@code OutputShop} in order to support a virtually
- * unlimited number of entries which may be written concurrently while
- * actually at most one entry is written concurrently to the output archive
- * output.
+ * Decorates annother output shop to support a virtually unlimited number of
+ * entries which may be written concurrently while actually at most one entry
+ * is written concurrently to the decorated output shop.
  * If there is more than one entry to be written concurrently, the additional
- * entries are actually written to temp files and copied to the output
- * output archive upon a call to their {@link OutputStream#close()} method.
+ * entries are buffered to an I/O entry allocated from an I/O pool and copied
+ * to the decorated output shop upon a call to their
+ * {@link OutputStream#close()} method.
  * Note that this implies that the {@code close()} method may fail with
  * an {@link IOException}.
  *
@@ -69,8 +69,8 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
      * The map of temporary archive entries which have not yet been written
      * to the output output archive.
      */
-    private final Map<String, TempEntryOutputStream> temps
-            = new LinkedHashMap<String, TempEntryOutputStream>();
+    private final Map<String, BufferedEntryOutputStream> buffers
+            = new LinkedHashMap<String, BufferedEntryOutputStream>();
 
     /** @see #isBusy */
     private boolean busy;
@@ -79,26 +79,31 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
      * Constructs a new {@code FsMultiplexedArchiveOutputShop}.
      * 
      * @param output the decorated output archive.
-     * @throws NullPointerException iff {@code output} is {@code null}.
+     * @throws NullPointerException if any parameter is {@code null}.
      */
-    public FsMultiplexedArchiveOutputShop(OutputShop<AE> output, final IOPool<?> pool) {
+    public FsMultiplexedArchiveOutputShop(
+            final OutputShop<AE> output,
+            final IOPool<?> pool) {
         super(output);
+        if (null == pool)
+            throw new NullPointerException();
         this.pool = pool;
     }
 
     @Override
     public int getSize() {
-        return delegate.getSize() + temps.size();
+        return delegate.getSize() + buffers.size();
     }
 
     @Override
     public Iterator<AE> iterator() {
-        return new JointIterator<AE>(delegate.iterator(), new TempEntriesIterator());
+        return new JointIterator<AE>(
+                delegate.iterator(),
+                new BufferedEntriesIterator());
     }
 
-    private class TempEntriesIterator implements Iterator<AE> {
-        private final Iterator<TempEntryOutputStream> i
-                = temps.values().iterator();
+    private class BufferedEntriesIterator implements Iterator<AE> {
+        final Iterator<BufferedEntryOutputStream> i = buffers.values().iterator();
 
         @Override
         public boolean hasNext() {
@@ -121,7 +126,7 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
         final AE entry = delegate.getEntry(name);
         if (null != entry)
             return entry;
-        final TempEntryOutputStream out = temps.get(name);
+        final BufferedEntryOutputStream out = buffers.get(name);
         return null == out ? null : out.getTarget();
     }
 
@@ -141,7 +146,7 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
                 if (isBusy()) {
                     final IOPool.Entry<?> temp = pool.allocate();
                     try {
-                        return new TempEntryOutputStream(getBoundSocket(), temp);
+                        return new BufferedEntryOutputStream(getBoundSocket(), temp);
                     } catch (IOException ex) {
                         try {
                             temp.release();
@@ -167,9 +172,9 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
         return busy;
     }
 
-    /** This entry output stream writes directly to the output archive. */
+    /** This entry output stream writes directly to this output shop. */
     private class EntryOutputStream extends DecoratingOutputStream {
-        private boolean closed;
+        boolean closed;
 
         EntryOutputStream(final OutputStream out) {
             super(out);
@@ -185,29 +190,29 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
             try {
                 delegate.close();
             } finally {
-                storeTemps();
+                storeBuffers();
             }
         }
     } // class EntryOutputStream
 
     /**
-     * This entry output stream writes the archive entry to a temporary file.
-     * When the stream is closed, the temporary file is then copied to the
-     * output archive and finally deleted unless the output output
-     * archive is still busy.
+     * This entry output stream writes the archive entry to an
+     * {@link de.schlichtherle.truezip.socket.IOPool.Entry I/O pool entry}.
+     * When the stream gets closed, the I/O pool entry is then copied to this
+     * output shop and finally deleted unless this output shop is still busy.
      */
-    private class TempEntryOutputStream
-    extends DecoratingOutputStream {
-        private final IOPool.Entry<?> temp;
-        private final OutputSocket<? extends AE> output;
-        private final AE local;
-        private final Entry peer;
-        private final InputSocket<?> input;
-        private boolean closed;
+    private class BufferedEntryOutputStream extends DecoratingOutputStream {
+        final IOPool.Entry<?> temp;
+        final OutputSocket<? extends AE> output;
+        final AE local;
+        final Entry peer;
+        final InputSocket<?> input;
+        boolean closed;
 
-        @SuppressWarnings("LeakingThisInConstructor")
-        TempEntryOutputStream(  @NonNull final OutputSocket<? extends AE> output,
-                                @NonNull final IOPool.Entry<?> temp)
+        //@SuppressWarnings("LeakingThisInConstructor")
+        BufferedEntryOutputStream(
+                final OutputSocket<? extends AE> output,
+                final IOPool.Entry<?> temp)
         throws IOException {
             super(temp.getOutputSocket().newOutputStream());
             this.output = output;
@@ -227,12 +232,13 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
             }
             this.temp = temp;
             this.input = new ProxyInput();
-            final TempEntryOutputStream old = temps.put(local.getName(), this);
+            final BufferedEntryOutputStream
+                    old = buffers.put(local.getName(), this);
             if (null != old)
                 old.store(true);
         }
 
-        public AE getTarget() {
+        AE getTarget() {
             return local;
         }
 
@@ -246,7 +252,7 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
                     delegate.close();
                 } finally {
                     final Entry src = input.getLocalTarget();
-                    final AE dst = output.getLocalTarget();
+                    final AE dst = getTarget();
                     for (Size type : ALL_SIZE_SET)
                         if (UNKNOWN == dst.getSize(type))
                             dst.setSize(type, src.getSize(type));
@@ -255,11 +261,11 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
                             dst.setTime(type, src.getTime(type));
                 }
             } finally {
-                storeTemps();
+                storeBuffers();
             }
         }
 
-        private boolean store(boolean discard) throws IOException {
+        boolean store(boolean discard) throws IOException {
             if (discard)
                 assert closed : "broken archive controller!";
             else if (!closed || isBusy())
@@ -277,29 +283,29 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
             }
             return true;
         }
-    } // class TempEntryOutputStream
+    } // class BufferedEntryOutputStream
 
     @Override
     public void close() throws IOException {
         assert !isBusy();
         try {
-            storeTemps();
-            assert temps.isEmpty();
+            storeBuffers();
+            assert buffers.isEmpty();
         } finally {
             delegate.close();
         }
     }
 
-    private void storeTemps() throws IOException {
+    private void storeBuffers() throws IOException {
         if (isBusy())
             return;
 
         final SequentialIOExceptionBuilder<IOException, SequentialIOException> builder
                 = new SequentialIOExceptionBuilder<IOException, SequentialIOException>(
                     IOException.class, SequentialIOException.class);
-        final Iterator<TempEntryOutputStream> i = temps.values().iterator();
+        final Iterator<BufferedEntryOutputStream> i = buffers.values().iterator();
         while (i.hasNext()) {
-            final TempEntryOutputStream out = i.next();
+            final BufferedEntryOutputStream out = i.next();
             boolean remove = true;
             try {
                 remove = out.store(false);
