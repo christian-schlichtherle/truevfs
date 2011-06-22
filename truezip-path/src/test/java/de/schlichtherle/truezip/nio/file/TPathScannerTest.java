@@ -18,7 +18,9 @@ package de.schlichtherle.truezip.nio.file;
 import de.schlichtherle.truezip.file.TConfig;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsPath;
+import static de.schlichtherle.truezip.nio.file.TPathScanner.*;
 import java.net.URI;
+import java.net.URISyntaxException;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
@@ -27,10 +29,11 @@ import static org.hamcrest.CoreMatchers.*;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class TUriScannerTest extends TestBase {
+public class TPathScannerTest extends TestBase {
     @Test
-    public void testResolve() {
+    public void testScan() throws URISyntaxException {
         for (final String[] params : new String[][] {
+            { "foo", "..", "", null },
             // $parent, $member, $path, [$mountPoint]
             { "file:/", "c%3A/foo", "file:/c:/foo", "file:/c:/" },
             { "file:/", "//foo/bar/", "file://foo/bar/", "file://foo/bar/" },
@@ -53,15 +56,42 @@ public class TUriScannerTest extends TestBase {
             { "mok:mok:scheme:/foo.mok!/x/bar.mok!/y", "../../../..", "scheme:/", "scheme:/" },
             //{ "mok:mok:scheme:/foo.mok!/x/bar.mok!/y", "../../../../..", "null" },
         }) {
-            final FsPath parent = FsPath.create(URI.create(params[0]));
-            final URI member = URI.create(params[1]);
-            final FsPath path = FsPath.create(URI.create(params[2]));
+            final FsPath parent = new FsPath(new URI(params[0]));
+            final URI member = new URI(params[1]);
+            final FsPath path = new FsPath(new URI(params[2]));
             final FsMountPoint mountPoint = null == params[3]
                     ? null
-                    : FsMountPoint.create(URI.create(params[3]));
-            final FsPath result = new TPathScanner(TConfig.get().getArchiveDetector()).scan(parent, member);
+                    : new FsMountPoint(new URI(params[3]));
+            final FsPath result = new TPathScanner(
+                        TConfig.get().getArchiveDetector())
+                    .scan(parent, member);
             assertThat(result, equalTo(path));
             assertThat(result.getMountPoint(), is(mountPoint));
+        }
+    }
+
+    @Test
+    public void testParent() throws URISyntaxException {
+        for (String[] params : new String[][] {
+            // $path, $parent
+            { "", null },
+            { "foo", "" },
+            { "file:/", null },
+            { "file:/foo", "file:/" },
+            { "file:/foo/", "file:/" },
+            { "file:/foo/bar", "file:/foo/" },
+            { "file:/foo/bar/", "file:/foo/" },
+            { "mok:file:/foo!/", "file:/" },
+            { "mok:file:/foo!/bar", "mok:file:/foo!/" },
+            { "mok:mok:file:/foo!/bar!/", "mok:file:/foo!/" },
+            { "mok:mok:file:/foo!/bar!/baz", "mok:mok:file:/foo!/bar!/" },
+            { "mok:mok:file:/foo!/bar!/baz/boom", "mok:mok:file:/foo!/bar!/baz" },
+        }) {
+            final FsPath path = new FsPath(new URI(params[0]));
+            final FsPath parent = params[1] == null
+                    ? null
+                    : new FsPath(new URI(params[1]));
+            assertThat(parent(path), is(parent));
         }
     }
 }
