@@ -137,7 +137,7 @@ public final class FsDefaultManager extends FsManager {
 
     private Set<FsController<?>> getControllers() {
         final Set<FsController<?>> snapshot
-                = new TreeSet<FsController<?>>(BOTTOM_UP_COMPARATOR);
+                = new TreeSet<FsController<?>>(FsControllerComparator.REVERSE);
         for (final Link<ScheduledModel> link : schedulers.values()) {
             final ScheduledModel model = Links.getTarget(link);
             final FsFederatingController controller
@@ -152,13 +152,16 @@ public final class FsDefaultManager extends FsManager {
      * Orders file system controllers so that all file systems appear before
      * any of their parent file systems.
      */
-    private static final Comparator<FsController<?>>
-            BOTTOM_UP_COMPARATOR = new Comparator<FsController<?>>() {
+    private static final class FsControllerComparator
+    implements Comparator<FsController<?>> {
+        static final FsControllerComparator REVERSE
+                = new FsControllerComparator();
+
         @Override
         public int compare( FsController<?> l,
                             FsController<?> r) {
             return r.getModel().getMountPoint().toHierarchicalUri()
                     .compareTo(l.getModel().getMountPoint().toHierarchicalUri());
         }
-    };
+    } // class BottomUpComparator
 }
