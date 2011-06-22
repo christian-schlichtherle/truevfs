@@ -167,8 +167,7 @@ implements OutputShop<ZipArchiveEntry> {
                                 || UNKNOWN == entry.getCompressedSize()
                                 || UNKNOWN == entry.getSize())
                             return new BufferedEntryOutputStream(
-                                    pool.allocate(),
-                                    entry);
+                                    pool.allocate(), entry);
                         break;
                     case DEFLATED:
                         break;
