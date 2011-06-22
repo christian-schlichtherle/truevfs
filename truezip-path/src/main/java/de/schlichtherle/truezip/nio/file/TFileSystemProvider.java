@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.nio.file;
 
+import de.schlichtherle.truezip.io.Paths;
 import net.jcip.annotations.ThreadSafe;
 import java.util.logging.Logger;
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
@@ -77,23 +78,30 @@ import static java.util.logging.Level.*;
 public final class TFileSystemProvider extends FileSystemProvider {
 
     private static volatile TFileSystemProvider
-            DEFAULT = new TFileSystemProvider();
+            ROOT_DIRECTORY = new TFileSystemProvider();
+    private static final TFileSystemProvider
+            CURRENT_DIRECTORY = new TFileSystemProvider(
+                FsScheme.create("tpath"),
+                FsMountPoint.create(new File("").toURI()));
 
     private final String scheme;
     private final FsPath root;
-    private final FsPath current;
 
     private Map<FsMountPoint, TFileSystem>
             fileSystems = new WeakHashMap<FsMountPoint, TFileSystem>();
 
     /**
-     * Obtains a file system provider for the given path.
+     * Obtains a file system provider for the given {@link TPath} URI.
      * 
-     * @param  path a path.
+     * @param  name a {@link TPath} URI.
      * @return A file system provider.
      */
     static TFileSystemProvider get(final URI name) {
-        return DEFAULT;
+        return isAbsolute(name) ? ROOT_DIRECTORY : CURRENT_DIRECTORY;
+    }
+
+    private static boolean isAbsolute(URI uri) {
+        return Paths.isAbsolute(uri.getSchemeSpecificPart(), SEPARATOR_CHAR);
     }
 
     /**
@@ -111,21 +119,18 @@ public final class TFileSystemProvider extends FileSystemProvider {
     @Deprecated
     public TFileSystemProvider() {
         this(   FsScheme.create("tpath"),
-                FsMountPoint.create(URI.create("file:/")),
-                FsMountPoint.create(new File("").toURI()));
+                FsMountPoint.create(URI.create("file:/")));
                 //FsMountPoint.create(Paths.get("").toUri())); // TUriScanner will remove redundant empty authority component
-        DEFAULT = this;
+        ROOT_DIRECTORY = this;
         Logger  .getLogger(TFileSystemProvider.class.getName())
                 .log(CONFIG, "Installed TrueZIP file system provider");
     }
 
     private TFileSystemProvider(
             final FsScheme scheme,
-            final FsMountPoint root,
-            final FsMountPoint current) {
+            final FsMountPoint root) {
         this.scheme = scheme.toString();
         this.root = new FsPath(root, ROOT);
-        this.current = new FsPath(current, ROOT);
 
         assert invariants();
     }
@@ -133,7 +138,6 @@ public final class TFileSystemProvider extends FileSystemProvider {
     private boolean invariants() {
         assert null != getScheme();
         assert !getRoot().toUri().isOpaque();
-        assert !getCurrent().toUri().isOpaque();
         return true;
     }
 
@@ -142,12 +146,13 @@ public final class TFileSystemProvider extends FileSystemProvider {
         return scheme;
     }
 
+    /**
+     * Returns the root mount point of this provider.
+     * 
+     * @return The root mount point of this provider.
+     */
     FsPath getRoot() {
         return root;
-    }
-
-    FsPath getCurrent() {
-        return current;
     }
 
     private static TConfig push(Map<String, ?> env) {
