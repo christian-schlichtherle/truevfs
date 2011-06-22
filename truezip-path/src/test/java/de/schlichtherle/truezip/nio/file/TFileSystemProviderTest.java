@@ -34,6 +34,7 @@ public class TFileSystemProviderTest extends TestBase {
     private TFileSystemProvider provider;
 
     @Before
+    @Override
     public void setUp() throws Exception {
         super.setUp();
         provider = TFileSystemProvider.class.newInstance();
@@ -104,19 +105,27 @@ public class TFileSystemProviderTest extends TestBase {
 
     @Test
     public void testGetPath() {
-        for (final String[] params : new String[][] {
-            // $uri
-            //{ "foo" },
-            //{ "bar" },
-            { "tpath:/foo" },
-            { "tpath:/bar" },
-            { "cheating:/foo" }, // gets mapped to the provider's scheme.
-            { "cheating:/bar" },
-            { "yes-this-works-as-excepted:/c:/Users/christian/" },
+        for (final Object[] params : new Object[][] {
+            // $uri, $succeeds
+            { "", false },
+            { "/", false },
+            { "file:/", false },
+            { "tpath:/", true },
         }) {
-            URI uri = URI.create(params[0]);
-            TPath path = provider.getPath(uri);
+            final URI uri = URI.create(params[0].toString());
+            final boolean succeeds = (Boolean) params[1];
+            TPath path;
+            try {
+                path = provider.getPath(uri);
+                if (!succeeds)
+                    fail();
+            } catch (IllegalArgumentException ex) {
+                if (succeeds)
+                    throw ex;
+                return;
+            }
             assertThat(path.getFileSystem().provider(), sameInstance(provider));
+            assertThat(path.toUri().getScheme(), is(provider.getScheme()));
         }
     }
 }
