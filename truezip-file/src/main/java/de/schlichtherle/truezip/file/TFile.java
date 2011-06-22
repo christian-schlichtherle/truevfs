@@ -54,7 +54,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.ServiceConfigurationError;
 import java.util.Set;
 import java.util.TreeSet;
@@ -425,6 +424,8 @@ public final class TFile extends File {
      *        {@link #getDefaultArchiveDetector() default archive detector} is
      *        used instead.
      */
+    // TODO: For TrueZIP 8, consider removing the copy construction feature.
+    // This is useless in Java.
     public TFile(   final File file,
                     final @CheckForNull TArchiveDetector detector) {
         super(file.getPath());
@@ -1968,6 +1969,12 @@ public final class TFile extends File {
      *     {@link java.nio.file.spi.FileSystemProvider#getScheme()} of any
      *     NIO.2 {@link java.nio.file.spi.FileSystemProvider} implementation.
      * </li>
+     * <li>Behavior: {@code Path} implementations are usually <em>greedy</em>,
+     *     i.e. when creating another {@code Path} from an instance (e.g. by
+     *     using {@link java.nio.file.Path#resolve(String)}), then the returned
+     *     object is usually an instance of the same implementation class
+     *     instead of some other {@code Path} implementation class which may be
+     *     better suited for the resulting path name.
      * </ol>
      * <p>
      * As an alternative, you can always create a {@code Path}
@@ -2450,47 +2457,25 @@ public final class TFile extends File {
             }
             if (null == entry)
                 return null;
-            final Set<String> members = entry.getMembers();
-            if (null == members)
-                return null;
-            final Collection<TFile> filtered
-                    = new ArrayList<TFile>(members.size());
-            for (final String member : members) {
-                final TFile file = new TFile(this, member, detector);
-                if (filter == null || filter.accept(file))
-                    filtered.add(file);
-            }
-            return filtered.toArray(new TFile[filtered.size()]);
+            return filter(entry.getMembers(), filter, detector);
         }
-        return delegateListFiles(filter, detector);
+        return filter(Arrays.asList(delegate.list()), filter, detector);
     }
 
-    private @Nullable TFile[] delegateListFiles(
+    private @Nullable TFile[] filter(
+            final @CheckForNull Collection<String> members,
             final @CheckForNull FileFilter filter,
             final TArchiveDetector detector) {
-        // When filtering, we want to pass in {@code de.schlichtherle.truezip.io.TFile}
-        // objects rather than {@code File} objects, so we cannot
-        // just call {@code entry.listFiles(FileFilter)}.
-        // Instead, we will query the entry for the children names (i.e.
-        // Strings) only, construct {@code de.schlichtherle.truezip.io.TFile}
-        // instances from this and then apply the filter to construct the
-        // result list.
-
-        final List<TFile> filteredList = new ArrayList<TFile>();
-        final String[] members = delegate.list();
-        if (members == null)
-            return null; // no directory
-
-        for (int i = 0, l = members.length; i < l; i++) {
-            final String member = members[i];
+        if (null == members)
+            return null;
+        final Collection<TFile>
+                accepted = new ArrayList<TFile>(members.size());
+        for (final String member : members) {
             final TFile file = new TFile(this, member, detector);
-            if (filter == null || filter.accept(file))
-                filteredList.add(file);
+            if (null == filter || filter.accept(file))
+                accepted.add(file);
         }
-        final TFile[] list = new TFile[filteredList.size()];
-        filteredList.toArray(list);
-
-        return list;
+        return accepted.toArray(new TFile[accepted.size()]);
     }
 
     /**
