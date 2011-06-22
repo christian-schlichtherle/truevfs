@@ -19,6 +19,8 @@ import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.rof.DefaultReadOnlyFile;
 import de.schlichtherle.truezip.io.SynchronizedInputStream;
 import de.schlichtherle.truezip.util.Pool;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -27,6 +29,7 @@ import java.nio.charset.Charset;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.zip.ZipException;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * Drop-in replacement for {@link java.util.zip.ZipFile java.util.zip.ZipFile}.
@@ -47,10 +50,12 @@ import java.util.zip.ZipException;
  * <p>
  * This class is thread-safe.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
- * @see ZipOutputStream
+ * @see     ZipOutputStream
  */
+@ThreadSafe
+@DefaultAnnotation(NonNull.class)
 public class ZipFile extends RawZipFile<ZipEntry> {
 
     private final String name;
@@ -245,15 +250,15 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      * A pool which allocates {@link DefaultReadOnlyFile} objects for the
      * provided to its constructor.
      */
-    private static class DefaultReadOnlyFilePool
+    private static final class DefaultReadOnlyFilePool
     implements Pool<ReadOnlyFile, IOException> {
         final File file;
 
-        public DefaultReadOnlyFilePool(File file) {
+        DefaultReadOnlyFilePool(File file) {
             this.file = file;
         }
 
-        public DefaultReadOnlyFilePool(String name) {
+        DefaultReadOnlyFilePool(String name) {
             this.file = new File(name);
         }
 
@@ -295,7 +300,8 @@ public class ZipFile extends RawZipFile<ZipEntry> {
 			public ZipEntry nextElement() {
                 return i.next().clone();
             }
-        }
+        } // CloneEnumeration
+
         return new CloneEnumeration();
     }
 
@@ -322,7 +328,8 @@ public class ZipFile extends RawZipFile<ZipEntry> {
 			public void remove() {
                 throw new UnsupportedOperationException();
             }
-        }
+        } // class EntryIterator
+
         return new EntryIterator();
     }
 
