@@ -262,7 +262,6 @@ implements Iterable<FsCovariantEntry<E>> {
      *
      * @return A clone of the set of archive file system listeners.
      */
-    @SuppressWarnings("unchecked")
     Set<FsArchiveFileSystemTouchListener<? super E>>
     getFsArchiveFileSystemTouchListeners() {
         return new HashSet<FsArchiveFileSystemTouchListener<? super E>>(touchListeners);

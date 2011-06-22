@@ -55,12 +55,12 @@ import javax.swing.text.JTextComponent;
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-public abstract class AbstractComboBoxBrowser implements Serializable {
+public abstract class AbstractComboBoxBrowser<E> implements Serializable {
     private static final long serialVersionUID = 1065103960246722893L;
 
     private final Listener listener = new Listener();
 
-    private @CheckForNull JComboBox comboBox;
+    private @CheckForNull JComboBox<E> comboBox;
 
     /**
      * Used to inhibit mutual recursive event firing.
@@ -82,7 +82,7 @@ public abstract class AbstractComboBoxBrowser implements Serializable {
      * @param comboBox The combo box to enable browsing for auto completions.
      *        May be {@code null}.
      */
-    protected AbstractComboBoxBrowser(final @CheckForNull JComboBox comboBox) {
+    protected AbstractComboBoxBrowser(final @CheckForNull JComboBox<E> comboBox) {
         changeComboBox(null, comboBox, false);
     }
 
@@ -90,7 +90,7 @@ public abstract class AbstractComboBoxBrowser implements Serializable {
      * Returns the combo box which this object is auto completing.
      * The default is {@code null}.
      */
-    public @Nullable JComboBox getComboBox() {
+    public @Nullable JComboBox<E> getComboBox() {
         return comboBox;
     }
 
@@ -102,13 +102,14 @@ public abstract class AbstractComboBoxBrowser implements Serializable {
      * @param comboBox The combo box to enable browsing for auto completions.
      *        May be {@code null}.
      */
-    public void setComboBox(final @CheckForNull JComboBox comboBox) {
+    public void setComboBox(final @CheckForNull JComboBox<E> comboBox) {
         changeComboBox(getComboBox(), comboBox, true);
     }
 
-    private void changeComboBox(
-            final @CheckForNull JComboBox oldCB,
-            final @CheckForNull JComboBox newCB,
+    @SuppressWarnings("unchecked")
+	private void changeComboBox(
+            final @CheckForNull JComboBox<E> oldCB,
+            final @CheckForNull JComboBox<E> newCB,
             final boolean update) {
         if (newCB == oldCB)
             return;
@@ -207,7 +208,7 @@ public abstract class AbstractComboBoxBrowser implements Serializable {
         if (lock())
             return;
         try {
-            final JComboBox cb = getComboBox();
+            final JComboBox<E> cb = getComboBox();
             final ComboBoxEditor cbe = cb.getEditor();
             final JTextComponent tc = (JTextComponent) cbe.getEditorComponent();
             assert cb.isShowing() || !tc.isFocusOwner();
@@ -231,7 +232,7 @@ public abstract class AbstractComboBoxBrowser implements Serializable {
             if (!(item instanceof String))
                 return;
 
-            final JComboBox cb = getComboBox();
+            final JComboBox<E> cb = getComboBox();
             final JTextComponent tc = (JTextComponent) cbe.getEditorComponent();
             assert cb.isShowing() || !tc.isFocusOwner();
             if (!tc.isFocusOwner() /*|| !cb.isShowing()*/)

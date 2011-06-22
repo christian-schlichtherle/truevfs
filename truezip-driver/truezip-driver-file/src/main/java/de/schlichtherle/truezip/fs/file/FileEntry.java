@@ -15,10 +15,8 @@
  */
 package de.schlichtherle.truezip.fs.file;
 
-import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.util.Pool.Releasable;
 import de.schlichtherle.truezip.socket.IOEntry;
-import de.schlichtherle.truezip.socket.IOPool.Entry;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.fs.FsOutputOption;
@@ -40,7 +38,6 @@ import java.util.HashSet;
 import java.util.Set;
 import net.jcip.annotations.Immutable;
 
-import static de.schlichtherle.truezip.entry.Entry.Type.*;
 import static de.schlichtherle.truezip.entry.Entry.Access.*;
 
 /**

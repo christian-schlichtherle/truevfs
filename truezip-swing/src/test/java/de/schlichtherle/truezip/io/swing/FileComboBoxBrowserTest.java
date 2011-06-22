@@ -74,7 +74,7 @@ public final class FileComboBoxBrowserTest {
         } catch (NullPointerException expected) {
         }
 
-        final JComboBox combo = new JComboBox();
+        final JComboBox<String> combo = new JComboBox<String>();
         browser.setComboBox(combo);
         browser.update("");
     }
@@ -93,7 +93,7 @@ public final class FileComboBoxBrowserTest {
             return;
         }
 
-        final JComboBox combo = new JComboBox();
+        final JComboBox<String> combo = new JComboBox<String>();
         final FileComboBoxBrowser browser = new FileComboBoxBrowser();
         browser.setDirectory(dir);
 
@@ -106,7 +106,7 @@ public final class FileComboBoxBrowserTest {
 
     private static void assertAutoCompletion(
             final FileComboBoxBrowser browser,
-            final JComboBox combo,
+            final JComboBox<String> combo,
             final String initials) {
         browser.setComboBox(null); // reset
         combo.removeAllItems(); // reset
@@ -132,9 +132,9 @@ public final class FileComboBoxBrowserTest {
         return Arrays.asList(entries);
     }
 
-    private static List<Object> asList(final JComboBox combo) {
+    private static List<Object> asList(final JComboBox<String> combo) {
         final List<Object> list = new LinkedList<Object>();
-        final ComboBoxModel model = combo.getModel();
+        final ComboBoxModel<String> model = combo.getModel();
         for (int i = 0, l = model.getSize(); i < l; i++)
             list.add(model.getElementAt(i));
         return list;

@@ -22,7 +22,6 @@ import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveEntry;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveEntryContainer;
-import de.schlichtherle.truezip.fs.archive.mock.MockArchiveEntryContainer.Output;
 import de.schlichtherle.truezip.util.UriBuilder;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;

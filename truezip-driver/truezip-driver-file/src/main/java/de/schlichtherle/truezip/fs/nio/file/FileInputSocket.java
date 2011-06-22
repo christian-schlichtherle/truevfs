@@ -23,6 +23,8 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
+import java.nio.file.Files;
+
 import static java.nio.file.Files.*;
 import net.jcip.annotations.ThreadSafe;
 
@@ -62,6 +64,6 @@ final class FileInputSocket extends InputSocket<FileEntry> {
 
     @Override
     public InputStream newInputStream() throws IOException {
-        return newInputStream(entry.getPath());
+        return Files.newInputStream(entry.getPath());
     }
 }

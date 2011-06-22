@@ -15,11 +15,8 @@
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
-import de.schlichtherle.truezip.entry.Entry.Access;
 import static de.schlichtherle.truezip.entry.Entry.Access.*;
-import de.schlichtherle.truezip.entry.Entry.Size;
 import static de.schlichtherle.truezip.entry.Entry.Size.*;
-import de.schlichtherle.truezip.entry.Entry.Type;
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
 import de.schlichtherle.truezip.fs.archive.FsArchiveEntry;
 import de.schlichtherle.truezip.socket.IOPool.Entry;

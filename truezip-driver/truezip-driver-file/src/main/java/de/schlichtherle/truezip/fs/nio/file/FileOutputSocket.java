@@ -185,7 +185,6 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
     public OutputStream newOutputStream() throws IOException {
@@ -220,7 +219,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
             boolean closed;
 
             OutputStream() throws IOException {
-                super(newOutputStream(tempFile,
+                super(Files.newOutputStream(tempFile,
                         set.toArray(new StandardOpenOption[set.size()])));
             }
 

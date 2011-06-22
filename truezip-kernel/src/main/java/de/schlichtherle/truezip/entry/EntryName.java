@@ -309,7 +309,8 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      * @deprecated
      * @see #toUri()
      */
-    public final URI getUri() {
+    @Deprecated
+	public final URI getUri() {
         return uri;
     }
 

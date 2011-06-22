@@ -59,7 +59,8 @@ public class TFileTest extends TestBase {
         archive = new TFile("archive.mok");
     }
 
-    @After
+    @Override
+	@After
     public void tearDown() {
         assertFalse(new File("archive.zip").exists());
     }

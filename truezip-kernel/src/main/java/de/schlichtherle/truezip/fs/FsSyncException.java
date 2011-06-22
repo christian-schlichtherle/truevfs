@@ -39,7 +39,8 @@ public class FsSyncException extends SequentialIOException {
      * @deprecated This method is only public in order to allow reflective
      *             access - do <em>not</em> call it directly!
      */
-    public FsSyncException(String message) {
+    @Deprecated
+	public FsSyncException(String message) {
         super(message);
     }
 

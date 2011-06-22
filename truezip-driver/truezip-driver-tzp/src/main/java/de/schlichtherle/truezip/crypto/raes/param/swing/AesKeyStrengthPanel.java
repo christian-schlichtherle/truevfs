@@ -52,8 +52,8 @@ public class AesKeyStrengthPanel extends EnhancedPanel {
         keyStrength.setSelectedIndex(BITS_256.ordinal());
     }
 
-    private ComboBoxModel createModel() {
-        return new DefaultComboBoxModel(
+    private ComboBoxModel<String> createModel() {
+        return new DefaultComboBoxModel<String>(
             new String[] {
                 resources.getString("medium"),
                 resources.getString("high"),
@@ -122,6 +122,6 @@ public class AesKeyStrengthPanel extends EnhancedPanel {
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private final javax.swing.JComboBox keyStrength = new javax.swing.JComboBox();
+    private final javax.swing.JComboBox<String> keyStrength = new javax.swing.JComboBox<String>();
     // End of variables declaration//GEN-END:variables
 }

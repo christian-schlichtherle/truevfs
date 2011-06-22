@@ -99,9 +99,5 @@ public final class KeyManagerLocator implements KeyManagerProvider {
             }
             SERVICE = service;
         }
-
-        /** You cannot instantiate this class. */
-        Boot() {
-        }
     } // class Boot
 }

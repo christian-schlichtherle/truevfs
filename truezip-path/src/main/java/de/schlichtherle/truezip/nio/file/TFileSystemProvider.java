@@ -463,7 +463,6 @@ public final class TFileSystemProvider extends FileSystemProvider {
 
     @Override
     @Nullable
-    @SuppressWarnings("unchecked")
     public <V extends FileAttributeView> V getFileAttributeView(
             Path path,
             Class<V> type,
@@ -472,7 +471,6 @@ public final class TFileSystemProvider extends FileSystemProvider {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public <A extends BasicFileAttributes> A readAttributes(
             Path path,
             Class<A> type,
