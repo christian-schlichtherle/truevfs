@@ -2319,12 +2319,12 @@ public final class TFile extends File {
                 return null;
             if (null == filter)
                 return members.toArray(new String[members.size()]);
-            final Collection<String> filtered
+            final Collection<String> accepted
                     = new ArrayList<String>(members.size());
             for (final String member : members)
                 if (filter.accept(this, member))
-                    filtered.add(member);
-            return filtered.toArray(new String[filtered.size()]);
+                    accepted.add(member);
+            return accepted.toArray(new String[accepted.size()]);
         }
         return delegate.list(filter);
     }
@@ -2396,28 +2396,25 @@ public final class TFile extends File {
             }
             if (null == entry)
                 return null;
-            final Set<String> members = entry.getMembers();
-            if (null == members)
-                return null;
-            final Collection<TFile> filtered
-                    = new ArrayList<TFile>(members.size());
-            for (final String member : members)
-                if (filter == null || filter.accept(this, member))
-                    filtered.add(new TFile(TFile.this, member, detector));
-            return filtered.toArray(new TFile[filtered.size()]);
+            return filter(entry.getMembers(), filter, detector);
         }
-        return convert(delegate.listFiles(filter), detector);
+        return filter(  Arrays.asList(delegate.list(filter)),
+                        (FilenameFilter) null,
+                        detector);
     }
 
-    private static @Nullable TFile[] convert(
-            final File[] files,
+    private @Nullable TFile[] filter(
+            final @CheckForNull Collection<String> members,
+            final @CheckForNull FilenameFilter filter,
             final TArchiveDetector detector) {
-        if (null == files)
-            return null; // no directory
-        TFile[] results = new TFile[files.length];
-        for (int i = files.length; 0 <= --i; )
-            results[i] = new TFile(files[i], detector);
-        return results;
+        if (null == members)
+            return null;
+        final Collection<TFile>
+                accepted = new ArrayList<TFile>(members.size());
+        for (final String member : members)
+            if (null == filter || filter.accept(this, member))
+                accepted.add(new TFile(this, member, detector));
+        return accepted.toArray(new TFile[accepted.size()]);
     }
 
     /**
