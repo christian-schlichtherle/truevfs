@@ -109,13 +109,13 @@ public final class TZipRaesPathTest extends TPathTestSuite {
         createDirectory(archive);
         createDirectory(inner);
 
-        TFileSystem.umount();
+        TFileSystemProvider.umount();
         view.setAction(CANCEL);
         assertTrue(exists(archive));
         assertFalse(isDirectory(archive));
         assertFalse(isRegularFile(archive));
 
-        TFileSystem.umount();
+        TFileSystemProvider.umount();
         view.setAction(ENTER);
         assertTrue(exists(archive));
         assertTrue(isDirectory(archive));
@@ -126,14 +126,14 @@ public final class TZipRaesPathTest extends TPathTestSuite {
         assertFalse(isDirectory(inner));
         assertFalse(isRegularFile(inner));
 
-        TFileSystem.umount();
+        TFileSystemProvider.umount();
         try {
             archive.toFile().rm_r();
             fail();
         } catch (IOException expected) {
         }
             
-        TFileSystem.umount();
+        TFileSystemProvider.umount();
         view.setAction(ENTER);
         archive.toFile().rm_r();
     }
