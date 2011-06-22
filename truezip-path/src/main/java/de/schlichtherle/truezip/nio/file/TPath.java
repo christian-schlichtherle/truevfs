@@ -99,7 +99,12 @@ public final class TPath implements Path {
     private volatile @CheckForNull Integer hashCode;
     private volatile @CheckForNull List<String> segments;
 
-    TPath(Path path) {
+    /**
+     * Constructs a new path from the given path.
+     * 
+     * @param path a path.
+     */
+    public TPath(Path path) {
         this(   path instanceof TPath
                     ? ((TPath) path).getName()
                     : name(path.toString().replace(
@@ -111,11 +116,11 @@ public final class TPath implements Path {
 
     /**
      * Constructs a new path from the given file.
-     * If this is an instance of {@link TFile}, its
-     * {@link TFile#getArchiveDetector() archive detector} and
-     * {@link TFile#toFsPath() address} get shared with this instance.
      * 
-     * @param file the file.
+     * @param file a file.
+     *        If this is an instance of {@link TFile}, its
+     *        {@link TFile#getArchiveDetector() archive detector} and
+     *        {@link TFile#toFsPath() address} get shared with this instance.
      */
     public TPath(File file) {
         final URI name = name(file.getPath());
@@ -265,9 +270,7 @@ public final class TPath implements Path {
 
     private static FsPath address(URI name, TArchiveDetector detector) {
         return new TPathScanner(detector).scan(
-                isAbsolute(name)
-                    ? TFileSystemProvider.get(name).getRoot()
-                    : TFileSystemProvider.get(name).getCurrent(),
+                TFileSystemProvider.get(name).getRoot(),
                 name);
     }
 

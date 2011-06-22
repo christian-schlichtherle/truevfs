@@ -106,13 +106,13 @@ public class TFileSystemProviderTest extends TestBase {
     public void testGetPath() {
         for (final String[] params : new String[][] {
             // $uri
-            { "foo" },
-            { "bar" },
+            //{ "foo" },
+            //{ "bar" },
             { "tpath:/foo" },
             { "tpath:/bar" },
-            { "cheating:/foo" }, // gets mapped to the provider's scheme.
-            { "cheating:/bar" },
-            { "yes-this-works-as-excepted:/c:/Users/christian/" },
+            //{ "cheating:/foo" }, // gets mapped to the provider's scheme.
+            //{ "cheating:/bar" },
+            //{ "yes-this-works-as-excepted:/c:/Users/christian/" },
         }) {
             URI uri = URI.create(params[0]);
             TPath path = provider.getPath(uri);
