@@ -44,12 +44,10 @@ import static de.schlichtherle.truezip.zip.ZipEntry.STORED;
 import static de.schlichtherle.truezip.zip.ZipEntry.UNKNOWN;
 
 /**
- * An implementation of {@link OutputShop} to write ZIP archives.
- * <p>
- * This output archive can only write one entry at a time.
+ * An output shop for writing ZIP archive files.
+ * This output shop can only write one entry at a time.
  * Archive drivers may wrap this class in a
- * {@link FsMultiplexedArchiveOutputShop}
- * to overcome this limitation.
+ * {@link FsMultiplexedArchiveOutputShop} to overcome this limitation.
  * 
  * @see     ZipInputShop
  * @author  Christian Schlichtherle
@@ -115,7 +113,7 @@ implements OutputShop<ZipArchiveEntry> {
         if (null != entry)
             return entry;
         entry = tempEntry;
-        return entry != null && name.equals(entry.getName()) ? entry : null;
+        return null != entry && name.equals(entry.getName()) ? entry : null;
     }
 
     @Override
@@ -168,7 +166,7 @@ implements OutputShop<ZipArchiveEntry> {
                         if (       UNKNOWN == entry.getCrc()
                                 || UNKNOWN == entry.getCompressedSize()
                                 || UNKNOWN == entry.getSize())
-                            return new StoredEntryOutputStream(
+                            return new BufferedEntryOutputStream(
                                     pool.allocate(),
                                     entry);
                         break;
@@ -194,11 +192,12 @@ implements OutputShop<ZipArchiveEntry> {
     }
 
     /**
-     * This entry output stream writes directly to our subclass.
-     * It can only be used if this output stream is not currently busy
-     * writing another entry and the entry holds enough information to
-     * write the entry header.
-     * These preconditions are checked by {@link #getOutputSocket(ZipArchiveEntry) t}.
+     * This entry output stream writes directly to this output shop.
+     * It can only be used if this output shop is not currently busy with
+     * writing another entry and the entry holds enough information to write
+     * the entry header.
+     * These preconditions are checked by
+     * {@link #getOutputSocket(ZipArchiveEntry)}.
      */
     private class EntryOutputStream extends DecoratingOutputStream {
         EntryOutputStream(ZipArchiveEntry entry) throws IOException {
@@ -218,18 +217,21 @@ implements OutputShop<ZipArchiveEntry> {
     } // class EntryOutputStream
 
     /**
-     * This entry output stream writes the entry to a temporary file.
-     * When the stream is closed, the temporary file is then copied to this
-     * output stream and finally deleted.
+     * This entry output stream writes the ZIP archive entry to an
+     * {@link de.schlichtherle.truezip.socket.IOPool.Entry I/O pool entry}.
+     * When the stream gets closed, the I/O pool entry is then copied to this
+     * output shop and finally deleted.
      */
-    private class StoredEntryOutputStream extends CheckedOutputStream {
+    private class BufferedEntryOutputStream extends CheckedOutputStream {
         private final IOPool.Entry<?> temp;
         private boolean closed;
 
-        StoredEntryOutputStream(final IOPool.Entry<?> temp, final ZipArchiveEntry entry)
+        BufferedEntryOutputStream(
+                final IOPool.Entry<?> temp,
+                final ZipArchiveEntry entry)
         throws IOException {
             super(temp.getOutputSocket().newOutputStream(), new CRC32());
-            assert entry.getMethod() == STORED;
+            assert STORED == entry.getMethod();
             this.temp = temp;
             tempEntry = entry;
         }
@@ -238,8 +240,6 @@ implements OutputShop<ZipArchiveEntry> {
         public void close() throws IOException {
             if (closed)
                 return;
-
-            // Order is important here!
             closed = true;
             try {
                 try {
@@ -259,11 +259,6 @@ implements OutputShop<ZipArchiveEntry> {
         }
 
         void store() throws IOException {
-            assert tempEntry.getMethod() == STORED;
-            assert tempEntry.getCrc() != UNKNOWN;
-            assert tempEntry.getCompressedSize() != UNKNOWN;
-            assert tempEntry.getSize() != UNKNOWN;
-
             try {
                 final InputStream in = temp.getInputSocket().newInputStream();
                 try {
@@ -280,7 +275,7 @@ implements OutputShop<ZipArchiveEntry> {
                 temp.release();
             }
         }
-    } // class TempEntryOutputStream
+    } // class BufferedEntryOutputStream
 
     /**
      * Retains the postamble of the source source ZIP file, if any.

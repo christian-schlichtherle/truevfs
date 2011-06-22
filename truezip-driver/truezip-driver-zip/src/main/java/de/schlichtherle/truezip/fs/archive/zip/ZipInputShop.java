@@ -29,7 +29,7 @@ import java.io.InputStream;
 import static de.schlichtherle.truezip.zip.ZipEntry.*;
 
 /**
- * An implementation of {@link InputShop} to read ZIP archives.
+ * An input shop for reading ZIP archive files.
  *
  * @see     ZipOutputShop
  * @author  Christian Schlichtherle
