@@ -48,9 +48,10 @@ import net.jcip.annotations.NotThreadSafe;
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
 final class TPathScanner {
+    static final URI SEPARATOR_URI = URI.create(SEPARATOR);
+    static final URI DOT_URI = URI.create(".");
+    static final URI DOT_DOT_URI = URI.create("..");
     static final String DOT_DOT_SEPARATOR = ".." + SEPARATOR_CHAR;
-    static final URI DOT = URI.create(".");
-    static final URI DOT_DOT = URI.create("..");
 
     private final TArchiveDetector detector;
     private final Splitter splitter = new Splitter(SEPARATOR_CHAR, false);
@@ -107,8 +108,8 @@ final class TPathScanner {
             if ("..".equals(mp))
                 return parent(parent);
             final int mpl = pathPrefixLength(member);
-            final URI pu = fixUnchecked(parent.toUri());
             if (0 < mpl) {
+                final URI pu = parent.toHierarchicalUri().resolve(SEPARATOR_URI);
                 final String ma = member.getAuthority();
                 final String p = null != ma || mp.startsWith(SEPARATOR)
                         ? mp.substring(0, mpl)
@@ -181,12 +182,12 @@ final class TPathScanner {
             if (null != path)
                 return parent(path);
             URI mpu = mp.toUri();
-            URI pu = mpu.resolve(DOT_DOT);
+            URI pu = mpu.resolve(DOT_DOT_URI);
             if (mpu.getRawPath().length() <= pu.getRawPath().length())
                 return null;
             return new FsPath(pu);
         } else {
-            URI pu = en.toUri().resolve(DOT);
+            URI pu = en.toUri().resolve(DOT_URI);
             en = new FsEntryName(pu, CANONICALIZE);
             return new FsPath(mp, en);
         }
