@@ -158,7 +158,6 @@ public final class TFileSystemProvider extends FileSystemProvider {
      *         (i.e. archive file) in its parent file system.
      * @throws FsSyncException if any error conditions occur.
      *         This implies loss of data!
-     * @see    #sync(BitField)
      */
     public static void umount() throws FsSyncException {
         manager.sync(UMOUNT);

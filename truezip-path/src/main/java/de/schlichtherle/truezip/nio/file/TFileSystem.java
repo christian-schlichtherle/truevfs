@@ -269,7 +269,7 @@ public final class TFileSystem extends FileSystem {
      * <p>
      * This method scans the {@link TPath#toString() path name} resulting
      * from the segment parameters to detect prospective archive files using
-     * the {@link #getDefaultArchiveDetector() default archive detector}.
+     * the {@link TPath#getDefaultArchiveDetector() default archive detector}.
      * <p>
      * The supported separators are "{@link File#separator}" and "{@code /}".
      * Any leading and trailing separators in the resulting path name get
