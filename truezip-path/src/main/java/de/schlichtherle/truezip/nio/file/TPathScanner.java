@@ -28,6 +28,7 @@ import de.schlichtherle.truezip.util.QuotedInputUriSyntaxException;
 import de.schlichtherle.truezip.util.UriBuilder;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import net.jcip.annotations.NotThreadSafe;
@@ -170,7 +171,7 @@ final class TPathScanner {
      * @return The parent file system path.
      * @throws URISyntaxException 
      */
-    static FsPath parent(FsPath path) throws URISyntaxException {
+    static @Nullable FsPath parent(FsPath path) throws URISyntaxException {
         FsMountPoint mp = path.getMountPoint();
         FsEntryName  en = path.getEntryName();
         if (en.isRoot()) {
