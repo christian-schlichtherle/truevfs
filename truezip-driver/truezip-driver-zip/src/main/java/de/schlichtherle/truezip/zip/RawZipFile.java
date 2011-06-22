@@ -15,6 +15,10 @@
  */
 package de.schlichtherle.truezip.zip;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
+import net.jcip.annotations.NotThreadSafe;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import java.nio.ByteBuffer;
 import de.schlichtherle.truezip.util.Pool;
 import java.nio.charset.Charset;
@@ -57,9 +61,12 @@ import static de.schlichtherle.truezip.zip.ZipEntry.STORED;
  * This class is able to skip a preamble like the one found in self extracting
  * archives.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
+ * @see     ZipFile
  */
+@NotThreadSafe
+@DefaultAnnotation(NonNull.class)
 public abstract class RawZipFile<E extends ZipEntry>
 implements Iterable<E>, Closeable {
 
@@ -106,7 +113,7 @@ implements Iterable<E>, Closeable {
     private final ZipEntryFactory<E> factory;
 
     /** The nullable data source. */
-    private ReadOnlyFile archive;
+    private @CheckForNull ReadOnlyFile archive;
 
     /** The number of fetch streams reading from this ZIP file. */
     private int openStreams;
@@ -147,22 +154,22 @@ implements Iterable<E>, Closeable {
      * @throws IOException on any other I/O related issue.
      */
     protected RawZipFile(
-            @NonNull ReadOnlyFile archive,
-            @NonNull Charset charset,
+            ReadOnlyFile archive,
+            Charset charset,
             boolean preambled,
             boolean postambled,
-            @NonNull ZipEntryFactory<E> factory)
+            ZipEntryFactory<E> factory)
     throws IOException {
         this(   new SingletonReadOnlyFilePool(archive),
                 charset, preambled, postambled, factory);
     }
 
     RawZipFile(
-            final @NonNull Pool<ReadOnlyFile, IOException> source,
-            final @NonNull Charset charset,
+            final Pool<ReadOnlyFile, IOException> source,
+            final Charset charset,
             final boolean preambled,
             final boolean postambled,
-            final @NonNull ZipEntryFactory<E> factory)
+            final ZipEntryFactory<E> factory)
     throws IOException {
         if (charset == null || factory == null)
             throw new NullPointerException();
@@ -680,14 +687,14 @@ implements Iterable<E>, Closeable {
      */
     public boolean offsetsConsiderPreamble() {
         assert mapper != null;
-        return mapper.location(0) == 0;
+        return 0 == mapper.location(0);
     }
 
     /**
      * Equivalent to {@link #getInputStream(String, boolean, boolean)
      * getInputStream(name, false, true)}.
      */
-    public final InputStream getInputStream(String name)
+    public final @Nullable InputStream getInputStream(String name)
     throws IOException {
         return getInputStream(name, false, true);
     }
@@ -696,7 +703,7 @@ implements Iterable<E>, Closeable {
      * Equivalent to {@link #getInputStream(String, boolean, boolean)
      * getInputStream(entry.getName(), false, true)} instead.
      */
-    public final InputStream getInputStream(ZipEntry entry)
+    public final @Nullable InputStream getInputStream(ZipEntry entry)
     throws IOException {
         return getInputStream(entry.getName(), false, true);
     }
@@ -705,7 +712,7 @@ implements Iterable<E>, Closeable {
      * Equivalent to {@link #getInputStream(String, boolean, boolean)
      * getInputStream(name, true, true)}.
      */
-    public final InputStream getCheckedInputStream(String name)
+    public final @Nullable InputStream getCheckedInputStream(String name)
     throws IOException {
         return getInputStream(name, true, true);
     }
@@ -714,7 +721,7 @@ implements Iterable<E>, Closeable {
      * Equivalent to {@link #getInputStream(String, boolean, boolean)
      * getInputStream(entry.getName(), true, true)} instead.
      */
-    public final InputStream getCheckedInputStream(ZipEntry entry)
+    public final @Nullable InputStream getCheckedInputStream(ZipEntry entry)
     throws IOException {
         return getInputStream(entry.getName(), true, true);
     }
@@ -726,8 +733,7 @@ implements Iterable<E>, Closeable {
      * If the {@link #close} method is called on this instance, all input
      * streams returned by this method are closed, too.
      *
-     * @param name The name of the entry to get the stream for
-     *        - may <em>not</em> be {@code null}!
+     * @param name The name of the entry to get the stream for.
      * @param check Whether or not the entry's CRC-32 value is checked.
      *        If and only if this parameter is true, two additional checks are
      *        performed for the ZIP entry:
@@ -750,14 +756,13 @@ implements Iterable<E>, Closeable {
      *        This parameter should be {@code true} for most applications.
      * @return A stream to read the entry data from or {@code null} if the
      *         entry does not exist.
-     * @throws NullPointerException If {@code name} is {@code null}.
      * @throws CRC32Exception If the declared CRC-32 values of the inflated
      *         entry data are inconsistent across the entry headers.
      * @throws ZipException If this file is not compatible to the ZIP File
      *         Format Specification.
      * @throws IOException If the entry cannot get read from this ZipFile.
      */
-    protected InputStream getInputStream(
+    protected @Nullable InputStream getInputStream(
             final String name,
             final boolean check,
             final boolean inflate)
@@ -775,6 +780,8 @@ implements Iterable<E>, Closeable {
         // This offset has been set by mountCentralDirectory()
         // and needs to be resolved first.
         offset = mapper.location(offset);
+        final ReadOnlyFile archive = this.archive;
+        assert null != archive;
         archive.seek(offset);
         final byte[] lfh = new byte[LFH_MIN_LEN];
         archive.readFully(lfh);
@@ -942,12 +949,12 @@ implements Iterable<E>, Closeable {
     private static final class RawCheckedInputStream
     extends DecoratingInputStream {
 
-        private final Checksum crc = new CRC32();
-        private final byte[] singleByteBuf = new byte[1];
-        private final Inflater inf;
-        private final byte[] infBuf; // contains inflated data!
-        private final ZipEntry entry;
-        private boolean closed;
+        final Checksum crc = new CRC32();
+        final byte[] singleByteBuf = new byte[1];
+        final Inflater inf;
+        final byte[] infBuf; // contains inflated data!
+        final ZipEntry entry;
+        boolean closed;
 
         RawCheckedInputStream(
                 final InputStream in,
@@ -959,7 +966,7 @@ implements Iterable<E>, Closeable {
             this.entry = entry;
         }
 
-        private void ensureOpen()
+        void ensureOpen()
         throws IOException {
             if (closed)
                 throw new IOException("Input stream has been closed!");
@@ -1027,8 +1034,6 @@ implements Iterable<E>, Closeable {
         public void close() throws IOException {
             if (closed)
                 return;
-
-            // Order is important!
             try {
                 while (skip(Long.MAX_VALUE) > 0) { // process CRC-32 until EOF - this version makes FindBugs happy!
                 }
@@ -1037,7 +1042,6 @@ implements Iterable<E>, Closeable {
                 InflaterPool.release(inf);
                 super.close();
             }
-
             long expectedCrc = entry.getCrc();
             long actualCrc = crc.getValue();
             if (expectedCrc != actualCrc)
@@ -1068,13 +1072,12 @@ implements Iterable<E>, Closeable {
      * @throws IOException if an error occurs closing the file.
      */
     @Override
-	public void close() throws IOException {
-        // Order is important here!
-        if (archive != null) {
-            final ReadOnlyFile oldArchive = archive;
-            archive = null;
-            oldArchive.close();
-        }
+    public void close() throws IOException {
+        final ReadOnlyFile archive = this.archive;
+        if (null == archive)
+            return;
+        this.archive = null;
+        archive.close();
     }
 
     /**
@@ -1086,9 +1089,9 @@ implements Iterable<E>, Closeable {
      * Note that this class is <em>not</em> thread safe!
      */
     private class IntervalInputStream extends AccountedInputStream {
-        private long remaining;
-        private long fp;
-        private boolean addDummyByte;
+        long remaining;
+        long fp;
+        boolean addDummyByte;
 
         /**
          * @param start The start address (not offset) in {@code archive}.
@@ -1103,8 +1106,7 @@ implements Iterable<E>, Closeable {
         }
 
         @Override
-		public int read()
-        throws IOException {
+        public int read() throws IOException {
             assertOpen();
 
             if (remaining <= 0) {
@@ -1116,6 +1118,8 @@ implements Iterable<E>, Closeable {
                 return -1;
             }
 
+            final ReadOnlyFile archive = RawZipFile.this.archive;
+            assert null != archive;
             archive.seek(fp);
             final int ret = archive.read();
             if (ret >= 0) {
@@ -1150,6 +1154,8 @@ implements Iterable<E>, Closeable {
             if (len > remaining)
                 len = (int) remaining;
 
+            final ReadOnlyFile archive = RawZipFile.this.archive;
+            assert null != archive;
             archive.seek(fp);
             final int ret = archive.read(b, off, len);
             if (ret > 0) {
@@ -1179,8 +1185,7 @@ implements Iterable<E>, Closeable {
          *         is actually determined by an {@link InflaterInputStream}.
          */
         @Override
-        public int available()
-        throws IOException {
+        public int available() throws IOException {
             assertOpen();
 
             long available = remaining;
@@ -1202,7 +1207,6 @@ implements Iterable<E>, Closeable {
 
         @Override
         public void close() throws IOException {
-            // Order is important here!
             if (closed)
                 return;
             closed = true;

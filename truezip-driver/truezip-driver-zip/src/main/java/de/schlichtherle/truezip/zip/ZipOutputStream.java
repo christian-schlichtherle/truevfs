@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.zip;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
@@ -24,6 +26,7 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.zip.ZipException;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * Drop-in replacement for
@@ -47,10 +50,12 @@ import java.util.zip.ZipException;
  * <p>
  * This class is thread-safe.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
- * @see ZipFile
+ * @see     ZipFile
  */
+@ThreadSafe
+@DefaultAnnotation(NonNull.class)
 public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
     
     /**
@@ -114,15 +119,16 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
                         ZipOutputStream.super.entries()));
 
             @Override
-			public boolean hasMoreElements() {
+            public boolean hasMoreElements() {
                 return e.hasMoreElements();
             }
 
             @Override
-			public ZipEntry nextElement() {
+            public ZipEntry nextElement() {
                 return e.nextElement().clone();
             }
-        }
+        } // class CloneEnumeration
+
         return new CloneEnumeration();
     }
 
@@ -138,9 +144,9 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
     @Override
     public synchronized Iterator<ZipEntry> iterator() {
         class EntryIterator implements Iterator<ZipEntry> {
-            private final Iterator<ZipEntry> i;
+            final Iterator<ZipEntry> i;
 
-            private EntryIterator() {
+            EntryIterator() {
                 List<ZipEntry> l = new ArrayList<ZipEntry>(ZipOutputStream.super.size());
                 Iterator<ZipEntry> si = ZipOutputStream.super.iterator();
                 while (si.hasNext())
@@ -149,20 +155,21 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
             }
 
             @Override
-			public boolean hasNext() {
+            public boolean hasNext() {
                 return i.hasNext();
             }
 
             @Override
-			public ZipEntry next() {
+            public ZipEntry next() {
                 return i.next().clone();
             }
 
             @Override
-			public void remove() {
+            public void remove() {
                 throw new UnsupportedOperationException();
             }
-        }
+        } // class EntryIterator
+
         return new EntryIterator();
     }
 

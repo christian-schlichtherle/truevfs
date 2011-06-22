@@ -15,11 +15,13 @@
  */
 package de.schlichtherle.truezip.zip;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.charset.Charset;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import java.util.Iterator;
 import de.schlichtherle.truezip.io.LEDataOutputStream;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -30,6 +32,7 @@ import java.util.Map;
 import java.util.zip.CRC32;
 import java.util.zip.Deflater;
 import java.util.zip.ZipException;
+import net.jcip.annotations.NotThreadSafe;
 
 import static de.schlichtherle.truezip.zip.ZipConstants.*;
 import static de.schlichtherle.truezip.zip.ZipEntry.DEFLATED;
@@ -43,9 +46,12 @@ import static de.schlichtherle.truezip.zip.ZipEntry.STORED;
  * <b>Warning:</b> This class is <em>not</em> intended for public use
  * - its API may change at will without prior notification!
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
+ * @see     ZipOutputStream
  */
+@NotThreadSafe
+@DefaultAnnotation(NonNull.class)
 public abstract class RawZipOutputStream<E extends ZipEntry>
 extends DecoratingOutputStream
 implements Iterable<E> {
@@ -93,7 +99,7 @@ implements Iterable<E> {
     private boolean closed;
 
     /** Current entry. */
-    private E entry;
+    private @CheckForNull E entry;
 
     /**
      * Whether or not we need to deflate the current entry.
@@ -111,8 +117,8 @@ implements Iterable<E> {
      *         by this JVM.
      */
     protected RawZipOutputStream(
-            final @NonNull OutputStream out,
-            final @NonNull Charset charset) {
+            final OutputStream out,
+            final Charset charset) {
         super(toLEDataOutputStream(out));
         if (null == out || null == charset)
             throw new NullPointerException();
@@ -133,8 +139,8 @@ implements Iterable<E> {
      *         after its central directory and before its end.
      */
     protected RawZipOutputStream(
-            final @NonNull OutputStream out,
-            final @NonNull RawZipFile<E> appendee)
+            final OutputStream out,
+            final RawZipFile<E> appendee)
     throws ZipException {
         super(new AppendingLEDataOutputStream(out, appendee));
         if (null == out)
@@ -154,7 +160,7 @@ implements Iterable<E> {
 
     /* Adjusts the number of written bytes for appending mode. */
     private static class AppendingLEDataOutputStream extends LEDataOutputStream {
-        public AppendingLEDataOutputStream(OutputStream out, RawZipFile<?> appendee) {
+        AppendingLEDataOutputStream(OutputStream out, RawZipFile<?> appendee) {
             super(out);
             super.written = null == appendee
                     ? 0
@@ -285,7 +291,7 @@ implements Iterable<E> {
      * {@code RawZipOutputStream} is currently writing a ZIP entry.
      */
     public boolean isBusy() {
-        return entry != null;
+        return null != entry;
     }
 
     /**
@@ -385,9 +391,8 @@ implements Iterable<E> {
 
     /** @throws IOException On any I/O related issue. */
     private void writeLocalFileHeader() throws IOException {
-        assert entry != null;
-
         final ZipEntry entry = this.entry;
+        assert null != entry;
         final LEDataOutputStream dos = (LEDataOutputStream) delegate;
         final long crc = entry.getCrc();
         final long csize = entry.getCompressedSize();
@@ -479,7 +484,8 @@ implements Iterable<E> {
     @Override
     public void write(final byte[] b, final int off, final int len)
     throws IOException {
-        if (entry != null) {
+        final E entry = this.entry;
+        if (null != entry) {
             if (len == 0) // let negative values pass for an exception
                 return;
             if (deflate) {
@@ -514,9 +520,9 @@ implements Iterable<E> {
      * @throws IOException On any I/O related issue.
      */
     public void closeEntry() throws IOException {
-        if (entry == null)
+        final E entry = this.entry;
+        if (null == entry)
             return;
-
         switch (entry.getMethod()) {
             case STORED:
                 final long expectedCrc = crc.getValue();
@@ -569,19 +575,17 @@ implements Iterable<E> {
         writeDataDescriptor();
         flush();
         crc.reset();
-        entry = null;
+        this.entry = null;
     }
 
     /**
      * @throws IOException On any I/O related issue.
      */
     private void writeDataDescriptor() throws IOException {
-        final ZipEntry entry = this.entry;
-        assert entry != null;
-
+        final E entry = this.entry;
+        assert null != entry;
         if (!entry.getGeneralBit(3))
             return;
-
         final LEDataOutputStream dos = (LEDataOutputStream) delegate;
         final long crc = entry.getCrc();
         final long csize = entry.getCompressedSize();
@@ -633,8 +637,6 @@ implements Iterable<E> {
     public void finish() throws IOException {
         if (finished)
             return;
-
-        // Order is important here!
         finished = true;
         closeEntry();
         final LEDataOutputStream dos = (LEDataOutputStream) delegate;
@@ -650,8 +652,7 @@ implements Iterable<E> {
      * @throws IOException On any I/O related issue.
      */
     private void writeCentralFileHeader(final ZipEntry entry) throws IOException {
-        assert entry != null;
-
+        assert null != entry;
         final LEDataOutputStream dos = (LEDataOutputStream) delegate;
         final long csize32 = entry.getCompressedSize32();
         final long size32 = entry.getSize32();
@@ -831,8 +832,6 @@ implements Iterable<E> {
     public void close() throws IOException {
         if (closed)
             return;
-
-        // Order is important here!
         closed = true;
         try {
             finish();
@@ -846,14 +845,14 @@ implements Iterable<E> {
      * A Deflater which can be asked for its current deflation level and
      * counts input and output data length as a long integer value.
      */
-    private static class ZipDeflater extends Deflater {
+    private static final class ZipDeflater extends Deflater {
         private int level = Deflater.DEFAULT_COMPRESSION;
 
-        public ZipDeflater() {
+        ZipDeflater() {
             super(Deflater.DEFAULT_COMPRESSION, true);
         }
 
-        public int getLevel() {
+        int getLevel() {
             return level;
         }
 
