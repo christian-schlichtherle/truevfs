@@ -1,0 +1,26 @@
+    -----------------------
+    About
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+About TrueZIP Kernel
+
+    This module implements virtual file systems for contents from
+    arbitrary sources, maintains their state and commits unsynchronized
+    changes of the contents to federated file systems if required or
+    requested.
+    It's also the nexus between federated file system applications and
+    providers.
+
+    The API of this module is more complex to use than the API of the
+    {{{../truezip-file/index.html}TrueZIP File*}}
+    module, but very versatile because of its extensible architecture,
+    e.g. it uses Dependency Injection wherever reasonable.
+    It enables applications to access non-federated file systems other
+    than the platform file system and any member file systems.
+    For example, an application could access an entry within an archive
+    file which is located at a web site using a URI like this:
+    <<<tar.gz:http://acme.com/archive.tar.gz!/entry>>>, provided that
+    the respective file system driver modules TrueZIP Driver HTTP(S)
+    and TrueZIP Driver TAR are available on the class path.
