@@ -29,7 +29,7 @@ import org.junit.Test;
 
 /**
  * @author  Christian Schlichtherle
- * @version $Id: TPathTest.java de01c7642fa4 2011/06/22 22:57:59 christian $
+ * @version $Id$
  */
 public class TPathTest extends TestBase {
 
@@ -318,7 +318,7 @@ public class TPathTest extends TestBase {
                 { "c:/", "c://" },
                 { "c:/foo", "c:/" },
                 { "//foo/bar/", "//foo/bar/" },
-                { "//foo/bar/baz", "//foo/bar/baz" },
+                { "//foo/bar/baz", "//foo/bar/" },
             }) {
                 assertGetRoot(params);
             }
@@ -396,7 +396,7 @@ public class TPathTest extends TestBase {
                 { "//foo/bar/boom", NO_MORE },
                 { "//foo/bar/boom", new String[] { "bang" } },
             }) {
-                assertSegments(params);
+                assertElements(params);
             }
         }
         for (Object[] params : new Object[][] {
@@ -408,11 +408,11 @@ public class TPathTest extends TestBase {
             { "/foo", NO_MORE },
             { "/foo", new String[] { "bar" } },
         }) {
-            assertSegments(params);
+            assertElements(params);
         }
     }
 
-    private static void assertSegments(Object... params) {
+    private static void assertElements(Object... params) {
         final String first = params[0].toString();
         final String[] more = (String[]) params[1];
         final TPath path;
