@@ -271,7 +271,8 @@ public final class TFileSystem extends FileSystem {
      * from the segment parameters to detect prospective archive files using
      * the {@link TPath#getDefaultArchiveDetector() default archive detector}.
      * <p>
-     * The supported separators are "{@link File#separator}" and "{@code /}".
+     * The supported path name separators are "{@link File#separator}" and
+     * "{@code /}".
      * Any leading and trailing separators in the resulting path name get
      * discarded.
      * 

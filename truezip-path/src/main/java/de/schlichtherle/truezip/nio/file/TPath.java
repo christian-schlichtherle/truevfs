@@ -81,7 +81,7 @@ import net.jcip.annotations.Immutable;
  * method {@link #equals(Object)}.
  * 
  * @author  Christian Schlichtherle
- * @version $Id: TPath.java de01c7642fa4 2011/06/22 22:57:59 christian $
+ * @version $Id$
  */
 @Immutable
 @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
@@ -127,7 +127,7 @@ public final class TPath implements Path {
      * <p>
      * If {@code file} is an instance of {@link TFile}, its
      * {@link TFile#getArchiveDetector() archive detector} and
-     * {@link TFile#toFsPath() address} get shared with this instance.
+     * {@link TFile#toFsPath() file system path} get shared with this instance.
      * <p>
      * Otherwise, the {@link File#getPath() path name} of the given file gets
      * scanned to detect prospective archive files using the
@@ -161,7 +161,8 @@ public final class TPath implements Path {
      * from the segment parameters to detect prospective archive files using
      * the {@link #getDefaultArchiveDetector() default archive detector}.
      * <p>
-     * The supported separators are "{@link File#separator}" and "{@code /}".
+     * The supported path name separators are "{@link File#separator}" and
+     * "{@code /}".
      * Any trailing separators in the resulting path name get discarded.
      * 
      * @param first the first sub path string.
@@ -178,7 +179,8 @@ public final class TPath implements Path {
      * from the segment parameters to detect prospective archive files using
      * the {@link #getDefaultArchiveDetector() default archive detector}.
      * <p>
-     * The supported separators are "{@link File#separator}" and "{@code /}".
+     * The supported path name separators are "{@link File#separator}" and
+     * "{@code /}".
      * Any leading and trailing separators in the resulting path name get
      * discarded.
      * 
@@ -439,9 +441,9 @@ public final class TPath implements Path {
     }
 
     /**
-     * Returns an {@link FsPath} for this path with an absolute URI.
+     * Returns a file system path for this path with an absolute URI.
      * 
-     * @return An {@link FsPath} for this path with an absolute URI.
+     * @return A file system path for this path with an absolute URI.
      */
     FsPath getAddress() {
         return this.address;
@@ -471,11 +473,11 @@ public final class TPath implements Path {
     @Override
     public @Nullable TPath getRoot() {
         final URI n = getName();
-        final String p = n.getPath();
-        final int l = pathPrefixLength(n);
-        if (l <= 0 || SEPARATOR_CHAR != p.charAt(l - 1))
+        final String ssp = n.getSchemeSpecificPart();
+        final int l = prefixLength(ssp);
+        if (l <= 0 || SEPARATOR_CHAR != ssp.charAt(l - 1))
             return null;
-        return new TPath(name(p.substring(0, l)), getArchiveDetector(), null);
+        return new TPath(name(ssp.substring(0, l)), getArchiveDetector(), null);
     }
 
     @Override
@@ -510,10 +512,10 @@ public final class TPath implements Path {
      */
     private List<String> getElements() {
         final List<String> elements = this.elements;
-        return null != elements ? elements : (this.elements = getSegments0());
+        return null != elements ? elements : (this.elements = getElements0());
     }
 
-    private List<String> getSegments0() {
+    private List<String> getElements0() {
         final URI n = getName();
         final String p = n.getPath();
         final String[] ss = p.substring(pathPrefixLength(n)).split(SEPARATOR);
@@ -674,13 +676,11 @@ public final class TPath implements Path {
     }
 
     /**
-     * Returns a {@code TFile} object for this path.
+     * Returns a new {@code TFile} object for this path.
      * If this path was constructed by the
-     * {@link #TPath(File) file constructor}, then the returned {@code TFile}
-     * object compares {@link TFile#equals(Object) equal} with this file
-     * object, even if it was a plain {@link File} object.
-     * However, the returned {@code TFile} object is <em>not</em> identical to
-     * this object, even if it was a {@link TFile} object.
+     * {@link #TPath(File) file constructor}, then the returned <em>new</em>
+     * {@code TFile} object compares {@link TFile#equals(Object) equal} with
+     * this file object, even if it was a plain {@link File} object.
      * 
      * @return A {@code TFile} object for this path.
      * @throws UnsupportedOperationException if this path is not file based,
