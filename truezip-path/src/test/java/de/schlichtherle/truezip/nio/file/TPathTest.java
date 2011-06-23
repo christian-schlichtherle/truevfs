@@ -29,7 +29,7 @@ import org.junit.Test;
 
 /**
  * @author  Christian Schlichtherle
- * @version $Id$
+ * @version $Id: TPathTest.java de01c7642fa4 2011/06/22 22:57:59 christian $
  */
 public class TPathTest extends TestBase {
 
@@ -314,17 +314,11 @@ public class TPathTest extends TestBase {
                 // $test, $root
                 //{ "c:", null },
                 //{ "c:foo", null },
-                { "c:\\\\", "c:\\" },
-                { "c:\\", "c:\\\\" },
-                { "c:\\foo", "c:\\" },
-            }) {
-                assertGetRoot(params);
-            }
-        } else {
-            for (String[] params : new String[][] {
-                // $test, $root
-                { "//foo/", "//foo/" },
-                { "//foo/bar", "//foo/" },
+                { "c://", "c:/" },
+                { "c:/", "c://" },
+                { "c:/foo", "c:/" },
+                { "//foo/bar/", "//foo/bar/" },
+                { "//foo/bar/baz", "//foo/bar/baz" },
             }) {
                 assertGetRoot(params);
             }
@@ -360,14 +354,6 @@ public class TPathTest extends TestBase {
                 { "c:/foo/bar", "bar" },
                 { "//foo/bar/", null },
                 { "//foo/bar/baz", "baz" },
-            }) {
-                assertGetFileName(params);
-            }
-        } else {
-            for (String[] params : new String[][] {
-                // $test, $root
-                { "//foo/", null },
-                { "//foo/bar", "bar" },
             }) {
                 assertGetFileName(params);
             }
@@ -409,14 +395,6 @@ public class TPathTest extends TestBase {
                 { "c:/foo", new String[] { "bar" } },
                 { "//foo/bar/boom", NO_MORE },
                 { "//foo/bar/boom", new String[] { "bang" } },
-            }) {
-                assertSegments(params);
-            }
-        } else {
-            for (Object[] params : new Object[][] {
-                // $first, $more
-                { "//foo/bar", NO_MORE },
-                { "//foo/bar", new String[] { "bang" } },
             }) {
                 assertSegments(params);
             }

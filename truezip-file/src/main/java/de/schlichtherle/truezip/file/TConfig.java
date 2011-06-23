@@ -82,7 +82,7 @@ try (TConfig config = TConfig.push()) {
  * 
  * @since   TrueZIP 7.2
  * @author  Christian Schlichtherle
- * @version $Id$
+ * @version $Id: TConfig.java 6086334f333b 2011/06/22 19:54:19 christian $
  */
 @DefaultAnnotation(NonNull.class)
 public final class TConfig implements Closeable {
@@ -285,10 +285,11 @@ public final class TConfig implements Closeable {
         }
 
         @Override
-        protected Deque<TConfig> childValue(Deque<TConfig> parent) {
-            Deque<TConfig> child = new LinkedList<TConfig>();
-            assert !parent.isEmpty();
-            child.push(parent.peek());
+        protected Deque<TConfig> childValue(final Deque<TConfig> parent) {
+            final Deque<TConfig> child = new LinkedList<TConfig>();
+            final TConfig element = parent.peek();
+            if (null != element)
+                child.push(element);
             return child;
         }
     } // class ThreadLocalConfigStack

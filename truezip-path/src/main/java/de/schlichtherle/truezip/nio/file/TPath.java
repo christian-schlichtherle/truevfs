@@ -20,6 +20,7 @@ import de.schlichtherle.truezip.file.TConfig;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.file.TFile;
+import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsEntry;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import de.schlichtherle.truezip.fs.FsInputOption;
@@ -80,7 +81,7 @@ import net.jcip.annotations.Immutable;
  * method {@link #equals(Object)}.
  * 
  * @author  Christian Schlichtherle
- * @version $Id$
+ * @version $Id: TPath.java de01c7642fa4 2011/06/22 22:57:59 christian $
  */
 @Immutable
 @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
@@ -847,6 +848,17 @@ public final class TPath implements Path {
         return getFileSystem().readAttributes(this, type, options);
     }
 
+    /**
+     * The methods in this class use
+     * {@link TPath#getAddress()}.{@link FsPath#getMountPoint()} as an
+     * identifier for the file system in order to avoid creating the
+     * {@link TFileSystem} object for a {@code TPath}.
+     * Creating the file system object usually creates an {@link FsController}
+     * too, which is an expensive operation.
+     * This may cause some unwanted {@link FsMountPoint} parsing when a
+     * {@code TPath} object is just used for resolving another {@code TPath}
+     * object.
+     */
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("SE_COMPARATOR_SHOULD_BE_SERIALIZABLE")
     private static class TPathComparator implements Comparator<TPath> {
         @Override
@@ -855,7 +867,7 @@ public final class TPath implements Path {
         }
 
         boolean equals(TPath p1, TPath p2) {
-            return p1.getFileSystem().equals(p2.getFileSystem())
+            return p1.getAddress().getMountPoint().equals(p2.getAddress().getMountPoint())
                     && p1.toString().equals(p2.toString());
         }
         
@@ -864,12 +876,23 @@ public final class TPath implements Path {
             if (null != hashCode)
                 return hashCode;
             int result = 17;
-            result = 37 * result + p.getFileSystem().hashCode();
+            result = 37 * result + p.getAddress().getMountPoint().hashCode();
             result = 37 * result + p.toString().hashCode();
             return p.hashCode = result;
         }
     }
 
+    /**
+     * The methods in this class use
+     * {@link TPath#getAddress()}.{@link FsPath#getMountPoint()} as an
+     * identifier for the file system in order to avoid creating the
+     * {@link TFileSystem} object for a {@code TPath}.
+     * Creating the file system object usually creates an {@link FsController}
+     * too, which is an expensive operation.
+     * This may cause some unwanted {@link FsMountPoint} parsing when a
+     * {@code TPath} object is just used for resolving another {@code TPath}
+     * object.
+     */
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("SE_COMPARATOR_SHOULD_BE_SERIALIZABLE")
     private static final class WindowsTPathComparator extends TPathComparator {
         @Override
@@ -879,7 +902,7 @@ public final class TPath implements Path {
 
         @Override
         boolean equals(TPath p1, TPath p2) {
-            return p1.getFileSystem().equals(p2.getFileSystem())
+            return p1.getAddress().getMountPoint().equals(p2.getAddress().getMountPoint())
                     && p1.toString().equalsIgnoreCase(p2.toString());
         }
 
@@ -889,7 +912,7 @@ public final class TPath implements Path {
             if (null != hashCode)
                 return hashCode;
             int result = 17;
-            result = 37 * result + p.getFileSystem().hashCode();
+            result = 37 * result + p.getAddress().getMountPoint().hashCode();
             result = 37 * result + p.toString().toLowerCase().hashCode();
             return p.hashCode = result;
         }

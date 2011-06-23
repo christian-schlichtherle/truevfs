@@ -43,7 +43,7 @@ import net.jcip.annotations.NotThreadSafe;
  * {@code de.schlichtherle.truezip.file} instead.
  * 
  * @author  Christian Schlichtherle
- * @version $Id$
+ * @version $Id: TPathScanner.java de01c7642fa4 2011/06/22 22:57:59 christian $
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
@@ -134,10 +134,9 @@ final class TPathScanner {
     static int pathPrefixLength(final URI uri) {
         final String ssp = uri.getSchemeSpecificPart();
         final String a = uri.getAuthority();
-        int pl = Paths.prefixLength(ssp, SEPARATOR_CHAR, true);
-        if (null != a)
-            pl -= 2 + a.length();
-        return pl;
+        final int al = null == a ? 0 : 2 + a.length();
+        final int pl = Paths.prefixLength(ssp, SEPARATOR_CHAR, true) - al;
+        return pl >= 0 ? pl : Paths.prefixLength(uri.getPath(), SEPARATOR_CHAR, false);
     }
 
     static URI checkFix(final URI uri) throws URISyntaxException {
