@@ -68,17 +68,54 @@ import net.jcip.annotations.Immutable;
 /**
  * A {@link Path} implementation
  * based on the TrueZIP Kernel module.
+ * Applications should directly instantiate this class to overcome the
+ * <a href="package-summary.html#fspsl">restrictions</a> of the file system
+ * provider service location in the NIO.2 API for JSE&nbsp;7.
+ * Once created, it's safe to use {@code TPath} instances polymorphically as
+ * {@code Path} instances.
  * <p>
- * Unless explicitly specified, you should <em>not</em> assume that calling
- * the same method on an instance of this class multiple times returns
- * identical objects.
+ * Objects of this class are immutable and inherently volatile because all
+ * virtual file system state is managed by the TrueZIP Kernel module.
  * <p>
- * Note that objects of this class are immutable and inherently volatile
- * because all virtual file system state is managed by the TrueZIP Kernel
- * module.
- * As a consequence, you should never use object identity ('==') to test for
- * equality of objects of this class with another object, but instead use the
- * method {@link #equals(Object)}.
+ * You should never use object identity ('==') to test for equality of objects
+ * of this class with another object.
+ * Use the method {@link #equals(Object)} instead.
+ * <p>
+ * Unless otherwise noted, you should <em>not</em> assume that calling the same
+ * method on an instance of this class multiple times will return the same
+ * object.
+ * <p>
+ * Unless otherwise noted, when an instance of this class is created, the
+ * resulting path name gets scanned for prospective archive files using the
+ * {@link #getDefaultArchiveDetector() default archive detector}.
+ * To change this, wrap the object creation in a code block which
+ * {@link TConfig#push() pushes} a temporary configuration on the inheritbale
+ * thread local stack of configurations as follows:
+ * <pre>{@code
+ *     // Create reference to the current directory.
+ *     TPath directory = new TPath("");
+ *     // This is how you would detect a prospective archive file, supposing
+ *     // the JAR of the module TrueZIP Driver ZIP is present on the run time
+ *     // class path.
+ *     TPath archive = directory.resolve("archive.zip");
+ *     TPath file;
+ *     try (TConfig config = TConfig.push()) {
+ *         config.setArchiveDetector(TArchiveDetector.NULL);
+ *         // Ignore prospective archive file here.
+ *         file = directory.resolve("archive.zip");
+ *     }
+ *     // Once created, the prospective archive file detection does not change
+ *     // because a TPath is immutable.
+ *     assert archive.getArchiveDetector() == TArchiveDetector.ALL;
+ *     assert archive.isArchive();
+ *     assert file.getArchiveDetector() == TArchiveDetector.NULL;
+ *     assert !file.isArchive();
+ * }</pre>
+ * <p>
+ * Mind that you should either use {@code archive} or {@code file} from the 
+ * previous example to do any subsequent I/O - but not both - so that you don't
+ * bypass or corrupt the state which gets implicitly associated with any
+ * archive file by the TrueZIP Kernel module!
  * 
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -101,22 +138,126 @@ public final class TPath implements Path {
     private volatile @CheckForNull List<String> elements;
 
     /**
-     * Constructs a new path from the given path.
+     * Constructs a new path from the given path strings.
      * <p>
-     * This constructor scans the {@link Path#toString() path name} of the
-     * given path to detect prospective archive files using the
+     * The supported path name separators are "{@link File#separator}" and
+     * "{@code /}".
+     * Any trailing separators in the resulting path name get discarded.
+     * <p>
+     * This constructor scans the {@link TPath#toString() path name} resulting
+     * from the segment parameters to detect prospective archive files using
+     * the {@link #getDefaultArchiveDetector() default archive detector}.
+     * 
+     * <h3>Examples</h3>
+<p>On all platforms:</p>
+<dl>
+    <dt>Relative path name:</dt>
+    <dd><code>Path path = new TPath("app.war/WEB-INF/lib", "lib.jar/META-INF/MANIFEST.MF");</code></dd>
+</dl>
+<p>On POSIX platforms (Unix, Linux, Mac OS X):</p>
+<dl>
+    <dt>Absolute path name:</dt>
+    <dd><code>Path path = new TPath("/home/christian/archive.zip");</code></dd>
+</dl>
+<p>On the Windows platform:</p>
+<dl>
+    <dt>Relative path name:</dt>
+    <dd><code>Path path = new TPath("app.war\WEB-INF\lib", "lib.jar\META-INF\MANIFEST.MF");</code></dd>
+    <dt>Absolute path name with C: drive letter and wierd case letters:</dt>
+    <dd><code>Path path = new TPath("c:\UsErS\cHrIsTiAn\ArChIvE.zIp");</code></dd>
+    <dt>Absolute path name with separated UNC host and share name and forward slash separator:</dt>
+    <dd><code>Path path = new TPath("//host", "share", "archive.zip");</code></dd>
+    <dt>Dito with mixed slash separators:</dt>
+    <dd><code>Path path = new TPath("\\host/share\archive.zip");</code></dd>
+</dl>
+     * 
+     * @param first the first sub path string.
+     * @param more optional sub path strings.
+     */
+    public TPath(String first, String... more) {
+        this(name(first, more), null, null);
+    }
+
+    /**
+     * Constructs a new path from the given file system and sub path strings.
+     * <p>
+     * The supported path name separators are "{@link File#separator}" and
+     * "{@code /}".
+     * Any leading and trailing separators in the resulting path name get
+     * discarded.
+     * <p>
+     * This constructor scans the {@link TPath#toString() path name} resulting
+     * from the segment parameters to detect prospective archive files using
+     * the {@link #getDefaultArchiveDetector() default archive detector}.
+     * 
+     * @param fileSystem the file system to access.
+     * @param first the first sub path string.
+     * @param more optional sub path strings.
+     */
+    TPath(final TFileSystem fileSystem, String first, final String... more) {
+        final URI name = name(cutLeadingSeparators(first), more);
+        this.name = name;
+        final TArchiveDetector detector = getDefaultArchiveDetector();
+        this.detector = detector;
+        this.address = new TPathScanner(detector).scan(
+                new FsPath(fileSystem.getMountPoint(), ROOT),
+                name);
+        this.fileSystem = fileSystem;
+
+        assert invariants();
+    }
+
+    /**
+     * Constructs a new path from the given hierarchical URI.
+     * <p>
+     * If the {@link URI#getScheme() scheme component} of the URI is undefined
+     * and the {@link URI#getSchemeSpecificPart() scheme specific part} does
+     * not start with a "{@code /}", then the URI gets resolved against the
+     * "{@code file:}" based URI for the current directory in the platform file
+     * system.
+     * Otherwise, if the scheme component is undefined, then the URI gets
+     * resolved against the URI "{@code file:/}".
+     * <p>
+     * This constructor scans the {@link URI#getPath() path component} of
+     * the URI to detect prospective archive files using the
      * {@link #getDefaultArchiveDetector() default archive detector}.
      * 
-     * @param path a path.
+     * <h3>Examples</h3>
+<p>On all platforms:</p>
+<dl>
+    <dt>Relative URI with relative path component:</dt>
+    <dd><code>Path path = new TPath(new URI("app.war/WEB-INF/lib/lib.jar/META-INF/MANIFEST.MF"));</code></dd>
+    <dt>HTTP URI:</dt>
+    <dd><code>Path path = new TPath(new URI("http://oracle.com/download/everything.zip"));</code></dd>
+</dl>
+<p>On POSIX platforms (Unix, Linux, Mac OS X):</p>
+<dl>
+    <dt>Relative URI with absolute path component:</dt>
+    <dd><code>Path path = new TPath(new URI("/home/christian/archive.zip"));</code></dd>
+    <dt>Dito with absolute, hierarchical URI:</dt>
+    <dd><code>Path path = new TPath(new URI("file:/home/christian/archive.zip"));</code></dd>
+</dl>
+<p>On the Windows platform:</p>
+<dl>
+    <dt>Relative URI with relative path component with C: drive letter and following absolute path name:</dt>
+    <dd><code>Path path = new TPath(new URI("c%3A/Users/christian/archive.zip"));</code></dd>
+    <dt>Dito with absolute, hierarchical URI:</dt>
+    <dd><code>Path path = new TPath(new URI("file:/c:/Users/christian/archive.zip"));</code></dd>
+    <dt>Relative URI with UNC host and share name:</dt>
+    <dd><code>Path path = new TPath(new URI("//host/share/archive.zip"));</code></dd>
+    <dt>Dito with absolute, hierarchical URI:</dt>
+    <dd><code>Path path = new TPath(new URI("file://host/share/archive.zip"));</code></dd>
+</dl>
+     * 
+     * @param  name the path name.
+     *         This must be a hierarchical URI with an undefined fragment
+     *         component.
+     *         Any trailing separators in the path component get discarded.
+     * @throws IllegalArgumentException if the preconditions for the parameter
+     *         do not hold.
      */
-    public TPath(Path path) {
-        this(   path instanceof TPath
-                    ? ((TPath) path).getName()
-                    : name(path.toString().replace(
-                        path.getFileSystem().getSeparator(),
-                        separator)),
-                null,
-                null);
+    public TPath(URI name) {
+        this(name, null, null);
     }
 
     /**
@@ -129,9 +270,30 @@ public final class TPath implements Path {
      * {@link TFile#getArchiveDetector() archive detector} and
      * {@link TFile#toFsPath() file system path} get shared with this instance.
      * <p>
-     * Otherwise, the {@link File#getPath() path name} of the given file gets
-     * scanned to detect prospective archive files using the
+     * Otherwise, this constructor scans the {@link File#getPath() path name}
+     * of the file to detect prospective archive files using the
      * {@link #getDefaultArchiveDetector() default archive detector}.
+     * 
+     * <h3>Examples</h3>
+<p>On all platforms:</p>
+<dl>
+    <dt>Relative path name:</dt>
+    <dd><code>Path path = new TPath(new File("app.war/WEB-INF/lib", "lib.jar/META-INF/MANIFEST.MF"));</code></dd>
+</dl>
+<p>On POSIX platforms (Unix, Linux, Mac OS X):</p>
+<dl>
+    <dt>Absolute path name with plain {@code File}:</dt>
+    <dd><code>Path path = new TPath(new File("/home/christian/archive.zip"));</code></dd>
+    <dt>Absolute path name with plain {@link de.schlichtherle.truezip.file.TFile}:</dt>
+    <dd><code>Path path = new TPath(new TFile("/home/christian/archive.zip"));</code></dd>
+</dl>
+<p>On the Windows platform:</p>
+<dl>
+    <dt>Absolute path name with plain {@code File}:</dt>
+    <dd><code>Path path = new TPath(new File("c:\home\christian\archive.zip"));</code></dd>
+    <dt>Absolute path name with {@link de.schlichtherle.truezip.file.TFile}:</dt>
+    <dd><code>Path path = new TPath(new TFile("c:\home\christian\archive.zip"));</code></dd>
+</dl>
      * 
      * @param file a file.
      *        If this is an instance of {@link TFile}, its
@@ -155,76 +317,29 @@ public final class TPath implements Path {
     }
 
     /**
-     * Constructs a new path from the given sub path strings.
+     * Constructs a new path from the given path.
      * <p>
-     * This constructor scans the {@link TPath#toString() path name} resulting
-     * from the segment parameters to detect prospective archive files using
-     * the {@link #getDefaultArchiveDetector() default archive detector}.
-     * <p>
-     * The supported path name separators are "{@link File#separator}" and
-     * "{@code /}".
-     * Any trailing separators in the resulting path name get discarded.
-     * 
-     * @param first the first sub path string.
-     * @param more optional sub path strings.
-     */
-    public TPath(String first, String... more) {
-        this(name(first, more), null, null);
-    }
-
-    /**
-     * Constructs a new path from the given file system and sub path strings.
-     * <p>
-     * This constructor scans the {@link TPath#toString() path name} resulting
-     * from the segment parameters to detect prospective archive files using
-     * the {@link #getDefaultArchiveDetector() default archive detector}.
-     * <p>
-     * The supported path name separators are "{@link File#separator}" and
-     * "{@code /}".
-     * Any leading and trailing separators in the resulting path name get
-     * discarded.
-     * 
-     * @param fileSystem the file system to access.
-     * @param first the first sub path string.
-     * @param more optional sub path strings.
-     */
-    TPath(final TFileSystem fileSystem, String first, final String... more) {
-        final URI name = name(cutLeadingSeparators(first), more);
-        this.name = name;
-        final TArchiveDetector detector = getDefaultArchiveDetector();
-        this.detector = detector;
-        this.address = new TPathScanner(detector).scan(
-                new FsPath(fileSystem.getMountPoint(), ROOT),
-                name);
-        this.fileSystem = fileSystem;
-
-        assert invariants();
-    }
-
-    /**
-     * Constructs a new path from the given hierarchical URI.
-     * <p>
-     * This constructor scans the {@link URI#getPath() path component} of
-     * the URI to detect prospective archive files using the
+     * This constructor scans the {@link Path#toString() path name} of the
+     * given path to detect prospective archive files using the
      * {@link #getDefaultArchiveDetector() default archive detector}.
-     * <p>
-     * If the {@link URI#getScheme() scheme component} of the URI is undefined
-     * and the {@link URI#getSchemeSpecificPart() scheme specific part} does
-     * not start with a "{@code /}", then the URI gets resolved against the
-     * "{@code file:}" based URI for the current directory in the platform file
-     * system.
-     * Otherwise, if the scheme component is undefined, then the URI gets
-     * resolved against the URI "{@code file:/}".
      * 
-     * @param  name the path name.
-     *         This must be a hierarchical URI with an undefined fragment
-     *         component.
-     *         Any trailing separators in the path component get discarded.
-     * @throws IllegalArgumentException if the preconditions for the parameter
-     *         do not hold.
+     * <h3>Examples</h3>
+<p>On all platforms:</p>
+<dl>
+    <dt>Relative path name:</dt>
+    <dd><code>Path path = new TPath(Paths.get("app.war/WEB-INF/lib", "lib.jar/META-INF/MANIFEST.MF"));</code></dd>
+</dl>
+     * 
+     * @param path a path.
      */
-    public TPath(URI name) {
-        this(name, null, null);
+    public TPath(Path path) {
+        this(   path instanceof TPath
+                    ? ((TPath) path).getName()
+                    : name(path.toString().replace(
+                        path.getFileSystem().getSeparator(),
+                        separator)),
+                null,
+                null);
     }
 
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("ES_COMPARING_STRINGS_WITH_EQ")

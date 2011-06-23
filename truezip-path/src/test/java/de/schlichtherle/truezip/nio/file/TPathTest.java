@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.nio.file;
 
+import de.schlichtherle.truezip.file.TArchiveDetector;
+import de.schlichtherle.truezip.file.TConfig;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.io.Paths;
@@ -441,5 +443,28 @@ public class TPathTest extends TestBase {
 
     private static String stripPrefix(final String s) {
         return s.substring(Paths.prefixLength(s, SEPARATOR_CHAR, true));
+    }
+
+    @Test
+    public void testConfiguration() {
+        // Create reference to the current directory.
+        TPath directory = new TPath("");
+        // This is how you would detect a prospective archive file.
+        TPath archive = directory.resolve("archive.mok");
+        TPath file;
+        TConfig config = TConfig.push();
+        try {
+            config.setArchiveDetector(TArchiveDetector.NULL);
+            // Ignore prospective archive file here.
+            file = directory.resolve("archive.mok");
+        } finally {
+            config.close();
+        }
+        // Once created, the prospective archive file detection does not change
+        // because a TPath is immutable.
+        assert archive.getArchiveDetector() == detector;
+        assert archive.isArchive();
+        assert file.getArchiveDetector() == TArchiveDetector.NULL;
+        assert !file.isArchive();
     }
 }
