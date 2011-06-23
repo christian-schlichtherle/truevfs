@@ -21,6 +21,7 @@ import de.schlichtherle.truezip.util.ArrayHelper;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import java.io.File;
+import static java.io.File.*;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import de.schlichtherle.truezip.fs.FsController;
@@ -53,7 +54,6 @@ import static org.junit.Assert.*;
  * Performs a functional test of a particular FsArchiveDriver by using the
  * API of the TrueZIP File* module.
  *
- * @see     TFileTestSuite TestSuite for the TrueZIP Path API.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -210,7 +210,6 @@ public abstract class TFileTestSuite extends TestBase {
         archive.rm();
     }
 
-    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     private void assertFalsePositive(final TFile file) throws IOException {
         assert file.isArchive();
 
@@ -264,13 +263,16 @@ public abstract class TFileTestSuite extends TestBase {
         assertTrue(file.lastModified() > 0);
 
         try {
-            new TFileInputStream(archive);
-            fail();
-        } catch (FileNotFoundException expected) {
+            new TFileInputStream(archive).close();
+            if ('\\' == separatorChar)
+                fail();
+        } catch (FileNotFoundException ex) {
+            if ('\\' != separatorChar && !archive.isArchive() && !archive.isEntry())
+                throw ex;
         }
 
         try {
-            new TFileOutputStream(archive);
+            new TFileOutputStream(archive).close();
             fail();
         } catch (FileNotFoundException expected) {
         }
@@ -288,13 +290,16 @@ public abstract class TFileTestSuite extends TestBase {
         assertTrue(file.lastModified() > 0);
 
         try {
-            new TFileInputStream(archive);
-            fail();
-        } catch (FileNotFoundException expected) {
+            new TFileInputStream(archive).close();
+            if ('\\' == separatorChar)
+                fail();
+        } catch (FileNotFoundException ex) {
+            if ('\\' != separatorChar && !archive.isArchive())
+                throw ex;
         }
 
         try {
-            new TFileOutputStream(archive);
+            new TFileOutputStream(archive).close();
             fail();
         } catch (FileNotFoundException expected) {
         }
@@ -361,7 +366,11 @@ public abstract class TFileTestSuite extends TestBase {
         assertTrue(dir.exists());
         assertTrue(dir.isDirectory());
         assertFalse(dir.isFile());
-        //assertEquals(0, dir.length());
+        if (dir instanceof TFile) {
+            final TFile tdir = (TFile) dir;
+            if (tdir.isArchive() || tdir.isEntry())
+                assertEquals(0, dir.length());
+        }
         
         assertTrue(file1.createNewFile());
         assertTrue(file1.exists());
@@ -411,17 +420,19 @@ public abstract class TFileTestSuite extends TestBase {
         }
     }
 
-    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     private void assertIllegalDirectoryOperations(final TFile dir)
     throws IOException {
         assert dir.isDirectory();
         try {
-            new TFileInputStream(dir);
-            fail();
-        } catch (FileNotFoundException expected) {
+            new TFileInputStream(dir).close();
+            if ('\\' == separatorChar)
+                fail();
+        } catch (FileNotFoundException ex) {
+            if ('\\' != separatorChar && !dir.isArchive() && !dir.isEntry())
+                throw ex;
         }
         try {
-            new TFileOutputStream(dir);
+            new TFileOutputStream(dir).close();
             fail();
         } catch (FileNotFoundException expected) {
         }
@@ -529,7 +540,7 @@ public abstract class TFileTestSuite extends TestBase {
         final InputStream in1 = new TFileInputStream(file1);
         try {
             try {
-                new TFileInputStream(file2);
+                new TFileInputStream(file2).close();
                 fail("Expected exception when reading an unsynchronized entry of a busy archive file!");
             } catch (FileNotFoundException ex) {
                 if (!(ex.getCause() instanceof FsSyncException)
@@ -587,8 +598,6 @@ public abstract class TFileTestSuite extends TestBase {
         assertFalse(file1.exists());
     }
 
-    @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OS_OPEN_STREAM")
     @Test
     public final void testBusyFileOutputStream() throws IOException {
         TFile file1 = new TFile(archive, "file1");
@@ -619,7 +628,7 @@ public abstract class TFileTestSuite extends TestBase {
         
         // out is still open!
         try {
-            new TFileOutputStream(file1);
+            new TFileOutputStream(file1).close();
             fail("Expected synchronization exception when overwriting an unsynchronized entry of a busy archive file!");
         } catch (FileNotFoundException ex) {
             if (!(ex.getCause() instanceof FsSyncException)
@@ -629,7 +638,7 @@ public abstract class TFileTestSuite extends TestBase {
 
         // out is still open!
         try {
-            new TFileOutputStream(file2);
+            new TFileOutputStream(file2).close();
         } catch (FileNotFoundException ex) {
             if (!(ex.getCause() instanceof FsSyncException)
                     || !(ex.getCause().getCause() instanceof FileBusyException))
