@@ -316,7 +316,7 @@ public final class Paths {
             final char separatorChar,
             final boolean inclUNC) {
         final int pathLen = path.length();
-        if (0 >= pathLen)
+        if (pathLen <= 0)
             return 0;
         char c = path.charAt(0);
         if ('\\' == File.separatorChar) {
