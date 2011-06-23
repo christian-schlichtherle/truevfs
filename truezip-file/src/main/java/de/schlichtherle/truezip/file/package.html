@@ -24,5 +24,17 @@
             directories in a file system path by means of the
             <code>TFile*</code> classes and their dependent classes.
         </p>
+        <p>
+            This is the primary API for JSE&nbsp;6 compliant TrueZIP applications:
+            In contrast to the TrueZIP Kernel API, this API is designed to be
+            easy to learn and convenient to use while providing a great level
+            of flexibility.
+            However, due to its file-based URI addressing scheme, it can only
+            access the platform file system and any archive files within the
+            platform file system.
+            If you need to access other (virtual) file systems, e.g. HTTP(S),
+            then please consider using the TrueZIP Path API or the TrueZIP
+            Kernel API instead.
+        </p>
     </body>
 </html>
