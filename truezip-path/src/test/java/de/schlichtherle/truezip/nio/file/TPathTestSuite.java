@@ -39,6 +39,7 @@ import de.schlichtherle.truezip.socket.OutputClosedException;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import static java.io.File.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -189,7 +190,6 @@ public abstract class TPathTestSuite extends TestBase {
         delete(archive);
     }
 
-    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     private void assertFalsePositive(final TPath file) throws IOException {
         assert file.isArchive();
 
@@ -243,13 +243,16 @@ public abstract class TPathTestSuite extends TestBase {
         assertTrue(getLastModifiedTime(file).toMillis() > 0);
 
         try {
-            newInputStream(archive);
-            fail();
-        } catch (IOException expected) {
+            newInputStream(archive).close();
+            if ('\\' == separatorChar)
+                fail();
+        } catch (IOException ex) {
+            if ('\\' != separatorChar && !archive.isArchive())
+                throw ex;
         }
 
         try {
-            newOutputStream(archive);
+            newOutputStream(archive).close();
             fail();
         } catch (IOException expected) {
         }
@@ -267,13 +270,16 @@ public abstract class TPathTestSuite extends TestBase {
         assertTrue(getLastModifiedTime(file).toMillis() > 0);
 
         try {
-            newInputStream(archive);
-            fail();
-        } catch (IOException expected) {
+            newInputStream(archive).close();
+            if ('\\' == separatorChar)
+                fail();
+        } catch (IOException ex) {
+            if ('\\' != separatorChar && !archive.isArchive() && !archive.isEntry())
+                throw ex;
         }
 
         try {
-            newOutputStream(archive);
+            newOutputStream(archive).close();
             fail();
         } catch (IOException expected) {
         }
@@ -348,7 +354,11 @@ public abstract class TPathTestSuite extends TestBase {
         assertTrue(exists(dir));
         assertTrue(isDirectory(dir));
         assertFalse(isRegularFile(dir));
-        assertEquals(0, size(dir));
+        if (dir instanceof TPath) {
+            final TPath tdir = (TPath) dir;
+            if (tdir.isArchive() || tdir.isEntry())
+                assertEquals(0, size(dir));
+        }
         
         createFile(file1);
         assertTrue(exists(file1));
@@ -406,17 +416,19 @@ public abstract class TPathTestSuite extends TestBase {
         }
     }
 
-    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     private void assertIllegalDirectoryOperations(final TPath dir)
     throws IOException {
         assert isDirectory(dir);
         try {
-            newInputStream(dir);
-            fail();
-        } catch (IOException expected) {
+            newInputStream(dir).close();
+            if ('\\' == separatorChar)
+                fail();
+        } catch (IOException ex) {
+            if ('\\' != separatorChar && !dir.isArchive() && !dir.isEntry())
+                throw ex;
         }
         try {
-            newOutputStream(dir);
+            newOutputStream(dir).close();
             fail();
         } catch (IOException expected) {
         }
@@ -520,8 +532,6 @@ public abstract class TPathTestSuite extends TestBase {
         }
     }
     
-    @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OS_OPEN_STREAM")
     @Test
     public final void testBusyFileInputStream() throws IOException {
         final TPath file1 = archive.resolve("file1");
@@ -592,8 +602,6 @@ public abstract class TPathTestSuite extends TestBase {
         assertFalse(exists(file1));
     }
 
-    @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OS_OPEN_STREAM")
     @Test
     public final void testBusyFileOutputStream() throws IOException {
         TPath file1 = archive.resolve("file1");
@@ -624,7 +632,7 @@ public abstract class TPathTestSuite extends TestBase {
         
         // out is still open!
         try {
-            newOutputStream(file1);
+            newOutputStream(file1).close();
             fail("Expected synchronization exception when overwriting an unsynchronized entry of a busy archive file!");
         } catch (FsSyncException ex) {
             if (!(ex.getCause() instanceof FileBusyException))
@@ -633,7 +641,7 @@ public abstract class TPathTestSuite extends TestBase {
 
         // out is still open!
         try {
-            newOutputStream(file2);
+            newOutputStream(file2).close();
         } catch (FsSyncException ex) {
             if (!(ex.getCause() instanceof FileBusyException))
                     throw ex;
