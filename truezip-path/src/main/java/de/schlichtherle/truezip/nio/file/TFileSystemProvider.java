@@ -80,8 +80,14 @@ import static java.util.logging.Level.*;
 @DefaultAnnotation(NonNull.class)
 public final class TFileSystemProvider extends FileSystemProvider {
 
-    private static final String DEFAULT_SCHEME = "tpath";
-    private static final URI ROOT_DIRECTORY = URI.create("file:/");
+    /** The scheme of the provider for the public no-arg constructor. */
+    public  static final String DEFAULT_SCHEME = "tpath";
+
+    /** The root mount point of the provider for the public no-arg constructor. */
+    public static final String DEFAULT_ROOT_MOUNT_POINT = "file:/";
+
+    private static final URI DEFAULT_ROOT_MOUNT_POINT_URI
+            = URI.create(DEFAULT_ROOT_MOUNT_POINT);
     private static final FsManager manager = FsManagerLocator.SINGLETON.get();
     private static final Map<String, TFileSystemProvider>
             providers = new WeakHashMap<String, TFileSystemProvider>();
@@ -100,9 +106,9 @@ public final class TFileSystemProvider extends FileSystemProvider {
      */
     static synchronized TFileSystemProvider get(URI name) {
         if (!TPathScanner.isAbsolute(name))
-            return Holder.CURRENT_DIRECTORY;
+            return Holder.CURRENT_DIRECTORY_PROVIDER;
         if (!name.isAbsolute())
-            name = ROOT_DIRECTORY;
+            name = DEFAULT_ROOT_MOUNT_POINT_URI;
         String scheme = name.getScheme();
         TFileSystemProvider provider = providers.get(scheme);
         if (null != provider)
@@ -113,25 +119,27 @@ public final class TFileSystemProvider extends FileSystemProvider {
     }
 
     /**
-     * Do <em>NOT</em> call this constructor - it's solely provided in order
-     * to use this file system provider class with the service loading feature
-     * of NIO.2!
+     * Constructs a new TrueZIP file system provider which is identified by the
+     * URI {@link #getScheme() scheme} {@value #DEFAULT_SCHEME} for accessing
+     * any path within the {@link #getRoot() root mount point} URI
+     * {@value #DEFAULT_ROOT_MOUNT_POINT}.
      * <p>
-     * The resulting file system provider is identified by the
-     * {@link #getScheme() scheme} {@code tpath}.
+     * Do <em>NOT</em> call this constructor directly - it's solely provided in
+     * order to use this file system provider class with the service location
+     * feature of the NIO.2 API!
      * 
-     * @deprecated do <em>NOT</em> call this constructor!
+     * @deprecated Do <em>NOT</em> call this constructor directly!
      */
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
     @SuppressWarnings("LeakingThisInConstructor")
     @Deprecated
     public TFileSystemProvider() {
-        this(DEFAULT_SCHEME, ROOT_DIRECTORY);
+        this(DEFAULT_SCHEME, DEFAULT_ROOT_MOUNT_POINT_URI);
         synchronized (TFileSystemProvider.class) {
             providers.put(scheme, this);
         }
         Logger  .getLogger(TFileSystemProvider.class.getName())
-                .log(CONFIG, "Installed TrueZIP default file system provider");
+                .log(CONFIG, "Installed TrueZIP file system provider instance.");
     }
 
     private TFileSystemProvider(final String scheme, final URI root) {
@@ -178,7 +186,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
      * 
      * @return The root mount point of this provider.
      */
-    FsPath getRoot() {
+    public FsPath getRoot() {
         return root;
     }
 
@@ -508,7 +516,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
 
     private static final class Holder {
         static final TFileSystemProvider
-            CURRENT_DIRECTORY = new TFileSystemProvider(
+            CURRENT_DIRECTORY_PROVIDER = new TFileSystemProvider(
                 "file", new File("").toURI());
 
         private Holder() {

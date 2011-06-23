@@ -43,7 +43,7 @@ import net.jcip.annotations.NotThreadSafe;
  * {@code de.schlichtherle.truezip.file} instead.
  * 
  * @author  Christian Schlichtherle
- * @version $Id: TPathScanner.java de01c7642fa4 2011/06/22 22:57:59 christian $
+ * @version $Id$
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
@@ -161,7 +161,8 @@ final class TPathScanner {
     }
 
     static boolean isAbsolute(URI uri) {
-        return Paths.isAbsolute(uri.getSchemeSpecificPart(), SEPARATOR_CHAR);
+        return uri.isAbsolute() || Paths.isAbsolute(
+                uri.getSchemeSpecificPart(), SEPARATOR_CHAR);
     }
 
     /**
