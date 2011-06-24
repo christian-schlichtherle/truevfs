@@ -3,23 +3,24 @@
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
     <properties>
-        <title>Tutorial</title>
+        <title>The TrueZIP 6 Tutorial</title>
         <author>Christian Schlichtherle</author>
     </properties>
     <body>
-        <h1>Obsolescence Notice</h1>
-        <p><em>The version described in this document is
-            <strong>obsolete</strong> and should not be used for new
-            applications anymore.</em></p>
-        <p>The links to the Javadoc in this document are non-functional
-            because the package names have been changed in TrueZIP 7.
-            The Javadoc for TrueZIP 6.8.2 is now available for download via
-            <a href="http://repo1.maven.org/maven2/de/schlichtherle/truezip/">Maven Central</a>.</p>
-        <h1>The TrueZIP 6 Tutorial</h1>
-        <h1>Contents</h1>
-        <macro name="toc">
-            <param name="fromDepth" value="1"/>
-        </macro>
+        <section name="Obsolescence Notice">
+	        <p><em>The version described in this document is
+	            <strong>obsolete</strong> and should not be used for new
+	            applications anymore.</em></p>
+	        <p>The links to the Javadoc in this document are non-functional
+	            because the package names have been changed in TrueZIP 7.
+	            The Javadoc for TrueZIP 6.8.2 is now available for download via
+	            <a href="http://repo1.maven.org/maven2/de/schlichtherle/truezip/">Maven Central</a>.</p>
+        </section>
+        <section name="Contents">
+	        <macro name="toc">
+	            <param name="fromDepth" value="1"/>
+	        </macro>
+        </section>
         <section name="Introduction">
             <p>Key Claims:</p>
             <ol>
