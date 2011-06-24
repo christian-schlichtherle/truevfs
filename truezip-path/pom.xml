@@ -31,7 +31,7 @@
         thread-safe, read/write access to archive files as if they were just
         plain directories in a file system path.
         It also provides the TFileSystemProviderc class to implement a file
-        system provider for the NIO.2 API in JSE&nbsp;7.
+        system provider for the NIO.2 API in JSE 7.
     </description>
 
     <dependencies>
