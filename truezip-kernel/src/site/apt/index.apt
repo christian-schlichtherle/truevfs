@@ -1,0 +1,30 @@
+    -----------------------
+    About
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+About TrueZIP Kernel
+
+    This module implements virtual file systems from arbitrary resources,
+    manages their state and commits unsynchronized changes if required or
+    requested.
+    The TrueZIP Kernel uses file system drivers to access these resources.
+    It provides multithreading, multiplexing, caching and buffering so that
+    the file system drivers do not need to take care of this.
+
+    In contrast to the modules
+    {{{../truezip-path/index.html}TrueZIP Path}}
+    or
+    {{{../truezip-file/index.html}TrueZIP File*}},
+    the API of this module is more complex to use, yet very extensible because
+    it relies on Dependency Injection for the resolution of
+    {{{../apidocs/de/schlichtherle/truezip/fs/FsDriver.html}file system drivers}}
+    and
+    {{{../apidocs/de/schlichtherle/truezip/socket/IOPool.html}I/O entry pools}}.
+    It also provides service locators for
+    {{{../apidocs/de/schlichtherle/truezip/fs/sl/FsDriverLocator.html}file system driver providers}}
+    and
+    {{{../apidocs/de/schlichtherle/truezip/socket/sl/IOPoolLocator.html}I/O entry pool providers}}
+    in order to enable applications to resolve these dependencies easily at
+    runtime.
