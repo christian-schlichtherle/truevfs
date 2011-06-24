@@ -29,7 +29,7 @@ import static de.schlichtherle.truezip.zip.ZipConstants.*;
  * It defines the common properties of all Extra Fields and how to
  * serialize/deserialize them to/from byte arrays.
  * 
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @NotThreadSafe
@@ -47,7 +47,6 @@ abstract class ExtraField {
      * use with the static factory method {@link #create}.
      * 
      * @param  c the implementation class of this abstract base class.
-     * @throws NullPointerException if {@code c} is {@code null}.
      * @throws IllegalArgumentException if {@code c} cannot get instantiated,
      *         is not a subclass of {@code ExtraField} or its Header ID is out
      *         of range.
@@ -75,12 +74,12 @@ abstract class ExtraField {
      * The returned Extra Field still requires proper initialization, for
      * example by calling {@link #readFrom}.
      * 
-     * @param headerID An unsigned short integer (two bytes) which indicates
-     *        the type of the returned Extra Field.
-     * @return A new Extra Field - never {@code null}!
+     * @param  headerID An unsigned short integer (two bytes) which indicates
+     *         the type of the returned Extra Field.
+     * @return A new Extra Field
      * @throws IllegalArgumentException If {@code headerID} is out of
      *         range.
-     * @see #register
+     * @see    #register
      */
     public static ExtraField create(final int headerID) {
         UShort.check(headerID, "Header ID out of range", null);
@@ -119,7 +118,6 @@ abstract class ExtraField {
 
     /**
      * Returns a protective copy of the Data Block.
-     * {@code null} is never returned.
      * 
      * @see #getDataSize
      */
@@ -141,16 +139,16 @@ abstract class ExtraField {
      * Upon return, this Extra Field shall not access {@code data}
      * subsequently and {@link #getDataSize} must equal {@code size}.
      *
-     * @param data The byte array to read the Data Block from.
-     * @param off The zero based offset in the byte array where the first byte
-     *        of the Data Block is read from.
-     * @param size The length of the Data Block in bytes.
+     * @param  data The byte array to read the Data Block from.
+     * @param  off The zero based offset in the byte array where the first byte
+     *         of the Data Block is read from.
+     * @param  size The length of the Data Block in bytes.
      * @throws IndexOutOfBoundsException If the byte array
      *         {@code data} does not hold at least {@code size}
      *         bytes at the zero based offset {@code off}.
      * @throws RuntimeException If {@code size} is illegal or the
      *         deserialized Data Block contains illegal data.
-     * @see #getDataSize
+     * @see    #getDataSize
      */
     abstract void readFrom(byte[] data, int off, int size);
 
@@ -160,13 +158,13 @@ abstract class ExtraField {
      * Upon return, this Extra Field shall not access {@code data}
      * subsequently.
      *
-     * @param data The byte array to write the Data Block to.
-     * @param off The zero based offset in the byte array where the first byte
-     *        of the Data Block is written to.
+     * @param  data The byte array to write the Data Block to.
+     * @param  off The zero based offset in the byte array where the first byte
+     *         of the Data Block is written to.
      * @throws IndexOutOfBoundsException If the byte array
      *         {@code data} does not hold at least {@link #getDataSize}
      *         bytes at the zero based offset {@code off}.
-     * @see #getDataSize
+     * @see    #getDataSize
      */
     abstract void writeTo(byte[] data, int off);
 }

@@ -54,6 +54,7 @@ public final class ExtraFieldTest {
     public void testCreate() {
         ExtraField ef;
 
+        ExtraField.register(NullExtraField.class);
         ef = ExtraField.create(0x0000);
         assertTrue(ef instanceof NullExtraField);
         assertEquals(0x0000, ef.getHeaderID());
