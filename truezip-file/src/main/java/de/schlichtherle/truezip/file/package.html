@@ -29,9 +29,29 @@
             In contrast to the TrueZIP Kernel API, this API is designed to be
             easy to learn and convenient to use while providing a great level
             of flexibility.
-            However, due to its file-based URI addressing scheme, it can only
-            access the platform file system and any archive files within the
-            platform file system.
+        </p>
+        <p>
+            For example, an application could access an entry within an archive
+            file using a {@code TFile} like this:
+        </p>
+        <pre><code>
+    File file = new TFile("archive.tar.gz/README.TXT");
+    InputStream in = new TFileInputStream(file);
+    try {
+        // Read the file contents here.
+        ...
+    } finally {
+        in.close();
+    }
+        </code></pre>
+        <p>
+            This example requires that the JARs of the file system driver
+            modules TrueZIP Driver File and TrueZIP Driver TAR are present
+            on the run time class path.
+        </p>
+        <p>
+            Note that this API can only access the platform file system and any
+            archive files within the platform file system.
             If you need to access other (virtual) file systems, e.g. HTTP(S),
             then please consider using the TrueZIP Path API or the TrueZIP
             Kernel API instead.
