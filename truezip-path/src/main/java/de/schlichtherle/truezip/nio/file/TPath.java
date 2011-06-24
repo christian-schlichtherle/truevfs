@@ -91,6 +91,7 @@ import net.jcip.annotations.Immutable;
  * To change this, wrap the object creation in a code block which
  * {@link TConfig#push() pushes} a temporary configuration on the inheritbale
  * thread local stack of configurations as follows:
+ * </p>
  * <pre>{@code
  *     // Create reference to the current directory.
  *     TPath directory = new TPath("");
@@ -228,7 +229,7 @@ public final class TPath implements Path {
     <dt>Relative URI with relative path component:</dt>
     <dd><code>Path path = new TPath(new URI("app.war/WEB-INF/lib/lib.jar/META-INF/MANIFEST.MF"));</code></dd>
     <dt>HTTP URI:</dt>
-    <dd><code>Path path = new TPath(new URI("http://oracle.com/download/everything.zip"));</code></dd>
+    <dd><code>Path path = new TPath(new URI("http://acme.com/download/everything.tar.gz/README.TXT"));</code></dd>
 </dl>
 <p>On POSIX platforms (Unix, Linux, Mac OS X):</p>
 <dl>
