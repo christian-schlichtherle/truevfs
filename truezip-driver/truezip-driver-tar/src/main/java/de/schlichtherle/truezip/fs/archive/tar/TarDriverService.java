@@ -25,6 +25,7 @@ import net.jcip.annotations.Immutable;
 /**
  * An immutable container of a map of drivers for the TAR file format.
  * The map provided by this service consists of the following entries:
+ * <p>
 <table border=1 cellpadding=5 summary="">
 <thead>
 <tr>

@@ -27,6 +27,7 @@ import net.jcip.annotations.Immutable;
  * An immutable container of a map with a driver for accessing the {@code file}
  * scheme.
  * The map provided by this service consists of the following entries:
+ * <p>
 <table border=1 cellpadding=5 summary="">
 <thead>
 <tr>
