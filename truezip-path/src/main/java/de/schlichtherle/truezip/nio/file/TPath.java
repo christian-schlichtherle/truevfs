@@ -787,7 +787,7 @@ public final class TPath implements Path {
 
     @Override
     public TPath toRealPath(LinkOption... options) throws IOException {
-        // FIXME: scan symlinks!
+        // TODO: scan symlinks!
         return new TPath(toUri(), getArchiveDetector(), getAddress());
     }
 
