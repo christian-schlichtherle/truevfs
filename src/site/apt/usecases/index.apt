@@ -9,9 +9,8 @@ Use Cases
     This section shows some typical use cases for TrueZIP.
     Each use case is an independent story which should be comprehendible
     without prior knowledge of TrueZIP.
-    Please blame me on the {{{../mail-lists.html}Users Mailing List}} if it's not.
-
-    Following is a non-exclusive list of typical uses cases for the TrueZIP API:
+    Note that these stories have been written with the TrueZIP File* API in
+    mind, but using the TrueZIP Path API would be equally possible:
 
     * {{{./aff.html}Application File Format}}
 
