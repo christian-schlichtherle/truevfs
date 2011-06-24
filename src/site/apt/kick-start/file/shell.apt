@@ -199,6 +199,8 @@ $ mvn exec:java -Dexec.mainClass=com.company.project.Tree
 |           `-- com
 |               `-- company
 |                   `-- project
+|                       |-- Application.java
+|                       |-- Cat.java
 |                       |-- Copy.java
 |                       |-- Pickr.java
 |                       `-- Tree.java
@@ -207,6 +209,8 @@ $ mvn exec:java -Dexec.mainClass=com.company.project.Tree
     |   `-- com
     |       `-- company
     |           `-- project
+    |               |-- Application.class
+    |               |-- Cat.class
     |               |-- Copy.class
     |               |-- Pickr.class
     |               `-- Tree.class
@@ -225,6 +229,8 @@ $ mvn exec:java -Dexec.mainClass=com.company.project.Tree
     |   `-- com
     |       `-- company
     |           `-- project
+    |               |-- Application.class
+    |               |-- Cat.class
     |               |-- Copy.class
     |               |-- Pickr.class
     |               `-- Tree.class
