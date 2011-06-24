@@ -11,7 +11,7 @@ About TrueZIP File*
     read/write access to archive files as if they were just plain
     directories in a file system path.
 
-    This is the primary API for JSE&nbsp;6 compliant TrueZIP applications:
+    This is the primary API for JSE 6 compliant TrueZIP applications:
     In contrast to the {{{../truezip-kernel/index.html}TrueZIP Kernel}} API,
     this API is designed to be easy to learn and convenient to use while
     providing a great level of flexibility.
