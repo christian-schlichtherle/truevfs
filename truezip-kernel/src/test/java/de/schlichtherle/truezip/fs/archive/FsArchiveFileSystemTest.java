@@ -74,8 +74,8 @@ public class FsArchiveFileSystemTest {
     private static class Listener
     implements FsArchiveFileSystemTouchListener<FsArchiveEntry> {
         final FsArchiveFileSystem<?> fileSystem;
-        int before;
-        int after;
+        //int before;
+        //int after;
 
         @SuppressWarnings("LeakingThisInConstructor")
         Listener(final FsArchiveFileSystem<?> fileSystem) {
@@ -87,14 +87,14 @@ public class FsArchiveFileSystemTest {
         public void beforeTouch(FsArchiveFileSystemEvent<?> event) {
             assertThat(event, notNullValue());
             assertThat(event.getSource(), sameInstance((Object) fileSystem));
-            before++;
+            //before++;
         }
 
         @Override
         public void afterTouch(FsArchiveFileSystemEvent<?> event) {
             assertThat(event, notNullValue());
             assertThat(event.getSource(), sameInstance((Object) fileSystem));
-            after++;
+            //after++;
         }
     }
 
