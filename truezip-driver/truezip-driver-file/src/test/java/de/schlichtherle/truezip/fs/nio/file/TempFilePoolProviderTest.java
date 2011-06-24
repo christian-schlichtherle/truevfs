@@ -15,8 +15,6 @@
  */
 package de.schlichtherle.truezip.fs.nio.file;
 
-import de.schlichtherle.truezip.fs.nio.file.TempFilePoolService;
-import de.schlichtherle.truezip.fs.nio.file.TempFilePool;
 import de.schlichtherle.truezip.socket.spi.IOPoolService;
 import org.junit.Before;
 import org.junit.Test;
