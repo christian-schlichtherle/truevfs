@@ -26,10 +26,29 @@
             dependent classes.
         </p>
         <p>
-            This is the primary API for JSE&nbsp;7 compliant TrueZIP applications.
+            This is the primary API for JSE&nbsp;7 compliant TrueZIP applications:
             In contrast to the TrueZIP Kernel API, this API is designed to be
             easy to learn and convenient to use while providing a great level
             of flexibility.
+            In contrast to the TrueZIP File* API, this API can access any
+            (virtual) file system, not just the platform file system and any
+            archive files within the platform file system.
+        </p>
+        <p>
+            For example, an application could access an entry within an archive
+            file which is located at a web site using a {@code TPath} like this:
+        </p>
+        <pre><code>
+    Path path = new TPath(new URI("http://acme.com/download/everything.tar.gz/README.TXT"));
+    try (Files.newInputStream(path)) {
+        // Read the file contents here.
+        ...
+    }
+        </code></pre>
+        <p>
+            This example requires that the JARs of the file system driver
+            modules TrueZIP Driver HTTP(S) and TrueZIP Driver TAR are present
+            on the run time class path.
         </p>
         <h3><a name="fspsl"/>File System Provider Service Location</h3>
         <p>

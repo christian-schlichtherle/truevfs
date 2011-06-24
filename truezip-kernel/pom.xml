@@ -27,12 +27,12 @@
 
     <name>TrueZIP Kernel</name>
     <description>
-        This module implements virtual file systems for contents from
-        arbitrary sources, maintains their state and commits unsynchronized
-        changes of the contents to federated file systems if required or
+        This module implements virtual file systems from arbitrary resources,
+        manages their state and commits unsynchronized changes if required or
         requested.
-        It's also the nexus between federated file system applications and
-        providers.
+        The TrueZIP Kernel uses file system drivers to access these resources.
+        It provides multithreading, multiplexing, caching and buffering so that
+        the file system drivers do not need to take care of this.
     </description>
 
     <build>
