@@ -25,10 +25,10 @@ About TrueZIP File*
 File file = new TFile("archive.tar.gz/README.TXT");
 InputStream in = new TFileInputStream(file);
 try {
-// Read the file contents here.
-...
+    // Read the file contents here.
+    ...
 } finally {
-in.close();
+    in.close();
 }
 +--+
 
