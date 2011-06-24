@@ -31,8 +31,8 @@ About TrueZIP Path
 +--+
 Path path = new TPath(new URI("http://acme.com/download/everything.tar.gz/README.TXT"));
 try (Files.newInputStream(path)) {
-// Read the file contents here.
-...
+    // Read the file contents here.
+    ...
 }
 +--+
 
