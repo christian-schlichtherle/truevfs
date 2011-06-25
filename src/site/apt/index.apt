@@ -69,11 +69,9 @@ About TrueZIP
 * Getting Started
 
     [[1]] Read the
-          {{{./kick-start/index.html}Kick-Start}} section in order to
-          generate, build and run a
-          {{{./truezip-file/index.html}TrueZIP File*}} or
-          {{{./truezip-path/index.html}TrueZIP Path}}
-          application in about ten minutes!
+          {{{./kick-start/index.html}Kick-Start}} section in order to generate,
+          build and run a TrueZIP File* or TrueZIP Path application in about
+          ten minutes!
 
     [[1]] If you are looking for more sample code and applications,
           please check the
