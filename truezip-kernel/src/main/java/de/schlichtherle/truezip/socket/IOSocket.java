@@ -26,11 +26,16 @@ import java.io.OutputStream;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * An abstract address of a target for I/O operations which is provided by sub
- * class implementations.
- * <p>
- * A key feature of an I/O socket is that it's targets can be resolved lazily,
- * i.e. the local or peer target may get resolved by a method of a sub class.
+ * An abstract factory for objects to do some I/O on a
+ * {@link #getLocalTarget() local target}.
+ * I/O sockets can be used to {@link #copy(InputSocket, OutputSocket) copy}
+ * data easily and very fast. 
+ * When copying data, the local target gets connected to a
+ * {@link #getPeerTarget() peer target}.
+ * Once connected, the sockets can then setup the data to be transferred by
+ * the copy method.
+ * This feature enables to avoid data recompression when copying a compressed
+ * archive entry to another archive entry of the same type.
  *
  * @param   <LT> the type of the {@link #getLocalTarget() local target}
  *          for I/O operations.

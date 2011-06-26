@@ -59,15 +59,15 @@ extends InputSocket<E> {
         return getBoundSocket().getPeerTarget();
     }
 
+    @Override
+    public ReadOnlyFile newReadOnlyFile() throws IOException {
+        return getBoundSocket().newReadOnlyFile();
+    }
+
     /** @since TrueZIP 7.2 */
     @Override
     public SeekableByteChannel newSeekableByteChannel() throws IOException {
         return getBoundSocket().newSeekableByteChannel();
-    }
-
-    @Override
-    public ReadOnlyFile newReadOnlyFile() throws IOException {
-        return getBoundSocket().newReadOnlyFile();
     }
 
     @Override
