@@ -35,7 +35,7 @@ extends Iterable<E> {
     int getSize();
 
     /**
-     * Returns a new iterator over all entries in this container.
+     * Returns a new iterator for all entries in this container.
      * <p>
      * First, the iteration <em>must</em> be consistent: Multiple iterators
      * must iterate the same entries in the same order again unless the set
