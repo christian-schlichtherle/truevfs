@@ -25,10 +25,10 @@ About TrueZIP
 ** Using TrueZIP
 
     As an API, TrueZIP provides uniform, transparent, thread-safe,
-    read/write access to archive files as if they were just plain directories
-    in a file system path.
-    Starting with TrueZIP 7.2, there are two APIs available which can get used
-    simultaneously, too: 
+    read/write access to archive files as if they were just plain
+    directories in a file system path.
+    Starting with TrueZIP 7.2, there are two APIs available which can get
+    used simultaneously, too:
     
     * The {{{./truezip-file/index.html}TrueZIP File*}} module provides the
       package
@@ -53,18 +53,33 @@ About TrueZIP
 
     []
 
-
     Writing an application for either API is really easy:
     Have a look at the {{{./usecases/index.html}Use Cases}} for some samples
     using the TrueZIP File* API.
 
 ** Extending TrueZIP
 
-    As a framework, TrueZIP provides the interfaces and classes to write file
-    system drivers which plug-in to its federated file system space.
-    The TrueZIP Kernel module provides multithreading, multiplexing, caching
-    and buffering so that the file system drivers do not need to take care of
-    this.
+    As a framework, TrueZIP provides the interfaces and classes to
+    write file system drivers which plug-in to its federated file
+    system space.
+    The TrueZIP Kernel module provides multithreading, multiplexing,
+    caching and buffering so that the file system drivers do not need to
+    take care of this.
+    There is no tutorial for how to write a file system driver yet,
+    but there's comprehensive Javadoc:
+
+    * If you are going to write a federated file system driver
+      (i.e. archive driver), please consult the Javadoc for
+      {{{./apidocs/de/schlichtherle/truezip/fs/archive/FsArchiveDriver.html}<<<de.schlichtherle.truezip.fs.archive.FsArchiveDriver>>>}}.
+
+    * If you are going to write a non-federated file system driver,
+      please consult the Javadoc for
+      {{{./apidocs/de/schlichtherle/truezip/fs/FsDriver.html}<<<de.schlichtherle.truezip.fs.FsDriver>>>}}.
+
+    []
+
+    For examples, please consult the {{{./source-repository.html}source code}}
+    for the file system drivers which ship with TrueZIP.
 
 * Getting Started
 
@@ -75,16 +90,15 @@ About TrueZIP
 
     [[1]] If you are looking for more sample code and applications,
           please check the
-          {{{http://java.net/projects/truezip/sources/v7/show/truezip-samples/}source code}}
+          {{{http://java.net/projects/truezip/sources/v7/show/truezip-samples/src/main/java/de/schlichtherle/truezip/sample}source code}}
           of the
           {{{./truezip-samples/index.html}TrueZIP Samples}} module.
 
-    [[1]] If you encounter issues, please read the
-          {{{./faq.html}FAQ}}
+    [[1]] If you encounter issues, please read the {{{./faq.html}FAQ}}
           before subscribing and posting to the
           {{{./mail-lists.html}User Mailing List}}.
 
-    [[1]] Last, but not least, please check the comprehensive
+    [[1]] Last, but not least, please check the
           {{{./apidocs/index.html}Javadoc}}.
 
     []
