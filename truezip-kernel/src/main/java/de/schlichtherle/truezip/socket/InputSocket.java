@@ -98,6 +98,22 @@ extends IOSocket<E, Entry> {
     }
 
     /**
+     * <b>Optional:</b> Returns a new read only file for reading bytes from
+     * the {@link #getLocalTarget() local target} in arbitrary order.
+     * <p>
+     * If this method is supported, implementations must enable calling it
+     * any number of times.
+     * Furthermore, the returned read only file should <em>not</em> be buffered.
+     * Buffering should be addressed by client applications instead.
+     *
+     * @throws UnsupportedOperationException if this operation is not supported
+     *         by the implementation.
+     * @throws IOException on any I/O error.
+     * @return A new read only file.
+     */
+    public abstract ReadOnlyFile newReadOnlyFile() throws IOException;
+
+    /**
      * <b>Optional:</b> Returns a new seekable byte channel for reading bytes
      * from the {@link #getLocalTarget() local target} in arbitrary order.
      * <p>
@@ -115,22 +131,6 @@ extends IOSocket<E, Entry> {
     public SeekableByteChannel newSeekableByteChannel() throws IOException {
         throw new UnsupportedOperationException();
     }
-
-    /**
-     * <b>Optional:</b> Returns a new read only file for reading bytes from
-     * the {@link #getLocalTarget() local target} in arbitrary order.
-     * <p>
-     * If this method is supported, implementations must enable calling it
-     * any number of times.
-     * Furthermore, the returned read only file should <em>not</em> be buffered.
-     * Buffering should be addressed by client applications instead.
-     *
-     * @throws UnsupportedOperationException if this operation is not supported
-     *         by the implementation.
-     * @throws IOException on any I/O error.
-     * @return A new read only file.
-     */
-    public abstract ReadOnlyFile newReadOnlyFile() throws IOException;
 
     /**
      * Returns a new input stream for reading bytes from the
