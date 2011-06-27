@@ -27,12 +27,17 @@
         </p>
         <p>
             This is the primary API for JSE&nbsp;7 compliant TrueZIP applications:
-            In contrast to the TrueZIP Kernel API, this API is designed to be
+            Like the TrueZIP Path API, this API is a facade for the TrueZIP
+            Kernel API.
+            In contrast to the TrueZIP File* API however, this API can access
+            any (virtual) file system, not just the platform file system and
+            any archive files within the platform file system.
+            In contrast to the TrueZIP Kernel API, both APIs are designed to be
             easy to learn and convenient to use while providing a great level
             of flexibility.
-            In contrast to the TrueZIP File* API, this API can access any
-            (virtual) file system, not just the platform file system and any
-            archive files within the platform file system.
+            Because all virtual file system state is managed by the TrueZIP
+            Kernel module, this module can concurrently access the same file
+            systems than the TrueZIP File* module.
         </p>
         <p>
             For example, an application could access an entry within an archive
