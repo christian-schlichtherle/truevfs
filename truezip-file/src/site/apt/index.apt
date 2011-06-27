@@ -1,5 +1,5 @@
     -----------------------
-    About
+    About TrueZIP File*
     -----------------------
     Christian Schlichtherle
     -----------------------
@@ -12,9 +12,17 @@ About TrueZIP File*
     directories in a file system path.
 
     This is the primary API for JSE 6 compliant TrueZIP applications:
+    Like the {{{../truezip-path}TrueZIP Path}} API, this API is just a facade
+    for the {{{../truezip-kernel/index.html}TrueZIP Kernel}} API.
+    In contrast to the {{{../truezip-path}TrueZIP Path}} API however,
+    this API is limited to access the platform file system and any archive
+    files within the platform file system.
     In contrast to the {{{../truezip-kernel/index.html}TrueZIP Kernel}} API,
-    this API is designed to be easy to learn and convenient to use while
+    both APIs are designed to be easy to learn and convenient to use while
     providing a great level of flexibility.
+    Because all virtual file system state is managed by the TrueZIP
+    Kernel module, this module can concurrently access the same file
+    systems than the TrueZIP File* module.
 
     For example, an application could access an entry within an archive
     file using a
