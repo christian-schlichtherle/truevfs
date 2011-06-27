@@ -302,8 +302,8 @@ implements Iterable<FsCovariantEntry<E>> {
      * Returns a covariant file system entry or {@code null} if no file system
      * entry exists for the given name.
      * Modifying the returned object graph is either not supported (i.e. throws
-     * an {@link UnsupportedOperationException}) or does not show any
-     * effect on the file system.
+     * an {@link UnsupportedOperationException}) or does not show any effect on
+     * this file system.
      * 
      * @param  name the name of the file system entry to look up.
      * @return A covariant file system entry or {@code null} if no file system
