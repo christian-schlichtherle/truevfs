@@ -314,7 +314,7 @@ public final class TFileSystem extends FileSystem {
             final Set<? extends OpenOption> options) {
         final int s = options.size();
         if (0 == s || 1 == s && options.contains(StandardOpenOption.READ))
-            return NO_INPUT_OPTION;
+            return NO_INPUT_OPTIONS;
         throw new IllegalArgumentException(options.toString());
     }
 
@@ -352,7 +352,7 @@ public final class TFileSystem extends FileSystem {
             }
         }
         return set.isEmpty()
-                ? NO_OUTPUT_OPTION
+                ? NO_OUTPUT_OPTIONS
                 : BitField.copyOf(set);
     }
 
@@ -470,7 +470,7 @@ public final class TFileSystem extends FileSystem {
             controller.mknod(
                     name,
                     DIRECTORY,
-                    NO_OUTPUT_OPTION.set(CREATE_PARENTS, TConfig.get().isLenient()),
+                    NO_OUTPUT_OPTIONS.set(CREATE_PARENTS, TConfig.get().isLenient()),
                     null);
         } catch (IOException ex) {
             if (null != controller.getEntry(name))

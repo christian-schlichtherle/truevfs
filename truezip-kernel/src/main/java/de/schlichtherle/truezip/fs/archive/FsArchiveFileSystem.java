@@ -88,7 +88,7 @@ implements Iterable<FsCovariantEntry<E>> {
 
     private FsArchiveFileSystem(final FsArchiveDriver<E> driver) {
         this.factory = driver;
-        final E root = newEntryUnchecked(ROOT_PATH, DIRECTORY, NO_OUTPUT_OPTION, null);
+        final E root = newEntryUnchecked(ROOT_PATH, DIRECTORY, NO_OUTPUT_OPTIONS, null);
         final long time = System.currentTimeMillis();
         for (Access access : ALL_ACCESS_SET)
             root.setTime(access, time);
@@ -165,7 +165,7 @@ implements Iterable<FsCovariantEntry<E>> {
         // Setup root file system entry, potentially replacing its previous
         // mapping from the input archive.
         master.add(ROOT_PATH, newEntryUnchecked(
-                ROOT_PATH, DIRECTORY, NO_OUTPUT_OPTION, rootTemplate));
+                ROOT_PATH, DIRECTORY, NO_OUTPUT_OPTIONS, rootTemplate));
         this.master = master;
         // Now perform a file system check to create missing parent directories
         // and populate directories with their members - this needs to be done
@@ -199,7 +199,7 @@ implements Iterable<FsCovariantEntry<E>> {
         FsCovariantEntry<E> parent = master.get(parentPath);
         if (null == parent || !parent.isType(DIRECTORY))
             parent = master.add(parentPath, newEntryUnchecked(
-                    parentPath, DIRECTORY, NO_OUTPUT_OPTION, null));
+                    parentPath, DIRECTORY, NO_OUTPUT_OPTIONS, null));
         parent.add(memberName);
         fix(parentPath);
     }
