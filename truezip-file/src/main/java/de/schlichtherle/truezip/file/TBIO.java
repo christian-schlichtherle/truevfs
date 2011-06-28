@@ -287,12 +287,6 @@ final class TBIO {
                 .getInputSocket(path.getEntryName(), options);
     }
 
-    private static TArchiveDetector getDetector(File file) {
-        return file instanceof TFile
-                ? ((TFile) file).getArchiveDetector()
-                : TConfig.get().getArchiveDetector();
-    }
-
     /**
      * Returns an output socket for the given file.
      * 
@@ -317,5 +311,11 @@ final class TBIO {
         return TFile.manager
                 .getController(path.getMountPoint(), getDetector(dst))
                 .getOutputSocket(path.getEntryName(), options, template);
+    }
+
+    private static TArchiveDetector getDetector(File file) {
+        return file instanceof TFile
+                ? ((TFile) file).getArchiveDetector()
+                : TConfig.get().getArchiveDetector();
     }
 }
