@@ -92,12 +92,12 @@ public abstract class TPathTestSuite extends TestBase {
     private TPath archive;
     private byte[] data;
 
-    protected TPathTestSuite(   final @NonNull FsScheme scheme,
-                                final @NonNull FsArchiveDriver<?> driver) {
-        if (null == scheme || null == driver)
+    protected TPathTestSuite(   final FsScheme scheme,
+                                final FsArchiveDriver<?> driver) {
+        super(new TArchiveDetector(scheme.toString(), driver));
+        if (null == driver)
             throw new NullPointerException();
         this.scheme = scheme;
-        this.detector = new TArchiveDetector(scheme.toString(), driver);
     }
 
     @Before

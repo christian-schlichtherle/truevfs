@@ -58,7 +58,7 @@ public class TFileSystemProviderTest extends TestBase {
                     ? null
                     : FsMountPoint.create(URI.create(params[2].toString()), CANONICALIZE);
             try {
-                final TFileSystem fs = provider.newFileSystem(path, environment);
+                final TFileSystem fs = provider.newFileSystem(path, getEnvironment());
                 if (null == mountPoint)
                     fail();
                 assertThat(fs.getMountPoint(), is(mountPoint));
@@ -100,7 +100,7 @@ public class TFileSystemProviderTest extends TestBase {
             final URI uri = URI.create(params[0]);
             final FsMountPoint mountPoint = FsMountPoint.create(URI.create(params[1]));
             try {
-                final TFileSystem fs = provider.newFileSystem(uri, environment);
+                final TFileSystem fs = provider.newFileSystem(uri, getEnvironment());
                 if (null == mountPoint)
                     fail();
                 assertThat(fs.getMountPoint(), is(mountPoint));

@@ -16,6 +16,9 @@
 package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import org.junit.After;
 import org.junit.Before;
 
@@ -23,12 +26,19 @@ import org.junit.Before;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public abstract class TestBase {
 
-    protected TArchiveDetector detector;
+    private TArchiveDetector detector;
 
     protected TestBase() {
-        detector = new TArchiveDetector("mok|mok1|mok2", new MockArchiveDriver());
+        this(null);
+    }
+
+    protected TestBase(final @CheckForNull TArchiveDetector detector) {
+        this.detector = null != detector
+                ? detector
+                : new TArchiveDetector("mok|mok1|mok2", new MockArchiveDriver());
     }
 
     @Before
@@ -41,5 +51,9 @@ public abstract class TestBase {
     @After
     public void tearDown() throws Exception {
         TConfig.pop();
+    }
+
+    protected final TArchiveDetector getDetector() {
+        return detector;
     }
 }

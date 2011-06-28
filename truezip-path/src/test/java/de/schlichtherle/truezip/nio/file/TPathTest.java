@@ -462,7 +462,7 @@ public class TPathTest extends TestBase {
         }
         // Once created, the prospective archive file detection does not change
         // because a TPath is immutable.
-        assert archive.getArchiveDetector() == detector;
+        assert archive.getArchiveDetector() == getDetector();
         assert archive.isArchive();
         assert file.getArchiveDetector() == TArchiveDetector.NULL;
         assert !file.isArchive();
