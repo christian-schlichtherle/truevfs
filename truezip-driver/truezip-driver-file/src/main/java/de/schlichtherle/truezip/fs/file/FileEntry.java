@@ -142,7 +142,7 @@ implements IOEntry<FileEntry>, Releasable<IOException> {
 
     @Override
     public final OutputSocket<FileEntry> getOutputSocket() {
-        return new FileOutputSocket(NO_OUTPUT_OPTION, null, this);
+        return new FileOutputSocket(NO_OUTPUT_OPTIONS, null, this);
     }
 
     final OutputSocket<FileEntry> getOutputSocket(
