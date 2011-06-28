@@ -381,7 +381,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
         boolean preserve = false;
         BitField<FsOutputOption> o = BitField
                 .of(EXCLUSIVE)
-                .set(CREATE_PARENTS, TConfig.get().isLenient());
+                .set(CREATE_PARENTS, dst.shouldCreateParents());
         for (final CopyOption option : options) {
             if (!(option instanceof StandardCopyOption))
                 throw new UnsupportedOperationException(option.toString());

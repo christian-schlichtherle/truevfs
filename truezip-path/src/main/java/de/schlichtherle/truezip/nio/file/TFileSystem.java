@@ -26,7 +26,6 @@ import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsInputOption;
-import static de.schlichtherle.truezip.fs.FsInputOptions.*;
 import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsOutputOption;
@@ -75,8 +74,6 @@ import java.nio.file.attribute.FileTime;
 import java.nio.file.attribute.UserPrincipalLookupService;
 import java.util.Collections;
 import java.util.EnumMap;
-import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -302,60 +299,6 @@ public final class TFileSystem extends FileSystem {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    private static BitField<FsInputOption> mapInput(
-            final OpenOption... options) {
-        final HashSet<OpenOption> set = new HashSet<OpenOption>(
-                options.length * 4 / 3 + 1);
-        Collections.addAll(set, options);
-        return mapInput(set);
-    }
-
-    private static BitField<FsInputOption> mapInput(
-            final Set<? extends OpenOption> options) {
-        final int s = options.size();
-        if (0 == s || 1 == s && options.contains(StandardOpenOption.READ))
-            return NO_INPUT_OPTIONS;
-        throw new IllegalArgumentException(options.toString());
-    }
-
-    private static BitField<FsOutputOption> mapOutput(
-            final OpenOption... options) {
-        final HashSet<OpenOption> set = new HashSet<OpenOption>(
-                options.length * 4 / 3 + 1);
-        Collections.addAll(set, options);
-        return mapOutput(set);
-    }
-
-    private static BitField<FsOutputOption> mapOutput(
-            final Set<? extends OpenOption> options) {
-        final EnumSet<FsOutputOption> set = EnumSet.noneOf(FsOutputOption.class);
-        if (TConfig.get().isLenient())
-            set.add(CREATE_PARENTS);
-        for (final OpenOption option : options) {
-            if (!(option instanceof StandardOpenOption))
-                throw new UnsupportedOperationException(option.toString());
-            switch ((StandardOpenOption) option) {
-                case READ:
-                    throw new IllegalArgumentException(option.toString());
-                case WRITE:
-                case TRUNCATE_EXISTING:
-                case CREATE:
-                    break;
-                case APPEND:
-                    set.add(APPEND);
-                    break;
-                case CREATE_NEW:
-                    set.add(EXCLUSIVE);
-                    break;
-                default:
-                    throw new UnsupportedOperationException(option.toString());
-            }
-        }
-        return set.isEmpty()
-                ? NO_OUTPUT_OPTIONS
-                : BitField.copyOf(set);
-    }
-
     SeekableByteChannel newByteChannel(
             final TPath path,
             final Set<? extends OpenOption> options,
@@ -365,13 +308,13 @@ public final class TFileSystem extends FileSystem {
         final FsController<?> controller = getController();
         if (options.isEmpty() || options.contains(StandardOpenOption.READ)) {
             final BitField<FsInputOption>
-                    o = mapInput(options).set(FsInputOption.CACHE);
+                    o = path.mapInput(options).set(FsInputOption.CACHE);
             return controller
                     .getInputSocket(name, o)
                     .newSeekableByteChannel();
         } else {
             final BitField<FsOutputOption>
-                    o = mapOutput(options).set(FsOutputOption.CACHE);
+                    o = path.mapOutput(options).set(FsOutputOption.CACHE);
             try {
                 return controller
                         .getOutputSocket(name, o, null)
@@ -390,7 +333,7 @@ public final class TFileSystem extends FileSystem {
         return getController()
                 .getInputSocket(
                     path.getAddress().getEntryName(),
-                    mapInput(options))
+                    path.mapInput(options))
                 .newInputStream();
     }
 
@@ -399,7 +342,7 @@ public final class TFileSystem extends FileSystem {
         return getController()
                 .getOutputSocket(
                     path.getAddress().getEntryName(),
-                    mapOutput(options),
+                    path.mapOutput(options),
                     null)
                 .newOutputStream();
     }
@@ -470,7 +413,7 @@ public final class TFileSystem extends FileSystem {
             controller.mknod(
                     name,
                     DIRECTORY,
-                    NO_OUTPUT_OPTIONS.set(CREATE_PARENTS, TConfig.get().isLenient()),
+                    NO_OUTPUT_OPTIONS.set(CREATE_PARENTS, path.shouldCreateParents()),
                     null);
         } catch (IOException ex) {
             if (null != controller.getEntry(name))

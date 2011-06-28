@@ -223,10 +223,8 @@ final class TBIO {
     private static void
     cp0(final boolean preserve, final File src, final File dst)
     throws IOException {
-        final InputSocket<?> input = getInputSocket(src,
-                NO_INPUT_OPTIONS);
-        final OutputSocket<?> output = getOutputSocket(dst,
-                NO_OUTPUT_OPTIONS.set(CREATE_PARENTS, TConfig.get().isLenient()),
+        final InputSocket<?> input = getInputSocket(src, NO_INPUT_OPTIONS);
+        final OutputSocket<?> output = getOutputSocket(dst, NO_OUTPUT_OPTIONS,
                 preserve ? input.getLocalTarget() : null);
         IOSocket.copy(input, output);
     }
@@ -278,8 +276,9 @@ final class TBIO {
             final TFile file = (TFile) src;
             final TFile archive = file.getInnerArchive();
             if (null != archive)
-                return archive.getController()
-                        .getInputSocket(file.getInnerFsEntryName(), options);
+                return archive.getController().getInputSocket(
+                        file.getInnerFsEntryName(),
+                        options);
         }
         final FsPath path = new FsPath(src);
         return TFile.manager
@@ -304,13 +303,17 @@ final class TBIO {
             final TFile file = (TFile) dst;
             final TFile archive = file.getInnerArchive();
             if (null != archive)
-                return archive.getController()
-                        .getOutputSocket(file.getInnerFsEntryName(), options, template);
+                return archive.getController().getOutputSocket(
+                        file.getInnerFsEntryName(),
+                        options.set(CREATE_PARENTS, TConfig.get().isLenient()),
+                        template);
         }
         final FsPath path = new FsPath(dst);
         return TFile.manager
                 .getController(path.getMountPoint(), getDetector(dst))
-                .getOutputSocket(path.getEntryName(), options, template);
+                .getOutputSocket(   path.getEntryName(),
+                                    options.clear(CREATE_PARENTS),
+                                    template);
     }
 
     private static TArchiveDetector getDetector(File file) {
