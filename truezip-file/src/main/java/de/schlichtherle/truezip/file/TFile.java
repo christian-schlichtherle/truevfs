@@ -128,8 +128,8 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  * need to inflate the data from the source entry just to deflate it again for
  * the destination entry.
  * In case of TAR compatible files, it avoids the need to create an
- * additional temporary file, but shows no impact otherwise - the TAR file
- * format doesn't support compression.
+ * additional temporary file, but shows no impact otherwise because the TAR
+ * file format doesn't support compression.
  *
  * <a name="traversal"><h3>Traversing Directory Trees</h3></a>
  * <p>
@@ -1835,6 +1835,7 @@ public final class TFile extends File {
 
     @Deprecated
     @Override
+    @SuppressWarnings("deprecation")
     public URL toURL() throws MalformedURLException {
         return null != innerArchive ? toURI().toURL() : delegate.toURL();
     }
@@ -3082,9 +3083,18 @@ public final class TFile extends File {
     /**
      * Copies the file {@code src} to the file {@code dst} and attempts to
      * copy all attributes of the source file to the destination file, too.
-     * Which attributes are actually copied is specific to the destination
-     * file system driver implementation, but the minimum guarantee is to
-     * copy the last modification time.
+     * Which attributes are actually copied is specific to the source and
+     * destination file system driver implementations, but the minimum
+     * guarantee is to copy the last modification time.
+     * For example, starting with TrueZIP 7.2, the last modification, last
+     * access and creation times are copied if all of the following are true:
+     * <p>
+     * <ol>
+     * <li>Both parameters refer to the platform file system
+     *     (even if any one is only a {@code java.io.File}), and
+     * <li>the JVM complies to JSE&nbsp;7, and
+     * <li>the TrueZIP Driver FILE module is used.
+     * </ol>
      * <p>
      * <table border=1 cellpadding=5 summary="">
      * <thead>
@@ -3301,9 +3311,18 @@ public final class TFile extends File {
      * Recursively copies the file or directory {@code src} to the file or
      * directory {@code dst} and attempts to copy all attributes of each
      * source file to the destination file, too.
-     * Which attributes are actually copied is specific to the destination
-     * file system driver implementation, but the minimum guarantee is to
-     * copy the last modification time.
+     * Which attributes are actually copied is specific to the source and
+     * destination file system driver implementations, but the minimum
+     * guarantee is to copy the last modification time.
+     * For example, starting with TrueZIP 7.2, the last modification, last
+     * access and creation times are copied if all of the following are true:
+     * <p>
+     * <ol>
+     * <li>Both parameters refer to the platform file system
+     *     (even if any one is only a {@code java.io.File}), and
+     * <li>the JVM complies to JSE&nbsp;7, and
+     * <li>the TrueZIP Driver FILE module is used.
+     * </ol>
      * <p>
      * <table border=1 cellpadding=5 summary="">
      * <thead>
