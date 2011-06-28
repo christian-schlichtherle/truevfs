@@ -224,9 +224,9 @@ final class TBIO {
     cp0(final boolean preserve, final File src, final File dst)
     throws IOException {
         final InputSocket<?> input = getInputSocket(src,
-                NO_INPUT_OPTION);
+                NO_INPUT_OPTIONS);
         final OutputSocket<?> output = getOutputSocket(dst,
-                NO_OUTPUT_OPTION.set(CREATE_PARENTS, TConfig.get().isLenient()),
+                NO_OUTPUT_OPTIONS.set(CREATE_PARENTS, TConfig.get().isLenient()),
                 preserve ? input.getLocalTarget() : null);
         IOSocket.copy(input, output);
     }
@@ -239,10 +239,9 @@ final class TBIO {
      */
     public static void rm_r(final File node, final TArchiveDetector detector)
     throws IOException {
-        if (node.isDirectory()) {
+        if (node.isDirectory())
             for (final String member : node.list())
                 rm_r(new TFile(node, member, detector), detector);
-        }
         if (!node.delete())
             throw new IOException(node + " (cannot delete)");
     }
@@ -276,9 +275,6 @@ final class TBIO {
     static InputSocket<?>
     getInputSocket(final File src, final BitField<FsInputOption> options) {
         if (src instanceof TFile) {
-            // This block could get removed in order to use the more general
-            // pattern below. However, it's kept for better performance.
-            // TODO: Removing this block yields occasional racing problems - fix this!
             final TFile file = (TFile) src;
             final TFile archive = file.getInnerArchive();
             if (null != archive)
@@ -311,9 +307,6 @@ final class TBIO {
                     final BitField<FsOutputOption> options,
                     final @CheckForNull Entry template) {
         if (dst instanceof TFile) {
-            // This block could get removed in order to use the more general
-            // pattern below. However, it's kept for better performance.
-            // TODO: Removing this block yields occasional racing problems - fix this!
             final TFile file = (TFile) dst;
             final TFile archive = file.getInnerArchive();
             if (null != archive)

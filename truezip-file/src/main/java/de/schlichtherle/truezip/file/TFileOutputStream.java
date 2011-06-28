@@ -15,14 +15,14 @@
  */
 package de.schlichtherle.truezip.file;
 
+import java.io.InputStream;
 import net.jcip.annotations.Immutable;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
-import de.schlichtherle.truezip.fs.FsOutputOption;
+import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
 import de.schlichtherle.truezip.socket.OutputSocket;
-import de.schlichtherle.truezip.util.BitField;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -88,9 +88,6 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.CREATE_PARENTS;
 @DefaultAnnotation(NonNull.class)
 @Immutable
 public final class TFileOutputStream extends DecoratingOutputStream {
-
-    private static final BitField<FsOutputOption>
-            DEFAULT_OPTIONS = BitField.noneOf(FsOutputOption.class);
 
     /**
      * Constructs a new output stream for writing plain old files or entries
@@ -167,7 +164,7 @@ public final class TFileOutputStream extends DecoratingOutputStream {
     throws FileNotFoundException {
         final OutputSocket<?> output = TBIO.getOutputSocket(
                 dst,
-                DEFAULT_OPTIONS
+                NO_OUTPUT_OPTIONS
                     .set(APPEND, append)
                     .set(CREATE_PARENTS, TConfig.get().isLenient()),
                 null);

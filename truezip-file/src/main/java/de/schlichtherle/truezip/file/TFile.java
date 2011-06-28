@@ -2543,7 +2543,7 @@ public final class TFile extends File {
                 innerArchive.getController().mknod(
                         getInnerFsEntryName(),
                         DIRECTORY,
-                        NO_OUTPUT_OPTION.set(CREATE_PARENTS, TConfig.get().isLenient()),
+                        NO_OUTPUT_OPTIONS.set(CREATE_PARENTS, TConfig.get().isLenient()),
                         null);
                 return true;
             } catch (IOException ex) {
@@ -2575,7 +2575,7 @@ public final class TFile extends File {
                 controller.mknod(
                         innerEntryName,
                         DIRECTORY,
-                        NO_OUTPUT_OPTION.set(CREATE_PARENTS, TConfig.get().isLenient()),
+                        NO_OUTPUT_OPTIONS.set(CREATE_PARENTS, TConfig.get().isLenient()),
                         null);
             } catch (IOException ex) {
                 final FsEntry entry = controller.getEntry(innerEntryName);

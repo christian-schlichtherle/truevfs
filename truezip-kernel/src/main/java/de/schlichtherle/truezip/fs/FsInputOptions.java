@@ -29,9 +29,22 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 @DefaultAnnotation(NonNull.class)
 public final class FsInputOptions {
 
-    /** A bit field with no input options set. */
+    /**
+     * A bit field with no input options set.
+     * 
+     * @since TrueZIP 7.2
+     */
     public static final BitField<FsInputOption>
-            NO_INPUT_OPTION = BitField.noneOf(FsInputOption.class);
+            NO_INPUT_OPTIONS = BitField.noneOf(FsInputOption.class);
+
+    /**
+     * @since TrueZIP 7.1.1
+     * @deprecated
+     * @see #NO_INPUT_OPTIONS
+     */
+    @Deprecated
+    public static final BitField<FsInputOption>
+            NO_INPUT_OPTION = NO_INPUT_OPTIONS;
 
     /** You cannot instantiate this class. */
     private FsInputOptions() {

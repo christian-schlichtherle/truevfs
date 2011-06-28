@@ -29,9 +29,22 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 @DefaultAnnotation(NonNull.class)
 public final class FsOutputOptions {
 
-    /** A bit field with no output options set. */
+    /**
+     * A bit field with no output options set.
+     * 
+     * @since TrueZIP 7.2
+     */
     public static final BitField<FsOutputOption>
-            NO_OUTPUT_OPTION = BitField.noneOf(FsOutputOption.class);
+            NO_OUTPUT_OPTIONS = BitField.noneOf(FsOutputOption.class);
+
+    /**
+     * @since TrueZIP 7.1.1
+     * @deprecated
+     * @see #NO_OUTPUT_OPTIONS
+     */
+    @Deprecated
+    public static final BitField<FsOutputOption>
+            NO_OUTPUT_OPTION = NO_OUTPUT_OPTIONS;
 
     /** You cannot instantiate this class. */
     private FsOutputOptions() {

@@ -334,7 +334,7 @@ extends FsDriver {
      */
     public final E newEntry(String name, Type type, @CheckForNull Entry template)
     throws CharConversionException {
-        return newEntry(name, type, template, NO_OUTPUT_OPTION);
+        return newEntry(name, type, template, NO_OUTPUT_OPTIONS);
     }
 
     /**

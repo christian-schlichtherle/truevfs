@@ -17,9 +17,8 @@ package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.DecoratingInputStream;
-import de.schlichtherle.truezip.fs.FsInputOption;
+import static de.schlichtherle.truezip.fs.FsInputOptions.*;
 import de.schlichtherle.truezip.socket.InputSocket;
-import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.File;
@@ -27,6 +26,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import net.jcip.annotations.Immutable;
 
 /**
@@ -85,9 +85,6 @@ import net.jcip.annotations.Immutable;
 @Immutable
 public final class TFileInputStream extends DecoratingInputStream {
 
-    private static final BitField<FsInputOption>
-            DEFAULT_OPTIONS = BitField.noneOf(FsInputOption.class);
-
     /**
      * Constructs a new input stream for reading plain old files or entries
      * in an archive file.
@@ -123,7 +120,7 @@ public final class TFileInputStream extends DecoratingInputStream {
 
     private static InputStream newInputStream(final File src)
     throws FileNotFoundException {
-        final InputSocket<?> input = TBIO.getInputSocket(src, DEFAULT_OPTIONS);
+        final InputSocket<?> input = TBIO.getInputSocket(src, NO_INPUT_OPTIONS);
         try {
             return input.newInputStream();
         } catch (FileNotFoundException ex) {
