@@ -19,6 +19,7 @@ import java.io.InputStream;
 import net.jcip.annotations.Immutable;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import static de.schlichtherle.truezip.fs.FsOutputOption.APPEND;
 import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
@@ -28,9 +29,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-
-import static de.schlichtherle.truezip.fs.FsOutputOption.APPEND;
-import static de.schlichtherle.truezip.fs.FsOutputOption.CREATE_PARENTS;
 
 /**
  * A replacement for the class {@link FileOutputStream} for writing plain old
@@ -164,9 +162,7 @@ public final class TFileOutputStream extends DecoratingOutputStream {
     throws FileNotFoundException {
         final OutputSocket<?> output = TBIO.getOutputSocket(
                 dst,
-                NO_OUTPUT_OPTIONS
-                    .set(APPEND, append)
-                    .set(CREATE_PARENTS, TConfig.get().isLenient()),
+                NO_OUTPUT_OPTIONS.set(APPEND, append),
                 null);
         try {
             return output.newOutputStream();

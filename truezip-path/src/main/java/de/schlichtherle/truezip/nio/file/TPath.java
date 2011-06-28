@@ -24,8 +24,11 @@ import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsEntry;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import de.schlichtherle.truezip.fs.FsInputOption;
+import static de.schlichtherle.truezip.fs.FsInputOptions.*;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsOutputOption;
+import static de.schlichtherle.truezip.fs.FsOutputOption.*;
+import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
 import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.socket.InputSocket;
@@ -51,6 +54,7 @@ import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.LinkOption;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.nio.file.WatchEvent.Kind;
 import java.nio.file.WatchEvent.Modifier;
 import java.nio.file.WatchKey;
@@ -59,7 +63,10 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileAttributeView;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -964,6 +971,61 @@ public final class TPath implements Path {
         return getFileSystem().readAttributes(this, type, options);
     }
 
+    BitField<FsInputOption> mapInput(final OpenOption... options) {
+        final HashSet<OpenOption> set = new HashSet<OpenOption>(
+                options.length * 4 / 3 + 1);
+        Collections.addAll(set, options);
+        return mapInput(set);
+    }
+
+    BitField<FsInputOption> mapInput(final Set<? extends OpenOption> options) {
+        final int s = options.size();
+        if (0 == s || 1 == s && options.contains(StandardOpenOption.READ))
+            return NO_INPUT_OPTIONS;
+        throw new IllegalArgumentException(options.toString());
+    }
+
+    BitField<FsOutputOption> mapOutput(final OpenOption... options) {
+        final HashSet<OpenOption> set = new HashSet<OpenOption>(
+                options.length * 4 / 3 + 1);
+        Collections.addAll(set, options);
+        return mapOutput(set);
+    }
+
+    BitField<FsOutputOption> mapOutput(final Set<? extends OpenOption> options) {
+        final EnumSet<FsOutputOption> set = EnumSet.noneOf(FsOutputOption.class);
+        if (shouldCreateParents())
+            set.add(CREATE_PARENTS);
+        for (final OpenOption option : options) {
+            if (!(option instanceof StandardOpenOption))
+                throw new UnsupportedOperationException(option.toString());
+            switch ((StandardOpenOption) option) {
+                case READ:
+                    throw new IllegalArgumentException(option.toString());
+                case WRITE:
+                case TRUNCATE_EXISTING:
+                case CREATE:
+                    break;
+                case APPEND:
+                    set.add(APPEND);
+                    break;
+                case CREATE_NEW:
+                    set.add(EXCLUSIVE);
+                    break;
+                default:
+                    throw new UnsupportedOperationException(option.toString());
+            }
+        }
+        return set.isEmpty()
+                ? NO_OUTPUT_OPTIONS
+                : BitField.copyOf(set);
+    }
+
+    boolean shouldCreateParents() {
+        return null != getAddress().getMountPoint().getParent()
+                && TConfig.get().isLenient();
+    }
+
     /**
      * The methods in this class use
      * {@link TPath#getAddress()}.{@link FsPath#getMountPoint()} as an
@@ -996,7 +1058,7 @@ public final class TPath implements Path {
             result = 37 * result + p.toString().hashCode();
             return p.hashCode = result;
         }
-    }
+    } // TPathComparator
 
     /**
      * The methods in this class use
@@ -1032,5 +1094,5 @@ public final class TPath implements Path {
             result = 37 * result + p.toString().toLowerCase().hashCode();
             return p.hashCode = result;
         }
-    }
+    } // WindowsTPathComparator
 }
