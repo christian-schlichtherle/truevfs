@@ -1236,6 +1236,8 @@ public final class TFile extends File {
     /**
      * Equivalent to
      * {@link TConfig#isLenient TConfig.get().isLenient()}.
+     * 
+     * @see #setLenient(boolean)
      */
     public static boolean isLenient() {
         return TConfig.get().isLenient();
@@ -1244,6 +1246,8 @@ public final class TFile extends File {
     /**
      * Equivalent to
      * {@link TConfig#setLenient TConfig.get().setLenient(lenient)}.
+     * 
+     * @see #isLenient()
      */
     public static void setLenient(boolean lenient) {
         TConfig.get().setLenient(lenient);
@@ -1252,6 +1256,8 @@ public final class TFile extends File {
     /**
      * Equivalent to
      * {@link TConfig#getArchiveDetector TConfig.get().getArchiveDetector()}.
+     * 
+     * @see #setDefaultArchiveDetector(TArchiveDetector)
      */
     public static TArchiveDetector getDefaultArchiveDetector() {
         return TConfig.get().getArchiveDetector();
@@ -1260,6 +1266,8 @@ public final class TFile extends File {
     /**
      * Equivalent to
      * {@link TConfig#setArchiveDetector TConfig.get().setArchiveDetector(detector)}.
+     * 
+     * @see #getDefaultArchiveDetector()
      */
     public static void setDefaultArchiveDetector(TArchiveDetector detector) {
         TConfig.get().setArchiveDetector(detector);
