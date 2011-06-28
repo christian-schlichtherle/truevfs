@@ -51,9 +51,9 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
     private final               BitField<FsOutputOption> options;
     private final @CheckForNull Entry                    template;
 
-    FileOutputSocket(   final               FileEntry                entry,
-                        final               BitField<FsOutputOption> options,
-                        final @CheckForNull Entry                    template) {
+    FileOutputSocket(   final               BitField<FsOutputOption> options,
+                        final @CheckForNull Entry                    template,
+                        final               FileEntry                entry) {
         assert null != entry;
         assert null != options;
         this.entry    = entry;
