@@ -142,12 +142,12 @@ implements IOEntry<FileEntry>, Releasable<IOException> {
 
     @Override
     public final OutputSocket<FileEntry> getOutputSocket() {
-        return new FileOutputSocket(this, NO_OUTPUT_OPTION, null);
+        return new FileOutputSocket(NO_OUTPUT_OPTION, null, this);
     }
 
     final OutputSocket<FileEntry> getOutputSocket(
             BitField<FsOutputOption> options,
             @CheckForNull de.schlichtherle.truezip.entry.Entry template) {
-        return new FileOutputSocket(this, options, template);
+        return new FileOutputSocket(options, template, this);
     }
 }

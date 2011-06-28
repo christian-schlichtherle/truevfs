@@ -145,12 +145,12 @@ final class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
 
     @Override
     public OutputSocket<HttpEntry> getOutputSocket() {
-        return new HttpOutputSocket(this, NO_OUTPUT_OPTIONS, null);
+        return new HttpOutputSocket(NO_OUTPUT_OPTIONS, null, this);
     }
 
     public OutputSocket<HttpEntry> getOutputSocket(
             BitField<FsOutputOption> options,
             @CheckForNull Entry template) {
-        return new HttpOutputSocket(this, options, template);
+        return new HttpOutputSocket(options, template, this);
     }
 }

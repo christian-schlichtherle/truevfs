@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import net.jcip.annotations.ThreadSafe;
 
-
 /**
  * An output socket for HTTP(S) entries.
  * 
@@ -40,9 +39,9 @@ final class HttpOutputSocket extends OutputSocket<HttpEntry> {
 
     private final HttpEntry entry;
 
-    HttpOutputSocket(   final               HttpEntry                entry,
-                        final               BitField<FsOutputOption> options,
-                        final @CheckForNull Entry                    template) {
+    HttpOutputSocket(   final               BitField<FsOutputOption> options,
+                        final @CheckForNull Entry                    template,
+                        final               HttpEntry                entry) {
         assert null != entry;
         assert null != options;
         this.entry    = entry;
