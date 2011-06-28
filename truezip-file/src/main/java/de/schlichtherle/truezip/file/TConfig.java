@@ -82,7 +82,7 @@ try (TConfig config = TConfig.push()) {
  * 
  * @since   TrueZIP 7.2
  * @author  Christian Schlichtherle
- * @version $Id: TConfig.java 6086334f333b 2011/06/22 19:54:19 christian $
+ * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
 public final class TConfig implements Closeable {
@@ -199,7 +199,7 @@ public final class TConfig implements Closeable {
      * <p>
      * Now, if this property is set to {@code false}, then an application
      * needs to call {@code new TFile("a/outer.zip/b/inner.zip").mkdirs()}
-     * before it can actually push the innermost {@code c} entry as a file
+     * before it can actually create the innermost {@code c} entry as a file
      * or directory.
      * <p>
      * More formally, before an application can access an entry in a federated
@@ -210,7 +210,7 @@ public final class TConfig implements Closeable {
      * If this property is set to {@code true} however, then any missing
      * parent directories (including archive files) up to the outermost archive
      * file {@code outer.zip} get automatically created when using operations
-     * to push the innermost element of the path {@code c}.
+     * to create the innermost element of the path {@code c}.
      * <p>
      * This allows applications to succeed with doing this:
      * {@code new TFile("a/outer.zip/b/inner.zip/c").createNewFile()},
@@ -218,7 +218,7 @@ public final class TConfig implements Closeable {
      * {@code new TFileOutputStream("a/outer.zip/b/inner.zip/c")}.
      * <p>
      * Note that in either case the parent directory of the outermost archive
-     * file {@code a} must exist - TrueZIP does not automatically push
+     * file {@code a} must exist - TrueZIP does not automatically create
      * directories in the platform file system!
      *
      * @param lenient the value of the property {@code lenient}.
