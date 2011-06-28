@@ -184,7 +184,7 @@ implements IOEntry<FileEntry>, Releasable<IOException> {
 
     @Override
     public final OutputSocket<FileEntry> getOutputSocket() {
-        return new FileOutputSocket(this, NO_OUTPUT_OPTION, null);
+        return new FileOutputSocket(this, NO_OUTPUT_OPTIONS, null);
     }
 
     final OutputSocket<FileEntry> getOutputSocket(
