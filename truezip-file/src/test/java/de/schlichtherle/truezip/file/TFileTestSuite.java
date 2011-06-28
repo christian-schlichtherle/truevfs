@@ -29,6 +29,7 @@ import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.socket.OutputClosedException;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -57,6 +58,7 @@ import static org.junit.Assert.*;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public abstract class TFileTestSuite extends TestBase {
 
     private static final Logger logger = Logger.getLogger(
@@ -81,12 +83,12 @@ public abstract class TFileTestSuite extends TestBase {
     private TFile archive;
     private byte[] data;
 
-    protected TFileTestSuite(   final @NonNull FsScheme scheme,
-                                final @NonNull FsArchiveDriver<?> driver) {
-        if (null == scheme || null == driver)
+    protected TFileTestSuite(   final FsScheme scheme,
+                                final FsArchiveDriver<?> driver) {
+        super(new TArchiveDetector(scheme.toString(), driver));
+        if (null == driver)
             throw new NullPointerException();
         this.scheme = scheme;
-        this.detector = new TArchiveDetector(scheme.toString(), driver);
     }
 
     @Before

@@ -44,7 +44,7 @@ public class TFileSystemTest extends TestBase {
         }) {
             final URI uri = URI.create(params[0]);
             final FsMountPoint mountPoint = FsMountPoint.create(URI.create(params[1]));
-            final TFileSystem fs = (TFileSystem) FileSystems.newFileSystem(uri, environment);
+            final TFileSystem fs = (TFileSystem) FileSystems.newFileSystem(uri, getEnvironment());
             fs.close();
             assertThat(fs.isOpen(), is(true));
             assertThat(fs.getMountPoint(), is(mountPoint));
