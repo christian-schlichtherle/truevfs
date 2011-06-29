@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.fs.file;
 
+import de.schlichtherle.truezip.fs.FsModelController;
+import net.jcip.annotations.Immutable;
 import java.util.Map;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
@@ -35,11 +37,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.net.URI;
 import java.net.URISyntaxException;
 import javax.swing.Icon;
-import net.jcip.annotations.ThreadSafe;
 
 import static de.schlichtherle.truezip.entry.Entry.*;
 import static de.schlichtherle.truezip.entry.Entry.Access.*;
@@ -48,22 +48,22 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import static java.io.File.separatorChar;
 
 /**
- * A controller for a mount point of the operating system's file system.
+ * A file system controller with a prospective directory in the platform file
+ * system as its mount point.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-@ThreadSafe
+@Immutable
 @DefaultAnnotation(NonNull.class)
-final class FileController extends FsController<FsModel>  {
+final class FileController extends FsModelController<FsModel>  {
 
-    private final FsModel model;
     private final File target;
 
     FileController(final FsModel model) {
+        super(model);
         if (null != model.getParent())
             throw new IllegalArgumentException();
-        this.model = model;
         URI uri = model.getMountPoint().toUri();
         if ('\\' == separatorChar && null != uri.getRawAuthority()) {
             try {
@@ -83,11 +83,6 @@ final class FileController extends FsController<FsModel>  {
             }
         }
         this.target = new File(uri);
-    }
-
-    @Override
-    public FsModel getModel() {
-        return model;
     }
 
     @Override
@@ -132,96 +127,6 @@ final class FileController extends FsController<FsModel>  {
     public boolean isExecutable(FsEntryName name) throws IOException {
         File file = new File(target, name.getPath());
         return file.canExecute();
-    }
-
-    /**
-     * Returns {@code true} if the given file can be created or exists
-     * and at least one byte can be successfully written to it - the file is
-     * restored to its previous state afterwards.
-     * This is a much stronger test than {@link File#canWrite()}.
-     */
-    @Deprecated
-    static boolean isCreatableOrWritable(final File file) {
-        try {
-            if (file.createNewFile()) {
-                return isCreatableOrWritable(file) && file.delete();
-            } else if (file.canWrite()) {
-                // Some operating and file system combinations make File.canWrite()
-                // believe that the file is writable although it's not.
-                // We are not that gullible, so let's test this...
-                final long time = file.lastModified();
-                if (time < 0) {
-                    // lastModified() may return negative values but setLastModified()
-                    // throws an IAE for negative values, so we are conservative.
-                    // See issue #18.
-                    return false;
-                }
-                if (!file.setLastModified(time + 1)) {
-                    // This may happen on Windows and normally means that
-                    // somebody else has opened this file
-                    // (regardless of read or write mode).
-                    // Be conservative: We don't allow writing to this file!
-                    return false;
-                }
-                boolean ok;
-                try {
-                    // Open the file for reading and writing, requiring any
-                    // update to its contents to be written to the filesystem
-                    // synchronously.
-                    // As Dr. Simon White from Catalysoft, Cambridge, UK
-                    // reported, "rws" does NOT work on Mac OS X with Apple's
-                    // Java 1.5 Release 1 (equivalent to Sun's Java 1.5.0_02),
-                    // however it DOES work with Apple's Java 1.5 Release 3.
-                    // He also confirmed that "rwd" works on Apple's
-                    // Java 1.5 Release 1, so we use this instead.
-                    // Thank you very much for spending the time to fix this
-                    // issue, Dr. White!
-                    final RandomAccessFile
-                            raf = new RandomAccessFile(file, "rwd");
-                    try {
-                        final boolean empty;
-                        int octet = raf.read();
-                        if (octet == -1) {
-                            octet = 0; // assume first byte is 0
-                            empty = true;
-                        } else {
-                            empty = false;
-                        }
-                        // Let's test if we can overwrite the first byte.
-                        // See issue #29.
-                        raf.seek(0);
-                        raf.write(octet);
-                        try {
-                            // Rewrite original content and check success.
-                            raf.seek(0);
-                            final int check = raf.read();
-                            // This should always return true unless the storage
-                            // device is faulty.
-                            ok = octet == check;
-                        } finally {
-                            if (empty)
-                                raf.setLength(0);
-                        }
-                    } finally {
-                        raf.close();
-                    }
-                } finally {
-                    if (!file.setLastModified(time)) {
-                        // This may happen on Windows and normally means that
-                        // somebody else has opened this file meanwhile
-                        // (regardless of read or write mode).
-                        // Be conservative: We don't allow (further) writing to
-                        // this file!
-                        ok = false;
-                    }
-                }
-                return ok;
-            } else { // if (!file.canWrite()) {
-                return false;
-            }
-        } catch (IOException ex) {
-            return false;
-        }
     }
 
     @Override

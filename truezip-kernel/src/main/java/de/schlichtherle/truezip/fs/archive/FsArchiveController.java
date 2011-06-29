@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.archive;
 
+import de.schlichtherle.truezip.fs.FsModelController;
 import java.util.Map;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import de.schlichtherle.truezip.entry.DecoratingEntry;
@@ -78,7 +79,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
 public abstract class FsArchiveController<E extends FsArchiveEntry>
-extends FsController<FsConcurrentModel> {
+extends FsModelController<FsConcurrentModel> {
 
     private static final Logger
             logger = Logger.getLogger(  FsArchiveController.class.getName(),
@@ -89,22 +90,15 @@ extends FsController<FsConcurrentModel> {
     private static final BitField<FsSyncOption>
             UNLINK_SYNC_OPTIONS = BitField.of(ABORT_CHANGES);
 
-    private final FsConcurrentModel model;
-
     /**
      * Constructs a new basic archive controller.
      *
      * @param model the non-{@code null} archive model.
      */
     protected FsArchiveController(final FsConcurrentModel model) {
+        super(model);
         if (null == model.getParent())
             throw new IllegalArgumentException();
-        this.model = model;
-    }
-
-    @Override
-    public final FsConcurrentModel getModel() {
-        return model;
     }
 
     final FsArchiveFileSystem<E> autoMount() throws IOException {
