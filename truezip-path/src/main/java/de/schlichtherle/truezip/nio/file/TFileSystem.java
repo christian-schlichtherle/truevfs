@@ -99,7 +99,7 @@ public final class TFileSystem extends FileSystem {
     TFileSystem(final TPath path) {
         assert null != path;
         this.controller = manager.getController(
-                path.getAddress().getMountPoint(),
+                path.getMountPoint(),
                 path.getArchiveDetector());
         this.provider = TFileSystemProvider.get(path.getName());
 
@@ -304,7 +304,7 @@ public final class TFileSystem extends FileSystem {
             final Set<? extends OpenOption> options,
             final FileAttribute<?>... attrs)
     throws IOException {
-        final FsEntryName name = path.getAddress().getEntryName();
+        final FsEntryName name = path.getEntryName();
         final FsController<?> controller = getController();
         if (options.isEmpty() || options.contains(StandardOpenOption.READ)) {
             final BitField<FsInputOption>
@@ -332,7 +332,7 @@ public final class TFileSystem extends FileSystem {
     throws IOException {
         return getController()
                 .getInputSocket(
-                    path.getAddress().getEntryName(),
+                    path.getEntryName(),
                     path.mapInput(options))
                 .newInputStream();
     }
@@ -341,7 +341,7 @@ public final class TFileSystem extends FileSystem {
     throws IOException {
         return getController()
                 .getOutputSocket(
-                    path.getAddress().getEntryName(),
+                    path.getEntryName(),
                     path.mapOutput(options),
                     null)
                 .newOutputStream();
@@ -351,7 +351,7 @@ public final class TFileSystem extends FileSystem {
             final TPath path,
             final Filter<? super Path> filter)
     throws IOException {
-        final FsEntryName name = path.getAddress().getEntryName();
+        final FsEntryName name = path.getEntryName();
         final FsEntry entry = getController().getEntry(name);
         final Set<String> set;
         if (null == entry || null == (set = entry.getMembers()))
@@ -408,7 +408,7 @@ public final class TFileSystem extends FileSystem {
         if (0 < attrs.length)
             throw new UnsupportedOperationException();
         final FsController<?> controller = getController();
-        final FsEntryName name = path.getAddress().getEntryName();
+        final FsEntryName name = path.getEntryName();
         try {
             controller.mknod(
                     name,
@@ -424,29 +424,29 @@ public final class TFileSystem extends FileSystem {
     }
 
     void delete(TPath path) throws IOException {
-        getController().unlink(path.getAddress().getEntryName());
+        getController().unlink(path.getEntryName());
     }
 
     FsEntry getEntry(TPath path) throws IOException {
-        return getController().getEntry(path.getAddress().getEntryName());
+        return getController().getEntry(path.getEntryName());
     }
 
     InputSocket<?> getInputSocket(  TPath path,
                                     BitField<FsInputOption> options) {
         return getController()
-                .getInputSocket(path.getAddress().getEntryName(), options);
+                .getInputSocket(path.getEntryName(), options);
     }
 
     OutputSocket<?> getOutputSocket(TPath path,
                                     BitField<FsOutputOption> options,
                                     @CheckForNull Entry template) {
         return getController()
-                .getOutputSocket(path.getAddress().getEntryName(), options, template);
+                .getOutputSocket(path.getEntryName(), options, template);
     }
 
     void checkAccess(final TPath path, final AccessMode... modes)
     throws IOException {
-        final FsEntryName name = path.getAddress().getEntryName();
+        final FsEntryName name = path.getEntryName();
         final FsController<?> controller = getController();
         if (null == controller.getEntry(name))
             throw new NoSuchFileException(path.toString());
@@ -524,7 +524,7 @@ public final class TFileSystem extends FileSystem {
                 times.put(READ, lastAccessTime.toMillis());
             if (null != createTime)
                 times.put(CREATE, createTime.toMillis());
-            controller.setTime(path.getAddress().getEntryName(), times);
+            controller.setTime(path.getEntryName(), times);
         }
     } // class FsEntryAttributeView
 
@@ -534,7 +534,7 @@ public final class TFileSystem extends FileSystem {
 
         FsEntryAttributes(final TPath path) throws IOException {
             if (null == (entry = getController().getEntry(
-                    path.getAddress().getEntryName())))
+                    path.getEntryName())))
                 throw new NoSuchFileException(path.toString());
         }
 

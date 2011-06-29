@@ -104,7 +104,8 @@ public class TPathTest extends TestBase {
         final FsPath address = FsPath.create(URI.create(params[3].toString()));
         final TPath path = new TPath(first, more);
         assertThat(path.toString(), equalTo(name.replace(SEPARATOR, path.getFileSystem().getSeparator())));
-        assertThat(path.getAddress(), equalTo(address));
+        assertThat(path.getMountPoint(), equalTo(address.getMountPoint()));
+        assertThat(path.getEntryName(), equalTo(address.getEntryName()));
     }
 
     @Test
@@ -195,7 +196,8 @@ public class TPathTest extends TestBase {
         final TPath member = new TPath(first);
         final TPath path = parent.resolve(member);
         assertThat(path.toString(), equalTo(name.replace(SEPARATOR, path.getFileSystem().getSeparator())));
-        assertThat(path.getAddress(), equalTo(address));
+        assertThat(path.getMountPoint(), equalTo(address.getMountPoint()));
+        assertThat(path.getEntryName(), equalTo(address.getEntryName()));
     }
 
     @Test
@@ -259,7 +261,8 @@ public class TPathTest extends TestBase {
         final TPath member = new TPath(first);
         final TPath path = parent.resolveSibling(member);
         assertThat(path.toString(), equalTo(name.replace(SEPARATOR, path.getFileSystem().getSeparator())));
-        assertThat(path.getAddress(), equalTo(address));
+        assertThat(path.getMountPoint(), equalTo(address.getMountPoint()));
+        assertThat(path.getEntryName(), equalTo(address.getEntryName()));
     }
 
     @Test
