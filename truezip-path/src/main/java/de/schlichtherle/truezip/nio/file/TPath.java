@@ -20,8 +20,8 @@ import de.schlichtherle.truezip.file.TConfig;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.file.TFile;
-import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsEntry;
+import de.schlichtherle.truezip.fs.FsEntryName;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import de.schlichtherle.truezip.fs.FsInputOption;
 import static de.schlichtherle.truezip.fs.FsInputOptions.*;
@@ -564,12 +564,30 @@ public final class TPath implements Path {
     }
 
     /**
-     * Returns a file system path for this path with an absolute URI.
+     * Returns the file system path for this path with an absolute URI.
      * 
-     * @return A file system path for this path with an absolute URI.
+     * @return The file system path for this path with an absolute URI.
      */
-    FsPath getAddress() {
+    private FsPath getAddress() {
         return this.address;
+    }
+
+    /**
+     * Returns the file system mount point for this path.
+     * 
+     * @return The file system mount point for this path.
+     */
+    FsMountPoint getMountPoint() {
+        return getAddress().getMountPoint();
+    }
+
+    /**
+     * Returns the file system entry name for this path.
+     * 
+     * @return The file system entry name for this path.
+     */
+    FsEntryName getEntryName() {
+        return getAddress().getEntryName();
     }
 
     /**
@@ -1022,8 +1040,7 @@ public final class TPath implements Path {
     }
 
     boolean shouldCreateParents() {
-        return null != getAddress().getMountPoint().getParent()
-                && TConfig.get().isLenient();
+        return null != getMountPoint().getParent() && TConfig.get().isLenient();
     }
 
     /**

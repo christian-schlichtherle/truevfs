@@ -230,7 +230,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
         TConfig config = push(configuration);
         try {
             TPath p = new TPath(path);
-            if (null == p.getAddress().getMountPoint().getParent())
+            if (null == p.getMountPoint().getParent())
                 throw new UnsupportedOperationException("No prospective archive file detected."); // don't be greedy!
             return p.getFileSystem();
         } finally {
@@ -299,7 +299,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
      * @return A file system.
      */
     synchronized TFileSystem getFileSystem(final TPath path) {
-        final FsMountPoint mp = path.getAddress().getMountPoint();
+        final FsMountPoint mp = path.getMountPoint();
         TFileSystem fs = fileSystems.get(mp);
         if (null == fs)
             fileSystems.put(mp, fs = new TFileSystem(path));
