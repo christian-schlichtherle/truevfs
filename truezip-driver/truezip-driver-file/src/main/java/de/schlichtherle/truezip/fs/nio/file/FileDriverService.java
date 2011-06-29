@@ -43,6 +43,7 @@ import net.jcip.annotations.Immutable;
 </tbody>
 </table>
  *
+ * @since   TrueZIP 7.2
  * @author  Christian Schlichtherle
  * @version $Id$
  */

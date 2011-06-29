@@ -60,6 +60,7 @@ public abstract class FsController<M extends FsModel> {
 
     /**
      * Returns the file system model.
+     * Multiple invocations must return the same object.
      * 
      * @return The file system model.
      */
@@ -69,6 +70,7 @@ public abstract class FsController<M extends FsModel> {
      * Returns the controller for the parent file system or {@code null} if
      * and only if this file system is not federated, i.e. not a member of
      * another file system.
+     * Multiple invocations must return the same object.
      * 
      * @return The nullable controller for the parent file system.
      */
@@ -80,6 +82,12 @@ public abstract class FsController<M extends FsModel> {
     public abstract @Nullable Icon getClosedIcon()
     throws IOException;
 
+    /**
+     * Returns {@code true} if and only if the file system is read-only.
+     * 
+     * @return {@code true} if and only if the file system is read-only.
+     * @throws IOException on any I/O error.
+     */
     public abstract boolean isReadOnly()
     throws IOException;
 
@@ -151,6 +159,7 @@ public abstract class FsController<M extends FsModel> {
      * @throws IOException on any I/O error.
      * @throws NullPointerException if any key or value in the map is
      *         {@code null}.
+     * @since  TrueZIP 7.2
      */
     public boolean setTime(FsEntryName name, Map<Access, Long> times)
     throws IOException {

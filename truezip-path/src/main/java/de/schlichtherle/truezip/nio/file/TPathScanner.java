@@ -42,6 +42,7 @@ import net.jcip.annotations.NotThreadSafe;
  * So evaluate publishing it as a member of the package
  * {@code de.schlichtherle.truezip.file} instead.
  * 
+ * @since   TrueZIP 7.2
  * @author  Christian Schlichtherle
  * @version $Id$
  */

@@ -57,7 +57,8 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 /**
  * A controller for a mount point of the operating system's file system.
  *
- * @author Christian Schlichtherle
+ * @since   TrueZIP 7.2
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe

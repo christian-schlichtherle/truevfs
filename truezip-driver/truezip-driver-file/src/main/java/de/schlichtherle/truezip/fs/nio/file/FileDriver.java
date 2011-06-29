@@ -27,6 +27,7 @@ import net.jcip.annotations.Immutable;
 /**
  * A file system driver for the FILE scheme.
  * 
+ * @since   TrueZIP 7.2
  * @author  Christian Schlichtherle
  * @version $Id$
  */
