@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.fs.nio.file;
 
+import de.schlichtherle.truezip.fs.FsModelController;
+import net.jcip.annotations.Immutable;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Map;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -34,10 +36,7 @@ import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.SeekableByteChannel;
 import java.nio.file.AccessDeniedException;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.OpenOption;
 import static java.nio.file.Files.*;
@@ -48,22 +47,22 @@ import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.FileTime;
 import java.util.EnumMap;
 import javax.swing.Icon;
-import net.jcip.annotations.ThreadSafe;
 
 import static de.schlichtherle.truezip.entry.Entry.*;
 import static de.schlichtherle.truezip.entry.Entry.Access.*;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 
 /**
- * A controller for a mount point of the operating system's file system.
+ * A file system controller with a prospective directory in the platform file
+ * system as its mount point.
  *
  * @since   TrueZIP 7.2
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@ThreadSafe
+@Immutable
 @DefaultAnnotation(NonNull.class)
-final class FileController extends FsController<FsModel>  {
+final class FileController extends FsModelController<FsModel>  {
 
     private static final OpenOption[] RWD_OPTIONS = {
         StandardOpenOption.READ,
@@ -71,13 +70,12 @@ final class FileController extends FsController<FsModel>  {
         StandardOpenOption.DSYNC,
     };
 
-    private final FsModel model;
     private final Path target;
 
     FileController(final FsModel model) {
+        super(model);
         if (null != model.getParent())
             throw new IllegalArgumentException();
-        this.model = model;
         this.target = Paths.get(model.getMountPoint().toUri());
     }
 
@@ -86,11 +84,6 @@ final class FileController extends FsController<FsModel>  {
                 file, BasicFileAttributeView.class);
         assert null != view;
         return view;
-    }
-
-    @Override
-    public FsModel getModel() {
-        return model;
     }
 
     @Override
@@ -135,105 +128,6 @@ final class FileController extends FsController<FsModel>  {
     public boolean isExecutable(FsEntryName name) throws IOException {
         Path file = target.resolve(name.getPath());
         return Files.isReadable(file);
-    }
-
-    /**
-     * Returns {@code true} if the given file can be created or exists
-     * and at least one byte can be successfully written to it - the file is
-     * restored to its previous state afterwards.
-     * This is a much stronger test than {@link java.io.File#canWrite()}.
-     */
-    @Deprecated
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("IL_INFINITE_RECURSIVE_LOOP")
-    static boolean isCreatableOrWritable(final Path file) {
-        try {
-            try {
-                createFile(file);
-                try {
-                    return isCreatableOrWritable(file);
-                } finally {
-                    delete(file);
-                }
-            } catch (FileAlreadyExistsException ex) {
-                if (Files.isWritable(file)) {
-                    // Some operating and file system combinations make File.canWrite()
-                    // believe that the file is writable although it's not.
-                    // We are not that gullible, so let's test this...
-                    final long time = getLastModifiedTime(file).toMillis();
-                    if (0 > time) {
-                        // lastModified() may return negative values but setLastModified()
-                        // throws an IAE for negative values, so we are conservative.
-                        // See issue #18.
-                        return false;
-                    }
-                    try {
-                        setLastModifiedTime(file, FileTime.fromMillis(time + 1));
-                    } catch (IOException ex2) {
-                        // This may happen on Windows and normally means that
-                        // somebody else has opened this file
-                        // (regardless of read or write mode).
-                        // Be conservative: We don't allow writing to this file!
-                        return false;
-                    }
-                    boolean ok;
-                    try {
-                        // Open the file for reading and writing, requiring any
-                        // update to its contents to be written to the filesystem
-                        // synchronously.
-                        final SeekableByteChannel
-                                sbc = newByteChannel(file, RWD_OPTIONS);
-                        try {
-                            final ByteBuffer buf = ByteBuffer.allocate(1);
-                            final boolean empty;
-                            byte octet;
-                            if (-1 == sbc.read(buf)) {
-                                octet = (byte) 0; // assume first byte is 0
-                                empty = true;
-                            } else {
-                                octet = buf.get(0);
-                                empty = false;
-                            }
-                            // Let's test if we can overwrite the first byte.
-                            // See issue #29.
-                            sbc.position(0);
-                            buf.rewind();
-                            sbc.write(buf);
-                            try {
-                                // Rewrite original content and check success.
-                                sbc.position(0);
-                                buf.rewind();
-                                sbc.read(buf);
-                                final byte check = buf.get(0);
-                                // This should always return true unless the storage
-                                // device is faulty.
-                                ok = octet == check;
-                            } finally {
-                                if (empty)
-                                    sbc.truncate(0);
-                            }
-                        } finally {
-                            sbc.close();
-                        }
-                    } finally {
-                        try {
-                            setLastModifiedTime(file, FileTime.fromMillis(time));
-                        } catch (IOException ex2) {
-                            // This may happen on Windows and normally means that
-                            // somebody else has opened this file meanwhile
-                            // (regardless of read or write mode).
-                            // Be conservative: We don't allow (further) writing to
-                            // this file!
-                            ok = false;
-                        }
-                    }
-                    return ok;
-                } else { // if (!Files.isWritable(file)) {
-                    return false;
-                }
-            }
-        } catch (IOException ex) {
-            return false;
-        }
     }
 
     @Override
