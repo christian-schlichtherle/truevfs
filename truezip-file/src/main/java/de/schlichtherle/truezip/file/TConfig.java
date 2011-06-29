@@ -22,6 +22,7 @@ import java.io.Closeable;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * A container for some configuration options.
@@ -84,6 +85,7 @@ try (TConfig config = TConfig.push()) {
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 @DefaultAnnotation(NonNull.class)
 public final class TConfig implements Closeable {
 
