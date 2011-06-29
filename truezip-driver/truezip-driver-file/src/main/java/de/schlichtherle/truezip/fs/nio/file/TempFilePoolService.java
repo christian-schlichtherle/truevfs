@@ -25,6 +25,7 @@ import net.jcip.annotations.Immutable;
 /**
  * Contains {@link TempFilePool#INSTANCE}.
  *
+ * @since   TrueZIP 7.2
  * @author Christian Schlichtherle
  * @version $Id$
  */

@@ -125,6 +125,7 @@ import net.jcip.annotations.Immutable;
  * bypass or corrupt the state which gets implicitly associated with any
  * archive file by the TrueZIP Kernel module!
  * 
+ * @since   TrueZIP 7.2
  * @author  Christian Schlichtherle
  * @version $Id$
  */

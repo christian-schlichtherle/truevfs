@@ -50,6 +50,7 @@ import static de.schlichtherle.truezip.entry.Entry.*;
 /**
  * An output socket for a file entry.
  *
+ * @since   TrueZIP 7.2
  * @see     FileInputSocket
  * @author  Christian Schlichtherle
  * @version $Id$

@@ -84,6 +84,7 @@ import net.jcip.annotations.ThreadSafe;
  * A {@link FileSystem} implementation
  * based on the TrueZIP Kernel module.
  * 
+ * @since   TrueZIP 7.2
  * @author  Christian Schlichtherle
  * @version $Id$
  */

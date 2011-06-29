@@ -73,6 +73,7 @@ import static java.util.logging.Level.*;
  * A {@link FileSystemProvider} implementation
  * based on the TrueZIP Kernel module.
  * 
+ * @since   TrueZIP 7.2
  * @author  Christian Schlichtherle
  * @version $Id$
  */

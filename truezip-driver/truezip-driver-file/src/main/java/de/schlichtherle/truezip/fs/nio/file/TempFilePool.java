@@ -33,6 +33,7 @@ import net.jcip.annotations.ThreadSafe;
  * a created {@link FileEntry} will delete the temporary file, too.
  * However, for best performance you should not rely on this.
  *
+ * @since   TrueZIP 7.2
  * @author Christian Schlichtherle
  * @version $Id$
  */
