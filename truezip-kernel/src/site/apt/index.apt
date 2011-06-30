@@ -29,6 +29,12 @@ About
     in order to enable applications to resolve these dependencies easily at
     runtime.
 
+    For a comparison example between the TrueZIP File* API and the TrueZIP
+    Kernel API, please refer to the article
+    {{{../truezip-samples/kernel-usage.html}TrueZIP Kernel API Usage}}
+    in the module
+    {{{../truezip-samples/index.html}TrueZIP Samples}}.
+
     There is no tutorial for how to write a file system driver yet,
     but there's comprehensive Javadoc:
 

@@ -81,8 +81,9 @@ About
 
     []
 
-    For examples, please consult the {{{./source-repository.html}source code}}
-    for the file system drivers which ship with TrueZIP.
+    For examples, please {{{./source-repository.html}check out}} the source
+    code of this project and consult the file system driver implementations
+    which ship with TrueZIP.
 
 * Getting Started
 
