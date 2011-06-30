@@ -47,9 +47,10 @@ import javax.swing.Icon;
 import net.jcip.annotations.Immutable;
 
 /**
- * An abstract archive driver which provides access to a federated file system
- * which is persistet in an archive file format like ZIP, JAR, TZP, TAR,
- * TAR.GZ, TAR.BZ2 etc.
+ * An abstract factory for components required for accessing a federated file
+ * system which is enclosed in a parent file system.
+ * Implementations of this abstract base class are used to access archive file
+ * formats like ZIP, JAR, TZP, TAR, TAR.GZ, TAR.BZ2 etc.
  *
  * @param   <E> The type of the archive entries.
  * @author  Christian Schlichtherle
@@ -156,11 +157,11 @@ extends FsDriver {
     }
 
     /**
-     * Returns a new thread-safe file system controller for the given mount
-     * point and parent file system controller.
+     * Returns a new thread-safe file system controller for the mount point of
+     * the given file system model and parent file system controller.
      * <p>
      * When called, the following expression is a precondition:
-     * {@code mountPoint.getParent().equals(parent.getModel().getMountPoint())}
+     * {@code model.getParent().equals(parent.getModel())}
      * <p>
      * Note that an archive file system is always federated and therefore
      * its parent file system controller is never {@code null}.
@@ -171,7 +172,8 @@ extends FsDriver {
      * Consequently, it is an error to call this method with a mount point
      * which has a scheme which is not supported by this archive driver.
      * <p>
-     * Note again that the returned file system controller must be thread-safe!
+     * Note again that unlike the other components created by this factory,
+     * the returned file system controller must be thread-safe!
      *
      * @param  model the file system model.
      * @param  parent the nullable parent file system controller.
@@ -185,7 +187,8 @@ extends FsDriver {
                    new FsCachingController(
                         new FsDefaultArchiveController<E>(
                             new FsConcurrentModel(model),
-                            this, parent),
+                            parent,
+                            this),
                         getPool()));
     }
 
@@ -330,7 +333,7 @@ extends FsDriver {
 
     /**
      * Equivalent to {@link #newEntry(java.lang.String, de.schlichtherle.truezip.entry.Entry.Type, de.schlichtherle.truezip.entry.Entry, de.schlichtherle.truezip.util.BitField)
-     * newEntry(name, type, template, NO_OUTPUT_OPTION)}.
+     * newEntry(name, type, template, FsOutputOptions.NO_OUTPUT_OPTIONS)}.
      */
     public final E newEntry(String name, Type type, @CheckForNull Entry template)
     throws CharConversionException {

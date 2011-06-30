@@ -198,7 +198,8 @@ public final class TFileSystem extends FileSystem {
      * This method is equivalent to calling
      * {@link #sync(BitField) sync(FsSyncOptions.UMOUNT)}.
      * <p>
-     * The file system stays open after this call and can be subsequently used.
+     * Note that the file system stays open (!) after this call and can get
+     * used subsequently.
      *
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         occur.
