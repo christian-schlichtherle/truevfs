@@ -418,6 +418,50 @@ try {
                 </ul>
              </answer>
         </faq>
+        <faq id="whichCopy">
+            <question>
+                The NIO.2 API and the TrueZIP File* API both provide a copy
+                method. Which one should I use?
+            </question>
+            <answer>
+                <p>
+                    Currently, the NIO.2 API supports only the copying of a
+                    single file: <code>Files.copy(Path, Path, CopyOption)</code>.
+                    Unfortunately, these methods use a simple
+                    read-then-write-in-a-loop implementation which results in
+                    bad performance.
+                    Furthermore, there are no methods for recursive copying of
+                    directory trees, so you'ld have to write this yourselve.
+                </p>
+                <p>
+                    With TrueZIP however, you can easily &quot;back out&quot;
+                    from a <code>TPath</code> object to a <code>TFile</code>
+                    object to use the advanced copy methods of the TrueZIP
+                    File* API.
+                    So instead of calling...
+                </p>
+<source>
+Path src = ...
+Path dst = ...
+Files.copy(src, dst, REPLACE_EXISTING);
+</source>
+                <p>
+                    You could call...
+                </p>
+<source>
+Path src = ...
+Path dst = ...
+TFile.cp(src.toFile(), dst.toFile());
+</source>
+                <p>
+                    in order to benefit from its superior performance.
+                    Likewise, you could call any other
+                    <code>TFile.cp*(*)</code> method, e.g.
+                    <code>TFile.cp_r(File src, File dst, TArchiveDetector detector)</code>
+                    for recursive copying of a directory tree.
+                </p>
+            </answer>
+        </faq>
         <faq id="ignoreArchivePath">
             <question>
                 The API should <em>not</em> detect a particular archive file as
