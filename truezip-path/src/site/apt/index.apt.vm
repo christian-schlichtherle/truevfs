@@ -41,11 +41,22 @@ try (Files.newInputStream(path)) {
 }
 +--+
 
-    This example requires that the JARs of the file system driver modules
+    This example presumes that the JARs of the file system driver modules
     {{{../truezip-driver/truezip-driver-http/index.html}TrueZIP Driver HTTP(S)}}
     and
     {{{../truezip-driver/truezip-driver-tar/index.html}TrueZIP Driver TAR}}
     are present on the run time class path.
 
-    For more information, please refer to the Javadoc of the package
+    Mind that a <<<TPath>>> is a <<<Path>>>, so you can use it polymorphically
+    with the entire NIO.2 API.
+
+    For more examples, please use the Maven archetype for TrueZIP Path module
+    applications as described in the
+    {{{../kick-start/index.html}Kick-Starting TrueZIP}} section.
+    You might also want to
+    {{{http://repo1.maven.org/maven2/de/schlichtherle/truezip/truezip-samples/${project.version}/truezip-samples-${project.version}-sources.jar}download}}
+    the source code of the
+    {{{../truezip-samples/index.html}TrueZIP Samples}} module.
+
+    For the API documentation, please refer to the Javadoc of the package
     {{{../apidocs/de/schlichtherle/truezip/nio/file/package-summary.html}<<<de.schlichtherle.truezip.nio.file>>>}}
