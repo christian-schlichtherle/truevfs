@@ -16,7 +16,6 @@
 package de.schlichtherle.truezip.nio.file;
 
 import de.schlichtherle.truezip.file.TArchiveDetector;
-import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import java.io.File;
 import static de.schlichtherle.truezip.nio.file.TFileSystemProvider.Parameter.*;

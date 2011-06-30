@@ -57,14 +57,14 @@ public class Copy extends Application<IOException> {
         if (TConfig.get().isLenient() && dst.isArchive() || Files.isDirectory(dst))
             dst = dst.resolve(src.getFileName());
 
-        // If TFile.setLenient(false) is never called in your application,
-        // then you could shorten this to...
+        // If TConfig.get().setLenient(false) is never called in your
+        // application, then you might as well shorten this to...
         /*if (dst.isArchive() || Files.isDirectory(dst))
             dst = dst.resolve(src.getFileName());*/
 
         // If you don't like path name completion for non-existent files which
         // just look like archive files according to their path name,
-        // then you could even shorten this to...
+        // then you might even shorten this to...
         /*if (Files.isDirectory(dst))
             dst = dst.resolve(src.getFileName());*/
 
@@ -75,7 +75,7 @@ public class Copy extends Application<IOException> {
         // out to the TrueZIP File* API as follows because a recursive copy
         // with the NIO.2 API is way too complex for this most prominent use
         // case.
-        //src.toFile().cp_rp(dst.toFile()); // give power to the people!
+        //TFile.cp_rp(src.toFile(), dst.toFile(), TArchiveDetector.NULL);
 
         return 0;
     }
