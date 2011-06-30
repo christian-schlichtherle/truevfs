@@ -1,0 +1,30 @@
+    -----------------------
+    6.8 Release News
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+{TrueZIP 6.8 has been released}
+
+    (August 31st, 2010)
+        
+    I am pleased to announce the release of TrueZIP 6.8.
+    This is a maintenance release \- it fixes classloading for OSGI
+    environments, updates the Javadoc and fixes some issues with
+    the unit tests for Swing GUI classes.
+
+    Last, but not least, Maven is now used for the build and
+    release process.
+    The Maven Coordinates are
+    <<<de.schlichtherle:truezip:jar:6.8>>>.
+    You should soon see the artifacts appear in
+    {{{http://repo1.maven.org/maven2/de/schlichtherle/truezip/}Maven Central}}.
+
+    If and only if you are using TrueZIP to access TAR files or
+    derivative archive file types, then you need to upgrade the run
+    time dependency <<<ant.jar>>> to Ant 1.8.1.
+        
+    Upgrading is recommended for all users.
+        
+    For more information, please refer to
+    the {{{../relnotes/release\-6_8.html}Release Notes}}.

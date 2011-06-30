@@ -1,0 +1,72 @@
+    -----------------------
+    5.1.2 Release News
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+{TrueZIP 5.1.2 has been released}
+
+    (February 24th, 2006)
+
+    This is a feature enhancement and bug fix release.
+
+    Following is a high level overview of the changes/add\-ons (in
+    order of priority):
+
+    [[1]] <<New:>> New classes have been added to
+    support <<<JTree>>> based traversal of directory
+    trees, including support for any ZIP compatible file type of course.
+    Please check out the classes <<<de.schlichtherle.io.swing.JFileTree>>>,
+    <<<de.schlichtherle.io.swing.tree.FileTreeModel>>> and
+    <<<de.schlichtherle.io.swing.tree.FileTreeCellRenderer>>>
+    in the packages <<<de.schlichtherle.io.swing>>> and
+    <<<de.schlichtherle.io.swing.tree>>>. The
+    JFileTree class is a complete file system browser, providing GUI aware
+    file operations like createNewFile, mkdir, copyTo, renameTo, delete,
+    deleteAll, etc. It uses system icons for all nodes, provides options
+    which control how to deal with suffixes, uses filters and allows you to
+    rename files and directories by editing their node. A tutorial for this
+    class should be added later.
+
+    [[1]] <<New:>> TrueZIP is now able to read and
+    update Self Extracting Archives, such as produced by WinZIP or JSmooth
+    for example. However, please be aware that the SFX code of these
+    applications does not tolerate updating their ZIP file contents. So
+    once updated, you cannot use the SFX code anymore, but you can still
+    use the regular tools (e.g. WinZIP or infoZIP) to access the updated
+    ZIP file contents. This restriction is imposed by the SFX code and
+    cannot be resolved by TrueZIP.
+
+    [[1]] <<New:>> When using characters in file names
+    which have no representation in the character set encoding of the
+    target ZIP compatible file, then the TrueZIP API will fail gracefully
+    with an IOException or a boolean return value of false (depending on
+    the method's way to indicate an error condition). This is to protect
+    applications from creating ZIP entries which cannot get encoded and
+    decoded again correctly. An example is the Euro sign which does not
+    have a representation in the IBM437 character set used by ordinary ZIP
+    files.
+
+    [[1]] <<Enhanced:>> The <<<de.schlichtherle.crypto.io.PasswdManager>>>
+    class has been refactored to allow easy programmatic setting of
+    <<<de.schlichtherle.crypto.io.RaesParameters>>> for a particular file
+    without the need to implement a custom <<<de.schlichtherle.io.ZipDetector>>>.
+
+    [[1]] <<Enhanced:>> The <<<de.schlichtherle.crypto.io.swing.SwingPasswdManager>>>
+    class now implements focus management for more convenient password editing.
+
+    [[1]] <<Enhanced:>> The performance has been
+    further enhanced by reimplementing the constructors of the
+    <<<de.schlichtherle.io.File>>> class and the low level
+    <<<de.schlichtherle.util.zip.ZipFile>>> class.
+
+    [[1]] <<Fixed:>> Some minor bugs have been fixed,
+    none of which caused ZIP file corruptions.
+
+    [[1]] <<Retained:>> Binary compatibility of <<<truezip.jar>>>.
+
+    [[1]] <<Updated:>> Project management files are
+    now upgraded to NetBeans 5 and have been enhanced to support some
+    versioning information in the source files.
+
+    []
