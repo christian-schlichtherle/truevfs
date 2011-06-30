@@ -56,11 +56,12 @@ import static de.schlichtherle.truezip.fs.FsSyncOption.*;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 
 /**
- * An abstract archive controller which is the super class for any archive
- * controller, providing all the essential services required for accessing an
+ * An abstract base class for any archive file system controller which
+ * provide all the essential services required for accessing a prospective
  * archive file.
- * It encapsulates all the code which is not depending on a particular archive
- * update strategy and the corresponding state of the controller.
+ * This base class encapsulates all the code which is not depending on a
+ * particular archive update strategy and the corresponding state of this
+ * file system controller.
  * <p>
  * Each instance of this class manages an archive file - the <i>target file</i>
  * - in order to allow random access to it as if it were a regular directory in
@@ -389,19 +390,20 @@ extends FsModelController<FsConcurrentModel> {
     }
 
     /**
-     * Synchronizes the archive file only if the archive file has new data for
-     * the file system entry with the given path path.
+     * Synchronizes the archive file only if there is new data for the file
+     * system entry with the given name.
+     * This method requires synchronization on the write lock.
      * <p>
-     * <b>Warning:</b> As a side effect,
-     * all data structures may get reset (filesystem, entries, streams, etc.)!
-     * This method may require synchronization on the write lock!
+     * <b>Warning:</b> As a side effect, the state of this controller may get
+     * entirely reset (virtual filesystem, entries, streams, etc.)!
      *
      * @param  name the non-{@code null} entry name.
-     * @param  intention the intended operation on the entry. If {@code null},
-     *         a pure file system operation with no I/O is intended.
+     * @param  intention the intended I/O operation on the entry.
+     *         If {@code null}, then a pure virtual file system operation with
+     *         no I/O is intended.
      * @see    FsController#sync
-     * @throws IOException if any exceptional condition occurs
-     *         throughout the synchronization of the target archive file.
+     * @throws IOException if any I/O error occurs when synchronizing the
+     *         archive file to its parent file system.
      * @return Whether or not a synchronization has been performed.
      */
     abstract boolean autoSync(  FsEntryName name,

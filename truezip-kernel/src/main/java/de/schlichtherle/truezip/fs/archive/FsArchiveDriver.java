@@ -47,8 +47,8 @@ import javax.swing.Icon;
 import net.jcip.annotations.Immutable;
 
 /**
- * An abstract factory for components required to access a federated file
- * system, which is a file system which is enclosed in a parent file system.
+ * An abstract factory for components required for accessing a federated file
+ * system which is enclosed in a parent file system.
  * Implementations of this abstract base class are used to access archive file
  * formats like ZIP, JAR, TZP, TAR, TAR.GZ, TAR.BZ2 etc.
  *
