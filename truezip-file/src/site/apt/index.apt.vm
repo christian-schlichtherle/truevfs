@@ -40,26 +40,34 @@ try {
 }
 +--+
 
-    This example requires that the JARs of the file system driver modules
+    This example presumes that the JARs of the file system driver modules
     {{{../truezip-driver/truezip-driver-file/index.html}TrueZIP Driver FILE}}
     and
     {{{../truezip-driver/truezip-driver-tar/index.html}TrueZIP Driver TAR}}
     are present on the run time class path.
 
-    Note that this API can only access the platform file system and any
-    archive files within the platform file system.
-    If you need to access other (virtual) file systems, e.g. HTTP(S),
-    then please consider using the
-    {{{../truezip-path/index.html}TrueZIP Path}}
-    API or the
-    {{{../truezip-kernel/index.html}TrueZIP Kernel}}
-    API instead.
+    Mind that a <<<TFile>>> is a <<<File>>>, so you can use it polymorphically.
+    However, you cannot use it with a plain <<<File(In|Out)putStream>>> or a
+    plain <<<File(Reader|Writer)>>> to access archive entries because these
+    classes were not designed for this.
+    You have to use a <<<TFile(In|Out)putStream>>> or a
+    <<<TFile(Reader|Writer)>>> instead.
 
-    For more information, please refer to the Javadoc of the package
+    For more examples, please use the Maven archetype for TrueZIP File* module
+    applications as described in the
+    {{{../kick-start/index.html}Kick-Starting TrueZIP}} section.
+    You might also want to
+    {{{http://repo1.maven.org/maven2/de/schlichtherle/truezip/truezip-samples/${project.version}/truezip-samples-${project.version}-sources.jar}download}}
+    the source code of the
+    {{{../truezip-samples/index.html}TrueZIP Samples}} module.
+
+    For the API documentation, please refer to the Javadoc of the package
     {{{../apidocs/de/schlichtherle/truezip/file/package-summary.html}<<<de.schlichtherle.truezip.file>>>}}
+
+* Swing GUI
 
     This module also provides Swing GUI classes for viewing file trees
     and choosing entries in archive files.
 
-    For more information, please refer to the Javadoc of the package
+    For the API documentation, please refer to the Javadoc of the package
     {{{../apidocs/de/schlichtherle/truezip/file/swing/package-summary.html}<<<de.schlichtherle.truezip.file.swing>>>}}

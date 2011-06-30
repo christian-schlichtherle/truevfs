@@ -66,7 +66,7 @@ Using TrueZIP Without Maven
     {{{http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22de.schlichtherle.truezip%22%20AND%20a%3A%22truezip-samples%22%20AND%20l%3A%22jar-with-dependencies%22}click here}}
     ).
     For the release of TrueZIP ${project.version}, you could also directly download it from
-   {{http://repo1.maven.org/maven2/de/schlichtherle/truezip/truezip-samples/${project.version}/truezip-samples-${project.version}-jar-with-dependencies.jar}}
+    {{http://repo1.maven.org/maven2/de/schlichtherle/truezip/truezip-samples/${project.version}/truezip-samples-${project.version}-jar-with-dependencies.jar}}
     .
 
     This all-in-one JAR saves you from grabbing the module JARs individually.
@@ -113,19 +113,19 @@ Using TrueZIP Without Maven
 *--*--*
 ||Canonical File Suffixes||File System Driver Class|
 *--+--+
-|<<<ear>>>, <<<jar>>>, <<<war>>>|{{{../../apidocs/de/schlichtherle/truezip/fs/archive/zip/JarDriver.html}<<<JarDriver>>>}}|
+|<<<ear>>>, <<<jar>>>, <<<war>>>|{{{../apidocs/de/schlichtherle/truezip/fs/archive/zip/JarDriver.html}<<<JarDriver>>>}}|
 *--+--+
-|<<<exe>>>|{{{../../apidocs/de/schlichtherle/truezip/fs/archive/zip/ReadOnlySfxDriver.html}<<<ReadOnlySfxDriver>>>}}|
+|<<<exe>>>|{{{../apidocs/de/schlichtherle/truezip/fs/archive/zip/ReadOnlySfxDriver.html}<<<ReadOnlySfxDriver>>>}}|
 *--+--+
 |<<<odb>>>, <<<odf>>>, <<<odg>>>, <<<odm>>>, <<<odp>>>, <<<ods>>>, <<<odt>>>, <<<otg>>>, <<<oth>>>, <<<otp>>>, <<<ots>>>, <<<ott>>>|{{{../../apidocs/de/schlichtherle/truezip/fs/archive/zip/OdfDriver.html}<<<OdfDriver>>>}}|
 *--+--+
-|<<<tar>>>|{{{../../apidocs/de/schlichtherle/truezip/fs/archive/tar/TarDriver.html}<<<TarDriver>>>}}|
+|<<<tar>>>|{{{../apidocs/de/schlichtherle/truezip/fs/archive/tar/TarDriver.html}<<<TarDriver>>>}}|
 *--+--+
-|<<<tar.bz2>>>, <<<tb2>>>, <<<tbz>>>|{{{../../apidocs/de/schlichtherle/truezip/fs/archive/tar/TarBZip2Driver.html}<<<TarBZip2Driver>>>}}|
+|<<<tar.bz2>>>, <<<tb2>>>, <<<tbz>>>|{{{../apidocs/de/schlichtherle/truezip/fs/archive/tar/TarBZip2Driver.html}<<<TarBZip2Driver>>>}}|
 *--+--+
-|<<<tar.gz>>>, <<<tgz>>>|{{{../../apidocs/de/schlichtherle/truezip/fs/archive/tar/TarGZipDriver.html}<<<TarGZipDriver>>>}}|
+|<<<tar.gz>>>, <<<tgz>>>|{{{../apidocs/de/schlichtherle/truezip/fs/archive/tar/TarGZipDriver.html}<<<TarGZipDriver>>>}}|
 *--+--+
-|<<<tzp>>>, <<<zip.rae>>>, <<<zip.raes>>>|{{{../../apidocs/de/schlichtherle/truezip/fs/archive/zip/raes/SafeZipRaesDriver.html}<<<SafeZipRaesDriver>>>}}|
+|<<<tzp>>>, <<<zip.rae>>>, <<<zip.raes>>>|{{{../apidocs/de/schlichtherle/truezip/fs/archive/zip/raes/SafeZipRaesDriver.html}<<<SafeZipRaesDriver>>>}}|
 *--+--+
-|<<<zip>>>|{{{../../apidocs/de/schlichtherle/truezip/fs/archive/zip/ZipDriver.html}<<<ZipDriver>>>}}|
+|<<<zip>>>|{{{../apidocs/de/schlichtherle/truezip/fs/archive/zip/ZipDriver.html}<<<ZipDriver>>>}}|
 *--+--+
