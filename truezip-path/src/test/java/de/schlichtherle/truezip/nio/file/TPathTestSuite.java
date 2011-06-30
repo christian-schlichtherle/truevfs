@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.nio.file;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import de.schlichtherle.truezip.io.Streams;
 import java.util.List;
 import java.util.LinkedList;
@@ -36,7 +38,6 @@ import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.socket.OutputClosedException;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import static java.io.File.*;
@@ -68,6 +69,7 @@ import static org.junit.Assert.*;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public abstract class TPathTestSuite extends TestBase {
 
     private static final Logger logger = Logger.getLogger(
@@ -156,10 +158,7 @@ public abstract class TPathTestSuite extends TestBase {
         TConfig config = TConfig.push();
         try {
             config.setArchiveDetector(TArchiveDetector.NULL);
-            TPath parent = path.getParent();
-            return null == parent
-                    ? new TPath(path)
-                    : parent.resolve(path.getFileName());
+            return path.resolveSibling(path.getFileName());
         } finally {
             config.close();
         }

@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.file;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.File;
 import java.util.logging.Logger;
 import java.beans.ExceptionListener;
@@ -45,6 +47,7 @@ import static org.junit.Assert.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public class TFileTest extends TestBase {
 
     private static final Logger logger

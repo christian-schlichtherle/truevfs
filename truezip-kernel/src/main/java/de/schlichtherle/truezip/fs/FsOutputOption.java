@@ -59,7 +59,7 @@ public enum FsOutputOption {
 
     /** Whether or not an entry must be exclusively created. */
     EXCLUSIVE,
-    
+
     /**
      * Expresses a preference to store an entry uncompressed within its archive.
      * This may get used or ignored by archive drivers.
