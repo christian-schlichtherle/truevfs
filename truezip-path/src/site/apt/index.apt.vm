@@ -16,8 +16,9 @@ About
     class to implement a file system provider for the NIO.2 API in JSE 7.
 
     This is the primary API for JSE 7 compliant TrueZIP applications:
-    Like the {{{../truezip-file/index.html}TrueZIP File*}} API, this API is
-    just a facade for the {{{../truezip-kernel/index.html}TrueZIP Kernel}} API.
+    Like the API of the {{{../truezip-file/index.html}TrueZIP File*}} module,
+    this API is just a facade for the
+    {{{../truezip-kernel/index.html}TrueZIP Kernel}} module.
     In contrast to the TrueZIP File* API however,
     this API can access any (virtual) file system, not just the platform file
     system and any archive files within the platform file system.
