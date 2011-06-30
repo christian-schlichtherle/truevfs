@@ -92,16 +92,16 @@ About
           ten minutes!
 
     [[1]] If you are looking for more sample code and applications,
-          please check the
-          {{{http://java.net/projects/truezip/sources/v7/show/truezip-samples/src/main/java/de/schlichtherle/truezip/sample}source code}}
-          of the
+          please
+          {{{http://repo1.maven.org/maven2/de/schlichtherle/truezip/truezip-samples/${project.version}/truezip-samples-${project.version}-sources.jar}download}}
+          the source code of the
           {{{./truezip-samples/index.html}TrueZIP Samples}} module.
 
     [[1]] If you encounter issues, please read the {{{./faq.html}FAQ}}
           before subscribing and posting to the
           {{{./mail-lists.html}User Mailing List}}.
 
-    [[1]] Last, but not least, please check the
+    [[1]] Last, but not least, please read the
           {{{./apidocs/index.html}Javadoc}}.
 
     []
