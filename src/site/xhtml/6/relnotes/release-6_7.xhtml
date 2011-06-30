@@ -1,0 +1,550 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>6.7 Release Notes</title>
+        <meta name="Author" content="Christian Schlichtherle"/>
+    </head>
+    <body>
+        <div id="content">
+            <h1>Release Notes for TrueZIP 6.7</h1>
+            <p class="subtitle">(July 16<sup>th</sup>, 2010)</p>
+            <h2>Contents</h2>
+            <ol>
+                <li><a href="#introduction">Introduction</a></li>
+                <li><a href="#updates">List of Updates (Change Log)</a></li>
+            </ol>
+            <h2><a name="introduction">Introduction</a></h2>
+            <p>
+                This is a feature and bug fix release.
+                Upgrading is recommended for all users.
+            </p>
+            <h3><a name="ZIP64">Transparent ZIP64 Support</a></h3>
+            <p>
+                This is the first release which supports ZIP64 extensions as
+                introduced in version 4.5 of PKWARE&#39;s
+                <a href="http://www.pkware.com/documents/casestudies/APPNOTE.TXT">ZIP File Format Specification</a>
+                when reading or writing ZIP archive files with the low level API
+                in the package
+                <a href="apidocs/de/schlichtherle/util/zip/package-summary.html">
+                    <code>de.schlichtherle.util.zip</code>
+                </a>.
+                This enables client applications to read and write ZIP archive
+                files of more than 4GB size or with more than 65535 entries.
+            </p>
+            <p>
+                Handling ZIP64 extensions is fully transparent for client
+                applications, so there are no public API changes involved.
+                The only noticeable difference is that the setters and getters
+                for the properties <code>size</code> and
+                <code>compressedSize</code>
+                (and the package private <code>offset</code>)
+                in the class
+                <a href="apidocs/de/schlichtherle/util/zip/ZipEntry.html">
+                    <code>de.schlichtherle.util.zip.ZipEntry</code>
+                </a>
+                can now accept and return values ranging from <code>0L</code> to
+                <code>Long.MAX_VALUE</code>.
+                Since these properties already had the primitive type
+                <code>long</code>,
+                this enhancement does not affect the binary compatibility of
+                the JAR for TrueZIP 6.7.
+            </p>
+            <p>
+                In order to retain maximum interoperability with third party
+                tools, by default, ZIP64 extensions are written to a ZIP file
+                only if they are required.
+                Currently, TrueZIP&#39;s implementation of ZIP64 extensions is
+                known to interoperate round trip
+                (create, update, read in both directions)
+                with WinZip 11.1 and 7-Zip 4.56.
+                Older versions of WinZip may work, but have not been tested.
+                Older versions of 7-Zip (namely 4.42) are known to have problems
+                reading ZIP files with ZIP64 extensions; please upgrade your copy
+                of 7-Zip accordingly.
+            </p>
+            <p>
+                If the system property <code>de.schlichtherle.util.zip.zip64ext</code>
+                is set to <code>true</code> (case is ignored), then ZIP64 extensions
+                are <em>always</em> added when writing a ZIP archive file, regardless
+                of its size.
+                This feature is intended for testing purposes only.
+                During normal operations, it should not be set as many
+                third party tools would not treat the redundant ZIP64 extensions
+                correctly.
+                Note that it's impossible to inhibit ZIP64 extensions.
+            </p>
+            <h3>Enhanced ZIP File Interoperability</h3>
+            <p>
+                Some improvements were made on the interoperability of ZIP
+                files created by TrueZIP with third party tools.
+            </p>
+            <p>
+                A minor bug has been fixed which caused some tools like e.g.
+                the Windows Explorer not to be able to treat directory entries
+                correctly.
+            </p>
+            <p>
+                ZIP files utilize a simplistic date/time conversion algorithm
+                which isn't detailed in the
+                <a href="http://www.pkware.com/documents/casestudies/APPNOTE.TXT">ZIP File Format Specification</a>
+                version 6.3.2 from September 28<sup>th</sup>, 2007.
+                Hence, for ZIP files the date/time conversion of the package
+                <code>java.util.zip</code> is not fully interoperable with
+                tools like Windows Explorer, WinZip 12.0 or 7-Zip 4.65.
+                Symptoms are time stamps which may differ by two seconds
+                or even an hour if the daylight saving time has changed
+                between the last modification time of an archive entry
+                and the current system time.
+            </p>
+            <p>
+                In order to address this issue, TrueZIP's equivalent to the
+                package
+                <code>java.util.zip</code>
+                in the low level interface package
+                <a href="apidocs/de/schlichtherle/util/zip/package-summary.html">
+                    <code>de.schlichtherle.util.zip</code>
+                </a>
+                now offers a new class,
+                <a href="apidocs/de/schlichtherle/util/zip/DateTimeConverter.html">
+                    <code>DateTimeConverter</code></a>.
+                This class is now used by the class
+                <a href="apidocs/de/schlichtherle/util/zip/ZipEntry.html">
+                    <code>ZipEntry</code>
+                </a>
+                in order to perform the date/time conversion.
+                By default,
+                <a href="apidocs/de/schlichtherle/util/zip/DateTimeConverter.html#JAR">
+                    <code>JAR</code>
+                </a>
+                file date/time conversion is selected in order
+                to maintain backwards compatibility to the JSE implementation.
+                If an application utilizing the low level interface needs
+                <a href="apidocs/de/schlichtherle/util/zip/DateTimeConverter.html#ZIP">
+                    <code>ZIP</code>
+                </a>
+                file date/time conversion however,
+                then it needs to subclass
+                <a href="apidocs/de/schlichtherle/util/zip/ZipEntry.html">
+                    <code>ZipEntry</code>
+                </a>
+                and override the method
+                <a href="apidocs/de/schlichtherle/util/zip/ZipEntry.html#getDateTimeConverter">
+                    <code>getDateTimeConverter()</code>.
+                </a>
+            </p>
+            <p>
+                For the high level API in the package
+                <a href="apidocs/de/schlichtherle/io/package-summary.html">
+                    <code>de.schlichtherle.io</code>
+                </a>
+                the
+                <a href="apidocs/de/schlichtherle/io/archive/spi/ArchiveDriver.html">
+                    <code>ArchiveDriver</code></a>s
+                for the ZIP and JAR file family have been
+                updated to select the appropriate date/time conversion
+                automatically.
+                So users of the high level API don't need to do anything in
+                order to benefit from the enhanced interoperability.
+            </p>
+            <p>
+                For additional information, please check the change log below.
+            </p>
+            <table id="legend">
+                <thead>
+                    <tr>
+                        <th colspan="2">Legend</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>New</th>
+                        <td>Introduces a new feature.</td>
+                    </tr>
+                    <tr>
+                        <th>Fixed</th>
+                        <td>Introduces a bug fix of an existing feature.</td>
+                    </tr>
+                    <tr>
+                        <th>Enhanced</th>
+                        <td>
+                            Introduces the enhancement of an existing feature.
+                            This update is fully backwards compatible.
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Changed</th>
+                        <td>
+                            Introduces the change of an existing feature.
+                            This update may cause
+                            <a href="releases.html#compatibility">
+                                backwards incompatibilities
+                            </a>.
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Deprecated</th>
+                        <td>Introduces the deprecation of an existing feature.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h2><a name="updates">List of Updates (Change Log)</a></h2>
+            <p>
+                Following is an overview of all updates in this release
+                which affect the public API.
+                Please note that internal refactorings are not listed.
+                For a full list of updates, please refer to the CVS repository
+                and diff to the tag <code>TrueZIP-6_6</code>.
+            </p>
+            <h3>Cross Package Updates</h3>
+            <ol>
+                <li>
+                    <b>Fixed &amp; Enhanced:</b> Updated the Javadoc of some classes.
+                </li>
+            </ol>
+            <h3>Updates in the Default Package</h3>
+            <ol>
+                <li>
+                    <b>Deprecated:</b> The command line utility classes in this
+                    package are now deprecated in favour of the same classes in
+                    the package
+                    <a href="apidocs/de/schlichtherle/package-summary.html">
+                        <code>de.schlichtherle</code>
+                    </a>.
+                    This is a minor step intended for better interoperability with the
+                    OSGi Framework.
+                </li>
+            </ol>
+            <h3>
+                Updates in the Package
+                <a href="apidocs/de/schlichtherle/package-summary.html">
+                    <code>de.schlichtherle</code>
+                </a>
+            </h3>
+            <ol>
+                <li>
+                    <b>Changed:</b> The visibility of the class
+                    <code>CommandLineUtility</code> has been changed to package
+                    private in order to reflect its very limited reusability.
+                    Client applications which sub classed this class should
+                    consider copying the source code instead.
+                </li>
+            </ol>
+            <h3>
+                Updates in the Package
+                <a href="apidocs/de/schlichtherle/io/package-summary.html">
+                    <code>de.schlichtherle.io</code>
+                </a>
+            </h3>
+            <ol>
+                <li>
+                    <b>Fixed:</b>
+                    <a href="apidocs/de/schlichtherle/io/Files.html#isWritableOrCreatable(java.io.File)">
+                        <code>Files.isWritableOrCreatable(java.io.File)</code></a>
+                    threw an <code>IllegalArgumentException</code> if and only if
+                    <code>File.lastModified()</code> returned a negative value.
+                    These files are now considered read-only (see issue #18).
+                </li>
+                <li>
+                    <b>Fixed:</b>
+                    <a href="apidocs/de/schlichtherle/io/Files.html#isWritableOrCreatable(java.io.File)">
+                        <code>Files.isWritableOrCreatable(java.io.File)</code></a>
+                    had a chance of leaving the first byte with its complement if
+                    the JVM gets killed unexpectedly (see issue #29).
+                </li>
+                <li>
+                    <b>Enhanced:</b>
+                    <a href="apidocs/de/schlichtherle/io/File.html#cat(java.io.InputStream, java.io.OutputStream)">
+                        <code>File.cat()</code></a>
+                    has been optimized a very little bit.
+                </li>
+            </ol>
+            <h3>
+                Updates in the Package
+                <a href="apidocs/de/schlichtherle/io/archive/package-summary.html">
+                    <code>de.schlichtherle.io.archive</code>
+                </a>
+            </h3>
+            <ol>
+                <li>
+                    <b>New:</b> The interface
+                    <a href="apidocs/de/schlichtherle/io/archive/Archive.html">
+                        <code>Archive</code>
+                    </a>
+                    now provides the method
+                    <a href="apidocs/de/schlichtherle/io/archive/Archive.html#getEnclArchive()">
+                        <code>getEnclArchive()</code>
+                    </a>
+                    in order to enable archive drivers to detect if they are
+                    working on an enclosed archive file.
+                </li>
+            </ol>
+            <h3>
+                Updates in the Package
+                <a href="apidocs/de/schlichtherle/io/archive/spi/package-summary.html">
+                    <code>de.schlichtherle.io.archive.spi</code>
+                </a>
+            </h3>
+            <ol>
+                <li>
+                    <b>Enhanced:</b> The class
+                    <a href="apidocs/de/schlichtherle/io/archive/spi/AbstractArchiveDriver.html">
+                        <code>AbstractArchiveDriver</code>
+                    </a>
+                    now logs details about the character set implementation at the
+                    CONFIG level.
+                </li>
+            </ol>
+            <h3>
+                Updates in the Package
+                <a href="apidocs/de/schlichtherle/io/archive/zip/package-summary.html">
+                    <code>de.schlichtherle.io.archive.zip</code>
+                </a>
+            </h3>
+            <ol>
+                <li>
+                    <b>New:</b> With the advent of ZIP64 support in the package
+                    <a href="apidocs/de/schlichtherle/util/zip/package-summary.html">
+                        <code>de.schlichtherle.util.zip</code>
+                    </a>
+                    the name prefix "Zip32" of some classes and methods in this package
+                    has become obsolete.
+                    Hence, new substitutes with "Zip" as their name prefix have been
+                    added.
+                    The obsoleted classes and methods with the "Zip32" name prefix are
+                    now marked as deprecated and have been retrofitted so that binary
+                    compatibility is retained.
+                </li>
+                <li>
+                    <b>Enhanced:</b> The class
+                    <a href="apidocs/de/schlichtherle/io/archive/zip/ZipDriver.html">
+                        <code>ZipDriver</code></a>
+                    (formerly <code>Zip32Driver</code>)
+                    and it's companion classes now utilize the
+                    newly introduced date/time conversion algorithm
+                    for ZIP files as implemented in the new object
+                    <a href="apidocs/de/schlichtherle/util/zip/DateTimeConverter.html#ZIP">
+                        <code>DateTimeConverter.ZIP</code></a>
+                    in the low level API.
+                    Likewise, the class
+                    <a href="apidocs/de/schlichtherle/io/archive/zip/JarDriver.html">
+                        <code>JarDriver</code></a>
+                    and it's companion classes continue to utilize the
+                    existing date/time conversion algorithm
+                    for JAR files as implemented in the new object
+                    <a href="apidocs/de/schlichtherle/util/zip/DateTimeConverter.html#JAR">
+                        <code>DateTimeConverter.JAR</code></a>
+                    in the low level API.
+                    In the latter case, the effective behaviour of the API
+                    hasn't changed at all.
+                </li>
+                <li>
+                    <b>Enhanced:</b> Where the constructors of the class
+                    <a href="apidocs/de/schlichtherle/io/archive/zip/ZipDriver.html">
+                        <code>ZipDriver</code>
+                    </a>
+                    and its subclasses accepted the compression <code>level</code>
+                    parameter to use when writing a ZIP archive,
+                    this parameter now accepts the value
+                    <code>java.util.zip.Deflater.NO_COMPRESSION</code>,
+                    too.
+                    Please note that the compression level is independent of the
+                    compression method and is only used for the default
+                    compression method
+                    <code>de.schlichtherle.util.zip.DEFLATED</code>.
+                </li>
+                <li>
+                    <b>Fixed:</b>
+                    <a href="apidocs/de/schlichtherle/io/archive/zip/ZipEntry.html#clone">
+                        <code>ZipEntry.clone()</code>
+                    </a>
+                    now throws an
+                    <code>UnsupportedOperationException</code>
+                    because cloning doesn't work with
+                    <a href="apidocs/de/schlichtherle/io/ArchiveEntryMetaData.html">
+                        <code>ArchiveEntryMetaData</code>
+                    </a>
+                    and is not required for
+                    <a href="apidocs/de/schlichtherle/io/archive/spi/ArchiveDriver.html">
+                        <code>ArchiveDriver</code></a>s
+                    anyway.
+                </li>
+            </ol>
+            <h3>
+                Updates in the Package
+                <a href="apidocs/de/schlichtherle/io/archive/zip/raes/package-summary.html">
+                    <code>de.schlichtherle.io.archive.zip.raes</code>
+                </a>
+            </h3>
+            <ol>
+                <li>
+                    <b>New:</b> With the advent of ZIP64 support in the package
+                    <a href="apidocs/de/schlichtherle/util/zip/package-summary.html">
+                        <code>de.schlichtherle.util.zip</code>
+                    </a>
+                    the name prefix "Zip32" of some classes and methods in this package
+                    has become obsolete.
+                    Hence, new substitutes with "Zip" as their name prefix have been
+                    added.
+                    The obsoleted classes and methods with the "Zip32" name prefix are
+                    now marked as deprecated and have been retrofitted so that binary
+                    compatibility is retained.
+                </li>
+                <li>
+                    <b>New:</b> The classes
+                    <a href="apidocs/de/schlichtherle/io/archive/zip/raes/ParanoidZipRaesDriver.html">
+                        <code>ParanoidZipRaesDriver</code>
+                    </a>
+                    and
+                    <a href="apidocs/de/schlichtherle/io/archive/zip/raes/SafeZipRaesDriver.html">
+                        <code>SafeZipRaesDriver</code>
+                    </a>
+                    now provide an additional constructor which accepts the
+                    default compression level as its sole parameter.
+                </li>
+            </ol>
+            <h3>
+                Updates in the Package
+                <a href="apidocs/de/schlichtherle/util/package-summary.html">
+                    <code>de.schlichtherle.util</code>
+                </a>
+            </h3>
+            <ol>
+                <li>
+                    <b>Fixed:</b>
+                    The class
+                    <a href="apidocs/de/schlichtherle/util/CanonicalStringSet.html">
+                        <code>CanonicalStringSet</code>
+                    </a>
+                    had bad <code>boolean</code> return values for its methods
+                    <a href="apidocs/de/schlichtherle/util/CanonicalStringSet.html#addAll(de.schlichtherle.util.CanonicalStringSet)">
+                        <code>addAll(CanonicalStringSet)</code>
+                    </a>
+                    and
+                    <a href="apidocs/de/schlichtherle/util/CanonicalStringSet.html#addAll(java.lang.String)">
+                        <code>addAll(String)</code>
+                    </a>.
+                    This has been fixed to match the set analogy of the class.
+                </li>
+            </ol>
+            <h3>
+                Updates in the Package
+                <a href="apidocs/de/schlichtherle/util/zip/package-summary.html">
+                    <code>de.schlichtherle.util.zip</code>
+                </a>
+            </h3>
+            <ol>
+                <li>
+                    <b>Enhanced:</b> The classes
+                    <a href="apidocs/de/schlichtherle/util/zip/BasicZipFile.html">
+                        <code>BasicZipFile</code>
+                    </a>
+                    and
+                    <a href="apidocs/de/schlichtherle/util/zip/BasicZipOutputStream.html">
+                        <code>BasicZipOutputStream</code>
+                    </a>
+                    now support <a href="#ZIP64">ZIP64 extensions</a>.
+                    For details and restrictions,
+                    please refer to their respective Javadoc.
+                </li>
+                <li>
+                    <b>Fixed:</b> The class
+                    <a href="apidocs/de/schlichtherle/util/zip/BasicZipOutputStream.html">
+                        <code>BasicZipOutputStream</code>
+                    </a>
+                    now writes MS-DOS compatible External File Attributes
+                    for directory entries in the Central Directory Header.
+                    This enhances the interoperability with some third party
+                    tools, e.g. the Exlorer in Microsoft Windows Vista.
+                </li>
+                <li>
+                    <p>
+                        <b>New:</b> The class
+                        <a href="apidocs/de/schlichtherle/util/zip/DateTimeConverter.html">
+                            <code>DateTimeConverter</code>
+                        </a>
+                        can be used to determine the strategy for date/time conversion
+                        between the system time (Java time) and DOS date/time
+                        fields in ZIP archive files.
+                    </p>
+                    <p>
+                        This class comes with two predefined instances:
+                        When using
+                        <a href="apidocs/de/schlichtherle/util/zip/DateTimeConverter.html#JAR">
+                            <code>DateTimeConverter.JAR</code>
+                        </a>
+                        TrueZIP's date/time conversion strategy is compatible to:
+                    </p>
+                    <ul>
+                        <li>Java SE: <code>jar</code> and <code>java.util.zip</code> package</li>
+                        <li>Info-ZIP: <code>unzip</code></li>
+                    </ul>
+                    <p>
+                        When using
+                        <a href="apidocs/de/schlichtherle/util/zip/DateTimeConverter.html#ZIP">
+                            <code>DateTimeConverter.ZIP</code>
+                        </a>
+                        TrueZIP's date/time conversion strategy is compatible to:
+                    </p>
+                    <ul>
+                        <li>Windows Vista Explorer (as of July 16<sup>th</sup>, 2010)</li>
+                        <li>WinZip 12.0</li>
+                        <li>7-Zip 4.65</li>
+                    </ul>
+                    <p>
+                        <em>Use with caution</em>: Using these instances
+                        affects the interoperability of TrueZIP with third
+                        party tools!
+                    </p>
+                </li>
+                <li>
+                    <b>New:</b> The conversion of date/time values
+                    between Java and DOS in the class
+                    <a href="apidocs/de/schlichtherle/util/zip/ZipEntry.html">
+                        <code>ZipEntry</code>
+                    </a>
+                    has been improved in interoperability:
+                    The new protected method
+                    <a href="apidocs/de/schlichtherle/util/zip/ZipEntry.html#getDateTimeConverter()">
+                        <code>getDateTimeConverter()</code>
+                    </a>
+                    is used to control the conversion of Java time to
+                    DOS date/time fields in ZIP archive files and
+                    vice versa.
+                    The implementation in this class returns
+                    <a href="apidocs/de/schlichtherle/util/zip/DateTimeConverter.html#JAR">
+                        <code>DateTimeConverter.JAR</code>
+                    </a>
+                    for maximum compatibility with Java SE.
+                    Subclasses could override these methods to return other
+                    <a href="apidocs/de/schlichtherle/util/zip/DateTimeConverter.html">
+                        <code>DateTimeConverter</code>
+                    </a>
+                    instances instead, e.g.
+                    <a href="apidocs/de/schlichtherle/util/zip/DateTimeConverter.html#ZIP">
+                        <code>DateTimeConverter.ZIP</code>
+                    </a>
+                    .
+                </li>
+                <li>
+                    <b>Enhanced:</b>
+                    If assertions are enabled, a
+                    <code>RuntimeException</code> is now thrown if an
+                    illegal DOS date/time field is detected when reading
+                    ZIP archive files.
+                    This can be used to detect bogus ZIP archive
+                    files created by third party tools.
+                    The exception is actually thrown by the class
+                    <a href="apidocs/de/schlichtherle/util/zip/DateTimeConverter.html">
+                        <code>DateTimeConverter</code>
+                    </a>
+                    , but usually exposed by the class
+                    <a href="apidocs/de/schlichtherle/util/zip/ZipFile.html">
+                        <code>ZipFile</code>
+                    </a>
+                    .
+                </li>
+            </ol>
+        </div>
+    </body>
+</html>
