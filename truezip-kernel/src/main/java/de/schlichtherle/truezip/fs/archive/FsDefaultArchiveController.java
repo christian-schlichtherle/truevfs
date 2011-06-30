@@ -61,8 +61,8 @@ import static de.schlichtherle.truezip.fs.FsSyncOption.*;
 import static de.schlichtherle.truezip.io.Paths.isRoot;
 
 /**
- * This archive controller implements the mounting/unmounting strategy
- * for the container archive file.
+ * This archive controller implements the mounting/unmounting strategy for a
+ * prospective archive file.
  *
  * @param   <E> The type of the archive entries.
  * @author  Christian Schlichtherle
@@ -115,6 +115,14 @@ extends FsFileSystemArchiveController<E> {
         this(model, parent, driver);
     }
 
+    /**
+     * Constructs a new archive file system controller.
+     * 
+     * @param model the file system model.
+     * @param parent the parent file system
+     * @param driver the archive driver.
+     * @since TrueZIP 7.2
+     */
     public FsDefaultArchiveController(
             final FsConcurrentModel model,
             final FsController<?> parent,
