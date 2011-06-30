@@ -1,10 +1,10 @@
     -----------------------
-    About TrueZIP Driver ZIP
+    About
     -----------------------
     Christian Schlichtherle
     -----------------------
 
-About TrueZIP Driver ZIP
+About
 
     This module contains the file system driver service class
     {{{../../apidocs/de/schlichtherle/truezip/fs/archive/zip/ZipDriverService.html}ZipDriverService}}
