@@ -134,15 +134,22 @@ Concepts
 ** Separation Of Concerns
 
     The design of interfaces and abstract classes aims for strong cohesion in
-    order to ease implementation classes and foster their reusability.
+    order to ease implementation classes and enhance their extensibility and
+    reusability.
     Where conflicts arise, the Law Of Demeter is sacrificed for strong cohesion.
 
     The set of overridable public methods of abstract classes and interfaces is
     reduced as much as reasonable in order to ease implementation classes.
 
+    For example, the abstract class
+    {{{./apidocs/de/schlichtherle/truezip/fs/FsDriver.html}<<<FsDriver>>>}}
+    consists of only one abstract method
+    {{{./apidocs/de/schlichtherle/truezip/fs/FsDriver.html#newController(de.schlichtherle.fs.FsModel, de.schlichtherle.fs.FsController)}<<<FsDriver.newController(FsModel, FsController)>>>}}
+    which needs to get implemented in any file system driver module.    
+
 ** Composition Over Inheritance
 
     The declaration of classes or methods as final forces the use of
-    composition (e.g. the Decorator Pattern) which in turn enables dependency
+    composition rather than inheritance which in turn enables dependency
     resolution at run time and thus enhances the overall extensibility of the
     architecture.
