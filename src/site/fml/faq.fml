@@ -5,7 +5,7 @@
         title="Frequently Asked Questions"
         toplink="false">
     <part id="file">
-        <title>TrueZIP File* module</title>
+        <title>TrueZIP File* API</title>
         <faq id="cannotReadArchive">
             <question>
                 When trying to read an archive file, I get an exception saying
@@ -146,9 +146,34 @@ src.cp_rp(dst);
 </source>
             </answer>
         </faq>
+        <faq id="filterTArchiveDetector">
+            <question>
+                The set of detected suffixes for archive files is too large.
+                How can I change it?
+            </question>
+            <answer>
+                <p>
+                    You can easily filter the set of canonical suffixes
+                    installed by the file system driver modules on the run time
+                    class path.
+                    For example, the TrueZIP Driver ZIP module will install a
+                    large set of canonical file suffixes for ZIP files.
+                    If all you want is to detect <code>*.zip</code> files
+                    however, you can do so easily using the following statement:
+                </p>
+<source>
+TFile.setDefaultArchiveDetector(new TArchiveDetector("zip"));
+</source>
+                <p>
+                    Check the
+                    <a href="kick-start/index.html">Maven archetypes</a> for
+                    more options and to help you get started with this quickly.
+                </p>
+            </answer>
+        </faq>
         <faq id="cannotListArchive">
             <question>
-                The API is not treating an archive file as a virtual directory.
+                The API is not detecting an archive file as a virtual directory.
                 What's wrong?
             </question>
             <answer>
@@ -172,9 +197,78 @@ TFile.setDefaultArchiveDetector(
 </source>
                 <p>
                     Check the
-                    <a href="kick-start/index.html">Maven Archetypes</a> for more
-                    options and to help you get started quickly with this.
+                    <a href="kick-start/index.html">Maven archetypes</a> for
+                    more options and to help you get started with this quickly.
                 </p>
+            </answer>
+        </faq>
+        <faq id="ignoreArchiveFile">
+            <question>
+                The API should <em>not</em> detect a particular archive file as
+                a virtual directory.
+                How can I do this?
+            </question>
+            <answer>
+                <p>
+                    Every now and then you might want to treat an archive file
+                    like a regular file rather than a virtual directory.
+                    For example, when trying to obtain the length of the
+                    archive file in bytes.
+                    You would normally do this by calling the method
+                    <code>File.length()</code>.
+                    However, if the <code>File</code> object is an instance of
+                    the <code>TFile</code> class and the path has been detected
+                    to name a valid archive file, then this method always
+                    returns 0.
+                </p>
+                <p>
+                    You can change this behavior easily by creating a
+                    <code>TFile</code> with <code>TArchiveDetector.NULL</code>
+                    as an additional constructor parameter.
+                    For example, you could use the following method to convert
+                    an archive-detecting <code>TFile</code> to
+                    a non-archive-detecting <code>TFile</code>:
+                </p>
+<source>
+static TFile newNonArchiveFile(TFile file) {
+    return new TFile(file.getParentFile(), file.getName(),
+                     TArchiveDetector.NULL);
+}
+</source>
+                <p>
+                    Here, <code>TArchiveDetector.NULL</code> is used to scan
+                    only the file name of the parameter <code>file</code>.
+                    Because this archive detector never detects a prospective
+                    archive file, any prospective archive file will get ignored.
+                    This will work even in the parent directory is an archive
+                    file or a directory within an archive file.
+                </p>
+                <p>
+                    Mind you that using the resulting <code>TFile</code> object
+                    for any I/O bypasses any state associated with the archive
+                    file in the TrueZIP Kernel module.
+                    This may result in an inconsistent state of the federated
+                    file system space and may even incur <em>loss of data</em>!
+                    In order to avoid this, it's a good idea to unmount the
+                    archive file like this before accessing the resulting
+                    <code>TFile</code> object:
+                </p>
+<source>
+TFile archive = new TFile("archive.zip");
+... // there may be some I/O here
+TFile file = newNonArchiveFile(archive);
+if (archive.isArchive()) // prospective archive file?
+    TFile.umount(archive); // unmount it
+// Now you can safely do any I/O to $file.
+// Mind that it may refer to an entry in another archive file,
+// so make sure to use a TFileInputStream.
+InputStream in = new TFileInputStream(file);
+try {
+    ... // read the archive file like a plain file here
+} finally {
+    in.close();
+}
+</source>
             </answer>
         </faq>
         <faq id="corruptedArchive">
@@ -185,18 +279,20 @@ TFile.setDefaultArchiveDetector(
             </question>
             <answer>
                 <p>
-                    The TrueZIP Kernel module applies advanced caching
-                    strategies for archive entries.
-                    So whenever you create or update archive entries, your
-                    changes need to get committed to the archive file when
-                    you're done.
+                    The TrueZIP Kernel module applies neat caching and
+                    buffering strategies for archive entries.
+                    So whenever your application creates or updates archive
+                    entries, the changes need to get committed to the archive
+                    file when done.
                     On certain events, e.g. whenever the JVM terminates
-                    normally (i.e. doesn't crash), this happens automatically.
+                    normally with or without a throwable (= doesn't crash),
+                    this happens automatically.
                     However, in a long running application you may want to do
                     this manually in order to allow <i>third parties</i> to
                     access the archive file.
                     The term <i>third party</i> in this context includes any
-                    other OS process and even the legacy java.io.File* API.
+                    other process in the operating system and even the plain
+                    <code>File*</code> API.
                 </p>
                 <p>
                     Committing any unsynchronized changes to all archive files
@@ -216,14 +312,27 @@ TFile.setDefaultArchiveDetector(
             </question>
             <answer>
                 <p>
-                    The TrueZIP File* API supports only file based URIs.
-                    To access an archive file via HTTP(S) or any other
-                    scheme, you need to use the TrueZIP Kernel API instead.
-                    There's a <a href="truezip-samples/kernel-usage.html">Usage</a>
+                    The TrueZIP File* API can only access the platform file
+                    system because the <code>TFile</code> class extends the
+                    <code>File</code> class.
+                    To access an archive file via HTTP(S) or any other procotol
+                    scheme, you have two options:
+                </p>
+                <ul>
+                <li>If your application uses a JSE&#160;7 compliant JVM,
+                    you can simply use the API of the
+                    <a href="truezip-path/index.html">TrueZIP Path</a>
+                    module.</li>
+                <li>Otherwise, you can use the API of the
+                    <a href="truezip-kernel/index.html">TrueZIP Kernel</a>
+                    module.
+                    There's a
+                    <a href="truezip-samples/kernel-usage.html">Usage</a>
                     article with samples in the
                     <a href="truezip-samples/index.html">TrueZIP Samples</a>
                     module.
-                </p>
+                </li>
+                </ul>
             </answer>
         </faq>
         <faq id="accessAbsoluteEntryName">
@@ -242,13 +351,142 @@ TFile.setDefaultArchiveDetector(
                     file.
                     There's no expression to address the absolute entry name
                     <code>/entry</code> within the archive file instead.
-                    Even if you would try
+                    Even if you tried
                     <code>new TFile("archive.zip//entry")</code>, it would
                     just get normalized to the previous expression.
                 </p>
                 <p>
                     See also <a href="#absoluteEntryName">here</a>.
                 </p>
+            </answer>
+        </faq>
+    </part>
+    <part id="path">
+        <title>TrueZIP Path API</title>
+        <faq id="interoperability">
+            <question>
+                Can I use the TrueZIP Path API concurrently with the TrueZIP
+                File* API?
+            </question>
+            <answer>
+                <p>
+                    Yes, absolutely.
+                    The NIO.2 API defines some methods for the interoperability
+                    of <code>File</code> and <code>Path</code> objects:
+                </p>
+                <ul>
+                    <li>
+                        <code>Path.toFile()</code> returns a <code>File</code>
+                        object for this <code>Path</code>.
+                        However, according to the interface contract for this
+                        method, it's supposed to work with the default file
+                        system provider only (e.g. if it's a
+                        <code>WindowsPath</code>).
+                    </li>
+                    <li>
+                        <code>File.toPath()</code> returns a <code>Path</code>
+                        object for this <code>File</code>.
+                        However, according to the interface contract for this
+                        method, the returned object is associated with the
+                        default file system provider (e.g. it's a
+                        <code>WindowsPath</code>).
+                        Furthermore, this method puts a compile time dependency
+                        on the NIO.2 API.
+                    </li>
+                </ul>
+                <p>
+                    To solve these issues, in TrueZIP this is implemented as
+                    follows:
+                </p>
+                <ul>
+                    <li>
+                        <code>TPath.toFile()</code> returns a <code>TFile</code>
+                        object for this <code>TPath</code>.
+                        This works for any (virtual) file system.
+                    </li>
+                    <li>
+                        To avoid a compile time dependency in the TrueZIP File*
+                        module on the TrueZIP Path module,
+                        <code>TFile.toPath()</code> throws an
+                        <code>UnsupportedOperationException</code>.
+                        To create a <code>TPath</code> from the
+                        <code>File</code> object <code>file</code>, call
+                        <code>new TPath(file)</code> instead.
+                        Note that this works for plain <code>File</code>
+                        objects too, not just <code>TFile</code> objects.
+                    </li>
+                </ul>
+             </answer>
+        </faq>
+        <faq id="ignoreArchivePath">
+            <question>
+                The API should <em>not</em> detect a particular archive file as
+                a virtual directory.
+                How can I do this?
+            </question>
+            <answer>
+                <p>
+                    Every now and then you might want to treat an archive file
+                    like a regular file rather than a virtual directory.
+                    For example, when trying to obtain the length of the
+                    archive file in bytes.
+                    You would normally do this by calling the method
+                    <code>Files.size(Path path)</code>.
+                    However, if the <code>Path</code> object is an instance of
+                    the <code>TPath</code> class and the path has been detected
+                    to name a valid archive file, then this method always
+                    returns 0.
+                </p>
+                <p>
+                    You can change this behavior easily by creating a
+                    <code>TPath</code> with <code>TArchiveDetector.NULL</code>
+                    in the current configuration on the inheritable thread
+                    local stack.
+                    For example, you could use the following method to convert
+                    an archive-detecting <code>TPath</code> to
+                    a non-archive-detecting <code>TPath</code>:
+                </p>
+<source>
+static TPath newNonArchiveFile(TPath file) {
+    TConfig config = TConfig.push();
+    try {
+        config.setArchiveDetector(TArchiveDetector.NULL);
+        return path.resolveSibling(path.getFileName());
+    } finally {
+        config.close();
+    }
+}
+</source>
+                <p>
+                    Here, <code>TArchiveDetector.NULL</code> is used to scan
+                    only the file name of the parameter <code>file</code>.
+                    Because this archive detector never detects a prospective
+                    archive file, any prospective archive file will get ignored.
+                    This will work even in the parent directory is an archive
+                    file or a directory within an archive file.
+                </p>
+                <p>
+                    Mind you that using the resulting <code>TFile</code> object
+                    for any I/O bypasses any state associated with the archive
+                    file in the TrueZIP Kernel module.
+                    This may result in an inconsistent state of the federated
+                    file system space and may even incur <em>loss of data</em>!
+                    In order to avoid this, it's a good idea to unmount the
+                    archive file like this before accessing the resulting
+                    <code>TPath</code> object:
+                </p>
+<source>
+TPath archive = new TPath("archive.zip");
+... // there may be some I/O here
+TPath file = newNonArchiveFile(archive);
+archive.getFileSystem().close(); // unmount prospective archive file
+// Now you can safely do any I/O to $file.
+// Mind that it may refer to an entry in another archive file,
+// so make sure to use a TFileInputStream.
+try (InputStream in = Files.newInputStream(file)) {
+    ... // read the archive file like a plain file here
+}
+</source>
             </answer>
         </faq>
     </part>

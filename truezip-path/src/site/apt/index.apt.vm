@@ -15,7 +15,7 @@ About
     {{{../apidocs/de/schlichtherle/truezip/nio/file/TFileSystemProvider.html}<<<TFileSystemProvider>>>}}
     class to implement a file system provider for the NIO.2 API in JSE 7.
 
-    This is the primary API for JSE 7 compliant TrueZIP applications:
+    This is the primary API for JSE&#160;7 compliant TrueZIP applications:
     Like the API of the {{{../truezip-file/index.html}TrueZIP File*}} module,
     this API is just a facade for the
     {{{../truezip-kernel/index.html}TrueZIP Kernel}} module.
@@ -48,7 +48,7 @@ try (Files.newInputStream(path)) {
     are present on the run time class path.
 
     Mind that a <<<TPath>>> is a <<<Path>>>, so you can use it polymorphically
-    with the entire NIO.2 API.
+    with the NIO.2 API.
 
     For more examples, please use the Maven archetype for TrueZIP Path module
     applications as described in the
