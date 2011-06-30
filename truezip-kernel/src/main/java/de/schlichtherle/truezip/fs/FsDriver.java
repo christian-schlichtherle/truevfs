@@ -21,7 +21,7 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import net.jcip.annotations.Immutable;
 
 /**
- * An abstract factory for thread-safe file system controllers.
+ * An abstract factory for components required to access a file system.
  * 
  * @author  Christian Schlichtherle
  * @version $Id$

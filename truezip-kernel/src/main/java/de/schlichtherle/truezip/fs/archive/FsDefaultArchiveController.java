@@ -103,10 +103,22 @@ extends FsFileSystemArchiveController<E> {
     private final FsArchiveFileSystemTouchListener<E> touchListener
             = new TouchListener();
 
+    /**
+     * @deprecated
+     * @see #FsDefaultArchiveController(FsConcurrentModel, FsController, FsArchiveDriver)
+     */
+    @Deprecated
     public FsDefaultArchiveController(
             final FsConcurrentModel model,
             final FsArchiveDriver<E> driver,
             final FsController<?> parent) {
+        this(model, parent, driver);
+    }
+
+    public FsDefaultArchiveController(
+            final FsConcurrentModel model,
+            final FsController<?> parent,
+            final FsArchiveDriver<E> driver) {
         super(model);
         if (null == driver)
             throw new NullPointerException();
