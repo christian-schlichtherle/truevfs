@@ -156,10 +156,7 @@ public abstract class TPathTestSuite extends TestBase {
         TConfig config = TConfig.push();
         try {
             config.setArchiveDetector(TArchiveDetector.NULL);
-            TPath parent = path.getParent();
-            return null == parent
-                    ? new TPath(path)
-                    : parent.resolve(path.getFileName());
+            return path.resolveSibling(path.getFileName());
         } finally {
             config.close();
         }
