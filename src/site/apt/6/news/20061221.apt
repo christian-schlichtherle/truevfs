@@ -1,0 +1,29 @@
+    -----------------------
+    6.4 Release News
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+{TrueZIP 6.4 has been released}
+
+    (December 21st, 2006)
+
+    It's only a minor release number increase, but it's a major improvement:
+    TrueZIP 6.4 fixes all known bugs, significantly improves performance in many
+    sectors and comes with a rigorously updated Javadoc for the package <<<
+    de.schlichtherle.io>>>.
+
+    TrueZIP 6.4 is now a first class citizen on Linux, too: On this platform,
+    previous releases where painfully slow when using RAES encrypted ZIP files and
+    showed some bugs when using GUI classes like <<<JFileChooser>>> or the Swing based key
+    manager implementation.
+
+    A new feature has been added, too: When prompting for keys for RAES encrypted
+    ZIP files on a JVM which is running in headless mode, TrueZIP 6.4 now prompts
+    the user on the console. This feature requires JSE 6 as the runtime environment.
+
+    Backwards compatibility is retained: TrueZIP 6.4 runs on any J2SE 1.4.2
+    compliant JRE. Recompilation of existing applications is not required.
+
+    For more information, please refer to the {{{../relnotes/release\-6_4.html}Release
+    Notes}}. Upgrading is highly recommended for all users.

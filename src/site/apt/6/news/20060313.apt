@@ -1,0 +1,32 @@
+    -----------------------
+    6.0 RC1 Release News
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+{TrueZIP 6.0 Release Candidate 1 is available}
+
+    (March 13th, 2006)
+
+    This is a major update release with support for TAR, TAR.GZ and TAR.BZ2
+    archives.
+
+    TrueZIP 6.0 provides some exciting new features:
+
+    [[1]] A plug\-in "driver" architecture for virtually any archive
+    type. This allows third parties to provide support for arbitrary
+    archive types, such as RAR or ARJ (volunteers wanted!).
+
+    [[1]] Out\-of\-the\-box support for TAR, TAR.GZ and TAR.BZ2 archive
+    using the new "plug\-in driver" architecture. As usual with TrueZIP,
+    this allows an application to address any entry in a TAR archive by
+    specifying the archive as part of the path name, such as e.g.
+    <<<src.tar.gz/inner.zip/readme.html>>>.
+
+    [[1]] ZIP64 is going to be added soon. However, it is still not
+    decided yet whether this will be available with the official TrueZIP
+    6.0 release or deferred to the release of TrueZIP 6.1 instead. I prefer
+    to have short release cycles, so it is likely that you may see this in
+    TrueZIP 6.1.
+
+    []
