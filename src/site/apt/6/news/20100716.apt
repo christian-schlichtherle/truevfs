@@ -1,0 +1,21 @@
+    -----------------------
+    6.7 Release News
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+{TrueZIP 6.7 has been released}
+
+    (July 16th, 2010)
+
+    I am pleased to announce the final release of TrueZIP 6.7.
+    This is a feature and maintenance release.
+    The primary objective of this release is to add transparent
+    ZIP64 support and increase the interoperability of ZIP files
+    with third party utilities such as Windows Explorer, WinZip,
+    7\-Zip and others.
+    Upgrading is recommended for <all> users because there
+    have been a few minor bug fixes since the Release Candidate 1.
+
+    For more information, please refer to
+    the {{{../relnotes/release\-6_7.html}Release Notes}}.
