@@ -20,6 +20,8 @@ import de.schlichtherle.truezip.file.TConfig;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.io.Paths;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import static java.io.File.*;
 import java.net.URI;
 import java.nio.file.Path;
@@ -33,6 +35,7 @@ import org.junit.Test;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public class TPathTest extends TestBase {
 
     @Test

@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.file;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
 import static org.junit.Assert.*;
 import org.junit.Test;
@@ -24,6 +26,7 @@ import static org.hamcrest.CoreMatchers.*;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public class TConfigTest {
 
     @Test
