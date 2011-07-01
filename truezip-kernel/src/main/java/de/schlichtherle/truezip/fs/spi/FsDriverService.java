@@ -65,7 +65,7 @@ public abstract class FsDriverService implements FsDriverProvider {
      * @param  config an array of key-value pair arrays.
      *         The first element of each inner array must either be a
      *         {@link FsScheme file system scheme}, an object {@code o} which
-     *         can get converted to a set of file system suffixes by calling
+     *         can get converted to a set of file name suffixes by calling
      *         {@link SuffixSet#SuffixSet(String) new SuffixSet(o.toString())}
      *         or a {@link Collection collection} of these.
      *         The second element of each inner array must either be a
