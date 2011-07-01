@@ -55,13 +55,13 @@ public class Copy extends Application<IOException> {
             dst = new TFile(dst, src.getName());
 
         // If TFile.setLenient(false) is never called in your application,
-        // then you could shorten this to...
+        // then you might as well shorten this to...
         /*if (dst.isArchive() || dst.isDirectory())
             dst = new TFile(dst, src.getName());*/
 
         // If you don't like path name completion for non-existent files which
         // just look like archive files according to their path name,
-        // then you could even shorten this to...
+        // then you might even shorten this to...
         /*if (dst.isDirectory())
             dst = new TFile(dst, src.getName());*/
 

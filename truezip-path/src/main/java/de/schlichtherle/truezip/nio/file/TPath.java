@@ -138,7 +138,7 @@ public final class TPath implements Path {
     private static final TPathComparator COMPARATOR = '\\' == separatorChar
             ? new WindowsTPathComparator()
             : new TPathComparator();
-    
+
     private final URI name;
     private final TArchiveDetector detector;
     private final FsPath address;
