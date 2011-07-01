@@ -25,48 +25,46 @@ import de.schlichtherle.truezip.fs.spi.FsDriverService;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import java.io.File;
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import net.jcip.annotations.Immutable;
-import net.jcip.annotations.ThreadSafe;
 
 /**
- * Detects <em>prospective</em> archive files by matching their path name
- * against a pattern of file name suffixes like <i>.zip</i> et al
- * and looks up their corresponding file system driver by using a file system
- * driver provider.
+ * Detects a <em>prospective</em> archive file and declares its file system
+ * type by mapping its file name suffix to an archive driver.
+ * Note that this class does <em>not</em> access any file system!
   * <p>
- * There are basically two types of constructors available in this class:
+ * The map of detectable archive file name suffixes and corresponding archive
+ * drivers is configured by the constructors of this class.
+ * There are two types of constructors available:
  * <ol>
- * <li>Constructors which filter the drivers of a given file system driver
- *     provider by a given list of file suffixes.
- *     For example, the drivers known by the provider
- *     {@link FsDriverLocator#SINGLETON} could be filtered by the suffix
- *     list {@code "tar|zip"} in order to recognize only TAR and ZIP files.
+ * <li>Constructors which filter the driver map of a given file system driver
+ *     provider by a given list of file name suffixes.
+ *     For example, the driver map of the provider
+ *     {@link FsDriverLocator#SINGLETON} could be filtered by the file name
+ *     suffix list {@code "tar|zip"} in order to recognize only TAR and ZIP
+ *     files.
  * <li>Constructors which decorate a given file system driver provider with a
- *     given map of file system schemes to file system drivers - whereby a
- *     number of options are available to conveniently specify the map.
- *     This could be used to specify custom archive file suffixes or file
- *     system schemes, i.e. file system drivers.
- *     For example, the suffix list {@code "foo|bar"} could be used to
- *     recognize a custom variant of the JAR file format (you would need to
- *     provide a custom file system driver then, too).
+ *     given map of file system schemes to file system drivers.
+ *     This can get used to specify custom archive file name suffixes or
+ *     archive drivers.
+ *     For example, the file name suffix list {@code "foo|bar"} could be used
+ *     to detect a custom variant of the JAR file format (you need to provide
+ *     a custom archive driver then, too).
  * </ol>
  * <p>
- * Where a constructor expects a suffix list as a parameter,
+ * Where a constructor expects a list of file name suffixes as a parameter,
  * it must obeye the syntax constraints for {@link SuffixSet}s.
  * As an example, the parameter {@code "zip|jar"} would cause
  * the archive detector to recognize ZIP and JAR files in a path.
- * The same would be true for {@code "||.ZIP||.JAR||ZIP||JAR||"},
- * but this notation is discouraged because it's obviously not in canonical
- * form.
+ * The same would be true for {@code "||.ZiP||.JaR||ZIP||JAR||"},
+ * but this notation is discouraged because it's not in canonical form.
  * 
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @Immutable
@@ -75,22 +73,18 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
 
     /**
      * This instance never recognizes any archive files in a path.
-     * This could be used as the end of a chain of
+     * This can get used as the end of a chain of
      * {@code TArchiveDetector} instances or if archive files
-     * shall be treated like ordinary files rather than (virtual) directories.
+     * shall be treated like regular files rather than (virtual) directories.
      */
-    public static final TArchiveDetector
-            NULL = new TArchiveDetector("");
+    public static final TArchiveDetector NULL = new TArchiveDetector("");
 
     /**
-     * This instance recognizes all archive types for which a file system
-     * driver can be found by the file system driver service locator singleton
+     * This instance recognizes all archive types for which an archive driver
+     * can be found by the file system driver service locator singleton
      * {@link FsDriverLocator#SINGLETON}.
-     * A file system driver is looked up by using the suffix of the file as the
-     * scheme of the file system.
      */
-    public static final TArchiveDetector
-            ALL = new TArchiveDetector(null);
+    public static final TArchiveDetector ALL = new TArchiveDetector(null);
 
     private final Map<FsScheme, FsDriver> drivers;
 
@@ -101,11 +95,6 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
      * {@link #drivers}.
      */
     private final String suffixes;
-
-    /**
-     * The thread local matcher used to match archive file suffixes.
-     */
-    private final ThreadLocalMatcher matcher;
 
     /**
      * Equivalent to
@@ -121,8 +110,8 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
      * provider for all canonicalized suffixes in the {@code suffixes} list.
      *
      * @param  provider the file system driver provider to filter.
-     * @param  suffixes A list of suffixes which shall identify prospective
-     *         archive files.
+     * @param  suffixes A list of file name suffixes which shall identify
+     *         prospective archive files.
      *         If this is {@code null}, no filtering is applied and all drivers
      *         known by the given provider are available for use with this
      *         archive detector.
@@ -169,7 +158,6 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
         }
         this.drivers = Collections.unmodifiableMap(outDrivers);
         this.suffixes = outSuffixes.toString();
-        this.matcher = new ThreadLocalMatcher(outSuffixes.toPattern());
     }
 
     /**
@@ -188,8 +176,8 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
      * {@code driver}.
      * 
      * @param  delegate the file system driver provider to decorate.
-     * @param  suffixes a list of suffixes which shall identify prospective
-     *         archive files.
+     * @param  suffixes A list of file name suffixes which shall identify
+     *         prospective archive files.
      *         This must not be {@code null} and must not be empty.
      * @param  driver the file system driver to map for the suffix list.
      *         {@code null} may be used to <i>shadow</i> a mapping for an equal
@@ -216,7 +204,7 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
      * @param  config an array of key-value pair arrays.
      *         The first element of each inner array must either be a
      *         {@link FsScheme file system scheme}, an object {@code o} which
-     *         can get converted to a set of file system suffixes by calling
+     *         can get converted to a set of file name suffixes by calling
      *         {@link SuffixSet#SuffixSet(String) new SuffixSet(o.toString())}
      *         or a {@link Collection collection} of these.
      *         The second element of each inner array must either be a
@@ -282,7 +270,6 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
         }
         this.drivers = Collections.unmodifiableMap(outDrivers);
         this.suffixes = outSuffixes.toString();
-        this.matcher = new ThreadLocalMatcher(outSuffixes.toPattern());
     }
 
     @Override
@@ -292,30 +279,36 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
 
     /**
      * Detects whether the given {@code path} name identifies a prospective
-     * archive file or not by applying heuristics to it and returns a
-     * scheme for accessing archive files of this type or {@code null}
-     * if the path does not denote a prospective archive file or an
-     * appropriate scheme is unknown.
-     * <p>
-     * Please note that implementations <em>must not</em> check the actual
-     * contents of the file identified by {@code path}!
-     * This is because {@code path} may refer to a file which is not yet
-     * existing or even an entry in a federated file system, in which case
-     * there is no way to check the file contents in the parent file systems.
+     * archive file by matching its file name suffixes against the set of file
+     * system schemes in the archive driver map.
+     * If a match is found, the file name suffix gets converted to a file
+     * system scheme and returned.
+     * Otherwise, {@code null} is returned.
      *
-     * @param  path the path name of the file in the federated file system.
-     *         This does not need to be absolute and it does not need to be
-     *         accessible in its containing virtual file system!
-     * @return A {@code scheme} for accessing the archive file or {@code null}
-     *         if the path does not denote an archive file (i.e. the path does
-     *         not have a known suffix) or an appropriate {@code scheme} is
-     *         unknown.
+     * @param  path the path name.
+     * @return A file system scheme to declare the file system type of the
+     *         prospective archive file or {@code null} if no archive file name
+     *         suffix has been detected.
      */
     public @CheckForNull FsScheme getScheme(String path) {
-        Matcher m = matcher.reset(path);
-        return m.matches()
-                ? FsScheme.create(m.group(1).toLowerCase(Locale.ENGLISH))
-                : null;
+        // An archive file name suffix may contain a dot (e.g. "tar.gz"), so we
+        // can't just look for the last dot in the file name and look up the
+        // remainder in the key set of the archive driver map.
+        // Likewise, a file name may contain additional dots, so we can't just
+        // look for the first dot in it and look up the remainder ...
+        path = path.replace('/', File.separatorChar);
+        int i = path.lastIndexOf(File.separatorChar) + 1;
+        path = path.substring(i);//.toLowerCase(Locale.ENGLISH);
+        int l = path.length();
+        try {
+            FsScheme scheme;
+            for (i = 0; 0 < (i = path.indexOf('.', i) + 1) && i < l ;)
+                if (drivers.containsKey(scheme = new FsScheme(path.substring(i))))
+                    return scheme;
+        } catch (URISyntaxException noSchemeNoArchiveBadLuck) {
+            return null; // FIXME: #TRUEZIP-132
+        }
+        return null;
     }
 
     /**
@@ -334,41 +327,5 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
     @Override
     public String toString() {
         return suffixes;
-    }
-
-    /**
-     * A thread local {@link Matcher}.
-     * This class is intended to be used in multithreaded environments for high
-     * performance pattern matching.
-     *
-     * @see #reset(CharSequence)
-     */
-    @ThreadSafe
-    private static final class ThreadLocalMatcher extends ThreadLocal<Matcher> {
-        private final Pattern pattern;
-
-        /**
-         * Constructs a new thread local matcher by using the given pattern.
-         *
-         * @param  pattern the pattern to be used.
-         */
-        ThreadLocalMatcher(Pattern pattern) {
-            if (null == pattern)
-                throw new NullPointerException();
-            this.pattern = pattern;
-        }
-
-        @Override
-        protected Matcher initialValue() {
-            return pattern.matcher(""); // NOI18N
-        }
-
-        /**
-         * Resets the thread local matcher with the given character sequence and
-         * returns it.
-         */
-        Matcher reset(CharSequence input) {
-            return get().reset(input);
-        }
     }
 }

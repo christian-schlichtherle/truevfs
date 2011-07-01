@@ -23,6 +23,7 @@ import de.schlichtherle.truezip.util.SuffixSet;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import java.io.File;
 import java.util.Locale;
 import java.util.Map;
 import org.junit.Before;
@@ -44,7 +45,7 @@ public class TArchiveDetectorTest {
     @Before
     public void setUp() {
         driver = new MockArchiveDriver();
-        ALL = new TArchiveDetector("jar|zip", driver);
+        ALL = new TArchiveDetector("tar.gz|zip", driver);
         NIL = new TArchiveDetector(ALL, ""); // test decoration
         MOK = new TArchiveDetector(NIL, "nil", driver); // test decoration
     }
@@ -266,23 +267,23 @@ public class TArchiveDetectorTest {
             "zip", "|ZIP||ZIP",
             "zip", "|ZIP|ZIP|",
 
-            "jar|zip", "JAR|ZIP",
-            "jar|zip", "ZIP|JAR",
-            "jar|zip", "|ZIP|JAR",
-            "jar|zip", "ZIP|JAR|",
-            "jar|zip", "|ZIP|JAR|",
-            "jar|zip", "||ZIP|JAR|",
-            "jar|zip", "|ZIP||JAR|",
-            "jar|zip", "|ZIP|JAR||",
+            "tar.gz|zip", "TAR.GZ|ZIP",
+            "tar.gz|zip", "ZIP|TAR.GZ",
+            "tar.gz|zip", "|ZIP|TAR.GZ",
+            "tar.gz|zip", "ZIP|TAR.GZ|",
+            "tar.gz|zip", "|ZIP|TAR.GZ|",
+            "tar.gz|zip", "||ZIP|TAR.GZ|",
+            "tar.gz|zip", "|ZIP||TAR.GZ|",
+            "tar.gz|zip", "|ZIP|TAR.GZ||",
 
-            "jar|zip", ".JAR|.ZIP",
-            "jar|zip", ".ZIP|.JAR",
-            "jar|zip", "|.ZIP|.JAR",
-            "jar|zip", ".ZIP|.JAR|",
-            "jar|zip", "|.ZIP|.JAR|",
-            "jar|zip", "||.ZIP|.JAR|",
-            "jar|zip", "|.ZIP||.JAR|",
-            "jar|zip", "|.ZIP|.JAR||",
+            "tar.gz|zip", ".TAR.GZ|.ZIP",
+            "tar.gz|zip", ".ZIP|.TAR.GZ",
+            "tar.gz|zip", "|.ZIP|.TAR.GZ",
+            "tar.gz|zip", ".ZIP|.TAR.GZ|",
+            "tar.gz|zip", "|.ZIP|.TAR.GZ|",
+            "tar.gz|zip", "||.ZIP|.TAR.GZ|",
+            "tar.gz|zip", "|.ZIP||.TAR.GZ|",
+            "tar.gz|zip", "|.ZIP|.TAR.GZ||",
         });
     }
 
@@ -335,17 +336,19 @@ public class TArchiveDetectorTest {
         }, NIL, MOK, ALL);
 
         assertScheme(new String[][] {
-            { null, ".jar" },
+            { null, ".tar.gz" },
             { null, ".zip" },
-            { null, "test.jar" },
+            { null, "test.tar.gz" },
             { null, "test.zip" },
         }, NIL, MOK);
 
         assertScheme(new String[][] {
-            { "jar", ".jar" },
-            { "jar", "test.jar" },
+            { "tar.gz", ".tar.gz" },
+            { "tar.gz", "test.tar.gz" },
+            { "tar.gz", "foo" + File.separator + "test.tar.gz" },
             { "zip", ".zip" },
             { "zip", "test.zip" },
+            { "zip", "foo" + File.separator + "test.zip" },
         }, ALL);
     }
 
