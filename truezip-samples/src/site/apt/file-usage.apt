@@ -66,12 +66,12 @@ Basic Operations
 
     Note that the <<<OutputStream.close()>>> method may throw an
     <<<IOException>>>, too.
-    An application need to deal with this appropriately, for example by
-    enclosing the entire block with another <<<try-catch>>>-block:
+    Applications need to deal with this appropriately, for example by
+    enclosing the entire block within another <<<try-catch>>>-block:
 
 %{snippet|id=cat2|file=truezip-samples/src/main/java/de/schlichtherle/truezip/sample/file/Usage.java}
 
-    This idiom is not specific to TrueZIP:
+    This idiom is not at all specific to TrueZIP:
     Streams often utilize OS resources such as file descriptors or network
     connections.
     All OS resources are limited however and sometimes they are even
