@@ -374,7 +374,7 @@ extends SafeKeyProvider<K> {
          * @throws IllegalStateException if getting this property is not legal
          *         in the current state.
          */
-        public URI getResource();
+        URI getResource();
 
         /**
          * Returns the protected resource's key.
@@ -383,7 +383,7 @@ extends SafeKeyProvider<K> {
          * @throws IllegalStateException if getting key is not legal in the
          *         current state.
          */
-        public @CheckForNull K getKey();
+        @CheckForNull K getKey();
 
         /**
          * Sets the protected resource's key to a clone of the given key.
@@ -392,7 +392,7 @@ extends SafeKeyProvider<K> {
          * @throws IllegalStateException if setting key is not legal in the
          *         current state.
          */
-        public void setKey(@CheckForNull K key);
+        void setKey(@CheckForNull K key);
 
         /**
          * Requests to prompt the user for a new key upon the next call to
@@ -405,7 +405,7 @@ extends SafeKeyProvider<K> {
          * @throws IllegalStateException if setting this property is not legal
          *         in the current state.
          */
-        public void setChangeRequested(boolean changeRequested);
+        void setChangeRequested(boolean changeRequested);
     } // Controller
 
     /** Proxies access to the key for {@link View} implementations. */
@@ -450,6 +450,7 @@ extends SafeKeyProvider<K> {
         }
     } // BaseController
 
+    /** The controller to use when promting for a key to write a resource. */
     private final class WriteController extends BaseController {
         WriteController(State state) {
             super(state);
@@ -461,6 +462,7 @@ extends SafeKeyProvider<K> {
         }
     } // WriteController
 
+    /** The controller to use when promting for a key to read a resource. */
     private final class ReadController extends BaseController {
         ReadController(State state) {
             super(state);
