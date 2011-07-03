@@ -79,7 +79,7 @@ implements SafeKey<AesCipherParameters>, Cloneable {
         final char[] oldPW = this.password;
         if (null != oldPW)
             Arrays.fill(oldPW, (char) 0);
-        this.password = null != newPW ? newPW.clone() : null;
+        this.password = null == newPW ? null : newPW.clone();
     }
 
     /**
