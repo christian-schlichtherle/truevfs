@@ -21,8 +21,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URI;
 import net.jcip.annotations.ThreadSafe;
 
-import static de.schlichtherle.truezip.key.PromptingKeyProvider.State.*;
-
 /**
  * A "safe" key provider which prompts the user for a key for its protected
  * resource.
@@ -39,6 +37,7 @@ import static de.schlichtherle.truezip.key.PromptingKeyProvider.State.*;
  * @version $Id$
  */
 @ThreadSafe
+@DefaultAnnotation(NonNull.class)
 public final class PromptingKeyProvider<K extends SafeKey<K>>
 extends SafeKeyProvider<K> {
 
@@ -48,7 +47,7 @@ extends SafeKeyProvider<K> {
     /** The view instance which is used to prompt the user for a key. */
     private volatile @CheckForNull View<K> view;
 
-    private volatile @NonNull State state = RESET;
+    private volatile State state = State.RESET;
 
     private volatile @CheckForNull K key;
 
@@ -80,11 +79,11 @@ extends SafeKeyProvider<K> {
         this.view = view;
     }
 
-    private @NonNull State getState() {
+    private State getState() {
         return state;
     }
 
-    private void setState(final @NonNull State state) {
+    private void setState(final State state) {
         this.state = state;
     }
 
@@ -108,7 +107,7 @@ extends SafeKeyProvider<K> {
         // This is quite paranoid, but supposedly fairly safe.
         final K oldKey = this.key;
         this.key = clone(newKey);
-        setState(null != newKey ? PROVIDED : CANCELLED);
+        setState(null != newKey ? State.PROVIDED : State.CANCELLED);
         reset(oldKey);
         //reset(newKey); // don't be mean!
     }
@@ -151,13 +150,11 @@ extends SafeKeyProvider<K> {
     private void reset() {
         setKey(null);
         setChangeRequested(false);
-        setState(RESET);
+        setState(State.RESET);
     }
 
     /** Implements the behavior strategy of its enclosing class. */
-    @ThreadSafe
-    @DefaultAnnotation(NonNull.class)
-    enum State {
+    private enum State {
         RESET {
             @Override
             <K extends SafeKey<K>> K
@@ -165,7 +162,8 @@ extends SafeKeyProvider<K> {
             throws UnknownKeyException {
                 State state;
                 try {
-                    Controller<K> controller = new WriteController<K>(provider, this);
+                    PromptingKeyProvider<K>.BaseController controller
+                            = provider.new WriteController(this);
                     provider.getView().promptWriteKey(controller);
                     controller.invalidate();
                 } finally {
@@ -182,7 +180,8 @@ extends SafeKeyProvider<K> {
                 State state;
                 do {
                     try {
-                        Controller<K> controller = new ReadController<K>(provider, this);
+                        PromptingKeyProvider<K>.BaseController controller
+                                = provider.new ReadController(this);
                         provider.getView().promptReadKey(controller, invalid);
                         controller.invalidate();
                     } catch (KeyPromptingCancelledException ex) {
@@ -283,7 +282,7 @@ extends SafeKeyProvider<K> {
         getResource(PromptingKeyProvider<K> provider) {
             return provider.getResource();
         }
-    } // enum State
+    } // State
 
     /**
      * Used for the actual prompting of the user for a key (a password for
@@ -301,6 +300,7 @@ extends SafeKeyProvider<K> {
      * Implementations of this interface <em>must</em> be thread safe
      * and should have no side effects!
      */
+    @ThreadSafe
     @DefaultAnnotation(NonNull.class)
     public interface View<K extends SafeKey<K>> {
 
@@ -360,20 +360,12 @@ extends SafeKeyProvider<K> {
          */
         void promptReadKey(Controller<K> controller, boolean invalid)
         throws UnknownKeyException;
-    } // interface View
+    } // View
 
     /** Proxies access to the key for {@link View} implementations. */
     @ThreadSafe
     @DefaultAnnotation(NonNull.class)
-    public static class Controller<K extends SafeKey<K>> {
-        private final PromptingKeyProvider<K> provider;
-        private @CheckForNull State state;
-
-        private Controller( final PromptingKeyProvider<K> provider,
-                            final State state) {
-            this.provider = provider;
-            this.state = state;
-        }
+    public interface Controller<K extends SafeKey<K>> {
 
         /**
          * Returns the unique resource identifier (resource ID) of the
@@ -382,11 +374,7 @@ extends SafeKeyProvider<K> {
          * @throws IllegalStateException if getting this property is not legal
          *         in the current state.
          */
-        public URI getResource() {
-            if (null == state)
-                throw new IllegalStateException();
-            return state.getResource(provider);
-        }
+        public URI getResource();
 
         /**
          * Returns the protected resource's key.
@@ -395,11 +383,7 @@ extends SafeKeyProvider<K> {
          * @throws IllegalStateException if getting key is not legal in the
          *         current state.
          */
-        public @CheckForNull K getKey() {
-            if (null == state)
-                throw new IllegalStateException();
-            return state.getKey(provider);
-        }
+        public @CheckForNull K getKey();
 
         /**
          * Sets the protected resource's key to a clone of the given key.
@@ -408,11 +392,7 @@ extends SafeKeyProvider<K> {
          * @throws IllegalStateException if setting key is not legal in the
          *         current state.
          */
-        public void setKey(@CheckForNull K key) {
-            if (null == state)
-                throw new IllegalStateException();
-            state.setKey(provider, key);
-        }
+        public void setKey(@CheckForNull K key);
 
         /**
          * Requests to prompt the user for a new key upon the next call to
@@ -425,40 +405,72 @@ extends SafeKeyProvider<K> {
          * @throws IllegalStateException if setting this property is not legal
          *         in the current state.
          */
+        public void setChangeRequested(boolean changeRequested);
+    } // Controller
+
+    /** Proxies access to the key for {@link View} implementations. */
+    private abstract class BaseController implements Controller<K> {
+        private @CheckForNull State state;
+
+        BaseController(final State state) {
+            this.state = state;
+        }
+
+        @Override
+        public URI getResource() {
+            if (null == state)
+                throw new IllegalStateException();
+            return state.getResource(PromptingKeyProvider.this);
+        }
+
+        @Override
+        public @CheckForNull
+        K getKey() {
+            if (null == state)
+                throw new IllegalStateException();
+            return state.getKey(PromptingKeyProvider.this);
+        }
+
+        @Override
+        public void setKey(@CheckForNull K key) {
+            if (null == state)
+                throw new IllegalStateException();
+            state.setKey(PromptingKeyProvider.this, key);
+        }
+
+        @Override
         public void setChangeRequested(boolean changeRequested) {
             if (null == state)
                 throw new IllegalStateException();
-            state.setChangeRequested(provider, changeRequested);
+            state.setChangeRequested(PromptingKeyProvider.this, changeRequested);
         }
 
         private void invalidate() {
             state = null;
         }
-    } // class Controller
+    } // BaseController
 
-    private static class WriteController<K extends SafeKey<K>>
-    extends Controller<K> {
-        private WriteController(PromptingKeyProvider<K> provider, State state) {
-            super(provider, state);
+    private final class WriteController extends BaseController {
+        WriteController(State state) {
+            super(state);
         }
 
         @Override
         public void setChangeRequested(boolean changeRequested) {
             throw new IllegalStateException();
         }
-    } // class WriteKeyController
+    } // WriteController
 
-    private static class ReadController<K extends SafeKey<K>>
-    extends Controller<K> {
-        private ReadController(PromptingKeyProvider<K> provider, State state) {
-            super(provider, state);
+    private final class ReadController extends BaseController {
+        ReadController(State state) {
+            super(state);
         }
 
         @Override
         public K getKey() {
             throw new IllegalStateException();
         }
-    } // class WriteKeyController
+    } // ReadController
 
     /** A factory for {@link PromptingKeyProvider}s. */
     public static final class Factory<K extends SafeKey<K>>
@@ -467,5 +479,5 @@ extends SafeKeyProvider<K> {
         public PromptingKeyProvider<K> newKeyProvider() {
             return new PromptingKeyProvider<K>();
         }
-    } // class Factory
+    } // Factory
 }
