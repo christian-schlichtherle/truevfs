@@ -13,24 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.file;
+package de.schlichtherle.truezip.nio.file.zip;
 
-import de.schlichtherle.truezip.fs.archive.tar.TarBZip2Driver;
 import de.schlichtherle.truezip.fs.FsScheme;
-import org.apache.tools.bzip2.CBZip2OutputStream;
+import de.schlichtherle.truezip.fs.archive.zip.ZipDriver;
+import de.schlichtherle.truezip.nio.file.TPathTestSuite;
 
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class TTarBZip2FileTest extends TFileTestSuite {
+public final class TZipPathTest extends TPathTestSuite {
 
-    public TTarBZip2FileTest() {
-        super(FsScheme.create("tar.bz2"), new TarBZip2Driver(IO_POOL_PROVIDER) {
-            @Override
-            public int getLevel() {
-                return CBZip2OutputStream.MIN_BLOCKSIZE;
-            }
-        });
+    public TZipPathTest() {
+        super(FsScheme.create("tar"), new ZipDriver(IO_POOL_PROVIDER));
     }
 }

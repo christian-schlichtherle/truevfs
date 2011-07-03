@@ -13,18 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.file;
+package de.schlichtherle.truezip.file.zip;
 
-import de.schlichtherle.truezip.fs.archive.tar.TarGZipDriver;
+import de.schlichtherle.truezip.file.TFileTestSuite;
+import de.schlichtherle.truezip.fs.archive.zip.CheckedZipDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
 
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class TTarGZipFileTest extends TFileTestSuite {
-
-    public TTarGZipFileTest() {
-        super(FsScheme.create("tar.gz"), new TarGZipDriver(IO_POOL_PROVIDER));
+public final class TCheckedZipFileTest extends TFileTestSuite {
+    
+    public TCheckedZipFileTest() {
+        super(FsScheme.create("zip"), new CheckedZipDriver(IO_POOL_PROVIDER));
     }
 }

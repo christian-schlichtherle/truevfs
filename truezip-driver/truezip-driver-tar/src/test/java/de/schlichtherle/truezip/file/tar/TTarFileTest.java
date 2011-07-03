@@ -13,18 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.nio.file;
+package de.schlichtherle.truezip.file.tar;
 
-import de.schlichtherle.truezip.fs.archive.zip.OdfDriver;
+import de.schlichtherle.truezip.file.TFileTestSuite;
+import de.schlichtherle.truezip.fs.archive.tar.TarDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
 
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class TOdfPathTest extends TPathTestSuite {
-    
-    public TOdfPathTest() {
-        super(FsScheme.create("odf"), new OdfDriver(IO_POOL_PROVIDER));
+public final class TTarFileTest extends TFileTestSuite {
+
+    public TTarFileTest() {
+        super(FsScheme.create("tar"), new TarDriver(IO_POOL_PROVIDER));
     }
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.nio.file;
+package de.schlichtherle.truezip.nio.file.zip.raes;
 
 import de.schlichtherle.truezip.key.MockView;
 import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
@@ -21,6 +21,9 @@ import static java.nio.file.Files.*;
 import de.schlichtherle.truezip.fs.archive.zip.raes.SafeZipRaesDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.fs.archive.zip.raes.PromptingKeyManagerService;
+import de.schlichtherle.truezip.nio.file.TFileSystemProvider;
+import de.schlichtherle.truezip.nio.file.TPath;
+import de.schlichtherle.truezip.nio.file.TPathTestSuite;
 import java.io.IOException;
 import org.junit.Test;
 
