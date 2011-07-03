@@ -20,7 +20,7 @@ import java.io.IOException;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * Indicates that an input stream or read only file for an entry has been
+ * Indicates that an input resource (input stream etc.) for an entry has been
  * forced to close.
  *
  * @see OutputClosedException
@@ -32,6 +32,6 @@ public class InputClosedException extends IOException {
     private static final long serialVersionUID = 4563928734723923649L;
     
     InputClosedException() {
-        super("input stream or read only file has been forced to close()");
+        super("input resource has been forced to close()");
     }
 }
