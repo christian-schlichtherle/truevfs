@@ -32,8 +32,9 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- * @author Christian Schlichtherle
- * @version $Id$
+ * @author     Christian Schlichtherle
+ * @version    $Id$
+ * @deprecated Just because the unit under test has been deprecated.
  */
 public class KeyManagementTest {
 
@@ -105,14 +106,8 @@ public class KeyManagementTest {
     }
 
     @Test
-    public void testSetAllPasswords1() throws IOException {
-        KeyManagement.setAllPasswords1(password);
-        makeArchive(new TFile(temp));
-    }
-
-    @Test
-    public void testSetAllPasswords2() throws IOException {
-        KeyManagement.setAllPasswords2(password);
+    public void testSetAllPasswords() throws IOException {
+        KeyManagement.setAllPasswords(password);
         makeArchive(new TFile(temp));
     }
 
