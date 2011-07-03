@@ -174,23 +174,6 @@ Committing Unsynchronized Changes To The Contents Of Archive Files
     They can't use logging and they can't use a GUI to monitor progress
     (see {{{Monitoring_Progress}below}}).
 
-* Monitoring Progress
-
-    \[This is a stub\]
-    When committing any unsynchronized changes to the contents of archive files
-    using
-    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#umount()}<<<TFile.umount()>>>}}
-    or
-    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#sync(de.schlichtherle.truezip.util.BitField)}<<<TFile.sync(BitField)>>>}},
-    monitoring can be done by instrumenting the TrueZIP Kernel module to use
-    the class
-    <<<de.schlichtherle.truezip.kernel.fs.FsStatisticsManager>>>.
-    Please check the Javadoc for the TrueZIP Kernel module class
-    <<<de.schlichtherle.truezip.kernel.fs.sl.FsManagerLocator>>> or the class
-    <<<de.schlichtherle.truezip.sample.file.app.Application>>> in the TrueZIP
-    Samples module to see how to instrument the kernel to use the class
-    <<<de.schlichtherle.truezip.kernel.fs.FsStatisticsManager>>>.
-
 * Third Party Access
 
     Because TrueZIP associates state with any archive file which is accessed
@@ -202,21 +185,20 @@ Committing Unsynchronized Changes To The Contents Of Archive Files
 
     In this context, third parties are:
 
+    [[1]] Instances of the class
+          {{{../apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}.
+          which do not detect the same set of archive files in the path due
+          to the use of a differently configured
+          {{{../apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}.
+
     [[1]] Instances of the class <<<File>>> which are not instances of the
-        class
-        {{{../apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}.
-        .
+          class
+          {{{../apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}.
 
-    [[2]] Instances of the class
-        {{{../apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}.
-        which do not recognize the same set of archive files in the path due
-        to the use of a differently working
-        {{{../apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}.
+    [[1]] Other definitions of the classes in the TrueZIP Kernel module which
+          have been loaded by different class loaders.
 
-    [[3]] Other definitions of the classes in this package which have been
-        loaded by different class loaders.
-
-    [[4]] Other platform processes.
+    [[1]] Other platform processes.
 
     []
 
@@ -226,7 +208,7 @@ Committing Unsynchronized Changes To The Contents Of Archive Files
     {{{../apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}
     objects - or
     {{{../apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}
-    objects with different
+    objects with a different
     {{{../apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}.
     parameters.
     This ensures that the state associated to an archive file is not shadowed
@@ -237,9 +219,9 @@ Committing Unsynchronized Changes To The Contents Of Archive Files
     objects recognize the same set of archive files in a path, it's recommended
     <not> to use constructors or methods of the
     {{{../apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}
-    class with explicit
-    {{{../apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}.
-    parameters unless there is good reason to.
+    class with an explicit
+    {{{../apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}
+    parameter.
 
     If the prerequisites for these recommendations don't apply or if the
     recommendations can't be followed, an application may call
