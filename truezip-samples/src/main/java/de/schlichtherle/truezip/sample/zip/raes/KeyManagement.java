@@ -25,15 +25,11 @@ import de.schlichtherle.truezip.key.KeyProvider;
 import de.schlichtherle.truezip.key.PromptingKeyProvider;
 import de.schlichtherle.truezip.key.PromptingKeyProvider.Controller;
 import de.schlichtherle.truezip.key.PromptingKeyProvider.View;
-import de.schlichtherle.truezip.key.SafeKeyManager;
-import de.schlichtherle.truezip.key.SafeKeyProvider;
 import de.schlichtherle.truezip.key.sl.KeyManagerLocator;
-import de.schlichtherle.truezip.key.spi.KeyManagerService;
 import de.schlichtherle.truezip.socket.sl.IOPoolLocator;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Arrays;
-import java.util.ServiceConfigurationError;
 
 /**
  * Provides static utility methods to set passwords for RAES encrypted ZIP
@@ -42,8 +38,11 @@ import java.util.ServiceConfigurationError;
  * programmatically instead of prompting the user for a key by means of the
  * default Swing or Console based user interfaces.
  *
- * @author Christian Schlichtherle
- * @version $Id$
+ * @author     Christian Schlichtherle
+ * @version    $Id$
+ * @deprecated This sample code should <em>not</em> be considered part of the
+ *             public API.
+ *             If you want to use it, then copy it, don't call it!
  */
 @DefaultAnnotation(NonNull.class)
 public final class KeyManagement {
@@ -52,8 +51,10 @@ public final class KeyManagement {
     private KeyManagement() {
     }
 
+// START SNIPPET: setPassword
     /**
-     * Sets the password for an individual RAES encrypted ZIP file.
+     * Sets the password for an individual RAES encrypted ZIP file a priori.
+     * <p>
      * This method uses the default {@link KeyManager} for
      * {@link AesCipherParameters} and the default {@link KeyProvider} for the
      * given {@code file} in order to set the given {@code password}.
@@ -61,14 +62,13 @@ public final class KeyManagement {
      * As another side effect, the key strength of the
      * {@link AesCipherParameters} is set to the maximum 256 bits.
      * <p>
-     * This method makes a protective copy of the given password char array.
-     * It's highly recommended to overwrite this array with any non-password
+     * A protective copy of the given password char array is made.
+     * It's recommended to overwrite the parameter array with any non-password
      * data after calling this method.
      *
      * @param file the TZP archive file to set the password for.
-     * @param password the password char array to be copied for subsequent use.
+     * @param password the password char array to be copied for internal use.
      */
-// START SNIPPET: setPassword
     public static void setPassword(TFile file, char[] password) {
         if (!file.isArchive())
             throw new IllegalArgumentException(file + " (not an archive file)");
@@ -83,30 +83,30 @@ public final class KeyManagement {
     }
 // END SNIPPET: setPassword
 
+// START SNIPPET: setAllPasswords
     /**
-     * Sets the password for all RAES encrypted ZIP files.
-     * <em>Important:</em> This method installs a new default archive detector
-     * using {@link TFile#setDefaultArchiveDetector}.
-     * This will affect only subsequently created {@link TFile} objects!
+     * Sets a common password for all RAES encrypted ZIP files ad hoc.
      * <p>
-     * This method decorates {@link TArchiveDetector#ALL} with a
-     * custom archive driver for the canonical archive file suffixes
-     * {@code "tzp|zip.rae|zip.raes"} and installs the result as the
-     * default archive detector using {@link TFile#setDefaultArchiveDetector}.
-     * The custom archive driver uses a custom {@link View} implementation for
+     * This method installs a custom {@link TArchiveDetector} as the
+     * {@link TFile#setDefaultArchiveDetector default archive detector}.
+     * This side effect will apply only to subsequently created {@link TFile}
+     * objects.
+     * The custom archive detector decorates {@link TArchiveDetector#ALL}
+     * with a custom archive driver for the canonical archive file suffixes
+     * {@code "tzp|zip.rae|zip.raes"}.
+     * The custom archive driver uses a custom {@link View} implementation as
      * its {@link PromptingKeyManagerService}.
      * <p>
-     * The key strength for all archive files 
+     * As another side effect, the key strength of all
      * {@link AesCipherParameters} is set to the maximum 256 bits.
      * <p>
-     * This method makes a protective copy of the given password char array.
-     * It's highly recommended to overwrite this array with any non-password
+     * A protective copy of the given password char array is made.
+     * It's recommended to overwrite the parameter array with any non-password
      * data after calling this method.
      *
-     * @param password the password char array to be copied for subsequent use.
+     * @param password the password char array to be copied for internal use.
      */
-// START SNIPPET: setAllPasswords1
-    public static void setAllPasswords1(char[] password) {
+    public static void setAllPasswords(char[] password) {
         TFile.setDefaultArchiveDetector(
                 new TArchiveDetector(
                     TArchiveDetector.ALL,
@@ -129,105 +129,18 @@ public final class KeyManagement {
         
         @Override
         public void promptWriteKey(Controller<AesCipherParameters> controller) {
+            // You might as well call controller.getResource() here in order to
+            // programmatically set the parameters for individual resource URIs.
             controller.setKey(params);
         }
         
         @Override
         public void promptReadKey(  Controller<AesCipherParameters> controller,
                                     boolean invalid) {
+            // You might as well call controller.getResource() here in order to
+            // programmatically set the parameters for individual resource URIs.
             controller.setKey(params);
         }
-    } // class SimpleView
-// END SNIPPET: setAllPasswords1
-
-    /**
-     * Sets the password for all RAES encrypted ZIP files.
-     * <em>Important:</em> This method installs a new default archive detector
-     * using {@link TFile#setDefaultArchiveDetector}.
-     * This will affect only subsequently created {@link TFile} objects!
-     * <p>
-     * This method decorates {@link TArchiveDetector#ALL} with a
-     * custom archive driver for the canonical archive file suffixes
-     * {@code "tzp|zip.rae|zip.raes"} and installs the result as the
-     * default archive detector using {@link TFile#setDefaultArchiveDetector}.
-     * The custom archive driver uses a custom implementation of a
-     * {@link KeyManager} which requires considerably more code than the
-     * approach used in {@link #setAllPasswords1}.
-     * <p>
-     * As another side effect, the key strength of the
-     * {@link AesCipherParameters} is set to the maximum 256 bits.
-     * <p>
-     * This method makes a protective copy of the given password char array.
-     * It's highly recommended to overwrite this array with any non-password
-     * data after calling this method.
-     *
-     * @param password the password char array to be copied for subsequent use.
-     */
-// START SNIPPET: setAllPasswords2
-    public static void setAllPasswords2(char[] password) {
-        TFile.setDefaultArchiveDetector(
-                new TArchiveDetector(
-                    TArchiveDetector.ALL,
-                    "tzp|zip.rae|zip.raes",
-                    new SafeZipRaesDriver(
-                        IOPoolLocator.SINGLETON,
-                        new SimpleKeyManagerService(password))));
-    }
-    
-    private static class SimpleKeyManagerService
-    extends KeyManagerService {
-        private KeyManager<AesCipherParameters> manager;
-    
-        SimpleKeyManagerService(char[] password) {
-            manager = new SafeKeyManager<AesCipherParameters, SimpleKeyProvider>(
-                    new SimpleKeyProviderFactory(password));
-        }
-    
-        @Override
-        @SuppressWarnings("unchecked")
-        public <K> KeyManager<K> get(Class<K> type) {
-            if (type.equals(AesCipherParameters.class))
-                return (KeyManager<K>) manager;
-            throw new ServiceConfigurationError("No key manager available for " + type);
-        }
-    } // SimpleKeyManagerService
-    
-    private static class SimpleKeyProviderFactory
-    implements KeyProvider.Factory<SimpleKeyProvider> {
-        private char[] password;
-    
-        SimpleKeyProviderFactory(char[] password) {
-            this.password = password.clone();
-        }
-    
-        @Override
-        public SimpleKeyProvider newKeyProvider() {
-            return new SimpleKeyProvider(password);
-        }
-    } // class SimpleKeyProviderFactory
-    
-    private static class SimpleKeyProvider
-    extends SafeKeyProvider<AesCipherParameters> {
-        private AesCipherParameters key = new AesCipherParameters();
-    
-        SimpleKeyProvider(char[] password) {
-            key.setPassword(password);
-        }
-    
-        @Override
-        protected AesCipherParameters getWriteKeyImpl() {
-            return key/*.clone()*/; // cloning is optional here
-        }
-    
-        @Override
-        protected AesCipherParameters getReadKeyImpl(boolean invalid) {
-            return key/*.clone()*/; // cloning is optional here
-        }
-    
-        @Override
-        public void setKey(AesCipherParameters key) {
-            this.key = key.clone();
-        }
-    } // class SimpleKeyProvider
-// END SNIPPET: setAllPasswords2
+    } // SimpleView
+// END SNIPPET: setAllPasswords
 }
