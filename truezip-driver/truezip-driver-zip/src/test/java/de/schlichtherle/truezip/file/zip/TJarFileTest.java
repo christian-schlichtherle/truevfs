@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.nio.file;
+package de.schlichtherle.truezip.file.zip;
 
+import de.schlichtherle.truezip.file.TFileTestSuite;
 import de.schlichtherle.truezip.fs.archive.zip.JarDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
 
@@ -22,9 +23,9 @@ import de.schlichtherle.truezip.fs.FsScheme;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class TJarPathTest extends TPathTestSuite {
+public final class TJarFileTest extends TFileTestSuite {
     
-    public TJarPathTest() {
+    public TJarFileTest() {
         super(FsScheme.create("jar"), new JarDriver(IO_POOL_PROVIDER));
     }
 }

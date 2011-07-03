@@ -13,18 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.nio.file;
+package de.schlichtherle.truezip.nio.file.tar;
 
-import de.schlichtherle.truezip.fs.archive.zip.CheckedZipDriver;
+import de.schlichtherle.truezip.fs.archive.tar.TarGZipDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
+import de.schlichtherle.truezip.nio.file.TPathTestSuite;
 
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class TCheckedZipPathTest extends TPathTestSuite {
-    
-    public TCheckedZipPathTest() {
-        super(FsScheme.create("zip"), new CheckedZipDriver(IO_POOL_PROVIDER));
+public final class TTarGZipPathTest extends TPathTestSuite {
+
+    public TTarGZipPathTest() {
+        super(FsScheme.create("tar.gz"), new TarGZipDriver(IO_POOL_PROVIDER));
     }
 }

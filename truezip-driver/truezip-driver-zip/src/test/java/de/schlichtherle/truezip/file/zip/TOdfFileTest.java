@@ -13,18 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.file;
+package de.schlichtherle.truezip.file.zip;
 
-import de.schlichtherle.truezip.fs.archive.zip.ZipDriver;
+import de.schlichtherle.truezip.file.TFileTestSuite;
+import de.schlichtherle.truezip.fs.archive.zip.OdfDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
 
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class TZipFileTest extends TFileTestSuite {
-
-    public TZipFileTest() {
-        super(FsScheme.create("zip"), new ZipDriver(IO_POOL_PROVIDER));
+public class TOdfFileTest extends TFileTestSuite {
+    
+    public TOdfFileTest() {
+        super(FsScheme.create("odf"), new OdfDriver(IO_POOL_PROVIDER));
     }
 }

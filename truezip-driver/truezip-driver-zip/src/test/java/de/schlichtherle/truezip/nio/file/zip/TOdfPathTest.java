@@ -13,18 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.file;
+package de.schlichtherle.truezip.nio.file.zip;
 
 import de.schlichtherle.truezip.fs.archive.zip.OdfDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
+import de.schlichtherle.truezip.nio.file.TPathTestSuite;
 
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class TOdfFileTest extends TFileTestSuite {
+public class TOdfPathTest extends TPathTestSuite {
     
-    public TOdfFileTest() {
+    public TOdfPathTest() {
         super(FsScheme.create("odf"), new OdfDriver(IO_POOL_PROVIDER));
     }
 }
