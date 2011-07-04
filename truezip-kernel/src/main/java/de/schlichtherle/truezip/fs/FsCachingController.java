@@ -337,7 +337,7 @@ extends FsDecoratingController< FsConcurrentModel,
         };
         
         abstract OutputSocket<?> newOutputSocket(EntryCache cache, OutputSocket <?> output);
-    } // enum EntryOutputSocketFactory
+    } // EntryOutputSocketFactory
 
     /** A cache for the contents of an individual file system entry. */
     private class EntryCache {
@@ -419,9 +419,9 @@ extends FsDecoratingController< FsConcurrentModel,
                 caches.put(name, EntryCache.this);
                 return in;
             }
-        } // class EntryInputSocket
+        } // EntryInputSocket
 
-        /** An output socket proxy. */
+        /** An output socket proxy which supports NIO.2. */
         private final class Nio2EntryOutputSocket
         extends EntryOutputSocket {
             Nio2EntryOutputSocket(OutputSocket <?> output) {
@@ -437,7 +437,7 @@ extends FsDecoratingController< FsConcurrentModel,
                 caches.put(name, EntryCache.this);
                 return new EntrySeekableByteChannel(sbc);
             }
-        } // class Nio2EntryOutputSocket
+        } // Nio2EntryOutputSocket
 
         /** An output socket proxy. */
         private class EntryOutputSocket
@@ -455,7 +455,7 @@ extends FsDecoratingController< FsConcurrentModel,
                 caches.put(name, EntryCache.this);
                 return new EntryOutputStream(out);
             }
-        } // class EntryOutputSocket
+        } // EntryOutputSocket
 
         /** An output stream proxy. */
         private final class EntrySeekableByteChannel
@@ -477,7 +477,7 @@ extends FsDecoratingController< FsConcurrentModel,
                                 cache.getEntry());
                 }
             }
-        } // class EntrySeekableByteChannel
+        } // EntrySeekableByteChannel
 
         /** An output stream proxy. */
         private final class EntryOutputStream
@@ -499,6 +499,6 @@ extends FsDecoratingController< FsConcurrentModel,
                                 cache.getEntry());
                 }
             }
-        } // class EntryOutputStream
-    } // class EntryCache
+        } // EntryOutputStream
+    } // EntryCache
 }
