@@ -325,7 +325,7 @@ public final class IOCache implements Flushable, Closeable {
         private Buffer getBuffer() throws IOException {
             return buffer = getInputBufferPool().allocate();
         }
-    } // class CacheInputSocket
+    } // CacheInputSocket
 
     private final class CacheOutputSocket
     extends OutputSocket<Entry> {
@@ -357,14 +357,14 @@ public final class IOCache implements Flushable, Closeable {
         private Buffer getBuffer() throws IOException {
             return buffer = getOutputBufferPool().allocate();
         }
-    } // class CacheOutputSocket
+    } // CacheOutputSocket
 
     /** Hides backing store entries. */
     private static class CacheEntry extends DecoratingEntry<Entry> {
         CacheEntry(Entry entry) {
             super(entry);
         }
-    } // class CacheEntry
+    } // CacheEntry
 
     private final class InputBufferPool
     implements Pool<Buffer, IOException> {
@@ -396,7 +396,7 @@ public final class IOCache implements Flushable, Closeable {
                     buffer.release();
             }
         }
-    } // class InputBufferPool
+    } // InputBufferPool
 
     private abstract class OutputBufferPool
     implements Pool<Buffer, IOException> {
@@ -418,7 +418,7 @@ public final class IOCache implements Flushable, Closeable {
                 setBuffer(buffer);
             }
         }
-    } // class OutputBufferPool
+    } // OutputBufferPool
 
     private class WriteThroughOutputBufferPool
     extends OutputBufferPool {
@@ -432,7 +432,7 @@ public final class IOCache implements Flushable, Closeable {
                 super.release(buffer);
             }
         }
-    } // class WriteThroughOutputBufferPool
+    } // WriteThroughOutputBufferPool
 
     private final class WriteBackOutputBufferPool
     extends OutputBufferPool {
@@ -450,7 +450,7 @@ public final class IOCache implements Flushable, Closeable {
                 }
             }
         }
-    } // class WriteBackOutputBufferPool
+    } // WriteBackOutputBufferPool
 
     private static final BufferSocketFactory FACTORY = JSE7.AVAILABLE
             ? BufferSocketFactory.NIO
@@ -484,7 +484,7 @@ public final class IOCache implements Flushable, Closeable {
         
         abstract InputSocket<?> newInputSocket(Buffer buffer);
         abstract OutputSocket<?> newOutputSocket(Buffer buffer);
-    } // enum BufferSocketFactory
+    } // BufferSocketFactory
 
     private final class Buffer {
         private final IOPool.Entry<?> data;
@@ -516,7 +516,7 @@ public final class IOCache implements Flushable, Closeable {
             public SeekableByteChannel newSeekableByteChannel() throws IOException {
                 return new BufferInputChannel(getBoundSocket().newSeekableByteChannel());
             }
-        } // class Nio2BufferInputSocket
+        } // Nio2BufferInputSocket
 
         @Immutable
         private class BufferInputSocket
@@ -534,7 +534,7 @@ public final class IOCache implements Flushable, Closeable {
             public final InputStream newInputStream() throws IOException {
                 return new BufferInputStream(getBoundSocket().newInputStream());
             }
-        } // class BufferInputSocket
+        } // BufferInputSocket
 
         private final class BufferInputChannel
         extends DecoratingSeekableByteChannel {
@@ -555,7 +555,7 @@ public final class IOCache implements Flushable, Closeable {
                     getInputBufferPool().release(Buffer.this);
                 }
             }
-        } // class BufferInputChannel
+        } // BufferInputChannel
 
         private final class BufferReadOnlyFile
         extends DecoratingReadOnlyFile {
@@ -576,7 +576,7 @@ public final class IOCache implements Flushable, Closeable {
                     getInputBufferPool().release(Buffer.this);
                 }
             }
-        } // class BufferReadOnlyFile
+        } // BufferReadOnlyFile
 
         private final class BufferInputStream
         extends DecoratingInputStream {
@@ -597,7 +597,7 @@ public final class IOCache implements Flushable, Closeable {
                     getInputBufferPool().release(Buffer.this);
                 }
             }
-        } // class BufferInputStream
+        } // BufferInputStream
 
         @Immutable
         private final class Nio2BufferOutputSocket
@@ -606,7 +606,7 @@ public final class IOCache implements Flushable, Closeable {
             public SeekableByteChannel newSeekableByteChannel() throws IOException {
                 return new BufferOutputChannel(getBoundSocket().newSeekableByteChannel());
             }
-        } // class Nio2BufferInputSocket
+        } // Nio2BufferInputSocket
 
         @Immutable
         private class BufferOutputSocket
@@ -619,7 +619,7 @@ public final class IOCache implements Flushable, Closeable {
             public final OutputStream newOutputStream() throws IOException {
                 return new BufferOutputStream(getBoundSocket().newOutputStream());
             }
-        } // class BufferOutputSocket
+        } // BufferOutputSocket
 
         private final class BufferOutputChannel
         extends DecoratingSeekableByteChannel {
@@ -640,7 +640,7 @@ public final class IOCache implements Flushable, Closeable {
                     getOutputBufferPool().release(Buffer.this);
                 }
             }
-        } // class BufferOutputChannel
+        } // BufferOutputChannel
 
         private final class BufferOutputStream
         extends DecoratingOutputStream {
@@ -661,6 +661,6 @@ public final class IOCache implements Flushable, Closeable {
                     getOutputBufferPool().release(Buffer.this);
                 }
             }
-        } // class BufferOutputStream
-    } // class Buffer
+        } // BufferOutputStream
+    } // Buffer
 }
