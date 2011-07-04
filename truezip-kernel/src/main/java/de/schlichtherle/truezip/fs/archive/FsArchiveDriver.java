@@ -239,7 +239,8 @@ extends FsDriver {
             throw ex;
         } catch (IOException ex) {
             throw (FileNotFoundException) new FileNotFoundException(
-                    model.getMountPoint().toString()).initCause(ex);
+                    model.getMountPoint().toHierarchicalUri().toString())
+                    .initCause(ex);
         }
     }
 
@@ -267,7 +268,8 @@ extends FsDriver {
             throw ex;
         } catch (IOException ex) {
             throw (FileNotFoundException) new FileNotFoundException(
-                    model.getMountPoint().toString()).initCause(ex);
+                    model.getMountPoint().toHierarchicalUri().toString())
+                    .initCause(ex);
         }
     }
 
@@ -291,9 +293,7 @@ extends FsDriver {
      *         or is (temporarily) not accessible.
      *         An exception of this type marks a <em>transient</em> cause,
      *         i.e. this method may get subsequently called until it succeeds.
-     * @throws IOException if the target archive file is a
-     *         <i>false positive</i> archive file.
-     *         An exception of this type marks a <em>persistent</em> cause,
+     * @throws An exception of this type marks a <em>persistent</em> cause,
      *         i.e. this method will not get called again until the archive
      *         file system is synchronized with its parent file system.
      */
@@ -327,7 +327,8 @@ extends FsDriver {
             throw ex;
         } catch (IOException ex) {
             throw (FileNotFoundException) new FileNotFoundException(
-                    model.getMountPoint().toString()).initCause(ex);
+                    model.getMountPoint().toHierarchicalUri().toString())
+                    .initCause(ex);
         }
     }
 
