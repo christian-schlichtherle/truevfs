@@ -239,8 +239,7 @@ extends FsDriver {
             throw ex;
         } catch (IOException ex) {
             throw (FileNotFoundException) new FileNotFoundException(
-                    model.getMountPoint().toString())
-                    .initCause(ex);
+                    model.getMountPoint().toString()).initCause(ex);
         }
     }
 
@@ -268,8 +267,7 @@ extends FsDriver {
             throw ex;
         } catch (IOException ex) {
             throw (FileNotFoundException) new FileNotFoundException(
-                    model.getMountPoint().toString())
-                    .initCause(ex);
+                    model.getMountPoint().toString()).initCause(ex);
         }
     }
 
@@ -327,8 +325,7 @@ extends FsDriver {
             throw ex;
         } catch (IOException ex) {
             throw (FileNotFoundException) new FileNotFoundException(
-                    model.getMountPoint().toString())
-                    .initCause(ex);
+                    model.getMountPoint().toString()).initCause(ex);
         }
     }
 
