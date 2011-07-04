@@ -47,11 +47,11 @@ public class Append {
                 try {
                     byte[] two = new byte[1024];
                     new Random().nextBytes(two);
-                    System.out.println(tmp + ": length: " + raf.length());
+                    assertEquals(one.length, raf.length());
                     out.write(two);
+                    assertEquals(one.length + two.length, raf.length());
                     raf.readFully(two);
                     assertTrue(Arrays.equals(one, two));
-                    System.out.println(tmp + ": length: " + raf.length());
                 } finally {
                     out.close();
                 }

@@ -74,7 +74,7 @@ public final class FsDefaultArchiveController<E extends FsArchiveEntry>
 extends FsFileSystemArchiveController<E> {
 
     private static final BitField<FsOutputOption>
-            MOUNT_MASK = BitField.of(CREATE_PARENTS);
+            MOUNT_OUTPUT_MASK = BitField.of(CREATE_PARENTS);
     private static final BitField<FsInputOption>
             MOUNT_INPUT_OPTIONS = BitField.of(FsInputOption.CACHE);
     private static final BitField<FsOutputOption>
@@ -187,7 +187,7 @@ extends FsFileSystemArchiveController<E> {
     @Override
     void mount(final boolean autoCreate, BitField<FsOutputOption> options)
     throws IOException {
-        options = options.and(MOUNT_MASK);
+        options = options.and(MOUNT_OUTPUT_MASK);
         try {
             // readOnly must be set first because the parent archive controller
             // could be a FileController and on Windows this property turns to
