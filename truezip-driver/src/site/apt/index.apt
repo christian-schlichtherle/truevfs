@@ -1,0 +1,15 @@
+    -----------------------
+    About
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+About TrueZIP Driver
+
+    This module contains submodules with pluggable file system drivers.
+
+    Add the JAR artifact of these submodule to the compile time class path for
+    dependency injection to the TrueZIP Kernel module or to the run time
+    class path for service location in the TrueZIP File* and TrueZIP Path
+    modules.
+
