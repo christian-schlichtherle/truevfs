@@ -13,7 +13,7 @@ About
 
     This is the primary API for JSE 6&#160;compliant TrueZIP applications:
     Like the API of the {{{../truezip-path/index.html}TrueZIP Path}} module,
-    this API is just a facade for the
+    this API is a facade for the
     {{{../truezip-kernel/index.html}TrueZIP Kernel}} module.
     In contrast to the TrueZIP Path API however,
     this API is limited to access the platform file system and any archive
