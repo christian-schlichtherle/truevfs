@@ -8,7 +8,7 @@ About
 
 * Welcome to the TrueZIP User Website!
 
-    TrueZIP is a plug-in framework for virtual file systems which
+    TrueZIP is a plug-in framework for virtual file systems (VFS) which
     provides transparent access to archive files as if they were just
     plain directories.
     
@@ -16,9 +16,9 @@ About
 
     [[1]] <<{Archive files are virtual directories}!>>
 
-    [[1]] <<{Make simple things easy and complex things possible}!>>
+    [[1]] <<{Reliability is a key value proposition}!>>
 
-    [[1]] <<{Quality matters}!>>
+    [[1]] <<{Make simple things easy and complex things possible}!>>
 
     []
 
