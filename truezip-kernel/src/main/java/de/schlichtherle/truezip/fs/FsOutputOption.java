@@ -61,14 +61,20 @@ public enum FsOutputOption {
     EXCLUSIVE,
 
     /**
+     * <em>Ignorable:</em>
      * Expresses a preference to store an entry uncompressed within its archive.
-     * This may get used or ignored by archive drivers.
+     * This option may get ignored by archive drivers.
+     * Furthermore, if this happens, there may be no direct feedback available
+     * to the caller.
      */
     STORE,
 
     /**
+     * <em>Ignorable:</em>
      * Expresses a preference to compress an entry within its archive.
-     * This may get used or ignored by archive drivers.
+     * This option may get ignored by archive drivers.
+     * Furthermore, if this happens, there may be no direct feedback available
+     * to the caller.
      */
     COMPRESS,
 }
