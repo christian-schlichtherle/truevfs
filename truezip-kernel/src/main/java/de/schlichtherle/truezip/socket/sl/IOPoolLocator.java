@@ -95,15 +95,14 @@ public final class IOPoolLocator implements IOPoolProvider {
                         service = oldService;
                 }
             }
-            if (null != service)
-                logger.log(CONFIG, "provided", service);
-            else
+            if (null == service)
                 throw new ServiceConfigurationError(
                         MessageFormat.format(
                             ResourceBundle
                                 .getBundle(IOPoolLocator.class.getName())
-                                .getString("none"),
+                                .getString("null"),
                             IOPoolService.class));
+            logger.log(CONFIG, "provided", service);
             SERVICE = service;
         }
     } // class Boot
