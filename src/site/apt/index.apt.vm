@@ -46,9 +46,9 @@ About
       package
       {{{./apidocs/de/schlichtherle/truezip/nio/file/package-summary.html}<<<de.schlichtherle.truezip.nio.file>>>}}.
       The classes in this package implement a
-      <<<java.nio.file.spi.FileSystemProvider>>> for the NIO.2 API to enable an
-      application to access archive files within any (virtual) file system,
-      e.g. via HTTP(S).
+      <<<java.nio.file.spi.FileSystemProvider>>> for the NIO.2 API (JSR 203)
+      to enable an application to access archive files within any (virtual)
+      file system, e.g. via HTTP(S).
       Applications can even read or write archive entries in random order using
       a <<<SeekableByteChannel>>>.
       This API requires a JSE 7 compliant JVM.
