@@ -296,9 +296,12 @@ public class FsPathTest {
             { "foo:/bar/baz/", "foo:/bar/", "baz" },
             { "foo:/bar/baz/?bang", "foo:/bar/", "baz?bang" },
 
+            { "file:////host/share/file", "file://host/share/", "file" },
+            { "file://host/share/file", "file://host/share/", "file" },
+
             { "file:///foo/c%3A//", "file:/foo/", "c%3A" },
             { "file:/foo/c%3A//", "file:/foo/", "c%3A" },
-            { "file:////c://", "file:/c:/", "" },
+            //{ "file:////c://", "file:/c:/", "" },
             { "file:///c://", "file:/c:/", "" },
             { "file:/c://", "file:/c:/", "" },
             { "file:/c%3A", "file:/", "c%3A" },

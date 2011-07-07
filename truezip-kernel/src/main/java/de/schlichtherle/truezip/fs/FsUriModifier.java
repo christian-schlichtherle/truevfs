@@ -50,13 +50,13 @@ public enum FsUriModifier {
     },
 
     /**
-     * The canonicalize modifier normalizes the URI path and applies a
-     * {@link PostFix post-fix} which depends on the class specific URI syntax.
+     * The canonicalize modifier applies a {@link PostFix post-fix} which
+     * depends on the class specific URI syntax.
      */
     CANONICALIZE {
         @Override
         URI modify(URI uri, PostFix fix) throws URISyntaxException {
-            return fix.modify(uri.normalize());
+            return fix.modify(uri);
         }
     };
 
@@ -77,8 +77,8 @@ public enum FsUriModifier {
     public enum PostFix {
 
         /**
-         * The post-fix for an {@link FsPath} depends on the URI type:
-         * For the URI is opaque or not absolute or has a fragment component
+         * The post-fix for an {@link FsPath} depends on the given URI:
+         * If the URI is opaque or not absolute or has a fragment component
          * defined, nothing is modified.
          * Otherwise, the following modifications are conducted:
          * <ol>
@@ -101,19 +101,27 @@ public enum FsUriModifier {
         PATH {
             @Override
             @edu.umd.cs.findbugs.annotations.SuppressWarnings("ES_COMPARING_STRINGS_WITH_EQ")
-            URI modify(final URI uri) throws URISyntaxException {
-                if (uri.isOpaque() || !uri.isAbsolute() || null != uri.getRawFragment())
+            URI modify(URI uri) throws URISyntaxException {
+                if (uri.isOpaque()
+                        || !uri.isAbsolute()
+                        || null != uri.getRawFragment())
                     return uri;
+                {
+                    String a = uri.getRawAuthority();
+                    String p = uri.getRawPath();
+                    if (null == a && null != p && p.startsWith(TWO_SEPARATORS)) {
+                        int i = p.indexOf(SEPARATOR_CHAR, 2);
+                        if (2 <= i) {
+                            a = p.substring(2, i);
+                            p = p.substring(i);
+                        }
+                        uri = new UriBuilder(uri, true).authority(a).path(p).getUri();
+                    }
+                    uri = uri.normalize();
+                }
                 String s = uri.getScheme();
                 String a = uri.getRawAuthority();
                 String p = uri.getRawPath(), q = p;
-                if (p.startsWith(SEPARATOR + SEPARATOR)) {
-                    int i = p.indexOf(SEPARATOR_CHAR, 2);
-                    if (2 <= i) {
-                        a = p.substring(2, i);
-                        p = p.substring(i);
-                    }
-                }
                 for (int l; p.endsWith(SEPARATOR)
                         && (   1 <=(l = p.length()) && null == s
                             || 2 <= l && ':' != p.charAt(l - 2)
@@ -121,26 +129,25 @@ public enum FsUriModifier {
                             || 4 <  l && p.startsWith(SEPARATOR)
                             || null != a); )
                     p = p.substring(0, l - 1);
-                String ssp;
-                return p == q
-                        && (null != a
-                            || null == (ssp = uri.getRawSchemeSpecificPart()) // cover for URI bug
-                            || !ssp.startsWith(SEPARATOR + SEPARATOR))
-                        ? uri
-                        : new UriBuilder(uri, true).authority(a).path(p).getUri();
-            }
-        },
-
-        /** The post-fix for an {@link FsMountPoint} does nothing. */
-        MOUNT_POINT {
-            @Override
-            URI modify(URI uri) {
-                return uri;
+                return p != q
+                        ? new UriBuilder(uri, true).path(p).getUri()
+                        : uri;
             }
         },
 
         /**
-         * The post-fix for an {@link FsEntryName} depends on the URI type:
+         * The post-fix for an {@link FsMountPoint} just normalizes the given
+         * URI.
+         */
+        MOUNT_POINT {
+            @Override
+            URI modify(URI uri) {
+                return uri.normalize();
+            }
+        },
+
+        /**
+         * The post-fix for an {@link FsEntryName} depends on the given URI:
          * If the URI is absolute or has an authority or a fragment component
          * defined, nothing is modified.
          * Otherwise, the URI path component gets truncated so that it does not
@@ -150,7 +157,8 @@ public enum FsUriModifier {
         ENTRY_NAME {
             @Override
             @edu.umd.cs.findbugs.annotations.SuppressWarnings("ES_COMPARING_STRINGS_WITH_EQ")
-            URI modify(final URI uri) throws URISyntaxException {
+            URI modify(URI uri) throws URISyntaxException {
+                uri = uri.normalize();
                 if (uri.isAbsolute()
                         || null != uri.getRawAuthority()
                         || null != uri.getRawFragment())
@@ -167,11 +175,13 @@ public enum FsUriModifier {
         };
 
         /**
-         * An idempotent function which modifies a URI.
+         * An idempotent function which modifies the given URI.
          *
          * @param  uri the URI to modify.
          * @return the modified URI.
          */
         abstract URI modify(URI uri) throws URISyntaxException;
+
+        private static final String TWO_SEPARATORS = SEPARATOR + SEPARATOR;
     }
 }
