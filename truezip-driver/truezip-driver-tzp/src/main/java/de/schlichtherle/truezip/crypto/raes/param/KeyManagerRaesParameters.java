@@ -110,14 +110,14 @@ public final class KeyManagerRaesParameters implements RaesParametersProvider {
         @Override
         public KeyStrength getKeyStrength() {
             if (null == param)
-                throw new IllegalStateException("getWritePasswd() must get called first!");
+                throw new IllegalStateException("getWritePassword() must get called first!");
             return param.getKeyStrength();
         }
 
         @Override
         public void setKeyStrength(KeyStrength keyStrength) {
             if (null == param)
-                throw new IllegalStateException("getReadPasswd(boolean) must get called first!");
+                throw new IllegalStateException("getReadPassword(boolean) must get called first!");
             final KeyProvider<AesCipherParameters>
                     provider = manager.getKeyProvider(resource);
             param.setKeyStrength(keyStrength);
