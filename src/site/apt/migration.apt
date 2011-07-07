@@ -20,7 +20,7 @@ Migrating TrueZIP 6 Applications to TrueZIP 7
 * Initiate Sources
 
     As the primary option - if you haven't done so already -
-    {{{./archetype/file/shell.html}initiate a Maven project}}
+    {{{./kick-start/file/shell.html}initiate a Maven project}}
     and integrate your sources into its directory tree or - as a secondary
     option -
     {{{http://truezip.schlichtherle.de/2011/05/13/no-maven/}download the all-in-one JAR-with-dependencies}}
@@ -30,9 +30,9 @@ Migrating TrueZIP 6 Applications to TrueZIP 7
 * Setup Class Path
 
     While TrueZIP 6 consists of a single monolithic module, TrueZIP 7 is a
-    multi-module build in order to reduce application dependencies and enable
+    multi-module project in order to reduce application dependencies and enable
     them to apply the convention-over-configuration paradigm for the initial
-    set up of their supported file system types.
+    set up of the detectable archive file types.
 
 * Search And Replace
 
