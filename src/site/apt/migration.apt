@@ -157,7 +157,7 @@ Migrating TrueZIP 6 Applications to TrueZIP 7
 * Build Project
 
     Now cross fingers and build your project.
-    If it compiles, chances are that it will work straigt away because the
+    If it compiles, chances are that it will work straight away because the
     semantics of the classes and methods of the TrueZIP File* API haven't
     really changed between TrueZIP 6 and 7:
     After all, a recursive archive copy operation (once <<<archiveCopyAll>>>)
