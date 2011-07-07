@@ -40,14 +40,15 @@ implements SafeKey<AesCipherParameters>, Cloneable {
 
     @Override
     public AesCipherParameters clone() {
+        final AesCipherParameters clone;
         try {
-            AesCipherParameters clone = (AesCipherParameters) super.clone();
-            if (null != password)
-                clone.password = password.clone();
-            return clone;
+             clone = (AesCipherParameters) super.clone();
         } catch (CloneNotSupportedException ex) {
             throw new AssertionError(ex);
         }
+        if (null != password)
+            clone.password = password.clone();
+        return clone;
     }
 
     @Override
