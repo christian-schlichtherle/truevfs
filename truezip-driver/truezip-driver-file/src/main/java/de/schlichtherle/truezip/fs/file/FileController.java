@@ -58,6 +58,8 @@ import static java.io.File.separatorChar;
 @DefaultAnnotation(NonNull.class)
 final class FileController extends FsModelController<FsModel>  {
 
+    private static final String TWO_SEPARATORS = SEPARATOR + SEPARATOR;
+
     private final File target;
 
     FileController(final FsModel model) {
@@ -76,7 +78,7 @@ final class FileController extends FsModelController<FsModel>  {
                 // Note that the use of the buggy URI constructor is authorized
                 // for this case!
                 uri = new URI(  uri.getScheme(), "",
-                                SEPARATOR + SEPARATOR + uri.getAuthority() + uri.getPath(),
+                                TWO_SEPARATORS + uri.getAuthority() + uri.getPath(),
                                 uri.getQuery(), uri.getFragment());
             } catch (URISyntaxException ex) {
                 throw new AssertionError(ex);
