@@ -365,12 +365,13 @@ try {
         <title>TrueZIP Path API</title>
         <faq id="interoperability">
             <question>
-                Can I use the TrueZIP Path API concurrently with the TrueZIP
-                File* API?
+                Can I use the APIs of the modules TrueZIP Path and
+                TrueZIP File* concurrently?
             </question>
             <answer>
                 <p>
-                    Yes, absolutely.
+                    Absolutely yes, because both module APIs are just facades
+                    for the module TrueZIP Kernel.
                     The NIO.2 API defines some methods for the interoperability
                     of <code>File</code> and <code>Path</code> objects:
                 </p>
@@ -409,9 +410,9 @@ try {
                         module on the TrueZIP Path module,
                         <code>TFile.toPath()</code> throws an
                         <code>UnsupportedOperationException</code>.
-                        To create a <code>TPath</code> from the
-                        <code>File</code> object <code>file</code>, call
-                        <code>new TPath(file)</code> instead.
+                        To create a <code>TPath</code> from a
+                        <code>File</code> object, call
+                        <code>new TPath(File)</code> instead.
                         Note that this works for plain <code>File</code>
                         objects too, not just <code>TFile</code> objects.
                     </li>
