@@ -20,41 +20,35 @@ import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
- * A general purpose interface used by client applications to retrieve a
- * key which is required for write or read access to a protected resource.
- * Both the key and the protected resource may be virtually anything:
- * The minimum requirement for a key is just that it's an {@link Object}.
- * The protected resource is not even explicitly modelled in this interface.
- * So in order to use it, an instance must be associated with a protected
- * resource by a third party - this is the job of the {@link KeyManager} class.
+ * Manages the life cycle of a generic authentication key which is required
+ * for the encryption or decryption of protected resources.
+ * A key provider is usually associated to one or more protected resources by a
+ * {@link KeyManager}.
+ * Note that neither the protected resources nor their encryption/decryption
+ * operations are modelled by this interface.
  * <p>
- * Once an instance has been associated to a protected resource, the client
- * application is assumed to use the key for two basic operations:
+ * Clients are assumed to use this interface for the following purposes:
  * <ol>
- * <li>The key is used in order to create a new protected resource or entirely
- *     replace its contents.
- *     This implies that the key does not need to be authenticated.
- *     For this purpose, client applications call the method
- *     {@link #getWriteKey}.
- * <li>The key is used in order to open an already existing protected resource
- *     for access to its contents.
- *     This implies that the key needs to be authenticated by the client
- *     application.
- *     For this purpose, client applications call the method
- *     {@link #getReadKey}.
+ * <li>Retrieving an authentication key for encryption of a protected resource
+ *     by calling the method {@link #getWriteKey}.
+ *     This assumes that the key does not need to get authenticated.
+ * <li>Retrieving an authentication key for decryption of a protected resource
+ *     by calling the method {@link #getReadKey}.
+ *     This assumes that the key needs to get authenticated by another
+ *     component which decrypts the protected resource.
  * </ol>
+ * The methods of this interface may get executed in arbitrary order.
  * Calling the same method subsequently is guaranteed to return a key which at
  * least compares {@link Object#equals equal}, but is not necessarily the same.
  * <p>
- * From a client application's perspective, the two basic operations may be
- * executed in no particular order. Following are some typical use cases:
+ * Following are some typical use cases:
  * <ol>
  * <li>A new protected resource needs to be created.
- *     In this case, just {@link #getWriteKey} needs to get called.
+ *     In this case, {@link #getWriteKey} needs to get called.
  * <li>The contents of an already existing protected resource need to be
  *     completely replaced.
  *     Hence there is no need to retrieve and authenticate the existing key.
- *     Again, just {@link #getWriteKey} needs to get called.
+ *     Again, {@link #getWriteKey} needs to get called.
  * <li>The contents of an already existing protected resource need to be
  *     read, but not changed.
  *     This implies that the existing key needs to be retrieved and
@@ -76,15 +70,13 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  *     need to get called.
  * </ol>
  * As you can see in the last example, it is at the discretion of the key
- * provider whether or not {@link #getWriteKey} returns a key which compares
- * {@link Object#equals equal} to the key returned by {@link #getReadKey} or
- * returns a completely different new key.
+ * provider implementation whether or not {@link #getWriteKey} returns a key
+ * which compares {@link Object#equals equal} to the key returned by
+ * {@link #getReadKey} or returns a completely different key.
  * Ideally, a brave provider implementation would allow the user to control
  * this.
  * <p>
- * Note that provider implementations must be thread-safe.
- * This allows clients to use the same provider by multiple threads
- * concurrently.
+ * Implementations must be safe for multi-threading.
  *
  * @param   <K> The type of the keys.
  * @see     KeyManager
@@ -95,10 +87,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 public interface KeyProvider<K> {
 
     /**
-     * Returns the key for (over)writing the contents of a new or existing
-     * protected resource.
-     * So this key is not going to be used to authenticate an existing resource
-     * by the application.
+     * Returns the authentication key required to encrypt a protected resource.
      * <p>
      * Subsequent calls to this method return an object which at least compares
      * {@link Object#equals equal} to any previously returned object, but is
@@ -112,10 +101,10 @@ public interface KeyProvider<K> {
     K getWriteKey() throws UnknownKeyException;
 
     /**
-     * Returns the key for reading the contents of an existing protected
-     * resource.
+     * Returns the authentication key required to decrypt a protected resource.
      * This method is expected to be called consecutively until either the
-     * returned key is verified or an exception is thrown.
+     * returned key is authenticated by another component which decrypts the
+     * protected resource or an exception is thrown.
      * <p>
      * Unless {@code invalid} is {@code true}, subsequent calls to this method
      * return an object which at least compares {@link Object#equals equal} to
@@ -130,7 +119,7 @@ public interface KeyProvider<K> {
      * As a rule of thumb, at least three seconds should pass between two
      * consecutive calls to this method by the same thread.
      * "Safe" implementations of this interface should enforce this
-     * behaviour in order to protect client applications which do not obeye
+     * behaviour in order to protect client applications which do not obey
      * these considerations against abuses of the key provider implementation.
      *
      * @param  invalid {@code true} iff a previous call to this method resulted
@@ -147,18 +136,7 @@ public interface KeyProvider<K> {
      *
      * @param key the key.
      *        If this is {@code null}, this key provider is set to a state
-     *        as if prompting for the key had been disabled or cancelled.
+     *        as if prompting for the key had been cancelled.
      */
     void setKey(@CheckForNull K key);
-
-    /** A factory for key providers. */
-    public interface Factory<P extends KeyProvider<?>> {
-
-        /**
-         * Returns a new key provider.
-         *
-         * @return a new key provider.
-         */
-        P newKeyProvider();
-    } // interface Factory
 }
