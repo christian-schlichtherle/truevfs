@@ -44,12 +44,12 @@
         </p>
         <pre><code>
     File file = new TFile("archive.tar.gz/README.TXT");
-    InputStream in = new TFileInputStream(file);
+    OutputStream in = new TFileOutputStream(file);
     try {
-        // Read the file contents here.
+        // Write the file contents here.
         ...
     } finally {
-        in.close();
+        out.close();
     }
         </code></pre>
         <p>
