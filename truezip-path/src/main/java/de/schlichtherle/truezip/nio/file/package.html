@@ -27,8 +27,8 @@
         </p>
         <p>
             This is the primary API for JSE&nbsp;7 compliant TrueZIP applications:
-            Like the TrueZIP Path API, this API is a facade for the TrueZIP
-            Kernel API.
+            Like the API of the module TrueZIP Path, this API is a facade for
+            the module TrueZIP Kernel.
             In contrast to the TrueZIP File* API however, this API can access
             any (virtual) file system, not just the platform file system and
             any archive files within the platform file system.
@@ -54,6 +54,10 @@
             This example requires that the JARs of the file system driver
             modules TrueZIP Driver HTTP(S) and TrueZIP Driver TAR are present
             on the run time class path.
+        </p>
+        <p>
+            Mind that a <code>TPath</code> is a <code>Path</code>,
+            so you can use it polymorphically with the NIO.2 API.
         </p>
         <h3><a name="fspsl"/>File System Provider Service Location</h3>
         <p>

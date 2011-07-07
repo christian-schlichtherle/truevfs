@@ -13,17 +13,19 @@ About
     directories in a file system path.
     It also provides the
     {{{../apidocs/de/schlichtherle/truezip/nio/file/TFileSystemProvider.html}<<<TFileSystemProvider>>>}}
-    class to implement a file system provider for the NIO.2 API in JSE 7.
+    class to implement a file system provider for the NIO.2 API (JSR 203) in
+    JSE 7.
 
     This is the primary API for JSE&#160;7 compliant TrueZIP applications:
-    Like the API of the {{{../truezip-file/index.html}TrueZIP File*}} module,
-    this API is a facade for the
-    {{{../truezip-kernel/index.html}TrueZIP Kernel}} module.
-    In contrast to the TrueZIP File* API however,
-    this API can access any (virtual) file system, not just the platform file
-    system and any archive files within the platform file system.
-    In contrast to the TrueZIP Kernel API, both APIs are designed to be easy
-    to learn and convenient to use while providing a great level of flexibility.
+    Like the API of the module {{{../truezip-file/index.html}TrueZIP File*}},
+    this API is a facade for the module
+    {{{../truezip-kernel/index.html}TrueZIP Kernel}}.
+    In contrast to the TrueZIP File* API however, this API can access
+    any (virtual) file system, not just the platform file system and
+    any archive files within the platform file system.
+    In contrast to the TrueZIP Kernel API, both APIs are designed to be
+    easy to learn and convenient to use while providing a great level
+    of flexibility.
     Because all virtual file system state is managed by the TrueZIP
     Kernel module, this module can concurrently access the same file
     systems than the TrueZIP File* module.
@@ -46,9 +48,6 @@ try (Files.newInputStream(path)) {
     and
     {{{../truezip-driver/truezip-driver-tar/index.html}TrueZIP Driver TAR}}
     are present on the run time class path.
-
-    Mind that a <<<TPath>>> is a <<<Path>>>, so you can use it polymorphically
-    with the NIO.2 API.
 
     For more examples, please use the Maven archetype for TrueZIP Path module
     applications as described in the
