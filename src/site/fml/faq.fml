@@ -291,8 +291,9 @@ try {
                     this manually in order to allow <i>third parties</i> to
                     access the archive file.
                     The term <i>third party</i> in this context includes any
-                    other process in the operating system and even the plain
-                    <code>File*</code> API.
+                    other process in the operating system, the plain
+                    <code>File*</code> API and even a <code>TFile</code> object
+                    which uses <code>TArchiveDetector.NULL</code>.
                 </p>
                 <p>
                     Committing any unsynchronized changes to all archive files
