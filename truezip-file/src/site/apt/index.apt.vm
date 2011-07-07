@@ -11,15 +11,16 @@ About
     read/write access to archive files as if they were just plain
     directories in a file system path.
 
-    This is the primary API for JSE 6&#160;compliant TrueZIP applications:
-    Like the API of the {{{../truezip-path/index.html}TrueZIP Path}} module,
-    this API is a facade for the
-    {{{../truezip-kernel/index.html}TrueZIP Kernel}} module.
-    In contrast to the TrueZIP Path API however,
-    this API is limited to access the platform file system and any archive
-    files within the platform file system.
-    In contrast to the TrueZIP Kernel API, both APIs are designed to be easy
-    to learn and convenient to use while providing a great level of flexibility.
+    This is the primary API for JSE&#160;6 compliant TrueZIP applications:
+    Like the API of the module {{{../truezip-path/index.html}TrueZIP Path}},
+    this API is a facade for the module
+    {{{../truezip-kernel/index.html}TrueZIP Kernel}}.
+    In contrast to the TrueZIP Path API however, this API is limited
+    to access the platform file system and any archive files within
+    the platform file system.
+    In contrast to the TrueZIP Kernel API, both APIs are designed to be
+    easy to learn and convenient to use while providing a great level
+    of flexibility.
     Because all virtual file system state is managed by the TrueZIP
     Kernel module, this module can concurrently access the same file
     systems than the TrueZIP Path module.
@@ -45,13 +46,6 @@ try {
     and
     {{{../truezip-driver/truezip-driver-tar/index.html}TrueZIP Driver TAR}}
     are present on the run time class path.
-
-    Mind that a <<<TFile>>> is a <<<File>>>, so you can use it polymorphically.
-    However, you cannot use it with a plain <<<File(In|Out)putStream>>> or a
-    plain <<<File(Reader|Writer)>>> to access prospective archive entries
-    because these classes were not designed for this task.
-    You have to use a <<<TFile(In|Out)putStream>>> or a
-    <<<TFile(Reader|Writer)>>> instead.
 
     For more examples, please use the Maven archetype for TrueZIP File* module
     applications as described in the

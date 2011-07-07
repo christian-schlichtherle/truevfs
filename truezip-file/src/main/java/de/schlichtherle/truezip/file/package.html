@@ -26,11 +26,11 @@
         </p>
         <p>
             This is the primary API for JSE&nbsp;6 compliant TrueZIP applications:
-            Like the TrueZIP Path API, this API is a facade for the TrueZIP
-            Kernel API.
-            In contrast to the TrueZIP Path API however, this API is limited to
-            access the platform file system and any archive files within the
-            platform file system.
+            Like the API of the module TrueZIP Path, this API is a facade for
+            the module TrueZIP Kernel.
+            In contrast to the TrueZIP Path API however, this API is limited
+            to access the platform file system and any archive files within
+            the platform file system.
             In contrast to the TrueZIP Kernel API, both APIs are designed to be
             easy to learn and convenient to use while providing a great level
             of flexibility.
@@ -53,16 +53,19 @@
     }
         </code></pre>
         <p>
-            This example requires that the JARs of the file system driver
+            This example presumes that the JARs of the file system driver
             modules TrueZIP Driver File and TrueZIP Driver TAR are present
             on the run time class path.
         </p>
         <p>
-            Note that this API can only access the platform file system and any
-            archive files within the platform file system.
-            If you need to access other (virtual) file systems, e.g. HTTP(S),
-            then please consider using the TrueZIP Path API or the TrueZIP
-            Kernel API instead.
+            Mind that a <code>TFile</code> is a <code>File</code>, so you can
+            use it polymorphically.
+            However, you cannot use it with a plain
+            <code>File(In|Out)putStream</code> or a plain
+            <code>File(Reader|Writer)</code> to access prospective archive
+            entries because these classes were not designed for this task.
+            You have to use a <code>TFile(In|Out)putStream</code> or a
+            <code>TFile(Reader|Writer)</code> instead.
         </p>
     </body>
 </html>
