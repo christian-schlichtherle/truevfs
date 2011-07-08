@@ -30,11 +30,9 @@ public interface FsDriverProvider {
 
     /**
      * Returns an immutable map of file system schemes to drivers.
-     * Neither the keys nor the values of the returned map may be {@code null}.
-     * <p>
-     * Calling this method multiple times should return a map which compares
-     * at least {@link Object#equals equal} to the previously returned map in
-     * order to ensure a consistent file system implementation scheme.
+     * Neither the keys nor the values of the returned map may be {@code null}
+     * and subsequent calls must return a map which compares at least
+     * {@link Map#equals(Object) equal} with the previously returned map.
      *
      * @return An immutable map of file system schemes to drivers.
      */
