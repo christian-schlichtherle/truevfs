@@ -187,4 +187,56 @@ public final class ServiceLocator {
             throw new ServiceConfigurationError(ex.toString(), ex);
         }
     }
+
+    /**
+     * Promotes the given {@code object} to an instance of the given
+     * {@code type}.
+     * The following steps are consecutively applied in order to promote the
+     * given object by this utility method:
+     * <ol>
+     * <li>
+     * If {@code object} is an instance of {@link String} and {@code type} is
+     * not the string class itself, then {@code object} is considered to name
+     * a class, which is loaded by using a new {@code ServiceLocator} with the
+     * class loader of {@code type} as the primary class loader.
+     * </li>
+     * <li>
+     * Next, if {@code object} is an instance of {@link Class}, then it gets
+     * instantiated by calling it's public no-argument constructor.
+     * </li>
+     * <li>
+     * Finally, {@code object} is cast to {@code T} and returned.
+     * </li>
+     * </ol>
+     * 
+     * @param  <T> the desired type of the object.
+     * @param  object the object to promote.
+     * @param  type the class describing the desired type.
+     * @return an object of the desired type or {@code null} if and only if
+     *         {@code object} is {@code null}.
+     * @throws IllegalArgumentException if any promotion step fails.
+     */
+    @SuppressWarnings("unchecked")
+    public static @CheckForNull <T> T promote(
+            @CheckForNull Object object,
+            final Class<T> type) {
+        try {
+            if (object instanceof String && !type.equals(String.class))
+                object = new ServiceLocator(type.getClassLoader())
+                        .getClass((String) object);
+        } catch (ServiceConfigurationError ex) {
+            throw new IllegalArgumentException(ex);
+        }
+        try {
+            if (object instanceof Class<?>)
+                object = ((Class<?>) object).newInstance();
+            return (T) object; // may throw ClassCastException
+        } catch (ClassCastException ex) {
+            throw new IllegalArgumentException(ex);
+        } catch (InstantiationException ex) {
+            throw new IllegalArgumentException(ex);
+        } catch (IllegalAccessException ex) {
+            throw new IllegalArgumentException(ex);
+        }
+    }
 }
