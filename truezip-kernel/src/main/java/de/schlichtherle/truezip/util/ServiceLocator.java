@@ -196,13 +196,14 @@ public final class ServiceLocator {
      * <ol>
      * <li>
      * If {@code object} is an instance of {@link String} and {@code type} is
-     * not the string class itself, then {@code object} is considered to name
-     * a class, which is loaded by using a new {@code ServiceLocator} with the
-     * class loader of {@code type} as the primary class loader.
+     * not the {@link String} class instance, then {@code object} is considered
+     * to name a class, which is loaded by using a new {@code ServiceLocator}
+     * with the class loader of {@code type} as the primary class loader.
      * </li>
      * <li>
-     * Next, if {@code object} is an instance of {@link Class}, then it gets
-     * instantiated by calling it's public no-argument constructor.
+     * Next, if {@code object} is an instance of {@link Class} and {@code type}
+     * is not the {@link Class} class instance, then it gets instantiated by
+     * calling it's public no-argument constructor.
      * </li>
      * <li>
      * Finally, {@code object} is cast to {@code T} and returned.
@@ -215,6 +216,7 @@ public final class ServiceLocator {
      * @return an object of the desired type or {@code null} if and only if
      *         {@code object} is {@code null}.
      * @throws IllegalArgumentException if any promotion step fails.
+     * @since  TrueZIP 7.2
      */
     @SuppressWarnings("unchecked")
     public static @CheckForNull <T> T promote(
@@ -228,15 +230,15 @@ public final class ServiceLocator {
             throw new IllegalArgumentException(ex);
         }
         try {
-            if (object instanceof Class<?>)
+            if (object instanceof Class<?> && !type.equals(Class.class))
                 object = ((Class<?>) object).newInstance();
-            return (T) object; // may throw ClassCastException
-        } catch (ClassCastException ex) {
-            throw new IllegalArgumentException(ex);
         } catch (InstantiationException ex) {
             throw new IllegalArgumentException(ex);
         } catch (IllegalAccessException ex) {
             throw new IllegalArgumentException(ex);
         }
+        if (null != object && !type.isInstance(object))
+            throw new IllegalArgumentException();
+        return (T) object;
     }
 }
