@@ -18,13 +18,12 @@ package de.schlichtherle.truezip.key;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
 import net.jcip.annotations.ThreadSafe;
 
 /**
  * Provides the base functionality required to implement a "safe" key provider.
- * Each instance of this class maintains a single key which implements the
- * interface {@link SafeKey}).
+ * Each instance of this class maintains a single instance of the interface
+ * {@link SafeKey}).
  * A clone of this key is returned on each call to {@link #getWriteKey}
  * and {@link #getReadKey}.
  *
@@ -32,8 +31,8 @@ import net.jcip.annotations.ThreadSafe;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 @ThreadSafe
+@DefaultAnnotation(NonNull.class)
 public abstract class SafeKeyProvider<K extends SafeKey<K>>
 implements KeyProvider<K> {
 
@@ -45,15 +44,13 @@ implements KeyProvider<K> {
      */
     public static final int MIN_KEY_RETRY_DELAY = 3 * 1000;
 
-    private static final class ThreadLocalLong extends ThreadLocal<Long> {
-        @Override
-        public Long initialValue() {
-            return 0L;
-        }
-    } // class ThreadLocalLong
+    private volatile @CheckForNull K key;
 
     private final ThreadLocal<Long> invalidated = new ThreadLocalLong();
 
+    /**
+     * Constructs a new safe key provider.
+     */
     protected SafeKeyProvider() {
     }
 
@@ -61,98 +58,89 @@ implements KeyProvider<K> {
      * {@inheritDoc}
      * <p>
      * The implementation in {@link SafeKeyProvider} forwards the call to
-     * {@link #getWriteKeyImpl}.
+     * {@link #retrieveWriteKey}.
      *
-     * @throws UnknownKeyException If {@code getWriteKeyImpl} throws
-     *         this exception or the returned key is {@code null}.
+     * @throws UnknownKeyException If {@code retrieveWriteKey} throws
+     *         this exception or the secret key is still {@code null}.
      */
     @Override
     public final K getWriteKey() throws UnknownKeyException {
-        final K key = getWriteKeyImpl();
-        if (null == key)
-            throw new UnknownKeyException();
-        return clone(key);
+        retrieveWriteKey();
+        return getNonNullKey();
     }
 
     /**
-     * Returns the key for (over)writing the contents of a new or existing
-     * protected resource.
+     * Retrieves the secret key for the encryption of a protected resource.
      * <p>
      * Subsequent calls to this method may return the same object.
      *
-     * @return The key for (over)writing the contents of a new or existing
-     *         protected resource.
-     * @throws UnknownKeyException if the required key is unknown for some
-     *         reason, e.g. if prompting for the key has been disabled or
-     *         cancelled by the user.
+     * @throws UnknownKeyException If the secret key is unknown.
+     *         At the subclasses discretion, this may mean that prompting for
+     *         the key has been disabled or cancelled by the user.
      * @see #getWriteKey
      */
-    protected abstract @CheckForNull K getWriteKeyImpl()
+    protected abstract void retrieveWriteKey()
     throws UnknownKeyException;
 
     /**
      * {@inheritDoc}
      * <p>
      * The implementation in {@link SafeKeyProvider} forwards the call to
-     * {@link #getReadKeyImpl} and enforces a three seconds suspension penalty
+     * {@link #retrieveReadKey} and enforces a three seconds suspension penalty
      * if {@code invalid} is {@code true} before returning.
      * Because this method is final, this qualifies the implementation in
-     * this class as a "friendly" {@code KeyProvider} implementation,
+     * this class as a "safe" {@code KeyProvider} implementation,
      * even when subclassed.
      *
-     * @throws UnknownKeyException If {@code getReadKeyImpl} throws
-     *         this exception or the returned key is {@code null}.
+     * @throws UnknownKeyException If {@code retrieveReadKey} throws
+     *         this exception or the secret key is still {@code null}.
      */
     @Override
     public final K getReadKey(boolean invalid) throws UnknownKeyException {
         if (invalid)
             invalidated.set(System.currentTimeMillis());
         try {
-            final K key = getReadKeyImpl(invalid);
-            if (null == key)
-                throw new UnknownKeyException();
-            return clone(key);
+            retrieveReadKey(invalid);
         } finally {
             enforceSuspensionPenalty();
         }
+        return getNonNullKey();
     }
 
     /**
-     * Returns the key for reading the contents of an existing protected
-     * resource.
+     * Retrieves the secret key for the decryption of a protected resource.
      * <p>
      * Subsequent calls to this method may return the same object.
      *
-     * @return The key for reading the contents of an existing protected
-     *         resource.
-     * @throws UnknownKeyException If the required key is unknown.
+     * @throws UnknownKeyException If the secret key is unknown.
      *         At the subclasses discretion, this may mean that prompting for
      *         the key has been disabled or cancelled by the user.
-     * @see KeyProvider#getWriteKey
+     * @see #getReadKey
      */
-    protected abstract @CheckForNull K getReadKeyImpl(boolean invalid)
+    protected abstract void retrieveReadKey(boolean invalid)
     throws UnknownKeyException;
 
-    /**
-     * Returns a clone of the given key.
-     *
-     * @return A clone of the given key.
-     */
-    protected static @Nullable <K extends SafeKey<K>> K clone(@CheckForNull K key) {
+    private K getNonNullKey() throws UnknownKeyException {
+        final K key = getKey();
+        if (null == key)
+            throw new UnknownKeyException();
+        return key;
+    }
+
+    protected @CheckForNull K getKey() {
+        final K key = this.key;
         return null == key ? null : key.clone();
     }
 
-    /**
-     * Resets the given key.
-     *
-     * @param key the key to reset.
-     */
-    protected static <K extends SafeKey<K>> void reset(@CheckForNull K key) {
-        if (null != key)
-            key.reset();
+    @Override
+    public void setKey(final @CheckForNull K newKey) {
+        final K oldKey = this.key;
+        this.key = null == newKey ? null : newKey.clone();
+        if (null != oldKey)
+            oldKey.reset();
     }
 
-    @SuppressWarnings("SleepWhileHoldingLock")
+    @SuppressWarnings("SleepWhileInLoop")
     private void enforceSuspensionPenalty() {
         final long last = invalidated.get();
         long delay;
@@ -164,7 +152,14 @@ implements KeyProvider<K> {
                 interrupted = ex;
             }
         }
-        if (interrupted != null)
+        if (null != interrupted)
             Thread.currentThread().interrupt();
     }
+
+    private static final class ThreadLocalLong extends ThreadLocal<Long> {
+        @Override
+        public Long initialValue() {
+            return 0L;
+        }
+    } // ThreadLocalLong
 }

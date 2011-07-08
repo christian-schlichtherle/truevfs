@@ -23,14 +23,15 @@ import static de.schlichtherle.truezip.key.MockView.Action.*;
 import static org.junit.Assert.*;
 
 /**
- * @author Christian Schlichtherle
- * @version @version@
+ * @author  Christian Schlichtherle
+ * @version $Id$
  */
 public class PromptingKeyProviderTest {
 
     private static final URI RESOURCE = URI.create("foo");
 
     private MockView<DummyKey> view;
+    private PromptingKeyManager<DummyKey> manager;
     private PromptingKeyProvider<DummyKey> provider;
 
     @Before
@@ -38,9 +39,8 @@ public class PromptingKeyProviderTest {
         view = new MockView<DummyKey>();
         view.setResource(RESOURCE);
         view.setChangeRequested(true);
-        provider = new PromptingKeyProvider<DummyKey>();
-        provider.setView(view);
-        provider.setResource(RESOURCE);
+        manager = new PromptingKeyManager<DummyKey>(view);
+        provider = manager.getKeyProvider(RESOURCE);
     }
 
     @Test
@@ -111,7 +111,6 @@ public class PromptingKeyProviderTest {
             fail();
         } catch (UnknownKeyException expected) {
         }
-
 
         provider.setKey(key = new DummyKey());
         assertEquals(key, provider.getReadKey(false));

@@ -15,8 +15,11 @@
  */
 package de.schlichtherle.truezip.key;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import de.schlichtherle.truezip.key.PromptingKeyProvider.Controller;
 import de.schlichtherle.truezip.key.PromptingKeyProvider.View;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URI;
 import java.util.Random;
 import net.jcip.annotations.ThreadSafe;
@@ -27,14 +30,15 @@ import static de.schlichtherle.truezip.key.MockView.Action.*;
  * A view implementation which uses its properties for providing a key whenever
  * the user is prompted.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
+@DefaultAnnotation(NonNull.class)
 public final class MockView<K extends SafeKey<K>> implements View<K> {
+    private volatile @CheckForNull URI resource;
+    private volatile @CheckForNull K key;
     private volatile Action action = ENTER;
-    private volatile URI resource;
-    private volatile K key;
     private volatile boolean changeRequested;
 
     public Action getAction() {
@@ -47,19 +51,19 @@ public final class MockView<K extends SafeKey<K>> implements View<K> {
         this.action = action;
     }
 
-    public URI getResource() {
+    public @CheckForNull URI getResource() {
         return resource;
     }
 
-    public void setResource(final URI resource) {
+    public void setResource(final @CheckForNull URI resource) {
         this.resource = resource;
     }
 
-    public K getKey() {
+    public @CheckForNull K getKey() {
         return key;
     }
 
-    public void setKey(K key) {
+    public void setKey(@CheckForNull K key) {
         this.key = key;
     }
 
@@ -75,7 +79,7 @@ public final class MockView<K extends SafeKey<K>> implements View<K> {
     public synchronized void
     promptWriteKey(Controller<K> controller)
     throws UnknownKeyException {
-        final URI resource = this.resource;
+        final URI resource = getResource();
         if (null != resource && !resource.equals(controller.getResource()))
             throw new IllegalArgumentException();
         controller.getKey();
@@ -96,7 +100,7 @@ public final class MockView<K extends SafeKey<K>> implements View<K> {
     public synchronized void
     promptReadKey(Controller<K> controller, boolean invalid)
     throws UnknownKeyException {
-        final URI resource = this.resource;
+        final URI resource = getResource();
         if (null != resource && !resource.equals(controller.getResource()))
             throw new IllegalArgumentException();
         try {
@@ -172,11 +176,11 @@ public final class MockView<K extends SafeKey<K>> implements View<K> {
         };
 
         abstract <K extends SafeKey<K>> void
-        promptWriteKey(Controller<? super K> controller, K key)
+        promptWriteKey(Controller<? super K> controller, @CheckForNull K key)
         throws UnknownKeyException;
 
         abstract <K extends SafeKey<K>> void
-        promptReadKey(Controller<? super K> controller, K key, boolean changeRequested)
+        promptReadKey(Controller<? super K> controller, @CheckForNull K key, boolean changeRequested)
         throws UnknownKeyException;
     } // enum Action
 }
