@@ -21,7 +21,6 @@ import de.schlichtherle.truezip.fs.sl.FsDriverLocator;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.util.ServiceLocator;
 import de.schlichtherle.truezip.util.SuffixSet;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URISyntaxException;
@@ -29,7 +28,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.ServiceConfigurationError;
 import java.util.TreeSet;
 
 /**
@@ -58,23 +56,22 @@ public abstract class FsDriverService implements FsDriverProvider {
     /**
      * A static factory method for an unmodifiable driver map which is
      * constructed from the given configuration.
-     * This method is intended to be used by provider implementations
-     * of the {@link FsDriverProvider} interface for convenient creation of the
-     * map to return by their {@link FsDriverProvider#get()} method.
+     * This method is intended to be used by implementations of this class
+     * for convenient creation of the map to return by their {@link #get()}
+     * method.
      *
      * @param  config an array of key-value pair arrays.
      *         The first element of each inner array must either be a
      *         {@link FsScheme file system scheme}, an object {@code o} which
      *         can get converted to a set of file name suffixes by calling
-     *         {@link SuffixSet#SuffixSet(String) new SuffixSet(o.toString())}
+     *         <code> new {@link SuffixSet#SuffixSet(String) SuffixSet}(o.toString())</code>
      *         or a {@link Collection collection} of these.
      *         The second element of each inner array must either be a
-     *         {@link FsDriver file system driver object}, a
+     *         {@link FsDriver file system driver instance}, a
      *         {@link Class file system driver class}, a
      *         {@link String fully qualified name of a file system driver class},
      *         or {@code null}.
-     * @return The new map to use as the return value of
-     *         {@link FsDriverProvider#get()}.
+     * @return The file system driver map created from the given configuration.
      * @throws NullPointerException if a required configuration element is
      *         {@code null}.
      * @throws IllegalArgumentException if any other parameter precondition
@@ -82,15 +79,17 @@ public abstract class FsDriverService implements FsDriverProvider {
      * @see    SuffixSet Syntax contraints for suffix lists.
      */
     public static Map<FsScheme, FsDriver> newMap(final Object[][] config) {
-        final Map<FsScheme, FsDriver> drivers = new HashMap<FsScheme, FsDriver>();
+        final Map<FsScheme, FsDriver>
+                drivers = new HashMap<FsScheme, FsDriver>();
         for (final Object[] param : config) {
             final Collection<FsScheme> schemes = toSchemes(param[0]);
-            final FsDriver newDriver = toDriver(param[1]);
+            final FsDriver newDriver = ServiceLocator.promote(
+                    param[1], FsDriver.class);
             if (schemes.isEmpty())
                 throw new IllegalArgumentException("No schemes for " + newDriver);
             for (final FsScheme scheme : schemes) {
                 final FsDriver oldDriver = drivers.put(scheme, newDriver);
-                if (null != oldDriver
+                if (null != oldDriver && null != newDriver
                         && oldDriver.getPriority() > newDriver.getPriority())
                     drivers.put(scheme, oldDriver);
             }
@@ -98,11 +97,11 @@ public abstract class FsDriverService implements FsDriverProvider {
         return Collections.unmodifiableMap(drivers);
     }
 
-    private static @NonNull Collection<FsScheme> toSchemes(@NonNull Object o) {
-        Collection<FsScheme> set = new TreeSet<FsScheme>();
+    private static Collection<FsScheme> toSchemes(final Object o) {
+        final Collection<FsScheme> set = new TreeSet<FsScheme>();
         try {
             if (o instanceof Collection<?>)
-                for (Object p : (Collection<?>) o)
+                for (final Object p : (Collection<?>) o)
                     if (p instanceof FsScheme)
                         set.add((FsScheme) p);
                     else
@@ -111,33 +110,11 @@ public abstract class FsDriverService implements FsDriverProvider {
             else if (o instanceof FsScheme)
                 set.add((FsScheme) o);
             else
-                for (String p : new SuffixSet(o.toString()))
+                for (final String p : new SuffixSet(o.toString()))
                     set.add(new FsScheme(p));
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
         return set;
-    }
-
-    @SuppressWarnings("unchecked")
-    private static @CheckForNull FsDriver toDriver(@CheckForNull Object driver) {
-        try {
-        if (driver instanceof String)
-            driver = new ServiceLocator(FsDriverService.class.getClassLoader())
-                    .getClass((String) driver);
-        } catch (ServiceConfigurationError ex) {
-            throw new IllegalArgumentException(ex);
-        }
-        try {
-            if (driver instanceof Class<?>)
-                driver = ((Class<? extends FsDriver>) driver).newInstance();
-            return (FsDriver) driver; // may throw ClassCastException
-        } catch (ClassCastException ex) {
-            throw new IllegalArgumentException(ex);
-        } catch (InstantiationException ex) {
-            throw new IllegalArgumentException(ex);
-        } catch (IllegalAccessException ex) {
-            throw new IllegalArgumentException(ex);
-        }
     }
 }

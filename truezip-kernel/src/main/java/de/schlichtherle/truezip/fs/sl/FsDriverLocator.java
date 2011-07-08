@@ -37,11 +37,9 @@ import net.jcip.annotations.Immutable;
  * The map of file system drivers is populated by instantiating all classes
  * which are named in the resource files with the name
  * {@code "META-INF/services/de.schlichtherle.truezip.fs.spi.FsDriverService"}
- * on the class path by calling their no-arg constructor.
- * <p>
- * If no file system drivers are found, a {@link ServiceConfigurationError} is
- * thrown.
- *
+ * on the class path by calling their public no-argument constructor.
+ * 
+ * @see     FsDriverService
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -74,7 +72,7 @@ public final class FsDriverLocator implements FsDriverProvider {
             final Map<FsScheme, FsDriver>
                     sorted = new TreeMap<FsScheme, FsDriver>();
             if (!i.hasNext())
-                logger.log(WARNING, "none", FsDriverService.class);
+                logger.log(WARNING, "null", FsDriverService.class);
             while (i.hasNext()) {
                 FsDriverService service = i.next();
                 logger.log(CONFIG, "located", service);

@@ -38,16 +38,17 @@ import net.jcip.annotations.Immutable;
  * with the class name {@code "de.schlichtherle.truezip.socket.spi.IOPoolService"}
  * as the key is queried.
  * If this yields a value, the class with that name is then loaded and
- * instantiated by calling its no-arg constructor.
+ * instantiated by calling its public no-argument constructor.
  * <p>
  * Otherwise, the class path is searched for any resource file with the name
  * {@code "META-INF/services/de.schlichtherle.truezip.socket.spi.IOPoolService"}.
  * If this yields a result, the class with the name in this file is then loaded
- * and instantiated by calling its no-arg constructor.
+ * and instantiated by calling its public no-argument constructor.
  * <p>
  * Otherwise, a {@link ServiceConfigurationError} is thrown.
  *
- * @author Christian Schlichtherle
+ * @see     IOPoolService
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @Immutable
