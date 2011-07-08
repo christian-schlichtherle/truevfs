@@ -163,5 +163,5 @@ public final class FsDefaultManager extends FsManager {
             return r.getModel().getMountPoint().toHierarchicalUri()
                     .compareTo(l.getModel().getMountPoint().toHierarchicalUri());
         }
-    } // class BottomUpComparator
+    } // FsControllerComparator
 }
