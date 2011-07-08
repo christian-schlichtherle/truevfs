@@ -135,8 +135,9 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
         final SuffixSet outSuffixes = new SuffixSet();
         for (final Map.Entry<FsScheme, FsDriver> entry : inDrivers.entrySet()) {
             final FsDriver driver = entry.getValue();
-            if (null == driver)
-                continue;
+            assert null != driver;
+            /*if (null == driver)
+                continue;*/
             final FsScheme scheme = entry.getKey();
             final boolean federated = driver.isFederated();
             if (null != inSuffixes) {
@@ -250,8 +251,9 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
         final SuffixSet outSuffixes = new SuffixSet();
         for (final Map.Entry<FsScheme, FsDriver> entry : inDrivers.entrySet()) {
             final FsDriver driver = entry.getValue();
-            if (null == driver)
-                continue;
+            assert null != driver;
+            /*if (null == driver)
+                continue;*/
             final FsScheme scheme = entry.getKey();
             outDrivers.put(scheme, driver);
             if (driver.isFederated())
@@ -299,14 +301,16 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
         path = path.replace('/', File.separatorChar);
         int i = path.lastIndexOf(File.separatorChar) + 1;
         path = path.substring(i);//.toLowerCase(Locale.ENGLISH);
-        int l = path.length();
-        try {
-            FsScheme scheme;
-            for (i = 0; 0 < (i = path.indexOf('.', i) + 1) && i < l ;)
-                if (drivers.containsKey(scheme = new FsScheme(path.substring(i))))
-                    return scheme;
-        } catch (URISyntaxException noSchemeNoArchiveBadLuck) {
-            return null; // FIXME: #TRUEZIP-132
+        final int l = path.length();
+        FsScheme scheme;
+        for (i = 0; 0 < (i = path.indexOf('.', i) + 1) && i < l ;) {
+            try {
+                scheme = new FsScheme(path.substring(i));
+            } catch (URISyntaxException noSchemeNoArchiveBadLuck) {
+                continue; // FIXME: #TRUEZIP-132
+            }
+            if (drivers.containsKey(scheme))
+                return scheme;
         }
         return null;
     }

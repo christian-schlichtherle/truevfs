@@ -345,10 +345,10 @@ public class TArchiveDetectorTest {
         assertScheme(new String[][] {
             { "tar.gz", ".tar.gz" },
             { "tar.gz", "test.tar.gz" },
-            { "tar.gz", "foo" + File.separator + "test.tar.gz" },
+            { "tar.gz", "foo" + File.separator + "test.123.tar.gz" },
             { "zip", ".zip" },
             { "zip", "test.zip" },
-            { "zip", "foo" + File.separator + "test.zip" },
+            { "zip", "foo" + File.separator + "test.123.zip" },
         }, ALL);
     }
 
