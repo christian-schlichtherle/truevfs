@@ -42,17 +42,30 @@ extends SafeKeyManager<K, PromptingKeyProvider<K>> {
      * @param view the view instance for prompting for keys.
      */
     public PromptingKeyManager(final View<K> view) {
-        super(new PromptingKeyProvider.Factory<K>());
         if (null == view)
             throw new NullPointerException();
         this.view = view;
     }
 
+    final View<K> getView() {
+        return view;
+    }
+
+    /**
+     * Returns a new prompting key provider.
+     * 
+     * @return A new prompting key provider.
+     * @since  TrueZIP 7.2
+     */
+    @Override
+    protected PromptingKeyProvider<K> newKeyProvider() {
+        return new PromptingKeyProvider<K>(this);
+    }
+
     @Override
     public synchronized PromptingKeyProvider<K> getKeyProvider(URI resource) {
-        PromptingKeyProvider<K> provider = super.getKeyProvider(resource);
+        final PromptingKeyProvider<K> provider = super.getKeyProvider(resource);
         provider.setResource(resource);
-        provider.setView(view);
         return provider;
     }
 
@@ -60,13 +73,11 @@ extends SafeKeyManager<K, PromptingKeyProvider<K>> {
     public synchronized PromptingKeyProvider<K> moveKeyProvider(URI oldResource, URI newResource) {
         final PromptingKeyProvider<K>
                 oldProvider = super.moveKeyProvider(oldResource, newResource);
-        if (null != oldProvider) {
+        if (null != oldProvider)
             oldProvider.setResource(null);
-            oldProvider.setView(null);
-        }
-        PromptingKeyProvider<K> newProvider = super.getKeyProvider(newResource);
+        final PromptingKeyProvider<K>
+                newProvider = super.getKeyProvider(newResource);
         newProvider.setResource(newResource);
-        newProvider.setView(view);
         return oldProvider;
     }
 
@@ -75,7 +86,20 @@ extends SafeKeyManager<K, PromptingKeyProvider<K>> {
         final PromptingKeyProvider<K>
                 provider = super.removeKeyProvider(resource);
         provider.setResource(null);
-        provider.setView(null);
         return provider;
+    }
+
+    /**
+     * Returns a string representation of this object for debugging and logging
+     * purposes.
+     */
+    @Override
+    public String toString() {
+        return new StringBuilder()
+                .append(getClass().getName())
+                .append("[view=")
+                .append(getView())
+                .append(']')
+                .toString();
     }
 }

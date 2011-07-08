@@ -23,7 +23,7 @@ import de.schlichtherle.truezip.key.spi.KeyManagerService;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.awt.GraphicsEnvironment;
-import java.util.ServiceConfigurationError;
+import java.util.Map;
 import net.jcip.annotations.Immutable;
 
 /**
@@ -37,7 +37,7 @@ import net.jcip.annotations.Immutable;
 @DefaultAnnotation(NonNull.class)
 public final class PromptingKeyManagerService extends KeyManagerService {
 
-    private final PromptingKeyManager<AesCipherParameters> manager;
+    private final Map<Class<?>, KeyManager<?>> managers;
 
     /**
      * Constructs a new prompting key manager service using the default view.
@@ -48,11 +48,16 @@ public final class PromptingKeyManagerService extends KeyManagerService {
      * Otherwise, it's an instance of
      * {@link de.schlichtherle.truezip.crypto.raes.param.swing.AesCipherParametersView}.
      */
-    public PromptingKeyManagerService() {
-        manager = new PromptingKeyManager<AesCipherParameters>(
-            GraphicsEnvironment.isHeadless()
-                ? new de.schlichtherle.truezip.crypto.raes.param.console.AesCipherParametersView()
-                : new de.schlichtherle.truezip.crypto.raes.param.swing.AesCipherParametersView());
+    public <K> PromptingKeyManagerService() {
+        this.managers = newMap(new Object[][] {
+            {
+                AesCipherParameters.class,
+                new PromptingKeyManager<AesCipherParameters>(
+                    GraphicsEnvironment.isHeadless()
+                        ? new de.schlichtherle.truezip.crypto.raes.param.console.AesCipherParametersView()
+                        : new de.schlichtherle.truezip.crypto.raes.param.swing.AesCipherParametersView())
+            }
+        });
     }
 
     /**
@@ -62,14 +67,16 @@ public final class PromptingKeyManagerService extends KeyManagerService {
      *        key manager.
      */
     public PromptingKeyManagerService(View<AesCipherParameters> view) {
-        manager = new PromptingKeyManager<AesCipherParameters>(view);
+        this.managers = newMap(new Object[][] {
+            {
+                AesCipherParameters.class,
+                new PromptingKeyManager<AesCipherParameters>(view)
+            }
+        });
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public <K> KeyManager<K> get(Class<K> type) {
-        if (type.equals(AesCipherParameters.class))
-            return (KeyManager<K>) manager;
-        throw new ServiceConfigurationError("No key manager available for " + type);
+    public Map<Class<?>, KeyManager<?>> get() {
+        return managers;
     }
 }

@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.key.sl;
 
-import de.schlichtherle.truezip.key.sl.KeyManagerLocator;
 import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
 import de.schlichtherle.truezip.key.KeyManagerProvider;
 import org.junit.Before;

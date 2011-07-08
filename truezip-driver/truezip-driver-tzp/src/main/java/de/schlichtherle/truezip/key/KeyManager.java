@@ -21,8 +21,8 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import java.net.URI;
 
 /**
- * A container for key providers for protected resources which need to
- * get created or opened by client applications.
+ * A container for key providers for the encryption and decryption of protected
+ * resources.
  * <p>
  * Implementations must be safe for multi-threading.
  *
@@ -58,6 +58,7 @@ public interface KeyManager<K> {
 
     /**
      * Removes the key provider for the given protected resource.
+     * It is an error to use the returned key provider.
      *
      * @param  resource the URI of the protected resource.
      * @return The key provider which was previously mapped for the protected
@@ -66,4 +67,13 @@ public interface KeyManager<K> {
      *         {@code resource}.
      */
     @Nullable KeyProvider<K> removeKeyProvider(URI resource);
+
+    /**
+     * Returns a priority to help the key manager service locator.
+     * The greater number wins!
+     * The default value should be {@code 0}.
+     * 
+     * @return A priority to help the key manager service locator.
+     */
+    public int getPriority();
 }

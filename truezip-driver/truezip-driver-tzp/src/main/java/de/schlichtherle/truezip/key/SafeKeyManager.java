@@ -25,27 +25,31 @@ import net.jcip.annotations.ThreadSafe;
 /**
  * Uses a map to hold the safe key providers managed by this instance.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-public class SafeKeyManager<K extends SafeKey<K>, P extends SafeKeyProvider<K>>
+public abstract class SafeKeyManager<K extends SafeKey<K>, P extends SafeKeyProvider<K>>
 implements KeyManager<K> {
 
     private final Map<URI, P> providers = new HashMap<URI, P>();
-    private final KeyProvider.Factory<? extends P> factory;
 
     /**
-     * Constructs a new default key manager.
+     * Constructs a new safe key manager.
      *
-     * @param factory the factory for creating new key providers.
+     * @since TrueZIP 7.2
      */
-    public SafeKeyManager(final KeyProvider.Factory<? extends P> factory) {
-        if (null == factory)
-            throw new NullPointerException();
-        this.factory = factory;
+    protected SafeKeyManager() {
     }
+
+    /**
+     * Returns a new key provider.
+     * 
+     * @return A new key provider.
+     * @since  TrueZIP 7.2
+     */
+    protected abstract P newKeyProvider();
 
     @Override
     public synchronized P getKeyProvider(final URI resource) {
@@ -53,7 +57,7 @@ implements KeyManager<K> {
             throw new NullPointerException();
         P provider = providers.get(resource);
         if (null == provider) {
-            provider = factory.newKeyProvider();
+            provider = newKeyProvider();
             providers.put(resource, provider);
         }
         return provider;
@@ -65,14 +69,24 @@ implements KeyManager<K> {
             throw new NullPointerException();
         if (oldResource.equals(newResource))
             throw new IllegalArgumentException();
-        return providers.put(newResource, removeKeyProvider0(oldResource));
+        final P provider = removeKeyProvider0(oldResource);
+        //provider.setKey(null);
+        return providers.put(newResource, provider);
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The returned key provider is invalidated and will behave as if prompting
+     * for the secret key had been disabled or cancelled by the user.
+     */
     @Override
     public synchronized P removeKeyProvider(final URI resource) {
         if (null == resource)
             throw new NullPointerException();
-        return removeKeyProvider0(resource);
+        final P provider = removeKeyProvider0(resource);
+        provider.setKey(null);
+        return provider;
     }
 
     private P removeKeyProvider0(final URI resource) {
@@ -80,5 +94,19 @@ implements KeyManager<K> {
         if (null == provider)
             throw new IllegalArgumentException();
         return provider;
+    }
+
+    @Override
+    public int getPriority() {
+        return 0;
+    }
+
+    /**
+     * Returns a string representation of this object for debugging and logging
+     * purposes.
+     */
+    @Override
+    public String toString() {
+        return getClass().getName();
     }
 }

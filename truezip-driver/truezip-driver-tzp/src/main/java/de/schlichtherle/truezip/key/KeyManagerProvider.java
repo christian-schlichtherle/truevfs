@@ -19,22 +19,23 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.ServiceConfigurationError;
 
 /**
- * A service for the singleton key manager for given key type.
+ * A service for key managers for secret key classes.
  * <p>
  * Implementations must be thread-safe.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public interface KeyManagerProvider {
 
     /**
-     * Returns the singleton key manager for the given key type.
-     * <p>
-     * Calling this method several times must return the same key manager
-     * for the same key type in order to ensure consistency of the key space.
+     * Returns the key manager for the given secret key class.
+     * Subsequent calls must return the same key manager for the same secret
+     * key class.
      *
-     * @return The key manager for the given key type.
+     * @param  <K> the type of the secret key class.
+     * @param  type the class for the secret key type.
+     * @return the key manager for the given secret key class.
      * @throws ServiceConfigurationError if no appropriate key manager is
      *         available.
      */

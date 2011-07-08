@@ -18,23 +18,19 @@ package de.schlichtherle.truezip.key;
 import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
- * A safe key for a protected resource.
+ * A safe secret key for the encryption and decryption of protected resources.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface SafeKey<K> /*extends Cloneable*/ {
+public interface SafeKey<K> extends Cloneable {
 
-    /**
-     * Returns a clone of this safe key or {@code this}
-     * if and only if the implementation is immutable.
-     */
+    /** Returns a deep clone of this safe key. */
     @NonNull K clone();
 
     /**
-     * Resets this safe key to it's initial state, wiping any data from heap,
-     * or does nothing
-     * if and only if the implementation is immutable.
+     * Wipes any key data from the heap and resets this safe key to it's
+     * initial state.
      */
     void reset();
 }
