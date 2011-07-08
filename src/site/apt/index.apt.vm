@@ -29,7 +29,7 @@ About
     directories in a file system path.
 
     Starting with TrueZIP&#160;7.2, there are two client APIs available which
-    can get used to access the same file systems concurrently:
+    can get used concurrently to access the same file systems:
 
     * The {{{./truezip-file/index.html}TrueZIP File*}} module provides the
       package
