@@ -11,16 +11,38 @@ About
     TrueZIP is a Java based plug-in framework for virtual file systems (VFS)
     which provides transparent access to archive files as if they were just
     plain directories.
-    
+
     Key Claims:
 
     [[1]] <<{Archive files are virtual directories}!>>
 
-    [[1]] <<{Reliability is a key value proposition}!>>
+    [[1]] <<{Reliability is a primary value proposition}!>>
 
     [[1]] <<{Make simple things easy and complex things possible}!>>
 
     []
+
+** Supported File System Types
+
+    TrueZIP ships with the following pluggable file system driver modules:
+
+    * {{{./truezip-driver/truezip-driver-file/index.html}TrueZIP Driver FILE}}
+
+    * {{{./truezip-driver/truezip-driver-http/index.html}TrueZIP Driver HTTP(S)}}
+
+    * {{{./truezip-driver/truezip-driver-tar/index.html}TrueZIP Driver TAR}}
+
+    * {{{./truezip-driver/truezip-driver-zip/index.html}TrueZIP Driver ZIP}}
+
+    * {{{./truezip-driver/truezip-driver-tzp/index.html}TrueZIP Driver ZIP.RAES (TZP)}}
+
+    []
+
+    Add the JAR artifact of these modules to the
+    run time class path for service location in the TrueZIP File* and TrueZIP
+    Path modules (see below) or to the
+    compile time class path for dependency injection into the TrueZIP Kernel
+    module.
 
 ** Using TrueZIP
 
