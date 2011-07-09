@@ -21,7 +21,7 @@
         <breadcrumbs>
             <item name="TrueZIP" href="index.html"/>
         </breadcrumbs>
-        <menu name="Project Documentation">
+        <menu name="Documentation">
             <item name="About" href="index.html"/>
             <item name="Use Cases" href="usecases/index.html" collapse="true">
                 <item name="Application File Format" href="usecases/aff.html"/>
@@ -82,8 +82,8 @@
                 </item>
             </item>
         </menu>
-        <menu name="Project Reports" ref="reports" inherit="bottom"/>
-        <menu name="Project Modules" ref="modules" inherit="bottom"/>
+        <menu name="Reports" ref="reports" inherit="bottom"/>
+        <menu name="Sub-Modules" ref="modules" inherit="bottom"/>
         <menu name="Parent Module" ref="parent" inherit="bottom"/>
     </body>
 </project>
