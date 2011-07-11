@@ -415,7 +415,7 @@ public final class TFileSystem extends FileSystem {
             controller.mknod(
                     name,
                     DIRECTORY,
-                    NO_OUTPUT_OPTIONS.set(CREATE_PARENTS, path.shouldCreateParents()),
+                    path.getOutputPreferences(),
                     null);
         } catch (IOException ex) {
             if (null != controller.getEntry(name))

@@ -15,6 +15,12 @@
  */
 package de.schlichtherle.truezip.file;
 
+import de.schlichtherle.truezip.fs.FsInputOption;
+import de.schlichtherle.truezip.fs.FsInputOptions;
+import static de.schlichtherle.truezip.fs.FsInputOptions.*;
+import de.schlichtherle.truezip.fs.FsOutputOption;
+import static de.schlichtherle.truezip.fs.FsOutputOption.*;
+import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -38,7 +44,7 @@ import net.jcip.annotations.ThreadSafe;
  * Finally, a client application can use {@link #get()} to get access to the
  * current configuration.
  * If no configuration has been pushed on the inheritable thread local stack
- * before, the <i>global configuration</i> is returned instead.
+ * before, the <i>global configuration</i> is returned.
  * <p>
  * Whenever a child thread is started, it will share the current configuration
  * with its parent thread.
@@ -89,10 +95,51 @@ try (TConfig config = TConfig.push()) {
 @DefaultAnnotation(NonNull.class)
 public final class TConfig implements Closeable {
 
+    /**
+     * The default value of the
+     * {@link #getInputPreferences input preferences} property, which is
+     * {@link FsInputOptions#NO_INPUT_OPTIONS}.
+     */
+    public static final BitField<FsInputOption>
+            DEFAULT_INPUT_PREFERENCES = NO_INPUT_OPTIONS;
+
+    /**
+     * The mask of allowed {@link #setInputPreferences input preferences},
+     * which is
+     * <code>{@link BitField}.of({@link FsInputOption#CACHE})</code>.
+     */
+    public static final BitField<FsInputOption>
+            INPUT_PREFERENCES_MASK = BitField
+                .of(FsInputOption.CACHE);
+
+    private static final BitField<FsInputOption>
+            INPUT_PREFERENCES_COMPLEMENT_MASK = INPUT_PREFERENCES_MASK.not();
+
+    /**
+     * The default value of the
+     * {@link #getOutputPreferences output preferences} property, which is
+     * <code>{@link BitField}.of({@link FsOutputOption#CREATE_PARENTS})</code>.
+     */
+    public static final BitField<FsOutputOption>
+            DEFAULT_OUTPUT_PREFERENCES = BitField.of(CREATE_PARENTS);
+
+    /**
+     * The mask of allowed {@link #setOutputPreferences output preferences},
+     * which is
+     * <code>{@link BitField}.of({@link FsOutputOption#CACHE}, {@link FsOutputOption#CREATE_PARENTS}, {@link FsOutputOption#COMPRESS}, {@link FsOutputOption#STORE})</code>.
+     */
+    public static final BitField<FsOutputOption>
+            OUTPUT_PREFERENCES_MASK = BitField
+                .of(FsOutputOption.CACHE, CREATE_PARENTS, COMPRESS, STORE);
+
+    private static final BitField<FsOutputOption>
+            OUTPUT_PREFERENCES_COMPLEMENT_MASK = OUTPUT_PREFERENCES_MASK.not();
+
     private static volatile @CheckForNull InheritableThreadLocalConfigStack configs;
 
-    private boolean lenient;
     private TArchiveDetector detector;
+    private BitField<FsInputOption> inputPreferences;
+    private BitField<FsOutputOption> outputPreferences;
 
     /**
      * Returns the current configuration.
@@ -164,16 +211,18 @@ public final class TConfig implements Closeable {
             configs.remove();
     }
 
-    /** Default constructor. */
+    /** Default constructor for the global configuration. */
     private TConfig() {
-        this.lenient = true;
         this.detector = TArchiveDetector.ALL;
+        this.inputPreferences = DEFAULT_INPUT_PREFERENCES;
+        this.outputPreferences = DEFAULT_OUTPUT_PREFERENCES;
     }
 
-    /** Copy constructor. */
+    /** Copy constructor for inheritable thread local configurations. */
     private TConfig(final TConfig template) {
-        this.lenient = template.isLenient();
         this.detector = template.getArchiveDetector();
+        this.inputPreferences = template.getInputPreferences();
+        this.outputPreferences = template.getOutputPreferences();
     }
 
     /**
@@ -183,7 +232,7 @@ public final class TConfig implements Closeable {
      * @see    #setLenient(boolean)
      */
     public boolean isLenient() {
-        return lenient;
+        return outputPreferences.get(CREATE_PARENTS);
     }
 
     /**
@@ -227,7 +276,8 @@ public final class TConfig implements Closeable {
      * @see   #isLenient()
      */
     public void setLenient(final boolean lenient) {
-        this.lenient = lenient;
+        this.outputPreferences = this.outputPreferences
+                .set(CREATE_PARENTS, lenient);
     }
 
     /**
@@ -259,6 +309,60 @@ public final class TConfig implements Closeable {
         if (null == detector)
             throw new NullPointerException();
         this.detector = detector;
+    }
+
+    /**
+     * Returns the input preferences.
+     * 
+     * @return The input preferences.
+     */
+    public BitField<FsInputOption> getInputPreferences() {
+        return inputPreferences;
+    }
+
+    /**
+     * Sets the input preferences.
+     * 
+     * @param  preferences the input preferences.
+     * @throws IllegalArgumentException if an option is present in
+     *         {@code preferences} which is not present in
+     *         {@link #INPUT_PREFERENCES_MASK}.
+     */
+    public void setInputPreferences(final BitField<FsInputOption> preferences) {
+        final BitField<FsInputOption> illegal = preferences
+                .and(INPUT_PREFERENCES_COMPLEMENT_MASK);
+        if (!illegal.isEmpty())
+            throw new IllegalArgumentException(preferences + " (illegal input preferences)");
+        this.inputPreferences = preferences;
+    }
+
+    /**
+     * Returns the output preferences.
+     * 
+     * @return The output preferences.
+     */
+    public BitField<FsOutputOption> getOutputPreferences() {
+        return outputPreferences;
+    }
+
+    /**
+     * Sets the output preferences.
+     * 
+     * @param  preferences the output preferences.
+     * @throws IllegalArgumentException if an option is present in
+     *         {@code preferences} which is not present in
+     *         {@link #OUTPUT_PREFERENCES_MASK} or if both
+     *         {@link FsOutputOption#STORE} and
+     *         {@link FsOutputOption#COMPRESS} have been set.
+     */
+    public void setOutputPreferences(final BitField<FsOutputOption> preferences) {
+        final BitField<FsOutputOption> illegal = preferences
+                .and(OUTPUT_PREFERENCES_COMPLEMENT_MASK);
+        if (!illegal.isEmpty())
+            throw new IllegalArgumentException(preferences + " (illegal output preferences)");
+        if (preferences.get(STORE) && preferences.get(COMPRESS))
+            throw new IllegalArgumentException(preferences + " (either STORE or COMPRESS can be set, but not both)");
+        this.outputPreferences = preferences;
     }
 
     /**
@@ -294,7 +398,7 @@ public final class TConfig implements Closeable {
                 child.push(element);
             return child;
         }
-    } // class ThreadLocalConfigStack
+    } // InheritableThreadLocalConfigStack
 
     /** Holds the global configuration. */
     private static final class Holder {
@@ -303,5 +407,5 @@ public final class TConfig implements Closeable {
         /** Make lint happy. */
         private Holder() {
         }
-    } // class Holder
+    } // Holder
 }
