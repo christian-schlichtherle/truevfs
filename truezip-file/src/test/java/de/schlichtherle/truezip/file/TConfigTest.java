@@ -173,6 +173,12 @@ public class TConfigTest {
             assertTrue(config.getInputPreferences().isEmpty());
             assertThat(config.getOutputPreferences(), is(BitField.of(COMPRESS)));
 
+            config.setOutputPreferences(BitField.of(GROW));
+
+            assertFalse(config.isLenient());
+            assertTrue(config.getInputPreferences().isEmpty());
+            assertThat(config.getOutputPreferences(), is(BitField.of(GROW)));
+
             config.setOutputPreferences(BitField.of(CACHE, CREATE_PARENTS, COMPRESS));
 
             assertTrue(config.isLenient());
