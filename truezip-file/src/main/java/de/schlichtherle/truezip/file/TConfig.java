@@ -178,7 +178,7 @@ public final class TConfig implements Closeable {
      */
     public static final BitField<FsOutputOption>
             OUTPUT_PREFERENCES_MASK = BitField
-                .of(FsOutputOption.CACHE, CREATE_PARENTS, COMPRESS, STORE);
+                .of(FsOutputOption.CACHE, CREATE_PARENTS, COMPRESS, STORE, GROW);
 
     private static final BitField<FsOutputOption>
             OUTPUT_PREFERENCES_COMPLEMENT_MASK = OUTPUT_PREFERENCES_MASK.not();
