@@ -50,6 +50,8 @@ import net.jcip.annotations.ThreadSafe;
  * with its parent thread.
  * 
  * <a name="examples"/><h3>Examples</h3>
+
+ * <h4>Setting The Default Archive Detector</h4>
  * <p>
  * The standard use case looks like this:
  * <pre>{@code
@@ -86,6 +88,52 @@ try (TConfig config = TConfig.push()) {
     ...
 }
  * }</pre>
+ *
+ * <h4>Appending To Archive Files</h4>
+ * <p>
+ * By default, TrueZIP is configured to produce the smalled possible archive
+ * files. This is achieved by setting the maximum compression rate in the
+ * archive driver and by performing a <i>full update</i> if an entry is going
+ * to get written to an archive file which is already present in it.
+ * <p>
+ * This default <i>collision strategy</i> usually involves some copying and
+ * could be deemed as an unacceptable &quot;performance penalty&quot; if the
+ * archive entries to write are rather small compared to the total size of the
+ * archive file.
+ * <p>
+ * You can change the collision strategy by allowing archive files to grow by
+ * simply <i>appending</i> entries to their end as follows:
+ * <pre>{@code
+TFile file = new TFile("archive.zip/entry");
+// Push a new current configuration on the inheritable thread local stack.
+TConfig config = TConfig.push();
+try {
+    // Change the inheritable thread local configuration.
+    config.setOutputPreferences(BitField.of(FsOutputOption.GROW, FsOutputOption.CREATE_PARENTS));
+    // Append the entry to the archive file even if it's already present.
+    TFileOutputStream out = new TFileOutputStream(file);
+    try {
+        // Do some I/O here.
+        ...
+    } finally {
+        out.close();
+    }
+} finally {
+    // Pop the configuration off the inheritable thread local stack.
+    config.close();
+}
+ * }</pre>
+ * <p>
+ * Here, {@link FsOutputOption#GROW} is used by the application to express a
+ * preference to inhibit full updates and simply append entries to an archive
+ * file's end instead.
+ * <p>
+ * Note that it's specific to the archive file system driver if this output
+ * option is supported or not.
+ * If it's not supported, it gets silently ignored,
+ * thereby falling back to the default collision strategy.
+ * In this example, the archive file system driver for ZIP files is used,
+ * which is known to support this output option.
  * 
  * @since   TrueZIP 7.2
  * @author  Christian Schlichtherle
@@ -322,6 +370,8 @@ public final class TConfig implements Closeable {
 
     /**
      * Sets the input preferences.
+     * These preferences are usually not cached, so changing them should take
+     * effect immediately.
      * 
      * @param  preferences the input preferences.
      * @throws IllegalArgumentException if an option is present in
@@ -347,6 +397,8 @@ public final class TConfig implements Closeable {
 
     /**
      * Sets the output preferences.
+     * These preferences are usually not cached, so changing them should take
+     * effect immediately.
      * 
      * @param  preferences the output preferences.
      * @throws IllegalArgumentException if an option is present in

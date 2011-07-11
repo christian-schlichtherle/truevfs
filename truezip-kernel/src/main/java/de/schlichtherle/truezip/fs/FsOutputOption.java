@@ -52,8 +52,8 @@ public enum FsOutputOption {
     CREATE_PARENTS,
 
     /**
-     * Whether or not the new entry data shall get appended to the existing
-     * entry data rather than replacing it entirely.
+     * Whether or not the new entry contents shall get appended to the existing
+     * entry contents rather than replacing them entirely.
      */
     APPEND,
 
@@ -63,7 +63,8 @@ public enum FsOutputOption {
     /**
      * <em>Ignorable:</em>
      * Expresses a preference to store an entry uncompressed within its archive.
-     * This option may get ignored by archive drivers.
+     * <p>
+     * This option may get ignored by archive file system drivers.
      * Furthermore, if this happens, there may be no direct feedback available
      * to the caller.
      */
@@ -72,9 +73,22 @@ public enum FsOutputOption {
     /**
      * <em>Ignorable:</em>
      * Expresses a preference to compress an entry within its archive.
-     * This option may get ignored by archive drivers.
+     * <p>
+     * This option may get ignored by archive file system drivers.
      * Furthermore, if this happens, there may be no direct feedback available
      * to the caller.
      */
     COMPRESS,
+
+    /**
+     * <em>Ignorable:</em>
+     * Expresses a preference to allow archive files to grow by appending
+     * archive entries to their end, even if they are already present in the
+     * archive files.
+     * <p>
+     * This option may get ignored by archive file system drivers.
+     * Furthermore, if this happens, there may be no direct feedback available
+     * to the caller.
+     */
+    GROW,
 }
