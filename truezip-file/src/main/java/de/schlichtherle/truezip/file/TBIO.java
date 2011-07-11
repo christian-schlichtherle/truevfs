@@ -305,7 +305,7 @@ final class TBIO {
             if (null != archive)
                 return archive.getController().getOutputSocket(
                         file.getInnerFsEntryName(),
-                        options.set(CREATE_PARENTS, TConfig.get().isLenient()),
+                        TConfig.get().getOutputPreferences(),
                         template);
         }
         final FsPath path = new FsPath(dst);

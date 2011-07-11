@@ -380,9 +380,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
         if (isSameFile0(src, dst))
             throw new IOException(dst + " (source and destination are the same file)");
         boolean preserve = false;
-        BitField<FsOutputOption> o = BitField
-                .of(EXCLUSIVE)
-                .set(CREATE_PARENTS, dst.shouldCreateParents());
+        BitField<FsOutputOption> o = dst.getOutputPreferences().set(EXCLUSIVE);
         for (final CopyOption option : options) {
             if (!(option instanceof StandardCopyOption))
                 throw new UnsupportedOperationException(option.toString());

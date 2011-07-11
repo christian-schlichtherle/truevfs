@@ -1013,9 +1013,7 @@ public final class TPath implements Path {
     }
 
     BitField<FsOutputOption> mapOutput(final Set<? extends OpenOption> options) {
-        final EnumSet<FsOutputOption> set = EnumSet.noneOf(FsOutputOption.class);
-        if (shouldCreateParents())
-            set.add(CREATE_PARENTS);
+        final EnumSet<FsOutputOption> set = NO_OUTPUT_OPTIONS.toEnumSet();
         for (final OpenOption option : options) {
             if (!(option instanceof StandardOpenOption))
                 throw new UnsupportedOperationException(option.toString());
@@ -1036,13 +1034,17 @@ public final class TPath implements Path {
                     throw new UnsupportedOperationException(option.toString());
             }
         }
-        return set.isEmpty()
-                ? NO_OUTPUT_OPTIONS
-                : BitField.copyOf(set);
+        final BitField<FsOutputOption> prefs = getOutputPreferences();
+        return set.isEmpty() ? prefs : prefs.or(BitField.copyOf(set));
     }
 
-    boolean shouldCreateParents() {
-        return null != getMountPoint().getParent() && TConfig.get().isLenient();
+    BitField<FsOutputOption> getOutputPreferences() {
+        final BitField<FsOutputOption> prefs = TConfig
+                .get()
+                .getOutputPreferences();
+        return null != getMountPoint().getParent()
+                ? prefs
+                : prefs.clear(CREATE_PARENTS);
     }
 
     /**
