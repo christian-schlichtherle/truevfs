@@ -1001,8 +1001,12 @@ public final class TPath implements Path {
     BitField<FsInputOption> mapInput(final Set<? extends OpenOption> options) {
         final int s = options.size();
         if (0 == s || 1 == s && options.contains(StandardOpenOption.READ))
-            return NO_INPUT_OPTIONS;
+            return getInputPreferences();
         throw new IllegalArgumentException(options.toString());
+    }
+
+    BitField<FsInputOption> getInputPreferences() {
+        return TConfig.get().getInputPreferences();
     }
 
     BitField<FsOutputOption> mapOutput(final OpenOption... options) {

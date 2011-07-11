@@ -223,8 +223,11 @@ final class TBIO {
     private static void
     cp0(final boolean preserve, final File src, final File dst)
     throws IOException {
-        final InputSocket<?> input = getInputSocket(src, NO_INPUT_OPTIONS);
-        final OutputSocket<?> output = getOutputSocket(dst, NO_OUTPUT_OPTIONS,
+        final TConfig config = TConfig.get();
+        final InputSocket<?> input = getInputSocket(src,
+                config.getInputPreferences());
+        final OutputSocket<?> output = getOutputSocket(dst,
+                config.getOutputPreferences(),
                 preserve ? input.getLocalTarget() : null);
         IOSocket.copy(input, output);
     }
@@ -305,7 +308,7 @@ final class TBIO {
             if (null != archive)
                 return archive.getController().getOutputSocket(
                         file.getInnerFsEntryName(),
-                        TConfig.get().getOutputPreferences(),
+                        options,
                         template);
         }
         final FsPath path = new FsPath(dst);
