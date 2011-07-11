@@ -78,7 +78,7 @@ import java.io.OutputStream;
  * and require less space in the temp file folder.
  *
  * @see     TFile#cat(InputStream, OutputStream)
- * @see     TFile#setLenient
+ * @see     TConfig#setLenient
  * @see     TFileInputStream
  * @author  Christian Schlichtherle
  * @version $Id$
