@@ -74,7 +74,7 @@ public final class FsDefaultArchiveController<E extends FsArchiveEntry>
 extends FsFileSystemArchiveController<E> {
 
     private static final BitField<FsOutputOption>
-            MOUNT_OUTPUT_MASK = BitField.of(CREATE_PARENTS);
+            MOUNT_OUTPUT_MASK = BitField.of(CREATE_PARENTS, GROW);
     private static final BitField<FsInputOption>
             MOUNT_INPUT_OPTIONS = BitField.of(FsInputOption.CACHE);
     private static final BitField<FsOutputOption>
