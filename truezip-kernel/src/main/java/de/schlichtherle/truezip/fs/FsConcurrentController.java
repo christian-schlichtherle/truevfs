@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.fs;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.entry.Entry.Access;
+import de.schlichtherle.truezip.fs.FsConcurrentModel.Operation;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
@@ -26,6 +27,7 @@ import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,18 +43,30 @@ import net.jcip.annotations.ThreadSafe;
  * A concurrent file system controller is a proxy for its decorated file system
  * controller which provides read/write lock features for multi-threaded access
  * by its clients.
+ * It's {@link #getModel() model} property provides access to a
+ * {@link FsConcurrentModel} with additional features for multi-threaded
+ * access.
  * 
  * @see     FsConcurrentModel
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
+@DefaultAnnotation(NonNull.class)
 public final class FsConcurrentController
 extends FsDecoratingController< FsConcurrentModel,
                                 FsController<? extends FsConcurrentModel>> {
 
-    private volatile ReadLock readLock;
-    private volatile WriteLock writeLock;
+    private static final FsConcurrentOperation
+            NULL = new FsConcurrentOperation();
+    private static final FsConcurrentOperation
+            NONE = new FsConcurrentOperation();
+    static {
+        NONE.setOutputOptions(FsOutputOptions.NO_OUTPUT_OPTIONS);
+    }
+
+    private volatile @CheckForNull ReadLock readLock;
+    private volatile @CheckForNull WriteLock writeLock;
 
     /**
      * Constructs a new concurrent file system controller.
@@ -78,7 +92,8 @@ extends FsDecoratingController< FsConcurrentModel,
                 : (this.writeLock = getModel().writeLock());
     }
 
-    private void assertNotReadLockedByCurrentThread(FsNotWriteLockedException ex)
+    private void assertNotReadLockedByCurrentThread(
+            @CheckForNull FsNotWriteLockedException ex)
     throws FsNotWriteLockedException {
         getModel().assertNotReadLockedByCurrentThread(ex);
     }
@@ -88,6 +103,7 @@ extends FsDecoratingController< FsConcurrentModel,
         try {
             readLock().lock();
             try {
+                getModel().setOperation(NULL);
                 return delegate.getOpenIcon();
             } finally {
                 readLock().unlock();
@@ -96,6 +112,7 @@ extends FsDecoratingController< FsConcurrentModel,
             assertNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
+                getModel().setOperation(NULL);
                 return delegate.getOpenIcon();
             } finally {
                 writeLock().unlock();
@@ -108,6 +125,7 @@ extends FsDecoratingController< FsConcurrentModel,
         try {
             readLock().lock();
             try {
+                getModel().setOperation(NULL);
                 return delegate.getClosedIcon();
             } finally {
                 readLock().unlock();
@@ -116,6 +134,7 @@ extends FsDecoratingController< FsConcurrentModel,
             assertNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
+                getModel().setOperation(NULL);
                 return delegate.getClosedIcon();
             } finally {
                 writeLock().unlock();
@@ -128,6 +147,7 @@ extends FsDecoratingController< FsConcurrentModel,
         try {
             readLock().lock();
             try {
+                getModel().setOperation(NULL);
                 return delegate.isReadOnly();
             } finally {
                 readLock().unlock();
@@ -136,6 +156,7 @@ extends FsDecoratingController< FsConcurrentModel,
             assertNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
+                getModel().setOperation(NULL);
                 return delegate.isReadOnly();
             } finally {
                 writeLock().unlock();
@@ -149,6 +170,7 @@ extends FsDecoratingController< FsConcurrentModel,
         try {
             readLock().lock();
             try {
+                getModel().setOperation(NULL);
                 return delegate.getEntry(name);
             } finally {
                 readLock().unlock();
@@ -157,6 +179,7 @@ extends FsDecoratingController< FsConcurrentModel,
             assertNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
+                getModel().setOperation(NULL);
                 return delegate.getEntry(name);
             } finally {
                 writeLock().unlock();
@@ -169,6 +192,7 @@ extends FsDecoratingController< FsConcurrentModel,
         try {
             readLock().lock();
             try {
+                getModel().setOperation(NULL);
                 return delegate.isReadable(name);
             } finally {
                 readLock().unlock();
@@ -177,6 +201,7 @@ extends FsDecoratingController< FsConcurrentModel,
             assertNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
+                getModel().setOperation(NULL);
                 return delegate.isReadable(name);
             } finally {
                 writeLock().unlock();
@@ -189,6 +214,7 @@ extends FsDecoratingController< FsConcurrentModel,
         try {
             readLock().lock();
             try {
+                getModel().setOperation(NULL);
                 return delegate.isWritable(name);
             } finally {
                 readLock().unlock();
@@ -197,6 +223,7 @@ extends FsDecoratingController< FsConcurrentModel,
             assertNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
+                getModel().setOperation(NULL);
                 return delegate.isWritable(name);
             } finally {
                 writeLock().unlock();
@@ -209,6 +236,7 @@ extends FsDecoratingController< FsConcurrentModel,
         assertNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
+            getModel().setOperation(NONE);
             delegate.setReadOnly(name);
         } finally {
             writeLock().unlock();
@@ -221,6 +249,7 @@ extends FsDecoratingController< FsConcurrentModel,
         assertNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
+            getModel().setOperation(NONE);
             return delegate.setTime(name, types, value);
         } finally {
             writeLock().unlock();
@@ -233,6 +262,7 @@ extends FsDecoratingController< FsConcurrentModel,
         assertNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
+            getModel().setOperation(NONE);
             return delegate.setTime(name, times);
         } finally {
             writeLock().unlock();
@@ -242,12 +272,13 @@ extends FsDecoratingController< FsConcurrentModel,
     @Override
     public InputSocket<?> getInputSocket(   FsEntryName name,
                                             BitField<FsInputOption> options) {
-        return new Input(delegate.getInputSocket(name, options));
+        return new Input(name, options);
     }
 
     private final class Input extends DecoratingInputSocket<Entry> {
-        Input(InputSocket<?> input) {
-            super(input);
+        Input(  FsEntryName name,
+                BitField<FsInputOption> options) {
+            super(delegate.getInputSocket(name, options));
         }
 
         @Override
@@ -255,6 +286,7 @@ extends FsDecoratingController< FsConcurrentModel,
             try {
                 readLock().lock();
                 try {
+                    getModel().setOperation(NULL);
                     return getBoundSocket().getLocalTarget();
                 } finally {
                     readLock().unlock();
@@ -263,6 +295,7 @@ extends FsDecoratingController< FsConcurrentModel,
                 assertNotReadLockedByCurrentThread(ex);
                 writeLock().lock();
                 try {
+                    getModel().setOperation(NULL);
                     return getBoundSocket().getLocalTarget();
                 } finally {
                     writeLock().unlock();
@@ -275,6 +308,7 @@ extends FsDecoratingController< FsConcurrentModel,
             try {
                 readLock().lock();
                 try {
+                    getModel().setOperation(NULL);
                     return getBoundSocket().newSeekableByteChannel();
                 } finally {
                     readLock().unlock();
@@ -283,6 +317,7 @@ extends FsDecoratingController< FsConcurrentModel,
                 assertNotReadLockedByCurrentThread(ex);
                 writeLock().lock();
                 try {
+                    getModel().setOperation(NULL);
                     return getBoundSocket().newSeekableByteChannel();
                 } finally {
                     writeLock().unlock();
@@ -295,6 +330,7 @@ extends FsDecoratingController< FsConcurrentModel,
             try {
                 readLock().lock();
                 try {
+                    getModel().setOperation(NULL);
                     return getBoundSocket().newReadOnlyFile();
                 } finally {
                     readLock().unlock();
@@ -303,6 +339,7 @@ extends FsDecoratingController< FsConcurrentModel,
                 assertNotReadLockedByCurrentThread(ex);
                 writeLock().lock();
                 try {
+                    getModel().setOperation(NULL);
                     return getBoundSocket().newReadOnlyFile();
                 } finally {
                     writeLock().unlock();
@@ -315,6 +352,7 @@ extends FsDecoratingController< FsConcurrentModel,
             try {
                 readLock().lock();
                 try {
+                    getModel().setOperation(NULL);
                     return getBoundSocket().newInputStream();
                 } finally {
                     readLock().unlock();
@@ -323,24 +361,31 @@ extends FsDecoratingController< FsConcurrentModel,
                 assertNotReadLockedByCurrentThread(ex);
                 writeLock().lock();
                 try {
+                    getModel().setOperation(NULL);
                     return getBoundSocket().newInputStream();
                 } finally {
                     writeLock().unlock();
                 }
             }
         }
-    } // class Input
+    } // Input
 
     @Override
     public OutputSocket<?> getOutputSocket( FsEntryName name,
                                             BitField<FsOutputOption> options,
                                             Entry template) {
-        return new Output(delegate.getOutputSocket(name, options, template));
+        return new Output(name, options, template);
     }
 
     private final class Output extends DecoratingOutputSocket<Entry> {
-        Output(OutputSocket<?> output) {
-            super(output);
+        final Operation operation;
+
+        Output( FsEntryName name,
+                BitField<FsOutputOption> options,
+                Entry template) {
+            super(delegate.getOutputSocket(name, options, template));
+            this.operation = getOperation(options);
+            
         }
 
         @Override
@@ -348,6 +393,7 @@ extends FsDecoratingController< FsConcurrentModel,
             assertNotReadLockedByCurrentThread(null);
             writeLock().lock();
             try {
+                getModel().setOperation(operation);
                 return getBoundSocket().getLocalTarget();
             } finally {
                 writeLock().unlock();
@@ -359,6 +405,7 @@ extends FsDecoratingController< FsConcurrentModel,
             assertNotReadLockedByCurrentThread(null);
             writeLock().lock();
             try {
+                getModel().setOperation(operation);
                 return getBoundSocket().newSeekableByteChannel();
             } finally {
                 writeLock().unlock();
@@ -370,12 +417,13 @@ extends FsDecoratingController< FsConcurrentModel,
             assertNotReadLockedByCurrentThread(null);
             writeLock().lock();
             try {
+                getModel().setOperation(operation);
                 return getBoundSocket().newOutputStream();
             } finally {
                 writeLock().unlock();
             }
         }
-    } // class Output
+    } // Output
 
     @Override
     public void mknod(
@@ -385,8 +433,10 @@ extends FsDecoratingController< FsConcurrentModel,
             @CheckForNull Entry template)
     throws IOException {
         assertNotReadLockedByCurrentThread(null);
+        final Operation operation = getOperation(options);
         writeLock().lock();
         try {
+            getModel().setOperation(operation);
             delegate.mknod(name, type, options, template);
         } finally {
             writeLock().unlock();
@@ -399,6 +449,7 @@ extends FsDecoratingController< FsConcurrentModel,
         assertNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
+            getModel().setOperation(NONE);
             delegate.unlink(name);
         } finally {
             writeLock().unlock();
@@ -414,9 +465,25 @@ extends FsDecoratingController< FsConcurrentModel,
         //assertNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
+            getModel().setOperation(NONE);
             delegate.sync(options, handler);
         } finally {
             writeLock().unlock();
         }
+    }
+
+    /**
+     * Returns an operation object holding the given output options.
+     * <p>
+     * TODO: Consider reusing the created object by mapping it.
+     * 
+     * @param  options the options for the output operation in scope.
+     * @return A JavaBean which encapsulates the given options for the
+     *         {@link FsConcurrentController} operation in scope.
+     */
+    private static Operation getOperation(BitField<FsOutputOption> options) {
+        FsConcurrentOperation operation = new FsConcurrentOperation();
+        operation.setOutputOptions(options);
+        return operation;
     }
 }
