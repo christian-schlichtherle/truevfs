@@ -29,8 +29,8 @@ import net.jcip.annotations.NotThreadSafe;
  * A JavaBean which represents the original values of selected parameters
  * for the {@link FsContextController} operation in progress.
  * <p>
- * TODO: When adding any input operation parameters, make {@link #setOperation}
- * really thread-safe.
+ * TODO: When adding any input operation parameters, make
+ * {@link FsContextModel#setContext} really thread-safe.
  *
  * @see     FsContextModel
  * @see     FsContextController
