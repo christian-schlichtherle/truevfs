@@ -20,11 +20,9 @@ import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.fs.FsInputOption;
-import static de.schlichtherle.truezip.fs.FsInputOptions.*;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.fs.FsOutputOption;
-import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -284,7 +282,9 @@ final class TBIO {
                         options);
         }
         final FsPath path = new FsPath(src);
-        return TFile.manager
+        return TConfig
+                .get()
+                .getManager()
                 .getController(path.getMountPoint(), getDetector(src))
                 .getInputSocket(path.getEntryName(), options);
     }
@@ -312,7 +312,9 @@ final class TBIO {
                         template);
         }
         final FsPath path = new FsPath(dst);
-        return TFile.manager
+        return TConfig
+                .get()
+                .getManager()
                 .getController(path.getMountPoint(), getDetector(dst))
                 .getOutputSocket(   path.getEntryName(),
                                     options.clear(CREATE_PARENTS),

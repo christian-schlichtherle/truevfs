@@ -15,11 +15,13 @@
  */
 package de.schlichtherle.truezip.file;
 
+import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.FsInputOption;
 import de.schlichtherle.truezip.fs.FsInputOptions;
 import static de.schlichtherle.truezip.fs.FsInputOptions.*;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
+import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
@@ -185,6 +187,9 @@ public final class TConfig implements Closeable {
 
     private static volatile @CheckForNull InheritableThreadLocalConfigStack configs;
 
+    /** The file system manager to use within this package. */
+    private static final FsManager manager = FsManagerLocator.SINGLETON.get();
+
     private TArchiveDetector detector;
     private BitField<FsInputOption> inputPreferences;
     private BitField<FsOutputOption> outputPreferences;
@@ -271,6 +276,10 @@ public final class TConfig implements Closeable {
         this.detector = template.getArchiveDetector();
         this.inputPreferences = template.getInputPreferences();
         this.outputPreferences = template.getOutputPreferences();
+    }
+
+    FsManager getManager() {
+        return manager;
     }
 
     /**

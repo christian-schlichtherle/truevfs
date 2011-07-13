@@ -16,8 +16,6 @@
 package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.util.UriBuilder;
-import de.schlichtherle.truezip.fs.FsManager;
-import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.io.Paths;
@@ -29,7 +27,6 @@ import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsFilteringManager;
-import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.fs.FsSyncOption;
 import de.schlichtherle.truezip.util.BitField;
@@ -367,9 +364,6 @@ public final class TFile extends File {
     private static final Set<File>
             ROOTS = Collections.unmodifiableSet(
                 new TreeSet<File>(Arrays.asList(listRoots())));
-
-    /** The file system manager to use within this package. */
-    static final FsManager manager = FsManagerLocator.SINGLETON.get();
 
     /**
      * The delegate is used to implement the behaviour of the file system
@@ -931,7 +925,7 @@ public final class TFile extends File {
      */
     public static void sync(BitField<FsSyncOption> options)
     throws FsSyncException {
-        manager.sync(options);
+        TConfig.get().getManager().sync(options);
     }
 
     /**
@@ -983,7 +977,7 @@ public final class TFile extends File {
         if (null != archive.getEnclArchive())
             throw new IllegalArgumentException(archive + " (not a top level archive file)");
         new FsFilteringManager(
-                manager,
+                TConfig.get().getManager(),
                 archive .getController()
                         .getModel()
                         .getMountPoint())
@@ -1612,7 +1606,7 @@ public final class TFile extends File {
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
         }
-        return controller = manager.getController(mountPoint, detector);
+        return controller = TConfig.get().getManager().getController(mountPoint, detector);
     }
 
     /**
