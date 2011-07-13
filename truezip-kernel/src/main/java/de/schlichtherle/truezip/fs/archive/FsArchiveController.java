@@ -101,6 +101,10 @@ extends FsModelController<FsContextModel> {
             throw new IllegalArgumentException();
     }
 
+    final FsOperationContext getContext() {
+        return getModel().getContext();
+    }
+
     final FsArchiveFileSystem<E> autoMount() throws IOException {
         return autoMount(false, AUTO_MOUNT_OPTIONS);
     }
@@ -243,7 +247,7 @@ extends FsModelController<FsContextModel> {
         }
 
         FsArchiveFileSystemOperation<E> mknod() throws IOException {
-            assert options.equals(getModel().getContext().getOutputOptions());
+            assert options.equals(getContext().getOutputOptions());
             autoSync(name, WRITE);
             // Start creating or overwriting the archive entry.
             // This will fail if the entry already exists as a directory.
@@ -303,7 +307,7 @@ extends FsModelController<FsContextModel> {
         }
     } // class Output
 
-    private static class ProxyEntry
+    private static final class ProxyEntry
     extends DecoratingEntry<FsArchiveEntry>
     implements FsArchiveEntry {
         ProxyEntry(FsArchiveEntry entry) {
@@ -335,7 +339,7 @@ extends FsModelController<FsContextModel> {
             final BitField<FsOutputOption> options,
             final Entry template)
     throws IOException {
-        assert options.equals(getModel().getContext().getOutputOptions());
+        assert options.equals(getContext().getOutputOptions());
         if (name.isRoot()) {
             try {
                 autoMount(); // detect false positives!
