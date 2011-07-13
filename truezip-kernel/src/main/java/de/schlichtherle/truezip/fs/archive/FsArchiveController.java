@@ -23,7 +23,6 @@ import de.schlichtherle.truezip.fs.FsEntryNotFoundException;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.fs.FsConcurrentModel;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.entry.Entry.Access;
@@ -80,7 +79,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
 abstract class FsArchiveController<E extends FsArchiveEntry>
-extends FsModelController<FsConcurrentModel> {
+extends FsModelController<FsContextModel> {
 
     private static final Logger
             logger = Logger.getLogger(  FsArchiveController.class.getName(),
@@ -96,7 +95,7 @@ extends FsModelController<FsConcurrentModel> {
      *
      * @param model the non-{@code null} archive model.
      */
-    FsArchiveController(final FsConcurrentModel model) {
+    FsArchiveController(final FsContextModel model) {
         super(model);
         if (null == model.getParent())
             throw new IllegalArgumentException();
@@ -244,7 +243,7 @@ extends FsModelController<FsConcurrentModel> {
         }
 
         FsArchiveFileSystemOperation<E> mknod() throws IOException {
-            //assert options.equals(getModel().getOperation().getOutputOptions());
+            assert options.equals(getModel().getContext().getOutputOptions());
             autoSync(name, WRITE);
             // Start creating or overwriting the archive entry.
             // This will fail if the entry already exists as a directory.
@@ -336,7 +335,7 @@ extends FsModelController<FsConcurrentModel> {
             final BitField<FsOutputOption> options,
             final Entry template)
     throws IOException {
-        //assert options.equals(getModel().getOperation().getOutputOptions());
+        assert options.equals(getModel().getContext().getOutputOptions());
         if (name.isRoot()) {
             try {
                 autoMount(); // detect false positives!
