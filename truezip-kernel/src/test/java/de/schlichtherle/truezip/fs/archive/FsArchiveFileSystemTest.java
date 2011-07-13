@@ -36,7 +36,7 @@ public class FsArchiveFileSystemTest {
     @Test
     public void testListeners() {
         final FsArchiveFileSystem<?> fileSystem
-                = FsArchiveFileSystem.newArchiveFileSystem(new MockArchiveDriver());
+                = FsArchiveFileSystem.newEmptyFileSystem(new MockArchiveDriver());
 
         try {
             fileSystem.addFsArchiveFileSystemTouchListener(null);
@@ -137,7 +137,7 @@ public class FsArchiveFileSystemTest {
 
         // Populate file system.
         final FsArchiveFileSystem<MockArchiveEntry>
-                fileSystem = FsArchiveFileSystem.newArchiveFileSystem(
+                fileSystem = FsArchiveFileSystem.newPopulatedFileSystem(
                     driver, container, null, false);
 
         // Check file system.
