@@ -79,7 +79,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
-public abstract class FsArchiveController<E extends FsArchiveEntry>
+abstract class FsArchiveController<E extends FsArchiveEntry>
 extends FsModelController<FsConcurrentModel> {
 
     private static final Logger
@@ -96,7 +96,7 @@ extends FsModelController<FsConcurrentModel> {
      *
      * @param model the non-{@code null} archive model.
      */
-    protected FsArchiveController(final FsConcurrentModel model) {
+    FsArchiveController(final FsConcurrentModel model) {
         super(model);
         if (null == model.getParent())
             throw new IllegalArgumentException();

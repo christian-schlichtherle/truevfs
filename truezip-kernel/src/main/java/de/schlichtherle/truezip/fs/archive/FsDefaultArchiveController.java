@@ -109,7 +109,6 @@ extends FsFileSystemArchiveController<E> {
      * @param model the file system model.
      * @param parent the parent file system
      * @param driver the archive driver.
-     * @since TrueZIP 7.2
      */
     FsDefaultArchiveController(
             final FsConcurrentModel model,
