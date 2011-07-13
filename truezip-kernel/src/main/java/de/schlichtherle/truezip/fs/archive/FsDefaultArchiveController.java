@@ -204,13 +204,15 @@ extends FsFileSystemArchiveController<E> {
 
     /**
      * Ensures that {@link #output} is not {@code null}.
+     * This method will use
+     * <code>{@link #getContext()}.{@link FsOperationContext#getOutputOptions()}</code>
+     * to obtain the output options to use for writing the entry in the parent
+     * file system.
      * 
-     * @param  options a bit field of output options.
      * @throws IOException on any I/O error.
      * @return The output.
      */
-    private Output makeOutput()
-    throws IOException {
+    private Output makeOutput() throws IOException {
         Output output = getOutput();
         if (null != output)
             return output;
