@@ -87,7 +87,7 @@ extends FsDecoratingController< FsContextModel,
     public Icon getOpenIcon() throws IOException {
         final FsContextModel model = getModel();
         final FsOperationContext context = model.getContext();
-        getModel().setContext(NULL);
+        model.setContext(NULL);
         try {
             return delegate.getOpenIcon();
         } finally {
@@ -99,7 +99,7 @@ extends FsDecoratingController< FsContextModel,
     public Icon getClosedIcon() throws IOException {
         final FsContextModel model = getModel();
         final FsOperationContext context = model.getContext();
-        getModel().setContext(NULL);
+        model.setContext(NULL);
         try {
             return delegate.getClosedIcon();
         } finally {
@@ -111,7 +111,7 @@ extends FsDecoratingController< FsContextModel,
     public boolean isReadOnly() throws IOException {
         final FsContextModel model = getModel();
         final FsOperationContext context = model.getContext();
-        getModel().setContext(NULL);
+        model.setContext(NULL);
         try {
             return delegate.isReadOnly();
         } finally {
@@ -124,7 +124,7 @@ extends FsDecoratingController< FsContextModel,
     throws IOException {
         final FsContextModel model = getModel();
         final FsOperationContext context = model.getContext();
-        getModel().setContext(NULL);
+        model.setContext(NULL);
         try {
             return delegate.getEntry(name);
         } finally {
@@ -136,7 +136,7 @@ extends FsDecoratingController< FsContextModel,
     public boolean isReadable(FsEntryName name) throws IOException {
         final FsContextModel model = getModel();
         final FsOperationContext context = model.getContext();
-        getModel().setContext(NULL);
+        model.setContext(NULL);
         try {
             return delegate.isReadable(name);
         } finally {
@@ -148,7 +148,7 @@ extends FsDecoratingController< FsContextModel,
     public boolean isWritable(FsEntryName name) throws IOException {
         final FsContextModel model = getModel();
         final FsOperationContext context = model.getContext();
-        getModel().setContext(NULL);
+        model.setContext(NULL);
         try {
             return delegate.isWritable(name);
         } finally {
@@ -160,7 +160,7 @@ extends FsDecoratingController< FsContextModel,
     public void setReadOnly(FsEntryName name) throws IOException {
         final FsContextModel model = getModel();
         final FsOperationContext context = model.getContext();
-        getModel().setContext(NONE);
+        model.setContext(NONE);
         try {
             delegate.setReadOnly(name);
         } finally {
@@ -173,7 +173,7 @@ extends FsDecoratingController< FsContextModel,
     throws IOException {
         final FsContextModel model = getModel();
         final FsOperationContext context = model.getContext();
-        getModel().setContext(NONE);
+        model.setContext(NONE);
         try {
             return delegate.setTime(name, types, value);
         } finally {
@@ -186,7 +186,7 @@ extends FsDecoratingController< FsContextModel,
     throws IOException {
         final FsContextModel model = getModel();
         final FsOperationContext context = model.getContext();
-        getModel().setContext(NONE);
+        model.setContext(NONE);
         try {
             return delegate.setTime(name, times);
         } finally {
@@ -210,7 +210,7 @@ extends FsDecoratingController< FsContextModel,
         public Entry getLocalTarget() throws IOException {
             final FsContextModel model = getModel();
             final FsOperationContext context = model.getContext();
-            getModel().setContext(NULL);
+            model.setContext(NULL);
             try {
                 return getBoundSocket().getLocalTarget();
             } finally {
@@ -222,7 +222,7 @@ extends FsDecoratingController< FsContextModel,
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
             final FsContextModel model = getModel();
             final FsOperationContext context = model.getContext();
-            getModel().setContext(NULL);
+            model.setContext(NULL);
             try {
                 return getBoundSocket().newSeekableByteChannel();
             } finally {
@@ -234,7 +234,7 @@ extends FsDecoratingController< FsContextModel,
         public ReadOnlyFile newReadOnlyFile() throws IOException {
             final FsContextModel model = getModel();
             final FsOperationContext context = model.getContext();
-            getModel().setContext(NULL);
+            model.setContext(NULL);
             try {
                 return getBoundSocket().newReadOnlyFile();
             } finally {
@@ -246,7 +246,7 @@ extends FsDecoratingController< FsContextModel,
         public InputStream newInputStream() throws IOException {
             final FsContextModel model = getModel();
             final FsOperationContext context = model.getContext();
-            getModel().setContext(NULL);
+            model.setContext(NULL);
             try {
                 return getBoundSocket().newInputStream();
             } finally {
@@ -277,7 +277,7 @@ extends FsDecoratingController< FsContextModel,
         public Entry getLocalTarget() throws IOException {
             final FsContextModel model = getModel();
             final FsOperationContext context = model.getContext();
-            getModel().setContext(operation);
+            model.setContext(operation);
             try {
                 return getBoundSocket().getLocalTarget();
             } finally {
@@ -289,7 +289,7 @@ extends FsDecoratingController< FsContextModel,
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
             final FsContextModel model = getModel();
             final FsOperationContext context = model.getContext();
-            getModel().setContext(operation);
+            model.setContext(operation);
             try {
                 return getBoundSocket().newSeekableByteChannel();
             } finally {
@@ -301,7 +301,7 @@ extends FsDecoratingController< FsContextModel,
         public OutputStream newOutputStream() throws IOException {
             final FsContextModel model = getModel();
             final FsOperationContext context = model.getContext();
-            getModel().setContext(operation);
+            model.setContext(operation);
             try {
                 return getBoundSocket().newOutputStream();
             } finally {
@@ -319,7 +319,7 @@ extends FsDecoratingController< FsContextModel,
     throws IOException {
         final FsContextModel model = getModel();
         final FsOperationContext context = model.getContext();
-        getModel().setContext(makeContext(options));
+        model.setContext(makeContext(options));
         try {
             delegate.mknod(name, type, options, template);
         } finally {
@@ -332,7 +332,7 @@ extends FsDecoratingController< FsContextModel,
     throws IOException {
         final FsContextModel model = getModel();
         final FsOperationContext context = model.getContext();
-        getModel().setContext(NONE);
+        model.setContext(NONE);
         try {
             delegate.unlink(name);
         } finally {
