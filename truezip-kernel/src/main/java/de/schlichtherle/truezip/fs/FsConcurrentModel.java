@@ -159,7 +159,7 @@ public final class FsConcurrentModel extends FsDecoratingModel<FsModel> {
      * @see   #getOperation()
      */
     void setOperation(final Operation operation) {
-        //assert (null != request) ^ (null != this.request);
+        assert null != operation;
         this.operation = operation;
     }
 
