@@ -15,24 +15,16 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
-import net.jcip.annotations.NotThreadSafe;
 import net.jcip.annotations.ThreadSafe;
 
 /**
  * A file system model which supports multiple concurrent reader threads.
- * It's {@link #getOperation() operation} property provides access to a
- * {@link FsConcurrentOperation} JavaBean which encapsulates the original
- * values of selected parameters for the {@link FsConcurrentController}
- * operation in scope.
  *
  * @see     FsConcurrentController
  * @author  Christian Schlichtherle
@@ -40,11 +32,9 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-public final class FsConcurrentModel extends FsDecoratingModel<FsModel> {
+public class FsConcurrentModel extends FsDecoratingModel<FsModel> {
 
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-
-    private volatile Operation operation = new FsConcurrentOperation();
 
     public FsConcurrentModel(FsModel model) {
         super(model);
@@ -99,71 +89,6 @@ public final class FsConcurrentModel extends FsDecoratingModel<FsModel> {
     }
 
     /**
-     * A JavaBean which encapsulates the original values of selected parameters
-     * for the {@link FsConcurrentController} operation in scope.
-     * <p>
-     * TODO: When adding any input operation parameters, make
-     * {@link #setOperation} really thread-safe.
-     */
-    @NotThreadSafe
-    public interface Operation {
-        /**
-         * Returns the options for the output operation in scope.
-         * If the operation in scope is not an output operation, then
-         * {@code null} is returned.
-         * Otherwise, if the output operation in scope does not accept options,
-         * then an empty bit field is returned.
-         * Otherwise, a bit field with the options for the output operation is
-         * returned.
-         * 
-         * @return The options for the output operation in scope.
-         * @see    FsConcurrentController#getOutputSocket(FsEntryName, BitField, Entry)
-         * @see    FsConcurrentController#mknod(FsEntryName, Entry.Type, BitField, Entry)
-         */
-        @Nullable BitField<FsOutputOption> getOutputOptions();
-    } // Operation
-
-    /**
-     * Returns a JavaBean which encapsulates the original values of selected
-     * parameters for the {@link FsConcurrentController} operation in scope.
-     * It's an error to call this method if an {@code FsConcurrentController}
-     * operation is not in scope and the result is undefined.
-     * 
-     * @return A JavaBean which encapsulates the original values of selected
-     *         parameters for the {@link FsConcurrentController} operation in
-     *         scope.
-     */
-    public Operation getOperation() {
-        return operation;
-    }
-
-    /**
-     * Sets the JavaBean which encapsulates the original values of selected
-     * parameters for the {@link FsConcurrentController} operation in scope.
-     * This method should only get called by the class
-     * {@link FsConcurrentController}.
-     * <p>
-     * TODO: The current implementation is only virtually thread-safe: It
-     * benefits from the fact that the current {@link FsConcurrentOperation}
-     * API encapsulates only parameters for output operations and output
-     * operations are effectively single-threaded by obtaining a write-lock in
-     * {@link FsConcurrentController}.
-     * As soon as any input operation parameters are added to
-     * {@link FsConcurrentOperation}, this implementation needs to get changed
-     * so that it uses a {@link ThreadLocal} or similar feature to make it
-     * truly thread-safe.
-     * 
-     * @param operation the JavaBean which encapsulates the original values of
-     *        selected parameters for the {@link FsConcurrentController}
-     *        operation in scope.
-     * @see   #getOperation()
-     */
-    void setOperation(final Operation operation) {
-        assert null != operation;
-        this.operation = operation;
-    }
-
-    /**
      * Returns a string representation of this object for debugging and logging
      * purposes.
      */
@@ -173,8 +98,6 @@ public final class FsConcurrentModel extends FsDecoratingModel<FsModel> {
                 .append(getClass().getName())
                 .append("[delegate=")
                 .append(delegate)
-                .append(",request=")
-                .append(getOperation())
                 .append("]")
                 .toString();
     }
