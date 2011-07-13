@@ -50,7 +50,7 @@ final class FsConcurrentOperation implements Operation {
      * @param outputOptions the options for the output operation in scope.
      * @see   #getOutputOptions()
      */
-    void setOutputOptions(@Nullable final BitField<FsOutputOption> outputOptions) {
+    void setOutputOptions(final @Nullable BitField<FsOutputOption> outputOptions) {
         this.outputOptions = outputOptions;
     }
 
