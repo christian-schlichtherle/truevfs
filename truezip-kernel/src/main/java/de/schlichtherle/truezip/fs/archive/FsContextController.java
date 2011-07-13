@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
+import java.util.HashMap;
 import java.util.Map;
 import javax.swing.Icon;
 import net.jcip.annotations.ThreadSafe;
@@ -48,7 +49,7 @@ import net.jcip.annotations.ThreadSafe;
 /**
  * A file system controller which decorates another file system controller in
  * order to provide the original values of selected parameters for its
- * operation in scope.
+ * operation in progress.
  * 
  * @see     FsContextModel
  * @since   TrueZIP 7.3
@@ -69,6 +70,9 @@ extends FsDecoratingController< FsContextModel,
         NONE.setOutputOptions(FsOutputOptions.NO_OUTPUT_OPTIONS);
     }
 
+    private static final Map<BitField<FsOutputOption>, FsOperationContext>
+            contexts = new HashMap<BitField<FsOutputOption>, FsOperationContext>();
+
     /**
      * Constructs a new operation file system controller.
      *
@@ -81,59 +85,113 @@ extends FsDecoratingController< FsContextModel,
 
     @Override
     public Icon getOpenIcon() throws IOException {
+        final FsContextModel model = getModel();
+        final FsOperationContext context = model.getContext();
         getModel().setContext(NULL);
-        return delegate.getOpenIcon();
+        try {
+            return delegate.getOpenIcon();
+        } finally {
+            model.setContext(context);
+        }
     }
 
     @Override
     public Icon getClosedIcon() throws IOException {
+        final FsContextModel model = getModel();
+        final FsOperationContext context = model.getContext();
         getModel().setContext(NULL);
-        return delegate.getClosedIcon();
+        try {
+            return delegate.getClosedIcon();
+        } finally {
+            model.setContext(context);
+        }
     }
 
     @Override
     public boolean isReadOnly() throws IOException {
+        final FsContextModel model = getModel();
+        final FsOperationContext context = model.getContext();
         getModel().setContext(NULL);
-        return delegate.isReadOnly();
+        try {
+            return delegate.isReadOnly();
+        } finally {
+            model.setContext(context);
+        }
     }
 
     @Override
     public FsEntry getEntry(FsEntryName name)
     throws IOException {
+        final FsContextModel model = getModel();
+        final FsOperationContext context = model.getContext();
         getModel().setContext(NULL);
-        return delegate.getEntry(name);
+        try {
+            return delegate.getEntry(name);
+        } finally {
+            model.setContext(context);
+        }
     }
 
     @Override
     public boolean isReadable(FsEntryName name) throws IOException {
+        final FsContextModel model = getModel();
+        final FsOperationContext context = model.getContext();
         getModel().setContext(NULL);
-        return delegate.isReadable(name);
+        try {
+            return delegate.isReadable(name);
+        } finally {
+            model.setContext(context);
+        }
     }
 
     @Override
     public boolean isWritable(FsEntryName name) throws IOException {
+        final FsContextModel model = getModel();
+        final FsOperationContext context = model.getContext();
         getModel().setContext(NULL);
-        return delegate.isWritable(name);
+        try {
+            return delegate.isWritable(name);
+        } finally {
+            model.setContext(context);
+        }
     }
 
     @Override
     public void setReadOnly(FsEntryName name) throws IOException {
+        final FsContextModel model = getModel();
+        final FsOperationContext context = model.getContext();
         getModel().setContext(NONE);
-        delegate.setReadOnly(name);
+        try {
+            delegate.setReadOnly(name);
+        } finally {
+            model.setContext(context);
+        }
     }
 
     @Override
     public boolean setTime(FsEntryName name, BitField<Access> types, long value)
     throws IOException {
+        final FsContextModel model = getModel();
+        final FsOperationContext context = model.getContext();
         getModel().setContext(NONE);
-        return delegate.setTime(name, types, value);
+        try {
+            return delegate.setTime(name, types, value);
+        } finally {
+            model.setContext(context);
+        }
     }
 
     @Override
     public boolean setTime(FsEntryName name, Map<Access, Long> times)
     throws IOException {
+        final FsContextModel model = getModel();
+        final FsOperationContext context = model.getContext();
         getModel().setContext(NONE);
-        return delegate.setTime(name, times);
+        try {
+            return delegate.setTime(name, times);
+        } finally {
+            model.setContext(context);
+        }
     }
 
     @Override
@@ -150,26 +208,50 @@ extends FsDecoratingController< FsContextModel,
 
         @Override
         public Entry getLocalTarget() throws IOException {
+            final FsContextModel model = getModel();
+            final FsOperationContext context = model.getContext();
             getModel().setContext(NULL);
-            return getBoundSocket().getLocalTarget();
+            try {
+                return getBoundSocket().getLocalTarget();
+            } finally {
+                model.setContext(context);
+            }
         }
 
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            final FsContextModel model = getModel();
+            final FsOperationContext context = model.getContext();
             getModel().setContext(NULL);
-            return getBoundSocket().newSeekableByteChannel();
+            try {
+                return getBoundSocket().newSeekableByteChannel();
+            } finally {
+                model.setContext(context);
+            }
         }
 
         @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
+            final FsContextModel model = getModel();
+            final FsOperationContext context = model.getContext();
             getModel().setContext(NULL);
-            return getBoundSocket().newReadOnlyFile();
+            try {
+                return getBoundSocket().newReadOnlyFile();
+            } finally {
+                model.setContext(context);
+            }
         }
 
         @Override
         public InputStream newInputStream() throws IOException {
+            final FsContextModel model = getModel();
+            final FsOperationContext context = model.getContext();
             getModel().setContext(NULL);
-            return getBoundSocket().newInputStream();
+            try {
+                return getBoundSocket().newInputStream();
+            } finally {
+                model.setContext(context);
+            }
         }
     } // Input
 
@@ -193,20 +275,38 @@ extends FsDecoratingController< FsContextModel,
 
         @Override
         public Entry getLocalTarget() throws IOException {
+            final FsContextModel model = getModel();
+            final FsOperationContext context = model.getContext();
             getModel().setContext(operation);
-            return getBoundSocket().getLocalTarget();
+            try {
+                return getBoundSocket().getLocalTarget();
+            } finally {
+                model.setContext(context);
+            }
         }
 
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            final FsContextModel model = getModel();
+            final FsOperationContext context = model.getContext();
             getModel().setContext(operation);
-            return getBoundSocket().newSeekableByteChannel();
+            try {
+                return getBoundSocket().newSeekableByteChannel();
+            } finally {
+                model.setContext(context);
+            }
         }
 
         @Override
         public OutputStream newOutputStream() throws IOException {
+            final FsContextModel model = getModel();
+            final FsOperationContext context = model.getContext();
             getModel().setContext(operation);
-            return getBoundSocket().newOutputStream();
+            try {
+                return getBoundSocket().newOutputStream();
+            } finally {
+                model.setContext(context);
+            }
         }
     } // Output
 
@@ -217,16 +317,27 @@ extends FsDecoratingController< FsContextModel,
             @NonNull BitField<FsOutputOption> options,
             @CheckForNull Entry template)
     throws IOException {
-        final FsOperationContext operation = makeContext(options);
-        getModel().setContext(operation);
-        delegate.mknod(name, type, options, template);
+        final FsContextModel model = getModel();
+        final FsOperationContext context = model.getContext();
+        getModel().setContext(makeContext(options));
+        try {
+            delegate.mknod(name, type, options, template);
+        } finally {
+            model.setContext(context);
+        }
     }
 
     @Override
     public void unlink(FsEntryName name)
     throws IOException {
+        final FsContextModel model = getModel();
+        final FsOperationContext context = model.getContext();
         getModel().setContext(NONE);
-        delegate.unlink(name);
+        try {
+            delegate.unlink(name);
+        } finally {
+            model.setContext(context);
+        }
     }
 
     @Override
@@ -235,22 +346,34 @@ extends FsDecoratingController< FsContextModel,
             @NonNull final BitField<FsSyncOption> options,
             @NonNull final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
-        getModel().setContext(NONE);
-        delegate.sync(options, handler);
+        final FsContextModel model = getModel();
+        final FsOperationContext context = model.getContext();
+        model.setContext(NONE);
+        try {
+            delegate.sync(options, handler);
+        } finally {
+            model.setContext(context);
+        }
     }
 
     /**
-     * Returns an operation object holding the given output options.
+     * Returns an operation context holding the given output options.
      * <p>
      * TODO: Consider reusing the created object by mapping it.
      * 
-     * @param  options the options for the output operation in scope.
-     * @return A JavaBean which encapsulates the given options for the
-     *         {@link FsContextController} operation in scope.
+     * @param  options the options for the output operation in progress.
+     * @return An operation context holding the given output options.
      */
     private static FsOperationContext makeContext(BitField<FsOutputOption> options) {
-        FsOperationContext operation = new FsOperationContext();
-        operation.setOutputOptions(options);
-        return operation;
+        FsOperationContext context;
+        synchronized (FsContextController.class) {
+            context = contexts.get(options);
+            if (null == context) {
+                context = new FsOperationContext();
+                context.setOutputOptions(options);
+                contexts.put(options, context);
+            }
+        }
+        return context;
     }
 }

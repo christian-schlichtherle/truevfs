@@ -27,7 +27,7 @@ import net.jcip.annotations.NotThreadSafe;
 
 /**
  * A JavaBean which represents the original values of selected parameters
- * for the {@link FsContextController} operation in scope.
+ * for the {@link FsContextController} operation in progress.
  * <p>
  * TODO: When adding any input operation parameters, make {@link #setOperation}
  * really thread-safe.
@@ -45,15 +45,15 @@ final class FsOperationContext {
     private @CheckForNull BitField<FsOutputOption> outputOptions;
 
     /**
-     * Returns the options for the output operation in scope.
-     * If the operation in scope is not an output operation, then
+     * Returns the options for the output operation in progress.
+     * If the operation in progress is not an output operation, then
      * {@code null} is returned.
-     * Otherwise, if the output operation in scope does not accept options,
+     * Otherwise, if the output operation in progress does not accept options,
      * then an empty bit field is returned.
      * Otherwise, a bit field with the options for the output operation is
      * returned.
      * 
-     * @return The options for the output operation in scope.
+     * @return The options for the output operation in progress.
      * @see    FsContextController#getOutputSocket(FsEntryName, BitField, Entry)
      * @see    FsContextController#mknod(FsEntryName, Entry.Type, BitField, Entry)
      */
@@ -62,9 +62,9 @@ final class FsOperationContext {
     }
 
     /**
-     * Sets the options for the output operation in scope.
+     * Sets the options for the output operation in progress.
      *
-     * @param outputOptions the options for the output operation in scope.
+     * @param outputOptions the options for the output operation in progress.
      * @see   #getOutputOptions()
      */
     void setOutputOptions(final @Nullable BitField<FsOutputOption> outputOptions) {

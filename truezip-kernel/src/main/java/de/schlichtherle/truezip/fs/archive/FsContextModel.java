@@ -18,14 +18,16 @@ package de.schlichtherle.truezip.fs.archive;
 import de.schlichtherle.truezip.fs.FsConcurrentController;
 import de.schlichtherle.truezip.fs.FsConcurrentModel;
 import de.schlichtherle.truezip.fs.FsModel;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import net.jcip.annotations.ThreadSafe;
 
 /**
  * A concurrent file system model which provides the original values of
- * selected parameters for the {@link FsContextController} operation in scope
- * as a context.
+ * selected parameters for the {@link FsContextController} operation in
+ * progress.
  *
  * @see     FsContextController
  * @since   TrueZIP 7.3
@@ -36,7 +38,7 @@ import net.jcip.annotations.ThreadSafe;
 @DefaultAnnotation(NonNull.class)
 final class FsContextModel extends FsConcurrentModel {
 
-    private volatile FsOperationContext context = new FsOperationContext();
+    private volatile @CheckForNull FsOperationContext context;
 
     FsContextModel(FsModel model) {
         super(model);
@@ -44,21 +46,21 @@ final class FsContextModel extends FsConcurrentModel {
 
     /**
      * Returns a JavaBean which represents the original values of selected
-     * parameters for the {@link FsContextController} operation in scope.
+     * parameters for the {@link FsContextController} operation in progress.
      * It's an error to call this method if an {@code FsContextController}
-     * operation is not in scope and the result is undefined.
+     * operation is not in progress and the result is undefined.
      * 
      * @return A JavaBean which represents the original values of selected
      *         parameters for the {@link FsContextController} operation in
-     *         scope.
+     *         progress.
      */
-    public FsOperationContext getContext() {
+    public @Nullable FsOperationContext getContext() {
         return context;
     }
 
     /**
      * Sets the JavaBean which represents the original values of selected
-     * parameters for the {@link FsContextController} operation in scope.
+     * parameters for the {@link FsContextController} operation in progress.
      * This method should only get called by the class
      * {@link FsContextController}.
      * <p>
@@ -74,11 +76,10 @@ final class FsContextModel extends FsConcurrentModel {
      * 
      * @param context the JavaBean which represents the original values of
      *        selected parameters for the {@link FsContextController}
-     *        operation in scope.
+     *        operation in progress.
      * @see   #getContext()
      */
-    void setContext(final FsOperationContext context) {
-        assert null != context;
+    void setContext(final @Nullable FsOperationContext context) {
         this.context = context;
     }
 
