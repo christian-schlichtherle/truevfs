@@ -183,7 +183,7 @@ extends FsFileSystemArchiveController<E> {
             final InputSocket<?> socket = driver.getInputSocket(
                     parent, parentName, MOUNT_INPUT_OPTIONS);
             setInput(new Input(driver.newInputShop(getModel(), socket)));
-            setFileSystem(newArchiveFileSystem(driver,
+            setFileSystem(newPopulatedFileSystem(driver,
                     getInput().getDelegate(), socket.getLocalTarget(), readOnly));
         } catch (FsException ex) {
             throw ex;
@@ -197,7 +197,7 @@ extends FsFileSystemArchiveController<E> {
             // The entry does NOT exist in the parent archive
             // file, but we may create it automatically.
             final FsArchiveFileSystem<E> fileSystem
-                    = newArchiveFileSystem(driver);
+                    = newEmptyFileSystem(driver);
             // This may fail if e.g. the container file is an RAES
             // encrypted ZIP file and the user cancels password
             // prompting.
