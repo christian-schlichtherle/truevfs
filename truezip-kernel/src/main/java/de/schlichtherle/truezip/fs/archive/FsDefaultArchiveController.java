@@ -70,7 +70,7 @@ import static de.schlichtherle.truezip.io.Paths.isRoot;
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
-public final class FsDefaultArchiveController<E extends FsArchiveEntry>
+final class FsDefaultArchiveController<E extends FsArchiveEntry>
 extends FsFileSystemArchiveController<E> {
 
     private static final BitField<FsOutputOption>
@@ -104,18 +104,6 @@ extends FsFileSystemArchiveController<E> {
             = new TouchListener();
 
     /**
-     * @deprecated
-     * @see #FsDefaultArchiveController(FsConcurrentModel, FsController, FsArchiveDriver)
-     */
-    @Deprecated
-    public FsDefaultArchiveController(
-            final FsConcurrentModel model,
-            final FsArchiveDriver<E> driver,
-            final FsController<?> parent) {
-        this(model, parent, driver);
-    }
-
-    /**
      * Constructs a new archive file system controller.
      * 
      * @param model the file system model.
@@ -123,7 +111,7 @@ extends FsFileSystemArchiveController<E> {
      * @param driver the archive driver.
      * @since TrueZIP 7.2
      */
-    public FsDefaultArchiveController(
+    FsDefaultArchiveController(
             final FsConcurrentModel model,
             final FsController<?> parent,
             final FsArchiveDriver<E> driver) {
@@ -187,7 +175,6 @@ extends FsFileSystemArchiveController<E> {
     @Override
     void mount(final boolean autoCreate, BitField<FsOutputOption> options)
     throws IOException {
-        options = options.and(MOUNT_OUTPUT_MASK);
         try {
             // readOnly must be set first because the parent archive controller
             // could be a FileController and on Windows this property turns to
@@ -214,7 +201,7 @@ extends FsFileSystemArchiveController<E> {
             // This may fail if e.g. the container file is an RAES
             // encrypted ZIP file and the user cancels password
             // prompting.
-            makeOutput(options);
+            makeOutput(options.and(MOUNT_OUTPUT_MASK));
             setFileSystem(fileSystem);
         }
         getFileSystem().addFsArchiveFileSystemTouchListener(touchListener);
@@ -227,7 +214,7 @@ extends FsFileSystemArchiveController<E> {
      * @throws IOException on any I/O error.
      * @return The output.
      */
-    Output makeOutput(final BitField<FsOutputOption> options)
+    private Output makeOutput(final BitField<FsOutputOption> options)
     throws IOException {
         Output output = getOutput();
         if (null != output)
@@ -619,5 +606,5 @@ extends FsFileSystemArchiveController<E> {
             assert event.getSource() == getFileSystem();
             getModel().setTouched(true);
         }
-    } // class TouchListener
+    } // TouchListener
 }
