@@ -85,8 +85,6 @@ extends FsModelController<FsContextModel> {
             logger = Logger.getLogger(  FsArchiveController.class.getName(),
                                         FsArchiveController.class.getName());
 
-    private static final BitField<FsOutputOption>
-            AUTO_MOUNT_OPTIONS = BitField.noneOf(FsOutputOption.class);
     private static final BitField<FsSyncOption>
             UNLINK_SYNC_OPTIONS = BitField.of(ABORT_CHANGES);
 
@@ -105,8 +103,9 @@ extends FsModelController<FsContextModel> {
         return getModel().getContext();
     }
 
+    /** Equivalent to {@link #autoMount(boolean) autoMount(false)}. */
     final FsArchiveFileSystem<E> autoMount() throws IOException {
-        return autoMount(false, AUTO_MOUNT_OPTIONS);
+        return autoMount(false);
     }
 
     /**
@@ -120,15 +119,13 @@ extends FsModelController<FsContextModel> {
      * method will temporarily release all locks, so any preconditions must be
      * checked again upon return to protect against concurrent modifications!
      *
-     * @param autoCreate If the archive file does not exist and this is
-     *        {@code true}, a new file system with only a (virtual) root
-     *        directory is created with its last modification time set to the
-     *        system's current time.
-     * @return A valid archive file system - {@code null} is never returned.
+     * @param  autoCreate If the archive file does not exist and this is
+     *         {@code true}, a new archvie file system with only a (virtual)
+     *         root directory is created with its last modification time set
+     *         to the system's current time.
+     * @return An archive file system.
      */
-    abstract FsArchiveFileSystem<E> autoMount(
-            boolean autoCreate,
-            BitField<FsOutputOption> options)
+    abstract FsArchiveFileSystem<E> autoMount(boolean autoCreate)
     throws IOException;
 
     @Override
@@ -252,7 +249,7 @@ extends FsModelController<FsContextModel> {
             // Start creating or overwriting the archive entry.
             // This will fail if the entry already exists as a directory.
             return autoMount(   !name.isRoot()
-                                && options.get(CREATE_PARENTS), options)
+                                && options.get(CREATE_PARENTS))
                     .mknod(name, FILE, options, template);
         }
 
@@ -346,13 +343,13 @@ extends FsModelController<FsContextModel> {
             } catch (FsFalsePositiveException ex) {
                 if (DIRECTORY != type)
                     throw ex;
-                autoMount(true, options);
+                autoMount(true);
                 return;
             }
             throw new FsEntryNotFoundException(getModel(),
                     name, "directory exists already");
         } else {
-            autoMount(options.get(CREATE_PARENTS), options)
+            autoMount(options.get(CREATE_PARENTS))
                     .mknod(name, type, options, template)
                     .run();
         }

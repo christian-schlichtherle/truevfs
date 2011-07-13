@@ -73,11 +73,9 @@ final class FsDefaultArchiveController<E extends FsArchiveEntry>
 extends FsFileSystemArchiveController<E> {
 
     private static final BitField<FsOutputOption>
-            MOUNT_OUTPUT_MASK = BitField.of(CREATE_PARENTS, GROW);
+            MAKE_OUTPUT_MASK = BitField.of(CACHE, CREATE_PARENTS, GROW);
     private static final BitField<FsInputOption>
             MOUNT_INPUT_OPTIONS = BitField.of(FsInputOption.CACHE);
-    private static final BitField<FsOutputOption>
-            MAKE_OUTPUT_OPTIONS = BitField.noneOf(FsOutputOption.class);
     private static final BitField<FsSyncOption>
             SYNC_OPTIONS = BitField.of( WAIT_CLOSE_INPUT,
                                         WAIT_CLOSE_OUTPUT,
@@ -171,8 +169,7 @@ extends FsFileSystemArchiveController<E> {
     }
 
     @Override
-    void mount(final boolean autoCreate, BitField<FsOutputOption> options)
-    throws IOException {
+    void mount(final boolean autoCreate) throws IOException {
         try {
             // readOnly must be set first because the parent archive controller
             // could be a FileController and on Windows this property turns to
@@ -199,7 +196,7 @@ extends FsFileSystemArchiveController<E> {
             // This may fail if e.g. the container file is an RAES
             // encrypted ZIP file and the user cancels password
             // prompting.
-            makeOutput(options.and(MOUNT_OUTPUT_MASK));
+            makeOutput();
             setFileSystem(fileSystem);
         }
         getFileSystem().addFsArchiveFileSystemTouchListener(touchListener);
@@ -212,13 +209,17 @@ extends FsFileSystemArchiveController<E> {
      * @throws IOException on any I/O error.
      * @return The output.
      */
-    private Output makeOutput(final BitField<FsOutputOption> options)
+    private Output makeOutput()
     throws IOException {
         Output output = getOutput();
         if (null != output)
             return output;
+        final BitField<FsOutputOption> options = getContext()
+                .getOutputOptions()
+                .and(MAKE_OUTPUT_MASK)
+                .set(CACHE);
         final OutputSocket<?> socket = driver.getOutputSocket(
-                parent, parentName, options.set(FsOutputOption.CACHE), null);
+                parent, parentName, options, null);
         final Input input = getInput();
         setOutput(output = new Output(driver.newOutputShop(getModel(), socket,
                      null != input ? input.getDelegate() : null)));
@@ -232,7 +233,7 @@ extends FsFileSystemArchiveController<E> {
 
     @Override
     OutputSocket<?> getOutputSocket(final E entry) throws IOException {
-        return makeOutput(MAKE_OUTPUT_OPTIONS).getOutputSocket(entry);
+        return makeOutput().getOutputSocket(entry);
     }
 
     @Override
@@ -596,7 +597,7 @@ extends FsFileSystemArchiveController<E> {
         public void beforeTouch(FsArchiveFileSystemEvent<? extends E> event)
         throws IOException {
             assert event.getSource() == getFileSystem();
-            makeOutput(MAKE_OUTPUT_OPTIONS);
+            makeOutput();
         }
 
         @Override

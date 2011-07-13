@@ -17,8 +17,6 @@ package de.schlichtherle.truezip.fs.archive;
 
 import de.schlichtherle.truezip.fs.FsFalsePositiveException;
 import de.schlichtherle.truezip.fs.FsModel;
-import de.schlichtherle.truezip.fs.FsOutputOption;
-import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -51,11 +49,9 @@ extends FsArchiveController<E> {
     }
 
     @Override
-    final FsArchiveFileSystem<E> autoMount(
-            final boolean autoCreate,
-            final BitField<FsOutputOption> options)
+    final FsArchiveFileSystem<E> autoMount(final boolean autoCreate)
     throws IOException {
-        return mountState.autoMount(autoCreate, options);
+        return mountState.autoMount(autoCreate);
     }
 
     final @Nullable FsArchiveFileSystem<E> getFileSystem() {
@@ -83,16 +79,14 @@ extends FsArchiveController<E> {
      *        directory is created with its last modification time set to the
      *        system's current time.
      */
-    abstract void mount(boolean autoCreate, BitField<FsOutputOption> options)
-    throws IOException;
+    abstract void mount(boolean autoCreate) throws IOException;
 
     /**
      * Represents the mount state of the archive file system.
      * This is an abstract class: The state is implemented in the subclasses.
      */
     private static abstract class MountState<E extends FsArchiveEntry> {
-        abstract FsArchiveFileSystem<E> autoMount(boolean autoCreate,
-                                                BitField<FsOutputOption> options)
+        abstract FsArchiveFileSystem<E> autoMount(boolean autoCreate)
         throws IOException;
 
         @Nullable FsArchiveFileSystem<E> getFileSystem() {
@@ -104,13 +98,11 @@ extends FsArchiveController<E> {
 
     private class ResetFileSystem extends MountState<E> {
         @Override
-        FsArchiveFileSystem<E> autoMount(
-                final boolean autoCreate,
-                final BitField<FsOutputOption> options)
+        FsArchiveFileSystem<E> autoMount(final boolean autoCreate)
         throws IOException {
             getModel().assertWriteLockedByCurrentThread();
             try {
-                mount(autoCreate, options);
+                mount(autoCreate);
             } catch (FsCacheableFalsePositiveException ex) {
                 // Cache exception for false positive file system.
                 //   The state is reset when unlink() is called on the false
@@ -129,7 +121,7 @@ extends FsArchiveController<E> {
             // DON'T just call autoMounter.getFileSystem()!
             // This would return null if autoMounter is an instance of
             // FalsePositiveFileSystem.
-            return mountState.autoMount(autoCreate, options);
+            return mountState.autoMount(autoCreate);
         }
 
         @Override
@@ -150,8 +142,7 @@ extends FsArchiveController<E> {
         }
 
         @Override
-        FsArchiveFileSystem<E> autoMount(boolean autoCreate,
-                                        BitField<FsOutputOption> options) {
+        FsArchiveFileSystem<E> autoMount(boolean autoCreate) {
             return fileSystem;
         }
 
@@ -178,8 +169,7 @@ extends FsArchiveController<E> {
         }
 
         @Override
-        FsArchiveFileSystem<E> autoMount( boolean autoCreate,
-                                        BitField<FsOutputOption> options)
+        FsArchiveFileSystem<E> autoMount(boolean autoCreate)
         throws FsFalsePositiveException {
             throw exception;
         }
