@@ -182,8 +182,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
                                             BitField<FsOutputOption> options,
                                             @CheckForNull Entry template) {
         // Leave FsOutputOption.COMPRESS untouched - the driver shall be given
-        // opportunity to use its internal preferences to sort out such a
-        // conflict.
+        // opportunity to apply its own preferences to sort out such a conflict.
         return controller.getOutputSocket(name, options.set(STORE), template);
     }
 
