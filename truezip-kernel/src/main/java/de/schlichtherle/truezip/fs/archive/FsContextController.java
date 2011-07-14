@@ -44,7 +44,7 @@ import java.nio.channels.SeekableByteChannel;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.Icon;
-import net.jcip.annotations.ThreadSafe;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * A file system controller which decorates another file system controller in
@@ -56,7 +56,7 @@ import net.jcip.annotations.ThreadSafe;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@ThreadSafe
+@NotThreadSafe
 @DefaultAnnotation(NonNull.class)
 final class FsContextController
 extends FsDecoratingController< FsContextModel,
