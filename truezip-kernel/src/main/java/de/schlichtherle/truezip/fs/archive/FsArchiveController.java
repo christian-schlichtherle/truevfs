@@ -218,7 +218,7 @@ extends FsModelController<FsConcurrentModel> {
         public InputStream newInputStream() throws IOException {
             return getBoundSocket().newInputStream();
         }
-    } // class Input
+    } // Input
 
     abstract InputSocket<?> getInputSocket(String name) throws IOException;
 
@@ -302,7 +302,7 @@ extends FsModelController<FsConcurrentModel> {
                 }
             }
         }
-    } // class Output
+    } // Output
 
     private static class ProxyEntry
     extends DecoratingEntry<FsArchiveEntry>

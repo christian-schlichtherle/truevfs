@@ -166,7 +166,7 @@ extends FsDecoratingController< FsConcurrentModel,
             // is redundant, but it makes the stack trace much easier to digest.
             return getBoundSocket().newInputStream();
         }
-    } // class Input
+    } // Input
 
     @Override
     public OutputSocket<?> getOutputSocket(
@@ -241,7 +241,7 @@ extends FsDecoratingController< FsConcurrentModel,
             // is redundant, but it makes the stack trace much easier to digest.
             return getBoundSocket().newOutputStream();
         }
-    } // class Output
+    } // Output
 
     @Override
     public void mknod(  final FsEntryName name,
