@@ -93,7 +93,7 @@ extends DecoratingInputSocket<E> {
             if (null != delegate)
                 delegate.close();
         }
-    } // class ProxyReadOnlyFile
+    } // ProxyReadOnlyFile
 
     /**
      * Returns a proxy input stream which acquires its underlying input
@@ -170,5 +170,5 @@ extends DecoratingInputSocket<E> {
                 return false;
             }
         }
-    } // class ProxyInputStream
+    } // ProxyInputStream
 }
