@@ -203,7 +203,7 @@ extends DecoratingInputShop<E, InputShop<E>> {
                                 getBoundSocket().newInputStream()));
                 }
             }
-        } // class Input
+        } // Input
 
         return new Input();
     }
