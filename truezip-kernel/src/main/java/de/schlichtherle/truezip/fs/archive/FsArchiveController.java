@@ -232,31 +232,30 @@ extends FsModelController<FsContextModel> {
 
     private final class Output extends OutputSocket<FsArchiveEntry> {
         final FsEntryName name;
-        final BitField<FsOutputOption> options;
+        final boolean append;
         final @CheckForNull Entry template;
 
         Output( final FsEntryName name,
                 final BitField<FsOutputOption> options,
                 final @CheckForNull Entry template) {
             this.name = name;
-            this.options = options;
+            this.append = options.get(APPEND);
             this.template = template;
         }
 
         FsArchiveFileSystemOperation<E> mknod() throws IOException {
-            assert options.equals(getContext().getOutputOptions());
             autoSync(name, WRITE);
+            final BitField<FsOutputOption> options = getContext().getOutputOptions();
             // Start creating or overwriting the archive entry.
             // This will fail if the entry already exists as a directory.
-            return autoMount(   !name.isRoot()
-                                && options.get(CREATE_PARENTS))
+            return autoMount(!name.isRoot() && options.get(CREATE_PARENTS))
                     .mknod(name, FILE, options, template);
         }
 
         @Override
         public FsArchiveEntry getLocalTarget() throws IOException {
             final E entry = mknod().getTarget().getEntry();
-            if (options.get(APPEND)) {
+            if (append) {
                 // A proxy entry must get returned here in order to inhibit
                 // a peer target to recognize the type of this entry and
                 // change the contents of the transferred data accordingly.
@@ -272,7 +271,7 @@ extends FsModelController<FsContextModel> {
             final E entry = mknod.getTarget().getEntry();
             final OutputSocket<?> socket = getOutputSocket(entry);
             InputStream in = null;
-            if (options.get(APPEND)) {
+            if (append) {
                 try {
                     in = getInputSocket(entry.getName()).newInputStream();
                 } catch (FileNotFoundException ex) {
