@@ -45,7 +45,7 @@ Concepts
     The decomposition of this framework into separate modules enables users to
     easily configure the initial setup of the application's archive detection
     by simply adding or removing the JARs of the required file system driver
-    modules from or to the run time class path.
+    modules to or from the run time class path.
     This will cause the application to automatically detect the canonical file
     suffixes for the archive files supported by the respective file system
     driver modules - no XML or property file editing is required.
