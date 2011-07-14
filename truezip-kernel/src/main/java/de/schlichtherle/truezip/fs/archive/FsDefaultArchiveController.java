@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.archive;
 
+import de.schlichtherle.truezip.socket.DelegatingOutputSocket;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.io.InputBusyException;
@@ -230,13 +231,26 @@ extends FsFileSystemArchiveController<E> {
     }
 
     @Override
-    InputSocket<?> getInputSocket(final String name) throws IOException {
+    InputSocket<?> getInputSocket(final String name) {
         return getInput().getInputSocket(name);
     }
 
     @Override
-    OutputSocket<?> getOutputSocket(final E entry) throws IOException {
-        return makeOutput().getOutputSocket(entry);
+    OutputSocket<?> getOutputSocket(final E entry) {
+        class Output extends DelegatingOutputSocket<Entry> {
+            OutputSocket<? extends Entry> delegate;
+
+            @Override
+            protected OutputSocket<? extends Entry> getDelegate()
+            throws IOException {
+                final OutputSocket<? extends Entry> delegate = this.delegate;
+                return null != delegate
+                        ? delegate
+                        : (this.delegate = makeOutput().getOutputSocket(entry));
+            }
+        } // Output
+
+        return new Output();
     }
 
     @Override

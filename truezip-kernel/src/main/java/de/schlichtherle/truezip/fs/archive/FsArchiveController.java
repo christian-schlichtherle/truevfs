@@ -220,7 +220,7 @@ extends FsModelController<FsContextModel> {
         }
     } // Input
 
-    abstract InputSocket<?> getInputSocket(String name) throws IOException;
+    abstract InputSocket<?> getInputSocket(String name);
 
     @Override
     public final OutputSocket<?> getOutputSocket(
@@ -269,7 +269,6 @@ extends FsModelController<FsContextModel> {
         public OutputStream newOutputStream() throws IOException {
             final FsArchiveFileSystemOperation<E> mknod = mknod();
             final E entry = mknod.getTarget().getEntry();
-            final OutputSocket<?> socket = getOutputSocket(entry);
             InputStream in = null;
             if (append) {
                 try {
@@ -279,7 +278,7 @@ extends FsModelController<FsContextModel> {
                 }
             }
             try {
-                final OutputStream out = socket
+                final OutputStream out = getOutputSocket(entry)
                         .bind(null == in ? this : null)
                         .newOutputStream();
                 try {
@@ -324,9 +323,9 @@ extends FsModelController<FsContextModel> {
         public boolean setTime(Access type, long value) {
             return delegate.setTime(type, value);
         }
-    } // class ProxyEntry
+    } // ProxyEntry
 
-    abstract OutputSocket<?> getOutputSocket(E entry) throws IOException;
+    abstract OutputSocket<?> getOutputSocket(E entry);
 
     @Override
     public final void mknod(
