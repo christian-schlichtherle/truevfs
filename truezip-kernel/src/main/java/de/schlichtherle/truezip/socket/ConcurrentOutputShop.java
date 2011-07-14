@@ -190,7 +190,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
                             getBoundSocket().newOutputStream()));
                 }
             }
-        } // class Output
+        } // Output
 
         return new Output();
     }
