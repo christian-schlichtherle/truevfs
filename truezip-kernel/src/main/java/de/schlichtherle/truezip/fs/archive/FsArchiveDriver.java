@@ -17,7 +17,6 @@ package de.schlichtherle.truezip.fs.archive;
 
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Type;
-import de.schlichtherle.truezip.fs.FsConcurrentModel;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.fs.FsController;
@@ -185,10 +184,11 @@ extends FsDriver {
     newController(FsModel model, FsController<?> parent) {
         return  new FsConcurrentController(
                    new FsCachingController(
-                        new FsDefaultArchiveController<E>(
-                            new FsConcurrentModel(model),
-                            parent,
-                            this),
+                        new FsContextController(
+                            new FsDefaultArchiveController<E>(
+                                new FsContextModel(model),
+                                parent,
+                                this)),
                         getPool()));
     }
 

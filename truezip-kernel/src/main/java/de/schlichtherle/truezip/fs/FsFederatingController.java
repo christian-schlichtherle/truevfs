@@ -220,7 +220,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                         .newInputStream();
             }
         }
-    } // class Input
+    } // Input
 
     @Override
     public OutputSocket<?> getOutputSocket(
@@ -279,7 +279,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                         .newOutputStream();
             }
         }
-    } // class Output
+    } // Output
 
     @Override
     public void mknod(

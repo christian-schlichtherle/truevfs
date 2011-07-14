@@ -44,7 +44,7 @@
         </p>
         <pre><code>
     File file = new TFile("archive.tar.gz/README.TXT");
-    OutputStream in = new TFileOutputStream(file);
+    Writer out = new TFileWriter(file);
     try {
         // Write the file contents here.
         ...
