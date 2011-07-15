@@ -28,8 +28,9 @@ import net.jcip.annotations.NotThreadSafe;
 /**
  * Delegates all methods to another input socket.
  * 
+ * @see     DelegatingOutputSocket
  * @param   <E> The type of the {@link #getLocalTarget() local target}.
- * @since   TrueZIP 7.2
+ * @since   TrueZIP 7.3
  * @author  Christian Schlichtherle
  * @version $Id$
  */

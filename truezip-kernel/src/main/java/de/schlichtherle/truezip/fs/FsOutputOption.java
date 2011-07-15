@@ -94,7 +94,7 @@ public enum FsOutputOption {
      * Furthermore, if this happens, there may be no direct feedback available
      * to the caller.
      * 
-     * @since TrueZIP 7.2
+     * @since TrueZIP 7.3
      */
     GROW,
 }

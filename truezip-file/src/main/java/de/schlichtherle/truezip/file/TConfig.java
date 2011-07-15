@@ -149,6 +149,8 @@ public final class TConfig implements Closeable {
      * The default value of the
      * {@link #getInputPreferences input preferences} property, which is
      * {@link FsInputOptions#NO_INPUT_OPTIONS}.
+     * 
+     * @since TrueZIP 7.3
      */
     public static final BitField<FsInputOption>
             DEFAULT_INPUT_PREFERENCES = NO_INPUT_OPTIONS;
@@ -157,6 +159,8 @@ public final class TConfig implements Closeable {
      * The mask of allowed {@link #setInputPreferences input preferences},
      * which is
      * <code>{@link BitField}.of({@link FsInputOption#CACHE})</code>.
+     * 
+     * @since TrueZIP 7.3
      */
     public static final BitField<FsInputOption>
             INPUT_PREFERENCES_MASK = BitField
@@ -169,6 +173,8 @@ public final class TConfig implements Closeable {
      * The default value of the
      * {@link #getOutputPreferences output preferences} property, which is
      * <code>{@link BitField}.of({@link FsOutputOption#CREATE_PARENTS})</code>.
+     * 
+     * @since TrueZIP 7.3
      */
     public static final BitField<FsOutputOption>
             DEFAULT_OUTPUT_PREFERENCES = BitField.of(CREATE_PARENTS);
@@ -177,6 +183,8 @@ public final class TConfig implements Closeable {
      * The mask of allowed {@link #setOutputPreferences output preferences},
      * which is
      * <code>{@link BitField}.of({@link FsOutputOption#CACHE}, {@link FsOutputOption#CREATE_PARENTS}, {@link FsOutputOption#COMPRESS}, {@link FsOutputOption#STORE})</code>.
+     * 
+     * @since TrueZIP 7.3
      */
     public static final BitField<FsOutputOption>
             OUTPUT_PREFERENCES_MASK = BitField
@@ -372,6 +380,7 @@ public final class TConfig implements Closeable {
      * Returns the input preferences.
      * 
      * @return The input preferences.
+     * @since  TrueZIP 7.3
      */
     public BitField<FsInputOption> getInputPreferences() {
         return inputPreferences;
@@ -386,6 +395,7 @@ public final class TConfig implements Closeable {
      * @throws IllegalArgumentException if an option is present in
      *         {@code preferences} which is not present in
      *         {@link #INPUT_PREFERENCES_MASK}.
+     * @since  TrueZIP 7.3
      */
     public void setInputPreferences(final BitField<FsInputOption> preferences) {
         final BitField<FsInputOption> illegal = preferences
@@ -399,6 +409,7 @@ public final class TConfig implements Closeable {
      * Returns the output preferences.
      * 
      * @return The output preferences.
+     * @since  TrueZIP 7.3
      */
     public BitField<FsOutputOption> getOutputPreferences() {
         return outputPreferences;
@@ -415,6 +426,7 @@ public final class TConfig implements Closeable {
      *         {@link #OUTPUT_PREFERENCES_MASK} or if both
      *         {@link FsOutputOption#STORE} and
      *         {@link FsOutputOption#COMPRESS} have been set.
+     * @since  TrueZIP 7.3
      */
     public void setOutputPreferences(final BitField<FsOutputOption> preferences) {
         final BitField<FsOutputOption> illegal = preferences
