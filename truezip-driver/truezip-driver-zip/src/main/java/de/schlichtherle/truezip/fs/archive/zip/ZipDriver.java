@@ -183,6 +183,8 @@ implements ZipEntryFactory<ZipArchiveEntry> {
                                             @CheckForNull Entry template) {
         // Leave FsOutputOption.COMPRESS untouched - the driver shall be given
         // opportunity to apply its own preferences to sort out such a conflict.
+        /*if (options.get(GROW))
+            options = options.clear(GROW).set(APPEND);*/
         return controller.getOutputSocket(name, options.set(STORE), template);
     }
 
@@ -233,7 +235,9 @@ implements ZipEntryFactory<ZipArchiveEntry> {
      * {@link #newZipInputShop}.
      */
     @Override
-    public ZipInputShop newInputShop(FsModel model, InputSocket<?> input)
+    public ZipInputShop newInputShop(
+            final FsModel model,
+            final InputSocket<?> input)
     throws IOException {
         final ReadOnlyFile rof = input.newReadOnlyFile();
         try {
@@ -258,9 +262,9 @@ implements ZipEntryFactory<ZipArchiveEntry> {
      */
     @Override
     public OutputShop<ZipArchiveEntry> newOutputShop(
-            FsModel model,
-            OutputSocket<?> output,
-            @CheckForNull InputShop<ZipArchiveEntry> source)
+            final FsModel model,
+            final OutputSocket<?> output,
+            final @CheckForNull InputShop<ZipArchiveEntry> source)
     throws IOException {
         final OutputStream out = output.newOutputStream();
         try {
