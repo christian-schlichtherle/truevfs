@@ -66,5 +66,5 @@ public final class TZipFileTest extends TFileTestSuite {
             out.close();
         }
         TFile.umount();
-    }
+    }*/
 }
