@@ -81,5 +81,5 @@ extends DecoratingOutputSocket<E> {
             if (null != delegate)
                 delegate.close();
         }
-    } // class ProxyOutputStream
+    } // ProxyOutputStream
 }

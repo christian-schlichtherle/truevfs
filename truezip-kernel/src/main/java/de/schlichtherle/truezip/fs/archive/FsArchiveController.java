@@ -23,7 +23,6 @@ import de.schlichtherle.truezip.fs.FsEntryNotFoundException;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.fs.FsConcurrentModel;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.entry.Entry.Access;
@@ -79,15 +78,13 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
-public abstract class FsArchiveController<E extends FsArchiveEntry>
-extends FsModelController<FsConcurrentModel> {
+abstract class FsArchiveController<E extends FsArchiveEntry>
+extends FsModelController<FsContextModel> {
 
     private static final Logger
             logger = Logger.getLogger(  FsArchiveController.class.getName(),
                                         FsArchiveController.class.getName());
 
-    private static final BitField<FsOutputOption>
-            AUTO_MOUNT_OPTIONS = BitField.noneOf(FsOutputOption.class);
     private static final BitField<FsSyncOption>
             UNLINK_SYNC_OPTIONS = BitField.of(ABORT_CHANGES);
 
@@ -96,14 +93,19 @@ extends FsModelController<FsConcurrentModel> {
      *
      * @param model the non-{@code null} archive model.
      */
-    protected FsArchiveController(final FsConcurrentModel model) {
+    FsArchiveController(final FsContextModel model) {
         super(model);
         if (null == model.getParent())
             throw new IllegalArgumentException();
     }
 
+    final FsOperationContext getContext() {
+        return getModel().getContext();
+    }
+
+    /** Equivalent to {@link #autoMount(boolean) autoMount(false)}. */
     final FsArchiveFileSystem<E> autoMount() throws IOException {
-        return autoMount(false, AUTO_MOUNT_OPTIONS);
+        return autoMount(false);
     }
 
     /**
@@ -117,15 +119,13 @@ extends FsModelController<FsConcurrentModel> {
      * method will temporarily release all locks, so any preconditions must be
      * checked again upon return to protect against concurrent modifications!
      *
-     * @param autoCreate If the archive file does not exist and this is
-     *        {@code true}, a new file system with only a (virtual) root
-     *        directory is created with its last modification time set to the
-     *        system's current time.
-     * @return A valid archive file system - {@code null} is never returned.
+     * @param  autoCreate If the archive file does not exist and this is
+     *         {@code true}, a new archvie file system with only a (virtual)
+     *         root directory is created with its last modification time set
+     *         to the system's current time.
+     * @return An archive file system.
      */
-    abstract FsArchiveFileSystem<E> autoMount(
-            boolean autoCreate,
-            BitField<FsOutputOption> options)
+    abstract FsArchiveFileSystem<E> autoMount(boolean autoCreate)
     throws IOException;
 
     @Override
@@ -218,44 +218,44 @@ extends FsModelController<FsConcurrentModel> {
         public InputStream newInputStream() throws IOException {
             return getBoundSocket().newInputStream();
         }
-    } // class Input
+    } // Input
 
-    abstract InputSocket<?> getInputSocket(String name) throws IOException;
+    abstract InputSocket<?> getInputSocket(String name);
 
     @Override
     public final OutputSocket<?> getOutputSocket(
             FsEntryName name,
             BitField<FsOutputOption> options,
-            @CheckForNull Entry template) {
+            Entry template) {
         return new Output(name, options, template);
     }
 
     private final class Output extends OutputSocket<FsArchiveEntry> {
         final FsEntryName name;
-        final BitField<FsOutputOption> options;
+        final boolean append;
         final @CheckForNull Entry template;
 
         Output( final FsEntryName name,
                 final BitField<FsOutputOption> options,
                 final @CheckForNull Entry template) {
             this.name = name;
-            this.options = options;
+            this.append = options.get(APPEND);
             this.template = template;
         }
 
         FsArchiveFileSystemOperation<E> mknod() throws IOException {
             autoSync(name, WRITE);
+            final BitField<FsOutputOption> options = getContext().getOutputOptions();
             // Start creating or overwriting the archive entry.
             // This will fail if the entry already exists as a directory.
-            return autoMount(   !name.isRoot()
-                                && options.get(CREATE_PARENTS), options)
+            return autoMount(!name.isRoot() && options.get(CREATE_PARENTS))
                     .mknod(name, FILE, options, template);
         }
 
         @Override
         public FsArchiveEntry getLocalTarget() throws IOException {
             final E entry = mknod().getTarget().getEntry();
-            if (options.get(APPEND)) {
+            if (append) {
                 // A proxy entry must get returned here in order to inhibit
                 // a peer target to recognize the type of this entry and
                 // change the contents of the transferred data accordingly.
@@ -269,9 +269,8 @@ extends FsModelController<FsConcurrentModel> {
         public OutputStream newOutputStream() throws IOException {
             final FsArchiveFileSystemOperation<E> mknod = mknod();
             final E entry = mknod.getTarget().getEntry();
-            final OutputSocket<?> socket = getOutputSocket(entry);
             InputStream in = null;
-            if (options.get(APPEND)) {
+            if (append) {
                 try {
                     in = getInputSocket(entry.getName()).newInputStream();
                 } catch (FileNotFoundException ex) {
@@ -279,7 +278,7 @@ extends FsModelController<FsConcurrentModel> {
                 }
             }
             try {
-                final OutputStream out = socket
+                final OutputStream out = getOutputSocket(entry)
                         .bind(null == in ? this : null)
                         .newOutputStream();
                 try {
@@ -301,9 +300,9 @@ extends FsModelController<FsConcurrentModel> {
                 }
             }
         }
-    } // class Output
+    } // Output
 
-    private static class ProxyEntry
+    private static final class ProxyEntry
     extends DecoratingEntry<FsArchiveEntry>
     implements FsArchiveEntry {
         ProxyEntry(FsArchiveEntry entry) {
@@ -324,30 +323,31 @@ extends FsModelController<FsConcurrentModel> {
         public boolean setTime(Access type, long value) {
             return delegate.setTime(type, value);
         }
-    } // class ProxyEntry
+    } // ProxyEntry
 
-    abstract OutputSocket<?> getOutputSocket(E entry) throws IOException;
+    abstract OutputSocket<?> getOutputSocket(E entry);
 
     @Override
     public final void mknod(
             final FsEntryName name,
             final Type type,
             final BitField<FsOutputOption> options,
-            final @CheckForNull Entry template)
+            final Entry template)
     throws IOException {
+        assert options.equals(getContext().getOutputOptions());
         if (name.isRoot()) {
             try {
                 autoMount(); // detect false positives!
             } catch (FsFalsePositiveException ex) {
                 if (DIRECTORY != type)
                     throw ex;
-                autoMount(true, options);
+                autoMount(true);
                 return;
             }
             throw new FsEntryNotFoundException(getModel(),
                     name, "directory exists already");
         } else {
-            autoMount(options.get(CREATE_PARENTS), options)
+            autoMount(options.get(CREATE_PARENTS))
                     .mknod(name, type, options, template)
                     .run();
         }

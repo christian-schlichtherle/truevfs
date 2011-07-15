@@ -1001,8 +1001,12 @@ public final class TPath implements Path {
     BitField<FsInputOption> mapInput(final Set<? extends OpenOption> options) {
         final int s = options.size();
         if (0 == s || 1 == s && options.contains(StandardOpenOption.READ))
-            return NO_INPUT_OPTIONS;
+            return getInputPreferences();
         throw new IllegalArgumentException(options.toString());
+    }
+
+    BitField<FsInputOption> getInputPreferences() {
+        return TConfig.get().getInputPreferences();
     }
 
     BitField<FsOutputOption> mapOutput(final OpenOption... options) {
@@ -1013,9 +1017,7 @@ public final class TPath implements Path {
     }
 
     BitField<FsOutputOption> mapOutput(final Set<? extends OpenOption> options) {
-        final EnumSet<FsOutputOption> set = EnumSet.noneOf(FsOutputOption.class);
-        if (shouldCreateParents())
-            set.add(CREATE_PARENTS);
+        final EnumSet<FsOutputOption> set = NO_OUTPUT_OPTIONS.toEnumSet();
         for (final OpenOption option : options) {
             if (!(option instanceof StandardOpenOption))
                 throw new UnsupportedOperationException(option.toString());
@@ -1036,13 +1038,17 @@ public final class TPath implements Path {
                     throw new UnsupportedOperationException(option.toString());
             }
         }
-        return set.isEmpty()
-                ? NO_OUTPUT_OPTIONS
-                : BitField.copyOf(set);
+        final BitField<FsOutputOption> prefs = getOutputPreferences();
+        return set.isEmpty() ? prefs : prefs.or(BitField.copyOf(set));
     }
 
-    boolean shouldCreateParents() {
-        return null != getMountPoint().getParent() && TConfig.get().isLenient();
+    BitField<FsOutputOption> getOutputPreferences() {
+        final BitField<FsOutputOption> prefs = TConfig
+                .get()
+                .getOutputPreferences();
+        return null != getMountPoint().getParent()
+                ? prefs
+                : prefs.clear(CREATE_PARENTS);
     }
 
     /**

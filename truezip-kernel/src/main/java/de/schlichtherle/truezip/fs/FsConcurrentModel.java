@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -23,7 +24,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * Supports multiple concurrent reader threads.
+ * A file system model which supports multiple concurrent reader threads.
  *
  * @see     FsConcurrentController
  * @author  Christian Schlichtherle
@@ -31,7 +32,7 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-public final class FsConcurrentModel extends FsDecoratingModel<FsModel> {
+public class FsConcurrentModel extends FsDecoratingModel<FsModel> {
 
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
@@ -80,9 +81,24 @@ public final class FsConcurrentModel extends FsDecoratingModel<FsModel> {
      * @throws FsNotWriteLockedException if the <i>read lock</i> is
      *         held by the current thread.
      */
-    void assertNotReadLockedByCurrentThread(FsNotWriteLockedException ex)
+    void assertNotReadLockedByCurrentThread(
+            @CheckForNull FsNotWriteLockedException ex)
     throws FsNotWriteLockedException {
         if (0 < lock.getReadHoldCount())
             throw new FsNotWriteLockedException(this, ex);
+    }
+
+    /**
+     * Returns a string representation of this object for debugging and logging
+     * purposes.
+     */
+    @Override
+    public String toString() {
+        return new StringBuilder()
+                .append(getClass().getName())
+                .append("[delegate=")
+                .append(delegate)
+                .append("]")
+                .toString();
     }
 }
