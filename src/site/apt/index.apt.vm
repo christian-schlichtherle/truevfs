@@ -11,6 +11,7 @@ About
     TrueZIP is a Java based plug-in framework for virtual file systems (VFS)
     which provides transparent access to archive files as if they were just
     plain directories.
+    The most recent version of TrueZIP is ${project.version}.
 
     Key Claims:
 
