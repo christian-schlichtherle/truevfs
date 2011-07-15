@@ -53,6 +53,8 @@ class FileEntry
 extends FsEntry
 implements IOEntry<FileEntry>, Releasable<IOException> {
 
+    private static final File CURRENT_DIRECTORY = new File("");
+
     private final File file;
     private final String name;
     volatile @CheckForNull TempFilePool pool;
@@ -72,8 +74,13 @@ implements IOEntry<FileEntry>, Releasable<IOException> {
     public final FileEntry createTempFile() throws IOException {
         TempFilePool pool = this.pool;
         if (null == pool)
-            pool = this.pool = new TempFilePool(file.getParentFile());
+            pool = this.pool = new TempFilePool(getRealParent(file));
         return pool.allocate();
+    }
+
+    private static File getRealParent(File path) {
+        File parent = path.getParentFile();
+        return null != parent ? parent : CURRENT_DIRECTORY;
     }
 
     @Override
