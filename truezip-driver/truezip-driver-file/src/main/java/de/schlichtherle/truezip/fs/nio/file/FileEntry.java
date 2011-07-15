@@ -34,6 +34,7 @@ import java.util.Collections;
 import java.nio.file.DirectoryStream;
 import static java.nio.file.Files.*;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import static java.io.File.*;
 import java.util.LinkedHashSet;
@@ -53,6 +54,8 @@ import net.jcip.annotations.Immutable;
 class FileEntry
 extends FsEntry
 implements IOEntry<FileEntry>, Releasable<IOException> {
+
+    private static final Path CURRENT_DIRECTORY = Paths.get("");
 
     private final Path path;
     private final String name;
@@ -77,8 +80,13 @@ implements IOEntry<FileEntry>, Releasable<IOException> {
     public final FileEntry createTempFile() throws IOException {
         TempFilePool pool = this.pool;
         if (null == pool)
-            pool = this.pool = new TempFilePool(path.getParent());
+            pool = this.pool = new TempFilePool(getRealParent(path));
         return pool.allocate();
+    }
+
+    private static Path getRealParent(Path path) {
+        Path parent = path.getParent();
+        return null != parent ? parent : CURRENT_DIRECTORY;
     }
 
     @Override
