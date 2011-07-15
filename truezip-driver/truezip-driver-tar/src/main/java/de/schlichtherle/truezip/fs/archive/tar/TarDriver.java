@@ -16,14 +16,15 @@
 package de.schlichtherle.truezip.fs.archive.tar;
 
 import de.schlichtherle.truezip.entry.Entry;
-import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
-import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
+import static de.schlichtherle.truezip.entry.Entry.Access.*;
+import static de.schlichtherle.truezip.entry.Entry.Size.*;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsInputOption;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.FsOutputOption;
+import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriver;
 import de.schlichtherle.truezip.fs.archive.FsMultiplexedArchiveOutputShop;
 import de.schlichtherle.truezip.socket.IOPool;
@@ -95,10 +96,7 @@ public class TarDriver extends FsCharsetArchiveDriver<TarArchiveEntry> {
                                             FsEntryName name,
                                             BitField<FsOutputOption> options,
                                             @CheckForNull Entry template) {
-        return controller.getOutputSocket(
-                name,
-                options.set(FsOutputOption.COMPRESS),
-                template);
+        return controller.getOutputSocket(name, options.set(COMPRESS), template);
     }
 
     @Override
