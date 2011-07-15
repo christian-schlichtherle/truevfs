@@ -29,7 +29,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public final class TZipFileTest extends TFileTestSuite {
@@ -38,9 +38,7 @@ public final class TZipFileTest extends TFileTestSuite {
         super(FsScheme.create("zip"), new ZipDriver(IO_POOL_PROVIDER));
     }
 
-    private static final String TEXT = "Hello world!";
-
-    @Test
+    /*@Test
     public void testGrow() throws IOException {
         final TFile entry = new TFile(getArchive(), "entry");
         assertPrint(entry);
@@ -63,7 +61,7 @@ public final class TZipFileTest extends TFileTestSuite {
     private void assertPrint(final TFile entry) throws IOException {
         final PrintWriter out = new PrintWriter(new TFileWriter(entry));
         try {
-            out.println(TEXT);
+            out.println("Hello world!");
         } finally {
             out.close();
         }
