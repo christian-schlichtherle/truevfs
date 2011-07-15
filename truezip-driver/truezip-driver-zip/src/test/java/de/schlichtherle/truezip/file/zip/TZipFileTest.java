@@ -38,7 +38,7 @@ public final class TZipFileTest extends TFileTestSuite {
         super(FsScheme.create("zip"), new ZipDriver(IO_POOL_PROVIDER));
     }
 
-    /*private static final String TEXT = "Hello world!";
+    private static final String TEXT = "Hello world!";
 
     @Test
     public void testGrow() throws IOException {
@@ -68,5 +68,5 @@ public final class TZipFileTest extends TFileTestSuite {
             out.close();
         }
         TFile.umount();
-    }*/
+    }
 }
