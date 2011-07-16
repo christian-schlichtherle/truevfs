@@ -330,7 +330,7 @@ public final class IOCache implements Flushable, Closeable {
 
         @Override
         public Entry getLocalTarget() throws IOException {
-            Buffer buffer = this.buffer;
+            final Buffer buffer = this.buffer;
             return null != buffer
                     ? buffer.data
                     : new CacheEntry(output.getLocalTarget());
