@@ -67,13 +67,13 @@ extends OutputSocket<E> {
     }
 
     @Override
-    public OutputStream newOutputStream() throws IOException {
-        return getBoundSocket().newOutputStream();
+    public SeekableByteChannel newSeekableByteChannel() throws IOException {
+        return getBoundSocket().newSeekableByteChannel();
     }
 
     @Override
-    public SeekableByteChannel newSeekableByteChannel() throws IOException {
-        return getBoundSocket().newSeekableByteChannel();
+    public OutputStream newOutputStream() throws IOException {
+        return getBoundSocket().newOutputStream();
     }
 
     /**
