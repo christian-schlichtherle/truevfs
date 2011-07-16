@@ -248,7 +248,7 @@ public final class IOCache implements Flushable, Closeable {
      * @return An input socket for reading the cached entry data.
      */
     public InputSocket<?> getInputSocket() {
-        return new CacheInputSocket();
+        return new Input();
     }
 
     /**
@@ -257,7 +257,7 @@ public final class IOCache implements Flushable, Closeable {
      * @return An output socket for writing the cached entry data.
      */
     public OutputSocket<?> getOutputSocket() {
-        return new CacheOutputSocket();
+        return new Output();
     }
 
     private InputBufferPool getInputBufferPool() {
@@ -290,14 +290,12 @@ public final class IOCache implements Flushable, Closeable {
         }
     }
 
-    private final class CacheInputSocket
-    extends InputSocket<Entry> {
-        @CheckForNull
-        private volatile Buffer buffer;
+    private final class Input extends InputSocket<Entry> {
+        private volatile @CheckForNull Buffer buffer;
 
         @Override
         public Entry getLocalTarget() throws IOException {
-            Buffer buffer = this.buffer;
+            final Buffer buffer = this.buffer;
             return null != buffer
                     ? buffer.data
                     : new CacheEntry(input.getLocalTarget());
@@ -325,12 +323,10 @@ public final class IOCache implements Flushable, Closeable {
         private Buffer getBuffer() throws IOException {
             return buffer = getInputBufferPool().allocate();
         }
-    } // CacheInputSocket
+    } // Input
 
-    private final class CacheOutputSocket
-    extends OutputSocket<Entry> {
-        @CheckForNull
-        private volatile Buffer buffer;
+    private final class Output extends OutputSocket<Entry> {
+        private volatile @CheckForNull Buffer buffer;
 
         @Override
         public Entry getLocalTarget() throws IOException {
@@ -357,7 +353,7 @@ public final class IOCache implements Flushable, Closeable {
         private Buffer getBuffer() throws IOException {
             return buffer = getOutputBufferPool().allocate();
         }
-    } // CacheOutputSocket
+    } // Output
 
     /** Hides backing store entries. */
     private static class CacheEntry extends DecoratingEntry<Entry> {
