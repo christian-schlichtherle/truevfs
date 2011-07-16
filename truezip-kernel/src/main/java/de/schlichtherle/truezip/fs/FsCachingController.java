@@ -107,14 +107,14 @@ extends FsDecoratingController< FsConcurrentModel,
     public InputSocket<?> getInputSocket(
             FsEntryName name,
             BitField<FsInputOption> options) {
-        return new CacheInputSocket(name, options);
+        return new Input(name, options);
     }
 
-    private final class CacheInputSocket extends DecoratingInputSocket<Entry> {
+    private final class Input extends DecoratingInputSocket<Entry> {
         final FsEntryName name;
         final BitField<FsInputOption> options;
 
-        CacheInputSocket(final FsEntryName name, final BitField<FsInputOption> options) {
+        Input(final FsEntryName name, final BitField<FsInputOption> options) {
             super(delegate.getInputSocket(name, options));
             this.name = name;
             this.options = options;
@@ -173,15 +173,15 @@ extends FsDecoratingController< FsConcurrentModel,
             FsEntryName name,
             BitField<FsOutputOption> options,
             Entry template) {
-        return new CacheOutputSocket(name, options, template);
+        return new Output(name, options, template);
     }
 
-    private final class CacheOutputSocket extends DecoratingOutputSocket<Entry> {
+    private final class Output extends DecoratingOutputSocket<Entry> {
         final FsEntryName name;
         final BitField<FsOutputOption> options;
         final @CheckForNull Entry template;
 
-        CacheOutputSocket( final FsEntryName name,
+        Output( final FsEntryName name,
                 final BitField<FsOutputOption> options,
                 final @CheckForNull Entry template) {
             super(delegate.getOutputSocket(name, options, template));
@@ -325,14 +325,14 @@ extends FsDecoratingController< FsConcurrentModel,
         OIO() {
             @Override
             OutputSocket<?> newOutputSocket(EntryCache cache, OutputSocket <?> output) {
-                return cache.new EntryOutputSocket(output);
+                return cache.new Output(output);
             }
         },
 
         NIO() {
             @Override
             OutputSocket<?> newOutputSocket(EntryCache cache, OutputSocket <?> output) {
-                return cache.new Nio2EntryOutputSocket(output);
+                return cache.new Nio2Output(output);
             }
         };
         
@@ -355,8 +355,7 @@ extends FsDecoratingController< FsConcurrentModel,
 
         EntryCache configure(BitField<FsInputOption> options) {
             options = options.clear(FsInputOption.CACHE); // consume
-            cache.configure(new EntryInputSocket(
-                    delegate.getInputSocket(name, options)));
+            cache.configure(new Input(delegate.getInputSocket(name, options)));
             input = null;
             return this;
         }
@@ -395,9 +394,8 @@ extends FsDecoratingController< FsConcurrentModel,
                         cache.getOutputSocket()));
         }
 
-        private final class EntryInputSocket
-        extends DecoratingInputSocket<Entry> {
-            EntryInputSocket(InputSocket <?> input) {
+        private final class Input extends DecoratingInputSocket<Entry> {
+            Input(InputSocket <?> input) {
                 super(input);
             }
 
@@ -419,12 +417,11 @@ extends FsDecoratingController< FsConcurrentModel,
                 caches.put(name, EntryCache.this);
                 return in;
             }
-        } // EntryInputSocket
+        } // Input
 
         /** An output socket proxy which supports NIO.2. */
-        private final class Nio2EntryOutputSocket
-        extends EntryOutputSocket {
-            Nio2EntryOutputSocket(OutputSocket <?> output) {
+        private final class Nio2Output extends Output {
+            Nio2Output(OutputSocket <?> output) {
                 super(output);
             }
 
@@ -440,9 +437,8 @@ extends FsDecoratingController< FsConcurrentModel,
         } // Nio2EntryOutputSocket
 
         /** An output socket proxy. */
-        private class EntryOutputSocket
-        extends DecoratingOutputSocket<Entry> {
-            EntryOutputSocket(OutputSocket <?> output) {
+        private class Output extends DecoratingOutputSocket<Entry> {
+            Output(OutputSocket <?> output) {
                 super(output);
             }
 
@@ -455,7 +451,7 @@ extends FsDecoratingController< FsConcurrentModel,
                 caches.put(name, EntryCache.this);
                 return new EntryOutputStream(out);
             }
-        } // EntryOutputSocket
+        } // Output
 
         /** An output stream proxy. */
         private final class EntrySeekableByteChannel
