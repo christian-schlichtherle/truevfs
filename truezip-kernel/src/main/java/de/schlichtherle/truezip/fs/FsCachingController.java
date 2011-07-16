@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import de.schlichtherle.truezip.io.DecoratingInputStream;
 import net.jcip.annotations.Immutable;
 import de.schlichtherle.truezip.util.JSE7;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
@@ -405,10 +406,22 @@ extends FsDecoratingController< FsConcurrentModel,
                 assert getModel().isWriteLockedByCurrentThread();
                 final InputStream in = getBoundSocket().newInputStream();
                 assert getModel().isTouched();
-                caches.put(name, EntryCache.this);
-                return in;
+                return new EntryInputStream(in);
             }
         } // Input
+
+        /** An input stream proxy. */
+        private final class EntryInputStream extends DecoratingInputStream {
+            EntryInputStream(InputStream in) {
+                super(in);
+            }
+
+            @Override
+            public void close() throws IOException {
+                delegate.close();
+                caches.put(name, EntryCache.this);
+            }
+        } // EntryInputStream
 
         /** An output socket proxy which supports NIO.2. */
         private final class Nio2Output extends Output {
@@ -467,8 +480,7 @@ extends FsDecoratingController< FsConcurrentModel,
         } // EntrySeekableByteChannel
 
         /** An output stream proxy. */
-        private final class EntryOutputStream
-        extends DecoratingOutputStream {
+        private final class EntryOutputStream extends DecoratingOutputStream {
             EntryOutputStream(OutputStream out) {
                 super(out);
             }
