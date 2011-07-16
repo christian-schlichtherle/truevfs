@@ -68,8 +68,8 @@ extends InputSocket<E> {
     }
 
     @Override
-    public InputStream newInputStream() throws IOException {
-        return getBoundSocket().newInputStream();
+    public SeekableByteChannel newSeekableByteChannel() throws IOException {
+        return getBoundSocket().newSeekableByteChannel();
     }
 
     @Override
@@ -78,8 +78,8 @@ extends InputSocket<E> {
     }
 
     @Override
-    public SeekableByteChannel newSeekableByteChannel() throws IOException {
-        return getBoundSocket().newSeekableByteChannel();
+    public InputStream newInputStream() throws IOException {
+        return getBoundSocket().newInputStream();
     }
 
     /**
