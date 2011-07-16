@@ -42,7 +42,7 @@ extends DelegatingOutputSocket<E> {
     }
 
     @Override
-    protected final OutputSocket<? extends E> getDelegate() {
+    protected OutputSocket<? extends E> getDelegate() {
         return delegate;
     }
 
