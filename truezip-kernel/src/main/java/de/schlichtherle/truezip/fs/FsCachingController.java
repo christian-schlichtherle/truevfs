@@ -134,36 +134,31 @@ extends FsDecoratingController< FsConcurrentModel,
 
         @Override
         public Entry getLocalTarget() throws IOException {
-            // This is the same as the code in the super class, so overriding
-            // is redundant, but it makes the stack trace much easier to digest.
+            // Same implementation as super class, but makes stack trace nicer.
             return getBoundSocket().getLocalTarget();
         }
 
         @Override
         public Entry getPeerTarget() throws IOException {
-            // This is the same as the code in the super class, so overriding
-            // is redundant, but it makes the stack trace much easier to digest.
+            // Same implementation as super class, but makes stack trace nicer.
             return getBoundSocket().getPeerTarget();
         }
 
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            // This is the same as the code in the super class, so overriding
-            // is redundant, but it makes the stack trace much easier to digest.
+            // Same implementation as super class, but makes stack trace nicer.
             return getBoundSocket().newSeekableByteChannel();
         }
 
         @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
-            // This is the same as the code in the super class, so overriding
-            // is redundant, but it makes the stack trace much easier to digest.
+            // Same implementation as super class, but makes stack trace nicer.
             return getBoundSocket().newReadOnlyFile();
         }
 
         @Override
         public InputStream newInputStream() throws IOException {
-            // This is the same as the code in the super class, so overriding
-            // is redundant, but it makes the stack trace much easier to digest.
+            // Same implementation as super class, but makes stack trace nicer.
             return getBoundSocket().newInputStream();
         }
     } // Input
@@ -216,29 +211,25 @@ extends FsDecoratingController< FsConcurrentModel,
 
         @Override
         public Entry getLocalTarget() throws IOException {
-            // This is the same as the code in the super class, so overriding
-            // is redundant, but it makes the stack trace much easier to digest.
+            // Same implementation as super class, but makes stack trace nicer.
             return getBoundSocket().getLocalTarget();
         }
 
         @Override
         public Entry getPeerTarget() throws IOException {
-            // This is the same as the code in the super class, so overriding
-            // is redundant, but it makes the stack trace much easier to digest.
+            // Same implementation as super class, but makes stack trace nicer.
             return getBoundSocket().getPeerTarget();
         }
 
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            // This is the same as the code in the super class, so overriding
-            // is redundant, but it makes the stack trace much easier to digest.
+            // Same implementation as super class, but makes stack trace nicer.
             return getBoundSocket().newSeekableByteChannel();
         }
 
         @Override
         public OutputStream newOutputStream() throws IOException {
-            // This is the same as the code in the super class, so overriding
-            // is redundant, but it makes the stack trace much easier to digest.
+            // Same implementation as super class, but makes stack trace nicer.
             return getBoundSocket().newOutputStream();
         }
     } // Output
