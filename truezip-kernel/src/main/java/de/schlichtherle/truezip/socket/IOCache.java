@@ -67,63 +67,9 @@ import net.jcip.annotations.ThreadSafe;
 @DefaultAnnotation(NonNull.class)
 public final class IOCache implements Flushable, Closeable {
 
-    /** Provides different cache strategies. */
-    public enum Strategy {
-
-        /**
-         * Any attempt to obtain an output socket will result in a
-         * {@link NullPointerException}.
-         */
-        READ_ONLY {
-            @Override IOCache.OutputBufferPool
-            newOutputBufferPool(IOCache cache) {
-                throw new AssertionError(); // should throw an NPE before we can get here!
-            }
-        },
-
-        /**
-         * A write-through cache flushes any written data as soon as the
-         * output stream created by {@link #getOutputSocket} gets closed.
-         */
-        WRITE_THROUGH {
-            @Override IOCache.OutputBufferPool
-            newOutputBufferPool(IOCache cache) {
-                return cache.new WriteThroughOutputBufferPool();
-            }
-        },
-
-        /**
-         * A write-back cache flushes any written data if and only if it gets
-         * explicitly {@link #flush flushed}.
-         */
-        WRITE_BACK {
-            @Override IOCache.OutputBufferPool
-            newOutputBufferPool(IOCache cache) {
-                return cache.new WriteBackOutputBufferPool();
-            }
-        };
-
-        /**
-         * Returns a new cache.
-         *
-         * @param  pool the pool of temporary entries to cache the entry data.
-         * @return A new cache.
-         */
-        public IOCache
-        newCache(IOPool<?> pool) {
-            return new IOCache(this, pool);
-        }
-
-        IOCache.InputBufferPool
-        newInputBufferPool(IOCache cache) {
-            return cache.new InputBufferPool();
-        }
-
-        abstract IOCache.OutputBufferPool
-        newOutputBufferPool(IOCache cache);
-    } // enum Strategy
-
-    private static class Lock { }
+    private static final BufferSocketFactory FACTORY = JSE7.AVAILABLE
+            ? BufferSocketFactory.NIO
+            : BufferSocketFactory.OIO;
 
     private final Lock lock = new Lock();
     private final Strategy strategy;
@@ -290,8 +236,78 @@ public final class IOCache implements Flushable, Closeable {
         }
     }
 
-    private final class Input extends InputSocket<Entry> {
-        private volatile @CheckForNull Buffer buffer;
+    /** Provides different cache strategies. */
+    @Immutable
+    public enum Strategy {
+
+        /**
+         * Any attempt to obtain an output socket will result in a
+         * {@link NullPointerException}.
+         */
+        READ_ONLY {
+            @Override IOCache.OutputBufferPool
+            newOutputBufferPool(IOCache cache) {
+                throw new AssertionError(); // should throw an NPE before we can get here!
+            }
+        },
+
+        /**
+         * A write-through cache flushes any written data as soon as the
+         * output stream created by {@link #getOutputSocket} gets closed.
+         */
+        WRITE_THROUGH {
+            @Override IOCache.OutputBufferPool
+            newOutputBufferPool(IOCache cache) {
+                return cache.new WriteThroughOutputBufferPool();
+            }
+        },
+
+        /**
+         * A write-back cache flushes any written data if and only if it gets
+         * explicitly {@link #flush flushed}.
+         */
+        WRITE_BACK {
+            @Override IOCache.OutputBufferPool
+            newOutputBufferPool(IOCache cache) {
+                return cache.new WriteBackOutputBufferPool();
+            }
+        };
+
+        /**
+         * Returns a new cache.
+         *
+         * @param  pool the pool of temporary entries to cache the entry data.
+         * @return A new cache.
+         */
+        public IOCache
+        newCache(IOPool<?> pool) {
+            return new IOCache(this, pool);
+        }
+
+        IOCache.InputBufferPool
+        newInputBufferPool(IOCache cache) {
+            return cache.new InputBufferPool();
+        }
+
+        abstract IOCache.OutputBufferPool
+        newOutputBufferPool(IOCache cache);
+    } // Strategy
+
+    private static final class Lock { }
+
+    private final class Input extends DelegatingInputSocket<Entry> {
+        volatile @CheckForNull Buffer buffer;
+
+        @Override
+        protected InputSocket<? extends Entry> getDelegate() throws IOException {
+            return (buffer = getInputBufferPool().allocate()).getInputSocket();
+        }
+
+        @Override
+        protected InputSocket<? extends Entry> getBoundSocket() throws IOException {
+            // Same implementation as super class, but makes stack trace nicer.
+            return getDelegate().bind(this);
+        }
 
         @Override
         public Entry getLocalTarget() throws IOException {
@@ -302,31 +318,43 @@ public final class IOCache implements Flushable, Closeable {
         }
 
         @Override
+        public Entry getPeerTarget() throws IOException {
+            // Same implementation as super class, but makes stack trace nicer.
+            return getBoundSocket().getPeerTarget();
+        }
+
+        @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            // Same implementation as super class, but makes stack trace nicer.
             return getBoundSocket().newSeekableByteChannel();
         }
 
         @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
+            // Same implementation as super class, but makes stack trace nicer.
             return getBoundSocket().newReadOnlyFile();
         }
 
         @Override
         public InputStream newInputStream() throws IOException {
+            // Same implementation as super class, but makes stack trace nicer.
             return getBoundSocket().newInputStream();
-        }
-
-        private InputSocket<?> getBoundSocket() throws IOException {
-            return getBuffer().getInputSocket().bind(this);
-        }
-
-        private Buffer getBuffer() throws IOException {
-            return buffer = getInputBufferPool().allocate();
         }
     } // Input
 
-    private final class Output extends OutputSocket<Entry> {
-        private volatile @CheckForNull Buffer buffer;
+    private final class Output extends DelegatingOutputSocket<Entry> {
+        volatile @CheckForNull Buffer buffer;
+
+        @Override
+        protected OutputSocket<? extends Entry> getDelegate() throws IOException {
+            return (buffer = getOutputBufferPool().allocate()).getOutputSocket();
+        }
+
+        @Override
+        protected OutputSocket<? extends Entry> getBoundSocket() throws IOException {
+            // Same implementation as super class, but makes stack trace nicer.
+            return getDelegate().bind(this);
+        }
 
         @Override
         public Entry getLocalTarget() throws IOException {
@@ -337,33 +365,34 @@ public final class IOCache implements Flushable, Closeable {
         }
 
         @Override
+        public Entry getPeerTarget() throws IOException {
+            // Same implementation as super class, but makes stack trace nicer.
+            return getBoundSocket().getPeerTarget();
+        }
+
+        @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            // Same implementation as super class, but makes stack trace nicer.
             return getBoundSocket().newSeekableByteChannel();
         }
 
         @Override
         public OutputStream newOutputStream() throws IOException {
+            // Same implementation as super class, but makes stack trace nicer.
             return getBoundSocket().newOutputStream();
-        }
-
-        private OutputSocket<?> getBoundSocket() throws IOException {
-            return getBuffer().getOutputSocket().bind(this);
-        }
-
-        private Buffer getBuffer() throws IOException {
-            return buffer = getOutputBufferPool().allocate();
         }
     } // Output
 
     /** Hides backing store entries. */
+    @Immutable
     private static class CacheEntry extends DecoratingEntry<Entry> {
         CacheEntry(Entry entry) {
             super(entry);
         }
     } // CacheEntry
 
-    private final class InputBufferPool
-    implements Pool<Buffer, IOException> {
+    @Immutable
+    private final class InputBufferPool implements Pool<Buffer, IOException> {
         @Override
         public Buffer allocate() throws IOException {
             synchronized (lock) {
@@ -394,6 +423,7 @@ public final class IOCache implements Flushable, Closeable {
         }
     } // InputBufferPool
 
+    @Immutable
     private abstract class OutputBufferPool
     implements Pool<Buffer, IOException> {
         @Override
@@ -416,8 +446,8 @@ public final class IOCache implements Flushable, Closeable {
         }
     } // OutputBufferPool
 
-    private class WriteThroughOutputBufferPool
-    extends OutputBufferPool {
+    @Immutable
+    private final class WriteThroughOutputBufferPool extends OutputBufferPool {
         @Override
         public void release(Buffer buffer) throws IOException {
             if (0 == buffer.writers) // DCL does work with volatile fields since JSE 5!
@@ -430,8 +460,8 @@ public final class IOCache implements Flushable, Closeable {
         }
     } // WriteThroughOutputBufferPool
 
-    private final class WriteBackOutputBufferPool
-    extends OutputBufferPool {
+    @Immutable
+    private final class WriteBackOutputBufferPool extends OutputBufferPool {
         @Override
         public void release(final Buffer buffer) throws IOException {
             if (0 == buffer.writers) // DCL does work with volatile fields since JSE 5!
@@ -447,10 +477,6 @@ public final class IOCache implements Flushable, Closeable {
             }
         }
     } // WriteBackOutputBufferPool
-
-    private static final BufferSocketFactory FACTORY = JSE7.AVAILABLE
-            ? BufferSocketFactory.NIO
-            : BufferSocketFactory.OIO;
 
     @Immutable
     private enum BufferSocketFactory {
@@ -483,31 +509,30 @@ public final class IOCache implements Flushable, Closeable {
     } // BufferSocketFactory
 
     private final class Buffer {
-        private final IOPool.Entry<?> data;
+        final IOPool.Entry<?> data;
 
         volatile int readers, writers; // max one writer!
 
-        private Buffer() throws IOException {
+        Buffer() throws IOException {
             data = pool.allocate();
         }
 
-        private InputSocket<?> getInputSocket() {
+        InputSocket<?> getInputSocket() {
             return FACTORY.newInputSocket(this);
         }
 
-        private OutputSocket<?> getOutputSocket() {
+        OutputSocket<?> getOutputSocket() {
             return FACTORY.newOutputSocket(this);
         }
 
-        private void release() throws IOException {
+        void release() throws IOException {
             assert 0 == writers;
             assert 0 == readers;
             data.release();
         }
 
         @Immutable
-        private final class Nio2BufferInputSocket
-        extends BufferInputSocket {
+        final class Nio2BufferInputSocket extends BufferInputSocket {
             @Override
             public SeekableByteChannel newSeekableByteChannel() throws IOException {
                 return new BufferInputChannel(getBoundSocket().newSeekableByteChannel());
@@ -515,8 +540,7 @@ public final class IOCache implements Flushable, Closeable {
         } // Nio2BufferInputSocket
 
         @Immutable
-        private class BufferInputSocket
-        extends DecoratingInputSocket<Entry> {
+        class BufferInputSocket extends DecoratingInputSocket<Entry> {
             BufferInputSocket() {
                 super(data.getInputSocket());
             }
@@ -532,9 +556,8 @@ public final class IOCache implements Flushable, Closeable {
             }
         } // BufferInputSocket
 
-        private final class BufferInputChannel
-        extends DecoratingSeekableByteChannel {
-            private boolean closed;
+        final class BufferInputChannel extends DecoratingSeekableByteChannel {
+            boolean closed;
 
             BufferInputChannel(SeekableByteChannel sbc) {
                 super(sbc);
@@ -553,9 +576,8 @@ public final class IOCache implements Flushable, Closeable {
             }
         } // BufferInputChannel
 
-        private final class BufferReadOnlyFile
-        extends DecoratingReadOnlyFile {
-            private boolean closed;
+        final class BufferReadOnlyFile extends DecoratingReadOnlyFile {
+            boolean closed;
 
             BufferReadOnlyFile(ReadOnlyFile rof) {
                 super(rof);
@@ -574,9 +596,8 @@ public final class IOCache implements Flushable, Closeable {
             }
         } // BufferReadOnlyFile
 
-        private final class BufferInputStream
-        extends DecoratingInputStream {
-            private boolean closed;
+        final class BufferInputStream extends DecoratingInputStream {
+            boolean closed;
 
             BufferInputStream(InputStream in) {
                 super(in);
@@ -596,8 +617,7 @@ public final class IOCache implements Flushable, Closeable {
         } // BufferInputStream
 
         @Immutable
-        private final class Nio2BufferOutputSocket
-        extends BufferOutputSocket {
+        final class Nio2BufferOutputSocket extends BufferOutputSocket {
             @Override
             public SeekableByteChannel newSeekableByteChannel() throws IOException {
                 return new BufferOutputChannel(getBoundSocket().newSeekableByteChannel());
@@ -605,8 +625,7 @@ public final class IOCache implements Flushable, Closeable {
         } // Nio2BufferInputSocket
 
         @Immutable
-        private class BufferOutputSocket
-        extends DecoratingOutputSocket<Entry> {
+        class BufferOutputSocket extends DecoratingOutputSocket<Entry> {
             BufferOutputSocket() {
                 super(data.getOutputSocket());
             }
@@ -617,9 +636,8 @@ public final class IOCache implements Flushable, Closeable {
             }
         } // BufferOutputSocket
 
-        private final class BufferOutputChannel
-        extends DecoratingSeekableByteChannel {
-            private boolean closed;
+        final class BufferOutputChannel extends DecoratingSeekableByteChannel {
+            boolean closed;
 
             BufferOutputChannel(SeekableByteChannel sbc) {
                 super(sbc);
@@ -638,9 +656,8 @@ public final class IOCache implements Flushable, Closeable {
             }
         } // BufferOutputChannel
 
-        private final class BufferOutputStream
-        extends DecoratingOutputStream {
-            private boolean closed;
+        final class BufferOutputStream extends DecoratingOutputStream {
+            boolean closed;
 
             BufferOutputStream(OutputStream out) {
                 super(out);
