@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import javax.swing.Icon;
+import net.jcip.annotations.NotThreadSafe;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -245,6 +246,7 @@ extends FsDecoratingController< FsConcurrentModel,
         return new Input(delegate.getInputSocket(name, options));
     }
 
+    @NotThreadSafe
     private final class Input extends DecoratingInputSocket<Entry> {
         Input(InputSocket<?> input) {
             super(input);
@@ -338,6 +340,7 @@ extends FsDecoratingController< FsConcurrentModel,
         return new Output(delegate.getOutputSocket(name, options, template));
     }
 
+    @NotThreadSafe
     private final class Output extends DecoratingOutputSocket<Entry> {
         Output(OutputSocket<?> output) {
             super(output);
