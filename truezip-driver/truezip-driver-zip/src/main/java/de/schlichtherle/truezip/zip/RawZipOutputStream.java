@@ -21,6 +21,7 @@ import java.nio.charset.Charset;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import java.util.Iterator;
 import de.schlichtherle.truezip.io.LEDataOutputStream;
+import de.schlichtherle.truezip.util.JSE7;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
@@ -30,7 +31,6 @@ import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.zip.CRC32;
-import java.util.zip.Deflater;
 import java.util.zip.ZipException;
 import net.jcip.annotations.NotThreadSafe;
 
@@ -69,7 +69,9 @@ implements Iterable<E> {
     private final CRC32 crc = new CRC32();
 
     /** This instance is used for deflated output. */
-    private final ZipDeflater def = new ZipDeflater();
+    private final ZipDeflater def = JSE7.AVAILABLE
+            ? new ZipDeflater()
+            : new Jdk6Deflater();
 
     /** This buffer holds deflated data for output. */
     private final byte[] dbuf = new byte[FLATER_BUF_LENGTH];
@@ -838,28 +840,6 @@ implements Iterable<E> {
         } finally {
             entries.clear();
             delegate.close();
-        }
-    }
-
-    /**
-     * A Deflater which can be asked for its current deflation level and
-     * counts input and output data length as a long integer value.
-     */
-    private static final class ZipDeflater extends Deflater {
-        private int level = Deflater.DEFAULT_COMPRESSION;
-
-        ZipDeflater() {
-            super(Deflater.DEFAULT_COMPRESSION, true);
-        }
-
-        int getLevel() {
-            return level;
-        }
-
-        @Override
-        public void setLevel(final int level) {
-            super.setLevel(level);
-            this.level = level;
         }
     }
 }
