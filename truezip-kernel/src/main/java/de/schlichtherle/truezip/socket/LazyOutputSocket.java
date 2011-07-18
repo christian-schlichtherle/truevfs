@@ -58,7 +58,8 @@ extends DecoratingOutputSocket<E> {
         }
 
         OutputStream getOutputStream() throws IOException {
-            return null != delegate ? delegate : (delegate = getBoundSocket().newOutputStream());
+            final OutputStream out = delegate;
+            return null != out ? out : (delegate = getBoundSocket().newOutputStream());
         }
 
         @Override
@@ -78,8 +79,9 @@ extends DecoratingOutputSocket<E> {
 
         @Override
         public void close() throws IOException {
-            if (null != delegate)
-                delegate.close();
+            final OutputStream out = delegate;
+            if (null != out)
+                out.close();
         }
     } // ProxyOutputStream
 }
