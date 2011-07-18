@@ -254,7 +254,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
     implements Pool<ReadOnlyFile, IOException> {
         final File file;
 
-        DefaultReadOnlyFilePool(File file) {
+        DefaultReadOnlyFilePool(final File file) {
             this.file = file;
         }
 
@@ -271,7 +271,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
         public void release(ReadOnlyFile rof) throws IOException {
             rof.close();
         }
-    }
+    } // DefaultReadOnlyFilePool
 
     /**
      * Returns the {@link Object#toString() string representation} of whatever
@@ -292,12 +292,12 @@ public class ZipFile extends RawZipFile<ZipEntry> {
             final Iterator<ZipEntry> i = ZipFile.super.iterator();
 
             @Override
-			public boolean hasMoreElements() {
+            public boolean hasMoreElements() {
                 return i.hasNext();
             }
 
             @Override
-			public ZipEntry nextElement() {
+            public ZipEntry nextElement() {
                 return i.next().clone();
             }
         } // CloneEnumeration
@@ -315,20 +315,20 @@ public class ZipFile extends RawZipFile<ZipEntry> {
             final Iterator<ZipEntry> i = ZipFile.super.iterator();
 
             @Override
-			public boolean hasNext() {
+            public boolean hasNext() {
                 return i.hasNext();
             }
 
             @Override
-			public ZipEntry next() {
+            public ZipEntry next() {
                 return i.next().clone();
             }
 
             @Override
-			public void remove() {
+            public void remove() {
                 throw new UnsupportedOperationException();
             }
-        } // class EntryIterator
+        } // EntryIterator
 
         return new EntryIterator();
     }
