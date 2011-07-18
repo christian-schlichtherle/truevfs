@@ -8,8 +8,7 @@ Kick-Starting TrueZIP
 
     This section shows how to kick-start a TrueZIP application by generating
     it from a Maven archetype.
-    The TrueZIP File* and TrueZIP Path APIs each feature their own Maven
-    archetype:
+    Each client API module features its own Maven archetype:
 
     * The TrueZIP File* module features an archetype with the following Maven
       coordinates:
@@ -41,7 +40,8 @@ Kick-Starting TrueZIP
 
         [[a]] {{{./file/shell.html}shell}}.
 
-    [[1]] If you do not want to use Maven, you can still use TrueZIP if you
-          read this guide: {{{./no-maven.html}Using TrueZIP without Maven}}.
+    [[1]] If you do not want to use Maven, you can still use TrueZIP once
+          you've read this guide:
+          {{{./no-maven.html}Using TrueZIP without Maven}}.
 
     []
