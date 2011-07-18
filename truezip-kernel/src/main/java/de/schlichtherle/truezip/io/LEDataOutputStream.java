@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.io.OutputStream;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * A stream to write data in Little Endian (LE) format.
@@ -28,12 +30,12 @@ import java.io.OutputStream;
  * A noteable difference to {@code DataOutputStream} is that the
  * {@link #size()} method and the {@link #written} field are respectively
  * return {@code long} values and wrap to {@link Long#MAX_VALUE}.
- * <p>
- * Note that this class is <em>not</em> thread safe.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
+@DefaultAnnotation(NonNull.class)
 public class LEDataOutputStream
 extends DecoratingOutputStream
 implements DataOutput {
@@ -45,7 +47,7 @@ implements DataOutput {
      * The number of bytes written to the data output stream so far.
      * If this counter overflows, it will be wrapped to Long.MAX_VALUE.
      */
-    protected volatile long written;
+    protected long written;
 
     /**
      * Creates a new data output stream to write data to the specified
