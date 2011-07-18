@@ -332,13 +332,13 @@ extends FsDecoratingController< FsConcurrentModel,
     } // EntryOutputSocketFactory
 
     /** A cache for the contents of an individual file system entry. */
-    private class EntryCache {
-        private final FsEntryName name;
-        private final IOCache cache;
-        private volatile @CheckForNull InputSocket<?> input;
-        private volatile @CheckForNull OutputSocket<?> output;
-        private volatile @Nullable BitField<FsOutputOption> mknodOptions;
-        private volatile @CheckForNull Entry template;
+    private final class EntryCache {
+        final FsEntryName name;
+        final IOCache cache;
+        volatile @CheckForNull InputSocket<?> input;
+        volatile @CheckForNull OutputSocket<?> output;
+        volatile @Nullable BitField<FsOutputOption> mknodOptions;
+        volatile @CheckForNull Entry template;
 
         EntryCache(final FsEntryName name) {
             this.name = name;
@@ -386,7 +386,7 @@ extends FsDecoratingController< FsConcurrentModel,
                         cache.getOutputSocket()));
         }
 
-        private final class Input extends DecoratingInputSocket<Entry> {
+        final class Input extends DecoratingInputSocket<Entry> {
             Input(InputSocket <?> input) {
                 super(input);
             }
@@ -411,7 +411,7 @@ extends FsDecoratingController< FsConcurrentModel,
         } // Input
 
         /** An input stream proxy. */
-        private final class EntryInputStream extends DecoratingInputStream {
+        final class EntryInputStream extends DecoratingInputStream {
             EntryInputStream(InputStream in) {
                 super(in);
             }
@@ -424,7 +424,7 @@ extends FsDecoratingController< FsConcurrentModel,
         } // EntryInputStream
 
         /** An output socket proxy which supports NIO.2. */
-        private final class Nio2Output extends Output {
+        final class Nio2Output extends Output {
             Nio2Output(OutputSocket <?> output) {
                 super(output);
             }
@@ -441,7 +441,7 @@ extends FsDecoratingController< FsConcurrentModel,
         } // Nio2EntryOutputSocket
 
         /** An output socket proxy. */
-        private class Output extends DecoratingOutputSocket<Entry> {
+        class Output extends DecoratingOutputSocket<Entry> {
             Output(OutputSocket <?> output) {
                 super(output);
             }
@@ -458,7 +458,7 @@ extends FsDecoratingController< FsConcurrentModel,
         } // Output
 
         /** An output stream proxy. */
-        private final class EntrySeekableByteChannel
+        final class EntrySeekableByteChannel
         extends DecoratingSeekableByteChannel {
             EntrySeekableByteChannel(SeekableByteChannel sbc) {
                 super(sbc);
@@ -480,7 +480,7 @@ extends FsDecoratingController< FsConcurrentModel,
         } // EntrySeekableByteChannel
 
         /** An output stream proxy. */
-        private final class EntryOutputStream extends DecoratingOutputStream {
+        final class EntryOutputStream extends DecoratingOutputStream {
             EntryOutputStream(OutputStream out) {
                 super(out);
             }
