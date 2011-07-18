@@ -550,10 +550,10 @@ extends FsFileSystemArchiveController<E> {
                 throw new NullPointerException();
             throw new UnsupportedOperationException();
         }
-    } // class DummyInputService
+    } // DummyInputService
 
     /**
-     * This member class makes this archive controller instance strongly
+     * This inner class makes this archive controller instance strongly
      * reachable from any created input stream.
      * This is required by the memory management to ensure that for any
      * prospective archive file at most one archive controller object is in
@@ -571,7 +571,7 @@ extends FsFileSystemArchiveController<E> {
     } // class Input
 
     /**
-     * This member class makes this archive controller instance strongly
+     * This inner class makes this archive controller instance strongly
      * reachable from any created output stream.
      * This is required by the memory management to ensure that for any
      * prospective archive file at most one archive controller object is in
@@ -599,12 +599,13 @@ extends FsFileSystemArchiveController<E> {
         throws IOException {
             assert event.getSource() == getFileSystem();
             makeOutput(MAKE_OUTPUT_OPTIONS);
+            assert getModel().isTouched();
         }
 
         @Override
         public void afterTouch(FsArchiveFileSystemEvent<? extends E> event) {
             assert event.getSource() == getFileSystem();
-            getModel().setTouched(true);
+            //getModel().setTouched(true);
         }
     } // TouchListener
 }
