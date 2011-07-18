@@ -26,7 +26,7 @@ import java.io.PrintStream;
 /**
  * Abstract base class for command line utilities.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
@@ -139,5 +139,5 @@ abstract class Application extends TApplication<RuntimeException> {
         protected IllegalUsageException(String msg) {
             super(msg);
         }
-    } // class IllegalUsageException
+    } // IllegalUsageException
 }
