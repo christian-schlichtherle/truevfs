@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import de.schlichtherle.truezip.io.DecoratingInputStream;
 import net.jcip.annotations.Immutable;
 import de.schlichtherle.truezip.util.JSE7;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
@@ -480,8 +481,7 @@ extends FsDecoratingController< FsConcurrentModel,
         } // EntrySeekableByteChannel
 
         /** An output stream proxy. */
-        private final class EntryOutputStream
-        extends DecoratingOutputStream {
+        private final class EntryOutputStream extends DecoratingOutputStream {
             EntryOutputStream(OutputStream out) {
                 super(out);
             }
