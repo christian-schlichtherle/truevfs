@@ -226,7 +226,7 @@ extends FsModelController<FsConcurrentModel> {
     public final OutputSocket<?> getOutputSocket(
             FsEntryName name,
             BitField<FsOutputOption> options,
-            @CheckForNull Entry template) {
+            Entry template) {
         return new Output(name, options, template);
     }
 
@@ -244,6 +244,7 @@ extends FsModelController<FsConcurrentModel> {
         }
 
         FsArchiveFileSystemOperation<E> mknod() throws IOException {
+            //assert options.equals(getModel().getOperation().getOutputOptions());
             autoSync(name, WRITE);
             // Start creating or overwriting the archive entry.
             // This will fail if the entry already exists as a directory.
@@ -333,8 +334,9 @@ extends FsModelController<FsConcurrentModel> {
             final FsEntryName name,
             final Type type,
             final BitField<FsOutputOption> options,
-            final @CheckForNull Entry template)
+            final Entry template)
     throws IOException {
+        //assert options.equals(getModel().getOperation().getOutputOptions());
         if (name.isRoot()) {
             try {
                 autoMount(); // detect false positives!
