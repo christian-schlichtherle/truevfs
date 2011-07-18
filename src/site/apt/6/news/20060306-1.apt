@@ -1,0 +1,52 @@
+    -----------------------
+    6.0 Development News
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+{TrueZIP 6.0 is in development}
+
+    (March 6th, 2006)
+
+    This will be a major update release with support for TAR archives and much
+    more.
+    TrueZIP 6 will provide some exciting new features:
+
+    [[1]] A plug\-in "driver" architecture for any archive type. This
+    allows third parties to provide support for virtually any archive type,
+    such as RAR or ARJ.
+
+    [[1]] Out\-of\-the\-box support for TAR, TAR.GZ and TAR.BZ2 archive
+    using the new archive "driver" architecture. As usual with TrueZIP,
+    this will allow an application to address any entry in a TAR archive by
+    specifying the archive as part of the path name, such as e.g. <<<src.tar.gz/readme.html>>>.
+
+    [[1]] Out\-of\-the\-box support for ZIP64 archives in order to break
+    the 4GB limitation of the current ZIP32 implementation. However, please
+    note that in order to provide a short release cycle, this may be
+    deferred to the release of TrueZIP 6.1 instead of TrueZIP 6.0.
+
+    [[1]] And some other goodies as well, but I don't want to promise
+    too much yet...
+
+    []
+
+    The current status is that the TAR support is already
+    implemented and working (i.e. passes all JUnit tests). The archive
+    driver interface has yet to be refactored again in order to remove all
+    of the ZIP32 specific legacy. A beta release is planned for next week.
+    This release will be stable (i.e. passes all JUnit tests), but may be
+    subject to some more refactorings.
+
+    Besides of all the good news, there is also some
+    not\-so\-good\-news: In order to abstract TrueZIP from ZIP32, some public
+    API classes and interfaces had to be refactored. So if your application
+    is not just using basic file I/O, it is likely that you will have to
+    refactor some of your code. For this reason, TrueZIP 5.1 is and will be
+    continued to be maintained, i.e. all bugs will be fixed and minor
+    enhancements will be added (but no big features).
+
+    So application developers have the choice to stay with TrueZIP
+    5.1.X and be on the safe side in terms of bug fixes and regular
+    maintenance or switching to TrueZIP 6 to take advantage of the support
+    for all the new archive types.
