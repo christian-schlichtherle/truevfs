@@ -50,9 +50,9 @@ import net.jcip.annotations.ThreadSafe;
  * <p>
  * This class is thread-safe.
  *
+ * @see     ZipFile
  * @author  Christian Schlichtherle
  * @version $Id$
- * @see     ZipFile
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
