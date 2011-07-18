@@ -60,7 +60,8 @@ extends DecoratingInputSocket<E> {
         }
 
         ReadOnlyFile getReadOnlyFile() throws IOException {
-            return null != delegate ? delegate : (delegate = getBoundSocket().newReadOnlyFile());
+            final ReadOnlyFile rof = delegate;
+            return null != rof ? rof : (delegate = getBoundSocket().newReadOnlyFile());
         }
 
         @Override
@@ -90,8 +91,9 @@ extends DecoratingInputSocket<E> {
 
         @Override
         public void close() throws IOException {
-            if (null != delegate)
-                delegate.close();
+            final ReadOnlyFile rof = delegate;
+            if (null != rof)
+                rof.close();
         }
     } // ProxyReadOnlyFile
 
@@ -114,7 +116,8 @@ extends DecoratingInputSocket<E> {
         }
 
         InputStream getInputStream() throws IOException {
-            return null != delegate ? delegate : (delegate = getBoundSocket().newInputStream());
+            final InputStream in = delegate;
+            return null != in ? in : (delegate = getBoundSocket().newInputStream());
         }
 
         @Override
@@ -139,8 +142,9 @@ extends DecoratingInputSocket<E> {
 
         @Override
         public void close() throws IOException {
-            if (null != delegate)
-                delegate.close();
+            final InputStream in = delegate;
+            if (null != in)
+                in.close();
         }
 
         @Override
