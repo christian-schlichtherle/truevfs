@@ -61,9 +61,9 @@ import static de.schlichtherle.truezip.zip.ZipEntry.STORED;
  * This class is able to skip a preamble like the one found in self extracting
  * archives.
  *
+ * @see     RawZipOutputStream
  * @author  Christian Schlichtherle
  * @version $Id$
- * @see     ZipFile
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
@@ -813,7 +813,7 @@ implements Iterable<E>, Closeable {
                 InflaterPool.release(inf);
             }
         }
-    } // class PooledInflaterInputStream
+    } // PooledInflaterInputStream
 
     /**
      * extends its super class to perform the check again the expected CRC
@@ -852,7 +852,7 @@ implements Iterable<E>, Closeable {
                 throw new CRC32Exception(
                         entry.getName(), expectedCrc, actualCrc);
         }
-    } // class CheckedInputStream
+    } // CheckedInputStream
 
     /**
      * This method skips {@code toSkip} bytes in the given input stream
@@ -987,7 +987,7 @@ implements Iterable<E>, Closeable {
         public boolean markSupported() {
             return false;
         }
-    } // class RawCheckedInputStream
+    } // RawCheckedInputStream
 
     /**
      * Closes the file.
@@ -1012,7 +1012,7 @@ implements Iterable<E>, Closeable {
      * corresponding instances of this member class to get close()d, too.
      * Note that this class is <em>not</em> thread safe!
      */
-    private class IntervalInputStream extends AccountedInputStream {
+    private final class IntervalInputStream extends AccountedInputStream {
         long remaining;
         long fp;
         boolean addDummyByte;
@@ -1108,7 +1108,7 @@ implements Iterable<E>, Closeable {
                     ? Integer.MAX_VALUE
                     : (int) available;
         }
-    } // class IntervalInputStream
+    } // IntervalInputStream
 
     /** Accounts itself until it gets closed. */
     private abstract class AccountedInputStream extends InputStream {
@@ -1126,17 +1126,17 @@ implements Iterable<E>, Closeable {
             openStreams--;
             super.close();
         }
-    } // class AccountedInputStream
+    } // AccountedInputStream
 
     /** Maps a given offset to a file pointer position. */
     static class OffsetMapper {
         long location(long offset) {
             return offset;
         }
-    } // class OffsetMapper
+    } // OffsetMapper
 
     /** Adds a start value to the given offset. */
-    private static class IrregularOffsetMapper extends OffsetMapper {
+    private static final class IrregularOffsetMapper extends OffsetMapper {
         final long start;
 
         IrregularOffsetMapper(long start) {
@@ -1147,5 +1147,5 @@ implements Iterable<E>, Closeable {
         long location(long offset) {
             return start + offset;
         }
-    } // class IrregularOffsetMapper
+    } // IrregularOffsetMapper
 }

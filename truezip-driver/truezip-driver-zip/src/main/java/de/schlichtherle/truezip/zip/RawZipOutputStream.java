@@ -46,9 +46,9 @@ import static de.schlichtherle.truezip.zip.ZipEntry.STORED;
  * <b>Warning:</b> This class is <em>not</em> intended for public use
  * - its API may change at will without prior notification!
  *
+ * @see     RawZipFile
  * @author  Christian Schlichtherle
  * @version $Id$
- * @see     ZipOutputStream
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
@@ -159,14 +159,15 @@ implements Iterable<E> {
     }
 
     /* Adjusts the number of written bytes for appending mode. */
-    private static class AppendingLEDataOutputStream extends LEDataOutputStream {
+    private static final class AppendingLEDataOutputStream
+    extends LEDataOutputStream {
         AppendingLEDataOutputStream(OutputStream out, RawZipFile<?> appendee) {
             super(out);
             super.written = null == appendee
                     ? 0
                     : appendee.getOffsetMapper().location(appendee.length());
         }
-    } // class AppendingLEDataOutputStream
+    } // AppendingLEDataOutputStream
 
     /** Returns the charset to use for entry names and the file comment. */
     public String getCharset() {
@@ -189,8 +190,8 @@ implements Iterable<E> {
      *
      * @deprecated Use {@link #iterator()} instead.
      */
- 	@Deprecated
-	public Enumeration<? extends ZipEntry> entries() {
+    @Deprecated
+    public Enumeration<? extends ZipEntry> entries() {
         return Collections.enumeration(entries.values());
     }
 
@@ -647,10 +648,10 @@ implements Iterable<E> {
         // Last Mod. File Time / Date.
         dos.writeInt((int) entry.getDosTime());
         // CRC-32.
-        // Compressed Size.
-        // Uncompressed Size.
         dos.writeInt((int) entry.getCrc());
+        // Compressed Size.
         dos.writeInt((int) csize32);
+        // Uncompressed Size.
         dos.writeInt((int) size32);
         // File Name Length.
         final byte[] name = entry.getName().getBytes(charset);
