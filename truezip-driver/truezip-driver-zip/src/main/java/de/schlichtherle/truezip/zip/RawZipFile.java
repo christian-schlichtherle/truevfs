@@ -795,7 +795,7 @@ implements Iterable<E>, Closeable {
 
     /** An input stream which uses a pooled inflater. */
     private static final class PooledInflaterInputStream
-            extends InflaterInputStream {
+    extends InflaterInputStream {
         private boolean closed;
 
         PooledInflaterInputStream(InputStream in, int size) {
@@ -820,7 +820,7 @@ implements Iterable<E>, Closeable {
      * from the entry provided to its constructor when close() is called.
      */
     private static final class CheckedInputStream
-            extends java.util.zip.CheckedInputStream {
+    extends java.util.zip.CheckedInputStream {
         private final ZipEntry entry;
         private final int size;
 
