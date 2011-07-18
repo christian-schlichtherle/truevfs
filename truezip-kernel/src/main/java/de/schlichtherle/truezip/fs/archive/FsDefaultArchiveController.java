@@ -61,8 +61,9 @@ import static de.schlichtherle.truezip.fs.FsSyncOption.*;
 import static de.schlichtherle.truezip.io.Paths.isRoot;
 
 /**
- * This archive controller implements the mounting/unmounting strategy for a
- * prospective archive file.
+ * This archive controller manages I/O to the entry which represents the target
+ * archive file in its parent file system and resolves archive entry collisions,
+ * for example by performing a full update of the target archive file.
  *
  * @param   <E> The type of the archive entries.
  * @author  Christian Schlichtherle
