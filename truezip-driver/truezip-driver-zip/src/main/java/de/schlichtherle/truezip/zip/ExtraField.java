@@ -126,7 +126,6 @@ abstract class ExtraField {
         UShort.check(size);
         if (size == 0)
             return EMPTY;
-
         final byte[] data = new byte[size];
         writeTo(data, 0);
         return data;
