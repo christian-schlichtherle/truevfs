@@ -200,15 +200,17 @@ extends FsDriver {
      * @param  input the input socket for reading the contents of the archive
      *         from its target.
      * @return A new input shop.
-     * @throws FileNotFoundException if the target archive file does not exist
-     *         or is (temporarily) not accessible.
-     *         An exception of this type marks a <em>transient</em> cause,
-     *         i.e. this method may get subsequently called until it succeeds.
-     * @throws IOException if the target archive file is a
-     *         <i>false positive</i> archive file.
-     *         An exception of this type marks a <em>persistent</em> cause,
-     *         i.e. this method will not get called again until the archive
-     *         file system is synchronized with its parent file system.
+     * @throws IOException on any I/O error.
+     *         If the file system entry for the given model exists in the
+     *         parent file system and is not of the type {@link Type#SPECIAL},
+     *         then this exception is deemed to indicate a
+     *         <em>permanent false positive</em> archive file and gets cached
+     *         until the file system controller for the given model is
+     *         {@link FsController#sync(de.schlichtherle.truezip.util.BitField, de.schlichtherle.truezip.util.ExceptionHandler) synced}
+     *         again.
+     *         Otherwise, this exception is deemed to indicate a
+     *         <em>preliminary false positive</em> archive file and does not
+     *         get cached.
      */
     public abstract InputShop<E>
     newInputShop(   FsModel model,
@@ -228,7 +230,12 @@ extends FsDriver {
      * @return A new read only file obtained from the socket.
      * @throws FsException at the discretion of the socket.
      * @throws FileNotFoundException on any I/O error.
+     * @deprecated Since TrueZIP 7.3, this method is not required anymore and
+     *             should not get called in order to inhibit the redundant
+     *             wrapping of an {@link IOException} in a
+     *             {@link FileNotFoundException}.
      */
+    @Deprecated
     protected static ReadOnlyFile newReadOnlyFile(FsModel model, InputSocket<?> input)
     throws FsException, FileNotFoundException {
         try {
@@ -256,7 +263,12 @@ extends FsDriver {
      * @return A new input stream obtained from the socket.
      * @throws FsException at the discretion of the socket.
      * @throws FileNotFoundException on any I/O error.
+     * @deprecated Since TrueZIP 7.3, this method is not required anymore and
+     *             should not get called in order to inhibit the redundant
+     *             wrapping of an {@link IOException} in a
+     *             {@link FileNotFoundException}.
      */
+    @Deprecated
     protected static InputStream newInputStream(FsModel model, InputSocket<?> input)
     throws FsException, FileNotFoundException {
         try {
@@ -287,13 +299,7 @@ extends FsDriver {
      *         For example, this could be used to copy the comment of a ZIP
      *         file.
      * @return A new output shop.
-     * @throws FileNotFoundException if the target archive file does not exist
-     *         or is (temporarily) not accessible.
-     *         An exception of this type marks a <em>transient</em> cause,
-     *         i.e. this method may get subsequently called until it succeeds.
-     * @throws An exception of this type marks a <em>persistent</em> cause,
-     *         i.e. this method will not get called again until the archive
-     *         file system is synchronized with its parent file system.
+     * @throws IOException on any I/O error.
      */
     public abstract OutputShop<E>
     newOutputShop(  FsModel model,
@@ -314,7 +320,12 @@ extends FsDriver {
      * @return A new output stream obtained from the socket.
      * @throws FsException at the discretion of the socket.
      * @throws FileNotFoundException on any I/O error.
+     * @deprecated Since TrueZIP 7.3, this method is not required anymore and
+     *             should not get called in order to inhibit the redundant
+     *             wrapping of an {@link IOException} in a
+     *             {@link FileNotFoundException}.
      */
+    @Deprecated
     protected static OutputStream newOutputStream(FsModel model, OutputSocket<?> output)
     throws FsException, FileNotFoundException {
         try {

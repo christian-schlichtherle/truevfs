@@ -94,16 +94,16 @@ extends FsArchiveController<E> {
         }
 
         abstract void setFileSystem(@CheckForNull FsArchiveFileSystem<E> fileSystem);
-    } // class MountState
+    } // MountState
 
-    private class ResetFileSystem extends MountState<E> {
+    private final class ResetFileSystem extends MountState<E> {
         @Override
         FsArchiveFileSystem<E> autoMount(final boolean autoCreate)
         throws IOException {
             getModel().assertWriteLockedByCurrentThread();
             try {
                 mount(autoCreate);
-            } catch (FsCacheableFalsePositiveException ex) {
+            } catch (FsPermanentFalsePositiveException ex) {
                 // Cache exception for false positive file system.
                 //   The state is reset when unlink() is called on the false
                 // positive file system or sync().
@@ -114,7 +114,7 @@ extends FsArchiveController<E> {
                 // would run the file system initialization again, only to
                 // result in another instance of the same exception type again.
                 mountState = new FalsePositiveFileSystem(ex);
-                throw ex;
+                //throw ex;
             }
 
             assert this != mountState;
@@ -130,9 +130,9 @@ extends FsArchiveController<E> {
             if (fileSystem != null)
                 mountState = new MountedFileSystem(fileSystem);
         }
-    } // class ResetFileSystem
+    } // ResetFileSystem
 
-    private class MountedFileSystem extends MountState<E> {
+    private final class MountedFileSystem extends MountState<E> {
         private final FsArchiveFileSystem<E> fileSystem;
 
         MountedFileSystem(final FsArchiveFileSystem<E> fileSystem) {
@@ -157,12 +157,12 @@ extends FsArchiveController<E> {
                 throw new IllegalArgumentException("File system already mounted!");
             mountState = new ResetFileSystem();
         }
-    } // class MountedFileSystem
+    } // MountedFileSystem
 
-    private class FalsePositiveFileSystem extends MountState<E> {
-        private FsFalsePositiveException exception;
+    private final class FalsePositiveFileSystem extends MountState<E> {
+        private FsPermanentFalsePositiveException exception;
 
-        private FalsePositiveFileSystem(final FsFalsePositiveException exception) {
+        private FalsePositiveFileSystem(final FsPermanentFalsePositiveException exception) {
             if (exception == null)
                 throw new NullPointerException();
             this.exception = exception;
@@ -180,17 +180,17 @@ extends FsArchiveController<E> {
                     ? new MountedFileSystem(fileSystem)
                     : new ResetFileSystem();
         }
-    } // class FalsePositiveFileSystem
+    } // FalsePositiveFileSystem
 }
 
 /** A cacheable false positive exception. */
 @DefaultAnnotation(NonNull.class)
 @SuppressWarnings("MultipleTopLevelClassesInFile")
-class FsCacheableFalsePositiveException extends FsFalsePositiveException {
+final class FsPermanentFalsePositiveException extends FsFalsePositiveException {
     private static final long serialVersionUID = 5436924103910446876L;
 
-    FsCacheableFalsePositiveException(  FsModel model,
+    FsPermanentFalsePositiveException(  FsModel model,
                                         @CheckForNull IOException cause) {
         super(model, cause);
     }
-}
+} // FsPermanentFalsePositiveException

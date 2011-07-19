@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.archive;
 
+import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.socket.DelegatingOutputSocket;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsEntryName;
@@ -44,7 +45,6 @@ import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Iterator;
@@ -122,7 +122,6 @@ extends FsFileSystemArchiveController<E> {
         this.parent = parent;
         this.parentName = getModel().getMountPoint().getPath().resolve(ROOT)
                 .getEntryName();
-
         assert invariants();
     }
 
@@ -187,12 +186,23 @@ extends FsFileSystemArchiveController<E> {
         } catch (FsException ex) {
             throw ex;
         } catch (IOException ex) {
-            if (!autoCreate /*|| null != parent.getEntry(parentName)*/)
-                throw ex instanceof FileNotFoundException
-                    ? new FsFalsePositiveException(getModel(), ex)
-                    : new FsCacheableFalsePositiveException(getModel(), ex);
+            if (!autoCreate) {
+                final FsEntry parentEntry;
+                try {
+                    parentEntry = parent.getEntry(parentName);
+                } catch (FsException ex2) {
+                    assert false;
+                    throw ex2;
+                } catch (IOException ex2) {
+                    //ex2.initCause(ex);
+                    throw new FsFalsePositiveException(getModel(), ex2);
+                }
+                if (null != parentEntry && !parentEntry.isType(SPECIAL))
+                    throw new FsPermanentFalsePositiveException(getModel(), ex);
+                throw new FsFalsePositiveException(getModel(), ex);
+            }
             if (null != parent.getEntry(parentName))
-                throw new FsCacheableFalsePositiveException(getModel(), ex);
+                throw new FsPermanentFalsePositiveException(getModel(), ex);
             // The entry does NOT exist in the parent archive
             // file, but we may create it automatically.
             // This may fail if the container file is an RAES encrypted ZIP

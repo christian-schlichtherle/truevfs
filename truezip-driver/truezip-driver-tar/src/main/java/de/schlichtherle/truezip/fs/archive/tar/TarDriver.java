@@ -139,7 +139,7 @@ public class TarDriver extends FsCharsetArchiveDriver<TarArchiveEntry> {
     @Override
     public TarInputShop newInputShop(FsModel model, InputSocket<?> input)
     throws IOException {
-        final InputStream in = newInputStream(model, input);
+        final InputStream in = input.newInputStream();
         try {
             return newTarInputShop(model, in);
         } finally {
@@ -166,7 +166,7 @@ public class TarDriver extends FsCharsetArchiveDriver<TarArchiveEntry> {
             OutputSocket<?> output,
             InputShop<TarArchiveEntry> source)
     throws IOException {
-        final OutputStream out = newOutputStream(model, output);
+        final OutputStream out = output.newOutputStream();
         try {
             return new FsMultiplexedArchiveOutputShop<TarArchiveEntry>(
                     newTarOutputShop(model, out, (TarInputShop) source),
