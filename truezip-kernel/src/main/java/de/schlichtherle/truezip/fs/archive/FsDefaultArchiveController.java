@@ -306,10 +306,8 @@ extends FsFileSystemArchiveController<E> {
     throws X {
         assert !isTouched() || null != getOutput(); // file system touched => output archive
         assert getModel().isWriteLockedByCurrentThread();
-
         if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT))
             throw new IllegalArgumentException();
-
         awaitSync(options, handler);
         commenceSync(handler);
         try {
@@ -512,7 +510,6 @@ extends FsFileSystemArchiveController<E> {
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         setFileSystem(null);
-
         try {
             final Input input = getInput();
             setInput(null);
@@ -548,7 +545,6 @@ extends FsFileSystemArchiveController<E> {
      */
     private static final class DummyInputService<E extends Entry>
     implements InputShop<E> {
-
         @Override
         public void close() throws IOException {
         }
