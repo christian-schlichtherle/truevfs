@@ -19,7 +19,7 @@ import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.fs.archive.FsMultiplexedArchiveOutputShop;
+import de.schlichtherle.truezip.fs.archive.FsMultiplexedOutputShop;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.socket.IOPool;
@@ -50,7 +50,7 @@ import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
  * underlying {@link TarOutputStream} instead.
  * <p>
  * This output archive can only write one entry concurrently.
- * Archive drivers may wrap this class in a {@link FsMultiplexedArchiveOutputShop}
+ * Archive drivers may wrap this class in a {@link FsMultiplexedOutputShop}
  * to overcome this limitation.
  *
  * @see     TarInputShop
