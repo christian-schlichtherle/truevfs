@@ -15,44 +15,43 @@
  */
 package de.schlichtherle.truezip.fs.archive;
 
-import de.schlichtherle.truezip.fs.FsModelController;
-import java.util.Map;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import de.schlichtherle.truezip.entry.DecoratingEntry;
-import de.schlichtherle.truezip.fs.FsEntryNotFoundException;
+import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.entry.Entry.Access;
+import static de.schlichtherle.truezip.entry.Entry.Access.*;
+import de.schlichtherle.truezip.entry.Entry.Type;
+import static de.schlichtherle.truezip.entry.Entry.Type.*;
+import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsEntry;
+import de.schlichtherle.truezip.fs.FsEntryName;
+import static de.schlichtherle.truezip.fs.FsEntryName.*;
+import de.schlichtherle.truezip.fs.FsEntryNotFoundException;
+import de.schlichtherle.truezip.fs.FsException;
+import de.schlichtherle.truezip.fs.FsFalsePositiveException;
+import de.schlichtherle.truezip.fs.FsInputOption;
+import de.schlichtherle.truezip.fs.FsModelController;
+import de.schlichtherle.truezip.fs.FsOutputOption;
+import static de.schlichtherle.truezip.fs.FsOutputOption.*;
+import de.schlichtherle.truezip.fs.FsSyncException;
+import de.schlichtherle.truezip.fs.FsSyncOption;
+import static de.schlichtherle.truezip.fs.FsSyncOption.*;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.entry.Entry.Type;
-import de.schlichtherle.truezip.entry.Entry.Access;
-import de.schlichtherle.truezip.fs.FsFalsePositiveException;
-import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.FsEntryName;
-import de.schlichtherle.truezip.fs.FsException;
-import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.InputSocket;
-import de.schlichtherle.truezip.fs.FsInputOption;
 import de.schlichtherle.truezip.socket.OutputSocket;
-import de.schlichtherle.truezip.fs.FsOutputOption;
-import de.schlichtherle.truezip.fs.FsSyncOption;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.jcip.annotations.NotThreadSafe;
-
-import static de.schlichtherle.truezip.entry.Entry.Access.*;
-import static de.schlichtherle.truezip.entry.Entry.Type.*;
-import static de.schlichtherle.truezip.fs.FsEntryName.*;
-import static de.schlichtherle.truezip.fs.FsSyncOption.*;
-import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 
 /**
  * An abstract base class for any archive file system controller which
@@ -99,6 +98,14 @@ extends FsModelController<FsContextModel> {
             throw new IllegalArgumentException();
     }
 
+    /**
+     * Returns a JavaBean which represents the original values of selected
+     * parameters for the {@link FsContextController} operation in progress.
+     * 
+     * @return A JavaBean which represents the original values of selected
+     *         parameters for the {@link FsContextController} operation in
+     *         progress.
+     */
     final FsOperationContext getContext() {
         return getModel().getContext();
     }
