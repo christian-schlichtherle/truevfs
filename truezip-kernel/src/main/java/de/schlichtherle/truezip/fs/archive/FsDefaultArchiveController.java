@@ -173,8 +173,8 @@ extends FsFileSystemArchiveController<E> {
     void mount(final boolean autoCreate) throws IOException {
         try {
             // readOnly must be set first because the parent archive controller
-            // could be a FileController and on Windows this property turns to
-            // TRUE once a file is opened for reading!
+            // could be a FileController and on Windows this property changes
+            // to TRUE once a file is opened for reading!
             final boolean readOnly = !parent.isWritable(parentName);
             final InputSocket<?> socket = driver.getInputSocket(
                     parent, parentName, MOUNT_INPUT_OPTIONS);
