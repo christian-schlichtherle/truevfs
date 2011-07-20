@@ -309,7 +309,7 @@ extends FsFileSystemArchiveController<E> {
         if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT))
             throw new IllegalArgumentException();
         awaitSync(options, handler);
-        commenceSync(handler);
+        beginSync(handler);
         try {
             if (!options.get(ABORT_CHANGES) && isTouched())
                 performSync(handler);
@@ -386,7 +386,7 @@ extends FsFileSystemArchiveController<E> {
      * @throws IOException at the discretion of the exception {@code handler}
      *         upon the occurence of an {@link FsSyncException}.
      */
-    private <X extends IOException> void commenceSync(
+    private <X extends IOException> void beginSync(
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         class FilterExceptionHandler
