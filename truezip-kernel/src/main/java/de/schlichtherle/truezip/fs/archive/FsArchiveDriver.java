@@ -50,6 +50,8 @@ import net.jcip.annotations.Immutable;
  * system which is enclosed in a parent file system.
  * Implementations of this abstract base class are used to access archive file
  * formats like ZIP, JAR, TZP, TAR, TAR.GZ, TAR.BZ2 etc.
+ * <p>
+ * Sub-classes must be thread-safe and should be immutable.
  *
  * @param   <E> The type of the archive entries.
  * @author  Christian Schlichtherle
