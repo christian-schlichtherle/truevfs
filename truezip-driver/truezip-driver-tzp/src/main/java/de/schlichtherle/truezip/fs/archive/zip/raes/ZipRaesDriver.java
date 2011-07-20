@@ -23,9 +23,11 @@ import de.schlichtherle.truezip.crypto.raes.param.KeyManagerRaesParameters;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.fs.FsController;
+import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
+import de.schlichtherle.truezip.fs.archive.FsMultiplexedArchiveOutputShop;
 import de.schlichtherle.truezip.fs.archive.zip.JarArchiveEntry;
 import de.schlichtherle.truezip.fs.archive.zip.JarDriver;
 import de.schlichtherle.truezip.fs.archive.zip.ZipArchiveEntry;
@@ -35,8 +37,6 @@ import de.schlichtherle.truezip.key.KeyManagerProvider;
 import de.schlichtherle.truezip.key.KeyProvider;
 import de.schlichtherle.truezip.key.PromptingKeyProvider;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.socket.DecoratingInputSocket;
-import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.socket.InputSocket;
@@ -49,7 +49,6 @@ import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.CharConversionException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import net.jcip.annotations.Immutable;
@@ -156,40 +155,40 @@ public abstract class ZipRaesDriver extends JarDriver {
     @Override
     public final ZipInputShop
     newInputShop(   final FsModel model,
-                    final InputSocket<?> target)
+                    final InputSocket<?> input)
     throws IOException {
-        class Input extends DecoratingInputSocket<Entry> {
-            Input() {
-                super(target);
+        final ReadOnlyFile rof = input.newReadOnlyFile();
+        try {
+            final RaesReadOnlyFile rrof = RaesReadOnlyFile.getInstance(
+                    rof, getRaesParameters(model));
+            if (rof.length() <= getAuthenticationTrigger()) { // compare rof, not rrof!
+                // Note: If authentication fails, this is reported through some
+                // sort of IOException, not a FileNotFoundException!
+                // This allows the client to treat the tampered archive like an
+                // ordinary file which may be read, written or deleted.
+                rrof.authenticate();
             }
+            return newZipInputShop(model, rrof);
+        } catch (IOException ex) {
+            rof.close();
+            throw ex;
+        }
+    }
 
-            @Override
-            public ReadOnlyFile newReadOnlyFile() throws IOException {
-                final ReadOnlyFile rof = super.newReadOnlyFile();
-                try {
-                    final RaesReadOnlyFile rrof = RaesReadOnlyFile.getInstance(
-                            rof, getRaesParameters(model));
-                    if (rof.length() <= getAuthenticationTrigger()) { // compare rof, not rrof!
-                        // Note: If authentication fails, this is reported through some
-                        // sort of IOException, not a FileNotFoundException!
-                        // This allows the client to treat the tampered archive like an
-                        // ordinary file which may be read, written or deleted.
-                        rrof.authenticate();
-                    }
-                    return rrof;
-                } catch (IOException ex) {
-                    rof.close();
-                    throw ex;
-                }
-            }
-
-            @Override
-            public InputStream newInputStream() throws IOException {
-                throw new UnsupportedOperationException(); // TODO: Support this feature for STORED entries.
-            }
-        } // class Input
-
-        return super.newInputShop(model, new Input());
+    /**
+     * Sets {@link FsOutputOption#STORE} in {@code options} before
+     * forwarding the call to {@code controller}.
+     */
+    @Override
+    public final OutputSocket<?> getOutputSocket(
+            final FsController<?> controller,
+            final FsEntryName name,
+            BitField<FsOutputOption> options,
+            final @CheckForNull Entry template) {
+        // Leave FsOutputOption.COMPRESS untouched - the driver shall be given
+        // opportunity to apply its own preferences to sort out such a conflict.
+        options = options.set(STORE);
+        return controller.getOutputSocket(name, options, template);
     }
 
     /**
@@ -201,34 +200,26 @@ public abstract class ZipRaesDriver extends JarDriver {
     @Override
     public OutputShop<ZipArchiveEntry>
     newOutputShop(  final FsModel model,
-                    final OutputSocket<?> target,
+                    final OutputSocket<?> output,
                     final @CheckForNull InputShop<ZipArchiveEntry> source)
     throws IOException {
-        class Output extends DecoratingOutputSocket<Entry> {
-            Output() {
-                super(target);
+        final OutputStream out = new LazyOutputSocket<Entry>(output)
+                .newOutputStream();
+        try {
+            final RaesOutputStream ros = RaesOutputStream.getInstance(
+                    out, getRaesParameters(model));
+            return new FsMultiplexedArchiveOutputShop<ZipArchiveEntry>(
+                    newZipOutputShop(model, ros, (ZipInputShop) source),
+                    getPool());
+        } catch (IOException ex) {
+            try {
+                out.close();
+            } catch (IOException ex2) {
+                ex2.initCause(ex);
+                throw ex2;
             }
-
-            @Override
-            public OutputStream newOutputStream() throws IOException {
-                final OutputStream
-                        out = new LazyOutputSocket<Entry>(getBoundSocket())
-                            .newOutputStream();
-                try {
-                    return RaesOutputStream.getInstance(
-                            out, getRaesParameters(model));
-                } catch (IOException cause) {
-                    try {
-                        out.close();
-                    } catch (IOException ex) {
-                        throw (IOException) ex.initCause(cause);
-                    }
-                    throw cause;
-                }
-            }
-        } // class Output
-
-        return super.newOutputShop(model, new Output(), source);
+            throw ex;
+        }
     }
 
     /**
@@ -305,5 +296,5 @@ public abstract class ZipRaesDriver extends JarDriver {
          *        which has been successfully synchronized.
          */
         public abstract void sync(KeyProvider<?> provider);
-    } // enum KeyProviderSyncStrategy
+    } // KeyProviderSyncStrategy
 }
