@@ -16,16 +16,15 @@
 
 package de.schlichtherle.truezip.fs.archive.zip;
 
-import de.schlichtherle.truezip.socket.IOPool;
+import static de.schlichtherle.truezip.fs.archive.FsArchiveEntry.UNKNOWN;
+import de.schlichtherle.truezip.fs.archive.FsMultiplexedOutputShop;
 import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
+import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.OutputSocket;
-import de.schlichtherle.truezip.fs.archive.FsMultiplexedArchiveOutputShop;
+import static de.schlichtherle.truezip.zip.ZipEntry.STORED;
 import java.io.IOException;
 import java.io.OutputStream;
 import net.jcip.annotations.NotThreadSafe;
-
-import static de.schlichtherle.truezip.fs.archive.FsArchiveEntry.UNKNOWN;
-import static de.schlichtherle.truezip.zip.ZipEntry.STORED;
 
 /**
  * Created by {@link OdfDriver} to meet the special requirements of
@@ -35,7 +34,7 @@ import static de.schlichtherle.truezip.zip.ZipEntry.STORED;
  * @version $Id$
  */
 @NotThreadSafe
-public class OdfOutputShop extends FsMultiplexedArchiveOutputShop<ZipArchiveEntry> {
+public class OdfOutputShop extends FsMultiplexedOutputShop<ZipArchiveEntry> {
 
     /** The name of the entry to receive tender, loving care. */
     private static final String MIMETYPE = "mimetype";
@@ -43,9 +42,14 @@ public class OdfOutputShop extends FsMultiplexedArchiveOutputShop<ZipArchiveEntr
     /** Whether we have started to write the <i>mimetype</i> entry or not. */
     private boolean mimetype;
 
-    /** Creates a new {@code OdfOutputShop}. */
-    public OdfOutputShop(ZipOutputShop delegate, IOPool<?> pool) {
-        super(delegate, pool);
+    /**
+     * Constructs a new ODF output shop.
+     * 
+     * @param output the decorated output shop.
+     * @param pool the pool for buffering entry data.
+     */
+    public OdfOutputShop(ZipOutputShop output, IOPool<?> pool) {
+        super(output, pool);
     }
 
     @Override
