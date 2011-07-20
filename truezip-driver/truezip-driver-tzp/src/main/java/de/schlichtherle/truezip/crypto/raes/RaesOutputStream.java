@@ -30,9 +30,8 @@ import org.bouncycastle.crypto.Mac;
  * An {@link OutputStream} to produce a file with data ecnrypted according
  * to the Random Access Encryption Specification (RAES).
  *
- * @see RaesReadOnlyFile
- *
- * @author Christian Schlichtherle
+ * @see     RaesReadOnlyFile
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @NotThreadSafe
@@ -84,7 +83,6 @@ public abstract class RaesOutputStream extends CipherOutputStream {
     throws IOException {
         if (null == out)
             throw new NullPointerException();
-
         // Order is important here to support multiple interface implementations!
         if (parameters instanceof Type0RaesParameters) {
             return new Type0RaesOutputStream(out,
