@@ -112,8 +112,10 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
     private Set<OpenOption> optionSet() {
         final Set<OpenOption> set = new HashSet<OpenOption>(INITIAL_CAPACITY);
         Collections.addAll(set, WRITE_STANDARD_OPEN_OPTION);
-        if (options.get(APPEND))
+        if (options.get(APPEND)) {
             set.add(StandardOpenOption.APPEND);
+            set.remove(StandardOpenOption.TRUNCATE_EXISTING);
+        }
         if (options.get(EXCLUSIVE))
             set.add(StandardOpenOption.CREATE_NEW);
         return set;
