@@ -15,29 +15,23 @@
  */
 package de.schlichtherle.truezip.nio.file;
 
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
-import de.schlichtherle.truezip.io.Streams;
-import java.util.List;
-import java.util.LinkedList;
-import java.nio.file.DirectoryStream;
-import de.schlichtherle.truezip.file.TFile;
-import java.nio.file.Files;
-import static java.nio.file.Files.*;
-import java.nio.file.Path;
 import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.file.TConfig;
+import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.TFileTestSuite;
-import de.schlichtherle.truezip.socket.spi.ByteArrayIOPoolService;
-import de.schlichtherle.truezip.socket.IOPoolProvider;
-import de.schlichtherle.truezip.util.ArrayHelper;
-import de.schlichtherle.truezip.fs.FsSyncException;
-import de.schlichtherle.truezip.fs.FsSyncWarningException;
-import de.schlichtherle.truezip.io.FileBusyException;
-import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import de.schlichtherle.truezip.fs.FsScheme;
+import de.schlichtherle.truezip.fs.FsSyncException;
+import de.schlichtherle.truezip.fs.FsSyncWarningException;
+import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
+import de.schlichtherle.truezip.io.FileBusyException;
+import de.schlichtherle.truezip.io.Streams;
+import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.socket.OutputClosedException;
+import de.schlichtherle.truezip.socket.spi.ByteArrayIOPoolService;
+import de.schlichtherle.truezip.util.ArrayHelper;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import static java.io.File.*;
@@ -45,21 +39,26 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.nio.file.DirectoryStream;
 import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import static java.nio.file.Files.*;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.NotDirectoryException;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.FileTime;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import static org.hamcrest.CoreMatchers.*;
 import org.junit.After;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
 
 /**
  * Performs a functional test of a particular FsArchiveDriver by using the
@@ -261,7 +260,8 @@ public abstract class TPathTestSuite extends TestBase {
         // Create regular archive file.
 
         createDirectory(file);
-        assertTrue(isRegularFile(newNonArchiveFile(file)));
+        /*if (!file.isEntry())
+            assertFalse(exists(newNonArchiveFile(file)));*/
         assertTrue(exists(file));
         assertTrue(isDirectory(file));
         assertFalse(isRegularFile(file));
@@ -1280,22 +1280,22 @@ public abstract class TPathTestSuite extends TestBase {
         delete(archive1a);
         delete(archive);
     }
-    
+
     private void assertRenameTo(TPath src, TPath dst) throws IOException {
         assertTrue(exists(src));
-        if (!src.isEntry())
-            assertTrue(exists(newNonArchiveFile(src)));
+        /*if (!src.isEntry())
+            assertTrue(exists(newNonArchiveFile(src)));*/
         assertFalse(exists(dst));
-        if (!dst.isEntry())
+        //if (!dst.isEntry())
             assertFalse(exists(newNonArchiveFile(dst)));
         assert TConfig.get().isLenient();
         src.toFile().mv(dst.toFile());
         assertFalse(exists(src));
-        if (!src.isEntry())
+        //if (!src.isEntry())
             assertFalse(exists(newNonArchiveFile(src)));
         assertTrue(exists(dst));
-        if (!dst.isEntry())
-            assertTrue(exists(newNonArchiveFile(dst)));
+        /*if (!dst.isEntry())
+            assertFalse(exists(newNonArchiveFile(dst)));*/
     }
 
     private static final String[] MEMBERS = {
@@ -1303,7 +1303,7 @@ public abstract class TPathTestSuite extends TestBase {
         "Another directory member",
         "Yet another directory member",
     };
-    
+
     @Test
     public final void testList() throws IOException {
         final Path dir = createTempFile();

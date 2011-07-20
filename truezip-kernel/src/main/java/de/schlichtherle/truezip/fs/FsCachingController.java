@@ -15,40 +15,39 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.io.DecoratingInputStream;
-import net.jcip.annotations.Immutable;
-import de.schlichtherle.truezip.util.JSE7;
-import de.schlichtherle.truezip.io.DecoratingOutputStream;
-import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import java.io.InputStream;
-import de.schlichtherle.truezip.socket.IOCache.Strategy;
-import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.entry.Entry.Type;
+import static de.schlichtherle.truezip.entry.Entry.Type.*;
+import static de.schlichtherle.truezip.fs.FsOutputOption.*;
+import static de.schlichtherle.truezip.fs.FsSyncOption.*;
+import de.schlichtherle.truezip.io.DecoratingInputStream;
+import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
+import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.DecoratingInputSocket;
 import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.socket.IOCache;
+import de.schlichtherle.truezip.socket.IOCache.Strategy;
+import static de.schlichtherle.truezip.socket.IOCache.Strategy.*;
 import de.schlichtherle.truezip.socket.IOPool;
-import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
+import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
+import de.schlichtherle.truezip.util.JSE7;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import net.jcip.annotations.Immutable;
 import net.jcip.annotations.NotThreadSafe;
-
-import static de.schlichtherle.truezip.entry.Entry.Type.*;
-import static de.schlichtherle.truezip.socket.IOCache.Strategy.*;
-import static de.schlichtherle.truezip.fs.FsOutputOption.*;
-import static de.schlichtherle.truezip.fs.FsSyncOption.*;
 
 /**
  * A content caching file system controller implements a combined caching and
@@ -337,7 +336,7 @@ extends FsDecoratingController< FsConcurrentModel,
         final IOCache cache;
         volatile @CheckForNull InputSocket<?> input;
         volatile @CheckForNull OutputSocket<?> output;
-        volatile @Nullable BitField<FsOutputOption> mknodOptions;
+        volatile @Nullable BitField<FsOutputOption> outputOptions;
         volatile @CheckForNull Entry template;
 
         EntryCache(final FsEntryName name) {
@@ -355,7 +354,7 @@ extends FsDecoratingController< FsConcurrentModel,
         EntryCache configure(   BitField<FsOutputOption> options,
                                 final @CheckForNull Entry template) {
             // Consume FsOutputOption.CACHE.
-            this.mknodOptions = options = options.clear(FsOutputOption.CACHE); // consume
+            this.outputOptions = options = options.clear(FsOutputOption.CACHE); // consume
             cache.configure(delegate.getOutputSocket(
                     name,
                     options.clear(EXCLUSIVE),
@@ -384,6 +383,25 @@ extends FsDecoratingController< FsConcurrentModel,
                     : (this.output = FACTORY.newOutputSocket(
                         this,
                         cache.getOutputSocket()));
+        }
+
+        void beginOutput() throws IOException {
+            assert getModel().isWriteLockedByCurrentThread();
+            delegate.mknod(name, FILE, outputOptions, template);
+            assert getModel().isTouched();
+        }
+
+        void commitOutput() throws IOException {
+            // FIXME: This is not always true because of calls from close()
+            // assert getModel().isWriteLockedByCurrentThread();!
+            assert getModel().isTouched();
+            if (null != template)
+                return;
+            delegate.mknod(
+                    name,
+                    FILE,
+                    outputOptions.clear(EXCLUSIVE),
+                    cache.getEntry());
         }
 
         final class Input extends DecoratingInputSocket<Entry> {
@@ -431,9 +449,7 @@ extends FsDecoratingController< FsConcurrentModel,
 
             @Override
             public SeekableByteChannel newSeekableByteChannel() throws IOException {
-                assert getModel().isWriteLockedByCurrentThread();
-                delegate.mknod(name, FILE, mknodOptions, template);
-                assert getModel().isTouched();
+                beginOutput();
                 final SeekableByteChannel sbc = getBoundSocket().newSeekableByteChannel();
                 caches.put(name, EntryCache.this);
                 return new EntrySeekableByteChannel(sbc);
@@ -448,9 +464,7 @@ extends FsDecoratingController< FsConcurrentModel,
 
             @Override
             public final OutputStream newOutputStream() throws IOException {
-                assert getModel().isWriteLockedByCurrentThread();
-                delegate.mknod(name, FILE, mknodOptions, template);
-                assert getModel().isTouched();
+                beginOutput();
                 final OutputStream out = getBoundSocket().newOutputStream();
                 caches.put(name, EntryCache.this);
                 return new EntryOutputStream(out);
@@ -469,12 +483,7 @@ extends FsDecoratingController< FsConcurrentModel,
                 try {
                     delegate.close();
                 } finally {
-                    if (null == template)
-                        FsCachingController.this.delegate.mknod(
-                                name,
-                                FILE,
-                                mknodOptions.clear(EXCLUSIVE),
-                                cache.getEntry());
+                    commitOutput();
                 }
             }
         } // EntrySeekableByteChannel
@@ -490,12 +499,7 @@ extends FsDecoratingController< FsConcurrentModel,
                 try {
                     delegate.close();
                 } finally {
-                    if (null == template)
-                        FsCachingController.this.delegate.mknod(
-                                name,
-                                FILE,
-                                mknodOptions.clear(EXCLUSIVE),
-                                cache.getEntry());
+                    commitOutput();
                 }
             }
         } // EntryOutputStream

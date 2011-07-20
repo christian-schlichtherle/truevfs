@@ -15,28 +15,29 @@
  */
 package de.schlichtherle.truezip.fs.nio.file;
 
-import de.schlichtherle.truezip.socket.IOEntry;
-import de.schlichtherle.truezip.util.Pool.Releasable;
-import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.fs.FsOutputOption;
-import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
-import de.schlichtherle.truezip.socket.InputSocket;
-import de.schlichtherle.truezip.socket.OutputSocket;
+import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
+import de.schlichtherle.truezip.fs.FsOutputOption;
+import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
+import de.schlichtherle.truezip.socket.IOEntry;
+import de.schlichtherle.truezip.socket.InputSocket;
+import de.schlichtherle.truezip.socket.OutputSocket;
+import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.Pool.Releasable;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import static java.io.File.*;
 import java.io.IOException;
-import java.util.Collections;
 import java.nio.file.DirectoryStream;
 import static java.nio.file.Files.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
-import static java.io.File.*;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import net.jcip.annotations.Immutable;
@@ -198,7 +199,7 @@ implements IOEntry<FileEntry>, Releasable<IOException> {
 
     final OutputSocket<FileEntry> getOutputSocket(
             BitField<FsOutputOption> options,
-            @CheckForNull de.schlichtherle.truezip.entry.Entry template) {
+            @CheckForNull Entry template) {
         return new FileOutputSocket(this, options, template);
     }
 }
