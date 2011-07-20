@@ -21,6 +21,8 @@ import de.schlichtherle.truezip.fs.archive.zip.ZipInputShop;
 import de.schlichtherle.truezip.key.KeyManagerProvider;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import net.jcip.annotations.Immutable;
 
@@ -49,6 +51,7 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
+@DefaultAnnotation(NonNull.class)
 public class SafeZipRaesDriver extends ZipRaesDriver {
 
     public SafeZipRaesDriver(   IOPoolProvider ioPoolProvider,
@@ -97,7 +100,7 @@ public class SafeZipRaesDriver extends ZipRaesDriver {
         // Hence, checking the CRC-32 value of the plain text ZIP file is
         // redundant.
         return rof.length() > getAuthenticationTrigger()
-                ? new CheckedZipInputShop(rof, this)
+                ? new CheckedZipInputShop(this, rof)
                 : super.newZipInputShop(model, rof);
     }
 }

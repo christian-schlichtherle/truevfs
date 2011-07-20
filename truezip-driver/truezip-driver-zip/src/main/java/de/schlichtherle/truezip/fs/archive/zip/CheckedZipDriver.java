@@ -49,6 +49,6 @@ public class CheckedZipDriver extends ZipDriver {
     @Override
     protected ZipInputShop newZipInputShop(FsModel model, ReadOnlyFile rof)
     throws IOException {
-        return new CheckedZipInputShop(rof, this);
+        return new CheckedZipInputShop(this, rof);
     }
 }
