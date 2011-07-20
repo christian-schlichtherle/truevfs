@@ -122,31 +122,30 @@ implements Iterable<E>, Closeable {
      * Reads the given {@code archive} in order to provide random access
      * to its ZIP entries.
      *
-     * @param archive the {@link ReadOnlyFile} instance to be read in order to
-     *        provide random access to its ZIP entries.
-     * @param charset the charset to use for decoding entry names and ZIP file
-     *        comment.
-     * @param preambled if this is {@code true}, then the ZIP file may have a
-     *        preamble.
-     *        Otherwise, the ZIP file must start with either a Local File
-     *        Header (LFH) signature or an End Of Central Directory (EOCD)
-     *        Header, causing this constructor to fail if the file is actually
-     *        a false positive ZIP file, i.e. not compatible to the ZIP File
-     *        Format Specification.
-     *        This may be useful to read Self Extracting ZIP files (SFX), which
-     *        usually contain the application code required for extraction in
-     *        the preamble.
-     * @param postambled if this is {@code true}, then the ZIP file may have a
-     *        postamble of arbitrary length.
-     *        Otherwise, the ZIP file must not have a postamble which exceeds
-     *        64KB size, including the End Of Central Directory record
-     *        (i.e. including the ZIP file comment), causing this constructor
-     *        to fail if the file is actually a false positive ZIP file, i.e.
-     *        not compatible to the ZIP File Format Specification.
-     *        This may be useful to read Self Extracting ZIP files (SFX) with
-     *        large postambles.
-     * @param factory a factory for {@link ZipEntry}s.
-     * @throws NullPointerException if any reference parameter is {@code null}.
+     * @param  archive the {@link ReadOnlyFile} instance to be read in order to
+     *         provide random access to its ZIP entries.
+     * @param  charset the charset to use for decoding entry names and ZIP file
+     *         comment.
+     * @param  preambled if this is {@code true}, then the ZIP file may have a
+     *         preamble.
+     *         Otherwise, the ZIP file must start with either a Local File
+     *         Header (LFH) signature or an End Of Central Directory (EOCD)
+     *         Header, causing this constructor to fail if the file is actually
+     *         a false positive ZIP file, i.e. not compatible to the ZIP File
+     *         Format Specification.
+     *         This may be useful to read Self Extracting ZIP files (SFX),
+     *         which usually contain the application code required for
+     *         extraction in the preamble.
+     * @param  postambled if this is {@code true}, then the ZIP file may have a
+     *         postamble of arbitrary length.
+     *         Otherwise, the ZIP file must not have a postamble which exceeds
+     *         64KB size, including the End Of Central Directory record
+     *         (i.e. including the ZIP file comment), causing this constructor
+     *         to fail if the file is actually a false positive ZIP file, i.e.
+     *         not compatible to the ZIP File Format Specification.
+     *         This may be useful to read Self Extracting ZIP files (SFX) with
+     *         large postambles.
+     * @param  factory a factory for {@link ZipEntry}s.
      * @throws FileNotFoundException if {@code archive} cannot get opened for
      *         reading.
      * @throws ZipException if {@code archive} is not compatible to the ZIP
@@ -514,6 +513,10 @@ implements Iterable<E>, Closeable {
     /** Returns the charset to use for entry names and the file comment. */
     public String getCharset() {
         return charset.name();
+    }
+
+    final Charset getCharset0() {
+        return charset;
     }
 
     /**
