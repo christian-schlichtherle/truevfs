@@ -2009,15 +2009,14 @@ public final class TFile extends File {
      */
     @Override
     public boolean exists() {
-        // This methods deviates from the general pattern of testing if
-        // innerArchive is not null.
-        // This optimization avoids mounting an archive file system just in
-        // order to test for its existence.
-        // See http://java.net/jira/browse/TRUEZIP-77
-        if (null != enclArchive) {
+        // DONT test existance of getEnclFsEntryName() in enclArchive because
+        // it doesn't need to exist - see
+        // http://java.net/jira/browse/TRUEZIP-136 .
+        if (null != innerArchive) {
             try {
-                return null != enclArchive.getController()
-                        .getEntry(getEnclFsEntryName());
+                FsEntry entry = innerArchive.getController()
+                        .getEntry(getInnerFsEntryName());
+                return null != entry;
             } catch (IOException ex) {
                 return false;
             }

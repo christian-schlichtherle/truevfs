@@ -15,30 +15,30 @@
  */
 package de.schlichtherle.truezip.fs.file;
 
-import de.schlichtherle.truezip.util.Pool.Releasable;
-import de.schlichtherle.truezip.socket.IOEntry;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.fs.FsOutputOption;
-import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
-import de.schlichtherle.truezip.socket.InputSocket;
-import de.schlichtherle.truezip.socket.OutputSocket;
+import de.schlichtherle.truezip.entry.Entry;
+import static de.schlichtherle.truezip.entry.Entry.Access.*;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
+import de.schlichtherle.truezip.fs.FsOutputOption;
+import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
+import de.schlichtherle.truezip.socket.IOEntry;
+import de.schlichtherle.truezip.socket.InputSocket;
+import de.schlichtherle.truezip.socket.OutputSocket;
+import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.Pool.Releasable;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
-import java.util.Arrays;
-import java.util.Collections;
 import java.io.File;
 import static java.io.File.*;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import net.jcip.annotations.Immutable;
-
-import static de.schlichtherle.truezip.entry.Entry.Access.*;
 
 /**
  * Adapts a {@link File} instance to a {@link FsEntry}.
@@ -149,12 +149,12 @@ implements IOEntry<FileEntry>, Releasable<IOException> {
 
     @Override
     public final OutputSocket<FileEntry> getOutputSocket() {
-        return new FileOutputSocket(NO_OUTPUT_OPTIONS, null, this);
+        return new FileOutputSocket(this, NO_OUTPUT_OPTIONS, null);
     }
 
     final OutputSocket<FileEntry> getOutputSocket(
             BitField<FsOutputOption> options,
-            @CheckForNull de.schlichtherle.truezip.entry.Entry template) {
-        return new FileOutputSocket(options, template, this);
+            @CheckForNull Entry template) {
+        return new FileOutputSocket(this, options, template);
     }
 }
