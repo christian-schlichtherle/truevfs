@@ -85,13 +85,14 @@ public class ParanoidZipRaesDriver extends ZipRaesDriver {
             final RaesOutputStream ros = RaesOutputStream.getInstance(
                     out, getRaesParameters(model));
             return newZipOutputShop(model, ros, (ZipInputShop) source);
-        } catch (IOException cause) {
+        } catch (IOException ex) {
             try {
                 out.close();
-            } catch (IOException ex) {
-                throw (IOException) ex.initCause(cause);
+            } catch (IOException ex2) {
+                ex2.initCause(ex);
+                throw ex2;
             }
-            throw cause;
+            throw ex;
         }
     }
 }
