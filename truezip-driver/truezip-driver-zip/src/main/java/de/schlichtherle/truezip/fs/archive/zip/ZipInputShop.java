@@ -72,13 +72,13 @@ implements InputShop<ZipArchiveEntry> {
             @Override
             public InputStream newInputStream() throws IOException {
                 final Entry entry = getPeerTarget();
-                return ZipInputShop.this.getInputStream(
+                return getInputStream(
                         getLocalTarget().getName(),
                         false,
                         !(entry instanceof ZipArchiveEntry)
                             || ((ZipArchiveEntry) entry).getMethod() != DEFLATED);
             }
-        } // class Input
+        } // Input
 
         return new Input();
     }
