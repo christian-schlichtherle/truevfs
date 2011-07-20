@@ -21,6 +21,8 @@ import java.io.OutputStream;
 import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.OutputSocket;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import net.jcip.annotations.Immutable;
 
@@ -47,6 +49,7 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
+@DefaultAnnotation(NonNull.class)
 public class OdfDriver extends JarDriver {
 
     public OdfDriver(IOPoolProvider provider) {

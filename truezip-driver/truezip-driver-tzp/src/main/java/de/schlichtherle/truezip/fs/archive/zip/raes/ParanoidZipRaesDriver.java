@@ -27,6 +27,8 @@ import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.socket.LazyOutputSocket;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.OutputSocket;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.OutputStream;
 import net.jcip.annotations.Immutable;
@@ -49,6 +51,7 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
+@DefaultAnnotation(NonNull.class)
 public class ParanoidZipRaesDriver extends ZipRaesDriver {
 
     public ParanoidZipRaesDriver(   IOPoolProvider ioPoolProvider,
