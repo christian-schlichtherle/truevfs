@@ -15,29 +15,28 @@
  */
 package de.schlichtherle.truezip.zip;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import java.nio.charset.UnsupportedCharsetException;
-import java.nio.charset.Charset;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
-import java.util.Iterator;
 import de.schlichtherle.truezip.io.LEDataOutputStream;
 import de.schlichtherle.truezip.util.JSE7;
+import static de.schlichtherle.truezip.zip.ZipConstants.*;
+import static de.schlichtherle.truezip.zip.ZipEntry.DEFLATED;
+import static de.schlichtherle.truezip.zip.ZipEntry.PLATFORM_FAT;
+import static de.schlichtherle.truezip.zip.ZipEntry.STORED;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.zip.CRC32;
 import java.util.zip.ZipException;
 import net.jcip.annotations.NotThreadSafe;
-
-import static de.schlichtherle.truezip.zip.ZipConstants.*;
-import static de.schlichtherle.truezip.zip.ZipEntry.DEFLATED;
-import static de.schlichtherle.truezip.zip.ZipEntry.PLATFORM_FAT;
-import static de.schlichtherle.truezip.zip.ZipEntry.STORED;
 
 /**
  * Provides unsafe (raw) access to a ZIP file using unsynchronized
@@ -136,13 +135,10 @@ implements Iterable<E> {
      *         {@code appendee} is reading.
      * @param  appendee the raw ZIP file to append to.
      *         This may already be closed.
-     * @throws ZipException if {@code appendee} has a postamble, i.e. some data
-     *         after its central directory and before its end.
      */
     protected RawZipOutputStream(
             final OutputStream out,
-            final RawZipFile<E> appendee)
-    throws ZipException {
+            final RawZipFile<E> appendee) {
         this(out, appendee, null);
     }
 
@@ -160,19 +156,14 @@ implements Iterable<E> {
      *         This may already be closed.
      * @param  charset the character set to use if {@code appendee} is
      *         {@code null}.
-     * @throws ZipException if {@code appendee} has a postamble, i.e. some data
-     *         after its central directory and before its end
      * @since  TrueZIP 7.3
      */
     protected RawZipOutputStream(
             final OutputStream out,
             final @CheckForNull RawZipFile<E> appendee,
-            final @CheckForNull Charset charset)
-    throws ZipException {
+            final @CheckForNull Charset charset) {
         super(promote(out, appendee));
         if (null != appendee) {
-            if (0 < appendee.getPostambleLength())
-                throw new ZipException("Appending to a ZIP file with a postamble is not supported!");
             this.charset = appendee.getCharset0();
             this.comment = appendee.getComment();
             final Map<String, E> entries = this.entries;
