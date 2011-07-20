@@ -104,7 +104,6 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      *        not compatible to the ZIP File Format Specification.
      *        This may be useful to read Self Extracting ZIP files (SFX) with
      *        large postambles.
-     * @throws NullPointerException if any reference parameter is {@code null}.
      * @throws FileNotFoundException if {@code name} cannot get opened for
      *         reading.
      * @throws ZipException if {@code name} is not compatible with the ZIP
@@ -166,7 +165,6 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      *        not compatible to the ZIP File Format Specification.
      *        This may be useful to read Self Extracting ZIP files (SFX) with
      *        large postambles.
-     * @throws NullPointerException if any reference parameter is {@code null}.
      * @throws FileNotFoundException if {@code file} cannot get opened for
      *         reading.
      * @throws ZipException if {@code file} is not compatible with the ZIP
@@ -228,7 +226,6 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      *        not compatible to the ZIP File Format Specification.
      *        This may be useful to read Self Extracting ZIP files (SFX) with
      *        large postambles.
-     * @throws NullPointerException if any reference parameter is {@code null}.
      * @throws FileNotFoundException if {@code rof} cannot get opened for
      *         reading.
      * @throws ZipException if {@code rof} is not compatible with the ZIP
