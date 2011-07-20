@@ -15,9 +15,9 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
-import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
+import de.schlichtherle.truezip.socket.InputShop;
 import java.io.IOException;
 import net.jcip.annotations.Immutable;
 
@@ -47,7 +47,7 @@ public class CheckedZipDriver extends ZipDriver {
     }
 
     @Override
-    protected ZipInputShop newZipInputShop(FsModel model, ReadOnlyFile rof)
+    protected InputShop<ZipArchiveEntry> newInputShop(ReadOnlyFile rof)
     throws IOException {
         return new CheckedZipInputShop(this, rof);
     }

@@ -16,14 +16,20 @@
 package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.fs.FsModel;
+import de.schlichtherle.truezip.fs.FsOutputOption;
+import static de.schlichtherle.truezip.fs.FsOutputOption.*;
+import de.schlichtherle.truezip.fs.archive.FsMultiplexedOutputShop;
+import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
-import java.io.OutputStream;
 import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.OutputSocket;
+import de.schlichtherle.truezip.util.BitField;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
+import java.io.OutputStream;
 import net.jcip.annotations.Immutable;
 
 /**
@@ -42,34 +48,28 @@ import net.jcip.annotations.Immutable;
  * <p>
  * When using this driver to create or modify an ODF file, then in order to
  * achieve best performance, the {@code mimetype} entry should be created or
- * modified first in order to avoid temp file buffering of any other entries.
+ * modified first in order to avoid temp file buffering of all other entries.
  *
- * @see OdfOutputShop
- * @author Christian Schlichtherle
+ * @see     OdfOutputShop
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @Immutable
 @DefaultAnnotation(NonNull.class)
 public class OdfDriver extends JarDriver {
-
     public OdfDriver(IOPoolProvider provider) {
         super(provider);
     }
 
     @Override
-    public OutputShop<ZipArchiveEntry> newOutputShop(
-            FsModel model,
-            OutputSocket<?> output,
-            InputShop<ZipArchiveEntry> source)
+    protected OutputShop<ZipArchiveEntry> newOutputShop(
+            final OutputStream out,
+            final @CheckForNull ZipInputShop source)
     throws IOException {
-        final OutputStream out = output.newOutputStream();
-        try {
-            return new OdfOutputShop(
-                    newZipOutputShop(model, out, (ZipInputShop) source),
-                    getPool());
-        } catch (IOException ex) {
-            out.close();
-            throw ex;
-        }
+        final IOPool<?> pool = getPool();
+        final ZipOutputShop shop = new ZipOutputShop(this, out, source);
+        return null != source && source.isAppendee()
+                ? new FsMultiplexedOutputShop<ZipArchiveEntry>(shop, pool)
+                : new OdfOutputShop(shop, pool);
     }
 }

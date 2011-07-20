@@ -16,8 +16,8 @@
 package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.entry.Entry;
-import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
-import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
+import static de.schlichtherle.truezip.entry.Entry.Access.*;
+import static de.schlichtherle.truezip.entry.Entry.Size.*;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsEntryName;
@@ -25,9 +25,8 @@ import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriver;
-import de.schlichtherle.truezip.fs.archive.FsMultiplexedArchiveOutputShop;
+import de.schlichtherle.truezip.fs.archive.FsMultiplexedOutputShop;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.socket.InputShop;
@@ -116,7 +115,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
      *
      * @return The value of the property {@code preambled}.
      */
-    public boolean getPreambled() {
+    protected boolean getPreambled() {
         return false;
     }
 
@@ -141,7 +140,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
      *
      * @return The value of the property {@code postambled}.
      */
-    public boolean getPostambled() {
+    protected boolean getPostambled() {
         return false;
     }
 
@@ -155,7 +154,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
      *
      * @return The value of the property {@code method}.
      */
-    public int getMethod() {
+    protected int getMethod() {
         return DEFLATED;
     }
 
@@ -169,7 +168,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
      *
      * @return The value of the property {@code level}.
      */
-    public int getLevel() {
+    protected int getLevel() {
         return Deflater.BEST_COMPRESSION;
     }
 
@@ -178,23 +177,23 @@ implements ZipEntryFactory<ZipArchiveEntry> {
      * <p>
      * The implementation in the class {@link ZipDriver} acquires a read only
      * file from the given socket and forwards the call to
-     * {@link #newZipInputShop}.
+     * {@link #newInputShop}.
      */
     @Override
-    public ZipInputShop newInputShop(
+    public InputShop<ZipArchiveEntry> newInputShop(
             final FsModel model,
             final InputSocket<?> input)
     throws IOException {
         final ReadOnlyFile rof = input.newReadOnlyFile();
         try {
-            return newZipInputShop(model, rof);
+            return newInputShop(rof);
         } catch (IOException ex) {
             rof.close();
             throw ex;
         }
     }
 
-    protected ZipInputShop newZipInputShop(FsModel model, ReadOnlyFile rof)
+    protected InputShop<ZipArchiveEntry> newInputShop(ReadOnlyFile rof)
     throws IOException {
         return new ZipInputShop(this, rof);
     }
@@ -214,10 +213,9 @@ implements ZipEntryFactory<ZipArchiveEntry> {
      * overridden, too.
      * Otherwise, a class cast exception will get thrown in
      * {@link #newOutputShop}.
-     * 
      */
     @Override
-    public OutputSocket<?> getOutputSocket(
+    public OptionOutputSocket getOutputSocket(
             final FsController<?> controller,
             final FsEntryName name,
             final BitField<FsOutputOption> options,
@@ -227,23 +225,10 @@ implements ZipEntryFactory<ZipArchiveEntry> {
         BitField<FsOutputOption> options2 = options.set(STORE);
         if (options2.get(GROW))
             options2 = options2.set(APPEND);
-        return new Output(
+        return new OptionOutputSocket(
                 controller.getOutputSocket(name, options2, template),
                 options); // use original options!
     }
-
-    private static final class Output extends DecoratingOutputSocket<Entry> {
-        final BitField<FsOutputOption> options;
-
-        Output(OutputSocket<?> output, BitField<FsOutputOption> options) {
-            super(output);
-            this.options = options;
-        }
-
-        boolean get(FsOutputOption option) {
-            return options.get(option);
-        }
-    } // Output
 
     /**
      * This implementation first checks if {@link FsOutputOption#GROW} is set
@@ -251,35 +236,54 @@ implements ZipEntryFactory<ZipArchiveEntry> {
      * If this is the case and the given {@code source} is not {@code null},
      * then it's marked for appending to it.
      * Then, an output stream is acquired from the given {@code output} socket
-     * and the parameters are forwarded to {@link #newZipOutputShop} and the
-     * result gets wrapped in a new {@link FsMultiplexedArchiveOutputShop}
+     * and the parameters are forwarded to {@link #newOutputShop(FsModel, OptionOutputSocket, ZipInputShop)}
+     * and the result gets wrapped in a new {@link FsMultiplexedOutputShop}
      * which uses the current {@link #getPool}.
      */
     @Override
-    public OutputShop<ZipArchiveEntry> newOutputShop(
+    public final OutputShop<ZipArchiveEntry> newOutputShop(
             final FsModel model,
             final OutputSocket<?> output,
             final @CheckForNull InputShop<ZipArchiveEntry> source)
     throws IOException {
-        final Output zipOutput = (Output) output;
-        final ZipInputShop zipSource = (ZipInputShop) source;
-        if (zipOutput.get(GROW) && null != zipSource)
-            zipSource.setAppendee(true);
-        final OutputStream out = zipOutput.newOutputStream();
+        return newOutputShop0(
+                model,
+                (OptionOutputSocket) output,
+                (ZipInputShop) source);
+    }
+
+    private OutputShop<ZipArchiveEntry> newOutputShop0(
+            final FsModel model,
+            final OptionOutputSocket output,
+            final @CheckForNull ZipInputShop source)
+    throws IOException {
+        final BitField<FsOutputOption> options = output.getOptions();
+        if (null != source)
+            source.setAppendee(options.get(GROW));
+        return newOutputShop(model, output, source);
+    }
+
+    protected OutputShop<ZipArchiveEntry> newOutputShop(
+            final FsModel model,
+            final OptionOutputSocket output,
+            final @CheckForNull ZipInputShop source)
+    throws IOException {
+        final OutputStream out = output.newOutputStream();
         try {
-            return new FsMultiplexedArchiveOutputShop<ZipArchiveEntry>(
-                    newZipOutputShop(model, out, zipSource),
-                    getPool());
+            return newOutputShop(out, source);
         } catch (IOException ex) {
             out.close();
             throw ex;
         }
     }
 
-    protected ZipOutputShop newZipOutputShop(
-            FsModel model, OutputStream out, @CheckForNull ZipInputShop source)
+    protected OutputShop<ZipArchiveEntry> newOutputShop(
+            final OutputStream out,
+            final @CheckForNull ZipInputShop source)
     throws IOException {
-        return new ZipOutputShop(this, out, source);
+        return new FsMultiplexedOutputShop<ZipArchiveEntry>(
+                new ZipOutputShop(this, out, source),
+                getPool());
     }
 
     @Override
@@ -317,7 +321,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
         return new ZipArchiveEntry(name);
     }
 
-    public ZipArchiveEntry newEntry(String name, ZipArchiveEntry template) {
+    protected ZipArchiveEntry newEntry(String name, ZipArchiveEntry template) {
         return new ZipArchiveEntry(name, template);
     }
 }

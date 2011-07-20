@@ -17,7 +17,7 @@ package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.entry.Entry;
 import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
-import de.schlichtherle.truezip.fs.archive.FsMultiplexedArchiveOutputShop;
+import de.schlichtherle.truezip.fs.archive.FsMultiplexedOutputShop;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.io.Streams;
@@ -46,14 +46,14 @@ import java.util.zip.CheckedOutputStream;
  * An output shop for writing ZIP archive files.
  * This output shop can only write one entry at a time.
  * Archive drivers may wrap this class in a
- * {@link FsMultiplexedArchiveOutputShop} to overcome this limitation.
+ * {@link FsMultiplexedOutputShop} to overcome this limitation.
  * 
  * @see     ZipInputShop
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-public class ZipOutputShop
+public final class ZipOutputShop
 extends RawZipOutputStream<ZipArchiveEntry>
 implements OutputShop<ZipArchiveEntry> {
 
