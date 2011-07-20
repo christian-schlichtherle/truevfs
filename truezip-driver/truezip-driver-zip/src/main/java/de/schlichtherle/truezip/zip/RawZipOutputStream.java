@@ -111,32 +111,31 @@ implements Iterable<E> {
     private boolean deflate;
 
     /**
-     * Constructs a ZIP output stream which decorates the given output stream
-     * using the given charset.
+     * Constructs a raw ZIP output stream which decorates the given output
+     * stream using the given charset.
      *
-     * @throws NullPointerException If any parameter is {@code null}.
      * @throws UnsupportedCharsetException If {@code charset} is not supported
      *         by this JVM.
      */
     protected RawZipOutputStream(
             final OutputStream out,
             final Charset charset) {
-        super(toLEDataOutputStream(out));
-        if (null == out || null == charset)
+        super(promote(out, null));
+        if (null == charset)
             throw new NullPointerException();
         this.charset = charset;
     }
 
     /**
-     * Constructs a ZIP output stream which decorates the given output stream
-     * and apppends to the given raw ZIP file.
-     * <p>
-     * In order to append entries to an existing ZIP file, {@code out}
-     * must be set up so that it appends to the same ZIP file from
-     * which {@code appendee} is reading.
-     * {@code appendee} may already be closed.
+     * Constructs a raw ZIP output stream which decorates the given output
+     * stream and appends to the given raw ZIP file.
      *
-     * @throws NullPointerException If any parameter is {@code null}.
+     * @param  out The output stream to write the ZIP file to.
+     *         If {@code appendee} is not {@code null}, then this must be set
+     *         up so that it appends to the same ZIP file from which
+     *         {@code appendee} is reading.
+     * @param  appendee the raw ZIP file to append to.
+     *         This may already be closed.
      * @throws ZipException if {@code appendee} has a postamble, i.e. some data
      *         after its central directory and before its end.
      */
@@ -144,20 +143,58 @@ implements Iterable<E> {
             final OutputStream out,
             final RawZipFile<E> appendee)
     throws ZipException {
-        super(new AppendingLEDataOutputStream(out, appendee));
-        if (null == out)
-            throw new NullPointerException();
-        if (appendee.getPostambleLength() > 0)
-            throw new ZipException("Appending to a ZIP file with a postamble is not supported!");
-        for (E entry : appendee)
-            entries.put(entry.getName(), entry);
-        this.charset = Charset.forName(appendee.getCharset());
+        this(out, appendee, null);
     }
 
-    private static LEDataOutputStream toLEDataOutputStream(OutputStream out) {
-        return out instanceof LEDataOutputStream
-                ? (LEDataOutputStream) out
-                : new LEDataOutputStream(out);
+    /**
+     * Constructs a raw ZIP output stream which decorates the given output
+     * stream and optionally apppends to the given raw ZIP file.
+     * <p>
+     * This constructor is not intended for ordinary use.
+     *
+     * @param  out The output stream to write the ZIP file to.
+     *         If {@code appendee} is not {@code null}, then this must be set
+     *         up so that it appends to the same ZIP file from which
+     *         {@code appendee} is reading.
+     * @param  appendee the raw ZIP file to append to.
+     *         This may already be closed.
+     * @param  charset the character set to use if {@code appendee} is
+     *         {@code null}.
+     * @throws ZipException if {@code appendee} has a postamble, i.e. some data
+     *         after its central directory and before its end
+     * @since  TrueZIP 7.3
+     */
+    protected RawZipOutputStream(
+            final OutputStream out,
+            final @CheckForNull RawZipFile<E> appendee,
+            final @CheckForNull Charset charset)
+    throws ZipException {
+        super(promote(out, appendee));
+        if (null != appendee) {
+            if (0 < appendee.getPostambleLength())
+                throw new ZipException("Appending to a ZIP file with a postamble is not supported!");
+            this.charset = appendee.getCharset0();
+            this.comment = appendee.getComment();
+            final Map<String, E> entries = this.entries;
+            for (E entry : appendee)
+                entries.put(entry.getName(), entry);
+        } else {
+            if (null == charset)
+                throw new NullPointerException();
+            this.charset = charset;
+        }
+    }
+
+    private static LEDataOutputStream promote(
+            final OutputStream out,
+            final @CheckForNull RawZipFile<?> appendee) {
+        if (null == out)
+            throw new NullPointerException();
+        return null != appendee
+                ? new AppendingLEDataOutputStream(out, appendee)
+                : out instanceof LEDataOutputStream
+                    ? (LEDataOutputStream) out
+                    : new LEDataOutputStream(out);
     }
 
     /* Adjusts the number of written bytes for appending mode. */
@@ -165,9 +202,7 @@ implements Iterable<E> {
     extends LEDataOutputStream {
         AppendingLEDataOutputStream(OutputStream out, RawZipFile<?> appendee) {
             super(out);
-            super.written = null == appendee
-                    ? 0
-                    : appendee.getOffsetMapper().location(appendee.length());
+            super.written = appendee.getOffsetMapper().location(appendee.length());
         }
     } // AppendingLEDataOutputStream
 
