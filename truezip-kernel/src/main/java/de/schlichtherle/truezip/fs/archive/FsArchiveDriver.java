@@ -63,6 +63,43 @@ public abstract class FsArchiveDriver<E extends FsArchiveEntry>
 extends FsDriver {
 
     /**
+     * Returns a new thread-safe file system controller for the mount point of
+     * the given file system model and parent file system controller.
+     * <p>
+     * When called, the following expression is a precondition:
+     * {@code model.getParent().equals(parent.getModel())}
+     * <p>
+     * Note that an archive file system is always federated and therefore
+     * its parent file system controller is never {@code null}.
+     * <p>
+     * Furthermore, an archive driver implementation is <em>not</em> expected
+     * to consider the scheme of the given mount point to determine the class
+     * of the returned file system controller.
+     * Consequently, it is an error to call this method with a mount point
+     * which has a scheme which is not supported by this archive driver.
+     * <p>
+     * Note again that unlike the other components created by this factory,
+     * the returned file system controller must be thread-safe!
+     *
+     * @param  model the file system model.
+     * @param  parent the nullable parent file system controller.
+     * @return A new thread-safe file system controller for the given mount
+     *         point and parent file system controller.
+     */
+    @Override
+    public FsController<?>
+    newController(FsModel model, FsController<?> parent) {
+        return  new FsConcurrentController(
+                   new FsCachingController(
+                        new FsContextController(
+                            new FsDefaultArchiveController<E>(
+                                new FsContextModel(model),
+                                parent,
+                                this)),
+                        getPool()));
+    }
+
+    /**
      * {@inheritDoc}
      * <p>
      * The implementation in the class {@link FsArchiveDriver} always returns
@@ -127,6 +164,7 @@ extends FsDriver {
      * @param  name the entry name.
      * @param  options the options to use.
      * @return An input socket for reading an artifact of this driver.
+     * @since  TrueZIP 7.1
      */
     public InputSocket<?> getInputSocket(   FsController<?> controller,
                                             FsEntryName name,
@@ -135,72 +173,14 @@ extends FsDriver {
     }
 
     /**
-     * Called to prepare writing an archive file artifact of this driver to
-     * {@code name} in {@code controller} using {@code options} and {@code template}.
-     * <p>
-     * This method should be overridden in order to modify the given options
-     * before forwarding the call to the given controller.
-     * The implementation in the class {@link FsArchiveDriver} simply forwards
-     * the call to the given controller with the given options unaltered.
-     * 
-     * @param  controller the controller to use for writing an artifact of this
-     *         driver.
-     * @param  name the entry name.
-     * @param  options the options to use.
-     * @param  template the template to use.
-     * @return An output socket for writing an artifact of this driver.
-     */
-    public OutputSocket<?> getOutputSocket( FsController<?> controller,
-                                            FsEntryName name,
-                                            BitField<FsOutputOption> options,
-                                            @CheckForNull Entry template) {
-        return controller.getOutputSocket(name, options, template);
-    }
-
-    /**
-     * Returns a new thread-safe file system controller for the mount point of
-     * the given file system model and parent file system controller.
-     * <p>
-     * When called, the following expression is a precondition:
-     * {@code model.getParent().equals(parent.getModel())}
-     * <p>
-     * Note that an archive file system is always federated and therefore
-     * its parent file system controller is never {@code null}.
-     * <p>
-     * Furthermore, an archive driver implementation is <em>not</em> expected
-     * to consider the scheme of the given mount point to determine the class
-     * of the returned file system controller.
-     * Consequently, it is an error to call this method with a mount point
-     * which has a scheme which is not supported by this archive driver.
-     * <p>
-     * Note again that unlike the other components created by this factory,
-     * the returned file system controller must be thread-safe!
-     *
-     * @param  model the file system model.
-     * @param  parent the nullable parent file system controller.
-     * @return A new thread-safe file system controller for the given mount
-     *         point and parent file system controller.
-     */
-    @Override
-    public FsController<?>
-    newController(FsModel model, FsController<?> parent) {
-        return  new FsConcurrentController(
-                   new FsCachingController(
-                        new FsContextController(
-                            new FsDefaultArchiveController<E>(
-                                new FsContextModel(model),
-                                parent,
-                                this)),
-                        getPool()));
-    }
-
-    /**
      * Creates a new input shop for reading the archive entries for the
      * given {@code model} from the given {@code input} socket's target.
      * 
      * @param  model the file system model.
-     * @param  input the input socket for reading the contents of the archive
-     *         from its target.
+     * @param  input the input socket for reading the contents of the
+     *         archive file from its target.
+     *         This is guaranteed to be the product of this driver's
+     *         {@link #getInputSocket} method.
      * @return A new input shop.
      * @throws IOException on any I/O error.
      *         If the file system entry for the given model exists in the
@@ -286,20 +266,46 @@ extends FsDriver {
     }
 
     /**
+     * Called to prepare writing an archive file artifact of this driver to
+     * {@code name} in {@code controller} using {@code options} and
+     * {@code template}.
+     * <p>
+     * This method should be overridden in order to modify the given options
+     * before forwarding the call to the given controller.
+     * The implementation in the class {@link FsArchiveDriver} simply forwards
+     * the call to the given controller with the given options unaltered.
+     * 
+     * @param  controller the controller to use for writing an artifact of this
+     *         driver.
+     * @param  name the entry name.
+     * @param  options the options to use.
+     * @param  template the template to use.
+     * @return An output socket for writing an artifact of this driver.
+     * @since  TrueZIP 7.1
+     */
+    public OutputSocket<?> getOutputSocket( FsController<?> controller,
+                                            FsEntryName name,
+                                            BitField<FsOutputOption> options,
+                                            @CheckForNull Entry template) {
+        return controller.getOutputSocket(name, options, template);
+    }
+
+    /**
      * Creates a new output shop for writing archive entries for the
      * given {@code model} to the given {@code output} socket's target.
      * 
      * @param  model the file system model.
      * @param  output the output socket for writing the contents of the
-     *         archive to its target.
+     *         archive file to its target.
+     *         This is guaranteed to be the product of this driver's
+     *         {@link #getOutputSocket} method.
      * @param  source the {@link InputShop} if {@code archive} is going to get
      *         updated.
-     *         If not {@code null}, this is guaranteed to be a product
-     *         of this driver's {@link #newInputShop} factory method, which may
-     *         be used to copy some meta data which is specific to the type of
-     *         archive this driver supports.
-     *         For example, this could be used to copy the comment of a ZIP
-     *         file.
+     *         If not {@code null}, this is guaranteed to be the product
+     *         of this driver's {@link #newInputShop} factory method.
+     *         This feature could get used to copy some meta data which is
+     *         specific to the type of archive this driver supports,
+     *         e.g. the comment of a ZIP file.
      * @return A new output shop.
      * @throws IOException on any I/O error.
      */
