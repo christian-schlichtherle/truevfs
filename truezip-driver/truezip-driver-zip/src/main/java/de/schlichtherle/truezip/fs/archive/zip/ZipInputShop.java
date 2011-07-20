@@ -54,7 +54,7 @@ implements InputShop<ZipArchiveEntry> {
      * @return {@code true} if and only if the target archive file gets entries
      *         appended to it.
      */
-    boolean isAppendee() {
+    protected boolean isAppendee() {
         return appendee;
     }
 
@@ -65,7 +65,7 @@ implements InputShop<ZipArchiveEntry> {
      * @param appendee {@code true} if and only if the target archive file gets
      *        entries appended to it.
      */
-    void setAppendee(boolean appendee) {
+    protected void setAppendee(boolean appendee) {
         this.appendee = appendee;
     }
 
