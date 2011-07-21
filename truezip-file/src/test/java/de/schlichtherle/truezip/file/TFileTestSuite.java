@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.fs.FsController;
+import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
@@ -25,6 +26,7 @@ import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.socket.OutputClosedException;
 import de.schlichtherle.truezip.socket.spi.ByteArrayIOPoolService;
 import de.schlichtherle.truezip.util.ArrayHelper;
+import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.ByteArrayInputStream;
@@ -1423,7 +1425,7 @@ public abstract class TFileTestSuite extends TestBase {
                         throw new AssertionError(ex);
                 }
             }
-        } // class WritingThread
+        } // WritingThread
         
         // Create and start all threads.
         final WritingThread[] threads = new WritingThread[nThreads];
@@ -1495,7 +1497,7 @@ public abstract class TFileTestSuite extends TestBase {
                     TFile.rm_r(archive);
                 }
             }
-        } // class WritingThread
+        } // WritingThread
         
         // Create and start all threads.
         final WritingThread[] threads = new WritingThread[nThreads];
@@ -1531,5 +1533,49 @@ public abstract class TFileTestSuite extends TestBase {
         }
 
         abstract void work() throws IOException;
+    } // IOThread
+
+    @Test
+    public void testGrow() throws IOException {
+        final TFile file = newNonArchiveFile(archive);
+        final TFile entry1 = new TFile(archive, "entry1");
+        final TFile entry2 = new TFile(archive, "entry2");
+
+        final TConfig config = TConfig.push();
+        try {
+            config.setOutputPreferences(BitField.of(CREATE_PARENTS, STORE));
+
+            assertGrow(entry1);
+            assertGrow(entry2);
+
+            TFile.umount();
+            assertTrue(file.length() > 2 * data.length); // two entries plus one central directory
+
+            final TConfig config2 = TConfig.push();
+            try {
+                config2.setOutputPreferences(BitField.of(CREATE_PARENTS, STORE, GROW));
+
+                assertGrow(entry1);
+                assertGrow(entry2);
+                assertGrow(entry1);
+                assertGrow(entry2);
+            } finally {
+                config2.close();
+            }
+
+            TFile.umount();
+            assertTrue(file.length() > 6 * data.length); // six entries plus two central directories
+        } finally {
+            config.close();
+        }
+    }
+
+    private void assertGrow(final TFile entry) throws IOException {
+        final OutputStream out = new TFileOutputStream(entry);
+        try {
+            out.write(data);
+        } finally {
+            out.close();
+        }
     }
 }

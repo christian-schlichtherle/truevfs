@@ -34,4 +34,8 @@ public final class TTarBZip2PathTest extends TPathTestSuite {
             }
         });
     }
+
+    @Override
+    public void testGrow() {
+    }
 }

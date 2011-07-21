@@ -20,6 +20,7 @@ import de.schlichtherle.truezip.file.TConfig;
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.TFileTestSuite;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
+import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
@@ -30,6 +31,7 @@ import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.socket.OutputClosedException;
 import de.schlichtherle.truezip.socket.spi.ByteArrayIOPoolService;
 import de.schlichtherle.truezip.util.ArrayHelper;
+import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.ByteArrayInputStream;
@@ -125,6 +127,14 @@ public abstract class TPathTestSuite extends TestBase {
         return "." + scheme;
     }
 
+    protected final byte[] getData() {
+        return data.clone();
+    }
+
+    protected final int getDataLength() {
+        return data.length;
+    }
+
     @After
     @Override
     public void tearDown() throws Exception {
@@ -153,7 +163,7 @@ public abstract class TPathTestSuite extends TestBase {
         }
     }
 
-    protected static TPath newNonArchiveFile(TPath path) {
+    protected static TPath newNonArchivePath(TPath path) {
         TConfig config = TConfig.push();
         try {
             config.setArchiveDetector(TArchiveDetector.NULL);
@@ -183,7 +193,7 @@ public abstract class TPathTestSuite extends TestBase {
         assertFalsePositive(entry);
         delete(archive);
 
-        createDirectory(newNonArchiveFile(archive));
+        createDirectory(newNonArchivePath(archive));
         assertFalsePositive(entry);
         delete(archive);
     }
@@ -233,7 +243,7 @@ public abstract class TPathTestSuite extends TestBase {
 
         // Create directory false positive.
 
-        createDirectory(newNonArchiveFile(file));
+        createDirectory(newNonArchivePath(file));
         assertTrue(exists(file));
         assertTrue(isDirectory(file));
         assertFalse(isRegularFile(file));
@@ -261,7 +271,7 @@ public abstract class TPathTestSuite extends TestBase {
 
         createDirectory(file);
         /*if (!file.isEntry())
-            assertFalse(exists(newNonArchiveFile(file)));*/
+            assertFalse(exists(newNonArchivePath(file)));*/
         assertTrue(exists(file));
         assertTrue(isDirectory(file));
         assertFalse(isRegularFile(file));
@@ -401,7 +411,7 @@ public abstract class TPathTestSuite extends TestBase {
             };
             TPath file = archive;
             for (int i = 0; i <= names.length; i++) {
-                final TPath file2 = newNonArchiveFile(file);
+                final TPath file2 = newNonArchivePath(file);
                 createDirectory(file2);
                 assertIllegalDirectoryOperations(file2);
                 delete(file2);
@@ -479,7 +489,7 @@ public abstract class TPathTestSuite extends TestBase {
         } catch (IOException expected) {
         }
         TFileSystemProvider.umount(); // allow external modifications!
-        delete(newNonArchiveFile(archive)); // use plain file to delete instead!
+        delete(newNonArchivePath(archive)); // use plain file to delete instead!
         assertFalse(exists(archive));
         assertFalse(isDirectory(archive));
         assertFalse(isRegularFile(archive));
@@ -555,7 +565,7 @@ public abstract class TPathTestSuite extends TestBase {
 
             // in1 is still open!
             try {
-                TFile.umount(); // forces closing of fis1
+                TFileSystemProvider.umount(); // forces closing of fis1
                 fail("Expected warning exception when synchronizing a busy archive file!");
             } catch (FsSyncWarningException ex) {
                 if (!(ex.getCause() instanceof FileBusyException))
@@ -580,7 +590,7 @@ public abstract class TPathTestSuite extends TestBase {
                 fail("The garbage collector hasn't been collecting an open stream. If this is only happening occasionally, you can safely ignore it.");
             }
 
-            delete(newNonArchiveFile(archive));
+            delete(newNonArchivePath(archive));
         } finally {
             // Closing the invalidated stream explicitly should be OK.
             in1.close();
@@ -961,7 +971,7 @@ public abstract class TPathTestSuite extends TestBase {
         assertCopyDelete(archive, names, 0);
         delete(archive);
 
-        createDirectory(newNonArchiveFile(archive)); // create false positive archive file
+        createDirectory(newNonArchivePath(archive)); // create false positive archive file
         assertCopyDelete(archive, names, 0);
         delete(archive);
     }
@@ -978,7 +988,7 @@ public abstract class TPathTestSuite extends TestBase {
         assertCopyDelete(dir, names, off + 1); // continue recursion
         delete(dir);
 
-        createDirectory(newNonArchiveFile(dir)); // create false positive archive file
+        createDirectory(newNonArchivePath(dir)); // create false positive archive file
         assertCopyDelete(parent, dir);
         assertCopyDelete(dir, names, off + 1); // continue recursion
         delete(dir);
@@ -1098,7 +1108,7 @@ public abstract class TPathTestSuite extends TestBase {
         } catch (IOException expected) {
         }
         TFileSystemProvider.umount(); // allow external modifications!
-        delete(newNonArchiveFile(archive)); // use plain file to delete instead!
+        delete(newNonArchivePath(archive)); // use plain file to delete instead!
         assertFalse(exists(archive));
         assertFalse(isDirectory(archive));
         assertFalse(isRegularFile(archive));
@@ -1187,7 +1197,7 @@ public abstract class TPathTestSuite extends TestBase {
             in1.close();
         }
         archive.toFile().rm_r();
-        assertFalse(exists(newNonArchiveFile(archive)));
+        assertFalse(exists(newNonArchivePath(archive)));
     }
     
     @Test
@@ -1212,7 +1222,7 @@ public abstract class TPathTestSuite extends TestBase {
         // - not a regular archive.
         // So upon completion of this step, the object "archive" refers to a
         // false positive.
-        final TPath tmp = newNonArchiveFile(archive);
+        final TPath tmp = newNonArchivePath(archive);
         final InputStream in = new ByteArrayInputStream(data);
         copy(in, tmp);
         assertRenameArchiveToTemp(archive);
@@ -1227,7 +1237,7 @@ public abstract class TPathTestSuite extends TestBase {
         TPath tmp = new TPath(Files.createTempFile(TEMP_FILE_PREFIX, null));
         delete(tmp);
         assertFalse(exists(tmp));
-        assertFalse(exists(newNonArchiveFile(tmp)));
+        assertFalse(exists(newNonArchivePath(tmp)));
 
         // Now rename the archive to the temporary path.
         // Depending on the true state of the object "archive", this will
@@ -1235,12 +1245,12 @@ public abstract class TPathTestSuite extends TestBase {
         // plain file (iff archive is a false positive).
         archive.toFile().mv(tmp.toFile());
         assertFalse(exists(archive));
-        assertFalse(exists(newNonArchiveFile(archive)));
+        assertFalse(exists(newNonArchivePath(archive)));
 
         // Now delete resulting temporary file or directory.
         tmp.toFile().rm_r();
         assertFalse(exists(tmp));
-        assertFalse(exists(newNonArchiveFile(tmp)));
+        assertFalse(exists(newNonArchivePath(tmp)));
     }
 
     @Test
@@ -1284,18 +1294,18 @@ public abstract class TPathTestSuite extends TestBase {
     private void assertRenameTo(TPath src, TPath dst) throws IOException {
         assertTrue(exists(src));
         /*if (!src.isEntry())
-            assertTrue(exists(newNonArchiveFile(src)));*/
+            assertTrue(exists(newNonArchivePath(src)));*/
         assertFalse(exists(dst));
         //if (!dst.isEntry())
-            assertFalse(exists(newNonArchiveFile(dst)));
+            assertFalse(exists(newNonArchivePath(dst)));
         assert TConfig.get().isLenient();
         src.toFile().mv(dst.toFile());
         assertFalse(exists(src));
         //if (!src.isEntry())
-            assertFalse(exists(newNonArchiveFile(src)));
+            assertFalse(exists(newNonArchivePath(src)));
         assertTrue(exists(dst));
         /*if (!dst.isEntry())
-            assertFalse(exists(newNonArchiveFile(dst)));*/
+            assertFalse(exists(newNonArchivePath(dst)));*/
     }
 
     private static final String[] MEMBERS = {
@@ -1369,7 +1379,7 @@ public abstract class TPathTestSuite extends TestBase {
             public void work() throws IOException {
                 assertArchiveEntries(archive, nEntries);
             }
-        } // class CheckAllEntriesThread
+        } // CheckAllEntriesThread
         
         // Create and start all threads.
         final CheckAllEntriesThread[] threads = new CheckAllEntriesThread[nThreads];
@@ -1486,7 +1496,7 @@ public abstract class TPathTestSuite extends TestBase {
                         throw new AssertionError(ex);
                 }
             }
-        } // class WritingThread
+        } // WritingThread
         
         // Create and start all threads.
         final WritingThread[] threads = new WritingThread[nThreads];
@@ -1558,7 +1568,7 @@ public abstract class TPathTestSuite extends TestBase {
                     archive.toFile().rm_r();
                 }
             }
-        } // class WritingThread
+        } // WritingThread
         
         // Create and start all threads.
         final WritingThread[] threads = new WritingThread[nThreads];
@@ -1594,5 +1604,49 @@ public abstract class TPathTestSuite extends TestBase {
         }
 
         abstract void work() throws IOException;
+    } // IOThread
+
+    @Test
+    public void testGrow() throws IOException {
+        final TPath path = newNonArchivePath(archive);
+        final TPath entry1 = archive.resolve("entry1");
+        final TPath entry2 = archive.resolve("entry2");
+
+        final TConfig config = TConfig.push();
+        try {
+            config.setOutputPreferences(BitField.of(CREATE_PARENTS, STORE));
+
+            assertGrow(entry1);
+            assertGrow(entry2);
+
+            TFileSystemProvider.umount();
+            assertTrue(size(path) > 2 * data.length); // two entries plus one central directory
+
+            final TConfig config2 = TConfig.push();
+            try {
+                config2.setOutputPreferences(BitField.of(CREATE_PARENTS, STORE, GROW));
+
+                assertGrow(entry1);
+                assertGrow(entry2);
+                assertGrow(entry1);
+                assertGrow(entry2);
+            } finally {
+                config2.close();
+            }
+
+            TFileSystemProvider.umount();
+            assertTrue(size(path) > 6 * data.length); // six entries plus two central directories
+        } finally {
+            config.close();
+        }
+    }
+
+    private void assertGrow(final TPath entry) throws IOException {
+        final OutputStream out = newOutputStream(entry);
+        try {
+            out.write(data);
+        } finally {
+            out.close();
+        }
     }
 }

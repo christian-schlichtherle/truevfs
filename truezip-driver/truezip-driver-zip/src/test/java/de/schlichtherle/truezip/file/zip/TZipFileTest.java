@@ -15,18 +15,9 @@
  */
 package de.schlichtherle.truezip.file.zip;
 
-import de.schlichtherle.truezip.file.TConfig;
-import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.TFileTestSuite;
-import de.schlichtherle.truezip.file.TFileWriter;
-import de.schlichtherle.truezip.fs.archive.zip.ZipDriver;
-import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import de.schlichtherle.truezip.fs.FsScheme;
-import de.schlichtherle.truezip.util.BitField;
-import java.io.IOException;
-import java.io.PrintWriter;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import de.schlichtherle.truezip.fs.archive.zip.ZipDriver;
 
 /**
  * @author  Christian Schlichtherle
@@ -37,34 +28,4 @@ public final class TZipFileTest extends TFileTestSuite {
     public TZipFileTest() {
         super(FsScheme.create("zip"), new ZipDriver(IO_POOL_PROVIDER));
     }
-
-    /*@Test
-    public void testGrow() throws IOException {
-        final TFile entry = new TFile(getArchive(), "entry");
-        assertPrint(entry);
-
-        final TFile file = newNonArchiveFile(getArchive());
-        final long size = file.length();
-        assertTrue(size > 0);
-
-        final TConfig config = TConfig.push();
-        try {
-            config.setOutputPreferences(BitField.of(CREATE_PARENTS, GROW));
-            assertPrint(entry);
-        } finally {
-            config.close();
-        }
-
-        assertTrue(file.length() >= 2 * size);
-    }
-
-    private void assertPrint(final TFile entry) throws IOException {
-        final PrintWriter out = new PrintWriter(new TFileWriter(entry));
-        try {
-            out.println("Hello world!");
-        } finally {
-            out.close();
-        }
-        TFile.umount();
-    }*/
 }
