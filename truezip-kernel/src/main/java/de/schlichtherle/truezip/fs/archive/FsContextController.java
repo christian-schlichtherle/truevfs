@@ -219,15 +219,9 @@ extends FsDecoratingController< FsContextModel,
         }
 
         @Override
-        public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            final FsContextModel model = getModel();
-            final FsOperationContext context = model.getContext();
-            model.setContext(NULL);
-            try {
-                return getBoundSocket().newSeekableByteChannel();
-            } finally {
-                model.setContext(context);
-            }
+        public Entry getPeerTarget() throws IOException {
+            // Same implementation as super class, but makes stack trace nicer.
+            return getBoundSocket().getPeerTarget();
         }
 
         @Override
@@ -237,6 +231,18 @@ extends FsDecoratingController< FsContextModel,
             model.setContext(NULL);
             try {
                 return getBoundSocket().newReadOnlyFile();
+            } finally {
+                model.setContext(context);
+            }
+        }
+
+        @Override
+        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            final FsContextModel model = getModel();
+            final FsOperationContext context = model.getContext();
+            model.setContext(NULL);
+            try {
+                return getBoundSocket().newSeekableByteChannel();
             } finally {
                 model.setContext(context);
             }
@@ -283,6 +289,12 @@ extends FsDecoratingController< FsContextModel,
             } finally {
                 model.setContext(context);
             }
+        }
+
+        @Override
+        public Entry getPeerTarget() throws IOException {
+            // Same implementation as super class, but makes stack trace nicer.
+            return getBoundSocket().getPeerTarget();
         }
 
         @Override

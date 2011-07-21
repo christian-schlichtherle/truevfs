@@ -68,13 +68,13 @@ extends InputSocket<E> {
     }
 
     @Override
-    public SeekableByteChannel newSeekableByteChannel() throws IOException {
-        return getBoundSocket().newSeekableByteChannel();
+    public ReadOnlyFile newReadOnlyFile() throws IOException {
+        return getBoundSocket().newReadOnlyFile();
     }
 
     @Override
-    public ReadOnlyFile newReadOnlyFile() throws IOException {
-        return getBoundSocket().newReadOnlyFile();
+    public SeekableByteChannel newSeekableByteChannel() throws IOException {
+        return getBoundSocket().newSeekableByteChannel();
     }
 
     @Override
