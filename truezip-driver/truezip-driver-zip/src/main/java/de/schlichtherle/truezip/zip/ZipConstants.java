@@ -53,14 +53,14 @@ interface ZipConstants {
     /** Central File Header signature. */
     int CFH_SIG = 0x02014B50;
 
-    /** End Of Central Directory Record signature. */
-    int EOCDR_SIG = 0x06054B50;
-
     /** Zip64 End Of Central Directory Record. */
     int ZIP64_EOCDR_SIG = 0x06064B50;
 
     /** Zip64 End Of Central Directory Locator. */
     int ZIP64_EOCDL_SIG = 0x07064B50;
+
+    /** End Of Central Directory Record signature. */
+    int EOCDR_SIG = 0x06054B50;
 
     /** The minimum length of the Local File Header record. */
     int LFH_MIN_LEN =
