@@ -282,7 +282,7 @@ extends FsFileSystemArchiveController<E> {
         final Output output = getOutput();
         if (null != output && null != output.getEntry(
                 n = entry.getEntry().getName()))
-            //if (READ == intention || !output.canAppend(entry.getEntry()))
+            if (READ == intention || !getContext().get(GROW))
                 return sync();
         final Input input = getInput();
         if (null != input && null != input.getEntry(
