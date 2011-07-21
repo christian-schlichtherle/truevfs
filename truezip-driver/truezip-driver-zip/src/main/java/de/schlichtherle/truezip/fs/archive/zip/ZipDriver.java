@@ -204,7 +204,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
      * <ol>
      * <li>{@link FsOutputOption#STORE} is set.
      * <li>If {@link FsOutputOption#GROW} is set, {@link FsOutputOption#APPEND}
-     *     gets set, too.
+     *     gets set too, and {@link FsOutputOption#CACHE} gets cleared.
      * </ol>
      * <p>
      * The resulting output socket is then wrapped in a private nested class
@@ -224,7 +224,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
         // opportunity to apply its own preferences to sort out such a conflict.
         BitField<FsOutputOption> options2 = options.set(STORE);
         if (options2.get(GROW))
-            options2 = options2.set(APPEND);
+            options2 = options2.set(APPEND).clear(CACHE);
         return new OptionOutputSocket(
                 controller.getOutputSocket(name, options2, template),
                 options); // use original options!
