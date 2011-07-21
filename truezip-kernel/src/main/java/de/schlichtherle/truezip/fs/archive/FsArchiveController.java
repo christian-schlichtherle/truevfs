@@ -48,6 +48,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.channels.SeekableByteChannel;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -222,6 +223,11 @@ extends FsModelController<FsContextModel> {
         }
 
         @Override
+        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            return getBoundSocket().newSeekableByteChannel();
+        }
+
+        @Override
         public InputStream newInputStream() throws IOException {
             return getBoundSocket().newInputStream();
         }
@@ -280,8 +286,9 @@ extends FsModelController<FsContextModel> {
             if (append) {
                 try {
                     in = getInputSocket(entry.getName()).newInputStream();
-                } catch (FileNotFoundException ex) {
-                    logger.log(Level.WARNING, ex.toString(), ex);
+                } catch (FileNotFoundException ignored) {
+                    // When appending, there is no need for the entry to exist,
+                    // so we can safely ignore this.
                 }
             }
             try {
