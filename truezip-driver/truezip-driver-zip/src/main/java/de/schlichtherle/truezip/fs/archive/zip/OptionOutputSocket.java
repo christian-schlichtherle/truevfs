@@ -20,6 +20,9 @@ import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.channels.SeekableByteChannel;
 
 /**
  * An output socket which provides a property for its output options.
@@ -40,5 +43,29 @@ extends DecoratingOutputSocket<Entry> {
 
     public BitField<FsOutputOption> getOptions() {
         return options;
+    }
+
+    @Override
+    public Entry getLocalTarget() throws IOException {
+        // Same implementation as super class, but makes stack trace nicer.
+        return getBoundSocket().getLocalTarget();
+    }
+
+    @Override
+    public Entry getPeerTarget() throws IOException {
+        // Same implementation as super class, but makes stack trace nicer.
+        return getBoundSocket().getPeerTarget();
+    }
+
+    @Override
+    public SeekableByteChannel newSeekableByteChannel() throws IOException {
+        // Same implementation as super class, but makes stack trace nicer.
+        return getBoundSocket().newSeekableByteChannel();
+    }
+
+    @Override
+    public OutputStream newOutputStream() throws IOException {
+        // Same implementation as super class, but makes stack trace nicer.
+        return getBoundSocket().newOutputStream();
     }
 }
