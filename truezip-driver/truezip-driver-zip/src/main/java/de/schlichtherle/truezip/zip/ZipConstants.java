@@ -30,7 +30,7 @@ interface ZipConstants {
 
     /**
      * This boolean field is set by the system property
-     * {@code de.schlichtherle.truezip.io.zip.forceZIP64Ext}.
+     * {@code de.schlichtherle.truezip.zip.forceZip64Ext}.
      * If this property is set to {@code true} (case is ignored),
      * then ZIP64 extensions are always added when writing a ZIP file,
      * regardless of its size.
@@ -42,7 +42,7 @@ interface ZipConstants {
      * required.
      */
     boolean FORCE_ZIP64_EXT
-            = Boolean.getBoolean("de.schlichtherle.truezip.io.zip.forceZIP64Ext");
+            = Boolean.getBoolean("de.schlichtherle.truezip.zip.forceZip64Ext");
 
     /** Local File Header signature. */
     int LFH_SIG = 0x04034B50;
