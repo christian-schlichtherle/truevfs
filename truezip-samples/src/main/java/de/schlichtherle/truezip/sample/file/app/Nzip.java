@@ -16,9 +16,11 @@
 package de.schlichtherle.truezip.sample.file.app;
 
 import de.schlichtherle.truezip.file.TArchiveDetector;
+import de.schlichtherle.truezip.file.TConfig;
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.TFileComparator;
 import de.schlichtherle.truezip.file.TFileInputStream;
+import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.fs.archive.tar.TarBZip2Driver;
 import de.schlichtherle.truezip.fs.archive.tar.TarDriver;
@@ -26,8 +28,8 @@ import de.schlichtherle.truezip.fs.archive.tar.TarGZipDriver;
 import de.schlichtherle.truezip.fs.archive.zip.CheckedJarDriver;
 import de.schlichtherle.truezip.fs.archive.zip.CheckedReadOnlySfxDriver;
 import de.schlichtherle.truezip.fs.archive.zip.CheckedZipDriver;
-import de.schlichtherle.truezip.socket.sl.IOPoolLocator;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
+import de.schlichtherle.truezip.socket.sl.IOPoolLocator;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
@@ -326,32 +328,33 @@ public class Nzip extends Application {
         boolean utf8out = false;
         boolean cp437in = false;
         boolean utf8in = false;
-        int in = 0, out = 0;
+        boolean store = false;
+        boolean compress = false;
+        boolean grow = false;
         for (; srcI < args.length && args[srcI].charAt(0) == '-'; srcI++) {
             if (mv) // mv
                 throw new IllegalUsageException();
             final String opt = args[srcI].toLowerCase(Locale.ENGLISH);
             if ("-unzip".equals(opt)) {
                 unzip = true;
-                out++;
             } else if ("-cp437out".equals(opt)) {
                 cp437out = true;
-                out++;
             } else if ("-utf8out".equals(opt)) {
                 utf8out = true;
-                out++;
             } else if ("-cp437in".equals(opt)) {
                 cp437in = true;
-                in++;
             } else if ("-utf8in".equals(opt)) {
                 utf8in = true;
-                in++;
+            } else if ("-store".equals(opt)) {
+                store = true;
+            } else if ("-compress".equals(opt)) {
+                compress = true;
+            } else if ("-grow".equals(opt)) {
+                grow = true;
             } else {
                 throw new IllegalUsageException();
             }
         }
-        if (in > 1 || out > 1)
-            throw new IllegalUsageException();
 
         final TArchiveDetector srcDetector;
         if (cp437in)
@@ -377,22 +380,32 @@ public class Nzip extends Application {
                 && !dst.isArchive() && !dst.isDirectory()))
             throw new IllegalUsageException();
 
-        for (int i = srcI; i < dstI; i++) {
-            final TFile src = new TFile(args[i], srcDetector);
-            final TFile tmp = dstI - srcI > 1 || dst.isDirectory()
-                    ? new TFile(dst, src.getName(), dstDetector)
-                    : dst;
-            if (mv) {
-                try {
-                    if (tmp.isFile())
-                        tmp.rm();
-                    src.mv(tmp);
-                } catch (IOException ex) {
-                    throw new IOException(src + ": " + resources.getString("cpOrMv.cmt") + ": " + tmp, ex);
+        final TConfig config = TConfig.push();
+        try {
+            config.setOutputPreferences(config.getOutputPreferences()
+                    .set(STORE, store)
+                    .set(COMPRESS, compress)
+                    .set(GROW, grow));
+
+            for (int i = srcI; i < dstI; i++) {
+                final TFile src = new TFile(args[i], srcDetector);
+                final TFile tmp = dstI - srcI > 1 || dst.isDirectory()
+                        ? new TFile(dst, src.getName(), dstDetector)
+                        : dst;
+                if (mv) {
+                    try {
+                        if (tmp.isFile())
+                            tmp.rm();
+                        src.mv(tmp);
+                    } catch (IOException ex) {
+                        throw new IOException(src + ": " + resources.getString("cpOrMv.cmt") + ": " + tmp, ex);
+                    }
+                } else { // cp
+                    TFile.cp_rp(src, tmp, srcDetector, dstDetector);
                 }
-            } else { // cp
-                TFile.cp_rp(src, tmp, srcDetector, dstDetector);
             }
+        } finally {
+            config.close();
         }
     }
 
