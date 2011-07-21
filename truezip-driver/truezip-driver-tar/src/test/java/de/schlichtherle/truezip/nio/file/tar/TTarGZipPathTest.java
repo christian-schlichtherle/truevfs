@@ -28,4 +28,8 @@ public final class TTarGZipPathTest extends TPathTestSuite {
     public TTarGZipPathTest() {
         super(FsScheme.create("tar.gz"), new TarGZipDriver(IO_POOL_PROVIDER));
     }
+
+    @Override
+    public void testGrow() {
+    }
 }

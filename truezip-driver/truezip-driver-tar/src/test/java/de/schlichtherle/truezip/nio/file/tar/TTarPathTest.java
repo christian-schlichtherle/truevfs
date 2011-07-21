@@ -28,4 +28,8 @@ public final class TTarPathTest extends TPathTestSuite {
     public TTarPathTest() {
         super(FsScheme.create("tar"), new TarDriver(IO_POOL_PROVIDER));
     }
+
+    @Override
+    public void testGrow() {
+    }
 }
