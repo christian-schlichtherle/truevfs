@@ -125,7 +125,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
     }
 
     private void append(final FileEntry temp) throws IOException {
-        if (temp != entry && options.get(APPEND))
+        if (temp != entry && options.get(APPEND) && entry.getFile().exists())
             IOSocket.copy(entry.getInputSocket(), temp.getOutputSocket());
     }
 
