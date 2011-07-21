@@ -54,13 +54,13 @@ interface ZipConstants {
     int CFH_SIG = 0x02014B50;
 
     /** End Of Central Directory Record signature. */
-    int EOCD_SIG = 0x06054B50;
+    int EOCDR_SIG = 0x06054B50;
 
     /** Zip64 End Of Central Directory Record. */
-    int ZIP64_EOCD_SIG = 0x06064b50;
+    int ZIP64_EOCDR_SIG = 0x06064B50;
 
     /** Zip64 End Of Central Directory Locator. */
-    int ZIP64_EOCDL_SIG = 0x07064b50;
+    int ZIP64_EOCDL_SIG = 0x07064B50;
 
     /** The minimum length of the Local File Header record. */
     int LFH_MIN_LEN =
@@ -96,8 +96,8 @@ interface ZipConstants {
             /* external file attributes        */ 4 +
             /* relative offset of local header */ 4;
 
-    /** The minimum length of the End Of Central Directory record. */
-    int EOCD_MIN_LEN =
+    /** The minimum length of the End Of Central Directory Record. */
+    int EOCDR_MIN_LEN =
             /* end of central dir signature    */ 4 +
             /* number of this disk             */ 2 +
             /* number of the disk with the     */
@@ -112,8 +112,8 @@ interface ZipConstants {
             /* the starting disk number        */ 4 +
             /* zipfile comment length          */ 2;
 
-    /** The minimum length of the Zip64 End Of Central Directory record. */
-    int ZIP64_EOCD_MIN_LEN =
+    /** The minimum length of the Zip64 End Of Central Directory Record. */
+    int ZIP64_EOCDR_MIN_LEN =
             /* zip64 end of central dir        */
             /* signature                       */ 4 +
             /* size of zip64 end of central    */

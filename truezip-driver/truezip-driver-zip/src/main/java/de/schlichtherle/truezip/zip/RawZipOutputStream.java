@@ -733,10 +733,10 @@ implements Iterable<E> {
         if (zip64) {
             final long zip64eocdOffset // relative offset of the zip64 end of central directory record
                     = dos.size();
-            // ZIP64 End Of Central Directory record signature.
-            dos.writeInt(ZIP64_EOCD_SIG);
-            // Size Of ZIP64 End Of Central Directory record.
-            dos.writeLong(ZIP64_EOCD_MIN_LEN - 12);
+            // ZIP64 End Of Central Directory Record signature.
+            dos.writeInt(ZIP64_EOCDR_SIG);
+            // Size Of ZIP64 End Of Central Directory Record.
+            dos.writeLong(ZIP64_EOCDR_MIN_LEN - 12);
             // Version Made By.
             dos.writeShort(63);
             // Version Needed To Extract.
@@ -764,7 +764,7 @@ implements Iterable<E> {
             dos.writeInt(1);
         }
         // End Of Central Directory record signature.
-        dos.writeInt(EOCD_SIG);
+        dos.writeInt(EOCDR_SIG);
         // Disk numbers.
         dos.writeShort(0);
         dos.writeShort(0);

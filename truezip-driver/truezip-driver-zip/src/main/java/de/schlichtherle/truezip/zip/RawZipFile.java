@@ -361,17 +361,17 @@ implements Iterable<E>, Closeable {
             // Constraint: A ZIP file must start with a Local File Header
             // or a (ZIP64) End Of Central Directory Record iff it's emtpy.
             preambled = signature == LFH_SIG
-                      || signature == ZIP64_EOCD_SIG
-                      || signature == EOCD_SIG;
+                      || signature == ZIP64_EOCDR_SIG
+                      || signature == EOCDR_SIG;
         }
         if (preambled) {
             length = rof.length();
-            final long max = length - EOCD_MIN_LEN;
+            final long max = length - EOCDR_MIN_LEN;
             final long min = !postambled && max >= 0xffff ? max - 0xffff : 0;
             for (long eocdrOffset = max; eocdrOffset >= min; eocdrOffset--) {
                 rof.seek(eocdrOffset);
                 rof.readFully(sig);
-                if (LittleEndian.readUInt(sig, 0) != EOCD_SIG)
+                if (LittleEndian.readUInt(sig, 0) != EOCDR_SIG)
                     continue;
                 long diskNo;        // number of this disk
                 long cdDiskNo;      // number of the disk with the start of the central directory
@@ -382,7 +382,7 @@ implements Iterable<E>, Closeable {
                 int commentLen;     // .ZIP file comment length
                 int off = 0;
                 // Process EOCDR.
-                final byte[] eocdr = new byte[EOCD_MIN_LEN - sig.length];
+                final byte[] eocdr = new byte[EOCDR_MIN_LEN - sig.length];
                 rof.readFully(eocdr);
                 diskNo = LittleEndian.readUShort(eocdr, off);
                 off += 2;
@@ -432,13 +432,13 @@ implements Iterable<E>, Closeable {
                         throw new ZipException( // MUST be ZipException, not IOException - see catch clauses!
                                 "ZIP file spanning/splitting is not supported!");
                     // Read Zip64 End Of Central Directory Record.
-                    final byte[] zip64eocdr = new byte[ZIP64_EOCD_MIN_LEN];
+                    final byte[] zip64eocdr = new byte[ZIP64_EOCDR_MIN_LEN];
                     rof.seek(zip64eocdrOffset);
                     rof.readFully(zip64eocdr);
                     off = 0; // reuse
                     final long zip64eocdrSig = LittleEndian.readUInt(zip64eocdr, off);
                     off += 4;
-                    if (zip64eocdrSig != ZIP64_EOCD_SIG)
+                    if (zip64eocdrSig != ZIP64_EOCDR_SIG)
                         throw new ZipException( // MUST be ZipException, not IOException - see catch clauses!
                                 "Expected ZIP64 End Of Central Directory Record signature!");
                     //final long zip64eocdrSize;  // size of zip64 end of central directory record
