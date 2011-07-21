@@ -186,15 +186,9 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         }
 
         @Override
-        public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            try {
-                return getBoundSocket().newSeekableByteChannel();
-            } catch (FsFalsePositiveException ex) {
-                return getParent()
-                        .getInputSocket(resolveParent(name), options)
-                        .bind(this)
-                        .newSeekableByteChannel();
-            }
+        public Entry getPeerTarget() throws IOException {
+            // Same implementation as super class, but makes stack trace nicer.
+            return getBoundSocket().getPeerTarget();
         }
 
         @Override
@@ -206,6 +200,18 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                         .getInputSocket(resolveParent(name), options)
                         .bind(this)
                         .newReadOnlyFile();
+            }
+        }
+
+        @Override
+        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            try {
+                return getBoundSocket().newSeekableByteChannel();
+            } catch (FsFalsePositiveException ex) {
+                return getParent()
+                        .getInputSocket(resolveParent(name), options)
+                        .bind(this)
+                        .newSeekableByteChannel();
             }
         }
 
@@ -254,6 +260,12 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                         .bind(this)
                         .getLocalTarget();
             }
+        }
+
+        @Override
+        public Entry getPeerTarget() throws IOException {
+            // Same implementation as super class, but makes stack trace nicer.
+            return getBoundSocket().getPeerTarget();
         }
 
         @Override

@@ -276,23 +276,9 @@ extends FsDecoratingController< FsConcurrentModel,
         }
 
         @Override
-        public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            try {
-                readLock().lock();
-                try {
-                    return getBoundSocket().newSeekableByteChannel();
-                } finally {
-                    readLock().unlock();
-                }
-            } catch (FsNotWriteLockedException ex) {
-                assertNotReadLockedByCurrentThread(ex);
-                writeLock().lock();
-                try {
-                    return getBoundSocket().newSeekableByteChannel();
-                } finally {
-                    writeLock().unlock();
-                }
-            }
+        public Entry getPeerTarget() throws IOException {
+            // Same implementation as super class, but makes stack trace nicer.
+            return getBoundSocket().getPeerTarget();
         }
 
         @Override
@@ -309,6 +295,26 @@ extends FsDecoratingController< FsConcurrentModel,
                 writeLock().lock();
                 try {
                     return getBoundSocket().newReadOnlyFile();
+                } finally {
+                    writeLock().unlock();
+                }
+            }
+        }
+
+        @Override
+        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            try {
+                readLock().lock();
+                try {
+                    return getBoundSocket().newSeekableByteChannel();
+                } finally {
+                    readLock().unlock();
+                }
+            } catch (FsNotWriteLockedException ex) {
+                assertNotReadLockedByCurrentThread(ex);
+                writeLock().lock();
+                try {
+                    return getBoundSocket().newSeekableByteChannel();
                 } finally {
                     writeLock().unlock();
                 }
@@ -358,6 +364,12 @@ extends FsDecoratingController< FsConcurrentModel,
             } finally {
                 writeLock().unlock();
             }
+        }
+
+        @Override
+        public Entry getPeerTarget() throws IOException {
+            // Same implementation as super class, but makes stack trace nicer.
+            return getBoundSocket().getPeerTarget();
         }
 
         @Override
