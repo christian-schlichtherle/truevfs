@@ -1543,7 +1543,7 @@ public abstract class TFileTestSuite extends TestBase {
 
         final TConfig config = TConfig.push();
         try {
-            config.setOutputPreferences(BitField.of(CREATE_PARENTS, STORE));
+            config.setOutputPreferences(BitField.of(CREATE_PARENTS, STORE, GROW));
 
             assertGrow(entry1);
             assertGrow(entry2);
@@ -1551,17 +1551,10 @@ public abstract class TFileTestSuite extends TestBase {
             TFile.umount();
             assertTrue(file.length() > 2 * data.length); // two entries plus one central directory
 
-            final TConfig config2 = TConfig.push();
-            try {
-                config2.setOutputPreferences(BitField.of(CREATE_PARENTS, STORE, GROW));
-
-                assertGrow(entry1);
-                assertGrow(entry2);
-                assertGrow(entry1);
-                assertGrow(entry2);
-            } finally {
-                config2.close();
-            }
+            assertGrow(entry1);
+            assertGrow(entry2);
+            assertGrow(entry1);
+            assertGrow(entry2);
 
             TFile.umount();
             assertTrue(file.length() > 6 * data.length); // six entries plus two central directories
