@@ -19,7 +19,6 @@ import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.util.BitField;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
@@ -42,7 +41,7 @@ import net.jcip.annotations.NotThreadSafe;
 @DefaultAnnotation(NonNull.class)
 final class FsOperationContext {
 
-    private @CheckForNull BitField<FsOutputOption> outputOptions;
+    private @Nullable BitField<FsOutputOption> outputOptions;
 
     /**
      * Returns the options for the output operation in progress.
@@ -57,7 +56,7 @@ final class FsOperationContext {
      * @see    FsContextController#getOutputSocket(FsEntryName, BitField, Entry)
      * @see    FsContextController#mknod(FsEntryName, Entry.Type, BitField, Entry)
      */
-    public @Nullable BitField<FsOutputOption> getOutputOptions() {
+    @Nullable BitField<FsOutputOption> getOutputOptions() {
         return outputOptions;
     }
 
@@ -69,6 +68,16 @@ final class FsOperationContext {
      */
     void setOutputOptions(final @Nullable BitField<FsOutputOption> outputOptions) {
         this.outputOptions = outputOptions;
+    }
+
+    /**
+     * Returns {@code true} if and only if the given output option is set.
+     *
+     * @param option The output option to test.
+     * @throws NullPointerException if there is no output operation in progress.
+     */
+    boolean get(FsOutputOption option) {
+        return outputOptions.get(option);
     }
 
     /**
