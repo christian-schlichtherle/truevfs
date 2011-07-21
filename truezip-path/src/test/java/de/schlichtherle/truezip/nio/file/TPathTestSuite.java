@@ -1614,7 +1614,7 @@ public abstract class TPathTestSuite extends TestBase {
 
         final TConfig config = TConfig.push();
         try {
-            config.setOutputPreferences(BitField.of(CREATE_PARENTS, STORE));
+            config.setOutputPreferences(BitField.of(CREATE_PARENTS, STORE, GROW));
 
             assertGrow(entry1);
             assertGrow(entry2);
@@ -1622,17 +1622,10 @@ public abstract class TPathTestSuite extends TestBase {
             TFileSystemProvider.umount();
             assertTrue(size(path) > 2 * data.length); // two entries plus one central directory
 
-            final TConfig config2 = TConfig.push();
-            try {
-                config2.setOutputPreferences(BitField.of(CREATE_PARENTS, STORE, GROW));
-
-                assertGrow(entry1);
-                assertGrow(entry2);
-                assertGrow(entry1);
-                assertGrow(entry2);
-            } finally {
-                config2.close();
-            }
+            assertGrow(entry1);
+            assertGrow(entry2);
+            assertGrow(entry1);
+            assertGrow(entry2);
 
             TFileSystemProvider.umount();
             assertTrue(size(path) > 6 * data.length); // six entries plus two central directories
