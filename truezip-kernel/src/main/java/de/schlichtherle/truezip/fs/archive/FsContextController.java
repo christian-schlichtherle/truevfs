@@ -64,10 +64,8 @@ extends FsDecoratingController< FsContextModel,
 
     private static final FsOperationContext
             NULL = new FsOperationContext();
-    private static final FsOperationContext
-            NONE = new FsOperationContext();
     static {
-        NONE.setOutputOptions(FsOutputOptions.NO_OUTPUT_OPTIONS);
+        NULL.setOutputOptions(FsOutputOptions.NO_OUTPUT_OPTIONS);
     }
 
     private static final Map<BitField<FsOutputOption>, FsOperationContext>
@@ -160,7 +158,7 @@ extends FsDecoratingController< FsContextModel,
     public void setReadOnly(FsEntryName name) throws IOException {
         final FsContextModel model = getModel();
         final FsOperationContext context = model.getContext();
-        model.setContext(NONE);
+        model.setContext(NULL);
         try {
             delegate.setReadOnly(name);
         } finally {
@@ -173,7 +171,7 @@ extends FsDecoratingController< FsContextModel,
     throws IOException {
         final FsContextModel model = getModel();
         final FsOperationContext context = model.getContext();
-        model.setContext(NONE);
+        model.setContext(NULL);
         try {
             return delegate.setTime(name, types, value);
         } finally {
@@ -186,7 +184,7 @@ extends FsDecoratingController< FsContextModel,
     throws IOException {
         final FsContextModel model = getModel();
         final FsOperationContext context = model.getContext();
-        model.setContext(NONE);
+        model.setContext(NULL);
         try {
             return delegate.setTime(name, times);
         } finally {
@@ -344,7 +342,7 @@ extends FsDecoratingController< FsContextModel,
     throws IOException {
         final FsContextModel model = getModel();
         final FsOperationContext context = model.getContext();
-        model.setContext(NONE);
+        model.setContext(NULL);
         try {
             delegate.unlink(name);
         } finally {
@@ -360,7 +358,7 @@ extends FsDecoratingController< FsContextModel,
     throws X {
         final FsContextModel model = getModel();
         final FsOperationContext context = model.getContext();
-        model.setContext(NONE);
+        model.setContext(NULL);
         try {
             delegate.sync(options, handler);
         } finally {
