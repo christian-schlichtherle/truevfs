@@ -145,15 +145,15 @@ extends FsDecoratingController< FsConcurrentModel,
         }
 
         @Override
-        public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            // Same implementation as super class, but makes stack trace nicer.
-            return getBoundSocket().newSeekableByteChannel();
-        }
-
-        @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
             // Same implementation as super class, but makes stack trace nicer.
             return getBoundSocket().newReadOnlyFile();
+        }
+
+        @Override
+        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            // Same implementation as super class, but makes stack trace nicer.
+            return getBoundSocket().newSeekableByteChannel();
         }
 
         @Override
@@ -192,19 +192,6 @@ extends FsDecoratingController< FsConcurrentModel,
                 if (!options.get(FsOutputOption.CACHE))
                     return super.getBoundSocket(); // don't cache
                 cache = new EntryCache(name);
-            } else {
-                if (options.get(APPEND)) {
-                    // This combination of features would be expected to work
-                    // with a WRITE_THROUGH cache strategy.
-                    // However, we are using WRITE_BACK for performance reasons
-                    // and we can't change the strategy because the cache might
-                    // be busy on input!
-                    // So if this is really required, change the caching
-                    // strategy to WRITE_THROUGH and bear the performance
-                    // impact.
-                    assert WRITE_THROUGH == STRATEGY; // TODO: Check and fix this!
-                    cache.flush();
-                }
             }
             return cache.configure(options, template).getOutputSocket().bind(this);
         }
@@ -392,7 +379,7 @@ extends FsDecoratingController< FsConcurrentModel,
         }
 
         void commitOutput() throws IOException {
-            // FIXME: This is not always true because of calls from close()
+            // FIXME: Not necessarily true because this is called from close()!
             // assert getModel().isWriteLockedByCurrentThread();!
             assert getModel().isTouched();
             if (null != template)
