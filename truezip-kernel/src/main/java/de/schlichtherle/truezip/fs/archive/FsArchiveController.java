@@ -44,7 +44,6 @@ import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -280,18 +279,18 @@ extends FsModelController<FsContextModel> {
 
         @Override
         public OutputStream newOutputStream() throws IOException {
-            final FsArchiveFileSystemOperation<E> mknod = mknod();
-            final E entry = mknod.getTarget().getEntry();
             InputStream in = null;
             if (append) {
                 try {
-                    in = getInputSocket(entry.getName()).newInputStream();
-                } catch (FileNotFoundException ignored) {
+                    in = new Input(name).newInputStream();
+                } catch (IOException ex) {
                     // When appending, there is no need for the entry to exist,
-                    // so we can safely ignore this.
+                    // so we can safely ignore this - fall through!
                 }
             }
             try {
+                final FsArchiveFileSystemOperation<E> mknod = mknod();
+                final E entry = mknod.getTarget().getEntry();
                 final OutputStream out = getOutputSocket(entry)
                         .bind(null == in ? this : null)
                         .newOutputStream();
@@ -404,15 +403,13 @@ extends FsModelController<FsContextModel> {
     }
 
     /**
-     * Synchronizes the archive file only if there is new data for the file
-     * system entry with the given name.
-     * This method requires synchronization on the write lock.
+     * Synchronizes the target archive file if and only if required.
      * <p>
      * <b>Warning:</b> As a side effect, the state of this controller may get
      * entirely reset (virtual filesystem, entries, streams, etc.)!
      *
-     * @param  name the non-{@code null} entry name.
-     * @param  intention the intended I/O operation on the entry.
+     * @param  name the file system entry name.
+     * @param  intention the intended I/O operation on the archive entry.
      *         If {@code null}, then a pure virtual file system operation with
      *         no I/O is intended.
      * @see    FsController#sync
