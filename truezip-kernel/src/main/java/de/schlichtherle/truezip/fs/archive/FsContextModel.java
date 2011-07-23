@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.fs.archive;
 
-import de.schlichtherle.truezip.fs.FsConcurrentController;
 import de.schlichtherle.truezip.fs.FsConcurrentModel;
 import de.schlichtherle.truezip.fs.FsModel;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -38,7 +37,8 @@ import net.jcip.annotations.ThreadSafe;
 @DefaultAnnotation(NonNull.class)
 final class FsContextModel extends FsConcurrentModel {
 
-    private volatile @CheckForNull FsOperationContext context;
+    private volatile ThreadLocal<FsOperationContext>
+            context = new ThreadLocal<FsOperationContext>();
 
     FsContextModel(FsModel model) {
         super(model);
@@ -47,15 +47,15 @@ final class FsContextModel extends FsConcurrentModel {
     /**
      * Returns a JavaBean which represents the original values of selected
      * parameters for the {@link FsContextController} operation in progress.
-     * It's an error to call this method if an {@code FsContextController}
-     * operation is not in progress and the result is undefined.
+     * If no {@code FsContextController} operation is in progress, then
+     * {@code null} gets returned.
      * 
      * @return A JavaBean which represents the original values of selected
      *         parameters for the {@link FsContextController} operation in
      *         progress.
      */
-    public @Nullable FsOperationContext getContext() {
-        return context;
+    @Nullable FsOperationContext getContext() {
+        return context.get();
     }
 
     /**
@@ -63,24 +63,17 @@ final class FsContextModel extends FsConcurrentModel {
      * parameters for the {@link FsContextController} operation in progress.
      * This method should only get called by the class
      * {@link FsContextController}.
-     * <p>
-     * TODO: The current implementation is only virtually thread-safe: It
-     * benefits from the fact that the current {@link FsOperationContext}
-     * API encapsulates only parameters for output operations and output
-     * operations are effectively single-threaded by obtaining a write-lock in
-     * {@link FsConcurrentController}.
-     * As soon as any input operation parameters are added to
-     * {@link FsOperationContext}, this implementation needs to get changed
-     * so that it uses a {@link ThreadLocal} or similar feature to make it
-     * truly thread-safe.
      * 
      * @param context the JavaBean which represents the original values of
      *        selected parameters for the {@link FsContextController}
      *        operation in progress.
      * @see   #getContext()
      */
-    void setContext(final @Nullable FsOperationContext context) {
-        this.context = context;
+    void setContext(final @CheckForNull FsOperationContext context) {
+        if (null != context)
+            this.context.set(context);
+        else
+            this.context.remove();
     }
 
     /**
