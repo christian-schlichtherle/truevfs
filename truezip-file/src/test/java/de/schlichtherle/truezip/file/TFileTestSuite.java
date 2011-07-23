@@ -549,7 +549,7 @@ public abstract class TFileTestSuite extends TestBase {
             } catch (FileNotFoundException ex) {
                 if (!(ex.getCause() instanceof FsSyncException)
                         || !(ex.getCause().getCause() instanceof FileBusyException))
-                        throw ex;
+                    throw ex;
             }
             file2.input(in1);
 
