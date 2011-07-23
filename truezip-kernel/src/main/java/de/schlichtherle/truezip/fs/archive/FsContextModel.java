@@ -49,6 +49,8 @@ final class FsContextModel extends FsConcurrentModel {
      * parameters for the {@link FsContextController} operation in progress.
      * If no {@code FsContextController} operation is in progress, then
      * {@code null} gets returned.
+     * <p>
+     * Note that this is a thread-local property!
      * 
      * @return A JavaBean which represents the original values of selected
      *         parameters for the {@link FsContextController} operation in
@@ -63,6 +65,8 @@ final class FsContextModel extends FsConcurrentModel {
      * parameters for the {@link FsContextController} operation in progress.
      * This method should only get called by the class
      * {@link FsContextController}.
+     * <p>
+     * Note that this is a thread-local property!
      * 
      * @param context the JavaBean which represents the original values of
      *        selected parameters for the {@link FsContextController}
