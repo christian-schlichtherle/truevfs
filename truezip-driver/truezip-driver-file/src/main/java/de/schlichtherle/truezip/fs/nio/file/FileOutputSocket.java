@@ -104,8 +104,11 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
         } else {
             temp = entry;
         }
-        if (options.get(CREATE_PARENTS) && !TRUE.equals(exists))
-            createDirectories(entryFile.getParent());
+        if (options.get(CREATE_PARENTS) && !TRUE.equals(exists)) {
+            final Path parentFile = entryFile.getParent();
+            if (null != parentFile)
+                createDirectories(parentFile);
+        }
         return temp;
     }
 
