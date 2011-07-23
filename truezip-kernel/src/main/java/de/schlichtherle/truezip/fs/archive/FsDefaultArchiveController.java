@@ -15,27 +15,35 @@
  */
 package de.schlichtherle.truezip.fs.archive;
 
-import de.schlichtherle.truezip.fs.FsEntry;
-import de.schlichtherle.truezip.socket.DelegatingOutputSocket;
+import de.schlichtherle.truezip.entry.Entry;
+import static de.schlichtherle.truezip.entry.Entry.*;
+import static de.schlichtherle.truezip.entry.Entry.Access.*;
+import static de.schlichtherle.truezip.entry.Entry.Type.*;
 import de.schlichtherle.truezip.fs.FsController;
+import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
+import static de.schlichtherle.truezip.fs.FsEntryName.*;
+import de.schlichtherle.truezip.fs.FsException;
+import de.schlichtherle.truezip.fs.FsFalsePositiveException;
+import de.schlichtherle.truezip.fs.FsInputOption;
+import de.schlichtherle.truezip.fs.FsOutputOption;
+import static de.schlichtherle.truezip.fs.FsOutputOption.*;
+import de.schlichtherle.truezip.fs.FsSyncException;
+import de.schlichtherle.truezip.fs.FsSyncOption;
+import static de.schlichtherle.truezip.fs.FsSyncOption.*;
+import de.schlichtherle.truezip.fs.FsSyncWarningException;
+import static de.schlichtherle.truezip.fs.archive.FsArchiveFileSystem.*;
 import de.schlichtherle.truezip.io.InputBusyException;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.OutputBusyException;
-import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.fs.FsFalsePositiveException;
-import de.schlichtherle.truezip.fs.FsException;
-import de.schlichtherle.truezip.fs.FsSyncException;
-import de.schlichtherle.truezip.fs.FsSyncOption;
-import de.schlichtherle.truezip.fs.FsSyncWarningException;
+import static de.schlichtherle.truezip.io.Paths.isRoot;
 import de.schlichtherle.truezip.socket.ConcurrentInputShop;
 import de.schlichtherle.truezip.socket.ConcurrentOutputShop;
-import de.schlichtherle.truezip.fs.FsInputOption;
+import de.schlichtherle.truezip.socket.DelegatingOutputSocket;
+import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.socket.InputService;
 import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.socket.InputSocket;
-import de.schlichtherle.truezip.socket.IOSocket;
-import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.socket.OutputService;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.OutputSocket;
@@ -46,19 +54,12 @@ import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
+import static java.lang.Boolean.*;
 import java.util.Collections;
 import java.util.Iterator;
-import javax.swing.Icon;
 import net.jcip.annotations.NotThreadSafe;
 
-import static de.schlichtherle.truezip.fs.archive.FsArchiveFileSystem.*;
-import static de.schlichtherle.truezip.entry.Entry.Access.*;
-import static de.schlichtherle.truezip.entry.Entry.Type.*;
-import static de.schlichtherle.truezip.entry.Entry.*;
-import static de.schlichtherle.truezip.fs.FsEntryName.*;
-import static de.schlichtherle.truezip.fs.FsOutputOption.*;
-import static de.schlichtherle.truezip.fs.FsSyncOption.*;
-import static de.schlichtherle.truezip.io.Paths.isRoot;
+import javax.swing.Icon;
 
 /**
  * This archive controller manages I/O to the entry which represents the target
@@ -79,9 +80,9 @@ extends FsFileSystemArchiveController<E> {
     private static final BitField<FsOutputOption>
             MAKE_OUTPUT_MASK = BitField.of(CACHE, CREATE_PARENTS, GROW);
     private static final BitField<FsSyncOption>
-            SYNC_OPTIONS = BitField.of( WAIT_CLOSE_INPUT,
-                                        WAIT_CLOSE_OUTPUT,
-                                        CLEAR_CACHE);
+            AUTO_SYNC_OPTIONS = BitField.of(WAIT_CLOSE_INPUT,
+                                            WAIT_CLOSE_OUTPUT,
+                                            CLEAR_CACHE); // FIXME: Should get removed for better performance!
 
     private final FsArchiveDriver<E> driver;
     private final FsController<?> parent;
@@ -230,7 +231,7 @@ extends FsFileSystemArchiveController<E> {
         final BitField<FsOutputOption> options = getContext()
                 .getOutputOptions()
                 .and(MAKE_OUTPUT_MASK)
-                .set(CACHE);
+                .set(CACHE); // FIXME: Should not be set if GROW!
         final OutputSocket<?> socket = driver.getOutputSocket(
                 parent, parentName, options, null);
         final Input input = getInput();
@@ -273,29 +274,30 @@ extends FsFileSystemArchiveController<E> {
     boolean autoSync(   final FsEntryName name,
                         final @CheckForNull Access intention)
     throws FsSyncException, FsException {
-        final FsArchiveFileSystem<E> fileSystem;
-        final FsCovariantEntry<E> entry;
-        if (null == (fileSystem = getFileSystem())
-                || null == (entry = fileSystem.getEntry(name)))
+        final FsArchiveFileSystem<E> f;
+        final FsCovariantEntry<E> ce;
+        if (null == (f = getFileSystem()) || null == (ce = f.getEntry(name)))
             return false;
-        String n = null;
-        final Output output = getOutput();
-        if (null != output && null != output.getEntry(
-                n = entry.getEntry().getName()))
-            if (READ == intention || !getContext().get(GROW))
-                return sync();
-        final Input input = getInput();
-        if (null != input && null != input.getEntry(
-                null != n ? n : (n = entry.getEntry().getName())))
-            return false;
-        if (READ == intention)
-            return sync();
+        String aen = null;
+        final Output o = getOutput();
+        E oe = null;
+        Boolean grow = null;
+        if (null != o && null != (oe = o.getEntry(aen = ce.getEntry().getName())))
+            if (!(grow = getContext().get(GROW)))
+                return autoSync();
+        final Input i = getInput();
+        E ie = null;
+        if (null != i && null != (ie = i.getEntry(null != aen ? aen : (aen = ce.getEntry().getName()))))
+            if (FALSE.equals(grow) || null == grow && !getContext().get(GROW))
+                return false;
+        if (READ == intention && (null == ie || ie != oe && oe != null))
+            return autoSync();
         return false;
     }
 
-    private boolean sync() throws FsSyncException, FsException {
+    private boolean autoSync() throws FsSyncException, FsException {
         getModel().assertWriteLockedByCurrentThread();
-        sync(SYNC_OPTIONS);
+        sync(AUTO_SYNC_OPTIONS);
         return true;
     }
 
