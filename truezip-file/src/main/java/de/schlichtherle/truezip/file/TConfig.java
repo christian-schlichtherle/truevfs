@@ -64,6 +64,7 @@ import net.jcip.annotations.ThreadSafe;
  * some configuration options with a global scope like this:
  * <pre>{@code
 class MyApplication extends TApplication<IOException> {
+
     //@Override
     protected void setup() {
         // This should obtain the global configuration.
@@ -72,7 +73,7 @@ class MyApplication extends TApplication<IOException> {
         config.setArchiveDetector(new TArchiveDetector("aff",
                 new JarDriver(IOPoolLocator.SINGLETON)));
         // Set FsOutputOption.GROW for appending-to rather than updating
-        // archive files - see below.
+        // archive files.
         config.setOutputPreferences(
                 config.getOutputPreferences.set(FsOutputOption.GROW));
     }
@@ -87,17 +88,18 @@ class MyApplication extends TApplication<IOException> {
  * thread rather than changing the global configuration, then the
  * {@link #push()} method needs to get called like this:
  * <pre>{@code
-TFile file1 = new TFile("file.mok");
+TFile file1 = new TFile("file.aff");
 assert !file1.isArchive();
+
 // Push a new current configuration on the inheritable thread local stack.
 TConfig config = TConfig.push();
 try {
-    // Configure custom application file format.
+    // Configure custom application file format "aff".
     config.setArchiveDetector(new TArchiveDetector("aff",
             new JarDriver(IOPoolLocator.SINGLETON)));
 
     // Use the current configuration.
-    TFile file2 = new TFile("file.mok");
+    TFile file2 = new TFile("file.aff");
     assert file2.isArchive();
     // Do some I/O here.
     ...
@@ -109,16 +111,17 @@ try {
  * <p>
  * Using try-with-resources in JSE&nbsp;7, this can get shortened to:
  * <pre>{@code
-TFile file1 = new TFile("file.mok");
+TFile file1 = new TFile("file.aff");
 assert !file1.isArchive();
+
 // Push a new current configuration on the inheritable thread local stack.
 try (TConfig config = TConfig.push()) {
-    // Configure custom application file format.
+    // Configure custom application file format "aff".
     config.setArchiveDetector(new TArchiveDetector("aff",
             new JarDriver(IOPoolLocator.SINGLETON)));
 
     // Use the current configuration.
-    TFile file2 = new TFile("file.mok");
+    TFile file2 = new TFile("file.aff");
     assert file2.isArchive();
     // Do some I/O here.
     ...
@@ -129,18 +132,30 @@ try (TConfig config = TConfig.push()) {
  * <p>
  * By default, TrueZIP is configured to produce the smallest possible archive
  * files.
- * This is achieved by setting the maximum compression rate in the archive
- * drivers and by performing a <i>full update</i> if an archive entry is going
- * to get written to an archive file which is already present.
- * This default <i>collision strategy</i> usually involves some copying and
- * could be deemed as an unacceptable &quot;performance penalty&quot; if the
- * archive entries to write are rather small compared to the total size of the
+ * This is achieved by selecting the maximum compression ratio in the archive
+ * drivers and by performing an archive update whenever an existing archive
+ * entry is going to get overwritten with new contents or updated with new meta
+ * data in order to avoid the writing of redundant data to the resulting
  * archive file.
+ * An archive update is basically a copy operation where all archive entries
+ * which haven't been written yet get copied from the input archive file to the
+ * output archive file.
+ * However, while this strategy produces the smallest possible archive files,
+ * it may yield bad performance if the number and contents of the archive
+ * entries to create or update are pretty small compared to the total size of
+ * the resulting archive file.
  * <p>
- * You can change the collision strategy by allowing archive files to grow by
- * simply <i>appending</i> entries to their end as follows:
+ * Therefore, you can change this strategy by setting the
+ * {@link FsOutputOption#GROW} output option preference when writing archive
+ * entry contents or updating their meta data.
+ * When set, this output option allows archive files to grow by appending new
+ * or updated archive entries to their end and inhibiting archive update
+ * operations.
+ * You can set this preference in the global configuration as shown above or
+ * you can set it on a case-by-case basis as follows:
  * <pre>{@code
 TFile file = new TFile("archive.zip/entry");
+
 // Push a new current configuration on the inheritable thread local stack.
 TConfig config = TConfig.push();
 try {
@@ -164,15 +179,22 @@ try {
 }
  * }</pre>
  * <p>
- * Here, {@link FsOutputOption#GROW} is used by the application to express a
- * preference to inhibit full updates and simply append entries to an archive
- * file's end instead.
  * Note that it's specific to the archive file system driver if this output
- * option is supported or not.
- * If it's not supported, it gets silently ignored, thereby falling back to the
- * default collision strategy of performing a full update.
- * The drivers of the module TrueZIP Driver ZIP are known to support this
- * output option.
+ * option preference is supported or not.
+ * If it's not supported, then it gets silently ignored, thereby falling back
+ * to the default strategy of performing an archive update whenever required
+ * to avoid writing redundant archive entry data.
+ * Currently, the situation is like this:
+ * <ul>
+ * <li>The drivers of the module TrueZIP Driver ZIP fully support this output
+ *     option preference, so it's available for EAR, JAR, WAR etc.</li>
+ * <li>The drivers of the module TrueZIP Driver ZIP.RAES only allow redundant
+ *     archive entry contents and meta data.
+ *     You cannot append to an existing ZIP.RAES file, however.</li>
+ * <li>The drivers of the module TrueZIP Driver TAR only allow redundant
+ *     archive entry contents.
+ *     You cannot append to an existing TAR file, however.</li>
+ * </ul>
  * 
  * @since   TrueZIP 7.2
  * @author  Christian Schlichtherle
