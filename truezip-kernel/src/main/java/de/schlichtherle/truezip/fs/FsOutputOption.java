@@ -86,10 +86,15 @@ public enum FsOutputOption {
 
     /**
      * <em>Ignorable:</em>
-     * Expresses a preference to allow an archive file to grow by appending
-     * archive entry contents and meta data to its end, even if an
-     * archive entry is already present in it.
-     * This feature is the equivalent to a multi-session disc (CD, DVD etc.)
+     * Expresses a preference to allow an archive file to grow by appending any
+     * new or updated archive entry contents or meta data to its end.
+     * Setting this option may produce redundant data in the resulting archive
+     * file.
+     * However, it may yield much better performance if the number and contents
+     * of the archive entries to create or update are rather small compared to
+     * the total size of the resulting archive file.
+     * <p>
+     * This option is the equivalent to a multi-session disc (CD, DVD etc.)
      * for archive files.
      * <p>
      * This option may get ignored by archive file system drivers.
