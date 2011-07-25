@@ -103,7 +103,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
      *         {@code true} because when reading a ZIP file sequentially,
      *         each ZIP entry should &quot;override&quot; any previously read
      *         ZIP entry with an equal name.
-     *         This holds true even if the central directory is used to read
+     *         This holds true even if the central directory is used to access
      *         the ZIP entries in random order.
      */
     @Override
@@ -115,9 +115,11 @@ implements ZipEntryFactory<ZipArchiveEntry> {
      * {@inheritDoc}
      *
      * @return The implementation in the class {@link ZipDriver} returns
-     *         {@code true} because the ZIP file format specifies a central
-     *         directory which should get used to obtain the last written ZIP
-     *         entry meta data.
+     *         {@code true} because when reading a ZIP file sequentially,
+     *         each ZIP entry should &quot;override&quot; any previously read
+     *         ZIP entry with an equal name.
+     *         This holds true even if the central directory is used to access
+     *         the ZIP entries in random order.
      */
     @Override
     public boolean getRedundantMetaDataSupport() {
