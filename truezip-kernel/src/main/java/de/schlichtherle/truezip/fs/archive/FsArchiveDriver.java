@@ -112,6 +112,41 @@ extends FsDriver {
     }
 
     /**
+     * Returns {@code true} if and only if the archive files produced by this
+     * archive driver may contain redundant archive entry contents.
+     * If the return value is {@code true}, then an archive file may contain
+     * redundant archive entry contents, but only the last contents written
+     * should get used when reading the archive file.
+     * 
+     * @return The implementation in the class {@link FsArchiveDriver} returns
+     *         {@code false}.
+     * @since  TrueZIP 7.3
+     */
+    public boolean getRedundantContentSupport() {
+        return false;
+    }
+
+    /**
+     * Returns {@code true} if and only if the archive files produced by this
+     * archive driver may contain redundant archive entry meta data.
+     * If the return value is {@code true}, then an archive file may contain
+     * redundant archive entry meta data, but only the last meta data written
+     * should get used when reading the archive file.
+     * This usually implies the existence of a central directory in the
+     * resulting archive file.
+     * <p>
+     * The implementation in the class {@link FsArchiveDriver} returns
+     * {@code false}.
+     * 
+     * @return {@code true} if and only if the archive files produced by this
+     *         archive driver may contain redundant archive entry meta data.
+     * @since  TrueZIP 7.3
+     */
+    public boolean getRedundantMetaDataSupport() {
+        return false;
+    }
+
+    /**
      * Returns the I/O pool to use for allocating temporary I/O entries.
      *
      * @return The I/O pool to use for allocating temporary I/O entries.
