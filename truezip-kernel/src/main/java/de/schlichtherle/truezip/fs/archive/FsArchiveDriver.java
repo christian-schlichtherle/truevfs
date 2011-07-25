@@ -119,7 +119,7 @@ extends FsDriver {
      * should get used when reading the archive file.
      * 
      * @return The implementation in the class {@link FsArchiveDriver} returns
-     *         {@code false}.
+     *         {@code false} for backwards compatibility.
      * @since  TrueZIP 7.3
      */
     public boolean getRedundantContentSupport() {
@@ -134,12 +134,9 @@ extends FsDriver {
      * should get used when reading the archive file.
      * This usually implies the existence of a central directory in the
      * resulting archive file.
-     * <p>
-     * The implementation in the class {@link FsArchiveDriver} returns
-     * {@code false}.
      * 
-     * @return {@code true} if and only if the archive files produced by this
-     *         archive driver may contain redundant archive entry meta data.
+     * @return The implementation in the class {@link FsArchiveDriver} returns
+     *         {@code false} for backwards compatibility.
      * @since  TrueZIP 7.3
      */
     public boolean getRedundantMetaDataSupport() {
