@@ -382,7 +382,7 @@ extends FsDecoratingController< FsConcurrentModel,
         }
 
         void commitOutput() throws IOException {
-            // FIXME: Not necessarily true because this is called from close()!
+            // TODO: Not necessarily true because this is called from close()!
             // assert getModel().isWriteLockedByCurrentThread();!
             assert getModel().isTouched();
             if (null != template)
