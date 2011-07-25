@@ -262,7 +262,9 @@ extends FsDecoratingController< FsConcurrentModel,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         beforeSync(options, handler);
-        delegate.sync(options.clear(CLEAR_CACHE), handler);
+        // TODO: Consume FsSyncOption.CLEAR_CACHE and clear a flag in the model
+        // instead.
+        delegate.sync(options/*.clear(CLEAR_CACHE)*/, handler);
     }
 
     private <X extends IOException> void beforeSync(
@@ -332,7 +334,8 @@ extends FsDecoratingController< FsConcurrentModel,
         }
 
         EntryCache configure(BitField<FsInputOption> options) {
-            options = options.clear(FsInputOption.CACHE); // consume
+            // Consume FsInputOption.CACHE.
+            options = options.clear(FsInputOption.CACHE);
             cache.configure(new Input(delegate.getInputSocket(name, options)));
             input = null;
             return this;
