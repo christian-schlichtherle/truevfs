@@ -33,15 +33,17 @@ import java.util.NoSuchElementException;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * A container for some configuration options.
+ * A container for configuration options with global or inheritable thread
+ * local scope.
  * <p>
  * A client application can use {@link #push()} to create a new
- * <i>current configuration</i> by copying the current configuration and
- * pushing the copy on top of an inheritable thread local stack.
+ * <i>inheritable thread local configuration</i> by copying the
+ * <i>current configuration</i> and pushing the copy on top of an inheritable
+ * thread local stack.
  * <p>
  * A client application can use {@link #pop()} or {@link #close()} to
- * pop the current configuration or this configuration respectively from the
- * top of the inheritable thread local stack.
+ * pop the current configuration or {@code this} configuration respectively
+ * from the top of the inheritable thread local stack.
  * <p>
  * Finally, a client application can use {@link #get()} to get access to the
  * current configuration.
@@ -52,38 +54,70 @@ import net.jcip.annotations.ThreadSafe;
  * with its parent thread.
  * 
  * <a name="examples"/><h3>Examples</h3>
-
- * <h4>Setting The Default Archive Detector</h4>
+ *
+ * <h4>Changing The Global Configuration</h4>
  * <p>
- * The standard use case looks like this:
+ * If no {@link #push()} without a corresponding {@link #close()} or
+ * {@link #pop()} has been called before, then the {@link #get()} method will
+ * return the global configuration.
+ * This feature is intended to get used during the application setup to change
+ * some configuration options with a global scope like this:
+ * <pre>{@code
+class MyApplication extends TApplication<IOException> {
+    //@Override
+    protected void setup() {
+        // This should obtain the global configuration.
+        TConfig config = TConfig.get();
+        // Configure custom application file format.
+        config.setArchiveDetector(new TArchiveDetector("aff",
+                new JarDriver(IOPoolLocator.SINGLETON)));
+        // Set FsOutputOption.GROW for appending-to rather than updating
+        // archive files - see below.
+        config.setOutputPreferences(
+                config.getOutputPreferences.set(FsOutputOption.GROW));
+    }
+
+    ...
+}
+ * }</pre>
+ * 
+ * <h4>Setting The Default Archive Detector In The Current Thread</h4>
+ * <p>
+ * If an application needs to change the configuration of just the current
+ * thread rather than changing the global configuration, then the
+ * {@link #push()} method needs to get called like this:
  * <pre>{@code
 TFile file1 = new TFile("file.mok");
 assert !file1.isArchive();
 // Push a new current configuration on the inheritable thread local stack.
 TConfig config = TConfig.push();
 try {
-    // Change the inheritable thread local configuration.
-    config.setArchiveDetector(new TArchiveDetector("mok", new MockArchiveDriver()));
-    // Use the inheritable thread local configuration.
+    // Configure custom application file format.
+    config.setArchiveDetector(new TArchiveDetector("aff",
+            new JarDriver(IOPoolLocator.SINGLETON)));
+
+    // Use the current configuration.
     TFile file2 = new TFile("file.mok");
     assert file2.isArchive();
     // Do some I/O here.
     ...
 } finally {
-    // Pop the configuration off the inheritable thread local stack.
+    // Pop the current configuration off the inheritable thread local stack.
     config.close();
 }
  * }</pre>
  * <p>
- * Using try-with-resources in JSE 7, this can get shortened to:
+ * Using try-with-resources in JSE&nbsp;7, this can get shortened to:
  * <pre>{@code
 TFile file1 = new TFile("file.mok");
 assert !file1.isArchive();
 // Push a new current configuration on the inheritable thread local stack.
 try (TConfig config = TConfig.push()) {
-    // Change the inheritable thread local configuration.
-    config.setArchiveDetector(new TArchiveDetector("mok", new MockArchiveDriver()));
-    // Use the inheritable thread local configuration.
+    // Configure custom application file format.
+    config.setArchiveDetector(new TArchiveDetector("aff",
+            new JarDriver(IOPoolLocator.SINGLETON)));
+
+    // Use the current configuration.
     TFile file2 = new TFile("file.mok");
     assert file2.isArchive();
     // Do some I/O here.
@@ -91,13 +125,13 @@ try (TConfig config = TConfig.push()) {
 }
  * }</pre>
  *
- * <h4>Appending To Archive Files</h4>
+ * <h4>Appending To Archive Files In The Current Thread</h4>
  * <p>
- * By default, TrueZIP is configured to produce the smalled possible archive
- * files. This is achieved by setting the maximum compression rate in the
- * archive driver and by performing a <i>full update</i> if an entry is going
- * to get written to an archive file which is already present in it.
- * <p>
+ * By default, TrueZIP is configured to produce the smallest possible archive
+ * files.
+ * This is achieved by setting the maximum compression rate in the archive
+ * drivers and by performing a <i>full update</i> if an archive entry is going
+ * to get written to an archive file which is already present.
  * This default <i>collision strategy</i> usually involves some copying and
  * could be deemed as an unacceptable &quot;performance penalty&quot; if the
  * archive entries to write are rather small compared to the total size of the
@@ -110,18 +144,22 @@ TFile file = new TFile("archive.zip/entry");
 // Push a new current configuration on the inheritable thread local stack.
 TConfig config = TConfig.push();
 try {
-    // Change the inheritable thread local configuration.
-    config.setOutputPreferences(BitField.of(FsOutputOption.GROW, FsOutputOption.CREATE_PARENTS));
-    // Append the entry to the archive file even if it's already present.
+    // Set FsOutputOption.GROW for appending-to rather than updating
+    // archive files.
+    config.setOutputPreferences(
+            config.getOutputPreferences.set(FsOutputOption.GROW));
+
+    // Use the current configuration and append the entry to the archive file
+    // even if it's already present.
     TFileOutputStream out = new TFileOutputStream(file);
     try {
-        // Do some I/O here.
+        // Do some output here.
         ...
     } finally {
         out.close();
     }
 } finally {
-    // Pop the configuration off the inheritable thread local stack.
+    // Pop the current configuration off the inheritable thread local stack.
     config.close();
 }
  * }</pre>
@@ -129,13 +167,12 @@ try {
  * Here, {@link FsOutputOption#GROW} is used by the application to express a
  * preference to inhibit full updates and simply append entries to an archive
  * file's end instead.
- * <p>
  * Note that it's specific to the archive file system driver if this output
  * option is supported or not.
- * If it's not supported, it gets silently ignored,
- * thereby falling back to the default collision strategy.
- * In this example, the archive file system driver for ZIP files is used,
- * which is known to support this output option.
+ * If it's not supported, it gets silently ignored, thereby falling back to the
+ * default collision strategy of performing a full update.
+ * The drivers of the module TrueZIP Driver ZIP are known to support this
+ * output option.
  * 
  * @since   TrueZIP 7.2
  * @author  Christian Schlichtherle
@@ -182,7 +219,7 @@ public final class TConfig implements Closeable {
     /**
      * The mask of allowed {@link #setOutputPreferences output preferences},
      * which is
-     * <code>{@link BitField}.of({@link FsOutputOption#CACHE}, {@link FsOutputOption#CREATE_PARENTS}, {@link FsOutputOption#COMPRESS}, {@link FsOutputOption#STORE})</code>.
+     * <code>{@link BitField}.of({@link FsOutputOption#CACHE}, {@link FsOutputOption#CREATE_PARENTS}, {@link FsOutputOption#COMPRESS}, {@link FsOutputOption#STORE}, {@link FsOutputOption#GROW})</code>.
      * 
      * @since TrueZIP 7.3
      */
@@ -286,6 +323,14 @@ public final class TConfig implements Closeable {
         this.outputPreferences = template.getOutputPreferences();
     }
 
+    /**
+     * Returns the file system manager to use within this package.
+     * Note that the current implementation effectively returns
+     * {@code FsManagerLocator.SINGLETON.get()}.
+     * However, this may be subject to change.
+     * 
+     * @return The file system manager to use within this package.
+     */
     FsManager getManager() {
         return manager;
     }
