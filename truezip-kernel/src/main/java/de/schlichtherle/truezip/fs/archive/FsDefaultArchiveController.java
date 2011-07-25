@@ -58,7 +58,6 @@ import static java.lang.Boolean.*;
 import java.util.Collections;
 import java.util.Iterator;
 import net.jcip.annotations.NotThreadSafe;
-
 import javax.swing.Icon;
 
 /**
@@ -81,8 +80,7 @@ extends FsFileSystemArchiveController<E> {
             MAKE_OUTPUT_MASK = BitField.of(CACHE, CREATE_PARENTS, GROW);
     private static final BitField<FsSyncOption>
             AUTO_SYNC_OPTIONS = BitField.of(WAIT_CLOSE_INPUT,
-                                            WAIT_CLOSE_OUTPUT,
-                                            CLEAR_CACHE); // FIXME: Should get removed for better performance!
+                                            WAIT_CLOSE_OUTPUT);
 
     private final FsArchiveDriver<E> driver;
     private final FsController<?> parent;
@@ -231,7 +229,7 @@ extends FsFileSystemArchiveController<E> {
         final BitField<FsOutputOption> options = getContext()
                 .getOutputOptions()
                 .and(MAKE_OUTPUT_MASK)
-                .set(CACHE); // FIXME: Should not be set if GROW!
+                .set(CACHE);
         final OutputSocket<?> socket = driver.getOutputSocket(
                 parent, parentName, options, null);
         final Input input = getInput();
@@ -322,7 +320,10 @@ extends FsFileSystemArchiveController<E> {
                 assert null == getFileSystem();
                 assert null == getInput();
                 assert null == getOutput();
-                getModel().setTouched(false);
+                // TODO: Remove a condition and clear a flag in the model
+                // instead.
+                if (options.get(ABORT_CHANGES) || options.get(CLEAR_CACHE))
+                    getModel().setTouched(false);
             }
         }
     }
