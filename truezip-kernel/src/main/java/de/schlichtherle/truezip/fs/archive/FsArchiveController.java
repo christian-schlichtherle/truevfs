@@ -410,8 +410,9 @@ extends FsModelController<FsContextModel> {
      *
      * @param  name the file system entry name.
      * @param  intention the intended I/O operation on the archive entry.
-     *         If {@code null}, then a pure virtual file system operation with
-     *         no I/O is intended.
+     *         If {@code null}, then only an update to the archive entry meta
+     *         data (i.e. a pure virtual file system operation with no I/O)
+     *         is intended.
      * @see    FsController#sync
      * @throws IOException if any I/O error occurs when synchronizing the
      *         archive file to its parent file system.
