@@ -276,19 +276,37 @@ extends FsFileSystemArchiveController<E> {
         final FsCovariantEntry<E> ce;
         if (null == (f = getFileSystem()) || null == (ce = f.getEntry(name)))
             return false;
-        String aen = null;
-        final Output o = getOutput();
-        E oe = null;
+        // HIC SUNT DRACONES
         Boolean grow = null;
-        if (null != o && null != (oe = o.getEntry(aen = ce.getEntry().getName())))
-            if (!(grow = getContext().get(GROW)))
-                return autoSync();
-        final Input i = getInput();
-        E ie = null;
-        if (null != i && null != (ie = i.getEntry(null != aen ? aen : (aen = ce.getEntry().getName()))))
-            if (FALSE.equals(grow) || null == grow && !getContext().get(GROW))
-                return false;
-        if (READ == intention && (null == ie || ie != oe && oe != null))
+        String aen; // archive entry name
+        final Output oa = getOutput(); // output archive
+        final E oae; // output archive entry
+        if (null != oa) {
+            aen = ce.getEntry().getName();
+            oae = oa.getEntry(aen);
+            if (null != oae)
+                if (!(grow = getContext().get(GROW))
+                        || null == intention && !driver.getRedundantMetaDataSupport()
+                        || WRITE == intention && !driver.getRedundantContentSupport())
+                    return autoSync();
+        } else {
+            aen = null;
+            oae = null;
+        }
+        final Input ia = getInput(); // input archive
+        final E iae; // input archive entry
+        if (null != ia) {
+            if (null == aen)
+                aen = ce.getEntry().getName();
+            iae = ia.getEntry(aen);
+            if (null != iae)
+                if (FALSE.equals(grow)
+                        || null == grow && !getContext().get(GROW))
+                    return false;
+        } else {
+            iae = null;
+        }
+        if (READ == intention && (null == iae || iae != oae && oae != null))
             return autoSync();
         return false;
     }

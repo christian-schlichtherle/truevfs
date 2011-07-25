@@ -69,6 +69,19 @@ public class TarDriver extends FsCharsetArchiveDriver<TarArchiveEntry> {
         this.provider = provider;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return The implementation in the class {@link TarDriver} returns
+     *         {@code true} because when reading a TAR file sequentially,
+     *         each TAR entry should &quot;override&quot; any previously read
+     *         TAR entry with an equal name.
+     */
+    @Override
+    public boolean getRedundantContentSupport() {
+        return true;
+    }
+
     @Override
     protected final IOPool<?> getPool() {
         return provider.get();

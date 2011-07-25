@@ -96,6 +96,34 @@ implements ZipEntryFactory<ZipArchiveEntry> {
         this.provider = provider;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return The implementation in the class {@link ZipDriver} returns
+     *         {@code true} because when reading a ZIP file sequentially,
+     *         each ZIP entry should &quot;override&quot; any previously read
+     *         ZIP entry with an equal name.
+     *         This holds true even if the central directory is used to read
+     *         the ZIP entries in random order.
+     */
+    @Override
+    public boolean getRedundantContentSupport() {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return The implementation in the class {@link ZipDriver} returns
+     *         {@code true} because the ZIP file format specifies a central
+     *         directory which should get used to obtain the last written ZIP
+     *         entry meta data.
+     */
+    @Override
+    public boolean getRedundantMetaDataSupport() {
+        return true;
+    }
+
     @Override
     protected final IOPool<?> getPool() {
         return provider.get();
