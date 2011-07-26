@@ -39,7 +39,7 @@ import java.nio.file.Files;
 import static java.nio.file.Files.*;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
+import static java.nio.file.StandardCopyOption.*;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.FileTime;
@@ -112,6 +112,11 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
         return temp;
     }
 
+    private void append(final FileEntry temp) throws IOException {
+        if (temp != entry && options.get(APPEND) && exists(entry.getPath()))
+            IOSocket.copy(entry.getInputSocket(), temp.getOutputSocket());
+    }
+
     private Set<OpenOption> optionSet() {
         final Set<OpenOption> set = new HashSet<OpenOption>(INITIAL_CAPACITY);
         Collections.addAll(set, WRITE_STANDARD_OPEN_OPTION);
@@ -132,41 +137,33 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
     private void commit(final FileEntry temp) throws IOException {
         final Path entryFile = entry.getPath();
         final Path tempFile = temp.getPath();
-        IOException ex = null;
-        try {
-            if (temp != entry) {
-                try {
-                    try {
-                        move(tempFile, entryFile,
-                                StandardCopyOption.REPLACE_EXISTING);
-                    } catch (IOException ex2) {
-                        // Slow.
-                        /*Files.copy(tempFile, entryFile,
-                                StandardCopyOption.REPLACE_EXISTING);*/
-                        // Fast.
-                        IOSocket.copy(  temp.getInputSocket(),
-                                        entry.getOutputSocket());
-                    }
-                } catch (IOException ex2) {
-                    throw ex = ex2;
-                } finally {
-                    release(temp, ex);
-                }
+        if (temp != entry) {
+            copyAttributes(tempFile);
+            try {
+                move(tempFile, entryFile, REPLACE_EXISTING);
+            } catch (IOException ex) {
+                // Slow.
+                /*Files.copy(tempFile, entryFile,
+                        StandardCopyOption.REPLACE_EXISTING);*/
+                // Fast.
+                IOSocket.copy(  temp.getInputSocket(),
+                                entry.getOutputSocket());
+                copyAttributes(entryFile);
             }
-        } finally {
-            final Entry template = this.template;
-            if (null != template) {
-                try {
-                    getFileAttributeView(entryFile, BasicFileAttributeView.class)
-                            .setTimes(  toFileTime(template.getTime(WRITE)),
-                                        toFileTime(template.getTime(READ)),
-                                        toFileTime(template.getTime(CREATE)));
-                } catch (IOException ex2) {
-                    ex2.initCause(ex);
-                    throw ex2;
-                }
-            }
+            release(temp, null);
+        } else {
+            copyAttributes(entryFile);
         }
+    }
+
+    private void copyAttributes(final Path file) throws IOException {
+        final Entry template = this.template;
+        if (null == template)
+            return;
+        getFileAttributeView(file, BasicFileAttributeView.class)
+                .setTimes(  toFileTime(template.getTime(WRITE)),
+                            toFileTime(template.getTime(READ)),
+                            toFileTime(template.getTime(CREATE)));
     }
 
     private static @Nullable FileTime toFileTime(long time) {
@@ -183,11 +180,6 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
             ex2.initCause(ex);
             throw ex2;
         }
-    }
-
-    private void append(final FileEntry temp) throws IOException {
-        if (temp != entry && options.get(APPEND) && exists(entry.getPath()))
-            IOSocket.copy(entry.getInputSocket(), temp.getOutputSocket());
     }
 
     @Override

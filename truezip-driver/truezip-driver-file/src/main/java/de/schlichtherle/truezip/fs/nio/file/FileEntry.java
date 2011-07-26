@@ -80,14 +80,27 @@ implements IOEntry<FileEntry>, Releasable<IOException> {
 
     public final FileEntry createTempFile() throws IOException {
         TempFilePool pool = this.pool;
-        if (null == pool)
-            pool = this.pool = new TempFilePool(getRealParent(path));
+        if (null == pool) {
+            final Path path = this.path;
+            final Path dir = getRealParent(path);
+            final String suffix = getSuffix(path);
+            pool = this.pool = new TempFilePool(dir, suffix);
+        }
         return pool.allocate();
     }
 
     private static Path getRealParent(Path path) {
         Path parent = path.getParent();
         return null != parent ? parent : CURRENT_DIRECTORY;
+    }
+
+    private static @Nullable String getSuffix(Path path) {
+        path = path.getFileName();
+        if (null == path)
+            return null;
+        final String name = path.toString();
+        final int i = name.indexOf('.');
+        return -1 == i ? null : name.substring(i);
     }
 
     @Override

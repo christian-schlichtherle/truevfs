@@ -73,14 +73,24 @@ implements IOEntry<FileEntry>, Releasable<IOException> {
 
     public final FileEntry createTempFile() throws IOException {
         TempFilePool pool = this.pool;
-        if (null == pool)
-            pool = this.pool = new TempFilePool(getRealParent(file));
+        if (null == pool) {
+            final File file = this.file;
+            final File dir = getRealParent(file);
+            final String suffix = getSuffix(file);
+            pool = this.pool = new TempFilePool(dir, suffix);
+        }
         return pool.allocate();
     }
 
     private static File getRealParent(File path) {
         File parent = path.getParentFile();
         return null != parent ? parent : CURRENT_DIRECTORY;
+    }
+
+    private static @Nullable String getSuffix(File file) {
+        final String name = file.getName();
+        final int i = name.indexOf('.');
+        return -1 == i ? null : name.substring(i);
     }
 
     @Override
