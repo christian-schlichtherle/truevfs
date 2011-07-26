@@ -82,12 +82,12 @@ implements IOEntry<FileEntry>, Releasable<IOException> {
         return pool.allocate();
     }
 
-    private static File getRealParent(File path) {
-        File parent = path.getParentFile();
+    private static File getRealParent(final File file) {
+        final File parent = file.getParentFile();
         return null != parent ? parent : CURRENT_DIRECTORY;
     }
 
-    private static @Nullable String getSuffix(File file) {
+    private static @Nullable String getSuffix(final File file) {
         final String name = file.getName();
         final int i = name.indexOf('.');
         return -1 == i ? null : name.substring(i);
