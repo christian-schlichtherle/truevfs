@@ -82,14 +82,14 @@ implements IOEntry<FileEntry>, Releasable<IOException> {
         TempFilePool pool = this.pool;
         if (null == pool) {
             final Path path = this.path;
-            final Path dir = getRealParent(path);
+            final Path dir = getParent(path);
             final String suffix = getSuffix(path);
             pool = this.pool = new TempFilePool(dir, suffix);
         }
         return pool.allocate();
     }
 
-    private static Path getRealParent(final Path path) {
+    private static Path getParent(final Path path) {
         final Path parent = path.getParent();
         return null != parent ? parent : CURRENT_DIRECTORY;
     }
