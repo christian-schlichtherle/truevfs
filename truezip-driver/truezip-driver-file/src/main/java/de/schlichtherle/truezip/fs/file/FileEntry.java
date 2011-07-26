@@ -75,14 +75,14 @@ implements IOEntry<FileEntry>, Releasable<IOException> {
         TempFilePool pool = this.pool;
         if (null == pool) {
             final File file = this.file;
-            final File dir = getRealParent(file);
+            final File dir = getParent(file);
             final String suffix = getSuffix(file);
             pool = this.pool = new TempFilePool(dir, suffix);
         }
         return pool.allocate();
     }
 
-    private static File getRealParent(final File file) {
+    private static File getParent(final File file) {
         final File parent = file.getParentFile();
         return null != parent ? parent : CURRENT_DIRECTORY;
     }
