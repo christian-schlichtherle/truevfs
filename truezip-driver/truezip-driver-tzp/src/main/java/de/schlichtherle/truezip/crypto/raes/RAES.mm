@@ -49,7 +49,7 @@
 <font ITALIC="true" NAME="SansSerif" SIZE="12"/>
 <icon BUILTIN="bookmark"/>
 </node>
-<node COLOR="#111111" CREATED="1143719879687" ID="Freemind_Link_1666701784" MODIFIED="1143720209656" TEXT="with optional authentication">
+<node COLOR="#111111" CREATED="1143719879687" ID="Freemind_Link_1666701784" MODIFIED="1311641386435" TEXT="with multiple authentication options">
 <edge COLOR="#009999" WIDTH="4"/>
 <font ITALIC="true" NAME="SansSerif" SIZE="12"/>
 <icon BUILTIN="bookmark"/>
@@ -85,7 +85,7 @@
 <node COLOR="#111111" CREATED="1143675116093" ID="Freemind_Link_1912412120" MODIFIED="1143675127375" TEXT="Advantages">
 <node COLOR="#111111" CREATED="1143675128578" ID="Freemind_Link_117595815" MODIFIED="1143680965468" TEXT="Allows fast processing"/>
 </node>
-<node COLOR="#111111" CREATED="1143675143796" ID="Freemind_Link_909574961" MODIFIED="1288123568789" TEXT="Disadvantages">
+<node COLOR="#111111" CREATED="1143675143796" ID="Freemind_Link_909574961" MODIFIED="1311640957507" TEXT="Disadvantages">
 <hook NAME="accessories/plugins/BlinkingNodeHook.properties"/>
 <node COLOR="#111111" CREATED="1143675155000" ID="Freemind_Link_1516326278" MODIFIED="1143683706109" TEXT="No message authentication">
 <icon BUILTIN="clanbomber"/>
@@ -97,7 +97,9 @@
 <node COLOR="#111111" CREATED="1143641995562" ID="Freemind_Link_1427565560" MODIFIED="1143683850437" TEXT="Message Authentication Code">
 <font ITALIC="true" NAME="SansSerif" SIZE="12"/>
 </node>
-<node COLOR="#111111" CREATED="1143675178750" ID="Freemind_Link_916980617" MODIFIED="1143724610734" TEXT="Digests entire cipher text"/>
+<node COLOR="#111111" CREATED="1143675178750" ID="Freemind_Link_916980617" MODIFIED="1311641415471" TEXT="Digests entire cipher text">
+<font BOLD="true" NAME="SansSerif" SIZE="12"/>
+</node>
 <node COLOR="#111111" CREATED="1143710747218" ID="Freemind_Link_1319333372" MODIFIED="1143711122156" TEXT="Writing">
 <node COLOR="#111111" CREATED="1143710750125" ID="Freemind_Link_1990208408" MODIFIED="1143714042046" TEXT="Mandatory">
 <icon BUILTIN="messagebox_warning"/>
@@ -376,7 +378,7 @@
 <icon BUILTIN="bookmark"/>
 </node>
 </node>
-<node COLOR="#990000" CREATED="1144073260951" ID="Freemind_Link_503247976" MODIFIED="1144073264310" TEXT="Suffixes">
+<node COLOR="#990000" CREATED="1144073260951" ID="Freemind_Link_503247976" MODIFIED="1311641314800" TEXT="Extensions">
 <font NAME="SansSerif" SIZE="14"/>
 <node COLOR="#111111" CREATED="1144073275654" ID="Freemind_Link_347103573" MODIFIED="1144073291091" TEXT="&quot;.tzp&quot;"/>
 <node COLOR="#111111" CREATED="1144073264263" ID="Freemind_Link_1789857532" MODIFIED="1144073293420" TEXT="&quot;.zip.rae&quot;"/>
@@ -425,21 +427,18 @@
 <font BOLD="true" NAME="SansSerif" SIZE="12"/>
 <node COLOR="#111111" CREATED="1144070956920" ID="Freemind_Link_1435837042" MODIFIED="1144070961248" TEXT="Marker interface"/>
 <node COLOR="#111111" CREATED="1144070932138" ID="Freemind_Link_1318952951" MODIFIED="1144070937091" TEXT="Subinterfaces">
-<node COLOR="#111111" CREATED="1144070877388" ID="Freemind_Link_1378473595" MODIFIED="1144070907638" TEXT="RaesParametersAgent">
+<node COLOR="#111111" CREATED="1144070877388" ID="Freemind_Link_1378473595" MODIFIED="1311641499726" TEXT="RaesParametersProvider">
 <font BOLD="true" NAME="SansSerif" SIZE="12"/>
-<node COLOR="#111111" CREATED="1144070886154" ID="Freemind_Link_663907322" MODIFIED="1144070904935" TEXT="RaesParameters getParameters(Class type)">
+<node COLOR="#111111" CREATED="1144070886154" ID="Freemind_Link_663907322" MODIFIED="1311641507066" TEXT="RaesParameters get(Class type)">
 <font BOLD="true" NAME="SansSerif" SIZE="12"/>
 </node>
 </node>
 <node COLOR="#111111" CREATED="1143630974343" ID="Freemind_Link_115931107" MODIFIED="1144070437904" TEXT="Type0RaesParameters">
 <font BOLD="true" NAME="SansSerif" SIZE="12"/>
-<node COLOR="#111111" CREATED="1143630991687" ID="Freemind_Link_1009322915" MODIFIED="1144070860779" TEXT="char[] getCreatePasswd()">
+<node COLOR="#111111" CREATED="1143630991687" ID="Freemind_Link_1009322915" MODIFIED="1311641568881" TEXT="char[] getWritePasswordd()">
 <font BOLD="true" NAME="SansSerif" SIZE="12"/>
 </node>
-<node COLOR="#111111" CREATED="1143630980406" ID="Freemind_Link_1728700991" MODIFIED="1144070864982" TEXT="char[] getOpenPasswd()">
-<font BOLD="true" NAME="SansSerif" SIZE="12"/>
-</node>
-<node COLOR="#111111" CREATED="1143714416078" ID="Freemind_Link_490724566" MODIFIED="1144070867748" TEXT="void invalidOpenPasswd()">
+<node COLOR="#111111" CREATED="1143630980406" ID="Freemind_Link_1728700991" MODIFIED="1311641558475" TEXT="char[] getReadPassword(boolean)">
 <font BOLD="true" NAME="SansSerif" SIZE="12"/>
 </node>
 <node COLOR="#111111" CREATED="1143717577921" ID="Freemind_Link_264934587" MODIFIED="1143717579687" TEXT="..."/>
