@@ -89,31 +89,35 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
         return temp;
     }
 
+    private void append(final FileEntry temp) throws IOException {
+        if (temp != entry && options.get(APPEND) && entry.getFile().exists())
+            IOSocket.copy(entry.getInputSocket(), temp.getOutputSocket());
+    }
+
     private void commit(final FileEntry temp) throws IOException {
         final File entryFile = entry.getFile();
         final File tempFile = temp.getFile();
-        IOException ex = null;
-        try {
-            if (temp != entry) {
-                try {
-                    if (!tempFile.renameTo(entryFile)
-                            && !(entryFile.delete() && tempFile.renameTo(entryFile)))
-                        IOSocket.copy(  temp.getInputSocket(),
-                                        entry.getOutputSocket());
-                } catch (IOException ex2) {
-                    throw ex = ex2;
-                } finally {
-                    release(temp, ex);
-                }
+        if (temp != entry) {
+            copyAttributes(tempFile);
+            if (!tempFile.renameTo(entryFile)
+                    && !(entryFile.delete() && tempFile.renameTo(entryFile))) {
+                IOSocket.copy(  temp.getInputSocket(),
+                                entry.getOutputSocket());
+                copyAttributes(entryFile);
             }
-        } finally {
-            final Entry template = this.template;
-            if (null != template) {
-                final long time = template.getTime(WRITE);
-                if (UNKNOWN != time && !entryFile.setLastModified(time))
-                    throw new IOException(entryFile + " (cannot preserve last modification time)", ex);
-            }
+            release(temp, null);
+        } else {
+            copyAttributes(entryFile);
         }
+    }
+
+    private void copyAttributes(final File file) throws IOException {
+        final Entry template = this.template;
+        if (null == template)
+            return;
+        final long time = template.getTime(WRITE);
+        if (UNKNOWN != time && !file.setLastModified(time))
+            throw new IOException(file + " (cannot preserve last modification time)");
     }
 
     private void release(
@@ -126,11 +130,6 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
             ex2.initCause(ex);
             throw ex2;
         }
-    }
-
-    private void append(final FileEntry temp) throws IOException {
-        if (temp != entry && options.get(APPEND) && entry.getFile().exists())
-            IOSocket.copy(entry.getInputSocket(), temp.getOutputSocket());
     }
 
     @Override
