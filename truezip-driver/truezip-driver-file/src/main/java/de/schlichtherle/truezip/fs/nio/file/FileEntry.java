@@ -89,8 +89,8 @@ implements IOEntry<FileEntry>, Releasable<IOException> {
         return pool.allocate();
     }
 
-    private static Path getRealParent(Path path) {
-        Path parent = path.getParent();
+    private static Path getRealParent(final Path path) {
+        final Path parent = path.getParent();
         return null != parent ? parent : CURRENT_DIRECTORY;
     }
 
