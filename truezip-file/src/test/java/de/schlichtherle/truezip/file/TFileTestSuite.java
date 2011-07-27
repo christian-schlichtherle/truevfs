@@ -140,10 +140,7 @@ public abstract class TFileTestSuite extends TestBase {
     }
 
     protected static TFile newNonArchiveFile(TFile file) {
-        return new TFile(
-                file.getParentFile(),
-                file.getName(),
-                TArchiveDetector.NULL);
+        return file.getNonArchiveFile();
     }
 
     @Test
