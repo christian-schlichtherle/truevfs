@@ -99,8 +99,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
         final File tempFile = temp.getFile();
         if (temp != entry) {
             copyAttributes(tempFile);
-            if (!tempFile.renameTo(entryFile)
-                    && !(entryFile.delete() && tempFile.renameTo(entryFile))) {
+            if (!move(tempFile, entryFile)) {
                 IOSocket.copy(  temp.getInputSocket(),
                                 entry.getOutputSocket());
                 copyAttributes(entryFile);
@@ -109,6 +108,12 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
         } else {
             copyAttributes(entryFile);
         }
+    }
+    
+    private static boolean move(File src, File dst) {
+        return src.exists()
+                && (!dst.exists() || dst.delete())
+                && src.renameTo(dst);
     }
 
     private void copyAttributes(final File file) throws IOException {
