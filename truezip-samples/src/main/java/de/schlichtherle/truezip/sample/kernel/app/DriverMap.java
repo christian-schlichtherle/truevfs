@@ -33,11 +33,11 @@ import java.util.TreeMap;
 /**
  * Pretty-prints an HTML table of the map of a file system driver provider.
  * 
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-public class DriverMap implements Runnable {
+public final class DriverMap implements Runnable {
 
     private static final String TABLE_ATTRIBUTES = " border=\"2\" cellpadding=\"4\""; //"";
     private static final String BEGIN_CODE = "<code>"; //"{@code "
