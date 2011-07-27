@@ -106,7 +106,7 @@ public class TFileView extends TDecoratingFileView {
                 && !newNonArchiveFile(file).isDirectory();
     }
 
-    private static TFile newNonArchiveFile(@NonNull TFile file) {
+    private static TFile newNonArchiveFile(TFile file) {
         TFile parent = file.getParentFile();
         assert null != parent : "expected non-null from context!";
         return new TFile(parent, file.getName(), TArchiveDetector.NULL);
