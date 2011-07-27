@@ -16,8 +16,8 @@
 package de.schlichtherle.truezip.fs.sl;
 
 import de.schlichtherle.truezip.fs.FsDriver;
-import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.fs.FsDriverProvider;
+import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.fs.spi.FsDriverService;
 import de.schlichtherle.truezip.util.ServiceLocator;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.ServiceConfigurationError;
 import java.util.TreeMap;
 import static java.util.logging.Level.*;
 import java.util.logging.Logger;
@@ -100,5 +99,5 @@ public final class FsDriverLocator implements FsDriverProvider {
             }
             DRIVERS = Collections.unmodifiableMap(fast);
         }
-    } // class Boot
+    } // Boot
 }

@@ -106,5 +106,5 @@ public final class IOPoolLocator implements IOPoolProvider {
             logger.log(CONFIG, "provided", service);
             SERVICE = service;
         }
-    } // class Boot
+    } // Boot
 }
