@@ -3599,17 +3599,24 @@ public final class TFile extends File {
     /**
      * Compacts this archive file by removing any redundant archive entry
      * contents and meta data, including central directories.
+     * If this instance does not identify an {@link #isArchive() archive file},
+     * then this operation does nothing and returns immediately.
      * <p>
-     * If the {@link FsOutputOption#GROW} preference is used in order to append
-     * archive entries to the end of an archive file rather than assembling a
-     * new archive file, then over time this may result in a lot of redundant
-     * artifacts such as archive entry contents and meta data, including
-     * central directories.
-     * This operation can then get used to remove these redundant artifacts
+     * This operation is intended to compact archive files which have been
+     * frequently updated with {@link FsOutputOption#GROW} or similar means.
+     * If this output option preference is set and an archive file is updated
+     * frequently, then over time a lot of redundant artifacts such as archive
+     * entry contents and meta data, including central directories may be
+     * physically present in the archive file, even if all its entries have
+     * been deleted.
+     * This operation should then get used to remove any redundant artifacts
      * again.
      * <p>
-     * If this instance does not identify an {@link #isArchive() archive file},
-     * then this method returns immediately without changing anything.
+     * Mind that this operation has no means to detect if there is actually any
+     * redundant data present in this archive file.
+     * Any call to this operation will perform exactly the same steps, so if
+     * this archive file is already compact, then the call will just waste time
+     * and temporary space in the platform file system.
      * <p>
      * This operation is not thread-safe and hence not atomic, so you should
      * not concurrently access this archive file or any of its entries.
@@ -3622,15 +3629,16 @@ public final class TFile extends File {
      * Otherwise, the definition of <i>s</i> is specific to the archive file
      * system driver.
      * Usually, if the archive file contains a central directory, you could
-     * expect the best case, otherwise the worst case, but this is without
-     * warranty.
+     * expect the best case, otherwise the worst case, but this information
+     * is given without warranty.
      * <p>
      * If this archive file has been successfully compacted, then it's left
-     * unmounted, so any subsequent operation will mount it again, which may
-     * require additional time.
+     * unmounted, so any subsequent operation will mount it again, which
+     * requires additional time.
      * 
      * @return this
      * @throws IOException On any I/O error.
+     * @see    FsOutputOption#GROW
      * @since  TrueZIP 7.3
      */
     public TFile compact() throws IOException {
