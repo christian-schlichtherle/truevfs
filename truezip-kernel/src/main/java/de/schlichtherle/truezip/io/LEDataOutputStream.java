@@ -23,7 +23,7 @@ import java.io.OutputStream;
 import net.jcip.annotations.NotThreadSafe;
 
 /**
- * A stream to write data in Little Endian (LE) format.
+ * An output stream to write data in Little Endian (LE) format.
  * <p>
  * This class is similar to {@link java.io.DataOutputStream},
  * but writes data in Little Endian format to its underlying stream.
@@ -31,7 +31,7 @@ import net.jcip.annotations.NotThreadSafe;
  * {@link #size()} method and the {@link #written} field are respectively
  * return {@code long} values and wrap to {@link Long#MAX_VALUE}.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @NotThreadSafe
@@ -64,7 +64,7 @@ implements DataOutput {
      * Increases the written counter by the specified value
      * until it reaches {@link Long#MAX_VALUE}.
      */
-    private void incCount(int inc) {
+    private void inc(int inc) {
         final long temp = written + inc;
         written = temp >= 0 ? temp : Long.MAX_VALUE;
     }
@@ -83,7 +83,7 @@ implements DataOutput {
     @Override
     public void write(int b) throws IOException {
 	delegate.write(b);
-        incCount(1);
+        inc(1);
     }
 
     /**
@@ -100,7 +100,7 @@ implements DataOutput {
     @Override
     public void write(byte b[], int off, int len) throws IOException {
 	delegate.write(b, off, len);
-	incCount(len);
+	inc(len);
     }
 
     /**
@@ -117,7 +117,7 @@ implements DataOutput {
     @Override
     public final void writeBoolean(boolean b) throws IOException {
 	delegate.write(b ? 1 : 0);
-	incCount(1);
+	inc(1);
     }
 
     /**
@@ -132,7 +132,7 @@ implements DataOutput {
     @Override
     public final void writeByte(int b) throws IOException {
 	delegate.write(b);
-        incCount(1);
+        inc(1);
     }
 
     /**
@@ -164,7 +164,7 @@ implements DataOutput {
         s >>= 8;
         buf[1] = (byte) s;
         delegate.write(buf, 0, 2);
-        incCount(2);
+        inc(2);
     }
 
     /**
@@ -186,7 +186,7 @@ implements DataOutput {
         i >>= 8;
         buf[3] = (byte) i;
         delegate.write(buf, 0, 4);
-        incCount(4);
+        inc(4);
     }
 
     /**
@@ -216,7 +216,7 @@ implements DataOutput {
         l >>= 8;
         buf[7] = (byte) l;
         delegate.write(buf, 0, 8);
-	incCount(8);
+	inc(8);
     }
 
     /**
