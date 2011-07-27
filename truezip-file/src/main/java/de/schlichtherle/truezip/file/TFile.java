@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.file;
 
+import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.util.UriBuilder;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import de.schlichtherle.truezip.io.Paths.Splitter;
@@ -162,8 +163,8 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  * Such an invalid archive file is called a <i>false positive</i> archive file.
  * TrueZIP correctly identifies all types of false positive archive files by
  * performing a recursive look up operation for the first parent file system
- * where the given archive file actually exists and treats it according to the
- * <i>true state</i> of this entity.
+ * where the respective prospective archive file actually exists and treats it
+ * according to its <i>true state</i>.
  * <p>
  * The following table shows how certain methods in this class behave,
  * depending upon an archive file's path and its <i>true state</i> in the
@@ -335,10 +336,11 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  *     platform file system, which is indicated by <i>{@code ?}</i>.
  *     For regular directories on Windows/NTFS for example, the return value
  *     would be {@code 0}.
- * <li>This example assumes that the TrueZIP Driver ZIP module is
- *     present on the run time class path.</li>
- * <li>This example assumes that the TrueZIP Driver ZIP.RAES (TZP) module is
- *     present on the run time class path.</li>
+ * <li>This example presumes that the JAR of the module
+ *     TrueZIP&nbsp;Driver&nbsp;ZIP is present on the run time class path.</li>
+ * <li>This example presumes that the JAR of the module
+ *     TrueZIP&nbsp;Driver&nbsp;ZIP.RAES&nbsp;(TZP) is present on the run time
+ *     class path.</li>
  * <li>The methods behave exactly the same for both <i>archive.zip</i> and
  *    <i>archive.tzp</i> with one exception: If the key for a RAES encrypted
  *    ZIP file remains unknown (e.g. because the user cancelled password
@@ -364,6 +366,8 @@ public final class TFile extends File {
     private static final Set<File>
             ROOTS = Collections.unmodifiableSet(
                 new TreeSet<File>(Arrays.asList(listRoots())));
+
+    private static final File CURRENT_DIRECTORY = new File(".");
 
     /**
      * The delegate is used to implement the behaviour of the file system
@@ -1267,6 +1271,10 @@ public final class TFile extends File {
         TConfig.get().setArchiveDetector(detector);
     }
 
+    TFile getNonArchiveFile() {
+        return new TFile(getParentFile(), getName(), TArchiveDetector.NULL);
+    }
+
     /**
      * Returns the first parent directory (starting from this file) which is
      * <em>not</em> an archive file or a file located in an archive file.
@@ -1358,8 +1366,8 @@ public final class TFile extends File {
     }
 
     /**
-     * Removes any {@code "."} and {@code ".."} directories from the path name
-     * wherever possible.
+     * Removes any redundant {@code "."} and {@code ".."} directories from the
+     * path name.
      *
      * @return The normalized file object denoting the same file or
      *         directory as this instance.
@@ -3586,5 +3594,104 @@ public final class TFile extends File {
     public static void cat(final InputStream in, final OutputStream out)
     throws IOException {
         Streams.cat(in, out);
+    }
+
+    /**
+     * Compacts this archive file by removing any redundant archive entry
+     * contents and meta data, including central directories.
+     * <p>
+     * If the {@link FsOutputOption#GROW} preference is used in order to append
+     * archive entries to the end of an archive file rather than assembling a
+     * new archive file, then over time this may result in a lot of redundant
+     * artifacts such as archive entry contents and meta data, including
+     * central directories.
+     * This operation can then get used to remove these redundant artifacts
+     * again.
+     * <p>
+     * If this instance does not identify an {@link #isArchive() archive file},
+     * then this method returns immediately without changing anything.
+     * <p>
+     * This operation is not thread-safe and hence not atomic, so you should
+     * not concurrently access this archive file or any of its entries.
+     * <p>
+     * This operation performs in the order of <i>O(s)</i>, where <i>s</i> is
+     * the total size of the archive file either before (worst case) or after
+     * (best case) compacting it.
+     * If this archive file has already been mounted, then <i>s</i> is the
+     * total size of the archive file after compacting it (best case).
+     * Otherwise, the definition of <i>s</i> is specific to the archive file
+     * system driver.
+     * Usually, if the archive file contains a central directory, you could
+     * expect the best case, otherwise the worst case, but this is without
+     * warranty.
+     * <p>
+     * If this archive file has been successfully compacted, then it's left
+     * unmounted, so any subsequent operation will mount it again, which may
+     * require additional time.
+     * 
+     * @return this
+     * @throws IOException On any I/O error.
+     * @since  TrueZIP 7.3
+     */
+    public TFile compact() throws IOException {
+        if (isArchive())
+            compact(this);
+        return this;
+    }
+
+    private static void compact(TFile grown) throws IOException {
+        assert grown.isArchive();
+        grown = grown.getNormalizedFile();
+        assert grown.isArchive();
+
+        final File dir = getParent(grown);
+        final String suffix = getSuffix(grown);
+        final TConfig config = TConfig.push();
+        try {
+            // Switch off FsOutputOption.GROW.
+            config.setOutputPreferences(
+                    config.getOutputPreferences().clear(GROW));
+
+            // Create temp file.
+            final TFile compact = new TFile(createTempFile("tzp", suffix, dir));
+            compact.rm();
+            try {
+                // Make a structural copy of the grown archive file, thereby
+                // compacting it.
+                grown.cp_rp(compact);
+
+                // Unmount both archive files so we can delete and move them
+                // safely and fast like regular files.
+                TFile.umount(grown);
+                TFile.umount(compact);
+
+                // Move the compacted archive file over to the grown archive
+                // file like a regular file.
+                if (!move(compact.getNonArchiveFile(), grown.getNonArchiveFile()))
+                    throw new IOException(compact + " (cannot move to " + grown + ")");
+            } catch (IOException ex) {
+                compact.rm();
+                throw ex;
+            }
+        } finally {
+            config.close();
+        }
+    }
+
+    private static File getParent(final File file) {
+        final File parent = file.getParentFile();
+        return null != parent ? parent : CURRENT_DIRECTORY;
+    }
+
+    private static @Nullable String getSuffix(final TFile file) {
+        final TArchiveDetector detector = file.getArchiveDetector();
+        final FsScheme scheme = detector.getScheme(file.getName());
+        return null != scheme ? "." + scheme : null;
+    }
+
+    private static boolean move(File src, File dst) {
+        return src.exists()
+                && (!dst.exists() || dst.delete())
+                && src.renameTo(dst);
     }
 }
