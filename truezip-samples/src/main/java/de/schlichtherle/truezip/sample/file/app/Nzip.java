@@ -152,7 +152,7 @@ public class Nzip extends Application {
      *         {@code true} otherwise.
      * @throws IllegalUsageException If {@code args} does not contain
      *         correct commands or parameters.
-     * @throws IOException On any I/O related exception.
+     * @throws IOException On any I/O error.
      */
     @Override
     protected int runChecked(String[] args)
@@ -176,6 +176,8 @@ public class Nzip extends Application {
                 ls(args, true, true);
             } else if ("cat".equals(cmd)) {
                 cat(args);
+            } else if ("compact".equals(cmd)) {
+                compact(args);
             } else if ("cp".equals(cmd)) {
                 cpOrMv(args, false);
             } else if ("mv".equals(cmd)) {
@@ -317,6 +319,21 @@ public class Nzip extends Application {
         }
     }
 
+    private void compact(String[] args)
+    throws IllegalUsageException, IOException {
+        if (args.length < 1)
+            throw new IllegalUsageException();
+
+        for (int i = 0; i < args.length; i++) {
+            final TFile file = new TFile(args[i]);
+            if (file.isArchive()) {
+                file.compact();
+            } else {
+                err.println(file + " (" + resources.getString("compact.na") + ")");
+            }
+        }
+    }
+
     private void cpOrMv(final String[] args, final boolean mv)
     throws IllegalUsageException, IOException {
         if (args.length < 2)
@@ -431,7 +448,7 @@ public class Nzip extends Application {
                     msg = resources.getString("touch.culmtof");
                 else
                     msg = resources.getString("touch.culmtosfod");
-                throw new IOException(file.getPath() + " (" + msg + ")");
+                throw new IOException(file + " (" + msg + ")");
             }
         }
     }
@@ -454,7 +471,7 @@ public class Nzip extends Application {
                     msg = resources.getString("mkdir.fea");
                 else
                     msg = resources.getString("mkdir.sfodea");
-                throw new IOException(file.getPath() + " (" + msg + ")");
+                throw new IOException(file + " (" + msg + ")");
             }
         }
     }
