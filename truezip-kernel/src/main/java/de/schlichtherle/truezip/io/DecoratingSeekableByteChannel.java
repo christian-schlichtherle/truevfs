@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.io;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
@@ -37,16 +36,15 @@ public abstract class DecoratingSeekableByteChannel
 implements SeekableByteChannel {
 
     /** The nullable decorated seekable byte channel. */
-    @Nullable
-    protected SeekableByteChannel delegate;
+    protected @Nullable SeekableByteChannel delegate;
 
     /**
      * Constructs a new decorating seekable byte channel.
      *
-     * @param channel the seekable byte channel to wrap in this decorator.
+     * @param channel the seekable byte channel to decorate.
      */
     protected DecoratingSeekableByteChannel(
-            final @CheckForNull SeekableByteChannel channel) {
+            final @Nullable SeekableByteChannel channel) {
         this.delegate = channel;
     }
 

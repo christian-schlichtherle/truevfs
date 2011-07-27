@@ -22,7 +22,8 @@ import de.schlichtherle.truezip.file.swing.TFileChooser;
 import javax.swing.SwingUtilities;
 
 /**
- * Lets you pick a file using a {@link TFileChooser} and prints it's path.
+ * This command line utility lets you pick a file using a {@link TFileChooser}
+ * and prints it's path.
  * Of course, {@code TFileChooser} can browse archive files, too.
  * <p>
  * For example, if the JAR for the module {@code truezip-driver-zip} is present

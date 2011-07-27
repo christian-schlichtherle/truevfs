@@ -16,6 +16,8 @@
 
 package de.schlichtherle.truezip.zip;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.util.HashSet;
@@ -33,7 +35,8 @@ import java.util.zip.Inflater;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-class InflaterPool {
+@DefaultAnnotation(NonNull.class)
+final class InflaterPool {
     private static final Set<Inflater> allocated
             = new HashSet<Inflater>();
     private static final List<Reference<Inflater>> released

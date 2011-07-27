@@ -16,14 +16,14 @@
 package de.schlichtherle.truezip.sample.kernel.app;
 
 import de.schlichtherle.truezip.file.TFile;
-import de.schlichtherle.truezip.fs.FsDefaultDriver;
-import de.schlichtherle.truezip.fs.sl.FsDriverLocator;
 import de.schlichtherle.truezip.fs.FsCompositeDriver;
+import de.schlichtherle.truezip.fs.FsDefaultDriver;
 import de.schlichtherle.truezip.fs.FsInputOption;
 import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.fs.FsUriModifier;
+import de.schlichtherle.truezip.fs.sl.FsDriverLocator;
 import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
@@ -37,9 +37,14 @@ import java.net.URI;
  * for copying the contents of the first parameter URI to the second parameter
  * URI.
  * 
- * @see <a href="http://curl.haxx.se/">cURL and libcurl - Home Page</a>
- * @author Christian Schlichtherle
- * @version $Id$
+ * @deprecated Since TrueZIP 7.2, the new TrueZIP Path API provides the same
+ *             functionality with much more ease.
+ *             Use the Maven archetype for the module TrueZIP Path instead.
+ *             Its group ID is {@code de.schlichtherle.truezip}.
+ *             Its artifact ID is {@code truezip-archetype-path}.
+ * @see        <a href="http://curl.haxx.se/">cURL and libcurl - Home Page</a>
+ * @author     Christian Schlichtherle
+ * @version    $Id$
  */
 public final class Copy {
 

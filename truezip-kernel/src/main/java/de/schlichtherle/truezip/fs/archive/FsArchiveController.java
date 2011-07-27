@@ -15,45 +15,43 @@
  */
 package de.schlichtherle.truezip.fs.archive;
 
-import de.schlichtherle.truezip.fs.FsModelController;
-import java.util.Map;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import de.schlichtherle.truezip.entry.DecoratingEntry;
-import de.schlichtherle.truezip.fs.FsEntryNotFoundException;
+import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.entry.Entry.Access;
+import static de.schlichtherle.truezip.entry.Entry.Access.*;
+import de.schlichtherle.truezip.entry.Entry.Type;
+import static de.schlichtherle.truezip.entry.Entry.Type.*;
+import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsEntry;
+import de.schlichtherle.truezip.fs.FsEntryName;
+import static de.schlichtherle.truezip.fs.FsEntryName.*;
+import de.schlichtherle.truezip.fs.FsEntryNotFoundException;
+import de.schlichtherle.truezip.fs.FsException;
+import de.schlichtherle.truezip.fs.FsFalsePositiveException;
+import de.schlichtherle.truezip.fs.FsInputOption;
+import de.schlichtherle.truezip.fs.FsModelController;
+import de.schlichtherle.truezip.fs.FsOutputOption;
+import static de.schlichtherle.truezip.fs.FsOutputOption.*;
+import de.schlichtherle.truezip.fs.FsSyncException;
+import de.schlichtherle.truezip.fs.FsSyncOption;
+import static de.schlichtherle.truezip.fs.FsSyncOption.*;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.fs.FsConcurrentModel;
-import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.entry.Entry.Type;
-import de.schlichtherle.truezip.entry.Entry.Access;
-import de.schlichtherle.truezip.fs.FsFalsePositiveException;
-import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.FsEntryName;
-import de.schlichtherle.truezip.fs.FsException;
-import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.InputSocket;
-import de.schlichtherle.truezip.fs.FsInputOption;
 import de.schlichtherle.truezip.socket.OutputSocket;
-import de.schlichtherle.truezip.fs.FsOutputOption;
-import de.schlichtherle.truezip.fs.FsSyncOption;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.channels.SeekableByteChannel;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.jcip.annotations.NotThreadSafe;
-
-import static de.schlichtherle.truezip.entry.Entry.Access.*;
-import static de.schlichtherle.truezip.entry.Entry.Type.*;
-import static de.schlichtherle.truezip.fs.FsEntryName.*;
-import static de.schlichtherle.truezip.fs.FsSyncOption.*;
-import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 
 /**
  * An abstract base class for any archive file system controller which
@@ -80,14 +78,12 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
 abstract class FsArchiveController<E extends FsArchiveEntry>
-extends FsModelController<FsConcurrentModel> {
+extends FsModelController<FsContextModel> {
 
     private static final Logger
             logger = Logger.getLogger(  FsArchiveController.class.getName(),
                                         FsArchiveController.class.getName());
 
-    private static final BitField<FsOutputOption>
-            AUTO_MOUNT_OPTIONS = BitField.noneOf(FsOutputOption.class);
     private static final BitField<FsSyncOption>
             UNLINK_SYNC_OPTIONS = BitField.of(ABORT_CHANGES);
 
@@ -96,14 +92,27 @@ extends FsModelController<FsConcurrentModel> {
      *
      * @param model the non-{@code null} archive model.
      */
-    FsArchiveController(final FsConcurrentModel model) {
+    FsArchiveController(final FsContextModel model) {
         super(model);
         if (null == model.getParent())
             throw new IllegalArgumentException();
     }
 
+    /**
+     * Returns a JavaBean which represents the original values of selected
+     * parameters for the {@link FsContextController} operation in progress.
+     * 
+     * @return A JavaBean which represents the original values of selected
+     *         parameters for the {@link FsContextController} operation in
+     *         progress.
+     */
+    final FsOperationContext getContext() {
+        return getModel().getContext();
+    }
+
+    /** Equivalent to {@link #autoMount(boolean) autoMount(false)}. */
     final FsArchiveFileSystem<E> autoMount() throws IOException {
-        return autoMount(false, AUTO_MOUNT_OPTIONS);
+        return autoMount(false);
     }
 
     /**
@@ -117,15 +126,13 @@ extends FsModelController<FsConcurrentModel> {
      * method will temporarily release all locks, so any preconditions must be
      * checked again upon return to protect against concurrent modifications!
      *
-     * @param autoCreate If the archive file does not exist and this is
-     *        {@code true}, a new file system with only a (virtual) root
-     *        directory is created with its last modification time set to the
-     *        system's current time.
-     * @return A valid archive file system - {@code null} is never returned.
+     * @param  autoCreate If the archive file does not exist and this is
+     *         {@code true}, a new archvie file system with only a (virtual)
+     *         root directory is created with its last modification time set
+     *         to the system's current time.
+     * @return An archive file system.
      */
-    abstract FsArchiveFileSystem<E> autoMount(
-            boolean autoCreate,
-            BitField<FsOutputOption> options)
+    abstract FsArchiveFileSystem<E> autoMount(boolean autoCreate)
     throws IOException;
 
     @Override
@@ -215,12 +222,17 @@ extends FsModelController<FsConcurrentModel> {
         }
 
         @Override
+        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            return getBoundSocket().newSeekableByteChannel();
+        }
+
+        @Override
         public InputStream newInputStream() throws IOException {
             return getBoundSocket().newInputStream();
         }
     } // Input
 
-    abstract InputSocket<?> getInputSocket(String name) throws IOException;
+    abstract InputSocket<?> getInputSocket(String name);
 
     @Override
     public final OutputSocket<?> getOutputSocket(
@@ -232,31 +244,30 @@ extends FsModelController<FsConcurrentModel> {
 
     private final class Output extends OutputSocket<FsArchiveEntry> {
         final FsEntryName name;
-        final BitField<FsOutputOption> options;
+        final boolean append;
         final @CheckForNull Entry template;
 
         Output( final FsEntryName name,
                 final BitField<FsOutputOption> options,
                 final @CheckForNull Entry template) {
             this.name = name;
-            this.options = options;
+            this.append = options.get(APPEND);
             this.template = template;
         }
 
         FsArchiveFileSystemOperation<E> mknod() throws IOException {
-            //assert options.equals(getModel().getOperation().getOutputOptions());
             autoSync(name, WRITE);
+            final BitField<FsOutputOption> options = getContext().getOutputOptions();
             // Start creating or overwriting the archive entry.
             // This will fail if the entry already exists as a directory.
-            return autoMount(   !name.isRoot()
-                                && options.get(CREATE_PARENTS), options)
+            return autoMount(!name.isRoot() && options.get(CREATE_PARENTS))
                     .mknod(name, FILE, options, template);
         }
 
         @Override
         public FsArchiveEntry getLocalTarget() throws IOException {
             final E entry = mknod().getTarget().getEntry();
-            if (options.get(APPEND)) {
+            if (append) {
                 // A proxy entry must get returned here in order to inhibit
                 // a peer target to recognize the type of this entry and
                 // change the contents of the transferred data accordingly.
@@ -268,19 +279,19 @@ extends FsModelController<FsConcurrentModel> {
 
         @Override
         public OutputStream newOutputStream() throws IOException {
-            final FsArchiveFileSystemOperation<E> mknod = mknod();
-            final E entry = mknod.getTarget().getEntry();
-            final OutputSocket<?> socket = getOutputSocket(entry);
             InputStream in = null;
-            if (options.get(APPEND)) {
+            if (append) {
                 try {
-                    in = getInputSocket(entry.getName()).newInputStream();
-                } catch (FileNotFoundException ex) {
-                    logger.log(Level.WARNING, ex.toString(), ex);
+                    in = new Input(name).newInputStream();
+                } catch (IOException ex) {
+                    // When appending, there is no need for the entry to exist,
+                    // so we can safely ignore this - fall through!
                 }
             }
             try {
-                final OutputStream out = socket
+                final FsArchiveFileSystemOperation<E> mknod = mknod();
+                final E entry = mknod.getTarget().getEntry();
+                final OutputStream out = getOutputSocket(entry)
                         .bind(null == in ? this : null)
                         .newOutputStream();
                 try {
@@ -304,7 +315,7 @@ extends FsModelController<FsConcurrentModel> {
         }
     } // Output
 
-    private static class ProxyEntry
+    private static final class ProxyEntry
     extends DecoratingEntry<FsArchiveEntry>
     implements FsArchiveEntry {
         ProxyEntry(FsArchiveEntry entry) {
@@ -325,9 +336,9 @@ extends FsModelController<FsConcurrentModel> {
         public boolean setTime(Access type, long value) {
             return delegate.setTime(type, value);
         }
-    } // class ProxyEntry
+    } // ProxyEntry
 
-    abstract OutputSocket<?> getOutputSocket(E entry) throws IOException;
+    abstract OutputSocket<?> getOutputSocket(E entry);
 
     @Override
     public final void mknod(
@@ -336,20 +347,20 @@ extends FsModelController<FsConcurrentModel> {
             final BitField<FsOutputOption> options,
             final Entry template)
     throws IOException {
-        //assert options.equals(getModel().getOperation().getOutputOptions());
+        assert options.equals(getContext().getOutputOptions());
         if (name.isRoot()) {
             try {
                 autoMount(); // detect false positives!
             } catch (FsFalsePositiveException ex) {
                 if (DIRECTORY != type)
                     throw ex;
-                autoMount(true, options);
+                autoMount(true);
                 return;
             }
             throw new FsEntryNotFoundException(getModel(),
                     name, "directory exists already");
         } else {
-            autoMount(options.get(CREATE_PARENTS), options)
+            autoMount(options.get(CREATE_PARENTS))
                     .mknod(name, type, options, template)
                     .run();
         }
@@ -392,17 +403,16 @@ extends FsModelController<FsConcurrentModel> {
     }
 
     /**
-     * Synchronizes the archive file only if there is new data for the file
-     * system entry with the given name.
-     * This method requires synchronization on the write lock.
+     * Synchronizes the target archive file if and only if required.
      * <p>
      * <b>Warning:</b> As a side effect, the state of this controller may get
      * entirely reset (virtual filesystem, entries, streams, etc.)!
      *
-     * @param  name the non-{@code null} entry name.
-     * @param  intention the intended I/O operation on the entry.
-     *         If {@code null}, then a pure virtual file system operation with
-     *         no I/O is intended.
+     * @param  name the file system entry name.
+     * @param  intention the intended I/O operation on the archive entry.
+     *         If {@code null}, then only an update to the archive entry meta
+     *         data (i.e. a pure virtual file system operation with no I/O)
+     *         is intended.
      * @see    FsController#sync
      * @throws IOException if any I/O error occurs when synchronizing the
      *         archive file to its parent file system.

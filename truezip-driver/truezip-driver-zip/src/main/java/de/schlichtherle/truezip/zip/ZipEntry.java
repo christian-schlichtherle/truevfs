@@ -37,11 +37,11 @@ import net.jcip.annotations.NotThreadSafe;
  * However, it is safe to call only the getters of this class from multiple
  * threads concurrently.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 @NotThreadSafe
+@DefaultAnnotation(NonNull.class)
 public class ZipEntry implements Cloneable {
 
     // Bit indices for initialized fields.
@@ -96,15 +96,6 @@ public class ZipEntry implements Cloneable {
     public ZipEntry(final String name) {
         setName0(name);
     }
-
-    /**
-     * Constructs a new zip entry which has all properties copied from the
-     * given template.
-     */
-    /*public ZipEntry(final ZipEntry template) {
-        this(template.getName(), template);
-        setInit(NAME, false); // unlock name
-    }*/
 
     /**
      * Constructs a new ZIP entry with the given name which has all other
@@ -436,7 +427,6 @@ public class ZipEntry implements Cloneable {
 
     private @CheckForNull ExtraFields getFields(final boolean zip64) {
         ExtraFields fields = this.fields;
-
         if (zip64) {
             final ExtraField field = compileZip64ExtraField();
             if (null != field) {
@@ -451,7 +441,6 @@ public class ZipEntry implements Cloneable {
                 assert ExtraField.ZIP64_HEADER_ID == field.getHeaderID();
             }
         }
-            
         return fields;
     }
 
@@ -475,7 +464,7 @@ public class ZipEntry implements Cloneable {
     }
 
     private void setExtra0(final @CheckForNull byte[] data) {
-        if (null == data || data.length <= 0) {
+        if (null == data || 0 >= data.length) {
             fields = null;
         } else {
             if (null == fields)
@@ -484,7 +473,7 @@ public class ZipEntry implements Cloneable {
             parseZip64ExtraField();
             assert null != fields;
             fields.remove(ExtraField.ZIP64_HEADER_ID);
-            if (fields.size() <= 0) {
+            if (0 >= fields.size()) {
                 assert fields.size() == 0;
                 fields = null;
             }
@@ -499,14 +488,11 @@ public class ZipEntry implements Cloneable {
     private void parseZip64ExtraField() {
         if (null == fields)
             return;
-
         final ExtraField ef = fields.get(ExtraField.ZIP64_HEADER_ID);
         if (null == ef)
             return;
-
         final byte[] data = ef.getDataBlock();
         int off = 0;
-
         // Read in Uncompressed Size.
         final long size = getSize32();
         if (size >= UInt.MAX_VALUE) {
@@ -514,7 +500,6 @@ public class ZipEntry implements Cloneable {
             setSize64(LittleEndian.readLong(data, off));
             off += 8;
         }
-
         // Read in Compressed Size.
         final long csize = getCompressedSize32();
         if (csize >= UInt.MAX_VALUE) {
@@ -522,7 +507,6 @@ public class ZipEntry implements Cloneable {
             setCompressedSize64(LittleEndian.readLong(data, off));
             off += 8;
         }
-
         // Read in Relative Header Offset.
         final long offset = getOffset32();
         if (offset >= UInt.MAX_VALUE) {
@@ -541,28 +525,24 @@ public class ZipEntry implements Cloneable {
     private @CheckForNull ExtraField compileZip64ExtraField() {
         final byte[] data = new byte[3 * 8]; // maximum size
         int off = 0;
-
         // Write out Uncompressed Size.
         final long size = getSize();
         if (size >= UInt.MAX_VALUE || FORCE_ZIP64_EXT && size >= 0) {
             LittleEndian.writeLong(size, data, off);
             off += 8;
         }
-
         // Write out Compressed Size.
         final long csize = getCompressedSize();
         if (csize >= UInt.MAX_VALUE || FORCE_ZIP64_EXT && csize >= 0) {
             LittleEndian.writeLong(csize, data, off);
             off += 8;
         }
-
         // Write out Relative Header Offset.
         final long offset = getOffset();
         if (offset >= UInt.MAX_VALUE || FORCE_ZIP64_EXT && offset >= 0) {
             LittleEndian.writeLong(offset, data, off);
             off += 8;
         }
-
         // Create ZIP64 Extended Information Extra Field from serialized data.
         final ExtraField field;
         if (off > 0) {
@@ -571,7 +551,6 @@ public class ZipEntry implements Cloneable {
         } else {
             field = null;
         }
-
         return field;
     }
 

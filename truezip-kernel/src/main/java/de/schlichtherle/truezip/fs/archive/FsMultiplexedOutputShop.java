@@ -60,7 +60,7 @@ import net.jcip.annotations.NotThreadSafe;
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
-public class FsMultiplexedArchiveOutputShop<AE extends FsArchiveEntry>
+public class FsMultiplexedOutputShop<AE extends FsArchiveEntry>
 extends DecoratingOutputShop<AE, OutputShop<AE>> {
 
     private final IOPool<?> pool;
@@ -76,12 +76,12 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
     private boolean busy;
 
     /**
-     * Constructs a new {@code FsMultiplexedArchiveOutputShop}.
+     * Constructs a new multiplexed output shop.
      * 
-     * @param output the decorated output archive.
-     * @throws NullPointerException if any parameter is {@code null}.
+     * @param output the decorated output shop.
+     * @param pool the pool for buffering entry data.
      */
-    public FsMultiplexedArchiveOutputShop(
+    public FsMultiplexedOutputShop(
             final OutputShop<AE> output,
             final IOPool<?> pool) {
         super(output);
@@ -137,7 +137,7 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
 
         class Output extends DecoratingOutputSocket<AE> {
             Output() {
-                super(FsMultiplexedArchiveOutputShop.super.getOutputSocket(entry));
+                super(FsMultiplexedOutputShop.super.getOutputSocket(entry));
             }
 
             @Override

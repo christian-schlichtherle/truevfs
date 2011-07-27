@@ -16,16 +16,17 @@
 package de.schlichtherle.truezip.fs.archive.tar;
 
 import de.schlichtherle.truezip.entry.Entry;
-import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
-import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
+import static de.schlichtherle.truezip.entry.Entry.Access.*;
+import static de.schlichtherle.truezip.entry.Entry.Size.*;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsInputOption;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.FsOutputOption;
+import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriver;
-import de.schlichtherle.truezip.fs.archive.FsMultiplexedArchiveOutputShop;
+import de.schlichtherle.truezip.fs.archive.FsMultiplexedOutputShop;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.socket.InputShop;
@@ -68,6 +69,19 @@ public class TarDriver extends FsCharsetArchiveDriver<TarArchiveEntry> {
         this.provider = provider;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return The implementation in the class {@link TarDriver} returns
+     *         {@code true} because when reading a TAR file sequentially,
+     *         each TAR entry should &quot;override&quot; any previously read
+     *         TAR entry with an equal name.
+     */
+    @Override
+    public boolean getRedundantContentSupport() {
+        return true;
+    }
+
     @Override
     protected final IOPool<?> getPool() {
         return provider.get();
@@ -95,10 +109,7 @@ public class TarDriver extends FsCharsetArchiveDriver<TarArchiveEntry> {
                                             FsEntryName name,
                                             BitField<FsOutputOption> options,
                                             @CheckForNull Entry template) {
-        return controller.getOutputSocket(
-                name,
-                options.set(FsOutputOption.COMPRESS),
-                template);
+        return controller.getOutputSocket(name, options.set(COMPRESS), template);
     }
 
     @Override
@@ -141,7 +152,7 @@ public class TarDriver extends FsCharsetArchiveDriver<TarArchiveEntry> {
     @Override
     public TarInputShop newInputShop(FsModel model, InputSocket<?> input)
     throws IOException {
-        final InputStream in = newInputStream(model, input);
+        final InputStream in = input.newInputStream();
         try {
             return newTarInputShop(model, in);
         } finally {
@@ -160,7 +171,7 @@ public class TarDriver extends FsCharsetArchiveDriver<TarArchiveEntry> {
      * The implementation in the class {@link TarDriver} acquires an output
      * stream from the given socket, forwards the call to
      * {@link #newTarOutputShop} and wraps the result in a new
-     * {@link FsMultiplexedArchiveOutputShop}.
+     * {@link FsMultiplexedOutputShop}.
      */
     @Override
     public OutputShop<TarArchiveEntry> newOutputShop(
@@ -168,9 +179,9 @@ public class TarDriver extends FsCharsetArchiveDriver<TarArchiveEntry> {
             OutputSocket<?> output,
             InputShop<TarArchiveEntry> source)
     throws IOException {
-        final OutputStream out = newOutputStream(model, output);
+        final OutputStream out = output.newOutputStream();
         try {
-            return new FsMultiplexedArchiveOutputShop<TarArchiveEntry>(
+            return new FsMultiplexedOutputShop<TarArchiveEntry>(
                     newTarOutputShop(model, out, (TarInputShop) source),
                     getPool());
         } catch (IOException ex) {

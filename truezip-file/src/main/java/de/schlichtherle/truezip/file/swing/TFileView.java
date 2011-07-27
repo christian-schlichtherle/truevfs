@@ -68,15 +68,18 @@ public class TFileView extends TDecoratingFileView {
     }
 
     static @Nullable String typeDescription(File file) {
-        if (!(file instanceof TFile))
-            return null;
-        TFile smartFile = (TFile) file;
-        if (isTrueArchive(smartFile)) {
+        return file instanceof TFile ? typeDescription((TFile) file) : null;
+    }
+
+    private static @Nullable String typeDescription(TFile file) {
+        if (isTrueArchive(file)) {
             return resources.getString("archiveFile");
-        } else if (isEntryInTrueArchive(smartFile)) {
-            return smartFile.isDirectory()
+        } else if (isTrueEntry(file)) {
+            return file.isDirectory()
                     ? resources.getString("archiveDirectoryEntry")
-                    : resources.getString("archiveFileEntry");
+                    : file.isFile()
+                        ? resources.getString("archiveFileEntry")
+                        : null;
         }
         return null;
     }
@@ -88,40 +91,35 @@ public class TFileView extends TDecoratingFileView {
     }
 
     static @Nullable Icon icon(File file) {
-        if (!(file instanceof TFile))
-            return null;
-        TFile smartFile = (TFile) file;
-        if (isTrueArchive(smartFile)) {
-                return UIManager.getIcon("FileView.directoryIcon");
-        } else if (isEntryInTrueArchive(smartFile)) {
-            return smartFile.isDirectory()
+        return file instanceof TFile ? icon((TFile) file) : null;
+    }
+
+    private static @Nullable Icon icon(final TFile file) {
+        if (isTrueArchive(file)) {
+            return UIManager.getIcon("FileView.directoryIcon");
+        } else if (isTrueEntry(file)) {
+            return file.isDirectory()
                     ? UIManager.getIcon("FileView.directoryIcon")
-                    : UIManager.getIcon("FileView.fileIcon");
+                    : file.isFile()
+                        ? UIManager.getIcon("FileView.fileIcon")
+                        : null;
         }
         return null;
     }
 
     private static boolean isTrueArchive(TFile file) {
-        return file.isArchive() && file.isDirectory()
-                && !newNonArchiveFile(file).isDirectory();
+        return file.isArchive() && file.isDirectory();
     }
 
-    private static TFile newNonArchiveFile(@NonNull TFile file) {
-        TFile parent = file.getParentFile();
-        assert null != parent : "expected non-null from context!";
-        return new TFile(parent, file.getName(), TArchiveDetector.NULL);
-    }
-
-    private static boolean isEntryInTrueArchive(TFile file) {
+    private static boolean isTrueEntry(TFile file) {
+        //return file.isEntry() && file.getParentFile().isDirectory();
         // An archive entry always names a parent. This parent must not be
         // a regular directory.
         if (!file.isEntry())
             return false;
         TFile parent = file.getParentFile();
         assert parent != null : "An archive entry must always name a parent!";
-        return parent.isDirectory()
-                && !new TFile(parent.getPath(), TArchiveDetector.NULL)
-                    .isDirectory();
+        return parent.isDirectory();
     }
 
     @Override

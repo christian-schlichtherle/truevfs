@@ -32,10 +32,10 @@ import static de.schlichtherle.truezip.io.Paths.*;
  * methods for dealing with the character set supported by a particular
  * archive type.
  * This class is intended to be used to implement archive types with a defined
- * character set, e.g. the ZIP file format with its IBM437 character set or
- * the TAR file format with its US-ASCII character set.
+ * character set, e.g. the ZIP file format with the IBM437 character set or
+ * the TAR file format with the US-ASCII character set.
  * <p>
- * Implementations must be immutable.
+ * Sub-classes must be thread-safe and should be immutable.
  * 
  * @author Christian Schlichtherle
  * @version $Id$

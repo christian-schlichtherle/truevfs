@@ -23,33 +23,34 @@ import de.schlichtherle.truezip.crypto.raes.param.KeyManagerRaesParameters;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.fs.FsController;
+import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
+import de.schlichtherle.truezip.fs.archive.FsMultiplexedOutputShop;
 import de.schlichtherle.truezip.fs.archive.zip.JarArchiveEntry;
 import de.schlichtherle.truezip.fs.archive.zip.JarDriver;
+import de.schlichtherle.truezip.fs.archive.zip.OptionOutputSocket;
 import de.schlichtherle.truezip.fs.archive.zip.ZipArchiveEntry;
 import de.schlichtherle.truezip.fs.archive.zip.ZipInputShop;
+import de.schlichtherle.truezip.fs.archive.zip.ZipOutputShop;
 import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.key.KeyManagerProvider;
 import de.schlichtherle.truezip.key.KeyProvider;
 import de.schlichtherle.truezip.key.PromptingKeyProvider;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.socket.DecoratingInputSocket;
-import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
+import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.LazyOutputSocket;
 import de.schlichtherle.truezip.socket.OutputShop;
-import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.CharConversionException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import net.jcip.annotations.Immutable;
@@ -88,7 +89,7 @@ public abstract class ZipRaesDriver extends JarDriver {
      *
      * @return The key provider sync strategy.
      */
-    public KeyProviderSyncStrategy getKeyProviderSyncStrategy() {
+    protected KeyProviderSyncStrategy getKeyProviderSyncStrategy() {
         return KeyProviderSyncStrategy.RESET_CANCELLED_KEY;
     }
 
@@ -115,7 +116,7 @@ public abstract class ZipRaesDriver extends JarDriver {
      *
      * @return The value of the property {@code authenticationTrigger}.
      */
-    public abstract long getAuthenticationTrigger();
+    protected abstract long getAuthenticationTrigger();
 
     @Override
     public final FsController<?>
@@ -154,81 +155,63 @@ public abstract class ZipRaesDriver extends JarDriver {
      * class implementation.
      */
     @Override
-    public final ZipInputShop
+    public final InputShop<ZipArchiveEntry>
     newInputShop(   final FsModel model,
-                    final InputSocket<?> target)
+                    final InputSocket<?> input)
     throws IOException {
-        class Input extends DecoratingInputSocket<Entry> {
-            Input() {
-                super(target);
+        final ReadOnlyFile rof = input.newReadOnlyFile();
+        try {
+            final RaesReadOnlyFile rrof = RaesReadOnlyFile.getInstance(
+                    rof, getRaesParameters(model));
+            if (rof.length() <= getAuthenticationTrigger()) { // compare rof, not rrof!
+                // Note: If authentication fails, this is reported through some
+                // sort of IOException, not a FileNotFoundException!
+                // This allows the client to treat the tampered archive like an
+                // ordinary file which may be read, written or deleted.
+                rrof.authenticate();
             }
-
-            @Override
-            public ReadOnlyFile newReadOnlyFile() throws IOException {
-                final ReadOnlyFile rof = super.newReadOnlyFile();
-                try {
-                    final RaesReadOnlyFile rrof = RaesReadOnlyFile.getInstance(
-                            rof, getRaesParameters(model));
-                    if (rof.length() <= getAuthenticationTrigger()) { // compare rof, not rrof!
-                        // Note: If authentication fails, this is reported through some
-                        // sort of IOException, not a FileNotFoundException!
-                        // This allows the client to treat the tampered archive like an
-                        // ordinary file which may be read, written or deleted.
-                        rrof.authenticate();
-                    }
-                    return rrof;
-                } catch (IOException ex) {
-                    rof.close();
-                    throw ex;
-                }
-            }
-
-            @Override
-            public InputStream newInputStream() throws IOException {
-                throw new UnsupportedOperationException(); // TODO: Support this feature for STORED entries.
-            }
-        } // class Input
-
-        return super.newInputShop(model, new Input());
+            return newInputShop(rrof);
+        } catch (IOException ex) {
+            rof.close();
+            throw ex;
+        }
     }
 
     /**
-     * {@inheritDoc}
-     * <p>
-     * The implementation in the class {@link ZipRaesDriver} calls
-     * {@link #getRaesParameters} for authentication.
+     * Sets {@link FsOutputOption#STORE} in {@code options} before
+     * forwarding the call to {@code controller}.
      */
     @Override
-    public OutputShop<ZipArchiveEntry>
-    newOutputShop(  final FsModel model,
-                    final OutputSocket<?> target,
-                    final @CheckForNull InputShop<ZipArchiveEntry> source)
+    public final OptionOutputSocket getOutputSocket(
+            final FsController<?> controller,
+            final FsEntryName name,
+            BitField<FsOutputOption> options,
+            final @CheckForNull Entry template) {
+        options = options.clear(GROW);
+        // Leave FsOutputOption.COMPRESS untouched - the driver shall be given
+        // opportunity to apply its own preferences to sort out such a conflict.
+        BitField<FsOutputOption> options2 = options.set(STORE);
+        return new OptionOutputSocket(
+                controller.getOutputSocket(name, options2, template),
+                options); // use modified options!
+    }
+
+    @Override
+    protected OutputShop<ZipArchiveEntry> newOutputShop(
+            final FsModel model,
+            final OptionOutputSocket output,
+            final @CheckForNull ZipInputShop source)
     throws IOException {
-        class Output extends DecoratingOutputSocket<Entry> {
-            Output() {
-                super(target);
-            }
-
-            @Override
-            public OutputStream newOutputStream() throws IOException {
-                final OutputStream
-                        out = new LazyOutputSocket<Entry>(getBoundSocket())
-                            .newOutputStream();
-                try {
-                    return RaesOutputStream.getInstance(
-                            out, getRaesParameters(model));
-                } catch (IOException cause) {
-                    try {
-                        out.close();
-                    } catch (IOException ex) {
-                        throw (IOException) ex.initCause(cause);
-                    }
-                    throw cause;
-                }
-            }
-        } // class Output
-
-        return super.newOutputShop(model, new Output(), source);
+        final OutputStream out = new LazyOutputSocket<Entry>(output)
+                .newOutputStream();
+        try {
+            final RaesOutputStream ros = RaesOutputStream.getInstance(
+                    out, getRaesParameters(model));
+            return newOutputShop(ros, source);
+        } catch (IOException ex) {
+            out.close();
+            throw ex;
+        }
     }
 
     /**
@@ -305,5 +288,5 @@ public abstract class ZipRaesDriver extends JarDriver {
          *        which has been successfully synchronized.
          */
         public abstract void sync(KeyProvider<?> provider);
-    } // enum KeyProviderSyncStrategy
+    } // KeyProviderSyncStrategy
 }
