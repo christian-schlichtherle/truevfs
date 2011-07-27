@@ -3614,9 +3614,9 @@ public final class TFile extends File {
      * <p>
      * Mind that this operation has no means to detect if there is actually any
      * redundant data present in this archive file.
-     * Any call to this operation will perform exactly the same steps, so if
-     * this archive file is already compact, then the call will just waste time
-     * and temporary space in the platform file system.
+     * Any invocation will perform exactly the same steps, so if this archive
+     * file is already compact, then this will just waste time and temporary
+     * space in the platform file system.
      * <p>
      * This operation is not thread-safe and hence not atomic, so you should
      * not concurrently access this archive file or any of its entries.
