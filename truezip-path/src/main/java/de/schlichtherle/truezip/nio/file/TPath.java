@@ -15,23 +15,22 @@
  */
 package de.schlichtherle.truezip.nio.file;
 
-import static de.schlichtherle.truezip.nio.file.TPathScanner.*;
-import de.schlichtherle.truezip.file.TConfig;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.file.TArchiveDetector;
+import de.schlichtherle.truezip.file.TConfig;
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import de.schlichtherle.truezip.fs.FsInputOption;
-import static de.schlichtherle.truezip.fs.FsInputOptions.*;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
 import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.io.Paths;
+import static de.schlichtherle.truezip.nio.file.TPathScanner.*;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
@@ -612,6 +611,21 @@ public final class TPath implements Path {
     public boolean isAbsolute() {
         return TPathScanner.isAbsolute(getName());
     }
+
+    TPath getNonArchivePath() {
+        final TConfig config = TConfig.push();
+        try {
+            config.setArchiveDetector(TArchiveDetector.NULL);
+            final TPath fileName = getFileName();
+            if (null == fileName) {
+                assert toString().isEmpty();
+                return this;
+            }
+            return resolveSibling(fileName);
+        } finally {
+            config.close();
+        }
+    }
     
     @Override
     public @Nullable TPath getRoot() {
@@ -624,7 +638,7 @@ public final class TPath implements Path {
     }
 
     @Override
-    public TPath getFileName() {
+    public @Nullable TPath getFileName() {
         final List<String> elements = getElements();
         final int l = elements.size();
         if (l <= 0)
@@ -633,7 +647,7 @@ public final class TPath implements Path {
     }
 
     @Override
-    public TPath getParent() {
+    public @Nullable TPath getParent() {
         final URI n = getName();
         {
             final int l = n.getPath().length();
