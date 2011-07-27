@@ -164,13 +164,7 @@ public abstract class TPathTestSuite extends TestBase {
     }
 
     protected static TPath newNonArchivePath(TPath path) {
-        TConfig config = TConfig.push();
-        try {
-            config.setArchiveDetector(TArchiveDetector.NULL);
-            return path.resolveSibling(path.getFileName());
-        } finally {
-            config.close();
-        }
+        return path.getNonArchivePath();
     }
 
     private static void gc() {
