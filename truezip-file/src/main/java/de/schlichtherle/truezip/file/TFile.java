@@ -3662,8 +3662,8 @@ public final class TFile extends File {
 
                 // Unmount both archive files so we can delete and move them
                 // safely and fast like regular files.
-                TFile.umount(grown);
-                TFile.umount(compact);
+                umount(grown);
+                umount(compact);
 
                 // Move the compacted archive file over to the grown archive
                 // file like a regular file.
