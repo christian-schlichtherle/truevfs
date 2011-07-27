@@ -57,7 +57,7 @@ final class TempFilePool implements IOPool<FileEntry> {
 
     @Override
     public TempEntry allocate() throws IOException {
-        return new TempEntry(createTempFile(".tzp", suffix, dir), this);
+        return new TempEntry(createTempFile("tzp", suffix, dir), this);
     }
 
     @Override

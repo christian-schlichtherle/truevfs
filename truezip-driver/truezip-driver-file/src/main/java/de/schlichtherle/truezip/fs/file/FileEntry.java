@@ -53,7 +53,7 @@ class FileEntry
 extends FsEntry
 implements IOEntry<FileEntry>, Releasable<IOException> {
 
-    private static final File CURRENT_DIRECTORY = new File("");
+    private static final File CURRENT_DIRECTORY = new File(".");
 
     private final File file;
     private final String name;
