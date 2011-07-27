@@ -56,7 +56,7 @@ class FileEntry
 extends FsEntry
 implements IOEntry<FileEntry>, Releasable<IOException> {
 
-    private static final Path CURRENT_DIRECTORY = Paths.get("");
+    private static final Path CURRENT_DIRECTORY = Paths.get(".");
 
     private final Path path;
     private final String name;
