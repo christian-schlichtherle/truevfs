@@ -105,6 +105,9 @@ abstract class Application extends TApplication<RuntimeException> {
     protected final int work(final String[] args) {
         try {
             return runChecked(args);
+        } catch (IllegalUsageException ex) {
+            err.println(ex.getLocalizedMessage());
+            return 1;
         } catch (Exception ex) {
             ex.printStackTrace(err);
             return 1;
