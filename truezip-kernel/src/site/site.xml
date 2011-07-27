@@ -5,7 +5,7 @@
     <body>
         <menu name="Documentation">
             <item name="About" href="index.html"/>
-            <item name="Nzip Utility" href="Nzip.html"/>
+            <item name="Usage" href="usage.html"/>
         </menu>
     </body>
 </project>

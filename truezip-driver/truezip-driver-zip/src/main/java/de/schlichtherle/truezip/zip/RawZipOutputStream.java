@@ -15,29 +15,28 @@
  */
 package de.schlichtherle.truezip.zip;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import java.nio.charset.UnsupportedCharsetException;
-import java.nio.charset.Charset;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
-import java.util.Iterator;
 import de.schlichtherle.truezip.io.LEDataOutputStream;
 import de.schlichtherle.truezip.util.JSE7;
+import static de.schlichtherle.truezip.zip.ZipConstants.*;
+import static de.schlichtherle.truezip.zip.ZipEntry.DEFLATED;
+import static de.schlichtherle.truezip.zip.ZipEntry.PLATFORM_FAT;
+import static de.schlichtherle.truezip.zip.ZipEntry.STORED;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.zip.CRC32;
 import java.util.zip.ZipException;
 import net.jcip.annotations.NotThreadSafe;
-
-import static de.schlichtherle.truezip.zip.ZipConstants.*;
-import static de.schlichtherle.truezip.zip.ZipEntry.DEFLATED;
-import static de.schlichtherle.truezip.zip.ZipEntry.PLATFORM_FAT;
-import static de.schlichtherle.truezip.zip.ZipEntry.STORED;
 
 /**
  * Provides unsafe (raw) access to a ZIP file using unsynchronized
@@ -46,9 +45,9 @@ import static de.schlichtherle.truezip.zip.ZipEntry.STORED;
  * <b>Warning:</b> This class is <em>not</em> intended for public use
  * - its API may change at will without prior notification!
  *
+ * @see     RawZipFile
  * @author  Christian Schlichtherle
  * @version $Id$
- * @see     ZipOutputStream
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
@@ -111,64 +110,92 @@ implements Iterable<E> {
     private boolean deflate;
 
     /**
-     * Constructs a ZIP output stream which decorates the given output stream
-     * using the given charset.
+     * Constructs a raw ZIP output stream which decorates the given output
+     * stream using the given charset.
      *
-     * @throws NullPointerException If any parameter is {@code null}.
      * @throws UnsupportedCharsetException If {@code charset} is not supported
      *         by this JVM.
      */
     protected RawZipOutputStream(
             final OutputStream out,
             final Charset charset) {
-        super(toLEDataOutputStream(out));
-        if (null == out || null == charset)
+        super(promote(out, null));
+        if (null == charset)
             throw new NullPointerException();
         this.charset = charset;
     }
 
     /**
-     * Constructs a ZIP output stream which decorates the given output stream
-     * and apppends to the given raw ZIP file.
-     * <p>
-     * In order to append entries to an existing ZIP file, {@code out}
-     * must be set up so that it appends to the same ZIP file from
-     * which {@code appendee} is reading.
-     * {@code appendee} may already be closed.
+     * Constructs a raw ZIP output stream which decorates the given output
+     * stream and appends to the given raw ZIP file.
      *
-     * @throws NullPointerException If any parameter is {@code null}.
-     * @throws ZipException if {@code appendee} has a postamble, i.e. some data
-     *         after its central directory and before its end.
+     * @param  out The output stream to write the ZIP file to.
+     *         If {@code appendee} is not {@code null}, then this must be set
+     *         up so that it appends to the same ZIP file from which
+     *         {@code appendee} is reading.
+     * @param  appendee the raw ZIP file to append to.
+     *         This may already be closed.
      */
     protected RawZipOutputStream(
             final OutputStream out,
-            final RawZipFile<E> appendee)
-    throws ZipException {
-        super(new AppendingLEDataOutputStream(out, appendee));
-        if (null == out)
-            throw new NullPointerException();
-        if (appendee.getPostambleLength() > 0)
-            throw new ZipException("Appending to a ZIP file with a postamble is not supported!");
-        for (E entry : appendee)
-            entries.put(entry.getName(), entry);
-        this.charset = Charset.forName(appendee.getCharset());
+            final RawZipFile<E> appendee) {
+        this(out, appendee, null);
     }
 
-    private static LEDataOutputStream toLEDataOutputStream(OutputStream out) {
-        return out instanceof LEDataOutputStream
-                ? (LEDataOutputStream) out
-                : new LEDataOutputStream(out);
+    /**
+     * Constructs a raw ZIP output stream which decorates the given output
+     * stream and optionally apppends to the given raw ZIP file.
+     * <p>
+     * This constructor is not intended for ordinary use.
+     *
+     * @param  out The output stream to write the ZIP file to.
+     *         If {@code appendee} is not {@code null}, then this must be set
+     *         up so that it appends to the same ZIP file from which
+     *         {@code appendee} is reading.
+     * @param  appendee the raw ZIP file to append to.
+     *         This may already be closed.
+     * @param  charset the character set to use if {@code appendee} is
+     *         {@code null}.
+     * @since  TrueZIP 7.3
+     */
+    protected RawZipOutputStream(
+            final OutputStream out,
+            final @CheckForNull RawZipFile<E> appendee,
+            final @CheckForNull Charset charset) {
+        super(promote(out, appendee));
+        if (null != appendee) {
+            this.charset = appendee.getCharset0();
+            this.comment = appendee.getComment();
+            final Map<String, E> entries = this.entries;
+            for (E entry : appendee)
+                entries.put(entry.getName(), entry);
+        } else {
+            if (null == charset)
+                throw new NullPointerException();
+            this.charset = charset;
+        }
+    }
+
+    private static LEDataOutputStream promote(
+            final OutputStream out,
+            final @CheckForNull RawZipFile<?> appendee) {
+        if (null == out)
+            throw new NullPointerException();
+        return null != appendee
+                ? new AppendingLEDataOutputStream(out, appendee)
+                : out instanceof LEDataOutputStream
+                    ? (LEDataOutputStream) out
+                    : new LEDataOutputStream(out);
     }
 
     /* Adjusts the number of written bytes for appending mode. */
-    private static class AppendingLEDataOutputStream extends LEDataOutputStream {
+    private static final class AppendingLEDataOutputStream
+    extends LEDataOutputStream {
         AppendingLEDataOutputStream(OutputStream out, RawZipFile<?> appendee) {
             super(out);
-            super.written = null == appendee
-                    ? 0
-                    : appendee.getOffsetMapper().location(appendee.length());
+            super.written = appendee.getOffsetMapper().location(appendee.length());
         }
-    } // class AppendingLEDataOutputStream
+    } // AppendingLEDataOutputStream
 
     /** Returns the charset to use for entry names and the file comment. */
     public String getCharset() {
@@ -191,8 +218,8 @@ implements Iterable<E> {
      *
      * @deprecated Use {@link #iterator()} instead.
      */
- 	@Deprecated
-	public Enumeration<? extends ZipEntry> entries() {
+    @Deprecated
+    public Enumeration<? extends ZipEntry> entries() {
         return Collections.enumeration(entries.values());
     }
 
@@ -326,16 +353,14 @@ implements Iterable<E> {
      * @throws ZipException If and only if writing the entry is impossible
      *         because the resulting file would not comply to the ZIP file
      *         format specification.
-     * @throws IOException On any I/O related issue.
+     * @throws IOException On any I/O error.
      */
     public void putNextEntry(final E entry, final boolean deflate)
     throws IOException {
         closeEntry();
-
         final String name = entry.getName();
         /*if (entries.get(name) != null)
             throw new ZipException(name + " (duplicate entry)");*/
-
         {
             final long size = entry.getNameLength(charset)
                             + entry.getExtraLength()
@@ -344,7 +369,6 @@ implements Iterable<E> {
                 throw new ZipException(entry.getName()
                 + " (sum of name, extra fields and comment too long: " + size + ")");
         }
-
         int method = entry.getMethod();
         if (method == ZipEntry.UNKNOWN)
             method = getMethod();
@@ -353,29 +377,24 @@ implements Iterable<E> {
                 checkLocalFileHeaderData(entry);
                 this.deflate = false;
                 break;
-
             case DEFLATED:
                 if (!deflate)
                     checkLocalFileHeaderData(entry);
                 this.deflate = deflate;
                 break;
-
             default:
                 throw new ZipException(entry.getName()
                 + " (unsupported compression method: " + method + ")");
         }
-
         if (entry.getPlatform() == ZipEntry.UNKNOWN)
             entry.setPlatform(PLATFORM_FAT);
         if (entry.getMethod()   == ZipEntry.UNKNOWN)
             entry.setMethod(method);
         if (entry.getTime()     == ZipEntry.UNKNOWN)
             entry.setTime(System.currentTimeMillis());
-
         // Write LFH BEFORE putting the entry in the map.
         this.entry = entry;
         writeLocalFileHeader();
-
         // Store entry now so that an immediate subsequent call to getEntry(...)
         // returns it.
         entries.put(name, entry);
@@ -391,7 +410,7 @@ implements Iterable<E> {
             throw new ZipException(entry.getName() + " (unknown uncompressed size)");
     }
 
-    /** @throws IOException On any I/O related issue. */
+    /** @throws IOException On any I/O error. */
     private void writeLocalFileHeader() throws IOException {
         final ZipEntry entry = this.entry;
         assert null != entry;
@@ -411,31 +430,23 @@ implements Iterable<E> {
                 || size   >= UInt.MAX_VALUE
                 || offset >= UInt.MAX_VALUE
                 || FORCE_ZIP64_EXT;
-
         // Compose General Purpose Bit Flag.
         // See appendix D of PKWARE's ZIP File Format Specification.
         final boolean utf8 = UTF8.equals(charset);
         final int general = (dd   ? (1 <<  3) : 0)
                           | (utf8 ? (1 << 11) : 0);
-
         // Start changes.
         finished = false;
-
         // Local File Header Signature.
         dos.writeInt(LFH_SIG);
-
         // Version Needed To Extract.
         dos.writeShort(zip64 ? 45 : dd ? 20 : 10);
-
         // General Purpose Bit Flag.
         dos.writeShort(general);
-
         // Compression Method.
         dos.writeShort(entry.getMethod());
-
         // Last Mod. Time / Date in DOS format.
         dos.writeInt((int) entry.getDosTime());
-
         // CRC-32.
         // Compressed Size.
         // Uncompressed Size.
@@ -448,22 +459,17 @@ implements Iterable<E> {
             dos.writeInt((int) csize32);
             dos.writeInt((int) size32);
         }
-
         // File Name Length.
         final byte[] name = entry.getName().getBytes(charset);
         dos.writeShort(name.length);
-
         // Extra Field Length.
         final byte[] extra = entry.getExtra(!dd);
         assert extra != null;
         dos.writeShort(extra.length);
-
         // File Name.
         dos.write(name);
-
         // Extra Field(s).
         dos.write(extra);
-
         // Commit changes.
         entry.setGeneral(general);
         entry.setOffset(offset);
@@ -471,7 +477,7 @@ implements Iterable<E> {
     }
 
     /**
-     * @throws IOException On any I/O related issue.
+     * @throws IOException On any I/O error.
      */
     @Override
     public void write(int b) throws IOException {
@@ -481,7 +487,7 @@ implements Iterable<E> {
     }
 
     /**
-     * @throws IOException On any I/O related issue.
+     * @throws IOException On any I/O error.
      */
     @Override
     public void write(final byte[] b, final int off, final int len)
@@ -519,7 +525,7 @@ implements Iterable<E> {
      * @throws ZipException If and only if writing the entry is impossible
      *         because the resulting file would not comply to the ZIP file
      *         format specification.
-     * @throws IOException On any I/O related issue.
+     * @throws IOException On any I/O error.
      */
     public void closeEntry() throws IOException {
         final E entry = this.entry;
@@ -547,18 +553,15 @@ implements Iterable<E> {
                     + ")");
                 }
                 break;
-
             case DEFLATED:
                 if (deflate) {
                     assert !def.finished();
                     def.finish();
                     while (!def.finished())
                         deflate();
-
                     entry.setCrc(crc.getValue());
                     entry.setCompressedSize(def.getBytesWritten());
                     entry.setSize(def.getBytesRead());
-
                     def.reset();
                 } else {
                     // Note: There is no way to check whether the written
@@ -566,14 +569,12 @@ implements Iterable<E> {
                     // uncompressed size!
                 }
                 break;
-
             default:
                 throw new ZipException(entry.getName()
-                + " (unsupported Compression Method: "
+                + " (unsupported compression method "
                 + entry.getMethod()
                 + ")");
         }
-
         writeDataDescriptor();
         flush();
         crc.reset();
@@ -581,7 +582,7 @@ implements Iterable<E> {
     }
 
     /**
-     * @throws IOException On any I/O related issue.
+     * @throws IOException On any I/O error.
      */
     private void writeDataDescriptor() throws IOException {
         final E entry = this.entry;
@@ -600,13 +601,10 @@ implements Iterable<E> {
                 || size   >= UInt.MAX_VALUE
                 || offset >= UInt.MAX_VALUE
                 || FORCE_ZIP64_EXT;
-
         // Data Descriptor Signature.
         dos.writeInt(DD_SIG);
-
         // CRC-32.
         dos.writeInt((int) crc);
-
         // Compressed Size.
         // Uncompressed Size.
         if (zip64) {
@@ -634,7 +632,7 @@ implements Iterable<E> {
      * @throws ZipException If and only if writing the entry is impossible
      *         because the resulting file would not comply to the ZIP file
      *         format specification.
-     * @throws IOException On any I/O related issue.
+     * @throws IOException On any I/O error.
      */
     public void finish() throws IOException {
         if (finished)
@@ -651,7 +649,7 @@ implements Iterable<E> {
     /**
      * Writes a Central File Header record.
      *
-     * @throws IOException On any I/O related issue.
+     * @throws IOException On any I/O error.
      */
     private void writeCentralFileHeader(final ZipEntry entry) throws IOException {
         assert null != entry;
@@ -665,66 +663,49 @@ implements Iterable<E> {
                 || size32   >= UInt.MAX_VALUE
                 || offset32 >= UInt.MAX_VALUE
                 || FORCE_ZIP64_EXT;
-
         // Central File Header.
         dos.writeInt(CFH_SIG);
-
         // Version Made By.
         dos.writeShort((entry.getPlatform() << 8) | 63);
-
         // Version Needed To Extract.
         dos.writeShort(zip64 ? 45 : dd ? 20 : 10);
-
         // General Purpose Bit Flag.
         dos.writeShort(entry.getGeneral());
-
         // Compression Method.
         dos.writeShort(entry.getMethod());
-
         // Last Mod. File Time / Date.
         dos.writeInt((int) entry.getDosTime());
-
         // CRC-32.
-        // Compressed Size.
-        // Uncompressed Size.
         dos.writeInt((int) entry.getCrc());
+        // Compressed Size.
         dos.writeInt((int) csize32);
+        // Uncompressed Size.
         dos.writeInt((int) size32);
-
         // File Name Length.
         final byte[] name = entry.getName().getBytes(charset);
         dos.writeShort(name.length);
-
         // Extra Field Length.
         final byte[] extra = entry.getExtra();
         assert extra != null;
         dos.writeShort(extra.length);
-
         // File Comment Length.
         String comment = entry.getComment();
         if (comment == null)
             comment = "";
         final byte[] data = comment.getBytes(charset);
         dos.writeShort(data.length);
-
         // Disk Number Start.
         dos.writeShort(0);
-
         // Internal File Attributes.
         dos.writeShort(0);
-
         // External File Attributes.
         dos.writeInt(entry.isDirectory() ? 0x10 : 0); // fixed issue #27.
-
         // Relative Offset Of Local File Header.
         dos.writeInt((int) offset32);
-
         // File Name.
         dos.write(name);
-
         // Extra Field(s).
         dos.write(extra);
-
         // File Comment.
         dos.write(data);
     }
@@ -732,7 +713,7 @@ implements Iterable<E> {
     /**
      * Writes the End Of Central Directory record.
      *
-     * @throws IOException On any I/O related issue.
+     * @throws IOException On any I/O error.
      */
     private void writeEndOfCentralDirectory() throws IOException {
         final LEDataOutputStream dos = (LEDataOutputStream) delegate;
@@ -749,70 +730,50 @@ implements Iterable<E> {
                 =  cdEntriesZip64
                 || cdSizeZip64
                 || cdOffsetZip64;
-
         if (zip64) {
             final long zip64eocdOffset // relative offset of the zip64 end of central directory record
                     = dos.size();
-
-            // ZIP64 End Of Central Directory record signature.
-            dos.writeInt(ZIP64_EOCD_SIG);
-
-            // Size Of ZIP64 End Of Central Directory record.
-            dos.writeLong(ZIP64_EOCD_MIN_LEN - 12);
-
+            // ZIP64 End Of Central Directory Record signature.
+            dos.writeInt(ZIP64_EOCDR_SIG);
+            // Size Of ZIP64 End Of Central Directory Record.
+            dos.writeLong(ZIP64_EOCDR_MIN_LEN - 12);
             // Version Made By.
             dos.writeShort(63);
-
             // Version Needed To Extract.
             dos.writeShort(45);
-
             // Number Of This Disk.
             dos.writeInt(0);
-
             // Number Of The Disk With The Start Of The Central Directory.
             dos.writeInt(0);
-
             // Total Number Of Entries In The Central Directory On This Disk.
             dos.writeLong(cdEntries);
-
             // Total Number Of Entries In The Central Directory.
             dos.writeLong(cdEntries);
-
             // Size Of The Central Directory.
             dos.writeLong(cdSize);
-
             // Offset Of Start Of Central Directory With Respect To The
             // Starting Disk Number.
             dos.writeLong(cdOffset);
-
             // ZIP64 End Of Central Directory Locator signature.
             dos.writeInt(ZIP64_EOCDL_SIG);
-
             // Number Of The Disk With The Start Of The ZIP64 End Of Central Directory.
             dos.writeInt(0);
-
             // Relative Offset Of The ZIP64 End Of Central Directory record.
             dos.writeLong(zip64eocdOffset);
-
             // Total Number Of Disks.
             dos.writeInt(1);
         }
-
         // End Of Central Directory record signature.
-        dos.writeInt(EOCD_SIG);
-
+        dos.writeInt(EOCDR_SIG);
         // Disk numbers.
         dos.writeShort(0);
         dos.writeShort(0);
-
         // Number of entries.
         dos.writeShort(cdEntries16);
         dos.writeShort(cdEntries16);
-
         // Length and offset of Central Directory.
         dos.writeInt((int) cdSize32);
         dos.writeInt((int) cdOffset32);
-
         // ZIP file comment.
         String comment = getComment();
         if (comment == null)
@@ -828,7 +789,7 @@ implements Iterable<E> {
      * This closes the open output stream writing to this ZIP file,
      * if any.
      *
-     * @throws IOException On any I/O related issue.
+     * @throws IOException On any I/O error.
      */
     @Override
     public void close() throws IOException {

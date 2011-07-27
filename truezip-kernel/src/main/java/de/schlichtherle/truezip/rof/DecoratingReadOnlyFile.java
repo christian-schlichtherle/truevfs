@@ -15,12 +15,10 @@
  */
 package de.schlichtherle.truezip.rof;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
-import net.jcip.annotations.ThreadSafe;
 
 /**
  * An abstract decorator for a read only file.
@@ -58,26 +56,24 @@ import net.jcip.annotations.ThreadSafe;
  * Thus, if you would like to access the underlying {@code ReadOnlyFile}
  * again after you have finished working with an instance of this class,
  * you should synchronize their file pointers using the pattern as described
- * in {@link DecoratingReadOnlyFile}.
+ * in the Javadoc for the class {@link DecoratingReadOnlyFile}.
  * </blockquote>
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-@ThreadSafe
 @DefaultAnnotation(NonNull.class)
 public abstract class DecoratingReadOnlyFile extends AbstractReadOnlyFile {
 
     /** The nullable decorated read only file. */
-    @Nullable
-    protected ReadOnlyFile delegate;
+    protected @Nullable ReadOnlyFile delegate;
 
     /**
      * Constructs a new decorating read only file.
      *
-     * @param rof the read only file to wrap in this decorator.
+     * @param rof the nullable read only file to decorate.
      */
-    protected DecoratingReadOnlyFile(@CheckForNull ReadOnlyFile rof) {
+    protected DecoratingReadOnlyFile(final @Nullable ReadOnlyFile rof) {
         this.delegate = rof;
     }
 

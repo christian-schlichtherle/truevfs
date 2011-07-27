@@ -493,7 +493,7 @@ TFile.cp(src.toFile(), dst.toFile());
                     a non-archive-detecting <code>TPath</code>:
                 </p>
 <source>
-static TPath newNonArchiveFile(TPath file) {
+static TPath newNonArchivePath(TPath file) {
     TConfig config = TConfig.push();
     try {
         config.setArchiveDetector(TArchiveDetector.NULL);
@@ -524,12 +524,12 @@ static TPath newNonArchiveFile(TPath file) {
 <source>
 TPath archive = new TPath("archive.zip");
 ... // there may be some I/O here
-TPath file = newNonArchiveFile(archive);
+TPath path = newNonArchivePath(archive);
 archive.getFileSystem().close(); // unmount prospective archive file
-// Now you can safely do any I/O to $file.
+// Now you can safely do any I/O to $path.
 // Mind that it may refer to an entry in another archive file,
 // so make sure to use a TFileInputStream.
-try (InputStream in = Files.newInputStream(file)) {
+try (InputStream in = Files.newInputStream(path)) {
     ... // read the archive file like a plain file here
 }
 </source>

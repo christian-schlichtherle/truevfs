@@ -26,6 +26,7 @@ import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,21 +40,22 @@ import net.jcip.annotations.NotThreadSafe;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * A concurrent file system controller is a proxy for its decorated file system
- * controller which provides read/write lock features for multi-threaded access
- * by its clients.
+ * A concurrent file system controller which decorates another file system
+ * controller in order to provide read/write lock features for multi-threaded
+ * access by its clients.
  * 
  * @see     FsConcurrentModel
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
+@DefaultAnnotation(NonNull.class)
 public final class FsConcurrentController
 extends FsDecoratingController< FsConcurrentModel,
                                 FsController<? extends FsConcurrentModel>> {
 
-    private volatile ReadLock readLock;
-    private volatile WriteLock writeLock;
+    private volatile @CheckForNull ReadLock readLock;
+    private volatile @CheckForNull WriteLock writeLock;
 
     /**
      * Constructs a new concurrent file system controller.
@@ -79,7 +81,8 @@ extends FsDecoratingController< FsConcurrentModel,
                 : (this.writeLock = getModel().writeLock());
     }
 
-    private void assertNotReadLockedByCurrentThread(FsNotWriteLockedException ex)
+    private void assertNotReadLockedByCurrentThread(
+            @CheckForNull FsNotWriteLockedException ex)
     throws FsNotWriteLockedException {
         getModel().assertNotReadLockedByCurrentThread(ex);
     }
@@ -273,23 +276,9 @@ extends FsDecoratingController< FsConcurrentModel,
         }
 
         @Override
-        public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            try {
-                readLock().lock();
-                try {
-                    return getBoundSocket().newSeekableByteChannel();
-                } finally {
-                    readLock().unlock();
-                }
-            } catch (FsNotWriteLockedException ex) {
-                assertNotReadLockedByCurrentThread(ex);
-                writeLock().lock();
-                try {
-                    return getBoundSocket().newSeekableByteChannel();
-                } finally {
-                    writeLock().unlock();
-                }
-            }
+        public Entry getPeerTarget() throws IOException {
+            // Same implementation as super class, but makes stack trace nicer.
+            return getBoundSocket().getPeerTarget();
         }
 
         @Override
@@ -306,6 +295,26 @@ extends FsDecoratingController< FsConcurrentModel,
                 writeLock().lock();
                 try {
                     return getBoundSocket().newReadOnlyFile();
+                } finally {
+                    writeLock().unlock();
+                }
+            }
+        }
+
+        @Override
+        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            try {
+                readLock().lock();
+                try {
+                    return getBoundSocket().newSeekableByteChannel();
+                } finally {
+                    readLock().unlock();
+                }
+            } catch (FsNotWriteLockedException ex) {
+                assertNotReadLockedByCurrentThread(ex);
+                writeLock().lock();
+                try {
+                    return getBoundSocket().newSeekableByteChannel();
                 } finally {
                     writeLock().unlock();
                 }
@@ -331,7 +340,7 @@ extends FsDecoratingController< FsConcurrentModel,
                 }
             }
         }
-    } // class Input
+    } // Input
 
     @Override
     public OutputSocket<?> getOutputSocket( FsEntryName name,
@@ -358,6 +367,12 @@ extends FsDecoratingController< FsConcurrentModel,
         }
 
         @Override
+        public Entry getPeerTarget() throws IOException {
+            // Same implementation as super class, but makes stack trace nicer.
+            return getBoundSocket().getPeerTarget();
+        }
+
+        @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
             assertNotReadLockedByCurrentThread(null);
             writeLock().lock();
@@ -378,7 +393,7 @@ extends FsDecoratingController< FsConcurrentModel,
                 writeLock().unlock();
             }
         }
-    } // class Output
+    } // Output
 
     @Override
     public void mknod(

@@ -21,6 +21,8 @@ import de.schlichtherle.truezip.util.Link.Type;
 import static de.schlichtherle.truezip.util.Link.Type.*;
 import de.schlichtherle.truezip.util.Links;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
@@ -32,10 +34,11 @@ import net.jcip.annotations.ThreadSafe;
 /**
  * The default implementation of a file system manager.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
+@DefaultAnnotation(NonNull.class)
 public final class FsDefaultManager extends FsManager {
 
     /**

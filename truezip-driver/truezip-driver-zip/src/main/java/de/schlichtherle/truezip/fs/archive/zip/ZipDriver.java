@@ -16,8 +16,8 @@
 package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.entry.Entry;
-import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
-import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
+import static de.schlichtherle.truezip.entry.Entry.Access.*;
+import static de.schlichtherle.truezip.entry.Entry.Size.*;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsEntryName;
@@ -25,7 +25,7 @@ import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriver;
-import de.schlichtherle.truezip.fs.archive.FsMultiplexedArchiveOutputShop;
+import de.schlichtherle.truezip.fs.archive.FsMultiplexedOutputShop;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
@@ -96,6 +96,36 @@ implements ZipEntryFactory<ZipArchiveEntry> {
         this.provider = provider;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return The implementation in the class {@link ZipDriver} returns
+     *         {@code true} because when reading a ZIP file sequentially,
+     *         each ZIP entry should &quot;override&quot; any previously read
+     *         ZIP entry with an equal name.
+     *         This holds true even if the central directory is used to access
+     *         the ZIP entries in random order.
+     */
+    @Override
+    public boolean getRedundantContentSupport() {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return The implementation in the class {@link ZipDriver} returns
+     *         {@code true} because when reading a ZIP file sequentially,
+     *         each ZIP entry should &quot;override&quot; any previously read
+     *         ZIP entry with an equal name.
+     *         This holds true even if the central directory is used to access
+     *         the ZIP entries in random order.
+     */
+    @Override
+    public boolean getRedundantMetaDataSupport() {
+        return true;
+    }
+
     @Override
     protected final IOPool<?> getPool() {
         return provider.get();
@@ -115,7 +145,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
      *
      * @return The value of the property {@code preambled}.
      */
-    public boolean getPreambled() {
+    protected boolean getPreambled() {
         return false;
     }
 
@@ -140,7 +170,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
      *
      * @return The value of the property {@code postambled}.
      */
-    public boolean getPostambled() {
+    protected boolean getPostambled() {
         return false;
     }
 
@@ -154,7 +184,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
      *
      * @return The value of the property {@code method}.
      */
-    public int getMethod() {
+    protected int getMethod() {
         return DEFLATED;
     }
 
@@ -168,22 +198,122 @@ implements ZipEntryFactory<ZipArchiveEntry> {
      *
      * @return The value of the property {@code level}.
      */
-    public int getLevel() {
+    protected int getLevel() {
         return Deflater.BEST_COMPRESSION;
     }
 
     /**
-     * Sets {@link FsOutputOption#STORE} in {@code options} before
-     * forwarding the call to {@code controller}.
+     * {@inheritDoc}
+     * <p>
+     * The implementation in the class {@link ZipDriver} acquires a read only
+     * file from the given socket and forwards the call to
+     * {@link #newInputShop}.
      */
     @Override
-    public OutputSocket<?> getOutputSocket( FsController<?> controller,
-                                            FsEntryName name,
-                                            BitField<FsOutputOption> options,
-                                            @CheckForNull Entry template) {
+    public InputShop<ZipArchiveEntry> newInputShop(
+            final FsModel model,
+            final InputSocket<?> input)
+    throws IOException {
+        final ReadOnlyFile rof = input.newReadOnlyFile();
+        try {
+            return newInputShop(rof);
+        } catch (IOException ex) {
+            rof.close();
+            throw ex;
+        }
+    }
+
+    protected InputShop<ZipArchiveEntry> newInputShop(ReadOnlyFile rof)
+    throws IOException {
+        return new ZipInputShop(this, rof);
+    }
+
+    /**
+     * This implementation modifies {@code options} in the following way before
+     * it forwards the call to {@code controller}:
+     * <ol>
+     * <li>{@link FsOutputOption#STORE} is set.
+     * <li>If {@link FsOutputOption#GROW} is set, {@link FsOutputOption#APPEND}
+     *     gets set too, and {@link FsOutputOption#CACHE} gets cleared.
+     * </ol>
+     * <p>
+     * The resulting output socket is then wrapped in a private nested class
+     * for an upcast in {@link #newOutputShop}.
+     * Thus, when overriding this method, {@link #newOutputShop} should get
+     * overridden, too.
+     * Otherwise, a class cast exception will get thrown in
+     * {@link #newOutputShop}.
+     */
+    @Override
+    public OptionOutputSocket getOutputSocket(
+            final FsController<?> controller,
+            final FsEntryName name,
+            final BitField<FsOutputOption> options,
+            final @CheckForNull Entry template) {
         // Leave FsOutputOption.COMPRESS untouched - the driver shall be given
         // opportunity to apply its own preferences to sort out such a conflict.
-        return controller.getOutputSocket(name, options.set(STORE), template);
+        BitField<FsOutputOption> options2 = options.set(STORE);
+        if (options2.get(GROW))
+            options2 = options2.set(APPEND).clear(CACHE);
+        return new OptionOutputSocket(
+                controller.getOutputSocket(name, options2, template),
+                options); // use original options!
+    }
+
+    /**
+     * This implementation first checks if {@link FsOutputOption#GROW} is set
+     * for the given {@code output} socket.
+     * If this is the case and the given {@code source} is not {@code null},
+     * then it's marked for appending to it.
+     * Then, an output stream is acquired from the given {@code output} socket
+     * and the parameters are forwarded to {@link #newOutputShop(FsModel, OptionOutputSocket, ZipInputShop)}
+     * and the result gets wrapped in a new {@link FsMultiplexedOutputShop}
+     * which uses the current {@link #getPool}.
+     */
+    @Override
+    public final OutputShop<ZipArchiveEntry> newOutputShop(
+            final FsModel model,
+            final OutputSocket<?> output,
+            final @CheckForNull InputShop<ZipArchiveEntry> source)
+    throws IOException {
+        return newOutputShop0(
+                model,
+                (OptionOutputSocket) output,
+                (ZipInputShop) source);
+    }
+
+    private OutputShop<ZipArchiveEntry> newOutputShop0(
+            final FsModel model,
+            final OptionOutputSocket output,
+            final @CheckForNull ZipInputShop source)
+    throws IOException {
+        final BitField<FsOutputOption> options = output.getOptions();
+        if (null != source)
+            source.setAppendee(options.get(GROW));
+        return newOutputShop(model, output, source);
+    }
+
+    protected OutputShop<ZipArchiveEntry> newOutputShop(
+            final FsModel model,
+            final OptionOutputSocket output,
+            final @CheckForNull ZipInputShop source)
+    throws IOException {
+        final OutputStream out = output.newOutputStream();
+        try {
+            return newOutputShop(out, source);
+        } catch (IOException ex) {
+            out.close();
+            throw ex;
+        }
+    }
+
+    protected OutputShop<ZipArchiveEntry> newOutputShop(
+            final OutputStream out,
+            final @CheckForNull ZipInputShop source)
+    throws IOException {
+        return new FsMultiplexedOutputShop<ZipArchiveEntry>(
+                new ZipOutputShop(this, out, source),
+                getPool());
     }
 
     @Override
@@ -221,61 +351,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
         return new ZipArchiveEntry(name);
     }
 
-    public ZipArchiveEntry newEntry(String name, ZipArchiveEntry template) {
+    protected ZipArchiveEntry newEntry(String name, ZipArchiveEntry template) {
         return new ZipArchiveEntry(name, template);
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The implementation in the class {@link ZipDriver} acquires a read only
-     * file from the given socket and forwards the call to
-     * {@link #newZipInputShop}.
-     */
-    @Override
-    public ZipInputShop newInputShop(FsModel model, InputSocket<?> input)
-    throws IOException {
-        final ReadOnlyFile rof = input.newReadOnlyFile();
-        try {
-            return newZipInputShop(model, rof);
-        } catch (IOException ex) {
-            rof.close();
-            throw ex;
-        }
-    }
-
-    protected ZipInputShop newZipInputShop(FsModel model, ReadOnlyFile rof)
-    throws IOException {
-        return new ZipInputShop(this, rof);
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The implementation in {@link ZipDriver} simply forwards the call to
-     * {@link #newZipOutputShop} and wraps the result in a new
-     * {@link FsMultiplexedArchiveOutputShop}.
-     */
-    @Override
-    public OutputShop<ZipArchiveEntry> newOutputShop(
-            FsModel model,
-            OutputSocket<?> output,
-            @CheckForNull InputShop<ZipArchiveEntry> source)
-    throws IOException {
-        final OutputStream out = output.newOutputStream();
-        try {
-            return new FsMultiplexedArchiveOutputShop<ZipArchiveEntry>(
-                    newZipOutputShop(model, out, (ZipInputShop) source),
-                    getPool());
-        } catch (IOException ex) {
-            out.close();
-            throw ex;
-        }
-    }
-
-    protected ZipOutputShop newZipOutputShop(
-            FsModel model, OutputStream out, @CheckForNull ZipInputShop source)
-    throws IOException {
-        return new ZipOutputShop(this, out, source);
     }
 }

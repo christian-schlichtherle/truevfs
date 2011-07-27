@@ -28,6 +28,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
+ * This command line utility concatenates the contents of the parameter paths
+ * on the standard output.
+ * 
+ * @see     <a href="http://www.gnu.org/software/wget/">GNU Cat - Home Page</a>
  * @author  Christian Schlichtherle
  * @version $Id$
  */

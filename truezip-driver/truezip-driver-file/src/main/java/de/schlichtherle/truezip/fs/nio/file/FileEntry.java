@@ -15,28 +15,29 @@
  */
 package de.schlichtherle.truezip.fs.nio.file;
 
-import de.schlichtherle.truezip.socket.IOEntry;
-import de.schlichtherle.truezip.util.Pool.Releasable;
-import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.fs.FsOutputOption;
-import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
-import de.schlichtherle.truezip.socket.InputSocket;
-import de.schlichtherle.truezip.socket.OutputSocket;
+import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
+import de.schlichtherle.truezip.fs.FsOutputOption;
+import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
+import de.schlichtherle.truezip.socket.IOEntry;
+import de.schlichtherle.truezip.socket.InputSocket;
+import de.schlichtherle.truezip.socket.OutputSocket;
+import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.Pool.Releasable;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import static java.io.File.*;
 import java.io.IOException;
-import java.util.Collections;
 import java.nio.file.DirectoryStream;
 import static java.nio.file.Files.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
-import static java.io.File.*;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import net.jcip.annotations.Immutable;
@@ -55,7 +56,7 @@ class FileEntry
 extends FsEntry
 implements IOEntry<FileEntry>, Releasable<IOException> {
 
-    private static final Path CURRENT_DIRECTORY = Paths.get("");
+    private static final Path CURRENT_DIRECTORY = Paths.get(".");
 
     private final Path path;
     private final String name;
@@ -79,14 +80,27 @@ implements IOEntry<FileEntry>, Releasable<IOException> {
 
     public final FileEntry createTempFile() throws IOException {
         TempFilePool pool = this.pool;
-        if (null == pool)
-            pool = this.pool = new TempFilePool(getRealParent(path));
+        if (null == pool) {
+            final Path path = this.path;
+            final Path dir = getParent(path);
+            final String suffix = getSuffix(path);
+            pool = this.pool = new TempFilePool(dir, suffix);
+        }
         return pool.allocate();
     }
 
-    private static Path getRealParent(Path path) {
-        Path parent = path.getParent();
+    private static Path getParent(final Path path) {
+        final Path parent = path.getParent();
         return null != parent ? parent : CURRENT_DIRECTORY;
+    }
+
+    private static @Nullable String getSuffix(Path path) {
+        path = path.getFileName();
+        if (null == path)
+            return null;
+        final String name = path.toString();
+        final int i = name.indexOf('.');
+        return -1 == i ? null : name.substring(i);
     }
 
     @Override
@@ -198,7 +212,7 @@ implements IOEntry<FileEntry>, Releasable<IOException> {
 
     final OutputSocket<FileEntry> getOutputSocket(
             BitField<FsOutputOption> options,
-            @CheckForNull de.schlichtherle.truezip.entry.Entry template) {
+            @CheckForNull Entry template) {
         return new FileOutputSocket(this, options, template);
     }
 }

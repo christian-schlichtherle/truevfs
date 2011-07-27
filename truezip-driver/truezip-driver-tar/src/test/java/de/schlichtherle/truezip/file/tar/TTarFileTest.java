@@ -28,4 +28,8 @@ public final class TTarFileTest extends TFileTestSuite {
     public TTarFileTest() {
         super(FsScheme.create("tar"), new TarDriver(IO_POOL_PROVIDER));
     }
+
+    @Override
+    public void testGrow() {
+    }
 }

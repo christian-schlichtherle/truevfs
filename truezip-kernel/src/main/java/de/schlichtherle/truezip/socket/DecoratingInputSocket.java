@@ -16,10 +16,9 @@
 package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.channels.SeekableByteChannel;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * An abstract decorator for an input socket.
@@ -29,8 +28,10 @@ import java.nio.channels.SeekableByteChannel;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
+@DefaultAnnotation(NonNull.class)
 public abstract class DecoratingInputSocket<E extends Entry>
-extends InputSocket<E> {
+extends DelegatingInputSocket<E> {
 
     private final InputSocket<? extends E> delegate;
 
@@ -40,39 +41,9 @@ extends InputSocket<E> {
         this.delegate = input;
     }
 
-    /**
-     * Binds the decorated socket to this socket and returns it.
-     *
-     * @return The bound decorated socket.
-     */
-    protected InputSocket<? extends E> getBoundSocket() throws IOException {
-        return delegate.bind(this);
-    }
-
     @Override
-    public E getLocalTarget() throws IOException {
-        return getBoundSocket().getLocalTarget();
-    }
-
-    @Override
-    public Entry getPeerTarget() throws IOException {
-        return getBoundSocket().getPeerTarget();
-    }
-
-    @Override
-    public ReadOnlyFile newReadOnlyFile() throws IOException {
-        return getBoundSocket().newReadOnlyFile();
-    }
-
-    /** @since TrueZIP 7.2 */
-    @Override
-    public SeekableByteChannel newSeekableByteChannel() throws IOException {
-        return getBoundSocket().newSeekableByteChannel();
-    }
-
-    @Override
-    public InputStream newInputStream() throws IOException {
-        return getBoundSocket().newInputStream();
+    protected InputSocket<? extends E> getDelegate() {
+        return delegate;
     }
 
     /**
@@ -84,7 +55,7 @@ extends InputSocket<E> {
         return new StringBuilder()
                 .append(getClass().getName())
                 .append("[delegate=")
-                .append(delegate)
+                .append(getDelegate())
                 .append(']')
                 .toString();
     }

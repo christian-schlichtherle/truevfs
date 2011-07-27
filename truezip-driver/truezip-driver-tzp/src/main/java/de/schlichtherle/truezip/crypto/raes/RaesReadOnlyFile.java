@@ -65,9 +65,8 @@ import static de.schlichtherle.truezip.crypto.raes.RaesConstants.*;
  * you should synchronize their file pointers using the pattern as described
  * in the base class {@link DecoratingReadOnlyFile}.
  *
- * @see RaesOutputStream
- *
- * @author Christian Schlichtherle
+ * @see     RaesOutputStream
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @NotThreadSafe

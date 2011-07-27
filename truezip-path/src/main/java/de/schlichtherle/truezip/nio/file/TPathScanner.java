@@ -37,10 +37,9 @@ import net.jcip.annotations.NotThreadSafe;
  * Scans hierarchical {@link URI}s for prospective archive files with the help
  * of a {@link TArchiveDetector}.
  * <p>
- * TODO:
- * This class has no dependencies on other classes in this package.
- * So evaluate publishing it as a member of the package
- * {@code de.schlichtherle.truezip.file} instead.
+ * Note that this class has no dependencies on other classes in this package,
+ * so it could get published as a member of the package
+ * {@code de.schlichtherle.truezip.file} instead if required.
  * 
  * @since   TrueZIP 7.2
  * @author  Christian Schlichtherle

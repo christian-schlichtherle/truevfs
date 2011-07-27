@@ -50,9 +50,9 @@ import net.jcip.annotations.ThreadSafe;
  * <p>
  * This class is thread-safe.
  *
+ * @see     ZipFile
  * @author  Christian Schlichtherle
  * @version $Id$
- * @see     ZipFile
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
@@ -61,8 +61,6 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
     /**
      * Constructs a ZIP output stream which decorates the given output stream
      * using the {@code "UTF-8"} charset.
-     *
-     * @throws NullPointerException If {@code out} is {@code null}.
      */
     public ZipOutputStream(OutputStream out) {
         super(out, DEFAULT_CHARSET);
@@ -71,8 +69,6 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
     /**
      * Constructs a ZIP output stream which decorates the given output stream
      * using the given charset.
-     *
-     * @throws NullPointerException If any parameter is {@code null}.
      */
     public ZipOutputStream(OutputStream out, Charset charset) {
         super(out, charset);
@@ -87,12 +83,8 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
      * {@code appendee} is reading.
      * {@code appendee} may already be closed.
      *
-     * @throws NullPointerException If any parameter is {@code null}.
-     * @throws ZipException if {@code appendee} has a postamble, i.e. some data
-     *         after its central directory and before its end.
      */
-    public ZipOutputStream(OutputStream out, ZipFile appendee)
-    throws ZipException {
+    public ZipOutputStream(OutputStream out, ZipFile appendee) {
         super(out, appendee);
     }
 

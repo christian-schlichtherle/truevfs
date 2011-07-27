@@ -15,18 +15,15 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip.raes;
 
-import de.schlichtherle.truezip.crypto.raes.RaesOutputStream;
-import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.archive.zip.ZipArchiveEntry;
-import de.schlichtherle.truezip.fs.archive.zip.ZipDriver;
 import de.schlichtherle.truezip.fs.archive.zip.ZipInputShop;
+import de.schlichtherle.truezip.fs.archive.zip.ZipOutputShop;
 import de.schlichtherle.truezip.key.KeyManagerProvider;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
-import de.schlichtherle.truezip.socket.InputShop;
-import de.schlichtherle.truezip.socket.LazyOutputSocket;
 import de.schlichtherle.truezip.socket.OutputShop;
-import de.schlichtherle.truezip.socket.OutputSocket;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.OutputStream;
 import net.jcip.annotations.Immutable;
@@ -49,6 +46,7 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
+@DefaultAnnotation(NonNull.class)
 public class ParanoidZipRaesDriver extends ZipRaesDriver {
 
     public ParanoidZipRaesDriver(   IOPoolProvider ioPoolProvider,
@@ -62,33 +60,17 @@ public class ParanoidZipRaesDriver extends ZipRaesDriver {
     }
 
     /**
-     * This implementation calls {@link #getRaesParameters}, with which it
-     * initializes a new {@link RaesOutputStream}, and finally passes the
-     * resulting stream to {@link ZipDriver#newZipOutputShop}.
+     * This implementation returns a new {@link ZipOutputShop}.
      * <p>
      * Note that this limits the number of concurrent output entry streams
      * to one in order to inhibit writing unencrypted temporary files for
      * buffering the written entries.
      */
     @Override
-    public final OutputShop<ZipArchiveEntry>
-    newOutputShop(  final FsModel model,
-                    final OutputSocket<?> output,
-                    final InputShop<ZipArchiveEntry> source)
+    protected OutputShop<ZipArchiveEntry> newOutputShop(
+            final OutputStream out,
+            final @CheckForNull ZipInputShop source)
     throws IOException {
-        final OutputStream out = new LazyOutputSocket<Entry>(output)
-                .newOutputStream();
-        try {
-            final RaesOutputStream ros = RaesOutputStream.getInstance(
-                    out, getRaesParameters(model));
-            return newZipOutputShop(model, ros, (ZipInputShop) source);
-        } catch (IOException cause) {
-            try {
-                out.close();
-            } catch (IOException ex) {
-                throw (IOException) ex.initCause(cause);
-            }
-            throw cause;
-        }
+        return new ZipOutputShop(this, out, source);
     }
 }

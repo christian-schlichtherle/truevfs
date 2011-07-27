@@ -66,23 +66,23 @@ public final class TZipRaesPathTest extends TPathTestSuite {
         final TPath archive = getArchive();
         final TPath entry1 = archive.resolve("entry1");
 
-        assertFalse(exists(newNonArchiveFile(archive)));
+        assertFalse(exists(newNonArchivePath(archive)));
 
         try {
             createDirectory(entry1);
             fail("An IOException should have been thrown because password prompting has been disabled!");
         } catch (IOException expected) {
         }
-        assertFalse(exists(newNonArchiveFile(entry1)));
-        assertFalse(exists(newNonArchiveFile(archive)));
+        assertFalse(exists(newNonArchivePath(entry1)));
+        assertFalse(exists(newNonArchivePath(archive)));
 
         try {
             createFile(entry1);
             fail("An IOException should have been thrown because password prompting has been disabled!");
         } catch (IOException expected) {
         }
-        assertFalse(exists(newNonArchiveFile(entry1)));
-        assertFalse(exists(newNonArchiveFile(archive)));
+        assertFalse(exists(newNonArchivePath(entry1)));
+        assertFalse(exists(newNonArchivePath(archive)));
 
         final TPath entry2 = entry1.resolve("entry2");
         try {
@@ -90,18 +90,18 @@ public final class TZipRaesPathTest extends TPathTestSuite {
             fail("An IOException should have been thrown because password prompting has been disabled!");
         } catch (IOException expected) {
         }
-        assertFalse(exists(newNonArchiveFile(entry2)));
-        assertFalse(exists(newNonArchiveFile(entry1)));
-        assertFalse(exists(newNonArchiveFile(archive)));
+        assertFalse(exists(newNonArchivePath(entry2)));
+        assertFalse(exists(newNonArchivePath(entry1)));
+        assertFalse(exists(newNonArchivePath(archive)));
 
         try {
             createFile(entry2);
             fail("An IOException should have been thrown because password prompting has been disabled!");
         } catch (IOException expected) {
         }
-        assertFalse(exists(newNonArchiveFile(entry2)));
-        assertFalse(exists(newNonArchiveFile(entry1)));
-        assertFalse(exists(newNonArchiveFile(archive)));
+        assertFalse(exists(newNonArchivePath(entry2)));
+        assertFalse(exists(newNonArchivePath(entry1)));
+        assertFalse(exists(newNonArchivePath(archive)));
     }
 
     @Test
@@ -139,5 +139,9 @@ public final class TZipRaesPathTest extends TPathTestSuite {
         TFileSystemProvider.umount();
         view.setAction(ENTER);
         archive.toFile().rm_r();
+    }
+
+    @Override
+    public void testGrow() {
     }
 }
