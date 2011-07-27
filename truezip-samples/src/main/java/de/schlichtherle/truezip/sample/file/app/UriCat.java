@@ -16,11 +16,8 @@
 package de.schlichtherle.truezip.sample.file.app;
 
 import de.schlichtherle.truezip.file.TFile;
-import de.schlichtherle.truezip.file.TFileInputStream;
 import de.schlichtherle.truezip.fs.FsSyncException;
-import de.schlichtherle.truezip.io.Streams;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -30,10 +27,13 @@ import java.net.URISyntaxException;
  * The URI must be file-based, i.e. the top level file system scheme must
  * be {@code file}.
  *
- * @author Christian Schlichtherle
- * @version $Id$
+ * @deprecated Use the Maven archetype for the module TrueZIP File* instead.
+ *             Its group ID is {@code de.schlichtherle.truezip}.
+ *             Its artifact ID is {@code truezip-archetype-file}.
+ * @author     Christian Schlichtherle
+ * @version    $Id$
  */
-public class UriCat extends Application {
+public final class UriCat extends Application {
 
     /** Equivalent to {@code System.exit(new CatPath().run(args));}. */
     public static void main(String[] args) throws FsSyncException {
@@ -51,6 +51,10 @@ public class UriCat extends Application {
 // START SNIPPET: cat
     /**
      * Copies the contents of the parameter resource to the standard output.
+     * <p>
+     * The set of archive file suffixes detected by this method is determined
+     * by the {@link TFile#getDefaultArchiveDetector() default archive detector}
+     * and the respective file system driver providers on the class path.
      *
      * @param  resource the URI string of the resource to copy.
      *         The URI must be file-based, i.e. the top level file system
@@ -62,13 +66,7 @@ public class UriCat extends Application {
     static void uriCat(String resource) throws IOException, URISyntaxException {
         URI uri = new URI(resource);
         TFile file = uri.isAbsolute() ? new TFile(uri) : new TFile(resource);
-        InputStream in = new TFileInputStream(file);
-        try {
-            // Copy the data.
-            Streams.cat(in, System.out);
-        } finally {
-            in.close(); // ALWAYS close the stream!
-        }
+        file.output(System.out);
     }
 // END SNIPPET: cat
 }
