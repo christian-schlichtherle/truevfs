@@ -72,8 +72,8 @@ class MyApplication extends TApplication<IOException> {
         // Configure custom application file format.
         config.setArchiveDetector(new TArchiveDetector("aff",
                 new JarDriver(IOPoolLocator.SINGLETON)));
-        // Set FsOutputOption.GROW for appending-to rather than assembling a
-        // new archive file.
+        // Set FsOutputOption.GROW for appending-to rather than reassembling an
+        // archive file.
         config.setOutputPreferences(
                 config.getOutputPreferences.set(FsOutputOption.GROW));
     }
@@ -91,7 +91,8 @@ class MyApplication extends TApplication<IOException> {
 TFile file1 = new TFile("file.aff");
 assert !file1.isArchive();
 
-// First, push a new current configuration on the inheritable thread local stack.
+// First, push a new current configuration on the inheritable thread local
+// stack.
 TConfig config = TConfig.push();
 try {
     // Configure custom application file format "aff".
@@ -114,7 +115,8 @@ try {
 TFile file1 = new TFile("file.aff");
 assert !file1.isArchive();
 
-// First, push a new current configuration on the inheritable thread local stack.
+// First, push a new current configuration on the inheritable thread local
+// stack.
 try (TConfig config = TConfig.push()) {
     // Configure custom application file format "aff".
     config.setArchiveDetector(new TArchiveDetector("aff",
@@ -157,11 +159,12 @@ try (TConfig config = TConfig.push()) {
 // We are going to append "entry" to "archive.zip".
 TFile file = new TFile("archive.zip/entry");
 
-// First, push a new current configuration on the inheritable thread local stack.
+// First, push a new current configuration on the inheritable thread local
+// stack.
 TConfig config = TConfig.push();
 try {
-    // Set FsOutputOption.GROW for appending-to rather than assembling a
-    // new archive file.
+    // Set FsOutputOption.GROW for appending-to rather than reassembling an
+    // archive file.
     config.setOutputPreferences(
             config.getOutputPreferences.set(FsOutputOption.GROW));
 
