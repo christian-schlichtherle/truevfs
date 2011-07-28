@@ -17,7 +17,6 @@ package de.schlichtherle.truezip.fs.archive;
 
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Type;
-import de.schlichtherle.truezip.fs.FsConcurrentModel;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.fs.FsController;
@@ -51,6 +50,8 @@ import net.jcip.annotations.Immutable;
  * system which is enclosed in a parent file system.
  * Implementations of this abstract base class are used to access archive file
  * formats like ZIP, JAR, TZP, TAR, TAR.GZ, TAR.BZ2 etc.
+ * <p>
+ * Sub-classes must be thread-safe and should be immutable.
  *
  * @param   <E> The type of the archive entries.
  * @author  Christian Schlichtherle
@@ -62,6 +63,43 @@ public abstract class FsArchiveDriver<E extends FsArchiveEntry>
 extends FsDriver {
 
     /**
+     * Returns a new thread-safe file system controller for the mount point of
+     * the given file system model and parent file system controller.
+     * <p>
+     * When called, the following expression is a precondition:
+     * {@code model.getParent().equals(parent.getModel())}
+     * <p>
+     * Note that an archive file system is always federated and therefore
+     * its parent file system controller is never {@code null}.
+     * <p>
+     * Furthermore, an archive driver implementation is <em>not</em> expected
+     * to consider the scheme of the given mount point to determine the class
+     * of the returned file system controller.
+     * Consequently, it is an error to call this method with a mount point
+     * which has a scheme which is not supported by this archive driver.
+     * <p>
+     * Note again that unlike the other components created by this factory,
+     * the returned file system controller must be thread-safe!
+     *
+     * @param  model the file system model.
+     * @param  parent the nullable parent file system controller.
+     * @return A new thread-safe file system controller for the given mount
+     *         point and parent file system controller.
+     */
+    @Override
+    public FsController<?>
+    newController(FsModel model, FsController<?> parent) {
+        return  new FsConcurrentController(
+                   new FsCachingController(
+                        new FsContextController(
+                            new FsDefaultArchiveController<E>(
+                                new FsContextModel(model),
+                                parent,
+                                this)),
+                        getPool()));
+    }
+
+    /**
      * {@inheritDoc}
      * <p>
      * The implementation in the class {@link FsArchiveDriver} always returns
@@ -71,6 +109,38 @@ extends FsDriver {
     @Override
     public final boolean isFederated() {
         return true;
+    }
+
+    /**
+     * Returns {@code true} if and only if the archive files produced by this
+     * archive driver may contain redundant archive entry contents.
+     * If the return value is {@code true}, then an archive file may contain
+     * redundant archive entry contents, but only the last contents written
+     * should get used when reading the archive file.
+     * 
+     * @return The implementation in the class {@link FsArchiveDriver} returns
+     *         {@code false} for backwards compatibility.
+     * @since  TrueZIP 7.3
+     */
+    public boolean getRedundantContentSupport() {
+        return false;
+    }
+
+    /**
+     * Returns {@code true} if and only if the archive files produced by this
+     * archive driver may contain redundant archive entry meta data.
+     * If the return value is {@code true}, then an archive file may contain
+     * redundant archive entry meta data, but only the last meta data written
+     * should get used when reading the archive file.
+     * This usually implies the existence of a central directory in the
+     * resulting archive file.
+     * 
+     * @return The implementation in the class {@link FsArchiveDriver} returns
+     *         {@code false} for backwards compatibility.
+     * @since  TrueZIP 7.3
+     */
+    public boolean getRedundantMetaDataSupport() {
+        return false;
     }
 
     /**
@@ -126,6 +196,7 @@ extends FsDriver {
      * @param  name the entry name.
      * @param  options the options to use.
      * @return An input socket for reading an artifact of this driver.
+     * @since  TrueZIP 7.1
      */
     public InputSocket<?> getInputSocket(   FsController<?> controller,
                                             FsEntryName name,
@@ -134,81 +205,26 @@ extends FsDriver {
     }
 
     /**
-     * Called to prepare writing an archive file artifact of this driver to
-     * {@code name} in {@code controller} using {@code options} and {@code template}.
-     * <p>
-     * This method should be overridden in order to modify the given options
-     * before forwarding the call to the given controller.
-     * The implementation in the class {@link FsArchiveDriver} simply forwards
-     * the call to the given controller with the given options unaltered.
-     * 
-     * @param  controller the controller to use for writing an artifact of this
-     *         driver.
-     * @param  name the entry name.
-     * @param  options the options to use.
-     * @param  template the template to use.
-     * @return An output socket for writing an artifact of this driver.
-     */
-    public OutputSocket<?> getOutputSocket( FsController<?> controller,
-                                            FsEntryName name,
-                                            BitField<FsOutputOption> options,
-                                            @CheckForNull Entry template) {
-        return controller.getOutputSocket(name, options, template);
-    }
-
-    /**
-     * Returns a new thread-safe file system controller for the mount point of
-     * the given file system model and parent file system controller.
-     * <p>
-     * When called, the following expression is a precondition:
-     * {@code model.getParent().equals(parent.getModel())}
-     * <p>
-     * Note that an archive file system is always federated and therefore
-     * its parent file system controller is never {@code null}.
-     * <p>
-     * Furthermore, an archive driver implementation is <em>not</em> expected
-     * to consider the scheme of the given mount point to determine the class
-     * of the returned file system controller.
-     * Consequently, it is an error to call this method with a mount point
-     * which has a scheme which is not supported by this archive driver.
-     * <p>
-     * Note again that unlike the other components created by this factory,
-     * the returned file system controller must be thread-safe!
-     *
-     * @param  model the file system model.
-     * @param  parent the nullable parent file system controller.
-     * @return A new thread-safe file system controller for the given mount
-     *         point and parent file system controller.
-     */
-    @Override
-    public FsController<?>
-    newController(FsModel model, FsController<?> parent) {
-        return  new FsConcurrentController(
-                   new FsCachingController(
-                        new FsDefaultArchiveController<E>(
-                            new FsConcurrentModel(model),
-                            parent,
-                            this),
-                        getPool()));
-    }
-
-    /**
      * Creates a new input shop for reading the archive entries for the
      * given {@code model} from the given {@code input} socket's target.
      * 
      * @param  model the file system model.
-     * @param  input the input socket for reading the contents of the archive
-     *         from its target.
+     * @param  input the input socket for reading the contents of the
+     *         archive file from its target.
+     *         This is guaranteed to be the product of this driver's
+     *         {@link #getInputSocket} method.
      * @return A new input shop.
-     * @throws FileNotFoundException if the target archive file does not exist
-     *         or is (temporarily) not accessible.
-     *         An exception of this type marks a <em>transient</em> cause,
-     *         i.e. this method may get subsequently called until it succeeds.
-     * @throws IOException if the target archive file is a
-     *         <i>false positive</i> archive file.
-     *         An exception of this type marks a <em>persistent</em> cause,
-     *         i.e. this method will not get called again until the archive
-     *         file system is synchronized with its parent file system.
+     * @throws IOException on any I/O error.
+     *         If the file system entry for the given model exists in the
+     *         parent file system and is not of the type {@link Type#SPECIAL},
+     *         then this exception is deemed to indicate a
+     *         <em>permanent false positive</em> archive file and gets cached
+     *         until the file system controller for the given model is
+     *         {@link FsController#sync(de.schlichtherle.truezip.util.BitField, de.schlichtherle.truezip.util.ExceptionHandler) synced}
+     *         again.
+     *         Otherwise, this exception is deemed to indicate a
+     *         <em>preliminary false positive</em> archive file and does not
+     *         get cached.
      */
     public abstract InputShop<E>
     newInputShop(   FsModel model,
@@ -228,7 +244,12 @@ extends FsDriver {
      * @return A new read only file obtained from the socket.
      * @throws FsException at the discretion of the socket.
      * @throws FileNotFoundException on any I/O error.
+     * @deprecated Since TrueZIP 7.3, this method is not required anymore and
+     *             should not get called in order to inhibit the redundant
+     *             wrapping of an {@link IOException} in a
+     *             {@link FileNotFoundException}.
      */
+    @Deprecated
     protected static ReadOnlyFile newReadOnlyFile(FsModel model, InputSocket<?> input)
     throws FsException, FileNotFoundException {
         try {
@@ -256,7 +277,12 @@ extends FsDriver {
      * @return A new input stream obtained from the socket.
      * @throws FsException at the discretion of the socket.
      * @throws FileNotFoundException on any I/O error.
+     * @deprecated Since TrueZIP 7.3, this method is not required anymore and
+     *             should not get called in order to inhibit the redundant
+     *             wrapping of an {@link IOException} in a
+     *             {@link FileNotFoundException}.
      */
+    @Deprecated
     protected static InputStream newInputStream(FsModel model, InputSocket<?> input)
     throws FsException, FileNotFoundException {
         try {
@@ -272,28 +298,48 @@ extends FsDriver {
     }
 
     /**
+     * Called to prepare writing an archive file artifact of this driver to
+     * {@code name} in {@code controller} using {@code options} and
+     * {@code template}.
+     * <p>
+     * This method should be overridden in order to modify the given options
+     * before forwarding the call to the given controller.
+     * The implementation in the class {@link FsArchiveDriver} simply forwards
+     * the call to the given controller with the given options unaltered.
+     * 
+     * @param  controller the controller to use for writing an artifact of this
+     *         driver.
+     * @param  name the entry name.
+     * @param  options the options to use.
+     * @param  template the template to use.
+     * @return An output socket for writing an artifact of this driver.
+     * @since  TrueZIP 7.1
+     */
+    public OutputSocket<?> getOutputSocket( FsController<?> controller,
+                                            FsEntryName name,
+                                            BitField<FsOutputOption> options,
+                                            @CheckForNull Entry template) {
+        return controller.getOutputSocket(name, options, template);
+    }
+
+    /**
      * Creates a new output shop for writing archive entries for the
      * given {@code model} to the given {@code output} socket's target.
      * 
      * @param  model the file system model.
      * @param  output the output socket for writing the contents of the
-     *         archive to its target.
+     *         archive file to its target.
+     *         This is guaranteed to be the product of this driver's
+     *         {@link #getOutputSocket} method.
      * @param  source the {@link InputShop} if {@code archive} is going to get
      *         updated.
-     *         If not {@code null}, this is guaranteed to be a product
-     *         of this driver's {@link #newInputShop} factory method, which may
-     *         be used to copy some meta data which is specific to the type of
-     *         archive this driver supports.
-     *         For example, this could be used to copy the comment of a ZIP
-     *         file.
+     *         If not {@code null}, this is guaranteed to be the product
+     *         of this driver's {@link #newInputShop} factory method.
+     *         This feature could get used to copy some meta data which is
+     *         specific to the type of archive this driver supports,
+     *         e.g. the comment of a ZIP file.
      * @return A new output shop.
-     * @throws FileNotFoundException if the target archive file does not exist
-     *         or is (temporarily) not accessible.
-     *         An exception of this type marks a <em>transient</em> cause,
-     *         i.e. this method may get subsequently called until it succeeds.
-     * @throws An exception of this type marks a <em>persistent</em> cause,
-     *         i.e. this method will not get called again until the archive
-     *         file system is synchronized with its parent file system.
+     * @throws IOException on any I/O error.
      */
     public abstract OutputShop<E>
     newOutputShop(  FsModel model,
@@ -314,7 +360,12 @@ extends FsDriver {
      * @return A new output stream obtained from the socket.
      * @throws FsException at the discretion of the socket.
      * @throws FileNotFoundException on any I/O error.
+     * @deprecated Since TrueZIP 7.3, this method is not required anymore and
+     *             should not get called in order to inhibit the redundant
+     *             wrapping of an {@link IOException} in a
+     *             {@link FileNotFoundException}.
      */
+    @Deprecated
     protected static OutputStream newOutputStream(FsModel model, OutputSocket<?> output)
     throws FsException, FileNotFoundException {
         try {

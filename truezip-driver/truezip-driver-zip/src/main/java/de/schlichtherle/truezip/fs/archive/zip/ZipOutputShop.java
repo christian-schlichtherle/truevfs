@@ -15,17 +15,21 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
-import de.schlichtherle.truezip.socket.IOPool;
-import de.schlichtherle.truezip.socket.InputSocket;
-import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.socket.OutputSocket;
-import de.schlichtherle.truezip.fs.archive.FsMultiplexedArchiveOutputShop;
-import de.schlichtherle.truezip.socket.OutputShop;
+import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
+import de.schlichtherle.truezip.fs.archive.FsMultiplexedOutputShop;
+import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.zip.RawZipOutputStream;
+import de.schlichtherle.truezip.socket.IOPool;
+import de.schlichtherle.truezip.socket.InputSocket;
+import de.schlichtherle.truezip.socket.OutputShop;
+import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.JointIterator;
+import de.schlichtherle.truezip.zip.RawZipOutputStream;
+import static de.schlichtherle.truezip.zip.ZipEntry.DEFLATED;
+import static de.schlichtherle.truezip.zip.ZipEntry.STORED;
+import static de.schlichtherle.truezip.zip.ZipEntry.UNKNOWN;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -38,23 +42,18 @@ import java.util.Iterator;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedOutputStream;
 
-import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
-import static de.schlichtherle.truezip.zip.ZipEntry.DEFLATED;
-import static de.schlichtherle.truezip.zip.ZipEntry.STORED;
-import static de.schlichtherle.truezip.zip.ZipEntry.UNKNOWN;
-
 /**
  * An output shop for writing ZIP archive files.
  * This output shop can only write one entry at a time.
  * Archive drivers may wrap this class in a
- * {@link FsMultiplexedArchiveOutputShop} to overcome this limitation.
+ * {@link FsMultiplexedOutputShop} to overcome this limitation.
  * 
  * @see     ZipInputShop
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-public class ZipOutputShop
+public final class ZipOutputShop
 extends RawZipOutputStream<ZipArchiveEntry>
 implements OutputShop<ZipArchiveEntry> {
 
@@ -66,30 +65,32 @@ implements OutputShop<ZipArchiveEntry> {
                             final OutputStream out,
                             final @CheckForNull ZipInputShop source)
     throws IOException {
-        super(out, driver.getCharset());
+        super(  out,
+                null != source && source.isAppendee() ? source : null,
+                driver.getCharset());
         super.setMethod(driver.getMethod());
         super.setLevel(driver.getLevel());
         this.pool = driver.getPool();
         if (null != source) {
-            // Retain comment and preamble of input ZIP archive.
-            super.setComment(source.getComment());
-            if (0 < source.getPreambleLength()) {
-                final InputStream in = source.getPreambleInputStream();
-                try {
-                    Streams.cat(in, source.offsetsConsiderPreamble() ? this : out);
-                } finally {
-                    in.close();
+            if (!source.isAppendee()) {
+                // Retain comment and preamble of input ZIP archive.
+                super.setComment(source.getComment());
+                if (0 < source.getPreambleLength()) {
+                    final InputStream in = source.getPreambleInputStream();
+                    try {
+                        Streams.cat(in,
+                                source.offsetsConsiderPreamble() ? this : out);
+                    } finally {
+                        in.close();
+                    }
                 }
             }
+            // Retain postamble of input ZIP archive.
             if (0 < source.getPostambleLength()) {
-                postamble = pool.allocate();
+                this.postamble = this.pool.allocate();
                 Streams.copy(   source.getPostambleInputStream(),
                                 postamble.getOutputSocket().newOutputStream());
-            } else {
-                postamble = null;
             }
-        } else {
-            postamble = null;
         }
     }
 
@@ -191,6 +192,42 @@ implements OutputShop<ZipArchiveEntry> {
     }
 
     /**
+     * Retains the postamble of the source source ZIP file, if any.
+     */
+    @Override
+    public void close() throws IOException {
+        try {
+            final IOPool.Entry<?> postamble = this.postamble;
+            if (null != postamble) {
+                this.postamble = null;
+                try {
+                    final InputSocket<?> input = postamble.getInputSocket();
+                    final InputStream in = input.newInputStream();
+                    try {
+                    // Second, if the output ZIP compatible file differs in length from
+                    // the input ZIP compatible file pad the output to the next four byte
+                    // boundary before appending the postamble.
+                    // This might be required for self extracting files on some platforms
+                    // (e.g. Wintel).
+                    final long ol = length();
+                    final long ipl = input.getLocalTarget().getSize(DATA);
+                    if ((ol + ipl) % 4 != 0)
+                        write(new byte[4 - (int) (ol % 4)]);
+
+                        Streams.cat(in, this);
+                    } finally {
+                        in.close();
+                    }
+                } finally {
+                    postamble.release();
+                }
+            }
+        } finally {
+            super.close();
+        }
+    }
+
+    /**
      * This entry output stream writes directly to this output shop.
      * It can only be used if this output shop is not currently busy with
      * writing another entry and the entry holds enough information to write
@@ -213,7 +250,7 @@ implements OutputShop<ZipArchiveEntry> {
         public void close() throws IOException {
             closeEntry();
         }
-    } // class EntryOutputStream
+    } // EntryOutputStream
 
     /**
      * This entry output stream writes the ZIP archive entry to an
@@ -274,41 +311,5 @@ implements OutputShop<ZipArchiveEntry> {
                 temp.release();
             }
         }
-    } // class BufferedEntryOutputStream
-
-    /**
-     * Retains the postamble of the source source ZIP file, if any.
-     */
-    @Override
-    public void close() throws IOException {
-        try {
-            final IOPool.Entry<?> postamble = this.postamble;
-            if (null != postamble) {
-                this.postamble = null;
-                try {
-                    final InputSocket<?> input = postamble.getInputSocket();
-                    final InputStream in = input.newInputStream();
-                    try {
-                    // Second, if the output ZIP compatible file differs in length from
-                    // the input ZIP compatible file pad the output to the next four byte
-                    // boundary before appending the postamble.
-                    // This might be required for self extracting files on some platforms
-                    // (e.g. Wintel).
-                    final long ol = length();
-                    final long ipl = input.getLocalTarget().getSize(DATA);
-                    if ((ol + ipl) % 4 != 0)
-                        write(new byte[4 - (int) (ol % 4)]);
-
-                        Streams.cat(in, this);
-                    } finally {
-                        in.close();
-                    }
-                } finally {
-                    postamble.release();
-                }
-            }
-        } finally {
-            super.close();
-        }
-    }
+    } // BufferedEntryOutputStream
 }

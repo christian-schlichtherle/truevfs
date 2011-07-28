@@ -27,7 +27,8 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-class FsArchiveFileSystemEvent<E extends FsArchiveEntry> extends EventObject {
+final class FsArchiveFileSystemEvent<E extends FsArchiveEntry>
+extends EventObject {
     private static final long serialVersionUID = 7205624082374036401L;
 
     /**

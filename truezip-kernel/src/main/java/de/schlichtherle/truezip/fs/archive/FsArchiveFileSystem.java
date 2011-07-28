@@ -71,9 +71,9 @@ implements Iterable<FsCovariantEntry<E>> {
             touchListeners = new HashSet<FsArchiveFileSystemTouchListener<? super E>>();
 
     /**
-     * Returns a new archive file system and ensures its integrity.
-     * The root directory is created with its last modification time set to
-     * the system's current time.
+     * Returns a new empty archive file system and ensures its integrity.
+     * Only the root directory is created with its last modification time set
+     * to the system's current time.
      * The file system is modifiable and marked as touched!
      *
      * @param  <E> The type of the archive entries.
@@ -82,7 +82,7 @@ implements Iterable<FsCovariantEntry<E>> {
      * @throws NullPointerException If {@code factory} is {@code null}.
      */
     static <E extends FsArchiveEntry> FsArchiveFileSystem<E>
-    newArchiveFileSystem(FsArchiveDriver<E> driver) {
+    newEmptyFileSystem(FsArchiveDriver<E> driver) {
         return new FsArchiveFileSystem<E>(driver);
     }
 
@@ -121,17 +121,16 @@ implements Iterable<FsCovariantEntry<E>> {
      *         the population of the archive file system.
      * @param  rootTemplate The nullable template to use for the root entry of
      *         the returned archive file system.
+     *         This must not be an instance of {@link FsCovariantEntry}.
      * @param  readOnly If and only if {@code true}, any subsequent
      *         modifying operation on the file system will result in a
      *         {@link FsReadOnlyArchiveFileSystemException}.
      * @return A new archive file system.
      * @throws NullPointerException If {@code factory} or {@code archive} are
      *         {@code null}.
-     * @throws IllegalArgumentException If {@code rootTemplate} is an instance
-     *         of {@link FsCovariantEntry}.
      */
     static <E extends FsArchiveEntry> FsArchiveFileSystem<E>
-    newArchiveFileSystem(   FsArchiveDriver<E> driver,
+    newPopulatedFileSystem( FsArchiveDriver<E> driver,
                             EntryContainer<E> archive,
                             @CheckForNull Entry rootTemplate,
                             boolean readOnly) {
@@ -143,8 +142,7 @@ implements Iterable<FsCovariantEntry<E>> {
     FsArchiveFileSystem(final FsArchiveDriver<E> driver,
                         final EntryContainer<E> archive,
                         final @CheckForNull Entry rootTemplate) {
-        if (rootTemplate instanceof FsCovariantEntry<?>)
-            throw new IllegalArgumentException();
+        assert !(rootTemplate instanceof FsCovariantEntry<?>);
         this.factory = driver;
         // Allocate some extra capacity to create missing parent directories.
         final EntryTable<E> master = new EntryTable<E>(

@@ -16,10 +16,9 @@
 package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.entry.Entry;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.channels.SeekableByteChannel;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * An abstract decorator for an output socket.
@@ -29,46 +28,22 @@ import java.nio.channels.SeekableByteChannel;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
+@DefaultAnnotation(NonNull.class)
 public abstract class DecoratingOutputSocket<E extends Entry>
-extends OutputSocket<E> {
+extends DelegatingOutputSocket<E> {
 
     private final OutputSocket<? extends E> delegate;
 
-    protected DecoratingOutputSocket(
-            final @NonNull OutputSocket<? extends E> output) {
+    protected DecoratingOutputSocket(final OutputSocket<? extends E> output) {
         if (null == output)
             throw new NullPointerException();
         this.delegate = output;
     }
 
-    /**
-     * Binds the decorated socket to this socket and returns it.
-     *
-     * @return The bound decorated socket.
-     */
-    protected OutputSocket<? extends E> getBoundSocket() throws IOException {
-        return delegate.bind(this);
-    }
-
     @Override
-    public E getLocalTarget() throws IOException {
-        return getBoundSocket().getLocalTarget();
-    }
-
-    @Override
-    public Entry getPeerTarget() throws IOException {
-        return getBoundSocket().getPeerTarget();
-    }
-
-    /** @since TrueZIP 7.2 */
-    @Override
-    public SeekableByteChannel newSeekableByteChannel() throws IOException {
-        return getBoundSocket().newSeekableByteChannel();
-    }
-
-    @Override
-    public OutputStream newOutputStream() throws IOException {
-        return getBoundSocket().newOutputStream();
+    protected OutputSocket<? extends E> getDelegate() {
+        return delegate;
     }
 
     /**
@@ -80,7 +55,7 @@ extends OutputSocket<E> {
         return new StringBuilder()
                 .append(getClass().getName())
                 .append("[delegate=")
-                .append(delegate)
+                .append(getDelegate())
                 .append(']')
                 .toString();
     }

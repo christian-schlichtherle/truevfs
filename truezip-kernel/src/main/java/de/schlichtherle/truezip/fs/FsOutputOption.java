@@ -52,8 +52,8 @@ public enum FsOutputOption {
     CREATE_PARENTS,
 
     /**
-     * Whether or not the new entry data shall get appended to the existing
-     * entry data rather than replacing it entirely.
+     * Whether or not the new entry contents shall get appended to the existing
+     * entry contents rather than replacing them entirely.
      */
     APPEND,
 
@@ -63,18 +63,45 @@ public enum FsOutputOption {
     /**
      * <em>Ignorable:</em>
      * Expresses a preference to store an entry uncompressed within its archive.
-     * This option may get ignored by archive drivers.
+     * <p>
+     * This option may get ignored by archive file system drivers.
      * Furthermore, if this happens, there may be no direct feedback available
      * to the caller.
+     * 
+     * @since TrueZIP 7.1
      */
     STORE,
 
     /**
      * <em>Ignorable:</em>
      * Expresses a preference to compress an entry within its archive.
-     * This option may get ignored by archive drivers.
+     * <p>
+     * This option may get ignored by archive file system drivers.
      * Furthermore, if this happens, there may be no direct feedback available
      * to the caller.
+     * 
+     * @since TrueZIP 7.1
      */
     COMPRESS,
+
+    /**
+     * <em>Ignorable:</em>
+     * Expresses a preference to allow an archive file to grow by appending any
+     * new or updated archive entry contents or meta data to its end.
+     * Setting this option may produce redundant data in the resulting archive
+     * file.
+     * However, it may yield much better performance if the number and contents
+     * of the archive entries to create or update are rather small compared to
+     * the total size of the resulting archive file.
+     * <p>
+     * This option is the equivalent to a multi-session disc (CD, DVD etc.)
+     * for archive files.
+     * <p>
+     * This option may get ignored by archive file system drivers.
+     * Furthermore, if this happens, there may be no direct feedback available
+     * to the caller.
+     * 
+     * @since TrueZIP 7.3
+     */
+    GROW,
 }

@@ -26,7 +26,7 @@ import java.io.PrintStream;
 /**
  * Abstract base class for command line utilities.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
@@ -105,10 +105,11 @@ abstract class Application extends TApplication<RuntimeException> {
     protected final int work(final String[] args) {
         try {
             return runChecked(args);
-        } catch (RuntimeException ex) {
-            throw ex;
-        } catch (Exception ex) {
+        } catch (IllegalUsageException ex) {
             err.println(ex.getLocalizedMessage());
+            return 1;
+        } catch (Exception ex) {
+            ex.printStackTrace(err);
             return 1;
         }
     }
@@ -139,5 +140,5 @@ abstract class Application extends TApplication<RuntimeException> {
         protected IllegalUsageException(String msg) {
             super(msg);
         }
-    } // class IllegalUsageException
+    } // IllegalUsageException
 }

@@ -49,18 +49,20 @@ final class TempFilePool implements IOPool<FileEntry> {
      * Use this if you don't have special requirements regarding the temp file
      * prefix, suffix or directory.
      */
-    static final TempFilePool INSTANCE = new TempFilePool(null);
+    static final TempFilePool INSTANCE = new TempFilePool(null, null);
 
     private final @Nullable Path dir;
+    private final @Nullable String suffix;
 
     /** Constructs a new temp file pool. */
-    TempFilePool(final @CheckForNull Path dir) {
+    TempFilePool(final @CheckForNull Path dir, final @CheckForNull String suffix) {
         this.dir = null != dir ? dir : TEMP_DIR;
+        this.suffix = suffix;
     }
 
     @Override
     public TempEntry allocate() throws IOException {
-        return new TempEntry(createTempFile(dir, ".tzp", null), this);
+        return new TempEntry(createTempFile(dir, "tzp", suffix), this);
     }
 
     @Override

@@ -15,24 +15,24 @@
  */
 package de.schlichtherle.truezip.file;
 
-import de.schlichtherle.truezip.socket.spi.ByteArrayIOPoolService;
-import de.schlichtherle.truezip.socket.IOPoolProvider;
-import de.schlichtherle.truezip.util.ArrayHelper;
+import de.schlichtherle.truezip.fs.FsController;
+import static de.schlichtherle.truezip.fs.FsOutputOption.*;
+import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
-import java.io.File;
-import static java.io.File.*;
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
-import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
-import de.schlichtherle.truezip.fs.FsScheme;
+import de.schlichtherle.truezip.io.FileBusyException;
+import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.socket.OutputClosedException;
+import de.schlichtherle.truezip.socket.spi.ByteArrayIOPoolService;
+import de.schlichtherle.truezip.util.ArrayHelper;
+import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import static java.io.File.*;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
@@ -40,16 +40,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import static org.hamcrest.CoreMatchers.*;
 import org.junit.After;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
 
 /**
  * Performs a functional test of a particular FsArchiveDriver by using the
@@ -139,10 +140,7 @@ public abstract class TFileTestSuite extends TestBase {
     }
 
     protected static TFile newNonArchiveFile(TFile file) {
-        return new TFile(
-                file.getParentFile(),
-                file.getName(),
-                TArchiveDetector.NULL);
+        return file.getNonArchiveFile();
     }
 
     @Test
@@ -284,7 +282,8 @@ public abstract class TFileTestSuite extends TestBase {
         // Create regular archive file.
 
         assertTrue(file.mkdir());
-        assertTrue(newNonArchiveFile(file).isFile());
+        /*if (!file.isEntry())
+            assertFalse(newNonArchiveFile(file).exists());*/
         assertTrue(file.exists());
         assertTrue(file.isDirectory());
         assertFalse(file.isFile());
@@ -547,7 +546,7 @@ public abstract class TFileTestSuite extends TestBase {
             } catch (FileNotFoundException ex) {
                 if (!(ex.getCause() instanceof FsSyncException)
                         || !(ex.getCause().getCause() instanceof FileBusyException))
-                        throw ex;
+                    throw ex;
             }
             file2.input(in1);
 
@@ -703,12 +702,12 @@ public abstract class TFileTestSuite extends TestBase {
         
         assertTrue(dir6.mkdir()); // create all at once! note archive is in current directory!
         
-        assertFalse(dir6.mkdir()); // isExisting already!
-        assertFalse(dir5.mkdir()); // isExisting already!
-        assertFalse(dir4.mkdir()); // isExisting already!
-        assertFalse(dir3.mkdir()); // isExisting already!
-        assertFalse(dir2.mkdir()); // isExisting already!
-        assertFalse(dir1.mkdir()); // isExisting already!
+        assertFalse(dir6.mkdir()); // exists already!
+        assertFalse(dir5.mkdir()); // exists already!
+        assertFalse(dir4.mkdir()); // exists already!
+        assertFalse(dir3.mkdir()); // exists already!
+        assertFalse(dir2.mkdir()); // exists already!
+        assertFalse(dir1.mkdir()); // exists already!
         
         dir6.rm();
         dir5.rm();
@@ -1213,19 +1212,19 @@ public abstract class TFileTestSuite extends TestBase {
     
     private void assertRenameTo(TFile src, TFile dst) throws IOException {
         assertTrue(src.exists());
-        if (!src.isEntry())
-            assertTrue(newNonArchiveFile(src).exists());
+        /*if (!src.isEntry())
+            assertTrue(newNonArchiveFile(src).exists());*/
         assertFalse(dst.exists());
-        if (!dst.isEntry())
+        //if (!dst.isEntry())
             assertFalse(newNonArchiveFile(dst).exists());
         assert TFile.isLenient();
         src.mv(dst);
         assertFalse(src.exists());
-        if (!src.isEntry())
+        //if (!src.isEntry())
             assertFalse(newNonArchiveFile(src).exists());
         assertTrue(dst.exists());
-        if (!dst.isEntry())
-            assertTrue(newNonArchiveFile(dst).exists());
+        /*if (!dst.isEntry())
+            assertFalse(newNonArchiveFile(dst).exists());*/
     }
 
     private static final String[] MEMBERS = {
@@ -1423,7 +1422,7 @@ public abstract class TFileTestSuite extends TestBase {
                         throw new AssertionError(ex);
                 }
             }
-        } // class WritingThread
+        } // WritingThread
         
         // Create and start all threads.
         final WritingThread[] threads = new WritingThread[nThreads];
@@ -1495,7 +1494,7 @@ public abstract class TFileTestSuite extends TestBase {
                     TFile.rm_r(archive);
                 }
             }
-        } // class WritingThread
+        } // WritingThread
         
         // Create and start all threads.
         final WritingThread[] threads = new WritingThread[nThreads];
@@ -1531,5 +1530,42 @@ public abstract class TFileTestSuite extends TestBase {
         }
 
         abstract void work() throws IOException;
+    } // IOThread
+
+    @Test
+    public void testGrow() throws IOException {
+        final TFile file = newNonArchiveFile(archive);
+        final TFile entry1 = new TFile(archive, "entry1");
+        final TFile entry2 = new TFile(archive, "entry2");
+
+        final TConfig config = TConfig.push();
+        try {
+            config.setOutputPreferences(BitField.of(CREATE_PARENTS, STORE, GROW));
+
+            assertGrow(entry1);
+            assertGrow(entry2);
+
+            TFile.umount();
+            assertTrue(file.length() > 2 * data.length); // two entries plus one central directory
+
+            assertGrow(entry1);
+            assertGrow(entry2);
+            assertGrow(entry1);
+            assertGrow(entry2);
+
+            TFile.umount();
+            assertTrue(file.length() > 6 * data.length); // six entries plus two central directories
+        } finally {
+            config.close();
+        }
+    }
+
+    private void assertGrow(final TFile entry) throws IOException {
+        final OutputStream out = new TFileOutputStream(entry);
+        try {
+            out.write(data);
+        } finally {
+            out.close();
+        }
     }
 }

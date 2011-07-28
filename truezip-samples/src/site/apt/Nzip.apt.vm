@@ -19,9 +19,9 @@ Nzip - a Comprehensive Command Line Utility
     You can use this utility to conveniently copy entire directory trees into
     an archive file or from an archive file or any other virtual directory.
 
-* Preparing The Stage
+* Setting The Stage
 
-    Before the examples are shown, a little preparation is done in order to
+    Before the examples are shown, a little preparation is required in order to
     make it easier to start the utility class from the command line.
     With plain Java, you would have to start the utility class with a command
     like this:

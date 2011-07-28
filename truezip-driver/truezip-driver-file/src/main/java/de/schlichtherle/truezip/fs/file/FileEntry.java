@@ -15,36 +15,36 @@
  */
 package de.schlichtherle.truezip.fs.file;
 
-import de.schlichtherle.truezip.util.Pool.Releasable;
-import de.schlichtherle.truezip.socket.IOEntry;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.fs.FsOutputOption;
-import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
-import de.schlichtherle.truezip.socket.InputSocket;
-import de.schlichtherle.truezip.socket.OutputSocket;
+import de.schlichtherle.truezip.entry.Entry;
+import static de.schlichtherle.truezip.entry.Entry.Access.*;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
+import de.schlichtherle.truezip.fs.FsOutputOption;
+import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
+import de.schlichtherle.truezip.socket.IOEntry;
+import de.schlichtherle.truezip.socket.InputSocket;
+import de.schlichtherle.truezip.socket.OutputSocket;
+import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.Pool.Releasable;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
-import java.util.Arrays;
-import java.util.Collections;
 import java.io.File;
 import static java.io.File.*;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import net.jcip.annotations.Immutable;
 
-import static de.schlichtherle.truezip.entry.Entry.Access.*;
-
 /**
  * Adapts a {@link File} instance to a {@link FsEntry}.
  *
- * @author Christian Schlichtherle
- * @version $Id$
+ * @author  Christian Schlichtherle
+ * @version $Id $
  */
 @Immutable
 @DefaultAnnotation(NonNull.class)
@@ -52,6 +52,8 @@ import static de.schlichtherle.truezip.entry.Entry.Access.*;
 class FileEntry
 extends FsEntry
 implements IOEntry<FileEntry>, Releasable<IOException> {
+
+    private static final File CURRENT_DIRECTORY = new File(".");
 
     private final File file;
     private final String name;
@@ -71,9 +73,24 @@ implements IOEntry<FileEntry>, Releasable<IOException> {
 
     public final FileEntry createTempFile() throws IOException {
         TempFilePool pool = this.pool;
-        if (null == pool)
-            pool = this.pool = new TempFilePool(file.getParentFile());
+        if (null == pool) {
+            final File file = this.file;
+            final File dir = getParent(file);
+            final String suffix = getSuffix(file);
+            pool = this.pool = new TempFilePool(dir, suffix);
+        }
         return pool.allocate();
+    }
+
+    private static File getParent(final File file) {
+        final File parent = file.getParentFile();
+        return null != parent ? parent : CURRENT_DIRECTORY;
+    }
+
+    private static @Nullable String getSuffix(final File file) {
+        final String name = file.getName();
+        final int i = name.indexOf('.');
+        return -1 == i ? null : name.substring(i);
     }
 
     @Override
@@ -142,12 +159,12 @@ implements IOEntry<FileEntry>, Releasable<IOException> {
 
     @Override
     public final OutputSocket<FileEntry> getOutputSocket() {
-        return new FileOutputSocket(NO_OUTPUT_OPTIONS, null, this);
+        return new FileOutputSocket(this, NO_OUTPUT_OPTIONS, null);
     }
 
     final OutputSocket<FileEntry> getOutputSocket(
             BitField<FsOutputOption> options,
-            @CheckForNull de.schlichtherle.truezip.entry.Entry template) {
-        return new FileOutputSocket(options, template, this);
+            @CheckForNull Entry template) {
+        return new FileOutputSocket(this, options, template);
     }
 }

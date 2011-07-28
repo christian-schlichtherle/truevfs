@@ -104,5 +104,5 @@ public final class FsManagerLocator implements FsManagerProvider {
             }
             MANAGER = manager;
         }
-    } // class Boot
+    } // Boot
 }

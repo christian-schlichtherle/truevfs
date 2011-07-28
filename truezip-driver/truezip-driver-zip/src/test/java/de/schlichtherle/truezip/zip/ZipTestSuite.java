@@ -89,7 +89,7 @@ public abstract class ZipTestSuite {
     }
 
     protected final byte[] getData() {
-        return data;
+        return data.clone();
     }
 
     @After
@@ -161,134 +161,134 @@ public abstract class ZipTestSuite {
 
         try {
             newZipOutputStream(null, (Charset) null);
-            fail("Use of null argument must throw a NullPointerException!");
-        } catch (NullPointerException npe) {
+            fail();
+        } catch (NullPointerException expected) {
         }
 
         try {
             newZipOutputStream(null, (ZipFile) null);
-            fail("Use of null arguments should throw a NullPointerException!");
-        } catch (NullPointerException npe) {
+            fail();
+        } catch (NullPointerException expected) {
         }
 
         try {
             newZipOutputStream(new ByteArrayOutputStream(), (Charset) null);
-            fail("Use of null argument must throw a NullPointerException!");
-        } catch (NullPointerException npe) {
+            fail();
+        } catch (NullPointerException expected) {
         }
 
         try {
             newZipOutputStream(new ByteArrayOutputStream(), (ZipFile) null);
-            fail("Use of null argument must throw a NullPointerException!");
-        } catch (NullPointerException npe) {
+            fail();
+        } catch (NullPointerException expected) {
         }
 
         try {
             newZipOutputStream(null, Charset.forName("UTF-8"));
-            fail("Use of null argument must throw a NullPointerException!");
-        } catch (NullPointerException npe) {
+            fail();
+        } catch (NullPointerException expected) {
         }
 
         try {
             newZipFile((String) null);
-            fail("Use of null argument must throw a NullPointerException!");
-        } catch (NullPointerException npe) {
+            fail();
+        } catch (NullPointerException expected) {
         }
 
         try {
             newZipFile((String) null, null);
-            fail("Use of null argument must throw a NullPointerException!");
-        } catch (NullPointerException npe) {
+            fail();
+        } catch (NullPointerException expected) {
         }
 
         try {
             newZipFile((String) null, Charset.forName("UTF-8"));
-            fail("Use of null argument must throw a NullPointerException!");
-        } catch (NullPointerException npe) {
+            fail();
+        } catch (NullPointerException expected) {
         }
 
         try {
             newZipFile(zip.getPath(), null);
-            fail("Use of null argument must throw a NullPointerException!");
-        } catch (NullPointerException npe) {
+            fail();
+        } catch (NullPointerException expected) {
         }
 
         try {
             newZipFile((File) null);
-            fail("Use of null argument must throw a NullPointerException!");
-        } catch (NullPointerException npe) {
+            fail();
+        } catch (NullPointerException expected) {
         }
 
         try {
             newZipFile((File) null, null);
-            fail("Use of null argument must throw a NullPointerException!");
-        } catch (NullPointerException npe) {
+            fail();
+        } catch (NullPointerException expected) {
         }
 
         try {
             newZipFile((File) null, Charset.forName("UTF-8"));
-            fail("Use of null argument must throw a NullPointerException!");
-        } catch (NullPointerException npe) {
+            fail();
+        } catch (NullPointerException expected) {
         }
 
         try {
             newZipFile(zip, null);
-            fail("Use of null argument must throw a NullPointerException!");
-        } catch (NullPointerException npe) {
+            fail();
+        } catch (NullPointerException expected) {
         }
 
         try {
             newZipFile((ReadOnlyFile) null);
-            fail("Use of null argument must throw a NullPointerException!");
-        } catch (NullPointerException npe) {
+            fail();
+        } catch (NullPointerException expected) {
         }
 
         try {
             newZipFile((ReadOnlyFile) null, null);
-            fail("Use of null argument must throw a NullPointerException!");
-        } catch (NullPointerException npe) {
+            fail();
+        } catch (NullPointerException expected) {
         }
 
         try {
             newZipFile((ReadOnlyFile) null, Charset.forName("UTF-8"));
-            fail("Use of null argument must throw a NullPointerException!");
-        } catch (NullPointerException npe) {
+            fail();
+        } catch (NullPointerException expected) {
         }
 
         try {
             newZipFile(rof, null);
-            fail("Use of null argument must throw a NullPointerException!");
-        } catch (NullPointerException npe) {
+            fail();
+        } catch (NullPointerException expected) {
         }
 
         try {
             newZipFile(zip.getPath());
-            fail("This is not a valid ZIP file!");
-        } catch (IOException ioe) {
+            fail();
+        } catch (IOException expected) {
         }
 
         try {
             newZipFile(zip);
-            fail("This is not a valid ZIP file!");
-        } catch (IOException ioe) {
+            fail();
+        } catch (IOException expected) {
         }
 
         try {
             newZipFile(rof);
-            fail("This is not a valid ZIP file!");
-        } catch (IOException ioe) {
+            fail();
+        } catch (IOException expected) {
         }
 
         try {
             newZipFile(zip, Charset.forName("UTF-8"));
-            fail("This is not a valid ZIP file!");
-        } catch (IOException ioe) {
+            fail();
+        } catch (IOException expected) {
         }
 
         try {
             newZipFile(rof, Charset.forName("UTF-8"));
-            fail("This is not a valid ZIP file!");
-        } catch (IOException ioe) {
+            fail();
+        } catch (IOException expected) {
         }
 
         rof.close();

@@ -15,26 +15,35 @@
  */
 package de.schlichtherle.truezip.fs.archive;
 
+import de.schlichtherle.truezip.entry.Entry;
+import static de.schlichtherle.truezip.entry.Entry.*;
+import static de.schlichtherle.truezip.entry.Entry.Access.*;
+import static de.schlichtherle.truezip.entry.Entry.Type.*;
 import de.schlichtherle.truezip.fs.FsController;
+import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
+import static de.schlichtherle.truezip.fs.FsEntryName.*;
+import de.schlichtherle.truezip.fs.FsException;
+import de.schlichtherle.truezip.fs.FsFalsePositiveException;
+import de.schlichtherle.truezip.fs.FsInputOption;
+import de.schlichtherle.truezip.fs.FsOutputOption;
+import static de.schlichtherle.truezip.fs.FsOutputOption.*;
+import de.schlichtherle.truezip.fs.FsSyncException;
+import de.schlichtherle.truezip.fs.FsSyncOption;
+import static de.schlichtherle.truezip.fs.FsSyncOption.*;
+import de.schlichtherle.truezip.fs.FsSyncWarningException;
+import static de.schlichtherle.truezip.fs.archive.FsArchiveFileSystem.*;
 import de.schlichtherle.truezip.io.InputBusyException;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.OutputBusyException;
-import de.schlichtherle.truezip.fs.FsConcurrentModel;
-import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.fs.FsFalsePositiveException;
-import de.schlichtherle.truezip.fs.FsException;
-import de.schlichtherle.truezip.fs.FsSyncException;
-import de.schlichtherle.truezip.fs.FsSyncOption;
-import de.schlichtherle.truezip.fs.FsSyncWarningException;
+import static de.schlichtherle.truezip.io.Paths.isRoot;
 import de.schlichtherle.truezip.socket.ConcurrentInputShop;
 import de.schlichtherle.truezip.socket.ConcurrentOutputShop;
-import de.schlichtherle.truezip.fs.FsInputOption;
+import de.schlichtherle.truezip.socket.DelegatingOutputSocket;
+import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.socket.InputService;
 import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.socket.InputSocket;
-import de.schlichtherle.truezip.socket.IOSocket;
-import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.socket.OutputService;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.OutputSocket;
@@ -44,25 +53,17 @@ import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import static java.lang.Boolean.*;
 import java.util.Collections;
 import java.util.Iterator;
-import javax.swing.Icon;
 import net.jcip.annotations.NotThreadSafe;
-
-import static de.schlichtherle.truezip.fs.archive.FsArchiveFileSystem.*;
-import static de.schlichtherle.truezip.entry.Entry.Access.*;
-import static de.schlichtherle.truezip.entry.Entry.Type.*;
-import static de.schlichtherle.truezip.entry.Entry.*;
-import static de.schlichtherle.truezip.fs.FsEntryName.*;
-import static de.schlichtherle.truezip.fs.FsOutputOption.*;
-import static de.schlichtherle.truezip.fs.FsSyncOption.*;
-import static de.schlichtherle.truezip.io.Paths.isRoot;
+import javax.swing.Icon;
 
 /**
- * This archive controller implements the mounting/unmounting strategy for a
- * prospective archive file.
+ * This archive controller manages I/O to the entry which represents the target
+ * archive file in its parent file system and resolves archive entry collisions,
+ * for example by performing a full update of the target archive file.
  *
  * @param   <E> The type of the archive entries.
  * @author  Christian Schlichtherle
@@ -70,19 +71,16 @@ import static de.schlichtherle.truezip.io.Paths.isRoot;
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
-public final class FsDefaultArchiveController<E extends FsArchiveEntry>
+final class FsDefaultArchiveController<E extends FsArchiveEntry>
 extends FsFileSystemArchiveController<E> {
 
-    private static final BitField<FsOutputOption>
-            MOUNT_OUTPUT_MASK = BitField.of(CREATE_PARENTS);
     private static final BitField<FsInputOption>
             MOUNT_INPUT_OPTIONS = BitField.of(FsInputOption.CACHE);
     private static final BitField<FsOutputOption>
-            MAKE_OUTPUT_OPTIONS = BitField.noneOf(FsOutputOption.class);
+            MAKE_OUTPUT_MASK = BitField.of(CACHE, CREATE_PARENTS, GROW);
     private static final BitField<FsSyncOption>
-            SYNC_OPTIONS = BitField.of( WAIT_CLOSE_INPUT,
-                                        WAIT_CLOSE_OUTPUT,
-                                        CLEAR_CACHE);
+            AUTO_SYNC_OPTIONS = BitField.of(WAIT_CLOSE_INPUT,
+                                            WAIT_CLOSE_OUTPUT);
 
     private final FsArchiveDriver<E> driver;
     private final FsController<?> parent;
@@ -104,27 +102,14 @@ extends FsFileSystemArchiveController<E> {
             = new TouchListener();
 
     /**
-     * @deprecated
-     * @see #FsDefaultArchiveController(FsConcurrentModel, FsController, FsArchiveDriver)
-     */
-    @Deprecated
-    public FsDefaultArchiveController(
-            final FsConcurrentModel model,
-            final FsArchiveDriver<E> driver,
-            final FsController<?> parent) {
-        this(model, parent, driver);
-    }
-
-    /**
      * Constructs a new archive file system controller.
      * 
      * @param model the file system model.
      * @param parent the parent file system
      * @param driver the archive driver.
-     * @since TrueZIP 7.2
      */
-    public FsDefaultArchiveController(
-            final FsConcurrentModel model,
+    FsDefaultArchiveController(
+            final FsContextModel model,
             final FsController<?> parent,
             final FsArchiveDriver<E> driver) {
         super(model);
@@ -136,7 +121,6 @@ extends FsFileSystemArchiveController<E> {
         this.parent = parent;
         this.parentName = getModel().getMountPoint().getPath().resolve(ROOT)
                 .getEntryName();
-
         assert invariants();
     }
 
@@ -185,55 +169,69 @@ extends FsFileSystemArchiveController<E> {
     }
 
     @Override
-    void mount(final boolean autoCreate, BitField<FsOutputOption> options)
-    throws IOException {
-        options = options.and(MOUNT_OUTPUT_MASK);
+    void mount(final boolean autoCreate) throws IOException {
         try {
             // readOnly must be set first because the parent archive controller
-            // could be a FileController and on Windows this property turns to
-            // TRUE once a file is opened for reading!
+            // could be a FileController and on Windows this property changes
+            // to TRUE once a file is opened for reading!
             final boolean readOnly = !parent.isWritable(parentName);
             final InputSocket<?> socket = driver.getInputSocket(
                     parent, parentName, MOUNT_INPUT_OPTIONS);
             setInput(new Input(driver.newInputShop(getModel(), socket)));
-            setFileSystem(newArchiveFileSystem(driver,
-                    getInput().getDelegate(), socket.getLocalTarget(), readOnly));
+            setFileSystem(newPopulatedFileSystem(driver,
+                    getInput().getDelegate(),
+                    socket.getLocalTarget(),
+                    readOnly));
         } catch (FsException ex) {
             throw ex;
         } catch (IOException ex) {
-            if (!autoCreate /*|| null != parent.getEntry(parentName)*/)
-                throw ex instanceof FileNotFoundException
-                    ? new FsFalsePositiveException(getModel(), ex)
-                    : new FsCacheableFalsePositiveException(getModel(), ex);
+            if (!autoCreate) {
+                final FsEntry parentEntry;
+                try {
+                    parentEntry = parent.getEntry(parentName);
+                } catch (FsException ex2) {
+                    assert false;
+                    throw ex2;
+                } catch (IOException ex2) {
+                    //ex2.initCause(ex);
+                    throw new FsFalsePositiveException(getModel(), ex2);
+                }
+                if (null != parentEntry && !parentEntry.isType(SPECIAL))
+                    throw new FsPermanentFalsePositiveException(getModel(), ex);
+                throw new FsFalsePositiveException(getModel(), ex);
+            }
             if (null != parent.getEntry(parentName))
-                throw new FsCacheableFalsePositiveException(getModel(), ex);
+                throw new FsPermanentFalsePositiveException(getModel(), ex);
             // The entry does NOT exist in the parent archive
             // file, but we may create it automatically.
-            final FsArchiveFileSystem<E> fileSystem
-                    = newArchiveFileSystem(driver);
-            // This may fail if e.g. the container file is an RAES
-            // encrypted ZIP file and the user cancels password
-            // prompting.
-            makeOutput(options);
-            setFileSystem(fileSystem);
+            // This may fail if the container file is an RAES encrypted ZIP
+            // file and the user cancels password prompting.
+            makeOutput();
+            setFileSystem(newEmptyFileSystem(driver));
         }
         getFileSystem().addFsArchiveFileSystemTouchListener(touchListener);
     }
 
     /**
      * Ensures that {@link #output} is not {@code null}.
+     * This method will use
+     * <code>{@link #getContext()}.{@link FsOperationContext#getOutputOptions()}</code>
+     * to obtain the output options to use for writing the entry in the parent
+     * file system.
      * 
-     * @param  options a bit field of output options.
      * @throws IOException on any I/O error.
      * @return The output.
      */
-    Output makeOutput(final BitField<FsOutputOption> options)
-    throws IOException {
+    private Output makeOutput() throws IOException {
         Output output = getOutput();
         if (null != output)
             return output;
+        final BitField<FsOutputOption> options = getContext()
+                .getOutputOptions()
+                .and(MAKE_OUTPUT_MASK)
+                .set(CACHE);
         final OutputSocket<?> socket = driver.getOutputSocket(
-                parent, parentName, options.set(FsOutputOption.CACHE), null);
+                parent, parentName, options, null);
         final Input input = getInput();
         setOutput(output = new Output(driver.newOutputShop(getModel(), socket,
                      null != input ? input.getDelegate() : null)));
@@ -241,13 +239,26 @@ extends FsFileSystemArchiveController<E> {
     }
 
     @Override
-    InputSocket<?> getInputSocket(final String name) throws IOException {
+    InputSocket<?> getInputSocket(final String name) {
         return getInput().getInputSocket(name);
     }
 
     @Override
-    OutputSocket<?> getOutputSocket(final E entry) throws IOException {
-        return makeOutput(MAKE_OUTPUT_OPTIONS).getOutputSocket(entry);
+    OutputSocket<?> getOutputSocket(final E entry) {
+        class Output extends DelegatingOutputSocket<Entry> {
+            OutputSocket<? extends Entry> delegate;
+
+            @Override
+            protected OutputSocket<? extends Entry> getDelegate()
+            throws IOException {
+                final OutputSocket<? extends Entry> delegate = this.delegate;
+                return null != delegate
+                        ? delegate
+                        : (this.delegate = makeOutput().getOutputSocket(entry));
+            }
+        } // Output
+
+        return new Output();
     }
 
     @Override
@@ -261,29 +272,48 @@ extends FsFileSystemArchiveController<E> {
     boolean autoSync(   final FsEntryName name,
                         final @CheckForNull Access intention)
     throws FsSyncException, FsException {
-        final FsArchiveFileSystem<E> fileSystem;
-        final FsCovariantEntry<E> entry;
-        if (null == (fileSystem = getFileSystem())
-                || null == (entry = fileSystem.getEntry(name)))
+        final FsArchiveFileSystem<E> f;
+        final FsCovariantEntry<E> ce;
+        if (null == (f = getFileSystem()) || null == (ce = f.getEntry(name)))
             return false;
-        String n = null;
-        final Output output = getOutput();
-        if (null != output && null != output.getEntry(
-                n = entry.getEntry().getName()))
-            //if (READ == intention || !output.canAppend(entry.getEntry()))
-                return sync();
-        final Input input = getInput();
-        if (null != input && null != input.getEntry(
-                null != n ? n : (n = entry.getEntry().getName())))
-            return false;
-        if (READ == intention)
-            return sync();
+        // HIC SUNT DRACONES
+        Boolean grow = null;
+        String aen; // archive entry name
+        final Output oa = getOutput(); // output archive
+        final E oae; // output archive entry
+        if (null != oa) {
+            aen = ce.getEntry().getName();
+            oae = oa.getEntry(aen);
+            if (null != oae)
+                if (!(grow = getContext().get(GROW))
+                        || null == intention && !driver.getRedundantMetaDataSupport()
+                        || WRITE == intention && !driver.getRedundantContentSupport())
+                    return autoSync();
+        } else {
+            aen = null;
+            oae = null;
+        }
+        final Input ia = getInput(); // input archive
+        final E iae; // input archive entry
+        if (null != ia) {
+            if (null == aen)
+                aen = ce.getEntry().getName();
+            iae = ia.getEntry(aen);
+            if (null != iae)
+                if (FALSE.equals(grow)
+                        || null == grow && !getContext().get(GROW))
+                    return false;
+        } else {
+            iae = null;
+        }
+        if (READ == intention && (null == iae || iae != oae && oae != null))
+            return autoSync();
         return false;
     }
 
-    private boolean sync() throws FsSyncException, FsException {
+    private boolean autoSync() throws FsSyncException, FsException {
         getModel().assertWriteLockedByCurrentThread();
-        sync(SYNC_OPTIONS);
+        sync(AUTO_SYNC_OPTIONS);
         return true;
     }
 
@@ -294,12 +324,10 @@ extends FsFileSystemArchiveController<E> {
     throws X {
         assert !isTouched() || null != getOutput(); // file system touched => output archive
         assert getModel().isWriteLockedByCurrentThread();
-
         if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT))
             throw new IllegalArgumentException();
-
         awaitSync(options, handler);
-        commenceSync(handler);
+        beginSync(handler);
         try {
             if (!options.get(ABORT_CHANGES) && isTouched())
                 performSync(handler);
@@ -310,7 +338,10 @@ extends FsFileSystemArchiveController<E> {
                 assert null == getFileSystem();
                 assert null == getInput();
                 assert null == getOutput();
-                getModel().setTouched(false);
+                // TODO: Remove a condition and clear a flag in the model
+                // instead.
+                if (options.get(ABORT_CHANGES) || options.get(CLEAR_CACHE))
+                    getModel().setTouched(false);
             }
         }
     }
@@ -376,7 +407,7 @@ extends FsFileSystemArchiveController<E> {
      * @throws IOException at the discretion of the exception {@code handler}
      *         upon the occurence of an {@link FsSyncException}.
      */
-    private <X extends IOException> void commenceSync(
+    private <X extends IOException> void beginSync(
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         class FilterExceptionHandler
@@ -500,7 +531,6 @@ extends FsFileSystemArchiveController<E> {
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         setFileSystem(null);
-
         try {
             final Input input = getInput();
             setInput(null);
@@ -536,7 +566,6 @@ extends FsFileSystemArchiveController<E> {
      */
     private static final class DummyInputService<E extends Entry>
     implements InputShop<E> {
-
         @Override
         public void close() throws IOException {
         }
@@ -563,10 +592,10 @@ extends FsFileSystemArchiveController<E> {
                 throw new NullPointerException();
             throw new UnsupportedOperationException();
         }
-    } // class DummyInputService
+    } // DummyInputService
 
     /**
-     * This member class makes this archive controller instance strongly
+     * This inner class makes this archive controller instance strongly
      * reachable from any created input stream.
      * This is required by the memory management to ensure that for any
      * prospective archive file at most one archive controller object is in
@@ -584,7 +613,7 @@ extends FsFileSystemArchiveController<E> {
     } // class Input
 
     /**
-     * This member class makes this archive controller instance strongly
+     * This inner class makes this archive controller instance strongly
      * reachable from any created output stream.
      * This is required by the memory management to ensure that for any
      * prospective archive file at most one archive controller object is in
@@ -611,13 +640,14 @@ extends FsFileSystemArchiveController<E> {
         public void beforeTouch(FsArchiveFileSystemEvent<? extends E> event)
         throws IOException {
             assert event.getSource() == getFileSystem();
-            makeOutput(MAKE_OUTPUT_OPTIONS);
+            makeOutput();
+            assert getModel().isTouched();
         }
 
         @Override
         public void afterTouch(FsArchiveFileSystemEvent<? extends E> event) {
             assert event.getSource() == getFileSystem();
-            getModel().setTouched(true);
+            //getModel().setTouched(true);
         }
-    } // class TouchListener
+    } // TouchListener
 }

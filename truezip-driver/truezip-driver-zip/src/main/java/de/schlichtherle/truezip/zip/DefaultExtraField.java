@@ -16,19 +16,24 @@
 
 package de.schlichtherle.truezip.zip;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import net.jcip.annotations.NotThreadSafe;
+
 /**
  * Default implementation for an Extra Field in a Local or Central Header of a
  * ZIP archive.
- * <p>
- * This class is <em>not</em> thread-safe.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
+@DefaultAnnotation(NonNull.class)
 final class DefaultExtraField extends ExtraField {
 
     private final int headerID;
-    private byte[] data;
+    private @CheckForNull byte[] data;
 
     /**
      * Creates a new instance of the default Extra Field implementation.
@@ -43,25 +48,27 @@ final class DefaultExtraField extends ExtraField {
     }
 
     @Override
-	public int getHeaderID() {
+    int getHeaderID() {
         return headerID;
     }
 
     @Override
-	int getDataSize() {
-        return data != null ? data.length : 0;
+    int getDataSize() {
+        final byte[] data = this.data;
+        return null != data ? data.length : 0;
     }
 
     @Override
-	void readFrom(final byte[] data, final int off, final int size) {
+    void readFrom(final byte[] src, final int off, final int size) {
         UShort.check(size, "Data Size out of range", null);
-        this.data = new byte[size];
-        System.arraycopy(data, off, this.data, 0, size);
+        final byte[] dst = this.data = new byte[size];
+        System.arraycopy(src, off, dst, 0, size);
     }
 
     @Override
-	void writeTo(byte[] data, int off) {
-        if (this.data != null)
-            System.arraycopy(this.data, 0, data, off, this.data.length);
+    void writeTo(byte[] dst, int off) {
+        final byte[] src = this.data;
+        if (null != src)
+            System.arraycopy(src, 0, dst, off, src.length);
     }
 }

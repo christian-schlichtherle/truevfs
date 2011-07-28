@@ -16,17 +16,16 @@
 package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.socket.InputSocket;
-import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.socket.InputShop;
+import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.zip.RawZipFile;
+import static de.schlichtherle.truezip.zip.ZipEntry.*;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-
-import static de.schlichtherle.truezip.zip.ZipEntry.*;
 
 /**
  * An input shop for reading ZIP archive files.
@@ -40,9 +39,34 @@ public class ZipInputShop
 extends RawZipFile<ZipArchiveEntry>
 implements InputShop<ZipArchiveEntry> {
 
+    private boolean appendee;
+
     public ZipInputShop(ZipDriver driver, ReadOnlyFile rof)
     throws IOException {
         super(rof, driver.getCharset(), driver.getPreambled(), driver.getPostambled(), driver);
+    }
+
+    /**
+     * Returns {@code true} if and only if the target archive file gets entries
+     *         appended to it.
+     * Note that this property does not affect the behaviour of this class.
+     * 
+     * @return {@code true} if and only if the target archive file gets entries
+     *         appended to it.
+     */
+    protected boolean isAppendee() {
+        return appendee;
+    }
+
+    /**
+     * Indicates whether or not the target archive file gets entries appended
+     * to it.
+     * 
+     * @param appendee {@code true} if and only if the target archive file gets
+     *        entries appended to it.
+     */
+    protected void setAppendee(boolean appendee) {
+        this.appendee = appendee;
     }
 
     @Override
@@ -72,13 +96,13 @@ implements InputShop<ZipArchiveEntry> {
             @Override
             public InputStream newInputStream() throws IOException {
                 final Entry entry = getPeerTarget();
-                return ZipInputShop.this.getInputStream(
+                return getInputStream(
                         getLocalTarget().getName(),
                         false,
                         !(entry instanceof ZipArchiveEntry)
                             || ((ZipArchiveEntry) entry).getMethod() != DEFLATED);
             }
-        } // class Input
+        } // Input
 
         return new Input();
     }

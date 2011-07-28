@@ -17,9 +17,12 @@ package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
+import de.schlichtherle.truezip.socket.OutputShop;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.charset.Charset;
 import net.jcip.annotations.Immutable;
 
@@ -32,6 +35,7 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
+@DefaultAnnotation(NonNull.class)
 public class ReadOnlySfxDriver extends ZipDriver {
 
     /**
@@ -46,13 +50,15 @@ public class ReadOnlySfxDriver extends ZipDriver {
     }
 
     @Override
-    public final boolean getPreambled() {
+    protected final boolean getPreambled() {
         return true;
     }
 
     @Override
-    protected ZipOutputShop newZipOutputShop(
-            FsModel model, OutputStream out, ZipInputShop source)
+    protected final OutputShop<ZipArchiveEntry> newOutputShop(
+            final FsModel model,
+            final OptionOutputSocket output,
+            final @CheckForNull ZipInputShop source)
     throws IOException {
         throw new FileNotFoundException(
                 "driver class does not support creating or modifying SFX archives");

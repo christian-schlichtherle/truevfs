@@ -21,7 +21,7 @@ import de.schlichtherle.truezip.fs.FsScheme;
 import org.apache.tools.bzip2.CBZip2OutputStream;
 
 /**
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public final class TTarBZip2FileTest extends TFileTestSuite {
@@ -33,5 +33,9 @@ public final class TTarBZip2FileTest extends TFileTestSuite {
                 return CBZip2OutputStream.MIN_BLOCKSIZE;
             }
         });
+    }
+
+    @Override
+    public void testGrow() {
     }
 }

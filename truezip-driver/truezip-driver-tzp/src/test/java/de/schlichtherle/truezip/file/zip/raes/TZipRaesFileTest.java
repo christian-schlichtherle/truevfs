@@ -130,4 +130,8 @@ public final class TZipRaesFileTest extends TFileTestSuite {
         view.setAction(ENTER);
         archive.rm_r();
     }
+
+    @Override
+    public void testGrow() {
+    }
 }

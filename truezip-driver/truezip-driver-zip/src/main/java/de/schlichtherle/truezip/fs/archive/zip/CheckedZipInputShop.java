@@ -37,14 +37,14 @@ import java.io.InputStream;
  * So if just the CRC-32 value for the entry in the archive file has been
  * modified, you can still read its entire contents.
  * 
- * @author Christian Schlichtherle
+ * @see     CheckedZipDriver
+ * @author  Christian Schlichtherle
  * @version $Id$
- * @see CheckedZipDriver
  */
 @DefaultAnnotation(NonNull.class)
 public class CheckedZipInputShop extends ZipInputShop {
     
-    public CheckedZipInputShop(ReadOnlyFile rof, ZipDriver driver)
+    public CheckedZipInputShop(ZipDriver driver, ReadOnlyFile rof)
     throws IOException {
         super(driver, rof);
     }
@@ -71,12 +71,12 @@ public class CheckedZipInputShop extends ZipInputShop {
 
             @Override
             public InputStream newInputStream() throws IOException {
-                return CheckedZipInputShop.this.getInputStream(
+                return getInputStream(
                         getLocalTarget().getName(),
                         true,
                         !(getPeerTarget() instanceof ZipArchiveEntry));
             }
-        } // class Input
+        } // Input
 
         return new Input();
     }

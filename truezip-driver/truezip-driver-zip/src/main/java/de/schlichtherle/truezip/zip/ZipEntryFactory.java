@@ -16,20 +16,24 @@
 
 package de.schlichtherle.truezip.zip;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
+
 /**
  * A factory for {@link ZipEntry}s.
  *
- * @param <E> The type of the created ZIP entries.
- * @author Christian Schlichtherle
+ * @see     RawZipFile
+ * @param   <E> The type of the created ZIP entries.
+ * @author  Christian Schlichtherle
  * @version $Id$
- * @see RawZipFile
  */
+@DefaultAnnotation(NonNull.class)
 public interface ZipEntryFactory<E extends ZipEntry> {
 
     /**
      * Returns a new ZIP entry with the given {@code name}.
      *
-     * @param  name the entry name - {@code null} is not permitted.
+     * @param  name the entry name.
      * @return A new ZIP entry with the given {@code name}.
      */
     E newEntry(String name);

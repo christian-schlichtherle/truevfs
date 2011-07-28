@@ -50,9 +50,9 @@ import net.jcip.annotations.ThreadSafe;
  * <p>
  * This class is thread-safe.
  *
+ * @see     ZipOutputStream
  * @author  Christian Schlichtherle
  * @version $Id$
- * @see     ZipOutputStream
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
@@ -104,7 +104,6 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      *        not compatible to the ZIP File Format Specification.
      *        This may be useful to read Self Extracting ZIP files (SFX) with
      *        large postambles.
-     * @throws NullPointerException if any reference parameter is {@code null}.
      * @throws FileNotFoundException if {@code name} cannot get opened for
      *         reading.
      * @throws ZipException if {@code name} is not compatible with the ZIP
@@ -166,7 +165,6 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      *        not compatible to the ZIP File Format Specification.
      *        This may be useful to read Self Extracting ZIP files (SFX) with
      *        large postambles.
-     * @throws NullPointerException if any reference parameter is {@code null}.
      * @throws FileNotFoundException if {@code file} cannot get opened for
      *         reading.
      * @throws ZipException if {@code file} is not compatible with the ZIP
@@ -228,7 +226,6 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      *        not compatible to the ZIP File Format Specification.
      *        This may be useful to read Self Extracting ZIP files (SFX) with
      *        large postambles.
-     * @throws NullPointerException if any reference parameter is {@code null}.
      * @throws FileNotFoundException if {@code rof} cannot get opened for
      *         reading.
      * @throws ZipException if {@code rof} is not compatible with the ZIP
@@ -254,7 +251,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
     implements Pool<ReadOnlyFile, IOException> {
         final File file;
 
-        DefaultReadOnlyFilePool(File file) {
+        DefaultReadOnlyFilePool(final File file) {
             this.file = file;
         }
 
@@ -271,7 +268,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
         public void release(ReadOnlyFile rof) throws IOException {
             rof.close();
         }
-    }
+    } // DefaultReadOnlyFilePool
 
     /**
      * Returns the {@link Object#toString() string representation} of whatever
@@ -292,12 +289,12 @@ public class ZipFile extends RawZipFile<ZipEntry> {
             final Iterator<ZipEntry> i = ZipFile.super.iterator();
 
             @Override
-			public boolean hasMoreElements() {
+            public boolean hasMoreElements() {
                 return i.hasNext();
             }
 
             @Override
-			public ZipEntry nextElement() {
+            public ZipEntry nextElement() {
                 return i.next().clone();
             }
         } // CloneEnumeration
@@ -315,20 +312,20 @@ public class ZipFile extends RawZipFile<ZipEntry> {
             final Iterator<ZipEntry> i = ZipFile.super.iterator();
 
             @Override
-			public boolean hasNext() {
+            public boolean hasNext() {
                 return i.hasNext();
             }
 
             @Override
-			public ZipEntry next() {
+            public ZipEntry next() {
                 return i.next().clone();
             }
 
             @Override
-			public void remove() {
+            public void remove() {
                 throw new UnsupportedOperationException();
             }
-        } // class EntryIterator
+        } // EntryIterator
 
         return new EntryIterator();
     }

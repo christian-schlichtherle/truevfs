@@ -15,11 +15,8 @@
  */
 package de.schlichtherle.truezip.fs.archive;
 
-import de.schlichtherle.truezip.fs.FsConcurrentModel;
 import de.schlichtherle.truezip.fs.FsFalsePositiveException;
 import de.schlichtherle.truezip.fs.FsModel;
-import de.schlichtherle.truezip.fs.FsOutputOption;
-import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -47,16 +44,14 @@ extends FsArchiveController<E> {
     /**
      * Creates a new instance of FsFileSystemArchiveController
      */
-    FsFileSystemArchiveController(FsConcurrentModel model) {
+    FsFileSystemArchiveController(FsContextModel model) {
         super(model);
     }
 
     @Override
-    final FsArchiveFileSystem<E> autoMount(
-            final boolean autoCreate,
-            final BitField<FsOutputOption> options)
+    final FsArchiveFileSystem<E> autoMount(final boolean autoCreate)
     throws IOException {
-        return mountState.autoMount(autoCreate, options);
+        return mountState.autoMount(autoCreate);
     }
 
     final @Nullable FsArchiveFileSystem<E> getFileSystem() {
@@ -84,16 +79,14 @@ extends FsArchiveController<E> {
      *        directory is created with its last modification time set to the
      *        system's current time.
      */
-    abstract void mount(boolean autoCreate, BitField<FsOutputOption> options)
-    throws IOException;
+    abstract void mount(boolean autoCreate) throws IOException;
 
     /**
      * Represents the mount state of the archive file system.
      * This is an abstract class: The state is implemented in the subclasses.
      */
     private static abstract class MountState<E extends FsArchiveEntry> {
-        abstract FsArchiveFileSystem<E> autoMount(boolean autoCreate,
-                                                BitField<FsOutputOption> options)
+        abstract FsArchiveFileSystem<E> autoMount(boolean autoCreate)
         throws IOException;
 
         @Nullable FsArchiveFileSystem<E> getFileSystem() {
@@ -101,18 +94,16 @@ extends FsArchiveController<E> {
         }
 
         abstract void setFileSystem(@CheckForNull FsArchiveFileSystem<E> fileSystem);
-    } // class MountState
+    } // MountState
 
-    private class ResetFileSystem extends MountState<E> {
+    private final class ResetFileSystem extends MountState<E> {
         @Override
-        FsArchiveFileSystem<E> autoMount(
-                final boolean autoCreate,
-                final BitField<FsOutputOption> options)
+        FsArchiveFileSystem<E> autoMount(final boolean autoCreate)
         throws IOException {
             getModel().assertWriteLockedByCurrentThread();
             try {
-                mount(autoCreate, options);
-            } catch (FsCacheableFalsePositiveException ex) {
+                mount(autoCreate);
+            } catch (FsPermanentFalsePositiveException ex) {
                 // Cache exception for false positive file system.
                 //   The state is reset when unlink() is called on the false
                 // positive file system or sync().
@@ -123,14 +114,14 @@ extends FsArchiveController<E> {
                 // would run the file system initialization again, only to
                 // result in another instance of the same exception type again.
                 mountState = new FalsePositiveFileSystem(ex);
-                throw ex;
+                //throw ex;
             }
 
             assert this != mountState;
             // DON'T just call autoMounter.getFileSystem()!
             // This would return null if autoMounter is an instance of
             // FalsePositiveFileSystem.
-            return mountState.autoMount(autoCreate, options);
+            return mountState.autoMount(autoCreate);
         }
 
         @Override
@@ -139,9 +130,9 @@ extends FsArchiveController<E> {
             if (fileSystem != null)
                 mountState = new MountedFileSystem(fileSystem);
         }
-    } // class ResetFileSystem
+    } // ResetFileSystem
 
-    private class MountedFileSystem extends MountState<E> {
+    private final class MountedFileSystem extends MountState<E> {
         private final FsArchiveFileSystem<E> fileSystem;
 
         MountedFileSystem(final FsArchiveFileSystem<E> fileSystem) {
@@ -151,8 +142,7 @@ extends FsArchiveController<E> {
         }
 
         @Override
-        FsArchiveFileSystem<E> autoMount(boolean autoCreate,
-                                        BitField<FsOutputOption> options) {
+        FsArchiveFileSystem<E> autoMount(boolean autoCreate) {
             return fileSystem;
         }
 
@@ -167,20 +157,19 @@ extends FsArchiveController<E> {
                 throw new IllegalArgumentException("File system already mounted!");
             mountState = new ResetFileSystem();
         }
-    } // class MountedFileSystem
+    } // MountedFileSystem
 
-    private class FalsePositiveFileSystem extends MountState<E> {
-        private FsFalsePositiveException exception;
+    private final class FalsePositiveFileSystem extends MountState<E> {
+        private FsPermanentFalsePositiveException exception;
 
-        private FalsePositiveFileSystem(final FsFalsePositiveException exception) {
+        private FalsePositiveFileSystem(final FsPermanentFalsePositiveException exception) {
             if (exception == null)
                 throw new NullPointerException();
             this.exception = exception;
         }
 
         @Override
-        FsArchiveFileSystem<E> autoMount( boolean autoCreate,
-                                        BitField<FsOutputOption> options)
+        FsArchiveFileSystem<E> autoMount(boolean autoCreate)
         throws FsFalsePositiveException {
             throw exception;
         }
@@ -191,17 +180,17 @@ extends FsArchiveController<E> {
                     ? new MountedFileSystem(fileSystem)
                     : new ResetFileSystem();
         }
-    } // class FalsePositiveFileSystem
+    } // FalsePositiveFileSystem
 }
 
 /** A cacheable false positive exception. */
 @DefaultAnnotation(NonNull.class)
 @SuppressWarnings("MultipleTopLevelClassesInFile")
-class FsCacheableFalsePositiveException extends FsFalsePositiveException {
+final class FsPermanentFalsePositiveException extends FsFalsePositiveException {
     private static final long serialVersionUID = 5436924103910446876L;
 
-    FsCacheableFalsePositiveException(  FsModel model,
+    FsPermanentFalsePositiveException(  FsModel model,
                                         @CheckForNull IOException cause) {
         super(model, cause);
     }
-}
+} // FsPermanentFalsePositiveException
