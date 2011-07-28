@@ -43,8 +43,8 @@ import net.jcip.annotations.Immutable;
 /**
  * Adapts a {@link File} instance to a {@link FsEntry}.
  *
- * @author Christian Schlichtherle
- * @version $Id$
+ * @author  Christian Schlichtherle
+ * @version $Id $
  */
 @Immutable
 @DefaultAnnotation(NonNull.class)
