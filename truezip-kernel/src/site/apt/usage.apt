@@ -10,7 +10,7 @@ Abstract
 
     This article showcases the TrueZIP&#160;Kernel API in contrast to the
     {{{../truezip-file/index.html}TrueZIP File*}} API.
-    Since TrueZIP 7.2, the new {{{./truezip-path/index.html}TrueZIP Path}} API
+    Since TrueZIP 7.2, the new {{{../truezip-path/index.html}TrueZIP Path}} API
     provides the same functionality than the TrueZIP&#160;Kernel API with much
     more ease, so you might consider this document as being deprecated,
     except for educational purposes.
