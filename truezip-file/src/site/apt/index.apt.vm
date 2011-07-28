@@ -34,7 +34,7 @@ About
 File file = new TFile("archive.tar.gz/README.TXT");
 OutputStream Out = new TFileOutputStream(file);
 try {
-    // Write the file contents here.
+    // Write archive entry contents here.
     ...
 } finally {
     out.close();
