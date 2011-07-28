@@ -802,7 +802,7 @@ implements Iterable<E>, Closeable {
         private boolean closed;
 
         PooledInflaterInputStream(InputStream in, int size) {
-            super(in, InflaterPool.fetch(), size);
+            super(in, Inflaters.fetch(), size);
         }
 
         @Override
@@ -813,7 +813,7 @@ implements Iterable<E>, Closeable {
             try {
                 super.close();
             } finally {
-                InflaterPool.release(inf);
+                Inflaters.release(inf);
             }
         }
     } // PooledInflaterInputStream
@@ -895,7 +895,7 @@ implements Iterable<E>, Closeable {
                 final ZipEntry entry,
                 final int size) {
             super(in);
-            this.inf = InflaterPool.fetch();
+            this.inf = Inflaters.fetch();
             this.infBuf = new byte[size];
             this.entry = entry;
         }
@@ -966,7 +966,7 @@ implements Iterable<E>, Closeable {
                 }
             } finally {
                 closed = true;
-                InflaterPool.release(inf);
+                Inflaters.release(inf);
                 super.close();
             }
             long expectedCrc = entry.getCrc();
@@ -981,8 +981,7 @@ implements Iterable<E>, Closeable {
         }
 
         @Override
-        public void reset()
-        throws IOException {
+        public void reset() throws IOException {
             throw new IOException("mark()/reset() is not supported!");
         }
 

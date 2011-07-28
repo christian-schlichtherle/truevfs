@@ -26,23 +26,26 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.zip.Inflater;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * Provides utility methods for pooling {@link Inflater}s.
  * Inflater objects are expensive to allocate, so pooling them improves
  * performance.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 @DefaultAnnotation(NonNull.class)
-final class InflaterPool {
-    private static final Set<Inflater> allocated
-            = new HashSet<Inflater>();
-    private static final List<Reference<Inflater>> released
-            = new LinkedList<Reference<Inflater>>();
+final class Inflaters {
 
-    private InflaterPool() {
+    private static final Set<Inflater>
+            allocated = new HashSet<Inflater>();
+    private static final List<Reference<Inflater>>
+            released = new LinkedList<Reference<Inflater>>();
+
+    private Inflaters() {
     }
 
     static Inflater fetch() {
@@ -52,12 +55,12 @@ final class InflaterPool {
             for (Iterator<Reference<Inflater>> i = released.iterator(); i.hasNext(); ) {
                 inflater = i.next().get();
                 i.remove();
-                if (inflater != null) {
+                if (null != inflater) {
                     //inflater.reset();
                     break;
                 }
             }
-            if (inflater == null)
+            if (null == inflater)
                 inflater = new Inflater(true);
 
             // We MUST make sure that we keep a strong reference to the
