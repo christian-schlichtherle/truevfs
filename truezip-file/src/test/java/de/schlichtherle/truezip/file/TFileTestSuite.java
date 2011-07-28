@@ -1540,7 +1540,7 @@ public abstract class TFileTestSuite extends TestBase {
 
         final TConfig config = TConfig.push();
         try {
-            config.setOutputPreferences(BitField.of(CREATE_PARENTS, STORE, GROW));
+            config.setOutputPreferences(config.getOutputPreferences().set(GROW));
 
             assertGrow(entry1);
             assertGrow(entry2);
@@ -1553,11 +1553,17 @@ public abstract class TFileTestSuite extends TestBase {
             assertGrow(entry1);
             assertGrow(entry2);
 
+            // FIXME: http://java.net/jira/browse/TRUEZIP-144
+            /*entry1.rm();
+            entry2.rm();*/
+
             TFile.umount();
             assertTrue(file.length() > 6 * data.length); // six entries plus two central directories
         } finally {
             config.close();
         }
+
+        //assertThat(archive.list().length, is(0));
     }
 
     private void assertGrow(final TFile entry) throws IOException {
