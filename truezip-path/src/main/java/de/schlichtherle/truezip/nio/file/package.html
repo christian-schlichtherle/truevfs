@@ -45,13 +45,13 @@
         </p>
         <pre><code>
     Path path = new TPath(new URI("http://acme.com/download/everything.tar.gz/README.TXT"));
-    try (Files.newInputStream(path)) {
+    try (InputStream in = Files.newInputStream(path)) {
         // Read the file contents here.
         ...
     }
         </code></pre>
         <p>
-            This example requires that the JARs of the file system driver
+            This example presumes that the JARs of the file system driver
             modules TrueZIP Driver HTTP(S) and TrueZIP Driver TAR are present
             on the run time class path.
         </p>
