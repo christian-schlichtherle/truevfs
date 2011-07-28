@@ -15,7 +15,7 @@
     <body>
         <links>
             <item name="The TrueZIP Blog" href="http://truezip.schlichtherle.de"/>
-            <item name="Version Information" href="http://java.net/jira/browse/TRUEZIP#selectedTab=com.atlassian.jira.plugin.system.project:versions-panel"/>
+            <item name="Change Log" href="http://java.net/jira/browse/TRUEZIP#selectedTab=com.atlassian.jira.plugin.system.project:changelog-panel"/>
             <item name="Developer Website" href="http://java.net/projects/truezip"/>
         </links>
         <breadcrumbs>
