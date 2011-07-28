@@ -16,15 +16,19 @@
 
 package de.schlichtherle.truezip.zip;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import net.jcip.annotations.ThreadSafe;
+
 /**
  * Provides static utility methods for reading and writing integer values in
  * little endian format from or to byte arrays.
- * <p>
- * This class is safe for multithreading.
  * 
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
+@DefaultAnnotation(NonNull.class)
 final class LittleEndian {
 
     /** This class cannot get instantiated. */
@@ -41,7 +45,7 @@ final class LittleEndian {
      *        of the signed short integer value is read from.
      * @return The signed short integer value read from the byte array.
      */
-    public static short readShort(final byte[] buf, final int off) {
+    static short readShort(final byte[] buf, final int off) {
         return (short) ((buf[off + 1] << 8) | (buf[off] & 0xff));
     }
 
@@ -60,7 +64,7 @@ final class LittleEndian {
      *         type, hence an {@code int} is returned which's two most
      *         significant bytes are zero.
      */
-    public static int readUShort(final byte[] buf, final int off) {
+    static int readUShort(final byte[] buf, final int off) {
         return ((buf[off + 1] & 0xff) << 8) | (buf[off] & 0xff);
     }
 
@@ -74,7 +78,7 @@ final class LittleEndian {
      *        of the signed integer value is read from.
      * @return The signed integer value read from the byte array.
      */
-    public static int readInt(final byte[] buf, int off) {
+    static int readInt(final byte[] buf, int off) {
         off += 3;
         int i = buf[off--]; // expands sign
         i <<= 8;
@@ -101,7 +105,7 @@ final class LittleEndian {
      *         type, hence a {@code long} is returned which's four most
      *         significant bytes are zero.
      */
-    public static long readUInt(final byte[] buf, int off) {
+    static long readUInt(final byte[] buf, int off) {
         return readInt(buf, off) & UInt.MAX_VALUE;
     }
 
@@ -115,7 +119,7 @@ final class LittleEndian {
      *        of the (signed) long integer value is read from.
      * @return The (signed) long integer value read from the byte array.
      */
-    public static long readLong(final byte[] buf, int off) {
+    static long readLong(final byte[] buf, int off) {
         off += 7;
         long l = buf[off--]; // expands sign
         l <<= 8;
@@ -146,7 +150,7 @@ final class LittleEndian {
      * @param off The zero based offset in the byte array where the first byte
      *        of the short integer value is written to.
      */
-    public static void writeShort(int s, final byte[] buf, final int off) {
+    static void writeShort(int s, final byte[] buf, final int off) {
         buf[off] = (byte) s;
         s >>= 8;
         buf[off + 1] = (byte) s;
@@ -162,7 +166,7 @@ final class LittleEndian {
      * @param off The zero based offset in the byte array where the first byte
      *        of the integer value is written to.
      */
-    public static void writeInt(int i, final byte[] buf, final int off) {
+    static void writeInt(int i, final byte[] buf, final int off) {
         buf[off] = (byte) i;
         i >>= 8;
         buf[off + 1] = (byte) i;
@@ -182,7 +186,7 @@ final class LittleEndian {
      * @param off The zero based offset in the byte array where the first byte
      *        of the long integer value is written to.
      */
-    public static void writeLong(long l, final byte[] buf, final int off) {
+    static void writeLong(long l, final byte[] buf, final int off) {
         buf[off] = (byte) l;
         l >>= 8;
         buf[off + 1] = (byte) l;

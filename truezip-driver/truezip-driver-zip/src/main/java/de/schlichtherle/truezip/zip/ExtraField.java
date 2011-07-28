@@ -37,7 +37,7 @@ import static de.schlichtherle.truezip.zip.ZipConstants.*;
 abstract class ExtraField {
 
     /** The Header ID of a ZIP64 Extended Information Extra Field. */
-    public static final int ZIP64_HEADER_ID = 0x0001;
+    static final int ZIP64_HEADER_ID = 0x0001;
 
     private static final Map<Integer, Class<? extends ExtraField>> registry
             = new HashMap<Integer, Class<? extends ExtraField>>();
@@ -54,7 +54,7 @@ abstract class ExtraField {
      *         cause.
      * @see    #create
      */
-    public static void register(final Class<? extends ExtraField> c) {
+    static void register(final Class<? extends ExtraField> c) {
         final ExtraField ef;
         try {
             ef = (ExtraField) c.newInstance();
@@ -81,12 +81,12 @@ abstract class ExtraField {
      *         range.
      * @see    #register
      */
-    public static ExtraField create(final int headerID) {
+    static ExtraField create(final int headerID) {
         UShort.check(headerID, "Header ID out of range", null);
         final Class<? extends ExtraField> c = registry.get(headerID);
         final ExtraField ef;
         try {
-            ef = c != null
+            ef = null != c
                     ? (ExtraField) c.newInstance()
                     : new DefaultExtraField(headerID);
         } catch (Exception cannotHappen) {
@@ -101,7 +101,7 @@ abstract class ExtraField {
      * The Header ID is an unsigned short integer (two bytes)
      * which must be constant during the life cycle of this object.
      */
-    public abstract int getHeaderID();
+    abstract int getHeaderID();
 
     /**
      * Returns the Data Size of this Extra Field.
@@ -124,9 +124,8 @@ abstract class ExtraField {
     final byte[] getDataBlock() {
         final int size = getDataSize();
         UShort.check(size);
-        if (size == 0)
+        if (0 == size)
             return EMPTY;
-
         final byte[] data = new byte[size];
         writeTo(data, 0);
         return data;

@@ -29,7 +29,7 @@ import net.jcip.annotations.Immutable;
  * Note that applications cannot write archive <em>files</em> directly using
  * this class - just their entries.
  *
- * @see     TFile#setLenient
+ * @see     TConfig#setLenient
  * @see     TFileReader
  * @author  Christian Schlichtherle
  * @version $Id$

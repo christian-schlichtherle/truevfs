@@ -15,12 +15,15 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip.raes;
 
-import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.archive.zip.CheckedZipInputShop;
+import de.schlichtherle.truezip.fs.archive.zip.ZipArchiveEntry;
 import de.schlichtherle.truezip.fs.archive.zip.ZipInputShop;
 import de.schlichtherle.truezip.key.KeyManagerProvider;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
+import de.schlichtherle.truezip.socket.InputShop;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import net.jcip.annotations.Immutable;
 
@@ -49,6 +52,7 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
+@DefaultAnnotation(NonNull.class)
 public class SafeZipRaesDriver extends ZipRaesDriver {
 
     public SafeZipRaesDriver(   IOPoolProvider ioPoolProvider,
@@ -87,8 +91,7 @@ public class SafeZipRaesDriver extends ZipRaesDriver {
      * and CRC-32 authenticated.
      */
     @Override
-    protected final ZipInputShop
-    newZipInputShop(FsModel model, ReadOnlyFile rof)
+    protected final InputShop<ZipArchiveEntry> newInputShop(ReadOnlyFile rof)
     throws IOException {
         // Optimization: If the read-only file is smaller than the
         // authentication trigger, then its entire cipher text has already
@@ -97,7 +100,7 @@ public class SafeZipRaesDriver extends ZipRaesDriver {
         // Hence, checking the CRC-32 value of the plain text ZIP file is
         // redundant.
         return rof.length() > getAuthenticationTrigger()
-                ? new CheckedZipInputShop(rof, this)
-                : super.newZipInputShop(model, rof);
+                ? new CheckedZipInputShop(this, rof)
+                : super.newInputShop(rof);
     }
 }

@@ -186,15 +186,9 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         }
 
         @Override
-        public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            try {
-                return getBoundSocket().newSeekableByteChannel();
-            } catch (FsFalsePositiveException ex) {
-                return getParent()
-                        .getInputSocket(resolveParent(name), options)
-                        .bind(this)
-                        .newSeekableByteChannel();
-            }
+        public Entry getPeerTarget() throws IOException {
+            // Same implementation as super class, but makes stack trace nicer.
+            return getBoundSocket().getPeerTarget();
         }
 
         @Override
@@ -210,6 +204,18 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         }
 
         @Override
+        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            try {
+                return getBoundSocket().newSeekableByteChannel();
+            } catch (FsFalsePositiveException ex) {
+                return getParent()
+                        .getInputSocket(resolveParent(name), options)
+                        .bind(this)
+                        .newSeekableByteChannel();
+            }
+        }
+
+        @Override
         public InputStream newInputStream() throws IOException {
             try {
                 return getBoundSocket().newInputStream();
@@ -220,7 +226,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                         .newInputStream();
             }
         }
-    } // class Input
+    } // Input
 
     @Override
     public OutputSocket<?> getOutputSocket(
@@ -257,6 +263,12 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         }
 
         @Override
+        public Entry getPeerTarget() throws IOException {
+            // Same implementation as super class, but makes stack trace nicer.
+            return getBoundSocket().getPeerTarget();
+        }
+
+        @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
             try {
                 return getBoundSocket().newSeekableByteChannel();
@@ -279,7 +291,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                         .newOutputStream();
             }
         }
-    } // class Output
+    } // Output
 
     @Override
     public void mknod(

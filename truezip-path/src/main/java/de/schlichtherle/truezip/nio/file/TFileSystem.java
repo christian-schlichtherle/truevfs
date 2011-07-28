@@ -81,8 +81,7 @@ import java.util.Set;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * A {@link FileSystem} implementation
- * based on the TrueZIP Kernel module.
+ * A {@link FileSystem} implementation based on the TrueZIP Kernel module.
  * 
  * @since   TrueZIP 7.2
  * @author  Christian Schlichtherle
@@ -415,7 +414,7 @@ public final class TFileSystem extends FileSystem {
             controller.mknod(
                     name,
                     DIRECTORY,
-                    NO_OUTPUT_OPTIONS.set(CREATE_PARENTS, path.shouldCreateParents()),
+                    path.getOutputPreferences(),
                     null);
         } catch (IOException ex) {
             if (null != controller.getEntry(name))

@@ -15,9 +15,11 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
-import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
+import de.schlichtherle.truezip.socket.InputShop;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import net.jcip.annotations.Immutable;
 
@@ -41,6 +43,7 @@ import net.jcip.annotations.Immutable;
  * @see CheckedZipInputShop
  */
 @Immutable
+@DefaultAnnotation(NonNull.class)
 public class CheckedJarDriver extends JarDriver {
 
     public CheckedJarDriver(IOPoolProvider provider) {
@@ -48,8 +51,8 @@ public class CheckedJarDriver extends JarDriver {
     }
 
     @Override
-    protected ZipInputShop newZipInputShop(FsModel model, ReadOnlyFile rof)
+    protected InputShop<ZipArchiveEntry> newInputShop(ReadOnlyFile rof)
     throws IOException {
-        return new CheckedZipInputShop(rof, this);
+        return new CheckedZipInputShop(this, rof);
     }
 }

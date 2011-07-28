@@ -15,37 +15,37 @@
  */
 package de.schlichtherle.truezip.fs.nio.file;
 
-import edu.umd.cs.findbugs.annotations.Nullable;
-import java.nio.file.OpenOption;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.io.DecoratingOutputStream;
+import static de.schlichtherle.truezip.entry.Entry.*;
+import static de.schlichtherle.truezip.entry.Entry.Access.*;
 import de.schlichtherle.truezip.fs.FsOutputOption;
+import static de.schlichtherle.truezip.fs.FsOutputOption.*;
+import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
 import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.OutputStream;
+import static java.lang.Boolean.*;
 import java.nio.channels.SeekableByteChannel;
+import java.nio.file.AccessMode;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import static java.nio.file.Files.*;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
+import static java.nio.file.StandardCopyOption.*;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.FileTime;
-import net.jcip.annotations.ThreadSafe;
-
-import static de.schlichtherle.truezip.fs.FsOutputOption.*;
-import static de.schlichtherle.truezip.entry.Entry.Access.*;
-import static de.schlichtherle.truezip.entry.Entry.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * An output socket for a file entry.
@@ -55,7 +55,6 @@ import static de.schlichtherle.truezip.entry.Entry.*;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@ThreadSafe
 @DefaultAnnotation(NonNull.class)
 final class FileOutputSocket extends OutputSocket<FileEntry> {
 
@@ -77,6 +76,8 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
                         final @CheckForNull Entry                    template) {
         assert null != entry;
         assert null != options;
+        if (options.get(EXCLUSIVE) && options.get(APPEND))
+            throw new IllegalArgumentException();
         this.entry    = entry;
         this.options  = options;
         this.template = template;
@@ -87,40 +88,109 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
         return entry;
     }
 
-    @Override
-    public SeekableByteChannel newSeekableByteChannel() throws IOException {
+    private FileEntry begin() throws IOException {
+        final FileEntry temp;
         final Path entryFile = entry.getPath();
-        if (options.get(CREATE_PARENTS))
-            createDirectories(entryFile.getParent());
-        FileAlreadyExistsException exists = null;
-        if (options.get(CACHE)) {
-            try {
-                createFile(entryFile);
-            } catch (FileAlreadyExistsException ex) {
-                if (options.get(EXCLUSIVE))
-                    throw ex;
-                exists = ex;
-            }
-        } else if (options.get(EXCLUSIVE) && exists(entryFile)) {
+        Boolean exists = null;
+        if (options.get(EXCLUSIVE) && (exists = exists(entryFile)))
             throw new FileAlreadyExistsException(entry.toString());
+        if (options.get(CACHE)) {
+            if (TRUE.equals(exists)
+                    || null == exists && (exists = exists(entryFile)))
+                entryFile   .getFileSystem()
+                            .provider()
+                            .checkAccess(entryFile, AccessMode.WRITE);
+            temp = entry.createTempFile();
+        } else {
+            temp = entry;
         }
-        final FileEntry temp = null != exists
-                ? entry.createTempFile()
-                : entry;
-        final Path tempFile = temp.getPath();
+        if (options.get(CREATE_PARENTS) && !TRUE.equals(exists)) {
+            final Path parentFile = entryFile.getParent();
+            if (null != parentFile)
+                createDirectories(parentFile);
+        }
+        return temp;
+    }
 
+    private void append(final FileEntry temp) throws IOException {
+        if (temp != entry && options.get(APPEND) && exists(entry.getPath()))
+            IOSocket.copy(entry.getInputSocket(), temp.getOutputSocket());
+    }
+
+    private Set<OpenOption> optionSet() {
         final Set<OpenOption> set = new HashSet<OpenOption>(INITIAL_CAPACITY);
         Collections.addAll(set, WRITE_STANDARD_OPEN_OPTION);
-        if (options.get(APPEND))
+        if (options.get(APPEND)) {
             set.add(StandardOpenOption.APPEND);
+            set.remove(StandardOpenOption.TRUNCATE_EXISTING);
+        }
         if (options.get(EXCLUSIVE))
             set.add(StandardOpenOption.CREATE_NEW);
+        return set;
+    }
+
+    private OpenOption[] optionArray() {
+        final Set<OpenOption> set = optionSet();
+        return set.toArray(new OpenOption[set.size()]);
+    }
+
+    private void commit(final FileEntry temp) throws IOException {
+        final Path entryFile = entry.getPath();
+        final Path tempFile = temp.getPath();
+        if (temp != entry) {
+            copyAttributes(tempFile);
+            try {
+                move(tempFile, entryFile, REPLACE_EXISTING);
+            } catch (IOException ex) {
+                // Slow.
+                /*Files.copy(tempFile, entryFile,
+                        StandardCopyOption.REPLACE_EXISTING);*/
+                // Fast.
+                IOSocket.copy(  temp.getInputSocket(),
+                                entry.getOutputSocket());
+                copyAttributes(entryFile);
+            }
+            release(temp, null);
+        } else {
+            copyAttributes(entryFile);
+        }
+    }
+
+    private void copyAttributes(final Path file) throws IOException {
+        final Entry template = this.template;
+        if (null == template)
+            return;
+        getFileAttributeView(file, BasicFileAttributeView.class)
+                .setTimes(  toFileTime(template.getTime(WRITE)),
+                            toFileTime(template.getTime(READ)),
+                            toFileTime(template.getTime(CREATE)));
+    }
+
+    private static @Nullable FileTime toFileTime(long time) {
+        return UNKNOWN == time ? null : FileTime.fromMillis(time);
+    }
+
+    private void release(
+            final FileEntry temp,
+            final @CheckForNull IOException ex)
+    throws IOException {
+        try {
+            temp.release();
+        } catch (IOException ex2) {
+            ex2.initCause(ex);
+            throw ex2;
+        }
+    }
+
+    @Override
+    public SeekableByteChannel newSeekableByteChannel() throws IOException {
+        final FileEntry temp = begin();
 
         class SeekableByteChannel extends DecoratingSeekableByteChannel {
             boolean closed;
 
             SeekableByteChannel() throws IOException {
-                super(newByteChannel(tempFile, set));
+                super(Files.newByteChannel(temp.getPath(), optionSet()));
             }
 
             @Override
@@ -131,97 +201,29 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
                 try {
                     delegate.close();
                 } finally {
-                    IOException ex = null;
-                    try {
-                        if (temp != entry) {
-                            try {
-                                try {
-                                    move(tempFile, entryFile,
-                                            StandardCopyOption.REPLACE_EXISTING);
-                                } catch (IOException ex2) {
-                                    Files.copy(tempFile, entryFile,
-                                            StandardCopyOption.REPLACE_EXISTING);
-                                }
-                            } catch (IOException ex2) {
-                                throw ex = ex2;
-                            } finally {
-                                try {
-                                    temp.release();
-                                } catch (IOException ex2) {
-                                    throw (IOException) ex2.initCause(ex);
-                                }
-                            }
-                        }
-                    } finally {
-                        final Entry template = FileOutputSocket.this.template;
-                        if (null != template) {
-                            try {
-                                getFileAttributeView(entryFile, BasicFileAttributeView.class)
-                                        .setTimes(  toFileTime(template.getTime(WRITE)),
-                                                    toFileTime(template.getTime(READ)),
-                                                    toFileTime(template.getTime(CREATE)));
-                            } catch (IOException ex2) {
-                                throw (IOException) ex2.initCause(ex);
-                            }
-                        }
-                    }
+                    commit(temp);
                 }
             }
-        } // class OutputStream
+        } // SeekableByteChannel
 
         try {
-            if (temp != entry && options.get(APPEND))
-                IOSocket.copy(  entry.getInputSocket(),
-                                temp.getOutputSocket());
+            append(temp);
             return new SeekableByteChannel();
-        } catch (IOException cause) {
-            if (temp != entry) {
-                try {
-                    temp.release();
-                } catch (IOException ex) {
-                    throw (IOException) ex.initCause(cause);
-                }
-            }
-            throw cause;
+        } catch (IOException ex) {
+            release(temp, ex);
+            throw ex;
         }
     }
 
     @Override
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
     public OutputStream newOutputStream() throws IOException {
-        final Path entryFile = entry.getPath();
-        if (options.get(CREATE_PARENTS))
-            createDirectories(entryFile.getParent());
-        FileAlreadyExistsException exists = null;
-        if (options.get(CACHE)) {
-            try {
-                createFile(entryFile);
-            } catch (FileAlreadyExistsException ex) {
-                if (options.get(EXCLUSIVE))
-                    throw ex;
-                exists = ex;
-            }
-        } else if (options.get(EXCLUSIVE) && exists(entryFile)) {
-            throw new FileAlreadyExistsException(entry.toString());
-        }
-        final FileEntry temp = null != exists
-                ? entry.createTempFile()
-                : entry;
-        final Path tempFile = temp.getPath();
-
-        final Set<OpenOption> set = new HashSet<OpenOption>(INITIAL_CAPACITY);
-        Collections.addAll(set, WRITE_STANDARD_OPEN_OPTION);
-        if (options.get(APPEND))
-            set.add(StandardOpenOption.APPEND);
-        if (options.get(EXCLUSIVE))
-            set.add(StandardOpenOption.CREATE_NEW);
+        final FileEntry temp = begin();
 
         class OutputStream extends DecoratingOutputStream {
             boolean closed;
 
             OutputStream() throws IOException {
-                super(Files.newOutputStream(tempFile,
-                        set.toArray(new StandardOpenOption[set.size()])));
+                super(Files.newOutputStream(temp.getPath(), optionArray()));
             }
 
             @Override
@@ -232,62 +234,17 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
                 try {
                     delegate.close();
                 } finally {
-                    IOException ex = null;
-                    try {
-                        if (temp != entry) {
-                            try {
-                                try {
-                                    move(tempFile, entryFile,
-                                            StandardCopyOption.REPLACE_EXISTING);
-                                } catch (IOException ex2) {
-                                    Files.copy(tempFile, entryFile,
-                                            StandardCopyOption.REPLACE_EXISTING);
-                                }
-                            } catch (IOException ex2) {
-                                throw ex = ex2;
-                            } finally {
-                                try {
-                                    temp.release();
-                                } catch (IOException ex2) {
-                                    throw (IOException) ex2.initCause(ex);
-                                }
-                            }
-                        }
-                    } finally {
-                        final Entry template = FileOutputSocket.this.template;
-                        if (null != template) {
-                            try {
-                                getFileAttributeView(entryFile, BasicFileAttributeView.class)
-                                        .setTimes(  toFileTime(template.getTime(WRITE)),
-                                                    toFileTime(template.getTime(READ)),
-                                                    toFileTime(template.getTime(CREATE)));
-                            } catch (IOException ex2) {
-                                throw (IOException) ex2.initCause(ex);
-                            }
-                        }
-                    }
+                    commit(temp);
                 }
             }
-        } // class OutputStream
+        } // OutputStream
 
         try {
-            if (temp != entry && options.get(APPEND))
-                IOSocket.copy(  entry.getInputSocket(),
-                                temp.getOutputSocket());
+            append(temp);
             return new OutputStream();
-        } catch (IOException cause) {
-            if (temp != entry) {
-                try {
-                    temp.release();
-                } catch (IOException ex) {
-                    throw (IOException) ex.initCause(cause);
-                }
-            }
-            throw cause;
+        } catch (IOException ex) {
+            release(temp, ex);
+            throw ex;
         }
-    }
-
-    private static @Nullable FileTime toFileTime(long time) {
-        return UNKNOWN == time ? null : FileTime.fromMillis(time);
     }
 }
