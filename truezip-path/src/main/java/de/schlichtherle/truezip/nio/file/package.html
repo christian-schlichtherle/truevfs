@@ -46,7 +46,7 @@
         <pre><code>
     Path path = new TPath(new URI("http://acme.com/download/everything.tar.gz/README.TXT"));
     try (InputStream in = Files.newInputStream(path)) {
-        // Read the file contents here.
+        // Read archive entry contents here.
         ...
     }
         </code></pre>
