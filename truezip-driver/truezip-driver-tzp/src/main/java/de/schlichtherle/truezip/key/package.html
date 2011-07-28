@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (C) 2005-2011 Schlichtherle IT Services
+  -
+  - Licensed under the Apache License, Version 2.0 (the "License");
+  - you may not use this file except in compliance with the License.
+  - You may obtain a copy of the License at
+  -
+  -     http://www.apache.org/licenses/LICENSE-2.0
+  -
+  - Unless required by applicable law or agreed to in writing, software
+  - distributed under the License is distributed on an "AS IS" BASIS,
+  - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  - See the License for the specific language governing permissions and
+  - limitations under the License.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head><title>Package Summary</title></head>
+    <body>
+        <p>Provides an extensible manager for generic keys required to
+            create or open protected resources.
+            Its primary objective is to decouple...
+        </p>
+        <ul>
+            <li>
+                the process to retrieve keys required to open or create
+                protected resources from...
+            </li>
+            <li>
+                the process to use and verify these keys.
+            </li>
+        </ul>
+        <p>The process to retrieve keys is executed by the (abstract) classes
+            and interfaces in this package.</p>
+        <p>The process to use and optionally authenticate keys is executed by
+            the users of this package - called <i>client applications</i> or
+            <i>clients</i> for short.</p>
+        <p>A protected resource can be anything which can be referenced by a
+            {@link java.net.URI}: As an example, it could be a URL to an AES
+            encrypted file which the client application is going to create or
+            overwrite.
+            The key could be a password or a key file entered or selected by
+            the user.</p>
+    </body>
+</html>
