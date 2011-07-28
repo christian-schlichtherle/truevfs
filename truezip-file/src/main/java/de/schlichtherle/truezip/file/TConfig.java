@@ -91,14 +91,14 @@ class MyApplication extends TApplication<IOException> {
 TFile file1 = new TFile("file.aff");
 assert !file1.isArchive();
 
-// Push a new current configuration on the inheritable thread local stack.
+// First, push a new current configuration on the inheritable thread local stack.
 TConfig config = TConfig.push();
 try {
     // Configure custom application file format "aff".
     config.setArchiveDetector(new TArchiveDetector("aff",
             new JarDriver(IOPoolLocator.SINGLETON)));
 
-    // Use the current configuration.
+    // Now use the current configuration.
     TFile file2 = new TFile("file.aff");
     assert file2.isArchive();
     // Do some I/O here.
@@ -114,13 +114,13 @@ try {
 TFile file1 = new TFile("file.aff");
 assert !file1.isArchive();
 
-// Push a new current configuration on the inheritable thread local stack.
+// First, push a new current configuration on the inheritable thread local stack.
 try (TConfig config = TConfig.push()) {
     // Configure custom application file format "aff".
     config.setArchiveDetector(new TArchiveDetector("aff",
             new JarDriver(IOPoolLocator.SINGLETON)));
 
-    // Use the current configuration.
+    // Now use the current configuration.
     TFile file2 = new TFile("file.aff");
     assert file2.isArchive();
     // Do some I/O here.
@@ -156,7 +156,7 @@ try (TConfig config = TConfig.push()) {
  * <pre>{@code
 TFile file = new TFile("archive.zip/entry");
 
-// Push a new current configuration on the inheritable thread local stack.
+// First, push a new current configuration on the inheritable thread local stack.
 TConfig config = TConfig.push();
 try {
     // Set FsOutputOption.GROW for appending-to rather than updating
@@ -164,8 +164,8 @@ try {
     config.setOutputPreferences(
             config.getOutputPreferences.set(FsOutputOption.GROW));
 
-    // Use the current configuration and append the entry to the archive file
-    // even if it's already present.
+    // Now use the current configuration and append the entry to the archive
+    // file even if it's already present.
     TFileOutputStream out = new TFileOutputStream(file);
     try {
         // Do some output here.
