@@ -154,13 +154,14 @@ try (TConfig config = TConfig.push()) {
  * You can set this preference in the global configuration as shown above or
  * you can set it on a case-by-case basis as follows:
  * <pre>{@code
+// We are going to append "entry" to "archive.zip".
 TFile file = new TFile("archive.zip/entry");
 
 // First, push a new current configuration on the inheritable thread local stack.
 TConfig config = TConfig.push();
 try {
-    // Set FsOutputOption.GROW for appending-to rather than updating
-    // archive files.
+    // Set FsOutputOption.GROW for appending-to rather than updating archive
+    // files.
     config.setOutputPreferences(
             config.getOutputPreferences.set(FsOutputOption.GROW));
 
