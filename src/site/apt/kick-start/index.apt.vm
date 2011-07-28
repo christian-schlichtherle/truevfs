@@ -8,16 +8,16 @@ Kick-Starting TrueZIP
 
     This section shows how to kick-start a TrueZIP application by generating
     it from a Maven archetype.
-    Each client API module features its own Maven archetype:
+    Each client API features its own Maven archetype:
 
-    * The TrueZIP File* module features an archetype with the following Maven
+    * The TrueZIP File* API features an archetype with the following Maven
       coordinates:
 
     Group Id: <<de.schlichtherle.truezip>>\
     Artifact Id: <<truezip-archetype-file>>\
     Version: <<${project.version}>>
     
-    * The TrueZIP Path module features an archetype with the following Maven
+    * The TrueZIP Path API features an archetype with the following Maven
       coordinates:
 
     Group Id: <<de.schlichtherle.truezip>>\
@@ -27,9 +27,9 @@ Kick-Starting TrueZIP
     []
 
     The following guides are written with the archetype for the TrueZIP File*
-    module in mind.
+    API in mind.
     However, they work the same way with the archetype for the TrueZIP Path
-    module - you just need to use the appropriate Maven coordinates from the
+    API - you just need to use the appropriate Maven coordinates from the
     above list:
 
     [[1]] Kick-Starting TrueZIP applications from a Maven archetype in...
