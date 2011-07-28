@@ -1608,7 +1608,7 @@ public abstract class TPathTestSuite extends TestBase {
 
         final TConfig config = TConfig.push();
         try {
-            config.setOutputPreferences(BitField.of(CREATE_PARENTS, STORE, GROW));
+            config.setOutputPreferences(config.getOutputPreferences().set(GROW));
 
             assertGrow(entry1);
             assertGrow(entry2);
@@ -1621,11 +1621,17 @@ public abstract class TPathTestSuite extends TestBase {
             assertGrow(entry1);
             assertGrow(entry2);
 
+            // FIXME: http://java.net/jira/browse/TRUEZIP-144
+            /*delete(entry1);
+            delete(entry2);*/
+
             TFileSystemProvider.umount();
             assertTrue(size(path) > 6 * data.length); // six entries plus two central directories
         } finally {
             config.close();
         }
+
+        //assertThat(listFiles(archive).length, is(0));
     }
 
     private void assertGrow(final TPath entry) throws IOException {
