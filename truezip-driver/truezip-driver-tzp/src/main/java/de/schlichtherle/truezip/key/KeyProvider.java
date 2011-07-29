@@ -18,28 +18,31 @@ package de.schlichtherle.truezip.key;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import net.jcip.annotations.ThreadSafe;
 
 /**
- * Manages the life cycle of a generic secret key for the encryption and
- * decryption of protected resources.
+ * Manages the life cycle of a generic secret key for reading and writing
+ * protected resources.
  * A key provider is usually (but not necessarily) associated to one or more
  * protected resources by a {@link KeyManager}.
- * Note that neither the protected resources nor their encryption/decryption
- * operations are modelled by this interface.
  * <p>
- * Clients are assumed to use this interface for the following purposes:
+ * Clients typically use the secret key for the encryption and authentication
+ * of protected resources.
+ * However, neither the protected resources nor their encryption or
+ * authentication operations are modelled by this interface.
+ * Instead, clients are assumed to use it for the following purposes:
  * <ol>
- * <li>The method {@link #getWriteKey} retrieves the secret key for encrypting
- *     a protected resource.
- *     This implies that the secret key does not need to get authenticated.
- * <li>The method {@link #getReadKey} retrieves the secret key for decrypting
- *     a protected resource.
- *     This implies that the secret key needs to get authenticated by the
- *     component which actually performs the decryption.
- * <li>The method {@link #setKey} sets the secret key.
+ * <li>The method {@link #getWriteKey} returns the secret key for writing a
+ *     protected resource.
+ *     This implies that the secret key does not need to get verified by the
+ *     client.
+ * <li>The method {@link #getReadKey} returns the secret key for reading a
+ *     protected resource.
+ *     This implies that the secret key needs to get verified by the client.
+ * <li>The method {@link #setKey} sets the secret key programmatically.
  *     This can be used after a call to {@link #getReadKey} in order to update
- *     some properties of the secret key after it has been authenticated by
- *     the component which actually performs the decryption.
+ *     some properties of the secret key after it has been verified by the
+ *     client.
  * </ol>
  * The methods of this interface may get executed in arbitrary order.
  * Calling the same method subsequently is guaranteed to return a key which at
@@ -47,25 +50,25 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * <p>
  * Following are some typical use cases:
  * <ol>
- * <li>A new protected resource needs to be created.
+ * <li>A new protected resource needs to get created.
  *     In this case, {@link #getWriteKey} needs to get called.
- * <li>The contents of an already existing protected resource need to be
+ * <li>The contents of an already existing protected resource need to get
  *     completely replaced.
- *     Hence there is no need to retrieve and authenticate the secret key.
+ *     Hence there is no need to retrieve and verify the secret key.
  *     Again, {@link #getWriteKey} needs to get called.
  * <li>The contents of an already existing protected resource need to be
  *     read, but not changed.
- *     This implies that the secret key needs to be retrieved and authenticated.
+ *     This implies that the secret key needs to get retrieved and verified.
  *     In this case, just {@link #getReadKey} needs to get called.
- * <li>The contents of an already existing protected resource need to be
+ * <li>The contents of an already existing protected resource need to get
  *     read and then only partially updated with new contents.
- *     This implies that the secret key needs to be retrieved and authenticated.
+ *     This implies that the secret key needs to get retrieved and verified.
  *     Because the contents are only partially updated, changing the secret key
  *     is not possible.
  *     Again, just {@link #getReadKey} needs to get called.
- * <li>The contents of an already existing protected resource need to be
+ * <li>The contents of an already existing protected resource need to get
  *     read and then entirely replaced with new contents.
- *     This implies that the secret key needs to be retrieved and authenticated
+ *     This implies that the secret key needs to get retrieved and verified
  *     before it may optionally get replaced (at the provider's discretion)
  *     with a different secret key.
  *     In this case, first {@link #getReadKey} and then {@link #getWriteKey}
@@ -75,8 +78,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * provider implementation whether or not {@link #getWriteKey} returns a secret
  * key which compares {@link Object#equals equal} to the secret key returned by
  * {@link #getReadKey} or returns a completely different secret key.
- * Ideally, a brave provider implementation would allow the user to control
- * this.
+ * Typically, a provider implementation enables the user to control this.
  * <p>
  * Implementations must be safe for multi-threading.
  *
@@ -85,17 +87,19 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 @DefaultAnnotation(NonNull.class)
 public interface KeyProvider<K> {
 
     /**
-     * Retrieves the secret key for the encryption of a protected resource.
-     * <p>
-     * Subsequent calls to this method return an object which at least compares
-     * {@link Object#equals equal} to any previously returned object, but is
-     * not necessarily the same.
+     * Returns the secret key for writing a protected resource.
+     * This implies that the secret key does not need to get verified by the
+     * client.
      *
-     * @return the secret key.
+     * @return the secret key for writing a protected resource.
+     *         Subsequent calls to this method return a secret key which at
+     *         least compares {@link Object#equals equal} to this secret key,
+     *         but is not necessarily the same.
      * @throws UnknownKeyException if the secret key is unknown for some
      *         reason, e.g. if prompting for the secret key has been disabled
      *         or cancelled by the user.
@@ -103,30 +107,27 @@ public interface KeyProvider<K> {
     K getWriteKey() throws UnknownKeyException;
 
     /**
-     * Retrieves the secret key for the decryption of a protected resource.
+     * Returns the secret key for reading a protected resource.
+     * This implies that the secret key needs to get verified by the client.
      * This method is expected to be called consecutively until either the
-     * returned key has been authenticated by another component which actually
+     * returned key has been verified by another component which actually
      * performs the decryption or an exception is thrown.
      * <p>
-     * Unless {@code invalid} is {@code true}, subsequent calls to this method
-     * return an object which at least compares {@link Object#equals equal} to
-     * any previously returned object, but is not necessarily the same.
-     * <p>
-     * <b>Important:</b> From an application's perspective, a
-     * {@code KeyProvider} is not trustworthy!
-     * Hence, the key returned by this method must not only get authenticated,
-     * but the application should also throttle the pace for the return from a
+     * <b>Important:</b> From a {@code KeyProvider} perspective, a client is
+     * not trustworthy!
+     * Hence, the implementation should throttle the pace for the return from a
      * subsequent call to this method if the key is invalid in order to protect
-     * the client application from an exhaustive search for the correct key.
+     * against an exhaustive search for the correct key.
      * As a rule of thumb, at least three seconds should pass between two
      * consecutive calls to this method by the same thread.
-     * "Safe" implementations of this interface should enforce this
-     * behaviour in order to protect client applications which do not obey
-     * these considerations against abuses of the key provider implementation.
      *
      * @param  invalid {@code true} iff a previous call to this method resulted
      *         in an invalid key.
-     * @return the secret key.
+     * @return the secret key for reading a protected resource.
+     *         Unless {@code invalid} is {@code true}, subsequent calls to this
+     *         method return a secret key which at least compares
+     *         {@link Object#equals equal} to this secret key, but is not
+     *         necessarily the same.
      * @throws UnknownKeyException if the secret key is unknown for some
      *         reason, e.g. if prompting for the secret key has been disabled
      *         or cancelled by the user.
@@ -135,6 +136,12 @@ public interface KeyProvider<K> {
 
     /**
      * Sets the secret key programmatically.
+     * This can be used after a call to {@link #getReadKey} in order to update
+     * some properties of the secret key after it has been verified by the
+     * client.
+     * <p>
+     * Implementations should make a protective copy of the given key in order
+     * to protect against subsequent modifications by the client.
      *
      * @param key the secret key.
      *        If this is {@code null}, this key provider is set to a state
