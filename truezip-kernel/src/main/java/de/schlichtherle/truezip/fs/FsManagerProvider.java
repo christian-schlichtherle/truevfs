@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
@@ -22,9 +23,10 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * <p>
  * Implementations must be thread-safe.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public interface FsManagerProvider {
 
     /**
@@ -36,5 +38,5 @@ public interface FsManagerProvider {
      *
      * @return The file system manager.
      */
-    @NonNull FsManager get();
+    FsManager get();
 }
