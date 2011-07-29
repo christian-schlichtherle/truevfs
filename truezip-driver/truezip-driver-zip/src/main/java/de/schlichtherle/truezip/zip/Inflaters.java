@@ -48,7 +48,7 @@ final class Inflaters {
     private Inflaters() {
     }
 
-    static Inflater fetch() {
+    static Inflater allocate() {
         Inflater inflater = null;
 
         synchronized (released) {

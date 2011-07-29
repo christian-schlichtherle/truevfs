@@ -327,8 +327,7 @@ implements Iterable<E> {
      * Equivalent to
      * {@link #putNextEntry(ZipEntry, boolean) putNextEntry(entry, true)}.
      */
-    public final void putNextEntry(final E entry)
-    throws IOException {
+    public final void putNextEntry(final E entry) throws IOException {
         putNextEntry(entry, true);
     }
 
@@ -343,13 +342,13 @@ implements Iterable<E> {
      * java.util.zip.ZipOutputStream} which would throw a {@link ZipException}
      * in this method when the second entry with the same name is to be written.
      *
-     * @param entry The ZIP entry to write.
-     * @param deflate Whether or not the entry data should be deflated.
-     *        This should be set to {@code false} if and only if you are
-     *        writing data which has been read from a ZIP file and has not
-     *        been inflated again.
-     *        The entries' properties CRC, compressed size and uncompressed
-     *        size must be set appropriately.
+     * @param  entry The ZIP entry to write.
+     * @param  deflate Whether or not the entry data should get deflated.
+     *         This should be set to {@code false} if and only if you are
+     *         writing data which has been read from a ZIP file and has not
+     *         been inflated again.
+     *         The entries' properties CRC, compressed size and uncompressed
+     *         size must be set appropriately.
      * @throws ZipException If and only if writing the entry is impossible
      *         because the resulting file would not comply to the ZIP file
      *         format specification.
