@@ -28,7 +28,6 @@ import org.bouncycastle.crypto.Mac;
 
 /**
  * A read only file for transparent random read access to an encrypted file.
- * <p>
  * The client must call {@link #init(SeekableBlockCipher, long, long)}
  * before it can actually read anything!
  * <p>
@@ -38,7 +37,8 @@ import org.bouncycastle.crypto.Mac;
  * you should synchronize their file pointers using the pattern as described
  * in the base class {@link DecoratingReadOnlyFile}.
  *
- * @author Christian Schlichtherle
+ * @see     CipherOutputStream
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 //

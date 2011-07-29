@@ -111,14 +111,14 @@ class Type0RaesOutputStream extends RaesOutputStream {
             passwd[i] = 0;
 
         gen.init(pass, salt, ITERATION_COUNT);
-        // Order is important here, because paramGen does not properly
-        // reset the digest object!
+        // Order is important here, because gen does not properly reset the
+        // digest object!
         final ParametersWithIV
                 cipherParam = (ParametersWithIV) gen.generateDerivedParameters(
                     keyStrengthBits, AES_BLOCK_SIZE);
         final CipherParameters
                 macParam = gen.generateDerivedMacParameters(keyStrengthBits);
-        for (int i = pass.length; --i >= 0; ) // nullify password buffer
+        for (int i = pass.length; --i >= 0; ) // wipe password buffer
             pass[i] = 0;
 
         // Init cipher.

@@ -27,8 +27,7 @@ import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 
 /**
- * Similar to {@code javax.crypto.CipherOutputStream},
- * with some exceptions:
+ * Similar to {@code javax.crypto.CipherOutputStream} with some exceptions:
  * <ul>
  * <li>This implementation is based on Bouncy Castle's lightweight crypto API
  *     and uses a {@link BufferedBlockCipher} for ciphering.
@@ -42,7 +41,8 @@ import org.bouncycastle.crypto.InvalidCipherTextException;
  *     information about the ciphered data (e.g. a MAC).
  * </ul>
  *
- * @author Christian Schlichtherle
+ * @see     CipherReadOnlyFile
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
