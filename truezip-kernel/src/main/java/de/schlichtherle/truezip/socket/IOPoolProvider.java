@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.socket;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
@@ -25,6 +26,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public interface IOPoolProvider {
 
     /**
@@ -35,5 +37,5 @@ public interface IOPoolProvider {
      *
      * @return An I/O pool.
      */
-    @NonNull IOPool<?> get();
+    IOPool<?> get();
 }

@@ -36,7 +36,7 @@ import java.util.Set;
  *     ...;
  * </code></pre>
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)

@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Map;
 
@@ -26,6 +27,7 @@ import java.util.Map;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public interface FsDriverProvider {
 
     /**
@@ -36,5 +38,5 @@ public interface FsDriverProvider {
      *
      * @return An immutable map of file system schemes to drivers.
      */
-    @NonNull Map<FsScheme, FsDriver> get();
+    Map<FsScheme, FsDriver> get();
 }
