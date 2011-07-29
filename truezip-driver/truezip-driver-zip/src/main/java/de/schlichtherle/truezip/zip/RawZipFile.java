@@ -115,7 +115,7 @@ implements Iterable<E>, Closeable {
     /** The nullable data source. */
     private @CheckForNull ReadOnlyFile archive;
 
-    /** The number of fetch streams reading from this ZIP file. */
+    /** The number of allocate streams reading from this ZIP file. */
     private int openStreams;
 
     /**
@@ -675,7 +675,7 @@ implements Iterable<E>, Closeable {
      * streams returned by this method are closed, too.
      *
      * @param name The name of the entry to get the stream for.
-     * @param check Whether or not the entry's CRC-32 value is checked.
+     * @param check Whether or not the entry's CRC-32 value gets checked.
      *        If and only if this parameter is true, two additional checks are
      *        performed for the ZIP entry:
      *        <ol>
@@ -802,7 +802,7 @@ implements Iterable<E>, Closeable {
         private boolean closed;
 
         PooledInflaterInputStream(InputStream in, int size) {
-            super(in, Inflaters.fetch(), size);
+            super(in, Inflaters.allocate(), size);
         }
 
         @Override
@@ -819,8 +819,8 @@ implements Iterable<E>, Closeable {
     } // PooledInflaterInputStream
 
     /**
-     * extends its super class to perform the check again the expected CRC
-     * from the entry provided to its constructor when close() is called.
+     * Compares the actual CRC to the expected CRC in the close() method and
+     * throws a CRC32Exception on a mismatch.
      */
     private static final class CheckedInputStream
     extends java.util.zip.CheckedInputStream {
@@ -876,8 +876,8 @@ implements Iterable<E>, Closeable {
     }
 
     /**
-     * A stream which reads and returns deflated data from its input
-     * while a CRC-32 checksum is computed over the inflated data and
+     * A stream which reads and returns <em>deflated</em> data from its input
+     * while a CRC-32 checksum is computed over the <em>inflated</em> data and
      * checked in the method {@code close}.
      */
     private static final class RawCheckedInputStream
@@ -895,7 +895,7 @@ implements Iterable<E>, Closeable {
                 final ZipEntry entry,
                 final int size) {
             super(in);
-            this.inf = Inflaters.fetch();
+            this.inf = Inflaters.allocate();
             this.infBuf = new byte[size];
             this.entry = entry;
         }
@@ -993,7 +993,7 @@ implements Iterable<E>, Closeable {
 
     /**
      * Closes the file.
-     * This closes any fetch input streams reading from this ZIP file.
+     * This closes any allocate input streams reading from this ZIP file.
      *
      * @throws IOException if an error occurs closing the file.
      */
