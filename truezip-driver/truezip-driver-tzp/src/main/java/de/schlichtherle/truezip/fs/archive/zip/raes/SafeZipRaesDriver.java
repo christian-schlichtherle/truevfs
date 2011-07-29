@@ -64,7 +64,7 @@ public class SafeZipRaesDriver extends ZipRaesDriver {
      * The default trigger for authentication in bytes ({@value}).
      * Input archive files smaller than or equal to this size get verified
      * using the RAES Message Authentication Code (MAC) before they are
-     * accessed.
+     * decrypted.
      */
     private static final long AUTHENTICATION_TRIGGER = 512 * 1024;
 
