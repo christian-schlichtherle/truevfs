@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.crypto;
 
-import de.schlichtherle.truezip.crypto.SeekableBlockCipher;
 import org.bouncycastle.crypto.BlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.DataLengthException;
