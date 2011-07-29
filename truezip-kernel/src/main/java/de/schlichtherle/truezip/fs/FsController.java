@@ -51,7 +51,7 @@ import javax.swing.Icon;
  * system controllers to be thread-safe.
  *
  * @param   <M> The type of the file system model.
- * @see FsManager
+ * @see     FsManager
  * @author  Christian Schlichtherle
  * @version $Id$
  */
