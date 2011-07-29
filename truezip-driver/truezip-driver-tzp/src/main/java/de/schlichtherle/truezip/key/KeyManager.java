@@ -21,12 +21,11 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import java.net.URI;
 
 /**
- * A container for key providers for the encryption and decryption of protected
- * resources.
+ * A container for key providers for reading and writing protected resources.
  * <p>
  * Implementations must be safe for multi-threading.
  *
- * @param   <K> The type of the keys.
+ * @param   <K> The type of the secret keys.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
