@@ -900,8 +900,7 @@ implements Iterable<E>, Closeable {
             this.entry = entry;
         }
 
-        void ensureOpen()
-        throws IOException {
+        void assertOpen() throws IOException {
             if (closed)
                 throw new IOException("Input stream has been closed!");
         }
@@ -921,7 +920,7 @@ implements Iterable<E>, Closeable {
             if (len == 0)
                 return 0; // be fault-tolerant and compatible to FileInputStream
             // Check state.
-            ensureOpen();
+            assertOpen();
             // Check parameters.
             if (buf == null)
                 throw new NullPointerException();
