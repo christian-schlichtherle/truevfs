@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.key;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.ServiceConfigurationError;
 
@@ -26,6 +27,7 @@ import java.util.ServiceConfigurationError;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public interface KeyManagerProvider {
 
     /**
@@ -39,5 +41,5 @@ public interface KeyManagerProvider {
      * @throws ServiceConfigurationError if no appropriate key manager is
      *         available.
      */
-    @NonNull <K> KeyManager<K> get(@NonNull Class<K> type);
+    <K> KeyManager<K> get(Class<K> type);
 }
