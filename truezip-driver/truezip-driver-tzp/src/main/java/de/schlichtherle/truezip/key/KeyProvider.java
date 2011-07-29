@@ -33,14 +33,14 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * <ol>
  * <li>The method {@link #getWriteKey} returns the secret key for writing a
  *     protected resource.
- *     This implies that the secret key does not need to get verified by the
+ *     This implies that the secret key does not need to get validated by the
  *     client.
  * <li>The method {@link #getReadKey} returns the secret key for reading a
  *     protected resource.
- *     This implies that the secret key needs to get verified by the client.
+ *     This implies that the secret key needs to get validated by the client.
  * <li>The method {@link #setKey} sets the secret key programmatically.
- *     This can be used after a call to {@link #getReadKey} in order to update
- *     some properties of the secret key after it has been verified by the
+ *     This can get used after a call to {@link #getReadKey} in order to update
+ *     some properties of the secret key after it has been validated by the
  *     client.
  * </ol>
  * The methods of this interface may get executed in arbitrary order.
@@ -53,21 +53,21 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  *     In this case, {@link #getWriteKey} needs to get called.
  * <li>The contents of an already existing protected resource need to get
  *     completely replaced.
- *     Hence there is no need to retrieve and verify the secret key.
+ *     Hence there is no need to retrieve and validate the secret key.
  *     Again, {@link #getWriteKey} needs to get called.
  * <li>The contents of an already existing protected resource need to be
  *     read, but not changed.
- *     This implies that the secret key needs to get retrieved and verified.
+ *     This implies that the secret key needs to get retrieved and validated.
  *     In this case, just {@link #getReadKey} needs to get called.
  * <li>The contents of an already existing protected resource need to get
  *     read and then only partially updated with new contents.
- *     This implies that the secret key needs to get retrieved and verified.
+ *     This implies that the secret key needs to get retrieved and validated.
  *     Because the contents are only partially updated, changing the secret key
  *     is not possible.
  *     Again, just {@link #getReadKey} needs to get called.
  * <li>The contents of an already existing protected resource need to get
  *     read and then entirely replaced with new contents.
- *     This implies that the secret key needs to get retrieved and verified
+ *     This implies that the secret key needs to get retrieved and validated
  *     before it may optionally get replaced (at the provider's discretion)
  *     with a different secret key.
  *     In this case, first {@link #getReadKey} and then {@link #getWriteKey}
@@ -91,7 +91,7 @@ public interface KeyProvider<K> {
 
     /**
      * Returns the secret key for writing a protected resource.
-     * This implies that the secret key does not need to get verified by the
+     * This implies that the secret key does not need to get validated by the
      * client.
      *
      * @return the secret key for writing a protected resource.
@@ -106,9 +106,9 @@ public interface KeyProvider<K> {
 
     /**
      * Returns the secret key for reading a protected resource.
-     * This implies that the secret key needs to get verified by the client.
+     * This implies that the secret key needs to get validated by the client.
      * This method is expected to be called consecutively until either the
-     * returned key has been verified by another component which actually
+     * returned key has been validated by another component which actually
      * performs the decryption or an exception is thrown.
      * <p>
      * <b>Important:</b> From a {@code KeyProvider} perspective, a client is
@@ -134,8 +134,8 @@ public interface KeyProvider<K> {
 
     /**
      * Sets the secret key programmatically.
-     * This can be used after a call to {@link #getReadKey} in order to update
-     * some properties of the secret key after it has been verified by the
+     * This can get used after a call to {@link #getReadKey} in order to update
+     * some properties of the secret key after it has been validated by the
      * client.
      * <p>
      * Implementations should make a protective copy of the given key in order
