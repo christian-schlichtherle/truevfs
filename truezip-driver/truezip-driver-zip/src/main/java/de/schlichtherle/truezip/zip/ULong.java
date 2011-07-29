@@ -16,15 +16,20 @@
 
 package de.schlichtherle.truezip.zip;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import net.jcip.annotations.ThreadSafe;
+
 /**
  * Provides constants and static utility methods for unsigned long integer
  * values ({@value SIZE} bits).
- * <p>
- * This class is safe for multithreading.
  * 
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
+@DefaultAnnotation(NonNull.class)
 final class ULong {
 
     /**
@@ -65,17 +70,17 @@ final class ULong {
      */
     public static void check(
             final long l,
-            final String subject,
-            final String error) {
+            final @CheckForNull String subject,
+            final @CheckForNull String error) {
         if (MIN_VALUE <= l)
             return;
 
         final StringBuilder message = new StringBuilder();
-        if (subject != null) {
+        if (null != subject) {
             message.append(subject);
             message.append(": ");
         }
-        if (error != null) {
+        if (null != error) {
             message.append(error);
             message.append(": ");
         }
