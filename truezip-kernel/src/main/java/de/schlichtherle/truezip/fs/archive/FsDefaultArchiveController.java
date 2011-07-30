@@ -197,11 +197,11 @@ extends FsFileSystemArchiveController<E> {
                     throw new FsFalsePositiveException(getModel(), ex2);
                 }
                 if (null != parentEntry && !parentEntry.isType(SPECIAL))
-                    throw new FsPermanentFalsePositiveException(getModel(), ex);
+                    throw new FsCacheableFalsePositiveException(getModel(), ex);
                 throw new FsFalsePositiveException(getModel(), ex);
             }
             if (null != parent.getEntry(parentName))
-                throw new FsPermanentFalsePositiveException(getModel(), ex);
+                throw new FsCacheableFalsePositiveException(getModel(), ex);
             // The entry does NOT exist in the parent archive
             // file, but we may create it automatically.
             // This may fail if the container file is an RAES encrypted ZIP
