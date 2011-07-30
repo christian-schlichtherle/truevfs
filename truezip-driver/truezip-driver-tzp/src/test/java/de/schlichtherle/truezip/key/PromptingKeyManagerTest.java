@@ -26,7 +26,8 @@ import static org.junit.Assert.*;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class PromptingKeyManagerTest extends KeyManagerTestSuite {
+public class PromptingKeyManagerTest
+extends KeyManagerTestSuite<PromptingKeyManager<?>> {
 
     @Override
     protected PromptingKeyManager<?> newKeyManager() {
@@ -36,7 +37,6 @@ public class PromptingKeyManagerTest extends KeyManagerTestSuite {
 
     @Test
     public void testGetPromptingKeyProvider() {
-        PromptingKeyManager<?> manager = newKeyManager();
         URI id = URI.create("a");
 
         PromptingKeyProvider<?> prov = manager.getKeyProvider(id);
@@ -45,7 +45,6 @@ public class PromptingKeyManagerTest extends KeyManagerTestSuite {
 
     @Test
     public void testMovePromptingKeyProvider() {
-        PromptingKeyManager<?> manager = newKeyManager();
         URI idA = URI.create("a");
         URI idB = URI.create("b");
 
@@ -58,7 +57,6 @@ public class PromptingKeyManagerTest extends KeyManagerTestSuite {
 
     @Test
     public void testRemovePromptingKeyProvider() {
-        PromptingKeyManager<?> manager = newKeyManager();
         URI id = URI.create("a");
 
         PromptingKeyProvider<?> prov = manager.getKeyProvider(id);

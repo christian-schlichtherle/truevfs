@@ -55,7 +55,7 @@ public final class RaesTest extends ReadOnlyFileTestSuite {
                 Streams.copy(in, out);
                 logger.log(Level.FINE,
                         "Encrypted {0} bytes of random data using AES-{1}/CTR/Hmac-SHA-256/PBKDFv2.",
-                        new Object[]{ plainFile.length(), 128 + 64 * out.getKeyStrength().ordinal() });
+                        new Object[]{ plainFile.length(), out.getKeyStrength().getBits() });
                 // Open cipherFile for random access decryption.
             } catch (IOException ex) {
                 final File cipherFile = this.cipherFile;

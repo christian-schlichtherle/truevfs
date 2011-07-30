@@ -13,24 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.key;
 
-import net.jcip.annotations.ThreadSafe;
+package de.schlichtherle.truezip.key.pbe.swing;
+
+import java.security.GeneralSecurityException;
 
 /**
- * Thrown to indicate that the retrieval of the key to open or create a
- * protected resource has been cancelled.
- * This is normally caused by user input, for example if the user has closed
- * the prompting dialog.
+ * Thrown to indicate that a password or key file is considered weak.
  *
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  * @version $Id$
  */
-@ThreadSafe
-public class KeyPromptingCancelledException extends CacheableUnknownKeyException {
-    private static final long serialVersionUID = 7645927619378423566L;
-    
-    public KeyPromptingCancelledException() {
-        super("Key prompting has been cancelled!");
+public class WeakKeyException extends GeneralSecurityException {
+    private static final long serialVersionUID = 2946387652018652745L;
+
+    /**
+     * Creates a new {@code WeakKeyException} with the given localized message.
+     */
+    public WeakKeyException(String localizedMessage) {
+        super(localizedMessage);
     }
 }

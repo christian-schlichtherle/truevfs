@@ -59,7 +59,7 @@ public final class MockType0RaesParameters implements Type0RaesParameters {
     @Override
     public KeyStrength getKeyStrength() {
         keyStrength = keyStrengths[rnd.nextInt(keyStrengths.length)];
-        logger.log(Level.FINE, "Using {0} bits cipher key.", 128 + 64 * keyStrength.ordinal());
+        logger.log(Level.FINE, "Using {0} bits cipher key.", keyStrength.getBits());
         return keyStrength;
     }
 

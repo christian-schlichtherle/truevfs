@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.crypto.raes;
 
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import java.util.ResourceBundle;
 
 /**
  * The parameters of this interface are used with RAES <i>type 0</i> files.
@@ -74,15 +75,35 @@ public interface Type0RaesParameters extends RaesParameters {
      */
     void setKeyStrength(KeyStrength keyStrength);
 
-    /** Defines the key strength for the AES algorithm. */
-    enum KeyStrength {
-        /** Enum identifier for a 128 bit ciphering key. */
+    public enum KeyStrength
+    implements de.schlichtherle.truezip.crypto.KeyStrength {
+        /** Enum identifier for a 128 bit AES cipher key. */
         BITS_128,
 
-        /** Enum identifier for a 192 bit ciphering key. */
+        /** Enum identifier for a 192 bit AES cipher key. */
         BITS_192,
 
-        /** Enum identifier for a 256 bit ciphering key. */
-        BITS_256,
+        /** Enum identifier for a 256 bit AES cipher key. */
+        BITS_256;
+
+        private static final ResourceBundle resources
+                = ResourceBundle.getBundle(KeyStrength.class.getName());
+
+        /** Returns the key strength in bytes. */
+        @Override
+        public int getBytes() {
+            return 16 + 8 * ordinal();
+        }
+
+        /** Returns the key strength in bits. */
+        @Override
+        public int getBits() {
+            return 8 * getBytes();
+        }
+
+        @Override
+        public String toString() {
+            return resources.getString(name());
+        }
     }
 }

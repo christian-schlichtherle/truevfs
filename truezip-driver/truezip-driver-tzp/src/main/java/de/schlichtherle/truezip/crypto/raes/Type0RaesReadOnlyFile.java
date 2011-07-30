@@ -15,8 +15,9 @@
  */
 package de.schlichtherle.truezip.crypto.raes;
 
-import de.schlichtherle.truezip.crypto.SeekableBlockCipher;
 import de.schlichtherle.truezip.crypto.SICSeekableBlockCipher;
+import de.schlichtherle.truezip.crypto.SeekableBlockCipher;
+import static de.schlichtherle.truezip.crypto.raes.RaesConstants.*;
 import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.util.ArrayHelper;
@@ -28,15 +29,13 @@ import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.Mac;
 import org.bouncycastle.crypto.PBEParametersGenerator;
+import static org.bouncycastle.crypto.PBEParametersGenerator.PKCS12PasswordToBytes;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.engines.AESFastEngine;
 import org.bouncycastle.crypto.generators.PKCS12ParametersGenerator;
 import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
-
-import static de.schlichtherle.truezip.crypto.raes.RaesConstants.*;
-import static org.bouncycastle.crypto.PBEParametersGenerator.PKCS12PasswordToBytes;
 
 /**
  * Reads a type 0 RAES file.

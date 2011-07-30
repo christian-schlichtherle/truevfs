@@ -49,6 +49,8 @@ extends SafeKeyProvider<K> {
 
     private volatile boolean changeRequested;
 
+    private volatile @CheckForNull CacheableUnknownKeyException exception;
+
     PromptingKeyProvider(final PromptingKeyManager<K> manager) {
         assert null != manager;
         this.manager = manager;
@@ -131,6 +133,15 @@ extends SafeKeyProvider<K> {
         this.changeRequested = changeRequested;
     }
 
+    private @CheckForNull CacheableUnknownKeyException getException() {
+        return exception;
+    }
+
+    private void setException(
+            final @CheckForNull CacheableUnknownKeyException exception) {
+        this.exception = exception;
+    }
+
     /**
      * Resets the state of this key provider, its current key and the value of
      * its {@code changeRequested} property
@@ -150,8 +161,9 @@ extends SafeKeyProvider<K> {
     }
 
     private void reset() {
-        setChangeRequested(false);
         setKey0(null);
+        setChangeRequested(false);
+        setException(null);
         setState(State.RESET);
     }
 
@@ -194,9 +206,8 @@ extends SafeKeyProvider<K> {
                         } finally {
                             controller.close();
                         }
-                    } catch (KeyPromptingCancelledException ex) {
-                        provider.setState(CANCELLED);
-                        throw ex;
+                    } catch (CacheableUnknownKeyException ex) {
+                        setException(provider, ex);
                     }
                     state = provider.getState();
                 } while (state == this);
@@ -241,14 +252,14 @@ extends SafeKeyProvider<K> {
             <K extends SafeKey<K>> void
             retrieveWriteKey(PromptingKeyProvider<K> provider)
             throws UnknownKeyException {
-                throw new KeyPromptingCancelledException();
+                throw getException(provider);
             }
 
             @Override
             <K extends SafeKey<K>> void
             retrieveReadKey(PromptingKeyProvider<K> provider, boolean invalid)
             throws UnknownKeyException {
-                throw new KeyPromptingCancelledException();
+                throw getException(provider);
             }
 
             @Override
@@ -289,6 +300,20 @@ extends SafeKeyProvider<K> {
         getResource(PromptingKeyProvider<K> provider) {
             return provider.getResource();
         }
+
+        final <K extends SafeKey<K>> CacheableUnknownKeyException
+        getException(PromptingKeyProvider<K> provider) {
+            CacheableUnknownKeyException ex = provider.getException();
+            if (null == ex)
+                provider.setException(ex = new KeyPromptingCancelledException());
+            return ex;
+        }
+        
+        final <K extends SafeKey<K>> void
+        setException(PromptingKeyProvider<K> provider, CacheableUnknownKeyException ex) {
+            provider.setException(ex);
+            provider.setState(CANCELLED);
+        }
     } // State
 
     /**
@@ -304,7 +329,6 @@ extends SafeKeyProvider<K> {
      * Implementations of this interface <em>must</em> be thread safe
      * and should have no side effects!
      */
-    @ThreadSafe
     @DefaultAnnotation(NonNull.class)
     public interface View<K extends SafeKey<K>> {
 

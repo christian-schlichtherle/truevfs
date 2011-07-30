@@ -13,24 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.key;
+package de.schlichtherle.truezip.key.pbe.swing;
 
-import net.jcip.annotations.ThreadSafe;
+import java.awt.Toolkit;
+import javax.swing.JPanel;
 
 /**
- * Thrown to indicate that the retrieval of the key to open or create a
- * protected resource has been cancelled.
- * This is normally caused by user input, for example if the user has closed
- * the prompting dialog.
+ * Provides run by beeping using the default toolkit.
  *
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  * @version $Id$
  */
-@ThreadSafe
-public class KeyPromptingCancelledException extends CacheableUnknownKeyException {
-    private static final long serialVersionUID = 7645927619378423566L;
-    
-    public KeyPromptingCancelledException() {
-        super("Key prompting has been cancelled!");
+public class BasicFeedback implements Feedback {
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The implementation in this class simply beeps using the default toolkit.
+     */
+    @Override
+    public void run(JPanel panel) {
+        Toolkit.getDefaultToolkit().beep();
     }
 }

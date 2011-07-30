@@ -19,6 +19,7 @@ import de.schlichtherle.truezip.crypto.raes.RaesKeyException;
 import de.schlichtherle.truezip.crypto.raes.RaesParameters;
 import de.schlichtherle.truezip.crypto.raes.RaesParametersProvider;
 import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters;
+import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
 import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.key.KeyManagerProvider;
 import de.schlichtherle.truezip.key.KeyProvider;
@@ -91,8 +92,8 @@ public final class KeyManagerRaesParameters implements RaesParametersProvider {
                     provider = manager.getKeyProvider(resource);
             try {
                 return (param = provider.getWriteKey()).getPassword();
-            } catch (UnknownKeyException failure) {
-                throw new RaesKeyException(failure);
+            } catch (UnknownKeyException ex) {
+                throw new RaesKeyException(ex);
             }
         }
 
@@ -102,8 +103,8 @@ public final class KeyManagerRaesParameters implements RaesParametersProvider {
                     provider = manager.getKeyProvider(resource);
             try {
                 return (param = provider.getReadKey(invalid)).getPassword();
-            } catch (UnknownKeyException failure) {
-                throw new RaesKeyException(failure);
+            } catch (UnknownKeyException ex) {
+                throw new RaesKeyException(ex);
             }
         }
 

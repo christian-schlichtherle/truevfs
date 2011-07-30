@@ -25,103 +25,103 @@ import static org.junit.Assert.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class KeyManagerTestSuite {
-    private KeyManager<?> instance;
+public abstract class KeyManagerTestSuite<M extends KeyManager<?>> {
+    protected M manager;
 
     @Before
     public void setUp() {
-        instance = newKeyManager();
+        manager = newKeyManager();
     }
 
-    protected abstract KeyManager<?> newKeyManager();
+    protected abstract M newKeyManager();
 
     @Test
-    public final void testGetKeyProvider() {
+    public void testGetKeyProvider() {
         URI id = URI.create("a");
 
         try {
-            instance.getKeyProvider(null);
+            manager.getKeyProvider(null);
             fail("A NullPointerException is expected from the previous call!");
         } catch (NullPointerException expected) {
         }
 
-        KeyProvider<?> prov1 = instance.getKeyProvider(id);
+        KeyProvider<?> prov1 = manager.getKeyProvider(id);
         assertNotNull(prov1);
 
-        KeyProvider<?> prov2 = instance.getKeyProvider(id);
+        KeyProvider<?> prov2 = manager.getKeyProvider(id);
         assertSame(prov1, prov2);
     }
 
     @Test
-    public final void testMoveKeyProvider() {
+    public void testMoveKeyProvider() {
         URI idA = URI.create("a");
         URI idB = URI.create("b");
 
         try {
-            instance.moveKeyProvider(null, null);
+            manager.moveKeyProvider(null, null);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            instance.moveKeyProvider(idA, null);
+            manager.moveKeyProvider(idA, null);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            instance.moveKeyProvider(null, idB);
+            manager.moveKeyProvider(null, idB);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            instance.moveKeyProvider(idA, idB);
+            manager.moveKeyProvider(idA, idB);
             fail();
         } catch (IllegalArgumentException expected) {
             // no provider mapped yet
         }
 
-        KeyProvider<?> provA1 = instance.getKeyProvider(idA);
+        KeyProvider<?> provA1 = manager.getKeyProvider(idA);
         assertNotNull(provA1);
 
-        assertNull(instance.moveKeyProvider(idA, idB));
+        assertNull(manager.moveKeyProvider(idA, idB));
 
-        KeyProvider<?> provA2 = instance.getKeyProvider(idA);
+        KeyProvider<?> provA2 = manager.getKeyProvider(idA);
         assertNotNull(provA2);
         assertFalse(provA1.equals(provA2));
 
-        KeyProvider<?> provB1 = instance.getKeyProvider(idB);
+        KeyProvider<?> provB1 = manager.getKeyProvider(idB);
         assertNotNull(provB1);
         assertSame(provA1, provB1);
     }
 
     @Test
-    public final void testRemoveKeyProvider() {
+    public void testRemoveKeyProvider() {
         URI id = URI.create("a");
 
         try {
-            instance.removeKeyProvider(id);
+            manager.removeKeyProvider(id);
             fail();
         } catch (IllegalArgumentException expected) {
             // no provider mapped yet
         }
 
-        KeyProvider<?> prov1 = instance.getKeyProvider(id);
-        assertNotNull(instance.removeKeyProvider(id));
+        KeyProvider<?> prov1 = manager.getKeyProvider(id);
+        assertNotNull(manager.removeKeyProvider(id));
 
         try {
-            instance.removeKeyProvider(id);
+            manager.removeKeyProvider(id);
             fail();
         } catch (IllegalArgumentException expected) {
             // no provider mapped any more
         }
 
-        KeyProvider<?> prov2 = instance.getKeyProvider(id);
-        assertNotNull(instance.removeKeyProvider(id));
+        KeyProvider<?> prov2 = manager.getKeyProvider(id);
+        assertNotNull(manager.removeKeyProvider(id));
 
         try {
-            instance.removeKeyProvider(id);
+            manager.removeKeyProvider(id);
             fail();
         } catch (IllegalArgumentException expected) {
             // no provider mapped any more
