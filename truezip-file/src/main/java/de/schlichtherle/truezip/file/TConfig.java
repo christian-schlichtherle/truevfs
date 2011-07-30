@@ -245,13 +245,13 @@ public final class TConfig implements Closeable {
     /**
      * The mask of allowed {@link #setOutputPreferences output preferences},
      * which is
-     * <code>{@link BitField}.of({@link FsOutputOption#CACHE}, {@link FsOutputOption#CREATE_PARENTS}, {@link FsOutputOption#COMPRESS}, {@link FsOutputOption#STORE}, {@link FsOutputOption#GROW})</code>.
+     * <code>{@link BitField}.of({@link FsOutputOption#CACHE}, {@link FsOutputOption#CREATE_PARENTS}, {@link FsOutputOption#COMPRESS}, {@link FsOutputOption#STORE}, {@link FsOutputOption#GROW}, {@link FsOutputOption#ENCRYPT})</code>.
      * 
      * @since TrueZIP 7.3
      */
     public static final BitField<FsOutputOption>
             OUTPUT_PREFERENCES_MASK = BitField
-                .of(FsOutputOption.CACHE, CREATE_PARENTS, COMPRESS, STORE, GROW);
+                .of(FsOutputOption.CACHE, CREATE_PARENTS, COMPRESS, STORE, GROW, ENCRYPT);
 
     private static final BitField<FsOutputOption>
             OUTPUT_PREFERENCES_COMPLEMENT_MASK = OUTPUT_PREFERENCES_MASK.not();
@@ -399,7 +399,7 @@ public final class TConfig implements Closeable {
      * file {@code outer.zip} get automatically created when using operations
      * to create the innermost element of the path {@code c}.
      * <p>
-     * This allows applications to succeed with doing this:
+     * This enables applications to succeed with doing this:
      * {@code new TFile("a/outer.zip/b/inner.zip/c").createNewFile()},
      * or that:
      * {@code new TFileOutputStream("a/outer.zip/b/inner.zip/c")}.

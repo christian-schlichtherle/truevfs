@@ -104,4 +104,17 @@ public enum FsOutputOption {
      * @since TrueZIP 7.3
      */
     GROW,
+
+    /**
+     * <em>Ignorable:</em>
+     * Expresses a preference to encrypt archive entries when writing them to
+     * an archive file.
+     * <p>
+     * This option may get ignored by archive file system drivers.
+     * Furthermore, if this happens, there may be no direct feedback available
+     * to the caller.
+     * 
+     * @since TrueZIP 7.3
+     */
+    ENCRYPT,
 }
