@@ -41,8 +41,8 @@ interface ZipConstants {
      * Note that it's impossible to inhibit ZIP64 extensions if they are
      * required.
      */
-    boolean FORCE_ZIP64_EXT
-            = Boolean.getBoolean("de.schlichtherle.truezip.zip.forceZip64Ext");
+    boolean FORCE_ZIP64_EXT = Boolean.getBoolean(
+            ZipConstants.class.getPackage().getName() + ".forceZip64Ext");
 
     /** Local File Header signature. */
     int LFH_SIG = 0x04034B50;
