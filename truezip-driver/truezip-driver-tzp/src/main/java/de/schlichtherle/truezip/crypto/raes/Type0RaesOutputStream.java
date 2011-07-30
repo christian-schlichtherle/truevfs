@@ -15,11 +15,12 @@
  */
 package de.schlichtherle.truezip.crypto.raes;
 
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import de.schlichtherle.truezip.crypto.SICSeekableBlockCipher;
+import static de.schlichtherle.truezip.crypto.raes.RaesConstants.*;
 import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
 import de.schlichtherle.truezip.io.LEDataOutputStream;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.SecureRandom;
@@ -36,8 +37,6 @@ import org.bouncycastle.crypto.io.MacOutputStream;
 import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
-
-import static de.schlichtherle.truezip.crypto.raes.RaesConstants.*;
 
 /**
  * Writes a type 0 RAES file.
@@ -93,8 +92,8 @@ class Type0RaesOutputStream extends RaesOutputStream {
 
         keyStrength = param.getKeyStrength();
         final int keyStrengthOrdinal = keyStrength.ordinal();
-        final int keyStrengthBytes = 16 + 8 * keyStrengthOrdinal; // key strength in bytes: 16, 24 or 32
-        final int keyStrengthBits = 8 * keyStrengthBytes;
+        final int keyStrengthBytes = keyStrength.getBytes();
+        final int keyStrengthBits = keyStrength.getBits();
 
         // Init digest for key generation and KLAC.
         final Digest digest = new SHA256Digest();

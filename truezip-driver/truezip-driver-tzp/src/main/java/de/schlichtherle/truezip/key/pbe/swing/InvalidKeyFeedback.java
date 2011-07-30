@@ -13,30 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.key;
-
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
-import net.jcip.annotations.NotThreadSafe;
+package de.schlichtherle.truezip.key.pbe.swing;
 
 /**
- * A safe secret key for the encryption and decryption of protected resources.
- * <p>
- * Implementations of this interface do not need to be thread-safe.
+ * Provides visual and/or audible feedback to the user when prompting
+ * for a key again after an invalid key has been provided before.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-@NotThreadSafe
-@DefaultAnnotation(NonNull.class)
-public interface SafeKey<K> extends Cloneable {
-
-    /** Returns a deep clone of this safe key. */
-    @NonNull K clone();
-
-    /**
-     * Wipes any key data from the heap and resets this safe key to it's
-     * initial state.
-     */
-    void reset();
+@SuppressWarnings("MarkerInterface")
+public interface InvalidKeyFeedback extends Feedback {
 }

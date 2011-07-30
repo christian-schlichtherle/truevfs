@@ -15,10 +15,17 @@
  */
 package de.schlichtherle.truezip.key;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import net.jcip.annotations.NotThreadSafe;
+
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
+@DefaultAnnotation(NonNull.class)
 final class DummyKey implements SafeKey<DummyKey>, Cloneable {
 
     private static volatile int count;
@@ -41,7 +48,7 @@ final class DummyKey implements SafeKey<DummyKey>, Cloneable {
     }
 
     @Override
-    public boolean equals(Object that) {
+    public boolean equals(@CheckForNull Object that) {
         return that instanceof DummyKey && this.key == ((DummyKey) that).key;
     }
 

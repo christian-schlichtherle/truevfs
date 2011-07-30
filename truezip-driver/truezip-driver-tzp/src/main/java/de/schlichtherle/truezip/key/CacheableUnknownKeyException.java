@@ -19,23 +19,20 @@ import net.jcip.annotations.ThreadSafe;
 
 /**
  * Thrown to indicate that the retrieval of the key to open or create a
- * protected resource has been disabled.
- * This is normally caused by the client application, but will also happen
- * if the JVM is running in headless mode.
+ * protected resource has failed and that this exception is cacheable.
+ * The subclass provides more information.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
-public class KeyPromptingDisabledException extends CacheableUnknownKeyException  {
-    private static final long serialVersionUID = 7656348649239172586L;
+public class CacheableUnknownKeyException extends UnknownKeyException {
+    private static final long serialVersionUID = 2463586348235337265L;
 
-    public KeyPromptingDisabledException() {
-        super("Key prompting has been disabled!");
+    CacheableUnknownKeyException() {
     }
 
-    public KeyPromptingDisabledException(Throwable cause) {
-        super("Key prompting has been disabled!");
-        super.initCause(cause);
+    CacheableUnknownKeyException(String message) {
+        super(message);
     }
 }
