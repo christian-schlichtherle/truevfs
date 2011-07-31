@@ -28,7 +28,7 @@ import static org.hamcrest.CoreMatchers.*;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class HttpDriverProviderTest {
+public final class HttpDriverServiceTest {
 
     public static final String DRIVER_LIST = "http|https";
 
