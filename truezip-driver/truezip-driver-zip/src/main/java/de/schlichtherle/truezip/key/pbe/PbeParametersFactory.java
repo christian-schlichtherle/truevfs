@@ -13,27 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.crypto.raes.param.console;
+package de.schlichtherle.truezip.key.pbe;
 
-import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
-import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
-import de.schlichtherle.truezip.key.pbe.console.PbeParametersView;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * A console based user interface to prompt for passwords.
+ * An abstract view for {@link PbeParameters}.
  * 
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-public final class AesCipherParametersView
-extends PbeParametersView<KeyStrength, AesCipherParameters> {
-    @Override
-    public AesCipherParameters newPbeParameters() {
-        return new AesCipherParameters();
-    }
+public interface PbeParametersFactory<P extends PbeParameters<?, ?>> {
+
+    /**
+     * Returns new parameters for password based encryption.
+     * 
+     * @return New parameters for password based encryption.
+     */
+    P newPbeParameters();
 }

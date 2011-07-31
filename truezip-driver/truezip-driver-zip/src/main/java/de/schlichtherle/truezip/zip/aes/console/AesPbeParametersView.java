@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.crypto.raes.param.console;
+package de.schlichtherle.truezip.zip.aes.console;
 
-import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
-import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
+import de.schlichtherle.truezip.key.pbe.AesKeyStrength;
+import de.schlichtherle.truezip.key.pbe.AesPbeParameters;
 import de.schlichtherle.truezip.key.pbe.console.PbeParametersView;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -30,10 +30,10 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-public final class AesCipherParametersView
-extends PbeParametersView<KeyStrength, AesCipherParameters> {
+public final class AesPbeParametersView
+extends PbeParametersView<AesKeyStrength, AesPbeParameters> {
     @Override
-    public AesCipherParameters newPbeParameters() {
-        return new AesCipherParameters();
+    public AesPbeParameters newPbeParameters() {
+        return new AesPbeParameters();
     }
 }

@@ -37,16 +37,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk16</artifactId>
-            <version>1.46</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truezip-swing</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truezip-driver-zip</artifactId>
             <version>${project.version}</version>
@@ -75,10 +65,6 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>truezip-path</artifactId>
             <type>test-jar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.netbeans</groupId>
-            <artifactId>jemmy</artifactId>
         </dependency>
     </dependencies>
 

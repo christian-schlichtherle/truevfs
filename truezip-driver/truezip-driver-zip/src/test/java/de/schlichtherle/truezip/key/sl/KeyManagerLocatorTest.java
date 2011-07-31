@@ -13,30 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.fs.archive.zip.raes;
+package de.schlichtherle.truezip.key.sl;
 
-import de.schlichtherle.truezip.key.spi.KeyManagerService;
-import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
+import de.schlichtherle.truezip.key.KeyManagerProvider;
+import de.schlichtherle.truezip.key.pbe.AesPbeParameters;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class PromptingKeyManagerServiceTest {
+public final class KeyManagerLocatorTest {
 
-    private KeyManagerService instance;
+    private KeyManagerProvider instance;
     
     @Before
     public void setUp() {
-        instance = new PromptingKeyManagerService();
+        instance = KeyManagerLocator.SINGLETON;
     }
 
     @Test
-    public void testGet() {
-        assertNotNull(instance.get(AesCipherParameters.class));
+    public void testGetManager() {
+        //assertNotNull(instance.get(Object.class));
+        assertNotNull(instance.get(AesPbeParameters.class));
     }
 }
