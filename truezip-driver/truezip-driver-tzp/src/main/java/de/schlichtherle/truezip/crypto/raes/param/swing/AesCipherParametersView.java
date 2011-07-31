@@ -33,7 +33,7 @@ import net.jcip.annotations.ThreadSafe;
 public final class AesCipherParametersView
 extends PbeParametersView<KeyStrength, AesCipherParameters> {
     @Override
-    protected AesCipherParameters newPbeParameters() {
+    public AesCipherParameters newPbeParameters() {
         return new AesCipherParameters();
     }
 }

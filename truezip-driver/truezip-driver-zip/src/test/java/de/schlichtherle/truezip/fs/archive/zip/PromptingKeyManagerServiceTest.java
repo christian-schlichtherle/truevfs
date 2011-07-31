@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.fs.archive.zip.raes;
+package de.schlichtherle.truezip.fs.archive.zip;
 
+import de.schlichtherle.truezip.key.pbe.AesPbeParameters;
 import de.schlichtherle.truezip.key.spi.KeyManagerService;
-import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -37,6 +37,6 @@ public final class PromptingKeyManagerServiceTest {
 
     @Test
     public void testGet() {
-        assertNotNull(instance.get(AesCipherParameters.class));
+        assertNotNull(instance.get(AesPbeParameters.class));
     }
 }
