@@ -26,7 +26,10 @@ import java.io.Console;
 import java.io.PrintWriter;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -119,14 +122,18 @@ implements View<P> {
 
             con.printf(resources.getString("keyStrength.banner"));
             final String selection;
+            final Map<Integer, S> map;
             {
-                final PrintWriter writer = con.writer();
                 final StringBuilder builder = new StringBuilder();
-                for (final S strength : param.getAvailableKeyStrengths()) {
-                    writer.println(strength);
+                final Set<S> set = param.getAvailableKeyStrengths();
+                map = new HashMap<Integer, S>(set.size() / 3 * 4 + 1);
+                final PrintWriter writer = con.writer();
+                for (final S strength : set) {
                     if (0 < builder.length())
                         builder.append('/');
                     builder.append(strength.getBits());
+                    map.put(strength.getBits(), strength);
+                    writer.println(strength);
                 }
                 selection = builder.toString();
             }
@@ -140,11 +147,11 @@ implements View<P> {
                     return;
                 try {
                     final int bits = Integer.parseInt(keyStrength);
-                    for (final S strength : param.getAvailableKeyStrengths()) {
-                        if (strength.getBits() == bits) {
-                            param.setKeyStrength(strength);
-                            break prompting;
-                        }
+                    final S strength = map.get(bits);
+                    if (null != strength) {
+                        assert strength.getBits() == bits;
+                        param.setKeyStrength(strength);
+                        break prompting;
                     }
                 } catch (NumberFormatException syntaxError) {
                 }

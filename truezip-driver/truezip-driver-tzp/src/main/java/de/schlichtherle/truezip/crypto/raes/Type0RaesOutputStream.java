@@ -90,10 +90,11 @@ class Type0RaesOutputStream extends RaesOutputStream {
         if (null == passwd)
             throw new RaesKeyException();
 
-        keyStrength = param.getKeyStrength();
+        final KeyStrength keyStrength = param.getKeyStrength();
         final int keyStrengthOrdinal = keyStrength.ordinal();
         final int keyStrengthBytes = keyStrength.getBytes();
         final int keyStrengthBits = keyStrength.getBits();
+        this.keyStrength = keyStrength;
 
         // Init digest for key generation and KLAC.
         final Digest digest = new SHA256Digest();

@@ -25,13 +25,15 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
- * A panel which allows the user to select the key strength for the AES cipher.
+ * A panel which allows the user to select the key strength for a cipher.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 @DefaultAnnotation(NonNull.class)
 public class KeyStrengthPanel<S extends KeyStrength> extends EnhancedPanel {
     private static final long serialVersionUID = 5629581723148235643L;
@@ -41,20 +43,18 @@ public class KeyStrengthPanel<S extends KeyStrength> extends EnhancedPanel {
 
     private final List<S> availableKeyStrengths;
 
-    /** Constructs a new AES key strength panel. */
+    /**
+     * Constructs a new panel using a protective copy of the given set of
+     * available key strengths.
+     */
     public KeyStrengthPanel(final Set<S> availableKeyStrenghts) {
         this.availableKeyStrengths = new ArrayList<S>(availableKeyStrenghts);
         initComponents();
     }
 
-    private ComboBoxModel<String> newModel() {
-        String[] texts = new String[availableKeyStrengths.size()];
-        {
-            int i = 0;
-            for (S strength : availableKeyStrengths)
-                texts[i++] = strength.toString();
-        }
-        return new DefaultComboBoxModel<String>(texts);
+    @SuppressWarnings("unchecked")
+    private ComboBoxModel newModel() {
+        return new DefaultComboBoxModel(availableKeyStrengths.toArray());
     }
 
     /** This method is called from within the constructor to
@@ -104,19 +104,22 @@ public class KeyStrengthPanel<S extends KeyStrength> extends EnhancedPanel {
      *
      * @return The value of the property {@code keyStrength}.
      */
+    @SuppressWarnings("unchecked")
     public S getKeyStrength() {
-        return availableKeyStrengths.get(keyStrength.getSelectedIndex());
+        return (S) keyStrength.getSelectedItem();
     }
-    
+
     /**
      * Sets the value of the property {@code keyStrength}.
      *
      * @param keyStrength the new value of the property {@code keyStrength}.
      */
     public void setKeyStrength(final S keyStrength) {
-        this.keyStrength.setSelectedIndex(keyStrength.ordinal());
+        if (null == keyStrength)
+            throw new NullPointerException();
+        this.keyStrength.setSelectedItem(keyStrength);
     }
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private final javax.swing.JComboBox keyStrength = new javax.swing.JComboBox();
     // End of variables declaration//GEN-END:variables

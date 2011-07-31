@@ -83,10 +83,10 @@ class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
 
         // Check key size and iteration count
         final int keyStrengthOrdinal = readUByte(header, 5);
-        final int keyStrengthBytes = 16 + 8 * keyStrengthOrdinal; // key strength in bytes: 16, 24 or 32
-        final int keyStrengthBits = 8 * keyStrengthBytes;
+        final KeyStrength keyStrength;
         try {
             keyStrength = KeyStrength.values()[keyStrengthOrdinal];
+            assert keyStrength.ordinal() == keyStrengthOrdinal;
         } catch (ArrayIndexOutOfBoundsException ex) {
             throw new RaesException(
                     "Unknown index for cipher key strength: "
@@ -94,6 +94,9 @@ class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
                     + "!",
                     ex);
         }
+        final int keyStrengthBytes = keyStrength.getBytes();
+        final int keyStrengthBits = keyStrength.getBits();
+        this.keyStrength = keyStrength;
 
         final int iCount = readUShort(header, 6);
         if (1024 > iCount)
