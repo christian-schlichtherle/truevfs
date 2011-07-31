@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.fs.file;
+package de.schlichtherle.truezip.fs.nio.file;
 
 import de.schlichtherle.truezip.socket.spi.IOPoolService;
 import org.junit.Before;
@@ -25,7 +25,7 @@ import static org.junit.Assert.*;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class TempFilePoolProviderTest {
+public final class TempFilePoolServiceTest {
 
     private IOPoolService instance;
     

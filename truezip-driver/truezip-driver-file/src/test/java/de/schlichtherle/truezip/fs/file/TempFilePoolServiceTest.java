@@ -13,44 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.fs.nio.file;
+package de.schlichtherle.truezip.fs.file;
 
-import de.schlichtherle.truezip.fs.FsScheme;
-import de.schlichtherle.truezip.fs.spi.FsDriverService;
-import de.schlichtherle.truezip.util.SuffixSet;
+import de.schlichtherle.truezip.socket.spi.IOPoolService;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
-import static org.hamcrest.CoreMatchers.*;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class FileDriverProviderTest {
+public final class TempFilePoolServiceTest {
 
-    public static final String DRIVER_LIST = "file";
-
-    private FsDriverService instance;
-
+    private IOPoolService instance;
+    
     @Before
     public void setUp() {
-        instance = new FileDriverService();
+        instance = new TempFilePoolService();
     }
 
     @Test
     public void testGet() {
-        for (String scheme : new SuffixSet(DRIVER_LIST))
-            assertThat(instance.get().get(FsScheme.create(scheme)), notNullValue());
-    }
-
-    @Test
-    public void testImmutability() {
-        try {
-            instance.get().remove(FsScheme.create("file"));
-            fail("put");
-        } catch (UnsupportedOperationException ex) {
-        }
+        assertSame(instance.get(), TempFilePool.INSTANCE);
     }
 }
