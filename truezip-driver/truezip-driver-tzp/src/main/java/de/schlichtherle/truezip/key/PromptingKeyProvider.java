@@ -220,7 +220,7 @@ extends SafeKeyProvider<K> {
             }
         },
 
-        PROVIDED {
+        SET {
             @Override
             <K extends SafeKey<K>> void
             retrieveWriteKey(PromptingKeyProvider<K> provider)
@@ -288,7 +288,7 @@ extends SafeKeyProvider<K> {
         final <K extends SafeKey<K>> void
         setKey(PromptingKeyProvider<K> provider, @CheckForNull K key) {
             provider.setKey0(key);
-            provider.setState(null != key ? State.PROVIDED : State.CANCELLED);
+            provider.setState(null != key ? State.SET : State.CANCELLED);
         }
 
         <K extends SafeKey<K>> void
