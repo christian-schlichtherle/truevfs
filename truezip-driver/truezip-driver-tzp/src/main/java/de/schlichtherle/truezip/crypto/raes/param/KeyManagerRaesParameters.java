@@ -37,7 +37,7 @@ import java.net.URI;
  * support other encryption and authentication schemes in future versions
  * without requiring to change the client code.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)

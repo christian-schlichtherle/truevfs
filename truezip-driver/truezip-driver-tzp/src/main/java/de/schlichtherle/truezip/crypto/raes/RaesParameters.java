@@ -23,8 +23,8 @@ package de.schlichtherle.truezip.crypto.raes;
  * Hence, for each RAES type a separate parameter interface is used
  * which extends this marker interface.
  * 
- * @see Type0RaesParameters
- * @author Christian Schlichtherle
+ * @see     Type0RaesParameters
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public interface RaesParameters {

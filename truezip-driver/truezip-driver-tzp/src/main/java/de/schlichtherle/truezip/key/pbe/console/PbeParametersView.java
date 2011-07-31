@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.key.pbe.console;
 
-import de.schlichtherle.truezip.crypto.KeyStrength;
+import de.schlichtherle.truezip.key.pbe.KeyStrength;
 import de.schlichtherle.truezip.key.KeyPromptingDisabledException;
 import de.schlichtherle.truezip.key.pbe.PbeParameters;
 import de.schlichtherle.truezip.key.PromptingKeyProvider.Controller;
@@ -29,7 +29,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.Set;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -92,31 +91,31 @@ implements View<P> {
                 param = newPbeParameters();
 
             while (true) {
-                char[] newPasswd1 = con.readPassword(
+                char[] input1 = con.readPassword(
                         resources.getString("writeKey.newPasswd1"));
-                if (null == newPasswd1 || 0 >= newPasswd1.length)
+                if (null == input1 || 0 >= input1.length)
                     return;
                 try {
-                    char[] newPasswd2 = con.readPassword(
+                    char[] input2 = con.readPassword(
                             resources.getString("writeKey.newPasswd2"));
-                    if (newPasswd2 == null)
+                    if (input2 == null)
                         return;
                     try {
-                        if (!Arrays.equals(newPasswd1, newPasswd2)) {
+                        if (!Arrays.equals(input1, input2)) {
                             con.printf(resources.getString("writeKey.passwd.noMatch"));
                             continue;
                         }
-                        if (newPasswd1.length < MIN_PASSWD_LEN) {
+                        if (input1.length < MIN_PASSWD_LEN) {
                             con.printf(resources.getString("writeKey.passwd.tooShort"));
                             continue;
                         }
-                        param.setPassword(newPasswd1);
+                        param.setPassword(input1);
                         break;
                     } finally {
-                        Arrays.fill(newPasswd2, (char) 0);
+                        Arrays.fill(input2, (char) 0);
                     }
                 }  finally {
-                    Arrays.fill(newPasswd1, (char) 0);
+                    Arrays.fill(input1, (char) 0);
                 }
             }
 
@@ -125,10 +124,10 @@ implements View<P> {
             final Map<Integer, S> map;
             {
                 final StringBuilder builder = new StringBuilder();
-                final Set<S> set = param.getAvailableKeyStrengths();
-                map = new HashMap<Integer, S>(set.size() / 3 * 4 + 1);
+                final S[] array = param.getKeyStrengthValues();
+                map = new HashMap<Integer, S>(array.length / 3 * 4 + 1);
                 final PrintWriter writer = con.writer();
-                for (final S strength : set) {
+                for (final S strength : array) {
                     if (0 < builder.length())
                         builder.append('/');
                     builder.append(strength.getBits());
@@ -139,21 +138,21 @@ implements View<P> {
             }
 
             prompting: while (true) {
-                String keyStrength = con.readLine(
+                String input = con.readLine(
                         resources.getString("keyStrength.prompt"),
                         selection,
                         param.getKeyStrength().getBits());
-                if (null == keyStrength || keyStrength.length() <= 0)
+                if (null == input || input.length() <= 0)
                     return;
                 try {
-                    final int bits = Integer.parseInt(keyStrength);
+                    final int bits = Integer.parseInt(input);
                     final S strength = map.get(bits);
                     if (null != strength) {
                         assert strength.getBits() == bits;
                         param.setKeyStrength(strength);
                         break prompting;
                     }
-                } catch (NumberFormatException syntaxError) {
+                } catch (NumberFormatException ex) {
                 }
             }
 

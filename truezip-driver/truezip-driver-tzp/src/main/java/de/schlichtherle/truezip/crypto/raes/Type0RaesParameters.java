@@ -18,6 +18,8 @@ package de.schlichtherle.truezip.crypto.raes;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.ResourceBundle;
+import net.jcip.annotations.NotThreadSafe;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * The parameters of this interface are used with RAES <i>type 0</i> files.
@@ -29,6 +31,7 @@ import java.util.ResourceBundle;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 @DefaultAnnotation(NonNull.class)
 public interface Type0RaesParameters extends RaesParameters {
 
@@ -75,8 +78,9 @@ public interface Type0RaesParameters extends RaesParameters {
      */
     void setKeyStrength(KeyStrength keyStrength);
 
+    @ThreadSafe
     public enum KeyStrength
-    implements de.schlichtherle.truezip.crypto.KeyStrength {
+    implements de.schlichtherle.truezip.key.pbe.KeyStrength {
         /** Enum identifier for a 128 bit AES cipher key. */
         BITS_128,
 

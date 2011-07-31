@@ -19,9 +19,6 @@ import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
 import de.schlichtherle.truezip.key.pbe.PbeParameters;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.Set;
 import net.jcip.annotations.NotThreadSafe;
 
 /**
@@ -34,9 +31,6 @@ import net.jcip.annotations.NotThreadSafe;
 @DefaultAnnotation(NonNull.class)
 public final class AesCipherParameters
 extends PbeParameters<KeyStrength, AesCipherParameters> {
-    private static final Set<KeyStrength>
-            AVAILABLE_KEY_STRENGTHS = Collections.unmodifiableSet(
-                EnumSet.allOf(KeyStrength.class));
 
     public AesCipherParameters() {
         reset();
@@ -49,7 +43,7 @@ extends PbeParameters<KeyStrength, AesCipherParameters> {
     }
 
     @Override
-    public Set<KeyStrength> getAvailableKeyStrengths() {
-        return AVAILABLE_KEY_STRENGTHS;
+    public KeyStrength[] getKeyStrengthValues() {
+        return KeyStrength.values();
     }
 }

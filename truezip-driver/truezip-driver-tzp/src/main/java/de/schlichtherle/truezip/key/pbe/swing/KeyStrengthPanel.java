@@ -15,14 +15,13 @@
  */
 package de.schlichtherle.truezip.key.pbe.swing;
 
-import de.schlichtherle.truezip.crypto.KeyStrength;
+import de.schlichtherle.truezip.key.pbe.KeyStrength;
 import de.schlichtherle.truezip.swing.EnhancedPanel;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.Vector;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import net.jcip.annotations.NotThreadSafe;
@@ -35,26 +34,26 @@ import net.jcip.annotations.NotThreadSafe;
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
+@SuppressWarnings("UseOfObsoleteCollectionType")
 public class KeyStrengthPanel<S extends KeyStrength> extends EnhancedPanel {
     private static final long serialVersionUID = 5629581723148235643L;
 
     private static final ResourceBundle resources
             = ResourceBundle.getBundle(KeyStrengthPanel.class.getName());
 
-    private final List<S> availableKeyStrengths;
+    private final S[] availableKeyStrengths;
 
     /**
-     * Constructs a new panel using a protective copy of the given set of
-     * available key strengths.
+     * Constructs a new panel using a protective copy of the given collection
+     * of available key strengths.
      */
-    public KeyStrengthPanel(final Set<S> availableKeyStrenghts) {
-        this.availableKeyStrengths = new ArrayList<S>(availableKeyStrenghts);
+    public KeyStrengthPanel(final S[] availableKeyStrenghts) {
+        this.availableKeyStrengths = availableKeyStrenghts.clone();
         initComponents();
     }
 
-    @SuppressWarnings("unchecked")
-    private ComboBoxModel newModel() {
-        return new DefaultComboBoxModel(availableKeyStrengths.toArray());
+    private ComboBoxModel<S> newModel() {
+        return new DefaultComboBoxModel<S>(availableKeyStrengths);
     }
 
     /** This method is called from within the constructor to

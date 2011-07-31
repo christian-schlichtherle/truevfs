@@ -71,7 +71,7 @@ public final class WriteKeyPanelTest extends KeyPanelTestSuite<WriteKeyPanel> {
     @Test
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testExtraDataUI() {
-        final JComponent ui = new KeyStrengthPanel<KeyStrength>(EnumSet.allOf(KeyStrength.class));
+        final JComponent ui = new KeyStrengthPanel<KeyStrength>(KeyStrength.values());
         panel.setExtraDataUI(ui);
         frame.pack();
         assertSame(ui, panel.getExtraDataUI());

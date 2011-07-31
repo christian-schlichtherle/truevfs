@@ -34,7 +34,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  *     explict control about the type of RAES file created.
  * </ol>
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public interface RaesParametersProvider extends RaesParameters {

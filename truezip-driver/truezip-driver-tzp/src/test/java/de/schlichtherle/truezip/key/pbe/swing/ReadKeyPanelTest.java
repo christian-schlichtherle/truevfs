@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.key.pbe.swing;
 
 import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
+import de.schlichtherle.truezip.key.pbe.PbeParameters;
 import static org.junit.Assert.*;
 import org.junit.Test;
 import org.netbeans.jemmy.operators.JCheckBoxOperator;
@@ -34,7 +35,7 @@ public final class ReadKeyPanelTest extends KeyPanelTestSuite<ReadKeyPanel> {
 
     @Test
     public void testPasswd() {
-        final AesCipherParameters param = new AesCipherParameters();
+        final PbeParameters<?, ?> param = new AesCipherParameters();
 
         // Check default.
         assertTrue(panel.updateParam(param));

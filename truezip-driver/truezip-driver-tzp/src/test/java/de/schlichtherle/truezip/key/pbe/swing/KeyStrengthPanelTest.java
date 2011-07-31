@@ -35,7 +35,7 @@ public final class KeyStrengthPanelTest extends JemmyUtils {
 
     @Before
     public void setUp() {
-        panel = new KeyStrengthPanel<KeyStrength>(EnumSet.allOf(KeyStrength.class));
+        panel = new KeyStrengthPanel<KeyStrength>(KeyStrength.values());
         frame = showInNewFrame(panel);
     }
 
