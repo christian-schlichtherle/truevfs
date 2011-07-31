@@ -33,7 +33,7 @@ public interface KeyStrength {
     int getBytes();
 
     /**
-     * Returns a localized informative string representing this key strength.
+     * Returns a localized display string representing this key strength.
      */
     @Override
     String toString();

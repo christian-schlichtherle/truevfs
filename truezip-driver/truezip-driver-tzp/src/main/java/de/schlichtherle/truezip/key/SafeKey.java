@@ -24,7 +24,7 @@ import net.jcip.annotations.NotThreadSafe;
  * <p>
  * Implementations of this interface do not need to be thread-safe.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @NotThreadSafe

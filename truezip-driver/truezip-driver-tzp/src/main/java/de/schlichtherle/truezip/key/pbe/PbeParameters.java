@@ -142,7 +142,7 @@ implements SafeKey<P>, Cloneable {
      * Returns a set of all available key strengths.
      * It is an error to modify the returned set.
      * 
-     * @return a set of all available key strengths.
+     * @return A set of all available key strengths.
      */
     public abstract Set<S> getAvailableKeyStrengths();
 }
