@@ -78,6 +78,7 @@ public interface Type0RaesParameters extends RaesParameters {
      */
     void setKeyStrength(KeyStrength keyStrength);
 
+    /** Enumerates the AES cipher key strenghts. */
     @ThreadSafe
     public enum KeyStrength
     implements de.schlichtherle.truezip.key.pbe.KeyStrength {
