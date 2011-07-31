@@ -41,7 +41,7 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
 /**
  * Writes a type 0 RAES file.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @NotThreadSafe

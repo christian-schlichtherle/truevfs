@@ -40,7 +40,7 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
 /**
  * Reads a type 0 RAES file.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @NotThreadSafe

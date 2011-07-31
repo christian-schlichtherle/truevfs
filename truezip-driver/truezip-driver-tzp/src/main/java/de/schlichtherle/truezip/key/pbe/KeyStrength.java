@@ -13,18 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.crypto;
+package de.schlichtherle.truezip.key.pbe;
+
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * Defines the key strengths for a cipher.
+ * <p>
+ * Implementations must be thread-safe!
  *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
+@DefaultAnnotation(NonNull.class)
 public interface KeyStrength {
-
-    /** Returns the index of the key strength. */
-    int ordinal();
 
     /** Returns the key strength in bits. */
     int getBits();
@@ -32,9 +37,7 @@ public interface KeyStrength {
     /** Returns the key strength in bytes. */
     int getBytes();
 
-    /**
-     * Returns a localized display string representing this key strength.
-     */
+    /** Returns a localized display string representing this key strength. */
     @Override
     String toString();
 }

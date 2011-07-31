@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.key.pbe.swing;
 
 import de.schlichtherle.truezip.awt.Windows;
-import de.schlichtherle.truezip.crypto.KeyStrength;
+import de.schlichtherle.truezip.key.pbe.KeyStrength;
 import de.schlichtherle.truezip.key.KeyPromptingInterruptedException;
 import de.schlichtherle.truezip.key.PromptingKeyProvider.Controller;
 import de.schlichtherle.truezip.key.PromptingKeyProvider.View;
@@ -43,7 +43,7 @@ import net.jcip.annotations.ThreadSafe;
 /**
  * A Swing based user interface to prompt for passwords or key files.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
@@ -159,7 +159,7 @@ implements View<P> {
             param = newPbeParameters();
 
         final KeyStrengthPanel<S> keyStrengthPanel = new KeyStrengthPanel<S>(
-                param.getAvailableKeyStrengths());
+                param.getKeyStrengthValues());
         keyStrengthPanel.setKeyStrength(param.getKeyStrength());
         final WriteKeyPanel keyPanel = new WriteKeyPanel();
         keyPanel.setExtraDataUI(keyStrengthPanel);

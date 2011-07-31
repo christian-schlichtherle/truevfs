@@ -15,14 +15,12 @@
  */
 package de.schlichtherle.truezip.key.pbe;
 
-import de.schlichtherle.truezip.crypto.KeyStrength;
 import de.schlichtherle.truezip.key.SafeKey;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Arrays;
-import java.util.Set;
 import net.jcip.annotations.NotThreadSafe;
 
 /**
@@ -139,10 +137,10 @@ implements SafeKey<P>, Cloneable {
     }
 
     /**
-     * Returns a set of all available key strengths.
-     * It is an error to modify the returned set.
+     * Returns a new non-empty array of all possible key strength values.
+     * There should be no duplicated elements in this array.
      * 
-     * @return A set of all available key strengths.
+     * @return A new non-empty array of all possible key strength values.
      */
-    public abstract Set<S> getAvailableKeyStrengths();
+    public abstract S[] getKeyStrengthValues();
 }
