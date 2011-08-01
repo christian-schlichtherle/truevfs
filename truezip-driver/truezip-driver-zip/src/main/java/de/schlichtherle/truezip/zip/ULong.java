@@ -36,7 +36,7 @@ final class ULong {
      * The minimum value of an unsigned long integer,
      * which is {@value MIN_VALUE}.
      */
-    public static final long MIN_VALUE = 0x0000000000000000L;
+    public static final long MIN_VALUE = 0;
 
     /**
      * The maximum value of an unsigned long integer,
