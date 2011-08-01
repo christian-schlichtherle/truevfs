@@ -29,8 +29,13 @@ public class RaesException extends IOException {
     private static final long serialVersionUID = 8564203786508562247L;
 
     /**
-     * Constructs an instance of {@code RaesException} with the specified
-     * detail message.
+     * Constructs a new RAES exception.
+     */
+    public RaesException() {
+    }
+
+    /**
+     * Constructs a new RAES exception with the specified detail message.
      *
      * @param msg The detail message.
      */
@@ -39,11 +44,11 @@ public class RaesException extends IOException {
     }
 
     /**
-     * Constructs an instance of {@code RaesException} with the specified
-     * detail message and cause.
+     * Constructs a new RAES exception with the specified detail message and
+     * cause.
      *
      * @param msg The detail message.
-     * @param cause The original cause for this exception to be thrown.
+     * @param cause The cause for this exception to be thrown.
      */
     public RaesException(String msg, Throwable cause) {
         super(msg);

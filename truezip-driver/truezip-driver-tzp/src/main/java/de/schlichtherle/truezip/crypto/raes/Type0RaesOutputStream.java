@@ -46,7 +46,7 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
-class Type0RaesOutputStream extends RaesOutputStream {
+final class Type0RaesOutputStream extends RaesOutputStream {
 
     private static final SecureRandom shaker = new SecureRandom();
 
@@ -87,8 +87,7 @@ class Type0RaesOutputStream extends RaesOutputStream {
 
         // Check parameters (fail fast).
         final char[] passwd = param.getWritePassword();
-        if (null == passwd)
-            throw new RaesKeyException();
+        assert null != passwd;
 
         final KeyStrength keyStrength = param.getKeyStrength();
         final int keyStrengthOrdinal = keyStrength.ordinal();
@@ -124,7 +123,7 @@ class Type0RaesOutputStream extends RaesOutputStream {
         // Init cipher.
         final BufferedBlockCipher
                 cipher = new BufferedBlockCipher(
-                    new SICSeekableBlockCipher(
+                    new SICSeekableBlockCipher( // or new SICBlockCipher(
                         new AESFastEngine()));
         cipher.init(true, cipherParam);
 
