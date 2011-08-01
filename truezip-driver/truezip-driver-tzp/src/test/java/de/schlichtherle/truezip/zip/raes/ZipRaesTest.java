@@ -31,9 +31,8 @@ import java.nio.charset.Charset;
 
 /**
  * Tests compression and encryption of data.
- * Subclasses must override {@link #setUp}.
  * 
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public final class ZipRaesTest extends ZipTestSuite {
