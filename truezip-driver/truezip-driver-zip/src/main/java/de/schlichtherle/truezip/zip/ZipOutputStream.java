@@ -69,6 +69,9 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
     /**
      * Constructs a ZIP output stream which decorates the given output stream
      * using the given charset.
+     *
+     * @throws UnsupportedCharsetException If {@code charset} is not supported
+     *         by this JVM.
      */
     public ZipOutputStream(OutputStream out, Charset charset) {
         super(out, charset);
@@ -76,13 +79,14 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
 
     /**
      * Constructs a ZIP output stream which decorates the given output stream
-     * and apppends to the given raw ZIP file.
-     * <p>
-     * In order to append entries to an existing ZIP file, {@code out} must be
-     * set up so that it appends to the same ZIP file from which
-     * {@code appendee} is reading.
-     * {@code appendee} may already be closed.
-     *
+     * and appends to the given ZIP file.
+     * 
+     * @param  out The output stream to write the ZIP file to.
+     *         If {@code appendee} is not {@code null}, then this must be set
+     *         up so that it appends to the same ZIP file from which
+     *         {@code appendee} is reading.
+     * @param  appendee the raw ZIP file to append to.
+     *         This may already be closed.
      */
     public ZipOutputStream(OutputStream out, ZipFile appendee) {
         super(out, appendee);
