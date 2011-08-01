@@ -45,7 +45,7 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
-class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
+final class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
 
     /**
      * The minimum delay between subsequent attempts to authenticate a key
@@ -137,8 +137,7 @@ class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
         long lastTry = 0; // don't enforce suspension on first prompt!
         for (boolean invalid = false; ; invalid = true) {
             final char[] passwd = param.getReadPassword(invalid);
-            if (null == passwd) // safety first!
-                throw new RaesKeyException();
+            assert null != passwd;
             final byte[] pass = PKCS12PasswordToBytes(passwd);
             for (int i = passwd.length; --i >= 0; ) // nullify password parameter
                 passwd[i] = 0;

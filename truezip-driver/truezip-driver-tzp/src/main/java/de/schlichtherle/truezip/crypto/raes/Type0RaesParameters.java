@@ -26,9 +26,9 @@ import net.jcip.annotations.ThreadSafe;
  * Type 0 RAES files use password based encryption according to the
  * specifications in PKCS #5 V2.0 und PKCS #12 V1.0.
  *
- * @see <a href="http://www.rsasecurity.com/rsalabs/pkcs/pkcs-5/index.html" target="_blank">PKCS #5</a>
- * @see <a href="http://www.rsasecurity.com/rsalabs/pkcs/pkcs-12/index.html" target="_blank">PKCS #12</a>
- * @author Christian Schlichtherle
+ * @see     <a href="http://www.rsasecurity.com/rsalabs/pkcs/pkcs-5/index.html" target="_blank">PKCS #5</a>
+ * @see     <a href="http://www.rsasecurity.com/rsalabs/pkcs/pkcs-12/index.html" target="_blank">PKCS #12</a>
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @NotThreadSafe
@@ -80,7 +80,7 @@ public interface Type0RaesParameters extends RaesParameters {
 
     /** Enumerates the AES cipher key strenghts. */
     @ThreadSafe
-    enum KeyStrength implements de.schlichtherle.truezip.key.pbe.KeyStrength {
+    enum KeyStrength implements de.schlichtherle.truezip.crypto.key.KeyStrength {
         /** Enum identifier for a 128 bit AES cipher key. */
         BITS_128,
 

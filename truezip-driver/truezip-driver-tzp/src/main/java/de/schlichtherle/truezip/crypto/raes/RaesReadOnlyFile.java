@@ -72,6 +72,10 @@ import net.jcip.annotations.NotThreadSafe;
 @DefaultAnnotation(NonNull.class)
 public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
 
+    RaesReadOnlyFile(@CheckForNull ReadOnlyFile rof) {
+        super(rof);
+    }
+
     static short readUByte(final byte[] b, final int off) {
         return (short) (b[off] & 0xff);
     }
@@ -122,9 +126,9 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
         final ReadOnlyFile rof = new DefaultReadOnlyFile(file);
         try {
             return getInstance(rof, params);
-        } catch (IOException failure) {
+        } catch (IOException ex) {
             rof.close();
-            throw failure;
+            throw ex;
         }
     }
 
@@ -166,17 +170,15 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
         final int type = readUByte(leadIn, 4);
         switch (type) {
             case 0:
-                parameters = findParameters(Type0RaesParameters.class, parameters);
-                return new Type0RaesReadOnlyFile(
-                        rof, (Type0RaesParameters) parameters);
-
+                return new Type0RaesReadOnlyFile(rof,
+                        getParameters(Type0RaesParameters.class, parameters));
             default:
                 throw new RaesException("Unknown RAES type: " + type);
         }
     }
 
     @SuppressWarnings("unchecked")
-    private static <P extends RaesParameters> P findParameters(
+    private static <P extends RaesParameters> P getParameters(
             final Class<P> type,
             final @CheckForNull RaesParameters parameters)
     throws RaesParametersException {
@@ -186,15 +188,11 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
         } else if (type.isAssignableFrom(parameters.getClass())) {
             return (P) parameters;
         } else if (parameters instanceof RaesParametersProvider) {
-            return findParameters(type,
+            return getParameters(type,
                     ((RaesParametersProvider) parameters).get(type));
         } else {
             throw new RaesParametersException();
         }
-    }
-
-    RaesReadOnlyFile(@CheckForNull ReadOnlyFile rof) {
-        super(rof);
     }
 
     /**
