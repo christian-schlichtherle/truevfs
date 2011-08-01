@@ -45,8 +45,8 @@ import net.jcip.annotations.NotThreadSafe;
 public class ZipEntry implements Cloneable {
 
     // Bit indices for initialized fields.
-    private static final int    NAME     = 0, PLATFORM = 1, GENERAL  = 2,
-                                METHOD   = 3, CRC      = 4;
+    private static final int    PLATFORM = 0, GENERAL  = 1,
+                                METHOD   = 2, CRC      = 3;
 
     /** The unknown value for numeric properties. */
     public static final byte UNKNOWN = -1;
@@ -63,6 +63,15 @@ public class ZipEntry implements Cloneable {
     /** Compression method for compressed (<em>deflated</em>) entries. */
     public static final int DEFLATED = 8;
 
+    /** Pseudo Compression method for WinZip AES encrypted entries. */
+    static final int ENCRYPTED = 99;
+
+    /** General Purpose Bit Flag for encrypted data. */
+    static int GPBF_ENCRYPTED = 0;
+
+    static int GPBF_DATA_DESCRIPTOR = 3;
+    static int GPBF_UTF8 = 11;
+
     /**
      * Smallest supported DOS date/time value in a ZIP file,
      * which is January 1<sup>st</sup>, 1980 AD 00:00:00 local time.
@@ -71,11 +80,11 @@ public class ZipEntry implements Cloneable {
 
     private byte init;                  // bit flag for init state
     private String name;
-    private byte platform = UNKNOWN;    // 1 byte unsigned int
-    private short general = UNKNOWN;    // 2 bytes unsigned int
-    private short method = UNKNOWN;     // 2 bytes unsigned int
+    private byte platform = UNKNOWN;    // 1 byte unsigned int (UByte)
+    private short general = 0;          // 2 bytes unsigned int (UShort)
+    private short method = UNKNOWN;     // 2 bytes unsigned int (UShort)
     private long jTime = UNKNOWN;       // Java time (!)
-    private int crc = UNKNOWN;          // 4 bytes unsigned int
+    private int crc = UNKNOWN;          // 4 bytes unsigned int (ULong)
     private long csize = UNKNOWN;       // 63 bits unsigned integer (ULong)
     private long size = UNKNOWN;        // 63 bits unsigned integer (Ulong)
 
@@ -92,14 +101,15 @@ public class ZipEntry implements Cloneable {
     /** Comment field. */
     private @CheckForNull String comment;
 
-    /** Constructs a new ZIP entry with the specified name. */
+    /** Constructs a new ZIP entry with the given name. */
     public ZipEntry(final String name) {
-        setName0(name);
+        UShort.check(name.length());
+        this.name = name;
     }
 
     /**
-     * Constructs a new ZIP entry with the given name which has all other
-     * properties copied from the given template.
+     * Constructs a new ZIP entry with the given name and all other properties
+     * copied from the given template.
      */
     public ZipEntry(final String name, final ZipEntry template) {
         this.init = template.init;
@@ -125,7 +135,6 @@ public class ZipEntry implements Cloneable {
             throw new AssertionError(cannotHappen);
         }
         entry.setExtra(getExtra());
-        //entry.setInit(NAME, false); // unlock name
         return entry;
     }
 
@@ -151,16 +160,6 @@ public class ZipEntry implements Cloneable {
         return null == name ? 0 : charset.encode(name).limit();
     }
 
-    private void setName0(final String name) {
-        if (isInit(NAME))
-            throw new IllegalStateException("'name' is already initialized!");
-        if (name == null)
-            throw new NullPointerException();
-        UShort.check(name.length());
-        setInit(NAME, true);
-        this.name = name;
-    }
-
     /**
      * Returns true if and only if this ZIP entry represents a directory entry
      * (i.e. end with {@code '/'}).
@@ -181,29 +180,30 @@ public class ZipEntry implements Cloneable {
         this.platform = (byte) platform;
     }
 
+    /** Returns the General Purpose Bit Flags. */
     int getGeneral() {
         return isInit(GENERAL) ? general & UShort.MAX_VALUE : UNKNOWN;
     }
 
+    /** Sets the General Purpose Bit Flags. */
     void setGeneral(final int general) {
         final boolean known = general != UNKNOWN;
         if (known)
             UShort.check(general, name, "General Purpose Bit Flag out of range");
         setInit(GENERAL, known);
-        this.general = (short) general;
+        this.general = known ? (short) general : 0;
     }
 
-    final boolean getGeneralBit(int index) {
-        if (!isInit(GENERAL))
-            throw new IllegalStateException(name
-            + ": General Purpose Bit Flag not initialized!");
+    /** Returns the indexed General Purpose Bit. */
+    final boolean getGeneralBit(final int index) {
         if (index < 0 || 15 < index)
             throw new IllegalArgumentException(name
             + ": General Purpose Bit Flag index out of range: " + index);
-        return (general & (1 << index)) != 0;
+        return /*isInit(GENERAL) &&*/ (general & (1 << index)) != 0;
     }
 
-    final void setGeneralBit(int index, boolean bit) {
+    /** Sets the indexed General Purpose Bit. */
+    final void setGeneralBit(final int index, final boolean bit) {
         if (index < 0 || 15 < index)
             throw new IllegalArgumentException(name
             + ": General Purpose Bit Flag index out of range: " + index);
@@ -241,6 +241,26 @@ public class ZipEntry implements Cloneable {
         this.method = (short) method;
     }
 
+    /**
+     * Returns {@code true} if and only if this ZIP entry is encrypted.
+     * Note that only WinZip AES encryption is currently supported.
+     * 
+     * @return {@code true} if and only if this ZIP entry is encrypted.
+     */
+    /*public boolean isEncrypted() {
+        return getGeneralBit(GPBF_ENCRYPTED);
+    }*/
+
+    /**
+     * Sets the encryption flag for this ZIP entry.
+     * Note that only WinZip AES encryption is currently supported.
+     * 
+     * @param encrypted whether or not this ZIP entry should get encrypted.
+     */
+    /*public void setEncrypted(boolean encrypted) {
+        setGeneralBit(GPBF_ENCRYPTED, encrypted);
+    }*/
+    
     protected long getDosTime() {
         return jTime != UNKNOWN
                 ? getDateTimeConverter().toDosTime(jTime)
