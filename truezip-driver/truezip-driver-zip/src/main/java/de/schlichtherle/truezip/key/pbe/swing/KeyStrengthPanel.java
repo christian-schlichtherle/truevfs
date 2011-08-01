@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.key.pbe.swing;
 
-import de.schlichtherle.truezip.key.pbe.KeyStrength;
+import de.schlichtherle.truezip.crypto.param.KeyStrength;
 import de.schlichtherle.truezip.swing.EnhancedPanel;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -42,7 +42,7 @@ public class KeyStrengthPanel<S extends KeyStrength> extends EnhancedPanel {
     private final S[] availableKeyStrengths;
 
     /**
-     * Constructs a new panel using a protective copy of the given collection
+     * Constructs a new panel using a protective copy of the given array
      * of available key strengths.
      */
     public KeyStrengthPanel(final S[] availableKeyStrenghts) {

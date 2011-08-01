@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.key.sl;
 
 import de.schlichtherle.truezip.key.KeyManagerProvider;
-import de.schlichtherle.truezip.key.pbe.AesPbeParameters;
+import de.schlichtherle.truezip.zip.aes.AesPbeParameters;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;

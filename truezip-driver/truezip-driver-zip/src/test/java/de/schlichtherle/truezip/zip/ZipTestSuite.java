@@ -43,7 +43,7 @@ import static org.junit.Assert.*;
 /**
  * Performs an integration test for reading and writing ZIP files.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public abstract class ZipTestSuite {
