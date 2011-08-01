@@ -124,5 +124,5 @@ public final class KeyManagerRaesParameters implements RaesParametersProvider {
             param.setKeyStrength(keyStrength);
             provider.setKey(param);
         }
-    }
+    } // Type0
 }
