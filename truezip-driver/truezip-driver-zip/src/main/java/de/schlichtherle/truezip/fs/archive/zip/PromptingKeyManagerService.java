@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.fs.archive.zip;
 import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import de.schlichtherle.truezip.key.PromptingKeyProvider.View;
-import de.schlichtherle.truezip.key.pbe.AesPbeParameters;
+import de.schlichtherle.truezip.zip.aes.AesPbeParameters;
 import de.schlichtherle.truezip.key.spi.KeyManagerService;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;

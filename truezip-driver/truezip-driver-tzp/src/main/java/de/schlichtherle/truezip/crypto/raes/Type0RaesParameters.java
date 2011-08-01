@@ -80,7 +80,7 @@ public interface Type0RaesParameters extends RaesParameters {
 
     /** Enumerates the AES cipher key strenghts. */
     @ThreadSafe
-    enum KeyStrength implements de.schlichtherle.truezip.crypto.key.KeyStrength {
+    enum KeyStrength implements de.schlichtherle.truezip.crypto.param.KeyStrength {
         /** Enum identifier for a 128 bit AES cipher key. */
         BITS_128,
 

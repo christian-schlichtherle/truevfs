@@ -13,31 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.key.pbe;
+package de.schlichtherle.truezip.zip.aes;
 
+import de.schlichtherle.truezip.key.pbe.PbeParameters;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import net.jcip.annotations.ThreadSafe;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
- * Defines the key strengths for a cipher.
- * <p>
- * Implementations must be thread-safe!
+ * A JavaBean which holds password based encryption parameters for use with the
+ * AES cipher.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@ThreadSafe
+@NotThreadSafe
 @DefaultAnnotation(NonNull.class)
-public interface KeyStrength {
+public final class AesPbeParameters
+extends PbeParameters<AesKeyStrength, AesPbeParameters> {
 
-    /** Returns the key strength in bits. */
-    int getBits();
+    public AesPbeParameters() {
+        reset();
+    }
 
-    /** Returns the key strength in bytes. */
-    int getBytes();
-
-    /** Returns a localized display string representing this key strength. */
     @Override
-    String toString();
+    public void reset() {
+        super.reset();
+        setKeyStrength(AesKeyStrength.BITS_256);
+    }
+
+    @Override
+    public AesKeyStrength[] getKeyStrengthValues() {
+        return AesKeyStrength.values();
+    }
 }

@@ -326,7 +326,7 @@ extends SafeKeyProvider<K> {
      * Implementations of this interface are maintained by a
      * {@link PromptingKeyManager}.
      * <p>
-     * Implementations of this interface <em>must</em> be thread safe
+     * Implementations of this interface must be thread safe
      * and should have no side effects!
      */
     @DefaultAnnotation(NonNull.class)

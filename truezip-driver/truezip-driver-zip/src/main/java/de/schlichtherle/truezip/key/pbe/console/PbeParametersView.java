@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.key.pbe.console;
 
-import de.schlichtherle.truezip.key.pbe.KeyStrength;
+import de.schlichtherle.truezip.crypto.param.KeyStrength;
 import de.schlichtherle.truezip.key.KeyPromptingDisabledException;
 import de.schlichtherle.truezip.key.pbe.PbeParameters;
 import de.schlichtherle.truezip.key.PromptingKeyProvider.Controller;
@@ -42,9 +42,6 @@ import net.jcip.annotations.ThreadSafe;
 @DefaultAnnotation(NonNull.class)
 public abstract class PbeParametersView<S extends KeyStrength, P extends PbeParameters<S, P>>
 implements PbeParametersFactory<P>, View<P> {
-
-    /** Used to lock out concurrent prompting. */
-    private static class PromptingLock { }
 
     private static final ResourceBundle resources
             = ResourceBundle.getBundle(PbeParametersView.class.getName());
@@ -194,5 +191,9 @@ implements PbeParametersFactory<P>, View<P> {
                     return;
             }
         }
+    }
+
+    /** Used to lock out concurrent prompting. */
+    private static class PromptingLock {
     }
 }

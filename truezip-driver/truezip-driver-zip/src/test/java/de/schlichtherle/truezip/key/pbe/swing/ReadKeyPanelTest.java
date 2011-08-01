@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.key.pbe.swing;
 
-import de.schlichtherle.truezip.key.pbe.AesPbeParameters;
+import de.schlichtherle.truezip.zip.aes.AesPbeParameters;
 import de.schlichtherle.truezip.key.pbe.PbeParameters;
 import static org.junit.Assert.*;
 import org.junit.Test;

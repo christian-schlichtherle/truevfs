@@ -15,11 +15,13 @@
  */
 package de.schlichtherle.truezip.key.pbe;
 
+import de.schlichtherle.truezip.crypto.param.PasswordParameters;
+import de.schlichtherle.truezip.crypto.param.KeyStrengthParameters;
+import de.schlichtherle.truezip.crypto.param.KeyStrength;
 import de.schlichtherle.truezip.key.SafeKey;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Arrays;
 import net.jcip.annotations.NotThreadSafe;
 
@@ -34,7 +36,7 @@ import net.jcip.annotations.NotThreadSafe;
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
 public abstract class PbeParameters<S extends KeyStrength, P extends PbeParameters<S, P>>
-implements SafeKey<P>, Cloneable {
+implements SafeKey<P>, PasswordParameters, KeyStrengthParameters<S> {
 
     private @CheckForNull char[] password;
     private @CheckForNull S keyStrength;
@@ -60,24 +62,12 @@ implements SafeKey<P>, Cloneable {
         setKeyStrength(null);
     }
 
-    /**
-     * Returns a protective copy of the password char array.
-     *
-     * @return A protective copy of the password char array.
-     */
-    public @Nullable char[] getPassword() {
+    @Override
+    public char[] getPassword() {
         return null == password ? null : password.clone();
     }
 
-    /**
-     * Copies the given password char array for deriving the cipher key.
-     * <p>
-     * This method makes a protective copy of the given password char array.
-     * It's highly recommended to overwrite this array with any non-password
-     * data after calling this method.
-     *
-     * @param newPW the password char array for deriving the cipher key.
-     */
+    @Override
     public void setPassword(final @CheckForNull char[] newPW) {
         final char[] oldPW = this.password;
         if (null != oldPW)
@@ -118,29 +108,13 @@ implements SafeKey<P>, Cloneable {
         }
     }
 
-    /**
-     * Returns the cipher key strength.
-     *
-     * @return The cipher key strength.
-     */
-    public @Nullable S getKeyStrength() {
+    @Override
+    public S getKeyStrength() {
         return keyStrength;
     }
 
-    /**
-     * Sets the cipher key strength.
-     *
-     * @param keyStrength the cipher key strength.
-     */
-    public void setKeyStrength(final @CheckForNull S keyStrength) {
+    @Override
+    public void setKeyStrength(final S keyStrength) {
         this.keyStrength = keyStrength;
     }
-
-    /**
-     * Returns a new non-empty array of all possible key strength values.
-     * There should be no duplicated elements in this array.
-     * 
-     * @return A new non-empty array of all possible key strength values.
-     */
-    public abstract S[] getKeyStrengthValues();
 }

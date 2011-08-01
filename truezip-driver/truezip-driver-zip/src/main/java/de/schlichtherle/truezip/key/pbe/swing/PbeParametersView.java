@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.key.pbe.swing;
 
 import de.schlichtherle.truezip.awt.Windows;
-import de.schlichtherle.truezip.key.pbe.KeyStrength;
+import de.schlichtherle.truezip.crypto.param.KeyStrength;
 import de.schlichtherle.truezip.key.KeyPromptingInterruptedException;
 import de.schlichtherle.truezip.key.PromptingKeyProvider.Controller;
 import de.schlichtherle.truezip.key.PromptingKeyProvider.View;
