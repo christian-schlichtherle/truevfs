@@ -27,8 +27,8 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
  * This code is based on bouncy castle's {@link SICBlockCipher} class,
  * but also allows random access to a block.
  *
- * @author The Legion of the Bouncy Castle (majority of the code)
- * @author Christian Schlichtherle (optimizations and extension to support seeking)
+ * @author  The Legion of the Bouncy Castle (majority of the code)
+ * @author  Christian Schlichtherle (optimizations and extension to support seeking)
  * @version $Id$
  */
 public class SICSeekableBlockCipher implements SeekableBlockCipher {
@@ -37,13 +37,13 @@ public class SICSeekableBlockCipher implements SeekableBlockCipher {
     private final int blockSize;
     private final byte[] IV;
     private final byte[] counterIn;
-    private long blockCounter; // the blockCounter counter
+    private long blockCounter;
     private final byte[] counterOut;
 
     /**
-     * Basic constructor.
+     * Constructs a new SIC seekable block cipher mode.
      *
-     * @param cipher The block cipher to be used.
+     * @param cipher The underlying block cipher to use.
      */
     public SICSeekableBlockCipher(final BlockCipher cipher) {
         this.cipher = cipher;
@@ -65,19 +65,19 @@ public class SICSeekableBlockCipher implements SeekableBlockCipher {
     @Override
     public void init(boolean forEncryption, CipherParameters params)
     throws IllegalArgumentException {
-        if (params instanceof ParametersWithIV) {
-          ParametersWithIV ivParams = (ParametersWithIV) params;
-          byte[] iv = ivParams.getIV();
-          System.arraycopy(iv, 0, IV, 0, IV.length);
-
-          reset();
-          cipher.init(true, ivParams.getParameters());
-        }
+        if (!(params instanceof ParametersWithIV))
+            throw new IllegalArgumentException("SIC mode requires ParametersWithIV");
+        ParametersWithIV ivParams = (ParametersWithIV) params;
+        byte[] iv = ivParams.getIV();
+        System.arraycopy(iv, 0, IV, 0, IV.length);
+        reset();
+        cipher.init(true, ivParams.getParameters());
     }
 
     @Override
     public String getAlgorithmName() {
-        // Must add "/SIC" in order to make BufferedBlockCipher work correctly.
+        // Must add "/SIC" in order to make decorating BufferedBlockCipher work
+        // correctly.
         return cipher.getAlgorithmName() + "/SIC";
     }
 
