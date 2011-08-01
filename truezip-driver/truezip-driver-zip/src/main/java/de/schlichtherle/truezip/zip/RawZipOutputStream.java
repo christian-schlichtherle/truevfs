@@ -19,9 +19,7 @@ import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.LEDataOutputStream;
 import de.schlichtherle.truezip.util.JSE7;
 import static de.schlichtherle.truezip.zip.ZipConstants.*;
-import static de.schlichtherle.truezip.zip.ZipEntry.DEFLATED;
-import static de.schlichtherle.truezip.zip.ZipEntry.PLATFORM_FAT;
-import static de.schlichtherle.truezip.zip.ZipEntry.STORED;
+import static de.schlichtherle.truezip.zip.ZipEntry.*;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -420,6 +418,7 @@ implements Iterable<E> {
         final long csize32 = entry.getCompressedSize32();
         final long size32 = entry.getSize32();
         final long offset = dos.size();
+        final boolean encrypted = entry.getGeneralBit(GPBF_ENCRYPTED);
         final boolean dd // data descriptor?
                 =  crc   == ZipEntry.UNKNOWN
                 || csize == ZipEntry.UNKNOWN
@@ -432,8 +431,9 @@ implements Iterable<E> {
         // Compose General Purpose Bit Flag.
         // See appendix D of PKWARE's ZIP File Format Specification.
         final boolean utf8 = UTF8.equals(charset);
-        final int general = (dd   ? (1 <<  3) : 0)
-                          | (utf8 ? (1 << 11) : 0);
+        final int general = (encrypted ? (1 << GPBF_ENCRYPTED) : 0)
+                          | (dd   ? (1 << GPBF_DATA_DESCRIPTOR) : 0)
+                          | (utf8 ? (1 << GPBF_UTF8) : 0);
         // Start changes.
         finished = false;
         // Local File Header Signature.
@@ -586,7 +586,7 @@ implements Iterable<E> {
     private void writeDataDescriptor() throws IOException {
         final E entry = this.entry;
         assert null != entry;
-        if (!entry.getGeneralBit(3))
+        if (!entry.getGeneralBit(GPBF_DATA_DESCRIPTOR))
             return;
         final LEDataOutputStream dos = (LEDataOutputStream) delegate;
         final long crc = entry.getCrc();
@@ -656,7 +656,7 @@ implements Iterable<E> {
         final long csize32 = entry.getCompressedSize32();
         final long size32 = entry.getSize32();
         final long offset32 = entry.getOffset32();
-        final boolean dd = entry.getGeneralBit(3);
+        final boolean dd = entry.getGeneralBit(GPBF_DATA_DESCRIPTOR);
         final boolean zip64 // ZIP64 extensions?
                 =  csize32  >= UInt.MAX_VALUE
                 || size32   >= UInt.MAX_VALUE

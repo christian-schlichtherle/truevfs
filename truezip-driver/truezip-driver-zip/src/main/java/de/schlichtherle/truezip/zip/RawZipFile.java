@@ -15,22 +15,23 @@
  */
 package de.schlichtherle.truezip.zip;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
-import net.jcip.annotations.NotThreadSafe;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import java.nio.ByteBuffer;
-import de.schlichtherle.truezip.util.Pool;
-import java.nio.charset.Charset;
 import de.schlichtherle.truezip.io.DecoratingInputStream;
-import java.util.Iterator;
 import de.schlichtherle.truezip.rof.BufferedReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.util.Pool;
+import static de.schlichtherle.truezip.zip.ZipConstants.*;
+import static de.schlichtherle.truezip.zip.ZipEntry.*;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.Closeable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.zip.CRC32;
@@ -39,10 +40,7 @@ import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 import java.util.zip.ZipException;
-
-import static de.schlichtherle.truezip.zip.ZipConstants.*;
-import static de.schlichtherle.truezip.zip.ZipEntry.DEFLATED;
-import static de.schlichtherle.truezip.zip.ZipEntry.STORED;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * Provides unsafe (raw) access to a ZIP file using unsynchronized methods and
@@ -53,7 +51,7 @@ import static de.schlichtherle.truezip.zip.ZipEntry.STORED;
  * <p>
  * Where the constructors of this class accept a {@code charset}
  * parameter, this is used to decode comments and entry names in the ZIP file.
- * However, if an entry has bit 11 set in its General Purpose Bit Flag,
+ * However, if an entry has bit 11 set in its General Purpose Bit Flags,
  * then this parameter is ignored and "UTF-8" is used for this entry.
  * This is in accordance to Appendix D of PKWARE's ZIP File Format
  * Specification, version 6.3.0 and later.
@@ -71,15 +69,15 @@ public abstract class RawZipFile<E extends ZipEntry>
 implements Iterable<E>, Closeable {
 
     private static final int LFH_FILE_NAME_LENGTH_OFF =
-            /* local file header signature     */ 4 +
-            /* version needed to extract       */ 2 +
-            /* general purpose bit flag        */ 2 +
-            /* compression method              */ 2 +
-            /* last mod file time              */ 2 +
-            /* last mod file date              */ 2 +
-            /* crc-32                          */ 4 +
-            /* compressed size                 */ 4 +
-            /* uncompressed size               */ 4;
+            /* Local File Header signature     */ 4 +
+            /* Version Needed To Extract       */ 2 +
+            /* General Purpose Bit Flags       */ 2 +
+            /* Compression Method              */ 2 +
+            /* Last Mod File Time              */ 2 +
+            /* Last Mod File Date              */ 2 +
+            /* CRC-32                          */ 4 +
+            /* Compressed Size                 */ 4 +
+            /* Uncompressed Size               */ 4;
 
     /**
      * The default character set used for entry names and comments in ZIP files.
@@ -245,7 +243,7 @@ implements Iterable<E>, Closeable {
             final byte[] name = new byte[nameLen];
             rof.readFully(name);
             // See appendix D of PKWARE's ZIP File Format Specification.
-            final boolean utf8 = (general & (1 << 11)) != 0;
+            final boolean utf8 = (general & (1 << GPBF_UTF8)) != 0;
             if (utf8)
                 charset = UTF8;
             final E entry = factory.newEntry(decode(name));
@@ -254,10 +252,10 @@ implements Iterable<E>, Closeable {
                 final int versionMadeBy = LittleEndian.readUShort(cfh, off);
                 off += 2;
                 entry.setPlatform((short) (versionMadeBy >> 8));
-                off += 2; // version needed to extract
+                off += 2; // Version Needed To Extract
                 entry.setGeneral(general);
-                off += 2; // general purpose bit flag
-                assert entry.getGeneralBit(11) == utf8;
+                off += 2; // General Purpose Bit Flags
+                assert entry.getGeneralBit(GPBF_UTF8) == utf8;
                 final int method = LittleEndian.readUShort(cfh, off);
                 off += 2;
                 if (method != STORED && method != DEFLATED)
@@ -272,12 +270,12 @@ implements Iterable<E>, Closeable {
                 off += 4;
                 entry.setSize32(LittleEndian.readUInt(cfh, off));
                 off += 4;
-                off += 2;   // file name length
+                off += 2;   // File Name Length
                 final int extraLen = LittleEndian.readUShort(cfh, off);
                 off += 2;
                 final int commentLen = LittleEndian.readUShort(cfh, off);
                 off += 2;
-                off += 2;   // disk number
+                off += 2;   // Disk Number
                 //ze.setInternalAttributes(readUShort(cfh, off));
                 off += 2;
                 //ze.setExternalAttributes(readUInt(cfh, off));
@@ -341,12 +339,12 @@ implements Iterable<E>, Closeable {
      * Positions the file pointer at the first Central File Header.
      * Performs some means to check that this is really a ZIP file.
      * <p>
-     * As a side effect, both {@code mapper} and }postamble}
+     * As a side effect, both {@code mapper} and {@code postamble}
      * will be set.
      *
      * @throws ZipException If the file is not compatible to the ZIP File
      *         Format Specification.
-     * @throws IOException On any other I/O related issue.
+     * @throws IOException On any other I/O error.
      */
     private int findCentralDirectory(
             final ReadOnlyFile rof,
@@ -418,7 +416,7 @@ implements Iterable<E>, Closeable {
                     off += 4;
                     if (zip64eocdlSig != ZIP64_EOCDL_SIG)
                         throw new IOException( // MUST be IOException, not ZipException - see catch clauses!
-                                "Expected ZIP64 End Of Central Directory Locator signature!");
+                                "No ZIP64 End Of Central Directory Locator signature found!");
                     final long zip64eocdrDisk;      // number of the disk with the start of the zip64 end of central directory record
                     final long zip64eocdrOffset;    // relative offset of the zip64 end of central directory record
                     final long totalDisks;          // total number of disks
@@ -440,10 +438,10 @@ implements Iterable<E>, Closeable {
                     off += 4;
                     if (zip64eocdrSig != ZIP64_EOCDR_SIG)
                         throw new ZipException( // MUST be ZipException, not IOException - see catch clauses!
-                                "Expected ZIP64 End Of Central Directory Record signature!");
-                    //final long zip64eocdrSize;  // size of zip64 end of central directory record
-                    //final int madeBy;           // version made by
-                    //final int needed2extract;   // version needed to extract
+                                "No ZIP64 End Of Central Directory Record signature found!");
+                    //final long zip64eocdrSize;  // Size Of ZIP64 End Of Central Directory Record
+                    //final int madeBy;           // Version Made By
+                    //final int needed2extract;   // Version Needed To Extract
                     //zip64eocdrSize = LittleEndian.readLong(zip64eocdr, off);
                     off += 8;
                     //madeBy = LittleEndian.readUShort(zip64eocdr, off);
@@ -477,17 +475,15 @@ implements Iterable<E>, Closeable {
                     long start = eocdrOffset - cdSize;
                     rof.seek(start);
                     start -= cdOffset;
-                    if (start != 0) {
-                        mapper = new IrregularOffsetMapper(start);
-                    } else {
-                        mapper = new OffsetMapper();
-                    }
+                    mapper = 0 != start
+                            ? new IrregularOffsetMapper(start)
+                            : new OffsetMapper();
                 }
                 return (int) cdEntries;
             }
         }
         throw new ZipException(
-                "Expected End Of Central Directory Record signature!");
+                "No End Of Central Directory Record signature found!");
     }
 
     /**
@@ -734,7 +730,7 @@ implements Iterable<E>, Closeable {
         if (check) {
             // Check CRC-32 in the Local File Header or Data Descriptor.
             final long localCrc;
-            if (entry.getGeneralBit(3)) {
+            if (entry.getGeneralBit(GPBF_DATA_DESCRIPTOR)) {
                 // The CRC-32 is in the Data Descriptor after the compressed
                 // size.
                 // Note the Data Descriptor's Signature is optional:
