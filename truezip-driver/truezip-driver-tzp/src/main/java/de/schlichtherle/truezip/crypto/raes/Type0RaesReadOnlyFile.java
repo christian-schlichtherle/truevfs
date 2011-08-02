@@ -90,9 +90,7 @@ final class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
         } catch (ArrayIndexOutOfBoundsException ex) {
             throw new RaesException(
                     "Unknown index for cipher key strength: "
-                    + keyStrengthOrdinal
-                    + "!",
-                    ex);
+                    + keyStrengthOrdinal);
         }
         final int keyStrengthBytes = keyStrength.getBytes();
         final int keyStrengthBits = keyStrength.getBits();

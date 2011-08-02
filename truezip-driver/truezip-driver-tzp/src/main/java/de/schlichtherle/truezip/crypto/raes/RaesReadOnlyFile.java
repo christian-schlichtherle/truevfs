@@ -99,16 +99,15 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
     /**
      * Creates a new instance of {@code RaesReadOnlyFile}.
      *
-     * @param file The file to read.
-     * @param params The {@link RaesParameters} required to access the
-     *        RAES type actually found in the file.
-     *        If the run time class of this parameter does not match the
-     *        required parameter interface according to the RAES type found
-     *        in the file, but is an instance of the
-     *        {@link RaesParametersProvider} interface, it is used to find
-     *        the required RAES parameters.
-     *        This is applied recursively.
-     *
+     * @param  file The file to read.
+     * @param  param The {@link RaesParameters} required to access the
+     *         RAES type actually found in the file.
+     *         If the run time class of this parameter does not match the
+     *         required parameter interface according to the RAES type found
+     *         in the file, but is an instance of the
+     *         {@link RaesParametersProvider} interface, it is used to find
+     *         the required RAES parameters.
+     *         This is applied recursively.
      * @throws NullPointerException If any of the parameters is {@code null}.
      * @throws FileNotFoundException If the file cannot get opened for reading.
      * @throws RaesParametersException If no suitable RAES parameters have been
@@ -118,14 +117,14 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
      */
     public static RaesReadOnlyFile getInstance(
             final File file,
-            final RaesParameters params)
+            final RaesParameters param)
     throws  FileNotFoundException,
             RaesParametersException,
             RaesException,
             IOException {
         final ReadOnlyFile rof = new DefaultReadOnlyFile(file);
         try {
-            return getInstance(rof, params);
+            return getInstance(rof, param);
         } catch (IOException ex) {
             rof.close();
             throw ex;
@@ -136,7 +135,7 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
      * Returns a new instance of an {@code RaesReadOnlyFile}.
      *
      * @param rof The read only file to read.
-     * @param parameters The {@link RaesParameters} required to access the
+     * @param param The {@link RaesParameters} required to access the
      *        RAES type actually found in the file.
      *        If the run time class of this parameter does not match the
      *        required parameter interface according to the RAES type found
@@ -154,7 +153,7 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
      */
     public static RaesReadOnlyFile getInstance(
             final ReadOnlyFile rof,
-            RaesParameters parameters)
+            RaesParameters param)
     throws IOException {
         /*if (null == parameters)
             throw new NullPointerException();*/
@@ -171,7 +170,7 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
         switch (type) {
             case 0:
                 return new Type0RaesReadOnlyFile(rof,
-                        getParameters(Type0RaesParameters.class, parameters));
+                        getParameters(Type0RaesParameters.class, param));
             default:
                 throw new RaesException("Unknown RAES type: " + type);
         }
@@ -180,16 +179,16 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
     @SuppressWarnings("unchecked")
     private static <P extends RaesParameters> P getParameters(
             final Class<P> type,
-            final @CheckForNull RaesParameters parameters)
+            final @CheckForNull RaesParameters param)
     throws RaesParametersException {
         // Order is important here to support multiple interface implementations!
-        if (null == parameters) {
+        if (null == param) {
             throw new RaesParametersException();
-        } else if (type.isAssignableFrom(parameters.getClass())) {
-            return (P) parameters;
-        } else if (parameters instanceof RaesParametersProvider) {
+        } else if (type.isAssignableFrom(param.getClass())) {
+            return (P) param;
+        } else if (param instanceof RaesParametersProvider) {
             return getParameters(type,
-                    ((RaesParametersProvider) parameters).get(type));
+                    ((RaesParametersProvider) param).get(type));
         } else {
             throw new RaesParametersException();
         }

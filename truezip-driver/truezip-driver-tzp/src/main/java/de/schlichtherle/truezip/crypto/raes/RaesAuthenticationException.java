@@ -15,19 +15,23 @@
  */
 package de.schlichtherle.truezip.crypto.raes;
 
+import net.jcip.annotations.ThreadSafe;
+
 /**
- * Thrown to indicate that an RAES file has been tampered with.
- * This is a subclass of {@link RaesException} to indicate that this
- * is considered to be an RAES specific issue when accessing the contents
- * of a file.
+ * Thrown to indicate that a RAES file has been tampered with.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 public class RaesAuthenticationException extends RaesException {
     private static final long serialVersionUID = 2362389234686232732L;
 
+    /**
+     * Constructs a RAES exception with
+     * a detail message indicating that a RAES file has been tampered with.
+     */
     public RaesAuthenticationException() {
-        super("File has been tampered with!");
+        super("RAES file has been tampered with!");
     }
 }

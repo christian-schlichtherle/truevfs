@@ -27,50 +27,51 @@ import de.schlichtherle.truezip.key.UnknownKeyException;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URI;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * An adapter which retrieves {@link RaesParameters} by using a
- * {@link KeyManager}.
+ * {@link KeyManager} for {@link AesCipherParameters}.
  * <p>
- * According to the requirements of RAES, only password based encryption
- * is supported. The adapter pattern allows this class to be changed to
- * support other encryption and authentication schemes in future versions
- * without requiring to change the client code.
+ * The current implementation supports only {@link Type0RaesParameters}.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 @DefaultAnnotation(NonNull.class)
 public final class KeyManagerRaesParameters implements RaesParametersProvider {
 
     private final KeyManager<AesCipherParameters> manager;
-    private final URI resource;
+    private final URI raes;
 
     /**
-     * Equivalent to
-     * {@link #KeyManagerRaesParameters(KeyManager, URI) new KeyManagerRaesParameters(provider.get(AesCipherParameters.class), resource)}.
+     * Constructs RAES parameters using the given key manager provider.
+     *
+     * @param  raes the absolute URI of the RAES file.
+     * @throws IllegalArgumentException if {@code raes} is not an absolute URI.
      */
     public KeyManagerRaesParameters(
             final KeyManagerProvider provider,
-            final URI resource) {
-        this(provider.get(AesCipherParameters.class), resource);
+            final URI raes) {
+        this(provider.get(AesCipherParameters.class), raes);
     }
 
     /**
-     * Constructs new RAES parameters using the given key manager.
+     * Constructs RAES parameters using the given key manager.
      *
-     * @param resource the absolute URI of the RAES file.
-     * @throws IllegalArgumentException if {@code resource} is not absolute.
+     * @param  raes the absolute URI of the RAES file.
+     * @throws IllegalArgumentException if {@code raes} is not an absolute URI.
      */
     public KeyManagerRaesParameters(
             final KeyManager<AesCipherParameters> manager,
-            final URI resource) {
+            final URI raes) {
         if (null == manager)
             throw new NullPointerException();
-        if (!resource.isAbsolute())
+        if (!raes.isAbsolute())
             throw new IllegalArgumentException();
         this.manager = manager;
-        this.resource = resource;
+        this.raes = raes;
     }
 
     @Override
@@ -80,29 +81,28 @@ public final class KeyManagerRaesParameters implements RaesParametersProvider {
     }
 
     /**
-     * An adapter which presents the KeyManager's {@code KeyProvider}
-     * interface as {@code Type0RaesParameters}.
+     * Adapts a {@code KeyProvider} for {@link  AesCipherParameters} obtained
+     * from the {@link manager} to {@code Type0RaesParameters}.
      */
     private class Type0 implements Type0RaesParameters {
-        private AesCipherParameters param;
-
         @Override
         public char[] getWritePassword() throws RaesKeyException {
             final KeyProvider<AesCipherParameters>
-                    provider = manager.getKeyProvider(resource);
+                    provider = manager.getKeyProvider(raes);
             try {
-                return (param = provider.getWriteKey()).getPassword();
+                return provider.getWriteKey().getPassword();
             } catch (UnknownKeyException ex) {
                 throw new RaesKeyException(ex);
             }
         }
 
         @Override
-        public char[] getReadPassword(boolean invalid) throws RaesKeyException {
+        public char[] getReadPassword(final boolean invalid)
+        throws RaesKeyException {
             final KeyProvider<AesCipherParameters>
-                    provider = manager.getKeyProvider(resource);
+                    provider = manager.getKeyProvider(raes);
             try {
-                return (param = provider.getReadKey(invalid)).getPassword();
+                return provider.getReadKey(invalid).getPassword();
             } catch (UnknownKeyException ex) {
                 throw new RaesKeyException(ex);
             }
@@ -110,17 +110,25 @@ public final class KeyManagerRaesParameters implements RaesParametersProvider {
 
         @Override
         public KeyStrength getKeyStrength() {
-            if (null == param)
-                throw new IllegalStateException("getWritePassword() must get called first!");
-            return param.getKeyStrength();
+            final KeyProvider<AesCipherParameters>
+                    provider = manager.getKeyProvider(raes);
+            try {
+                return provider.getWriteKey().getKeyStrength();
+            } catch (UnknownKeyException ex) {
+                throw new IllegalStateException("getWritePassword() must get called first!", ex);
+            }
         }
 
         @Override
-        public void setKeyStrength(KeyStrength keyStrength) {
-            if (null == param)
-                throw new IllegalStateException("getReadPassword(boolean) must get called first!");
+        public void setKeyStrength(final KeyStrength keyStrength) {
             final KeyProvider<AesCipherParameters>
-                    provider = manager.getKeyProvider(resource);
+                    provider = manager.getKeyProvider(raes);
+            final AesCipherParameters param;
+            try {
+                param = provider.getReadKey(false);
+            } catch (UnknownKeyException ex) {
+                throw new IllegalStateException("getReadPassword(boolean) must get called first!", ex);
+            }
             param.setKeyStrength(keyStrength);
             provider.setKey(param);
         }
