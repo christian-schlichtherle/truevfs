@@ -26,9 +26,8 @@ import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 /**
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public final class RaesTest extends ReadOnlyFileTestSuite {
@@ -77,7 +76,7 @@ public final class RaesTest extends ReadOnlyFileTestSuite {
         } finally {
             final File cipherFile = this.cipherFile;
             this.cipherFile = null;
-            if (null != cipherFile && cipherFile.exists() && !cipherFile.delete())
+            if (null != cipherFile && !cipherFile.delete() && cipherFile.exists())
                 logger.log(Level.WARNING, "{0} (File.delete() failed)", cipherFile);
         }
     }

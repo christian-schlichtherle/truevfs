@@ -15,8 +15,8 @@
  */
 package de.schlichtherle.truezip.crypto.raes;
 
+import net.jcip.annotations.NotThreadSafe;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import net.jcip.annotations.ThreadSafe;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import java.util.Random;
 import java.util.logging.Level;
@@ -24,7 +24,11 @@ import java.util.logging.Logger;
 
 import static org.junit.Assert.*;
 
-@ThreadSafe
+/**
+ * @author  Christian Schlichtherle
+ * @version $Id$
+ */
+@NotThreadSafe
 @DefaultAnnotation(NonNull.class)
 public final class MockType0RaesParameters implements Type0RaesParameters {
 

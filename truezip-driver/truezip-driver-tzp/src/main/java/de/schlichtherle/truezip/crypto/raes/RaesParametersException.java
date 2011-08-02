@@ -15,44 +15,45 @@
  */
 package de.schlichtherle.truezip.crypto.raes;
 
+import net.jcip.annotations.ThreadSafe;
+
 /**
- * Thrown to indicate that no suitable RAES parameters have been provided or
- * something is wrong with the parameters.
+ * Thrown to indicate that no suitable cryptographic parameters have been
+ * provided or something is wrong with these parameters.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 public class RaesParametersException extends RaesException {
-
     private static final long serialVersionUID = 1605398165986459281L;
 
     /**
-     * Constructs a new RAES parameters exception with
-     * a detail message indicating that no suitable {@link RaesParameters} have
-     * been found.
+     * Constructs a RAES parameters exception with
+     * a detail message indicating that no suitable {@link RaesParameters}
+     * have been found.
      */
     public RaesParametersException() {
-        super("No suitable RaesParameters provided!");
+        super("No suitable RaesParameters available!");
     }
 
     /**
-     * Constructs a new RAES parameters exception with
-     * the specified detail message.
+     * Constructs a RAES parameters exception with
+     * the given detail message.
      *
-     * @param msg The detail message.
+     * @param msg the detail message.
      */
     public RaesParametersException(String msg) {
         super(msg);
     }
 
     /**
-     * Constructs a new RAES parameters exception with
-     * the specified cause.
+     * Constructs a RAES parameters exception with
+     * the given cause.
      *
-     * @param cause The cause.
+     * @param cause the cause for this exception to get thrown.
      */
     public RaesParametersException(Throwable cause) {
-        //super(cause != null ? cause.toString() : null);
-        super.initCause(cause);
+        super(cause);
     }
 }
