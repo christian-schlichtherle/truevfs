@@ -247,9 +247,9 @@ public class ZipEntry implements Cloneable {
      * 
      * @return {@code true} if and only if this ZIP entry is encrypted.
      */
-    /*public boolean isEncrypted() {
+    public boolean isEncrypted() {
         return getGeneralBit(GPBF_ENCRYPTED);
-    }*/
+    }
 
     /**
      * Sets the encryption flag for this ZIP entry.
@@ -257,9 +257,9 @@ public class ZipEntry implements Cloneable {
      * 
      * @param encrypted whether or not this ZIP entry should get encrypted.
      */
-    /*public void setEncrypted(boolean encrypted) {
+    public void setEncrypted(boolean encrypted) {
         setGeneralBit(GPBF_ENCRYPTED, encrypted);
-    }*/
+    }
     
     protected long getDosTime() {
         return jTime != UNKNOWN

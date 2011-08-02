@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.key;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * Manages the life cycle of a generic secret key for reading and writing
@@ -86,6 +87,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 @DefaultAnnotation(NonNull.class)
 public interface KeyProvider<K> {
 
