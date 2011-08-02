@@ -418,7 +418,7 @@ implements Iterable<E> {
         final long csize32 = entry.getCompressedSize32();
         final long size32 = entry.getSize32();
         final long offset = dos.size();
-        final boolean encrypted = entry.getGeneralBit(GPBF_ENCRYPTED);
+        final boolean encrypted = entry.isEncrypted();
         final boolean dd // data descriptor?
                 =  crc   == ZipEntry.UNKNOWN
                 || csize == ZipEntry.UNKNOWN

@@ -343,8 +343,8 @@ implements ZipEntryFactory<ZipArchiveEntry> {
         } else if (mknod.get(STORE)) { // #2 priority
             entry.setMethod(STORED);
         }
-        /*if (mknod.get(ENCRYPT))
-            entry.setEncrypted(true);*/
+        if (mknod.get(ENCRYPT))
+            entry.setEncrypted(true);
         return entry;
     }
 
