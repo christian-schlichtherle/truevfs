@@ -258,7 +258,7 @@ public abstract class ZipRaesDriver extends JarDriver {
          */
         RESET_CANCELLED_KEY {
             @Override
-            public void sync(KeyProvider<?> provider) {
+            void sync(KeyProvider<?> provider) {
                 if (provider instanceof PromptingKeyProvider<?>)
                     ((PromptingKeyProvider<?>) provider).resetCancelledKey();
             }
@@ -270,7 +270,7 @@ public abstract class ZipRaesDriver extends JarDriver {
          */
         RESET_UNCONDITIONALLY {
             @Override
-            public void sync(KeyProvider<?> provider) {
+            void sync(KeyProvider<?> provider) {
                 if (provider instanceof PromptingKeyProvider<?>)
                     ((PromptingKeyProvider<?>) provider).resetUnconditionally();
             }
@@ -284,6 +284,6 @@ public abstract class ZipRaesDriver extends JarDriver {
          * @param provider the key provider for the RAES encrypted ZIP file
          *        which has been successfully synchronized.
          */
-        public abstract void sync(KeyProvider<?> provider);
+        abstract void sync(KeyProvider<?> provider);
     } // KeyProviderSyncStrategy
 }
