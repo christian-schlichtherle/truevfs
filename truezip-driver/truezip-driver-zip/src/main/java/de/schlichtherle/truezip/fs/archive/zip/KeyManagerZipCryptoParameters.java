@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.zip.aes;
+package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.key.KeyManagerProvider;
@@ -23,6 +23,8 @@ import de.schlichtherle.truezip.zip.WinZipAesParameters;
 import de.schlichtherle.truezip.zip.ZipCryptoParameters;
 import de.schlichtherle.truezip.zip.ZipCryptoParametersProvider;
 import de.schlichtherle.truezip.zip.ZipKeyException;
+import de.schlichtherle.truezip.crypto.param.AesKeyStrength;
+import de.schlichtherle.truezip.key.pbe.AesPbeParameters;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URI;
@@ -39,7 +41,7 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-public final class KeyManagerZipCryptoParameters implements ZipCryptoParametersProvider {
+public class KeyManagerZipCryptoParameters implements ZipCryptoParametersProvider {
 
     private final KeyManager<AesPbeParameters> manager;
     private final URI zip;
@@ -75,7 +77,7 @@ public final class KeyManagerZipCryptoParameters implements ZipCryptoParametersP
      * @return The URI for looking up a {@link KeyProvider} for
      *         {@link AesPbeParameters} by using a {@link KeyManager}.
      */
-    protected URI resource(URI zip, String name) {
+    protected URI toResource(URI zip, String name) {
         return zip;
     }
 
@@ -88,7 +90,7 @@ public final class KeyManagerZipCryptoParameters implements ZipCryptoParametersP
         public char[] getWritePassword(final String name)
         throws ZipKeyException {
             final KeyProvider<AesPbeParameters>
-                    provider = manager.getKeyProvider(resource(zip, name));
+                    provider = manager.getKeyProvider(toResource(zip, name));
             try {
                 return provider.getWriteKey().getPassword();
             } catch (UnknownKeyException ex) {
@@ -100,7 +102,7 @@ public final class KeyManagerZipCryptoParameters implements ZipCryptoParametersP
         public char[] getReadPassword(final String name, final boolean invalid)
         throws ZipKeyException {
             final KeyProvider<AesPbeParameters>
-                    provider = manager.getKeyProvider(resource(zip, name));
+                    provider = manager.getKeyProvider(toResource(zip, name));
             try {
                 return provider.getReadKey(invalid).getPassword();
             } catch (UnknownKeyException ex) {
@@ -111,7 +113,7 @@ public final class KeyManagerZipCryptoParameters implements ZipCryptoParametersP
         @Override
         public AesKeyStrength getKeyStrength(final String name) {
             final KeyProvider<AesPbeParameters>
-                    provider = manager.getKeyProvider(resource(zip, name));
+                    provider = manager.getKeyProvider(toResource(zip, name));
             try {
                 return provider.getWriteKey().getKeyStrength();
             } catch (UnknownKeyException ex) {
@@ -123,7 +125,7 @@ public final class KeyManagerZipCryptoParameters implements ZipCryptoParametersP
         public void setKeyStrength( final String name,
                                     final AesKeyStrength keyStrength) {
             final KeyProvider<AesPbeParameters>
-                    provider = manager.getKeyProvider(resource(zip, name));
+                    provider = manager.getKeyProvider(toResource(zip, name));
             final AesPbeParameters param;
             try {
                 param = provider.getReadKey(false);

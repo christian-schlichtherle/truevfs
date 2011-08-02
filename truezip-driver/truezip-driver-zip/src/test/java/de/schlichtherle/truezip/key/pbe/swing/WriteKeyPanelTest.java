@@ -15,10 +15,8 @@
  */
 package de.schlichtherle.truezip.key.pbe.swing;
 
-import de.schlichtherle.truezip.zip.aes.AesKeyStrength;
-import de.schlichtherle.truezip.zip.aes.AesPbeParameters;
-import de.schlichtherle.truezip.crypto.param.KeyStrength;
-import de.schlichtherle.truezip.key.pbe.PbeParameters;
+import de.schlichtherle.truezip.crypto.param.AesKeyStrength;
+import de.schlichtherle.truezip.key.pbe.AesPbeParameters;
 import javax.swing.JComponent;
 import static org.junit.Assert.*;
 import org.junit.Test;
@@ -37,13 +35,13 @@ public final class WriteKeyPanelTest extends KeyPanelTestSuite<WriteKeyPanel> {
     }
 
     @Override
-    public PbeParameters<?, ?> newPbeParameters() {
+    public AesPbeParameters newPbeParameters() {
         return new AesPbeParameters();
     }
 
     @Test
     public void testPasswd() {
-        final PbeParameters<?, ?> param = newPbeParameters();
+        final AesPbeParameters param = newPbeParameters();
 
         // Check default.
         assertFalse(panel.updateParam(param));

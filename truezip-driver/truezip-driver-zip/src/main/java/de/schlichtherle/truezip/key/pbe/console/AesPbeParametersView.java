@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.zip.aes.console;
+package de.schlichtherle.truezip.key.pbe.console;
 
-import de.schlichtherle.truezip.zip.aes.AesKeyStrength;
-import de.schlichtherle.truezip.zip.aes.AesPbeParameters;
-import de.schlichtherle.truezip.key.pbe.console.PbeParametersView;
+import de.schlichtherle.truezip.crypto.param.AesKeyStrength;
+import de.schlichtherle.truezip.key.pbe.AesPbeParameters;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.ThreadSafe;
