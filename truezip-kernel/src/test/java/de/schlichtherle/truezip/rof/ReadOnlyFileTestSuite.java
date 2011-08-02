@@ -34,7 +34,7 @@ import static org.junit.Assert.*;
  * Performs an integration test for an implementation of {@link ReadOnlyFile}.
  * Some tests use Las Vegas algorithms, so the run time may vary.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public abstract class ReadOnlyFileTestSuite {
