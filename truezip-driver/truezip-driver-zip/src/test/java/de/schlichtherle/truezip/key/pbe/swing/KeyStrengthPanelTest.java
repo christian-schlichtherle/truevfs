@@ -15,8 +15,8 @@
  */
 package de.schlichtherle.truezip.key.pbe.swing;
 
-import de.schlichtherle.truezip.zip.aes.AesKeyStrength;
-import static de.schlichtherle.truezip.zip.aes.AesKeyStrength.*;
+import de.schlichtherle.truezip.crypto.param.AesKeyStrength;
+import static de.schlichtherle.truezip.crypto.param.AesKeyStrength.*;
 import org.junit.After;
 import static org.junit.Assert.*;
 import org.junit.Before;

@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.zip;
 
-import de.schlichtherle.truezip.zip.aes.AesKeyStrength;
+import de.schlichtherle.truezip.crypto.param.AesKeyStrength;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 

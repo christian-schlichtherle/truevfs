@@ -15,8 +15,8 @@
  */
 package de.schlichtherle.truezip.key;
 
-import de.schlichtherle.truezip.zip.aes.AesPbeParameters;
-import de.schlichtherle.truezip.zip.aes.console.AesPbeParametersView;
+import de.schlichtherle.truezip.key.pbe.AesPbeParameters;
+import de.schlichtherle.truezip.key.pbe.console.AesPbeParametersView;
 import java.net.URI;
 import org.junit.Test;
 

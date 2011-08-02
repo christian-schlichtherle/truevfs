@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.zip.aes;
+package de.schlichtherle.truezip.key.pbe;
 
-import de.schlichtherle.truezip.key.pbe.PbeParameters;
+import de.schlichtherle.truezip.crypto.param.AesKeyStrength;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.NotThreadSafe;
