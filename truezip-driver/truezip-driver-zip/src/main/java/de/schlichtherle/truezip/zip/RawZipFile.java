@@ -167,7 +167,7 @@ implements Iterable<E>, Closeable {
             final boolean postambled,
             final ZipEntryFactory<E> factory)
     throws IOException {
-        if (charset == null || factory == null)
+        if (null == charset || null == factory)
             throw new NullPointerException();
         final ReadOnlyFile rof = source.allocate();
         try {
@@ -185,9 +185,10 @@ implements Iterable<E>, Closeable {
             source.release(rof);
             throw ex;
         }
-        assert rof != null;
-        assert charset != null;
-        assert mapper != null;
+        assert null != this.archive;
+        assert null != this.charset;
+        assert null != this.factory;
+        assert null != this.mapper;
     }
 
     /** A pool with a singleton read only file provided to its constructor. */
@@ -257,7 +258,7 @@ implements Iterable<E>, Closeable {
                 assert entry.getGeneralBit(GPBF_UTF8) == utf8;
                 final int method = LittleEndian.readUShort(cfh, off);
                 off += 2;
-                if (method != STORED && method != DEFLATED)
+                if (STORED != method && DEFLATED != method)
                     throw new ZipException(entry.getName()
                     + " (unsupported compression method: " + method + ")");
                 entry.setMethod(method);
@@ -300,9 +301,9 @@ implements Iterable<E>, Closeable {
                 if (lfhOff < preamble)
                     preamble = lfhOff;
             } catch (RuntimeException incompatibleZipFile) {
-                final ZipException exc = new ZipException(entry.getName());
-                exc.initCause(incompatibleZipFile);
-                throw exc;
+                final ZipException ex = new ZipException(entry.getName());
+                ex.initCause(incompatibleZipFile);
+                throw ex;
             }
             // Map the entry using the name that has been determined
             // by the ZipEntryFactory.
