@@ -12,6 +12,8 @@ About
     which provides transparent access to archive files as if they were just
     plain directories.
     The most recent version is TrueZIP ${project.version}.
+    See the
+    {{{http://java.net/jira/browse/TRUEZIP#selectedTab=com.atlassian.jira.plugin.system.project:changelog-panel}Change Log}}.
 
     Key Claims:
 
