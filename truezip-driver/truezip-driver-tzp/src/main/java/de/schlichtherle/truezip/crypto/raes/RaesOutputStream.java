@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.crypto.raes;
 
 import de.schlichtherle.truezip.crypto.CipherOutputStream;
-import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
+import de.schlichtherle.truezip.crypto.param.KeyStrength;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -56,7 +56,7 @@ public abstract class RaesOutputStream extends CipherOutputStream {
     }
 
     /**
-     * Returns a new instance of an {@code RaesOutputStream}.
+     * Returns a new {@code RaesOutputStream}.
      *
      * @param  out The underlying output stream to use for the encrypted data.
      * @param  param The {@link RaesParameters} used to determine and
@@ -71,10 +71,10 @@ public abstract class RaesOutputStream extends CipherOutputStream {
      *         Instances of this interface are queried to find RAES parameters
      *         which match a known RAES type.
      *         This algorithm is recursively applied.
-     * @return A new instance of an {@code RaesOutputStream}.
-     * @throws RaesParametersException If {@code parameters} is {@code null} or
+     * @return A new {@code RaesOutputStream}.
+     * @throws RaesParametersException If {@code param} is {@code null} or
      *         no suitable RAES parameters can be found.
-     * @throws IOException On any other I/O related issue.
+     * @throws IOException On any I/O error.
      */
     public static RaesOutputStream getInstance(
             final OutputStream out,
