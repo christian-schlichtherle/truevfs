@@ -32,7 +32,7 @@ import net.jcip.annotations.ThreadSafe;
  * the local system time, which is represented by a UNIX-like encoding
  * by the Java API.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
@@ -151,10 +151,14 @@ public enum DateTimeConverter {
 
     /**
      * Converts a Java time value to a DOS date/time value.
-     * The returned value is rounded up or down to even seconds,
+     * <p>
+     * If the given Java time value preceeds {@link #MIN_DOS_TIME},
+     * then it's adjusted to this value.
+     * If the given Java time value exceeds {@link #MAX_DOS_TIME},
+     * then it's adjusted to this value.
+     * <p>
+     * The return value is rounded up or down to even seconds,
      * depending on {@link #roundUp}.
-     * If the Java time value is earlier than January 1<sup>st</sup>,
-     * 1980 AD 00:00:00 local time, then this value is returned instead.
      * <p>
      * This method uses a lenient {@link GregorianCalendar} for the date/time
      * conversion which has its timezone set to the return value of
@@ -163,17 +167,15 @@ public enum DateTimeConverter {
      * @param  jTime The number of milliseconds since midnight, January 1st,
      *         1970 AD UTC (called <i>the epoch</i> alias Java time).
      * @return A DOS date/time value reflecting the local time zone and
-     *         rounded down to even seconds which is minimum
-     *         January 1<sup>st</sup>, 1980 AD 00:00:00.
-     * @throws RuntimeException If {@code jTime} is negative
-     *         or later than 2107 AD.
+     *         rounded down to even seconds
+     *         and is in between {@link #MIN_DOS_TIME} and {@link #MAX_DOS_TIME}.
+     * @throws IllegalArgumentException If {@code jTime} is negative.
      * @see    #toJavaTime(long)
      * @see    #newTimeZone()
      */
     final long toDosTime(final long jTime) {
         if (jTime < 0)
-            throw new IllegalArgumentException("Java time is negative: 0x"
-                    + Long.toHexString(jTime).toUpperCase(Locale.ENGLISH));
+            throw new IllegalArgumentException("Negative Java time: " + jTime);
         final GregorianCalendar cal = getGregorianCalendar();
         cal.setTimeInMillis(roundUp(jTime) ? jTime + 1999 : jTime);
         long dTime = cal.get(Calendar.YEAR) - 1980;
@@ -186,9 +188,7 @@ public enum DateTimeConverter {
                 | (cal.get(Calendar.MINUTE) << 5)
                 | (cal.get(Calendar.SECOND) >> 1);
         if (MAX_DOS_TIME < dTime)
-            throw new IllegalArgumentException(
-                    "Java time is later than 2107 AD: 0x"
-                    + Long.toHexString(jTime).toUpperCase(Locale.ENGLISH));
+            return MAX_DOS_TIME;
         assert MIN_DOS_TIME <= dTime && dTime <= MAX_DOS_TIME;
         return dTime;
     }
@@ -201,12 +201,19 @@ public enum DateTimeConverter {
      * If an invalid DOS date/time value is provided, it gets adjusted by
      * overflowing the respective field value as if using a
      * {@link java.util.Calendar#setLenient lenient calendar}.
-     * This feature is provided in order to read bogus ZIP archive files
+     * If the given DOS date/time value preceeds {@link #MIN_DOS_TIME},
+     * then it's adjusted to this value.
+     * If the given DOS date/time value exceeds {@link #MAX_DOS_TIME},
+     * then it's adjusted to this value.
+     * These features are provided in order to read bogus ZIP archive files
      * created by third party tools.
-     * However, the returned Java time may differ from its intended value at
+     * <p>
+     * Note that the returned Java time may differ from its intended value at
      * the time of the creation of the ZIP archive file and when converting
      * it back again, the resulting DOS date/time value will not be the same as
      * {@code dTime}.
+     * This is because of the limited resolution of two seconds for DOS
+     * data/time values.
      * <p>
      * This method uses a lenient {@link GregorianCalendar} for the date/time
      * conversion which has its timezone set to the return value of
@@ -214,21 +221,16 @@ public enum DateTimeConverter {
      *
      * @param  dTime The DOS date/time value.
      * @return The number of milliseconds since midnight, January 1st,
-     *         1970 AD UTC (called <i>epoch</i> alias <i>Java time</i>).
-     * @throws IllegalArgumentException If {@code dTime} is earlier
-     *         than 1980 AD or greater than {@code 0xffffffffL}.
+     *         1970 AD UTC (called <i>epoch</i> alias <i>Java time</i>)
+     *         and is in between {@link #MIN_DOS_TIME} and {@link #MAX_DOS_TIME}.
      * @see    #toDosTime(long)
      * @see    #newTimeZone()
      */
-    final long toJavaTime(final long dTime) {
+    final long toJavaTime(long dTime) {
         if (dTime < MIN_DOS_TIME)
-            throw new IllegalArgumentException(
-                    "DOS date/time is earlier than 1980 AD: 0x"
-                    + Long.toHexString(dTime).toUpperCase(Locale.ENGLISH));
+            dTime = MIN_DOS_TIME;
         if (MAX_DOS_TIME < dTime)
-            throw new IllegalArgumentException(
-                    "DOS date/time is later than 2107 AD: 0x"
-                    + Long.toHexString(dTime).toUpperCase(Locale.ENGLISH));
+            dTime = MAX_DOS_TIME;
         final int time = (int) dTime;
         final GregorianCalendar cal = getGregorianCalendar();
         cal.set(Calendar.YEAR, 1980 + ((time >> 25) & 0x7f));
@@ -249,7 +251,9 @@ public enum DateTimeConverter {
     extends ThreadLocal<GregorianCalendar> {
         @Override
         protected GregorianCalendar initialValue() {
-            return new GregorianCalendar(newTimeZone());
+            final GregorianCalendar cal = new GregorianCalendar(newTimeZone());
+            assert cal.isLenient();
+            return cal;
         }
     };
 }
