@@ -29,7 +29,6 @@ import java.io.Closeable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -93,8 +92,8 @@ implements Iterable<E>, Closeable {
     /** The charset to use for entry names and comments. */
     private Charset charset;
 
-    /** The comment of this ZIP file. */
-    private String comment;
+    /** The encoded file comment. */
+    private @CheckForNull byte[] comment;
 
     /** The total number of bytes in this ZIP file. */
     private long length = -1;
@@ -245,7 +244,7 @@ implements Iterable<E>, Closeable {
             // See appendix D of PKWARE's ZIP File Format Specification.
             final boolean utf8 = (general & (1 << GPBF_UTF8)) != 0;
             if (utf8)
-                charset = UTF8;
+                this.charset = UTF8;
             final E entry = factory.newEntry(decode(name));
             try {
                 int off = 0;
@@ -332,7 +331,7 @@ implements Iterable<E>, Closeable {
     }
 
     private String decode(byte[] bytes) {
-        return charset.decode(ByteBuffer.wrap(bytes)).toString();
+        return new String(bytes, charset);
     }
 
     /**
@@ -399,10 +398,10 @@ implements Iterable<E>, Closeable {
                 off += 4;
                 commentLen = LittleEndian.readUShort(eocdr, off);
                 //off += 2;
-                if (commentLen > 0) {
+                if (0 < commentLen) {
                     final byte[] comment = new byte[commentLen];
                     rof.readFully(comment);
-                    setComment(decode(comment));
+                    this.comment = comment;
                 }
                 postamble = length - rof.getFilePointer();
                 // Check for ZIP64 End Of Central Directory Locator.
@@ -486,16 +485,19 @@ implements Iterable<E>, Closeable {
                 "No End Of Central Directory Record signature found!");
     }
 
-    /**
-     * Returns the comment of this ZIP file or {@code null} if no comment
-     * exists.
-     */
-    public String getComment() {
+    @SuppressWarnings("ReturnOfCollectionOrArrayField")
+    byte[] getFileComment() {
         return comment;
     }
 
-    private void setComment(String comment) {
-        this.comment = comment;
+    /**
+     * Returns the file comment.
+     * 
+     * @return The file comment.
+     */
+    public @Nullable String getComment() {
+        final byte[] comment = this.comment;
+        return null == comment ? null : decode(comment);
     }
 
     /**
@@ -506,13 +508,13 @@ implements Iterable<E>, Closeable {
         return openStreams > 0;
     }
 
-    /** Returns the charset to use for entry names and the file comment. */
-    public String getCharset() {
-        return charset.name();
+    final Charset getFileCharset() {
+        return charset;
     }
 
-    final Charset getCharset0() {
-        return charset;
+    /** Returns the charset used for reading entry names and the file comment. */
+    public String getCharset() {
+        return charset.name();
     }
 
     /**
@@ -711,7 +713,7 @@ implements Iterable<E>, Closeable {
         if (entry == null)
             return null;
         long offset = entry.getOffset();
-        assert offset != ZipEntry.UNKNOWN;
+        assert UNKNOWN != offset;
         // This offset has been set by mountCentralDirectory()
         // and needs to be resolved first.
         offset = mapper.location(offset);
@@ -1126,6 +1128,7 @@ implements Iterable<E>, Closeable {
     } // AccountedInputStream
 
     /** Maps a given offset to a file pointer position. */
+    @SuppressWarnings("PackageVisibleInnerClass")
     static class OffsetMapper {
         long location(long offset) {
             return offset;
