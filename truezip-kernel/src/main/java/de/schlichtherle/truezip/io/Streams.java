@@ -166,7 +166,7 @@ public final class Streams {
 
             @Override
             public void run() {
-                // Cache some data for better performance.
+                // Cache some fields for better performance.
                 final InputStream _in = in;
                 final Buffer[] _buffers = buffers;
                 final int _buffersLen = buffers.length;
@@ -184,7 +184,8 @@ public final class Streams {
                             try {
                                 wait();
                             } catch (InterruptedException interrupted) {
-                                return; // the writer thread wants us to stop reading.
+                                // The writer thread wants us to stop reading.
+                                return;
                             }
                         }
                         buffer = _buffers[(off + size) % _buffersLen];
@@ -197,12 +198,12 @@ public final class Streams {
                     final byte[] buf = buffer.buf;
                     try {
                         read = _in.read(buf, 0, buf.length);
-                    } catch (IOException ex) {
+                    } catch (Throwable ex) {
                         exception = new InputException(ex);
                         read = -1;
                     }
                     /*if (Thread.interrupted())
-                    read = -1; // throws away buf - OK in this context*/
+                        read = -1; // throws away buf - OK in this context*/
                     buffer.read = read;
 
                     // Advance head and notify writer.
