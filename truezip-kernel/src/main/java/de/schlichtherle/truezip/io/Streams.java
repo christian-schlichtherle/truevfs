@@ -126,7 +126,7 @@ public final class Streams {
             throw new NullPointerException();
 
         // Note that we do not use PipedInput/OutputStream because these
-        // classes are slooowww. This is partially because they are using
+        // classes are slooow. This is partially because they are using
         // Object.wait()/notify() in a suboptimal way and partially because
         // they copy data to and from an additional buffer byte array, which
         // is redundant if the data to be transferred is already held in
@@ -140,10 +140,13 @@ public final class Streams {
         // However, threads are different: They share the same memory and thus
         // we can use much more elaborated algorithms for data transfer.
 
-        // Finally, in this case we will simply cycle through an array of
-        // byte buffers, where an additionally created reader executor will fill
-        // the buffers with data from the input and the current executor will
-        // flush the filled buffers to the output.
+        // Finally, in this case we will use a FIFO to exchange byte buffers
+        // between an additional reader thread and the current writer thread.
+        // An additionally created reader thread will fill the buffers with
+        // data from the input and the current thread will flush the filled
+        // buffers to the output.
+        // The FIFO is simply implemented as an array with an offset and a size
+        // which is used like a ring buffer.
 
         final Buffer[] buffers = allocateBuffers();
 
@@ -156,7 +159,7 @@ public final class Streams {
             int off;
 
             /** The number of buffers filled with data to be written. */
-            int len;
+            int size;
 
             /** The IOException that happened in this task, if any. */
             volatile InputException exception;
@@ -177,14 +180,14 @@ public final class Streams {
                     // Wait until a buffer is available.
                     final Buffer buffer;
                     synchronized (Reader.this) {
-                        while (len >= _buffersLen) {
+                        while (size >= _buffersLen) {
                             try {
                                 wait();
                             } catch (InterruptedException interrupted) {
-                                return; // stop reading.
+                                return; // the writer thread wants us to stop reading.
                             }
                         }
-                        buffer = _buffers[(off + len) % _buffersLen];
+                        buffer = _buffers[(off + size) % _buffersLen];
                     }
 
                     // Fill buffer until end of file or buffer.
@@ -204,7 +207,7 @@ public final class Streams {
 
                     // Advance head and notify writer.
                     synchronized (Reader.this) {
-                        len++;
+                        size++;
                         notify(); // only the writer could be waiting now!
                     }
                 } while (read != -1);
@@ -224,10 +227,12 @@ public final class Streams {
                 final int off;
                 final Buffer buffer;
                 synchronized (reader) {
-                    while (reader.len <= 0) {
+                    while (reader.size <= 0) {
                         try {
                             reader.wait();
-                        } catch (InterruptedException ignored) {
+                        } catch (InterruptedException ex) {
+                            Logger  .getLogger(Streams.class.getName())
+                                    .log(Level.FINE, ex.getLocalizedMessage(), ex);
                         }
                     }
                     off = reader.off;
@@ -261,7 +266,7 @@ public final class Streams {
                             throw new AssertionError(ex2);
                         } catch (InterruptedException ex2) {
                             Logger  .getLogger(Streams.class.getName())
-                                    .log(Level.INFO, ex2.getLocalizedMessage(), ex2);
+                                    .log(Level.FINE, ex2.getLocalizedMessage(), ex2);
                         }
                     }
                     throw ex;
@@ -270,7 +275,7 @@ public final class Streams {
                 // Advance tail and notify reader.
                 synchronized (reader) {
                     reader.off = (off + 1) % buffersLen;
-                    reader.len--;
+                    reader.size--;
                     reader.notify(); // only the reader could be waiting now!
                 }
             }
