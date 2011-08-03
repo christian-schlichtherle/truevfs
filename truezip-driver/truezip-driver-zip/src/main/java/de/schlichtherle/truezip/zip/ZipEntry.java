@@ -64,7 +64,7 @@ public class ZipEntry implements Cloneable {
     public static final int DEFLATED = 8;
 
     /** Pseudo Compression method for WinZip AES encrypted entries. */
-    static final int ENCRYPTED = 99;
+    static final int WINZIP_AES = 99;
 
     /** General Purpose Bit Flag for encrypted data. */
     static int GPBF_ENCRYPTED = 0;

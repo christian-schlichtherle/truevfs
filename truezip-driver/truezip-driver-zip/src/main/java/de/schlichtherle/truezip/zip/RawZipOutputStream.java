@@ -470,20 +470,20 @@ implements Iterable<E> {
         final long offset = dos.size();
         final boolean encrypted = entry.isEncrypted();
         final boolean dd // data descriptor?
-                =  crc   == UNKNOWN
-                || csize == UNKNOWN
-                || size  == UNKNOWN;
+                =  UNKNOWN == crc
+                || UNKNOWN == csize
+                || UNKNOWN == size;
         final boolean zip64 // ZIP64 extensions?
-                =  csize  >= UInt.MAX_VALUE
-                || size   >= UInt.MAX_VALUE
-                || offset >= UInt.MAX_VALUE
+                =  UInt.MAX_VALUE <= csize
+                || UInt.MAX_VALUE <= size
+                || UInt.MAX_VALUE <= offset
                 || FORCE_ZIP64_EXT;
         // Compose General Purpose Bit Flag.
         // See appendix D of PKWARE's ZIP File Format Specification.
         final boolean utf8 = UTF8.equals(charset);
         final int general = (encrypted ? (1 << GPBF_ENCRYPTED) : 0)
-                          | (dd   ? (1 << GPBF_DATA_DESCRIPTOR) : 0)
-                          | (utf8 ? (1 << GPBF_UTF8) : 0);
+                          | (dd        ? (1 << GPBF_DATA_DESCRIPTOR) : 0)
+                          | (utf8      ? (1 << GPBF_UTF8) : 0);
         // Start changes.
         finished = false;
         // Local File Header Signature.
@@ -587,7 +587,7 @@ implements Iterable<E> {
                     throw new ZipException(entry.getName()
                     + " (bad CRC-32: 0x"
                     + Long.toHexString(entry.getCrc())
-                    + " expected: 0x"
+                    + "; expected: 0x"
                     + Long.toHexString(expectedCrc)
                     + ")");
                 }
@@ -597,7 +597,7 @@ implements Iterable<E> {
                     throw new ZipException(entry.getName()
                     + " (bad uncompressed Size: "
                     + entry.getSize()
-                    + " expected: "
+                    + "; expected: "
                     + entrySize
                     + ")");
                 }
@@ -620,7 +620,7 @@ implements Iterable<E> {
                 break;
             default:
                 throw new ZipException(entry.getName()
-                + " (unsupported compression method "
+                + " (unsupported compression method: "
                 + entry.getMethod()
                 + ")");
         }
@@ -718,7 +718,7 @@ implements Iterable<E> {
         dos.writeShort((entry.getPlatform() << 8) | 63);
         // Version Needed To Extract.
         dos.writeShort(zip64 ? 45 : dd ? 20 : 10);
-        // General Purpose Bit Flag.
+        // General Purpose Bit Flags.
         dos.writeShort(entry.getGeneral());
         // Compression Method.
         dos.writeShort(entry.getMethod());

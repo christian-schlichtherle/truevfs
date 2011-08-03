@@ -31,7 +31,7 @@ final class DefaultZipEntryFactory implements ZipEntryFactory<ZipEntry> {
     }
 
     @Override
-	public ZipEntry newEntry(String name) {
+    public ZipEntry newEntry(String name) {
         return new ZipEntry(name);
     }
 }
