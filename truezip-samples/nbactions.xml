@@ -8,7 +8,8 @@
             </goals>
             <properties>
                 <exec.classpathScope>runtime</exec.classpathScope>
-                <exec.args>-ea -classpath %classpath com.company.project.Tree</exec.args>
+                <exec.workingdir>C:\Users\christian\Documents\temp</exec.workingdir>
+                <exec.args>-ea -classpath %classpath de.schlichtherle.truezip.sample.file.app.Nzip llr testZip.zip</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
@@ -20,7 +21,8 @@
             </goals>
             <properties>
                 <exec.classpathScope>runtime</exec.classpathScope>
-                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -ea -classpath %classpath com.company.project.Tree</exec.args>
+                <exec.workingdir>C:\Users\christian\Documents\temp</exec.workingdir>
+                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -ea -classpath %classpath de.schlichtherle.truezip.sample.file.app.Nzip llr testZip.zip</exec.args>
                 <jpda.listen>true</jpda.listen>
                 <exec.executable>java</exec.executable>
             </properties>
@@ -32,7 +34,8 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2:exec</goal>
             </goals>
             <properties>
-                <exec.args>${profiler.args} -ea -classpath %classpath com.company.project.Tree</exec.args>
+                <exec.args>${profiler.args} -ea -classpath %classpath de.schlichtherle.truezip.sample.file.app.Nzip llr testZip.zip</exec.args>
+                <exec.workingdir>C:\Users\christian\Documents\temp</exec.workingdir>
                 <profiler.action>profile</profiler.action>
                 <exec.executable>${profiler.java}</exec.executable>
             </properties>

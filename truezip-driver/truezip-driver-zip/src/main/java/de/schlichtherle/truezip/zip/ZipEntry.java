@@ -78,6 +78,12 @@ public class ZipEntry implements Cloneable {
      */
     public static final long MIN_DOS_TIME = DateTimeConverter.MIN_DOS_TIME;
 
+    /**
+     * Largest supported DOS date/time value in a ZIP file,
+     * which is December 31<sup>st</sup>, 2107 AD 23:59:58 local time.
+     */
+    public static final long MAX_DOS_TIME = DateTimeConverter.MAX_DOS_TIME;
+
     private byte init;                  // bit flag for init state
     private String name;
     private byte platform = UNKNOWN;    // 1 byte unsigned int (UByte)
@@ -262,15 +268,15 @@ public class ZipEntry implements Cloneable {
     }
     
     protected long getDosTime() {
-        return jTime != UNKNOWN
-                ? getDateTimeConverter().toDosTime(jTime)
-                : UNKNOWN;
+        return UNKNOWN == jTime
+                ? UNKNOWN
+                : getDateTimeConverter().toDosTime(jTime);
     }
 
     protected void setDosTime(final long dTime) {
-        this.jTime = dTime != UNKNOWN
-                ? getDateTimeConverter().toJavaTime(dTime)
-                : UNKNOWN;
+        this.jTime = UNKNOWN == dTime
+                ? UNKNOWN
+                : getDateTimeConverter().toJavaTime(dTime);
     }
 
     public long getTime() {
@@ -281,7 +287,7 @@ public class ZipEntry implements Cloneable {
         if (UNKNOWN == jTime) {
             this.jTime = UNKNOWN;
         } else {
-            // Adjust to lower granularity of DOS date/time.
+            // Adjust to lower resolution of DOS date/time.
             DateTimeConverter dtc = getDateTimeConverter();
             this.jTime = dtc.toJavaTime(dtc.toDosTime(jTime));
         }

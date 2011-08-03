@@ -174,28 +174,26 @@ public final class ZipEntryTest {
 
     @Test
     public void testDosTime() {
-        try {
-            entry.setDosTime(UNKNOWN - 1);
-            fail("Expected RuntimeException");
-        } catch (RuntimeException ex) {
-        }
+        entry.setDosTime(UNKNOWN - 1);
+        assertEquals(MIN_DOS_TIME, entry.getDosTime());
 
-        try {
-            entry.setDosTime(0);
-            fail("Expected RuntimeException");
-        } catch (RuntimeException ex) {
-        }
+        entry.setDosTime(Long.MIN_VALUE);
+        assertEquals(MIN_DOS_TIME, entry.getDosTime());
 
-        try {
-            entry.setDosTime(UInt.MAX_VALUE + 1);
-            fail("Expected RuntimeException");
-        } catch (RuntimeException ex) {
-        }
+        entry.setDosTime(MIN_DOS_TIME - 1);
+        assertEquals(MIN_DOS_TIME, entry.getDosTime());
 
-        assertEquals(UNKNOWN, entry.getDosTime());
+        entry.setDosTime(MIN_DOS_TIME);
+        assertEquals(MIN_DOS_TIME, entry.getDosTime());
 
-        entry.setDosTime(ZipEntry.MIN_DOS_TIME);
-        assertEquals(ZipEntry.MIN_DOS_TIME, entry.getDosTime());
+        entry.setDosTime(MAX_DOS_TIME);
+        assertEquals(MAX_DOS_TIME, entry.getDosTime());
+
+        entry.setDosTime(MAX_DOS_TIME + 1);
+        assertEquals(MAX_DOS_TIME, entry.getDosTime());
+
+        entry.setDosTime(Long.MAX_VALUE);
+        assertEquals(MAX_DOS_TIME, entry.getDosTime());
 
         entry.setDosTime(UNKNOWN);
         assertEquals(UNKNOWN, entry.getDosTime());
@@ -204,15 +202,25 @@ public final class ZipEntryTest {
     @Test
     public void testTime() {
         try {
+            entry.setTime(Long.MIN_VALUE);
+            fail();
+        } catch (IllegalArgumentException ex) {
+        }
+
+        try {
             entry.setTime(UNKNOWN - 1);
-            fail("Expected RuntimeException");
-        } catch (RuntimeException ex) {
+            fail();
+        } catch (IllegalArgumentException ex) {
         }
 
         assertEquals(UNKNOWN, entry.getTime());
+
         entry.setTime(0);
-        long time = entry.getTime();
-        assertEquals(time, DateTimeConverter.JAR.toJavaTime(ZipEntry.MIN_DOS_TIME));
+        assertEquals(entry.getTime(), DateTimeConverter.JAR.toJavaTime(MIN_DOS_TIME));
+
+        entry.setTime(Long.MAX_VALUE);
+        assertEquals(entry.getTime(), DateTimeConverter.JAR.toJavaTime(MAX_DOS_TIME));
+
         entry.setTime(UNKNOWN);
         assertEquals(UNKNOWN, entry.getTime());
     }
