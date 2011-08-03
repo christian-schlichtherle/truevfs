@@ -459,7 +459,7 @@ implements Iterable<E> {
 
     /** @throws IOException On any I/O error. */
     private void writeLocalFileHeader() throws IOException {
-        final ZipEntry entry = this.entry;
+        final E entry = this.entry;
         assert null != entry;
         final LEDataOutputStream dos = (LEDataOutputStream) delegate;
         final long crc = entry.getCrc();
