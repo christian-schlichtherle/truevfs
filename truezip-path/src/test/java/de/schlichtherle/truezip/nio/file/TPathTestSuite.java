@@ -493,7 +493,7 @@ public abstract class TPathTestSuite extends TestBase {
         }
     }
 
-    private void assertFileOutputStream(TPath file) throws IOException {
+    private void assertFileOutputStream(final TPath file) throws IOException {
         final byte[] message = "Hello World!\r\n".getBytes();
         final OutputStream out = newOutputStream(file);
         try {
