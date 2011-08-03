@@ -23,6 +23,7 @@ import static de.schlichtherle.truezip.zip.ZipEntry.*;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
@@ -75,8 +76,8 @@ implements Iterable<E> {
 
     private final byte[] sbuf = new byte[1];
 
-    /** The file comment. */
-    private String comment = "";
+    /** The encoded file comment. */
+    private @CheckForNull byte[] comment;
 
     /** Default compression method for next entry. */
     private short method = DEFLATED;
@@ -106,6 +107,8 @@ implements Iterable<E> {
      * write already compressed entry data into the ZIP file.
      */
     private boolean deflate;
+
+    private @CheckForNull ZipCryptoParameters cryptoParameters;
 
     /**
      * Constructs a raw ZIP output stream which decorates the given output
@@ -162,8 +165,8 @@ implements Iterable<E> {
             final @CheckForNull Charset charset) {
         super(promote(out, appendee));
         if (null != appendee) {
-            this.charset = appendee.getCharset0();
-            this.comment = appendee.getComment();
+            this.charset = appendee.getFileCharset();
+            this.comment = appendee.getFileComment();
             final Map<String, E> entries = this.entries;
             for (E entry : appendee)
                 entries.put(entry.getName(), entry);
@@ -194,6 +197,14 @@ implements Iterable<E> {
             super.written = appendee.getOffsetMapper().location(appendee.length());
         }
     } // AppendingLEDataOutputStream
+
+    private byte[] encode(String string) {
+        return string.getBytes(charset);
+    }
+
+    private String decode(byte[] bytes) {
+        return new String(bytes, charset);
+    }
 
     /** Returns the charset to use for entry names and the file comment. */
     public String getCharset() {
@@ -248,22 +259,39 @@ implements Iterable<E> {
 
     /**
      * Returns the file comment.
+     * 
+     * @return The file comment.
      */
-    public String getComment() {
-        return comment;
+    public @Nullable String getComment() {
+        final byte[] comment = this.comment;
+        //return null == comment ? null : new String(comment, charset);
+        return null == comment ? null : decode(comment);
     }
 
     /**
      * Sets the file comment.
+     * 
+     * @param  comment the file comment.
+     * @throws IllegalArgumentException if the encoded comment is longer than
+     *         {@value UShort#MAX_VALUE} bytes.
      */
-    public void setComment(String comment) {
-        this.comment = comment;
+    public void setComment(final @CheckForNull String comment) {
+        if (null != comment && !comment.isEmpty()) {
+            //final byte[] bytes = comment.getBytes(charset);
+            final byte[] bytes = encode(comment);
+            UShort.check(bytes.length);
+            this.comment = bytes;
+        } else {
+            this.comment = null;
+        }
     }
 
     /**
      * Returns the default compression method for subsequent entries.
      * This property is only used if a {@link ZipEntry} does not specify a
      * compression method.
+     * <p>
+     * The initial value is {@link ZipEntry#DEFLATED}.
      *
      * @see #setMethod
      * @see ZipEntry#getMethod
@@ -279,20 +307,21 @@ implements Iterable<E> {
      * <p>
      * Legal values are {@link ZipEntry#STORED} (uncompressed) and
      * {@link ZipEntry#DEFLATED} (compressed).
-     * The initial value is {@link ZipEntry#DEFLATED}.
      *
      * @see #getMethod
      * @see ZipEntry#setMethod
      */
-    public void setMethod(int method) {
-	if (method != STORED && method != DEFLATED)
+    public void setMethod(final int method) {
+	if (STORED != method && DEFLATED != method)
 	    throw new IllegalArgumentException(
                     "Invalid compression method: " + method);
         this.method = (short) method;
     }
 
     /**
-     * Returns the compression level currently used.
+     * Returns the current compression level.
+     * 
+     * @return The current compression level.
      */
     public int getLevel() {
         return def.getLevel();
@@ -300,10 +329,31 @@ implements Iterable<E> {
 
     /**
      * Sets the compression level for subsequent entries.
+     * 
+     * @param level the compression level.
+     * @throws IllegalArgumentException if the compression level is invalid.
      */
     public void setLevel(int level) {
 	def.setLevel(level);
     }
+
+    /**
+     * Returns the crypto parameters.
+     * 
+     * @return The crypto parameters.
+     */
+    /*public @Nullable ZipCryptoParameters getCryptoParameters() {
+        return cryptoParameters;
+    }*/
+
+    /**
+     * Sets the crypto parameters.
+     * 
+     * @param cryptoParameters the crypto parameters.
+     */
+    /*public void setCryptoParameters(final @CheckForNull ZipCryptoParameters cryptoParameters) {
+        this.cryptoParameters = cryptoParameters;
+    }*/
 
     /**
      * Returns the total number of (compressed) bytes this stream has written
@@ -364,10 +414,10 @@ implements Iterable<E> {
                             + entry.getCommentLength(charset);
             if (size > UShort.MAX_VALUE)
                 throw new ZipException(entry.getName()
-                + " (sum of name, extra fields and comment too long: " + size + ")");
+                + " (sum of name, extra fields and comment is too long: " + size + ")");
         }
         int method = entry.getMethod();
-        if (method == ZipEntry.UNKNOWN)
+        if (UNKNOWN == method)
             method = getMethod();
         switch (method) {
             case STORED:
@@ -383,11 +433,11 @@ implements Iterable<E> {
                 throw new ZipException(entry.getName()
                 + " (unsupported compression method: " + method + ")");
         }
-        if (entry.getPlatform() == ZipEntry.UNKNOWN)
+        if (UNKNOWN == entry.getPlatform())
             entry.setPlatform(PLATFORM_FAT);
-        if (entry.getMethod()   == ZipEntry.UNKNOWN)
+        if (UNKNOWN == entry.getMethod())
             entry.setMethod(method);
-        if (entry.getTime()     == ZipEntry.UNKNOWN)
+        if (UNKNOWN == entry.getTime())
             entry.setTime(System.currentTimeMillis());
         // Write LFH BEFORE putting the entry in the map.
         this.entry = entry;
@@ -399,11 +449,11 @@ implements Iterable<E> {
 
     private static void checkLocalFileHeaderData(final ZipEntry entry)
     throws ZipException {
-        if (entry.getCrc()              == ZipEntry.UNKNOWN)
+        if (UNKNOWN == entry.getCrc())
             throw new ZipException(entry.getName() + " (unknown CRC checksum)");
-        if (entry.getCompressedSize32() == ZipEntry.UNKNOWN)
+        if (UNKNOWN == entry.getCompressedSize32())
             throw new ZipException(entry.getName() + " (unknown compressed size)");
-        if (entry.getSize32()           == ZipEntry.UNKNOWN)
+        if (UNKNOWN == entry.getSize32())
             throw new ZipException(entry.getName() + " (unknown uncompressed size)");
     }
 
@@ -420,9 +470,9 @@ implements Iterable<E> {
         final long offset = dos.size();
         final boolean encrypted = entry.isEncrypted();
         final boolean dd // data descriptor?
-                =  crc   == ZipEntry.UNKNOWN
-                || csize == ZipEntry.UNKNOWN
-                || size  == ZipEntry.UNKNOWN;
+                =  crc   == UNKNOWN
+                || csize == UNKNOWN
+                || size  == UNKNOWN;
         final boolean zip64 // ZIP64 extensions?
                 =  csize  >= UInt.MAX_VALUE
                 || size   >= UInt.MAX_VALUE
@@ -459,7 +509,7 @@ implements Iterable<E> {
             dos.writeInt((int) size32);
         }
         // File Name Length.
-        final byte[] name = entry.getName().getBytes(charset);
+        final byte[] name = encode(entry.getName());
         dos.writeShort(name.length);
         // Extra Field Length.
         final byte[] extra = entry.getExtra(!dd);
@@ -681,18 +731,15 @@ implements Iterable<E> {
         // Uncompressed Size.
         dos.writeInt((int) size32);
         // File Name Length.
-        final byte[] name = entry.getName().getBytes(charset);
+        final byte[] name = encode(entry.getName());
         dos.writeShort(name.length);
         // Extra Field Length.
         final byte[] extra = entry.getExtra();
         assert extra != null;
         dos.writeShort(extra.length);
         // File Comment Length.
-        String comment = entry.getComment();
-        if (comment == null)
-            comment = "";
-        final byte[] data = comment.getBytes(charset);
-        dos.writeShort(data.length);
+        final byte[] comment = getEntryComment(entry);
+        dos.writeShort(comment.length);
         // Disk Number Start.
         dos.writeShort(0);
         // Internal File Attributes.
@@ -706,7 +753,14 @@ implements Iterable<E> {
         // Extra Field(s).
         dos.write(extra);
         // File Comment.
-        dos.write(data);
+        dos.write(comment);
+    }
+
+    private byte[] getEntryComment(final ZipEntry entry) {
+        String comment = entry.getComment();
+        if (comment == null)
+            comment = "";
+        return encode(comment);
     }
 
     /**
@@ -774,12 +828,14 @@ implements Iterable<E> {
         dos.writeInt((int) cdSize32);
         dos.writeInt((int) cdOffset32);
         // ZIP file comment.
-        String comment = getComment();
-        if (comment == null)
-            comment = "";
-        final byte[] data = comment.getBytes(charset);
-        dos.writeShort(data.length);
-        dos.write(data);
+        final byte[] comment = getFileComment();
+        dos.writeShort(comment.length);
+        dos.write(comment);
+    }
+
+    private byte[] getFileComment() {
+        final byte[] comment = this.comment;
+        return null != comment ? comment : new byte[0];
     }
 
     /**
