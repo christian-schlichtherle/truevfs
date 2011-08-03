@@ -402,12 +402,25 @@ implements Iterable<E> {
      *         format specification.
      * @throws IOException On any I/O error.
      */
-    public void putNextEntry(final E entry, final boolean deflate)
+    public void putNextEntry(final E entry, boolean deflate)
     throws IOException {
         closeEntry();
-        final String name = entry.getName();
-        /*if (entries.get(name) != null)
-            throw new ZipException(name + " (duplicate entry)");*/
+        deflate = setupEntry(entry, deflate);
+        final OutputStream out = openOutput(entry, deflate);
+        this.entry = entry;
+        // Write LFH BEFORE putting the entry in the map.
+        writeLocalFileHeader();
+        // Store entry now so that a subsequent call to getEntry(...) returns
+        // it.
+        entries.put(entry.getName(), entry);
+        this.delegate = out;
+    }
+
+    /**
+     * This method may have side effects on {@code entry} only.
+     */
+    private boolean setupEntry(final E entry, boolean deflate)
+    throws IOException {
         {
             final long size = entry.getNameLength(charset)
                             + entry.getExtraLength()
@@ -418,16 +431,15 @@ implements Iterable<E> {
         }
         int method = entry.getMethod();
         if (UNKNOWN == method)
-            method = getMethod();
+            entry.setMethod(method = getMethod());
         switch (method) {
             case STORED:
                 checkLocalFileHeaderData(entry);
-                this.deflate = false;
+                deflate = false;
                 break;
             case DEFLATED:
                 if (!deflate)
                     checkLocalFileHeaderData(entry);
-                this.deflate = deflate;
                 break;
             default:
                 throw new ZipException(entry.getName()
@@ -435,20 +447,13 @@ implements Iterable<E> {
         }
         if (UNKNOWN == entry.getPlatform())
             entry.setPlatform(PLATFORM_FAT);
-        if (UNKNOWN == entry.getMethod())
-            entry.setMethod(method);
         if (UNKNOWN == entry.getTime())
             entry.setTime(System.currentTimeMillis());
-        // Write LFH BEFORE putting the entry in the map.
-        this.entry = entry;
-        writeLocalFileHeader();
-        // Store entry now so that an immediate subsequent call to getEntry(...)
-        // returns it.
-        entries.put(name, entry);
+        return deflate;
     }
 
     private static void checkLocalFileHeaderData(final ZipEntry entry)
-    throws ZipException {
+    throws IOException {
         if (UNKNOWN == entry.getCrc())
             throw new ZipException(entry.getName() + " (unknown CRC checksum)");
         if (UNKNOWN == entry.getCompressedSize32())
@@ -457,8 +462,18 @@ implements Iterable<E> {
             throw new ZipException(entry.getName() + " (unknown uncompressed size)");
     }
 
+    /**
+     * This method may not have any side effects.
+     */
+    private OutputStream openOutput(final E entry, final boolean deflate)
+    throws IOException {
+        this.deflate = deflate; // FIXME!
+        return this.delegate;
+    }
+
     /** @throws IOException On any I/O error. */
-    private void writeLocalFileHeader() throws IOException {
+    private void writeLocalFileHeader()
+    throws IOException {
         final E entry = this.entry;
         assert null != entry;
         final LEDataOutputStream dos = (LEDataOutputStream) delegate;
@@ -485,7 +500,7 @@ implements Iterable<E> {
                           | (dd        ? (1 << GPBF_DATA_DESCRIPTOR) : 0)
                           | (utf8      ? (1 << GPBF_UTF8) : 0);
         // Start changes.
-        finished = false;
+        this.finished = false;
         // Local File Header Signature.
         dos.writeInt(LFH_SIG);
         // Version Needed To Extract.
@@ -522,7 +537,7 @@ implements Iterable<E> {
         // Commit changes.
         entry.setGeneral(general);
         entry.setOffset(offset);
-        dataStart = dos.size();
+        this.dataStart = dos.size();
     }
 
     /**
@@ -569,17 +584,10 @@ implements Iterable<E> {
     }
 
     /**
-     * Writes all necessary data for this entry to the underlying stream.
-     *
-     * @throws ZipException If and only if writing the entry is impossible
-     *         because the resulting file would not comply to the ZIP file
-     *         format specification.
-     * @throws IOException On any I/O error.
+     * Mind the side effects!
      */
-    public void closeEntry() throws IOException {
+    private void closeOutput() throws IOException {
         final E entry = this.entry;
-        if (null == entry)
-            return;
         switch (entry.getMethod()) {
             case STORED:
                 final long expectedCrc = crc.getValue();
@@ -624,6 +632,21 @@ implements Iterable<E> {
                 + entry.getMethod()
                 + ")");
         }
+    }
+
+    /**
+     * Writes all necessary data for this entry to the underlying stream.
+     *
+     * @throws ZipException If and only if writing the entry is impossible
+     *         because the resulting file would not comply to the ZIP file
+     *         format specification.
+     * @throws IOException On any I/O error.
+     */
+    public void closeEntry() throws IOException {
+        final E entry = this.entry;
+        if (null == entry)
+            return;
+        closeOutput();
         writeDataDescriptor();
         flush();
         crc.reset();
@@ -684,13 +707,13 @@ implements Iterable<E> {
      * @throws IOException On any I/O error.
      */
     public void finish() throws IOException {
-        if (finished)
+        if (this.finished)
             return;
-        finished = true;
+        this.finished = true;
         closeEntry();
-        final LEDataOutputStream dos = (LEDataOutputStream) delegate;
-        cdOffset = dos.size();
-        for (ZipEntry entry : entries.values())
+        final LEDataOutputStream dos = (LEDataOutputStream) this.delegate;
+        this.cdOffset = dos.size();
+        for (E entry : this.entries.values())
             writeCentralFileHeader(entry);
         writeEndOfCentralDirectory();
     }
@@ -700,7 +723,7 @@ implements Iterable<E> {
      *
      * @throws IOException On any I/O error.
      */
-    private void writeCentralFileHeader(final ZipEntry entry) throws IOException {
+    private void writeCentralFileHeader(final E entry) throws IOException {
         assert null != entry;
         final LEDataOutputStream dos = (LEDataOutputStream) delegate;
         final long csize32 = entry.getCompressedSize32();
