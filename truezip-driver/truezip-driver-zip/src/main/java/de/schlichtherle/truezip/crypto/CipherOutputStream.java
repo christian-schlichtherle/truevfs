@@ -73,8 +73,8 @@ public class CipherOutputStream extends DecoratingOutputStream {
      * @param cipher The cipher to use for encryption or decryption.
      *        Maybe {@code null} for subsequent initialization by a subclass.
      */
-    public CipherOutputStream(  @CheckForNull OutputStream out,
-                                final @CheckForNull BufferedBlockCipher cipher) {
+    public CipherOutputStream(  @Nullable OutputStream out,
+                                final @Nullable BufferedBlockCipher cipher) {
         super(out);
         this.cipher = cipher;
     }
@@ -174,14 +174,14 @@ public class CipherOutputStream extends DecoratingOutputStream {
     @Override
     public void close() throws IOException {
         // Order is important here!
-        if (!closed) {
-            closed = true;
-            try {
-                finish();
-            } finally {
-                cipher = null;
-                delegate.close();
-            }
+        if (closed)
+            return;
+        closed = true;
+        try {
+            finish();
+        } finally {
+            cipher = null;
+            delegate.close();
         }
     }
 }
