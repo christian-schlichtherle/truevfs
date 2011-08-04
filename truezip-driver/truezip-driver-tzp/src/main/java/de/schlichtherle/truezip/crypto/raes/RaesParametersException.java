@@ -34,7 +34,7 @@ public class RaesParametersException extends RaesException {
      * have been found.
      */
     public RaesParametersException() {
-        super("No suitable RaesParameters available!");
+        super("No suitable RAES parameters available!");
     }
 
     /**
