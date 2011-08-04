@@ -440,7 +440,7 @@ implements Iterable<E> {
     }
 
     /**
-     * This method may not have any side effects.
+     * This method may not have any side effects!
      */
     private OutputStream openOutput(final E entry, final boolean deflate)
     throws IOException {
@@ -534,10 +534,12 @@ implements Iterable<E> {
      */
     private void closeOutput() throws IOException {
         OutputStream out = this.delegate;
-        if (!(out instanceof ProxyOutputStream))
+        if (!(out instanceof ProxyOutputStream)) {
+            assert out instanceof LEDataOutputStream;
             return;
+        }
         final ProxyOutputStream pos = ((ProxyOutputStream) out);
-        out = pos.getDelegate();
+        out = pos.getProxiedOutputStream();
         assert out instanceof LEDataOutputStream;
         try {
             pos.finish();
@@ -806,7 +808,7 @@ implements Iterable<E> {
      * Instances of this interface must extend {@link OutputStream}!
      */
     private interface ProxyOutputStream {
-        OutputStream getDelegate();
+        OutputStream getProxiedOutputStream();
         void finish() throws IOException;
     } // ProxyOutputStream
 
@@ -820,7 +822,7 @@ implements Iterable<E> {
         }
 
         @Override
-        public OutputStream getDelegate() {
+        public OutputStream getProxiedOutputStream() {
             return this.out;
         }
 
@@ -844,10 +846,10 @@ implements Iterable<E> {
         }
 
         @Override
-        public OutputStream getDelegate() {
+        public OutputStream getProxiedOutputStream() {
             final OutputStream out = this.out;
             return out instanceof ProxyOutputStream
-                    ? ((ProxyOutputStream) out).getDelegate()
+                    ? ((ProxyOutputStream) out).getProxiedOutputStream()
                     : out;
         }
 
@@ -894,7 +896,7 @@ implements Iterable<E> {
                 + Long.toHexString(expectedCrc)
                 + ")");
             }
-            final long written = ((LEDataOutputStream) getDelegate()).size();
+            final long written = ((LEDataOutputStream) getProxiedOutputStream()).size();
             final long entrySize = written - RawZipOutputStream.this.dataStart;
             if (entry.getSize() != entrySize) {
                 throw new ZipException(entry.getName()
