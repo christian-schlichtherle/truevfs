@@ -39,13 +39,28 @@ import net.jcip.annotations.ThreadSafe;
  * Provides static utility methods for {@link InputStream}s and
  * {@link OutputStream}s.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
 @ThreadSafe
 public final class Streams {
 
+    /**
+     * The size of the FIFO used for exchanging I/O buffers between a reader
+     * thread and a writer thread.
+     * A minimum of two elements is required.
+     * The actual number is optimized to compensate for oscillating I/O
+     * bandwidths like e.g. with network shares.
+     */
+    private static final int FIFO_SIZE = 4;
+
+    /**
+     * The buffer size used for reading and writing.
+     * Optimized for performance.
+     */
+    public static final int BUFFER_SIZE = 8 * 1024;
+    
     /** You cannot instantiate this class. */
     private Streams() {
     }
@@ -53,7 +68,7 @@ public final class Streams {
     private static final ExecutorService executor
             = Executors.newCachedThreadPool(new InputStreamReaderThreadFactory());
 
-    /** A factory for input stream reader threads. */
+    /** A factory for input stream reader daemon threads. */
     private static class InputStreamReaderThreadFactory
     implements ThreadFactory {
         @Override
@@ -148,7 +163,7 @@ public final class Streams {
         // The FIFO is simply implemented as an array with an offset and a size
         // which is used like a ring buffer.
 
-        final Buffer[] buffers = allocateBuffers();
+        final Buffer[] buffers = Buffer.allocate();
 
         /*
          * The task that cycles through the buffers in order to fill them
@@ -285,48 +300,44 @@ public final class Streams {
             if (reader.exception != null)
                 throw reader.exception;
         } finally {
-            releaseBuffers(buffers);
-        }
-    }
-
-    private static Buffer[] allocateBuffers() {
-        synchronized (Buffer.list) {
-            Buffer[] buffers;
-            for (Iterator<Reference<Buffer[]>> i = Buffer.list.iterator(); i.hasNext(); ) {
-                buffers = i.next().get();
-                i.remove();
-                if (buffers != null)
-                    return buffers;
-                }
-            }
-
-        // A minimum of two buffers is required.
-        // The actual number is optimized to compensate for oscillating
-        // I/O bandwidths like e.g. with network shares.
-        final Buffer[] buffers = new Buffer[4];
-        for (int i = buffers.length; --i >= 0; )
-            buffers[i] = new Buffer();
-        return buffers;
-    }
-
-    private static void releaseBuffers(Buffer[] buffers) {
-        synchronized (Buffer.list) {
-            Buffer.list.add(new SoftReference<Buffer[]>(buffers));
+            Buffer.release(buffers);
         }
     }
 
     /** A buffer for I/O. */
-    private static class Buffer {
+    private static final class Buffer {
         /**
          * Each entry in this list holds a soft reference to an array
          * initialized with instances of this class.
          */
         static final List<Reference<Buffer[]>> list = new LinkedList<Reference<Buffer[]>>();
 
-        /** The byte buffer used for asynchronous reading and writing. */
-        byte[] buf = new byte[64 * 1024];
+        static Buffer[] allocate() {
+            synchronized (Buffer.class) {
+                Buffer[] buffers;
+                final Iterator<Reference<Buffer[]>> i = list.iterator();
+                while (i.hasNext()) {
+                    buffers = i.next().get();
+                    i.remove();
+                    if (null != buffers)
+                        return buffers;
+                }
+            }
+
+            final Buffer[] buffers = new Buffer[FIFO_SIZE];
+            for (int i = buffers.length; --i >= 0; )
+                buffers[i] = new Buffer();
+            return buffers;
+        }
+
+        static synchronized void release(Buffer[] buffers) {
+            list.add(new SoftReference<Buffer[]>(buffers));
+        }
+
+        /** The byte buffer used for reading and writing. */
+        final byte[] buf = new byte[BUFFER_SIZE];
 
         /** The actual number of bytes read into the buffer. */
         int read;
-    }
+    } // Buffer
 }
