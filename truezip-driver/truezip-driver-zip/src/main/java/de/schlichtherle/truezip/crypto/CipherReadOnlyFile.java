@@ -138,7 +138,7 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
      *        This may be {@code null}, but must be properly initialized
      *        <em>before</em> a call to {@link #init}.
      */
-    protected CipherReadOnlyFile(@CheckForNull ReadOnlyFile rof) {
+    protected CipherReadOnlyFile(@Nullable ReadOnlyFile rof) {
         super(rof);
     }
 
@@ -157,8 +157,8 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
      * Initializes this cipher read only file - must be called before first
      * read access!
      *
-     * @param start The start offset of the encrypted data in this file.
-     * @param length The length of the encrypted data in this file.
+     * @param  start The start offset of the encrypted data in this file.
+     * @param  length The length of the encrypted data in this file.
      * @throws IOException If this read only file has already been closed.
      *         This exception is <em>not</em> recoverable.
      * @throws IllegalStateException If this object has already been
@@ -174,17 +174,17 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
             final long length)
     throws IOException {
         // Check state.
-        if (closed)
+        if (this.closed)
             throw new IOException("file has been closed");
-        if (this.cipher != null)
+        if (null != this.cipher)
             throw new IllegalStateException("file is already initialized");
 
         // Check state (recoverable).
-        if (null == delegate)
+        if (null == this.delegate)
             throw new NullPointerException();
 
         // Check parameters (fail fast).
-        if (cipher == null)
+        if (null == cipher)
             throw new NullPointerException("cipher");
         if (start < 0 || length < 0)
             throw new IllegalArgumentException();
@@ -193,16 +193,16 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
         this.start = start;
         this.length = length;
 
-        blockOff = length;
+        this.blockOff = length;
         final int blockLen = cipher.getBlockSize();
-        block = new byte[blockLen];
-        windowOff = Long.MIN_VALUE; // invalidate window
-        window = new byte[(MAX_WINDOW_LEN / blockLen) * blockLen]; // round down to multiple of block size
+        this.block = new byte[blockLen];
+        this.windowOff = Long.MIN_VALUE; // invalidate window
+        this.window = new byte[(MAX_WINDOW_LEN / blockLen) * blockLen]; // round down to multiple of block size
 
-        assert fp == 0;
-        assert block.length > 0;
-        assert window.length > 0;
-        assert window.length % block.length == 0;
+        assert this.fp == 0;
+        assert this.block.length > 0;
+        assert this.window.length > 0;
+        assert this.window.length % this.block.length == 0;
     }
 
     /**
