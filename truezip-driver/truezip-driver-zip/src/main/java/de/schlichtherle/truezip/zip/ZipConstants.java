@@ -16,14 +16,15 @@
 
 package de.schlichtherle.truezip.zip;
 
+import de.schlichtherle.truezip.io.Streams;
 import java.nio.charset.Charset;
 
 /**
- * A package private interface with some useful constants for ZIP archive files.
+ * A package private interface with some constants for ZIP files.
  * Public classes <em>must not</em> implement this interface - otherwise the
- * constants become part of the public API.
+ * constants become part of the public API!
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 interface ZipConstants {
@@ -155,10 +156,16 @@ interface ZipConstants {
     Charset DEFAULT_CHARSET = UTF8;
 
     /**
-     * The buffer size used for deflating and inflating.
-     * Optimized for reading and writing flash memory media.
+     * The maximum buffer size used for deflating and inflating.
+     * Optimized for performance.
      */
-    int FLATER_BUF_LENGTH = 64 * 1024;
+    int MAX_FLATER_BUF_LENGTH = Streams.BUFFER_SIZE;
+
+    /**
+     * The minimum buffer size used for deflating and inflating.
+     * Optimized for performance.
+     */
+    int MIN_FLATER_BUF_LENGTH = MAX_FLATER_BUF_LENGTH / 8;
 
     /** An empty byte array. */
     byte[] EMPTY = new byte[0];

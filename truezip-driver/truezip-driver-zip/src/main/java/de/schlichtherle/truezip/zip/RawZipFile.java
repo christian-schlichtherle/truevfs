@@ -775,17 +775,17 @@ implements Iterable<E>, Closeable {
                     in = new CheckedInputStream(in, entry, bufSize);
                 break;
             default:
-                assert false : "This should already have been checked by mountCentralDirectory()!";
+                throw new AssertionError();
         }
         return in;
     }
 
     private static int getBufferSize(final ZipEntry entry) {
         long size = entry.getSize();
-        if (size > FLATER_BUF_LENGTH)
-            size = FLATER_BUF_LENGTH;
-        else if (size < FLATER_BUF_LENGTH / 8)
-            size = FLATER_BUF_LENGTH / 8;
+        if (MAX_FLATER_BUF_LENGTH < size)
+            size = MAX_FLATER_BUF_LENGTH;
+        else if (size < MIN_FLATER_BUF_LENGTH)
+            size = MIN_FLATER_BUF_LENGTH;
         return (int) size;
     }
 
