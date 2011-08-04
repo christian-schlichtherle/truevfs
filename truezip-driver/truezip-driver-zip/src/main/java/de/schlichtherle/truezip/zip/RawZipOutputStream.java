@@ -413,11 +413,11 @@ implements Iterable<E> {
         switch (method) {
             case STORED:
                 assert deflate;
-                checkLocalFileHeaderData(entry);
+                checkLocalFileHeaderProperties(entry);
                 break;
             case DEFLATED:
                 if (!deflate)
-                    checkLocalFileHeaderData(entry);
+                    checkLocalFileHeaderProperties(entry);
                 break;
             default:
                 throw new ZipException(entry.getName()
@@ -429,7 +429,7 @@ implements Iterable<E> {
             entry.setTime(System.currentTimeMillis());
     }
 
-    private static void checkLocalFileHeaderData(final ZipEntry entry)
+    private static void checkLocalFileHeaderProperties(final ZipEntry entry)
     throws IOException {
         if (UNKNOWN == entry.getCrc())
             throw new ZipException(entry.getName() + " (unknown CRC checksum)");
@@ -439,9 +439,6 @@ implements Iterable<E> {
             throw new ZipException(entry.getName() + " (unknown uncompressed size)");
     }
 
-    /**
-     * This method may not have any side effects!
-     */
     private OutputStream openOutput(final E entry, final boolean deflate)
     throws IOException {
         switch (entry.getMethod()) {
