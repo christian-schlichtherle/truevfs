@@ -224,9 +224,9 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
     @Override
     public synchronized void putNextEntry(
             final ZipEntry entry,
-            final boolean deflate)
+            final boolean process)
     throws IOException {
-        super.putNextEntry(entry, deflate);
+        super.putNextEntry(entry, process);
     }
 
     @Override

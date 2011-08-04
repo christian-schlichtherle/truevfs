@@ -155,8 +155,7 @@ implements OutputShop<ZipArchiveEntry> {
                         if (entry.getMethod() == zipPeer.getMethod())
                             entry.setCompressedSize(zipPeer.getCompressedSize());
                         entry.setCrc(zipPeer.getCrc());
-                        return new EntryOutputStream(
-                                entry, zipPeer.getMethod() != DEFLATED);
+                        return new EntryOutputStream(entry, false);
                     }
                 }
                 switch (entry.getMethod()) {
@@ -177,7 +176,7 @@ implements OutputShop<ZipArchiveEntry> {
                 }
                 return new EntryOutputStream(entry);
             }
-        } // class Output
+        } // Output
 
         return new Output();
     }
