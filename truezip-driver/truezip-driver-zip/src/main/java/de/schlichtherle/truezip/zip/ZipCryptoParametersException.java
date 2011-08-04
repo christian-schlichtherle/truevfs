@@ -34,7 +34,7 @@ public class ZipCryptoParametersException extends ZipCryptoException {
      * have been found.
      */
     public ZipCryptoParametersException() {
-        super("No suitable ZipCryptoParameters available!");
+        super("No suitable crypto parameters available!");
     }
 
     /**
