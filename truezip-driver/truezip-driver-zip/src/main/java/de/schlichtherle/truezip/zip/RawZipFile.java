@@ -667,33 +667,35 @@ implements Iterable<E>, Closeable {
     }
 
     /**
-     * Returns an {@code InputStream} for reading the inflated or
-     * deflated data of the given entry.
+     * Returns an {@code InputStream} for reading the contents of the given
+     * entry.
      * <p>
      * If the {@link #close} method is called on this instance, all input
      * streams returned by this method are closed, too.
      *
-     * @param name The name of the entry to get the stream for.
-     * @param check Whether or not the entry's CRC-32 value gets checked.
-     *        If and only if this parameter is true, two additional checks are
-     *        performed for the ZIP entry:
-     *        <ol>
-     *        <li>All entry headers are checked to have consistent declarations
-     *            of the CRC-32 value for the inflated entry data.
-     *        <li>When calling {@link InputStream#close} on the returned entry
-     *            stream, the CRC-32 value computed from the inflated entry
-     *            data is checked against the declared CRC-32 values.
-     *            This is independent from the {@code inflate} parameter.
-     *        </ol>
-     *        If any of these checks fail, a {@link CRC32Exception} is thrown.
-     *        <p>
-     *        This parameter should be {@code false} for most
-     *        applications, and is the default for the sibling of this class
-     *        in {@link java.util.zip.ZipFile java.util.zip.ZipFile}.
-     * @param inflate Whether or not the entry data should be inflated.
-     *        If {@code false}, the entry data is not inflated,
-     *        even if the entry data is deflated.
-     *        This parameter should be {@code true} for most applications.
+     * @param  name The name of the entry to get the stream for.
+     * @param  check Whether or not the entry's CRC-32 value gets checked.
+     *         If and only if this parameter is true, two additional checks are
+     *         performed for the ZIP entry:
+     *         <ol>
+     *         <li>All entry headers are checked to have consistent
+     *             declarations of the CRC-32 value for the inflated entry
+     *             data.
+     *         <li>When calling {@link InputStream#close} on the returned entry
+     *             stream, the CRC-32 value computed from the inflated entry
+     *             data is checked against the declared CRC-32 values.
+     *             This is independent from the {@code inflate} parameter.
+     *         </ol>
+     *         If any of these checks fail, a {@link CRC32Exception} is thrown.
+     *         <p>
+     *         This parameter should be {@code false} for most
+     *         applications, and is the default for the sibling of this class
+     *         in {@link java.util.zip.ZipFile java.util.zip.ZipFile}.
+     * @param  process Whether or not the entry contents should get processed,
+     *         e.g. inflated.
+     *         This should be set to {@code false} if and only if the
+     *         application is going to copy entries from an input ZIP file to
+     *         an output ZIP file.
      * @return A stream to read the entry data from or {@code null} if the
      *         entry does not exist.
      * @throws CRC32Exception If the declared CRC-32 values of the inflated
@@ -705,7 +707,7 @@ implements Iterable<E>, Closeable {
     protected @Nullable InputStream getInputStream(
             final String name,
             final boolean check,
-            final boolean inflate)
+            final boolean process)
     throws IOException {
         assertOpen();
         if (name == null)
@@ -759,7 +761,7 @@ implements Iterable<E>, Closeable {
         InputStream in = iis;
         switch (entry.getMethod()) {
             case DEFLATED:
-                if (inflate) {
+                if (process) {
                     iis.addDummy();
                     in = new PooledInflaterInputStream(in, bufSize);
                     if (check)

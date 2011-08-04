@@ -362,29 +362,30 @@ implements Iterable<E> {
      * Note that if two or more entries with the same name are written
      * consecutively to this stream, the last entry written will shadow
      * all other entries, i.e. all of them are written to the ZIP file
-     * (and hence require space), but only the last will be accessible from
-     * the central directory.
+     * (and hence require space), but only the last will be listed in the
+     * central directory.
      * This is unlike the genuine {@link java.util.zip.ZipOutputStream
      * java.util.zip.ZipOutputStream} which would throw a {@link ZipException}
-     * in this method when the second entry with the same name is to be written.
+     * in this method when another entry with the same name is to be written.
      *
-     * @param  entry The ZIP entry to write.
-     * @param  deflate Whether or not the entry data should get deflated.
-     *         This should be set to {@code false} if and only if you are
-     *         writing data which has been read from a ZIP file and has not
-     *         been inflated again.
-     *         The entries' properties CRC, compressed size and uncompressed
-     *         size must be set appropriately.
+     * @param  entry The entry to write.
+     * @param  process Whether or not the entry contents should get processed,
+     *         e.g. deflated.
+     *         This should be set to {@code false} if and only if the
+     *         application is going to copy entries from an input ZIP file to
+     *         an output ZIP file.
+     *         The entries' CRC-32, compressed size and uncompressed
+     *         size properties must be set in advance.
      * @throws ZipException If and only if writing the entry is impossible
      *         because the resulting file would not comply to the ZIP file
      *         format specification.
      * @throws IOException On any I/O error.
      */
-    public void putNextEntry(final E entry, final boolean deflate)
+    public void putNextEntry(final E entry, final boolean process)
     throws IOException {
         closeEntry();
-        setupEntry(entry, deflate);
-        final OutputStream out = openOutput(entry, deflate);
+        setupEntry(entry, process);
+        final OutputStream out = openOutput(entry, process);
         this.entry = entry;
         // Write LFH BEFORE putting the entry in the map.
         writeLocalFileHeader();
@@ -397,7 +398,7 @@ implements Iterable<E> {
     /**
      * This method may have side effects on {@code entry} only.
      */
-    private void setupEntry(final E entry, final boolean deflate)
+    private void setupEntry(final E entry, final boolean process)
     throws IOException {
         {
             final long size = entry.getNameLength(charset)
@@ -412,11 +413,10 @@ implements Iterable<E> {
             entry.setMethod(method = getMethod());
         switch (method) {
             case STORED:
-                assert deflate;
                 checkLocalFileHeaderProperties(entry);
                 break;
             case DEFLATED:
-                if (!deflate)
+                if (!process)
                     checkLocalFileHeaderProperties(entry);
                 break;
             default:
@@ -439,19 +439,22 @@ implements Iterable<E> {
             throw new ZipException(entry.getName() + " (unknown uncompressed size)");
     }
 
-    private OutputStream openOutput(final E entry, final boolean deflate)
+    private OutputStream openOutput(final E entry, final boolean process)
     throws IOException {
-        switch (entry.getMethod()) {
+        if (!process) {
+            assert UNKNOWN != entry.getCrc();
+            return this.delegate;
+        }
+        final int method = entry.getMethod();
+        /*if (entry.isEncrypted()) {
+            
+        }*/
+        switch (method) {
             case STORED:
                 return new CheckingCrc32OutputStream(this.delegate);
             case DEFLATED:
-                if (deflate) {
-                    return new UpdatingCrc32OutputStream(
-                            new ZipDeflaterOutputStream(this.delegate));
-                } else {
-                    assert UNKNOWN != entry.getCrc();
-                    return this.delegate;
-                }
+                return new UpdatingCrc32OutputStream(
+                        new ZipDeflaterOutputStream(this.delegate));
             default:
                 throw new AssertionError();
         }

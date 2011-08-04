@@ -95,12 +95,10 @@ implements InputShop<ZipArchiveEntry> {
 
             @Override
             public InputStream newInputStream() throws IOException {
-                final Entry entry = getPeerTarget();
                 return getInputStream(
                         getLocalTarget().getName(),
                         false,
-                        !(entry instanceof ZipArchiveEntry)
-                            || ((ZipArchiveEntry) entry).getMethod() != DEFLATED);
+                        !(getPeerTarget() instanceof ZipArchiveEntry));
             }
         } // Input
 

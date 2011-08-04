@@ -239,12 +239,20 @@ public class ZipEntry implements Cloneable {
      *         {@link #STORED}, {@link #DEFLATED} or {@link #UNKNOWN}.
      */
     public void setMethod(final int method) {
-        final boolean known = method != UNKNOWN;
-	if (known && method != STORED && method != DEFLATED)
-            throw new IllegalArgumentException(
-                    name + ": unsupported Compression Method: " + method);
-        setInit(METHOD, known);
-        this.method = (short) method;
+        switch (method) {
+            case STORED:
+            case DEFLATED:
+            case WINZIP_AES:
+                setInit(METHOD, true);
+                this.method = (short) method;
+                break;
+            case UNKNOWN:
+                setInit(METHOD, false);
+                break;
+            default:
+                throw new IllegalArgumentException(
+                        name + ": unsupported compression method: " + method);
+        }
     }
 
     /**
@@ -266,7 +274,7 @@ public class ZipEntry implements Cloneable {
     public void setEncrypted(boolean encrypted) {
         setGeneralBit(GPBF_ENCRYPTED, encrypted);
     }
-    
+
     protected long getDosTime() {
         return UNKNOWN == jTime
                 ? UNKNOWN
