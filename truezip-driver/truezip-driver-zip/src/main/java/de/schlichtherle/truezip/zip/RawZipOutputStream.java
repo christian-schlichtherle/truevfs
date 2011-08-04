@@ -24,7 +24,6 @@ import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
@@ -108,7 +107,7 @@ implements Iterable<E> {
     protected RawZipOutputStream(
             final OutputStream out,
             final Charset charset) {
-        super(promote(out, null));
+        super(newLEDataOutputStream(out, null));
         if (null == charset)
             throw new NullPointerException();
         this.charset = charset;
@@ -151,7 +150,7 @@ implements Iterable<E> {
             final OutputStream out,
             final @CheckForNull RawZipFile<E> appendee,
             final @CheckForNull Charset charset) {
-        super(promote(out, appendee));
+        super(newLEDataOutputStream(out, appendee));
         if (null != appendee) {
             this.charset = appendee.getFileCharset();
             this.comment = appendee.getFileComment();
@@ -165,7 +164,7 @@ implements Iterable<E> {
         }
     }
 
-    private static LEDataOutputStream promote(
+    private static LEDataOutputStream newLEDataOutputStream(
             final OutputStream out,
             final @CheckForNull RawZipFile<?> appendee) {
         if (null == out)
@@ -176,15 +175,6 @@ implements Iterable<E> {
                     ? (LEDataOutputStream) out
                     : new LEDataOutputStream(out);
     }
-
-    /* Adjusts the number of written bytes for appending mode. */
-    private static final class AppendingLEDataOutputStream
-    extends LEDataOutputStream {
-        AppendingLEDataOutputStream(OutputStream out, RawZipFile<?> appendee) {
-            super(out);
-            super.written = appendee.getOffsetMapper().location(appendee.length());
-        }
-    } // AppendingLEDataOutputStream
 
     private byte[] encode(String string) {
         return string.getBytes(charset);
@@ -456,15 +446,14 @@ implements Iterable<E> {
     throws IOException {
         switch (entry.getMethod()) {
             case STORED:
-                return new ZipStoredOutputStream(
-                        new NeverClosingOutputStream(this.delegate));
+                return new CheckingCrc32OutputStream(this.delegate);
             case DEFLATED:
                 if (deflate) {
-                    return new ZipDeflatedOutputStream(
+                    return new UpdatingCrc32OutputStream(
                             new ZipDeflaterOutputStream(this.delegate));
                 } else {
                     assert UNKNOWN != entry.getCrc();
-                    return new NeverClosingOutputStream(this.delegate);
+                    return this.delegate;
                 }
             default:
                 throw new AssertionError();
@@ -544,11 +533,14 @@ implements Iterable<E> {
      * Mind the side effects!
      */
     private void closeOutput() throws IOException {
-        final OutputStream out = ((ProxyOutputStream) delegate)
-                .getOriginalOutputStream();
+        OutputStream out = this.delegate;
+        if (!(out instanceof ProxyOutputStream))
+            return;
+        final ProxyOutputStream pos = ((ProxyOutputStream) out);
+        out = pos.getDelegate();
         assert out instanceof LEDataOutputStream;
         try {
-            this.delegate.close();
+            pos.finish();
         } finally {
             this.delegate = out;
         }
@@ -777,7 +769,7 @@ implements Iterable<E> {
 
     private byte[] getFileComment() {
         final byte[] comment = this.comment;
-        return null != comment ? comment : new byte[0];
+        return null != comment ? comment : EMPTY;
     }
 
     /**
@@ -801,21 +793,39 @@ implements Iterable<E> {
         }
     }
 
-    private interface ProxyOutputStream extends Closeable {
-        OutputStream getOriginalOutputStream();
-    }
+    /* Adjusts the number of written bytes for appending mode. */
+    private static final class AppendingLEDataOutputStream
+    extends LEDataOutputStream {
+        AppendingLEDataOutputStream(OutputStream out, RawZipFile<?> appendee) {
+            super(out);
+            super.written = appendee.getOffsetMapper().location(appendee.length());
+        }
+    } // AppendingLEDataOutputStream
+
+    /**
+     * Instances of this interface must extend {@link OutputStream}!
+     */
+    private interface ProxyOutputStream {
+        OutputStream getDelegate();
+        void finish() throws IOException;
+    } // ProxyOutputStream
 
     private final class ZipDeflaterOutputStream
     extends DeflaterOutputStream
     implements ProxyOutputStream {
 
         ZipDeflaterOutputStream(OutputStream out) {
-            super(out, RawZipOutputStream.this.def, FLATER_BUF_LENGTH);
+            super(out, RawZipOutputStream.this.def, MAX_FLATER_BUF_LENGTH);
             assert !(out instanceof ProxyOutputStream);
         }
 
         @Override
-        public void close() throws IOException {
+        public OutputStream getDelegate() {
+            return this.out;
+        }
+
+        @Override
+        public void finish() throws IOException {
             super.finish();
             final E entry = RawZipOutputStream.this.entry;
             final ZipDeflater def = RawZipOutputStream.this.def;
@@ -823,72 +833,57 @@ implements Iterable<E> {
             entry.setSize(def.getBytesRead());
             def.reset();
         }
+    } // ZipDeflaterOutputStream
 
-        @Override
-        public OutputStream getOriginalOutputStream() {
-            return this.out;
-        }
-    }
-
-    private static final class NeverClosingOutputStream
-    extends DecoratingOutputStream
-    implements ProxyOutputStream {
-
-        NeverClosingOutputStream(OutputStream out) {
-            super(out);
-            assert !(out instanceof ProxyOutputStream);
-        }
-
-        @Override
-        public void close() throws IOException {
-            super.flush();
-        }
-
-        @Override
-        public OutputStream getOriginalOutputStream() {
-            return this.delegate;
-        }
-    }
-
-    private class ZipCrc32OutputStream
+    private static class Crc32OutputStream
     extends CheckedOutputStream
     implements ProxyOutputStream {
 
-        ZipCrc32OutputStream(ProxyOutputStream out) {
-            super((OutputStream) out, new CRC32());
+        Crc32OutputStream(OutputStream out) {
+            super(out, new CRC32());
         }
 
         @Override
-        public OutputStream getOriginalOutputStream() {
-            return ((ProxyOutputStream) this.out).getOriginalOutputStream();
+        public OutputStream getDelegate() {
+            final OutputStream out = this.out;
+            return out instanceof ProxyOutputStream
+                    ? ((ProxyOutputStream) out).getDelegate()
+                    : out;
         }
-    }
 
-    private class ZipDeflatedOutputStream
-    extends ZipCrc32OutputStream {
+        @Override
+        public void finish() throws IOException {
+            final OutputStream out = this.out;
+            if (out instanceof ProxyOutputStream)
+                ((ProxyOutputStream) out).finish();
+        }
+    } // Crc32OutputStream
 
-        ZipDeflatedOutputStream(ProxyOutputStream out) {
+    private final class UpdatingCrc32OutputStream
+    extends Crc32OutputStream {
+
+        UpdatingCrc32OutputStream(OutputStream out) {
             super(out);
         }
 
         @Override
-        public void close() throws IOException {
-            super.close();
+        public void finish() throws IOException {
+            super.finish();
             final E entry = RawZipOutputStream.this.entry;
             entry.setCrc(getChecksum().getValue());
         }
-    }
+    } // UpdatingCrc32OutputStream
 
-    private class ZipStoredOutputStream
-    extends ZipCrc32OutputStream {
+    private final class CheckingCrc32OutputStream
+    extends Crc32OutputStream {
 
-        ZipStoredOutputStream(ProxyOutputStream out) {
+        CheckingCrc32OutputStream(OutputStream out) {
             super(out);
         }
 
         @Override
-        public void close() throws IOException {
-            super.close();
+        public void finish() throws IOException {
+            super.finish();
             final E entry = RawZipOutputStream.this.entry;
             final long expectedCrc = getChecksum().getValue();
             if (expectedCrc != entry.getCrc()) {
@@ -899,7 +894,7 @@ implements Iterable<E> {
                 + Long.toHexString(expectedCrc)
                 + ")");
             }
-            final long written = ((LEDataOutputStream) getOriginalOutputStream()).size();
+            final long written = ((LEDataOutputStream) getDelegate()).size();
             final long entrySize = written - RawZipOutputStream.this.dataStart;
             if (entry.getSize() != entrySize) {
                 throw new ZipException(entry.getName()
@@ -910,5 +905,5 @@ implements Iterable<E> {
                 + ")");
             }
         }
-    }
+    } // CheckingCrc32OutputStream
 }
