@@ -183,7 +183,7 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
     throws RaesParametersException {
         // Order is important here to support multiple interface implementations!
         if (null == param) {
-            throw new RaesParametersException();
+            throw new RaesParametersException("No RAES parameters available!");
         } else if (type.isAssignableFrom(param.getClass())) {
             return (P) param;
         } else if (param instanceof RaesParametersProvider) {
