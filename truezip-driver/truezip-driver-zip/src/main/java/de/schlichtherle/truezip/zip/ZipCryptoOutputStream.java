@@ -36,8 +36,7 @@ import org.bouncycastle.crypto.BufferedBlockCipher;
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
 abstract class ZipCryptoOutputStream
-extends CipherOutputStream
-implements ZipOutputProcessor {
+extends CipherOutputStream {
 
     /**
      * Returns a new {@code ZipCryptoOutputStream}.
