@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.crypto.raes;
 
 import de.schlichtherle.truezip.crypto.SICSeekableBlockCipher;
-import static de.schlichtherle.truezip.crypto.raes.RaesConstants.*;
+import static de.schlichtherle.truezip.crypto.raes.Constants.*;
 import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
 import de.schlichtherle.truezip.io.LEDataOutputStream;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;

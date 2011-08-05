@@ -17,18 +17,18 @@ package de.schlichtherle.truezip.crypto.raes;
 
 /**
  * This interfaces contains constants used to read or write files
- * according to the Random Access Encryption Specification (RaesConstants).
+ * according to the Random Access Encryption Specification (Constants).
  * Public classes <em>must not</em> implement this interface - otherwise the
  * constants become part of the public API.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-interface RaesConstants {
+interface Constants {
 
     /**
-     * The signature of any RaesConstants compatible content in little endian format
-     * ({@code "RaesConstants"} as a US-ASCII character sequence).
+     * The signature of any Constants compatible content in little endian format
+     * ({@code "Constants"} as a US-ASCII character sequence).
      */
     int SIGNATURE = 'R' | (('A' | (('E' | ('S' << 8)) << 8)) << 8);
 
