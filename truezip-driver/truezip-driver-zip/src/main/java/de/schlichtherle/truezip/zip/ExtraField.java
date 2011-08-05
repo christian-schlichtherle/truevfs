@@ -15,13 +15,12 @@
  */
 package de.schlichtherle.truezip.zip;
 
+import static de.schlichtherle.truezip.zip.Constants.*;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.HashMap;
 import java.util.Map;
 import net.jcip.annotations.NotThreadSafe;
-
-import static de.schlichtherle.truezip.zip.ZipConstants.*;
 
 /**
  * Abstract base class for an Extra Field in a Local or Central Header of a
@@ -38,6 +37,9 @@ abstract class ExtraField {
 
     /** The Header ID of a ZIP64 Extended Information Extra Field. */
     static final int ZIP64_HEADER_ID = 0x0001;
+
+    /** The Header ID a WinZip AES Extra Field. */
+    static final int WINZIP_AES_ID = 0x9901;
 
     private static final Map<Integer, Class<? extends ExtraField>> registry
             = new HashMap<Integer, Class<? extends ExtraField>>();

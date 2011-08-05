@@ -27,7 +27,7 @@ import java.nio.charset.Charset;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-interface ZipConstants {
+interface Constants {
 
     /**
      * This boolean field is set by the system property
@@ -43,7 +43,7 @@ interface ZipConstants {
      * required.
      */
     boolean FORCE_ZIP64_EXT = Boolean.getBoolean(
-            ZipConstants.class.getPackage().getName() + ".forceZip64Ext");
+            Constants.class.getPackage().getName() + ".forceZip64Ext");
 
     /** Local File Header signature. */
     int LFH_SIG = 0x04034B50;

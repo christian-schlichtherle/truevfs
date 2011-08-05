@@ -13,25 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.zip;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import net.jcip.annotations.NotThreadSafe;
+
 /**
- * The default factory for {@link ZipEntry}s.
+ * The base class for all encrypted output methods.
+ * <p>
+ * Implementations cannot be thread-safe.
  *
+ * @since   TrueZIP 7.3
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-final class DefaultZipEntryFactory implements ZipEntryFactory<ZipEntry> {
+@NotThreadSafe
+@DefaultAnnotation(NonNull.class)
+abstract class EncryptedOutputMethod
+extends DecoratingOutputMethod<OutputMethod> {
 
-    static final ZipEntryFactory<ZipEntry> SINGLETON
-    		= new DefaultZipEntryFactory();
-
-    private DefaultZipEntryFactory() {
-    }
-
-    @Override
-    public ZipEntry newEntry(String name) {
-        return new ZipEntry(name);
+    EncryptedOutputMethod(OutputMethod processor) {
+        super(processor);
     }
 }

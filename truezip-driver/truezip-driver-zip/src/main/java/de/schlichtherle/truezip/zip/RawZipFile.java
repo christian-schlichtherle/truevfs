@@ -19,7 +19,8 @@ import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.rof.BufferedReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.util.Pool;
-import static de.schlichtherle.truezip.zip.ZipConstants.*;
+import static de.schlichtherle.truezip.zip.Constants.*;
+import static de.schlichtherle.truezip.zip.LittleEndian.*;
 import static de.schlichtherle.truezip.zip.ZipEntry.*;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
@@ -84,7 +85,7 @@ implements Iterable<E>, Closeable {
      * Note that you should use &quot;IBM437&quot; for ordinary ZIP files
      * instead.
      */
-    public static final Charset DEFAULT_CHARSET = ZipConstants.DEFAULT_CHARSET;
+    public static final Charset DEFAULT_CHARSET = Constants.DEFAULT_CHARSET;
 
     /** Maps entry names to zip entries. */
     private final Map<String, E> entries = new LinkedHashMap<String, E>();
@@ -235,11 +236,11 @@ implements Iterable<E>, Closeable {
         final byte[] cfh = new byte[CFH_MIN_LEN - sig.length];
         for (; ; numEntries--) {
             rof.readFully(sig);
-            if (LittleEndian.readUInt(sig, 0) != CFH_SIG)
+            if (readUInt(sig, 0) != CFH_SIG)
                 break;
             rof.readFully(cfh);
-            final int general = LittleEndian.readUShort(cfh, 4);
-            final int nameLen = LittleEndian.readUShort(cfh, 24);
+            final int general = readUShort(cfh, 4);
+            final int nameLen = readUShort(cfh, 24);
             final byte[] name = new byte[nameLen];
             rof.readFully(name);
             // See appendix D of PKWARE's ZIP File Format Specification.
@@ -249,31 +250,31 @@ implements Iterable<E>, Closeable {
             final E entry = factory.newEntry(decode(name));
             try {
                 int off = 0;
-                final int versionMadeBy = LittleEndian.readUShort(cfh, off);
+                final int versionMadeBy = readUShort(cfh, off);
                 off += 2;
                 entry.setPlatform((short) (versionMadeBy >> 8));
                 off += 2; // Version Needed To Extract
                 entry.setGeneral(general);
                 off += 2; // General Purpose Bit Flags
                 assert entry.getGeneralBit(GPBF_UTF8) == utf8;
-                final int method = LittleEndian.readUShort(cfh, off);
+                final int method = readUShort(cfh, off);
                 off += 2;
                 if (STORED != method && DEFLATED != method)
                     throw new ZipException(entry.getName()
                     + " (unsupported compression method: " + method + ")");
                 entry.setMethod(method);
-                entry.setDosTime(LittleEndian.readUInt(cfh, off));
+                entry.setDosTime(readUInt(cfh, off));
                 off += 4;
-                entry.setCrc(LittleEndian.readUInt(cfh, off));
+                entry.setCrc(readUInt(cfh, off));
                 off += 4;
-                entry.setCompressedSize32(LittleEndian.readUInt(cfh, off));
+                entry.setCompressedSize32(readUInt(cfh, off));
                 off += 4;
-                entry.setSize32(LittleEndian.readUInt(cfh, off));
+                entry.setSize32(readUInt(cfh, off));
                 off += 4;
                 off += 2;   // File Name Length
-                final int extraLen = LittleEndian.readUShort(cfh, off);
+                final int extraLen = readUShort(cfh, off);
                 off += 2;
-                final int commentLen = LittleEndian.readUShort(cfh, off);
+                final int commentLen = readUShort(cfh, off);
                 off += 2;
                 off += 2;   // Disk Number
                 //ze.setInternalAttributes(readUShort(cfh, off));
@@ -281,7 +282,7 @@ implements Iterable<E>, Closeable {
                 //ze.setExternalAttributes(readUInt(cfh, off));
                 off += 4;
                 // Relative Offset Of Local File Header.
-                long lfhOff = LittleEndian.readUInt(cfh, off);
+                long lfhOff = readUInt(cfh, off);
                 //off += 4;
                 entry.setOffset32(lfhOff); // must be unmapped!
                 if (extraLen > 0) {
@@ -355,7 +356,7 @@ implements Iterable<E>, Closeable {
         if (!preambled) {
             rof.seek(0);
             rof.readFully(sig);
-            final long signature = LittleEndian.readUInt(sig, 0);
+            final long signature = readUInt(sig, 0);
             // Constraint: A ZIP file must start with a Local File Header
             // or a (ZIP64) End Of Central Directory Record iff it's emtpy.
             preambled = signature == LFH_SIG
@@ -369,7 +370,7 @@ implements Iterable<E>, Closeable {
             for (long eocdrOffset = max; eocdrOffset >= min; eocdrOffset--) {
                 rof.seek(eocdrOffset);
                 rof.readFully(sig);
-                if (LittleEndian.readUInt(sig, 0) != EOCDR_SIG)
+                if (readUInt(sig, 0) != EOCDR_SIG)
                     continue;
                 long diskNo;        // number of this disk
                 long cdDiskNo;      // number of the disk with the start of the central directory
@@ -382,22 +383,22 @@ implements Iterable<E>, Closeable {
                 // Process EOCDR.
                 final byte[] eocdr = new byte[EOCDR_MIN_LEN - sig.length];
                 rof.readFully(eocdr);
-                diskNo = LittleEndian.readUShort(eocdr, off);
+                diskNo = readUShort(eocdr, off);
                 off += 2;
-                cdDiskNo = LittleEndian.readUShort(eocdr, off);
+                cdDiskNo = readUShort(eocdr, off);
                 off += 2;
-                cdEntriesDisk = LittleEndian.readUShort(eocdr, off);
+                cdEntriesDisk = readUShort(eocdr, off);
                 off += 2;
-                cdEntries = LittleEndian.readUShort(eocdr, off);
+                cdEntries = readUShort(eocdr, off);
                 off += 2;
                 if (diskNo != 0 || cdDiskNo != 0 || cdEntriesDisk != cdEntries)
                     throw new ZipException(
                             "ZIP file spanning/splitting is not supported!");
-                cdSize = LittleEndian.readUInt(eocdr, off);
+                cdSize = readUInt(eocdr, off);
                 off += 4;
-                cdOffset = LittleEndian.readUInt(eocdr, off);
+                cdOffset = readUInt(eocdr, off);
                 off += 4;
-                commentLen = LittleEndian.readUShort(eocdr, off);
+                commentLen = readUShort(eocdr, off);
                 //off += 2;
                 if (0 < commentLen) {
                     final byte[] comment = new byte[commentLen];
@@ -412,7 +413,7 @@ implements Iterable<E>, Closeable {
                     rof.seek(eocdrOffset - ZIP64_EOCDL_LEN);
                     rof.readFully(zip64eocdl);
                     off = 0; // reuse
-                    final long zip64eocdlSig = LittleEndian.readUInt(zip64eocdl, off);
+                    final long zip64eocdlSig = readUInt(zip64eocdl, off);
                     off += 4;
                     if (zip64eocdlSig != ZIP64_EOCDL_SIG)
                         throw new IOException( // MUST be IOException, not ZipException - see catch clauses!
@@ -420,11 +421,11 @@ implements Iterable<E>, Closeable {
                     final long zip64eocdrDisk;      // number of the disk with the start of the zip64 end of central directory record
                     final long zip64eocdrOffset;    // relative offset of the zip64 end of central directory record
                     final long totalDisks;          // total number of disks
-                    zip64eocdrDisk = LittleEndian.readUInt(zip64eocdl, off);
+                    zip64eocdrDisk = readUInt(zip64eocdl, off);
                     off += 4;
-                    zip64eocdrOffset = LittleEndian.readLong(zip64eocdl, off);
+                    zip64eocdrOffset = readLong(zip64eocdl, off);
                     off += 8;
-                    totalDisks = LittleEndian.readUInt(zip64eocdl, off);
+                    totalDisks = readUInt(zip64eocdl, off);
                     //off += 4;
                     if (zip64eocdrDisk != 0 || totalDisks != 1)
                         throw new ZipException( // MUST be ZipException, not IOException - see catch clauses!
@@ -434,7 +435,7 @@ implements Iterable<E>, Closeable {
                     rof.seek(zip64eocdrOffset);
                     rof.readFully(zip64eocdr);
                     off = 0; // reuse
-                    final long zip64eocdrSig = LittleEndian.readUInt(zip64eocdr, off);
+                    final long zip64eocdrSig = readUInt(zip64eocdr, off);
                     off += 4;
                     if (zip64eocdrSig != ZIP64_EOCDR_SIG)
                         throw new ZipException( // MUST be ZipException, not IOException - see catch clauses!
@@ -442,19 +443,19 @@ implements Iterable<E>, Closeable {
                     //final long zip64eocdrSize;  // Size Of ZIP64 End Of Central Directory Record
                     //final int madeBy;           // Version Made By
                     //final int needed2extract;   // Version Needed To Extract
-                    //zip64eocdrSize = LittleEndian.readLong(zip64eocdr, off);
+                    //zip64eocdrSize = readLong(zip64eocdr, off);
                     off += 8;
-                    //madeBy = LittleEndian.readUShort(zip64eocdr, off);
+                    //madeBy = readUShort(zip64eocdr, off);
                     off += 2;
-                    //needed2extract = LittleEndian.readUShort(zip64eocdr, off);
+                    //needed2extract = readUShort(zip64eocdr, off);
                     off += 2;
-                    diskNo = LittleEndian.readUInt(zip64eocdr, off);
+                    diskNo = readUInt(zip64eocdr, off);
                     off += 4;
-                    cdDiskNo = LittleEndian.readUInt(zip64eocdr, off);
+                    cdDiskNo = readUInt(zip64eocdr, off);
                     off += 4;
-                    cdEntriesDisk = LittleEndian.readLong(zip64eocdr, off);
+                    cdEntriesDisk = readLong(zip64eocdr, off);
                     off += 8;
-                    cdEntries = LittleEndian.readLong(zip64eocdr, off);
+                    cdEntries = readLong(zip64eocdr, off);
                     off += 8;
                     if (diskNo != 0 || cdDiskNo != 0 || cdEntriesDisk != cdEntries)
                         throw new ZipException( // MUST be ZipException, not IOException - see catch clauses!
@@ -462,9 +463,9 @@ implements Iterable<E>, Closeable {
                     if (cdEntries < 0 || Integer.MAX_VALUE < cdEntries)
                         throw new ZipException( // MUST be ZipException, not IOException - see catch clauses!
                                 "Total Number Of Entries In The Central Directory out of range!");
-                    cdSize = LittleEndian.readLong(zip64eocdr, off);
+                    cdSize = readLong(zip64eocdr, off);
                     off += 8;
-                    cdOffset = LittleEndian.readLong(zip64eocdr, off);
+                    cdOffset = readLong(zip64eocdr, off);
                     //off += 8;
                     rof.seek(cdOffset);
                     mapper = new OffsetMapper();
@@ -725,13 +726,13 @@ implements Iterable<E>, Closeable {
         archive.seek(offset);
         final byte[] lfh = new byte[LFH_MIN_LEN];
         archive.readFully(lfh);
-        final long lfhSig = LittleEndian.readUInt(lfh, 0);
+        final long lfhSig = readUInt(lfh, 0);
         if (lfhSig != LFH_SIG)
             throw new ZipException(name
             + " (expected Local File Header Signature)");
         offset += LFH_MIN_LEN
-                + LittleEndian.readUShort(lfh, LFH_FILE_NAME_LENGTH_OFF) // file name length
-                + LittleEndian.readUShort(lfh, LFH_FILE_NAME_LENGTH_OFF + 2); // extra field length
+                + readUShort(lfh, LFH_FILE_NAME_LENGTH_OFF) // file name length
+                + readUShort(lfh, LFH_FILE_NAME_LENGTH_OFF + 2); // extra field length
         if (check) {
             // Check CRC-32 in the Local File Header or Data Descriptor.
             final long localCrc;
@@ -744,13 +745,13 @@ implements Iterable<E>, Closeable {
                 final byte[] dd = new byte[8];
                 archive.seek(offset + entry.getCompressedSize());
                 archive.readFully(dd);
-                final long ddSig = LittleEndian.readUInt(dd, 0);
+                final long ddSig = readUInt(dd, 0);
                 localCrc = ddSig == DD_SIG
-                        ? LittleEndian.readUInt(dd, 4)
+                        ? readUInt(dd, 4)
                         : ddSig;
             } else {
                 // The CRC-32 is in the Local File Header.
-                localCrc = LittleEndian.readUInt(lfh, 14);
+                localCrc = readUInt(lfh, 14);
             }
             if (entry.getCrc() != localCrc)
                 throw new CRC32Exception(name, entry.getCrc(), localCrc);

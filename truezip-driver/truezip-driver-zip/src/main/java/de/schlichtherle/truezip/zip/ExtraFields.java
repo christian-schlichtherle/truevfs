@@ -16,18 +16,18 @@
 
 package de.schlichtherle.truezip.zip;
 
-import edu.umd.cs.findbugs.annotations.Nullable;
+import static de.schlichtherle.truezip.zip.Constants.*;
+import static de.schlichtherle.truezip.zip.LittleEndian.*;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import net.jcip.annotations.NotThreadSafe;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Map;
 import java.util.TreeMap;
-
-import static de.schlichtherle.truezip.zip.ZipConstants.*;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * Represents a collection of {@link ExtraField Extra Fields} as they may
- * be present at several locations in ZipConstants archive files.
+ * be present at several locations in ZIP files.
  * 
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -173,9 +173,9 @@ final class ExtraFields implements Cloneable {
         if (null != data && 0 < size) {
             final int end = off + size;
             while (off < end) {
-                final int headerID = LittleEndian.readUShort(data, off);
+                final int headerID = readUShort(data, off);
                 off += 2;
-                final int dataSize = LittleEndian.readUShort(data, off);
+                final int dataSize = readUShort(data, off);
                 off += 2;
                 final ExtraField ef = ExtraField.create(headerID);
                 ef.readFrom(data, off, dataSize);
@@ -203,9 +203,9 @@ final class ExtraFields implements Cloneable {
      */
     void writeTo(final byte[] data, int off) {
        for (final ExtraField ef : extra.values()) {
-            LittleEndian.writeShort(ef.getHeaderID(), data, off);
+            writeShort(ef.getHeaderID(), data, off);
             off += 2;
-            LittleEndian.writeShort(ef.getDataSize(), data, off);
+            writeShort(ef.getDataSize(), data, off);
             off += 2;
             ef.writeTo(data, off);
             off += ef.getDataSize();

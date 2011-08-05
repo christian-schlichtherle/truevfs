@@ -15,8 +15,9 @@
  */
 package de.schlichtherle.truezip.zip;
 
-import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.rof.DefaultReadOnlyFile;
+import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import static de.schlichtherle.truezip.zip.Constants.*;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -34,11 +35,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipException;
 import org.junit.After;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-
-import static de.schlichtherle.truezip.zip.ZipConstants.*;
-import static org.junit.Assert.*;
 
 /**
  * Performs an integration test for reading and writing ZIP files.
