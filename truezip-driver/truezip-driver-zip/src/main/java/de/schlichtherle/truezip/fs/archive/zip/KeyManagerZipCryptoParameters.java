@@ -83,7 +83,7 @@ public class KeyManagerZipCryptoParameters implements ZipCryptoParametersProvide
 
     /**
      * Adapts a {@code KeyProvider} for {@link  AesPbeParameters} obtained
-     * from the {@link manager} to {@code WinZipAesParameters}.
+     * from the {@link #manager} to {@code WinZipAesParameters}.
      */
     private class WinZipAes implements WinZipAesParameters {
         @Override
