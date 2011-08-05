@@ -481,16 +481,6 @@ public class ZipEntry implements Cloneable {
     }
 
     /**
-     * Returns the length of the serialized Extra Fields in bytes.
-     *
-     * @return The minimum number of bytes needed to hold the serialized
-     *         Extra Fields.
-     */
-    final int getExtraLength() {
-        return getExtra(true).length;
-    }
-
-    /**
      * Sets the serialized Extra Fields by making a protective copy.
      *
      * @param data The byte array holding the serialized Extra Fields.
@@ -592,12 +582,13 @@ public class ZipEntry implements Cloneable {
         return field;
     }
 
-    public @CheckForNull String getComment() {
-        return comment;
+    final String getEffectiveComment() {
+        final String comment = this.comment;
+        return null != comment ? comment : "";
     }
 
-    final int getCommentLength(final Charset charset) {
-        return null == comment ? 0 : charset.encode(comment).limit();
+    public @CheckForNull String getComment() {
+        return comment;
     }
 
     public void setComment(final @CheckForNull String comment) {
