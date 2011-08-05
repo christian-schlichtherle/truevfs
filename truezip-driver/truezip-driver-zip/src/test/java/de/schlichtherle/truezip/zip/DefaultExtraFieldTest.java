@@ -51,11 +51,11 @@ public final class DefaultExtraFieldTest {
         }
 
         def = new DefaultExtraField(UShort.MIN_VALUE);
-        assertEquals(UShort.MIN_VALUE, def.getHeaderID());
+        assertEquals(UShort.MIN_VALUE, def.getHeaderId());
         assertEquals(0, def.getDataSize());
 
         def = new DefaultExtraField(UShort.MAX_VALUE);
-        assertEquals(UShort.MAX_VALUE, def.getHeaderID());
+        assertEquals(UShort.MAX_VALUE, def.getHeaderId());
         assertEquals(0, def.getDataSize());
     }
 

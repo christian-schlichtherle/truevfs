@@ -104,7 +104,7 @@ public final class ZipEntryTest {
         try {
             entry.setGeneralBit(-1, false);
             fail();
-        } catch (IllegalArgumentException ex) {
+        } catch (AssertionError expected) {
         }
 
         for (int i = 0; i < 16; i++) {
@@ -116,7 +116,7 @@ public final class ZipEntryTest {
         try {
             entry.setGeneralBit(16, false);
             fail();
-        } catch (IllegalArgumentException ex) {
+        } catch (AssertionError expected) {
         }
 
         entry.setGeneral(UNKNOWN);

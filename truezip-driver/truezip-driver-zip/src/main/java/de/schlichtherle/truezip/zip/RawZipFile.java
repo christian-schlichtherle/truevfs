@@ -236,7 +236,7 @@ implements Iterable<E>, Closeable {
         final byte[] cfh = new byte[CFH_MIN_LEN - sig.length];
         for (; ; numEntries--) {
             rof.readFully(sig);
-            if (readUInt(sig, 0) != CFH_SIG)
+            if (CFH_SIG != readUInt(sig, 0))
                 break;
             rof.readFully(cfh);
             final int general = readUShort(cfh, 4);
@@ -244,7 +244,7 @@ implements Iterable<E>, Closeable {
             final byte[] name = new byte[nameLen];
             rof.readFully(name);
             // See appendix D of PKWARE's ZIP File Format Specification.
-            final boolean utf8 = (general & (1 << GPBF_UTF8)) != 0;
+            final boolean utf8 = 0 != (general & (1 << GPBF_UTF8));
             if (utf8)
                 this.charset = UTF8;
             final E entry = factory.newEntry(decode(name));
@@ -257,12 +257,8 @@ implements Iterable<E>, Closeable {
                 entry.setGeneral(general);
                 off += 2; // General Purpose Bit Flags
                 assert entry.getGeneralBit(GPBF_UTF8) == utf8;
-                final int method = readUShort(cfh, off);
+                entry.setMethod(readUShort(cfh, off));
                 off += 2;
-                if (STORED != method && DEFLATED != method)
-                    throw new ZipException(entry.getName()
-                    + " (unsupported compression method: " + method + ")");
-                entry.setMethod(method);
                 entry.setDosTime(readUInt(cfh, off));
                 off += 4;
                 entry.setCrc(readUInt(cfh, off));
@@ -288,12 +284,12 @@ implements Iterable<E>, Closeable {
                 if (extraLen > 0) {
                     final byte[] extra = new byte[extraLen];
                     rof.readFully(extra);
-                    entry.setExtra(extra);
+                    entry.setExtra16(extra);
                 }
                 if (commentLen > 0) {
                     final byte[] comment = new byte[commentLen];
                     rof.readFully(comment);
-                    entry.setComment(decode(comment));
+                    entry.setComment16(decode(comment));
                 }
                 // Re-read virtual offset after ZIP64 Extended Information
                 // Extra Field may have been parsed, map it to the real
