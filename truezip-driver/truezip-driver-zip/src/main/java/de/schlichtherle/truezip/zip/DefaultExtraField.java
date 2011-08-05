@@ -33,7 +33,7 @@ import net.jcip.annotations.NotThreadSafe;
 @DefaultAnnotation(NonNull.class)
 final class DefaultExtraField extends ExtraField {
 
-    private final int headerID;
+    private final short headerID;
     private @CheckForNull byte[] data;
 
     /**
@@ -44,13 +44,13 @@ final class DefaultExtraField extends ExtraField {
      * @throws IllegalArgumentException If 
      */
     DefaultExtraField(final int headerID) {
-        UShort.check(headerID, "Header ID out of range", null);
-        this.headerID = headerID;
+        assert UShort.check(headerID, "Header ID out of range", null);
+        this.headerID = (short) headerID;
     }
 
     @Override
     int getHeaderID() {
-        return headerID;
+        return headerID & UShort.MAX_VALUE;
     }
 
     @Override
@@ -61,7 +61,7 @@ final class DefaultExtraField extends ExtraField {
 
     @Override
     void readFrom(final byte[] src, final int off, final int size) {
-        UShort.check(size, "Data Size out of range", null);
+        assert UShort.check(size, "Data Size out of range", null);
         arraycopy(src, off, this.data = new byte[size], 0, size);
     }
 

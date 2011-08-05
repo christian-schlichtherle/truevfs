@@ -131,7 +131,8 @@ public class ZipEntry implements Cloneable {
         this.csize = template.csize;
         this.size = template.size;
         this.offset = template.offset;
-        setExtra0(template.getExtra());
+        final ExtraFields templateFields = template.fields;
+        this.fields = null != templateFields ? templateFields.clone() : null;
         this.comment = template.comment;
     }
 
@@ -143,7 +144,8 @@ public class ZipEntry implements Cloneable {
         } catch (CloneNotSupportedException cannotHappen) {
             throw new AssertionError(cannotHappen);
         }
-        entry.setExtra(getExtra());
+        final ExtraFields fields = this.fields;
+        entry.fields = null != fields ? fields.clone() : null;
         return entry;
     }
 
@@ -190,12 +192,12 @@ public class ZipEntry implements Cloneable {
     }
 
     /** Returns the General Purpose Bit Flags. */
-    int getGeneral() {
+    final int getGeneral() {
         return isInit(GENERAL) ? general & UShort.MAX_VALUE : UNKNOWN;
     }
 
     /** Sets the General Purpose Bit Flags. */
-    void setGeneral(final int general) {
+    final void setGeneral(final int general) {
         final boolean known = general != UNKNOWN;
         if (known)
             UShort.check(general, name, "General Purpose Bit Flag out of range");
@@ -330,13 +332,13 @@ public class ZipEntry implements Cloneable {
         this.crc = (int) crc;
     }
 
-    long getCompressedSize32() {
+    final long getCompressedSize32() {
         if (csize == UNKNOWN)
             return UNKNOWN;
         return csize > UInt.MAX_VALUE || FORCE_ZIP64_EXT ? UInt.MAX_VALUE : csize;
     }
 
-    void setCompressedSize32(final long csize) {
+    final void setCompressedSize32(final long csize) {
         if (csize != UNKNOWN)
             UInt.check(csize, name, "Compressed Size out of range");
         this.csize = csize;
@@ -370,13 +372,13 @@ public class ZipEntry implements Cloneable {
         this.csize = csize;
     }
 
-    long getSize32() {
+    final long getSize32() {
         if (size == UNKNOWN)
             return UNKNOWN;
         return size > UInt.MAX_VALUE || FORCE_ZIP64_EXT ? UInt.MAX_VALUE : size;
     }
 
-    void setSize32(final long size) {
+    final void setSize32(final long size) {
         if (size != UNKNOWN)
             UInt.check(size, name, "Uncompressed Size out of range");
         this.size = size;
@@ -410,23 +412,23 @@ public class ZipEntry implements Cloneable {
         this.size = size;
     }
 
-    long getOffset32() {
+    final long getOffset32() {
         if (offset == UNKNOWN)
             return UNKNOWN;
         return offset > UInt.MAX_VALUE || FORCE_ZIP64_EXT ? UInt.MAX_VALUE : offset;
     }
 
-    void setOffset32(final long offset) {
+    final void setOffset32(final long offset) {
         if (offset != UNKNOWN)
             UInt.check(offset, name, "Relative Header Offset out of range");
         this.offset = offset;
     }
 
-    long getOffset() {
+    final long getOffset() {
         return offset;
     }
 
-    void setOffset(final long offset) {
+    final void setOffset(final long offset) {
         setOffset64(offset);
     }
 
@@ -504,11 +506,7 @@ public class ZipEntry implements Cloneable {
      *
      * @param data The byte array holding the serialized Extra Fields.
      */
-    public void setExtra(@CheckForNull byte[] data) {
-        setExtra0(data);
-    }
-
-    private void setExtra0(final @CheckForNull byte[] data) {
+    public void setExtra(final @CheckForNull byte[] data) {
         if (null == data || data.length <= 0) {
             this.fields = null;
         } else {
@@ -602,7 +600,7 @@ public class ZipEntry implements Cloneable {
     }
 
     final String getEffectiveComment() {
-        final String comment = this.comment;
+        final String comment = getComment();
         return null != comment ? comment : "";
     }
 
@@ -611,8 +609,8 @@ public class ZipEntry implements Cloneable {
     }
 
     public void setComment(final @CheckForNull String comment) {
-        if (null != comment)
-            UShort.check(comment.length(), name, "Comment too long");
+        /*if (null != comment)
+            UShort.check(comment.length(), name, "Comment too long");*/
         this.comment = comment;
     }
 

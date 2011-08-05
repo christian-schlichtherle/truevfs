@@ -125,6 +125,7 @@ final class ExtraFields implements Cloneable {
      * @see #getExtra
      */
     int getExtraLength() {
+        final Map<Integer, ExtraField> extra = this.extra;
         if (extra.isEmpty())
             return 0;
         int l = 0;
@@ -156,19 +157,19 @@ final class ExtraFields implements Cloneable {
      * Upon return, this collection shall not access {@code data}
      * subsequently and {@link #getExtraLength} must equal {@code size}.
      *
-     * @param data The byte array to read the list of Extra Fields from.
-     * @param off The zero based offset in the byte array where the first byte
-     *        of the list of Extra Fields is read from.
-     * @param size The length of the list of Extra Fields in bytes.
+     * @param  data The byte array to read the list of Extra Fields from.
+     * @param  off The zero based offset in the byte array where the first byte
+     *         of the list of Extra Fields is read from.
+     * @param  size The length of the list of Extra Fields in bytes.
      * @throws IndexOutOfBoundsException If the byte array
      *         {@code data} does not hold at least {@code size}
      *         bytes at the zero based offset {@code off}.
      * @throws RuntimeException If {@code size} is illegal or the
      *         deserialized list of Extra Fields contains illegal data.
-     * @see #getExtraLength
+     * @see    #getExtraLength
      */
     void readFrom(final byte[] data, int off, final int size) {
-        UShort.check(size, "Extra Field out of range", null);
+        assert UShort.check(size, "Extra Field out of range", null);
         final Map<Integer, ExtraField> map = new TreeMap<Integer, ExtraField>();
         if (null != data && 0 < size) {
             final int end = off + size;
@@ -193,13 +194,13 @@ final class ExtraFields implements Cloneable {
      * Upon return, this collection shall not access {@code data}
      * subsequently.
      *
-     * @param data The byte array to write the list of Extra Fields to.
-     * @param off The zero based offset in the byte array where the first byte
-     *        of the list of Extra Fields is written to.
+     * @param  data The byte array to write the list of Extra Fields to.
+     * @param  off The zero based offset in the byte array where the first byte
+     *         of the list of Extra Fields is written to.
      * @throws IndexOutOfBoundsException If the byte array
      *         {@code data} does not hold at least {@link #getExtraLength}
      *         bytes at the zero based offset {@code off}.
-     * @see #getExtraLength
+     * @see    #getExtraLength
      */
     void writeTo(final byte[] data, int off) {
        for (final ExtraField ef : extra.values()) {

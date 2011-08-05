@@ -57,23 +57,24 @@ final class UInt {
     /**
      * Checks the parameter range.
      * 
-     * @param l The long integer to check to be in the range of an unsigned
-     *        integer ({@value SIZE} bits).
-     * @param subject The subject of the exception message
-     *        - may be {@code null}.
-     *        This should not end with a punctuation character.
-     * @param error First sentence of the exception message
-     *        - may be {@code null}.
-     *        This should not end with a punctuation character.
+     * @param  l The long integer to check to be in the range of an unsigned
+     *         integer ({@value SIZE} bits).
+     * @param  subject The subject of the exception message
+     *         - may be {@code null}.
+     *         This should not end with a punctuation character.
+     * @param  error First sentence of the exception message
+     *         - may be {@code null}.
+     *         This should not end with a punctuation character.
+     * @return {@code true}
      * @throws IllegalArgumentException If {@code l} is less than
      *         {@link #MIN_VALUE} or greater than {@link #MAX_VALUE}.
      */
-    public static void check(
+    public static boolean check(
             final long l,
             final @CheckForNull String subject,
             final @CheckForNull String error) {
         if (MIN_VALUE <= l && l <= MAX_VALUE)
-            return;
+            return true;
 
         final StringBuilder message = new StringBuilder();
         if (null != subject) {
@@ -96,12 +97,13 @@ final class UInt {
     /**
      * Checks the parameter range.
      * 
-     * @param l The long integer to check to be in the range of an unsigned
-     *        integer ({@value SIZE} bits).
+     * @param  l The long integer to check to be in the range of an unsigned
+     *         integer ({@value SIZE} bits).
+     * @return {@code true}
      * @throws IllegalArgumentException If {@code l} is less than
      *         {@link #MIN_VALUE} or greater than {@link #MAX_VALUE}.
      */
-    public static void check(final long l) {
-        check(l, "Long integer out of range", null);
+    public static boolean check(final long l) {
+        return check(l, "Long integer out of range", null);
     }
 }

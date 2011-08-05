@@ -66,7 +66,7 @@ abstract class ExtraField {
             throw new IllegalArgumentException(ex);
         }
         final int headerID = ef.getHeaderID();
-        UShort.check(headerID, "Header ID out of range", null);
+        assert UShort.check(headerID, "Header ID out of range", null);
         registry.put(headerID, c);
     }
 
@@ -84,7 +84,7 @@ abstract class ExtraField {
      * @see    #register
      */
     static ExtraField create(final int headerID) {
-        UShort.check(headerID, "Header ID out of range", null);
+        assert UShort.check(headerID, "Header ID out of range", null);
         final Class<? extends ExtraField> c = registry.get(headerID);
         final ExtraField ef;
         try {
@@ -125,7 +125,7 @@ abstract class ExtraField {
      */
     final byte[] getDataBlock() {
         final int size = getDataSize();
-        UShort.check(size);
+        assert UShort.check(size);
         if (0 == size)
             return EMPTY;
         final byte[] data = new byte[size];
