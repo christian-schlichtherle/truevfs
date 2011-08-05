@@ -92,7 +92,7 @@ final class ExtraFields implements Cloneable {
      *         {@link UShort#MAX_VALUE}
      *         ({@value de.schlichtherle.truezip.zip.UShort#MAX_VALUE}).
      */
-    ExtraField put(final ExtraField ef) {
+    ExtraField add(final ExtraField ef) {
         if (null == ef)
             throw new NullPointerException();
         final int headerID = ef.getHeaderID();

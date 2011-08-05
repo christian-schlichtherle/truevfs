@@ -432,10 +432,31 @@ implements Iterable<E> {
         return processor;
     }
 
+    /**
+     * Returns a new {@code EncryptedOutputMethod}.
+     *
+     * @param  processor the output method to decorate.
+     * @param  param the {@link ZipCryptoParameters} used to determine and
+     *         configure the type of the encrypted ZIP file.
+     *         If the run time class of this parameter matches multiple
+     *         parameter interfaces, it is at the discretion of this
+     *         implementation which one is picked and hence which type of
+     *         encrypted ZIP file is created.
+     *         If you need more control over this, pass in an instance which's
+     *         run time class just implements the
+     *         {@link ZipCryptoParametersProvider} interface.
+     *         Instances of this interface are queried to find crypto
+     *         parameters which match a known encrypted ZIP file type.
+     *         This algorithm is recursively applied.
+     * @return A new {@code EncryptedOutputMethod}.
+     * @throws ZipCryptoParametersException if {@code param} is {@code null} or
+     *         no suitable crypto parameters can get found.
+     * @throws IOException on any I/O error.
+     */
     private EncryptedOutputMethod newEncryptedOutputMethod(
             final OutputMethod processor,
             final @CheckForNull ZipCryptoParameters param)
-    throws ZipException {
+    throws ZipCryptoParametersException {
         assert null != processor;
         // Order is important here to support multiple interface implementations!
         if (param == null) {
@@ -905,8 +926,10 @@ implements Iterable<E> {
         @Override
         public OutputStream init(final ZipEntry entry) throws IOException {
             // Order is important here!
-            final OutputStream out = delegate.init(entry);
+            final OutputStream out = new WinZipAesOutputStream(
+                    delegate.init(entry), param);
             entry.setMethod(WINZIP_AES);
+            
             return out;
         }
 
