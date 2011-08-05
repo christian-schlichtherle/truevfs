@@ -97,9 +97,9 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
     }
 
     /**
-     * Creates a new instance of {@code RaesReadOnlyFile}.
+     * Returns a new {@code RaesReadOnlyFile}.
      *
-     * @param  file The file to read.
+     * @param  file The file to open for reading the ciphered data.
      * @param  param The {@link RaesParameters} required to access the
      *         RAES type actually found in the file.
      *         If the run time class of this parameter does not match the
@@ -108,20 +108,16 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
      *         {@link RaesParametersProvider} interface, it is used to find
      *         the required RAES parameters.
      *         This is applied recursively.
-     * @throws NullPointerException If any of the parameters is {@code null}.
      * @throws FileNotFoundException If the file cannot get opened for reading.
-     * @throws RaesParametersException If no suitable RAES parameters have been
-     *         provided or something is wrong with the parameters.
+     * @throws RaesParametersException If {@code param} is {@code null} or
+     *         no suitable RAES parameters can get found.
      * @throws RaesException If the file is not RAES compatible.
-     * @throws IOException On any other I/O related issue.
+     * @throws IOException on any I/O error.
      */
     public static RaesReadOnlyFile getInstance(
             final File file,
             final RaesParameters param)
-    throws  FileNotFoundException,
-            RaesParametersException,
-            RaesException,
-            IOException {
+    throws IOException {
         final ReadOnlyFile rof = new DefaultReadOnlyFile(file);
         try {
             return getInstance(rof, param);
@@ -132,32 +128,27 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
     }
 
     /**
-     * Returns a new instance of an {@code RaesReadOnlyFile}.
+     * Returns a new {@code RaesReadOnlyFile}.
      *
-     * @param rof The read only file to read.
-     * @param param The {@link RaesParameters} required to access the
-     *        RAES type actually found in the file.
-     *        If the run time class of this parameter does not match the
-     *        required parameter interface according to the RAES type found
-     *        in the file, but is an instance of the
-     *        {@link RaesParametersProvider} interface, it's queried to find
-     *        the required RAES parameters.
-     *        This algorithm is recursively applied.
-     * @return A new instance of an {@code RaesReadOnlyFile}.
-     * @throws NullPointerException If {@code rof} is {@code null}.
-     * @throws RaesParametersException If {@code parameters} is {@code null} or
-     *         no suitable RAES parameters can be found.
+     * @param  rof the read only file to decorate for reading the ciphered data.
+     * @param  param the {@link RaesParameters} required to access the RAES
+     *         type actually found in the file.
+     *         If the run time class of this parameter does not match the
+     *         required parameter interface according to the RAES type found
+     *         in the file, but is an instance of the
+     *         {@link RaesParametersProvider} interface, it's queried to find
+     *         the required RAES parameters.
+     *         This algorithm is recursively applied.
+     * @return A new {@code RaesReadOnlyFile}.
+     * @throws RaesParametersException If {@code param} is {@code null} or
+     *         no suitable RAES parameters can get found.
      * @throws RaesException If the file is not RAES compatible.
-     * @throws FileNotFoundException If the file cannot get opened for reading.
-     * @throws IOException On any other I/O related issue.
+     * @throws IOException on any I/O error.
      */
     public static RaesReadOnlyFile getInstance(
             final ReadOnlyFile rof,
             RaesParameters param)
     throws IOException {
-        /*if (null == parameters)
-            throw new NullPointerException();*/
-
         // Load header data.
         final byte[] leadIn = new byte[LEAD_IN_LENGTH];
         rof.seek(0);
@@ -179,7 +170,7 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
     @SuppressWarnings("unchecked")
     private static <P extends RaesParameters> P getParameters(
             final Class<P> type,
-            final @CheckForNull RaesParameters param)
+            final RaesParameters param)
     throws RaesParametersException {
         // Order is important here to support multiple interface implementations!
         if (null == param) {

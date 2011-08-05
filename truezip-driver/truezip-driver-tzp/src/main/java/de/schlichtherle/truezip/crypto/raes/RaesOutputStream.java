@@ -58,7 +58,7 @@ public abstract class RaesOutputStream extends CipherOutputStream {
     /**
      * Returns a new {@code RaesOutputStream}.
      *
-     * @param  out The underlying output stream to use for the encrypted data.
+     * @param  out the output stream to decorate for writing the ciphered data.
      * @param  param The {@link RaesParameters} used to determine and
      *         configure the type of RAES file created.
      *         If the run time class of this parameter matches multiple
@@ -72,9 +72,9 @@ public abstract class RaesOutputStream extends CipherOutputStream {
      *         which match a known RAES type.
      *         This algorithm is recursively applied.
      * @return A new {@code RaesOutputStream}.
-     * @throws RaesParametersException If {@code param} is {@code null} or
+     * @throws RaesParametersException if {@code param} is {@code null} or
      *         no suitable RAES parameters can be found.
-     * @throws IOException On any I/O error.
+     * @throws IOException on any I/O error.
      */
     public static RaesOutputStream getInstance(
             final OutputStream out,
