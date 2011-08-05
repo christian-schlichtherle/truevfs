@@ -21,6 +21,7 @@ import static de.schlichtherle.truezip.zip.LittleEndian.*;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.nio.charset.Charset;
 import net.jcip.annotations.NotThreadSafe;
 
@@ -435,6 +436,24 @@ public class ZipEntry implements Cloneable {
         this.offset = offset;
     }
 
+    final @Nullable ExtraField getExtraField(int headerId) {
+        final ExtraFields fields = this.fields;
+        return fields == null ? null : fields.get(headerId);
+    }
+
+    final void setExtraField(final ExtraField field) {
+        ExtraFields fields = this.fields;
+        if (null != field) {
+            if (null == fields)
+                this.fields = fields = new ExtraFields();
+            fields.add(field);
+        } else {
+            if (null == fields)
+                return;
+            fields.remove(field.getHeaderID());
+        }
+    }
+
     /**
      * Returns a protective copy of the serialized Extra Fields.
      * Note that unlike its template {@link java.util.zip.ZipEntry#getExtra},
@@ -467,7 +486,7 @@ public class ZipEntry implements Cloneable {
             final ExtraField field = composeZip64ExtraField();
             if (null != field) {
                 fields = null != fields ? fields.clone() : new ExtraFields();
-                fields.put(field);
+                fields.add(field);
             }
         } else if (null != fields) {
             ExtraField field = fields.get(ZIP64_HEADER_ID);
