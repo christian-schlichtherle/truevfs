@@ -187,7 +187,7 @@ implements Iterable<E>, Closeable {
         }
         assert null != this.archive;
         assert null != this.charset;
-        assert null != this.factory;
+        //assert null != this.factory; // pleases FindBugs!
         assert null != this.mapper;
     }
 
@@ -487,8 +487,8 @@ implements Iterable<E>, Closeable {
     }
 
     @SuppressWarnings("ReturnOfCollectionOrArrayField")
-    byte[] getFileComment() {
-        return comment;
+    @CheckForNull byte[] getFileComment() {
+        return this.comment;
     }
 
     /**
