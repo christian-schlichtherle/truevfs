@@ -31,19 +31,19 @@ public final class ExtraFieldTest {
     public void testRegister() {
         try {
             ExtraField.register(null);
-            fail("Expected IllegalArgumentException!");
+            fail();
         } catch (NullPointerException expected) {
         }
 
         try {
             ExtraField.register(TooSmallHeaderIDExtraField.class);
-            fail("Expected IllegalArgumentException!");
+            fail();
         } catch (IllegalArgumentException expected) {
         }
 
         try {
             ExtraField.register(TooLargeHeaderIDExtraField.class);
-            fail("Expected IllegalArgumentException!");
+            fail();
         } catch (IllegalArgumentException expected) {
         }
         
@@ -74,13 +74,13 @@ public final class ExtraFieldTest {
 
         try {
             ef = ExtraField.create(UShort.MIN_VALUE - 1);
-            fail("Expected IllegalArgumentException!");
+            fail();
         } catch (IllegalArgumentException expected) {
         }
 
         try {
             ef = ExtraField.create(UShort.MAX_VALUE + 1);
-            fail("Expected IllegalArgumentException!");
+            fail();
         } catch (IllegalArgumentException expected) {
         }
     }
