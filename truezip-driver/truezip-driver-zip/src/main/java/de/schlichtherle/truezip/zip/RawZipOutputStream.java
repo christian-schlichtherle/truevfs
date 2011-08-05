@@ -717,9 +717,9 @@ implements Iterable<E> {
         throws ZipException {
             {
                 final long size = encode(entry.getName()).length
-                                + entry.getExtra().length
+                                + entry.getExtraLength()
                                 + encode(entry.getEffectiveComment()).length;
-                if (size > UShort.MAX_VALUE)
+                if (UShort.MAX_VALUE < size)
                     throw new ZipException(entry.getName()
                     + " (sum of name, extra fields and comment is too long: " + size + ")");
             }

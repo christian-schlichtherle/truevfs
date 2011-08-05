@@ -57,20 +57,20 @@ public final class ExtraFieldTest {
         ExtraField.register(NullExtraField.class);
         ef = ExtraField.create(0x0000);
         assertTrue(ef instanceof NullExtraField);
-        assertEquals(0x0000, ef.getHeaderID());
+        assertEquals(0x0000, ef.getHeaderId());
 
         ef = ExtraField.create(0x0001);
         //assertTrue(ef instanceof Zip64ExtraField);
         assertTrue(ef instanceof DefaultExtraField);
-        assertEquals(0x0001, ef.getHeaderID());
+        assertEquals(0x0001, ef.getHeaderId());
 
         ef = ExtraField.create(0x0002);
         assertTrue(ef instanceof DefaultExtraField);
-        assertEquals(0x0002, ef.getHeaderID());
+        assertEquals(0x0002, ef.getHeaderId());
 
         ef = ExtraField.create(UShort.MAX_VALUE);
         assertTrue(ef instanceof DefaultExtraField);
-        assertEquals(UShort.MAX_VALUE, ef.getHeaderID());
+        assertEquals(UShort.MAX_VALUE, ef.getHeaderId());
 
         try {
             ef = ExtraField.create(UShort.MIN_VALUE - 1);
@@ -90,7 +90,7 @@ public final class ExtraFieldTest {
         }
 
         @Override
-        public int getHeaderID() {
+        public int getHeaderId() {
             return 0x0000;
         }
 
@@ -110,14 +110,14 @@ public final class ExtraFieldTest {
 
     private static class TooSmallHeaderIDExtraField extends NullExtraField {
         @Override
-        public int getHeaderID() {
+        public int getHeaderId() {
             return UShort.MIN_VALUE - 1; // illegal return value
         }
     }
 
     private static class TooLargeHeaderIDExtraField extends NullExtraField {
         @Override
-        public int getHeaderID() {
+        public int getHeaderId() {
             return UShort.MAX_VALUE + 1; // illegal return value
         }
     }

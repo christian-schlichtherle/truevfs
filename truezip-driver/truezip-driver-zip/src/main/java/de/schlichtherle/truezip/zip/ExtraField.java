@@ -65,9 +65,9 @@ abstract class ExtraField {
         } catch (Exception ex) {
             throw new IllegalArgumentException(ex);
         }
-        final int headerID = ef.getHeaderID();
-        assert UShort.check(headerID, "Header ID out of range", null);
-        registry.put(headerID, c);
+        final int headerId = ef.getHeaderId();
+        assert UShort.check(headerId);
+        registry.put(headerId, c);
     }
 
     /**
@@ -76,25 +76,25 @@ abstract class ExtraField {
      * The returned Extra Field still requires proper initialization, for
      * example by calling {@link #readFrom}.
      * 
-     * @param  headerID An unsigned short integer (two bytes) which indicates
+     * @param  headerId An unsigned short integer (two bytes) which indicates
      *         the type of the returned Extra Field.
      * @return A new Extra Field
      * @throws IllegalArgumentException If {@code headerID} is out of
      *         range.
      * @see    #register
      */
-    static ExtraField create(final int headerID) {
-        assert UShort.check(headerID, "Header ID out of range", null);
-        final Class<? extends ExtraField> c = registry.get(headerID);
+    static ExtraField create(final int headerId) {
+        assert UShort.check(headerId);
+        final Class<? extends ExtraField> c = registry.get(headerId);
         final ExtraField ef;
         try {
             ef = null != c
                     ? (ExtraField) c.newInstance()
-                    : new DefaultExtraField(headerID);
+                    : new DefaultExtraField(headerId);
         } catch (Exception cannotHappen) {
             throw new AssertionError(cannotHappen);
         }
-        assert headerID == ef.getHeaderID();
+        assert headerId == ef.getHeaderId();
         return ef;
     }
 
@@ -103,7 +103,7 @@ abstract class ExtraField {
      * The Header ID is an unsigned short integer (two bytes)
      * which must be constant during the life cycle of this object.
      */
-    abstract int getHeaderID();
+    abstract int getHeaderId();
 
     /**
      * Returns the Data Size of this Extra Field.
