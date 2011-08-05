@@ -19,6 +19,7 @@ package de.schlichtherle.truezip.zip;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import static java.lang.System.*;
 import net.jcip.annotations.NotThreadSafe;
 
 /**
@@ -61,14 +62,13 @@ final class DefaultExtraField extends ExtraField {
     @Override
     void readFrom(final byte[] src, final int off, final int size) {
         UShort.check(size, "Data Size out of range", null);
-        final byte[] dst = this.data = new byte[size];
-        System.arraycopy(src, off, dst, 0, size);
+        arraycopy(src, off, this.data = new byte[size], 0, size);
     }
 
     @Override
     void writeTo(byte[] dst, int off) {
         final byte[] src = this.data;
         if (null != src)
-            System.arraycopy(src, 0, dst, off, src.length);
+            arraycopy(src, 0, dst, off, src.length);
     }
 }

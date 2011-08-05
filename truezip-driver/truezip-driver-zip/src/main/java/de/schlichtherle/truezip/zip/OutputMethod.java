@@ -32,7 +32,7 @@ import net.jcip.annotations.NotThreadSafe;
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
-interface ZipOutputMethod {
+interface OutputMethod {
 
     /**
      * Checks and updates the given {@code entry} and returns an output stream

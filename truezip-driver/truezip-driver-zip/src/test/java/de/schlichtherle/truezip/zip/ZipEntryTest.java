@@ -19,7 +19,7 @@ import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 import static org.hamcrest.CoreMatchers.*;
-import static de.schlichtherle.truezip.zip.ZipConstants.*;
+import static de.schlichtherle.truezip.zip.Constants.*;
 import static de.schlichtherle.truezip.zip.ZipEntry.*;
 import static org.junit.Assert.*;
 

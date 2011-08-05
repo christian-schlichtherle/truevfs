@@ -29,10 +29,12 @@ import org.bouncycastle.crypto.BufferedBlockCipher;
  * An {@link OutputStream} for producing a ZIP file with data ecnrypted
  * according to different specifications.
  *
+ * @deprecated FIXME: Remove this file!
  * @see     ZipCryptoInputStream
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@Deprecated
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
 abstract class ZipCryptoOutputStream

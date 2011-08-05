@@ -15,9 +15,11 @@
  */
 package de.schlichtherle.truezip.zip;
 
-import static de.schlichtherle.truezip.zip.ZipConstants.*;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import static de.schlichtherle.truezip.zip.Constants.*;
+import static de.schlichtherle.truezip.zip.ExtraField.*;
+import static de.schlichtherle.truezip.zip.LittleEndian.*;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.nio.charset.Charset;
 import net.jcip.annotations.NotThreadSafe;
@@ -449,12 +451,12 @@ public class ZipEntry implements Cloneable {
      * Returns a protective copy of the serialized Extra Fields.
      *
      * @param zip64 Whether or not a ZIP64 Extended Information Extra Field,
-     *        if present, shall be included in the return data or not.
+     *        if present, shall be included in the returned data or not.
      * @return A new byte array holding the serialized Extra Fields.
      *         {@code null} is never returned.
      * @see #getExtra()
      */
-    byte[] getExtra(final boolean zip64) {
+    final byte[] getExtra(final boolean zip64) {
         final ExtraFields fields = getFields(zip64);
         return null == fields ? EMPTY : fields.getExtra();
     }
@@ -462,17 +464,17 @@ public class ZipEntry implements Cloneable {
     private @CheckForNull ExtraFields getFields(final boolean zip64) {
         ExtraFields fields = this.fields;
         if (zip64) {
-            final ExtraField field = compileZip64ExtraField();
+            final ExtraField field = composeZip64ExtraField();
             if (null != field) {
                 fields = null != fields ? fields.clone() : new ExtraFields();
                 fields.put(field);
             }
         } else if (null != fields) {
-            ExtraField field = fields.get(ExtraField.ZIP64_HEADER_ID);
+            ExtraField field = fields.get(ZIP64_HEADER_ID);
             if (null != field) {
+                assert ZIP64_HEADER_ID == field.getHeaderID();
                 fields = fields.clone();
-                field = fields.remove(ExtraField.ZIP64_HEADER_ID);
-                assert ExtraField.ZIP64_HEADER_ID == field.getHeaderID();
+                field = fields.remove(ZIP64_HEADER_ID);
             }
         }
         return fields;
@@ -498,18 +500,19 @@ public class ZipEntry implements Cloneable {
     }
 
     private void setExtra0(final @CheckForNull byte[] data) {
-        if (null == data || 0 >= data.length) {
-            fields = null;
+        if (null == data || data.length <= 0) {
+            this.fields = null;
         } else {
+            ExtraFields fields = this.fields;
             if (null == fields)
-                fields = new ExtraFields();
+                this.fields = fields = new ExtraFields();
             fields.readFrom(data, 0, data.length);
             parseZip64ExtraField();
-            assert null != fields;
-            fields.remove(ExtraField.ZIP64_HEADER_ID);
-            if (0 >= fields.size()) {
+            assert fields == this.fields;
+            fields.remove(ZIP64_HEADER_ID);
+            if (fields.size() <= 0) {
                 assert fields.size() == 0;
-                fields = null;
+                this.fields = null;
             }
         }
     }
@@ -520,9 +523,10 @@ public class ZipEntry implements Cloneable {
      * The ZIP64 Extended Information Extra Field is <em>not</em> removed.
      */
     private void parseZip64ExtraField() {
+        final ExtraFields fields = this.fields;
         if (null == fields)
             return;
-        final ExtraField ef = fields.get(ExtraField.ZIP64_HEADER_ID);
+        final ExtraField ef = fields.get(ZIP64_HEADER_ID);
         if (null == ef)
             return;
         final byte[] data = ef.getDataBlock();
@@ -531,56 +535,56 @@ public class ZipEntry implements Cloneable {
         final long size = getSize32();
         if (size >= UInt.MAX_VALUE) {
             assert size == UInt.MAX_VALUE;
-            setSize64(LittleEndian.readLong(data, off));
+            setSize64(readLong(data, off));
             off += 8;
         }
         // Read in Compressed Size.
         final long csize = getCompressedSize32();
         if (csize >= UInt.MAX_VALUE) {
             assert csize == UInt.MAX_VALUE;
-            setCompressedSize64(LittleEndian.readLong(data, off));
+            setCompressedSize64(readLong(data, off));
             off += 8;
         }
         // Read in Relative Header Offset.
         final long offset = getOffset32();
         if (offset >= UInt.MAX_VALUE) {
             assert offset == UInt.MAX_VALUE;
-            setOffset64(LittleEndian.readLong(data, off));
+            setOffset64(readLong(data, off));
             //off += 8;
         }
     }
 
     /**
-     * Compiles a ZIP64 Extended Information Extra Field from the properties
+     * Composes a ZIP64 Extended Information Extra Field from the properties
      * of this entry.
      * If no ZIP64 Extended Information Extra Field is required it is removed
      * from the collection of Extra Fields.
      */
-    private @CheckForNull ExtraField compileZip64ExtraField() {
+    private @CheckForNull ExtraField composeZip64ExtraField() {
         final byte[] data = new byte[3 * 8]; // maximum size
         int off = 0;
         // Write out Uncompressed Size.
         final long size = getSize();
         if (size >= UInt.MAX_VALUE || FORCE_ZIP64_EXT && size >= 0) {
-            LittleEndian.writeLong(size, data, off);
+            writeLong(size, data, off);
             off += 8;
         }
         // Write out Compressed Size.
         final long csize = getCompressedSize();
         if (csize >= UInt.MAX_VALUE || FORCE_ZIP64_EXT && csize >= 0) {
-            LittleEndian.writeLong(csize, data, off);
+            writeLong(csize, data, off);
             off += 8;
         }
         // Write out Relative Header Offset.
         final long offset = getOffset();
         if (offset >= UInt.MAX_VALUE || FORCE_ZIP64_EXT && offset >= 0) {
-            LittleEndian.writeLong(offset, data, off);
+            writeLong(offset, data, off);
             off += 8;
         }
         // Create ZIP64 Extended Information Extra Field from serialized data.
         final ExtraField field;
         if (off > 0) {
-            field = new DefaultExtraField(ExtraField.ZIP64_HEADER_ID);
+            field = new DefaultExtraField(ZIP64_HEADER_ID);
             field.readFrom(data, 0, off);
         } else {
             field = null;

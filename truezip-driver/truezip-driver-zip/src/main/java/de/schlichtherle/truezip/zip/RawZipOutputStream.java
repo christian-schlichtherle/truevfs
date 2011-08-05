@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.zip;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.LEDataOutputStream;
 import de.schlichtherle.truezip.util.JSE7;
-import static de.schlichtherle.truezip.zip.ZipConstants.*;
+import static de.schlichtherle.truezip.zip.Constants.*;
 import static de.schlichtherle.truezip.zip.ZipEntry.*;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
@@ -33,8 +33,6 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.zip.CRC32;
-import java.util.zip.CheckedOutputStream;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.ZipException;
 import net.jcip.annotations.NotThreadSafe;
@@ -60,7 +58,7 @@ implements Iterable<E> {
      * The default character set used for entry names and comments in ZIP files.
      * This is {@code "UTF-8"} for compatibility with Sun's JDK implementation.
      */
-    public static final Charset DEFAULT_CHARSET = ZipConstants.DEFAULT_CHARSET;
+    public static final Charset DEFAULT_CHARSET = Constants.DEFAULT_CHARSET;
 
     private final LEDataOutputStream dos;
 
@@ -99,7 +97,7 @@ implements Iterable<E> {
 
     private @CheckForNull ZipCryptoParameters cryptoParameters;
 
-    private @Nullable ZipOutputMethod processor;
+    private @Nullable OutputMethod processor;
 
     /**
      * Constructs a raw ZIP output stream which decorates the given output
@@ -391,7 +389,7 @@ implements Iterable<E> {
     public void putNextEntry(final E entry, final boolean process)
     throws IOException {
         closeEntry();
-        final ZipOutputMethod method = newOutputMethod(entry, process);
+        final OutputMethod method = newOutputMethod(entry, process);
         final OutputStream out = method.init(entry);
         this.entry = entry;
         method.start();
@@ -402,14 +400,19 @@ implements Iterable<E> {
         entries.put(entry.getName(), entry);
     }
 
-    private ZipOutputMethod newOutputMethod(final E entry, final boolean process)
+    private OutputMethod newOutputMethod(
+            final E entry,
+            final boolean process)
     throws ZipException {
         // Order is important here!
-        ZipOutputMethod processor = new RawOutputMethod(process);
+        OutputMethod processor = new RawOutputMethod(process);
         if (!process) {
             assert UNKNOWN != entry.getCrc();
             return processor;
         }
+        if (entry.isEncrypted())
+            processor = newEncryptedOutputMethod(processor,
+                    getCryptoParameters());
         int method = entry.getMethod();
         if (UNKNOWN == method)
             entry.setMethod(method = getMethod());
@@ -422,9 +425,30 @@ implements Iterable<E> {
                 break;
             default:
                 throw new ZipException(entry.getName()
-                + " (unsupported compression method: " + method + ")");
+                        + " (unsupported compression method: "
+                        + method
+                        + ")");
         }
         return processor;
+    }
+
+    private EncryptedOutputMethod newEncryptedOutputMethod(
+            final OutputMethod processor,
+            final @CheckForNull ZipCryptoParameters param)
+    throws ZipException {
+        assert null != processor;
+        // Order is important here to support multiple interface implementations!
+        if (param == null) {
+            throw new ZipCryptoParametersException("No crypto parameters available!");
+        } else if (param instanceof WinZipAesParameters) {
+            return new WinZipAesOutputMethod(processor,
+                    (WinZipAesParameters) param);
+        } else if (param instanceof ZipCryptoParametersProvider) {
+            return newEncryptedOutputMethod(processor,
+                    ((ZipCryptoParametersProvider) param).get(ZipCryptoParameters.class));
+        } else {
+            throw new ZipCryptoParametersException();
+        }
     }
 
     private static void checkLocalFileHeaderProperties(final ZipEntry entry)
@@ -662,7 +686,7 @@ implements Iterable<E> {
         }
     } // AppendingLEDataOutputStream
 
-    private final class RawOutputMethod implements ZipOutputMethod {
+    private final class RawOutputMethod implements OutputMethod {
 
         private final boolean process;
 
@@ -806,40 +830,13 @@ implements Iterable<E> {
         }
     } // RawOutputMethod
 
-    private static abstract class DecoratingOutputMethod<
-            P extends ZipOutputMethod>
-    implements ZipOutputMethod {
-
-        final P delegate;
-
-        DecoratingOutputMethod(final P processor) {
-            assert null != processor;
-            this.delegate = processor;
-        }
-
-        @Override
-        public OutputStream init(ZipEntry entry) throws IOException {
-            return delegate.init(entry);
-        }
-
-        @Override
-        public void start() throws IOException {
-            delegate.start();
-        }
-
-        @Override
-        public void finish() throws IOException {
-            delegate.finish();
-        }
-    } // DecoratingOutputMethod
-
     private final class DeflatedOutputMethod
-    extends DecoratingOutputMethod<ZipOutputMethod> {
+    extends DecoratingOutputMethod<OutputMethod> {
 
         private @CheckForNull UpdatingCrc32OutputStream ucos;
         private @CheckForNull ZipDeflaterOutputStream zdos;
 
-        DeflatedOutputMethod(ZipOutputMethod processor) {
+        DeflatedOutputMethod(OutputMethod processor) {
             super(processor);
         }
 
@@ -871,11 +868,11 @@ implements Iterable<E> {
     } // DeflatedOutputMethod
 
     private final class StoredOutputMethod
-    extends DecoratingOutputMethod<ZipOutputMethod> {
+    extends DecoratingOutputMethod<OutputMethod> {
 
         private @CheckForNull CheckingCrc32OutputStream ccos;
 
-        StoredOutputMethod(ZipOutputMethod processor) {
+        StoredOutputMethod(OutputMethod processor) {
             super(processor);
         }
 
@@ -895,6 +892,40 @@ implements Iterable<E> {
         }
     } // StoredOutputMethod
 
+    private final class WinZipAesOutputMethod
+    extends EncryptedOutputMethod {
+        final WinZipAesParameters param;
+
+        WinZipAesOutputMethod(
+                OutputMethod processor,
+                final WinZipAesParameters param) {
+            super(processor);
+            assert processor instanceof RawZipOutputStream<?>.RawOutputMethod;
+            assert null != param;
+            this.param = param;
+        }
+
+        @Override
+        public OutputStream init(final ZipEntry entry) throws IOException {
+            // Order is important here!
+            final OutputStream out = delegate.init(entry);
+            entry.setMethod(WINZIP_AES);
+            return out;
+        }
+
+        @Override
+        public void start() throws IOException {
+            final LEDataOutputStream dos = RawZipOutputStream.this.dos;
+            delegate.start();
+            
+        }
+
+        @Override
+        public void finish() throws IOException {
+            delegate.finish();
+        }
+    } // WinZipAesOutputMethod
+
     private final class ZipDeflaterOutputStream
     extends DeflaterOutputStream {
 
@@ -912,14 +943,6 @@ implements Iterable<E> {
             deflater.reset();
         }
     } // ZipDeflaterOutputStream
-
-    private static class Crc32OutputStream
-    extends CheckedOutputStream {
-
-        Crc32OutputStream(OutputStream out) {
-            super(out, new CRC32());
-        }
-    } // Crc32OutputStream
 
     private final class UpdatingCrc32OutputStream
     extends Crc32OutputStream {
