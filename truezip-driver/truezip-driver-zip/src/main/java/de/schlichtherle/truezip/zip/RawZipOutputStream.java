@@ -575,10 +575,7 @@ implements Iterable<E> {
     }
 
     private byte[] getEntryComment(final ZipEntry entry) {
-        String comment = entry.getComment();
-        if (comment == null)
-            comment = "";
-        return encode(comment);
+        return encode(entry.getEffectiveComment());
     }
 
     /**
@@ -653,7 +650,7 @@ implements Iterable<E> {
 
     private byte[] getFileComment() {
         final byte[] comment = this.comment;
-        return null == comment ? EMPTY : comment;
+        return null != comment ? comment : EMPTY;
     }
 
     /**
@@ -698,9 +695,9 @@ implements Iterable<E> {
         public LEDataOutputStream init(final ZipEntry entry)
         throws ZipException {
             {
-                final long size = entry.getNameLength(charset)
-                                + entry.getExtraLength()
-                                + entry.getCommentLength(charset);
+                final long size = encode(entry.getName()).length
+                                + entry.getExtra().length
+                                + encode(entry.getEffectiveComment()).length;
                 if (size > UShort.MAX_VALUE)
                     throw new ZipException(entry.getName()
                     + " (sum of name, extra fields and comment is too long: " + size + ")");
