@@ -43,12 +43,8 @@ final class WinZipAesEntryParameters {
         this.entry = entry;
     }
 
-    char[] getWritePassword() throws ZipKeyException {
-        return param.getWritePassword(entry.getName());
-    }
-
-    char[] getReadPassword(boolean invalid) throws ZipKeyException {
-        return param.getReadPassword(entry.getName(), invalid);
+    ZipEntry getEntry() {
+        return entry;
     }
 
     AesKeyStrength getKeyStrength() throws ZipKeyException {
@@ -59,7 +55,11 @@ final class WinZipAesEntryParameters {
         param.setKeyStrength(entry.getName(), keyStrength);
     }
 
-    ZipEntry getEntry() {
-        return entry;
+    char[] getWritePassword() throws ZipKeyException {
+        return param.getWritePassword(entry.getName());
+    }
+
+    char[] getReadPassword(boolean invalid) throws ZipKeyException {
+        return param.getReadPassword(entry.getName(), invalid);
     }
 }
