@@ -114,7 +114,7 @@ abstract class ExtraField {
      * 
      * @return The size of the Data Block in bytes
      *         or {@code 0} if unknown.
-     * @see #getDataBlock
+     * @see    #getDataBlock
      */
     abstract int getDataSize();
 
