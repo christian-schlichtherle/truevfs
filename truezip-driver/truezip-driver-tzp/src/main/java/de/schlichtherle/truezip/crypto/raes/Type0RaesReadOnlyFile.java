@@ -142,7 +142,7 @@ final class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
 
             gen.init(pass, salt, iCount);
             cipherParam = (ParametersWithIV) gen.generateDerivedParameters(
-                    keyStrengthBits, AES_BLOCK_SIZE);
+                    keyStrengthBits, AES_BLOCK_SIZE_BITS);
             macParam = gen.generateDerivedMacParameters(keyStrengthBits);
             for (int i = pass.length; --i >= 0; ) // nullify password buffer
                 pass[i] = 0;

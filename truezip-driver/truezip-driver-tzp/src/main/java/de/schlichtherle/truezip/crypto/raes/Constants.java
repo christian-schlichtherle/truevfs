@@ -61,7 +61,7 @@ interface Constants {
 
     /**
      * The block size of the Advanced Encryption Specification (AES) Algorithm
-     * in bits ({@code 128}).
+     * in bits ({@value #AES_BLOCK_SIZE_BITS}).
      */
-    int AES_BLOCK_SIZE = 128;
+    int AES_BLOCK_SIZE_BITS = 128;
 }
