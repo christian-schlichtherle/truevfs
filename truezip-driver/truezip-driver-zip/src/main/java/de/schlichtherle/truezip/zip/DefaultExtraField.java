@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.zip;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -24,7 +23,7 @@ import net.jcip.annotations.NotThreadSafe;
 
 /**
  * Default implementation for an Extra Field in a Local or Central Header of a
- * ZIP archive.
+ * ZIP file.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -37,11 +36,10 @@ final class DefaultExtraField extends ExtraField {
     private @CheckForNull byte[] data;
 
     /**
-     * Creates a new instance of the default Extra Field implementation.
+     * Constructs a new Extra Field.
      * 
-     * @param headerId An unsigned short integer (two bytes) indicating the
-     *        type of the Extra Field.
-     * @throws IllegalArgumentException If 
+     * @param  headerId an unsigned short integer (two bytes) indicating the
+     *         type of the Extra Field.
      */
     DefaultExtraField(final int headerId) {
         assert UShort.check(headerId);
