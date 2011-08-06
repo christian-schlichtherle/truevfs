@@ -51,8 +51,8 @@ public abstract class RaesOutputStream extends CipherOutputStream {
             klac.update((byte) length);
             length >>= 8;
         }
-        final int bufLen = klac.doFinal(buf, 0);
-        assert bufLen == buf.length;
+        final int bufLength = klac.doFinal(buf, 0);
+        assert bufLength == buf.length;
     }
 
     /**
