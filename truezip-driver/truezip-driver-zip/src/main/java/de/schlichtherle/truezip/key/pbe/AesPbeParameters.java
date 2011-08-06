@@ -39,7 +39,7 @@ extends PbeParameters<AesKeyStrength, AesPbeParameters> {
     @Override
     public void reset() {
         super.reset();
-        setKeyStrength(AesKeyStrength.BITS_256);
+        setKeyStrength(AesKeyStrength.BITS_128);
     }
 
     @Override

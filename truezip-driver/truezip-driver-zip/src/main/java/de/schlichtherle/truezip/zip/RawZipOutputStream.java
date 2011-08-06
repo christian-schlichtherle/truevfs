@@ -869,8 +869,8 @@ implements Iterable<E> {
 
         @Override
         public void finish() throws IOException {
-            // It seems tempting to include the finish() methods of the output
-            // streams in the decorator pattern.
+            // It seems tempting to apply the decorator pattern to the finish()
+            // methods of the output streams.
             // However, the output streams would then finish ALL decorated
             // output streams recursively too, which is NOT what we want.
             // To inhibit this, we could introduce another decorated output
@@ -888,7 +888,7 @@ implements Iterable<E> {
     private final class StoredOutputMethod
     extends DecoratingOutputMethod<OutputMethod> {
 
-        @CheckForNull CheckingCrc32OutputStream ccos;
+        @CheckForNull CheckingCrc32OutputStream out;
 
         StoredOutputMethod(OutputMethod processor) {
             super(processor);
@@ -896,16 +896,16 @@ implements Iterable<E> {
 
         @Override
         public OutputStream init(ZipEntry entry) throws IOException {
-            assert null == this.ccos;
-            return this.ccos = new CheckingCrc32OutputStream(
+            assert null == this.out;
+            return this.out = new CheckingCrc32OutputStream(
                     delegate.init(entry));
         }
 
         @Override
         public void finish() throws IOException {
             // see DeflatedOutputMethod.finish().
-            assert null != this.ccos;
-            this.ccos.finish();
+            assert null != this.out;
+            this.out.finish();
             this.delegate.finish();
         }
     } // StoredOutputMethod
@@ -922,7 +922,7 @@ implements Iterable<E> {
     extends EncryptedOutputMethod {
 
         final WinZipAesParameters param;
-        @CheckForNull WinZipAesOutputStream wzaos;
+        @CheckForNull WinZipAesEntryOutputStream out;
 
         WinZipAesOutputMethod(
                 RawOutputMethod processor,
@@ -934,25 +934,33 @@ implements Iterable<E> {
 
         @Override
         public OutputStream init(final ZipEntry entry) throws IOException {
-            assert null == this.wzaos;
+            assert null == this.out;
             // Order is important here!
             final LEDataOutputStream out = delegate.init(entry);
             final WinZipAesEntryParameters
                     param = new WinZipAesEntryParameters(this.param, entry);
-            this.wzaos = new WinZipAesOutputStream(out, param);
+            this.out = new WinZipAesEntryOutputStream(out, param);
             final WinZipAesExtraField ef = new WinZipAesExtraField();
             ef.setKeyStrength(param.getKeyStrength());
             ef.setMethod(entry.getMethod());
             entry.addExtraField(ef);
             entry.setMethod16(WINZIP_AES);
-            return this.wzaos;
+            return this.out;
+        }
+
+        @Override
+        public void start() throws IOException {
+            // see DeflatedOutputMethod.finish().
+            assert null != this.out;
+            this.delegate.start();
+            this.out.start();
         }
 
         @Override
         public void finish() throws IOException {
             // see DeflatedOutputMethod.finish().
-            assert null != this.wzaos;
-            this.wzaos.finish();
+            assert null != this.out;
+            this.out.finish();
             this.delegate.finish();
         }
     } // WinZipAesOutputMethod
