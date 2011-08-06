@@ -35,7 +35,7 @@ public final class WriteKeyPanelTest extends KeyPanelTestSuite<WriteKeyPanel> {
     }
 
     @Override
-    public AesPbeParameters newPbeParameters() {
+    protected AesPbeParameters newPbeParameters() {
         return new AesPbeParameters();
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2011 Schlichtherle IT Services
+ * Copyright (C) 2005-2011 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,8 @@ import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriver;
 import de.schlichtherle.truezip.fs.archive.FsMultiplexedOutputShop;
+import de.schlichtherle.truezip.key.KeyManagerProvider;
+import de.schlichtherle.truezip.key.sl.KeyManagerLocator;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
@@ -67,33 +69,93 @@ extends FsCharsetArchiveDriver<ZipArchiveEntry>
 implements ZipEntryFactory<ZipArchiveEntry> {
 
     /**
-     * The default character set for entry names and comments, which is
-     * {@code "IBM437"}.
+     * The character set for entry names and comments in &quot;traditional&quot;
+     * ZIP files, which is {@code "IBM437"}.
      */
     private static final Charset ZIP_CHARSET = Charset.forName("IBM437");
 
-    private final IOPoolProvider provider;
+    private final IOPoolProvider ioPoolProvider;
+    private final KeyManagerProvider keyManagerProvider;
 
     /**
-     * Equivalent to
-     * {@link ZipDriver#ZipDriver(IOPoolProvider, Charset) new ZipDriver(provider, ZIP_CHARSET)}.
+     * Constructs a new ZIP file driver.
+     * This constructor uses {@link KeyManagerLocator#SINGLETON} for providing
+     * key managers for accessing protected resources (encryption).
+     * This constructor uses {@link #ZIP_CHARSET} for encoding entry names
+     * and comments.
+     *
+     * @deprecated In TrueZIP 7.3, support for WinZip AES encryption has been
+     *             added.
+     *             As a consequence, {@link KeyManagerLocator#SINGLETON} has
+     *             been added as a default parameter to this constructor.
+     *             If you don't want to depend on this default parameter,
+     *             then you need to call another constructor.
+     *             Otherwise, calling this constructor is still fine.
+     * @param ioPoolProvider the provider for I/O entry pools for allocating
+     *        temporary I/O entries (buffers).
      */
-    public ZipDriver(final IOPoolProvider provider) {
-        this(provider, ZIP_CHARSET);
+    @Deprecated
+    public ZipDriver(IOPoolProvider ioPoolProvider) {
+        this(ioPoolProvider, KeyManagerLocator.SINGLETON, ZIP_CHARSET);
     }
 
     /**
-     * Constructs a new ZIP driver.
+     * Constructs a new ZIP file driver.
+     * This constructor uses {@link KeyManagerLocator#SINGLETON} for providing
+     * key managers for accessing protected resources (encryption).
      *
-     * @param provider the I/O pool service to use for allocating temporary I/O
-     *        entries.
-     * @param charset the character set to use for entry names and comments.
+     * @deprecated In TrueZIP 7.3, support for WinZip AES encryption has been
+     *             added.
+     *             As a consequence, {@link KeyManagerLocator#SINGLETON} has
+     *             been added as a default parameter to this constructor.
+     *             If you don't want to use this default dependency,
+     *             then you need to call another constructor.
+     *             Otherwise, calling this constructor is still fine.
+     * @param ioPoolProvider the provider for I/O entry pools for allocating
+     *        temporary I/O entries (buffers).
+     * @param charset the character set for encoding entry names and comments.
      */
-    protected ZipDriver(final IOPoolProvider provider, Charset charset) {
+    @Deprecated
+    protected ZipDriver(IOPoolProvider ioPoolProvider, Charset charset) {
+        this(ioPoolProvider, KeyManagerLocator.SINGLETON, charset);
+    }
+
+    /**
+     * Constructs a new ZIP file driver.
+     * This constructor uses {@link #ZIP_CHARSET} for encoding entry names
+     * and comments.
+     *
+     * @since TrueZIP 7.3
+     * @param ioPoolProvider the provider for I/O entry pools for allocating
+     *        temporary I/O entries (buffers).
+     * @param keyManagerProvider the provider for key managers for accessing
+     *        protected resources (encryption).
+     */
+    public ZipDriver(
+            IOPoolProvider ioPoolProvider,
+            KeyManagerProvider keyManagerProvider) {
+        this(ioPoolProvider, keyManagerProvider, ZIP_CHARSET);
+    }
+
+    /**
+     * Constructs a new ZIP file driver.
+     *
+     * @since TrueZIP 7.3
+     * @param ioPoolProvider the provider for I/O entry pools for allocating
+     *        temporary I/O entries (buffers).
+     * @param keyManagerProvider the provider for key managers for accessing
+     *        protected resources (encryption).
+     * @param charset the character set for encoding entry names and comments.
+     */
+    protected ZipDriver(
+            final IOPoolProvider ioPoolProvider,
+            final KeyManagerProvider keyManagerProvider,
+            Charset charset) {
         super(charset);
-        if (null == provider)
+        if (null == ioPoolProvider || null == keyManagerProvider)
             throw new NullPointerException();
-        this.provider = provider;
+        this.ioPoolProvider = ioPoolProvider;
+        this.keyManagerProvider = keyManagerProvider;
     }
 
     /**
@@ -128,7 +190,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
 
     @Override
     protected final IOPool<?> getPool() {
-        return provider.get();
+        return ioPoolProvider.get();
     }
 
     /**

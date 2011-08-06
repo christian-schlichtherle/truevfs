@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.fs.archive.zip;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.fs.FsOutputOption;
+import de.schlichtherle.truezip.key.sl.KeyManagerLocator;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -44,19 +45,54 @@ import net.jcip.annotations.Immutable;
 public class JarDriver extends ZipDriver {
 
     /**
-     * The default character set for entry names and comments, which is
+     * The character set for entry names and comments in JAR files, which is
      * {@code "UTF-8"}.
      */
     public static final Charset JAR_CHARSET = Charset.forName("UTF-8");
 
-    public JarDriver(IOPoolProvider provider) {
-        super(provider, JAR_CHARSET);
+    /**
+     * Constructs a new JAR file driver.
+     * This constructor uses {@link KeyManagerLocator#SINGLETON} for providing
+     * key managers for accessing protected resources (encryption).
+     * This constructor uses {@link #JAR_CHARSET} for encoding entry names
+     * and comments.
+     *
+     * @deprecated In TrueZIP 7.3, support for WinZip AES encryption has been
+     *             added.
+     *             As a consequence, {@link KeyManagerLocator#SINGLETON} has
+     *             been added as a default parameter to this constructor.
+     *             If you don't want to use this default dependency,
+     *             then you need to call another constructor.
+     *             Otherwise, calling this constructor is still fine.
+     * @param ioPoolProvider the provider for I/O entry pools for allocating
+     *        temporary I/O entries (buffers).
+     */
+    public JarDriver(IOPoolProvider ioPoolProvider) {
+        this(ioPoolProvider, KeyManagerLocator.SINGLETON);
+    }
+
+    /**
+     * Constructs a new JAR file driver.
+     * This constructor uses {@link #JAR_CHARSET} for encoding entry names
+     * and comments.
+     *
+     * @since TrueZIP 7.3
+     * @param ioPoolProvider the provider for I/O entry pools for allocating
+     *        temporary I/O entries (buffers).
+     * @param keyManagerProvider the provider for key managers for accessing
+     *        protected resources (encryption).
+     */
+    public JarDriver(
+            IOPoolProvider ioPoolProvider,
+            KeyManagerLocator keyManagerProvider) {
+        super(ioPoolProvider, keyManagerProvider, JAR_CHARSET);
     }
 
     @Override
     public JarArchiveEntry newEntry(String path,
                                     Type type,
-                                    @CheckForNull Entry template, BitField<FsOutputOption> mknod)
+                                    Entry template,
+                                    BitField<FsOutputOption> mknod)
     throws CharConversionException {
         return (JarArchiveEntry) super.newEntry(path, type, template, mknod);
     }

@@ -30,7 +30,7 @@ import net.jcip.annotations.NotThreadSafe;
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
 public final class AesPbeParameters
-extends PbeParameters<AesKeyStrength, AesPbeParameters> {
+extends SafePbeParameters<AesKeyStrength, AesPbeParameters> {
 
     public AesPbeParameters() {
         reset();

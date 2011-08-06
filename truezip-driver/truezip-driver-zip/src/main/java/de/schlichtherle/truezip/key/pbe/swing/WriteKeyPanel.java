@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.key.pbe.swing;
 
-import de.schlichtherle.truezip.key.pbe.PbeParameters;
+import de.schlichtherle.truezip.key.pbe.SafePbeParameters;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -94,15 +94,15 @@ public class WriteKeyPanel extends KeyPanel {
     
     @Override
     public void setResource(final URI resource) {
-        final URI lastResource = PbeParametersView.lastResource;
+        final URI lastResource = SwingSafePbeParametersView.lastResource;
         if (!lastResource.equals(resource)
-                && !lastResource.equals(PbeParametersView.INITIAL_RESOURCE)) {
+                && !lastResource.equals(SwingSafePbeParametersView.INITIAL_RESOURCE)) {
             this.resource.setForeground(Color.RED);
         } else {
             this.resource.setForeground(defaultForeground);
         }
         this.resource.setText(resource.toString());
-        PbeParametersView.lastResource = resource;
+        SwingSafePbeParametersView.lastResource = resource;
     }
 
     @Override
@@ -117,7 +117,7 @@ public class WriteKeyPanel extends KeyPanel {
     }
 
     @Override
-    boolean updateParam(final PbeParameters<?, ?> param) {
+    boolean updateParam(final SafePbeParameters<?, ?> param) {
         try {
             switch (authenticationPanel.getAuthenticationMethod()) {
                 case AuthenticationPanel.AUTH_PASSWD:
@@ -147,7 +147,7 @@ public class WriteKeyPanel extends KeyPanel {
 
                     final byte[] key;
                     try {
-                        key = PbeParametersView.readKeyFile(keyFile);
+                        key = SwingSafePbeParametersView.readKeyFile(keyFile);
                     } catch (EOFException ex) {
                         setError(resources.getString("keyFile.eofException"));
                         return false;

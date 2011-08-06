@@ -467,7 +467,8 @@ implements Iterable<E> {
                     (WinZipAesParameters) param);
         } else if (param instanceof ZipCryptoParametersProvider) {
             return newEncryptedOutputMethod(processor,
-                    ((ZipCryptoParametersProvider) param).get(ZipCryptoParameters.class));
+                    ((ZipCryptoParametersProvider) param).get(
+                        ZipCryptoParameters.class));
         } else {
             throw new ZipCryptoParametersException();
         }
