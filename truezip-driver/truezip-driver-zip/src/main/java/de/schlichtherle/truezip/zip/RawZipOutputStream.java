@@ -545,7 +545,7 @@ implements Iterable<E> {
         final long csize32 = entry.getCompressedSize32();
         final long size32 = entry.getSize32();
         final long offset32 = entry.getOffset32();
-        final boolean dd = entry.getGeneralBit(GPBF_DATA_DESCRIPTOR);
+        final boolean dd = entry.getGeneral1(GPBF_DATA_DESCRIPTOR);
         final boolean zip64 // ZIP64 extensions?
                 =  csize32  >= UInt.MAX_VALUE
                 || size32   >= UInt.MAX_VALUE
@@ -558,11 +558,11 @@ implements Iterable<E> {
         // Version Needed To Extract.
         dos.writeShort(zip64 ? 45 : dd ? 20 : 10);
         // General Purpose Bit Flags.
-        dos.writeShort(entry.getGeneral());
+        dos.writeShort(entry.getGeneral16());
         // Compression Method.
         dos.writeShort(entry.getMethod());
         // Last Mod. File Time / Date.
-        dos.writeInt((int) entry.getDosTime());
+        dos.writeInt((int) entry.getTimeDos());
         // CRC-32.
         dos.writeInt((int) entry.getCrc());
         // Compressed Size.
@@ -736,7 +736,7 @@ implements Iterable<E> {
                     throw new AssertionError();
             }
             if (UNKNOWN == entry.getPlatform())
-                entry.setPlatform(PLATFORM_FAT);
+                entry.setPlatform8(PLATFORM_FAT);
             if (UNKNOWN == entry.getTime())
                 entry.setTime(System.currentTimeMillis());
             return RawZipOutputStream.this.dos;
@@ -782,7 +782,7 @@ implements Iterable<E> {
             // Compression Method.
             dos.writeShort(entry.getMethod());
             // Last Mod. Time / Date in DOS format.
-            dos.writeInt((int) entry.getDosTime());
+            dos.writeInt((int) entry.getTimeDos());
             // CRC-32.
             // Compressed Size.
             // Uncompressed Size.
@@ -800,15 +800,14 @@ implements Iterable<E> {
             dos.writeShort(name.length);
             // Extra Field Length.
             final byte[] extra = entry.getExtra(!dd);
-            assert extra != null;
             dos.writeShort(extra.length);
             // File Name.
             dos.write(name);
             // Extra Field(s).
             dos.write(extra);
             // Commit changes.
-            entry.setGeneral(general);
-            entry.setOffset(offset);
+            entry.setGeneral16(general);
+            entry.setOffset64(offset);
             RawZipOutputStream.this.dataStart = dos.size();
         }
 
@@ -819,7 +818,7 @@ implements Iterable<E> {
         public void finish() throws IOException {
             final LEDataOutputStream dos = RawZipOutputStream.this.dos;
             final E entry = RawZipOutputStream.this.entry;
-            if (!entry.getGeneralBit(GPBF_DATA_DESCRIPTOR))
+            if (!entry.getGeneral1(GPBF_DATA_DESCRIPTOR))
                 return;
             final long crc = entry.getCrc();
             final long csize = entry.getCompressedSize();
@@ -928,7 +927,7 @@ implements Iterable<E> {
             // Order is important here!
             final OutputStream out = new WinZipAesOutputStream(
                     delegate.init(entry), param);
-            entry.setMethod(WINZIP_AES);
+            entry.setMethod16(WINZIP_AES);
             
             return out;
         }
@@ -958,8 +957,8 @@ implements Iterable<E> {
             super.finish();
             final E entry = RawZipOutputStream.this.entry;
             final ZipDeflater deflater = RawZipOutputStream.this.deflater;
-            entry.setCompressedSize(deflater.getBytesWritten());
-            entry.setSize(deflater.getBytesRead());
+            entry.setCompressedSize64(deflater.getBytesWritten());
+            entry.setSize64(deflater.getBytesRead());
             deflater.reset();
         }
     } // ZipDeflaterOutputStream
@@ -973,7 +972,7 @@ implements Iterable<E> {
 
         void finish() {
             final E entry = RawZipOutputStream.this.entry;
-            entry.setCrc(getChecksum().getValue());
+            entry.setCrc32(getChecksum().getValue());
         }
     } // UpdatingCrc32OutputStream
 
