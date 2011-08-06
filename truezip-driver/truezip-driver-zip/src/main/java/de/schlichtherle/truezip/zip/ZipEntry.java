@@ -493,29 +493,29 @@ public class ZipEntry implements Cloneable {
     public final void setExtra(final @CheckForNull byte[] data) {
         if (null != data)
             UShort.check(data.length, "Extra Fields too large", null);
-        setExtraUnchecked(data);
-    }
-
-    final void setExtra16(final @CheckForNull byte[] data) {
-        assert null == data || UShort.check(data.length);
-        setExtraUnchecked(data);
-    }
-
-    private void setExtraUnchecked(final @CheckForNull byte[] data) {
         if (null == data || data.length <= 0) {
             this.fields = null;
         } else {
-            ExtraFields fields = this.fields;
-            if (null == fields)
-                this.fields = fields = new ExtraFields();
-            fields.readFrom(data, 0, data.length);
-            parseZip64ExtraField();
-            assert fields == this.fields;
-            fields.remove(ZIP64_HEADER_ID);
-            if (fields.size() <= 0) {
-                assert 0 == fields.size();
-                this.fields = null;
-            }
+            setExtraUnchecked(data);
+        }
+    }
+
+    final void setExtra16(final byte[] data) {
+        assert 0 < data.length && UShort.check(data.length);
+        setExtraUnchecked(data);
+    }
+
+    private void setExtraUnchecked(final byte[] data) {
+        ExtraFields fields = this.fields;
+        if (null == fields)
+            this.fields = fields = new ExtraFields();
+        fields.readFrom(data, 0, data.length);
+        parseZip64ExtraField();
+        assert fields == this.fields;
+        fields.remove(ZIP64_HEADER_ID);
+        if (fields.size() <= 0) {
+            assert 0 == fields.size();
+            this.fields = null;
         }
     }
 
@@ -609,7 +609,7 @@ public class ZipEntry implements Cloneable {
         this.comment = comment;
     }
 
-    final void setComment16(final @CheckForNull String comment) {
+    final void setComment16(final String comment) {
         assert UShort.check(comment.length());
         this.comment = comment;
     }

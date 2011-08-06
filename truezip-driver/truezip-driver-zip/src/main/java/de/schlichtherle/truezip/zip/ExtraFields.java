@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.zip;
 
 import static de.schlichtherle.truezip.zip.Constants.*;
 import static de.schlichtherle.truezip.zip.LittleEndian.*;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
@@ -72,7 +73,7 @@ final class ExtraFields implements Cloneable {
      *         the range of {@code 0} to {@link UShort#MAX_VALUE}
      *         ({@value de.schlichtherle.truezip.zip.UShort#MAX_VALUE}).
      */
-    @Nullable ExtraField get(final int headerId) {
+    @CheckForNull ExtraField get(final int headerId) {
         assert UShort.check(headerId);
         final ExtraField ef = extra.get(headerId);
         assert null == ef || ef.getHeaderId() == headerId;
