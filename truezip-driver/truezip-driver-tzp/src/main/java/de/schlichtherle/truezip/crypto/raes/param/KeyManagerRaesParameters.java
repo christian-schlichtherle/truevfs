@@ -86,7 +86,8 @@ public final class KeyManagerRaesParameters implements RaesParametersProvider {
      */
     private class Type0 implements Type0RaesParameters {
         @Override
-        public char[] getWritePassword() throws RaesKeyException {
+        public char[] getWritePassword()
+        throws RaesKeyException {
             final KeyProvider<AesCipherParameters>
                     provider = manager.getKeyProvider(raes);
             try {
@@ -109,25 +110,27 @@ public final class KeyManagerRaesParameters implements RaesParametersProvider {
         }
 
         @Override
-        public KeyStrength getKeyStrength() {
+        public KeyStrength getKeyStrength()
+        throws RaesKeyException {
             final KeyProvider<AesCipherParameters>
                     provider = manager.getKeyProvider(raes);
             try {
                 return provider.getWriteKey().getKeyStrength();
             } catch (UnknownKeyException ex) {
-                throw new IllegalStateException("getWritePassword() must get called first!", ex);
+                throw new RaesKeyException(ex);
             }
         }
 
         @Override
-        public void setKeyStrength(final KeyStrength keyStrength) {
+        public void setKeyStrength(final KeyStrength keyStrength)
+        throws RaesKeyException {
             final KeyProvider<AesCipherParameters>
                     provider = manager.getKeyProvider(raes);
             final AesCipherParameters param;
             try {
                 param = provider.getReadKey(false);
             } catch (UnknownKeyException ex) {
-                throw new IllegalStateException("getReadPassword(boolean) must get called first!", ex);
+                throw new RaesKeyException(ex);
             }
             param.setKeyStrength(keyStrength);
             provider.setKey(param);

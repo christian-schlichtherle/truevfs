@@ -63,22 +63,20 @@ public interface Type0RaesParameters extends RaesParameters {
      * Returns the key strength to use for writing a RAES type 0 file.
      *
      * @return The key strength to use for writing a RAES type 0 file.
-     * @throws RuntimeException if {@link #getWritePassword()}
-     *         hasn't been called before and the implementation can't tolerate
-     *         this.
+     * @throws RaesKeyException If password retrieval has failed for some
+     *         reason.
      */
-    KeyStrength getKeyStrength();
+    KeyStrength getKeyStrength() throws RaesKeyException;
 
     /**
      * Sets the key strength obtained from reading a RAES type 0 file.
      *
      * @param  keyStrength the key strength obtained from reading a RAES type 0
      *         file.
-     * @throws RuntimeException if {@link #getReadPassword(boolean)}
-     *         hasn't been called before and the implementation can't tolerate
-     *         this.
+     * @throws RaesKeyException If password retrieval has failed for some
+     *         reason.
      */
-    void setKeyStrength(KeyStrength keyStrength);
+    void setKeyStrength(KeyStrength keyStrength) throws RaesKeyException;
 
     /** Enumerates the AES cipher key strenghts. */
     @ThreadSafe
