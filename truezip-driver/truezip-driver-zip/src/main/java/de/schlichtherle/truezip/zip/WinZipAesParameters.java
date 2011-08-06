@@ -38,7 +38,8 @@ public interface WinZipAesParameters extends ZipCryptoParameters {
      * @throws ZipKeyException If password retrieval has failed for some
      *         reason.
      */
-    char[] getWritePassword(String name) throws ZipKeyException;
+    char[] getWritePassword(String name)
+    throws ZipKeyException;
 
     /**
      * Returns the password to use for reading a WinZip AES entry.
@@ -53,18 +54,19 @@ public interface WinZipAesParameters extends ZipCryptoParameters {
      * @throws ZipKeyException If password retrieval has failed for some
      *         reason.
      */
-    char[] getReadPassword(String name, boolean invalid) throws ZipKeyException;
+    char[] getReadPassword(String name, boolean invalid)
+    throws ZipKeyException;
 
     /**
      * Returns the key strength to use for writing a WinZip AES entry.
      *
      * @param  name the ZIP entry name.
      * @return The key strength to use for writing a WinZip AES entry.
-     * @throws RuntimeException if {@link #getWritePassword(String)}
-     *         hasn't been called before and the implementation can't tolerate
-     *         this.
+     * @throws ZipKeyException If password retrieval has failed for some
+     *         reason.
      */
-    AesKeyStrength getKeyStrength(String name);
+    AesKeyStrength getKeyStrength(String name)
+    throws ZipKeyException;
 
     /**
      * Sets the key strength obtained from reading a WinZip AES entry.
@@ -72,9 +74,9 @@ public interface WinZipAesParameters extends ZipCryptoParameters {
      * @param  name the ZIP entry name.
      * @param  keyStrength the key strength obtained from reading a WinZip AES
      *         entry.
-     * @throws RuntimeException if {@link #getReadPassword(String, boolean)}
-     *         hasn't been called before and the implementation can't tolerate
-     *         this.
+     * @throws ZipKeyException If password retrieval has failed for some
+     *         reason.
      */
-    void setKeyStrength(String name, AesKeyStrength keyStrength);
+    void setKeyStrength(String name, AesKeyStrength keyStrength)
+    throws ZipKeyException;
 }

@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.zip;
 
+import de.schlichtherle.truezip.io.LEDataOutputStream;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
@@ -33,12 +34,17 @@ import net.jcip.annotations.NotThreadSafe;
 @DefaultAnnotation(NonNull.class)
 final class WinZipAesOutputStream extends OutputStream {
 
-    WinZipAesOutputStream(OutputStream out, WinZipAesParameters param) {
+    WinZipAesOutputStream(
+            final LEDataOutputStream out,
+            final WinZipAesEntryParameters param) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public void write(int b) throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    void finish() throws IOException {
     }
 }

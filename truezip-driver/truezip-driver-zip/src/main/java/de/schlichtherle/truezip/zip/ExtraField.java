@@ -35,14 +35,18 @@ import net.jcip.annotations.NotThreadSafe;
 @DefaultAnnotation(NonNull.class)
 abstract class ExtraField {
 
+    private static final Map<Integer, Class<? extends ExtraField>> registry
+            = new HashMap<Integer, Class<? extends ExtraField>>();
+
     /** The Header ID of a ZIP64 Extended Information Extra Field. */
     static final int ZIP64_HEADER_ID = 0x0001;
 
     /** The Header ID a WinZip AES Extra Field. */
     static final int WINZIP_AES_ID = 0x9901;
 
-    private static final Map<Integer, Class<? extends ExtraField>> registry
-            = new HashMap<Integer, Class<? extends ExtraField>>();
+    static {
+        register(WinZipAesExtraField.class);
+    }
 
     /**
      * Registers a concrete implementation of this abstract base class for

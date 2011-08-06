@@ -427,17 +427,17 @@ public class ZipEntry implements Cloneable {
         return fields == null ? null : fields.get(headerId);
     }
 
-    final void setExtraField(final ExtraField field) {
+    final @Nullable ExtraField addExtraField(final ExtraField field) {
+        assert null != field;
         ExtraFields fields = this.fields;
-        if (null != field) {
-            if (null == fields)
-                this.fields = fields = new ExtraFields();
-            fields.add(field);
-        } else {
-            if (null == fields)
-                return;
-            fields.remove(field.getHeaderId());
-        }
+        if (null == fields)
+            this.fields = fields = new ExtraFields();
+        return fields.add(field);
+    }
+
+    final @Nullable ExtraField removeExtraField(final int headerId) {
+        final ExtraFields fields = this.fields;
+        return null != fields ? fields.remove(headerId) : null;
     }
 
     final int getExtraLength() {

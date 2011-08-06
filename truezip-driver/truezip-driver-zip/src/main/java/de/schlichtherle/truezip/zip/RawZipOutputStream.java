@@ -400,6 +400,7 @@ implements Iterable<E> {
         entries.put(entry.getName(), entry);
     }
 
+    @SuppressWarnings("unchecked")
     private OutputMethod newOutputMethod(
             final E entry,
             final boolean process)
@@ -411,7 +412,7 @@ implements Iterable<E> {
             return processor;
         }
         if (entry.isEncrypted())
-            processor = newEncryptedOutputMethod(processor,
+            processor = newEncryptedOutputMethod((RawOutputMethod) processor,
                     getCryptoParameters());
         int method = entry.getMethod();
         if (UNKNOWN == method)
@@ -454,7 +455,7 @@ implements Iterable<E> {
      * @throws IOException on any I/O error.
      */
     private EncryptedOutputMethod newEncryptedOutputMethod(
-            final OutputMethod processor,
+            final RawOutputMethod processor,
             final @CheckForNull ZipCryptoParameters param)
     throws ZipCryptoParametersException {
         assert null != processor;
@@ -706,7 +707,7 @@ implements Iterable<E> {
 
     private final class RawOutputMethod implements OutputMethod {
 
-        private final boolean process;
+        final boolean process;
 
         RawOutputMethod(final boolean process) {
             this.process = process;
@@ -850,8 +851,8 @@ implements Iterable<E> {
     private final class DeflatedOutputMethod
     extends DecoratingOutputMethod<OutputMethod> {
 
-        private @CheckForNull UpdatingCrc32OutputStream ucos;
-        private @CheckForNull ZipDeflaterOutputStream zdos;
+        @CheckForNull UpdatingCrc32OutputStream ucos;
+        @CheckForNull ZipDeflaterOutputStream zdos;
 
         DeflatedOutputMethod(OutputMethod processor) {
             super(processor);
@@ -887,7 +888,7 @@ implements Iterable<E> {
     private final class StoredOutputMethod
     extends DecoratingOutputMethod<OutputMethod> {
 
-        private @CheckForNull CheckingCrc32OutputStream ccos;
+        @CheckForNull CheckingCrc32OutputStream ccos;
 
         StoredOutputMethod(OutputMethod processor) {
             super(processor);
@@ -909,39 +910,50 @@ implements Iterable<E> {
         }
     } // StoredOutputMethod
 
+    private abstract class EncryptedOutputMethod
+    extends DecoratingOutputMethod<RawOutputMethod> {
+
+        EncryptedOutputMethod(RawOutputMethod processor) {
+            super(processor);
+        }
+    } // EncryptedOutputMethod
+
     private final class WinZipAesOutputMethod
     extends EncryptedOutputMethod {
+
         final WinZipAesParameters param;
+        @CheckForNull WinZipAesOutputStream wzaos;
 
         WinZipAesOutputMethod(
-                OutputMethod processor,
+                RawOutputMethod processor,
                 final WinZipAesParameters param) {
             super(processor);
-            assert processor instanceof RawZipOutputStream<?>.RawOutputMethod;
             assert null != param;
             this.param = param;
         }
 
         @Override
         public OutputStream init(final ZipEntry entry) throws IOException {
+            assert null == this.wzaos;
             // Order is important here!
-            final OutputStream out = new WinZipAesOutputStream(
-                    delegate.init(entry), param);
+            final LEDataOutputStream out = delegate.init(entry);
+            final WinZipAesEntryParameters
+                    param = new WinZipAesEntryParameters(this.param, entry);
+            this.wzaos = new WinZipAesOutputStream(out, param);
+            final WinZipAesExtraField ef = new WinZipAesExtraField();
+            ef.setKeyStrength(param.getKeyStrength());
+            ef.setMethod(entry.getMethod());
+            entry.addExtraField(ef);
             entry.setMethod16(WINZIP_AES);
-            
-            return out;
-        }
-
-        @Override
-        public void start() throws IOException {
-            final LEDataOutputStream dos = RawZipOutputStream.this.dos;
-            delegate.start();
-            
+            return this.wzaos;
         }
 
         @Override
         public void finish() throws IOException {
-            delegate.finish();
+            // see DeflatedOutputMethod.finish().
+            assert null != this.wzaos;
+            this.wzaos.finish();
+            this.delegate.finish();
         }
     } // WinZipAesOutputMethod
 
