@@ -252,20 +252,20 @@ implements Iterable<E>, Closeable {
                 int off = 0;
                 final int versionMadeBy = readUShort(cfh, off);
                 off += 2;
-                entry.setPlatform((short) (versionMadeBy >> 8));
+                entry.setPlatform8(versionMadeBy >> 8);
                 off += 2; // Version Needed To Extract
-                entry.setGeneral(general);
+                entry.setGeneral16(general);
                 off += 2; // General Purpose Bit Flags
-                assert entry.getGeneralBit(GPBF_UTF8) == utf8;
-                entry.setMethod(readUShort(cfh, off));
+                assert entry.getGeneral1(GPBF_UTF8) == utf8;
+                entry.setMethod16(readUShort(cfh, off));
                 off += 2;
-                entry.setDosTime(readUInt(cfh, off));
+                entry.setTimeDos(readUInt(cfh, off));
                 off += 4;
-                entry.setCrc(readUInt(cfh, off));
+                entry.setCrc32(readUInt(cfh, off));
                 off += 4;
-                entry.setCompressedSize32(readUInt(cfh, off));
+                entry.setCompressedSize64(readUInt(cfh, off));
                 off += 4;
-                entry.setSize32(readUInt(cfh, off));
+                entry.setSize64(readUInt(cfh, off));
                 off += 4;
                 off += 2;   // File Name Length
                 final int extraLen = readUShort(cfh, off);
@@ -280,7 +280,7 @@ implements Iterable<E>, Closeable {
                 // Relative Offset Of Local File Header.
                 long lfhOff = readUInt(cfh, off);
                 //off += 4;
-                entry.setOffset32(lfhOff); // must be unmapped!
+                entry.setOffset64(lfhOff); // must be unmapped!
                 if (extraLen > 0) {
                     final byte[] extra = new byte[extraLen];
                     rof.readFully(extra);
@@ -732,7 +732,7 @@ implements Iterable<E>, Closeable {
         if (check) {
             // Check CRC-32 in the Local File Header or Data Descriptor.
             final long localCrc;
-            if (entry.getGeneralBit(GPBF_DATA_DESCRIPTOR)) {
+            if (entry.getGeneral1(GPBF_DATA_DESCRIPTOR)) {
                 // The CRC-32 is in the Data Descriptor after the compressed
                 // size.
                 // Note the Data Descriptor's Signature is optional:

@@ -47,119 +47,181 @@ public final class ZipEntryTest {
     public void testPlatform() {
         try {
             entry.setPlatform((short) (UNKNOWN - 1));
-            fail("Expected RuntimeException");
-        } catch (RuntimeException ex) {
+            fail();
+        } catch (IllegalArgumentException expected) {
         }
 
         try {
-            entry.setPlatform((short) (0xff + 1));
-            fail("Expected RuntimeException");
-        } catch (RuntimeException ex) {
+            entry.setPlatform((short) (UByte.MAX_VALUE + 1));
+            fail();
+        } catch (IllegalArgumentException expected) {
         }
 
         assertEquals(UNKNOWN, entry.getPlatform());
-        entry.setPlatform((short) 0x00);
-        assertEquals((short) 0x00, entry.getPlatform());
-        entry.setPlatform(ZipEntry.PLATFORM_FAT);
-        assertEquals(ZipEntry.PLATFORM_FAT, entry.getPlatform());
-        entry.setPlatform(ZipEntry.PLATFORM_UNIX);
-        assertEquals(ZipEntry.PLATFORM_UNIX, entry.getPlatform());
-        entry.setPlatform((short) 0xff);
-        assertEquals((short) 0xff, entry.getPlatform());
+        entry.setPlatform(UByte.MIN_VALUE);
+        assertEquals(UByte.MIN_VALUE, entry.getPlatform());
+        entry.setPlatform(PLATFORM_FAT);
+        assertEquals(PLATFORM_FAT, entry.getPlatform());
+        entry.setPlatform(PLATFORM_UNIX);
+        assertEquals(PLATFORM_UNIX, entry.getPlatform());
+        entry.setPlatform(UByte.MAX_VALUE);
+        assertEquals(UByte.MAX_VALUE, entry.getPlatform());
         entry.setPlatform(UNKNOWN);
         assertEquals(UNKNOWN, entry.getPlatform());
     }
 
     @Test
-    public void testGeneral() {
+    public void testPlatform8() {
         try {
-            entry.setGeneral(UNKNOWN - 1);
-            fail("Expected RuntimeException");
-        } catch (RuntimeException ex) {
+            entry.setPlatform8(UNKNOWN - 1);
+            fail();
+        } catch (IllegalArgumentException expected) {
         }
 
         try {
-            entry.setGeneral(0xffff + 1);
-            fail("Expected RuntimeException");
-        } catch (RuntimeException ex) {
+            entry.setPlatform8(UByte.MIN_VALUE - 1);
+            fail();
+        } catch (IllegalArgumentException expected) {
         }
 
-        assertEquals(UNKNOWN, entry.getGeneral());
-        entry.setGeneral(0);
-        assertEquals(0, entry.getGeneral());
-        entry.setGeneral(8);
-        assertEquals(8, entry.getGeneral());
-        entry.setGeneral(1 << 11);
-        assertEquals(1 << 11, entry.getGeneral());
-        entry.setGeneral(0xffff);
-        assertEquals(0xffff, entry.getGeneral());
-        entry.setGeneral(UNKNOWN);
-        assertEquals(UNKNOWN, entry.getGeneral());
+        try {
+            entry.setPlatform8(UByte.MAX_VALUE + 1);
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
+
+        assertEquals(UNKNOWN, entry.getPlatform());
+        entry.setPlatform8(UByte.MIN_VALUE);
+        assertEquals(UByte.MIN_VALUE, entry.getPlatform());
+        entry.setPlatform8(PLATFORM_FAT);
+        assertEquals(PLATFORM_FAT, entry.getPlatform());
+        entry.setPlatform8(PLATFORM_UNIX);
+        assertEquals(PLATFORM_UNIX, entry.getPlatform());
+        entry.setPlatform8(UByte.MAX_VALUE);
+        assertEquals(UByte.MAX_VALUE, entry.getPlatform());
     }
 
     @Test
-    public void testGeneralBit() {
-        assertThat(entry.getGeneral(), is((int) UNKNOWN));
+    public void testGeneral16() {
+        try {
+            entry.setGeneral16(UNKNOWN - 1);
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
 
         try {
-            entry.setGeneralBit(-1, false);
+            entry.setGeneral16(UShort.MIN_VALUE - 1);
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
+
+        try {
+            entry.setGeneral16(UShort.MAX_VALUE + 1);
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
+
+        assertEquals(UShort.MIN_VALUE, entry.getGeneral16());
+        entry.setGeneral16(1 << GPBF_ENCRYPTED);
+        assertEquals(1 << GPBF_ENCRYPTED, entry.getGeneral16());
+        entry.setGeneral16(1 << GPBF_DATA_DESCRIPTOR);
+        assertEquals(1 << GPBF_DATA_DESCRIPTOR, entry.getGeneral16());
+        entry.setGeneral16(1 << GPBF_UTF8);
+        assertEquals(1 << GPBF_UTF8, entry.getGeneral16());
+        entry.setGeneral16(UShort.MAX_VALUE);
+        assertEquals(UShort.MAX_VALUE, entry.getGeneral16());
+    }
+
+    @Test
+    public void testGeneral1() {
+        assertThat(entry.getGeneral16(), is(UShort.MIN_VALUE));
+
+        try {
+            entry.setGeneral1(-1, false);
             fail();
         } catch (AssertionError expected) {
         }
 
-        for (int i = 0; i < 16; i++) {
-            assertFalse(entry.getGeneralBit(i));
-            entry.setGeneralBit(i, true);
-            assertTrue(entry.getGeneralBit(i));
-        }
-
         try {
-            entry.setGeneralBit(16, false);
+            entry.setGeneral1(16, false);
             fail();
         } catch (AssertionError expected) {
         }
 
-        entry.setGeneral(UNKNOWN);
-        assertThat(entry.getGeneral(), is((int) UNKNOWN));
+        assertThat(entry.getGeneral16(), is(UShort.MIN_VALUE));
 
         for (int i = 0; i < 16; i++) {
-            assertFalse(entry.getGeneralBit(i));
-            entry.setGeneralBit(i, true);
-            assertTrue(entry.getGeneralBit(i));
+            assertFalse(entry.getGeneral1(i));
+            entry.setGeneral1(i, true);
+            assertTrue(entry.getGeneral1(i));
         }
+        assertThat(entry.getGeneral16(), is(UShort.MAX_VALUE));
+
+        for (int i = 0; i < 16; i++) {
+            entry.setGeneral1(i, false);
+            assertFalse(entry.getGeneral1(i));
+        }
+        assertThat(entry.getGeneral16(), is(UShort.MIN_VALUE));
     }
 
     @Test
     public void testMethod() {
         try {
             entry.setMethod(UNKNOWN - 1);
-            fail("Expected RuntimeException");
-        } catch (RuntimeException ex) {
+            fail();
+        } catch (IllegalArgumentException expected) {
         }
 
         try {
-            entry.setMethod(0xffff);
-            fail("Expected RuntimeException");
-        } catch (RuntimeException ex) {
+            entry.setMethod(UShort.MAX_VALUE);
+            fail();
+        } catch (IllegalArgumentException expected) {
         }
 
         try {
-            entry.setMethod(0xffff + 1);
-            fail("Expected RuntimeException");
-        } catch (RuntimeException ex) {
+            entry.setMethod(UShort.MAX_VALUE + 1);
+            fail();
+        } catch (IllegalArgumentException expected) {
         }
 
         assertEquals(UNKNOWN, entry.getMethod());
-        /*entry.setMethod(0);
-        assertEquals(0, entry.getMethod());*/
-        entry.setMethod(ZipEntry.STORED);
-        assertEquals(ZipEntry.STORED, entry.getMethod());
-        entry.setMethod(ZipEntry.DEFLATED);
-        assertEquals(ZipEntry.DEFLATED, entry.getMethod());
-        /*entry.setMethod(0xffff);
-        assertEquals(0xffff, entry.getMethod());*/
+        entry.setMethod(STORED);
+        assertEquals(STORED, entry.getMethod());
+        entry.setMethod(DEFLATED);
+        assertEquals(DEFLATED, entry.getMethod());
         entry.setMethod(UNKNOWN);
         assertEquals(UNKNOWN, entry.getMethod());
+    }
+
+    @Test
+    public void testMethod16() {
+        try {
+            entry.setMethod16(UNKNOWN - 1);
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
+
+        try {
+            entry.setMethod16(UShort.MIN_VALUE - 1);
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
+
+        try {
+            entry.setMethod16(UShort.MAX_VALUE + 1);
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
+
+        assertEquals(UNKNOWN, entry.getMethod());
+        entry.setMethod16(UShort.MIN_VALUE);
+        assertEquals(UShort.MIN_VALUE, entry.getMethod());
+        entry.setMethod16(STORED);
+        assertEquals(STORED, entry.getMethod());
+        entry.setMethod16(DEFLATED);
+        assertEquals(DEFLATED, entry.getMethod());
+        entry.setMethod16(UShort.MAX_VALUE);
+        assertEquals(UShort.MAX_VALUE, entry.getMethod());
     }
 
     @Test
@@ -174,29 +236,29 @@ public final class ZipEntryTest {
 
     @Test
     public void testDosTime() {
-        entry.setDosTime(UNKNOWN - 1);
-        assertEquals(MIN_DOS_TIME, entry.getDosTime());
+        entry.setTimeDos(UNKNOWN - 1);
+        assertEquals(MIN_DOS_TIME, entry.getTimeDos());
 
-        entry.setDosTime(Long.MIN_VALUE);
-        assertEquals(MIN_DOS_TIME, entry.getDosTime());
+        entry.setTimeDos(Long.MIN_VALUE);
+        assertEquals(MIN_DOS_TIME, entry.getTimeDos());
 
-        entry.setDosTime(MIN_DOS_TIME - 1);
-        assertEquals(MIN_DOS_TIME, entry.getDosTime());
+        entry.setTimeDos(MIN_DOS_TIME - 1);
+        assertEquals(MIN_DOS_TIME, entry.getTimeDos());
 
-        entry.setDosTime(MIN_DOS_TIME);
-        assertEquals(MIN_DOS_TIME, entry.getDosTime());
+        entry.setTimeDos(MIN_DOS_TIME);
+        assertEquals(MIN_DOS_TIME, entry.getTimeDos());
 
-        entry.setDosTime(MAX_DOS_TIME);
-        assertEquals(MAX_DOS_TIME, entry.getDosTime());
+        entry.setTimeDos(MAX_DOS_TIME);
+        assertEquals(MAX_DOS_TIME, entry.getTimeDos());
 
-        entry.setDosTime(MAX_DOS_TIME + 1);
-        assertEquals(MAX_DOS_TIME, entry.getDosTime());
+        entry.setTimeDos(MAX_DOS_TIME + 1);
+        assertEquals(MAX_DOS_TIME, entry.getTimeDos());
 
-        entry.setDosTime(Long.MAX_VALUE);
-        assertEquals(MAX_DOS_TIME, entry.getDosTime());
+        entry.setTimeDos(Long.MAX_VALUE);
+        assertEquals(MAX_DOS_TIME, entry.getTimeDos());
 
-        entry.setDosTime(UNKNOWN);
-        assertEquals(UNKNOWN, entry.getDosTime());
+        entry.setTimeDos(UNKNOWN);
+        assertEquals(UNKNOWN, entry.getTimeDos());
     }
 
     @Test
@@ -204,13 +266,13 @@ public final class ZipEntryTest {
         try {
             entry.setTime(Long.MIN_VALUE);
             fail();
-        } catch (IllegalArgumentException ex) {
+        } catch (IllegalArgumentException expected) {
         }
 
         try {
             entry.setTime(UNKNOWN - 1);
             fail();
-        } catch (IllegalArgumentException ex) {
+        } catch (IllegalArgumentException expected) {
         }
 
         assertEquals(UNKNOWN, entry.getTime());
@@ -229,19 +291,19 @@ public final class ZipEntryTest {
     public void testCrc() {
         try {
             entry.setCrc(UNKNOWN - 1);
-            fail("Expected RuntimeException");
-        } catch (RuntimeException ex) {
+            fail();
+        } catch (IllegalArgumentException expected) {
         }
 
         try {
             entry.setCrc(UInt.MAX_VALUE + 1);
-            fail("Expected RuntimeException");
-        } catch (RuntimeException ex) {
+            fail();
+        } catch (IllegalArgumentException expected) {
         }
 
         assertEquals(UNKNOWN, entry.getCrc());
-        entry.setCrc(0);
-        assertEquals(0, entry.getCrc());
+        entry.setCrc(UInt.MIN_VALUE);
+        assertEquals(UInt.MIN_VALUE, entry.getCrc());
         entry.setCrc(UInt.MAX_VALUE);
         assertEquals(UInt.MAX_VALUE, entry.getCrc());
         entry.setCrc(UNKNOWN);
@@ -249,131 +311,194 @@ public final class ZipEntryTest {
     }
 
     @Test
-    public void testCompressedSize32() {
+    public void testCrc32() {
         try {
-            entry.setCompressedSize32(UNKNOWN - 1);
-            fail("Expected RuntimeException");
-        } catch (RuntimeException ex) {
+            entry.setCrc32(UNKNOWN - 1);
+            fail();
+        } catch (IllegalArgumentException expected) {
         }
 
         try {
-            entry.setCompressedSize32(UInt.MAX_VALUE + 1);
-            fail("Expected RuntimeException");
-        } catch (RuntimeException ex) {
+            entry.setCrc32(UInt.MIN_VALUE - 1);
+            fail();
+        } catch (IllegalArgumentException expected) {
         }
 
-        assertEquals(UNKNOWN, entry.getCompressedSize32());
-        entry.setCompressedSize32(0);
-        assertEquals(FORCE_ZIP64_EXT ? UInt.MAX_VALUE : 0, entry.getCompressedSize32());
-        entry.setCompressedSize32(UInt.MAX_VALUE);
-        assertEquals(UInt.MAX_VALUE, entry.getCompressedSize32());
-        entry.setCompressedSize32(UNKNOWN);
-        assertEquals(UNKNOWN, entry.getCompressedSize32());
+        try {
+            entry.setCrc32(UInt.MAX_VALUE + 1);
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
+
+        assertEquals(UNKNOWN, entry.getCrc());
+        entry.setCrc32(UInt.MIN_VALUE);
+        assertEquals(UInt.MIN_VALUE, entry.getCrc());
+        entry.setCrc32(UInt.MAX_VALUE);
+        assertEquals(UInt.MAX_VALUE, entry.getCrc());
     }
 
     @Test
     public void testCompressedSize() {
         try {
             entry.setCompressedSize(UNKNOWN - 1);
-            fail("Expected RuntimeException");
-        } catch (RuntimeException ex) {
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
+
+        try {
+            entry.setCompressedSize(ULong.MAX_VALUE + 1);
+            fail();
+        } catch (IllegalArgumentException expected) {
         }
 
         assertEquals(UNKNOWN, entry.getCompressedSize());
+        assertEquals(UNKNOWN, entry.getCompressedSize32());
 
-        entry.setCompressedSize(0);
-        assertEquals(0, entry.getCompressedSize());
+        entry.setCompressedSize(UInt.MIN_VALUE);
+        assertEquals(UInt.MIN_VALUE, entry.getCompressedSize());
+        assertEquals(UInt.MIN_VALUE, entry.getCompressedSize32());
         entry.setCompressedSize(UInt.MAX_VALUE);
         assertEquals(UInt.MAX_VALUE, entry.getCompressedSize());
+        assertEquals(UInt.MAX_VALUE, entry.getCompressedSize32());
         entry.setCompressedSize(UInt.MAX_VALUE + 1); // ZIP64!
         assertEquals(UInt.MAX_VALUE + 1, entry.getCompressedSize());
+        assertEquals(UInt.MAX_VALUE, entry.getCompressedSize32());
         entry.setCompressedSize(UNKNOWN);
         assertEquals(UNKNOWN, entry.getCompressedSize());
-
+        assertEquals(UNKNOWN, entry.getCompressedSize32());
     }
 
     @Test
-    public void testSize32() {
+    public void testCompressedSize64() {
         try {
-            entry.setSize32(UNKNOWN - 1);
-            fail("Expected RuntimeException");
-        } catch (RuntimeException ex) {
+            entry.setCompressedSize64(UNKNOWN - 1);
+            fail();
+        } catch (IllegalArgumentException expected) {
         }
 
         try {
-            entry.setSize32(UInt.MAX_VALUE + 1);
-            fail("Expected RuntimeException");
-        } catch (RuntimeException ex) {
+            entry.setCompressedSize64(ULong.MIN_VALUE - 1);
+            fail();
+        } catch (IllegalArgumentException expected) {
         }
 
-        assertEquals(UNKNOWN, entry.getSize32());
-        entry.setSize32(0);
-        assertEquals(FORCE_ZIP64_EXT ? UInt.MAX_VALUE : 0, entry.getSize32());
-        entry.setSize32(UInt.MAX_VALUE);
-        assertEquals(UInt.MAX_VALUE, entry.getSize32());
-        entry.setSize32(UNKNOWN);
-        assertEquals(UNKNOWN, entry.getSize32());
+        try {
+            entry.setCompressedSize64(ULong.MAX_VALUE + 1);
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
+
+        assertEquals(UNKNOWN, entry.getCompressedSize());
+        assertEquals(UNKNOWN, entry.getCompressedSize32());
+
+        entry.setCompressedSize64(UInt.MIN_VALUE);
+        assertEquals(UInt.MIN_VALUE, entry.getCompressedSize());
+        assertEquals(UInt.MIN_VALUE, entry.getCompressedSize32());
+        entry.setCompressedSize64(UInt.MAX_VALUE);
+        assertEquals(UInt.MAX_VALUE, entry.getCompressedSize());
+        assertEquals(UInt.MAX_VALUE, entry.getCompressedSize32());
+        entry.setCompressedSize64(UInt.MAX_VALUE + 1); // ZIP64!
+        assertEquals(UInt.MAX_VALUE + 1, entry.getCompressedSize());
+        assertEquals(UInt.MAX_VALUE, entry.getCompressedSize32());
     }
 
     @Test
     public void testSize() {
         try {
             entry.setSize(UNKNOWN - 1);
-            fail("Expected IllegalArgumentException");
-        } catch (IllegalArgumentException ex) {
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
+
+        try {
+            entry.setSize(ULong.MAX_VALUE + 1);
+            fail();
+        } catch (IllegalArgumentException expected) {
         }
 
         assertEquals(UNKNOWN, entry.getSize());
-        entry.setSize(0);
-        assertEquals(0, entry.getSize());
+        assertEquals(UNKNOWN, entry.getSize32());
+
+        entry.setSize(UInt.MIN_VALUE);
+        assertEquals(UInt.MIN_VALUE, entry.getSize());
+        assertEquals(UInt.MIN_VALUE, entry.getSize32());
         entry.setSize(UInt.MAX_VALUE);
         assertEquals(UInt.MAX_VALUE, entry.getSize());
+        assertEquals(UInt.MAX_VALUE, entry.getSize32());
         entry.setSize(UInt.MAX_VALUE + 1); // ZIP64!
         assertEquals(UInt.MAX_VALUE + 1, entry.getSize());
+        assertEquals(UInt.MAX_VALUE, entry.getSize32());
         entry.setSize(UNKNOWN);
         assertEquals(UNKNOWN, entry.getSize());
+        assertEquals(UNKNOWN, entry.getSize32());
     }
 
     @Test
-    public void testOffset32() {
+    public void testSize64() {
         try {
-            entry.setOffset32(UNKNOWN - 1);
-            fail("Expected RuntimeException");
-        } catch (RuntimeException ex) {
+            entry.setSize64(UNKNOWN - 1);
+            fail();
+        } catch (IllegalArgumentException expected) {
         }
 
         try {
-            entry.setOffset32(UInt.MAX_VALUE + 1);
-            fail("Expected RuntimeException");
-        } catch (RuntimeException ex) {
+            entry.setSize64(ULong.MIN_VALUE - 1);
+            fail();
+        } catch (IllegalArgumentException expected) {
         }
 
-        assertEquals(UNKNOWN, entry.getOffset32());
-        entry.setOffset32(0);
-        assertEquals(FORCE_ZIP64_EXT ? UInt.MAX_VALUE : 0, entry.getOffset32());
-        entry.setOffset32(UInt.MAX_VALUE);
-        assertEquals(UInt.MAX_VALUE, entry.getOffset32());
-        entry.setOffset32(UNKNOWN);
-        assertEquals(UNKNOWN, entry.getOffset32());
+        try {
+            entry.setSize64(ULong.MAX_VALUE + 1);
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
+
+        assertEquals(UNKNOWN, entry.getSize());
+        assertEquals(UNKNOWN, entry.getSize32());
+
+        entry.setSize64(UInt.MIN_VALUE);
+        assertEquals(UInt.MIN_VALUE, entry.getSize());
+        assertEquals(UInt.MIN_VALUE, entry.getSize32());
+        entry.setSize64(UInt.MAX_VALUE);
+        assertEquals(UInt.MAX_VALUE, entry.getSize());
+        assertEquals(UInt.MAX_VALUE, entry.getSize32());
+        entry.setSize64(UInt.MAX_VALUE + 1); // ZIP64!
+        assertEquals(UInt.MAX_VALUE + 1, entry.getSize());
+        assertEquals(UInt.MAX_VALUE, entry.getSize32());
     }
 
     @Test
-    public void testOffset() {
+    public void testOffset64() {
         try {
-            entry.setOffset(UNKNOWN - 1);
-            fail("Expected RuntimeException");
-        } catch (RuntimeException ex) {
+            entry.setOffset64(UNKNOWN - 1);
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
+
+        try {
+            entry.setOffset64(ULong.MIN_VALUE - 1);
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
+
+        try {
+            entry.setOffset64(ULong.MAX_VALUE + 1);
+            fail();
+        } catch (IllegalArgumentException expected) {
         }
 
         assertEquals(UNKNOWN, entry.getOffset());
-        entry.setOffset(0);
-        assertEquals(0, entry.getOffset());
-        entry.setOffset(UInt.MAX_VALUE);
+        assertEquals(UNKNOWN, entry.getOffset32());
+
+        entry.setOffset64(UInt.MIN_VALUE);
+        assertEquals(UInt.MIN_VALUE, entry.getOffset());
+        assertEquals(UInt.MIN_VALUE, entry.getOffset32());
+        entry.setOffset64(UInt.MAX_VALUE);
         assertEquals(UInt.MAX_VALUE, entry.getOffset());
-        entry.setOffset(UInt.MAX_VALUE + 1); // ZIP64!
+        assertEquals(UInt.MAX_VALUE, entry.getOffset32());
+        entry.setOffset64(UInt.MAX_VALUE + 1); // ZIP64!
         assertEquals(UInt.MAX_VALUE + 1, entry.getOffset());
-        entry.setOffset(UNKNOWN);
-        assertEquals(UNKNOWN, entry.getOffset());
+        assertEquals(UInt.MAX_VALUE, entry.getOffset32());
     }
 
     @Test
@@ -396,13 +521,16 @@ public final class ZipEntryTest {
             (byte) 0x00, (byte) 0x00, // Data Size: 0x0000
         };
 
-        entry.setSize32(UInt.MAX_VALUE);
-        entry.setCompressedSize32(UInt.MAX_VALUE);
-        entry.setOffset32(UInt.MAX_VALUE);
+        entry.setSize64(UInt.MAX_VALUE);
+        entry.setCompressedSize64(UInt.MAX_VALUE);
+        entry.setOffset64(UInt.MAX_VALUE);
         entry.setExtra(set); // this must be last in the sequence!
         assertEquals(0x0fedcba987654321L, entry.getSize());
+        assertEquals(UInt.MAX_VALUE, entry.getSize32());
         assertEquals(0x0fedcba987654322L, entry.getCompressedSize());
+        assertEquals(UInt.MAX_VALUE, entry.getCompressedSize32());
         assertEquals(0x0fedcba987654323L, entry.getOffset());
+        assertEquals(UInt.MAX_VALUE, entry.getOffset32());
 
         set[0] = (byte) 0xff;
 

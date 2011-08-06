@@ -90,7 +90,7 @@ final class UByte {
         message.append(MIN_VALUE);
         message.append(" and ");
         message.append(MAX_VALUE);
-        message.append(" inclusively.");
+        message.append(" inclusive.");
         throw new IllegalArgumentException(message.toString());
     }
 
