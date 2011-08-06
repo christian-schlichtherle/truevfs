@@ -111,26 +111,28 @@ public class KeyManagerZipCryptoParameters implements ZipCryptoParametersProvide
         }
 
         @Override
-        public AesKeyStrength getKeyStrength(final String name) {
+        public AesKeyStrength getKeyStrength(final String name)
+        throws ZipKeyException {
             final KeyProvider<AesPbeParameters>
                     provider = manager.getKeyProvider(toResource(zip, name));
             try {
                 return provider.getWriteKey().getKeyStrength();
             } catch (UnknownKeyException ex) {
-                throw new IllegalStateException("getWritePassword(String) must get called first!", ex);
+                throw new ZipKeyException(ex);
             }
         }
 
         @Override
         public void setKeyStrength( final String name,
-                                    final AesKeyStrength keyStrength) {
+                                    final AesKeyStrength keyStrength)
+        throws ZipKeyException {
             final KeyProvider<AesPbeParameters>
                     provider = manager.getKeyProvider(toResource(zip, name));
             final AesPbeParameters param;
             try {
                 param = provider.getReadKey(false);
             } catch (UnknownKeyException ex) {
-                throw new IllegalStateException("getReadPassword(boolean) must get called first!", ex);
+                throw new ZipKeyException(ex);
             }
             param.setKeyStrength(keyStrength);
             provider.setKey(param);
