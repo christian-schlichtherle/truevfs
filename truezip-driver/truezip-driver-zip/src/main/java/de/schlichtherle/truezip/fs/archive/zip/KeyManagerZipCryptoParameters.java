@@ -71,6 +71,10 @@ public class KeyManagerZipCryptoParameters implements ZipCryptoParametersProvide
     /**
      * Returns the URI for looking up a {@link KeyProvider} for
      * {@link AesPbeParameters} by using a {@link KeyManager}.
+     * <p>
+     * The implementation in the class {@code KeyManagerZipCryptoParameters}
+     * simply returns the {@code zip} parameter in order to lookup the same
+     * key provider for all entries in a ZIP file.
      * 
      * @param  zip the absolute URI of the ZIP file.
      * @param  name the ZIP entry name.
