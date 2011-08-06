@@ -58,4 +58,8 @@ final class WinZipAesEntryParameters {
     void setKeyStrength(AesKeyStrength keyStrength) throws ZipKeyException {
         param.setKeyStrength(entry.getName(), keyStrength);
     }
+
+    ZipEntry getEntry() {
+        return entry;
+    }
 }
