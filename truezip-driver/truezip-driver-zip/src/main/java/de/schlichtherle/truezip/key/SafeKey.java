@@ -32,7 +32,7 @@ import net.jcip.annotations.NotThreadSafe;
 public interface SafeKey<K> extends Cloneable {
 
     /** Returns a deep clone of this safe key. */
-    @NonNull K clone();
+    K clone();
 
     /**
      * Wipes any key data from the heap and resets this safe key to it's
