@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2011 Schlichtherle IT Services
+ * Copyright (C) 2011 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,26 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.key.pbe.console;
+package de.schlichtherle.truezip.key.pbe;
 
-import de.schlichtherle.truezip.crypto.param.AesKeyStrength;
-import de.schlichtherle.truezip.key.pbe.AesPbeParameters;
+import de.schlichtherle.truezip.key.PromptingKeyProvider.View;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * A console based user interface to prompt for passwords.
+ * A user interface to prompt for parameters for safe password based encryption.
+ * <p>
+ * Sub classes must be thread-safe and should have no side effects!
  * 
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-public final class AesPbeParametersView
-extends PbeParametersView<AesKeyStrength, AesPbeParameters> {
-    @Override
-    public AesPbeParameters newPbeParameters() {
-        return new AesPbeParameters();
-    }
+public abstract class SafePbeParametersView<P extends SafePbeParameters<?, P>>
+implements View<P> {
+
+    /**
+     * Returns new parameters for safe password based encryption.
+     * 
+     * @return New parameters for safe password based encryption.
+     */
+    protected abstract P newPbeParameters();
 }

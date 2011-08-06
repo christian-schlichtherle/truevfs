@@ -33,13 +33,13 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 public interface ZipCryptoParametersProvider extends ZipCryptoParameters {
 
     /**
-     * Returns a {@link ZipCryptoParameters} instance of the given
-     * {@code type}.
+     * Returns {@link ZipCryptoParameters} of the given {@code type}
+     * or {@code null} if not available.
      *
      * @param  type the {@link ZipCryptoParameters} interface class which's
      *         implementation is searched.
-     * @return A {@link ZipCryptoParameters} instance of the given
-     *         {@code type}.
+     * @return {@link ZipCryptoParameters} of the given {@code type}
+     *         or {@code null} if not available.
      */
     @CheckForNull <P extends ZipCryptoParameters> P get(Class<P> type);
 }

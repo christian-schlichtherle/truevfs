@@ -30,7 +30,7 @@ import java.net.URI;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * An adapter which retrieves {@link RaesParameters} by using a
+ * An adapter which provides {@link RaesParameters} by using a
  * {@link KeyManager} for {@link AesCipherParameters}.
  * <p>
  * The current implementation supports only {@link Type0RaesParameters}.
@@ -40,7 +40,8 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-public final class KeyManagerRaesParameters implements RaesParametersProvider {
+public final class KeyManagerRaesParameters
+implements RaesParametersProvider {
 
     private final KeyManager<AesCipherParameters> manager;
     private final URI raes;
@@ -74,10 +75,21 @@ public final class KeyManagerRaesParameters implements RaesParametersProvider {
         this.raes = raes;
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * If {@code type} is assignable from {@link Type0RaesParameters}, then the
+     * {@link KeyManager} for {@link AesCipherParameters} will get used which
+     * has been provided to the constructor.
+     * <p>
+     * Otherwise, {@code null} gets returned.
+     */
     @Override
     @SuppressWarnings("unchecked")
     public <P extends RaesParameters> P get(Class<P> type) {
-        return type.isAssignableFrom(Type0.class) ? (P) new Type0() : null;
+        if (type.isAssignableFrom(Type0RaesParameters.class))
+            return (P) new Type0();
+        return null;
     }
 
     /**

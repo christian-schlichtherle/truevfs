@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.key;
 
 import de.schlichtherle.truezip.key.pbe.AesPbeParameters;
-import de.schlichtherle.truezip.key.pbe.console.AesPbeParametersView;
+import de.schlichtherle.truezip.key.pbe.console.ConsoleAesPbeParametersView;
 import java.net.URI;
 import org.junit.Test;
 
@@ -32,7 +32,7 @@ extends KeyManagerTestSuite<PromptingKeyManager<?>> {
     @Override
     protected PromptingKeyManager<?> newKeyManager() {
         return new PromptingKeyManager<AesPbeParameters>(
-                new AesPbeParametersView());
+                new ConsoleAesPbeParametersView());
     }
 
     @Test

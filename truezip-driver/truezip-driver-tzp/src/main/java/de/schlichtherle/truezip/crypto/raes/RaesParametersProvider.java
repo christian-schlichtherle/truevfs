@@ -35,13 +35,14 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 public interface RaesParametersProvider extends RaesParameters {
 
     /**
-     * Returns a {@link RaesParameters} instance of the given
-     * {@code type}.
+     * Returns {@link RaesParameters} of the given {@code type}
+     * or {@code null} if not available.
      *
      * @param  type the {@link RaesParameters} interface class which's
      *         implementation is searched.
-     * @return A {@link RaesParameters} instance of the given
-     *         {@code type}.
+     * @return {@link RaesParameters} of the given {@code type}
+     *         or {@code null} if not available.
+
      */
     @CheckForNull <P extends RaesParameters> P get(Class<P> type);
 }

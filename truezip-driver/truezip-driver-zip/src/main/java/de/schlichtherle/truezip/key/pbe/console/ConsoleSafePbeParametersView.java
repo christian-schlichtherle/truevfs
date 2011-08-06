@@ -17,10 +17,9 @@ package de.schlichtherle.truezip.key.pbe.console;
 
 import de.schlichtherle.truezip.crypto.param.KeyStrength;
 import de.schlichtherle.truezip.key.KeyPromptingDisabledException;
-import de.schlichtherle.truezip.key.pbe.PbeParameters;
 import de.schlichtherle.truezip.key.PromptingKeyProvider.Controller;
-import de.schlichtherle.truezip.key.PromptingKeyProvider.View;
-import de.schlichtherle.truezip.key.pbe.PbeParametersFactory;
+import de.schlichtherle.truezip.key.pbe.SafePbeParameters;
+import de.schlichtherle.truezip.key.pbe.SafePbeParametersView;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.Console;
@@ -40,11 +39,13 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-public abstract class PbeParametersView<S extends KeyStrength, P extends PbeParameters<S, P>>
-implements PbeParametersFactory<P>, View<P> {
+public abstract class ConsoleSafePbeParametersView<
+        S extends KeyStrength,
+        P extends SafePbeParameters<S, P>>
+extends SafePbeParametersView<P> {
 
     private static final ResourceBundle resources
-            = ResourceBundle.getBundle(PbeParametersView.class.getName());
+            = ResourceBundle.getBundle(ConsoleSafePbeParametersView.class.getName());
 
     /**
      * Used to lock out prompting by multiple threads.

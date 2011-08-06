@@ -24,6 +24,7 @@ import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -116,7 +117,7 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
      */
     public static RaesReadOnlyFile getInstance(
             final File file,
-            final RaesParameters param)
+            final @Nullable RaesParameters param)
     throws IOException {
         final ReadOnlyFile rof = new DefaultReadOnlyFile(file);
         try {
@@ -147,7 +148,7 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
      */
     public static RaesReadOnlyFile getInstance(
             final ReadOnlyFile rof,
-            RaesParameters param)
+            @Nullable RaesParameters param)
     throws IOException {
         // Load header data.
         final byte[] leadIn = new byte[LEAD_IN_LENGTH];
@@ -170,7 +171,7 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
     @SuppressWarnings("unchecked")
     private static <P extends RaesParameters> P getParameters(
             final Class<P> type,
-            final RaesParameters param)
+            final @CheckForNull RaesParameters param)
     throws RaesParametersException {
         // Order is important here to support multiple interface implementations!
         if (null == param) {

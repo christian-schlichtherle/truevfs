@@ -20,6 +20,7 @@ import de.schlichtherle.truezip.crypto.param.KeyStrength;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.OutputStream;
 import net.jcip.annotations.NotThreadSafe;
@@ -78,7 +79,7 @@ public abstract class RaesOutputStream extends CipherOutputStream {
      */
     public static RaesOutputStream getInstance(
             final OutputStream out,
-            final @CheckForNull RaesParameters param)
+            final @Nullable RaesParameters param)
     throws IOException {
         if (null == out)
             throw new NullPointerException();

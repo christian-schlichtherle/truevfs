@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.key.pbe.swing;
 
-import de.schlichtherle.truezip.key.pbe.PbeParameters;
+import de.schlichtherle.truezip.key.pbe.SafePbeParameters;
 import de.schlichtherle.truezip.swing.EnhancedPanel;
 import de.schlichtherle.truezip.swing.PanelEvent;
 import de.schlichtherle.truezip.swing.PanelListener;
@@ -89,7 +89,7 @@ public abstract class KeyPanel extends EnhancedPanel {
      */
     public abstract void setError(final @CheckForNull String error);
 
-    abstract boolean updateParam(final PbeParameters<?, ?> param);
+    abstract boolean updateParam(final SafePbeParameters<?, ?> param);
 
     private static class KeyPanelListener implements PanelListener {
         @Override

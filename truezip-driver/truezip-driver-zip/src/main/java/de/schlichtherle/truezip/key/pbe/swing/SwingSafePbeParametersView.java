@@ -19,10 +19,9 @@ import de.schlichtherle.truezip.awt.Windows;
 import de.schlichtherle.truezip.crypto.param.KeyStrength;
 import de.schlichtherle.truezip.key.KeyPromptingInterruptedException;
 import de.schlichtherle.truezip.key.PromptingKeyProvider.Controller;
-import de.schlichtherle.truezip.key.PromptingKeyProvider.View;
 import de.schlichtherle.truezip.key.UnknownKeyException;
-import de.schlichtherle.truezip.key.pbe.PbeParameters;
-import de.schlichtherle.truezip.key.pbe.PbeParametersFactory;
+import de.schlichtherle.truezip.key.pbe.SafePbeParameters;
+import de.schlichtherle.truezip.key.pbe.SafePbeParametersView;
 import de.schlichtherle.truezip.util.ServiceLocator;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -49,11 +48,13 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-public abstract class PbeParametersView<S extends KeyStrength, P extends PbeParameters<S, P>>
-implements PbeParametersFactory<P>, View<P> {
+public abstract class SwingSafePbeParametersView<
+        S extends KeyStrength,
+        P extends SafePbeParameters<S, P>>
+extends SafePbeParametersView<P> {
 
     private static final ResourceBundle resources
-            = ResourceBundle.getBundle(PbeParametersView.class.getName());
+            = ResourceBundle.getBundle(SwingSafePbeParametersView.class.getName());
     static final URI INITIAL_RESOURCE = URI.create(""); // NOI18N
 
     /**
@@ -70,7 +71,7 @@ implements PbeParametersFactory<P>, View<P> {
             readKeyPanels = new WeakHashMap<URI, ReadKeyPanel>();
 
     private static final ServiceLocator serviceLocator
-            = new ServiceLocator(PbeParametersView.class.getClassLoader());
+            = new ServiceLocator(SwingSafePbeParametersView.class.getClassLoader());
 
     /**
      * The last resource ID used when prompting.
@@ -295,7 +296,7 @@ implements PbeParametersFactory<P>, View<P> {
         if (EventQueue.isDispatchThread()) {
             task.run();
         } else {
-            synchronized (PbeParametersView.class) {
+            synchronized (SwingSafePbeParametersView.class) {
                 try {
                     EventQueue.invokeAndWait(task);
                 } catch (InterruptedException failure) {

@@ -15,8 +15,7 @@
  */
 package de.schlichtherle.truezip.key.pbe.swing;
 
-import de.schlichtherle.truezip.key.pbe.PbeParameters;
-import de.schlichtherle.truezip.key.pbe.PbeParametersFactory;
+import de.schlichtherle.truezip.key.pbe.SafePbeParameters;
 import java.io.File;
 import java.net.URI;
 import org.junit.After;
@@ -39,8 +38,7 @@ import org.netbeans.jemmy.util.NameComponentChooser;
  * @version $Id$
  */
 public abstract class KeyPanelTestSuite<P extends KeyPanel>
-extends JemmyUtils
-implements PbeParametersFactory<PbeParameters<?, ?>> {
+extends JemmyUtils {
     private static final ComponentChooser
             KEY_FILE_CHOOSER = new NameComponentChooser("keyFileChooser");
 	
@@ -56,6 +54,8 @@ implements PbeParametersFactory<PbeParameters<?, ?>> {
     }
 
     protected abstract P newKeyPanel();
+
+    protected abstract SafePbeParameters<?, ?> newPbeParameters();
 
     private JLabelOperator findErrorLabel(final JFrameOperator frame) {
         final String error = "error";
@@ -105,7 +105,7 @@ implements PbeParametersFactory<PbeParameters<?, ?>> {
 
     @Test
     public void testKeyFile() {
-        final PbeParameters<?, ?> param = newPbeParameters();
+        final SafePbeParameters<?, ?> param = newPbeParameters();
 
         new JTabbedPaneOperator(frame).selectPage(AuthenticationPanel.AUTH_KEY_FILE); // select tab for key files
 

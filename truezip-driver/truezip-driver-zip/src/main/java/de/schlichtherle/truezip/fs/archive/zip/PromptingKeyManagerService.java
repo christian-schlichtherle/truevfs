@@ -19,6 +19,8 @@ import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import de.schlichtherle.truezip.key.PromptingKeyProvider.View;
 import de.schlichtherle.truezip.key.pbe.AesPbeParameters;
+import de.schlichtherle.truezip.key.pbe.console.ConsoleAesPbeParametersView;
+import de.schlichtherle.truezip.key.pbe.swing.SwingAesPbeParametersView;
 import de.schlichtherle.truezip.key.spi.KeyManagerService;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -44,9 +46,9 @@ public final class PromptingKeyManagerService extends KeyManagerService {
      * If this JVM is running {@link GraphicsEnvironment#isHeadless() headless},
      * then the view of the prompting key provider of the prompting key manager
      * is an instance of
-     * {@link de.schlichtherle.truezip.key.pbe.console.AesPbeParametersView}.
+     * {@link de.schlichtherle.truezip.key.pbe.console.ConsoleAesPbeParametersView}.
      * Otherwise, it's an instance of
-     * {@link de.schlichtherle.truezip.key.pbe.swing.AesPbeParametersView}.
+     * {@link de.schlichtherle.truezip.key.pbe.swing.ConsoleAesPbeParametersView}.
      */
     public <K> PromptingKeyManagerService() {
         this.managers = newMap(new Object[][] {
@@ -54,8 +56,8 @@ public final class PromptingKeyManagerService extends KeyManagerService {
                 AesPbeParameters.class,
                 new PromptingKeyManager<AesPbeParameters>(
                     GraphicsEnvironment.isHeadless()
-                        ? new de.schlichtherle.truezip.key.pbe.console.AesPbeParametersView()
-                        : new de.schlichtherle.truezip.key.pbe.swing.AesPbeParametersView())
+                        ? new ConsoleAesPbeParametersView()
+                        : new SwingAesPbeParametersView())
             }
         });
     }

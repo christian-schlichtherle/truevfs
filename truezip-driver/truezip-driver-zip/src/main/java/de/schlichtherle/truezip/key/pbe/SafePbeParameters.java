@@ -15,13 +15,12 @@
  */
 package de.schlichtherle.truezip.key.pbe;
 
-import de.schlichtherle.truezip.crypto.param.PasswordParameters;
-import de.schlichtherle.truezip.crypto.param.KeyStrengthParameters;
 import de.schlichtherle.truezip.crypto.param.KeyStrength;
 import de.schlichtherle.truezip.key.SafeKey;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Arrays;
 import net.jcip.annotations.NotThreadSafe;
 
@@ -35,8 +34,10 @@ import net.jcip.annotations.NotThreadSafe;
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
-public abstract class PbeParameters<S extends KeyStrength, P extends PbeParameters<S, P>>
-implements SafeKey<P>, PasswordParameters, KeyStrengthParameters<S> {
+public abstract class SafePbeParameters<
+        S extends KeyStrength,
+        P extends SafePbeParameters<S, P>>
+implements SafeKey<P> {
 
     private @CheckForNull char[] password;
     private @CheckForNull S keyStrength;
@@ -44,9 +45,9 @@ implements SafeKey<P>, PasswordParameters, KeyStrengthParameters<S> {
     @Override
     @SuppressWarnings("unchecked")
     public P clone() {
-        final PbeParameters<S, P> clone;
+        final SafePbeParameters<S, P> clone;
         try {
-             clone = (PbeParameters<S, P>) super.clone();
+             clone = (SafePbeParameters<S, P>) super.clone();
         } catch (CloneNotSupportedException ex) {
             throw new AssertionError(ex);
         }
@@ -62,12 +63,23 @@ implements SafeKey<P>, PasswordParameters, KeyStrengthParameters<S> {
         setKeyStrength(null);
     }
 
-    @Override
-    public char[] getPassword() {
+    /**
+     * Returns a protective copy of the stored password char array.
+     *
+     * @return A protective copy of the stored password char array.
+     */
+    public @Nullable char[] getPassword() {
         return null == password ? null : password.clone();
     }
 
-    @Override
+    /**
+     * Copies and stores the given password char array for deriving the cipher
+     * key.
+     * It's highly recommended to overwrite this array with any non-password
+     * data after calling this method.
+     *
+     * @param newPW the password char array for deriving the cipher key.
+     */
     public void setPassword(final @CheckForNull char[] newPW) {
         final char[] oldPW = this.password;
         if (null != oldPW)
@@ -108,13 +120,29 @@ implements SafeKey<P>, PasswordParameters, KeyStrengthParameters<S> {
         }
     }
 
-    @Override
-    public S getKeyStrength() {
+    /**
+     * Returns a new non-empty array of all available key strength values.
+     * There should be no duplicated elements in this array.
+     *
+     * @return A new non-empty array of all available key strength values.
+     */
+    public abstract S[] getKeyStrengthValues();
+
+    /**
+     * Returns the cipher key strength.
+     *
+     * @return The cipher key strength.
+     */
+    public @Nullable S getKeyStrength() {
         return keyStrength;
     }
 
-    @Override
-    public void setKeyStrength(final S keyStrength) {
+    /**
+     * Sets the cipher key strength.
+     *
+     * @param keyStrength the cipher key strength.
+     */
+    public void setKeyStrength(final @CheckForNull S keyStrength) {
         this.keyStrength = keyStrength;
     }
 }

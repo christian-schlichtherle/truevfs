@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.key.pbe.swing;
+package de.schlichtherle.truezip.key.pbe.console;
 
 import de.schlichtherle.truezip.crypto.param.AesKeyStrength;
 import de.schlichtherle.truezip.key.pbe.AesPbeParameters;
@@ -22,15 +22,15 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * A Swing based user interface to prompt for passwords or key files.
- *
+ * A console based user interface to prompt for passwords.
+ * 
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-public final class AesPbeParametersView
-extends PbeParametersView<AesKeyStrength, AesPbeParameters> {
+public final class ConsoleAesPbeParametersView
+extends ConsoleSafePbeParametersView<AesKeyStrength, AesPbeParameters> {
     @Override
     public AesPbeParameters newPbeParameters() {
         return new AesPbeParameters();

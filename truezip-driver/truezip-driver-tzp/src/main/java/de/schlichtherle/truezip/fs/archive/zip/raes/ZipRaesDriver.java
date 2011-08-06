@@ -69,8 +69,10 @@ public abstract class ZipRaesDriver extends JarDriver {
     /**
      * Constructs a new RAES encrypted ZIP file driver.
      *
-     * @param ioPoolProvider the I/O pool service to use for temporary data.
-     * @param keyManagerProvider the key manager service.
+     * @param ioPoolProvider the I/O entry pool provider for allocating
+     *        temporary I/O entries (buffers).
+     * @param keyManagerProvider the key manager provider for accessing
+     *        protected resources (cryptography).
      */
     public ZipRaesDriver(   IOPoolProvider ioPoolProvider,
                             final KeyManagerProvider keyManagerProvider) {
@@ -130,10 +132,10 @@ public abstract class ZipRaesDriver extends JarDriver {
      */
     @Override
     public final JarArchiveEntry
-    newEntry(   final String path,
-                final Type type,
-                final @CheckForNull Entry template,
-                final BitField<FsOutputOption> mknod)
+    newEntry(   String path,
+                Type type,
+                Entry template,
+                BitField<FsOutputOption> mknod)
     throws CharConversionException {
         // Enforce deflation to strengthen the authentication security level.
         return super.newEntry(path, type, template, mknod.set(COMPRESS));

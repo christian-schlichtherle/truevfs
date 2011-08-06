@@ -33,7 +33,7 @@ public final class ReadKeyPanelTest extends KeyPanelTestSuite<ReadKeyPanel> {
     }
 
     @Override
-    public AesPbeParameters newPbeParameters() {
+    protected AesPbeParameters newPbeParameters() {
         return new AesPbeParameters();
     }
 

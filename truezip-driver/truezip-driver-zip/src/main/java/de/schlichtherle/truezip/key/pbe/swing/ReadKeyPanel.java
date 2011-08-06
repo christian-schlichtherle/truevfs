@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.key.pbe.swing;
 
-import de.schlichtherle.truezip.key.pbe.PbeParameters;
+import de.schlichtherle.truezip.key.pbe.SafePbeParameters;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.awt.Color;
@@ -87,15 +87,15 @@ public class ReadKeyPanel extends KeyPanel {
 
     @Override
     public void setResource(final URI resource) {
-        final URI lastResource = PbeParametersView.lastResource;
+        final URI lastResource = SwingSafePbeParametersView.lastResource;
         if (!lastResource.equals(resource)
-                && !lastResource.equals(PbeParametersView.INITIAL_RESOURCE)) {
+                && !lastResource.equals(SwingSafePbeParametersView.INITIAL_RESOURCE)) {
             this.resource.setForeground(Color.RED);
         } else {
             this.resource.setForeground(defaultForeground);
         }
         this.resource.setText(resource.toString());
-        PbeParametersView.lastResource = resource;
+        SwingSafePbeParametersView.lastResource = resource;
     }
 
     @Override
@@ -110,7 +110,7 @@ public class ReadKeyPanel extends KeyPanel {
     }
 
     @Override
-    boolean updateParam(final PbeParameters<?, ?> param) {
+    boolean updateParam(final SafePbeParameters<?, ?> param) {
         switch (authenticationPanel.getAuthenticationMethod()) {
             case AuthenticationPanel.AUTH_PASSWD:
                 final char[] passwd = passwdField.getPassword();
@@ -121,7 +121,7 @@ public class ReadKeyPanel extends KeyPanel {
             case AuthenticationPanel.AUTH_KEY_FILE:
                 final File keyFile = authenticationPanel.getKeyFile();
                 try {
-                    final byte[] key = PbeParametersView.readKeyFile(
+                    final byte[] key = SwingSafePbeParametersView.readKeyFile(
                             keyFile);
                     param.setKeyFileBytes(key);
                     Arrays.fill(key, (byte) 0);
