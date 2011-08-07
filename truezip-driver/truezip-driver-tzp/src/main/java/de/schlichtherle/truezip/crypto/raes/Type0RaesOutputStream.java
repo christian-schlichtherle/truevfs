@@ -169,38 +169,31 @@ final class Type0RaesOutputStream extends RaesOutputStream {
     }
 
     @Override
-    public void close() throws IOException {
-        // Order is important here!
-        if (closed)
-            return;
-        closed = true;
-        try {
-            // Flush partial block to out, if any.
-            finish();
+    protected void finish() throws IOException {
+        // Flush partial block to out, if any.
+        super.finish();
 
-            final long trailer = dos.size();
+        final long trailer = dos.size();
 
-            assert mac.getMacSize() == klac.getMacSize();
-            final byte[] buf = new byte[mac.getMacSize()]; // MAC buffer
-            int bufLength;
+        final Mac mac = this.mac;
+        assert mac.getMacSize() == klac.getMacSize();
+        final byte[] buf = new byte[mac.getMacSize()]; // MAC buffer
+        int bufLength;
 
-            // Calculate and write KLAC to data envelope footer.
-            // Please note that we will only use the first half of the
-            // authentication code for security reasons.
-            final long length = trailer - start; // message length
-            klac(klac, length, buf);
-            dos.write(buf, 0, buf.length / 2);
+        // Calculate and write KLAC to data envelope footer.
+        // Please note that we will only use the first half of the
+        // authentication code for security reasons.
+        final long length = trailer - start; // message length
+        klac(klac, length, buf);
+        dos.write(buf, 0, buf.length / 2);
 
-            // Calculate and write MAC to data envelope footer.
-            // Again, we will only use the first half of the
-            // authentication code for security reasons.
-            bufLength = mac.doFinal(buf, 0);
-            assert bufLength == buf.length;
-            dos.write(buf, 0, buf.length / 2);
+        // Calculate and write MAC to data envelope footer.
+        // Again, we will only use the first half of the
+        // authentication code for security reasons.
+        bufLength = mac.doFinal(buf, 0);
+        assert bufLength == buf.length;
+        dos.write(buf, 0, buf.length / 2);
 
-            assert dos.size() - trailer == buf.length;
-        } finally {
-            delegate.close();
-        }
+        assert dos.size() - trailer == buf.length;
     }
 }
