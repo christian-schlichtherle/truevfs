@@ -27,6 +27,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriver;
 import de.schlichtherle.truezip.fs.archive.FsMultiplexedOutputShop;
 import de.schlichtherle.truezip.key.KeyManagerProvider;
+import de.schlichtherle.truezip.key.KeyProvider;
 import de.schlichtherle.truezip.key.sl.KeyManagerLocator;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.IOPool;
@@ -36,6 +37,7 @@ import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.zip.ZipCryptoParameters;
 import de.schlichtherle.truezip.zip.ZipEntry;
 import static de.schlichtherle.truezip.zip.ZipEntry.*;
 import de.schlichtherle.truezip.zip.ZipEntryFactory;
@@ -45,6 +47,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.zip.Deflater;
 import net.jcip.annotations.Immutable;
@@ -74,7 +77,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
      */
     private static final Charset ZIP_CHARSET = Charset.forName("IBM437");
 
-    private final IOPoolProvider ioPoolProvider;
+    private final IOPool<?> ioPool;
 
     /**
      * Constructs a new ZIP file driver.
@@ -97,9 +100,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
      */
     protected ZipDriver(IOPoolProvider ioPoolProvider, Charset charset) {
         super(charset);
-        if (null == ioPoolProvider)
-            throw new NullPointerException();
-        this.ioPoolProvider = ioPoolProvider;
+        this.ioPool = ioPoolProvider.get();
     }
 
     /**
@@ -108,7 +109,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
      * <p>
      * The implementation in {@link ZipDriver} always returns
      * {@link KeyManagerLocator#SINGLETON}.
-     * When overriding this method, subsequent calls should return the same
+     * When overriding this method, subsequent calls must return the same
      * object.
      * 
      * @return The provider for key managers for accessing protected resources
@@ -117,6 +118,37 @@ implements ZipEntryFactory<ZipArchiveEntry> {
      */
     public KeyManagerProvider getKeyManagerProvider() {
         return KeyManagerLocator.SINGLETON;
+    }
+
+    /**
+     * Returns the {@link RaesParameters} for the given file system model.
+     * 
+     * @param  model the file system model.
+     * @return The {@link RaesParameters} for the given file system model.
+     */
+    final ZipCryptoParameters zipCryptoParameters(FsModel model) {
+        return new KeyManagerZipCryptoParameters(
+                getKeyManagerProvider(),
+                mountPointUri(model));
+    }
+
+    /**
+     * Returns a URI which represents the mount point of the given model as a
+     * resource URI for looking up a {@link KeyProvider}.
+     * Note that this URI needs to be matched exactly when setting a password
+     * programmatically!
+     * <p>
+     * The implementation in the class {@link ZipDriver} returns the
+     * expression {@code model.getMountPoint().toHierarchicalUri()}
+     * in order to improve the readability of the URI in comparison to the
+     * expression {@code model.getMountPoint().toUri()}.
+     * 
+     * @param  model the file system model.
+     * @return A URI representing the file system model's mount point.
+     * @see    <a href="http://java.net/jira/browse/TRUEZIP-72">#TRUEZIP-72</a>
+     */
+    public URI mountPointUri(FsModel model) {
+        return model.getMountPoint().toHierarchicalUri();
     }
 
     /**
@@ -151,7 +183,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
 
     @Override
     protected final IOPool<?> getPool() {
-        return ioPoolProvider.get();
+        return ioPool;
     }
 
     /**
@@ -239,14 +271,16 @@ implements ZipEntryFactory<ZipArchiveEntry> {
     throws IOException {
         final ReadOnlyFile rof = input.newReadOnlyFile();
         try {
-            return newInputShop(rof);
+            return newInputShop(model, rof);
         } catch (IOException ex) {
             rof.close();
             throw ex;
         }
     }
 
-    protected InputShop<ZipArchiveEntry> newInputShop(ReadOnlyFile rof)
+    protected InputShop<ZipArchiveEntry> newInputShop(
+            FsModel model,
+            ReadOnlyFile rof)
     throws IOException {
         return new ZipInputShop(this, rof);
     }
@@ -323,7 +357,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
     throws IOException {
         final OutputStream out = output.newOutputStream();
         try {
-            return newOutputShop(out, source);
+            return newOutputShop(model, out, source);
         } catch (IOException ex) {
             out.close();
             throw ex;
@@ -331,11 +365,12 @@ implements ZipEntryFactory<ZipArchiveEntry> {
     }
 
     protected OutputShop<ZipArchiveEntry> newOutputShop(
-            final OutputStream out,
-            final @CheckForNull ZipInputShop source)
+            FsModel model,
+            OutputStream out,
+            @CheckForNull ZipInputShop source)
     throws IOException {
         return new FsMultiplexedOutputShop<ZipArchiveEntry>(
-                new ZipOutputShop(this, out, source),
+                new ZipOutputShop(this, model, out, source),
                 getPool());
     }
 

@@ -64,11 +64,12 @@ public class OdfDriver extends JarDriver {
 
     @Override
     protected OutputShop<ZipArchiveEntry> newOutputShop(
+            final FsModel model,
             final OutputStream out,
             final @CheckForNull ZipInputShop source)
     throws IOException {
         final IOPool<?> pool = getPool();
-        final ZipOutputShop shop = new ZipOutputShop(this, out, source);
+        final ZipOutputShop shop = new ZipOutputShop(this, model, out, source);
         return null != source && source.isAppendee()
                 ? new FsMultiplexedOutputShop<ZipArchiveEntry>(shop, pool)
                 : new OdfOutputShop(shop, pool);

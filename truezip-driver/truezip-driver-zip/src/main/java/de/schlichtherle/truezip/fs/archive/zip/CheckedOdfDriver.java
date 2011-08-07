@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
+import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.socket.InputShop;
@@ -50,7 +51,7 @@ public class CheckedOdfDriver extends OdfDriver {
     }
 
     @Override
-    protected InputShop<ZipArchiveEntry> newInputShop(ReadOnlyFile rof)
+    protected InputShop<ZipArchiveEntry> newInputShop(FsModel model, ReadOnlyFile rof)
     throws IOException {
         return new CheckedZipInputShop(this, rof);
     }

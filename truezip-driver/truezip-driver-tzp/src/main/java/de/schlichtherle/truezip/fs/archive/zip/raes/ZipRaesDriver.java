@@ -83,6 +83,38 @@ public abstract class ZipRaesDriver extends JarDriver {
     }
 
     /**
+     * Returns the provider for key managers for accessing protected resources
+     * (encryption).
+     * <p>
+     * The implementation in {@link ZipRaesDriver} always returns the parameter
+     * provided to the constructor.
+     * 
+     * @return The provider for key managers for accessing protected resources
+     *         (encryption).
+     * @since  TrueZIP 7.3.
+     */
+    @Override
+    public final KeyManagerProvider getKeyManagerProvider() {
+        return keyManagerProvider;
+    }
+
+    final KeyManager<AesCipherParameters> getKeyManager() {
+        return keyManagerProvider.get(AesCipherParameters.class);
+    }
+
+    /**
+     * Returns the {@link RaesParameters} for the given file system model.
+     * 
+     * @param  model the file system model.
+     * @return The {@link RaesParameters} for the given file system model.
+     */
+    final RaesParameters raesParameters(FsModel model) {
+        return new KeyManagerRaesParameters(
+                getKeyManager(),
+                mountPointUri(model));
+    }
+
+    /**
      * Returns the key provider sync strategy,
      * which is {@link KeyProviderSyncStrategy#RESET_CANCELLED_KEY}.
      *
@@ -145,7 +177,7 @@ public abstract class ZipRaesDriver extends JarDriver {
      * {@inheritDoc}
      * <p>
      * The implementation in {@link ZipRaesDriver} calls
-     * {@link #getRaesParameters}, with which it initializes a new
+     * {@link #raesParameters}, with which it initializes a new
      * {@link RaesReadOnlyFile}.
      * Next, if the gross file length of the archive is smaller than or equal
      * to the authentication trigger, the MAC authentication on the cipher
@@ -161,7 +193,7 @@ public abstract class ZipRaesDriver extends JarDriver {
         final ReadOnlyFile rof = input.newReadOnlyFile();
         try {
             final RaesReadOnlyFile rrof = RaesReadOnlyFile.getInstance(
-                    rof, getRaesParameters(model));
+                    rof, raesParameters(model));
             if (rof.length() <= getAuthenticationTrigger()) { // compare rof, not rrof!
                 // Note: If authentication fails, this is reported through some
                 // sort of IOException, not a FileNotFoundException!
@@ -169,7 +201,7 @@ public abstract class ZipRaesDriver extends JarDriver {
                 // ordinary file which may be read, written or deleted.
                 rrof.authenticate();
             }
-            return newInputShop(rrof);
+            return newInputShop(model, rrof);
         } catch (IOException ex) {
             rof.close();
             throw ex;
@@ -205,47 +237,12 @@ public abstract class ZipRaesDriver extends JarDriver {
                 .newOutputStream();
         try {
             final RaesOutputStream ros = RaesOutputStream.getInstance(
-                    out, getRaesParameters(model));
-            return newOutputShop(ros, source);
+                    out, raesParameters(model));
+            return newOutputShop(model, ros, source);
         } catch (IOException ex) {
             out.close();
             throw ex;
         }
-    }
-
-    /**
-     * Returns the {@link RaesParameters} for the given file system model.
-     * 
-     * @param  model the file system model.
-     * @return The {@link RaesParameters} for the given file system model.
-     */
-    final RaesParameters getRaesParameters(FsModel model) {
-        return new KeyManagerRaesParameters(
-                getKeyManager(),
-                toMountPointResource(model));
-    }
-
-    final KeyManager<AesCipherParameters> getKeyManager() {
-        return keyManagerProvider.get(AesCipherParameters.class);
-    }
-
-    /**
-     * Returns a URI which represents the mount point of the given model as a
-     * resource URI for looking up a {@link KeyProvider}.
-     * Note that this URI needs to be matched exactly when setting a password
-     * programmatically!
-     * <p>
-     * The implementation in the class {@link ZipRaesDriver} returns the
-     * expression {@code model.getMountPoint().toHierarchicalUri()}
-     * in order to improve the readability of the URI in comparison to the
-     * expression {@code model.getMountPoint().toUri()}.
-     * 
-     * @param  model the file system model.
-     * @return A URI representing the file system model's mount point.
-     * @see    <a href="http://java.net/jira/browse/TRUEZIP-72">#TRUEZIP-72</a>
-     */
-    protected URI toMountPointResource(FsModel model) {
-        return model.getMountPoint().toHierarchicalUri();
     }
 
     /**
