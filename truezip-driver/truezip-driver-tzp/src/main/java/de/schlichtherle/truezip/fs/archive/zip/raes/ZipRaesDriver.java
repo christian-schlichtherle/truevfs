@@ -104,11 +104,14 @@ public abstract class ZipRaesDriver extends JarDriver {
 
     /**
      * Returns the {@link RaesParameters} for the given file system model.
+     * <p>
+     * The implementation in the class {@link ZipRaesDriver} returns
+     * {@code new KeyManagerRaesParameters(getKeyManager(), mountPointUri(model))}.
      * 
      * @param  model the file system model.
      * @return The {@link RaesParameters} for the given file system model.
      */
-    final RaesParameters raesParameters(FsModel model) {
+    protected RaesParameters raesParameters(FsModel model) {
         return new KeyManagerRaesParameters(
                 getKeyManager(),
                 mountPointUri(model));
