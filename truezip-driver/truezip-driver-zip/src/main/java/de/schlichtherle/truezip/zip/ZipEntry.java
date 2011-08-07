@@ -240,7 +240,6 @@ public class ZipEntry implements Cloneable {
         switch (method) {
             case STORED:
             case DEFLATED:
-            case WINZIP_AES:
                 setInit(METHOD, true);
                 this.method = (short) method;
                 break;
@@ -249,7 +248,7 @@ public class ZipEntry implements Cloneable {
                 break;
             default:
                 throw new IllegalArgumentException(
-                        name + ": unsupported compression method: " + method);
+                        name + " (unsupported compression method " + method + ")");
         }
     }
 
