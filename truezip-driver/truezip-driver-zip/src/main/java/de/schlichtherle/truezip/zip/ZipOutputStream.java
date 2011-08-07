@@ -15,17 +15,19 @@
  */
 package de.schlichtherle.truezip.zip;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
-import java.util.zip.ZipException;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -57,7 +59,9 @@ import net.jcip.annotations.ThreadSafe;
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
 public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
-    
+
+    private @CheckForNull ZipCryptoParameters cryptoParameters;
+
     /**
      * Constructs a ZIP output stream which decorates the given output stream
      * using the {@code "UTF-8"} charset.
@@ -209,6 +213,25 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
     @Override
     public synchronized void setMethod(int method) {
         super.setMethod(method);
+    }
+
+    /**
+     * Returns the crypto parameters.
+     * 
+     * @return The crypto parameters.
+     */
+    public synchronized @Nullable ZipCryptoParameters getCryptoParameters() {
+        return cryptoParameters;
+    }
+
+    /**
+     * Sets the crypto parameters.
+     * 
+     * @param cryptoParameters the crypto parameters.
+     */
+    public synchronized void setCryptoParameters(
+            final @CheckForNull ZipCryptoParameters cryptoParameters) {
+        this.cryptoParameters = cryptoParameters;
     }
 
     @Override
