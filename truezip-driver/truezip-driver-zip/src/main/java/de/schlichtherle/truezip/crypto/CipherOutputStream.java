@@ -17,7 +17,6 @@
 package de.schlichtherle.truezip.crypto;
 
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
@@ -147,7 +146,7 @@ public class CipherOutputStream extends DecoratingOutputStream {
      *         the stream has been closed, an I/O error occured the cipher
      *         text is invalid, i.e. required padding information is missing.
      */
-    public void finish() throws IOException {
+    protected void finish() throws IOException {
         assertOpen();
 
         int outLen = cipher.getOutputSize(0);
@@ -155,8 +154,8 @@ public class CipherOutputStream extends DecoratingOutputStream {
             outBuf = new byte[outLen];
         try {
             outLen = cipher.doFinal(outBuf, 0);
-        } catch (InvalidCipherTextException icte) {
-            throw new IOException(icte);
+        } catch (InvalidCipherTextException ex) {
+            throw new IOException(ex);
         }
         delegate.write(outBuf, 0, outLen);
         delegate.flush();
