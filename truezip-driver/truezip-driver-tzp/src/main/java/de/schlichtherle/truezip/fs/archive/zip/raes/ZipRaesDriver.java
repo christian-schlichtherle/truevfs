@@ -166,6 +166,12 @@ public abstract class ZipRaesDriver extends JarDriver {
      * process and inhibits the use of an unencrypted temporary I/O entry
      * (usually a temporary file) in case the output is not copied from a file
      * system entry as its input.
+     * <p>
+     * Furthermore, the output option preference {@link FsOutputOption#ENCRYPT}
+     * is cleared in order to prevent adding a redundant encryption layer for
+     * the individual ZIP entry.
+     * This would not have any effect on the security level, but increase the
+     * size of the resulting archive file and heat the CPU.
      */
     @Override
     public final JarArchiveEntry
@@ -174,7 +180,8 @@ public abstract class ZipRaesDriver extends JarDriver {
                 Entry template,
                 BitField<FsOutputOption> mknod)
     throws CharConversionException {
-        return super.newEntry(path, type, template, mknod.set(COMPRESS));
+        return super.newEntry(path, type, template,
+                mknod.set(COMPRESS).clear(ENCRYPT));
     }
 
     /**
