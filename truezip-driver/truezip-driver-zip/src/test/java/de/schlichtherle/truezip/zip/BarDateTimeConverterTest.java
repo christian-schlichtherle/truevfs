@@ -19,10 +19,10 @@ package de.schlichtherle.truezip.zip;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class JARDateTimeConverterTest extends DateTimeConverterTestSuite {
+public final class BarDateTimeConverterTest extends DateTimeConverterTestSuite {
 
     @Override
     DateTimeConverter getInstance() {
-        return DateTimeConverter.JAR;
+        return DateTimeConverter.ZIP;
     }
 }
