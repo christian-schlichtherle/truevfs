@@ -553,7 +553,7 @@ implements Iterable<E>, Closeable {
     }
 
     /**
-     * Returns the length of the preamble of this ZIP file in bytes.
+     * Returns the size of the preamble of this ZIP file in bytes.
      *
      * @return A positive value or zero to indicate that this ZIP file does
      *         not have a preamble.
@@ -582,7 +582,7 @@ implements Iterable<E>, Closeable {
     }
 
     /**
-     * Returns the length of the postamble of this ZIP file in bytes.
+     * Returns the size of the postamble of this ZIP file in bytes.
      *
      * @return A positive value or zero to indicate that this ZIP file does
      *         not have a postamble.
