@@ -294,7 +294,7 @@ implements Iterable<E> {
     public void setMethod(final int method) {
 	if (STORED != method && DEFLATED != method)
 	    throw new IllegalArgumentException(
-                    "Invalid compression method: " + method);
+                    "Invalid compression method " + method);
         this.method = (short) method;
     }
 
@@ -413,7 +413,7 @@ implements Iterable<E> {
                 break;
             default:
                 throw new ZipException(entry.getName()
-                        + " (unsupported compression method: "
+                        + " (unsupported compression method "
                         + method
                         + ")");
         }
@@ -710,7 +710,7 @@ implements Iterable<E> {
                                 + encode(entry.getEffectiveComment()).length;
                 if (UShort.MAX_VALUE < size)
                     throw new ZipException(entry.getName()
-                    + " (sum of name, extra fields and comment is too long: " + size + ")");
+                    + " (the total size " + size + " for the name, extra fields and comment is too long)");
             }
             int method = entry.getMethod();
             switch (method) {
@@ -996,9 +996,9 @@ implements Iterable<E> {
             final long expectedCrc = getChecksum().getValue();
             if (expectedCrc != entry.getCrc()) {
                 throw new ZipException(entry.getName()
-                + " (bad CRC-32: 0x"
+                + " (bad CRC-32 0x"
                 + Long.toHexString(entry.getCrc())
-                + "; expected: 0x"
+                + ", expected 0x"
                 + Long.toHexString(expectedCrc)
                 + ")");
             }
@@ -1006,9 +1006,9 @@ implements Iterable<E> {
             final long entrySize = written - RawZipOutputStream.this.dataStart;
             if (entry.getSize() != entrySize) {
                 throw new ZipException(entry.getName()
-                + " (bad uncompressed Size: "
+                + " (bad uncompressed size "
                 + entry.getSize()
-                + "; expected: "
+                + ", expected "
                 + entrySize
                 + ")");
             }
