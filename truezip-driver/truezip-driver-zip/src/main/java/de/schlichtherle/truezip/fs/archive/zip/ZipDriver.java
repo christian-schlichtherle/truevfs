@@ -121,10 +121,10 @@ implements ZipEntryFactory<ZipArchiveEntry> {
     }
 
     /**
-     * Returns the {@link RaesParameters} for the given file system model.
+     * Returns the {@link ZipCryptoParameters} for the given file system model.
      * 
      * @param  model the file system model.
-     * @return The {@link RaesParameters} for the given file system model.
+     * @return The {@link zipCryptoParameters} for the given file system model.
      */
     final ZipCryptoParameters zipCryptoParameters(FsModel model) {
         return new KeyManagerZipCryptoParameters(
