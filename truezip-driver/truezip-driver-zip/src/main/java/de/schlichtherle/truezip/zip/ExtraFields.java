@@ -94,8 +94,6 @@ final class ExtraFields implements Cloneable {
      *         ({@value de.schlichtherle.truezip.zip.UShort#MAX_VALUE}).
      */
     ExtraField add(final ExtraField ef) {
-        if (null == ef)
-            throw new NullPointerException();
         final int headerId = ef.getHeaderId();
         assert UShort.check(headerId);
         return extra.put(headerId, ef);
