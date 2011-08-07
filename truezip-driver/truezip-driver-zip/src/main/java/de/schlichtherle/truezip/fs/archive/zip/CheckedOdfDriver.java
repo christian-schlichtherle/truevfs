@@ -45,8 +45,8 @@ import net.jcip.annotations.Immutable;
 @DefaultAnnotation(NonNull.class)
 public class CheckedOdfDriver extends OdfDriver {
 
-    public CheckedOdfDriver(IOPoolProvider provider) {
-        super(provider);
+    public CheckedOdfDriver(IOPoolProvider ioPoolProvider) {
+        super(ioPoolProvider);
     }
 
     @Override

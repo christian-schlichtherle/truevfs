@@ -57,8 +57,9 @@ import net.jcip.annotations.Immutable;
 @Immutable
 @DefaultAnnotation(NonNull.class)
 public class OdfDriver extends JarDriver {
-    public OdfDriver(IOPoolProvider provider) {
-        super(provider);
+
+    public OdfDriver(IOPoolProvider ioPoolProvider) {
+        super(ioPoolProvider);
     }
 
     @Override
