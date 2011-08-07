@@ -95,8 +95,6 @@ implements Iterable<E> {
     /** Current ZIP entry. */
     private @Nullable E entry;
 
-    private @CheckForNull ZipCryptoParameters cryptoParameters;
-
     private @Nullable OutputMethod processor;
 
     /**
@@ -324,18 +322,7 @@ implements Iterable<E> {
      * 
      * @return The crypto parameters.
      */
-    public @Nullable ZipCryptoParameters getCryptoParameters() {
-        return cryptoParameters;
-    }
-
-    /**
-     * Sets the crypto parameters.
-     * 
-     * @param cryptoParameters the crypto parameters.
-     */
-    public void setCryptoParameters(final @CheckForNull ZipCryptoParameters cryptoParameters) {
-        this.cryptoParameters = cryptoParameters;
-    }
+    protected abstract @CheckForNull ZipCryptoParameters getCryptoParameters();
 
     /**
      * Returns the total number of (compressed) bytes this stream has written
