@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.fs.FsModel;
 import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 import de.schlichtherle.truezip.fs.archive.FsMultiplexedOutputShop;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
@@ -27,13 +28,13 @@ import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.JointIterator;
 import de.schlichtherle.truezip.zip.RawZipOutputStream;
+import de.schlichtherle.truezip.zip.ZipCryptoParameters;
 import static de.schlichtherle.truezip.zip.ZipEntry.DEFLATED;
 import static de.schlichtherle.truezip.zip.ZipEntry.STORED;
 import static de.schlichtherle.truezip.zip.ZipEntry.UNKNOWN;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -41,6 +42,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedOutputStream;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * An output shop for writing ZIP archive files.
@@ -52,25 +54,31 @@ import java.util.zip.CheckedOutputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 @DefaultAnnotation(NonNull.class)
 public final class ZipOutputShop
 extends RawZipOutputStream<ZipArchiveEntry>
 implements OutputShop<ZipArchiveEntry> {
 
-    private final IOPool<?> pool;
+    private final ZipDriver driver;
+    private final FsModel model;
     private @CheckForNull IOPool.Entry<?> postamble;
-    private @Nullable ZipArchiveEntry tempEntry;
+    private @CheckForNull ZipArchiveEntry tempEntry;
 
     public ZipOutputShop(   final ZipDriver driver,
+                            final FsModel model,
                             final OutputStream out,
                             final @CheckForNull ZipInputShop source)
     throws IOException {
         super(  out,
                 null != source && source.isAppendee() ? source : null,
                 driver.getCharset());
+        if (null == model)
+            throw new NullPointerException();
         super.setMethod(driver.getMethod());
         super.setLevel(driver.getLevel());
-        this.pool = driver.getPool();
+        this.driver = driver;
+        this.model = model;
         if (null != source) {
             if (!source.isAppendee()) {
                 // Retain comment and preamble of input ZIP archive.
@@ -87,20 +95,30 @@ implements OutputShop<ZipArchiveEntry> {
             }
             // Retain postamble of input ZIP archive.
             if (0 < source.getPostambleLength()) {
-                this.postamble = this.pool.allocate();
+                this.postamble = getPool().allocate();
                 Streams.copy(   source.getPostambleInputStream(),
                                 postamble.getOutputSocket().newOutputStream());
             }
         }
     }
 
+    private IOPool<?> getPool() {
+        return driver.getPool();
+    }
+
+    @Override
+    protected ZipCryptoParameters getCryptoParameters() {
+        return driver.zipCryptoParameters(model);
+    }
+
     @Override
     public int getSize() {
-        return super.size() + (null != tempEntry ? 1 : 0);
+        return super.size() + (null != this.tempEntry ? 1 : 0);
     }
 
     @Override
     public Iterator<ZipArchiveEntry> iterator() {
+        final ZipArchiveEntry tempEntry = this.tempEntry;
         if (null == tempEntry)
             return super.iterator();
         return new JointIterator<ZipArchiveEntry>(
@@ -167,7 +185,7 @@ implements OutputShop<ZipArchiveEntry> {
                                 || UNKNOWN == entry.getCompressedSize()
                                 || UNKNOWN == entry.getSize())
                             return new BufferedEntryOutputStream(
-                                    pool.allocate(), entry);
+                                    getPool().allocate(), entry);
                         break;
                     case DEFLATED:
                         break;
@@ -187,7 +205,7 @@ implements OutputShop<ZipArchiveEntry> {
      */
     @Override
     public final boolean isBusy() {
-        return super.isBusy() || null != tempEntry;
+        return super.isBusy() || null != this.tempEntry;
     }
 
     /**
@@ -258,8 +276,8 @@ implements OutputShop<ZipArchiveEntry> {
      * output shop and finally deleted.
      */
     private class BufferedEntryOutputStream extends CheckedOutputStream {
-        private final IOPool.Entry<?> temp;
-        private boolean closed;
+        final IOPool.Entry<?> temp;
+        boolean closed;
 
         BufferedEntryOutputStream(
                 final IOPool.Entry<?> temp,
@@ -268,7 +286,7 @@ implements OutputShop<ZipArchiveEntry> {
             super(temp.getOutputSocket().newOutputStream(), new CRC32());
             assert STORED == entry.getMethod();
             this.temp = temp;
-            tempEntry = entry;
+            ZipOutputShop.this.tempEntry = entry;
         }
 
         @Override
@@ -281,15 +299,17 @@ implements OutputShop<ZipArchiveEntry> {
                     super.close();
                 } finally {
                     final long length = temp.getSize(DATA);
-                    if (length > Integer.MAX_VALUE)
-                        throw new IOException("file too large");
+                    /*if (Integer.MAX_VALUE < length)
+                        throw new IOException("file too large");*/
+                    final ZipArchiveEntry tempEntry = ZipOutputShop.this.tempEntry;
+                    assert STORED == tempEntry.getMethod();
                     tempEntry.setCrc(getChecksum().getValue());
                     tempEntry.setCompressedSize(length);
                     tempEntry.setSize(length);
                     store();
                 }
             } finally {
-                tempEntry = null;
+                ZipOutputShop.this.tempEntry = null;
             }
         }
 
@@ -297,7 +317,8 @@ implements OutputShop<ZipArchiveEntry> {
             try {
                 final InputStream in = temp.getInputSocket().newInputStream();
                 try {
-                    putNextEntry(tempEntry);
+                    assert null != ZipOutputShop.this.tempEntry;
+                    putNextEntry(ZipOutputShop.this.tempEntry);
                     try {
                         Streams.cat(in, ZipOutputShop.this);
                     } finally {

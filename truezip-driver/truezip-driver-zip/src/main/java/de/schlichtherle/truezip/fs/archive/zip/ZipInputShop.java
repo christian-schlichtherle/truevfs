@@ -48,8 +48,9 @@ implements InputShop<ZipArchiveEntry> {
 
     /**
      * Returns {@code true} if and only if the target archive file gets entries
-     *         appended to it.
-     * Note that this property does not affect the behaviour of this class.
+     * appended to it.
+     * Note that the implementation in the class {@link ZipInputShop} does not
+     * use this property.
      * 
      * @return {@code true} if and only if the target archive file gets entries
      *         appended to it.
