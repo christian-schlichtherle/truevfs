@@ -557,7 +557,6 @@ implements Iterable<E>, Closeable {
      *
      * @return A positive value or zero to indicate that this ZIP file does
      *         not have a preamble.
-     *
      */
     public long getPreambleLength() {
         return preamble;
