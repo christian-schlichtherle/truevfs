@@ -49,7 +49,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URI;
 import net.jcip.annotations.Immutable;
 
 /**
@@ -163,7 +162,10 @@ public abstract class ZipRaesDriver extends JarDriver {
      * Creates a new {@link JarArchiveEntry}, enforcing that the data gets
      * {@code DEFLATED} when written, even if copying data from a
      * {@code STORED} source entry.
-     * This feature strengthens the security of the authentication process.
+     * This feature strengthens the security level of the authentication
+     * process and inhibits the use of an unencrypted temporary I/O entry
+     * (usually a temporary file) in case the output is not copied from a file
+     * system entry as its input.
      */
     @Override
     public final JarArchiveEntry
@@ -172,7 +174,6 @@ public abstract class ZipRaesDriver extends JarDriver {
                 Entry template,
                 BitField<FsOutputOption> mknod)
     throws CharConversionException {
-        // Enforce deflation to strengthen the authentication security level.
         return super.newEntry(path, type, template, mknod.set(COMPRESS));
     }
 
