@@ -42,7 +42,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import net.jcip.annotations.NotThreadSafe;
 
-
 /**
  * Decorates annother output shop to support a virtually unlimited number of
  * entries which may be written concurrently while actually at most one entry
