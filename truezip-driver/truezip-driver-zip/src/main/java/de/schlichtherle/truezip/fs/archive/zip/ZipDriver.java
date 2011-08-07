@@ -75,87 +75,48 @@ implements ZipEntryFactory<ZipArchiveEntry> {
     private static final Charset ZIP_CHARSET = Charset.forName("IBM437");
 
     private final IOPoolProvider ioPoolProvider;
-    private final KeyManagerProvider keyManagerProvider;
 
     /**
      * Constructs a new ZIP file driver.
-     * This constructor uses {@link KeyManagerLocator#SINGLETON} for providing
-     * key managers for accessing protected resources (encryption).
      * This constructor uses {@link #ZIP_CHARSET} for encoding entry names
      * and comments.
      *
-     * @deprecated In TrueZIP 7.3, support for WinZip AES encryption has been
-     *             added.
-     *             As a consequence, {@link KeyManagerLocator#SINGLETON} has
-     *             been added as a default parameter to this constructor.
-     *             If you don't want to depend on this default parameter,
-     *             then you need to call another constructor.
-     *             Otherwise, calling this constructor is still fine.
      * @param ioPoolProvider the provider for I/O entry pools for allocating
      *        temporary I/O entries (buffers).
      */
-    @Deprecated
     public ZipDriver(IOPoolProvider ioPoolProvider) {
-        this(ioPoolProvider, KeyManagerLocator.SINGLETON, ZIP_CHARSET);
+        this(ioPoolProvider, ZIP_CHARSET);
     }
 
     /**
      * Constructs a new ZIP file driver.
-     * This constructor uses {@link KeyManagerLocator#SINGLETON} for providing
-     * key managers for accessing protected resources (encryption).
      *
-     * @deprecated In TrueZIP 7.3, support for WinZip AES encryption has been
-     *             added.
-     *             As a consequence, {@link KeyManagerLocator#SINGLETON} has
-     *             been added as a default parameter to this constructor.
-     *             If you don't want to use this default dependency,
-     *             then you need to call another constructor.
-     *             Otherwise, calling this constructor is still fine.
      * @param ioPoolProvider the provider for I/O entry pools for allocating
      *        temporary I/O entries (buffers).
      * @param charset the character set for encoding entry names and comments.
      */
-    @Deprecated
     protected ZipDriver(IOPoolProvider ioPoolProvider, Charset charset) {
-        this(ioPoolProvider, KeyManagerLocator.SINGLETON, charset);
-    }
-
-    /**
-     * Constructs a new ZIP file driver.
-     * This constructor uses {@link #ZIP_CHARSET} for encoding entry names
-     * and comments.
-     *
-     * @since TrueZIP 7.3
-     * @param ioPoolProvider the provider for I/O entry pools for allocating
-     *        temporary I/O entries (buffers).
-     * @param keyManagerProvider the provider for key managers for accessing
-     *        protected resources (encryption).
-     */
-    public ZipDriver(
-            IOPoolProvider ioPoolProvider,
-            KeyManagerProvider keyManagerProvider) {
-        this(ioPoolProvider, keyManagerProvider, ZIP_CHARSET);
-    }
-
-    /**
-     * Constructs a new ZIP file driver.
-     *
-     * @since TrueZIP 7.3
-     * @param ioPoolProvider the provider for I/O entry pools for allocating
-     *        temporary I/O entries (buffers).
-     * @param keyManagerProvider the provider for key managers for accessing
-     *        protected resources (encryption).
-     * @param charset the character set for encoding entry names and comments.
-     */
-    protected ZipDriver(
-            final IOPoolProvider ioPoolProvider,
-            final KeyManagerProvider keyManagerProvider,
-            Charset charset) {
         super(charset);
-        if (null == ioPoolProvider || null == keyManagerProvider)
+        if (null == ioPoolProvider)
             throw new NullPointerException();
         this.ioPoolProvider = ioPoolProvider;
-        this.keyManagerProvider = keyManagerProvider;
+    }
+
+    /**
+     * Returns the provider for key managers for accessing protected resources
+     * (encryption).
+     * <p>
+     * The implementation in {@link ZipDriver} always returns
+     * {@link KeyManagerLocator#SINGLETON}.
+     * When overriding this method, subsequent calls should return the same
+     * object.
+     * 
+     * @return The provider for key managers for accessing protected resources
+     *         (encryption).
+     * @since  TrueZIP 7.3.
+     */
+    public KeyManagerProvider getKeyManagerProvider() {
+        return KeyManagerLocator.SINGLETON;
     }
 
     /**

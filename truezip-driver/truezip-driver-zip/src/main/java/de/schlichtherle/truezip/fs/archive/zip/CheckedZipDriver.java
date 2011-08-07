@@ -42,8 +42,8 @@ import net.jcip.annotations.Immutable;
 @Immutable
 public class CheckedZipDriver extends ZipDriver {
 
-    public CheckedZipDriver(IOPoolProvider provider) {
-        super(provider);
+    public CheckedZipDriver(IOPoolProvider ioPoolProvider) {
+        super(ioPoolProvider);
     }
 
     @Override

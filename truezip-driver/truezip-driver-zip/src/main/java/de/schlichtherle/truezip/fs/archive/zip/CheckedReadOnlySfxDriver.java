@@ -45,8 +45,8 @@ import net.jcip.annotations.Immutable;
 @DefaultAnnotation(NonNull.class)
 public class CheckedReadOnlySfxDriver extends ReadOnlySfxDriver {
 
-    public CheckedReadOnlySfxDriver(IOPoolProvider provider) {
-        super(provider);
+    public CheckedReadOnlySfxDriver(IOPoolProvider ioPoolProvider) {
+        super(ioPoolProvider);
     }
 
     @Override

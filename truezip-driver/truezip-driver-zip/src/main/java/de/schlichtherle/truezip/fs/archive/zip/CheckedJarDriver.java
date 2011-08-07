@@ -46,8 +46,8 @@ import net.jcip.annotations.Immutable;
 @DefaultAnnotation(NonNull.class)
 public class CheckedJarDriver extends JarDriver {
 
-    public CheckedJarDriver(IOPoolProvider provider) {
-        super(provider);
+    public CheckedJarDriver(IOPoolProvider ioPoolProvider) {
+        super(ioPoolProvider);
     }
 
     @Override
