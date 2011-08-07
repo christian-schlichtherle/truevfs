@@ -40,8 +40,7 @@ public interface Type0RaesParameters extends RaesParameters {
      *
      * @return A clone of the char array holding the password to use
      *         for writing a RAES type 0 file.
-     * @throws RaesKeyException If password retrieval has failed for some
-     *         reason.
+     * @throws RaesKeyException If key retrieval has failed for some reason.
      */
     char[] getWritePassword() throws RaesKeyException;
 
@@ -54,8 +53,7 @@ public interface Type0RaesParameters extends RaesParameters {
      *         in an invalid password.
      * @return A clone of the char array holding the password to use
      *         for reading a RAES type 0 file.
-     * @throws RaesKeyException If password retrieval has failed for some
-     *         reason.
+     * @throws RaesKeyException If key retrieval has failed for some reason.
      */
     char[] getReadPassword(boolean invalid) throws RaesKeyException;
 
@@ -63,8 +61,7 @@ public interface Type0RaesParameters extends RaesParameters {
      * Returns the key strength to use for writing a RAES type 0 file.
      *
      * @return The key strength to use for writing a RAES type 0 file.
-     * @throws RaesKeyException If password retrieval has failed for some
-     *         reason.
+     * @throws RaesKeyException If key retrieval has failed for some reason.
      */
     KeyStrength getKeyStrength() throws RaesKeyException;
 
@@ -73,8 +70,7 @@ public interface Type0RaesParameters extends RaesParameters {
      *
      * @param  keyStrength the key strength obtained from reading a RAES type 0
      *         file.
-     * @throws RaesKeyException If password retrieval has failed for some
-     *         reason.
+     * @throws RaesKeyException If key retrieval has failed for some reason.
      */
     void setKeyStrength(KeyStrength keyStrength) throws RaesKeyException;
 

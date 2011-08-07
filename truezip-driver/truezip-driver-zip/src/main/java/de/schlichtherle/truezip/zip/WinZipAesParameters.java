@@ -35,8 +35,7 @@ public interface WinZipAesParameters extends ZipCryptoParameters {
      * @param  name the ZIP entry name.
      * @return A clone of the char array holding the password to use
      *         for writing a WinZip AES entry.
-     * @throws ZipKeyException If password retrieval has failed for some
-     *         reason.
+     * @throws ZipKeyException If key retrieval has failed for some reason.
      */
     char[] getWritePassword(String name)
     throws ZipKeyException;
@@ -51,8 +50,7 @@ public interface WinZipAesParameters extends ZipCryptoParameters {
      *         in an invalid password.
      * @return A clone of the char array holding the password to use
      *         for reading a WinZip AES entry.
-     * @throws ZipKeyException If password retrieval has failed for some
-     *         reason.
+     * @throws ZipKeyException If key retrieval has failed for some reason.
      */
     char[] getReadPassword(String name, boolean invalid)
     throws ZipKeyException;
@@ -62,8 +60,7 @@ public interface WinZipAesParameters extends ZipCryptoParameters {
      *
      * @param  name the ZIP entry name.
      * @return The key strength to use for writing a WinZip AES entry.
-     * @throws ZipKeyException If password retrieval has failed for some
-     *         reason.
+     * @throws ZipKeyException If key retrieval has failed for some reason.
      */
     AesKeyStrength getKeyStrength(String name)
     throws ZipKeyException;
@@ -74,8 +71,7 @@ public interface WinZipAesParameters extends ZipCryptoParameters {
      * @param  name the ZIP entry name.
      * @param  keyStrength the key strength obtained from reading a WinZip AES
      *         entry.
-     * @throws ZipKeyException If password retrieval has failed for some
-     *         reason.
+     * @throws ZipKeyException If key retrieval has failed for some reason.
      */
     void setKeyStrength(String name, AesKeyStrength keyStrength)
     throws ZipKeyException;
