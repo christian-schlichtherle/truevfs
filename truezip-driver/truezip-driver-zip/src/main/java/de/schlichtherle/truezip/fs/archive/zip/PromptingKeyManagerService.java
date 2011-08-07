@@ -45,10 +45,8 @@ public final class PromptingKeyManagerService extends KeyManagerService {
      * Constructs a new prompting key manager service using the default view.
      * If this JVM is running {@link GraphicsEnvironment#isHeadless() headless},
      * then the view of the prompting key provider of the prompting key manager
-     * is an instance of
-     * {@link de.schlichtherle.truezip.key.pbe.console.ConsoleAesPbeParametersView}.
-     * Otherwise, it's an instance of
-     * {@link de.schlichtherle.truezip.key.pbe.swing.ConsoleAesPbeParametersView}.
+     * is an instance of {@link ConsoleAesPbeParametersView}.
+     * Otherwise, it's an instance of {@link SwingAesPbeParametersView}.
      */
     public <K> PromptingKeyManagerService() {
         this.managers = newMap(new Object[][] {
