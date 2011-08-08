@@ -16,9 +16,9 @@
 package de.schlichtherle.truezip.zip;
 
 import de.schlichtherle.truezip.crypto.CipherOutputStream;
-import de.schlichtherle.truezip.crypto.SICSeekableBlockCipher;
 import de.schlichtherle.truezip.crypto.param.KeyStrength;
 import de.schlichtherle.truezip.io.LEDataOutputStream;
+import static de.schlichtherle.truezip.zip.ZipEntry.*;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
@@ -26,20 +26,20 @@ import java.security.SecureRandom;
 import java.util.Random;
 import net.jcip.annotations.NotThreadSafe;
 import org.bouncycastle.crypto.BufferedBlockCipher;
-import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.Mac;
 import org.bouncycastle.crypto.PBEParametersGenerator;
 import org.bouncycastle.crypto.digests.SHA1Digest;
-import org.bouncycastle.crypto.engines.AESFastEngine;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.io.MacOutputStream;
 import org.bouncycastle.crypto.macs.HMac;
+import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 
 /**
  * Encrypts ZIP entry contents according the WinZip AES specification.
  * 
  * @see     <a href="http://www.winzip.com/win/en/aes_info.htm">AES Encryption Information: Encryption Specification AE-1 and AE-2</a>
+ * @see     <a href="http://www.ietf.org/rfc/rfc2898.txt">RFC 2898: PKCS #5: Password-Based Cryptography Specification Version 2.0</a>
  * @see     RawZipOutputStream$WinZipAesOutputMethod
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -68,6 +68,8 @@ final class WinZipAesEntryOutputStream extends CipherOutputStream {
     /** The Message Authentication Code (MAC). */
     private Mac mac;
 
+    private boolean updatedCompressedSize;
+
     /**
      * The low level data output stream.
      * Used for writing the header and footer.
@@ -76,13 +78,29 @@ final class WinZipAesEntryOutputStream extends CipherOutputStream {
 
     WinZipAesEntryOutputStream(
             final LEDataOutputStream out,
-            final WinZipAesEntryParameters param) {
-        super(out, new BufferedBlockCipher(
-                new SICSeekableBlockCipher( // or new SICBlockCipher(
-                    new AESFastEngine())));
+            final WinZipAesEntryParameters param)
+    throws ZipKeyException {
+        super(out, new BufferedBlockCipher(new WinZipAesCipherMode()));
         assert null != out;
         assert null != param;
         this.param = param;
+
+        updateCompressedSize();
+    }
+
+    private void updateCompressedSize() throws ZipKeyException {
+        if (this.updatedCompressedSize)
+            return;
+        final WinZipAesEntryParameters param = this.param;
+        final ZipEntry entry = param.getEntry();
+        long size = entry.getCompressedSize();
+        if (UNKNOWN == size)
+            return;
+        this.updatedCompressedSize = true;
+        size += param.getKeyStrength().getBytes() / 2 // salt value
+                + 2   // password verification value
+                + 10; // authentication code
+        entry.setCompressedSize64(size);
     }
 
     void start() throws IOException {
@@ -104,20 +122,36 @@ final class WinZipAesEntryOutputStream extends CipherOutputStream {
         shaker.nextBytes(salt);
 
         // Derive cipher and MAC parameters.
+        // Here comes the strange part about WinZip AES encryption:
+        // Its unorthodox use of the Password-Based Key Derivation Function 2
+        // (PBKDF2) of PKCS #5 V2.0 alias RFC 2898.
         gen.init(pwdBytes, salt, ITERATION_COUNT);
-        final ParametersWithIV
-                cipherParam = (ParametersWithIV) gen.generateDerivedParameters(
-                    keyStrengthBits, AES_BLOCK_SIZE_BITS + PWD_VERIFIER_BITS);
-        final CipherParameters
-                macParam = gen.generateDerivedMacParameters(keyStrengthBits);
+        assert AES_BLOCK_SIZE_BITS <= keyStrengthBits;
+        // Yes, the password verifier is only a 16 bit value.
+        // So we must use the MAC for verification.
+        final KeyParameter keyParam =
+                (KeyParameter) gen.generateDerivedParameters(
+                    2 * keyStrengthBits + PWD_VERIFIER_BITS);
+        // Can you believe they "forgot" the nonce in the CTR mode IV?! :-(
+        // This is why the WinZip AES specification should be considered
+        // "broken"!
+        final byte[] ctrIv = new byte[AES_BLOCK_SIZE_BITS / 8];
+        final ParametersWithIV aesCtrParam = new ParametersWithIV(
+                new KeyParameter(keyParam.getKey(), 0, keyStrengthBytes),
+                ctrIv); // yes, the IV is an array of zero bytes!
+        final KeyParameter sha1HMacParam = new KeyParameter(
+                keyParam.getKey(),
+                keyStrengthBytes,
+                keyStrengthBytes);
         paranoidWipe(pwdBytes);
 
         // Init cipher.
-        this.cipher.init(true, cipherParam);
+        final BufferedBlockCipher cipher = this.cipher;
+        cipher.init(true, aesCtrParam);
 
         // Init MAC.
         final Mac mac = this.mac = new HMac(new SHA1Digest());
-        mac.init(macParam);
+        mac.init(sha1HMacParam);
 
         // Reinit chain of output streams as Encrypt-then-MAC.
         final LEDataOutputStream dos =
@@ -126,13 +160,13 @@ final class WinZipAesEntryOutputStream extends CipherOutputStream {
 
         // Write header.
         dos.write(salt);
-        writePasswordVerifier(cipherParam);
+        writePasswordVerifier(keyParam);
     }
 
-    private void writePasswordVerifier(ParametersWithIV cipherParam)
+    private void writePasswordVerifier(KeyParameter keyParam)
     throws IOException {
-        dos.write(  cipherParam.getIV(),
-                    AES_BLOCK_SIZE_BITS / 8,
+        dos.write(  keyParam.getKey(),
+                    2 * param.getKeyStrength().getBytes(),
                     PWD_VERIFIER_BITS / 8);
     }
 
@@ -149,14 +183,17 @@ final class WinZipAesEntryOutputStream extends CipherOutputStream {
     }
 
     @Override
-    public void finish() throws IOException {
+    protected void finish() throws IOException {
         // Flush partial block to out, if any.
         super.finish();
 
         // Calculate and write MAC to footer.
+        final Mac mac = this.mac;
         final byte[] buf = new byte[mac.getMacSize()]; // MAC buffer
         final int bufLength = mac.doFinal(buf, 0);
         assert bufLength == buf.length;
         dos.write(buf, 0, bufLength / 2);
+
+        updateCompressedSize();
     }
 }
