@@ -189,8 +189,7 @@ extends FsArchiveController<E> {
 final class FsCacheableFalsePositiveException extends FsFalsePositiveException {
     private static final long serialVersionUID = 5436924103910446876L;
 
-    FsCacheableFalsePositiveException(  FsModel model,
-                                        @CheckForNull IOException cause) {
+    FsCacheableFalsePositiveException(FsModel model, IOException cause) {
         super(model, cause);
     }
 } // FsCacheableFalsePositiveException

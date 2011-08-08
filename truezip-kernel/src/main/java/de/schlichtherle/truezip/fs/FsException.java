@@ -22,8 +22,12 @@ import java.io.IOException;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * An abstract exception which indicates an exceptional condition in a file
- * system.
+ * An abstract exception which indicates an exceptional condition discovered
+ * by the TrueZIP Kernel.
+ * <p>
+ * ONLY THE TRUEZIP KERNEL IS ALLOWED TO THROW AN EXCEPTION OF THIS TYPE!
+ * DO NOT CREATE OR EVEN THROW AN EXCEPTION OF THIS TYPE (INCLUDING SUB CLASSES)
+ * ANYWHERE ELSE!
  *
  * @see     FsController
  * @author  Christian Schlichtherle
