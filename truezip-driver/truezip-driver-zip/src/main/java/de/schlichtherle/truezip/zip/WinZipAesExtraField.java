@@ -36,15 +36,27 @@ final class WinZipAesExtraField extends ExtraField {
 
     private static final int DATA_SIZE = 7;
     private static final int VENDOR_ID = 'A' | ('E' << 8);
+    private static final AesKeyStrength[] KEY_STRENGTHS = AesKeyStrength.values();
 
-    private short vendorVersion = 1;
-    private AesKeyStrength keyStrength = BITS_256;
-    private short compressionMethod;
-    
+    public static final int AE_1 = 1;
+    public static final int AE_2 = 2;
+
+    private short vendorVersion = AE_1;
+    private byte encryptionStrength = encryptionStrength(BITS_128);
+    private short method;
+
     /**
      * Constructs a new WinZip AES Extra Field.
      */
     WinZipAesExtraField() {
+    }
+
+    private static byte encryptionStrength(AesKeyStrength keyStrength) {
+        return (byte) (keyStrength.ordinal() + 1);
+    }
+
+    private static AesKeyStrength keyStrength(int encryptionStrength) {
+        return KEY_STRENGTHS[(encryptionStrength - 1) & UByte.MAX_VALUE];
     }
 
     @Override
@@ -62,7 +74,7 @@ final class WinZipAesExtraField extends ExtraField {
     }
 
     void setVendorVersion(final int vendorVersion) {
-        if (vendorVersion < 1 || 2 < vendorVersion)
+        if (vendorVersion < AE_1 || AE_2 < vendorVersion)
             throw new IllegalArgumentException();
         this.vendorVersion = (short) vendorVersion;
     }
@@ -72,21 +84,20 @@ final class WinZipAesExtraField extends ExtraField {
     }
 
     AesKeyStrength getKeyStrength() {
-        return keyStrength;
+        return keyStrength(this.encryptionStrength);
     }
 
     void setKeyStrength(final AesKeyStrength keyStrength) {
-        assert null != keyStrength;
-        this.keyStrength = keyStrength;
+        this.encryptionStrength = encryptionStrength(keyStrength);
     }
 
-    int getCompressionMethod() {
-        return compressionMethod & UShort.MAX_VALUE;
+    int getMethod() {
+        return method & UShort.MAX_VALUE;
     }
 
     void setMethod(final int compressionMethod) {
         assert UShort.check(compressionMethod);
-        this.compressionMethod = (short) compressionMethod;
+        this.method = (short) compressionMethod;
     }
 
     @Override
@@ -99,7 +110,7 @@ final class WinZipAesExtraField extends ExtraField {
         off += 2;
         if (VENDOR_ID != vendorId)
             throw new IllegalArgumentException();
-        setKeyStrength(AesKeyStrength.values()[(src[off] - 1) & UByte.MAX_VALUE]);
+        setKeyStrength(keyStrength(src[off])); // checked
         off += 1;
         setMethod(readUShort(src, off));
         // off += 2;
@@ -107,13 +118,13 @@ final class WinZipAesExtraField extends ExtraField {
 
     @Override
     void writeTo(byte[] dst, int off) {
-        writeShort(getVendorVersion(), dst, off);
+        writeShort(this.vendorVersion, dst, off);
         off += 2;
         writeShort(VENDOR_ID, dst, off);
         off += 2;
-        dst[off] = (byte) (getKeyStrength().ordinal() + 1);
+        dst[off] = this.encryptionStrength;
         off += 1;
-        writeShort(getCompressionMethod(), dst, off);
+        writeShort(this.method, dst, off);
         // off += 2;
     }
 }
