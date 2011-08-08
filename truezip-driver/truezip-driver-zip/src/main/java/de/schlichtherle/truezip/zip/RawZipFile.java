@@ -257,7 +257,7 @@ implements Iterable<E>, Closeable {
                 entry.setGeneral16(general);
                 off += 2; // General Purpose Bit Flags
                 assert entry.getGeneral1(GPBF_UTF8) == utf8;
-                entry.setMethod16(readUShort(cfh, off));
+                entry.setMethod(readUShort(cfh, off));
                 off += 2;
                 entry.setTimeDos(readUInt(cfh, off));
                 off += 4;
@@ -755,7 +755,8 @@ implements Iterable<E>, Closeable {
                 = new IntervalInputStream(offset, entry.getCompressedSize());
         final int bufSize = getBufferSize(entry);
         InputStream in = iis;
-        switch (entry.getMethod()) {
+        final int method = entry.getMethod();
+        switch (method) {
             case DEFLATED:
                 if (process) {
                     iis.addDummy();
@@ -773,7 +774,8 @@ implements Iterable<E>, Closeable {
                     in = new CheckedInputStream(in, entry, bufSize);
                 break;
             default:
-                throw new AssertionError();
+                throw new ZipException(name
+                    + " (compression method " + method + " is not supported)");
         }
         return in;
     }
