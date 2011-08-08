@@ -917,8 +917,12 @@ implements Iterable<E> {
         @Override
         public OutputStream init(ZipEntry entry) throws IOException {
             assert null == this.out;
+            // The CRC-32 value must get backed up because it may get modified
+            // by the output method decorator chain as a side effect, e.g. when
+            // writing WinZip AES entries with AE-2 as the vendor version.
+            final long crc = entry.getCrc();
             return this.out = new CheckingCrc32OutputStream(
-                    delegate.init(entry));
+                    delegate.init(entry), crc);
         }
 
         @Override
@@ -1023,18 +1027,21 @@ implements Iterable<E> {
     private final class CheckingCrc32OutputStream
     extends Crc32OutputStream {
 
-        CheckingCrc32OutputStream(OutputStream out) {
+        final long crc;
+
+        CheckingCrc32OutputStream(OutputStream out, long crc) {
             super(out);
+            this.crc = crc;
         }
 
         void finish() throws ZipException {
             final E entry = RawZipOutputStream.this.entry;
             final long crc = getChecksum().getValue();
-            if (entry.getCrc() != crc) {
+            if (this.crc != crc) {
                 throw new ZipException(entry.getName()
-                + " (bad CRC-32 0x"
-                + Long.toHexString(entry.getCrc())
-                + ", expected 0x"
+                + " (bad declared CRC-32 value 0x"
+                + Long.toHexString(this.crc)
+                + ", computed 0x"
                 + Long.toHexString(crc)
                 + ")");
             }
