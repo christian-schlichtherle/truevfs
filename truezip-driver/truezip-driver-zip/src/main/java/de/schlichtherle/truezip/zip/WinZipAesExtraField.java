@@ -38,7 +38,7 @@ final class WinZipAesExtraField extends ExtraField {
     private static final int VENDOR_ID = 'A' | ('E' << 8);
 
     private short vendorVersion = 1;
-    private AesKeyStrength encryptionStrength = BITS_256;
+    private AesKeyStrength keyStrength = BITS_256;
     private short compressionMethod;
     
     /**
@@ -62,7 +62,8 @@ final class WinZipAesExtraField extends ExtraField {
     }
 
     void setVendorVersion(final int vendorVersion) {
-        assert UShort.check(vendorVersion);
+        if (vendorVersion < 1 || 2 < vendorVersion)
+            throw new IllegalArgumentException();
         this.vendorVersion = (short) vendorVersion;
     }
 
@@ -70,13 +71,13 @@ final class WinZipAesExtraField extends ExtraField {
         return VENDOR_ID;
     }
 
-    AesKeyStrength getEncryptionStrength() {
-        return encryptionStrength;
+    AesKeyStrength getKeyStrength() {
+        return keyStrength;
     }
 
-    void setKeyStrength(final AesKeyStrength encryptionStrength) {
-        assert null != encryptionStrength;
-        this.encryptionStrength = encryptionStrength;
+    void setKeyStrength(final AesKeyStrength keyStrength) {
+        assert null != keyStrength;
+        this.keyStrength = keyStrength;
     }
 
     int getCompressionMethod() {
@@ -92,27 +93,27 @@ final class WinZipAesExtraField extends ExtraField {
     void readFrom(final byte[] src, int off, final int size) {
         if (DATA_SIZE != size)
             throw new IllegalArgumentException();
-        vendorVersion = (short) readUShort(src, off);
+        setVendorVersion(readUShort(src, off));
         off += 2;
         final int vendorId = (short) readUShort(src, off);
         off += 2;
         if (VENDOR_ID != vendorId)
             throw new IllegalArgumentException();
-        encryptionStrength = AesKeyStrength.values()[src[off] & UByte.MAX_VALUE];
+        setKeyStrength(AesKeyStrength.values()[(src[off] - 1) & UByte.MAX_VALUE]);
         off += 1;
-        compressionMethod = (short) readUShort(src, off);
+        setMethod(readUShort(src, off));
         // off += 2;
     }
 
     @Override
     void writeTo(byte[] dst, int off) {
-        writeShort(vendorVersion, dst, off);
+        writeShort(getVendorVersion(), dst, off);
         off += 2;
         writeShort(VENDOR_ID, dst, off);
         off += 2;
-        dst[off] = (byte) encryptionStrength.ordinal();
+        dst[off] = (byte) (getKeyStrength().ordinal() + 1);
         off += 1;
-        writeShort(compressionMethod, dst, off);
+        writeShort(getCompressionMethod(), dst, off);
         // off += 2;
     }
 }
