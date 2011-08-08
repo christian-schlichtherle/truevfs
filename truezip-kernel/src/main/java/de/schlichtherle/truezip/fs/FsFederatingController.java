@@ -25,6 +25,7 @@ import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.InputStream;
 import java.io.IOException;
@@ -82,17 +83,18 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
+@DefaultAnnotation(NonNull.class)
 final class FsFederatingController
 extends FsDecoratingController<FsModel, FsController<?>> {
 
-    private volatile FsPath path;
+    private volatile @CheckForNull FsPath path;
 
     /**
      * Constructs a new file system federating controller.
      *
      * @param controller the decorated file system controller.
      */
-    FsFederatingController(final @NonNull FsController<?> controller) {
+    FsFederatingController(final FsController<?> controller) {
         super(controller);
         assert null != getParent();
     }
@@ -358,18 +360,18 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     public OutputSocket<?> getOutputSocket(
             FsEntryName name,
             BitField<FsOutputOption> options,
-            Entry template) {
+            @CheckForNull Entry template) {
         return new Output(name, options, template);
     }
 
     private final class Output extends DecoratingOutputSocket<Entry> {
         final FsEntryName name;
         final BitField<FsOutputOption> options;
-        final Entry template;
+        final @CheckForNull Entry template;
 
         Output( final FsEntryName name,
                 final BitField<FsOutputOption> options,
-                final Entry template) {
+                final @CheckForNull Entry template) {
             super(delegate.getOutputSocket(name, options, template));
             this.name = name;
             this.options = options;
@@ -442,9 +444,9 @@ extends FsDecoratingController<FsModel, FsController<?>> {
 
     @Override
     public void mknod(
-            @NonNull FsEntryName name,
-            @NonNull Type type,
-            @NonNull BitField<FsOutputOption> options,
+            FsEntryName name,
+            Type type,
+            BitField<FsOutputOption> options,
             @CheckForNull Entry template)
     throws IOException {
         try {
