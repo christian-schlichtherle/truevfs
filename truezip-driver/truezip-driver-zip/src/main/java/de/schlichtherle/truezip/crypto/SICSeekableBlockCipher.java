@@ -34,11 +34,11 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
 public class SICSeekableBlockCipher implements SeekableBlockCipher {
 
     private final BlockCipher cipher;
+    private long blockCounter;
     private final int blockSize;
     private final byte[] IV;
-    private final byte[] counterIn;
-    private long blockCounter;
-    private final byte[] counterOut;
+    private final byte[] cipherIn;
+    private final byte[] cipherOut;
 
     /**
      * Constructs a new SIC seekable block cipher mode.
@@ -49,8 +49,8 @@ public class SICSeekableBlockCipher implements SeekableBlockCipher {
         this.cipher = cipher;
         this.blockSize = cipher.getBlockSize();
         this.IV = new byte[blockSize];
-        this.counterIn = new byte[blockSize];
-        this.counterOut = new byte[blockSize];
+        this.cipherIn = new byte[blockSize];
+        this.cipherOut = new byte[blockSize];
     }
 
     /**
@@ -63,10 +63,9 @@ public class SICSeekableBlockCipher implements SeekableBlockCipher {
     }
 
     @Override
-    public void init(boolean forEncryption, CipherParameters params)
-    throws IllegalArgumentException {
-        if (!(params instanceof ParametersWithIV))
-            throw new IllegalArgumentException("SIC mode requires ParametersWithIV");
+    public void init(
+            boolean forEncryption, // not used for CTR mode
+            CipherParameters params) {
         ParametersWithIV ivParams = (ParametersWithIV) params;
         byte[] iv = ivParams.getIV();
         System.arraycopy(iv, 0, IV, 0, IV.length);
@@ -90,16 +89,22 @@ public class SICSeekableBlockCipher implements SeekableBlockCipher {
     @Override
     public int processBlock(
             final byte[] in,
-            final int inOff,
+            int inOff,
             final byte[] out,
-            final int outOff)
+            int outOff)
     throws DataLengthException, IllegalStateException {
         updateCounter();
-        cipher.processBlock(counterIn, 0, counterOut, 0);
+        cipher.processBlock(cipherIn, 0, cipherOut, 0);
 
-        // XOR the counterOut with the plaintext producing the cipher text.
-        for (int i = blockSize; --i >= 0; )
-          out[outOff + i] = (byte) (counterOut[i] ^ in[inOff + i]);
+        // XOR the cipherOut with the plaintext producing the cipher text.
+        final int blockSize = this.blockSize;
+        {
+            int i = blockSize;
+            inOff += i;
+            outOff += i;
+            while (i > 0)
+                out[--outOff] = (byte) (in[--inOff] ^ cipherOut[--i]);
+        }
 
         blockCounter++;
 
@@ -107,17 +112,18 @@ public class SICSeekableBlockCipher implements SeekableBlockCipher {
     }
 
     private void updateCounter() {
-        long block = this.blockCounter;
+        // This is big endian!
+        long blockCounter = this.blockCounter;
         for (int i = blockSize; --i >= 0; ) {
-            block += IV[i] & 0xff;
-            counterIn[i] = (byte) block;
-            block >>>= 8;
+            blockCounter += IV[i] & 0xff;
+            cipherIn[i] = (byte) blockCounter;
+            blockCounter >>>= 8;
         }
     }
 
     @Override
-    public void setBlockCounter(long block) {
-        blockCounter = block;
+    public void setBlockCounter(final long blockCounter) {
+        this.blockCounter = blockCounter;
     }
 
     @Override
@@ -127,10 +133,7 @@ public class SICSeekableBlockCipher implements SeekableBlockCipher {
 
     @Override
     public void reset() {
-        // Effectively the same as setBlockCounter(0).
-        //System.arraycopy(IV, 0, counterIn, 0, blockSize);
         blockCounter = 0;
-
         cipher.reset();
     }
 }
