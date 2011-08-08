@@ -38,10 +38,21 @@ final class WinZipAesExtraField extends ExtraField {
     private static final int VENDOR_ID = 'A' | ('E' << 8);
     private static final AesKeyStrength[] KEY_STRENGTHS = AesKeyStrength.values();
 
-    public static final int AE_1 = 1;
-    public static final int AE_2 = 2;
+    /**
+     * Entries of this type <em>do</em> include the standard ZIP CRC-32
+     * value.
+     * For use with {@link #setVendorVersion(int)}/{@link #getVendorVersion()}.
+     */
+    public static final int VV_AE_1 = 1;
 
-    private short vendorVersion = AE_1;
+    /**
+     * Entries of this type do <em>not</em> include the standard ZIP CRC-32
+     * value.
+     * For use with {@link #setVendorVersion(int)}/{@link #getVendorVersion()}.
+     */
+    public static final int VV_AE_2 = 2;
+
+    private short vendorVersion = VV_AE_1;
     private byte encryptionStrength = encryptionStrength(BITS_128);
     private short method;
 
@@ -69,12 +80,26 @@ final class WinZipAesExtraField extends ExtraField {
         return DATA_SIZE;
     }
 
+    /**
+     * Returns the vendor version.
+     * 
+     * @see #VV_AE_1
+     * @see #VV_AE_2
+     */
     int getVendorVersion() {
         return vendorVersion & UShort.MAX_VALUE;
     }
 
+    /**
+     * Sets the vendor version.
+     * 
+     * @see    #VV_AE_1
+     * @see    #VV_AE_2
+     * @param  vendorVersion the vendor version.
+     * @throws IllegalArgumentException
+     */
     void setVendorVersion(final int vendorVersion) {
-        if (vendorVersion < AE_1 || AE_2 < vendorVersion)
+        if (vendorVersion < VV_AE_1 || VV_AE_2 < vendorVersion)
             throw new IllegalArgumentException("" + vendorVersion);
         this.vendorVersion = (short) vendorVersion;
     }
