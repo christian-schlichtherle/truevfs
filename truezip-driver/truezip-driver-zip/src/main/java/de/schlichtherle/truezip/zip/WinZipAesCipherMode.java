@@ -32,6 +32,8 @@ final class WinZipAesCipherMode extends SICSeekableBlockCipher {
 
     /**
      * Constructs a new block cipher mode for use with WinZip AES.
+     * This constructor uses an {@link AESFastEngine} as the underlying block
+     * cipher.
      */
     WinZipAesCipherMode() {
         super(new AESFastEngine());
