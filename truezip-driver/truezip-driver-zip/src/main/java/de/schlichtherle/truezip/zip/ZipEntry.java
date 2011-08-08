@@ -240,6 +240,7 @@ public class ZipEntry implements Cloneable {
         switch (method) {
             case STORED:
             case DEFLATED:
+            case WINZIP_AES:
                 setInit(METHOD, true);
                 this.method = (short) method;
                 break;
