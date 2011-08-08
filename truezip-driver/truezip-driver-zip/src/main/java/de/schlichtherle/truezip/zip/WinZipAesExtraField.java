@@ -75,7 +75,7 @@ final class WinZipAesExtraField extends ExtraField {
 
     void setVendorVersion(final int vendorVersion) {
         if (vendorVersion < AE_1 || AE_2 < vendorVersion)
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("" + vendorVersion);
         this.vendorVersion = (short) vendorVersion;
     }
 
