@@ -22,10 +22,12 @@ import org.bouncycastle.crypto.modes.SICBlockCipher;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 
 /**
- * Implements Counter (CTR) mode (alias Segmented Integer Counter - SIC).
+ * Implements Counter (CTR) mode (alias Segmented Integer Counter - SIC)
  * on top of a simple block cipher.
  * This code is based on bouncy castle's {@link SICBlockCipher} class,
- * but also allows random access to a block.
+ * but allows random access to a block, too.
+ * Like the {@link SICBlockCipher} class, the counter is updated in big endian
+ * order.
  *
  * @author  The Legion of the Bouncy Castle (majority of the code)
  * @author  Christian Schlichtherle (optimizations and extension to support seeking)
@@ -33,15 +35,15 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
  */
 public class SICSeekableBlockCipher implements SeekableBlockCipher {
 
-    private final BlockCipher cipher;
-    private long blockCounter;
-    private final int blockSize;
-    private final byte[] IV;
-    private final byte[] cipherIn;
-    private final byte[] cipherOut;
+    protected final BlockCipher cipher;
+    protected long blockCounter;
+    protected final int blockSize;
+    protected final byte[] IV;
+    protected final byte[] cipherIn;
+    protected final byte[] cipherOut;
 
     /**
-     * Constructs a new SIC seekable block cipher mode.
+     * Constructs a new big endian SIC seekable block cipher mode.
      *
      * @param cipher The underlying block cipher to use.
      */
@@ -58,32 +60,32 @@ public class SICSeekableBlockCipher implements SeekableBlockCipher {
      *
      * @return The underlying block cipher which we are decorating.
      */
-    public BlockCipher getUnderlyingCipher() {
-        return cipher;
+    public final BlockCipher getUnderlyingCipher() {
+        return this.cipher;
     }
 
     @Override
-    public void init(
+    public final void init(
             boolean forEncryption, // not used for CTR mode
             CipherParameters params) {
         ParametersWithIV ivParams = (ParametersWithIV) params;
         byte[] iv = ivParams.getIV();
         System.arraycopy(iv, 0, IV, 0, IV.length);
         reset();
-        cipher.init(true, ivParams.getParameters());
+        this.cipher.init(true, ivParams.getParameters());
     }
 
     @Override
-    public String getAlgorithmName() {
+    public final String getAlgorithmName() {
         // Must add "/SIC" in order to make decorating BufferedBlockCipher work
         // correctly.
-        return cipher.getAlgorithmName() + "/SIC";
+        return this.cipher.getAlgorithmName() + "/SIC";
     }
 
     @Override
-    public int getBlockSize() {
-        assert blockSize == cipher.getBlockSize();
-        return blockSize;
+    public final int getBlockSize() {
+        assert this.blockSize == this.cipher.getBlockSize();
+        return this.blockSize;
     }
 
     @Override
@@ -94,7 +96,7 @@ public class SICSeekableBlockCipher implements SeekableBlockCipher {
             int outOff)
     throws DataLengthException, IllegalStateException {
         updateCounter();
-        cipher.processBlock(cipherIn, 0, cipherOut, 0);
+        this.cipher.processBlock(this.cipherIn, 0, this.cipherOut, 0);
 
         // XOR the cipherOut with the plaintext producing the cipher text.
         final int blockSize = this.blockSize;
@@ -103,37 +105,35 @@ public class SICSeekableBlockCipher implements SeekableBlockCipher {
             inOff += i;
             outOff += i;
             while (i > 0)
-                out[--outOff] = (byte) (in[--inOff] ^ cipherOut[--i]);
+                out[--outOff] = (byte) (in[--inOff] ^ this.cipherOut[--i]);
         }
-
-        blockCounter++;
 
         return blockSize;
     }
 
     private void updateCounter() {
-        // This is big endian!
-        long blockCounter = this.blockCounter;
-        for (int i = blockSize; --i >= 0; ) {
+        final int blockSize = this.blockSize;
+        long blockCounter = this.blockCounter++;
+        for (int i = blockSize; --i >= 0; ) { // big endian order!
             blockCounter += IV[i] & 0xff;
-            cipherIn[i] = (byte) blockCounter;
+            this.cipherIn[i] = (byte) blockCounter;
             blockCounter >>>= 8;
         }
     }
 
     @Override
-    public void setBlockCounter(final long blockCounter) {
+    public final void setBlockCounter(final long blockCounter) {
         this.blockCounter = blockCounter;
     }
 
     @Override
-    public long getBlockCounter() {
-        return blockCounter;
+    public final long getBlockCounter() {
+        return this.blockCounter;
     }
 
     @Override
     public void reset() {
-        blockCounter = 0;
-        cipher.reset();
+        this.blockCounter = 0;
+        this.cipher.reset();
     }
 }
