@@ -56,7 +56,7 @@ public class WriteKeyPanel extends KeyPanel {
             resources = ResourceBundle.getBundle(CLASS_NAME);
 
     /** The minimum acceptable length of a password. */
-    private static final int MIN_PASSWD_LEN = 6;
+    private static final int MIN_PASSWD_LEN = 8;
 
     private final Color defaultForeground;
 
@@ -201,7 +201,7 @@ public class WriteKeyPanel extends KeyPanel {
      */
     protected void checkPasswdKey(char[] key)
     throws WeakKeyException {
-        if (key.length < MIN_PASSWD_LEN)
+        if (MIN_PASSWD_LEN > key.length)
             throw new WeakKeyException(localizedMessage(
                     resources, "passwd.tooShort", MIN_PASSWD_LEN));
     }
