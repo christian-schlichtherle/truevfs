@@ -34,6 +34,7 @@ import org.bouncycastle.crypto.io.MacOutputStream;
 import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
+import static de.schlichtherle.truezip.zip.WinZipAesExtraField.*;
 
 /**
  * Encrypts ZIP entry contents according the WinZip AES specification.
@@ -68,7 +69,7 @@ final class WinZipAesEntryOutputStream extends CipherOutputStream {
     /** The Message Authentication Code (MAC). */
     private Mac mac;
 
-    private boolean updatedCompressedSize;
+    private boolean modifiedEntry;
 
     /**
      * The low level data output stream.
@@ -85,22 +86,32 @@ final class WinZipAesEntryOutputStream extends CipherOutputStream {
         assert null != param;
         this.param = param;
 
-        updateCompressedSize();
+        modifyEntry();
     }
 
-    private void updateCompressedSize() throws ZipKeyException {
-        if (this.updatedCompressedSize)
+    /**
+     * Modify the compressed size and the CRC-32 of the entry if required.
+     */
+    private void modifyEntry() throws ZipKeyException {
+        if (this.modifiedEntry)
             return;
         final WinZipAesEntryParameters param = this.param;
         final ZipEntry entry = param.getEntry();
-        long size = entry.getCompressedSize();
-        if (UNKNOWN == size)
+        long csize = entry.getCompressedSize();
+        if (UNKNOWN == csize) {
+            assert UNKNOWN == entry.getCrc();
             return;
-        this.updatedCompressedSize = true;
-        size += param.getKeyStrength().getBytes() / 2 // salt value
+        }
+        assert UNKNOWN != entry.getCrc();
+        this.modifiedEntry = true;
+        csize += param.getKeyStrength().getBytes() / 2 // salt value
                 + 2   // password verification value
                 + 10; // authentication code
-        entry.setCompressedSize64(size);
+        entry.setCompressedSize64(csize);
+        final WinZipAesExtraField
+                ef = (WinZipAesExtraField) entry.getExtraField(WINZIP_AES_ID);
+        if (VV_AE_2 == ef.getVendorVersion())
+            entry.setCrc32(0);
     }
 
     void start() throws IOException {
@@ -194,6 +205,6 @@ final class WinZipAesEntryOutputStream extends CipherOutputStream {
         assert bufLength == buf.length;
         dos.write(buf, 0, bufLength / 2);
 
-        updateCompressedSize();
+        modifyEntry();
     }
 }
