@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
@@ -23,6 +22,12 @@ import net.jcip.annotations.ThreadSafe;
 
 /**
  * Indicates that a file system is a false positive file system.
+ * This exception type is solely used within the TrueZIP Kernel in order to
+ * reroute file system operations to the parent file system of a false positive
+ * federated file system, i.e. a false positive archive file.
+ * An exception of this type should <em>never</em> escape from the TrueZIP
+ * Kernel and is <em>always</em> associated with another {@link IOException}
+ * as its {@link #getCause()}.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -32,8 +37,22 @@ import net.jcip.annotations.ThreadSafe;
 @DefaultAnnotation(NonNull.class)
 public class FsFalsePositiveException extends FsException {
 
-    public FsFalsePositiveException(FsModel model, @CheckForNull IOException cause) {
+    public FsFalsePositiveException(FsModel model, IOException cause) {
         super(model, cause);
+        assert null != cause;
         assert !(cause instanceof FsException);
+    }
+
+    @Override
+    public @NonNull IOException getCause() {
+        return (IOException) super.getCause();
+    }
+
+    @Override
+    public final FsFalsePositiveException initCause(Throwable cause) {
+        assert null != super.getCause();
+        assert super.getCause() instanceof IOException;
+        super.initCause(cause);
+        throw new AssertionError("The preceeding statement should have thrown an IllegalStateException");
     }
 }
