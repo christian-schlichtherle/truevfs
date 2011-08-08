@@ -30,11 +30,11 @@ public interface SeekableBlockCipher extends BlockCipher {
      * Sets the counter so that the block with the given index, starting
      * at 0, can be processed next.
      *
-     * @param block The index of the block, starting at 0, which will be
+     * @param blockCounter The index of the block, starting at 0, which will be
      *        processed next when
      *        {@link #processBlock(byte[], int, byte[], int)} is called.
      */
-    void setBlockCounter(long block);
+    void setBlockCounter(long blockCounter);
 
     /**
      * Returns the index of the block, starting at 0, which will be processed
