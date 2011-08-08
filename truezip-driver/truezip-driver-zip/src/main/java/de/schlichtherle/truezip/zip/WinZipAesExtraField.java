@@ -43,14 +43,14 @@ final class WinZipAesExtraField extends ExtraField {
      * value.
      * For use with {@link #setVendorVersion(int)}/{@link #getVendorVersion()}.
      */
-    public static final int VV_AE_1 = 1;
+    static final int VV_AE_1 = 1;
 
     /**
      * Entries of this type do <em>not</em> include the standard ZIP CRC-32
      * value.
      * For use with {@link #setVendorVersion(int)}/{@link #getVendorVersion()}.
      */
-    public static final int VV_AE_2 = 2;
+    static final int VV_AE_2 = 2;
 
     private short vendorVersion = VV_AE_1;
     private byte encryptionStrength = encryptionStrength(BITS_128);
