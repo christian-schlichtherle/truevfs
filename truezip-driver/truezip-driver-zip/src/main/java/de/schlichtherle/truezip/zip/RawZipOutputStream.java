@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.zip;
 
+import de.schlichtherle.truezip.crypto.param.AesKeyStrength;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.LEDataOutputStream;
 import de.schlichtherle.truezip.util.JSE7;
@@ -292,10 +293,9 @@ implements Iterable<E> {
      * @see ZipEntry#setMethod
      */
     public void setMethod(final int method) {
-	if (STORED != method && DEFLATED != method)
-	    throw new IllegalArgumentException(
-                    "Invalid compression method " + method);
-        this.method = (short) method;
+        final ZipEntry test = new ZipEntry("");
+        test.setMethod(method);
+        this.method = (short) test.getMethod();
     }
 
     /**
@@ -387,9 +387,14 @@ implements Iterable<E> {
         entries.put(entry.getName(), entry);
     }
 
+    /**
+     * Returns a new output method for the given entry.
+     * Except the property &quot;method&quot;, this method must not modify the
+     * given entry.
+     */
     @SuppressWarnings("unchecked")
     private OutputMethod newOutputMethod(
-            final E entry,
+            final ZipEntry entry,
             final boolean process)
     throws ZipException {
         // Order is important here!
@@ -399,11 +404,12 @@ implements Iterable<E> {
             return processor;
         }
         if (entry.isEncrypted())
-            processor = newEncryptedOutputMethod((RawOutputMethod) processor,
+            processor = newEncryptedOutputMethod(
+                    (RawOutputMethod) processor,
                     getCryptoParameters());
         int method = entry.getMethod();
         if (UNKNOWN == method)
-            entry.setMethod(method = getMethod());
+            entry.setMethod16(method = getMethod());
         switch (method) {
             case STORED:
                 processor = new StoredOutputMethod(processor);
@@ -518,7 +524,7 @@ implements Iterable<E> {
         closeEntry();
         final LEDataOutputStream dos = this.dos;
         this.cdOffset = dos.size();
-        for (E entry : this.entries.values())
+        for (ZipEntry entry : this.entries.values())
             writeCentralFileHeader(entry);
         writeEndOfCentralDirectory();
     }
@@ -528,7 +534,8 @@ implements Iterable<E> {
      *
      * @throws IOException On any I/O error.
      */
-    private void writeCentralFileHeader(final E entry) throws IOException {
+    private void writeCentralFileHeader(final ZipEntry entry)
+    throws IOException {
         assert null != entry;
         final LEDataOutputStream dos = this.dos;
         final long csize32 = entry.getCompressedSize32();
@@ -540,16 +547,23 @@ implements Iterable<E> {
                 || size32   >= UInt.MAX_VALUE
                 || offset32 >= UInt.MAX_VALUE
                 || FORCE_ZIP64_EXT;
+        final int method = entry.getMethod();
+        final boolean directory = entry.isDirectory();
+        final int version = zip64
+                ? 45
+                : DEFLATED == method || directory
+                    ? 20
+                    : 10;
         // Central File Header.
         dos.writeInt(CFH_SIG);
         // Version Made By.
         dos.writeShort((entry.getPlatform() << 8) | 63);
         // Version Needed To Extract.
-        dos.writeShort(zip64 ? 45 : dd ? 20 : 10);
+        dos.writeShort(version);
         // General Purpose Bit Flags.
         dos.writeShort(entry.getGeneral16());
         // Compression Method.
-        dos.writeShort(entry.getMethod());
+        dos.writeShort(method);
         // Last Mod. File Time / Date.
         dos.writeInt((int) entry.getTimeDos());
         // CRC-32.
@@ -573,7 +587,7 @@ implements Iterable<E> {
         // Internal File Attributes.
         dos.writeShort(0);
         // External File Attributes.
-        dos.writeInt(entry.isDirectory() ? 0x10 : 0); // fixed issue #27.
+        dos.writeInt(directory ? 0x10 : 0); // fixed issue #27.
         // Relative Offset Of Local File Header.
         dos.writeInt((int) offset32);
         // File Name.
@@ -737,7 +751,7 @@ implements Iterable<E> {
         @Override
         public void start() throws IOException {
             final LEDataOutputStream dos = RawZipOutputStream.this.dos;
-            final E entry = RawZipOutputStream.this.entry;
+            final ZipEntry entry = RawZipOutputStream.this.entry;
             final long crc = entry.getCrc();
             final long csize = entry.getCompressedSize();
             final long size = entry.getSize();
@@ -754,6 +768,13 @@ implements Iterable<E> {
                     || UInt.MAX_VALUE <= size
                     || UInt.MAX_VALUE <= offset
                     || FORCE_ZIP64_EXT;
+            final int method = entry.getMethod();
+            final boolean directory = entry.isDirectory();
+            final int version = zip64
+                    ? 45
+                    : DEFLATED == method || directory
+                        ? 20
+                        : 10;
             // Compose General Purpose Bit Flag.
             // See appendix D of PKWARE's ZIP File Format Specification.
             final boolean utf8 = UTF8.equals(charset);
@@ -765,7 +786,7 @@ implements Iterable<E> {
             // Local File Header Signature.
             dos.writeInt(LFH_SIG);
             // Version Needed To Extract.
-            dos.writeShort(zip64 ? 45 : dd ? 20 : 10);
+            dos.writeShort(version);
             // General Purpose Bit Flag.
             dos.writeShort(general);
             // Compression Method.
@@ -797,6 +818,7 @@ implements Iterable<E> {
             // Commit changes.
             entry.setGeneral16(general);
             entry.setOffset64(offset);
+            // Update data start.
             RawZipOutputStream.this.dataStart = dos.size();
         }
 
@@ -806,11 +828,20 @@ implements Iterable<E> {
         @Override
         public void finish() throws IOException {
             final LEDataOutputStream dos = RawZipOutputStream.this.dos;
-            final E entry = RawZipOutputStream.this.entry;
+            final long csize = RawZipOutputStream.this.dos.size()
+                    - RawZipOutputStream.this.dataStart;
+            final ZipEntry entry = RawZipOutputStream.this.entry;
+            if (entry.getCompressedSize() != csize) {
+                throw new ZipException(entry.getName()
+                + " (bad compressed entry size "
+                + entry.getCompressedSize()
+                + ", expected "
+                + csize
+                + ")");
+            }
             if (!entry.getGeneral1(GPBF_DATA_DESCRIPTOR))
                 return;
             final long crc = entry.getCrc();
-            final long csize = entry.getCompressedSize();
             final long size = entry.getSize();
             final long offset = entry.getOffset();
             // Offset MUST be considered in decision about ZIP64 format - see
@@ -914,7 +945,8 @@ implements Iterable<E> {
 
         WinZipAesOutputMethod(
                 RawOutputMethod processor,
-                final WinZipAesParameters param) {
+                final WinZipAesParameters param)
+        throws ZipKeyException {
             super(processor);
             assert null != param;
             this.param = param;
@@ -923,17 +955,17 @@ implements Iterable<E> {
         @Override
         public OutputStream init(final ZipEntry entry) throws IOException {
             assert null == this.out;
-            // Order is important here!
-            final LEDataOutputStream out = delegate.init(entry);
+            // Order is critical here!
             final WinZipAesEntryParameters
                     param = new WinZipAesEntryParameters(this.param, entry);
-            this.out = new WinZipAesEntryOutputStream(out, param);
+            final AesKeyStrength keyStrength = param.getKeyStrength();
+            final LEDataOutputStream dos = delegate.init(entry);
             final WinZipAesExtraField ef = new WinZipAesExtraField();
-            ef.setKeyStrength(param.getKeyStrength());
+            ef.setKeyStrength(keyStrength);
             ef.setMethod(entry.getMethod());
-            entry.addExtraField(ef);
             entry.setMethod16(WINZIP_AES);
-            return this.out;
+            entry.addExtraField(ef);
+            return this.out = new WinZipAesEntryOutputStream(dos, param);
         }
 
         @Override
@@ -993,23 +1025,13 @@ implements Iterable<E> {
 
         void finish() throws ZipException {
             final E entry = RawZipOutputStream.this.entry;
-            final long expectedCrc = getChecksum().getValue();
-            if (expectedCrc != entry.getCrc()) {
+            final long crc = getChecksum().getValue();
+            if (entry.getCrc() != crc) {
                 throw new ZipException(entry.getName()
                 + " (bad CRC-32 0x"
                 + Long.toHexString(entry.getCrc())
                 + ", expected 0x"
-                + Long.toHexString(expectedCrc)
-                + ")");
-            }
-            final long written = RawZipOutputStream.this.dos.size();
-            final long entrySize = written - RawZipOutputStream.this.dataStart;
-            if (entry.getSize() != entrySize) {
-                throw new ZipException(entry.getName()
-                + " (bad uncompressed size "
-                + entry.getSize()
-                + ", expected "
-                + entrySize
+                + Long.toHexString(crc)
                 + ")");
             }
         }
