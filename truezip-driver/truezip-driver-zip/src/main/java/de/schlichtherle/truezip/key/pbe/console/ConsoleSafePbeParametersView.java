@@ -53,7 +53,7 @@ extends SafePbeParametersView<P> {
     private static final PromptingLock lock = new PromptingLock();
 
     /** The minimum acceptable length of a password. */
-    private static final int MIN_PASSWD_LEN = 6;
+    private static final int MIN_PASSWD_LEN = 8;
 
     /**
      * The last resource ID used when prompting.
@@ -87,6 +87,10 @@ extends SafePbeParametersView<P> {
                         resources.getString("writeKey.newPasswd1"));
                 if (null == input1 || 0 >= input1.length)
                     return;
+                if (MIN_PASSWD_LEN > input1.length) {
+                    con.printf(resources.getString("writeKey.passwd.tooShort"), MIN_PASSWD_LEN);
+                    continue;
+                }
                 try {
                     char[] input2 = con.readPassword(
                             resources.getString("writeKey.newPasswd2"));
@@ -95,10 +99,6 @@ extends SafePbeParametersView<P> {
                     try {
                         if (!Arrays.equals(input1, input2)) {
                             con.printf(resources.getString("writeKey.passwd.noMatch"));
-                            continue;
-                        }
-                        if (input1.length < MIN_PASSWD_LEN) {
-                            con.printf(resources.getString("writeKey.passwd.tooShort"));
                             continue;
                         }
                         param.setPassword(input1);
@@ -129,20 +129,20 @@ extends SafePbeParametersView<P> {
                 selection = builder.toString();
             }
 
-            prompting: while (true) {
+            while (true) {
                 String input = con.readLine(
                         resources.getString("keyStrength.prompt"),
                         selection,
                         param.getKeyStrength().getBits());
                 if (null == input || input.length() <= 0)
-                    return;
+                    break;
                 try {
                     final int bits = Integer.parseInt(input);
                     final S strength = map.get(bits);
                     if (null != strength) {
                         assert strength.getBits() == bits;
                         param.setKeyStrength(strength);
-                        break prompting;
+                        break;
                     }
                 } catch (NumberFormatException ex) {
                 }

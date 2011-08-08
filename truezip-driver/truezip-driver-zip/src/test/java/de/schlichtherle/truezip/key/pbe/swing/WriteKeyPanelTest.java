@@ -49,14 +49,14 @@ public final class WriteKeyPanelTest extends KeyPanelTestSuite<WriteKeyPanel> {
         assertFalse(isBlank(error.getText()));
 
         // Enter mismatching passwords.
-        new JPasswordFieldOperator(frame, 0).setText("foofoo");
-        new JPasswordFieldOperator(frame, 1).setText("barbar");
+        new JPasswordFieldOperator(frame, 0).setText("foofoofoo");
+        new JPasswordFieldOperator(frame, 1).setText("barbarbar");
         assertFalse(panel.updateParam(param));
         assertNull(param.getPassword());
         assertFalse(isBlank(error.getText()));
 
         // Enter matching passwords, too short.
-        String passwd = "secre"; // 5 chars is too short
+        String passwd = "secret7"; // 7 chars is too short
         new JPasswordFieldOperator(frame, 0).setText(passwd);
         new JPasswordFieldOperator(frame, 1).setText(passwd);
         assertFalse(panel.updateParam(param));
@@ -64,7 +64,7 @@ public final class WriteKeyPanelTest extends KeyPanelTestSuite<WriteKeyPanel> {
         assertFalse(isBlank(error.getText()));
 
         // Enter matching passwords, long enough.
-        passwd = "secret"; // min 6 chars is OK
+        passwd = "secret78"; // min 8 chars is OK
         new JPasswordFieldOperator(frame, 0).setText(passwd);
         new JPasswordFieldOperator(frame, 1).setText(passwd);
         assertTrue(panel.updateParam(param));
