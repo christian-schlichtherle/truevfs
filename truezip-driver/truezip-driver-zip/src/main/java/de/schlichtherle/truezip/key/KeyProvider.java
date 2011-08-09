@@ -121,8 +121,8 @@ public interface KeyProvider<K> {
      * As a rule of thumb, at least three seconds should pass between two
      * consecutive calls to this method by the same thread.
      *
-     * @param  invalid {@code true} iff a previous call to this method resulted
-     *         in an invalid key.
+     * @param  invalid {@code true} iff a previous call to this method returned
+     *         an invalid key.
      * @return the secret key for reading a protected resource.
      *         Unless {@code invalid} is {@code true}, subsequent calls to this
      *         method return a secret key which at least compares
