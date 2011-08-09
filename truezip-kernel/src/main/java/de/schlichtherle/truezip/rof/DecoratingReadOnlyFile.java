@@ -19,6 +19,7 @@ import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * An abstract decorator for a read only file.
@@ -32,13 +33,13 @@ import java.io.IOException;
  * <pre>
  *     ReadOnlyFile rof = new DefaultReadOnlyFile(new File("HelloWorld.java"));
  *     try {
- *         ReadOnlyFile frof = new FilteredReadOnlyFile(rof);
+ *         ReadOnlyFile drof = new DecoratingReadOnlyFile(rof);
  *         try {
- *             // Do any file input on brof here...
- *             frof.seek(1);
+ *             // Do any file input on frof here...
+ *             drof.seek(1);
  *         } finally {
  *             // Synchronize the file pointers.
- *             rof.seek(frof.getFilePointer());
+ *             rof.seek(drof.getFilePointer());
  *         }
  *         // This assertion would fail if we hadn't done the file pointer
  *         // synchronization!
@@ -53,15 +54,16 @@ import java.io.IOException;
  * referring to this classes Javadoc like this:
  * <blockquote>
  * <b>Note:</b> This class implements its own virtual file pointer.
- * Thus, if you would like to access the underlying {@code ReadOnlyFile}
+ * Thus, if you would like to access the decorated {@code ReadOnlyFile}
  * again after you have finished working with an instance of this class,
- * you should synchronize their file pointers using the pattern as described
- * in the Javadoc for the class {@link DecoratingReadOnlyFile}.
+ * you should synchronize their file pointers using the pattern described
+ * in {@link DecoratingReadOnlyFile}.
  * </blockquote>
  *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 @DefaultAnnotation(NonNull.class)
 public abstract class DecoratingReadOnlyFile extends AbstractReadOnlyFile {
 

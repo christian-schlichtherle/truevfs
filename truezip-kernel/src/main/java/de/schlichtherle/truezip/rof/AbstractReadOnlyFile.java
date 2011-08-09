@@ -15,17 +15,20 @@
  */
 package de.schlichtherle.truezip.rof;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.EOFException;
 import java.io.IOException;
-import net.jcip.annotations.ThreadSafe;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * An abstract read only file which implements the common boilerplate.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-@ThreadSafe
+@NotThreadSafe
+@DefaultAnnotation(NonNull.class)
 public abstract class AbstractReadOnlyFile implements ReadOnlyFile {
 
     @Override
@@ -39,7 +42,7 @@ public abstract class AbstractReadOnlyFile implements ReadOnlyFile {
     }
 
     @Override
-    public final void readFully(final byte[] buf, final int off, final int len)
+    public void readFully(final byte[] buf, final int off, final int len)
     throws IOException {
         int total = 0, read;
         do {
