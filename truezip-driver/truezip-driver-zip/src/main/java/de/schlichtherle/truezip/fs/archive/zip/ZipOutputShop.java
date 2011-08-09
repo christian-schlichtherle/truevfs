@@ -38,6 +38,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.zip.CRC32;
@@ -106,9 +107,18 @@ implements OutputShop<ZipArchiveEntry> {
         return driver.getPool();
     }
 
+    public FsModel getModel() {
+        return model;
+    }
+
+    @Override
+    public Charset getRawCharset() {
+        return super.getRawCharset();
+    }
+
     @Override
     protected ZipCryptoParameters getCryptoParameters() {
-        return driver.zipCryptoParameters(model);
+        return driver.zipCryptoParameters(this);
     }
 
     @Override

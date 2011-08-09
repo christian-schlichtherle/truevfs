@@ -220,6 +220,7 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
      * 
      * @return The crypto parameters.
      */
+    @Override
     public synchronized @Nullable ZipCryptoParameters getCryptoParameters() {
         return cryptoParameters;
     }

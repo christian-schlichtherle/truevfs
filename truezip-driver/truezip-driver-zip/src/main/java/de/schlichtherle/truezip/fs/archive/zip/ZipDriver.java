@@ -121,18 +121,16 @@ implements ZipEntryFactory<ZipArchiveEntry> {
     }
 
     /**
-     * Returns the {@link ZipCryptoParameters} for the given file system model.
+     * Returns the {@link ZipCryptoParameters} for the given ZIP output shop.
      * <p>
      * The implementation in the class {@link ZipDriver} returns
-     * {@code new KeyManagerZipCryptoParameters(getKeyManagerProvider(), mountPointUri(model))}.
+     * {@code new KeyManagerZipCryptoParameters(output, this)}.
      * 
-     * @param  model the file system model.
-     * @return The {@link ZipCryptoParameters} for the given file system model.
+     * @param  output the ZIP output shop.
+     * @return The {@link ZipCryptoParameters} for the given ZIP output shop.
      */
-    protected ZipCryptoParameters zipCryptoParameters(FsModel model) {
-        return new KeyManagerZipCryptoParameters(
-                getKeyManagerProvider(),
-                mountPointUri(model));
+    protected ZipCryptoParameters zipCryptoParameters(ZipOutputShop output) {
+        return new KeyManagerZipCryptoParameters(output, this);
     }
 
     /**

@@ -15,20 +15,23 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
+import java.nio.charset.Charset;
+import de.schlichtherle.truezip.crypto.param.AesKeyStrength;
 import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.key.KeyManagerProvider;
 import de.schlichtherle.truezip.key.KeyProvider;
 import de.schlichtherle.truezip.key.UnknownKeyException;
+import de.schlichtherle.truezip.key.pbe.AesPbeParameters;
 import de.schlichtherle.truezip.zip.WinZipAesParameters;
 import de.schlichtherle.truezip.zip.ZipCryptoParameters;
 import de.schlichtherle.truezip.zip.ZipCryptoParametersProvider;
 import de.schlichtherle.truezip.zip.ZipKeyException;
-import de.schlichtherle.truezip.crypto.param.AesKeyStrength;
-import de.schlichtherle.truezip.key.pbe.AesPbeParameters;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URI;
 import net.jcip.annotations.ThreadSafe;
+import org.bouncycastle.crypto.PBEParametersGenerator;
+import static org.bouncycastle.crypto.PBEParametersGenerator.*;
 
 /**
  * An adapter which provides {@link ZipCryptoParameters} by using a
@@ -44,25 +47,30 @@ import net.jcip.annotations.ThreadSafe;
 public class KeyManagerZipCryptoParameters
 implements ZipCryptoParametersProvider {
 
-    private final KeyManagerProvider provider;
-    private final URI zip;
+    protected final KeyManagerProvider provider;
+
+    /** The resource URI of the ZIP file. */
+    protected final URI zip;
 
     /**
-     * Constructs ZIP crypto parameters using the given key manager provider.
+     * The character set used for encoding entry names and the file comment
+     * in the ZIP file.
+     */
+    protected final Charset charset;
+
+    /**
+     * Constructs ZIP crypto parameters for the given ZIP output shop and ZIP
+     * driver.
      *
-     * @param  provider the key manager provider.
-     * @param  zip the absolute URI of the ZIP file.
-     * @throws IllegalArgumentException if {@code zip} is not an absolute URI.
+     * @param  output the ZIP output shop.
+     * @param  driver the ZIP driver.
      */
     public KeyManagerZipCryptoParameters(
-            final KeyManagerProvider provider,
-            final URI zip) {
-        if (null == provider)
-            throw new NullPointerException();
-        if (!zip.isAbsolute())
-            throw new IllegalArgumentException();
-        this.provider = provider;
-        this.zip = zip;
+            final ZipOutputShop output,
+            final ZipDriver driver) {
+        this.provider = driver.getKeyManagerProvider();
+        this.zip = driver.mountPointUri(output.getModel());
+        this.charset = output.getRawCharset();
     }
 
     /**
@@ -84,20 +92,51 @@ implements ZipCryptoParametersProvider {
     }
 
     /**
-     * Returns the URI for looking up a {@link KeyProvider} for
-     * {@link AesPbeParameters} by using a {@link KeyManager}.
+     * A template method to return the URI for looking up a
+     * {@link KeyProvider} for {@link AesPbeParameters} by using a
+     * {@link KeyManager}.
      * <p>
      * The implementation in the class {@code KeyManagerZipCryptoParameters}
-     * simply returns the {@code zip} parameter in order to lookup the same
-     * key provider for all entries in a ZIP file.
+     * ignores the given entry name and just returns the value of the field
+     * {@link #zip} in order to lookup the same key provider for all entries in
+     * a ZIP file.
      * 
-     * @param  zip the absolute URI of the ZIP file.
-     * @param  name the ZIP entry name.
+     * @param  name the entry name.
      * @return The URI for looking up a {@link KeyProvider} for
      *         {@link AesPbeParameters} by using a {@link KeyManager}.
      */
-    protected URI resourceUri(URI zip, String name) {
+    protected URI resourceUri(String name) {
         return zip;
+    }
+
+    /**
+     * A template method to derive password bytes from the given password
+     * characters and the given entry name.
+     * Typically, only the given password characters should get encoded to
+     * form the result.
+     * Optionally, the given entry name can be mixed into the result for
+     * authentication.
+     * Note that this would then form a part of the password used for writing
+     * or reading encrypted entries, however.
+     * A third party which is expected to successfully read or write encrypted
+     * entries would have to agree on the same password bytes derivation scheme.
+     * <p>
+     * The implementation in the class {@code KeyManagerZipCryptoParameters}
+     * ignores the given entry name and just encodes the given password
+     * characters using
+     * {@link PBEParametersGenerator#PKCS5PasswordToBytes(char[])}.
+     * <p>
+     * A reasonable alternative implementation could encode the given password
+     * characters using the value of the field {@link #charset}, which is the
+     * character set actually used to encode entry names and comments in the
+     * ZIP file, e.g. UTF-8 or CP437.
+     * 
+     * @param  characters the password characters to encode.
+     * @param  name the entry name for optional mixing into the result.
+     * @return The derived password bytes.
+     */
+    protected byte[] password(char[] characters, String name) {
+        return PKCS5PasswordToBytes(characters);
     }
 
     /**
@@ -109,24 +148,24 @@ implements ZipCryptoParametersProvider {
                 manager = provider.get(AesPbeParameters.class);
 
         @Override
-        public char[] getWritePassword(final String name)
+        public byte[] getWritePassword(final String name)
         throws ZipKeyException {
             final KeyProvider<AesPbeParameters>
-                    provider = manager.getKeyProvider(resourceUri(zip, name));
+                    provider = manager.getKeyProvider(resourceUri(name));
             try {
-                return provider.getWriteKey().getPassword();
+                return password(provider.getWriteKey().getPassword(), name);
             } catch (UnknownKeyException ex) {
                 throw new ZipKeyException(ex);
             }
         }
 
         @Override
-        public char[] getReadPassword(final String name, final boolean invalid)
+        public byte[] getReadPassword(final String name, final boolean invalid)
         throws ZipKeyException {
             final KeyProvider<AesPbeParameters>
-                    provider = manager.getKeyProvider(resourceUri(zip, name));
+                    provider = manager.getKeyProvider(resourceUri(name));
             try {
-                return provider.getReadKey(invalid).getPassword();
+                return password(provider.getReadKey(invalid).getPassword(), name);
             } catch (UnknownKeyException ex) {
                 throw new ZipKeyException(ex);
             }
@@ -136,7 +175,7 @@ implements ZipCryptoParametersProvider {
         public AesKeyStrength getKeyStrength(final String name)
         throws ZipKeyException {
             final KeyProvider<AesPbeParameters>
-                    provider = manager.getKeyProvider(resourceUri(zip, name));
+                    provider = manager.getKeyProvider(resourceUri(name));
             try {
                 return provider.getWriteKey().getKeyStrength();
             } catch (UnknownKeyException ex) {
@@ -149,7 +188,7 @@ implements ZipCryptoParametersProvider {
                                     final AesKeyStrength keyStrength)
         throws ZipKeyException {
             final KeyProvider<AesPbeParameters>
-                    provider = manager.getKeyProvider(resourceUri(zip, name));
+                    provider = manager.getKeyProvider(resourceUri(name));
             final AesPbeParameters param;
             try {
                 param = provider.getReadKey(false);

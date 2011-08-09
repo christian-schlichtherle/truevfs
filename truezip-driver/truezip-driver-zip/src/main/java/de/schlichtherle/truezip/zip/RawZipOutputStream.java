@@ -156,8 +156,8 @@ implements Iterable<E> {
         super(newLEDataOutputStream(out, appendee));
         this.dos = (LEDataOutputStream) this.delegate;
         if (null != appendee) {
-            this.charset = appendee.getFileCharset();
-            this.comment = appendee.getFileComment();
+            this.charset = appendee.getRawCharset();
+            this.comment = appendee.getRawComment();
             final Map<String, E> entries = this.entries;
             for (E entry : appendee)
                 entries.put(entry.getName(), entry);
@@ -188,7 +188,18 @@ implements Iterable<E> {
         return new String(bytes, charset);
     }
 
-    /** Returns the charset to use for entry names and the file comment. */
+    /**
+     * Returns the character set which is used for
+     * encoding entry names and the file comment.
+     */
+    public Charset getRawCharset() {
+        return charset;
+    }
+
+    /**
+     * Returns the name of the character set which is used for
+     * encoding entry names and the file comment.
+     */
     public String getCharset() {
         return charset.name();
     }
@@ -259,7 +270,6 @@ implements Iterable<E> {
      */
     public void setComment(final @CheckForNull String comment) {
         if (null != comment && !comment.isEmpty()) {
-            //final byte[] bytes = comment.getBytes(charset);
             final byte[] bytes = encode(comment);
             UShort.check(bytes.length);
             this.comment = bytes;
@@ -668,12 +678,12 @@ implements Iterable<E> {
         dos.writeInt((int) cdSize32);
         dos.writeInt((int) cdOffset32);
         // ZIP file comment.
-        final byte[] comment = getFileComment();
+        final byte[] comment = getRawComment();
         dos.writeShort(comment.length);
         dos.write(comment);
     }
 
-    private byte[] getFileComment() {
+    private byte[] getRawComment() {
         final byte[] comment = this.comment;
         return null != comment ? comment : EMPTY;
     }
