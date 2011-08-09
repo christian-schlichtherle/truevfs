@@ -13,12 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.crypto;
 
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
@@ -284,11 +282,11 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
             return -1;
 
         // Check parameters.
-        if (buf == null)
-            throw new NullPointerException("buf");
-        final int offPlusLen = off + len;
-        if ((off | len | offPlusLen | buf.length - offPlusLen) < 0)
-	    throw new IndexOutOfBoundsException();
+        {
+            final int offPlusLen = off + len;
+            if ((off | len | offPlusLen | buf.length - offPlusLen) < 0)
+                throw new IndexOutOfBoundsException();
+        }
 
         // Setup.
         final int blockLen = block.length;
@@ -345,10 +343,9 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
      */
     @Override
     public void close() throws IOException {
+        // Order is important here!
         if (closed)
             return;
-
-        // Order is important here!
         closed = true;
         cipher = null;
         delegate.close();
