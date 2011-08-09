@@ -49,8 +49,8 @@ public interface Type0RaesParameters extends RaesParameters {
      * This method is called consecutively until either the returned password
      * is successfully validated or an exception is thrown.
      *
-     * @param  invalid {@code true} iff a previous call to this method resulted
-     *         in an invalid password.
+     * @param  invalid {@code true} iff a previous call to this method returned
+     *         an invalid password.
      * @return A clone of the char array holding the password to use
      *         for reading a RAES type 0 file.
      * @throws RaesKeyException If key retrieval has failed for some reason.
