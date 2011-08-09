@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.rof;
 
 import de.schlichtherle.truezip.util.ArrayHelper;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -37,6 +38,7 @@ import static org.junit.Assert.*;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public abstract class ReadOnlyFileTestSuite {
 
     private static final Logger logger = Logger.getLogger(
@@ -47,7 +49,7 @@ public abstract class ReadOnlyFileTestSuite {
     private static final Random rnd = new Random();
 
     /** The data to get compressed. */
-    private static final byte[] DATA = new byte[1024]; // enough to waste some heat on CPU cycles
+    protected static final byte[] DATA = new byte[1024]; // enough to waste some heat on CPU cycles
     static {
         rnd.nextBytes(DATA);
     }
@@ -67,15 +69,14 @@ public abstract class ReadOnlyFileTestSuite {
     @Before
     public void setUp() throws IOException {
         temp = File.createTempFile(TEMP_FILE_PREFIX, null);
-        data = DATA.clone();
         try {
             final OutputStream out = new FileOutputStream(temp);
             try {
-                out.write(data);
+                out.write(DATA);
             } finally {
                 out.close();
             }
-            assert data.length == temp.length();
+            assert DATA.length == temp.length();
             rrof = new DefaultReadOnlyFile(temp);
             trof = newReadOnlyFile(temp);
         } catch (IOException ex) {
@@ -83,9 +84,10 @@ public abstract class ReadOnlyFileTestSuite {
                 logger.log(Level.WARNING, "{0} (File.delete() failed)", temp);
             throw ex;
         }
+        data = DATA.clone();
     }
 
-    protected abstract @NonNull ReadOnlyFile newReadOnlyFile(@NonNull File file)
+    protected abstract ReadOnlyFile newReadOnlyFile(File file)
     throws IOException;
 
     @After
@@ -119,25 +121,25 @@ public abstract class ReadOnlyFileTestSuite {
 
         try {
             rof.length();
-            fail("Expected IOException!");
+            fail();
         } catch (IOException expected) {
         }
 
         try {
             rof.getFilePointer();
-            fail("Expected IOException!");
+            fail();
         } catch (IOException expected) {
         }
 
         try {
             rof.seek(0);
-            fail("Expected IOException!");
+            fail();
         } catch (IOException expected) {
         }
 
         try {
             rof.read();
-            fail("Expected IOException!");
+            fail();
         } catch (IOException expected) {
         }
 
@@ -148,7 +150,7 @@ public abstract class ReadOnlyFileTestSuite {
 
         try {
             rof.read(new byte[1]);
-            fail("Expected IOException!");
+            fail();
         } catch (IOException expected) {
         }
 
@@ -159,7 +161,7 @@ public abstract class ReadOnlyFileTestSuite {
 
         try {
             rof.read(new byte[1], 0, 1);
-            fail("Expected IOException!");
+            fail();
         } catch (IOException expected) {
         }
 
@@ -170,7 +172,7 @@ public abstract class ReadOnlyFileTestSuite {
 
         try {
             rof.readFully(new byte[1]);
-            fail("Expected IOException!");
+            fail();
         } catch (IOException expected) {
         }
 
@@ -181,7 +183,7 @@ public abstract class ReadOnlyFileTestSuite {
 
         try {
             rof.readFully(new byte[1], 0, 1);
-            fail("Expected IOException!");
+            fail();
         } catch (IOException expected) {
         }
 
@@ -224,7 +226,7 @@ public abstract class ReadOnlyFileTestSuite {
             final int tooSmall = rnd.nextInt() | Integer.MIN_VALUE;
             try {
                 assertRandomReadByte(rof, tooSmall);
-                fail("Expected IOException!");
+                fail();
             } catch (IOException ex) {
             }
 
