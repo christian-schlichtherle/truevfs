@@ -23,7 +23,8 @@ import org.bouncycastle.crypto.engines.AESFastEngine;
  * Implements Counter (CTR) mode (alias Segmented Integer Counter - SIC)
  * on top of an AES engine.
  * This class is almost identical to {@link SICSeekableBlockCipher} except that
- * the counter is reset to one and updated in little endian order.
+ * the block counter is incremented <em>before</em> updating the cipher input
+ * in <em>little endian</em> order.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -47,16 +48,16 @@ final class WinZipAesCipherMode extends SICSeekableBlockCipher {
             int outOff)
     throws DataLengthException, IllegalStateException {
         incCounter();
-        this.cipher.processBlock(this.counterIn, 0, this.counterOut, 0);
+        this.cipher.processBlock(this.cipherIn, 0, this.cipherOut, 0);
 
-        // XOR the counterOut with the plaintext producing the cipher text.
+        // XOR the cipherOut with the plaintext producing the cipher text.
         final int blockSize = this.blockSize;
         {
             int i = blockSize;
             inOff += i;
             outOff += i;
             while (i > 0)
-                out[--outOff] = (byte) (in[--inOff] ^ this.counterOut[--i]);
+                out[--outOff] = (byte) (in[--inOff] ^ this.cipherOut[--i]);
         }
 
         return blockSize;
@@ -64,17 +65,11 @@ final class WinZipAesCipherMode extends SICSeekableBlockCipher {
 
     private void incCounter() {
         final int blockSize = this.blockSize;
-        long blockCounter = this.blockCounter++;
+        long blockCounter = ++this.blockCounter; // pre-increment the block counter!
         for (int i = 0; i < blockSize; i++) { // little endian order!
             blockCounter += IV[i] & 0xff;
-            this.counterIn[i] = (byte) blockCounter;
+            this.cipherIn[i] = (byte) blockCounter;
             blockCounter >>>= 8;
         }
-    }
-
-    @Override
-    public void reset() {
-        super.reset();
-        setBlockCounter(1);
     }
 }
