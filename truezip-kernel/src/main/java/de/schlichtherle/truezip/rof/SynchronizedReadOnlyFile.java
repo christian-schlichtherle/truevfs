@@ -25,14 +25,8 @@ import net.jcip.annotations.ThreadSafe;
 /**
  * A decorator which synchronizes all access to a {@link ReadOnlyFile}
  * via an object provided to its constructor.
- * <p>
- * <b>Note:</b> This class implements its own virtual file pointer.
- * Thus, if you would like to access the decorated {@code ReadOnlyFile}
- * again after you have finished working with an instance of this class,
- * you should synchronize their file pointers using the pattern described
- * in {@link DecoratingReadOnlyFile}.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe

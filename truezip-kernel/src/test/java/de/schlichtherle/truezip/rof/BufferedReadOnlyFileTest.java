@@ -20,7 +20,7 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public final class BufferedReadOnlyFileTest extends ReadOnlyFileTestSuite {

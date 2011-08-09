@@ -28,11 +28,28 @@ import net.jcip.annotations.NotThreadSafe;
  * A {@link ReadOnlyFile} implementation which provides buffered random read
  * only access to another {@code ReadOnlyFile}.
  * <p>
- * <b>Note:</b> This class implements its own virtual file pointer.
- * Thus, if you would like to access the decorated {@code ReadOnlyFile}
- * again after you have finished working with an instance of this class,
- * you should synchronize their file pointers using the pattern described
- * in {@link DecoratingReadOnlyFile}.
+ * Note that this class implements a virtual file pointer.
+ * Thus, if you would like to use the decorated read only file again after
+ * you have finished using the decorating read only file, then you should
+ * synchronize their file pointers using the following idiom:
+ * <pre>
+ *     ReadOnlyFile rof = new DefaultReadOnlyFile(new File("HelloWorld.java"));
+ *     try {
+ *         ReadOnlyFile brof = new BufferedReadOnlyFile(rof);
+ *         try {
+ *             // Do any file input on frof here...
+ *             brof.seek(1);
+ *         } finally {
+ *             // Synchronize the file pointers.
+ *             rof.seek(brof.getFilePointer());
+ *         }
+ *         // This assertion would fail if we hadn't done the file pointer
+ *         // synchronization!
+ *         assert rof.getFilePointer() == 1;
+ *     } finally {
+ *         rof.close();
+ *     }
+ * </pre>
  *
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -71,10 +88,8 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
     /** The buffer window to the file data. */
     private final byte[] window;
 
-    private boolean closed;
-
     /**
-     * Creates a new instance of {@code BufferedReadOnlyFile}.
+     * Constructs a new buffered read only file.
      *
      * @param  file The file to read.
      * @throws FileNotFoundException If the file cannot get opened for reading.
@@ -85,7 +100,7 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
     }
 
     /**
-     * Creates a new instance of {@code BufferedReadOnlyFile}.
+     * Constructs a new buffered read only file.
      *
      * @param  file The file to read.
      * @param  windowLen The size of the buffer window in bytes.
@@ -100,7 +115,7 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
     }
 
     /**
-     * Creates a new instance of {@code BufferedReadOnlyFile}.
+     * Constructs a new buffered read only file.
      *
      * @param rof The read only file to read.
      * @throws FileNotFoundException If the file cannot get opened for reading.
@@ -113,7 +128,7 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
     }
 
     /**
-     * Creates a new instance of {@code BufferedReadOnlyFile}.
+     * Constructs a new buffered read only file.
      *
      * @param rof The read only file to read.
      * @param windowLen The size of the buffer window in bytes.
@@ -152,36 +167,51 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
         assert this.window.length > 0;
     }
 
+    /**
+     * Asserts that this file is open.
+     *
+     * @throws IOException If the preconditions do not hold.
+     */
+    private void assertOpen() throws IOException {
+        if (null == delegate)
+            throw new IOException("File is closed!");
+    }
+
     @Override
     public long length()
     throws IOException {
+        // Check state.
+        assertOpen();
+
         final long newLength = delegate.length();
         if (newLength != length) {
             length = newLength;
             invalidateWindow();
         }
-
-        return length;
+        return newLength;
     }
 
     @Override
     public long getFilePointer()
     throws IOException {
+        // Check state.
         assertOpen();
+
         return fp;
     }
 
     @Override
     public void seek(final long fp)
     throws IOException {
+        // Check state.
         assertOpen();
 
         if (fp < 0)
-            throw new IOException("file pointer must not be negative");
+            throw new IOException("File pointer must not be negative!");
         final long length = length();
         if (fp > length)
-            throw new IOException("file pointer (" + fp
-                    + ") is larger than file length (" + length + ")");
+            throw new IOException("File pointer (" + fp
+                    + ") is larger than file length (" + length + ")!");
 
         this.fp = fp;
     }
@@ -217,7 +247,7 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
 
         // Setup.
         final int windowLen = window.length;
-        int read = 0; // amount of decrypted data copied to buf
+        int read = 0; // amount of read data copied to buf
 
         {
             // Partial read of window data at the start.
@@ -233,7 +263,7 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
         }
 
         {
-            // Full read of window data in the center.
+            // Full read of window data in the middle.
             while (read + windowLen < len && fp + windowLen <= length) {
                 // The file pointer is starting and ending on window boundaries.
                 positionWindow();
@@ -261,28 +291,20 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
 
     /**
      * Closes this read only file.
-     * As a side effect, this will set the reference to the underlying read
+     * As a side effect, this will set the reference to the decorated read
      * only file ({@link #delegate} to {@code null}.
      */
     @Override
     public void close()
     throws IOException {
-        if (closed)
-            return;
-
         // Order is important here!
-        closed = true;
-        delegate.close();
-    }
-
-    /**
-     * Asserts that this file is open.
-     *
-     * @throws IOException If the preconditions do not hold.
-     */
-    private void assertOpen() throws IOException {
-        if (closed)
-            throw new IOException("file is closed");
+        if (null == delegate)
+            return;
+        try {
+            delegate.close();
+        } finally {
+            delegate = null;
+        }
     }
 
     //
