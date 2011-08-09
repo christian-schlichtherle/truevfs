@@ -95,40 +95,40 @@ final class Type0RaesOutputStream extends RaesOutputStream {
         final int keyStrengthBytes = keyStrength.getBytes();
         this.keyStrength = keyStrength;
 
-        // Init digest for key generation and KLAC.
-        final Digest digest = new SHA256Digest();
-        assert digest.getDigestSize() >= keyStrengthBytes;
-
-        // Init PBE parameters.
-        final PBEParametersGenerator gen = new PKCS12ParametersGenerator(digest);
-        final char[] pwdChars = param.getWritePassword();
-        final byte[] pwdBytes = PBEParametersGenerator.PKCS12PasswordToBytes(pwdChars);
-        paranoidWipe(pwdChars);
-
         // Shake the salt.
         final byte[] salt = new byte[keyStrengthBytes];
         shaker.nextBytes(salt);
 
+        // Init digest for key generation and KLAC.
+        final Digest digest = new SHA256Digest();
+        assert digest.getDigestSize() >= keyStrengthBytes;
+
+        // Init password.
+        final char[] pwdChars = param.getWritePassword();
+        final byte[] pwdBytes = PBEParametersGenerator.PKCS12PasswordToBytes(pwdChars);
+        paranoidWipe(pwdChars);
+
         // Derive cipher and MAC parameters.
+        final PBEParametersGenerator gen = new PKCS12ParametersGenerator(digest);
         gen.init(pwdBytes, salt, ITERATION_COUNT);
         final ParametersWithIV
-                cipherParam = (ParametersWithIV) gen.generateDerivedParameters(
+                aesCtrParam = (ParametersWithIV) gen.generateDerivedParameters(
                     keyStrengthBits, AES_BLOCK_SIZE_BITS);
         final CipherParameters
-                macParam = gen.generateDerivedMacParameters(keyStrengthBits);
+                sha256HMmacParam = gen.generateDerivedMacParameters(keyStrengthBits);
         paranoidWipe(pwdBytes);
 
         // Init cipher.
-        this.cipher.init(true, cipherParam);
+        this.cipher.init(true, aesCtrParam);
 
         // Init MAC.
         final Mac mac = this.mac = new HMac(digest);
-        mac.init(macParam);
+        mac.init(sha256HMmacParam);
 
         // Init KLAC.
         final Mac klac = this.klac = new HMac(new SHA256Digest()); // cannot reuse digest!
-        klac.init(macParam); // resets the digest
-        final byte[] cipherKey = ((KeyParameter) cipherParam.getParameters())
+        klac.init(sha256HMmacParam); // resets the digest
+        final byte[] cipherKey = ((KeyParameter) aesCtrParam.getParameters())
                 .getKey();
         klac.update(cipherKey, 0, cipherKey.length);
 
