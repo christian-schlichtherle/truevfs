@@ -484,7 +484,7 @@ implements Iterable<E>, Closeable {
     }
 
     @SuppressWarnings("ReturnOfCollectionOrArrayField")
-    @CheckForNull byte[] getFileComment() {
+    @CheckForNull byte[] getRawComment() {
         return this.comment;
     }
 
@@ -506,11 +506,22 @@ implements Iterable<E>, Closeable {
         return openStreams > 0;
     }
 
-    final Charset getFileCharset() {
+    /**
+     * Returns the character set which is effectively used for
+     * decoding entry names and the file comment.
+     * Depending on the ZIP file contents, this may differ from the character
+     * set provided to the constructor.
+     */
+    public Charset getRawCharset() {
         return charset;
     }
 
-    /** Returns the charset used for reading entry names and the file comment. */
+    /**
+     * Returns the name of the character set which is effectively used for
+     * decoding entry names and the file comment.
+     * Depending on the ZIP file contents, this may differ from the character
+     * set provided to the constructor.
+     */
     public String getCharset() {
         return charset.name();
     }

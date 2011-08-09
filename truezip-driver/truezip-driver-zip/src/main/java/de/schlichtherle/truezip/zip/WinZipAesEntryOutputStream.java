@@ -122,20 +122,18 @@ final class WinZipAesEntryOutputStream extends CipherOutputStream {
         final int keyStrengthBits = keyStrength.getBits();
         final int keyStrengthBytes = keyStrength.getBytes();
 
-        // Init PBE parameters.
-        final PBEParametersGenerator gen = new PKCS5S2ParametersGenerator();
-        final char[] pwdChars = param.getWritePassword();
-        final byte[] pwdBytes = PBEParametersGenerator.PKCS5PasswordToBytes(pwdChars);
-        paranoidWipe(pwdChars);
-
         // Shake the salt.
         final byte[] salt = new byte[keyStrengthBytes / 2];
         shaker.nextBytes(salt);
+
+        // Init password.
+        final byte[] pwdBytes = param.getWritePassword();
 
         // Derive cipher and MAC parameters.
         // Here comes the strange part about WinZip AES encryption:
         // Its unorthodox use of the Password-Based Key Derivation Function 2
         // (PBKDF2) of PKCS #5 V2.0 alias RFC 2898.
+        final PBEParametersGenerator gen = new PKCS5S2ParametersGenerator();
         gen.init(pwdBytes, salt, ITERATION_COUNT);
         assert AES_BLOCK_SIZE_BITS <= keyStrengthBits;
         // Yes, the password verifier is only a 16 bit value.
@@ -143,6 +141,8 @@ final class WinZipAesEntryOutputStream extends CipherOutputStream {
         final KeyParameter keyParam =
                 (KeyParameter) gen.generateDerivedParameters(
                     2 * keyStrengthBits + PWD_VERIFIER_BITS);
+        paranoidWipe(pwdBytes); // must not wipe before generator use!
+
         // Can you believe they "forgot" the nonce in the CTR mode IV?! :-(
         // This is why the WinZip AES specification should be considered
         // "broken"!
@@ -154,7 +154,6 @@ final class WinZipAesEntryOutputStream extends CipherOutputStream {
                 keyParam.getKey(),
                 keyStrengthBytes,
                 keyStrengthBytes);
-        paranoidWipe(pwdBytes);
 
         // Init cipher.
         final BufferedBlockCipher cipher = this.cipher;
@@ -184,13 +183,6 @@ final class WinZipAesEntryOutputStream extends CipherOutputStream {
     /** Wipe the given array. */
     private void paranoidWipe(final byte[] passwd) {
         shaker.nextBytes(passwd);
-    }
-
-    /** Wipe the given array. */
-    private void paranoidWipe(final char[] passwd) {
-        final Random rng = shaker;
-        for (int i = passwd.length; --i >= 0; )
-            passwd[i] = (char) rng.nextInt();
     }
 
     @Override
