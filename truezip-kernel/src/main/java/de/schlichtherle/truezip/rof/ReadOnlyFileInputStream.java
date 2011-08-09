@@ -16,23 +16,25 @@
 
 package de.schlichtherle.truezip.rof;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * An adapter class turning a provided {@link ReadOnlyFile} into
  * an {@link InputStream}.
  * Note that this stream supports marking.
- * Note that any of the methods in this class throw a
- * {@link NullPointerException} if {@link #rof} hasn't been initialized.
- * <p>
- * This class is <em>not</em> thread-safe.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
+@DefaultAnnotation(NonNull.class)
 public class ReadOnlyFileInputStream extends InputStream {
 
     /**
@@ -40,7 +42,7 @@ public class ReadOnlyFileInputStream extends InputStream {
      * Any of the methods in this class throw a {@link NullPointerException}
      * if this hasn't been initialized.
      */
-    protected ReadOnlyFile rof;
+    protected @Nullable ReadOnlyFile rof;
 
     /**
      * The position of the last mark.
@@ -55,12 +57,12 @@ public class ReadOnlyFileInputStream extends InputStream {
      *        {@code null}, but must be initialized before any method
      *        of this class can be used.
      */
-    public ReadOnlyFileInputStream(ReadOnlyFile rof) {
+    public ReadOnlyFileInputStream(@Nullable ReadOnlyFile rof) {
         this.rof = rof;
     }
 
     @Override
-	public int read() throws IOException {
+    public int read() throws IOException {
         return rof.read();
     }
 

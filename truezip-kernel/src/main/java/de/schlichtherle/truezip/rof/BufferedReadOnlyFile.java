@@ -16,6 +16,9 @@
 
 package de.schlichtherle.truezip.rof;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -26,19 +29,20 @@ import net.jcip.annotations.NotThreadSafe;
  * only access to another {@code ReadOnlyFile}.
  * <p>
  * <b>Note:</b> This class implements its own virtual file pointer.
- * Thus, if you would like to access the underlying {@code ReadOnlyFile}
+ * Thus, if you would like to access the decorated {@code ReadOnlyFile}
  * again after you have finished working with an instance of this class,
- * you should synchronize their file pointers using the pattern as described
+ * you should synchronize their file pointers using the pattern described
  * in {@link DecoratingReadOnlyFile}.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @NotThreadSafe
+@DefaultAnnotation(NonNull.class)
 public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
 
     /** The default buffer length of the window to the file. */
-    public static final int WINDOW_LEN = 4096;
+    public static final int WINDOW_LEN = 8096;
 
     /** Returns the smaller parameter. */
     protected static long min(long a, long b) {
@@ -72,34 +76,26 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
     /**
      * Creates a new instance of {@code BufferedReadOnlyFile}.
      *
-     * @param file The file to read.
-     * @throws NullPointerException If any of the parameters is {@code null}.
+     * @param  file The file to read.
      * @throws FileNotFoundException If the file cannot get opened for reading.
      * @throws IOException On any other I/O related issue.
      */
-    public BufferedReadOnlyFile(
-            final File file)
-    throws  NullPointerException,
-            FileNotFoundException,
-            IOException {
+    public BufferedReadOnlyFile(File file) throws IOException {
         this(null, file, WINDOW_LEN);
     }
 
     /**
      * Creates a new instance of {@code BufferedReadOnlyFile}.
      *
-     * @param file The file to read.
-     * @param windowLen The size of the buffer window in bytes.
-     * @throws NullPointerException If any of the parameters is {@code null}.
+     * @param  file The file to read.
+     * @param  windowLen The size of the buffer window in bytes.
      * @throws FileNotFoundException If the file cannot get opened for reading.
      * @throws IOException On any other I/O related issue.
      */
     public BufferedReadOnlyFile(
             final File file,
             final int windowLen)
-    throws  NullPointerException,
-            FileNotFoundException,
-            IOException {
+    throws IOException {
         this(null, file, windowLen);
     }
 
@@ -107,15 +103,12 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
      * Creates a new instance of {@code BufferedReadOnlyFile}.
      *
      * @param rof The read only file to read.
-     * @throws NullPointerException If any of the parameters is {@code null}.
      * @throws FileNotFoundException If the file cannot get opened for reading.
      * @throws IOException On any other I/O related issue.
      */
     public BufferedReadOnlyFile(
             final ReadOnlyFile rof)
-    throws  NullPointerException,
-            FileNotFoundException,
-            IOException {
+    throws IOException {
         this(rof, null, WINDOW_LEN);
     }
 
@@ -124,44 +117,39 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
      *
      * @param rof The read only file to read.
      * @param windowLen The size of the buffer window in bytes.
-     * @throws NullPointerException If any of the parameters is {@code null}.
      * @throws FileNotFoundException If the file cannot get opened for reading.
      * @throws IOException On any other I/O related issue.
      */
     public BufferedReadOnlyFile(
             final ReadOnlyFile rof,
             final int windowLen)
-    throws  NullPointerException,
-            FileNotFoundException,
-            IOException {
+    throws IOException {
         this(rof, null, windowLen);
     }
 
     private BufferedReadOnlyFile(
-            ReadOnlyFile rof,
-            final File file,
+            @CheckForNull ReadOnlyFile rof,
+            final @CheckForNull File file,
             final int windowLen)
-    throws  NullPointerException,
-            FileNotFoundException,
-            IOException {
+    throws IOException {
         super(rof);
 
         // Check parameters (fail fast).
-        if (rof == null) {
+        if (null == rof) {
             rof = new DefaultReadOnlyFile(file);
-        } else { // rof != null
-            assert file == null;
+        } else { // null != rof
+            assert null == file;
         }
         if (windowLen <= 0)
             throw new IllegalArgumentException();
 
         super.delegate = rof;
-        length = rof.length();
-        fp = rof.getFilePointer();
-        window = new byte[windowLen];
+        this.length = rof.length();
+        this.fp = rof.getFilePointer();
+        this.window = new byte[windowLen];
         invalidateWindow();
 
-        assert window.length > 0;
+        assert this.window.length > 0;
     }
 
     @Override
