@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.crypto;
 
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
@@ -51,16 +51,17 @@ public class CipherOutputStream extends DecoratingOutputStream {
     protected @Nullable BufferedBlockCipher cipher;
 
     /**
-     * The buffer used for preprocessing the output.
+     * The cipher output buffer used for preprocessing the output
+     * to the decorated stream.
      * This buffer is autosized to the largest buffer written to this stream.
      */
-    private byte[] outBuf = new byte[0];
+    private byte[] cipherOut = new byte[0];
 
     /** Whether this stream has been closed or not. */
     private boolean closed;
 
     /**
-     * Creates a new instance of CipherOutputStream.
+     * Creates a new cipher output stream.
      * Please note that unlike {@code javax.crypto.CipherOutputStream},
      * the cipher does not need to be initialized before calling this
      * constructor.
@@ -68,12 +69,12 @@ public class CipherOutputStream extends DecoratingOutputStream {
      * written to this stream or before this stream is closed.
      *
      * @param out The output stream to write the encrypted or decrypted data to.
-     *        Maybe {@code null} if initialized by the subclass constructor.
+     *        Maybe {@code null} for subsequent initialization by a sub-class.
      * @param cipher The cipher to use for encryption or decryption.
-     *        Maybe {@code null} for subsequent initialization by a subclass.
+     *        Maybe {@code null} for subsequent initialization by a sub-class.
      */
-    public CipherOutputStream(  @Nullable OutputStream out,
-                                final @Nullable BufferedBlockCipher cipher) {
+    public CipherOutputStream(  @CheckForNull OutputStream out,
+                                final @CheckForNull BufferedBlockCipher cipher) {
         super(out);
         this.cipher = cipher;
     }
@@ -92,8 +93,7 @@ public class CipherOutputStream extends DecoratingOutputStream {
     /**
      * Ciphers and writes the given byte to the underlying output stream.
      *
-     * @param b The byte to cipher and write.
-     *
+     * @param  b The byte to cipher and write.
      * @throws IOException If out or cipher aren't properly initialized,
      *         the stream has been closed or an I/O error occured.
      */
@@ -102,22 +102,22 @@ public class CipherOutputStream extends DecoratingOutputStream {
     throws IOException {
         assertOpen();
 
-        int outLen = cipher.getUpdateOutputSize(1);
-        if (outLen > outBuf.length)
-            outBuf = new byte[outLen];
-        outLen = cipher.processByte((byte) b, outBuf, 0);
-        if (outLen > 0)
-            delegate.write(outBuf, 0, outLen);
+        int cipherLen = cipher.getUpdateOutputSize(1);
+        byte[] cipherOut = this.cipherOut;
+        if (cipherLen > cipherOut.length)
+            cipherOut = this.cipherOut = new byte[cipherLen];
+        cipherLen = cipher.processByte((byte) b, cipherOut, 0);
+        if (cipherLen > 0)
+            delegate.write(cipherOut, 0, cipherLen);
     }
 
     /**
      * Ciphers and writes the contents of the given byte array to the
      * underlying output stream.
      *
-     * @param buf The buffer holding the data to cipher and write.
-     * @param off The start offset in the data buffer.
-     * @param len The number of bytes to cipher and write.
-     *
+     * @param  buf The buffer holding the data to cipher and write.
+     * @param  off The start offset of the data in the buffer.
+     * @param  len The number of bytes to cipher and write.
      * @throws IOException If out or cipher aren't properly initialized,
      *         the stream has been closed or an I/O error occured.
      */
@@ -126,11 +126,12 @@ public class CipherOutputStream extends DecoratingOutputStream {
     throws IOException {
         assertOpen();
 
-        int outLen = cipher.getUpdateOutputSize(len);
-        if (outLen > outBuf.length)
-            outBuf = new byte[outLen];
-        outLen = cipher.processBytes(buf, off, len, outBuf, 0);
-        delegate.write(outBuf, 0, outLen);
+        int cipherLen = cipher.getUpdateOutputSize(len);
+        byte[] cipherOut = this.cipherOut;
+        if (cipherLen > cipherOut.length)
+            cipherOut = this.cipherOut = new byte[cipherLen];
+        cipherLen = cipher.processBytes(buf, off, len, cipherOut, 0);
+        delegate.write(cipherOut, 0, cipherLen);
     }
 
     /**
@@ -149,15 +150,16 @@ public class CipherOutputStream extends DecoratingOutputStream {
     protected void finish() throws IOException {
         assertOpen();
 
-        int outLen = cipher.getOutputSize(0);
-        if (outLen > outBuf.length)
-            outBuf = new byte[outLen];
+        int cipherLen = cipher.getOutputSize(0);
+        byte[] cipherOut = this.cipherOut;
+        if (cipherLen > cipherOut.length)
+            cipherOut = this.cipherOut = new byte[cipherLen];
         try {
-            outLen = cipher.doFinal(outBuf, 0);
+            cipherLen = cipher.doFinal(cipherOut, 0);
         } catch (InvalidCipherTextException ex) {
             throw new IOException(ex);
         }
-        delegate.write(outBuf, 0, outLen);
+        delegate.write(cipherOut, 0, cipherLen);
         delegate.flush();
         //outBuf = new byte[0];
     }
@@ -168,7 +170,7 @@ public class CipherOutputStream extends DecoratingOutputStream {
      * the underlying output stream {@link #delegate} and the cipher
      * {@link #cipher}.
      *
-     * @throws IOException If an I/O error occurs.
+     * @throws IOException On any I/O error.
      */
     @Override
     public void close() throws IOException {
