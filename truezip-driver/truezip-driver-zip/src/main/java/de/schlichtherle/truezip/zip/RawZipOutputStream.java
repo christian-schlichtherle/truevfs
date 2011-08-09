@@ -848,14 +848,14 @@ implements Iterable<E> {
             // Offset MUST be considered in decision about ZIP64 format - see
             // description of Data Descriptor in ZIP File Format Specification!
             final boolean zip64 // ZIP64 extensions?
-                    =  csize  >= UInt.MAX_VALUE
-                    || size   >= UInt.MAX_VALUE
-                    || offset >= UInt.MAX_VALUE
+                    =  UInt.MAX_VALUE <= csize
+                    || UInt.MAX_VALUE <= size
+                    || UInt.MAX_VALUE <= offset
                     || FORCE_ZIP64_EXT;
             // Data Descriptor Signature.
             dos.writeInt(DD_SIG);
             // CRC-32.
-            dos.writeInt((int) crc);
+            dos.writeInt(UNKNOWN != crc ? (int) crc : 0);
             // Compressed Size.
             // Uncompressed Size.
             if (zip64) {
