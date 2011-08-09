@@ -46,28 +46,28 @@ final class WinZipAesCipherMode extends SICSeekableBlockCipher {
             final byte[] out,
             int outOff)
     throws DataLengthException, IllegalStateException {
-        updateCounter();
-        this.cipher.processBlock(this.cipherIn, 0, this.cipherOut, 0);
+        incCounter();
+        this.cipher.processBlock(this.counterIn, 0, this.counterOut, 0);
 
-        // XOR the cipherOut with the plaintext producing the cipher text.
+        // XOR the counterOut with the plaintext producing the cipher text.
         final int blockSize = this.blockSize;
         {
             int i = blockSize;
             inOff += i;
             outOff += i;
             while (i > 0)
-                out[--outOff] = (byte) (in[--inOff] ^ this.cipherOut[--i]);
+                out[--outOff] = (byte) (in[--inOff] ^ this.counterOut[--i]);
         }
 
         return blockSize;
     }
 
-    private void updateCounter() {
+    private void incCounter() {
         final int blockSize = this.blockSize;
         long blockCounter = this.blockCounter++;
         for (int i = 0; i < blockSize; i++) { // little endian order!
             blockCounter += IV[i] & 0xff;
-            this.cipherIn[i] = (byte) blockCounter;
+            this.counterIn[i] = (byte) blockCounter;
             blockCounter >>>= 8;
         }
     }
@@ -75,6 +75,6 @@ final class WinZipAesCipherMode extends SICSeekableBlockCipher {
     @Override
     public void reset() {
         super.reset();
-        this.blockCounter = 1;
+        setBlockCounter(1);
     }
 }
