@@ -26,8 +26,8 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
  * on top of a simple block cipher.
  * This code is based on bouncy castle's {@link SICBlockCipher} class,
  * but allows random access to a block, too.
- * Like the {@link SICBlockCipher} class, the counter is updated in big endian
- * order.
+ * Like the {@link SICBlockCipher} class, the block counter is incremented
+ * <em>after</em> updating the cipher input in <em>big endian</em> order.
  *
  * @author  The Legion of the Bouncy Castle (majority of the code)
  * @author  Christian Schlichtherle (optimizations and extension to support seeking)
@@ -36,11 +36,11 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
 public class SICSeekableBlockCipher implements SeekableBlockCipher {
 
     protected final BlockCipher cipher;
-    protected long blockCounter;
     protected final int blockSize;
+    protected long blockCounter;
     protected final byte[] IV;
-    protected final byte[] counterIn;
-    protected final byte[] counterOut;
+    protected final byte[] cipherIn;
+    protected final byte[] cipherOut;
 
     /**
      * Constructs a new big endian SIC seekable block cipher mode.
@@ -51,8 +51,8 @@ public class SICSeekableBlockCipher implements SeekableBlockCipher {
         this.cipher = cipher;
         this.blockSize = cipher.getBlockSize();
         this.IV = new byte[blockSize];
-        this.counterIn = new byte[blockSize];
-        this.counterOut = new byte[blockSize];
+        this.cipherIn = new byte[blockSize];
+        this.cipherOut = new byte[blockSize];
     }
 
     /**
@@ -96,16 +96,16 @@ public class SICSeekableBlockCipher implements SeekableBlockCipher {
             int outOff)
     throws DataLengthException, IllegalStateException {
         incCounter();
-        this.cipher.processBlock(this.counterIn, 0, this.counterOut, 0);
+        this.cipher.processBlock(this.cipherIn, 0, this.cipherOut, 0);
 
-        // XOR the counterOut with the plaintext producing the cipher text.
+        // XOR the cipherOut with the plaintext producing the cipher text.
         final int blockSize = this.blockSize;
         {
             int i = blockSize;
             inOff += i;
             outOff += i;
             while (i > 0)
-                out[--outOff] = (byte) (in[--inOff] ^ this.counterOut[--i]);
+                out[--outOff] = (byte) (in[--inOff] ^ this.cipherOut[--i]);
         }
 
         return blockSize;
@@ -113,10 +113,10 @@ public class SICSeekableBlockCipher implements SeekableBlockCipher {
 
     private void incCounter() {
         final int blockSize = this.blockSize;
-        long blockCounter = this.blockCounter++;
+        long blockCounter = this.blockCounter++; // post-increment the block counter!
         for (int i = blockSize; --i >= 0; ) { // big endian order!
             blockCounter += IV[i] & 0xff;
-            this.counterIn[i] = (byte) blockCounter;
+            this.cipherIn[i] = (byte) blockCounter;
             blockCounter >>>= 8;
         }
     }
@@ -134,6 +134,6 @@ public class SICSeekableBlockCipher implements SeekableBlockCipher {
     @Override
     public void reset() {
         this.cipher.reset();
-        setBlockCounter(0);
+        this.blockCounter = 0;
     }
 }
