@@ -47,11 +47,31 @@ public class IntervalReadOnlyFile extends DecoratingReadOnlyFile {
     private long fp;
 
     /**
-     * Constructs a new interval read only file.
+     * Constructs a new interval read only file starting at the current
+     * position of the file pointer in the decorated read only file.
      *
-     * @param rof the nullable read only file to decorate.
-     * @param start the start of the interval
-     * @param length the length of the interval
+     * @param rof the read only file to decorate.
+     * @param length the length of the interval.
+     */
+    public IntervalReadOnlyFile(
+            final ReadOnlyFile rof,
+            final long length)
+    throws IOException {
+        super(rof);
+        final long start = rof.getFilePointer();
+        if (start < 0 || length < 0 || rof.length() < start + length)
+            throw new IllegalArgumentException();
+        this.start = start;
+        this.length = length;
+    }
+
+    /**
+     * Constructs a new interval read only file and positions the file pointer
+     * in the decorated read only file at the given start.
+     *
+     * @param rof the read only file to decorate.
+     * @param start the start of the interval.
+     * @param length the length of the interval.
      */
     public IntervalReadOnlyFile(
             final ReadOnlyFile rof,
@@ -63,6 +83,7 @@ public class IntervalReadOnlyFile extends DecoratingReadOnlyFile {
             throw new IllegalArgumentException();
         this.start = start;
         this.length = length;
+        rof.seek(start);
     }
 
     /**
