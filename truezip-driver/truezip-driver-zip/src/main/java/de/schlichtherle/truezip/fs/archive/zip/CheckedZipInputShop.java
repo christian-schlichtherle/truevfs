@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.fs.archive.zip;
 
+import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.zip.CRC32Exception;
@@ -44,9 +45,9 @@ import java.io.InputStream;
 @DefaultAnnotation(NonNull.class)
 public class CheckedZipInputShop extends ZipInputShop {
     
-    public CheckedZipInputShop(ZipDriver driver, ReadOnlyFile rof)
+    public CheckedZipInputShop(ZipDriver driver, FsModel model, ReadOnlyFile rof)
     throws IOException {
-        super(driver, rof);
+        super(driver, model, rof);
     }
 
     /** Overridden to read from a checked input stream. */

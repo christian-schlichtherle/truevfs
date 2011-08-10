@@ -116,24 +116,41 @@ implements ZipEntryFactory<ZipArchiveEntry> {
      *         (encryption).
      * @since  TrueZIP 7.3.
      */
-    public KeyManagerProvider getKeyManagerProvider() {
+    protected KeyManagerProvider getKeyManagerProvider() {
         return KeyManagerLocator.SINGLETON;
     }
 
-    /**
-     * Returns the {@link ZipCryptoParameters} for the given ZIP output shop.
-     * <p>
-     * The implementation in the class {@link ZipDriver} returns
-     * {@code new KeyManagerZipCryptoParameters(output, this)}.
-     * 
-     * @param  output the ZIP output shop.
-     * @return The {@link ZipCryptoParameters} for the given ZIP output shop.
-     * @since   TrueZIP 7.3
-     */
-    protected ZipCryptoParameters zipCryptoParameters(ZipOutputShop output) {
-        return new KeyManagerZipCryptoParameters(output, this);
+    final ZipCryptoParameters zipCryptoParameters(ZipInputShop input) {
+        return zipCryptoParameters(input.getModel(), input.getRawCharset());
     }
 
+    final ZipCryptoParameters zipCryptoParameters(ZipOutputShop output) {
+        return zipCryptoParameters(output.getModel(), output.getRawCharset());
+    }
+
+    /**
+     * Returns the {@link ZipCryptoParameters} for the given file system model
+     * and character set.
+     * <p>
+     * The implementation in the class {@link ZipDriver} returns
+     * {@code new KeyManagerZipCryptoParameters(getKeyManagerProvider(), mountPointUri(model), charset)}.
+     * 
+     * @param  model the file system model.
+     * @param  charset charset the character set used for encoding entry names
+     *         and the file comment in the ZIP file.
+     * @return The {@link ZipCryptoParameters} for the given file system model
+     *         and character set.
+     * @since  TrueZIP 7.3
+     */
+    protected ZipCryptoParameters zipCryptoParameters(
+            FsModel model,
+            Charset charset) {
+        return new KeyManagerZipCryptoParameters(
+                getKeyManagerProvider(),
+                mountPointUri(model),
+                charset);
+    }
+    
     /**
      * Returns a URI which represents the mount point of the given model as a
      * resource URI for looking up a {@link KeyProvider}.
@@ -284,7 +301,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
             FsModel model,
             ReadOnlyFile rof)
     throws IOException {
-        return new ZipInputShop(this, rof);
+        return new ZipInputShop(this, model, rof);
     }
 
     /**

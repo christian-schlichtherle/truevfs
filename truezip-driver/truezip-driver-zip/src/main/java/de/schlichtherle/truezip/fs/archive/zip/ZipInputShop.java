@@ -15,10 +15,12 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
+import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.zip.RawZipFile;
+import de.schlichtherle.truezip.zip.ZipCryptoParameters;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.FileNotFoundException;
@@ -37,11 +39,33 @@ public class ZipInputShop
 extends RawZipFile<ZipArchiveEntry>
 implements InputShop<ZipArchiveEntry> {
 
+    private final ZipDriver driver;
+    private final FsModel model;
     private boolean appendee;
 
-    public ZipInputShop(ZipDriver driver, ReadOnlyFile rof)
+    public ZipInputShop(
+            final ZipDriver driver,
+            final FsModel model,
+            final ReadOnlyFile rof)
     throws IOException {
         super(rof, driver.getCharset(), driver.getPreambled(), driver.getPostambled(), driver);
+        this.driver = driver;
+        this.model = model;
+    }
+
+    /**
+     * Returns the file system model provided to the constructor.
+     * 
+     * @return The file system model provided to the constructor.
+     * @since  TrueZIP 7.3
+     */
+    public FsModel getModel() {
+        return model;
+    }
+
+    @Override
+    protected ZipCryptoParameters getCryptoParameters() {
+        return driver.zipCryptoParameters(this);
     }
 
     /**
@@ -64,7 +88,7 @@ implements InputShop<ZipArchiveEntry> {
      * @param appendee {@code true} if and only if the target archive file gets
      *        entries appended to it.
      */
-    protected void setAppendee(boolean appendee) {
+    final void setAppendee(boolean appendee) {
         this.appendee = appendee;
     }
 

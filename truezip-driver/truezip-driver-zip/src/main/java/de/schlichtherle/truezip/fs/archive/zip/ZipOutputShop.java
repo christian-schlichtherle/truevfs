@@ -103,10 +103,6 @@ implements OutputShop<ZipArchiveEntry> {
         }
     }
 
-    private IOPool<?> getPool() {
-        return driver.getPool();
-    }
-
     /**
      * Returns the file system model provided to the constructor.
      * 
@@ -115,6 +111,10 @@ implements OutputShop<ZipArchiveEntry> {
      */
     public FsModel getModel() {
         return model;
+    }
+
+    private IOPool<?> getPool() {
+        return driver.getPool();
     }
 
     @Override
