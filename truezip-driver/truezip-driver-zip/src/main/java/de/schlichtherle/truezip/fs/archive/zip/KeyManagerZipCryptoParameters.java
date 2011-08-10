@@ -15,8 +15,6 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
-import de.schlichtherle.truezip.fs.FsModel;
-import java.nio.charset.Charset;
 import de.schlichtherle.truezip.crypto.param.AesKeyStrength;
 import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.key.KeyManagerProvider;
@@ -30,7 +28,9 @@ import de.schlichtherle.truezip.zip.ZipKeyException;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URI;
+import java.nio.charset.Charset;
 import net.jcip.annotations.ThreadSafe;
+import org.bouncycastle.crypto.PBEParametersGenerator;
 import static org.bouncycastle.crypto.PBEParametersGenerator.*;
 
 /**
