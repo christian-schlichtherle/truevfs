@@ -19,8 +19,10 @@ import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.rof.DefaultReadOnlyFile;
 import de.schlichtherle.truezip.io.SynchronizedInputStream;
 import de.schlichtherle.truezip.util.Pool;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -57,6 +59,8 @@ import net.jcip.annotations.ThreadSafe;
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
 public class ZipFile extends RawZipFile<ZipEntry> {
+
+    private @CheckForNull ZipCryptoParameters cryptoParameters;
 
     private final String name;
 
@@ -332,6 +336,27 @@ public class ZipFile extends RawZipFile<ZipEntry> {
     @Override
     public synchronized boolean busy() {
         return super.busy();
+    }
+
+    /**
+     * Returns the crypto parameters.
+     * 
+     * @return The crypto parameters.
+     * @since  TrueZIP 7.3
+     */
+    @Override
+    public synchronized @Nullable ZipCryptoParameters getCryptoParameters() {
+        return cryptoParameters;
+    }
+
+    /**
+     * Sets the crypto parameters.
+     * 
+     * @param cryptoParameters the crypto parameters.
+     */
+    public synchronized void setCryptoParameters(
+            final @CheckForNull ZipCryptoParameters cryptoParameters) {
+        this.cryptoParameters = cryptoParameters;
     }
 
     @Override

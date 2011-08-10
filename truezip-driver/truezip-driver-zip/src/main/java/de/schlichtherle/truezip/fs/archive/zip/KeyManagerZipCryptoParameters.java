@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
+import de.schlichtherle.truezip.fs.FsModel;
 import java.nio.charset.Charset;
 import de.schlichtherle.truezip.crypto.param.AesKeyStrength;
 import de.schlichtherle.truezip.key.KeyManager;
@@ -30,7 +31,6 @@ import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URI;
 import net.jcip.annotations.ThreadSafe;
-import org.bouncycastle.crypto.PBEParametersGenerator;
 import static org.bouncycastle.crypto.PBEParametersGenerator.*;
 
 /**
@@ -48,6 +48,10 @@ import static org.bouncycastle.crypto.PBEParametersGenerator.*;
 public class KeyManagerZipCryptoParameters
 implements ZipCryptoParametersProvider {
 
+    /**
+     * The provider for key managers for accessing protected resources
+     * (encryption).
+     */
     protected final KeyManagerProvider provider;
 
     /** The resource URI of the ZIP file. */
@@ -60,18 +64,23 @@ implements ZipCryptoParametersProvider {
     protected final Charset charset;
 
     /**
-     * Constructs ZIP crypto parameters for the given ZIP output shop and ZIP
-     * driver.
+     * Constructs new ZIP crypto parameters.
      *
-     * @param  output the ZIP output shop.
-     * @param  driver the ZIP driver.
+     * @param provider provider for key managers for accessing protected
+     *        resources (encryption).
+     * @param zip the resource URI of the ZIP file.
+     * @param charset the character set used for encoding entry names and the
+     *        file comment in the ZIP file.
      */
     public KeyManagerZipCryptoParameters(
-            final ZipOutputShop output,
-            final ZipDriver driver) {
-        this.provider = driver.getKeyManagerProvider();
-        this.zip = driver.mountPointUri(output.getModel());
-        this.charset = output.getRawCharset();
+            final KeyManagerProvider provider,
+            final URI zip,
+            final Charset charset) {
+        if (null == provider || null == zip || null == charset)
+            throw new NullPointerException();
+        this.provider = provider;
+        this.zip = zip;
+        this.charset = charset;
     }
 
     /**

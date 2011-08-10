@@ -212,8 +212,8 @@ implements Iterable<E>, Closeable {
             final boolean postambled)
     throws IOException {
         int numEntries = findCentralDirectory(rof, preambled, postambled);
-        assert mapper != null;
-        preamble = Long.MAX_VALUE;
+        assert this.mapper != null;
+        this.preamble = Long.MAX_VALUE;
         final byte[] sig = new byte[4];
         final byte[] cfh = new byte[CFH_MIN_LEN - sig.length];
         for (; ; numEntries--) {
@@ -229,7 +229,7 @@ implements Iterable<E>, Closeable {
             final boolean utf8 = 0 != (general & (1 << GPBF_UTF8));
             if (utf8)
                 this.charset = UTF8;
-            final E entry = factory.newEntry(decode(name));
+            final E entry = this.factory.newEntry(decode(name));
             try {
                 int off = 0;
                 final int versionMadeBy = readUShort(cfh, off);
@@ -276,9 +276,9 @@ implements Iterable<E>, Closeable {
                 // Re-read virtual offset after ZIP64 Extended Information
                 // Extra Field may have been parsed, map it to the real
                 // offset and conditionally update the preamble size from it.
-                lfhOff = mapper.location(entry.getOffset());
-                if (lfhOff < preamble)
-                    preamble = lfhOff;
+                lfhOff = this.mapper.location(entry.getOffset());
+                if (lfhOff < this.preamble)
+                    this.preamble = lfhOff;
             } catch (RuntimeException incompatibleZipFile) {
                 final ZipException ex = new ZipException(entry.getName());
                 ex.initCause(incompatibleZipFile);
@@ -288,7 +288,7 @@ implements Iterable<E>, Closeable {
             // by the ZipEntryFactory.
             // Note that this name may differ from what has been found
             // in the ZIP file!
-            entries.put(entry.getName(), entry);
+            this.entries.put(entry.getName(), entry);
         }
         // Check if the number of entries found matches the number of entries
         // declared in the (ZIP64) End Of Central Directory header.
@@ -306,8 +306,8 @@ implements Iterable<E>, Closeable {
                     Math.abs(numEntries) +
                     (numEntries > 0 ? " more" : " less") +
                     " entries in the Central Directory!");
-        if (preamble == ULong.MAX_VALUE)
-            preamble = 0;
+        if (this.preamble == ULong.MAX_VALUE)
+            this.preamble = 0;
     }
 
     private String decode(byte[] bytes) {
@@ -342,8 +342,8 @@ implements Iterable<E>, Closeable {
                       || signature == EOCDR_SIG;
         }
         if (preambled) {
-            length = rof.length();
-            final long max = length - EOCDR_MIN_LEN;
+            this.length = rof.length();
+            final long max = this.length - EOCDR_MIN_LEN;
             final long min = !postambled && max >= 0xffff ? max - 0xffff : 0;
             for (long eocdrOffset = max; eocdrOffset >= min; eocdrOffset--) {
                 rof.seek(eocdrOffset);
@@ -383,7 +383,7 @@ implements Iterable<E>, Closeable {
                     rof.readFully(comment);
                     this.comment = comment;
                 }
-                postamble = length - rof.getFilePointer();
+                this.postamble = this.length - rof.getFilePointer();
                 // Check for ZIP64 End Of Central Directory Locator.
                 try {
                     // Read Zip64 End Of Central Directory Locator.
@@ -446,7 +446,7 @@ implements Iterable<E>, Closeable {
                     cdOffset = readLong(zip64eocdr, off);
                     //off += 8;
                     rof.seek(cdOffset);
-                    mapper = new OffsetMapper();
+                    this.mapper = new OffsetMapper();
                 } catch (ZipException ze) {
                     throw ze;
                 } catch (IOException ioe) {
@@ -454,7 +454,7 @@ implements Iterable<E>, Closeable {
                     long start = eocdrOffset - cdSize;
                     rof.seek(start);
                     start -= cdOffset;
-                    mapper = 0 != start
+                    this.mapper = 0 != start
                             ? new IrregularOffsetMapper(start)
                             : new OffsetMapper();
                 }
@@ -622,6 +622,14 @@ implements Iterable<E>, Closeable {
         assert mapper != null;
         return 0 == mapper.location(0);
     }
+
+    /**
+     * Returns the crypto parameters.
+     * 
+     * @return The crypto parameters.
+     * @since  TrueZIP 7.3
+     */
+    protected abstract @CheckForNull ZipCryptoParameters getCryptoParameters();
 
     /**
      * Equivalent to {@link #getInputStream(String, boolean, boolean)
