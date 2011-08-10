@@ -82,6 +82,18 @@ public abstract class ZipRaesDriver extends JarDriver {
     }
 
     /**
+     * {@inheritDoc}
+     * <p>
+     * Since TrueZIP 7.3, this method returns {@code true} for future use.
+     * 
+     * @return {@code true}
+     */
+    @Override
+    protected final boolean getPreambled() {
+        return true;
+    }
+
+    /**
      * Returns the provider for key managers for accessing protected resources
      * (encryption).
      * <p>
