@@ -279,7 +279,7 @@ public abstract class ReadOnlyFileTestSuite {
         final int length = (int) rrof.length();
         int off = 0;
         int read;
-        do {
+        while (true) {
             final byte[] buf = new byte[rnd.nextInt(length / 100)];
             read = rrof.read(buf);
             if (read < 0)
@@ -295,7 +295,7 @@ public abstract class ReadOnlyFileTestSuite {
                 assertEquals(0, trof.read(buf));
             }
             off += read;
-        } while (true);
+        }
 
         assertEquals(off, length);
         assertEquals(-1, read);

@@ -21,13 +21,13 @@ import java.io.IOException;
 import net.jcip.annotations.NotThreadSafe;
 
 /**
- * A read only file which reads a defined interval from its decorated read only
- * file.
+ * A decorating read only file which is limited to read an interval of its
+ * decorated read only file.
  * <p>
  * Note that this class implements a virtual file pointer.
  * Thus, if you would like to use the decorated read only file again after
- * you have finished using the decorating read only file, then you should not
- * assume a particular position of the file pointer of the decorated read only
+ * you have finished using this decorating read only file, then you should not
+ * assume a particular position of the file pointer in the decorated read only
  * file.
  * 
  * @author  Christian Schlichtherle
@@ -39,16 +39,22 @@ public class IntervalReadOnlyFile extends DecoratingReadOnlyFile {
 
     private final long start;
     private final long length;
+    private final boolean exclusive;
 
     /**
      * The virtual file pointer in the file data.
-     * This is relative to the start of the file.
+     * This is relative to {@link #start}.
      */
     private long fp;
 
     /**
      * Constructs a new interval read only file starting at the current
      * position of the file pointer in the decorated read only file.
+     * <p>
+     * Note that this constructor assumes that it has exclusive access to the
+     * decorated read only file.
+     * Concurrent modification of the file pointer in the decorated read only
+     * file may corrupt the input of this decorating read only file!
      *
      * @param rof the read only file to decorate.
      * @param length the length of the interval.
@@ -57,17 +63,16 @@ public class IntervalReadOnlyFile extends DecoratingReadOnlyFile {
             final ReadOnlyFile rof,
             final long length)
     throws IOException {
-        super(rof);
-        final long start = rof.getFilePointer();
-        if (start < 0 || length < 0 || rof.length() < start + length)
-            throw new IllegalArgumentException();
-        this.start = start;
-        this.length = length;
+        this(rof, rof.getFilePointer(), length, true);
     }
 
     /**
-     * Constructs a new interval read only file and positions the file pointer
-     * in the decorated read only file at the given start.
+     * Constructs a new interval read only file starting at the given position
+     * of the file pointer in the given decorated read only file.
+     * <p>
+     * Note that this constructor assumes that it does not have exclusive
+     * access to the decorated read only file and positions the file pointer
+     * in the decorated read only file before each read operation!
      *
      * @param rof the read only file to decorate.
      * @param start the start of the interval.
@@ -78,28 +83,43 @@ public class IntervalReadOnlyFile extends DecoratingReadOnlyFile {
             final long start,
             final long length)
     throws IOException {
+        this(rof, start, length, false);
+    }
+    
+    /**
+     * Constructs a new interval read only file starting at the given position
+     * of the file pointer in the given decorated read only file.
+     *
+     * @param rof the read only file to decorate.
+     * @param start the start of the interval.
+     * @param length the length of the interval.
+     * @param exclusive whether this decorating read only file may assume it
+     *        has exclusive access to the decorated read only file or not.
+     *        If this is {@code true}, then the position of the file pointer
+     *        in the decorated read only file must be {@code start}!
+     *        If this is {@code false}, then the file pointer in the decorated
+     *        read only file gets positioned before each read operation.
+     */
+    private IntervalReadOnlyFile(
+            final ReadOnlyFile rof,
+            final long start,
+            final long length,
+            final boolean exclusive)
+    throws IOException {
         super(rof);
         if (start < 0 || length < 0 || rof.length() < start + length)
             throw new IllegalArgumentException();
         this.start = start;
         this.length = length;
-        rof.seek(start);
-    }
-
-    /**
-     * Asserts that this file is open.
-     *
-     * @throws IOException If the preconditions do not hold.
-     */
-    private void assertOpen() throws IOException {
-        if (null == delegate)
-            throw new IOException("file is closed");
+        this.exclusive = exclusive;
     }
 
     @Override
     public long length() throws IOException {
         // Check state.
-        assertOpen();
+        final long length = this.length;
+        if (this.delegate.length() < this.start + length)
+            throw new IOException("Read Only File has been changed!");
 
         return length;
     }
@@ -108,25 +128,24 @@ public class IntervalReadOnlyFile extends DecoratingReadOnlyFile {
     public long getFilePointer()
     throws IOException {
         // Check state.
-        assertOpen();
+        this.delegate.getFilePointer();
 
-        return fp;
+        return this.fp;
     }
 
     @Override
     public void seek(final long fp)
     throws IOException {
-        // Check state.
-        assertOpen();
-
+        // Check parameters.
         if (fp < 0)
             throw new IOException("File pointer must not be negative!");
-        final long length = length();
+        final long length = this.length;
         if (fp > length)
             throw new IOException("File pointer (" + fp
                     + ") is larger than file length (" + length + ")!");
 
-        delegate.seek(fp + start);
+        // Operate.
+        this.delegate.seek(fp + this.start);
         this.fp = fp;
     }
 
@@ -134,57 +153,55 @@ public class IntervalReadOnlyFile extends DecoratingReadOnlyFile {
     public int read()
     throws IOException {
         // Check state.
-        assertOpen();
-        if (fp >= length())
+        long fp = this.fp;
+        if (fp >= this.length)
             return -1;
 
-        final int read = delegate.read();
-        fp++;
+        // Operate.
+        if (!this.exclusive)
+            this.delegate.seek(fp + this.start);
+        final int read = this.delegate.read();
+
+        // Update state.
+        this.fp = fp + 1;
         return read;
     }
 
     @Override
     public int read(final byte[] buf, final int off, int len)
     throws IOException {
-        if (len == 0)
-            return 0; // be fault-tolerant and compatible to RandomAccessFile
+        if (0 == len) {
+            // Be fault-tolerant and compatible to RandomAccessFile, even if
+            // the decorated read only file has been closed before.
+            return 0;
+        }
 
-        // Check state.
-        assertOpen();
-        final long length = length();
-        if (fp >= length)
-            return -1;
-
-        // Check parameters.
+        // Check and modify parameters.
         if (0 > (off | len | buf.length - off - len))
 	    throw new IndexOutOfBoundsException();
+        long fp = this.fp;
+        final long length = this.length;
         if (fp + len > length)
             len = (int) (length - fp);
 
-        final int read = delegate.read(buf, off, len);
-        fp += read;
+        // Operate.
+        if (!this.exclusive)
+            this.delegate.seek(fp + this.start);
+        final int read = this.delegate.read(buf, off, len);
 
-        // Assert that at least one byte has been read if len isn't zero.
-        // Note that EOF has been tested before.
-        assert read > 0;
-        return read;
-    }
-
-    /**
-     * Closes this read only file.
-     * As a side effect, this will set the reference to the decorated read
-     * only file ({@link #delegate} to {@code null}.
-     */
-    @Override
-    public void close()
-    throws IOException {
-        // Order is important here!
-        if (null == delegate)
-            return;
-        try {
-            delegate.close();
-        } finally {
-            delegate = null;
+        // Post-check state.
+        if (0 == len) {
+            // This was an attempt to read past the end of the file.
+            // This could have been checked in advance, but its still desirable
+            // to have the delegate test its state - it might throw an
+            // IOException if it has been closed before.
+            assert 0 >= read;
+            return -1;
         }
+        assert 0 < read;
+
+        // Update state.
+        this.fp = fp + read;
+        return read;
     }
 }
