@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.rof;
 
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import net.jcip.annotations.NotThreadSafe;
 
@@ -60,7 +61,7 @@ public class IntervalReadOnlyFile extends DecoratingReadOnlyFile {
      * @param length the length of the interval.
      */
     public IntervalReadOnlyFile(
-            final ReadOnlyFile rof,
+            final @Nullable ReadOnlyFile rof,
             final long length)
     throws IOException {
         this(rof, rof.getFilePointer(), length, true);
@@ -79,7 +80,7 @@ public class IntervalReadOnlyFile extends DecoratingReadOnlyFile {
      * @param length the length of the interval.
      */
     public IntervalReadOnlyFile(
-            final ReadOnlyFile rof,
+            final @Nullable ReadOnlyFile rof,
             final long start,
             final long length)
     throws IOException {
@@ -101,7 +102,7 @@ public class IntervalReadOnlyFile extends DecoratingReadOnlyFile {
      *        read only file gets positioned before each read operation.
      */
     private IntervalReadOnlyFile(
-            final ReadOnlyFile rof,
+            final @Nullable ReadOnlyFile rof,
             final long start,
             final long length,
             final boolean exclusive)
