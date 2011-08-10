@@ -32,6 +32,7 @@ import de.schlichtherle.truezip.fs.archive.zip.JarDriver;
 import de.schlichtherle.truezip.fs.archive.zip.OptionOutputSocket;
 import de.schlichtherle.truezip.fs.archive.zip.ZipArchiveEntry;
 import de.schlichtherle.truezip.fs.archive.zip.ZipInputShop;
+import de.schlichtherle.truezip.fs.archive.zip.ZipOutputShop;
 import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.key.KeyManagerProvider;
 import de.schlichtherle.truezip.key.KeyProvider;
@@ -105,11 +106,16 @@ public abstract class ZipRaesDriver extends JarDriver {
      * @since  TrueZIP 7.3.
      */
     @Override
-    public final KeyManagerProvider getKeyManagerProvider() {
+    protected final KeyManagerProvider getKeyManagerProvider() {
         return keyManagerProvider;
     }
 
-    final KeyManager<AesCipherParameters> getKeyManager() {
+    /**
+     * Returns the key manager for accessing RAES encrypted data.
+     * 
+     * @return The key manager for accessing RAES encrypted data.
+     */
+    protected final KeyManager<AesCipherParameters> getKeyManager() {
         return keyManagerProvider.get(AesCipherParameters.class);
     }
 

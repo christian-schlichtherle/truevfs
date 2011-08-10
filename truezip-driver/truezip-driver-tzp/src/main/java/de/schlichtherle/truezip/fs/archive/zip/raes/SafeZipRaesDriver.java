@@ -101,7 +101,7 @@ public class SafeZipRaesDriver extends ZipRaesDriver {
         // Hence, checking the CRC-32 value of the plain text ZIP file is
         // redundant.
         return rof.length() > getAuthenticationTrigger()
-                ? new CheckedZipInputShop(this, rof)
+                ? new CheckedZipInputShop(this, model, rof)
                 : super.newInputShop(model, rof);
     }
 }

@@ -20,6 +20,11 @@ import de.schlichtherle.truezip.crypto.raes.RaesParameters;
 import de.schlichtherle.truezip.crypto.raes.RaesParametersProvider;
 import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters;
 import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
+import de.schlichtherle.truezip.fs.FsModel;
+import de.schlichtherle.truezip.fs.archive.zip.ZipDriver;
+import de.schlichtherle.truezip.fs.archive.zip.ZipInputShop;
+import de.schlichtherle.truezip.fs.archive.zip.ZipOutputShop;
+import de.schlichtherle.truezip.fs.archive.zip.raes.ZipRaesDriver;
 import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.key.KeyManagerProvider;
 import de.schlichtherle.truezip.key.KeyProvider;
@@ -27,6 +32,7 @@ import de.schlichtherle.truezip.key.UnknownKeyException;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URI;
+import java.nio.charset.Charset;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -40,17 +46,21 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-public final class KeyManagerRaesParameters
+public class KeyManagerRaesParameters
 implements RaesParametersProvider {
 
-    private final KeyManager<AesCipherParameters> manager;
-    private final URI raes;
+    /** The key manager for accessing RAES encrypted data. */
+    protected final KeyManager<AesCipherParameters> manager;
+
+    /** The resource URI of the RAES file. */
+    protected final URI raes;
 
     /**
      * Constructs RAES parameters using the given key manager provider.
      *
+     * @param  provider the provider for the key manager for accessing RAES
+     *         encrypted data.
      * @param  raes the absolute URI of the RAES file.
-     * @throws IllegalArgumentException if {@code raes} is not an absolute URI.
      */
     public KeyManagerRaesParameters(
             final KeyManagerProvider provider,
@@ -59,18 +69,16 @@ implements RaesParametersProvider {
     }
 
     /**
-     * Constructs RAES parameters using the given key manager.
+     * Constructs new RAES parameters.
      *
-     * @param  raes the absolute URI of the RAES file.
-     * @throws IllegalArgumentException if {@code raes} is not an absolute URI.
+     * @param  manager the key manager for accessing RAES encrypted data.
+     * @param  raes the resource URI of the RAES file.
      */
     public KeyManagerRaesParameters(
             final KeyManager<AesCipherParameters> manager,
             final URI raes) {
-        if (null == manager)
+        if (null == manager || null == raes)
             throw new NullPointerException();
-        if (!raes.isAbsolute())
-            throw new IllegalArgumentException();
         this.manager = manager;
         this.raes = raes;
     }
