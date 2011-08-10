@@ -159,7 +159,7 @@ implements Iterable<E>, Closeable {
             boolean postambled,
             ZipEntryFactory<E> factory)
     throws IOException {
-        this(   new SingletonReadOnlyFilePool(archive),
+        this(   new SingleReadOnlyFilePool(archive),
                 charset, preambled, postambled, factory);
     }
 
@@ -193,26 +193,6 @@ implements Iterable<E>, Closeable {
         //assert null != this.factory; // pleases FindBugs!
         assert null != this.mapper;
     }
-
-    /** A pool with a singleton read only file provided to its constructor. */
-    private static class SingletonReadOnlyFilePool
-    implements Pool<ReadOnlyFile, IOException> {
-        final ReadOnlyFile rof;
-
-        SingletonReadOnlyFilePool(ReadOnlyFile rof) {
-            this.rof = rof;
-        }
-
-        @Override
-		public ReadOnlyFile allocate() {
-            return rof;
-        }
-
-        @Override
-		public void release(ReadOnlyFile rof) {
-            assert this.rof == rof;
-        }
-    } // class SingletonReadOnlyFile
 
     /**
      * Reads the central directory of the given file and populates
@@ -1132,4 +1112,24 @@ implements Iterable<E>, Closeable {
             return start + offset;
         }
     } // IrregularOffsetMapper
+
+    /** A pool with a single read only file provided to its constructor. */
+    private static final class SingleReadOnlyFilePool
+    implements Pool<ReadOnlyFile, IOException> {
+        final ReadOnlyFile rof;
+
+        SingleReadOnlyFilePool(ReadOnlyFile rof) {
+            this.rof = rof;
+        }
+
+        @Override
+        public ReadOnlyFile allocate() {
+            return rof;
+        }
+
+        @Override
+        public void release(ReadOnlyFile rof) {
+            assert this.rof == rof;
+        }
+    } // SingleReadOnlyFilePool
 }
