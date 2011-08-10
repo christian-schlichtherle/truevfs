@@ -54,7 +54,13 @@ public final class IntervalReadOnlyFileTest extends ReadOnlyFileTestSuite {
                 logger.log(Level.WARNING, "{0} (File.delete() failed)", temp2);
             throw ex;
         }
-        super.setUp();
+        super.setUp(); // calls newReadOnlyFile(File)
+    }
+
+    @Override
+    protected ReadOnlyFile newReadOnlyFile(File file) throws IOException {
+        final ReadOnlyFile rof = new DefaultReadOnlyFile(temp2);
+        return new IntervalReadOnlyFile(rof, DATA.length, DATA.length);
     }
 
     @After
@@ -67,11 +73,5 @@ public final class IntervalReadOnlyFileTest extends ReadOnlyFileTestSuite {
                 logger.log(Level.WARNING, "{0} (could not delete)", temp2);
             
         }
-    }
-
-    @Override
-    protected ReadOnlyFile newReadOnlyFile(File file) throws IOException {
-        final ReadOnlyFile rof = new DefaultReadOnlyFile(temp2);
-        return new IntervalReadOnlyFile(rof, DATA.length, DATA.length);
     }
 }
