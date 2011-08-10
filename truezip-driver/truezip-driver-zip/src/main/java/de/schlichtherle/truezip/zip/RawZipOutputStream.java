@@ -552,7 +552,6 @@ implements Iterable<E> {
         final long csize32 = entry.getCompressedSize32();
         final long size32 = entry.getSize32();
         final long offset32 = entry.getOffset32();
-        final boolean dd = entry.getGeneral1(GPBF_DATA_DESCRIPTOR);
         final boolean zip64 // ZIP64 extensions?
                 =  csize32  >= UInt.MAX_VALUE
                 || size32   >= UInt.MAX_VALUE
