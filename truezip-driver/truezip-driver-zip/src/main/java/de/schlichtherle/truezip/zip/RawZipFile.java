@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.zip;
 
 import de.schlichtherle.truezip.io.DecoratingInputStream;
+import de.schlichtherle.truezip.io.SynchronizedInputStream;
 import de.schlichtherle.truezip.rof.BufferedReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.util.Pool;
@@ -756,7 +757,7 @@ implements Iterable<E>, Closeable {
                         ? readUInt(dd, 4)
                         : ddSig;
             } else {
-                // The CRC-32 is in the Local File Header.
+                // The CRC-32 in the Local File Header.
                 localCrc = readUInt(lfh, 14);
             }
             if (entry.getCrc() != localCrc)
@@ -770,7 +771,7 @@ implements Iterable<E>, Closeable {
         switch (method) {
             case DEFLATED:
                 if (process) {
-                    iis.addDummy();
+                    iis.addDummyByte();
                     in = new PooledInflaterInputStream(in, bufSize);
                     if (check)
                         in = new CheckedInputStream(in, entry, bufSize);
@@ -784,6 +785,7 @@ implements Iterable<E>, Closeable {
                 if (check)
                     in = new CheckedInputStream(in, entry, bufSize);
                 break;
+            case WINZIP_AES:
             default:
                 throw new ZipException(name
                     + " (compression method " + method + " is not supported)");
@@ -883,6 +885,21 @@ implements Iterable<E>, Closeable {
                 break;
         }
         return total;
+    }
+
+    /**
+     * Closes the file.
+     * This closes any allocate input streams reading from this ZIP file.
+     *
+     * @throws IOException if an error occurs closing the file.
+     */
+    @Override
+    public void close() throws IOException {
+        final ReadOnlyFile archive = this.archive;
+        if (null == archive)
+            return;
+        this.archive = null;
+        archive.close();
     }
 
     /**
@@ -1001,27 +1018,18 @@ implements Iterable<E>, Closeable {
     } // RawCheckedInputStream
 
     /**
-     * Closes the file.
-     * This closes any allocate input streams reading from this ZIP file.
-     *
-     * @throws IOException if an error occurs closing the file.
-     */
-    @Override
-    public void close() throws IOException {
-        final ReadOnlyFile archive = this.archive;
-        if (null == archive)
-            return;
-        this.archive = null;
-        archive.close();
-    }
-
-    /**
      * InputStream that delegates requests to the underlying
      * RandomAccessFile, making sure that only bytes from a certain
      * range can be read.
      * Calling close() on the enclosing RawZipFile instance causes all
      * corresponding instances of this member class to get close()d, too.
-     * Note that this class is <em>not</em> thread safe!
+     * <p>
+     * Although this class is not thread-safe, it can be made thread-safe by
+     * decorating it with a {@link SynchronizedInputStream} which uses the
+     * {@link RawZipFile} as its lock - see
+     * {@link ZipFile#getInputStream(String, boolean, boolean)}.
+     * In order to support this scenario, the position of the file pointer gets
+     * adjusted before any I/O operation.
      */
     private final class IntervalInputStream extends AccountedInputStream {
         long remaining;
@@ -1033,7 +1041,7 @@ implements Iterable<E>, Closeable {
          * @param remaining The remaining bytes allowed to be read in
          *        {@code archive}.
          */
-        IntervalInputStream(long start, long remaining) {
+        IntervalInputStream(long start, long remaining) throws IOException {
             assert start >= 0;
             assert remaining >= 0;
             this.remaining = remaining;
@@ -1092,10 +1100,9 @@ implements Iterable<E>, Closeable {
         }
 
         /**
-         * Inflater needs an extra dummy byte for nowrap - see
-         * Inflater's javadocs.
+         * Inflater needs an extra dummy byte for nowrap - see {@link Inflater}.
          */
-        void addDummy() {
+        void addDummyByte() {
             addDummyByte = true;
         }
 
@@ -1113,7 +1120,7 @@ implements Iterable<E>, Closeable {
         public int available() throws IOException {
             assertOpen();
             long available = remaining;
-            if (addDummyByte)
+            if (addDummyByte && available < Long.MAX_VALUE)
                 available++;
             return available > Integer.MAX_VALUE
                     ? Integer.MAX_VALUE

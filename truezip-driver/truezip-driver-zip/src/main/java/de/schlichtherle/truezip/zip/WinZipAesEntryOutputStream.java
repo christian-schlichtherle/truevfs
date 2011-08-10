@@ -18,12 +18,12 @@ package de.schlichtherle.truezip.zip;
 import de.schlichtherle.truezip.crypto.CipherOutputStream;
 import de.schlichtherle.truezip.crypto.param.KeyStrength;
 import de.schlichtherle.truezip.io.LEDataOutputStream;
+import static de.schlichtherle.truezip.zip.WinZipAesExtraField.*;
 import static de.schlichtherle.truezip.zip.ZipEntry.*;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.security.SecureRandom;
-import java.util.Random;
 import net.jcip.annotations.NotThreadSafe;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.Mac;
@@ -34,7 +34,6 @@ import org.bouncycastle.crypto.io.MacOutputStream;
 import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
-import static de.schlichtherle.truezip.zip.WinZipAesExtraField.*;
 
 /**
  * Encrypts ZIP entry contents according the WinZip AES specification.
