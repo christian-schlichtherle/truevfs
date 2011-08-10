@@ -16,9 +16,10 @@
 package de.schlichtherle.truezip.zip;
 
 import de.schlichtherle.truezip.io.DecoratingInputStream;
-import de.schlichtherle.truezip.io.SynchronizedInputStream;
 import de.schlichtherle.truezip.rof.BufferedReadOnlyFile;
+import de.schlichtherle.truezip.rof.IntervalReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.rof.ReadOnlyFileInputStream;
 import de.schlichtherle.truezip.util.Pool;
 import static de.schlichtherle.truezip.zip.Constants.*;
 import static de.schlichtherle.truezip.zip.LittleEndian.*;
@@ -115,7 +116,7 @@ implements Iterable<E>, Closeable {
     private @CheckForNull ReadOnlyFile archive;
 
     /** The number of allocate streams reading from this ZIP file. */
-    private int openStreams;
+    private int openEntries;
 
     /**
      * Reads the given {@code archive} in order to provide random access
@@ -500,11 +501,11 @@ implements Iterable<E>, Closeable {
     }
 
     /**
-     * Returns {@code true} if and only if some input streams are busy with
-     * reading from this ZIP file.
+     * Returns {@code true} if and only if this ZIP file is busy reading
+     * one or more entries.
      */
     public boolean busy() {
-        return openStreams > 0;
+        return 0 < openEntries;
     }
 
     /**
@@ -590,7 +591,8 @@ implements Iterable<E>, Closeable {
      */
     public InputStream getPreambleInputStream() throws IOException {
         assertOpen();
-        return new IntervalInputStream(0, preamble);
+        return new ReadOnlyFileInputStream(
+                new SegmentReadOnlyFile(0, preamble));
     }
 
     /**
@@ -619,7 +621,8 @@ implements Iterable<E>, Closeable {
      */
     public InputStream getPostambleInputStream() throws IOException {
         assertOpen();
-        return new IntervalInputStream(length - postamble, postamble);
+        return new ReadOnlyFileInputStream(
+                new SegmentReadOnlyFile(length - postamble, postamble));
     }
 
     OffsetMapper getOffsetMapper() {
@@ -763,25 +766,27 @@ implements Iterable<E>, Closeable {
             if (entry.getCrc() != localCrc)
                 throw new CRC32Exception(name, entry.getCrc(), localCrc);
         }
-        final IntervalInputStream iis
-                = new IntervalInputStream(offset, entry.getCompressedSize());
+        final IntervalReadOnlyFile rof = new SegmentReadOnlyFile(
+                offset, entry.getCompressedSize());
+        InputStream in;
         final int bufSize = getBufferSize(entry);
-        InputStream in = iis;
         final int method = entry.getMethod();
         switch (method) {
             case DEFLATED:
                 if (process) {
-                    iis.addDummyByte();
-                    in = new PooledInflaterInputStream(in, bufSize);
+                    in = new PooledInflaterInputStream(
+                            new DummyByteInputStream(rof), bufSize);
                     if (check)
                         in = new CheckedInputStream(in, entry, bufSize);
                     break;
                 } else {
+                    in = new ReadOnlyFileInputStream(rof);
                     if (check)
                         in = new RawCheckedInputStream(in, entry, bufSize);
                 }
                 break;
             case STORED:
+                in = new ReadOnlyFileInputStream(rof);
                 if (check)
                     in = new CheckedInputStream(in, entry, bufSize);
                 break;
@@ -813,7 +818,7 @@ implements Iterable<E>, Closeable {
     extends InflaterInputStream {
         private boolean closed;
 
-        PooledInflaterInputStream(InputStream in, int size) {
+        PooledInflaterInputStream(DummyByteInputStream in, int size) {
             super(in, Inflaters.allocate(), size);
         }
 
@@ -1018,92 +1023,44 @@ implements Iterable<E>, Closeable {
     } // RawCheckedInputStream
 
     /**
-     * InputStream that delegates requests to the underlying
-     * RandomAccessFile, making sure that only bytes from a certain
-     * range can be read.
-     * Calling close() on the enclosing RawZipFile instance causes all
-     * corresponding instances of this member class to get close()d, too.
-     * <p>
-     * Although this class is not thread-safe, it can be made thread-safe by
-     * decorating it with a {@link SynchronizedInputStream} which uses the
-     * {@link RawZipFile} as its lock - see
-     * {@link ZipFile#getInputStream(String, boolean, boolean)}.
-     * In order to support this scenario, the position of the file pointer gets
-     * adjusted before any I/O operation.
+     * A read only file input stream which adds a dummy zero byte to the end of
+     * the input in order to support {@link PooledInflaterInputStream}.
      */
-    private final class IntervalInputStream extends AccountedInputStream {
-        long remaining;
-        long fp;
-        boolean addDummyByte;
+    private static final class DummyByteInputStream
+    extends ReadOnlyFileInputStream {
+        boolean added;
 
-        /**
-         * @param start The start address (not offset) in {@code archive}.
-         * @param remaining The remaining bytes allowed to be read in
-         *        {@code archive}.
-         */
-        IntervalInputStream(long start, long remaining) throws IOException {
-            assert start >= 0;
-            assert remaining >= 0;
-            this.remaining = remaining;
-            fp = start;
+        DummyByteInputStream(ReadOnlyFile rof) {
+            super(rof);
         }
 
         @Override
         public int read() throws IOException {
-            assertOpen();
-            if (remaining <= 0) {
-                if (addDummyByte) {
-                    addDummyByte = false;
-                    return 0;
-                }
-                return -1;
+            final int read = rof.read();
+            if (read < 0 && !added) {
+                added = true;
+                return 0;
             }
-            final ReadOnlyFile archive = RawZipFile.this.archive;
-            assert null != archive;
-            archive.seek(fp);
-            final int ret = archive.read();
-            if (ret >= 0) {
-                fp++;
-                remaining--;
-            }
-            return ret;
+            return read;
         }
 
         @Override
-        public int read(final byte[] b, final int off, int len)
+        public int read(final byte[] buf, final int off, int len)
         throws IOException {
-            if (len <= 0) {
-                if (len < 0)
-                    throw new IndexOutOfBoundsException();
+            if (0 == len)
                 return 0;
-            }
-            assertOpen();
-            if (remaining <= 0) {
-                if (addDummyByte) {
-                    addDummyByte = false;
-                    b[off] = 0;
+            final int read = rof.read(buf, off, len);
+            if (read < len && !added) {
+                added = true;
+                if (read < 0) {
+                    buf[0] = 0;
                     return 1;
+                } else {
+                    buf[read] = 0;
+                    return read + 1;
                 }
-                return -1;
             }
-            if (len > remaining)
-                len = (int) remaining;
-            final ReadOnlyFile archive = RawZipFile.this.archive;
-            assert null != archive;
-            archive.seek(fp);
-            final int ret = archive.read(b, off, len);
-            if (ret > 0) {
-                fp += ret;
-                remaining -= ret;
-            }
-            return ret;
-        }
-
-        /**
-         * Inflater needs an extra dummy byte for nowrap - see {@link Inflater}.
-         */
-        void addDummyByte() {
-            addDummyByte = true;
+            return read;
         }
 
         /**
@@ -1118,33 +1075,39 @@ implements Iterable<E>, Closeable {
          */
         @Override
         public int available() throws IOException {
-            assertOpen();
-            long available = remaining;
-            if (addDummyByte && available < Long.MAX_VALUE)
-                available++;
-            return available > Integer.MAX_VALUE
-                    ? Integer.MAX_VALUE
-                    : (int) available;
+            int available = super.available();
+            return added || available >= Integer.MAX_VALUE
+                    ? available
+                    : available + 1;
         }
-    } // IntervalInputStream
+    } // DummyByteInputStream
 
-    /** Accounts itself until it gets closed. */
-    private abstract class AccountedInputStream extends InputStream {
+    /**
+     * An interval read only file which accounts for itself until it gets
+     * closed.
+     * Note that when an object of this class gets closed, the decorated read
+     * only file, i.e. the raw zip file does NOT get closed!
+     */
+    private final class SegmentReadOnlyFile extends IntervalReadOnlyFile {
         private boolean closed;
 
-        AccountedInputStream() {
-            openStreams++;
+        SegmentReadOnlyFile(long start, long length)
+        throws IOException {
+            super(RawZipFile.this.archive, start, length);
+            assert null != RawZipFile.this.archive;
+            RawZipFile.this.openEntries++;
         }
 
         @Override
         public void close() throws IOException {
-            if (closed)
+            if (this.closed)
                 return;
-            closed = true;
-            openStreams--;
-            super.close();
+            this.closed = true;
+            RawZipFile.this.openEntries--;
+            // Never close the raw ZIP file!
+            //super.close();
         }
-    } // AccountedInputStream
+    } // SegmentReadOnlyFile
 
     /** Maps a given offset to a file pointer position. */
     @SuppressWarnings("PackageVisibleInnerClass")
