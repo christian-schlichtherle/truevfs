@@ -309,9 +309,8 @@ implements OutputShop<ZipArchiveEntry> {
                     super.close();
                 } finally {
                     final long length = temp.getSize(DATA);
-                    /*if (Integer.MAX_VALUE < length)
-                        throw new IOException("file too large");*/
                     final ZipArchiveEntry tempEntry = ZipOutputShop.this.tempEntry;
+                    assert null != tempEntry;
                     assert STORED == tempEntry.getMethod();
                     tempEntry.setCrc(getChecksum().getValue());
                     tempEntry.setCompressedSize(length);
@@ -327,8 +326,9 @@ implements OutputShop<ZipArchiveEntry> {
             try {
                 final InputStream in = temp.getInputSocket().newInputStream();
                 try {
-                    assert null != ZipOutputShop.this.tempEntry;
-                    putNextEntry(ZipOutputShop.this.tempEntry);
+                    final ZipArchiveEntry tempEntry = ZipOutputShop.this.tempEntry;
+                    assert null != tempEntry;
+                    putNextEntry(tempEntry);
                     try {
                         Streams.cat(in, ZipOutputShop.this);
                     } finally {
