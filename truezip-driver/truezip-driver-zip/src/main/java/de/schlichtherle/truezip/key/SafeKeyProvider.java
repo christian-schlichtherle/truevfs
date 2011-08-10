@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.key;
 
+import de.schlichtherle.truezip.crypto.SuspensionPenalty;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -42,7 +43,7 @@ implements KeyProvider<K> {
      * More specifically, this is the minimum delay between two calls to
      * {@link #getReadKey} by the same thread.
      */
-    public static final int MIN_KEY_RETRY_DELAY = 3 * 1000;
+    public static final int MIN_KEY_RETRY_DELAY = SuspensionPenalty.MIN_KEY_RETRY_DELAY;
 
     private volatile @CheckForNull K key;
 
@@ -142,18 +143,7 @@ implements KeyProvider<K> {
 
     @SuppressWarnings("SleepWhileInLoop")
     private void enforceSuspensionPenalty() {
-        final long last = invalidated.get();
-        long delay;
-        InterruptedException interrupted = null;
-        while ((delay = System.currentTimeMillis() - last) < MIN_KEY_RETRY_DELAY) {
-            try {
-                Thread.sleep(MIN_KEY_RETRY_DELAY - delay);
-            } catch (InterruptedException ex) {
-                interrupted = ex;
-            }
-        }
-        if (null != interrupted)
-            Thread.currentThread().interrupt();
+        invalidated.set(SuspensionPenalty.enforce(invalidated.get()));
     }
 
     private static final class ThreadLocalLong extends ThreadLocal<Long> {
