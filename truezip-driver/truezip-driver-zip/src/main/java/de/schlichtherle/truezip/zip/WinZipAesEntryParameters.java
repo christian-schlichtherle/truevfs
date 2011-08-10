@@ -23,7 +23,7 @@ import net.jcip.annotations.ThreadSafe;
 /**
  * The parameters of this interface are used with WinZip AES encrypted entries.
  *
- * @see     <a href="http://www.winzip.com/win/en/aes_info.htm">AES Encryption Information: Encryption Specification AE-1 and AE-2</a>
+ * @since   TrueZIP 7.3
  * @author  Christian Schlichtherle
  * @version $Id$
  */

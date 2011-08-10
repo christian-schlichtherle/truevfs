@@ -23,6 +23,7 @@ package de.schlichtherle.truezip.zip;
  * Hence, for each type a separate parameter interface is used which extends
  * this marker interface.
  * 
+ * @since   TrueZIP 7.3
  * @author  Christian Schlichtherle
  * @version $Id$
  */

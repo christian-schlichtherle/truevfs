@@ -64,7 +64,11 @@ public class ZipEntry implements Cloneable {
     /** Compression method for compressed (<em>deflated</em>) entries. */
     public static final int DEFLATED = 8;
 
-    /** Pseudo compression method for WinZip AES encrypted entries. */
+    /**
+     * Pseudo compression method for WinZip AES encrypted entries.
+     * 
+     * @since TrueZIP 7.3
+     */
     static final int WINZIP_AES = 99;
 
     /** General Purpose Bit Flag for encrypted data. */
@@ -264,6 +268,7 @@ public class ZipEntry implements Cloneable {
      * Note that only WinZip AES encryption is currently supported.
      * 
      * @return {@code true} if and only if this ZIP entry is encrypted.
+     * @since   TrueZIP 7.3
      */
     public final boolean isEncrypted() {
         return getGeneral1(GPBF_ENCRYPTED);
@@ -274,6 +279,7 @@ public class ZipEntry implements Cloneable {
      * Note that only WinZip AES encryption is currently supported.
      * 
      * @param encrypted whether or not this ZIP entry should get encrypted.
+     * @since   TrueZIP 7.3
      */
     public final void setEncrypted(boolean encrypted) {
         setGeneral1(GPBF_ENCRYPTED, encrypted);
