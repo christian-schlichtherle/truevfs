@@ -244,33 +244,6 @@ public class ZipFile extends RawZipFile<ZipEntry> {
     }
 
     /**
-     * A pool which allocates {@link DefaultReadOnlyFile} objects for the
-     * provided to its constructor.
-     */
-    private static final class DefaultReadOnlyFilePool
-    implements Pool<ReadOnlyFile, IOException> {
-        final File file;
-
-        DefaultReadOnlyFilePool(final File file) {
-            this.file = file;
-        }
-
-        DefaultReadOnlyFilePool(String name) {
-            this.file = new File(name);
-        }
-
-        @Override
-        public ReadOnlyFile allocate() throws IOException {
-            return new DefaultReadOnlyFile(file);
-        }
-
-        @Override
-        public void release(ReadOnlyFile rof) throws IOException {
-            rof.close();
-        }
-    } // DefaultReadOnlyFilePool
-
-    /**
      * Returns the {@link Object#toString() string representation} of whatever
      * input source object was used to construct this ZIP file.
      * For {@link String} and {@link File} objects, this is a path name.
@@ -373,4 +346,31 @@ public class ZipFile extends RawZipFile<ZipEntry> {
     public synchronized void close() throws IOException {
         super.close();
     }
+
+    /**
+     * A pool which allocates {@link DefaultReadOnlyFile} objects for the
+     * file provided to its constructor.
+     */
+    private static final class DefaultReadOnlyFilePool
+    implements Pool<ReadOnlyFile, IOException> {
+        final File file;
+
+        DefaultReadOnlyFilePool(String name) {
+            this(new File(name));
+        }
+
+        DefaultReadOnlyFilePool(final File file) {
+            this.file = file;
+        }
+
+        @Override
+        public ReadOnlyFile allocate() throws IOException {
+            return new DefaultReadOnlyFile(file);
+        }
+
+        @Override
+        public void release(ReadOnlyFile rof) throws IOException {
+            rof.close();
+        }
+    } // DefaultReadOnlyFilePool
 }
