@@ -31,6 +31,7 @@ import net.jcip.annotations.NotThreadSafe;
  * assume a particular position of the file pointer in the decorated read only
  * file.
  * 
+ * @since   TrueZIP 7.3
  * @author  Christian Schlichtherle
  * @version $Id$
  */
