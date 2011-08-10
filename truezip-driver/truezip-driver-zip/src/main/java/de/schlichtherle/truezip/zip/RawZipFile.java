@@ -513,6 +513,8 @@ implements Iterable<E>, Closeable {
      * decoding entry names and the file comment.
      * Depending on the ZIP file contents, this may differ from the character
      * set provided to the constructor.
+     * 
+     * @since TrueZIP 7.3
      */
     public Charset getRawCharset() {
         return charset;

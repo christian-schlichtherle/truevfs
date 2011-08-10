@@ -20,6 +20,7 @@ import net.jcip.annotations.ThreadSafe;
 /**
  * Thrown to indicate that an authenticated ZIP entry has been tampered with.
  *
+ * @since   TrueZIP 7.3
  * @author  Christian Schlichtherle
  * @version $Id$
  */

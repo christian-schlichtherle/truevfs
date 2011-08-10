@@ -39,6 +39,7 @@ import static org.bouncycastle.crypto.PBEParametersGenerator.*;
  * <p>
  * The current implementation supports only {@link WinZipAesParameters}.
  *
+ * @since   TrueZIP 7.3
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -136,6 +137,7 @@ implements ZipCryptoParametersProvider {
      * @param  characters the password characters to encode.
      * @param  name the entry name for optional mixing into the result.
      * @return The derived password bytes.
+     * @see    <a href="http://www.ietf.org/rfc/rfc2898.txt">RFC 2898: PKCS #5: Password-Based Cryptography Specification Version 2.0</a> (IETF et al.)
      */
     protected byte[] password(char[] characters, String name) {
         return PKCS5PasswordToBytes(characters);

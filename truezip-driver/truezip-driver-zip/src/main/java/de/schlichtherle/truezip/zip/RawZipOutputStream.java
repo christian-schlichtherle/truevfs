@@ -191,6 +191,8 @@ implements Iterable<E> {
     /**
      * Returns the character set which is used for
      * encoding entry names and the file comment.
+     * 
+     * @since TrueZIP 7.3
      */
     public Charset getRawCharset() {
         return charset;
@@ -332,6 +334,7 @@ implements Iterable<E> {
      * Returns the crypto parameters.
      * 
      * @return The crypto parameters.
+     * @since  TrueZIP 7.3
      */
     protected abstract @CheckForNull ZipCryptoParameters getCryptoParameters();
 

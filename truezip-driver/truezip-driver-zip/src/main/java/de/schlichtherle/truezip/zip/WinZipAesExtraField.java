@@ -25,7 +25,9 @@ import net.jcip.annotations.NotThreadSafe;
 /**
  * WinZip AES Extra Field.
  *
- * @see     <a href="http://www.winzip.com/win/en/aes_info.htm">AES Encryption Information: Encryption Specification AE-1 and AE-2</a>
+ * @since   TrueZIP 7.3
+ * @see     <a href="http://www.winzip.com/win/en/aes_info.htm">AES Encryption Information: Encryption Specification AE-1 and AE-2</a> (WinZip Computing, S.L.)
+ * @see     <a href="http://www.winzip.com/win/en/aes_tips.htm">AES Coding Tips for Developers</a> (WinZip Computing, S.L.)
  * @see     RawZipOutputStream$WinZipAesOutputMethod
  * @author  Christian Schlichtherle
  * @version $Id$

@@ -128,6 +128,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
      * 
      * @param  output the ZIP output shop.
      * @return The {@link ZipCryptoParameters} for the given ZIP output shop.
+     * @since   TrueZIP 7.3
      */
     protected ZipCryptoParameters zipCryptoParameters(ZipOutputShop output) {
         return new KeyManagerZipCryptoParameters(output, this);

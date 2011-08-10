@@ -26,6 +26,8 @@ import org.bouncycastle.crypto.engines.AESFastEngine;
  * the block counter is incremented <em>before</em> updating the cipher input
  * in <em>little endian</em> order.
  *
+ * @since   TrueZIP 7.3
+ * @see     <a href="http://www.gladman.me.uk/cryptography_technology/fileencrypt/">A Password Based File Encyption Utility</a> (Dr. Gladman)
  * @author  Christian Schlichtherle
  * @version $Id$
  */

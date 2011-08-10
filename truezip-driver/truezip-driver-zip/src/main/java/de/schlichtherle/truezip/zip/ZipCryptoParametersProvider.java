@@ -26,6 +26,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * This enables implementations to retrieve ZIP crypto parameters on demand
  * rather than providing them upfront for any possible type.
  *
+ * @since   TrueZIP 7.3
  * @author  Christian Schlichtherle
  * @version $Id$
  */

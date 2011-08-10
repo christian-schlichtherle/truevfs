@@ -22,6 +22,7 @@ import net.jcip.annotations.ThreadSafe;
  * Thrown if there is an issue when reading or writing an encrypted ZIP file
  * or entry.
  *
+ * @since   TrueZIP 7.3
  * @author  Christian Schlichtherle
  * @version $Id$
  */
