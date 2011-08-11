@@ -122,8 +122,8 @@ $ nzip.cmd cp file safe.tzp/file
 
 ** New Options for ZIP Files
 
-    In TrueZIP 7.3, new options have been added to the <<<cp>>> command,
-    primarily in order to support new options for ZIP files.
+    In TrueZIP 7.1 and 7.3, new options have been added to the <<<cp>>>
+    command, primarily in order to support new options for ZIP files.
 
     Use the following option in order to create a ZIP entry which is encrypted
     according to the
@@ -149,4 +149,11 @@ $ nzip.cmd cp -grow file true.zip/file
 
 +--+
 $ nzip.cmd cp -store file true.zip/file
++--+
+
+    For completeness, there's also an option to use the DEFLATED method.
+    This is the default however, so you don't need to specify it:
+
++--+
+$ nzip.cmd cp -compress file true.zip/file
 +--+
