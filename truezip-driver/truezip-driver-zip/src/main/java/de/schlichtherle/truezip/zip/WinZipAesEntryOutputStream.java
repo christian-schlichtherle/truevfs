@@ -83,7 +83,7 @@ final class WinZipAesEntryOutputStream extends CipherOutputStream {
             final LEDataOutputStream out,
             final WinZipAesEntryParameters param)
     throws ZipKeyException {
-        super(out, new BufferedBlockCipher(new WinZipAesCipherMode()));
+        super(out, new BufferedBlockCipher(new WinZipAesCipher()));
         assert null != out;
         assert null != param;
         this.param = param;
@@ -111,8 +111,8 @@ final class WinZipAesEntryOutputStream extends CipherOutputStream {
                 + 10; // authentication code
         entry.setCompressedSize64(csize);
         final WinZipAesExtraField
-                ef = (WinZipAesExtraField) entry.getExtraField(WINZIP_AES_ID);
-        if (VV_AE_2 == ef.getVendorVersion())
+                field = (WinZipAesExtraField) entry.getExtraField(WINZIP_AES_ID);
+        if (VV_AE_2 == field.getVendorVersion())
             entry.setCrc32(0);
     }
 
@@ -129,25 +129,23 @@ final class WinZipAesEntryOutputStream extends CipherOutputStream {
         shaker.nextBytes(salt);
 
         // Init password.
-        final byte[] pwdBytes = param.getWritePassword();
+        final byte[] passwd = param.getWritePassword();
 
         // Derive cipher and MAC parameters.
-        // Here comes the strange part about WinZip AES encryption:
-        // Its unorthodox use of the Password-Based Key Derivation Function 2
-        // (PBKDF2) of PKCS #5 V2.0 alias RFC 2898.
         final PBEParametersGenerator gen = new PKCS5S2ParametersGenerator();
-        gen.init(pwdBytes, salt, ITERATION_COUNT);
-        assert AES_BLOCK_SIZE_BITS <= keyStrengthBits;
+        gen.init(passwd, salt, ITERATION_COUNT);
+        // Here comes the strange part about WinZip AES encryption:
+        // Its unorthodox use of the Password-Based Key Derivation
+        // Function 2 (PBKDF2) of PKCS #5 V2.0 alias RFC 2898.
         // Yes, the password verifier is only a 16 bit value.
-        // So we must use the MAC for verification.
+        // So we must use the MAC for password verification, too.
+        assert AES_BLOCK_SIZE_BITS <= keyStrengthBits;
         final KeyParameter keyParam =
                 (KeyParameter) gen.generateDerivedParameters(
                     2 * keyStrengthBits + PWD_VERIFIER_BITS);
-        paranoidWipe(pwdBytes); // must not wipe before generator use!
+        paranoidWipe(passwd); // must not wipe before generator use!
 
         // Can you believe they "forgot" the nonce in the CTR mode IV?! :-(
-        // This is why the WinZip AES specification should be considered
-        // "broken"!
         final byte[] ctrIv = new byte[AES_BLOCK_SIZE_BITS / 8];
         final ParametersWithIV aesCtrParam = new ParametersWithIV(
                 new KeyParameter(keyParam.getKey(), 0, keyStrengthBytes),
