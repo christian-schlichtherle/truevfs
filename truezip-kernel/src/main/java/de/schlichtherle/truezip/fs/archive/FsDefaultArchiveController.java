@@ -28,6 +28,7 @@ import de.schlichtherle.truezip.fs.FsFalsePositiveException;
 import de.schlichtherle.truezip.fs.FsInputOption;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
+import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.fs.FsSyncOption;
 import static de.schlichtherle.truezip.fs.FsSyncOption.*;
@@ -76,8 +77,6 @@ extends FsFileSystemArchiveController<E> {
 
     private static final BitField<FsInputOption>
             MOUNT_INPUT_OPTIONS = BitField.of(FsInputOption.CACHE);
-    private static final BitField<FsOutputOption>
-            MAKE_OUTPUT_MASK = BitField.of(CACHE, CREATE_PARENTS, GROW);
     private static final BitField<FsSyncOption>
             AUTO_SYNC_OPTIONS = BitField.of(WAIT_CLOSE_INPUT,
                                             WAIT_CLOSE_OUTPUT);
@@ -228,7 +227,7 @@ extends FsFileSystemArchiveController<E> {
             return output;
         final BitField<FsOutputOption> options = getContext()
                 .getOutputOptions()
-                .and(MAKE_OUTPUT_MASK)
+                .and(OUTPUT_PREFERENCES_MASK)
                 .set(CACHE);
         final OutputSocket<?> socket = driver.getOutputSocket(
                 parent, parentName, options, null);

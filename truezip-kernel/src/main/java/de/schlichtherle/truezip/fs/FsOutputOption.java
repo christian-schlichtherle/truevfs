@@ -61,10 +61,9 @@ public enum FsOutputOption {
     EXCLUSIVE,
 
     /**
-     * <em>Ignorable:</em>
      * Expresses a preference to store an entry uncompressed within its archive.
      * <p>
-     * This option may get ignored by archive file system drivers.
+     * Note that this option may get ignored by archive file system drivers.
      * Furthermore, if this happens, there may be no direct feedback available
      * to the caller.
      * 
@@ -73,10 +72,9 @@ public enum FsOutputOption {
     STORE,
 
     /**
-     * <em>Ignorable:</em>
      * Expresses a preference to compress an entry within its archive.
      * <p>
-     * This option may get ignored by archive file system drivers.
+     * Note that this option may get ignored by archive file system drivers.
      * Furthermore, if this happens, there may be no direct feedback available
      * to the caller.
      * 
@@ -85,7 +83,6 @@ public enum FsOutputOption {
     COMPRESS,
 
     /**
-     * <em>Ignorable:</em>
      * Expresses a preference to allow an archive file to grow by appending any
      * new or updated archive entry contents or meta data to its end.
      * Setting this option may produce redundant data in the resulting archive
@@ -97,7 +94,7 @@ public enum FsOutputOption {
      * This option is the equivalent to a multi-session disc (CD, DVD etc.)
      * for archive files.
      * <p>
-     * This option may get ignored by archive file system drivers.
+     * Note that this option may get ignored by archive file system drivers.
      * Furthermore, if this happens, there may be no direct feedback available
      * to the caller.
      * 
@@ -106,11 +103,10 @@ public enum FsOutputOption {
     GROW,
 
     /**
-     * <em>Ignorable:</em>
      * Expresses a preference to encrypt archive entries when writing them to
      * an archive file.
      * <p>
-     * This option may get ignored by archive file system drivers.
+     * Note that this option may get ignored by archive file system drivers.
      * Furthermore, if this happens, there may be no direct feedback available
      * to the caller.
      * 
