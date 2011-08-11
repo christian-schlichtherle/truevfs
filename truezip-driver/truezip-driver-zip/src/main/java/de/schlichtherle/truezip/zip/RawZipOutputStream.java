@@ -1049,14 +1049,8 @@ implements Iterable<E> {
         void finish() throws ZipException {
             final E entry = RawZipOutputStream.this.entry;
             final long crc = getChecksum().getValue();
-            if (this.crc != crc) {
-                throw new ZipException(entry.getName()
-                + " (bad declared CRC-32 value 0x"
-                + Long.toHexString(this.crc)
-                + ", computed 0x"
-                + Long.toHexString(crc)
-                + ")");
-            }
+            if (this.crc != crc)
+                throw new CRC32Exception(entry.getName(), this.crc, crc);
         }
     } // CheckingCrc32OutputStream
 }

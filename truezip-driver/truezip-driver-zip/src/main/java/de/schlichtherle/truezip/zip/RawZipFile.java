@@ -738,6 +738,8 @@ implements Iterable<E>, Closeable {
         offset += LFH_MIN_LEN
                 + readUShort(lfh, LFH_FILE_NAME_LENGTH_OFF) // file name length
                 + readUShort(lfh, LFH_FILE_NAME_LENGTH_OFF + 2); // extra field length
+        if (UNKNOWN == entry.getCrc())
+            check = false;
         if (check) {
             // Check CRC-32 in the Local File Header or Data Descriptor.
             final long localCrc;
@@ -768,24 +770,23 @@ implements Iterable<E>, Closeable {
             if (WINZIP_AES != method)
                 throw new ZipException(name
                         + " (encrypted compression method " + method + " is not supported)");
-            if (process)
+            if (process) {
                 rof = new WinZipAesReadOnlyFile(rof,
                         new WinZipAesEntryParameters(
                                 parameters(
                                     WinZipAesParameters.class,
                                     getCryptoParameters()),
                                 entry));
+                // The entry has just been authenticated using SHA-1.
+                // Disable redundant CRC-32 check.
+                check = false;
+            }
             final WinZipAesExtraField field
                     = (WinZipAesExtraField) entry.getExtraField(WINZIP_AES_ID);
             method = field.getMethod();
-            // Disable CRC-32 checking if the entry has already been
-            // authenticated using SHA-1.
-            check = !process;
             assert VV_AE_2 != field.getVendorVersion()
                     || UNKNOWN == entry.getCrc();
         }
-        if (UNKNOWN == entry.getCrc())
-            check = false;
         InputStream in;
         final int bufSize = getBufferSize(entry);
         switch (method) {
@@ -898,11 +899,10 @@ implements Iterable<E>, Closeable {
             } finally {
                 super.close();
             }
-            final long expectedCrc = entry.getCrc();
-            final long actualCrc = getChecksum().getValue();
-            if (expectedCrc != actualCrc)
-                throw new CRC32Exception(
-                        entry.getName(), expectedCrc, actualCrc);
+            final long expected = entry.getCrc();
+            final long computed = getChecksum().getValue();
+            if (expected != computed)
+                throw new CRC32Exception(entry.getName(), expected, computed);
         }
     } // CheckedInputStream
 

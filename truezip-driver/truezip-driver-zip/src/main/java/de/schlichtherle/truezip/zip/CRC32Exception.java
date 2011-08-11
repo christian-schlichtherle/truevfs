@@ -28,41 +28,47 @@ import java.util.zip.ZipException;
  * <p>
  * The exception's detail message is the name of the ZIP entry.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public class CRC32Exception extends ZipException {
     private static final long serialVersionUID = 1656298435298526391L;
 
-    final long expectedCrc, actualCrc;
+    private final long expected, actual;
 
     /**
      * Creates a new instance of {@code CRC32Exception} where the
-     * given entry name is the detail message of the base class.
+     * given entry name forms part of the detail message.
      *
-     * @see #getMessage
-     * @see #getExpectedCrc
-     * @see #getActualCrc
+     * @param name the entry name.
+     * @param expected the declared CRC-32 value.
+     * @param actual the actual CRC-32 value;
+     * @see   #getExpectedCrc
+     * @see   #getActualCrc
      */
-    CRC32Exception(String entryName, long expectedCrc, long actualCrc) {
-        super(entryName);
-        assert expectedCrc != actualCrc;
-        this.expectedCrc = expectedCrc;
-        this.actualCrc = actualCrc;
+    CRC32Exception(final String name, final long expected, final long actual) {
+        super(name
+                + " (expected CRC-32 value 0x"
+                + Long.toHexString(expected)
+                + ", but is actually 0x"
+                + Long.toHexString(actual)
+                + ")");
+        assert expected != actual;
+        this.expected = expected;
+        this.actual = actual;
     }
 
     /**
-     * Returns the CRC-32 value which has been read from the ZIP file.
+     * Returns the CRC-32 value which has been expected for the ZIP entry.
      */
     public long getExpectedCrc() {
-        return expectedCrc;
+        return expected;
     }
 
     /**
-     * Returns the CRC-32 value which has been computed from the contents
-     * of the ZIP entry.
+     * Returns the CRC-32 value which has actually been found for the ZIP entry.
      */
     public long getActualCrc() {
-        return actualCrc;
+        return actual;
     }
 }
