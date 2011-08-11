@@ -141,9 +141,10 @@ implements KeyProvider<K> {
             oldKey.reset();
     }
 
-    @SuppressWarnings("SleepWhileInLoop")
     private void enforceSuspensionPenalty() {
-        invalidated.set(SuspensionPenalty.enforce(invalidated.get()));
+        // FIXME: This makes this class untestable!
+        //invalidated.set(
+                SuspensionPenalty.enforce(invalidated.get());//);
     }
 
     private static final class ThreadLocalLong extends ThreadLocal<Long> {
