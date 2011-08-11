@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.zip;
 
 import de.schlichtherle.truezip.util.ArrayHelper;
+import static de.schlichtherle.truezip.zip.ZipEntry.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -25,10 +26,9 @@ import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.junit.After;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  * Tests compression of data.
@@ -75,7 +75,7 @@ public final class ManySmallEntriesTest {
             entry.setSize(data.length);
             entry.setCompressedSize(data.length);
             entry.setCrc(dataCrc);
-            entry.setMethod(ZipEntry.STORED);
+            entry.setMethod(STORED);
 
             zipOut.putNextEntry(entry);
             zipOut.write(data);

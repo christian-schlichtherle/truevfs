@@ -30,7 +30,7 @@ import net.jcip.annotations.Immutable;
  * A container for a prompting key manager implementation for
  * {@link AesCipherParameters}.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @Immutable

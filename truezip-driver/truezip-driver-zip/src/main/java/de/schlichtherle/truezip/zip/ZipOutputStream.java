@@ -15,17 +15,19 @@
  */
 package de.schlichtherle.truezip.zip;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
-import java.util.zip.ZipException;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -57,7 +59,9 @@ import net.jcip.annotations.ThreadSafe;
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
 public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
-    
+
+    private @CheckForNull ZipCryptoParameters cryptoParameters;
+
     /**
      * Constructs a ZIP output stream which decorates the given output stream
      * using the {@code "UTF-8"} charset.
@@ -69,6 +73,9 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
     /**
      * Constructs a ZIP output stream which decorates the given output stream
      * using the given charset.
+     *
+     * @throws UnsupportedCharsetException If {@code charset} is not supported
+     *         by this JVM.
      */
     public ZipOutputStream(OutputStream out, Charset charset) {
         super(out, charset);
@@ -76,13 +83,14 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
 
     /**
      * Constructs a ZIP output stream which decorates the given output stream
-     * and apppends to the given raw ZIP file.
-     * <p>
-     * In order to append entries to an existing ZIP file, {@code out} must be
-     * set up so that it appends to the same ZIP file from which
-     * {@code appendee} is reading.
-     * {@code appendee} may already be closed.
-     *
+     * and appends to the given ZIP file.
+     * 
+     * @param  out The output stream to write the ZIP file to.
+     *         If {@code appendee} is not {@code null}, then this must be set
+     *         up so that it appends to the same ZIP file from which
+     *         {@code appendee} is reading.
+     * @param  appendee the raw ZIP file to append to.
+     *         This may already be closed.
      */
     public ZipOutputStream(OutputStream out, ZipFile appendee) {
         super(out, appendee);
@@ -207,6 +215,27 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
         super.setMethod(method);
     }
 
+    /**
+     * Returns the crypto parameters.
+     * 
+     * @return The crypto parameters.
+     * @since  TrueZIP 7.3
+     */
+    @Override
+    public synchronized @Nullable ZipCryptoParameters getCryptoParameters() {
+        return cryptoParameters;
+    }
+
+    /**
+     * Sets the crypto parameters.
+     * 
+     * @param cryptoParameters the crypto parameters.
+     */
+    public synchronized void setCryptoParameters(
+            final @CheckForNull ZipCryptoParameters cryptoParameters) {
+        this.cryptoParameters = cryptoParameters;
+    }
+
     @Override
     public synchronized long length() {
         return super.length();
@@ -220,9 +249,9 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
     @Override
     public synchronized void putNextEntry(
             final ZipEntry entry,
-            final boolean deflate)
+            final boolean process)
     throws IOException {
-        super.putNextEntry(entry, deflate);
+        super.putNextEntry(entry, process);
     }
 
     @Override

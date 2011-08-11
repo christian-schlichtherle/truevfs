@@ -19,8 +19,10 @@ import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.rof.DefaultReadOnlyFile;
 import de.schlichtherle.truezip.io.SynchronizedInputStream;
 import de.schlichtherle.truezip.util.Pool;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -57,6 +59,8 @@ import net.jcip.annotations.ThreadSafe;
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
 public class ZipFile extends RawZipFile<ZipEntry> {
+
+    private @CheckForNull ZipCryptoParameters cryptoParameters;
 
     private final String name;
 
@@ -244,33 +248,6 @@ public class ZipFile extends RawZipFile<ZipEntry> {
     }
 
     /**
-     * A pool which allocates {@link DefaultReadOnlyFile} objects for the
-     * provided to its constructor.
-     */
-    private static final class DefaultReadOnlyFilePool
-    implements Pool<ReadOnlyFile, IOException> {
-        final File file;
-
-        DefaultReadOnlyFilePool(final File file) {
-            this.file = file;
-        }
-
-        DefaultReadOnlyFilePool(String name) {
-            this.file = new File(name);
-        }
-
-        @Override
-        public ReadOnlyFile allocate() throws IOException {
-            return new DefaultReadOnlyFile(file);
-        }
-
-        @Override
-        public void release(ReadOnlyFile rof) throws IOException {
-            rof.close();
-        }
-    } // DefaultReadOnlyFilePool
-
-    /**
      * Returns the {@link Object#toString() string representation} of whatever
      * input source object was used to construct this ZIP file.
      * For {@link String} and {@link File} objects, this is a path name.
@@ -361,16 +338,64 @@ public class ZipFile extends RawZipFile<ZipEntry> {
         return super.busy();
     }
 
+    /**
+     * Returns the crypto parameters.
+     * 
+     * @return The crypto parameters.
+     * @since  TrueZIP 7.3
+     */
+    @Override
+    public synchronized @Nullable ZipCryptoParameters getCryptoParameters() {
+        return cryptoParameters;
+    }
+
+    /**
+     * Sets the crypto parameters.
+     * 
+     * @param cryptoParameters the crypto parameters.
+     */
+    public synchronized void setCryptoParameters(
+            final @CheckForNull ZipCryptoParameters cryptoParameters) {
+        this.cryptoParameters = cryptoParameters;
+    }
+
     @Override
     protected synchronized InputStream getInputStream(
-            String name, boolean check, boolean inflate)
+            String name, boolean check, boolean process)
     throws  IOException {
-        final InputStream in = super.getInputStream(name, check, inflate);
-        return in != null ? new SynchronizedInputStream(in, this) : null;
+        final InputStream in = super.getInputStream(name, check, process);
+        return in == null ? null : new SynchronizedInputStream(in, this);
     }
 
     @Override
     public synchronized void close() throws IOException {
         super.close();
     }
+
+    /**
+     * A pool which allocates {@link DefaultReadOnlyFile} objects for the
+     * file provided to its constructor.
+     */
+    private static final class DefaultReadOnlyFilePool
+    implements Pool<ReadOnlyFile, IOException> {
+        final File file;
+
+        DefaultReadOnlyFilePool(String name) {
+            this(new File(name));
+        }
+
+        DefaultReadOnlyFilePool(final File file) {
+            this.file = file;
+        }
+
+        @Override
+        public ReadOnlyFile allocate() throws IOException {
+            return new DefaultReadOnlyFile(file);
+        }
+
+        @Override
+        public void release(ReadOnlyFile rof) throws IOException {
+            rof.close();
+        }
+    } // DefaultReadOnlyFilePool
 }

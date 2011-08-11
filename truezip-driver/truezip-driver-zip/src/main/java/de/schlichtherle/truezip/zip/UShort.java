@@ -57,23 +57,24 @@ final class UShort {
     /**
      * Checks the parameter range.
      * 
-     * @param i The integer to check to be in the range of an unsigned short
-     *        integer ({@value SIZE} bits).
-     * @param subject The subject of the exception message
-     *        - may be {@code null}.
-     *        This should not end with a punctuation character.
-     * @param error First sentence of the exception message
-     *        - may be {@code null}.
-     *        This should not end with a punctuation character.
+     * @param  i The integer to check to be in the range of an unsigned short
+     *         integer ({@value SIZE} bits).
+     * @param  subject The subject of the exception message
+     *         - may be {@code null}.
+     *         This should not end with a punctuation character.
+     * @param  error First sentence of the exception message
+     *         - may be {@code null}.
+     *         This should not end with a punctuation character.
+     * @return {@code true}
      * @throws IllegalArgumentException If {@code i} is less than
      *         {@link #MIN_VALUE} or greater than {@link #MAX_VALUE}.
      */
-    public static void check(
+    public static boolean check(
             final int i,
             final @CheckForNull String subject,
             final @CheckForNull String error) {
         if (MIN_VALUE <= i && i <= MAX_VALUE)
-            return;
+            return true;
 
         final StringBuilder message = new StringBuilder();
         if (null != subject) {
@@ -89,19 +90,20 @@ final class UShort {
         message.append(MIN_VALUE);
         message.append(" and ");
         message.append(MAX_VALUE);
-        message.append(" inclusively.");
+        message.append(" inclusive.");
         throw new IllegalArgumentException(message.toString());
     }
 
     /**
      * Checks the parameter range.
      * 
-     * @param i The integer to check to be in the range of an unsigned short
-     *        integer ({@value SIZE} bits).
+     * @param  i The integer to check to be in the range of an unsigned short
+     *         integer ({@value SIZE} bits).
+     * @return {@code true}
      * @throws IllegalArgumentException If {@code i} is less than
      *         {@link #MIN_VALUE} or greater than {@link #MAX_VALUE}.
      */
-    public static void check(final int i) {
-        check(i, "Integer out of range", null);
+    public static boolean check(final int i) {
+        return check(i, "Integer out of range", null);
     }
 }

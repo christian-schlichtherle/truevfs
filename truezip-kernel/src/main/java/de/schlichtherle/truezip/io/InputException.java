@@ -16,44 +16,29 @@
 
 package de.schlichtherle.truezip.io;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import net.jcip.annotations.ThreadSafe;
 
 /**
- * Thrown if an {@link IOException} happened on the input side rather than
- * the output side when copying an InputStream to an OutputStream.
- *
- * @author Christian Schlichtherle
+ * Thrown if an error happened on the input side rather than the output side
+ * when copying an {@link InputStream} to an {@link OutputStream}.
+ * 
+ * @see     Streams#cat(InputStream, OutputStream)
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 public class InputException extends IOException {
     private static final long serialVersionUID = 1287654325546872424L;
 
     /**
      * Constructs a new {@code InputException}.
      *
-     * @param cause A valid {@code IOException}.
-     *        This must not be {@code null} and must not be an instance
-     *        of {@link FileNotFoundException} in order to prevent masking it.
-     * @throws IllegalArgumentException If {@code cause} is an instance of
-     *         {@code FileNotFoundException}.
+     * @param cause the cause for this exception to get thrown.
      */
-    public InputException(final IOException cause) {
-        super(cause != null ? cause.toString() : null);
-        if (cause instanceof FileNotFoundException)
-            throw new IllegalArgumentException(cause);
-        super.initCause(cause);
-    }
-
-    /**
-     * Returns the {@link IOException} provided as the cause when this
-     * exception was created.
-     *
-     * @return The {@link IOException} provided as the cause when this
-     * exception was created.
-     */
-    @Override
-    public IOException getCause() {
-        return (IOException) super.getCause();
+    public InputException(final Throwable cause) {
+        super(cause);
     }
 }

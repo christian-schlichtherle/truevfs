@@ -16,18 +16,19 @@
 
 package de.schlichtherle.truezip.zip;
 
-import edu.umd.cs.findbugs.annotations.Nullable;
+import static de.schlichtherle.truezip.zip.Constants.*;
+import static de.schlichtherle.truezip.zip.LittleEndian.*;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import net.jcip.annotations.NotThreadSafe;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Map;
 import java.util.TreeMap;
-
-import static de.schlichtherle.truezip.zip.ZipConstants.*;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * Represents a collection of {@link ExtraField Extra Fields} as they may
- * be present at several locations in ZipConstants archive files.
+ * be present at several locations in ZIP files.
  * 
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -65,17 +66,17 @@ final class ExtraFields implements Cloneable {
      * Returns the Extra Field with the given Header ID or {@code null}
      * if no such Extra Field exists.
      * 
-     * @param headerID The requested Header ID.
+     * @param headerId The requested Header ID.
      * @return The Extra Field with the given Header ID or {@code null}
      *         if no such Extra Field exists.
      * @throws IllegalArgumentException If {@code headerID} is not in
      *         the range of {@code 0} to {@link UShort#MAX_VALUE}
      *         ({@value de.schlichtherle.truezip.zip.UShort#MAX_VALUE}).
      */
-    @Nullable ExtraField get(final int headerID) {
-        UShort.check(headerID);
-        final ExtraField ef = extra.get(headerID);
-        assert null == ef || ef.getHeaderID() == headerID;
+    @CheckForNull ExtraField get(final int headerId) {
+        assert UShort.check(headerId);
+        final ExtraField ef = extra.get(headerId);
+        assert null == ef || ef.getHeaderId() == headerId;
         return ef;
     }
 
@@ -92,28 +93,26 @@ final class ExtraFields implements Cloneable {
      *         {@link UShort#MAX_VALUE}
      *         ({@value de.schlichtherle.truezip.zip.UShort#MAX_VALUE}).
      */
-    ExtraField put(final ExtraField ef) {
-        if (null == ef)
-            throw new NullPointerException();
-        final int headerID = ef.getHeaderID();
-        UShort.check(headerID);
-        return extra.put(headerID, ef);
+    ExtraField add(final ExtraField ef) {
+        final int headerId = ef.getHeaderId();
+        assert UShort.check(headerId);
+        return extra.put(headerId, ef);
     }
 
     /**
      * Removes the Extra Field with the given Header ID.
      * 
-     * @param headerID The requested Header ID.
+     * @param headerId The requested Header ID.
      * @return The Extra Field with the given Header ID or {@code null}
      *         if no such Extra Field exists.
      * @throws IllegalArgumentException If {@code headerID} is not in
      *         the range of {@code 0} to {@link UShort#MAX_VALUE}
      *         ({@value de.schlichtherle.truezip.zip.UShort#MAX_VALUE}).
      */
-    @Nullable ExtraField remove(final int headerID) {
-        UShort.check(headerID);
-        final ExtraField ef = extra.remove(headerID);
-        assert null == ef || ef.getHeaderID() == headerID;
+    @Nullable ExtraField remove(final int headerId) {
+        assert UShort.check(headerId);
+        final ExtraField ef = extra.remove(headerId);
+        assert null == ef || ef.getHeaderId() == headerId;
         return ef;
     }
 
@@ -125,6 +124,7 @@ final class ExtraFields implements Cloneable {
      * @see #getExtra
      */
     int getExtraLength() {
+        final Map<Integer, ExtraField> extra = this.extra;
         if (extra.isEmpty())
             return 0;
         int l = 0;
@@ -141,7 +141,7 @@ final class ExtraFields implements Cloneable {
      */
     byte[] getExtra() {
         final int size = getExtraLength();
-        UShort.check(size);
+        assert UShort.check(size);
         if (0 == size)
             return EMPTY;
         final byte[] data = new byte[size];
@@ -156,31 +156,31 @@ final class ExtraFields implements Cloneable {
      * Upon return, this collection shall not access {@code data}
      * subsequently and {@link #getExtraLength} must equal {@code size}.
      *
-     * @param data The byte array to read the list of Extra Fields from.
-     * @param off The zero based offset in the byte array where the first byte
-     *        of the list of Extra Fields is read from.
-     * @param size The length of the list of Extra Fields in bytes.
+     * @param  data The byte array to read the list of Extra Fields from.
+     * @param  off The zero based offset in the byte array where the first byte
+     *         of the list of Extra Fields is read from.
+     * @param  size The length of the list of Extra Fields in bytes.
      * @throws IndexOutOfBoundsException If the byte array
      *         {@code data} does not hold at least {@code size}
      *         bytes at the zero based offset {@code off}.
      * @throws RuntimeException If {@code size} is illegal or the
      *         deserialized list of Extra Fields contains illegal data.
-     * @see #getExtraLength
+     * @see    #getExtraLength
      */
     void readFrom(final byte[] data, int off, final int size) {
-        UShort.check(size, "Extra Field out of range", null);
+        assert UShort.check(size);
         final Map<Integer, ExtraField> map = new TreeMap<Integer, ExtraField>();
         if (null != data && 0 < size) {
             final int end = off + size;
             while (off < end) {
-                final int headerID = LittleEndian.readUShort(data, off);
+                final int headerId = readUShort(data, off);
                 off += 2;
-                final int dataSize = LittleEndian.readUShort(data, off);
+                final int dataSize = readUShort(data, off);
                 off += 2;
-                final ExtraField ef = ExtraField.create(headerID);
+                final ExtraField ef = ExtraField.create(headerId);
                 ef.readFrom(data, off, dataSize);
                 off += dataSize;
-                map.put(headerID, ef);
+                map.put(headerId, ef);
             }
             assert off == end;
         }
@@ -193,19 +193,19 @@ final class ExtraFields implements Cloneable {
      * Upon return, this collection shall not access {@code data}
      * subsequently.
      *
-     * @param data The byte array to write the list of Extra Fields to.
-     * @param off The zero based offset in the byte array where the first byte
-     *        of the list of Extra Fields is written to.
+     * @param  data The byte array to write the list of Extra Fields to.
+     * @param  off The zero based offset in the byte array where the first byte
+     *         of the list of Extra Fields is written to.
      * @throws IndexOutOfBoundsException If the byte array
      *         {@code data} does not hold at least {@link #getExtraLength}
      *         bytes at the zero based offset {@code off}.
-     * @see #getExtraLength
+     * @see    #getExtraLength
      */
     void writeTo(final byte[] data, int off) {
        for (final ExtraField ef : extra.values()) {
-            LittleEndian.writeShort(ef.getHeaderID(), data, off);
+            writeShort(ef.getHeaderId(), data, off);
             off += 2;
-            LittleEndian.writeShort(ef.getDataSize(), data, off);
+            writeShort(ef.getDataSize(), data, off);
             off += 2;
             ef.writeTo(data, off);
             off += ef.getDataSize();

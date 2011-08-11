@@ -32,8 +32,7 @@ import static org.junit.Assert.*;
 public abstract class DateTimeConverterTestSuite {
 
     private DateTimeConverter instance;
-    private long minJavaTime = new GregorianCalendar(1980, Calendar.JANUARY, 1, 0, 0, 0).getTimeInMillis();
-    private long maxJavaTime = new GregorianCalendar(2107, Calendar.DECEMBER, 31, 23, 59, 58).getTimeInMillis();
+    private long minJavaTime, maxJavaTime;
 
     @Before
     public void setUp() {
@@ -60,33 +59,21 @@ public abstract class DateTimeConverterTestSuite {
 
     @Test
     public final void testToJavaTime() {
-        try {
-            instance.toJavaTime(-1);
-            fail();
-        } catch (IllegalArgumentException expected) {
-        }
-
-        try {
-            instance.toJavaTime(0);
-            fail();
-        } catch (IllegalArgumentException expected) {
-        }
-
-        try {
-            instance.toJavaTime(MIN_DOS_TIME - 1);
-            fail();
-        } catch (IllegalArgumentException expected) {
-        }
-
-        try {
-            instance.toJavaTime(UInt.MAX_VALUE + 1);
-            fail();
-        } catch (IllegalArgumentException expected) {
-        }
+        assertThat(instance.toJavaTime(Long.MIN_VALUE), is(minJavaTime));
+        assertThat(instance.toJavaTime(MIN_DOS_TIME - 1), is(minJavaTime));
+        assertThat(instance.toJavaTime(MIN_DOS_TIME), is(minJavaTime));
+        assertThat(instance.toJavaTime(MAX_DOS_TIME), is(maxJavaTime));
+        assertThat(instance.toJavaTime(MAX_DOS_TIME + 1), is(maxJavaTime));
+        assertThat(instance.toJavaTime(Long.MAX_VALUE), is(maxJavaTime));
     }
 
     @Test
     public final void testToDosTime() {
+        try {
+            instance.toDosTime(Long.MIN_VALUE);
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
         try {
             instance.toDosTime(-1);
             fail();
@@ -94,25 +81,11 @@ public abstract class DateTimeConverterTestSuite {
         }
 
         assertThat(instance.toDosTime(0), is(MIN_DOS_TIME));
-
-        try {
-            instance.toDosTime(maxJavaTime + 2000);
-            fail();
-        } catch (IllegalArgumentException expected) {
-        }
-    }
-
-    @Test
-    public void testTwoWayConversion() {
-        for (long args[] : new long[][] {
-            { MIN_DOS_TIME, minJavaTime },
-            { MAX_DOS_TIME, maxJavaTime },
-        }) {
-            final long dTime = args[0];
-            final long jTime = args[1];
-            assertThat(instance.toJavaTime(dTime), is(jTime));
-            assertThat(instance.toDosTime(jTime), is(dTime));
-        }
+        assertThat(instance.toDosTime(minJavaTime - 1), is(MIN_DOS_TIME));
+        assertThat(instance.toDosTime(minJavaTime), is(MIN_DOS_TIME));
+        assertThat(instance.toDosTime(maxJavaTime), is(MAX_DOS_TIME));
+        assertThat(instance.toDosTime(maxJavaTime + 1), is(MAX_DOS_TIME));
+        assertThat(instance.toDosTime(Long.MAX_VALUE), is(MAX_DOS_TIME));
     }
 
     @Test

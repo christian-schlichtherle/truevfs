@@ -53,6 +53,20 @@
             <artifactId>truezip-path</artifactId>
             <type>test-jar</type>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truezip-swing</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk16</artifactId>
+            <version>1.46</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans</groupId>
+            <artifactId>jemmy</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -66,6 +80,14 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <links>
+                        <link>http://www.bouncycastle.org/docs/docs1.6/</link>
+                    </links>
+                </configuration>
             </plugin>
         </plugins>
     </build>

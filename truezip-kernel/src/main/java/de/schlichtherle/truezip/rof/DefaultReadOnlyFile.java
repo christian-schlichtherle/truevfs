@@ -13,21 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.rof;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.RandomAccessFile;
-import net.jcip.annotations.ThreadSafe;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * A {@link ReadOnlyFile} implementation derived from {@link RandomAccessFile}.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-@ThreadSafe
+@NotThreadSafe
+@DefaultAnnotation(NonNull.class)
 public class DefaultReadOnlyFile
 extends RandomAccessFile
 implements ReadOnlyFile {

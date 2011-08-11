@@ -15,13 +15,12 @@
  */
 package de.schlichtherle.truezip.zip;
 
+import static de.schlichtherle.truezip.zip.Constants.*;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.HashMap;
 import java.util.Map;
 import net.jcip.annotations.NotThreadSafe;
-
-import static de.schlichtherle.truezip.zip.ZipConstants.*;
 
 /**
  * Abstract base class for an Extra Field in a Local or Central Header of a
@@ -36,11 +35,18 @@ import static de.schlichtherle.truezip.zip.ZipConstants.*;
 @DefaultAnnotation(NonNull.class)
 abstract class ExtraField {
 
+    private static final Map<Integer, Class<? extends ExtraField>> registry
+            = new HashMap<Integer, Class<? extends ExtraField>>();
+
     /** The Header ID of a ZIP64 Extended Information Extra Field. */
     static final int ZIP64_HEADER_ID = 0x0001;
 
-    private static final Map<Integer, Class<? extends ExtraField>> registry
-            = new HashMap<Integer, Class<? extends ExtraField>>();
+    /** The Header ID a WinZip AES Extra Field. */
+    static final int WINZIP_AES_ID = 0x9901;
+
+    static {
+        register(WinZipAesExtraField.class);
+    }
 
     /**
      * Registers a concrete implementation of this abstract base class for
@@ -63,9 +69,9 @@ abstract class ExtraField {
         } catch (Exception ex) {
             throw new IllegalArgumentException(ex);
         }
-        final int headerID = ef.getHeaderID();
-        UShort.check(headerID, "Header ID out of range", null);
-        registry.put(headerID, c);
+        final int headerId = ef.getHeaderId();
+        assert UShort.check(headerId);
+        registry.put(headerId, c);
     }
 
     /**
@@ -74,25 +80,25 @@ abstract class ExtraField {
      * The returned Extra Field still requires proper initialization, for
      * example by calling {@link #readFrom}.
      * 
-     * @param  headerID An unsigned short integer (two bytes) which indicates
+     * @param  headerId An unsigned short integer (two bytes) which indicates
      *         the type of the returned Extra Field.
      * @return A new Extra Field
      * @throws IllegalArgumentException If {@code headerID} is out of
      *         range.
      * @see    #register
      */
-    static ExtraField create(final int headerID) {
-        UShort.check(headerID, "Header ID out of range", null);
-        final Class<? extends ExtraField> c = registry.get(headerID);
+    static ExtraField create(final int headerId) {
+        assert UShort.check(headerId);
+        final Class<? extends ExtraField> c = registry.get(headerId);
         final ExtraField ef;
         try {
             ef = null != c
                     ? (ExtraField) c.newInstance()
-                    : new DefaultExtraField(headerID);
+                    : new DefaultExtraField(headerId);
         } catch (Exception cannotHappen) {
             throw new AssertionError(cannotHappen);
         }
-        assert headerID == ef.getHeaderID();
+        assert headerId == ef.getHeaderId();
         return ef;
     }
 
@@ -101,7 +107,7 @@ abstract class ExtraField {
      * The Header ID is an unsigned short integer (two bytes)
      * which must be constant during the life cycle of this object.
      */
-    abstract int getHeaderID();
+    abstract int getHeaderId();
 
     /**
      * Returns the Data Size of this Extra Field.
@@ -112,7 +118,7 @@ abstract class ExtraField {
      * 
      * @return The size of the Data Block in bytes
      *         or {@code 0} if unknown.
-     * @see #getDataBlock
+     * @see    #getDataBlock
      */
     abstract int getDataSize();
 
@@ -123,7 +129,7 @@ abstract class ExtraField {
      */
     final byte[] getDataBlock() {
         final int size = getDataSize();
-        UShort.check(size);
+        assert UShort.check(size);
         if (0 == size)
             return EMPTY;
         final byte[] data = new byte[size];

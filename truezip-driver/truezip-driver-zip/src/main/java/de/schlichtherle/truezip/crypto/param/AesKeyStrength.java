@@ -1,0 +1,60 @@
+/*
+ * Copyright (C) 2011 Schlichtherle IT Services
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.schlichtherle.truezip.crypto.param;
+
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import java.util.ResourceBundle;
+import net.jcip.annotations.ThreadSafe;
+
+/**
+ * Enumerates the AES cipher key strenghts.
+ * 
+ * @author  Christian Schlichtherle
+ * @version $Id$
+ */
+@ThreadSafe
+@DefaultAnnotation(NonNull.class)
+public enum AesKeyStrength implements KeyStrength {
+    /** Enum identifier for a 128 bit AES cipher key. */
+    BITS_128,
+
+    /** Enum identifier for a 192 bit AES cipher key. */
+    BITS_192,
+
+    /** Enum identifier for a 256 bit AES cipher key. */
+    BITS_256;
+
+    private static final ResourceBundle resources
+            = ResourceBundle.getBundle(AesKeyStrength.class.getName());
+
+    /** Returns the key strength in bytes. */
+    @Override
+    public int getBytes() {
+        return 16 + 8 * ordinal();
+    }
+
+    /** Returns the key strength in bits. */
+    @Override
+    public int getBits() {
+        return 8 * getBytes();
+    }
+
+    @Override
+    public String toString() {
+        return resources.getString(name());
+    }
+}

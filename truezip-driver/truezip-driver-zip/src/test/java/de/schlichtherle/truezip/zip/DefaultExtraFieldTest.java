@@ -40,22 +40,22 @@ public final class DefaultExtraFieldTest {
     public void testConstructor() {
         try {
             def = new DefaultExtraField(UShort.MIN_VALUE - 1);
-            fail("Expected IllegalArgumentException!");
+            fail();
         } catch (IllegalArgumentException expected) {
         }
 
         try {
             def = new DefaultExtraField(UShort.MAX_VALUE + 1);
-            fail("Expected IllegalArgumentException!");
+            fail();
         } catch (IllegalArgumentException expected) {
         }
 
         def = new DefaultExtraField(UShort.MIN_VALUE);
-        assertEquals(UShort.MIN_VALUE, def.getHeaderID());
+        assertEquals(UShort.MIN_VALUE, def.getHeaderId());
         assertEquals(0, def.getDataSize());
 
         def = new DefaultExtraField(UShort.MAX_VALUE);
-        assertEquals(UShort.MAX_VALUE, def.getHeaderID());
+        assertEquals(UShort.MAX_VALUE, def.getHeaderId());
         assertEquals(0, def.getDataSize());
     }
 
@@ -75,22 +75,22 @@ public final class DefaultExtraFieldTest {
         
         try {
             def.readFrom(read, 1, UShort.MIN_VALUE - 1);
-            fail("Expected IllegalArgumentException!");
+            fail();
         } catch (IllegalArgumentException expected) {
         }
         try {
             def.readFrom(read, 1, read.length);
-            fail("Expected IndexOutOfBoundsException!");
+            fail();
         } catch (IndexOutOfBoundsException expected) {
         }
         try {
             def.readFrom(read, read.length, 1);
-            fail("Expected IndexOutOfBoundsException!");
+            fail();
         } catch (IndexOutOfBoundsException expected) {
         }
         try {
             def.readFrom(read, 1, UShort.MAX_VALUE + 1);
-            fail("Expected IllegalArgumentException!");
+            fail();
         } catch (IllegalArgumentException expected) {
         }
         def.readFrom(read, 1, read.length - 1);

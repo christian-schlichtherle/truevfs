@@ -16,37 +16,54 @@
 package de.schlichtherle.truezip.crypto.raes;
 
 import java.io.IOException;
+import net.jcip.annotations.ThreadSafe;
 
 /**
- * Thrown if a file is read which is not RAES compatible.
- * This is a subclass of {@link IOException} to indicate that this
- * is considered to be an issue when accessing the contents of a file.
+ * Thrown if there is an issue when reading or writing a RAES file which is
+ * specific to the RAES file format.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 public class RaesException extends IOException {
     private static final long serialVersionUID = 8564203786508562247L;
 
     /**
-     * Constructs an instance of {@code RaesException} with the specified
-     * detail message.
+     * Constructs a RAES exception with
+     * no detail message.
+     */
+    public RaesException() {
+    }
+
+    /**
+     * Constructs a RAES exception with
+     * the given detail message.
      *
-     * @param msg The detail message.
+     * @param msg the detail message.
      */
     public RaesException(String msg) {
         super(msg);
     }
 
     /**
-     * Constructs an instance of {@code RaesException} with the specified
-     * detail message and cause.
+     * Constructs a RAES exception with
+     * the given detail message and cause.
      *
-     * @param msg The detail message.
-     * @param cause The original cause for this exception to be thrown.
+     * @param msg the detail message.
+     * @param cause the cause for this exception to be thrown.
      */
     public RaesException(String msg, Throwable cause) {
-        super(msg);
-        super.initCause(cause);
+        super(msg, cause);
+    }
+
+    /**
+     * Constructs a RAES exception with
+     * the given cause.
+     *
+     * @param cause the cause for this exception to get thrown.
+     */
+    public RaesException(Throwable cause) {
+        super(cause);
     }
 }

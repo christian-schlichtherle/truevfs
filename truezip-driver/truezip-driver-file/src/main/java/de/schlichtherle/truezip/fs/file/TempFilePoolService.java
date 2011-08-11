@@ -24,7 +24,7 @@ import net.jcip.annotations.Immutable;
 /**
  * Contains {@link TempFilePool#INSTANCE}.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @Immutable

@@ -23,7 +23,7 @@ import net.jcip.annotations.NotThreadSafe;
 /**
  * A read only file which reads from a byte array provided to its constructor.
  * 
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @NotThreadSafe

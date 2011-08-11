@@ -95,12 +95,10 @@ implements IOEntry<FileEntry>, Releasable<IOException> {
     }
 
     private static @Nullable String getSuffix(Path path) {
+        // See http://java.net/jira/browse/TRUEZIP-152
         path = path.getFileName();
-        if (null == path)
-            return null;
-        final String name = path.toString();
-        final int i = name.indexOf('.');
-        return -1 == i ? null : name.substring(i);
+        assert path != null;
+        return path == null ? null : path.toString();
     }
 
     @Override

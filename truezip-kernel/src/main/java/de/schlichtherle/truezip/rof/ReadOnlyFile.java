@@ -15,22 +15,24 @@
  */
 package de.schlichtherle.truezip.rof;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * Provides random read-only access to a file.
  * The methods of this interface form a subset of {@link RandomAccessFile}
  * which is required for random read-only access.
  * The default implementation can be found in {@link DefaultReadOnlyFile}.
- * <p>
- * Though not strictly required, implementations should be thread-safe.
- * At least they should document their level of thread-safety.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
+@DefaultAnnotation(NonNull.class)
 public interface ReadOnlyFile extends Closeable {
 
     /**
@@ -48,10 +50,10 @@ public interface ReadOnlyFile extends Closeable {
      * which the next read occurs.
      * Whether the offset may be set beyond the end of the file is up to
      * the implementor.
-     * For example, the {@link DefaultReadOnlyFile} subclass
-     * {@link java.io.RandomAccessFile} passes {@code "r"} as a parameter to
-     * the superclass constructor.
-     * With Sun's JSE implementation, on the Windows platform this
+     * For example, the constructor of the class {@link DefaultReadOnlyFile} 
+     * passes {@code "r"} as a parameter to the constructor of its super-class
+     * {@link java.io.RandomAccessFile}.
+     * With Oracle's JSE implementation, on the Windows platform this
      * implementation allows to seek past the end of file, but on the Linux
      * platform it doesn't.
      *
@@ -75,7 +77,8 @@ public interface ReadOnlyFile extends Closeable {
     /**
      * Reads up to {@code len} bytes of data from this read only file into
      * the given array.
-     * This method blocks until at least one byte of input is available.
+     * This method blocks until at least one byte of input is available unless
+     * {@code len} is zero.
      *
      * @param  b The buffer to fill with data.
      * @param  off The start offset of the data.

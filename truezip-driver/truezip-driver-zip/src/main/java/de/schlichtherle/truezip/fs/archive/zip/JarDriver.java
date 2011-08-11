@@ -20,7 +20,6 @@ import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.util.BitField;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.CharConversionException;
@@ -44,19 +43,28 @@ import net.jcip.annotations.Immutable;
 public class JarDriver extends ZipDriver {
 
     /**
-     * The default character set for entry names and comments, which is
+     * The character set for entry names and comments in JAR files, which is
      * {@code "UTF-8"}.
      */
     public static final Charset JAR_CHARSET = Charset.forName("UTF-8");
 
-    public JarDriver(IOPoolProvider provider) {
-        super(provider, JAR_CHARSET);
+    /**
+     * Constructs a new JAR file driver.
+     * This constructor uses {@link #JAR_CHARSET} for encoding entry names
+     * and comments.
+     *
+     * @param ioPoolProvider the provider for I/O entry pools for allocating
+     *        temporary I/O entries (buffers).
+     */
+    public JarDriver(IOPoolProvider ioPoolProvider) {
+        super(ioPoolProvider, JAR_CHARSET);
     }
 
     @Override
     public JarArchiveEntry newEntry(String path,
                                     Type type,
-                                    @CheckForNull Entry template, BitField<FsOutputOption> mknod)
+                                    Entry template,
+                                    BitField<FsOutputOption> mknod)
     throws CharConversionException {
         return (JarArchiveEntry) super.newEntry(path, type, template, mknod);
     }

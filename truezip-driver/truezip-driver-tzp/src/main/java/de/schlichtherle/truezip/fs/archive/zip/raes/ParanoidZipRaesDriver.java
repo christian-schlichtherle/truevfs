@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip.raes;
 
+import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.archive.zip.ZipArchiveEntry;
 import de.schlichtherle.truezip.fs.archive.zip.ZipInputShop;
 import de.schlichtherle.truezip.fs.archive.zip.ZipOutputShop;
@@ -68,9 +69,10 @@ public class ParanoidZipRaesDriver extends ZipRaesDriver {
      */
     @Override
     protected OutputShop<ZipArchiveEntry> newOutputShop(
-            final OutputStream out,
-            final @CheckForNull ZipInputShop source)
+            FsModel model,
+            OutputStream out,
+            @CheckForNull ZipInputShop source)
     throws IOException {
-        return new ZipOutputShop(this, out, source);
+        return new ZipOutputShop(this, model, out, source);
     }
 }

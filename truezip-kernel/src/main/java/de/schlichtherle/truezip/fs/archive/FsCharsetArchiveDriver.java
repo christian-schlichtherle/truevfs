@@ -63,8 +63,7 @@ extends FsArchiveDriver<E> {
 
     /**
      * Returns the character set provided to the constructor.
-     * This can be safely overriden, but must return the same object on every
-     * call.
+     * Subsequent calls must return the same object.
      *
      * @return The character set to use for encoding entry names and
      *         probably other meta data when writing an archive file.
@@ -109,9 +108,11 @@ extends FsArchiveDriver<E> {
                     " (illegal characters in entry name)");
     }
 
-    private final ThreadLocalEncoder encoder = new ThreadLocalEncoder();
+    private final ThreadLocalCharsetEncoder
+            encoder = new ThreadLocalCharsetEncoder();
 
-    private final class ThreadLocalEncoder extends ThreadLocal<CharsetEncoder> {
+    private final class ThreadLocalCharsetEncoder
+    extends ThreadLocal<CharsetEncoder> {
         @Override
         protected CharsetEncoder initialValue() {
             return getCharset().newEncoder();

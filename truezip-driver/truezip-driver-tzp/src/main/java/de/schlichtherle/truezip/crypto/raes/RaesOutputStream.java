@@ -16,10 +16,11 @@
 package de.schlichtherle.truezip.crypto.raes;
 
 import de.schlichtherle.truezip.crypto.CipherOutputStream;
-import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
+import de.schlichtherle.truezip.crypto.param.KeyStrength;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.OutputStream;
 import net.jcip.annotations.NotThreadSafe;
@@ -51,46 +52,46 @@ public abstract class RaesOutputStream extends CipherOutputStream {
             klac.update((byte) length);
             length >>= 8;
         }
-        final int bufLen = klac.doFinal(buf, 0);
-        assert bufLen == buf.length;
+        final int bufLength = klac.doFinal(buf, 0);
+        assert bufLength == buf.length;
     }
 
     /**
-     * Returns a new instance of an {@code RaesOutputStream}.
+     * Returns a new {@code RaesOutputStream}.
      *
-     * @param out The underlying output stream to use for the encrypted data.
-     * @param parameters The {@link RaesParameters} used to determine and
-     *        configure the type of RAES file created.
-     *        If the run time class of this parameter matches multiple
-     *        parameter interfaces, it is at the discretion of this
-     *        implementation which one is picked and hence which type of
-     *        RAES file is created.
-     *        If you need more control over this, pass in an instance which's
-     *        run time class just implements the
-     *        {@link RaesParametersProvider} interface.
-     *        Instances of this interface are queried to find RAES parameters
-     *        which match a known RAES type.
-     *        This algorithm is recursively applied.
-     * @return A new instance of an {@code RaesOutputStream}.
-     * @throws NullPointerException If {@link #delegate} is {@code null}.
-     * @throws RaesParametersException If {@code parameters} is {@code null} or
+     * @param  out the output stream to decorate for writing the ciphered data.
+     * @param  param The {@link RaesParameters} used to determine and
+     *         configure the type of RAES file created.
+     *         If the run time class of this parameter matches multiple
+     *         parameter interfaces, it is at the discretion of this
+     *         implementation which one is picked and hence which type of
+     *         RAES file is created.
+     *         If you need more control over this, pass in an instance which's
+     *         run time class just implements the
+     *         {@link RaesParametersProvider} interface.
+     *         Instances of this interface are queried to find RAES parameters
+     *         which match a known RAES type.
+     *         This algorithm is recursively applied.
+     * @return A new {@code RaesOutputStream}.
+     * @throws RaesParametersException if {@code param} is {@code null} or
      *         no suitable RAES parameters can be found.
-     * @throws IOException On any other I/O related issue.
+     * @throws IOException on any I/O error.
      */
     public static RaesOutputStream getInstance(
             final OutputStream out,
-            @CheckForNull RaesParameters parameters)
+            final @Nullable RaesParameters param)
     throws IOException {
         if (null == out)
             throw new NullPointerException();
         // Order is important here to support multiple interface implementations!
-        if (parameters instanceof Type0RaesParameters) {
+        if (param == null) {
+            throw new RaesParametersException("No RAES parameters available!");
+        } else if (param instanceof Type0RaesParameters) {
             return new Type0RaesOutputStream(out,
-                    (Type0RaesParameters) parameters);
-        } else if (parameters instanceof RaesParametersProvider) {
-            parameters = ((RaesParametersProvider) parameters).get(
-                    RaesParameters.class);
-            return getInstance(out, parameters);
+                    (Type0RaesParameters) param);
+        } else if (param instanceof RaesParametersProvider) {
+            return getInstance(out,
+                    ((RaesParametersProvider) param).get(RaesParameters.class));
         } else {
             throw new RaesParametersException();
         }

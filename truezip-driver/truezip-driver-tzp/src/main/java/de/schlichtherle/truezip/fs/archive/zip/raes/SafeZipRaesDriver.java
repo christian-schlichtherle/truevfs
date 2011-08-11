@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip.raes;
 
+import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.archive.zip.CheckedZipInputShop;
 import de.schlichtherle.truezip.fs.archive.zip.ZipArchiveEntry;
 import de.schlichtherle.truezip.fs.archive.zip.ZipInputShop;
@@ -91,7 +92,7 @@ public class SafeZipRaesDriver extends ZipRaesDriver {
      * and CRC-32 authenticated.
      */
     @Override
-    protected final InputShop<ZipArchiveEntry> newInputShop(ReadOnlyFile rof)
+    protected final InputShop<ZipArchiveEntry> newInputShop(FsModel model, ReadOnlyFile rof)
     throws IOException {
         // Optimization: If the read-only file is smaller than the
         // authentication trigger, then its entire cipher text has already
@@ -100,7 +101,7 @@ public class SafeZipRaesDriver extends ZipRaesDriver {
         // Hence, checking the CRC-32 value of the plain text ZIP file is
         // redundant.
         return rof.length() > getAuthenticationTrigger()
-                ? new CheckedZipInputShop(this, rof)
-                : super.newInputShop(rof);
+                ? new CheckedZipInputShop(this, model, rof)
+                : super.newInputShop(model, rof);
     }
 }

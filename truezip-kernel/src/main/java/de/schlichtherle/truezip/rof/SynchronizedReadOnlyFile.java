@@ -15,6 +15,10 @@
  */
 package de.schlichtherle.truezip.rof;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import net.jcip.annotations.ThreadSafe;
 
@@ -22,10 +26,11 @@ import net.jcip.annotations.ThreadSafe;
  * A decorator which synchronizes all access to a {@link ReadOnlyFile}
  * via an object provided to its constructor.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
+@DefaultAnnotation(NonNull.class)
 public class SynchronizedReadOnlyFile extends DecoratingReadOnlyFile {
 
     /** The object to synchronize on - never {@code null}. */
@@ -37,7 +42,7 @@ public class SynchronizedReadOnlyFile extends DecoratingReadOnlyFile {
      *
      * @param rof the read only file to wrap in this decorator.
      */
-    public SynchronizedReadOnlyFile(final ReadOnlyFile rof) {
+    public SynchronizedReadOnlyFile(final @Nullable ReadOnlyFile rof) {
         this(rof, null);
     }
 
@@ -48,9 +53,11 @@ public class SynchronizedReadOnlyFile extends DecoratingReadOnlyFile {
      * @param lock the object to synchronize on.
      *        If {@code null}, then this object is used, not the stream.
      */
-    public SynchronizedReadOnlyFile(final ReadOnlyFile rof, final Object lock) {
+    public SynchronizedReadOnlyFile(
+            final @Nullable ReadOnlyFile rof,
+            final @CheckForNull Object lock) {
         super(rof);
-        this.lock = lock != null ? lock : this;
+        this.lock = null != lock ? lock : this;
     }
 
     @Override
@@ -88,12 +95,12 @@ public class SynchronizedReadOnlyFile extends DecoratingReadOnlyFile {
         }
     }
 
-    /*@Override
+    @Override
     public void readFully(byte[] b, int off, int len) throws IOException {
         synchronized (lock) {
             delegate.readFully(b, off, len);
         }
-    }*/
+    }
 
     @Override
     public void close() throws IOException {

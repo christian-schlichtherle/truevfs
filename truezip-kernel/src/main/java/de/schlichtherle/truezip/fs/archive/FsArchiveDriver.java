@@ -63,43 +63,6 @@ public abstract class FsArchiveDriver<E extends FsArchiveEntry>
 extends FsDriver {
 
     /**
-     * Returns a new thread-safe file system controller for the mount point of
-     * the given file system model and parent file system controller.
-     * <p>
-     * When called, the following expression is a precondition:
-     * {@code model.getParent().equals(parent.getModel())}
-     * <p>
-     * Note that an archive file system is always federated and therefore
-     * its parent file system controller is never {@code null}.
-     * <p>
-     * Furthermore, an archive driver implementation is <em>not</em> expected
-     * to consider the scheme of the given mount point to determine the class
-     * of the returned file system controller.
-     * Consequently, it is an error to call this method with a mount point
-     * which has a scheme which is not supported by this archive driver.
-     * <p>
-     * Note again that unlike the other components created by this factory,
-     * the returned file system controller must be thread-safe!
-     *
-     * @param  model the file system model.
-     * @param  parent the nullable parent file system controller.
-     * @return A new thread-safe file system controller for the given mount
-     *         point and parent file system controller.
-     */
-    @Override
-    public FsController<?>
-    newController(FsModel model, FsController<?> parent) {
-        return  new FsConcurrentController(
-                   new FsCachingController(
-                        new FsContextController(
-                            new FsDefaultArchiveController<E>(
-                                new FsContextModel(model),
-                                parent,
-                                this)),
-                        getPool()));
-    }
-
-    /**
      * {@inheritDoc}
      * <p>
      * The implementation in the class {@link FsArchiveDriver} always returns
@@ -110,6 +73,13 @@ extends FsDriver {
     public final boolean isFederated() {
         return true;
     }
+
+    /**
+     * Returns the I/O pool to use for allocating temporary I/O entries.
+     *
+     * @return The I/O pool to use for allocating temporary I/O entries.
+     */
+    protected abstract IOPool<?> getPool();
 
     /**
      * Returns {@code true} if and only if the archive files produced by this
@@ -144,13 +114,6 @@ extends FsDriver {
     }
 
     /**
-     * Returns the I/O pool to use for allocating temporary I/O entries.
-     *
-     * @return The I/O pool to use for allocating temporary I/O entries.
-     */
-    protected abstract IOPool<?> getPool();
-
-    /**
      * Returns the icon that should be displayed for the given archive file
      * if it's open/expanded in the view.
      * <p>
@@ -180,6 +143,43 @@ extends FsDriver {
      */
     public @CheckForNull Icon getClosedIcon(FsModel model) {
         return null;
+    }
+
+    /**
+     * Returns a new thread-safe file system controller for the mount point of
+     * the given file system model and parent file system controller.
+     * <p>
+     * When called, the following expression is a precondition:
+     * {@code model.getParent().equals(parent.getModel())}
+     * <p>
+     * Note that an archive file system is always federated and therefore
+     * its parent file system controller is never {@code null}.
+     * <p>
+     * Furthermore, an archive driver implementation is <em>not</em> expected
+     * to consider the scheme of the given mount point to determine the class
+     * of the returned file system controller.
+     * Consequently, it is an error to call this method with a mount point
+     * which has a scheme which is not supported by this archive driver.
+     * <p>
+     * Note again that unlike the other components created by this factory,
+     * the returned file system controller must be thread-safe!
+     *
+     * @param  model the file system model.
+     * @param  parent the nullable parent file system controller.
+     * @return A new thread-safe file system controller for the given mount
+     *         point and parent file system controller.
+     */
+    @Override
+    public FsController<?>
+    newController(FsModel model, FsController<?> parent) {
+        return  new FsConcurrentController(
+                   new FsCachingController(
+                        new FsContextController(
+                            new FsDefaultArchiveController<E>(
+                                new FsContextModel(model),
+                                parent,
+                                this)),
+                        getPool()));
     }
 
     /**
