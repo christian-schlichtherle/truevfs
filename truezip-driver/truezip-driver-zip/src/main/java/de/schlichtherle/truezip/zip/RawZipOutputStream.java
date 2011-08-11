@@ -977,14 +977,14 @@ implements Iterable<E> {
                     param = new WinZipAesEntryParameters(this.param, entry);
             final AesKeyStrength keyStrength = param.getKeyStrength();
             final LEDataOutputStream dos = delegate.init(entry);
-            final WinZipAesExtraField ef = new WinZipAesExtraField();
-            ef.setKeyStrength(keyStrength);
+            final WinZipAesExtraField field = new WinZipAesExtraField();
+            field.setKeyStrength(keyStrength);
             final int method = entry.getMethod();
-            ef.setMethod(method);
+            field.setMethod(method);
             final long size = entry.getSize();
-            ef.setVendorVersion(size >= 20 /* && BZIP2 != method */ ? VV_AE_1 : VV_AE_2);
+            field.setVendorVersion(size >= 20 /* && BZIP2 != method */ ? VV_AE_1 : VV_AE_2);
             entry.setMethod16(WINZIP_AES);
-            entry.addExtraField(ef);
+            entry.addExtraField(field);
             return this.out = new WinZipAesEntryOutputStream(dos, param);
         }
 
