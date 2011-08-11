@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import static de.schlichtherle.truezip.fs.FsInputOption.*;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -38,13 +39,22 @@ public final class FsInputOptions {
             NO_INPUT_OPTIONS = BitField.noneOf(FsInputOption.class);
 
     /**
-     * @since TrueZIP 7.1.1
      * @deprecated
+     * @since TrueZIP 7.1.1
      * @see #NO_INPUT_OPTIONS
      */
     @Deprecated
     public static final BitField<FsInputOption>
             NO_INPUT_OPTION = NO_INPUT_OPTIONS;
+
+    /**
+     * The mask of input preferences, which is
+     * <code>{@link BitField}.of({@link FsInputOption#CACHE})</code>.
+     * 
+     * @since TrueZIP 7.3
+     */
+    public static final BitField<FsInputOption> INPUT_PREFERENCES_MASK
+            = BitField.of(CACHE);
 
     /** You cannot instantiate this class. */
     private FsInputOptions() {
