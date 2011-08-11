@@ -69,7 +69,7 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
      * Note that the <em>actual</em> size of the window is a multiple of the
      * cipher's block size and may be smaller than the maximum window size.
      */
-    private static final int MAX_WINDOW_LEN = 8096;
+    private static final int MAX_WINDOW_LEN = 1024;
 
     /** Returns the smaller parameter. */
     private static long min(long a, long b) {
