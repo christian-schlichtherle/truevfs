@@ -32,6 +32,6 @@ public class RaesAuthenticationException extends RaesException {
      * a detail message indicating that a RAES file has been tampered with.
      */
     public RaesAuthenticationException() {
-        super("RAES file has been tampered with!");
+        super("Authenticated file content has been tampered with!");
     }
 }
