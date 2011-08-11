@@ -52,17 +52,22 @@ final class TempFilePool implements IOPool<FileEntry> {
     static final TempFilePool INSTANCE = new TempFilePool(null, null);
 
     private final @Nullable Path dir;
-    private final @Nullable String suffix;
+    private final @Nullable String name;
 
     /** Constructs a new temp file pool. */
-    TempFilePool(final @CheckForNull Path dir, final @CheckForNull String suffix) {
+    TempFilePool(
+            final @CheckForNull Path dir,
+            @CheckForNull String name) {
         this.dir = null != dir ? dir : TEMP_DIR;
-        this.suffix = suffix;
+        // See http://java.net/jira/browse/TRUEZIP-152
+        if (null != name)
+            name = "." + name + ".tmp";
+        this.name = name;
     }
 
     @Override
     public TempEntry allocate() throws IOException {
-        return new TempEntry(createTempFile(dir, "tzp", suffix), this);
+        return new TempEntry(createTempFile(dir, "tzp", name), this);
     }
 
     @Override

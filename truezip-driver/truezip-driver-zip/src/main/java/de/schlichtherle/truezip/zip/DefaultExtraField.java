@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.zip;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import static java.lang.System.*;
 import net.jcip.annotations.NotThreadSafe;
 
 /**
  * Default implementation for an Extra Field in a Local or Central Header of a
- * ZIP archive.
+ * ZIP file.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -32,24 +32,23 @@ import net.jcip.annotations.NotThreadSafe;
 @DefaultAnnotation(NonNull.class)
 final class DefaultExtraField extends ExtraField {
 
-    private final int headerID;
+    private final short headerId;
     private @CheckForNull byte[] data;
 
     /**
-     * Creates a new instance of the default Extra Field implementation.
+     * Constructs a new Extra Field.
      * 
-     * @param headerID An unsigned short integer (two bytes) indicating the
-     *        type of the Extra Field.
-     * @throws IllegalArgumentException If 
+     * @param  headerId an unsigned short integer (two bytes) indicating the
+     *         type of the Extra Field.
      */
-    DefaultExtraField(final int headerID) {
-        UShort.check(headerID, "Header ID out of range", null);
-        this.headerID = headerID;
+    DefaultExtraField(final int headerId) {
+        assert UShort.check(headerId);
+        this.headerId = (short) headerId;
     }
 
     @Override
-    int getHeaderID() {
-        return headerID;
+    int getHeaderId() {
+        return headerId & UShort.MAX_VALUE;
     }
 
     @Override
@@ -60,15 +59,14 @@ final class DefaultExtraField extends ExtraField {
 
     @Override
     void readFrom(final byte[] src, final int off, final int size) {
-        UShort.check(size, "Data Size out of range", null);
-        final byte[] dst = this.data = new byte[size];
-        System.arraycopy(src, off, dst, 0, size);
+        assert UShort.check(size);
+        arraycopy(src, off, this.data = new byte[size], 0, size);
     }
 
     @Override
     void writeTo(byte[] dst, int off) {
         final byte[] src = this.data;
         if (null != src)
-            System.arraycopy(src, 0, dst, off, src.length);
+            arraycopy(src, 0, dst, off, src.length);
     }
 }

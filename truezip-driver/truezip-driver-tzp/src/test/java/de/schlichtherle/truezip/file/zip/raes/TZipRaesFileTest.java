@@ -29,7 +29,7 @@ import static de.schlichtherle.truezip.key.MockView.Action.*;
 import static org.junit.Assert.*;
 
 /**
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public final class TZipRaesFileTest extends TFileTestSuite {

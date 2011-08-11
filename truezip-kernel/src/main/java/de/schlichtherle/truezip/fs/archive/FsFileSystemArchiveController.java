@@ -103,7 +103,7 @@ extends FsArchiveController<E> {
             getModel().assertWriteLockedByCurrentThread();
             try {
                 mount(autoCreate);
-            } catch (FsPermanentFalsePositiveException ex) {
+            } catch (FsCacheableFalsePositiveException ex) {
                 // Cache exception for false positive file system.
                 //   The state is reset when unlink() is called on the false
                 // positive file system or sync().
@@ -160,9 +160,9 @@ extends FsArchiveController<E> {
     } // MountedFileSystem
 
     private final class FalsePositiveFileSystem extends MountState<E> {
-        private FsPermanentFalsePositiveException exception;
+        private FsCacheableFalsePositiveException exception;
 
-        private FalsePositiveFileSystem(final FsPermanentFalsePositiveException exception) {
+        private FalsePositiveFileSystem(final FsCacheableFalsePositiveException exception) {
             if (exception == null)
                 throw new NullPointerException();
             this.exception = exception;
@@ -186,11 +186,10 @@ extends FsArchiveController<E> {
 /** A cacheable false positive exception. */
 @DefaultAnnotation(NonNull.class)
 @SuppressWarnings("MultipleTopLevelClassesInFile")
-final class FsPermanentFalsePositiveException extends FsFalsePositiveException {
+final class FsCacheableFalsePositiveException extends FsFalsePositiveException {
     private static final long serialVersionUID = 5436924103910446876L;
 
-    FsPermanentFalsePositiveException(  FsModel model,
-                                        @CheckForNull IOException cause) {
+    FsCacheableFalsePositiveException(FsModel model, IOException cause) {
         super(model, cause);
     }
-} // FsPermanentFalsePositiveException
+} // FsCacheableFalsePositiveException

@@ -88,9 +88,10 @@ implements IOEntry<FileEntry>, Releasable<IOException> {
     }
 
     private static @Nullable String getSuffix(final File file) {
+        // See http://java.net/jira/browse/TRUEZIP-152
         final String name = file.getName();
-        final int i = name.indexOf('.');
-        return -1 == i ? null : name.substring(i);
+        assert !name.isEmpty();
+        return name;
     }
 
     @Override

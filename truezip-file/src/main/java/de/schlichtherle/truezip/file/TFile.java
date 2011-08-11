@@ -3609,7 +3609,7 @@ public final class TFile extends File {
      * entry contents and meta data, including central directories may be
      * physically present in the archive file, even if all its entries have
      * been deleted.
-     * This operation should then get used to remove any redundant artifacts
+     * This operation could then get used to remove any redundant artifacts
      * again.
      * <p>
      * Mind that this operation has no means to detect if there is actually any
@@ -3618,8 +3618,8 @@ public final class TFile extends File {
      * file is already compact, then this will just waste time and temporary
      * space in the platform file system.
      * <p>
-     * This operation is not thread-safe and hence not atomic, so you should
-     * not concurrently access this archive file or any of its entries.
+     * Note that this operation is not thread-safe and hence not atomic, so you
+     * should not concurrently access this archive file or any of its entries!
      * <p>
      * This operation performs in the order of <i>O(s)</i>, where <i>s</i> is
      * the total size of the archive file either before (worst case) or after

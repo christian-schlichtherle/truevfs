@@ -15,8 +15,8 @@
  */
 package de.schlichtherle.truezip.sample.file.app;
 
-import de.schlichtherle.truezip.crypto.raes.param.swing.HurlingWindowFeedback;
-import de.schlichtherle.truezip.crypto.raes.param.swing.InvalidKeyFeedback;
+import de.schlichtherle.truezip.key.pbe.swing.HurlingWindowFeedback;
+import de.schlichtherle.truezip.key.pbe.swing.InvalidKeyFeedback;
 import de.schlichtherle.truezip.file.TApplication;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;

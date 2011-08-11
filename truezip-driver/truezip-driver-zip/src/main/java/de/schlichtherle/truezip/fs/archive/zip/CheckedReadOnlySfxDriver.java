@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
+import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.socket.InputShop;
@@ -45,13 +46,13 @@ import net.jcip.annotations.Immutable;
 @DefaultAnnotation(NonNull.class)
 public class CheckedReadOnlySfxDriver extends ReadOnlySfxDriver {
 
-    public CheckedReadOnlySfxDriver(IOPoolProvider provider) {
-        super(provider);
+    public CheckedReadOnlySfxDriver(IOPoolProvider ioPoolProvider) {
+        super(ioPoolProvider);
     }
 
     @Override
-    protected InputShop<ZipArchiveEntry> newInputShop(ReadOnlyFile rof)
+    protected InputShop<ZipArchiveEntry> newInputShop(FsModel model, ReadOnlyFile rof)
     throws IOException {
-        return new CheckedZipInputShop(this, rof);
+        return new CheckedZipInputShop(this, model, rof);
     }
 }

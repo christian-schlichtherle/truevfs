@@ -26,7 +26,6 @@ import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.socket.OutputClosedException;
 import de.schlichtherle.truezip.socket.spi.ByteArrayIOPoolService;
 import de.schlichtherle.truezip.util.ArrayHelper;
-import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.ByteArrayInputStream;
@@ -493,7 +492,7 @@ public abstract class TFileTestSuite extends TestBase {
         assertEquals(0, archive.length());
     }
 
-    private void assertFileOutputStream(TFile file) throws IOException {
+    private void assertFileOutputStream(final TFile file) throws IOException {
         final byte[] message = "Hello World!\r\n".getBytes();
         
         final OutputStream out = new TFileOutputStream(file);

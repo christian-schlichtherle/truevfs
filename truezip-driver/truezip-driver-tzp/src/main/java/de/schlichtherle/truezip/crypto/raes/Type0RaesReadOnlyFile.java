@@ -15,8 +15,10 @@
  */
 package de.schlichtherle.truezip.crypto.raes;
 
-import de.schlichtherle.truezip.crypto.SeekableBlockCipher;
 import de.schlichtherle.truezip.crypto.SICSeekableBlockCipher;
+import de.schlichtherle.truezip.crypto.SeekableBlockCipher;
+import de.schlichtherle.truezip.crypto.SuspensionPenalty;
+import static de.schlichtherle.truezip.crypto.raes.Constants.*;
 import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.util.ArrayHelper;
@@ -28,6 +30,7 @@ import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.Mac;
 import org.bouncycastle.crypto.PBEParametersGenerator;
+import static org.bouncycastle.crypto.PBEParametersGenerator.PKCS12PasswordToBytes;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.engines.AESFastEngine;
 import org.bouncycastle.crypto.generators.PKCS12ParametersGenerator;
@@ -35,24 +38,15 @@ import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 
-import static de.schlichtherle.truezip.crypto.raes.RaesConstants.*;
-import static org.bouncycastle.crypto.PBEParametersGenerator.PKCS12PasswordToBytes;
-
 /**
  * Reads a type 0 RAES file.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
-class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
-
-    /**
-     * The minimum delay between subsequent attempts to authenticate a key
-     * in milliseconds.
-     */
-    private static final long MIN_KEY_RETRY_DELAY = 3 * 1000;
+final class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
 
     /** The key strength. */
     private final KeyStrength keyStrength;
@@ -73,28 +67,30 @@ class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
     throws IOException {
         super(rof);
 
-        assert null != rof;
         assert null != param;
+
+        // Init read only file.
+        rof.seek(0);
+        final long fileLength = rof.length();
 
         // Load header data.
         final byte[] header = new byte[ENVELOPE_TYPE_0_HEADER_LEN_WO_SALT];
-        final long fileLength = rof.length();
-        rof.seek(0);
         rof.readFully(header);
 
         // Check key size and iteration count
         final int keyStrengthOrdinal = readUByte(header, 5);
-        final int keyStrengthBytes = 16 + 8 * keyStrengthOrdinal; // key strength in bytes: 16, 24 or 32
-        final int keyStrengthBits = 8 * keyStrengthBytes;
+        final KeyStrength keyStrength;
         try {
             keyStrength = KeyStrength.values()[keyStrengthOrdinal];
+            assert keyStrength.ordinal() == keyStrengthOrdinal;
         } catch (ArrayIndexOutOfBoundsException ex) {
             throw new RaesException(
                     "Unknown index for cipher key strength: "
-                    + keyStrengthOrdinal
-                    + "!",
-                    ex);
+                    + keyStrengthOrdinal);
         }
+        final int keyStrengthBytes = keyStrength.getBytes();
+        final int keyStrengthBits = keyStrength.getBits();
+        this.keyStrength = keyStrength;
 
         final int iCount = readUShort(header, 6);
         if (1024 > iCount)
@@ -103,91 +99,81 @@ class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
                     + iCount
                     + "!");
 
-        // Init start of encrypted data.
-        final long start = header.length + keyStrengthBytes;
-
         // Load salt.
         final byte[] salt = new byte[keyStrengthBytes];
         rof.readFully(salt);
 
-        // Init digest for key generation and KLAC.
-        final Digest digest = new SHA256Digest();
+        // Init start of encrypted data.
+        final long start = header.length + salt.length;
 
-        // Load footer data
-        footer = new byte[digest.getDigestSize()];
-        final long end = fileLength - footer.length;
-        rof.seek(end);
-        rof.readFully(footer);
-        if (-1 != this.delegate.read()) {
-            // This should never happen unless someone is writing to the
-            // end of the file concurrently!
-            throw new RaesException(
-                    "Expected end of file after data envelope trailer!");
+        // Init KLAC.
+        final Mac klac = new HMac(new SHA256Digest());
+
+        // Load footer data.
+        {
+            this.footer = new byte[klac.getMacSize()];
+            final long end = fileLength - this.footer.length;
+            rof.seek(end);
+            rof.readFully(this.footer);
+            if (-1 != rof.read()) {
+                // This should never happen unless someone is writing to the
+                // end of the file concurrently!
+                throw new RaesException(
+                        "Expected end of file after data envelope trailer!");
+            }
         }
 
         // Init encrypted data length.
-        final long length = fileLength - footer.length - start;
+        final long length = fileLength - this.footer.length - start;
 
-        // Init PBE parameters.
-        final PBEParametersGenerator gen = new PKCS12ParametersGenerator(digest);
-        ParametersWithIV cipherParam;
-        CipherParameters macParam;
+        // Derive cipher and MAC parameters.
+        final PBEParametersGenerator
+                gen = new PKCS12ParametersGenerator(new SHA256Digest());
+        ParametersWithIV aesCtrParam;
+        CipherParameters sha256HMacParam;
         long lastTry = 0; // don't enforce suspension on first prompt!
         for (boolean invalid = false; ; invalid = true) {
             final char[] passwd = param.getReadPassword(invalid);
-            if (null == passwd) // safety first!
-                throw new RaesKeyException();
+            assert null != passwd;
             final byte[] pass = PKCS12PasswordToBytes(passwd);
             for (int i = passwd.length; --i >= 0; ) // nullify password parameter
                 passwd[i] = 0;
 
             gen.init(pass, salt, iCount);
-            cipherParam = (ParametersWithIV) gen.generateDerivedParameters(
-                    keyStrengthBits, AES_BLOCK_SIZE);
-            macParam = gen.generateDerivedMacParameters(keyStrengthBits);
-            for (int i = pass.length; --i >= 0; ) // nullify password buffer
-                pass[i] = 0;
+            aesCtrParam = (ParametersWithIV) gen.generateDerivedParameters(
+                    keyStrengthBits, AES_BLOCK_SIZE_BITS);
+            sha256HMacParam = gen.generateDerivedMacParameters(keyStrengthBits);
+            paranoidWipe(pass);
 
-            // Init and verify KLAC.
-            final Mac klac = new HMac(digest);
-            klac.init(macParam);
-            final byte[] cipherKey = ((KeyParameter) cipherParam.getParameters()).getKey();
+            // Verify KLAC.
+            klac.init(sha256HMacParam);
+            final byte[] cipherKey = ((KeyParameter) aesCtrParam.getParameters()).getKey();
             klac.update(cipherKey, 0, cipherKey.length);
             final byte[] buf = new byte[klac.getMacSize()];
             RaesOutputStream.klac(klac, length, buf);
-            digest.reset(); // klac.doFinal(...) doesn't do this!
 
-            lastTry = enforceSuspensionPenalty(lastTry);
+            lastTry = SuspensionPenalty.enforce(lastTry);
 
-            if (ArrayHelper.equals(footer, 0, buf, 0, buf.length / 2))
+            if (ArrayHelper.equals(this.footer, 0, buf, 0, buf.length / 2))
                 break;
         }
 
-        param.setKeyStrength(keyStrength);
-
-        this.macParam = macParam;
-
         // Init cipher.
-        final SeekableBlockCipher cipher = new SICSeekableBlockCipher(new AESFastEngine());
-        cipher.init(false, cipherParam);
-
+        final SeekableBlockCipher
+                cipher = new SICSeekableBlockCipher(new AESFastEngine());
+        cipher.init(false, aesCtrParam);
         init(cipher, start, length);
+
+        this.macParam = sha256HMacParam;
+
+        // Commit parameters.
+        param.setKeyStrength(keyStrength);
     }
 
-    @SuppressWarnings("SleepWhileHoldingLock")
-    private static long enforceSuspensionPenalty(final long last) {
-        long delay;
-        InterruptedException interrupted = null;
-        while ((delay = System.currentTimeMillis() - last) < MIN_KEY_RETRY_DELAY) {
-            try {
-                Thread.sleep(MIN_KEY_RETRY_DELAY - delay);
-            } catch (InterruptedException ex) {
-                interrupted = ex;
-            }
-        }
-        if (interrupted != null)
-            Thread.currentThread().interrupt();
-        return last + delay;
+    /** Wipe the given array. */
+    private void paranoidWipe(final byte[] pwd) {
+        for (int i = pwd.length; --i >= 0; )
+            pwd[i] = 0;
     }
 
     @Override
@@ -199,10 +185,9 @@ class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
     public void authenticate() throws RaesAuthenticationException, IOException {
         final Mac mac = new HMac(new SHA256Digest());
         mac.init(macParam);
-
         final byte[] buf = computeMac(mac);
-
-        if (!ArrayHelper.equals(footer, footer.length / 2, buf, 0, buf.length / 2))
+        assert buf.length == mac.getMacSize();
+        if (!ArrayHelper.equals(buf, 0, footer, footer.length / 2, footer.length / 2))
             throw new RaesAuthenticationException();
     }
 }

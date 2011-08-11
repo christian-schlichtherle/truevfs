@@ -15,14 +15,16 @@
  */
 package de.schlichtherle.truezip.crypto.raes;
 
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import de.schlichtherle.truezip.crypto.SICSeekableBlockCipher;
+import static de.schlichtherle.truezip.crypto.raes.Constants.*;
 import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
 import de.schlichtherle.truezip.io.LEDataOutputStream;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.SecureRandom;
+import java.util.Random;
 import net.jcip.annotations.NotThreadSafe;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
@@ -37,24 +39,22 @@ import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 
-import static de.schlichtherle.truezip.crypto.raes.RaesConstants.*;
-
 /**
  * Writes a type 0 RAES file.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
-class Type0RaesOutputStream extends RaesOutputStream {
-
-    private static final SecureRandom shaker = new SecureRandom();
+final class Type0RaesOutputStream extends RaesOutputStream {
 
     /**
      * The iteration count for the derived keys of the cipher, KLAC and MAC.
      */
     final static int ITERATION_COUNT = 2005; // The RAES epoch :-)
+
+    private final SecureRandom shaker = new SecureRandom();
 
     /** The key strength. */
     private final KeyStrength keyStrength;
@@ -81,66 +81,62 @@ class Type0RaesOutputStream extends RaesOutputStream {
             final OutputStream out,
             final Type0RaesParameters param)
     throws IOException{
-        super(out, null);
+        super(out, new BufferedBlockCipher(
+                new SICSeekableBlockCipher( // or new SICBlockCipher(
+                    new AESFastEngine())));
 
         assert null != out;
         assert null != param;
 
-        // Check parameters (fail fast).
-        final char[] passwd = param.getWritePassword();
-        if (null == passwd)
-            throw new RaesKeyException();
-
-        keyStrength = param.getKeyStrength();
+        // Init key strength.
+        final KeyStrength keyStrength = param.getKeyStrength();
         final int keyStrengthOrdinal = keyStrength.ordinal();
-        final int keyStrengthBytes = 16 + 8 * keyStrengthOrdinal; // key strength in bytes: 16, 24 or 32
-        final int keyStrengthBits = 8 * keyStrengthBytes;
+        final int keyStrengthBits = keyStrength.getBits();
+        final int keyStrengthBytes = keyStrength.getBytes();
+        this.keyStrength = keyStrength;
 
-        // Init digest for key generation and KLAC.
-        final Digest digest = new SHA256Digest();
-
-        // Init key strength info and salt.
-        assert digest.getDigestSize() >= keyStrengthBytes;
+        // Shake the salt.
         final byte[] salt = new byte[keyStrengthBytes];
         shaker.nextBytes(salt);
 
-        // Init PBE parameters.
-        final PBEParametersGenerator gen = new PKCS12ParametersGenerator(digest);
-        final byte[] pass = PBEParametersGenerator.PKCS12PasswordToBytes(passwd);
-        for (int i = passwd.length; --i >= 0; ) // nullify password parameter
-            passwd[i] = 0;
+        // Init digest for key generation and KLAC.
+        final Digest digest = new SHA256Digest();
+        assert digest.getDigestSize() >= keyStrengthBytes;
 
-        gen.init(pass, salt, ITERATION_COUNT);
-        // Order is important here, because gen does not properly reset the
-        // digest object!
+        // Init password.
+        final char[] pwdChars = param.getWritePassword();
+        final byte[] pwdBytes = PBEParametersGenerator.PKCS12PasswordToBytes(pwdChars);
+        paranoidWipe(pwdChars);
+
+        // Derive cipher and MAC parameters.
+        final PBEParametersGenerator gen = new PKCS12ParametersGenerator(digest);
+        gen.init(pwdBytes, salt, ITERATION_COUNT);
         final ParametersWithIV
-                cipherParam = (ParametersWithIV) gen.generateDerivedParameters(
-                    keyStrengthBits, AES_BLOCK_SIZE);
+                aesCtrParam = (ParametersWithIV) gen.generateDerivedParameters(
+                    keyStrengthBits, AES_BLOCK_SIZE_BITS);
         final CipherParameters
-                macParam = gen.generateDerivedMacParameters(keyStrengthBits);
-        for (int i = pass.length; --i >= 0; ) // wipe password buffer
-            pass[i] = 0;
+                sha256HMmacParam = gen.generateDerivedMacParameters(keyStrengthBits);
+        paranoidWipe(pwdBytes);
 
         // Init cipher.
-        final BufferedBlockCipher
-                cipher = new BufferedBlockCipher(
-                    new SICSeekableBlockCipher(
-                        new AESFastEngine()));
-        cipher.init(true, cipherParam);
+        this.cipher.init(true, aesCtrParam);
 
         // Init MAC.
-        mac = new HMac(new SHA256Digest());
-        mac.init(macParam);
+        final Mac mac = this.mac = new HMac(digest);
+        mac.init(sha256HMmacParam);
 
         // Init KLAC.
-        klac = new HMac(digest);
-        klac.init(macParam); // resets the digest
-        final byte[] cipherKey = ((KeyParameter) cipherParam.getParameters())
+        final Mac klac = this.klac = new HMac(new SHA256Digest()); // cannot reuse digest!
+        klac.init(sha256HMmacParam); // resets the digest
+        final byte[] cipherKey = ((KeyParameter) aesCtrParam.getParameters())
                 .getKey();
         klac.update(cipherKey, 0, cipherKey.length);
 
-        // Init stream chain.
-        dos = new LEDataOutputStream(out);
+        // Reinit chain of output streams as Encrypt-then-MAC.
+        final LEDataOutputStream dos =
+                this.dos = out instanceof LEDataOutputStream
+                    ? (LEDataOutputStream) out
+                    : new LEDataOutputStream(out);
         this.delegate = new MacOutputStream(dos, mac);
 
         // Write data envelope header.
@@ -151,11 +147,20 @@ class Type0RaesOutputStream extends RaesOutputStream {
         dos.write(salt);
 
         // Init start.
-        start = dos.size();
+        this.start = dos.size();
         assert ENVELOPE_TYPE_0_HEADER_LEN_WO_SALT + salt.length == start;
+    }
 
-        // Finally init the super class cipher.
-        this.cipher = cipher;
+    /** Wipe the given array. */
+    private void paranoidWipe(final byte[] passwd) {
+        shaker.nextBytes(passwd);
+    }
+
+    /** Wipe the given array. */
+    private void paranoidWipe(final char[] passwd) {
+        final Random rng = shaker;
+        for (int i = passwd.length; --i >= 0; )
+            passwd[i] = (char) rng.nextInt();
     }
 
     @Override
@@ -164,38 +169,31 @@ class Type0RaesOutputStream extends RaesOutputStream {
     }
 
     @Override
-    public void close() throws IOException {
-        // Order is important here!
-        if (!closed) {
-            closed = true;
-            try {
-                // Flush partial block to out, if any.
-                finish();
+    protected void finish() throws IOException {
+        // Flush partial block to out, if any.
+        super.finish();
 
-                final long trailer = dos.size();
+        final long trailer = dos.size();
 
-                assert mac.getMacSize() == klac.getMacSize();
-                final byte[] buf = new byte[mac.getMacSize()]; // authentication code buffer
-                int bufLen;
+        final Mac mac = this.mac;
+        assert mac.getMacSize() == klac.getMacSize();
+        final byte[] buf = new byte[mac.getMacSize()]; // MAC buffer
+        int bufLength;
 
-                // Calculate and write KLAC to data envelope trailer.
-                // Please note that we will only use the first half of the
-                // authentication code for security reasons.
-                final long length = trailer - start; // message length
-                klac(klac, length, buf);
-                dos.write(buf, 0, buf.length / 2);
+        // Calculate and write KLAC to data envelope footer.
+        // Please note that we will only use the first half of the
+        // authentication code for security reasons.
+        final long length = trailer - start; // message length
+        klac(klac, length, buf);
+        dos.write(buf, 0, buf.length / 2);
 
-                // Calculate and write MAC to data envelope trailer.
-                // Again, we will only use the first half of the
-                // authentication code for security reasons.
-                bufLen = mac.doFinal(buf, 0);
-                assert bufLen == buf.length;
-                dos.write(buf, 0, buf.length / 2);
+        // Calculate and write MAC to data envelope footer.
+        // Again, we will only use the first half of the
+        // authentication code for security reasons.
+        bufLength = mac.doFinal(buf, 0);
+        assert bufLength == buf.length;
+        dos.write(buf, 0, buf.length / 2);
 
-                assert dos.size() - trailer == buf.length;
-            } finally {
-                delegate.close();
-            }
-        }
+        assert dos.size() - trailer == buf.length;
     }
 }

@@ -19,49 +19,22 @@ import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * An abstract decorator for a read only file.
  * <p>
- * Note that subclasses of this class may implement their own virtual file
+ * Note that sub-classes of this class may implement their own virtual file
  * pointer.
- * Thus, if you would like to access the underlying {@code ReadOnlyFile}
- * again after you have finished working with the
- * {@code FilteredReadOnlyFile}, you should synchronize its file pointer like
- * this:
- * <pre>
- *     ReadOnlyFile rof = new DefaultReadOnlyFile(new File("HelloWorld.java"));
- *     try {
- *         ReadOnlyFile frof = new FilteredReadOnlyFile(rof);
- *         try {
- *             // Do any file input on brof here...
- *             frof.seek(1);
- *         } finally {
- *             // Synchronize the file pointers.
- *             rof.seek(frof.getFilePointer());
- *         }
- *         // This assertion would fail if we hadn't done the file pointer
- *         // synchronization!
- *         assert rof.getFilePointer() == 1;
- *     } finally {
- *         rof.close();
- *     }
- * </pre>
- * This does not apply to this base class, however.
- * <p>
- * Subclasses implemententing their own virtual file pointer should add a note
- * referring to this classes Javadoc like this:
- * <blockquote>
- * <b>Note:</b> This class implements its own virtual file pointer.
- * Thus, if you would like to access the underlying {@code ReadOnlyFile}
- * again after you have finished working with an instance of this class,
- * you should synchronize their file pointers using the pattern as described
- * in the Javadoc for the class {@link DecoratingReadOnlyFile}.
- * </blockquote>
+ * Thus, if you would like to use the decorated read only file again after
+ * you have finished using the decorating read only file, then you should not
+ * assume a particular position of the file pointer of the decorated read only
+ * file.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 @DefaultAnnotation(NonNull.class)
 public abstract class DecoratingReadOnlyFile extends AbstractReadOnlyFile {
 

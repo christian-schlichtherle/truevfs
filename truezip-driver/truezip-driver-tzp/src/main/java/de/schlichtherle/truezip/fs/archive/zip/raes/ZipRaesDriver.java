@@ -27,19 +27,16 @@ import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
-import de.schlichtherle.truezip.fs.archive.FsMultiplexedOutputShop;
 import de.schlichtherle.truezip.fs.archive.zip.JarArchiveEntry;
 import de.schlichtherle.truezip.fs.archive.zip.JarDriver;
 import de.schlichtherle.truezip.fs.archive.zip.OptionOutputSocket;
 import de.schlichtherle.truezip.fs.archive.zip.ZipArchiveEntry;
 import de.schlichtherle.truezip.fs.archive.zip.ZipInputShop;
-import de.schlichtherle.truezip.fs.archive.zip.ZipOutputShop;
 import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.key.KeyManagerProvider;
 import de.schlichtherle.truezip.key.KeyProvider;
 import de.schlichtherle.truezip.key.PromptingKeyProvider;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.socket.InputSocket;
@@ -52,7 +49,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URI;
 import net.jcip.annotations.Immutable;
 
 /**
@@ -60,7 +56,7 @@ import net.jcip.annotations.Immutable;
  * and optionally authenticates the cipher data of the input archive files
  * presented to it.
  * 
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @Immutable
@@ -72,8 +68,10 @@ public abstract class ZipRaesDriver extends JarDriver {
     /**
      * Constructs a new RAES encrypted ZIP file driver.
      *
-     * @param ioPoolProvider the I/O pool service to use for temporary data.
-     * @param keyManagerProvider the key manager service.
+     * @param ioPoolProvider the I/O entry pool provider for allocating
+     *        temporary I/O entries (buffers).
+     * @param keyManagerProvider the key manager provider for accessing
+     *        protected resources (cryptography).
      */
     public ZipRaesDriver(   IOPoolProvider ioPoolProvider,
                             final KeyManagerProvider keyManagerProvider) {
@@ -81,6 +79,58 @@ public abstract class ZipRaesDriver extends JarDriver {
         if (null == keyManagerProvider)
             throw new NullPointerException();
         this.keyManagerProvider = keyManagerProvider;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Since TrueZIP 7.3, this method returns {@code true} for future use.
+     * 
+     * @return {@code true}
+     */
+    @Override
+    protected final boolean getPreambled() {
+        return true;
+    }
+
+    /**
+     * Returns the provider for key managers for accessing protected resources
+     * (encryption).
+     * <p>
+     * The implementation in {@link ZipRaesDriver} always returns the parameter
+     * provided to the constructor.
+     * 
+     * @return The provider for key managers for accessing protected resources
+     *         (encryption).
+     * @since  TrueZIP 7.3.
+     */
+    @Override
+    protected final KeyManagerProvider getKeyManagerProvider() {
+        return keyManagerProvider;
+    }
+
+    /**
+     * Returns the key manager for accessing RAES encrypted data.
+     * 
+     * @return The key manager for accessing RAES encrypted data.
+     */
+    protected final KeyManager<AesCipherParameters> getKeyManager() {
+        return keyManagerProvider.get(AesCipherParameters.class);
+    }
+
+    /**
+     * Returns the {@link RaesParameters} for the given file system model.
+     * <p>
+     * The implementation in the class {@link ZipRaesDriver} returns
+     * {@code new KeyManagerRaesParameters(getKeyManager(), mountPointUri(model))}.
+     * 
+     * @param  model the file system model.
+     * @return The {@link RaesParameters} for the given file system model.
+     */
+    protected RaesParameters raesParameters(FsModel model) {
+        return new KeyManagerRaesParameters(
+                getKeyManager(),
+                mountPointUri(model));
     }
 
     /**
@@ -129,24 +179,33 @@ public abstract class ZipRaesDriver extends JarDriver {
      * Creates a new {@link JarArchiveEntry}, enforcing that the data gets
      * {@code DEFLATED} when written, even if copying data from a
      * {@code STORED} source entry.
-     * This feature strengthens the security of the authentication process.
+     * This feature strengthens the security level of the authentication
+     * process and inhibits the use of an unencrypted temporary I/O entry
+     * (usually a temporary file) in case the output is not copied from a file
+     * system entry as its input.
+     * <p>
+     * Furthermore, the output option preference {@link FsOutputOption#ENCRYPT}
+     * is cleared in order to prevent adding a redundant encryption layer for
+     * the individual ZIP entry.
+     * This would not have any effect on the security level, but increase the
+     * size of the resulting archive file and heat the CPU.
      */
     @Override
     public final JarArchiveEntry
-    newEntry(   final String path,
-                final Type type,
-                final @CheckForNull Entry template,
-                final BitField<FsOutputOption> mknod)
+    newEntry(   String path,
+                Type type,
+                Entry template,
+                BitField<FsOutputOption> mknod)
     throws CharConversionException {
-        // Enforce deflation to strengthen the authentication security level.
-        return super.newEntry(path, type, template, mknod.set(COMPRESS));
+        return super.newEntry(path, type, template,
+                mknod.set(COMPRESS).clear(ENCRYPT));
     }
 
     /**
      * {@inheritDoc}
      * <p>
      * The implementation in {@link ZipRaesDriver} calls
-     * {@link #getRaesParameters}, with which it initializes a new
+     * {@link #raesParameters}, with which it initializes a new
      * {@link RaesReadOnlyFile}.
      * Next, if the gross file length of the archive is smaller than or equal
      * to the authentication trigger, the MAC authentication on the cipher
@@ -162,7 +221,7 @@ public abstract class ZipRaesDriver extends JarDriver {
         final ReadOnlyFile rof = input.newReadOnlyFile();
         try {
             final RaesReadOnlyFile rrof = RaesReadOnlyFile.getInstance(
-                    rof, getRaesParameters(model));
+                    rof, raesParameters(model));
             if (rof.length() <= getAuthenticationTrigger()) { // compare rof, not rrof!
                 // Note: If authentication fails, this is reported through some
                 // sort of IOException, not a FileNotFoundException!
@@ -170,7 +229,7 @@ public abstract class ZipRaesDriver extends JarDriver {
                 // ordinary file which may be read, written or deleted.
                 rrof.authenticate();
             }
-            return newInputShop(rrof);
+            return newInputShop(model, rrof);
         } catch (IOException ex) {
             rof.close();
             throw ex;
@@ -206,47 +265,12 @@ public abstract class ZipRaesDriver extends JarDriver {
                 .newOutputStream();
         try {
             final RaesOutputStream ros = RaesOutputStream.getInstance(
-                    out, getRaesParameters(model));
-            return newOutputShop(ros, source);
+                    out, raesParameters(model));
+            return newOutputShop(model, ros, source);
         } catch (IOException ex) {
             out.close();
             throw ex;
         }
-    }
-
-    /**
-     * Returns the {@link RaesParameters} for the given file system model.
-     * 
-     * @param  model the file system model.
-     * @return The {@link RaesParameters} for the given file system model.
-     */
-    final RaesParameters getRaesParameters(FsModel model) {
-        return new KeyManagerRaesParameters(
-                getKeyManager(),
-                toMountPointResource(model));
-    }
-
-    final KeyManager<AesCipherParameters> getKeyManager() {
-        return keyManagerProvider.get(AesCipherParameters.class);
-    }
-
-    /**
-     * Returns a URI which represents the mount point of the given model as a
-     * resource URI for looking up a {@link KeyProvider}.
-     * Note that this URI needs to be matched exactly when setting a password
-     * programmatically!
-     * <p>
-     * The implementation in the class {@link ZipRaesDriver} returns the
-     * expression {@code model.getMountPoint().toHierarchicalUri()}
-     * in order to improve the readability of the URI in comparison to the
-     * expression {@code model.getMountPoint().toUri()}.
-     * 
-     * @param  model the file system model.
-     * @return A URI representing the file system model's mount point.
-     * @see    <a href="http://java.net/jira/browse/TRUEZIP-72">#TRUEZIP-72</a>
-     */
-    protected URI toMountPointResource(FsModel model) {
-        return model.getMountPoint().toHierarchicalUri();
     }
 
     /**
@@ -261,7 +285,7 @@ public abstract class ZipRaesDriver extends JarDriver {
          */
         RESET_CANCELLED_KEY {
             @Override
-            public void sync(KeyProvider<?> provider) {
+            void sync(KeyProvider<?> provider) {
                 if (provider instanceof PromptingKeyProvider<?>)
                     ((PromptingKeyProvider<?>) provider).resetCancelledKey();
             }
@@ -273,7 +297,7 @@ public abstract class ZipRaesDriver extends JarDriver {
          */
         RESET_UNCONDITIONALLY {
             @Override
-            public void sync(KeyProvider<?> provider) {
+            void sync(KeyProvider<?> provider) {
                 if (provider instanceof PromptingKeyProvider<?>)
                     ((PromptingKeyProvider<?>) provider).resetUnconditionally();
             }
@@ -287,6 +311,6 @@ public abstract class ZipRaesDriver extends JarDriver {
          * @param provider the key provider for the RAES encrypted ZIP file
          *        which has been successfully synchronized.
          */
-        public abstract void sync(KeyProvider<?> provider);
+        abstract void sync(KeyProvider<?> provider);
     } // KeyProviderSyncStrategy
 }

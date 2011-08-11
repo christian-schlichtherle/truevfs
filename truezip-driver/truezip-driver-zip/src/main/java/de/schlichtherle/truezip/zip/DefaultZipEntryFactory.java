@@ -19,7 +19,7 @@ package de.schlichtherle.truezip.zip;
 /**
  * The default factory for {@link ZipEntry}s.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 final class DefaultZipEntryFactory implements ZipEntryFactory<ZipEntry> {
@@ -31,7 +31,7 @@ final class DefaultZipEntryFactory implements ZipEntryFactory<ZipEntry> {
     }
 
     @Override
-	public ZipEntry newEntry(String name) {
+    public ZipEntry newEntry(String name) {
         return new ZipEntry(name);
     }
 }

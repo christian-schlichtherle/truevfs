@@ -16,37 +16,33 @@
 package de.schlichtherle.truezip.crypto.raes;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
- * These {@link RaesParameters} delegate to some other instance of a sibling
- * interface or itself in order to locate the parameters required to read
- * or write a certain RAES type.
- * This may be implemented by clients to build RAES parameters of a certain
- * type on demand rather than providing them upfront.
+ * These {@link RaesParameters} delegate to some other instance of a
+ * sibling interface or itself in order to locate the parameters required to
+ * read or write a RAES file of a given type.
+ * This enables implementations to retrieve RAES parameters on demand
+ * rather than providing them upfront for any possible type.
  * <p>
- * There are two usages of this interface:
- * <ol>
- * <li>{@link RaesReadOnlyFile#getInstance} uses it to locate RAES parameters
- *     which match the RAES type found in the file unless the provided
- *     parameters already match the required type.
- * <li>{@link RaesOutputStream#getInstance} uses it to allow the client
- *     explict control about the type of RAES file created.
- * </ol>
+ * Implementations do not need to be safe for multi-threading.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public interface RaesParametersProvider extends RaesParameters {
 
     /**
-     * Requests a {@link RaesParameters} instance of the given
-     * {@code type}.
+     * Returns {@link RaesParameters} of the given {@code type}
+     * or {@code null} if not available.
      *
      * @param  type the {@link RaesParameters} interface class which's
      *         implementation is searched.
-     * @return An instance of {@code RaesParameters} or {@code null}
-     *         if no RAES parameters are available.
+     * @return {@link RaesParameters} of the given {@code type}
+     *         or {@code null} if not available.
+
      */
-    @CheckForNull <P extends RaesParameters> P get(@NonNull Class<P> type);
+    @CheckForNull <P extends RaesParameters> P get(Class<P> type);
 }

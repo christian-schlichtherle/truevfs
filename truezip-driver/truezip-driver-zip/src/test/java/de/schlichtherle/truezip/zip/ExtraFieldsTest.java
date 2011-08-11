@@ -87,7 +87,7 @@ public final class ExtraFieldsTest {
         assertNotNull(ef);
         assertSame(ef, fields.remove(ExtraField.ZIP64_HEADER_ID));
         assertNull(fields.get(ExtraField.ZIP64_HEADER_ID));
-        assertNull(fields.put(ef));
+        assertNull(fields.add(ef));
         final byte[] got = fields.getExtra();
         assertNotSame(serialized, got);
         assertTrue(Arrays.equals(serialized, got));
@@ -98,7 +98,7 @@ public final class ExtraFieldsTest {
         assertEquals(0, fields.getExtra().length);
         final ExtraField ef = new DefaultExtraField(ExtraField.ZIP64_HEADER_ID);
         assertNull(fields.get(ExtraField.ZIP64_HEADER_ID));
-        assertNull(fields.put(ef));
+        assertNull(fields.add(ef));
         byte[] got = fields.getExtra();
         assertEquals(4 + ef.getDataSize(), got.length);
         assertSame(ef, fields.remove(ExtraField.ZIP64_HEADER_ID));

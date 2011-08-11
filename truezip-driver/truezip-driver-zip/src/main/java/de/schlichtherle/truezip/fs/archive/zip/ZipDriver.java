@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2011 Schlichtherle IT Services
+ * Copyright (C) 2005-2011 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,9 @@ import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriver;
 import de.schlichtherle.truezip.fs.archive.FsMultiplexedOutputShop;
+import de.schlichtherle.truezip.key.KeyManagerProvider;
+import de.schlichtherle.truezip.key.KeyProvider;
+import de.schlichtherle.truezip.key.sl.KeyManagerLocator;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
@@ -34,6 +37,7 @@ import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.zip.ZipCryptoParameters;
 import de.schlichtherle.truezip.zip.ZipEntry;
 import static de.schlichtherle.truezip.zip.ZipEntry.*;
 import de.schlichtherle.truezip.zip.ZipEntryFactory;
@@ -43,6 +47,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.zip.Deflater;
 import net.jcip.annotations.Immutable;
@@ -67,33 +72,102 @@ extends FsCharsetArchiveDriver<ZipArchiveEntry>
 implements ZipEntryFactory<ZipArchiveEntry> {
 
     /**
-     * The default character set for entry names and comments, which is
-     * {@code "IBM437"}.
+     * The character set for entry names and comments in &quot;traditional&quot;
+     * ZIP files, which is {@code "IBM437"}.
      */
     private static final Charset ZIP_CHARSET = Charset.forName("IBM437");
 
-    private final IOPoolProvider provider;
+    private final IOPool<?> ioPool;
 
     /**
-     * Equivalent to
-     * {@link ZipDriver#ZipDriver(IOPoolProvider, Charset) new ZipDriver(provider, ZIP_CHARSET)}.
+     * Constructs a new ZIP file driver.
+     * This constructor uses {@link #ZIP_CHARSET} for encoding entry names
+     * and comments.
+     *
+     * @param ioPoolProvider the provider for I/O entry pools for allocating
+     *        temporary I/O entries (buffers).
      */
-    public ZipDriver(final IOPoolProvider provider) {
-        this(provider, ZIP_CHARSET);
+    public ZipDriver(IOPoolProvider ioPoolProvider) {
+        this(ioPoolProvider, ZIP_CHARSET);
     }
 
     /**
-     * Constructs a new ZIP driver.
+     * Constructs a new ZIP file driver.
      *
-     * @param provider the I/O pool service to use for allocating temporary I/O
-     *        entries.
-     * @param charset the character set to use for entry names and comments.
+     * @param ioPoolProvider the provider for I/O entry pools for allocating
+     *        temporary I/O entries (buffers).
+     * @param charset the character set for encoding entry names and comments.
      */
-    protected ZipDriver(final IOPoolProvider provider, Charset charset) {
+    protected ZipDriver(IOPoolProvider ioPoolProvider, Charset charset) {
         super(charset);
-        if (null == provider)
-            throw new NullPointerException();
-        this.provider = provider;
+        this.ioPool = ioPoolProvider.get();
+    }
+
+    /**
+     * Returns the provider for key managers for accessing protected resources
+     * (encryption).
+     * <p>
+     * The implementation in {@link ZipDriver} always returns
+     * {@link KeyManagerLocator#SINGLETON}.
+     * When overriding this method, subsequent calls must return the same
+     * object.
+     * 
+     * @return The provider for key managers for accessing protected resources
+     *         (encryption).
+     * @since  TrueZIP 7.3.
+     */
+    protected KeyManagerProvider getKeyManagerProvider() {
+        return KeyManagerLocator.SINGLETON;
+    }
+
+    final ZipCryptoParameters zipCryptoParameters(ZipInputShop input) {
+        return zipCryptoParameters(input.getModel(), input.getRawCharset());
+    }
+
+    final ZipCryptoParameters zipCryptoParameters(ZipOutputShop output) {
+        return zipCryptoParameters(output.getModel(), output.getRawCharset());
+    }
+
+    /**
+     * Returns the {@link ZipCryptoParameters} for the given file system model
+     * and character set.
+     * <p>
+     * The implementation in the class {@link ZipDriver} returns
+     * {@code new KeyManagerZipCryptoParameters(getKeyManagerProvider(), mountPointUri(model), charset)}.
+     * 
+     * @param  model the file system model.
+     * @param  charset charset the character set used for encoding entry names
+     *         and the file comment in the ZIP file.
+     * @return The {@link ZipCryptoParameters} for the given file system model
+     *         and character set.
+     * @since  TrueZIP 7.3
+     */
+    protected ZipCryptoParameters zipCryptoParameters(
+            FsModel model,
+            Charset charset) {
+        return new KeyManagerZipCryptoParameters(
+                getKeyManagerProvider(),
+                mountPointUri(model),
+                charset);
+    }
+    
+    /**
+     * Returns a URI which represents the mount point of the given model as a
+     * resource URI for looking up a {@link KeyProvider}.
+     * Note that this URI needs to be matched exactly when setting a password
+     * programmatically!
+     * <p>
+     * The implementation in the class {@link ZipDriver} returns the
+     * expression {@code model.getMountPoint().toHierarchicalUri()}
+     * in order to improve the readability of the URI in comparison to the
+     * expression {@code model.getMountPoint().toUri()}.
+     * 
+     * @param  model the file system model.
+     * @return A URI representing the file system model's mount point.
+     * @see    <a href="http://java.net/jira/browse/TRUEZIP-72">#TRUEZIP-72</a>
+     */
+    public URI mountPointUri(FsModel model) {
+        return model.getMountPoint().toHierarchicalUri();
     }
 
     /**
@@ -128,7 +202,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
 
     @Override
     protected final IOPool<?> getPool() {
-        return provider.get();
+        return ioPool;
     }
 
     /**
@@ -216,16 +290,18 @@ implements ZipEntryFactory<ZipArchiveEntry> {
     throws IOException {
         final ReadOnlyFile rof = input.newReadOnlyFile();
         try {
-            return newInputShop(rof);
+            return newInputShop(model, rof);
         } catch (IOException ex) {
             rof.close();
             throw ex;
         }
     }
 
-    protected InputShop<ZipArchiveEntry> newInputShop(ReadOnlyFile rof)
+    protected InputShop<ZipArchiveEntry> newInputShop(
+            FsModel model,
+            ReadOnlyFile rof)
     throws IOException {
-        return new ZipInputShop(this, rof);
+        return new ZipInputShop(this, model, rof);
     }
 
     /**
@@ -300,7 +376,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
     throws IOException {
         final OutputStream out = output.newOutputStream();
         try {
-            return newOutputShop(out, source);
+            return newOutputShop(model, out, source);
         } catch (IOException ex) {
             out.close();
             throw ex;
@@ -308,11 +384,12 @@ implements ZipEntryFactory<ZipArchiveEntry> {
     }
 
     protected OutputShop<ZipArchiveEntry> newOutputShop(
-            final OutputStream out,
-            final @CheckForNull ZipInputShop source)
+            FsModel model,
+            OutputStream out,
+            @CheckForNull ZipInputShop source)
     throws IOException {
         return new FsMultiplexedOutputShop<ZipArchiveEntry>(
-                new ZipOutputShop(this, out, source),
+                new ZipOutputShop(this, model, out, source),
                 getPool());
     }
 
@@ -343,6 +420,8 @@ implements ZipEntryFactory<ZipArchiveEntry> {
         } else if (mknod.get(STORE)) { // #2 priority
             entry.setMethod(STORED);
         }
+        if (mknod.get(ENCRYPT))
+            entry.setEncrypted(true);
         return entry;
     }
 

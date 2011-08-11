@@ -15,16 +15,17 @@
  */
 package de.schlichtherle.truezip.zip;
 
+import de.schlichtherle.truezip.crypto.param.AesKeyStrength;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.LEDataOutputStream;
 import de.schlichtherle.truezip.util.JSE7;
-import static de.schlichtherle.truezip.zip.ZipConstants.*;
-import static de.schlichtherle.truezip.zip.ZipEntry.DEFLATED;
-import static de.schlichtherle.truezip.zip.ZipEntry.PLATFORM_FAT;
-import static de.schlichtherle.truezip.zip.ZipEntry.STORED;
+import static de.schlichtherle.truezip.zip.Constants.*;
+import static de.schlichtherle.truezip.zip.WinZipAesExtraField.*;
+import static de.schlichtherle.truezip.zip.ZipEntry.*;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
@@ -34,7 +35,7 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.zip.CRC32;
+import java.util.zip.DeflaterOutputStream;
 import java.util.zip.ZipException;
 import net.jcip.annotations.NotThreadSafe;
 
@@ -59,26 +60,20 @@ implements Iterable<E> {
      * The default character set used for entry names and comments in ZIP files.
      * This is {@code "UTF-8"} for compatibility with Sun's JDK implementation.
      */
-    public static final Charset DEFAULT_CHARSET = ZipConstants.DEFAULT_CHARSET;
+    public static final Charset DEFAULT_CHARSET = Constants.DEFAULT_CHARSET;
+
+    private final LEDataOutputStream dos;
 
     /** The charset to use for entry names and comments. */
     private final Charset charset;
 
-    /** CRC instance to avoid parsing DEFLATED data twice. */
-    private final CRC32 crc = new CRC32();
-
     /** This instance is used for deflated output. */
-    private final ZipDeflater def = JSE7.AVAILABLE
+    private final ZipDeflater deflater = JSE7.AVAILABLE
             ? new ZipDeflater()
             : new Jdk6Deflater();
 
-    /** This buffer holds deflated data for output. */
-    private final byte[] dbuf = new byte[FLATER_BUF_LENGTH];
-
-    private final byte[] sbuf = new byte[1];
-
-    /** The file comment. */
-    private String comment = "";
+    /** The encoded file comment. */
+    private @CheckForNull byte[] comment;
 
     /** Default compression method for next entry. */
     private short method = DEFLATED;
@@ -99,15 +94,10 @@ implements Iterable<E> {
 
     private boolean closed;
 
-    /** Current entry. */
-    private @CheckForNull E entry;
+    /** Current ZIP entry. */
+    private @Nullable E entry;
 
-    /**
-     * Whether or not we need to deflate the current entry.
-     * This can be used together with the {@code DEFLATED} method to
-     * write already compressed entry data into the ZIP file.
-     */
-    private boolean deflate;
+    private @Nullable OutputMethod processor;
 
     /**
      * Constructs a raw ZIP output stream which decorates the given output
@@ -119,9 +109,10 @@ implements Iterable<E> {
     protected RawZipOutputStream(
             final OutputStream out,
             final Charset charset) {
-        super(promote(out, null));
+        super(newLEDataOutputStream(out, null));
         if (null == charset)
             throw new NullPointerException();
+        this.dos = (LEDataOutputStream) this.delegate;
         this.charset = charset;
     }
 
@@ -162,10 +153,11 @@ implements Iterable<E> {
             final OutputStream out,
             final @CheckForNull RawZipFile<E> appendee,
             final @CheckForNull Charset charset) {
-        super(promote(out, appendee));
+        super(newLEDataOutputStream(out, appendee));
+        this.dos = (LEDataOutputStream) this.delegate;
         if (null != appendee) {
-            this.charset = appendee.getCharset0();
-            this.comment = appendee.getComment();
+            this.charset = appendee.getRawCharset();
+            this.comment = appendee.getRawComment();
             final Map<String, E> entries = this.entries;
             for (E entry : appendee)
                 entries.put(entry.getName(), entry);
@@ -176,7 +168,7 @@ implements Iterable<E> {
         }
     }
 
-    private static LEDataOutputStream promote(
+    private static LEDataOutputStream newLEDataOutputStream(
             final OutputStream out,
             final @CheckForNull RawZipFile<?> appendee) {
         if (null == out)
@@ -188,16 +180,28 @@ implements Iterable<E> {
                     : new LEDataOutputStream(out);
     }
 
-    /* Adjusts the number of written bytes for appending mode. */
-    private static final class AppendingLEDataOutputStream
-    extends LEDataOutputStream {
-        AppendingLEDataOutputStream(OutputStream out, RawZipFile<?> appendee) {
-            super(out);
-            super.written = appendee.getOffsetMapper().location(appendee.length());
-        }
-    } // AppendingLEDataOutputStream
+    private byte[] encode(String string) {
+        return string.getBytes(charset);
+    }
 
-    /** Returns the charset to use for entry names and the file comment. */
+    private String decode(byte[] bytes) {
+        return new String(bytes, charset);
+    }
+
+    /**
+     * Returns the character set which is used for
+     * encoding entry names and the file comment.
+     * 
+     * @since TrueZIP 7.3
+     */
+    public Charset getRawCharset() {
+        return charset;
+    }
+
+    /**
+     * Returns the name of the character set which is used for
+     * encoding entry names and the file comment.
+     */
     public String getCharset() {
         return charset.name();
     }
@@ -250,22 +254,38 @@ implements Iterable<E> {
 
     /**
      * Returns the file comment.
+     * 
+     * @return The file comment.
      */
-    public String getComment() {
-        return comment;
+    public @Nullable String getComment() {
+        final byte[] comment = this.comment;
+        //return null == comment ? null : new String(comment, charset);
+        return null == comment ? null : decode(comment);
     }
 
     /**
      * Sets the file comment.
+     * 
+     * @param  comment the file comment.
+     * @throws IllegalArgumentException if the encoded comment is longer than
+     *         {@link UShort#MAX_VALUE} bytes.
      */
-    public void setComment(String comment) {
-        this.comment = comment;
+    public void setComment(final @CheckForNull String comment) {
+        if (null != comment && !comment.isEmpty()) {
+            final byte[] bytes = encode(comment);
+            UShort.check(bytes.length);
+            this.comment = bytes;
+        } else {
+            this.comment = null;
+        }
     }
 
     /**
      * Returns the default compression method for subsequent entries.
      * This property is only used if a {@link ZipEntry} does not specify a
      * compression method.
+     * <p>
+     * The initial value is {@link ZipEntry#DEFLATED}.
      *
      * @see #setMethod
      * @see ZipEntry#getMethod
@@ -281,38 +301,49 @@ implements Iterable<E> {
      * <p>
      * Legal values are {@link ZipEntry#STORED} (uncompressed) and
      * {@link ZipEntry#DEFLATED} (compressed).
-     * The initial value is {@link ZipEntry#DEFLATED}.
      *
      * @see #getMethod
      * @see ZipEntry#setMethod
      */
-    public void setMethod(int method) {
-	if (method != STORED && method != DEFLATED)
-	    throw new IllegalArgumentException(
-                    "Invalid compression method: " + method);
-        this.method = (short) method;
+    public void setMethod(final int method) {
+        final ZipEntry test = new ZipEntry("");
+        test.setMethod(method);
+        this.method = (short) test.getMethod();
     }
 
     /**
-     * Returns the compression level currently used.
+     * Returns the current compression level.
+     * 
+     * @return The current compression level.
      */
     public int getLevel() {
-        return def.getLevel();
+        return deflater.getLevel();
     }
 
     /**
      * Sets the compression level for subsequent entries.
+     * 
+     * @param level the compression level.
+     * @throws IllegalArgumentException if the compression level is invalid.
      */
     public void setLevel(int level) {
-	def.setLevel(level);
+	deflater.setLevel(level);
     }
+
+    /**
+     * Returns the crypto parameters.
+     * 
+     * @return The crypto parameters.
+     * @since  TrueZIP 7.3
+     */
+    protected abstract @CheckForNull ZipCryptoParameters getCryptoParameters();
 
     /**
      * Returns the total number of (compressed) bytes this stream has written
      * to the underlying stream.
      */
     public long length() {
-        return ((LEDataOutputStream) delegate).size();
+        return this.dos.size();
     }
 
     /**
@@ -320,7 +351,7 @@ implements Iterable<E> {
      * {@code RawZipOutputStream} is currently writing a ZIP entry.
      */
     public boolean isBusy() {
-        return null != entry;
+        return null != this.entry;
     }
 
     /**
@@ -336,186 +367,128 @@ implements Iterable<E> {
      * Note that if two or more entries with the same name are written
      * consecutively to this stream, the last entry written will shadow
      * all other entries, i.e. all of them are written to the ZIP file
-     * (and hence require space), but only the last will be accessible from
-     * the central directory.
+     * (and hence require space), but only the last will be listed in the
+     * central directory.
      * This is unlike the genuine {@link java.util.zip.ZipOutputStream
      * java.util.zip.ZipOutputStream} which would throw a {@link ZipException}
-     * in this method when the second entry with the same name is to be written.
+     * in this method when another entry with the same name is to be written.
      *
-     * @param  entry The ZIP entry to write.
-     * @param  deflate Whether or not the entry data should get deflated.
-     *         This should be set to {@code false} if and only if you are
-     *         writing data which has been read from a ZIP file and has not
-     *         been inflated again.
-     *         The entries' properties CRC, compressed size and uncompressed
-     *         size must be set appropriately.
+     * @param  entry The entry to write.
+     * @param  process Whether or not the entry contents should get processed,
+     *         e.g. deflated.
+     *         This should be set to {@code false} if and only if the
+     *         application is going to copy entries from an input ZIP file to
+     *         an output ZIP file.
+     *         The entries' CRC-32, compressed size and uncompressed
+     *         size properties must be set in advance.
      * @throws ZipException If and only if writing the entry is impossible
      *         because the resulting file would not comply to the ZIP file
      *         format specification.
      * @throws IOException On any I/O error.
      */
-    public void putNextEntry(final E entry, final boolean deflate)
+    @SuppressWarnings("unchecked")
+    public void putNextEntry(final E entry, final boolean process)
     throws IOException {
         closeEntry();
-        final String name = entry.getName();
-        /*if (entries.get(name) != null)
-            throw new ZipException(name + " (duplicate entry)");*/
-        {
-            final long size = entry.getNameLength(charset)
-                            + entry.getExtraLength()
-                            + entry.getCommentLength(charset);
-            if (size > UShort.MAX_VALUE)
-                throw new ZipException(entry.getName()
-                + " (sum of name, extra fields and comment too long: " + size + ")");
+        final OutputMethod method = newOutputMethod(entry, process);
+        final OutputStream out = method.init(entry);
+        this.entry = entry;
+        method.start();
+        this.processor = method;
+        this.delegate = out;
+        // Store entry now so that a subsequent call to getEntry(...) returns
+        // it.
+        entries.put(entry.getName(), entry);
+    }
+
+    /**
+     * Returns a new output method for the given entry.
+     * Except the property &quot;method&quot;, this method must not modify the
+     * given entry.
+     */
+    @SuppressWarnings("unchecked")
+    private OutputMethod newOutputMethod(
+            final ZipEntry entry,
+            final boolean process)
+    throws ZipException {
+        // Order is important here!
+        OutputMethod processor = new RawOutputMethod(process);
+        if (!process) {
+            assert UNKNOWN != entry.getCrc();
+            return processor;
         }
+        if (entry.isEncrypted())
+            processor = newEncryptedOutputMethod(
+                    (RawOutputMethod) processor,
+                    getCryptoParameters());
         int method = entry.getMethod();
-        if (method == ZipEntry.UNKNOWN)
-            method = getMethod();
+        if (UNKNOWN == method)
+            entry.setMethod16(method = getMethod());
         switch (method) {
             case STORED:
-                checkLocalFileHeaderData(entry);
-                this.deflate = false;
+                processor = new StoredOutputMethod(processor);
                 break;
             case DEFLATED:
-                if (!deflate)
-                    checkLocalFileHeaderData(entry);
-                this.deflate = deflate;
+                processor = new DeflatedOutputMethod(processor);
                 break;
             default:
                 throw new ZipException(entry.getName()
-                + " (unsupported compression method: " + method + ")");
+                        + " (unsupported compression method "
+                        + method
+                        + ")");
         }
-        if (entry.getPlatform() == ZipEntry.UNKNOWN)
-            entry.setPlatform(PLATFORM_FAT);
-        if (entry.getMethod()   == ZipEntry.UNKNOWN)
-            entry.setMethod(method);
-        if (entry.getTime()     == ZipEntry.UNKNOWN)
-            entry.setTime(System.currentTimeMillis());
-        // Write LFH BEFORE putting the entry in the map.
-        this.entry = entry;
-        writeLocalFileHeader();
-        // Store entry now so that an immediate subsequent call to getEntry(...)
-        // returns it.
-        entries.put(name, entry);
+        return processor;
     }
 
-    private static void checkLocalFileHeaderData(final ZipEntry entry)
+    /**
+     * Returns a new {@code EncryptedOutputMethod}.
+     *
+     * @param  processor the output method to decorate.
+     * @param  param the {@link ZipCryptoParameters} used to determine and
+     *         configure the type of the encrypted ZIP file.
+     *         If the run time class of this parameter matches multiple
+     *         parameter interfaces, it is at the discretion of this
+     *         implementation which one is picked and hence which type of
+     *         encrypted ZIP file is created.
+     *         If you need more control over this, pass in an instance which's
+     *         run time class just implements the
+     *         {@link ZipCryptoParametersProvider} interface.
+     *         Instances of this interface are queried to find crypto
+     *         parameters which match a known encrypted ZIP file type.
+     *         This algorithm is recursively applied.
+     * @return A new {@code EncryptedOutputMethod}.
+     * @throws ZipCryptoParametersException if {@code param} is {@code null} or
+     *         no suitable crypto parameters can get found.
+     * @throws IOException on any I/O error.
+     */
+    private EncryptedOutputMethod newEncryptedOutputMethod(
+            final RawOutputMethod processor,
+            final @CheckForNull ZipCryptoParameters param)
+    throws ZipCryptoParametersException {
+        assert null != processor;
+        // Order is important here to support multiple interface implementations!
+        if (param == null) {
+            throw new ZipCryptoParametersException("No crypto parameters available!");
+        } else if (param instanceof WinZipAesParameters) {
+            return new WinZipAesOutputMethod(processor,
+                    (WinZipAesParameters) param);
+        } else if (param instanceof ZipCryptoParametersProvider) {
+            return newEncryptedOutputMethod(processor,
+                    ((ZipCryptoParametersProvider) param).get(
+                        ZipCryptoParameters.class));
+        } else {
+            throw new ZipCryptoParametersException();
+        }
+    }
+
+    private static void checkLocalFileHeaderProperties(final ZipEntry entry)
     throws ZipException {
-        if (entry.getCrc()              == ZipEntry.UNKNOWN)
+        if (UNKNOWN == entry.getCrc())
             throw new ZipException(entry.getName() + " (unknown CRC checksum)");
-        if (entry.getCompressedSize32() == ZipEntry.UNKNOWN)
+        if (UNKNOWN == entry.getCompressedSize32())
             throw new ZipException(entry.getName() + " (unknown compressed size)");
-        if (entry.getSize32()           == ZipEntry.UNKNOWN)
+        if (UNKNOWN == entry.getSize32())
             throw new ZipException(entry.getName() + " (unknown uncompressed size)");
-    }
-
-    /** @throws IOException On any I/O error. */
-    private void writeLocalFileHeader() throws IOException {
-        final ZipEntry entry = this.entry;
-        assert null != entry;
-        final LEDataOutputStream dos = (LEDataOutputStream) delegate;
-        final long crc = entry.getCrc();
-        final long csize = entry.getCompressedSize();
-        final long size = entry.getSize();
-        final long csize32 = entry.getCompressedSize32();
-        final long size32 = entry.getSize32();
-        final long offset = dos.size();
-        final boolean dd // data descriptor?
-                =  crc   == ZipEntry.UNKNOWN
-                || csize == ZipEntry.UNKNOWN
-                || size  == ZipEntry.UNKNOWN;
-        final boolean zip64 // ZIP64 extensions?
-                =  csize  >= UInt.MAX_VALUE
-                || size   >= UInt.MAX_VALUE
-                || offset >= UInt.MAX_VALUE
-                || FORCE_ZIP64_EXT;
-        // Compose General Purpose Bit Flag.
-        // See appendix D of PKWARE's ZIP File Format Specification.
-        final boolean utf8 = UTF8.equals(charset);
-        final int general = (dd   ? (1 <<  3) : 0)
-                          | (utf8 ? (1 << 11) : 0);
-        // Start changes.
-        finished = false;
-        // Local File Header Signature.
-        dos.writeInt(LFH_SIG);
-        // Version Needed To Extract.
-        dos.writeShort(zip64 ? 45 : dd ? 20 : 10);
-        // General Purpose Bit Flag.
-        dos.writeShort(general);
-        // Compression Method.
-        dos.writeShort(entry.getMethod());
-        // Last Mod. Time / Date in DOS format.
-        dos.writeInt((int) entry.getDosTime());
-        // CRC-32.
-        // Compressed Size.
-        // Uncompressed Size.
-        if (dd) {
-            dos.writeInt(0);
-            dos.writeInt(0);
-            dos.writeInt(0);
-        } else {
-            dos.writeInt((int) crc);
-            dos.writeInt((int) csize32);
-            dos.writeInt((int) size32);
-        }
-        // File Name Length.
-        final byte[] name = entry.getName().getBytes(charset);
-        dos.writeShort(name.length);
-        // Extra Field Length.
-        final byte[] extra = entry.getExtra(!dd);
-        assert extra != null;
-        dos.writeShort(extra.length);
-        // File Name.
-        dos.write(name);
-        // Extra Field(s).
-        dos.write(extra);
-        // Commit changes.
-        entry.setGeneral(general);
-        entry.setOffset(offset);
-        dataStart = dos.size();
-    }
-
-    /**
-     * @throws IOException On any I/O error.
-     */
-    @Override
-    public void write(int b) throws IOException {
-        byte[] buf = sbuf;
-        buf[0] = (byte) b;
-        write(buf, 0, 1);
-    }
-
-    /**
-     * @throws IOException On any I/O error.
-     */
-    @Override
-    public void write(final byte[] b, final int off, final int len)
-    throws IOException {
-        final E entry = this.entry;
-        if (null != entry) {
-            if (len == 0) // let negative values pass for an exception
-                return;
-            if (deflate) {
-                // Fast implementation.
-                assert !def.finished();
-                def.setInput(b, off, len);
-                while (!def.needsInput())
-                    deflate();
-                crc.update(b, off, len);
-            } else {
-                delegate.write(b, off, len);
-                if (entry.getMethod() != DEFLATED)
-                    crc.update(b, off, len);
-            }
-        } else {
-            delegate.write(b, off, len);
-        }
-    }
-
-    private void deflate() throws IOException {
-        final int dlen = def.deflate(dbuf, 0, dbuf.length);
-        if (dlen > 0)
-            delegate.write(dbuf, 0, dlen);
     }
 
     /**
@@ -530,89 +503,14 @@ implements Iterable<E> {
         final E entry = this.entry;
         if (null == entry)
             return;
-        switch (entry.getMethod()) {
-            case STORED:
-                final long expectedCrc = crc.getValue();
-                if (expectedCrc != entry.getCrc()) {
-                    throw new ZipException(entry.getName()
-                    + " (bad CRC-32: 0x"
-                    + Long.toHexString(entry.getCrc())
-                    + " expected: 0x"
-                    + Long.toHexString(expectedCrc)
-                    + ")");
-                }
-                final long written = ((LEDataOutputStream) delegate).size();
-                final long entrySize = written - dataStart;
-                if (entry.getSize() != entrySize) {
-                    throw new ZipException(entry.getName()
-                    + " (bad uncompressed Size: "
-                    + entry.getSize()
-                    + " expected: "
-                    + entrySize
-                    + ")");
-                }
-                break;
-            case DEFLATED:
-                if (deflate) {
-                    assert !def.finished();
-                    def.finish();
-                    while (!def.finished())
-                        deflate();
-                    entry.setCrc(crc.getValue());
-                    entry.setCompressedSize(def.getBytesWritten());
-                    entry.setSize(def.getBytesRead());
-                    def.reset();
-                } else {
-                    // Note: There is no way to check whether the written
-                    // data matches the crc, the compressed size and the
-                    // uncompressed size!
-                }
-                break;
-            default:
-                throw new ZipException(entry.getName()
-                + " (unsupported compression method "
-                + entry.getMethod()
-                + ")");
+        try {
+            this.processor.finish();
+        } finally {
+            this.delegate = this.dos;
+            this.processor = null;
+            this.entry = null;
         }
-        writeDataDescriptor();
         flush();
-        crc.reset();
-        this.entry = null;
-    }
-
-    /**
-     * @throws IOException On any I/O error.
-     */
-    private void writeDataDescriptor() throws IOException {
-        final E entry = this.entry;
-        assert null != entry;
-        if (!entry.getGeneralBit(3))
-            return;
-        final LEDataOutputStream dos = (LEDataOutputStream) delegate;
-        final long crc = entry.getCrc();
-        final long csize = entry.getCompressedSize();
-        final long size = entry.getSize();
-        final long offset = entry.getOffset();
-        // Offset MUST be considered in decision about ZIP64 format - see
-        // description of Data Descriptor in ZIP File Format Specification!
-        final boolean zip64 // ZIP64 extensions?
-                =  csize  >= UInt.MAX_VALUE
-                || size   >= UInt.MAX_VALUE
-                || offset >= UInt.MAX_VALUE
-                || FORCE_ZIP64_EXT;
-        // Data Descriptor Signature.
-        dos.writeInt(DD_SIG);
-        // CRC-32.
-        dos.writeInt((int) crc);
-        // Compressed Size.
-        // Uncompressed Size.
-        if (zip64) {
-            dos.writeLong(csize);
-            dos.writeLong(size);
-        } else {
-            dos.writeInt((int) csize);
-            dos.writeInt((int) size);
-        }
     }
 
     /**
@@ -634,13 +532,13 @@ implements Iterable<E> {
      * @throws IOException On any I/O error.
      */
     public void finish() throws IOException {
-        if (finished)
+        if (this.finished)
             return;
-        finished = true;
+        this.finished = true;
         closeEntry();
-        final LEDataOutputStream dos = (LEDataOutputStream) delegate;
-        cdOffset = dos.size();
-        for (ZipEntry entry : entries.values())
+        final LEDataOutputStream dos = this.dos;
+        this.cdOffset = dos.size();
+        for (ZipEntry entry : this.entries.values())
             writeCentralFileHeader(entry);
         writeEndOfCentralDirectory();
     }
@@ -650,30 +548,37 @@ implements Iterable<E> {
      *
      * @throws IOException On any I/O error.
      */
-    private void writeCentralFileHeader(final ZipEntry entry) throws IOException {
+    private void writeCentralFileHeader(final ZipEntry entry)
+    throws IOException {
         assert null != entry;
-        final LEDataOutputStream dos = (LEDataOutputStream) delegate;
+        final LEDataOutputStream dos = this.dos;
         final long csize32 = entry.getCompressedSize32();
         final long size32 = entry.getSize32();
         final long offset32 = entry.getOffset32();
-        final boolean dd = entry.getGeneralBit(3);
         final boolean zip64 // ZIP64 extensions?
                 =  csize32  >= UInt.MAX_VALUE
                 || size32   >= UInt.MAX_VALUE
                 || offset32 >= UInt.MAX_VALUE
                 || FORCE_ZIP64_EXT;
+        final int method = entry.getMethod();
+        final boolean directory = entry.isDirectory();
+        final int version = zip64
+                ? 45
+                : DEFLATED == method || directory
+                    ? 20
+                    : 10;
         // Central File Header.
         dos.writeInt(CFH_SIG);
         // Version Made By.
         dos.writeShort((entry.getPlatform() << 8) | 63);
         // Version Needed To Extract.
-        dos.writeShort(zip64 ? 45 : dd ? 20 : 10);
-        // General Purpose Bit Flag.
-        dos.writeShort(entry.getGeneral());
+        dos.writeShort(version);
+        // General Purpose Bit Flags.
+        dos.writeShort(entry.getGeneral16());
         // Compression Method.
-        dos.writeShort(entry.getMethod());
+        dos.writeShort(method);
         // Last Mod. File Time / Date.
-        dos.writeInt((int) entry.getDosTime());
+        dos.writeInt((int) entry.getTimeDos());
         // CRC-32.
         dos.writeInt((int) entry.getCrc());
         // Compressed Size.
@@ -681,24 +586,21 @@ implements Iterable<E> {
         // Uncompressed Size.
         dos.writeInt((int) size32);
         // File Name Length.
-        final byte[] name = entry.getName().getBytes(charset);
+        final byte[] name = encode(entry.getName());
         dos.writeShort(name.length);
         // Extra Field Length.
         final byte[] extra = entry.getExtra();
         assert extra != null;
         dos.writeShort(extra.length);
         // File Comment Length.
-        String comment = entry.getComment();
-        if (comment == null)
-            comment = "";
-        final byte[] data = comment.getBytes(charset);
-        dos.writeShort(data.length);
+        final byte[] comment = getEntryComment(entry);
+        dos.writeShort(comment.length);
         // Disk Number Start.
         dos.writeShort(0);
         // Internal File Attributes.
         dos.writeShort(0);
         // External File Attributes.
-        dos.writeInt(entry.isDirectory() ? 0x10 : 0); // fixed issue #27.
+        dos.writeInt(directory ? 0x10 : 0); // fixed issue #27.
         // Relative Offset Of Local File Header.
         dos.writeInt((int) offset32);
         // File Name.
@@ -706,7 +608,11 @@ implements Iterable<E> {
         // Extra Field(s).
         dos.write(extra);
         // File Comment.
-        dos.write(data);
+        dos.write(comment);
+    }
+
+    private byte[] getEntryComment(final ZipEntry entry) {
+        return encode(entry.getEffectiveComment());
     }
 
     /**
@@ -715,7 +621,7 @@ implements Iterable<E> {
      * @throws IOException On any I/O error.
      */
     private void writeEndOfCentralDirectory() throws IOException {
-        final LEDataOutputStream dos = (LEDataOutputStream) delegate;
+        final LEDataOutputStream dos = this.dos;
         final long cdEntries = entries.size();
         final long cdSize = dos.size() - cdOffset;
         final long cdOffset = this.cdOffset;
@@ -774,12 +680,14 @@ implements Iterable<E> {
         dos.writeInt((int) cdSize32);
         dos.writeInt((int) cdOffset32);
         // ZIP file comment.
-        String comment = getComment();
-        if (comment == null)
-            comment = "";
-        final byte[] data = comment.getBytes(charset);
-        dos.writeShort(data.length);
-        dos.write(data);
+        final byte[] comment = getRawComment();
+        dos.writeShort(comment.length);
+        dos.write(comment);
+    }
+
+    private byte[] getRawComment() {
+        final byte[] comment = this.comment;
+        return null != comment ? comment : EMPTY;
     }
 
     /**
@@ -792,14 +700,363 @@ implements Iterable<E> {
      */
     @Override
     public void close() throws IOException {
-        if (closed)
+        if (this.closed)
             return;
-        closed = true;
+        this.closed = true;
         try {
             finish();
         } finally {
-            entries.clear();
-            delegate.close();
+            this.entries.clear();
+            this.delegate.close();
         }
     }
+
+    /* Adjusts the number of written bytes for appending mode. */
+    private static final class AppendingLEDataOutputStream
+    extends LEDataOutputStream {
+        AppendingLEDataOutputStream(OutputStream out, RawZipFile<?> appendee) {
+            super(out);
+            super.written = appendee.getOffsetMapper().location(appendee.length());
+        }
+    } // AppendingLEDataOutputStream
+
+    private final class RawOutputMethod implements OutputMethod {
+
+        final boolean process;
+
+        RawOutputMethod(final boolean process) {
+            this.process = process;
+        }
+
+        @Override
+        public LEDataOutputStream init(final ZipEntry entry)
+        throws ZipException {
+            {
+                final long size = encode(entry.getName()).length
+                                + entry.getExtraLength()
+                                + encode(entry.getEffectiveComment()).length;
+                if (UShort.MAX_VALUE < size)
+                    throw new ZipException(entry.getName()
+                    + " (the total size " + size + " for the name, extra fields and comment is too long)");
+            }
+            int method = entry.getMethod();
+            switch (method) {
+                case STORED:
+                    checkLocalFileHeaderProperties(entry);
+                    break;
+                case DEFLATED:
+                    if (!this.process)
+                        checkLocalFileHeaderProperties(entry);
+                    break;
+                default:
+                    throw new AssertionError();
+            }
+            if (UNKNOWN == entry.getPlatform())
+                entry.setPlatform8(PLATFORM_FAT);
+            if (UNKNOWN == entry.getTime())
+                entry.setTime(System.currentTimeMillis());
+            return RawZipOutputStream.this.dos;
+        }
+
+        /**
+         * Writes the Local File Header.
+         */
+        @Override
+        public void start() throws IOException {
+            final LEDataOutputStream dos = RawZipOutputStream.this.dos;
+            final ZipEntry entry = RawZipOutputStream.this.entry;
+            final long crc = entry.getCrc();
+            final long csize = entry.getCompressedSize();
+            final long size = entry.getSize();
+            final long csize32 = entry.getCompressedSize32();
+            final long size32 = entry.getSize32();
+            final long offset = dos.size();
+            final boolean encrypted = entry.isEncrypted();
+            final boolean dd // data descriptor?
+                    =  UNKNOWN == crc
+                    || UNKNOWN == csize
+                    || UNKNOWN == size;
+            final boolean zip64 // ZIP64 extensions?
+                    =  UInt.MAX_VALUE <= csize
+                    || UInt.MAX_VALUE <= size
+                    || UInt.MAX_VALUE <= offset
+                    || FORCE_ZIP64_EXT;
+            final int method = entry.getMethod();
+            final boolean directory = entry.isDirectory();
+            final int version = zip64
+                    ? 45
+                    : DEFLATED == method || directory
+                        ? 20
+                        : 10;
+            // Compose General Purpose Bit Flag.
+            // See appendix D of PKWARE's ZIP File Format Specification.
+            final boolean utf8 = UTF8.equals(charset);
+            final int general = (encrypted ? (1 << GPBF_ENCRYPTED) : 0)
+                              | (dd        ? (1 << GPBF_DATA_DESCRIPTOR) : 0)
+                              | (utf8      ? (1 << GPBF_UTF8) : 0);
+            // Start changes.
+            RawZipOutputStream.this.finished = false;
+            // Local File Header Signature.
+            dos.writeInt(LFH_SIG);
+            // Version Needed To Extract.
+            dos.writeShort(version);
+            // General Purpose Bit Flag.
+            dos.writeShort(general);
+            // Compression Method.
+            dos.writeShort(entry.getMethod());
+            // Last Mod. Time / Date in DOS format.
+            dos.writeInt((int) entry.getTimeDos());
+            // CRC-32.
+            // Compressed Size.
+            // Uncompressed Size.
+            if (dd) {
+                dos.writeInt(0);
+                dos.writeInt(0);
+                dos.writeInt(0);
+            } else {
+                dos.writeInt((int) crc);
+                dos.writeInt((int) csize32);
+                dos.writeInt((int) size32);
+            }
+            // File Name Length.
+            final byte[] name = encode(entry.getName());
+            dos.writeShort(name.length);
+            // Extra Field Length.
+            final byte[] extra = entry.getExtra(!dd);
+            dos.writeShort(extra.length);
+            // File Name.
+            dos.write(name);
+            // Extra Field(s).
+            dos.write(extra);
+            // Commit changes.
+            entry.setGeneral16(general);
+            entry.setOffset64(offset);
+            // Update data start.
+            RawZipOutputStream.this.dataStart = dos.size();
+        }
+
+        /**
+         * Writes the Data Descriptor.
+         */
+        @Override
+        public void finish() throws IOException {
+            final LEDataOutputStream dos = RawZipOutputStream.this.dos;
+            final long csize = RawZipOutputStream.this.dos.size()
+                    - RawZipOutputStream.this.dataStart;
+            final ZipEntry entry = RawZipOutputStream.this.entry;
+            if (entry.getCompressedSize() != csize) {
+                throw new ZipException(entry.getName()
+                + " (bad compressed entry size "
+                + entry.getCompressedSize()
+                + ", expected "
+                + csize
+                + ")");
+            }
+            if (!entry.getGeneral1(GPBF_DATA_DESCRIPTOR))
+                return;
+            final long crc = entry.getCrc();
+            final long size = entry.getSize();
+            final long offset = entry.getOffset();
+            // Offset MUST be considered in decision about ZIP64 format - see
+            // description of Data Descriptor in ZIP File Format Specification!
+            final boolean zip64 // ZIP64 extensions?
+                    =  UInt.MAX_VALUE <= csize
+                    || UInt.MAX_VALUE <= size
+                    || UInt.MAX_VALUE <= offset
+                    || FORCE_ZIP64_EXT;
+            // Data Descriptor Signature.
+            dos.writeInt(DD_SIG);
+            // CRC-32.
+            dos.writeInt(UNKNOWN != crc ? (int) crc : 0);
+            // Compressed Size.
+            // Uncompressed Size.
+            if (zip64) {
+                dos.writeLong(csize);
+                dos.writeLong(size);
+            } else {
+                dos.writeInt((int) csize);
+                dos.writeInt((int) size);
+            }
+        }
+    } // RawOutputMethod
+
+    private final class DeflatedOutputMethod
+    extends DecoratingOutputMethod<OutputMethod> {
+
+        @CheckForNull UpdatingCrc32OutputStream ucos;
+        @CheckForNull ZipDeflaterOutputStream zdos;
+
+        DeflatedOutputMethod(OutputMethod processor) {
+            super(processor);
+        }
+
+        @Override
+        public OutputStream init(ZipEntry entry) throws IOException {
+            assert null == this.zdos;
+            assert null == this.ucos;
+            return this.ucos = new UpdatingCrc32OutputStream(
+                    this.zdos = new ZipDeflaterOutputStream(
+                        this.delegate.init(entry)));
+        }
+
+        @Override
+        public void finish() throws IOException {
+            // It seems tempting to apply the decorator pattern to the finish()
+            // methods of the output streams.
+            // However, the output streams would then finish ALL decorated
+            // output streams recursively too, which is NOT what we want.
+            // To inhibit this, we could introduce another decorated output
+            // stream with a no-op finish() method, but then this output stream
+            // would be unnecessarily processed in ALL output operations too,
+            // which would only increase overhead.
+            assert null != this.zdos;
+            assert null != this.ucos;
+            this.ucos.finish();
+            this.zdos.finish();
+            this.delegate.finish();
+        }
+    } // DeflatedOutputMethod
+
+    private final class StoredOutputMethod
+    extends DecoratingOutputMethod<OutputMethod> {
+
+        @CheckForNull CheckingCrc32OutputStream out;
+
+        StoredOutputMethod(OutputMethod processor) {
+            super(processor);
+        }
+
+        @Override
+        public OutputStream init(ZipEntry entry) throws IOException {
+            assert null == this.out;
+            // The CRC-32 value must get backed up because it may get modified
+            // by the output method decorator chain as a side effect, e.g. when
+            // writing WinZip AES entries with AE-2 as the vendor version.
+            final long crc = entry.getCrc();
+            return this.out = new CheckingCrc32OutputStream(
+                    delegate.init(entry), crc);
+        }
+
+        @Override
+        public void finish() throws IOException {
+            // see DeflatedOutputMethod.finish().
+            assert null != this.out;
+            this.out.finish();
+            this.delegate.finish();
+        }
+    } // StoredOutputMethod
+
+    private abstract class EncryptedOutputMethod
+    extends DecoratingOutputMethod<RawOutputMethod> {
+
+        EncryptedOutputMethod(RawOutputMethod processor) {
+            super(processor);
+        }
+    } // EncryptedOutputMethod
+
+    private final class WinZipAesOutputMethod
+    extends EncryptedOutputMethod {
+
+        final WinZipAesParameters param;
+        @CheckForNull WinZipAesEntryOutputStream out;
+
+        WinZipAesOutputMethod(
+                RawOutputMethod processor,
+                final WinZipAesParameters param)
+        throws ZipKeyException {
+            super(processor);
+            assert null != param;
+            this.param = param;
+        }
+
+        @Override
+        public OutputStream init(final ZipEntry entry) throws IOException {
+            assert null == this.out;
+            // Order is critical here!
+            final WinZipAesEntryParameters
+                    param = new WinZipAesEntryParameters(this.param, entry);
+            final AesKeyStrength keyStrength = param.getKeyStrength();
+            final LEDataOutputStream dos = delegate.init(entry);
+            final WinZipAesExtraField field = new WinZipAesExtraField();
+            field.setKeyStrength(keyStrength);
+            final int method = entry.getMethod();
+            field.setMethod(method);
+            final long size = entry.getSize();
+            field.setVendorVersion(size >= 20 /* && BZIP2 != method */ ? VV_AE_1 : VV_AE_2);
+            entry.setMethod16(WINZIP_AES);
+            entry.addExtraField(field);
+            return this.out = new WinZipAesEntryOutputStream(dos, param);
+        }
+
+        @Override
+        public void start() throws IOException {
+            // see DeflatedOutputMethod.finish().
+            assert null != this.out;
+            this.delegate.start();
+            this.out.start();
+        }
+
+        @Override
+        public void finish() throws IOException {
+            // see DeflatedOutputMethod.finish().
+            assert null != this.out;
+            this.out.finish();
+            this.delegate.finish();
+        }
+    } // WinZipAesOutputMethod
+
+    private final class ZipDeflaterOutputStream
+    extends DeflaterOutputStream {
+
+        ZipDeflaterOutputStream(OutputStream out) {
+            super(out, RawZipOutputStream.this.deflater, MAX_FLATER_BUF_LENGTH);
+        }
+
+        @Override
+        public void finish() throws IOException {
+            super.finish();
+            final E entry = RawZipOutputStream.this.entry;
+            final ZipDeflater deflater = RawZipOutputStream.this.deflater;
+            entry.setCompressedSize64(deflater.getBytesWritten());
+            entry.setSize64(deflater.getBytesRead());
+            deflater.reset();
+        }
+    } // ZipDeflaterOutputStream
+
+    private final class UpdatingCrc32OutputStream
+    extends Crc32OutputStream {
+
+        UpdatingCrc32OutputStream(OutputStream out) {
+            super(out);
+        }
+
+        void finish() {
+            final E entry = RawZipOutputStream.this.entry;
+            entry.setCrc32(getChecksum().getValue());
+        }
+    } // UpdatingCrc32OutputStream
+
+    private final class CheckingCrc32OutputStream
+    extends Crc32OutputStream {
+
+        final long crc;
+
+        CheckingCrc32OutputStream(OutputStream out, long crc) {
+            super(out);
+            this.crc = crc;
+        }
+
+        void finish() throws ZipException {
+            final E entry = RawZipOutputStream.this.entry;
+            final long crc = getChecksum().getValue();
+            if (this.crc != crc) {
+                throw new ZipException(entry.getName()
+                + " (bad declared CRC-32 value 0x"
+                + Long.toHexString(this.crc)
+                + ", computed 0x"
+                + Long.toHexString(crc)
+                + ")");
+            }
+        }
+    } // CheckingCrc32OutputStream
 }

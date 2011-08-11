@@ -17,72 +17,91 @@ package de.schlichtherle.truezip.crypto.raes;
 
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import java.util.ResourceBundle;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * The parameters of this interface are used with RAES <i>type 0</i> files.
  * Type 0 RAES files use password based encryption according to the
  * specifications in PKCS #5 V2.0 und PKCS #12 V1.0.
+ * <p>
+ * Implementations do not need to be safe for multi-threading.
  *
- * @see <a href="http://www.rsasecurity.com/rsalabs/pkcs/pkcs-5/index.html" target="_blank">PKCS #5</a>
- * @see <a href="http://www.rsasecurity.com/rsalabs/pkcs/pkcs-12/index.html" target="_blank">PKCS #12</a>
- * @author Christian Schlichtherle
+ * @see     <a href="http://www.rsasecurity.com/rsalabs/pkcs/pkcs-5/index.html">PKCS #5</a>
+ * @see     <a href="http://www.rsasecurity.com/rsalabs/pkcs/pkcs-12/index.html">PKCS #12</a>
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
 public interface Type0RaesParameters extends RaesParameters {
 
     /**
-     * Returns the password required to create or overwrite the RAES type 0 file.
+     * Returns the password to use for writing a RAES type 0 file.
      *
-     * @return A clone of the char array holding the password to use for
-     *         creating or overwriting the RAES file.
-     * @throws RaesKeyException If password retrieval has been disabled or
-     *         cancelled.
+     * @return A clone of the char array holding the password to use
+     *         for writing a RAES type 0 file.
+     * @throws RaesKeyException If key retrieval has failed for some reason.
      */
     char[] getWritePassword() throws RaesKeyException;
 
     /**
-     * Returns the password required to open the RAES type 0 file for reading.
+     * Returns the password to use for reading a RAES type 0 file.
      * This method is called consecutively until either the returned password
-     * is correct or an exception is thrown.
+     * is successfully validated or an exception is thrown.
      *
-     * @param  invalid {@code true} iff a previous call to this method resulted
-     *         in an invalid password.
-     * @return A clone of the char array holding the password to open the RAES
-     *         file for reading.
-     * @throws RaesKeyException If password retrieval has been disabled or
-     *         cancelled.
+     * @param  invalid {@code true} iff a previous call to this method returned
+     *         an invalid password.
+     * @return A clone of the char array holding the password to use
+     *         for reading a RAES type 0 file.
+     * @throws RaesKeyException If key retrieval has failed for some reason.
      */
     char[] getReadPassword(boolean invalid) throws RaesKeyException;
 
     /**
-     * Returns the key strength to use for creating or overwriting the RAES file.
+     * Returns the key strength to use for writing a RAES type 0 file.
      *
-     * @return The key strength to use for creating or overwriting the RAES file.
-     * @throws RuntimeException if {@link #getWritePassword()} hasn't
-     *         been called before and the implementation can't tolerate this.
+     * @return The key strength to use for writing a RAES type 0 file.
+     * @throws RaesKeyException If key retrieval has failed for some reason.
      */
-    KeyStrength getKeyStrength();
+    KeyStrength getKeyStrength() throws RaesKeyException;
 
     /**
-     * Sets the key strength to use for creating or overwriting the RAES file.
+     * Sets the key strength obtained from reading a RAES type 0 file.
      *
-     * @param keyStrength the key strength to use for creating or overwriting
-     *        the RAES file.
-     * @throws RuntimeException if {@link #getReadPassword(boolean)} hasn't
-     *         been called before and the implementation can't tolerate this.
+     * @param  keyStrength the key strength obtained from reading a RAES type 0
+     *         file.
+     * @throws RaesKeyException If key retrieval has failed for some reason.
      */
-    void setKeyStrength(KeyStrength keyStrength);
+    void setKeyStrength(KeyStrength keyStrength) throws RaesKeyException;
 
-    /** Defines the key strength for the AES algorithm. */
-    enum KeyStrength {
-        /** Enum identifier for a 128 bit ciphering key. */
+    /** Enumerates the AES cipher key strenghts. */
+    @ThreadSafe
+    enum KeyStrength implements de.schlichtherle.truezip.crypto.param.KeyStrength {
+        /** Enum identifier for a 128 bit AES cipher key. */
         BITS_128,
 
-        /** Enum identifier for a 192 bit ciphering key. */
+        /** Enum identifier for a 192 bit AES cipher key. */
         BITS_192,
 
-        /** Enum identifier for a 256 bit ciphering key. */
-        BITS_256,
-    }
+        /** Enum identifier for a 256 bit AES cipher key. */
+        BITS_256;
+
+        private static final ResourceBundle resources
+                = ResourceBundle.getBundle(KeyStrength.class.getName());
+
+        @Override
+        public int getBytes() {
+            return 16 + 8 * ordinal();
+        }
+
+        @Override
+        public int getBits() {
+            return 8 * getBytes();
+        }
+
+        @Override
+        public String toString() {
+            return resources.getString(name());
+        }
+    } // KeyStrength
 }

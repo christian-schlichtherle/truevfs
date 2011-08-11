@@ -39,13 +39,28 @@ import net.jcip.annotations.ThreadSafe;
  * Provides static utility methods for {@link InputStream}s and
  * {@link OutputStream}s.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
 @ThreadSafe
 public final class Streams {
 
+    /**
+     * The size of the FIFO used for exchanging I/O buffers between a reader
+     * thread and a writer thread.
+     * A minimum of two elements is required.
+     * The actual number is optimized to compensate for oscillating I/O
+     * bandwidths like e.g. with network shares.
+     */
+    private static final int FIFO_SIZE = 4;
+
+    /**
+     * The buffer size used for reading and writing.
+     * Optimized for performance.
+     */
+    public static final int BUFFER_SIZE = 8 * 1024;
+    
     /** You cannot instantiate this class. */
     private Streams() {
     }
@@ -53,7 +68,7 @@ public final class Streams {
     private static final ExecutorService executor
             = Executors.newCachedThreadPool(new InputStreamReaderThreadFactory());
 
-    /** A factory for input stream reader threads. */
+    /** A factory for input stream reader daemon threads. */
     private static class InputStreamReaderThreadFactory
     implements ThreadFactory {
         @Override
@@ -126,7 +141,7 @@ public final class Streams {
             throw new NullPointerException();
 
         // Note that we do not use PipedInput/OutputStream because these
-        // classes are slooowww. This is partially because they are using
+        // classes are slooow. This is partially because they are using
         // Object.wait()/notify() in a suboptimal way and partially because
         // they copy data to and from an additional buffer byte array, which
         // is redundant if the data to be transferred is already held in
@@ -140,12 +155,15 @@ public final class Streams {
         // However, threads are different: They share the same memory and thus
         // we can use much more elaborated algorithms for data transfer.
 
-        // Finally, in this case we will simply cycle through an array of
-        // byte buffers, where an additionally created reader executor will fill
-        // the buffers with data from the input and the current executor will
-        // flush the filled buffers to the output.
+        // Finally, in this case we will use a FIFO to exchange byte buffers
+        // between an additional reader thread and the current writer thread.
+        // An additionally created reader thread will fill the buffers with
+        // data from the input and the current thread will flush the filled
+        // buffers to the output.
+        // The FIFO is simply implemented as an array with an offset and a size
+        // which is used like a ring buffer.
 
-        final Buffer[] buffers = allocateBuffers();
+        final Buffer[] buffers = Buffer.allocate();
 
         /*
          * The task that cycles through the buffers in order to fill them
@@ -156,14 +174,14 @@ public final class Streams {
             int off;
 
             /** The number of buffers filled with data to be written. */
-            int len;
+            int size;
 
             /** The IOException that happened in this task, if any. */
             volatile InputException exception;
 
             @Override
             public void run() {
-                // Cache some data for better performance.
+                // Cache some fields for better performance.
                 final InputStream _in = in;
                 final Buffer[] _buffers = buffers;
                 final int _buffersLen = buffers.length;
@@ -177,14 +195,15 @@ public final class Streams {
                     // Wait until a buffer is available.
                     final Buffer buffer;
                     synchronized (Reader.this) {
-                        while (len >= _buffersLen) {
+                        while (size >= _buffersLen) {
                             try {
                                 wait();
                             } catch (InterruptedException interrupted) {
-                                return; // stop reading.
+                                // The writer thread wants us to stop reading.
+                                return;
                             }
                         }
-                        buffer = _buffers[(off + len) % _buffersLen];
+                        buffer = _buffers[(off + size) % _buffersLen];
                     }
 
                     // Fill buffer until end of file or buffer.
@@ -194,17 +213,17 @@ public final class Streams {
                     final byte[] buf = buffer.buf;
                     try {
                         read = _in.read(buf, 0, buf.length);
-                    } catch (IOException ex) {
+                    } catch (Throwable ex) {
                         exception = new InputException(ex);
                         read = -1;
                     }
                     /*if (Thread.interrupted())
-                    read = -1; // throws away buf - OK in this context*/
+                        read = -1; // throws away buf - OK in this context*/
                     buffer.read = read;
 
                     // Advance head and notify writer.
                     synchronized (Reader.this) {
-                        len++;
+                        size++;
                         notify(); // only the writer could be waiting now!
                     }
                 } while (read != -1);
@@ -224,10 +243,12 @@ public final class Streams {
                 final int off;
                 final Buffer buffer;
                 synchronized (reader) {
-                    while (reader.len <= 0) {
+                    while (reader.size <= 0) {
                         try {
                             reader.wait();
-                        } catch (InterruptedException ignored) {
+                        } catch (InterruptedException ex) {
+                            Logger  .getLogger(Streams.class.getName())
+                                    .log(Level.FINE, ex.getLocalizedMessage(), ex);
                         }
                     }
                     off = reader.off;
@@ -261,7 +282,7 @@ public final class Streams {
                             throw new AssertionError(ex2);
                         } catch (InterruptedException ex2) {
                             Logger  .getLogger(Streams.class.getName())
-                                    .log(Level.INFO, ex2.getLocalizedMessage(), ex2);
+                                    .log(Level.FINE, ex2.getLocalizedMessage(), ex2);
                         }
                     }
                     throw ex;
@@ -270,7 +291,7 @@ public final class Streams {
                 // Advance tail and notify reader.
                 synchronized (reader) {
                     reader.off = (off + 1) % buffersLen;
-                    reader.len--;
+                    reader.size--;
                     reader.notify(); // only the reader could be waiting now!
                 }
             }
@@ -279,48 +300,44 @@ public final class Streams {
             if (reader.exception != null)
                 throw reader.exception;
         } finally {
-            releaseBuffers(buffers);
-        }
-    }
-
-    private static Buffer[] allocateBuffers() {
-        synchronized (Buffer.list) {
-            Buffer[] buffers;
-            for (Iterator<Reference<Buffer[]>> i = Buffer.list.iterator(); i.hasNext(); ) {
-                buffers = i.next().get();
-                i.remove();
-                if (buffers != null)
-                    return buffers;
-                }
-            }
-
-        // A minimum of two buffers is required.
-        // The actual number is optimized to compensate for oscillating
-        // I/O bandwidths like e.g. with network shares.
-        final Buffer[] buffers = new Buffer[4];
-        for (int i = buffers.length; --i >= 0; )
-            buffers[i] = new Buffer();
-        return buffers;
-    }
-
-    private static void releaseBuffers(Buffer[] buffers) {
-        synchronized (Buffer.list) {
-            Buffer.list.add(new SoftReference<Buffer[]>(buffers));
+            Buffer.release(buffers);
         }
     }
 
     /** A buffer for I/O. */
-    private static class Buffer {
+    private static final class Buffer {
         /**
          * Each entry in this list holds a soft reference to an array
          * initialized with instances of this class.
          */
         static final List<Reference<Buffer[]>> list = new LinkedList<Reference<Buffer[]>>();
 
-        /** The byte buffer used for asynchronous reading and writing. */
-        byte[] buf = new byte[64 * 1024];
+        static Buffer[] allocate() {
+            synchronized (Buffer.class) {
+                Buffer[] buffers;
+                final Iterator<Reference<Buffer[]>> i = list.iterator();
+                while (i.hasNext()) {
+                    buffers = i.next().get();
+                    i.remove();
+                    if (null != buffers)
+                        return buffers;
+                }
+            }
+
+            final Buffer[] buffers = new Buffer[FIFO_SIZE];
+            for (int i = buffers.length; --i >= 0; )
+                buffers[i] = new Buffer();
+            return buffers;
+        }
+
+        static synchronized void release(Buffer[] buffers) {
+            list.add(new SoftReference<Buffer[]>(buffers));
+        }
+
+        /** The byte buffer used for reading and writing. */
+        final byte[] buf = new byte[BUFFER_SIZE];
 
         /** The actual number of bytes read into the buffer. */
         int read;
-    }
+    } // Buffer
 }

@@ -348,6 +348,7 @@ public class Nzip extends Application {
         boolean store = false;
         boolean compress = false;
         boolean grow = false;
+        boolean encrypt = false;
         for (; srcI < args.length && args[srcI].charAt(0) == '-'; srcI++) {
             if (mv) // mv
                 throw new IllegalUsageException();
@@ -368,6 +369,8 @@ public class Nzip extends Application {
                 compress = true;
             } else if ("-grow".equals(opt)) {
                 grow = true;
+            } else if ("-encrypt".equals(opt)) {
+                encrypt = true;
             } else {
                 throw new IllegalUsageException();
             }
@@ -402,7 +405,8 @@ public class Nzip extends Application {
             config.setOutputPreferences(config.getOutputPreferences()
                     .set(STORE, store)
                     .set(COMPRESS, compress)
-                    .set(GROW, grow));
+                    .set(GROW, grow)
+                    .set(ENCRYPT, encrypt));
 
             for (int i = srcI; i < dstI; i++) {
                 final TFile src = new TFile(args[i], srcDetector);
