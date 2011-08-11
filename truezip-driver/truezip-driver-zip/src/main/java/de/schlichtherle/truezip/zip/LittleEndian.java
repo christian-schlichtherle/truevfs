@@ -44,8 +44,8 @@ final class LittleEndian {
      *         byte integer value is read from.
      * @return The signed byte integer value read from the byte array.
      */
-    static byte readByte(final byte[] b, final int off) {
-        return b[off];
+    static byte readByte(final byte[] buf, final int off) {
+        return buf[off];
     }
 
     /**
@@ -62,8 +62,8 @@ final class LittleEndian {
      *         type, hence an {@code int} is returned which's three most
      *         significant bytes are zero.
      */
-    static int readUByte(final byte[] b, final int off) {
-        return b[off] & UByte.MAX_VALUE;
+    static int readUByte(final byte[] buf, final int off) {
+        return buf[off] & UByte.MAX_VALUE;
     }
 
     /**
