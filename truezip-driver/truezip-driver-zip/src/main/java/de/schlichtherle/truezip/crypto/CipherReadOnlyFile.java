@@ -69,7 +69,7 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
      * Note that the <em>actual</em> size of the window is a multiple of the
      * cipher's block size and may be smaller than the maximum window size.
      */
-    private static final int MAX_WINDOW_LEN = 1024;
+    private static final int MAX_WINDOW_LEN = 8096;
 
     /** Returns the smaller parameter. */
     private static long min(long a, long b) {
@@ -183,7 +183,7 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
 
         // Check parameters (fail fast).
         if (null == cipher)
-            throw new NullPointerException("cipher");
+            throw new NullPointerException();
         if (start < 0 || length < 0)
             throw new IllegalArgumentException();
 
@@ -216,7 +216,6 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
     protected byte[] computeMac(final Mac mac) throws IOException {
         final int windowLen = window.length;
         final byte[] buf = new byte[mac.getMacSize()];
-
         final long safedFp = getFilePointer();
         try {
             for (fp = 0; fp < length; fp += windowLen) {
@@ -229,7 +228,6 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
         } finally {
             seek(safedFp);
         }
-
         return buf;
     }
 
