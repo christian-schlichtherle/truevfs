@@ -135,7 +135,7 @@ public class ZipEntry implements Cloneable {
         this.size = template.size;
         this.offset = template.offset;
         final ExtraFields templateFields = template.fields;
-        this.fields = null != templateFields ? templateFields.clone() : null;
+        this.fields = templateFields == null ? null : templateFields.clone();
         this.comment = template.comment;
     }
 
@@ -148,7 +148,7 @@ public class ZipEntry implements Cloneable {
             throw new AssertionError(cannotHappen);
         }
         final ExtraFields fields = this.fields;
-        entry.fields = null != fields ? fields.clone() : null;
+        entry.fields = fields == null ? null : fields.clone();
         return entry;
     }
 
@@ -626,16 +626,16 @@ public class ZipEntry implements Cloneable {
         return new StringBuilder(getClass().getName())
                 .append("[name=")
                 .append(getName())
-                .append(",method=")
-                .append(getMethod())
-                .append(",crc=")
-                .append(getCrc())
-                .append(",compressedSize=")
-                .append(getCompressedSize())
-                .append(",size=")
-                .append(getSize())
                 .append(",time=")
                 .append(getTime())
+                .append(",method=")
+                .append(getMethod())
+                .append(",size=")
+                .append(getSize())
+                .append(",compressedSize=")
+                .append(getCompressedSize())
+                .append(",crc=")
+                .append(getCrc())
                 .append("]")
                 .toString();
     }
