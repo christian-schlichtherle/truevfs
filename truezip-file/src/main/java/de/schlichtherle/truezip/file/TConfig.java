@@ -15,12 +15,13 @@
  */
 package de.schlichtherle.truezip.file;
 
-import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.FsInputOption;
 import de.schlichtherle.truezip.fs.FsInputOptions;
 import static de.schlichtherle.truezip.fs.FsInputOptions.*;
+import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
+import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
 import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -218,17 +219,6 @@ public final class TConfig implements Closeable {
     public static final BitField<FsInputOption>
             DEFAULT_INPUT_PREFERENCES = NO_INPUT_OPTIONS;
 
-    /**
-     * The mask of allowed {@link #setInputPreferences input preferences},
-     * which is
-     * <code>{@link BitField}.of({@link FsInputOption#CACHE})</code>.
-     * 
-     * @since TrueZIP 7.3
-     */
-    public static final BitField<FsInputOption>
-            INPUT_PREFERENCES_MASK = BitField
-                .of(FsInputOption.CACHE);
-
     private static final BitField<FsInputOption>
             INPUT_PREFERENCES_COMPLEMENT_MASK = INPUT_PREFERENCES_MASK.not();
 
@@ -241,17 +231,6 @@ public final class TConfig implements Closeable {
      */
     public static final BitField<FsOutputOption>
             DEFAULT_OUTPUT_PREFERENCES = BitField.of(CREATE_PARENTS);
-
-    /**
-     * The mask of allowed {@link #setOutputPreferences output preferences},
-     * which is
-     * <code>{@link BitField}.of({@link FsOutputOption#CACHE}, {@link FsOutputOption#CREATE_PARENTS}, {@link FsOutputOption#COMPRESS}, {@link FsOutputOption#STORE}, {@link FsOutputOption#GROW}, {@link FsOutputOption#ENCRYPT})</code>.
-     * 
-     * @since TrueZIP 7.3
-     */
-    public static final BitField<FsOutputOption>
-            OUTPUT_PREFERENCES_MASK = BitField
-                .of(FsOutputOption.CACHE, CREATE_PARENTS, COMPRESS, STORE, GROW, ENCRYPT);
 
     private static final BitField<FsOutputOption>
             OUTPUT_PREFERENCES_COMPLEMENT_MASK = OUTPUT_PREFERENCES_MASK.not();
@@ -505,7 +484,7 @@ public final class TConfig implements Closeable {
         if (!illegal.isEmpty())
             throw new IllegalArgumentException(preferences + " (illegal output preferences)");
         if (preferences.get(STORE) && preferences.get(COMPRESS))
-            throw new IllegalArgumentException(preferences + " (either STORE or COMPRESS can be set, but not both)");
+            throw new IllegalArgumentException(preferences + " (either STORE or COMPRESS may be set, but not both)");
         this.outputPreferences = preferences;
     }
 
