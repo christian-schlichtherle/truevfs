@@ -17,17 +17,18 @@ Nzip - a Comprehensive Command Line Utility
     (<<<cat>>>, <<<cp>>>, <<<mv>>>, <<<rm>>>, <<<mkdir>>>, <<<mkdirs>>>,
      <<<ls>>>, <<<ll>>> , <<<llr>>> , <<<touch>>> etc).
     You can use this utility to conveniently copy entire directory trees into
-    an archive file or from an archive file or any other virtual directory.
+    an archive file or from an archive file or any other virtual or non-virtual
+    directory.
 
 * Setting The Stage
 
-    Before the examples are shown, a little preparation is required in order to
-    make it easier to start the utility class from the command line.
+    Before the examples are shown below, a little preparation is required in
+    order to make it easier to start the utility class from the command line.
     With plain Java, you would have to start the utility class with a command
     like this:
 
 +--+
-$ java -cp truezip-${project.version}-jar-with-dependencies.jar Nzip %ARGS%
+$ java -jar truezip-${project.version}-jar-with-dependencies.jar Nzip %ARGS%
 +--+
 
     Where <<<%ARGS%>>> is a variable for arbitrary command line arguments - see
@@ -40,7 +41,7 @@ $ java -cp truezip-${project.version}-jar-with-dependencies.jar Nzip %ARGS%
 $ nzip.cmd %ARGS%
 +--+
 
-    This can be achieved by copying the following script file with the name
+    This can be done by copying the following script file with the name
     <<<nzip.cmd>>> in some directory on your <<<%PATH%>>>:
 
 +--+
@@ -57,6 +58,11 @@ java -ea %PROPS% -jar "%JAR%" %*
     - I leave this as an exercise to you, however.
 
 * Examples
+
+    Following are some examples using the Nzip command line utility class.
+    If you need help with the available commands and options, just run the
+    Nzip command line utility class without parameters.
+    It will print some help on standard error output then.
 
 *--*--*
 ||Command||Description|
@@ -94,16 +100,53 @@ java -ea %PROPS% -jar "%JAR%" %*
 
     Of course, you can substitute the <<<.zip>>> suffix in the examples above
     with any other canonical file type suffix recognized by the archive file
-    drivers which are available on the run time class path.
+    drivers which are available on the run time class path
     (<<<.ear>>>, <<<.jar>>>, <<<.war>>>, <<<.tar>>>, <<<.tgz>>>, <<<.tar.gz>>>,
     <<<.tb2>>>, <<<.tbz>>>,  <<<.tar.bz2>>>, <<<.tzp>>>, <<<.zip.rae>>>,
     <<<.zip.raes>>>).
 
     For example, if you would like to use RAES encrypted ZIP files you would
     simply name the suffix <<<.tzp>>> in a path.
-    So in order to copy all source code to an RAES encrypted ZIP
+    So in order to copy the directory <<<directory>>> to an RAES encrypted ZIP
     file <<<safe.tzp>>>, you could run:
 
 +--+
-$ nzip.cmd cp src safe.tzp
+$ nzip.cmd cp directory safe.tzp
++--+
+
+    If you want to copy a plain file <<<file>>> instead, then run:
+
++--+
+$ nzip.cmd cp file safe.tzp/file
++--+
+
+** New Options for ZIP Files
+
+    In TrueZIP 7.3, new options have been added to the <<<cp>>> command,
+    primarily in order to support new options for ZIP files.
+
+    Use the following option in order to create a ZIP entry which is encrypted
+    according to the
+    {{{http://www.winzip.com/win/en/aes_info.htm}WinZip AES encryption}}
+    specification.
+
++--+
+$ nzip.cmd cp -encrypt file true.zip/file
++--+
+
+    Use the following option in order to append a ZIP entry to the end of an
+    existing ZIP file rather than reassembling the ZIP file.
+    This might come in handy if the ZIP file is rather large compared to the
+    single entry to add.
+
++--+
+$ nzip.cmd cp -grow file true.zip/file
++--+
+
+    Sometimes you might want to use the STORED method rather than the DEFLATED
+    method when writing an entry to a ZIP file.
+    There's an option for this, too:
+
++--+
+$ nzip.cmd cp -store file true.zip/file
 +--+
