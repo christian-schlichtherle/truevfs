@@ -15,16 +15,16 @@
  */
 package de.schlichtherle.truezip.zip;
 
+import static de.schlichtherle.truezip.zip.LittleEndian.*;
 import java.util.Arrays;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  * A simple round trip test of the little endian utility methods.
  * 
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public final class LittleEndianTest {
@@ -44,50 +44,84 @@ public final class LittleEndianTest {
     }
 
     @Test
+    public void testByte() {
+        final int b1 = readByte(read, 1);
+        final int b2 = readByte(read, 2);
+        assertEquals((byte) 0x55, b1);
+        assertEquals((byte) 0xaa, b2);
+        writeByte(b1, write, 1);
+        writeByte(b2, write, 2);
+        writeByte(b1, write, 3);
+        writeByte(b2, write, 4);
+        writeByte(b1, write, 5);
+        writeByte(b2, write, 6);
+        writeByte(b1, write, 7);
+        writeByte(b2, write, 8);
+        assertTrue(Arrays.equals(read, write));
+    }
+
+    @Test
+    public void testUByte() {
+        final int b1 = readUByte(read, 1);
+        final int b2 = readUByte(read, 2);
+        assertEquals(0x55, b1);
+        assertEquals(0xaa, b2);
+        writeByte(b1, write, 1);
+        writeByte(b2, write, 2);
+        writeByte(b1, write, 3);
+        writeByte(b2, write, 4);
+        writeByte(b1, write, 5);
+        writeByte(b2, write, 6);
+        writeByte(b1, write, 7);
+        writeByte(b2, write, 8);
+        assertTrue(Arrays.equals(read, write));
+    }
+
+    @Test
     public void testShort() {
-        final short s = LittleEndian.readShort(read, 1);
+        final int s = readShort(read, 1);
         assertEquals((short) 0xaa55, s);
-        LittleEndian.writeShort(s, write, 1);
-        LittleEndian.writeShort(s, write, 3);
-        LittleEndian.writeShort(s, write, 5);
-        LittleEndian.writeShort(s, write, 7);
+        writeShort(s, write, 1);
+        writeShort(s, write, 3);
+        writeShort(s, write, 5);
+        writeShort(s, write, 7);
         assertTrue(Arrays.equals(read, write));
     }
 
     @Test
     public void testUShort() {
-        final int s = LittleEndian.readUShort(read, 1);
+        final int s = readUShort(read, 1);
         assertEquals(0xaa55, s);
-        LittleEndian.writeShort((short) s, write, 1);
-        LittleEndian.writeShort((short) s, write, 3);
-        LittleEndian.writeShort((short) s, write, 5);
-        LittleEndian.writeShort((short) s, write, 7);
+        writeShort(s, write, 1);
+        writeShort(s, write, 3);
+        writeShort(s, write, 5);
+        writeShort(s, write, 7);
         assertTrue(Arrays.equals(read, write));
     }
 
     @Test
     public void testInt() {
-        final int i = LittleEndian.readInt(read, 1);
+        final int i = readInt(read, 1);
         assertEquals(0xaa55aa55, i);
-        LittleEndian.writeInt(i, write, 1);
-        LittleEndian.writeInt(i, write, 5);
+        writeInt(i, write, 1);
+        writeInt(i, write, 5);
         assertTrue(Arrays.equals(read, write));
     }
 
     @Test
     public void testUInt() {
-        final long i = LittleEndian.readUInt(read, 1);
+        final long i = readUInt(read, 1);
         assertEquals(0xaa55aa55L, i);
-        LittleEndian.writeInt((int) i, write, 1);
-        LittleEndian.writeInt((int) i, write, 5);
+        writeInt((int) i, write, 1);
+        writeInt((int) i, write, 5);
         assertTrue(Arrays.equals(read, write));
     }
 
     @Test
     public void testLong() {
-        final long l = LittleEndian.readLong(read, 1);
+        final long l = readLong(read, 1);
         assertEquals(0xaa55aa55aa55aa55L, l);
-        LittleEndian.writeLong(l, write, 1);
+        writeLong(l, write, 1);
         assertTrue(Arrays.equals(read, write));
     }
 }
