@@ -162,14 +162,14 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
         switch (type) {
             case 0:
                 return new Type0RaesReadOnlyFile(rof,
-                        getParameters(Type0RaesParameters.class, param));
+                        parameters(Type0RaesParameters.class, param));
             default:
                 throw new RaesException("Unknown RAES type: " + type);
         }
     }
 
     @SuppressWarnings("unchecked")
-    private static <P extends RaesParameters> P getParameters(
+    private static <P extends RaesParameters> P parameters(
             final Class<P> type,
             final @CheckForNull RaesParameters param)
     throws RaesParametersException {
@@ -179,7 +179,7 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
         } else if (type.isAssignableFrom(param.getClass())) {
             return (P) param;
         } else if (param instanceof RaesParametersProvider) {
-            return getParameters(type,
+            return parameters(type,
                     ((RaesParametersProvider) param).get(type));
         } else {
             throw new RaesParametersException();
@@ -193,19 +193,18 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
     public abstract KeyStrength getKeyStrength();
 
     /**
-     * Authenticates all encrypted data in the read only file.
+     * Authenticates all encrypted data in this read only file.
      * It is safe to call this method multiple times to detect if the file
      * has been tampered with meanwhile.
      * <p>
      * This is the second, optional step of authentication.
-     * The first, mandatory step is to computeMac the cipher key and
-     * cipher text length only and has already been successfully completed
-     * in the constructor.
+     * The first, mandatory step is to compute the cipher key and cipher text
+     * length only and must already have been successfully completed in the
+     * constructor.
      *
      * @throws RaesAuthenticationException If the computed MAC does not match
      *         the MAC declared in the RAES file.
      * @throws IOException On any I/O related issue.
      */
-    public abstract void authenticate()
-    throws RaesAuthenticationException, IOException;
+    public abstract void authenticate() throws IOException;
 }
