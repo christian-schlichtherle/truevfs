@@ -31,14 +31,14 @@ import org.bouncycastle.crypto.engines.AESFastEngine;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-final class WinZipAesCipherMode extends SICSeekableBlockCipher {
+final class WinZipAesCipher extends SICSeekableBlockCipher {
 
     /**
      * Constructs a new block cipher mode for use with WinZip AES.
      * This constructor uses an {@link AESFastEngine} as the underlying block
      * cipher.
      */
-    WinZipAesCipherMode() {
+    WinZipAesCipher() {
         super(new AESFastEngine());
     }
 

@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.zip;
 
-import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.rof.BufferedReadOnlyFile;
 import de.schlichtherle.truezip.rof.IntervalReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
@@ -23,6 +22,7 @@ import de.schlichtherle.truezip.rof.ReadOnlyFileInputStream;
 import de.schlichtherle.truezip.util.Pool;
 import static de.schlichtherle.truezip.zip.Constants.*;
 import static de.schlichtherle.truezip.zip.LittleEndian.*;
+import static de.schlichtherle.truezip.zip.WinZipAesExtraField.*;
 import static de.schlichtherle.truezip.zip.ZipEntry.*;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
@@ -37,9 +37,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.zip.CRC32;
-import java.util.zip.Checksum;
-import java.util.zip.DataFormatException;
-import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 import java.util.zip.ZipException;
 import net.jcip.annotations.NotThreadSafe;
@@ -284,12 +281,20 @@ implements Iterable<E>, Closeable {
                 ex.initCause(incompatibleZipFile);
                 throw ex;
             }
+
+            // Post-process
+            if (WINZIP_AES == entry.getMethod()
+                    && VV_AE_2 == ((WinZipAesExtraField) entry.getExtraField(WINZIP_AES_ID))
+                        .getVendorVersion())
+                entry.setCrc(UNKNOWN); // disable CRC-32 checking
+
             // Map the entry using the name that has been determined
             // by the ZipEntryFactory.
             // Note that this name may differ from what has been found
             // in the ZIP file!
             this.entries.put(entry.getName(), entry);
         }
+
         // Check if the number of entries found matches the number of entries
         // declared in the (ZIP64) End Of Central Directory header.
         // Sometimes, legacy ZIP32 archives (those without ZIP64 extensions)
@@ -676,8 +681,8 @@ implements Iterable<E>, Closeable {
      *
      * @param  name The name of the entry to get the stream for.
      * @param  check Whether or not the entry's CRC-32 value gets checked.
-     *         If and only if this parameter is true, two additional checks are
-     *         performed for the ZIP entry:
+     *         If {@code process} and this parameter are both {@code true},
+     *         then two additional checks are performed for the ZIP entry:
      *         <ol>
      *         <li>All entry headers are checked to have consistent
      *             declarations of the CRC-32 value for the inflated entry
@@ -707,7 +712,7 @@ implements Iterable<E>, Closeable {
      */
     protected @Nullable InputStream getInputStream(
             final String name,
-            final boolean check,
+            boolean check,
             final boolean process)
     throws IOException {
         assertOpen();
@@ -756,11 +761,33 @@ implements Iterable<E>, Closeable {
             if (entry.getCrc() != localCrc)
                 throw new CRC32Exception(name, entry.getCrc(), localCrc);
         }
-        final IntervalReadOnlyFile rof = new SegmentReadOnlyFile(
+        ReadOnlyFile rof = new SegmentReadOnlyFile(
                 offset, entry.getCompressedSize());
+        int method = entry.getMethod();
+        if (entry.isEncrypted()) {
+            if (WINZIP_AES != method)
+                throw new ZipException(name
+                        + " (encrypted compression method " + method + " is not supported)");
+            if (process)
+                rof = new WinZipAesReadOnlyFile(rof,
+                        new WinZipAesEntryParameters(
+                                parameters(
+                                    WinZipAesParameters.class,
+                                    getCryptoParameters()),
+                                entry));
+            final WinZipAesExtraField field
+                    = (WinZipAesExtraField) entry.getExtraField(WINZIP_AES_ID);
+            method = field.getMethod();
+            // Disable CRC-32 checking if the entry has already been
+            // authenticated using SHA-1.
+            check = !process;
+            assert VV_AE_2 != field.getVendorVersion()
+                    || UNKNOWN == entry.getCrc();
+        }
+        if (UNKNOWN == entry.getCrc())
+            check = false;
         InputStream in;
         final int bufSize = getBufferSize(entry);
-        final int method = entry.getMethod();
         switch (method) {
             case DEFLATED:
                 if (process) {
@@ -771,21 +798,36 @@ implements Iterable<E>, Closeable {
                     break;
                 } else {
                     in = new ReadOnlyFileInputStream(rof);
-                    if (check)
-                        in = new RawCheckedInputStream(in, entry, bufSize);
                 }
                 break;
             case STORED:
                 in = new ReadOnlyFileInputStream(rof);
-                if (check)
+                if (process && check)
                     in = new CheckedInputStream(in, entry, bufSize);
                 break;
-            case WINZIP_AES:
             default:
                 throw new ZipException(name
                     + " (compression method " + method + " is not supported)");
         }
         return in;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <P extends ZipCryptoParameters> P parameters(
+            final Class<P> type,
+            final @CheckForNull ZipCryptoParameters param)
+    throws ZipCryptoParametersException {
+        // Order is important here to support multiple interface implementations!
+        if (null == param) {
+            throw new ZipCryptoParametersException("No crypto parameters available!");
+        } else if (type.isAssignableFrom(param.getClass())) {
+            return (P) param;
+        } else if (param instanceof ZipCryptoParametersProvider) {
+            return parameters(type,
+                    ((ZipCryptoParametersProvider) param).get(type));
+        } else {
+            throw new ZipCryptoParametersException();
+        }
     }
 
     private static int getBufferSize(final ZipEntry entry) {
@@ -851,7 +893,7 @@ implements Iterable<E>, Closeable {
         @Override
         public void close() throws IOException {
             try {
-                while (skip(Long.MAX_VALUE) > 0) { // process CRC-32 until EOF - this version makes FindBugs happy!
+                while (skip(Long.MAX_VALUE) > 0) { // process CRC-32 until EOF
                 }
             } finally {
                 super.close();
@@ -896,121 +938,6 @@ implements Iterable<E>, Closeable {
         this.archive = null;
         archive.close();
     }
-
-    /**
-     * A stream which reads and returns <em>deflated</em> data from its input
-     * while a CRC-32 checksum is computed over the <em>inflated</em> data and
-     * checked in the method {@code close}.
-     */
-    private static final class RawCheckedInputStream
-    extends DecoratingInputStream {
-
-        final Checksum crc = new CRC32();
-        final byte[] singleByteBuf = new byte[1];
-        final Inflater inf;
-        final byte[] infBuf; // contains inflated data!
-        final ZipEntry entry;
-        boolean closed;
-
-        RawCheckedInputStream(
-                final InputStream in,
-                final ZipEntry entry,
-                final int size) {
-            super(in);
-            this.inf = Inflaters.allocate();
-            this.infBuf = new byte[size];
-            this.entry = entry;
-        }
-
-        void assertOpen() throws IOException {
-            if (closed)
-                throw new IOException("Input stream has been closed!");
-        }
-
-        @Override
-        public int read()
-        throws IOException {
-            int read;
-            while ((read = read(singleByteBuf, 0, 1)) == 0) { // reading nothing is not acceptible!
-            }
-            return read > 0 ? singleByteBuf[0] & 0xff : -1;
-        }
-
-        @Override
-        public int read(final byte[] buf, final int off, final int len)
-        throws IOException {
-            if (len == 0)
-                return 0; // be fault-tolerant and compatible to FileInputStream
-            // Check state.
-            assertOpen();
-            // Check parameters.
-            if (buf == null)
-                throw new NullPointerException();
-            final int offPlusLen = off + len;
-            if ((off | len | offPlusLen | buf.length - offPlusLen) < 0)
-                throw new IndexOutOfBoundsException();
-            // Read data.
-            final int read = delegate.read(buf, off, len);
-            // Feed inflater.
-            if (read >= 0) {
-                inf.setInput(buf, off, read);
-            } else {
-                buf[off] = 0;
-                inf.setInput(buf, off, 1); // provide dummy byte
-            }
-            // Inflate and update checksum.
-            try {
-                int inflated;
-                while ((inflated = inf.inflate(infBuf, 0, infBuf.length)) > 0)
-                    crc.update(infBuf, 0, inflated);
-            } catch (DataFormatException ex) {
-                throw new IOException(ex);
-            }
-            // Check inflater invariants.
-            assert read >= 0 || inf.finished();
-            assert read <  0 || inf.needsInput();
-            assert !inf.needsDictionary();
-            return read;
-        }
-
-        @Override
-        public long skip(long toSkip) throws IOException {
-            return skipWithBuffer(this, toSkip, new byte[infBuf.length]);
-        }
-
-        @Override
-        public void close() throws IOException {
-            if (closed)
-                return;
-            try {
-                while (skip(Long.MAX_VALUE) > 0) { // process CRC-32 until EOF - this version makes FindBugs happy!
-                }
-            } finally {
-                closed = true;
-                Inflaters.release(inf);
-                super.close();
-            }
-            long expectedCrc = entry.getCrc();
-            long actualCrc = crc.getValue();
-            if (expectedCrc != actualCrc)
-                throw new CRC32Exception(
-                        entry.getName(), expectedCrc, actualCrc);
-        }
-
-        @Override
-        public void mark(int readlimit) {
-        }
-
-        @Override
-        public void reset() throws IOException {
-            throw new IOException("mark()/reset() is not supported!");
-        }
-
-        @Override
-        public boolean markSupported() {
-            return false;
-        }
-    } // RawCheckedInputStream
 
     /**
      * A read only file input stream which adds a dummy zero byte to the end of

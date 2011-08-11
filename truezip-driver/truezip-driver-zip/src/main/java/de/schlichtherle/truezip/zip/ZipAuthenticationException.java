@@ -29,11 +29,9 @@ public class ZipAuthenticationException extends ZipCryptoException {
     private static final long serialVersionUID = 2403462923846291232L;
 
     /**
-     * Constructs a ZIP authentication exception with
-     * a detail message indicating that an authenticated ZIP entry has been
-     * tampered with.
+     * Constructs a ZIP authentication exception with the given detail message.
      */
-    public ZipAuthenticationException() {
-        super("Authenticated ZIP entry has been tampered with!");
+    public ZipAuthenticationException(String msg) {
+        super(msg);
     }
 }
