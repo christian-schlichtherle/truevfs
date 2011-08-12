@@ -16,23 +16,17 @@
 package de.schlichtherle.truezip.file.tar;
 
 import de.schlichtherle.truezip.file.TFileTestSuite;
-import de.schlichtherle.truezip.fs.archive.tar.TarBZip2Driver;
+import de.schlichtherle.truezip.fs.archive.tar.TarGZipDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
-import org.apache.tools.bzip2.CBZip2OutputStream;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class TTarBZip2FileTest extends TFileTestSuite {
+public final class TarGZipFileTest extends TFileTestSuite {
 
-    public TTarBZip2FileTest() {
-        super(FsScheme.create("tar.bz2"), new TarBZip2Driver(IO_POOL_PROVIDER) {
-            @Override
-            public int getLevel() {
-                return CBZip2OutputStream.MIN_BLOCKSIZE;
-            }
-        });
+    public TarGZipFileTest() {
+        super(FsScheme.create("tar.gz"), new TarGZipDriver(IO_POOL_PROVIDER));
     }
 
     @Override
