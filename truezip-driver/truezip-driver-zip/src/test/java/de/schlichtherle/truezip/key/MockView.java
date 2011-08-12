@@ -15,19 +15,15 @@
  */
 package de.schlichtherle.truezip.key;
 
-import de.schlichtherle.truezip.key.KeyPromptingCancelledException;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import static de.schlichtherle.truezip.key.MockView.Action.*;
 import de.schlichtherle.truezip.key.PromptingKeyProvider.Controller;
 import de.schlichtherle.truezip.key.PromptingKeyProvider.View;
-import de.schlichtherle.truezip.key.SafeKey;
-import de.schlichtherle.truezip.key.UnknownKeyException;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URI;
 import java.util.Random;
 import net.jcip.annotations.ThreadSafe;
-
-import static de.schlichtherle.truezip.key.MockView.Action.*;
 
 /**
  * A view implementation which uses its properties for providing a key whenever
