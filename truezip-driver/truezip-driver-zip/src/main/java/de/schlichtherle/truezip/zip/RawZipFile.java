@@ -260,12 +260,12 @@ implements Iterable<E>, Closeable {
                 long lfhOff = readUInt(cfh, off);
                 //off += 4;
                 entry.setEncodedOffset(lfhOff); // must be unmapped!
-                if (extraLen > 0) {
+                if (0 < extraLen) {
                     final byte[] extra = new byte[extraLen];
                     rof.readFully(extra);
                     entry.setEncodedExtraFields(extra);
                 }
-                if (commentLen > 0) {
+                if (0 < commentLen) {
                     final byte[] comment = new byte[commentLen];
                     rof.readFully(comment);
                     entry.setDecodedComment(decode(comment));
