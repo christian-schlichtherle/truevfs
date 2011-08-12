@@ -119,15 +119,17 @@ public abstract class ZipRaesDriver extends JarDriver {
     }
 
     /**
-     * Returns the {@link RaesParameters} for the given file system model.
+     * Returns the RAES parameters for the given file system model
+     * or {@code null} if not available.
      * <p>
      * The implementation in the class {@link ZipRaesDriver} returns
      * {@code new KeyManagerRaesParameters(getKeyManager(), mountPointUri(model))}.
      * 
      * @param  model the file system model.
-     * @return The {@link RaesParameters} for the given file system model.
+     * @return The RAES parameters for the given file system model
+     *         or {@code null} if not available.
      */
-    protected RaesParameters raesParameters(FsModel model) {
+    protected @CheckForNull RaesParameters raesParameters(FsModel model) {
         return new KeyManagerRaesParameters(
                 getKeyManager(),
                 mountPointUri(model));
@@ -191,7 +193,7 @@ public abstract class ZipRaesDriver extends JarDriver {
      * size of the resulting archive file and heat the CPU.
      */
     @Override
-    public final JarArchiveEntry
+    public JarArchiveEntry
     newEntry(   String path,
                 Type type,
                 Entry template,
