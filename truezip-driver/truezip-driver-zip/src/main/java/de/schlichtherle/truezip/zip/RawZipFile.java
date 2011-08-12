@@ -22,7 +22,7 @@ import de.schlichtherle.truezip.rof.ReadOnlyFileInputStream;
 import de.schlichtherle.truezip.util.Pool;
 import static de.schlichtherle.truezip.zip.Constants.*;
 import static de.schlichtherle.truezip.zip.LittleEndian.*;
-import static de.schlichtherle.truezip.zip.WinZipAesExtraField.*;
+import static de.schlichtherle.truezip.zip.WinZipAesEntryExtraField.*;
 import static de.schlichtherle.truezip.zip.ZipEntry.*;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
@@ -263,7 +263,7 @@ implements Iterable<E>, Closeable {
                 if (extraLen > 0) {
                     final byte[] extra = new byte[extraLen];
                     rof.readFully(extra);
-                    entry.setExtra16(extra);
+                    entry.setExtra16(extra); // parses ZIP64 extra field!
                 }
                 if (commentLen > 0) {
                     final byte[] comment = new byte[commentLen];
@@ -281,12 +281,6 @@ implements Iterable<E>, Closeable {
                 ex.initCause(incompatibleZipFile);
                 throw ex;
             }
-
-            // Post-process
-            if (WINZIP_AES == entry.getMethod()
-                    && VV_AE_2 == ((WinZipAesExtraField) entry.getExtraField(WINZIP_AES_ID))
-                        .getVendorVersion())
-                entry.setCrc(UNKNOWN); // disable CRC-32 checking
 
             // Map the entry using the name that has been determined
             // by the ZipEntryFactory.
@@ -579,7 +573,7 @@ implements Iterable<E>, Closeable {
     public InputStream getPreambleInputStream() throws IOException {
         assertOpen();
         return new ReadOnlyFileInputStream(
-                new SegmentReadOnlyFile(0, preamble));
+                new EntryReadOnlyFile(0, preamble));
     }
 
     /**
@@ -609,7 +603,7 @@ implements Iterable<E>, Closeable {
     public InputStream getPostambleInputStream() throws IOException {
         assertOpen();
         return new ReadOnlyFileInputStream(
-                new SegmentReadOnlyFile(length - postamble, postamble));
+                new EntryReadOnlyFile(length - postamble, postamble));
     }
 
     OffsetMapper getOffsetMapper() {
@@ -738,8 +732,30 @@ implements Iterable<E>, Closeable {
         offset += LFH_MIN_LEN
                 + readUShort(lfh, LFH_FILE_NAME_LENGTH_OFF) // file name length
                 + readUShort(lfh, LFH_FILE_NAME_LENGTH_OFF + 2); // extra field length
-        if (UNKNOWN == entry.getCrc())
+        ReadOnlyFile erof = new EntryReadOnlyFile(
+                offset, entry.getCompressedSize());
+        if (!process) {
+            assert UNKNOWN != entry.getCrc();
+            return new ReadOnlyFileInputStream(erof);
+        }
+        int method = entry.getMethod();
+        if (entry.isEncrypted()) {
+            if (WINZIP_AES != method)
+                throw new ZipException(name
+                        + " (encrypted compression method " + method + " is not supported)");
+            erof = new WinZipAesEntryReadOnlyFile(erof,
+                    new WinZipAesEntryParameters(
+                            parameters(
+                                WinZipAesParameters.class,
+                                getCryptoParameters()),
+                            entry));
+            // The entry has just been authenticated using SHA-1.
+            // Disable redundant CRC-32 check.
             check = false;
+            final WinZipAesEntryExtraField field
+                    = (WinZipAesEntryExtraField) entry.getExtraField(WINZIP_AES_ID);
+            method = field.getMethod();
+        }
         if (check) {
             // Check CRC-32 in the Local File Header or Data Descriptor.
             final long localCrc;
@@ -763,53 +779,22 @@ implements Iterable<E>, Closeable {
             if (entry.getCrc() != localCrc)
                 throw new CRC32Exception(name, entry.getCrc(), localCrc);
         }
-        ReadOnlyFile rof = new SegmentReadOnlyFile(
-                offset, entry.getCompressedSize());
-        int method = entry.getMethod();
-        if (entry.isEncrypted()) {
-            if (WINZIP_AES != method)
-                throw new ZipException(name
-                        + " (encrypted compression method " + method + " is not supported)");
-            if (process) {
-                rof = new WinZipAesReadOnlyFile(rof,
-                        new WinZipAesEntryParameters(
-                                parameters(
-                                    WinZipAesParameters.class,
-                                    getCryptoParameters()),
-                                entry));
-                // The entry has just been authenticated using SHA-1.
-                // Disable redundant CRC-32 check.
-                check = false;
-            }
-            final WinZipAesExtraField field
-                    = (WinZipAesExtraField) entry.getExtraField(WINZIP_AES_ID);
-            method = field.getMethod();
-            assert VV_AE_2 != field.getVendorVersion()
-                    || UNKNOWN == entry.getCrc();
-        }
         InputStream in;
         final int bufSize = getBufferSize(entry);
         switch (method) {
             case DEFLATED:
-                if (process) {
-                    in = new PooledInflaterInputStream(
-                            new DummyByteInputStream(rof), bufSize);
-                    if (check)
-                        in = new CheckedInputStream(in, entry, bufSize);
-                    break;
-                } else {
-                    in = new ReadOnlyFileInputStream(rof);
-                }
+                in = new PooledInflaterInputStream(
+                        new DummyByteInputStream(erof), bufSize);
                 break;
             case STORED:
-                in = new ReadOnlyFileInputStream(rof);
-                if (process && check)
-                    in = new CheckedInputStream(in, entry, bufSize);
+                in = new ReadOnlyFileInputStream(erof);
                 break;
             default:
                 throw new ZipException(name
                     + " (compression method " + method + " is not supported)");
         }
+        if (check)
+            in = new CheckedInputStream(in, entry, bufSize);
         return in;
     }
 
@@ -1005,10 +990,10 @@ implements Iterable<E>, Closeable {
      * Note that when an object of this class gets closed, the decorated read
      * only file, i.e. the raw zip file does NOT get closed!
      */
-    private final class SegmentReadOnlyFile extends IntervalReadOnlyFile {
+    private final class EntryReadOnlyFile extends IntervalReadOnlyFile {
         private boolean closed;
 
-        SegmentReadOnlyFile(long start, long length)
+        EntryReadOnlyFile(long start, long length)
         throws IOException {
             super(RawZipFile.this.archive, start, length);
             assert null != RawZipFile.this.archive;

@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.zip;
 import de.schlichtherle.truezip.crypto.CipherOutputStream;
 import de.schlichtherle.truezip.crypto.param.KeyStrength;
 import de.schlichtherle.truezip.io.LEDataOutputStream;
-import static de.schlichtherle.truezip.zip.WinZipAesExtraField.*;
+import static de.schlichtherle.truezip.zip.WinZipAesEntryExtraField.*;
 import static de.schlichtherle.truezip.zip.ZipEntry.*;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -110,8 +110,8 @@ final class WinZipAesEntryOutputStream extends CipherOutputStream {
                 + 2   // password verification value
                 + 10; // authentication code
         entry.setCompressedSize64(csize);
-        final WinZipAesExtraField
-                field = (WinZipAesExtraField) entry.getExtraField(WINZIP_AES_ID);
+        final WinZipAesEntryExtraField
+                field = (WinZipAesEntryExtraField) entry.getExtraField(WINZIP_AES_ID);
         if (VV_AE_2 == field.getVendorVersion())
             entry.setCrc32(0);
     }

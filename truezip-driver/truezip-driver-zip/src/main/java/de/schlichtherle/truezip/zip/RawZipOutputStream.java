@@ -20,7 +20,7 @@ import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.LEDataOutputStream;
 import de.schlichtherle.truezip.util.JSE7;
 import static de.schlichtherle.truezip.zip.Constants.*;
-import static de.schlichtherle.truezip.zip.WinZipAesExtraField.*;
+import static de.schlichtherle.truezip.zip.WinZipAesEntryExtraField.*;
 import static de.schlichtherle.truezip.zip.ZipEntry.*;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
@@ -481,16 +481,6 @@ implements Iterable<E> {
         }
     }
 
-    private static void checkLocalFileHeaderProperties(final ZipEntry entry)
-    throws ZipException {
-        if (UNKNOWN == entry.getCrc())
-            throw new ZipException(entry.getName() + " (unknown CRC checksum)");
-        if (UNKNOWN == entry.getCompressedSize32())
-            throw new ZipException(entry.getName() + " (unknown compressed size)");
-        if (UNKNOWN == entry.getSize32())
-            throw new ZipException(entry.getName() + " (unknown uncompressed size)");
-    }
-
     /**
      * Writes all necessary data for this entry to the underlying stream.
      *
@@ -589,8 +579,7 @@ implements Iterable<E> {
         final byte[] name = encode(entry.getName());
         dos.writeShort(name.length);
         // Extra Field Length.
-        final byte[] extra = entry.getExtra();
-        assert extra != null;
+        final byte[] extra = entry.getExtra(true);
         dos.writeShort(extra.length);
         // File Comment Length.
         final byte[] comment = getEntryComment(entry);
@@ -739,17 +728,13 @@ implements Iterable<E> {
                     throw new ZipException(entry.getName()
                     + " (the total size " + size + " for the name, extra fields and comment is too long)");
             }
-            int method = entry.getMethod();
-            switch (method) {
-                case STORED:
-                    checkLocalFileHeaderProperties(entry);
-                    break;
-                case DEFLATED:
-                    if (!this.process)
-                        checkLocalFileHeaderProperties(entry);
-                    break;
-                default:
-                    throw new AssertionError();
+            if (DEFLATED != entry.getMethod() || !this.process) {
+                if (UNKNOWN == entry.getCrc())
+                    throw new ZipException(entry.getName() + " (unknown CRC-32 value)");
+                if (UNKNOWN == entry.getCompressedSize32())
+                    throw new ZipException(entry.getName() + " (unknown compressed size)");
+                if (UNKNOWN == entry.getSize32())
+                    throw new ZipException(entry.getName() + " (unknown uncompressed size)");
             }
             if (UNKNOWN == entry.getPlatform())
                 entry.setPlatform8(PLATFORM_FAT);
@@ -977,7 +962,7 @@ implements Iterable<E> {
                     param = new WinZipAesEntryParameters(this.param, entry);
             final AesKeyStrength keyStrength = param.getKeyStrength();
             final LEDataOutputStream dos = delegate.init(entry);
-            final WinZipAesExtraField field = new WinZipAesExtraField();
+            final WinZipAesEntryExtraField field = new WinZipAesEntryExtraField();
             field.setKeyStrength(keyStrength);
             final int method = entry.getMethod();
             field.setMethod(method);
