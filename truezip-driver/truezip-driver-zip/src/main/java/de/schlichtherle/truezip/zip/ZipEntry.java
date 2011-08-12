@@ -47,7 +47,9 @@ import net.jcip.annotations.NotThreadSafe;
 public class ZipEntry implements Cloneable {
 
     // Bit indices for initialized fields.
-    private static final int PLATFORM = 0, METHOD = 1, CRC = 2;
+    private static final int PLATFORM = 1, METHOD = 1 << 1,
+                             CRC = 1 << 2, CSIZE = 1 << 3,
+                             SIZE = 1 << 4, OFFSET = 1 << 5;
 
     /** The unknown value for numeric properties. */
     public static final byte UNKNOWN = -1;
@@ -89,18 +91,18 @@ public class ZipEntry implements Cloneable {
      */
     public static final long MAX_DOS_TIME = DateTimeConverter.MAX_DOS_TIME;
 
-    private byte init;                  // bit flag for init state
+    private byte init;                  // bit flags for init state
     private String name;
-    private byte platform = UNKNOWN;    // 1 byte unsigned int (UByte)
-    private short general = 0;          // 2 bytes unsigned int (UShort)
-    private short method = UNKNOWN;     // 2 bytes unsigned int (UShort)
-    private long javaTime = UNKNOWN;       // Java time (!)
-    private int crc = UNKNOWN;          // 4 bytes unsigned int (ULong)
-    private long csize = UNKNOWN;       // 63 bits unsigned integer (ULong)
-    private long size = UNKNOWN;        // 63 bits unsigned integer (Ulong)
+    private byte platform;              // 1 byte unsigned int (UByte)
+    private short general;              // 2 bytes unsigned int (UShort)
+    private short method;               // 2 bytes unsigned int (UShort)
+    private long javaTime = UNKNOWN;
+    private int crc;                    // 4 bytes unsigned int (ULong)
+    private long csize;                 // 63 bits unsigned integer (ULong)
+    private long size;                  // 63 bits unsigned integer (Ulong)
 
     /** Relative Offset Of Local File Header. */
-    private long offset = UNKNOWN;      // 63 bits unsigned integer (ULong)
+    private long offset;                // 63 bits unsigned integer (ULong)
 
     /**
      * The map of Extra Fields.
@@ -152,17 +154,15 @@ public class ZipEntry implements Cloneable {
         return entry;
     }
 
-    private boolean isInit(final int index) {
-        assert 0 <= index && index < 8 : "Bit index out of range: " + index;
-        return (init & (1 << index)) != 0;
+    private boolean isInit(final int mask) {
+        return (init & mask) != 0;
     }
 
-    private void setInit(final int index, final boolean init) {
-        assert 0 <= index && index < 8 : "Bit index out of range: " + index;
+    private void setInit(final int mask, final boolean init) {
         if (init)
-            this.init |=   1 << index;
+            this.init |=  mask;
         else
-            this.init &= ~(1 << index);
+            this.init &= ~mask;
     }
 
     /** Returns the ZIP entry name. */
@@ -184,20 +184,23 @@ public class ZipEntry implements Cloneable {
 
     public final void setPlatform(final short platform) {
         final boolean known = UNKNOWN != platform;
-        if (known)
+        if (known) {
             UByte.check(platform, name, "Platform out of range");
+            this.platform = (byte) platform;
+        } else {
+            this.platform = 0;
+        }
         setInit(PLATFORM, known);
-        this.platform = (byte) platform;
     }
 
     final short getEncodedPlatform() {
-        return isInit(PLATFORM) ? (short) (platform & UByte.MAX_VALUE) : 0;
+        return (short) (platform & UByte.MAX_VALUE);
     }
 
     final void setEncodedPlatform(final int platform) {
         assert UByte.check(platform);
-        setInit(PLATFORM, true);
         this.platform = (byte) platform;
+        setInit(PLATFORM, true);
     }
 
     /** Returns the General Purpose Bit Flags. */
@@ -271,10 +274,11 @@ public class ZipEntry implements Cloneable {
             case STORED:
             case DEFLATED:
             case WINZIP_AES:
-                setInit(METHOD, true);
                 this.method = (short) method;
+                setInit(METHOD, true);
                 break;
             case UNKNOWN:
+                this.method = 0;
                 setInit(METHOD, false);
                 break;
             default:
@@ -284,13 +288,13 @@ public class ZipEntry implements Cloneable {
     }
 
     final int getEncodedMethod() {
-        return isInit(METHOD) ? method & UShort.MAX_VALUE : 0;
+        return method & UShort.MAX_VALUE;
     }
 
     final void setEncodedMethod(final int method) {
         assert UShort.check(method);
-        setInit(METHOD, true);
         this.method = (short) method;
+        setInit(METHOD, true);
     }
 
     public final long getTime() {
@@ -339,20 +343,23 @@ public class ZipEntry implements Cloneable {
 
     public final void setCrc(final long crc) {
         final boolean known = UNKNOWN != crc;
-        if (known)
+        if (known) {
             UInt.check(crc, name, "CRC-32 out of range");
+            this.crc = (int) crc;
+        } else {
+            this.crc = 0;
+        }
         setInit(CRC, known);
-        this.crc = (int) crc;
     }
 
     final long getEncodedCrc() {
-        return isInit(CRC) ? crc & UInt.MAX_VALUE : 0;
+        return crc & UInt.MAX_VALUE;
     }
 
     final void setEncodedCrc(final long crc) {
         assert UInt.check(crc);
-        setInit(CRC, true);
         this.crc = (int) crc;
+        setInit(CRC, true);
     }
 
     /**
@@ -361,7 +368,7 @@ public class ZipEntry implements Cloneable {
      * @see #setCompressedSize
      */
     public final long getCompressedSize() {
-        return csize;
+        return isInit(CSIZE) ? csize : UNKNOWN;
     }
 
     /**
@@ -374,20 +381,24 @@ public class ZipEntry implements Cloneable {
      * @see #getCompressedSize
      */
     public final void setCompressedSize(final long csize) {
-        if (UNKNOWN != csize)
+        final boolean known = UNKNOWN != csize;
+        if (known) {
             ULong.check(csize, name, "Compressed Size out of range");
-        this.csize = csize;
+            this.csize = csize;
+        } else {
+            this.csize = 0;
+        }
+        setInit(CSIZE, known);
     }
 
     final long getEncodedCompressedSize() {
-        if (UNKNOWN == csize)
-            return 0;
-        return csize > UInt.MAX_VALUE || FORCE_ZIP64_EXT ? UInt.MAX_VALUE : csize;
+        return UInt.MAX_VALUE <= csize || FORCE_ZIP64_EXT ? UInt.MAX_VALUE : csize;
     }
 
     final void setEncodedCompressedSize(final long csize) {
         assert ULong.check(csize);
         this.csize = csize;
+        setInit(CSIZE, true);
     }
 
     /**
@@ -396,7 +407,7 @@ public class ZipEntry implements Cloneable {
      * @see #setCompressedSize
      */
     public final long getSize() {
-        return size;
+        return isInit(SIZE) ? size : UNKNOWN;
     }
 
     /**
@@ -409,35 +420,38 @@ public class ZipEntry implements Cloneable {
      * @see #getCompressedSize
      */
     public final void setSize(final long size) {
-        if (UNKNOWN != size)
+        final boolean known = UNKNOWN != size;
+        if (known) {
             ULong.check(size, name, "Uncompressed Size out of range");
-        this.size = size;
+            this.size = size;
+        } else {
+            this.size = 0;
+        }
+        setInit(SIZE, known);
     }
 
     final long getEncodedSize() {
-        if (size == UNKNOWN)
-            return 0;
-        return size > UInt.MAX_VALUE || FORCE_ZIP64_EXT ? UInt.MAX_VALUE : size;
+        return UInt.MAX_VALUE <= size || FORCE_ZIP64_EXT ? UInt.MAX_VALUE : size;
     }
 
     final void setEncodedSize(final long size) {
         assert ULong.check(size);
         this.size = size;
+        setInit(SIZE, true);
     }
 
     final long getOffset() {
-        return offset;
+        return isInit(OFFSET) ? offset : UNKNOWN;
     }
 
     final long getEncodedOffset() {
-        if (UNKNOWN == offset)
-            return 0;
-        return offset > UInt.MAX_VALUE || FORCE_ZIP64_EXT ? UInt.MAX_VALUE : offset;
+        return UInt.MAX_VALUE <= offset || FORCE_ZIP64_EXT ? UInt.MAX_VALUE : offset;
     }
 
     final void setEncodedOffset(final long offset) {
         assert ULong.check(offset);
         this.offset = offset;
+        setInit(OFFSET, true);
     }
 
     final @Nullable ExtraField getExtraField(int headerId) {
