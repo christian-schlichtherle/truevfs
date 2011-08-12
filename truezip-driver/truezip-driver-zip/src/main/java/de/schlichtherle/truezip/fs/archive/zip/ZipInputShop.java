@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
+import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.InputShop;
@@ -118,10 +119,15 @@ implements InputShop<ZipArchiveEntry> {
 
             @Override
             public InputStream newInputStream() throws IOException {
+                final ZipArchiveEntry lt = getLocalTarget();
+                final Entry pt = getPeerTarget();
+                final ZipArchiveEntry zpt = pt instanceof ZipArchiveEntry
+                        ? (ZipArchiveEntry) pt
+                        : null;
                 return getInputStream(
-                        getLocalTarget().getName(),
+                        lt.getName(),
                         false,
-                        !(getPeerTarget() instanceof ZipArchiveEntry));
+                        lt.isEncrypted() || null == zpt || zpt.isEncrypted());
             }
         } // Input
 
