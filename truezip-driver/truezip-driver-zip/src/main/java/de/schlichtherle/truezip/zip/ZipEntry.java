@@ -460,7 +460,7 @@ public class ZipEntry implements Cloneable {
      *         {@code null} is never returned.
      */
     public final byte[] getExtra() {
-        return getExtra(true);
+        return getExtra(false);
     }
 
     /**
@@ -502,21 +502,25 @@ public class ZipEntry implements Cloneable {
         if (null == data || data.length <= 0) {
             this.fields = null;
         } else {
-            setExtraUnchecked(data);
+            setExtraUnchecked(data, false);
         }
     }
 
+    /**
+     * Set extra fields and parse ZIP64 extra field.
+     */
     final void setExtra16(final byte[] data) {
         assert 0 < data.length && UShort.check(data.length);
-        setExtraUnchecked(data);
+        setExtraUnchecked(data, true);
     }
 
-    private void setExtraUnchecked(final byte[] data) {
+    private void setExtraUnchecked(final byte[] data, final boolean zip64) {
         ExtraFields fields = this.fields;
         if (null == fields)
             this.fields = fields = new ExtraFields();
         fields.readFrom(data, 0, data.length);
-        parseZip64ExtraField();
+        if (zip64)
+            parseZip64ExtraField();
         assert fields == this.fields;
         fields.remove(ZIP64_HEADER_ID);
         if (fields.size() <= 0) {

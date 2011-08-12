@@ -45,7 +45,7 @@ abstract class ExtraField {
     static final int WINZIP_AES_ID = 0x9901;
 
     static {
-        register(WinZipAesExtraField.class);
+        register(WinZipAesEntryExtraField.class);
     }
 
     /**

@@ -21,12 +21,11 @@ import de.schlichtherle.truezip.crypto.SuspensionPenalty;
 import de.schlichtherle.truezip.crypto.param.AesKeyStrength;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.util.ArrayHelper;
-import static de.schlichtherle.truezip.zip.WinZipAesExtraField.*;
+import static de.schlichtherle.truezip.zip.WinZipAesEntryExtraField.*;
 import static de.schlichtherle.truezip.zip.WinZipAesEntryOutputStream.*;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
-import java.util.Arrays;
 import net.jcip.annotations.NotThreadSafe;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.Mac;
@@ -51,9 +50,9 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
-final class WinZipAesReadOnlyFile extends CipherReadOnlyFile {
+final class WinZipAesEntryReadOnlyFile extends CipherReadOnlyFile {
 
-    WinZipAesReadOnlyFile(
+    WinZipAesEntryReadOnlyFile(
             final ReadOnlyFile rof,
             final WinZipAesEntryParameters param)
     throws IOException {
@@ -62,8 +61,8 @@ final class WinZipAesReadOnlyFile extends CipherReadOnlyFile {
         // Init WinZip AES extra field.
         final ZipEntry entry = param.getEntry();
         assert entry.isEncrypted();
-        final WinZipAesExtraField
-                field = (WinZipAesExtraField) entry.getExtraField(WINZIP_AES_ID);
+        final WinZipAesEntryExtraField
+                field = (WinZipAesEntryExtraField) entry.getExtraField(WINZIP_AES_ID);
 
         // Init key strength.
         final AesKeyStrength keyStrength = field.getKeyStrength();
@@ -105,11 +104,12 @@ final class WinZipAesReadOnlyFile extends CipherReadOnlyFile {
 
         // Derive cipher and MAC parameters.
         final PBEParametersGenerator gen = new PKCS5S2ParametersGenerator();
+        KeyParameter keyParam;
         ParametersWithIV aesCtrParam;
         CipherParameters sha1HMacParam;
         long lastTry = 0; // don't enforce suspension on first prompt!
-        for (boolean invalid = false; ; invalid = true) {
-            final byte[] passwd = param.getReadPassword(invalid);
+        do {
+            final byte[] passwd = param.getReadPassword(0 != lastTry);
             assert null != passwd;
 
             gen.init(passwd, salt, ITERATION_COUNT);
@@ -119,7 +119,7 @@ final class WinZipAesReadOnlyFile extends CipherReadOnlyFile {
             // Yes, the password verifier is only a 16 bit value.
             // So we must use the MAC for password verification, too.
             assert AES_BLOCK_SIZE_BITS <= keyStrengthBits;
-            final KeyParameter keyParam =
+            keyParam =
                     (KeyParameter) gen.generateDerivedParameters(
                         2 * keyStrengthBits + PWD_VERIFIER_BITS);
             paranoidWipe(passwd);
@@ -137,12 +137,10 @@ final class WinZipAesReadOnlyFile extends CipherReadOnlyFile {
             lastTry = SuspensionPenalty.enforce(lastTry);
 
             // Verify password.
-            if (ArrayHelper.equals(
-                    keyParam.getKey(), 2 * keyStrengthBytes,
-                    passwdVerifier, 0,
-                    PWD_VERIFIER_BITS / 2))
-                break;
-        }
+        } while (!ArrayHelper.equals(
+                keyParam.getKey(), 2 * keyStrengthBytes,
+                passwdVerifier, 0,
+                PWD_VERIFIER_BITS / 2));
 
         // Init cipher.
         final SeekableBlockCipher cipher = new WinZipAesCipher();

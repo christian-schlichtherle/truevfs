@@ -34,7 +34,7 @@ import net.jcip.annotations.NotThreadSafe;
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
-final class WinZipAesExtraField extends ExtraField {
+final class WinZipAesEntryExtraField extends ExtraField {
 
     private static final int DATA_SIZE = 7;
     private static final int VENDOR_ID = 'A' | ('E' << 8);
@@ -61,7 +61,7 @@ final class WinZipAesExtraField extends ExtraField {
     /**
      * Constructs a new WinZip AES Extra Field.
      */
-    WinZipAesExtraField() {
+    WinZipAesEntryExtraField() {
     }
 
     private static byte encryptionStrength(AesKeyStrength keyStrength) {
