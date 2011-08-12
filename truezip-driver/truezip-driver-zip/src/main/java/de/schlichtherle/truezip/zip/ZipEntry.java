@@ -94,7 +94,7 @@ public class ZipEntry implements Cloneable {
     private byte platform = UNKNOWN;    // 1 byte unsigned int (UByte)
     private short general = 0;          // 2 bytes unsigned int (UShort)
     private short method = UNKNOWN;     // 2 bytes unsigned int (UShort)
-    private long jTime = UNKNOWN;       // Java time (!)
+    private long javaTime = UNKNOWN;       // Java time (!)
     private int crc = UNKNOWN;          // 4 bytes unsigned int (ULong)
     private long csize = UNKNOWN;       // 63 bits unsigned integer (ULong)
     private long size = UNKNOWN;        // 63 bits unsigned integer (Ulong)
@@ -129,7 +129,7 @@ public class ZipEntry implements Cloneable {
         this.platform = template.platform;
         this.general = template.general;
         this.method = template.method;
-        this.jTime = template.jTime;
+        this.javaTime = template.javaTime;
         this.crc = template.crc;
         this.csize = template.csize;
         this.size = template.size;
@@ -190,36 +190,62 @@ public class ZipEntry implements Cloneable {
         this.platform = (byte) platform;
     }
 
-    final void setPlatform8(final int platform) {
+    final short getEncodedPlatform() {
+        return isInit(PLATFORM) ? (short) (platform & UByte.MAX_VALUE) : 0;
+    }
+
+    final void setEncodedPlatform(final int platform) {
         assert UByte.check(platform);
         setInit(PLATFORM, true);
         this.platform = (byte) platform;
     }
 
     /** Returns the General Purpose Bit Flags. */
-    final int getGeneral16() {
+    final int getGeneralPurposeBitFlags() {
         return general & UShort.MAX_VALUE;
     }
 
     /** Sets the General Purpose Bit Flags. */
-    final void setGeneral16(final int general) {
+    final void setGeneralPurposeBitFlags(final int general) {
         assert UShort.check(general);
         this.general = (short) general;
     }
 
     /** Returns the indexed General Purpose Bit Flag. */
-    final boolean getGeneral1(final int index) {
+    final boolean getGeneralPurposeBitFlag(final int index) {
         assert 0 <= index && index <= 15;
         return 0 != (general & (1 << index));
     }
 
     /** Sets the indexed General Purpose Bit Flag. */
-    final void setGeneral1(final int index, final boolean bit) {
+    final void setGeneralPurposeBitFlag(final int index, final boolean bit) {
         assert 0 <= index && index <= 15;
         if (bit)
             general |=   1 << index;
         else
             general &= ~(1 << index);
+    }
+
+    /**
+     * Returns {@code true} if and only if this ZIP entry is encrypted.
+     * Note that only WinZip AES encryption is currently supported.
+     * 
+     * @return {@code true} if and only if this ZIP entry is encrypted.
+     * @since   TrueZIP 7.3
+     */
+    public final boolean isEncrypted() {
+        return getGeneralPurposeBitFlag(GPBF_ENCRYPTED);
+    }
+
+    /**
+     * Sets the encryption flag for this ZIP entry.
+     * Note that only WinZip AES encryption is currently supported.
+     * 
+     * @param encrypted whether or not this ZIP entry should get encrypted.
+     * @since   TrueZIP 7.3
+     */
+    public final void setEncrypted(boolean encrypted) {
+        setGeneralPurposeBitFlag(GPBF_ENCRYPTED, encrypted);
     }
 
     /**
@@ -257,58 +283,40 @@ public class ZipEntry implements Cloneable {
         }
     }
 
-    final void setMethod16(final int method) {
+    final int getEncodedMethod() {
+        return isInit(METHOD) ? method & UShort.MAX_VALUE : 0;
+    }
+
+    final void setEncodedMethod(final int method) {
         assert UShort.check(method);
         setInit(METHOD, true);
         this.method = (short) method;
     }
 
-    /**
-     * Returns {@code true} if and only if this ZIP entry is encrypted.
-     * Note that only WinZip AES encryption is currently supported.
-     * 
-     * @return {@code true} if and only if this ZIP entry is encrypted.
-     * @since   TrueZIP 7.3
-     */
-    public final boolean isEncrypted() {
-        return getGeneral1(GPBF_ENCRYPTED);
-    }
-
-    /**
-     * Sets the encryption flag for this ZIP entry.
-     * Note that only WinZip AES encryption is currently supported.
-     * 
-     * @param encrypted whether or not this ZIP entry should get encrypted.
-     * @since   TrueZIP 7.3
-     */
-    public final void setEncrypted(boolean encrypted) {
-        setGeneral1(GPBF_ENCRYPTED, encrypted);
-    }
-
-    final long getTimeDos() {
-        return UNKNOWN == jTime
-                ? UNKNOWN
-                : getDateTimeConverter().toDosTime(jTime);
-    }
-
-    final void setTimeDos(final long dTime) {
-        this.jTime = UNKNOWN == dTime
-                ? UNKNOWN
-                : getDateTimeConverter().toJavaTime(dTime);
-    }
-
     public final long getTime() {
-        return jTime;
+        return javaTime;
     }
 
     public final void setTime(final long jTime) {
         if (UNKNOWN != jTime) {
             // Adjust to lower resolution of DOS date/time.
             final DateTimeConverter dtc = getDateTimeConverter();
-            this.jTime = dtc.toJavaTime(dtc.toDosTime(jTime));
+            this.javaTime = dtc.toJavaTime(dtc.toDosTime(jTime));
         } else {
-            this.jTime = UNKNOWN;
+            this.javaTime = UNKNOWN;
         }
+    }
+
+    final long getEncodedTime() {
+        return UNKNOWN == javaTime
+                ? UNKNOWN
+                : getDateTimeConverter().toDosTime(javaTime);
+    }
+
+    final void setEncodedTime(final long dosTime) {
+        this.javaTime = UNKNOWN == dosTime
+                ? UNKNOWN
+                : getDateTimeConverter().toJavaTime(dosTime);
     }
 
     /**
@@ -337,16 +345,14 @@ public class ZipEntry implements Cloneable {
         this.crc = (int) crc;
     }
 
-    final void setCrc32(final long crc) {
+    final long getEncodedCrc() {
+        return isInit(CRC) ? crc & UInt.MAX_VALUE : 0;
+    }
+
+    final void setEncodedCrc(final long crc) {
         assert UInt.check(crc);
         setInit(CRC, true);
         this.crc = (int) crc;
-    }
-
-    final long getCompressedSize32() {
-        if (UNKNOWN == csize)
-            return UNKNOWN;
-        return csize > UInt.MAX_VALUE || FORCE_ZIP64_EXT ? UInt.MAX_VALUE : csize;
     }
 
     /**
@@ -373,15 +379,15 @@ public class ZipEntry implements Cloneable {
         this.csize = csize;
     }
 
-    final void setCompressedSize64(final long csize) {
-        assert ULong.check(csize);
-        this.csize = csize;
+    final long getEncodedCompressedSize() {
+        if (UNKNOWN == csize)
+            return 0;
+        return csize > UInt.MAX_VALUE || FORCE_ZIP64_EXT ? UInt.MAX_VALUE : csize;
     }
 
-    final long getSize32() {
-        if (size == UNKNOWN)
-            return UNKNOWN;
-        return size > UInt.MAX_VALUE || FORCE_ZIP64_EXT ? UInt.MAX_VALUE : size;
+    final void setEncodedCompressedSize(final long csize) {
+        assert ULong.check(csize);
+        this.csize = csize;
     }
 
     /**
@@ -408,22 +414,28 @@ public class ZipEntry implements Cloneable {
         this.size = size;
     }
 
-    final void setSize64(final long size) {
-        assert ULong.check(size);
-        this.size = size;
+    final long getEncodedSize() {
+        if (size == UNKNOWN)
+            return 0;
+        return size > UInt.MAX_VALUE || FORCE_ZIP64_EXT ? UInt.MAX_VALUE : size;
     }
 
-    final long getOffset32() {
-        if (UNKNOWN == offset)
-            return UNKNOWN;
-        return offset > UInt.MAX_VALUE || FORCE_ZIP64_EXT ? UInt.MAX_VALUE : offset;
+    final void setEncodedSize(final long size) {
+        assert ULong.check(size);
+        this.size = size;
     }
 
     final long getOffset() {
         return offset;
     }
 
-    final void setOffset64(final long offset) {
+    final long getEncodedOffset() {
+        if (UNKNOWN == offset)
+            return 0;
+        return offset > UInt.MAX_VALUE || FORCE_ZIP64_EXT ? UInt.MAX_VALUE : offset;
+    }
+
+    final void setEncodedOffset(final long offset) {
         assert ULong.check(offset);
         this.offset = offset;
     }
@@ -446,49 +458,16 @@ public class ZipEntry implements Cloneable {
         return null != fields ? fields.remove(headerId) : null;
     }
 
-    final int getExtraLength() {
-        final ExtraFields fields = this.fields;
-        return null != fields ? fields.getExtraLength() : 0;
-    }
-
     /**
      * Returns a protective copy of the serialized Extra Fields.
-     * Note that unlike its template {@link java.util.zip.ZipEntry#getExtra},
+     * Note that unlike its template {@link java.util.zip.ZipEntry#getExtra()},
      * this method never returns {@code null}.
      *
      * @return A new byte array holding the serialized Extra Fields.
      *         {@code null} is never returned.
      */
     public final byte[] getExtra() {
-        return getExtra(false);
-    }
-
-    /**
-     * Returns a protective copy of the serialized Extra Fields.
-     *
-     * @param  zip64 Whether or not a ZIP64 Extended Information Extra Field,
-     *         if present, shall be included in the returned data or not.
-     * @return A new byte array holding the serialized Extra Fields.
-     *         {@code null} is never returned.
-     * @see    #getExtra()
-     */
-    final byte[] getExtra(final boolean zip64) {
-        final ExtraFields fields = getExtraFields(zip64);
-        return null == fields ? EMPTY : fields.getExtra();
-    }
-
-    private @CheckForNull ExtraFields getExtraFields(final boolean zip64) {
-        ExtraFields fields = this.fields;
-        if (zip64) {
-            final ExtraField field = composeZip64ExtraField();
-            if (null != field) {
-                fields = null != fields ? fields.clone() : new ExtraFields();
-                fields.add(field);
-            }
-        } else {
-            assert null == fields || null == fields.get(ZIP64_HEADER_ID);
-        }
-        return fields;
+        return getExtraFields(false);
     }
 
     /**
@@ -502,19 +481,46 @@ public class ZipEntry implements Cloneable {
         if (null == data || data.length <= 0) {
             this.fields = null;
         } else {
-            setExtraUnchecked(data, false);
+            setExtraFields(data, false);
         }
+    }
+
+    /**
+     * Returns a protective copy of the serialized Extra Fields.
+     *
+     * @param  zip64 Whether or not a ZIP64 Extended Information Extra Field,
+     *         if present, shall be included in the returned data or not.
+     * @return A new byte array holding the serialized Extra Fields.
+     *         {@code null} is never returned.
+     * @see    #getEncodedExtraFields()
+     */
+    final byte[] getEncodedExtraFields() {
+        return getExtraFields(true);
     }
 
     /**
      * Set extra fields and parse ZIP64 extra field.
      */
-    final void setExtra16(final byte[] data) {
+    final void setEncodedExtraFields(final byte[] data) {
         assert 0 < data.length && UShort.check(data.length);
-        setExtraUnchecked(data, true);
+        setExtraFields(data, true);
     }
 
-    private void setExtraUnchecked(final byte[] data, final boolean zip64) {
+    private byte[] getExtraFields(final boolean zip64) {
+        ExtraFields fields = this.fields;
+        if (zip64) {
+            final ExtraField field = composeZip64ExtraField();
+            if (null != field) {
+                fields = null != fields ? fields.clone() : new ExtraFields();
+                fields.add(field);
+            }
+        } else {
+            assert null == fields || null == fields.get(ZIP64_HEADER_ID);
+        }
+        return null == fields ? EMPTY : fields.getExtra();
+    }
+
+    private void setExtraFields(final byte[] data, final boolean zip64) {
         ExtraFields fields = this.fields;
         if (null == fields)
             this.fields = fields = new ExtraFields();
@@ -527,6 +533,44 @@ public class ZipEntry implements Cloneable {
             assert 0 == fields.size();
             this.fields = null;
         }
+    }
+
+    /**
+     * Composes a ZIP64 Extended Information Extra Field from the properties
+     * of this entry.
+     * If no ZIP64 Extended Information Extra Field is required it is removed
+     * from the collection of Extra Fields.
+     */
+    private @CheckForNull ExtraField composeZip64ExtraField() {
+        final byte[] data = new byte[3 * 8]; // maximum size
+        int off = 0;
+        // Write out Uncompressed Size.
+        final long size = getSize();
+        if (UInt.MAX_VALUE <= size || FORCE_ZIP64_EXT && UNKNOWN != size) {
+            writeLong(size, data, off);
+            off += 8;
+        }
+        // Write out Compressed Size.
+        final long csize = getCompressedSize();
+        if (UInt.MAX_VALUE <= csize || FORCE_ZIP64_EXT && UNKNOWN != csize) {
+            writeLong(csize, data, off);
+            off += 8;
+        }
+        // Write out Relative Header Offset.
+        final long offset = getOffset();
+        if (UInt.MAX_VALUE <= offset || FORCE_ZIP64_EXT && UNKNOWN != offset) {
+            writeLong(offset, data, off);
+            off += 8;
+        }
+        // Create ZIP64 Extended Information Extra Field from serialized data.
+        final ExtraField field;
+        if (off > 0) {
+            field = new DefaultExtraField(ZIP64_HEADER_ID);
+            field.readFrom(data, 0, off);
+        } else {
+            field = null;
+        }
+        return field;
     }
 
     /**
@@ -544,69 +588,26 @@ public class ZipEntry implements Cloneable {
         final byte[] data = ef.getDataBlock();
         int off = 0;
         // Read in Uncompressed Size.
-        final long size = getSize32();
+        final long size = getEncodedSize();
         if (size >= UInt.MAX_VALUE) {
             assert UInt.MAX_VALUE == size;
-            setSize64(readLong(data, off));
+            setEncodedSize(readLong(data, off));
             off += 8;
         }
         // Read in Compressed Size.
-        final long csize = getCompressedSize32();
+        final long csize = getEncodedCompressedSize();
         if (csize >= UInt.MAX_VALUE) {
             assert UInt.MAX_VALUE == csize;
-            setCompressedSize64(readLong(data, off));
+            setEncodedCompressedSize(readLong(data, off));
             off += 8;
         }
         // Read in Relative Header Offset.
-        final long offset = getOffset32();
+        final long offset = getEncodedOffset();
         if (offset >= UInt.MAX_VALUE) {
             assert UInt.MAX_VALUE == offset;
-            setOffset64(readLong(data, off));
+            setEncodedOffset(readLong(data, off));
             //off += 8;
         }
-    }
-
-    /**
-     * Composes a ZIP64 Extended Information Extra Field from the properties
-     * of this entry.
-     * If no ZIP64 Extended Information Extra Field is required it is removed
-     * from the collection of Extra Fields.
-     */
-    private @CheckForNull ExtraField composeZip64ExtraField() {
-        final byte[] data = new byte[3 * 8]; // maximum size
-        int off = 0;
-        // Write out Uncompressed Size.
-        final long size = getSize();
-        if (size >= UInt.MAX_VALUE || FORCE_ZIP64_EXT && size >= 0) {
-            writeLong(size, data, off);
-            off += 8;
-        }
-        // Write out Compressed Size.
-        final long csize = getCompressedSize();
-        if (csize >= UInt.MAX_VALUE || FORCE_ZIP64_EXT && csize >= 0) {
-            writeLong(csize, data, off);
-            off += 8;
-        }
-        // Write out Relative Header Offset.
-        final long offset = getOffset();
-        if (offset >= UInt.MAX_VALUE || FORCE_ZIP64_EXT && offset >= 0) {
-            writeLong(offset, data, off);
-            off += 8;
-        }
-        // Create ZIP64 Extended Information Extra Field from serialized data.
-        final ExtraField field;
-        if (off > 0) {
-            field = new DefaultExtraField(ZIP64_HEADER_ID);
-            field.readFrom(data, 0, off);
-        } else {
-            field = null;
-        }
-        return field;
-    }
-
-    final String getEffectiveComment() {
-        final String comment = getComment();
-        return null != comment ? comment : "";
     }
 
     public final @CheckForNull String getComment() {
@@ -619,9 +620,33 @@ public class ZipEntry implements Cloneable {
         this.comment = comment;
     }
 
-    final void setComment16(final String comment) {
+    final String getDecodedComment() {
+        final String comment = this.comment;
+        return null != comment ? comment : "";
+    }
+
+    final void setDecodedComment(final String comment) {
         assert UShort.check(comment.length());
         this.comment = comment;
+    }
+
+    final boolean isDataDescriptorRequired() {
+        return UNKNOWN == getCrc()
+                || UNKNOWN == getCompressedSize()
+                || UNKNOWN == getSize();
+    }
+
+    final boolean isZip64ExtensionsRequired() {
+        // Offset MUST be considered in decision about ZIP64 format - see
+        // description of Data Descriptor in ZIP File Format Specification!
+        if (FORCE_ZIP64_EXT)
+            return true /*UNKNOWN != getCompressedSize()
+                    || UNKNOWN != getSize()
+                    || UNKNOWN != getOffset()*/;
+        else
+            return UInt.MAX_VALUE <= getCompressedSize()
+                    || UInt.MAX_VALUE <= getSize()
+                    || UInt.MAX_VALUE <= getOffset();
     }
 
     /** Returns a string representation of this object. */
