@@ -542,9 +542,9 @@ implements Iterable<E> {
     throws IOException {
         assert null != entry;
         final LEDataOutputStream dos = this.dos;
-        final long csize32 = entry.getEncodedCompressedSize();
-        final long size32 = entry.getEncodedSize();
-        final long offset32 = entry.getEncodedOffset();
+        final long csize = entry.getEncodedCompressedSize();
+        final long size = entry.getEncodedSize();
+        final long offset = entry.getEncodedOffset();
         final boolean zip64 = entry.isZip64ExtensionsRequired();
         final int method = entry.getMethod();
         final boolean directory = entry.isDirectory();
@@ -568,9 +568,9 @@ implements Iterable<E> {
         // CRC-32.
         dos.writeInt((int) entry.getEncodedCrc());
         // Compressed Size.
-        dos.writeInt((int) csize32);
+        dos.writeInt((int) csize);
         // Uncompressed Size.
-        dos.writeInt((int) size32);
+        dos.writeInt((int) size);
         // File Name Length.
         final byte[] name = encode(entry.getName());
         dos.writeShort(name.length);
@@ -587,7 +587,7 @@ implements Iterable<E> {
         // External File Attributes.
         dos.writeInt(directory ? 0x10 : 0); // fixed issue #27.
         // Relative Offset Of Local File Header.
-        dos.writeInt((int) offset32);
+        dos.writeInt((int) offset);
         // File Name.
         dos.write(name);
         // Extra Field(s).
