@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.nio.file.zip;
 
-import de.schlichtherle.truezip.fs.archive.zip.OdfDriver;
+import de.schlichtherle.truezip.fs.archive.zip.CheckedZipDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.nio.file.TPathTestSuite;
 
@@ -23,9 +23,9 @@ import de.schlichtherle.truezip.nio.file.TPathTestSuite;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class TOdfPathTest extends TPathTestSuite {
+public final class CheckedZipPathTest extends TPathTestSuite {
     
-    public TOdfPathTest() {
-        super(FsScheme.create("odf"), new OdfDriver(IO_POOL_PROVIDER));
+    public CheckedZipPathTest() {
+        super(FsScheme.create("zip"), new CheckedZipDriver(IO_POOL_PROVIDER));
     }
 }
