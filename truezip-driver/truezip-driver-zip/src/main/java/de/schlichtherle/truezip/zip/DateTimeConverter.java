@@ -163,7 +163,7 @@ public enum DateTimeConverter {
      * conversion which has its timezone set to the return value of
      * {@link #newTimeZone()}.
      *
-     * @param  jTime The number of milliseconds since midnight, January 1st,
+     * @param  jtime The number of milliseconds since midnight, January 1st,
      *         1970 AD UTC (called <i>the epoch</i> alias Java time).
      * @return A DOS date/time value reflecting the local time zone and
      *         rounded down to even seconds
@@ -172,24 +172,24 @@ public enum DateTimeConverter {
      * @see    #toJavaTime(long)
      * @see    #newTimeZone()
      */
-    final long toDosTime(final long jTime) {
-        if (jTime < 0)
-            throw new IllegalArgumentException("Negative Java time: " + jTime);
+    final long toDosTime(final long jtime) {
+        if (jtime < 0)
+            throw new IllegalArgumentException("Negative Java time: " + jtime);
         final GregorianCalendar cal = getGregorianCalendar();
-        cal.setTimeInMillis(roundUp(jTime) ? jTime + 1999 : jTime);
-        long dTime = cal.get(Calendar.YEAR) - 1980;
-        if (dTime < 0)
+        cal.setTimeInMillis(roundUp(jtime) ? jtime + 1999 : jtime);
+        long dtime = cal.get(Calendar.YEAR) - 1980;
+        if (dtime < 0)
             return MIN_DOS_TIME;
-        dTime = (dTime << 25)
+        dtime = (dtime << 25)
                 | ((cal.get(Calendar.MONTH) + 1) << 21)
                 | (cal.get(Calendar.DAY_OF_MONTH) << 16)
                 | (cal.get(Calendar.HOUR_OF_DAY) << 11)
                 | (cal.get(Calendar.MINUTE) << 5)
                 | (cal.get(Calendar.SECOND) >> 1);
-        if (MAX_DOS_TIME < dTime)
+        if (MAX_DOS_TIME < dtime)
             return MAX_DOS_TIME;
-        assert MIN_DOS_TIME <= dTime && dTime <= MAX_DOS_TIME;
-        return dTime;
+        assert MIN_DOS_TIME <= dtime && dtime <= MAX_DOS_TIME;
+        return dtime;
     }
 
     /**
@@ -218,19 +218,19 @@ public enum DateTimeConverter {
      * conversion which has its timezone set to the return value of
      * {@link #newTimeZone()}.
      *
-     * @param  dTime The DOS date/time value.
+     * @param  dtime The DOS date/time value.
      * @return The number of milliseconds since midnight, January 1st,
      *         1970 AD UTC (called <i>epoch</i> alias <i>Java time</i>)
      *         and is in between {@link #MIN_DOS_TIME} and {@link #MAX_DOS_TIME}.
      * @see    #toDosTime(long)
      * @see    #newTimeZone()
      */
-    final long toJavaTime(long dTime) {
-        if (dTime < MIN_DOS_TIME)
-            dTime = MIN_DOS_TIME;
-        if (MAX_DOS_TIME < dTime)
-            dTime = MAX_DOS_TIME;
-        final int time = (int) dTime;
+    final long toJavaTime(long dtime) {
+        if (dtime < MIN_DOS_TIME)
+            dtime = MIN_DOS_TIME;
+        if (MAX_DOS_TIME < dtime)
+            dtime = MAX_DOS_TIME;
+        final int time = (int) dtime;
         final GregorianCalendar cal = getGregorianCalendar();
         cal.set(Calendar.YEAR, 1980 + ((time >> 25) & 0x7f));
         cal.set(Calendar.MONTH, ((time >> 21) & 0x0f) - 1);
