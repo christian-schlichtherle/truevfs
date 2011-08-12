@@ -120,17 +120,17 @@ implements ZipEntryFactory<ZipArchiveEntry> {
         return KeyManagerLocator.SINGLETON;
     }
 
-    final ZipCryptoParameters zipCryptoParameters(ZipInputShop input) {
+    final @CheckForNull ZipCryptoParameters zipCryptoParameters(ZipInputShop input) {
         return zipCryptoParameters(input.getModel(), input.getRawCharset());
     }
 
-    final ZipCryptoParameters zipCryptoParameters(ZipOutputShop output) {
+    final @CheckForNull ZipCryptoParameters zipCryptoParameters(ZipOutputShop output) {
         return zipCryptoParameters(output.getModel(), output.getRawCharset());
     }
 
     /**
-     * Returns the {@link ZipCryptoParameters} for the given file system model
-     * and character set.
+     * Returns the ZIP crypto parameters for the given file system model
+     * and character set or {@code null} if not available.
      * <p>
      * The implementation in the class {@link ZipDriver} returns
      * {@code new KeyManagerZipCryptoParameters(getKeyManagerProvider(), mountPointUri(model), charset)}.
@@ -138,11 +138,11 @@ implements ZipEntryFactory<ZipArchiveEntry> {
      * @param  model the file system model.
      * @param  charset charset the character set used for encoding entry names
      *         and the file comment in the ZIP file.
-     * @return The {@link ZipCryptoParameters} for the given file system model
-     *         and character set.
+     * @return The ZIP crypto parameters for the given file system model
+     *         and character set or {@code null} if not available.
      * @since  TrueZIP 7.3
      */
-    protected ZipCryptoParameters zipCryptoParameters(
+    protected @CheckForNull ZipCryptoParameters zipCryptoParameters(
             FsModel model,
             Charset charset) {
         return new KeyManagerZipCryptoParameters(
@@ -150,7 +150,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
                 mountPointUri(model),
                 charset);
     }
-    
+
     /**
      * Returns a URI which represents the mount point of the given model as a
      * resource URI for looking up a {@link KeyProvider}.
@@ -324,16 +324,16 @@ implements ZipEntryFactory<ZipArchiveEntry> {
     public OptionOutputSocket getOutputSocket(
             final FsController<?> controller,
             final FsEntryName name,
-            final BitField<FsOutputOption> options,
+            BitField<FsOutputOption> options,
             final @CheckForNull Entry template) {
         // Leave FsOutputOption.COMPRESS untouched - the driver shall be given
         // opportunity to apply its own preferences to sort out such a conflict.
-        BitField<FsOutputOption> options2 = options.set(STORE);
-        if (options2.get(GROW))
-            options2 = options2.set(APPEND).clear(CACHE);
+        options = options.set(STORE);
+        if (options.get(GROW))
+            options = options.set(APPEND).clear(CACHE);
         return new OptionOutputSocket(
-                controller.getOutputSocket(name, options2, template),
-                options); // use original options!
+                controller.getOutputSocket(name, options, template),
+                options);
     }
 
     /**
@@ -420,7 +420,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
         } else if (mknod.get(STORE)) { // #2 priority
             entry.setMethod(STORED);
         }
-        if (mknod.get(ENCRYPT))
+        if (mknod.get(ENCRYPT)) // FIXME: && type != DIRECTORY
             entry.setEncrypted(true);
         return entry;
     }
