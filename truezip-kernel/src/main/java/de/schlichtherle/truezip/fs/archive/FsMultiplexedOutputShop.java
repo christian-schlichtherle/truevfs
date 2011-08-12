@@ -66,7 +66,7 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
 
     /**
      * The map of temporary archive entries which have not yet been written
-     * to the output output archive.
+     * to the output archive.
      */
     private final Map<String, BufferedEntryOutputStream> buffers
             = new LinkedHashMap<String, BufferedEntryOutputStream>();
@@ -150,8 +150,8 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
                     } catch (IOException ex) {
                         try {
                             temp.release();
-                        } catch (IOException ex2) {
-                            throw (IOException) ex2.initCause(ex);
+                        } catch (IOException discard) {
+                            throw ex;
                         }
                         throw ex;
                     }
@@ -268,16 +268,11 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
                 assert closed : "broken archive controller!";
             else if (!closed || isBusy())
                 return false;
-            IOException cause = null;
             try {
                 if (!discard)
                     IOSocket.copy(input, output);
             } finally {
-                try {
-                    temp.release();
-                } catch (IOException ex) {
-                    throw (IOException) ex.initCause(cause);
-                }
+                temp.release();
             }
             return true;
         }
