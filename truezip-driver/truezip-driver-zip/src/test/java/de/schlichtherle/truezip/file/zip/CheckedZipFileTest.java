@@ -23,9 +23,9 @@ import de.schlichtherle.truezip.fs.FsScheme;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class TCheckedZipFileTest extends TFileTestSuite {
+public final class CheckedZipFileTest extends TFileTestSuite {
     
-    public TCheckedZipFileTest() {
+    public CheckedZipFileTest() {
         super(FsScheme.create("zip"), new CheckedZipDriver(IO_POOL_PROVIDER));
     }
 }
