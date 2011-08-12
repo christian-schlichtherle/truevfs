@@ -27,7 +27,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import net.jcip.annotations.NotThreadSafe;
 import org.bouncycastle.crypto.CipherParameters;
-import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.Mac;
 import org.bouncycastle.crypto.PBEParametersGenerator;
 import static org.bouncycastle.crypto.PBEParametersGenerator.PKCS12PasswordToBytes;
@@ -131,9 +130,10 @@ final class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
                 gen = new PKCS12ParametersGenerator(new SHA256Digest());
         ParametersWithIV aesCtrParam;
         CipherParameters sha256HMacParam;
+        byte[] buf;
         long lastTry = 0; // don't enforce suspension on first prompt!
-        for (boolean invalid = false; ; invalid = true) {
-            final char[] passwd = param.getReadPassword(invalid);
+        do {
+            final char[] passwd = param.getReadPassword(0 != lastTry);
             assert null != passwd;
             final byte[] pass = PKCS12PasswordToBytes(passwd);
             for (int i = passwd.length; --i >= 0; ) // nullify password parameter
@@ -145,18 +145,15 @@ final class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
             sha256HMacParam = gen.generateDerivedMacParameters(keyStrengthBits);
             paranoidWipe(pass);
 
-            // Verify KLAC.
+            lastTry = SuspensionPenalty.enforce(lastTry);
+
+            // Compute and verify KLAC.
             klac.init(sha256HMacParam);
             final byte[] cipherKey = ((KeyParameter) aesCtrParam.getParameters()).getKey();
             klac.update(cipherKey, 0, cipherKey.length);
-            final byte[] buf = new byte[klac.getMacSize()];
+            buf = new byte[klac.getMacSize()];
             RaesOutputStream.klac(klac, length, buf);
-
-            lastTry = SuspensionPenalty.enforce(lastTry);
-
-            if (ArrayHelper.equals(this.footer, 0, buf, 0, buf.length / 2))
-                break;
-        }
+        } while (!ArrayHelper.equals(this.footer, 0, buf, 0, buf.length / 2));
 
         // Init cipher.
         final SeekableBlockCipher
