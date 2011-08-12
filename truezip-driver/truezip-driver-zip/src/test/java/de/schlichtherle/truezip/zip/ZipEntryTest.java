@@ -19,7 +19,6 @@ import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 import static org.hamcrest.CoreMatchers.*;
-import static de.schlichtherle.truezip.zip.Constants.*;
 import static de.schlichtherle.truezip.zip.ZipEntry.*;
 import static org.junit.Assert.*;
 
@@ -524,7 +523,7 @@ public final class ZipEntryTest {
         entry.setSize64(UInt.MAX_VALUE);
         entry.setCompressedSize64(UInt.MAX_VALUE);
         entry.setOffset64(UInt.MAX_VALUE);
-        entry.setExtra(set); // this must be last in the sequence!
+        entry.setExtra16(set); // this must be last in the sequence!
         assertEquals(0x0fedcba987654321L, entry.getSize());
         assertEquals(UInt.MAX_VALUE, entry.getSize32());
         assertEquals(0x0fedcba987654322L, entry.getCompressedSize());
@@ -534,11 +533,11 @@ public final class ZipEntryTest {
 
         set[0] = (byte) 0xff;
 
-        byte[] got1 = entry.getExtra();
+        byte[] got1 = entry.getExtra(true);
         assertNotNull(got1);
         assertNotSame(set, got1);
 
-        final byte[] got2 = entry.getExtra();
+        final byte[] got2 = entry.getExtra(true);
         assertNotNull(got2);
         assertNotSame(set, got2);
 
