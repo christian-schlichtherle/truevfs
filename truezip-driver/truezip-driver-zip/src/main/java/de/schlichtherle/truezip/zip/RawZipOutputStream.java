@@ -763,9 +763,9 @@ implements Iterable<E> {
             // Compose General Purpose Bit Flag.
             // See appendix D of PKWARE's ZIP File Format Specification.
             final boolean utf8 = UTF8.equals(charset);
-            final int general = (encrypted ? (1 << GPBF_ENCRYPTED) : 0)
-                              | (dd        ? (1 << GPBF_DATA_DESCRIPTOR) : 0)
-                              | (utf8      ? (1 << GPBF_UTF8) : 0);
+            final int general = (encrypted ? GPBF_ENCRYPTED : 0)
+                              | (dd        ? GPBF_DATA_DESCRIPTOR : 0)
+                              | (utf8      ? GPBF_UTF8 : 0);
             // Start changes.
             RawZipOutputStream.this.finished = false;
             // Local File Header Signature.

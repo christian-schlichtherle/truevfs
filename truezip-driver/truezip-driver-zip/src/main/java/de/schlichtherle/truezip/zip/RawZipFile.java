@@ -223,7 +223,7 @@ implements Iterable<E>, Closeable {
             final byte[] name = new byte[nameLen];
             rof.readFully(name);
             // See appendix D of PKWARE's ZIP File Format Specification.
-            final boolean utf8 = 0 != (general & (1 << GPBF_UTF8));
+            final boolean utf8 = 0 != (general & GPBF_UTF8);
             if (utf8)
                 this.charset = UTF8;
             final E entry = this.factory.newEntry(decode(name));

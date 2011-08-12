@@ -46,7 +46,7 @@ import net.jcip.annotations.NotThreadSafe;
 @DefaultAnnotation(NonNull.class)
 public class ZipEntry implements Cloneable {
 
-    // Bit indices for initialized fields.
+    // Bit masks for initialized fields.
     private static final int PLATFORM = 1, METHOD = 1 << 1,
                              CRC = 1 << 2, CSIZE = 1 << 3,
                              SIZE = 1 << 4, OFFSET = 1 << 5,
@@ -74,11 +74,11 @@ public class ZipEntry implements Cloneable {
      */
     static final int WINZIP_AES = 99;
 
-    /** General Purpose Bit Flag for encrypted data. */
-    static int GPBF_ENCRYPTED = 0;
+    /** General Purpose Bit Flag mask for encrypted data. */
+    static int GPBF_ENCRYPTED = 1;
 
-    static int GPBF_DATA_DESCRIPTOR = 3;
-    static int GPBF_UTF8 = 11;
+    static int GPBF_DATA_DESCRIPTOR = 1 << 3;
+    static int GPBF_UTF8 = 1 << 11;
 
     /**
      * Smallest supported DOS date/time value in a ZIP file,
@@ -147,8 +147,8 @@ public class ZipEntry implements Cloneable {
         final ZipEntry entry;
         try {
             entry = (ZipEntry) super.clone();
-        } catch (CloneNotSupportedException cannotHappen) {
-            throw new AssertionError(cannotHappen);
+        } catch (CloneNotSupportedException ex) {
+            throw new AssertionError(ex);
         }
         final ExtraFields fields = this.fields;
         entry.fields = fields == null ? null : fields.clone();
@@ -156,7 +156,7 @@ public class ZipEntry implements Cloneable {
     }
 
     private boolean isInit(final int mask) {
-        return (init & mask) != 0;
+        return 0 != (init & mask);
     }
 
     private void setInit(final int mask, final boolean init) {
@@ -216,18 +216,16 @@ public class ZipEntry implements Cloneable {
     }
 
     /** Returns the indexed General Purpose Bit Flag. */
-    final boolean getGeneralPurposeBitFlag(final int index) {
-        assert 0 <= index && index <= 15;
-        return 0 != (general & (1 << index));
+    final boolean getGeneralPurposeBitFlag(final int mask) {
+        return 0 != (general & mask);
     }
 
     /** Sets the indexed General Purpose Bit Flag. */
-    final void setGeneralPurposeBitFlag(final int index, final boolean bit) {
-        assert 0 <= index && index <= 15;
+    final void setGeneralPurposeBitFlag(final int mask, final boolean bit) {
         if (bit)
-            general |=   1 << index;
+            general |=  mask;
         else
-            general &= ~(1 << index);
+            general &= ~mask;
     }
 
     /**

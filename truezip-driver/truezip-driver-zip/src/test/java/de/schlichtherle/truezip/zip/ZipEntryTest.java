@@ -121,46 +121,14 @@ public final class ZipEntryTest {
         }
 
         assertEquals(UShort.MIN_VALUE, entry.getGeneralPurposeBitFlags());
-        entry.setGeneralPurposeBitFlags(1 << GPBF_ENCRYPTED);
-        assertEquals(1 << GPBF_ENCRYPTED, entry.getGeneralPurposeBitFlags());
-        entry.setGeneralPurposeBitFlags(1 << GPBF_DATA_DESCRIPTOR);
-        assertEquals(1 << GPBF_DATA_DESCRIPTOR, entry.getGeneralPurposeBitFlags());
-        entry.setGeneralPurposeBitFlags(1 << GPBF_UTF8);
-        assertEquals(1 << GPBF_UTF8, entry.getGeneralPurposeBitFlags());
+        entry.setGeneralPurposeBitFlags(GPBF_ENCRYPTED);
+        assertEquals(GPBF_ENCRYPTED, entry.getGeneralPurposeBitFlags());
+        entry.setGeneralPurposeBitFlags(GPBF_DATA_DESCRIPTOR);
+        assertEquals(GPBF_DATA_DESCRIPTOR, entry.getGeneralPurposeBitFlags());
+        entry.setGeneralPurposeBitFlags(GPBF_UTF8);
+        assertEquals(GPBF_UTF8, entry.getGeneralPurposeBitFlags());
         entry.setGeneralPurposeBitFlags(UShort.MAX_VALUE);
         assertEquals(UShort.MAX_VALUE, entry.getGeneralPurposeBitFlags());
-    }
-
-    @Test
-    public void testGeneralPurposeBitFlag() {
-        assertThat(entry.getGeneralPurposeBitFlags(), is(UShort.MIN_VALUE));
-
-        try {
-            entry.setGeneralPurposeBitFlag(-1, false);
-            fail();
-        } catch (AssertionError expected) {
-        }
-
-        try {
-            entry.setGeneralPurposeBitFlag(16, false);
-            fail();
-        } catch (AssertionError expected) {
-        }
-
-        assertThat(entry.getGeneralPurposeBitFlags(), is(UShort.MIN_VALUE));
-
-        for (int i = 0; i < 16; i++) {
-            assertFalse(entry.getGeneralPurposeBitFlag(i));
-            entry.setGeneralPurposeBitFlag(i, true);
-            assertTrue(entry.getGeneralPurposeBitFlag(i));
-        }
-        assertThat(entry.getGeneralPurposeBitFlags(), is(UShort.MAX_VALUE));
-
-        for (int i = 0; i < 16; i++) {
-            entry.setGeneralPurposeBitFlag(i, false);
-            assertFalse(entry.getGeneralPurposeBitFlag(i));
-        }
-        assertThat(entry.getGeneralPurposeBitFlags(), is(UShort.MIN_VALUE));
     }
 
     @Test
