@@ -16,16 +16,16 @@
 package de.schlichtherle.truezip.file.zip;
 
 import de.schlichtherle.truezip.file.TFileTestSuite;
-import de.schlichtherle.truezip.fs.archive.zip.OdfDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
+import de.schlichtherle.truezip.fs.archive.zip.ZipDriver;
 
 /**
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class TOdfFileTest extends TFileTestSuite {
-    
-    public TOdfFileTest() {
-        super(FsScheme.create("odf"), new OdfDriver(IO_POOL_PROVIDER));
+public final class ZipFileTest extends TFileTestSuite {
+
+    public ZipFileTest() {
+        super(FsScheme.create("zip"), new ZipDriver(IO_POOL_PROVIDER));
     }
 }
