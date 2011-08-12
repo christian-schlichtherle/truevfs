@@ -513,6 +513,8 @@ public class ZipEntry implements Cloneable {
 
     /**
      * Set extra fields and parse ZIP64 extra field.
+     * This method <em>must not</em> get called before the uncompressed size,
+     * compressed size and offset have been initialized!
      */
     final void setEncodedExtraFields(final byte[] data) {
         assert 0 < data.length && UShort.check(data.length);
@@ -602,21 +604,21 @@ public class ZipEntry implements Cloneable {
         int off = 0;
         // Read in Uncompressed Size.
         final long size = getEncodedSize();
-        if (size >= UInt.MAX_VALUE) {
+        if (UInt.MAX_VALUE <= size) {
             assert UInt.MAX_VALUE == size;
             setEncodedSize(readLong(data, off));
             off += 8;
         }
         // Read in Compressed Size.
         final long csize = getEncodedCompressedSize();
-        if (csize >= UInt.MAX_VALUE) {
+        if (UInt.MAX_VALUE <= csize) {
             assert UInt.MAX_VALUE == csize;
             setEncodedCompressedSize(readLong(data, off));
             off += 8;
         }
         // Read in Relative Header Offset.
         final long offset = getEncodedOffset();
-        if (offset >= UInt.MAX_VALUE) {
+        if (UInt.MAX_VALUE <= offset) {
             assert UInt.MAX_VALUE == offset;
             setEncodedOffset(readLong(data, off));
             //off += 8;
