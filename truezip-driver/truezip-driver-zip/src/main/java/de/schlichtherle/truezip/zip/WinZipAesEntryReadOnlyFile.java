@@ -27,7 +27,6 @@ import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import net.jcip.annotations.NotThreadSafe;
-import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.Mac;
 import org.bouncycastle.crypto.PBEParametersGenerator;
 import org.bouncycastle.crypto.digests.SHA1Digest;
@@ -51,6 +50,16 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
 final class WinZipAesEntryReadOnlyFile extends CipherReadOnlyFile {
+
+    private final byte[] authenticationCode;
+
+    /**
+     * The key parameter required to init the SHA-1 Message Authentication
+     * Code (HMAC).
+     */
+    private final KeyParameter sha1MacParam;
+
+    private final ZipEntry entry;
 
     WinZipAesEntryReadOnlyFile(
             final ReadOnlyFile rof,
@@ -86,11 +95,11 @@ final class WinZipAesEntryReadOnlyFile extends CipherReadOnlyFile {
 
         // Init MAC and load authentication code.
         final Mac mac = new HMac(new SHA1Digest());
-        final byte[] authenticationCode = new byte[mac.getMacSize() / 2];
         {
-            final long end = fileLength - authenticationCode.length;
+            this.authenticationCode = new byte[mac.getMacSize() / 2];
+            final long end = fileLength - this.authenticationCode.length;
             rof.seek(end);
-            rof.readFully(authenticationCode);
+            rof.readFully(this.authenticationCode);
             if (-1 != rof.read()) {
                 // This should never happen unless someone is writing to the
                 // end of the file concurrently!
@@ -100,13 +109,13 @@ final class WinZipAesEntryReadOnlyFile extends CipherReadOnlyFile {
         }
 
         // Init encrypted data length.
-        final long length = fileLength - authenticationCode.length - start;
+        final long length = fileLength - this.authenticationCode.length - start;
 
         // Derive cipher and MAC parameters.
         final PBEParametersGenerator gen = new PKCS5S2ParametersGenerator();
         KeyParameter keyParam;
         ParametersWithIV aesCtrParam;
-        CipherParameters sha1HMacParam;
+        KeyParameter sha1MacParam;
         long lastTry = 0; // don't enforce suspension on first prompt!
         do {
             final byte[] passwd = param.getReadPassword(0 != lastTry);
@@ -129,7 +138,7 @@ final class WinZipAesEntryReadOnlyFile extends CipherReadOnlyFile {
             aesCtrParam = new ParametersWithIV(
                     new KeyParameter(keyParam.getKey(), 0, keyStrengthBytes),
                     ctrIv); // yes, the IV is an array of zero bytes!
-            sha1HMacParam = new KeyParameter(
+            sha1MacParam = new KeyParameter(
                     keyParam.getKey(),
                     keyStrengthBytes,
                     keyStrengthBytes);
@@ -142,16 +151,16 @@ final class WinZipAesEntryReadOnlyFile extends CipherReadOnlyFile {
                 passwdVerifier, 0,
                 PWD_VERIFIER_BITS / 2));
 
+        // Init parameters and entry for authenticate().
+        this.sha1MacParam = sha1MacParam;
+        this.entry = param.getEntry();
+
         // Init cipher.
         final SeekableBlockCipher cipher = new WinZipAesCipher();
         cipher.init(false, aesCtrParam);
         init(cipher, start, length);
 
-        // Authenticate.
-        mac.init(sha1HMacParam);
-        authenticate(mac, authenticationCode, entry.getName());
-
-        // Commit parameters.
+        // Commit key strength to parameters.
         param.setKeyStrength(keyStrength);
     }
 
@@ -165,22 +174,18 @@ final class WinZipAesEntryReadOnlyFile extends CipherReadOnlyFile {
      * Authenticates all encrypted data in this read only file.
      * It is safe to call this method multiple times to detect if the file
      * has been tampered with meanwhile.
-     * <p>
-     * This method is called from the constructor.
      *
      * @throws ZipAuthenticationException If the computed MAC does not match
      *         the MAC declared in the WinZip AES entry.
      * @throws IOException On any I/O related issue.
      */
-    private void authenticate(
-            final Mac mac,
-            final byte[] authenticationCode,
-            final String name)
-    throws IOException {
+    void authenticate() throws IOException {
+        final Mac mac = new HMac(new SHA1Digest());
+        mac.init(sha1MacParam);
         final byte[] buf = computeMac(mac);
         assert buf.length == mac.getMacSize();
         if (!ArrayHelper.equals(buf, 0, authenticationCode, 0, authenticationCode.length / 2))
-            throw new ZipAuthenticationException(name
+            throw new ZipAuthenticationException(entry.getName()
                     + " (authenticated entry content has been tampered with)");
     }
 }

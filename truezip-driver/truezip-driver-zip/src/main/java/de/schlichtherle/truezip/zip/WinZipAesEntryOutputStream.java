@@ -109,11 +109,11 @@ final class WinZipAesEntryOutputStream extends CipherOutputStream {
         csize += param.getKeyStrength().getBytes() / 2 // salt value
                 + 2   // password verification value
                 + 10; // authentication code
-        entry.setCompressedSize64(csize);
+        entry.setEncodedCompressedSize(csize);
         final WinZipAesEntryExtraField
                 field = (WinZipAesEntryExtraField) entry.getExtraField(WINZIP_AES_ID);
         if (VV_AE_2 == field.getVendorVersion())
-            entry.setCrc32(0);
+            entry.setEncodedCrc(0);
     }
 
     void start() throws IOException {

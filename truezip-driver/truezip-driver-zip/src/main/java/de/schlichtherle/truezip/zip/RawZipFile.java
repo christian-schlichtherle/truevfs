@@ -231,20 +231,20 @@ implements Iterable<E>, Closeable {
                 int off = 0;
                 final int versionMadeBy = readUShort(cfh, off);
                 off += 2;
-                entry.setPlatform8(versionMadeBy >> 8);
+                entry.setEncodedPlatform(versionMadeBy >> 8);
                 off += 2; // Version Needed To Extract
-                entry.setGeneral16(general);
+                entry.setGeneralPurposeBitFlags(general);
                 off += 2; // General Purpose Bit Flags
-                assert entry.getGeneral1(GPBF_UTF8) == utf8;
-                entry.setMethod(readUShort(cfh, off));
+                assert entry.getGeneralPurposeBitFlag(GPBF_UTF8) == utf8;
+                entry.setEncodedMethod(readUShort(cfh, off));
                 off += 2;
-                entry.setTimeDos(readUInt(cfh, off));
+                entry.setEncodedTime(readUInt(cfh, off));
                 off += 4;
-                entry.setCrc32(readUInt(cfh, off));
+                entry.setEncodedCrc(readUInt(cfh, off));
                 off += 4;
-                entry.setCompressedSize64(readUInt(cfh, off));
+                entry.setEncodedCompressedSize(readUInt(cfh, off));
                 off += 4;
-                entry.setSize64(readUInt(cfh, off));
+                entry.setEncodedSize(readUInt(cfh, off));
                 off += 4;
                 off += 2;   // File Name Length
                 final int extraLen = readUShort(cfh, off);
@@ -252,23 +252,23 @@ implements Iterable<E>, Closeable {
                 final int commentLen = readUShort(cfh, off);
                 off += 2;
                 off += 2;   // Disk Number
-                //ze.setInternalAttributes(readUShort(cfh, off));
+                //entry.setInternalAttributes(readUShort(cfh, off));
                 off += 2;
-                //ze.setExternalAttributes(readUInt(cfh, off));
+                //entry.setExternalAttributes(readUInt(cfh, off));
                 off += 4;
                 // Relative Offset Of Local File Header.
                 long lfhOff = readUInt(cfh, off);
                 //off += 4;
-                entry.setOffset64(lfhOff); // must be unmapped!
+                entry.setEncodedOffset(lfhOff); // must be unmapped!
                 if (extraLen > 0) {
                     final byte[] extra = new byte[extraLen];
                     rof.readFully(extra);
-                    entry.setExtra16(extra); // parses ZIP64 extra field!
+                    entry.setEncodedExtraFields(extra);
                 }
                 if (commentLen > 0) {
                     final byte[] comment = new byte[commentLen];
                     rof.readFully(comment);
-                    entry.setComment16(decode(comment));
+                    entry.setDecodedComment(decode(comment));
                 }
                 // Re-read virtual offset after ZIP64 Extended Information
                 // Extra Field may have been parsed, map it to the real
@@ -732,25 +732,26 @@ implements Iterable<E>, Closeable {
         offset += LFH_MIN_LEN
                 + readUShort(lfh, LFH_FILE_NAME_LENGTH_OFF) // file name length
                 + readUShort(lfh, LFH_FILE_NAME_LENGTH_OFF + 2); // extra field length
-        ReadOnlyFile erof = new EntryReadOnlyFile(
+        ReadOnlyFile rof = new EntryReadOnlyFile(
                 offset, entry.getCompressedSize());
         if (!process) {
             assert UNKNOWN != entry.getCrc();
-            return new ReadOnlyFileInputStream(erof);
+            return new ReadOnlyFileInputStream(rof);
         }
         int method = entry.getMethod();
         if (entry.isEncrypted()) {
             if (WINZIP_AES != method)
                 throw new ZipException(name
                         + " (encrypted compression method " + method + " is not supported)");
-            erof = new WinZipAesEntryReadOnlyFile(erof,
-                    new WinZipAesEntryParameters(
-                            parameters(
-                                WinZipAesParameters.class,
-                                getCryptoParameters()),
-                            entry));
-            // The entry has just been authenticated using SHA-1.
-            // Disable redundant CRC-32 check.
+            final WinZipAesEntryReadOnlyFile
+                    erof = new WinZipAesEntryReadOnlyFile(rof,
+                        new WinZipAesEntryParameters(
+                                parameters(
+                                    WinZipAesParameters.class,
+                                    getCryptoParameters()),
+                                entry));
+            // Authenticate and disable redundant CRC-32 check.
+            erof.authenticate();
             check = false;
             final WinZipAesEntryExtraField field
                     = (WinZipAesEntryExtraField) entry.getExtraField(WINZIP_AES_ID);
@@ -759,7 +760,7 @@ implements Iterable<E>, Closeable {
         if (check) {
             // Check CRC-32 in the Local File Header or Data Descriptor.
             final long localCrc;
-            if (entry.getGeneral1(GPBF_DATA_DESCRIPTOR)) {
+            if (entry.getGeneralPurposeBitFlag(GPBF_DATA_DESCRIPTOR)) {
                 // The CRC-32 is in the Data Descriptor after the compressed
                 // size.
                 // Note the Data Descriptor's Signature is optional:
@@ -784,10 +785,10 @@ implements Iterable<E>, Closeable {
         switch (method) {
             case DEFLATED:
                 in = new PooledInflaterInputStream(
-                        new DummyByteInputStream(erof), bufSize);
+                        new DummyByteInputStream(rof), bufSize);
                 break;
             case STORED:
-                in = new ReadOnlyFileInputStream(erof);
+                in = new ReadOnlyFileInputStream(rof);
                 break;
             default:
                 throw new ZipException(name

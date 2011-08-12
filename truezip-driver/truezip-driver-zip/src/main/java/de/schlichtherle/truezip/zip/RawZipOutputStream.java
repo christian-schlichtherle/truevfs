@@ -423,7 +423,7 @@ implements Iterable<E> {
                     getCryptoParameters());
         int method = entry.getMethod();
         if (UNKNOWN == method)
-            entry.setMethod16(method = getMethod());
+            entry.setEncodedMethod(method = getMethod());
         switch (method) {
             case STORED:
                 processor = new StoredOutputMethod(processor);
@@ -542,35 +542,31 @@ implements Iterable<E> {
     throws IOException {
         assert null != entry;
         final LEDataOutputStream dos = this.dos;
-        final long csize32 = entry.getCompressedSize32();
-        final long size32 = entry.getSize32();
-        final long offset32 = entry.getOffset32();
-        final boolean zip64 // ZIP64 extensions?
-                =  csize32  >= UInt.MAX_VALUE
-                || size32   >= UInt.MAX_VALUE
-                || offset32 >= UInt.MAX_VALUE
-                || FORCE_ZIP64_EXT;
+        final long csize32 = entry.getEncodedCompressedSize();
+        final long size32 = entry.getEncodedSize();
+        final long offset32 = entry.getEncodedOffset();
+        final boolean zip64 = entry.isZip64ExtensionsRequired();
         final int method = entry.getMethod();
         final boolean directory = entry.isDirectory();
         final int version = zip64
                 ? 45
-                : DEFLATED == method || directory
+                : STORED != method || directory
                     ? 20
                     : 10;
         // Central File Header.
         dos.writeInt(CFH_SIG);
         // Version Made By.
-        dos.writeShort((entry.getPlatform() << 8) | 63);
+        dos.writeShort((entry.getEncodedPlatform() << 8) | 63);
         // Version Needed To Extract.
         dos.writeShort(version);
         // General Purpose Bit Flags.
-        dos.writeShort(entry.getGeneral16());
+        dos.writeShort(entry.getGeneralPurposeBitFlags());
         // Compression Method.
         dos.writeShort(method);
         // Last Mod. File Time / Date.
-        dos.writeInt((int) entry.getTimeDos());
+        dos.writeInt((int) entry.getEncodedTime());
         // CRC-32.
-        dos.writeInt((int) entry.getCrc());
+        dos.writeInt((int) entry.getEncodedCrc());
         // Compressed Size.
         dos.writeInt((int) csize32);
         // Uncompressed Size.
@@ -579,10 +575,10 @@ implements Iterable<E> {
         final byte[] name = encode(entry.getName());
         dos.writeShort(name.length);
         // Extra Field Length.
-        final byte[] extra = entry.getExtra(true);
+        final byte[] extra = entry.getEncodedExtraFields();
         dos.writeShort(extra.length);
         // File Comment Length.
-        final byte[] comment = getEntryComment(entry);
+        final byte[] comment = getCommentEncoded(entry);
         dos.writeShort(comment.length);
         // Disk Number Start.
         dos.writeShort(0);
@@ -600,8 +596,8 @@ implements Iterable<E> {
         dos.write(comment);
     }
 
-    private byte[] getEntryComment(final ZipEntry entry) {
-        return encode(entry.getEffectiveComment());
+    private byte[] getCommentEncoded(final ZipEntry entry) {
+        return encode(entry.getDecodedComment());
     }
 
     /**
@@ -722,8 +718,8 @@ implements Iterable<E> {
         throws ZipException {
             {
                 final long size = encode(entry.getName()).length
-                                + entry.getExtraLength()
-                                + encode(entry.getEffectiveComment()).length;
+                                + entry.getEncodedExtraFields().length
+                                + encode(entry.getDecodedComment()).length;
                 if (UShort.MAX_VALUE < size)
                     throw new ZipException(entry.getName()
                     + " (the total size " + size + " for the name, extra fields and comment is too long)");
@@ -731,13 +727,13 @@ implements Iterable<E> {
             if (DEFLATED != entry.getMethod() || !this.process) {
                 if (UNKNOWN == entry.getCrc())
                     throw new ZipException(entry.getName() + " (unknown CRC-32 value)");
-                if (UNKNOWN == entry.getCompressedSize32())
+                if (UNKNOWN == entry.getCompressedSize())
                     throw new ZipException(entry.getName() + " (unknown compressed size)");
-                if (UNKNOWN == entry.getSize32())
+                if (UNKNOWN == entry.getSize())
                     throw new ZipException(entry.getName() + " (unknown uncompressed size)");
             }
             if (UNKNOWN == entry.getPlatform())
-                entry.setPlatform8(PLATFORM_FAT);
+                entry.setEncodedPlatform(PLATFORM_FAT);
             if (UNKNOWN == entry.getTime())
                 entry.setTime(System.currentTimeMillis());
             return RawZipOutputStream.this.dos;
@@ -750,27 +746,18 @@ implements Iterable<E> {
         public void start() throws IOException {
             final LEDataOutputStream dos = RawZipOutputStream.this.dos;
             final ZipEntry entry = RawZipOutputStream.this.entry;
-            final long crc = entry.getCrc();
-            final long csize = entry.getCompressedSize();
-            final long size = entry.getSize();
-            final long csize32 = entry.getCompressedSize32();
-            final long size32 = entry.getSize32();
+            final long crc = entry.getEncodedCrc();
+            final long csize = entry.getEncodedCompressedSize();
+            final long size = entry.getEncodedSize();
             final long offset = dos.size();
             final boolean encrypted = entry.isEncrypted();
-            final boolean dd // data descriptor?
-                    =  UNKNOWN == crc
-                    || UNKNOWN == csize
-                    || UNKNOWN == size;
-            final boolean zip64 // ZIP64 extensions?
-                    =  UInt.MAX_VALUE <= csize
-                    || UInt.MAX_VALUE <= size
-                    || UInt.MAX_VALUE <= offset
-                    || FORCE_ZIP64_EXT;
-            final int method = entry.getMethod();
+            final boolean dd = entry.isDataDescriptorRequired();
+            final boolean zip64 = entry.isZip64ExtensionsRequired();
+            final int method = entry.getEncodedMethod();
             final boolean directory = entry.isDirectory();
             final int version = zip64
                     ? 45
-                    : DEFLATED == method || directory
+                    : STORED != method || directory
                         ? 20
                         : 10;
             // Compose General Purpose Bit Flag.
@@ -788,9 +775,9 @@ implements Iterable<E> {
             // General Purpose Bit Flag.
             dos.writeShort(general);
             // Compression Method.
-            dos.writeShort(entry.getMethod());
+            dos.writeShort(method);
             // Last Mod. Time / Date in DOS format.
-            dos.writeInt((int) entry.getTimeDos());
+            dos.writeInt((int) entry.getEncodedTime());
             // CRC-32.
             // Compressed Size.
             // Uncompressed Size.
@@ -800,22 +787,22 @@ implements Iterable<E> {
                 dos.writeInt(0);
             } else {
                 dos.writeInt((int) crc);
-                dos.writeInt((int) csize32);
-                dos.writeInt((int) size32);
+                dos.writeInt((int) csize);
+                dos.writeInt((int) size);
             }
             // File Name Length.
             final byte[] name = encode(entry.getName());
             dos.writeShort(name.length);
             // Extra Field Length.
-            final byte[] extra = entry.getExtra(!dd);
+            final byte[] extra = entry.getEncodedExtraFields();
             dos.writeShort(extra.length);
             // File Name.
             dos.write(name);
             // Extra Field(s).
             dos.write(extra);
             // Commit changes.
-            entry.setGeneral16(general);
-            entry.setOffset64(offset);
+            entry.setGeneralPurposeBitFlags(general);
+            entry.setEncodedOffset(offset);
             // Update data start.
             RawZipOutputStream.this.dataStart = dos.size();
         }
@@ -837,22 +824,15 @@ implements Iterable<E> {
                 + csize
                 + ")");
             }
-            if (!entry.getGeneral1(GPBF_DATA_DESCRIPTOR))
+            if (!entry.getGeneralPurposeBitFlag(GPBF_DATA_DESCRIPTOR))
                 return;
-            final long crc = entry.getCrc();
-            final long size = entry.getSize();
-            final long offset = entry.getOffset();
-            // Offset MUST be considered in decision about ZIP64 format - see
-            // description of Data Descriptor in ZIP File Format Specification!
-            final boolean zip64 // ZIP64 extensions?
-                    =  UInt.MAX_VALUE <= csize
-                    || UInt.MAX_VALUE <= size
-                    || UInt.MAX_VALUE <= offset
-                    || FORCE_ZIP64_EXT;
+            final boolean zip64 = entry.isZip64ExtensionsRequired();
+            final long size = entry.getEncodedSize();
+            final long crc = entry.getEncodedCrc();
             // Data Descriptor Signature.
             dos.writeInt(DD_SIG);
             // CRC-32.
-            dos.writeInt(UNKNOWN != crc ? (int) crc : 0);
+            dos.writeInt((int) crc);
             // Compressed Size.
             // Uncompressed Size.
             if (zip64) {
@@ -968,7 +948,7 @@ implements Iterable<E> {
             field.setMethod(method);
             final long size = entry.getSize();
             field.setVendorVersion(size >= 20 /* && BZIP2 != method */ ? VV_AE_1 : VV_AE_2);
-            entry.setMethod16(WINZIP_AES);
+            entry.setEncodedMethod(WINZIP_AES);
             entry.addExtraField(field);
             return this.out = new WinZipAesEntryOutputStream(dos, param);
         }
@@ -1002,8 +982,8 @@ implements Iterable<E> {
             super.finish();
             final E entry = RawZipOutputStream.this.entry;
             final ZipDeflater deflater = RawZipOutputStream.this.deflater;
-            entry.setCompressedSize64(deflater.getBytesWritten());
-            entry.setSize64(deflater.getBytesRead());
+            entry.setEncodedCompressedSize(deflater.getBytesWritten());
+            entry.setEncodedSize(deflater.getBytesRead());
             deflater.reset();
         }
     } // ZipDeflaterOutputStream
@@ -1017,7 +997,7 @@ implements Iterable<E> {
 
         void finish() {
             final E entry = RawZipOutputStream.this.entry;
-            entry.setCrc32(getChecksum().getValue());
+            entry.setEncodedCrc(getChecksum().getValue());
         }
     } // UpdatingCrc32OutputStream
 
