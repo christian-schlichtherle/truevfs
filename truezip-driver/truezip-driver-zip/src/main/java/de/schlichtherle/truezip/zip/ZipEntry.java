@@ -49,7 +49,8 @@ public class ZipEntry implements Cloneable {
     // Bit indices for initialized fields.
     private static final int PLATFORM = 1, METHOD = 1 << 1,
                              CRC = 1 << 2, CSIZE = 1 << 3,
-                             SIZE = 1 << 4, OFFSET = 1 << 5;
+                             SIZE = 1 << 4, OFFSET = 1 << 5,
+                             DTIME = 1 << 6;
 
     /** The unknown value for numeric properties. */
     public static final byte UNKNOWN = -1;
@@ -96,8 +97,8 @@ public class ZipEntry implements Cloneable {
     private byte platform;              // 1 byte unsigned int (UByte)
     private short general;              // 2 bytes unsigned int (UShort)
     private short method;               // 2 bytes unsigned int (UShort)
-    private long javaTime = UNKNOWN;
-    private int crc;                    // 4 bytes unsigned int (ULong)
+    private int dtime;                  // 4 bytes unsigned int (UInt)
+    private int crc;                    // 4 bytes unsigned int (UInt)
     private long csize;                 // 63 bits unsigned integer (ULong)
     private long size;                  // 63 bits unsigned integer (Ulong)
 
@@ -131,7 +132,7 @@ public class ZipEntry implements Cloneable {
         this.platform = template.platform;
         this.general = template.general;
         this.method = template.method;
-        this.javaTime = template.javaTime;
+        this.dtime = template.dtime;
         this.crc = template.crc;
         this.csize = template.csize;
         this.size = template.size;
@@ -298,29 +299,29 @@ public class ZipEntry implements Cloneable {
     }
 
     public final long getTime() {
-        return javaTime;
+        if (!isInit(DTIME))
+            return UNKNOWN;
+        return getDateTimeConverter().toJavaTime(dtime & UInt.MAX_VALUE);
     }
 
-    public final void setTime(final long jTime) {
-        if (UNKNOWN != jTime) {
-            // Adjust to lower resolution of DOS date/time.
-            final DateTimeConverter dtc = getDateTimeConverter();
-            this.javaTime = dtc.toJavaTime(dtc.toDosTime(jTime));
+    public final void setTime(final long jtime) {
+        final boolean known = UNKNOWN != jtime;
+        if (known) {
+            this.dtime = (int) getDateTimeConverter().toDosTime(jtime);
         } else {
-            this.javaTime = UNKNOWN;
+            this.dtime = 0;
         }
+        setInit(DTIME, known);
     }
 
     final long getEncodedTime() {
-        return UNKNOWN == javaTime
-                ? UNKNOWN
-                : getDateTimeConverter().toDosTime(javaTime);
+        return dtime & UInt.MAX_VALUE;
     }
 
-    final void setEncodedTime(final long dosTime) {
-        this.javaTime = UNKNOWN == dosTime
-                ? UNKNOWN
-                : getDateTimeConverter().toJavaTime(dosTime);
+    final void setEncodedTime(final long dtime) {
+        assert UInt.check(dtime);
+        this.dtime = (int) dtime;
+        setInit(DTIME, true);
     }
 
     /**

@@ -234,33 +234,6 @@ public final class ZipEntryTest {
     }
 
     @Test
-    public void testDosTime() {
-        entry.setEncodedTime(UNKNOWN - 1);
-        assertEquals(MIN_DOS_TIME, entry.getEncodedTime());
-
-        entry.setEncodedTime(Long.MIN_VALUE);
-        assertEquals(MIN_DOS_TIME, entry.getEncodedTime());
-
-        entry.setEncodedTime(MIN_DOS_TIME - 1);
-        assertEquals(MIN_DOS_TIME, entry.getEncodedTime());
-
-        entry.setEncodedTime(MIN_DOS_TIME);
-        assertEquals(MIN_DOS_TIME, entry.getEncodedTime());
-
-        entry.setEncodedTime(MAX_DOS_TIME);
-        assertEquals(MAX_DOS_TIME, entry.getEncodedTime());
-
-        entry.setEncodedTime(MAX_DOS_TIME + 1);
-        assertEquals(MAX_DOS_TIME, entry.getEncodedTime());
-
-        entry.setEncodedTime(Long.MAX_VALUE);
-        assertEquals(MAX_DOS_TIME, entry.getEncodedTime());
-
-        entry.setEncodedTime(UNKNOWN);
-        assertEquals(UNKNOWN, entry.getEncodedTime());
-    }
-
-    @Test
     public void testTime() {
         try {
             entry.setTime(Long.MIN_VALUE);
@@ -284,6 +257,34 @@ public final class ZipEntryTest {
 
         entry.setTime(UNKNOWN);
         assertEquals(UNKNOWN, entry.getTime());
+    }
+
+    @Test
+    public void testEncodedTime() {
+        try {
+            entry.setEncodedTime(UNKNOWN - 1);
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
+
+        try {
+            entry.setEncodedTime(UInt.MIN_VALUE - 1);
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
+
+        try {
+            entry.setEncodedTime(UInt.MAX_VALUE + 1);
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
+
+        assertEquals(0, entry.getEncodedTime());
+
+        entry.setEncodedTime(UInt.MIN_VALUE);
+        assertEquals(UInt.MIN_VALUE, entry.getEncodedTime());
+        entry.setEncodedTime(UInt.MAX_VALUE);
+        assertEquals(UInt.MAX_VALUE, entry.getEncodedTime());
     }
 
     @Test
