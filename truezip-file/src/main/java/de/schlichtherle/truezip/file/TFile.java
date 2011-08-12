@@ -3462,8 +3462,8 @@ public final class TFile extends File {
         } catch (IOException ex) {
             try {
                 rm();
-            } catch (IOException ex2) {
-                throw (IOException) ex2.initCause(ex);
+            } catch (IOException discard) {
+                throw ex;
             }
             throw ex;
         }
