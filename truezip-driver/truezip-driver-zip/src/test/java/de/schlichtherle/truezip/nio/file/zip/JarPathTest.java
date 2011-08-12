@@ -23,9 +23,9 @@ import de.schlichtherle.truezip.nio.file.TPathTestSuite;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class TJarPathTest extends TPathTestSuite {
+public final class JarPathTest extends TPathTestSuite {
     
-    public TJarPathTest() {
+    public JarPathTest() {
         super(FsScheme.create("jar"), new JarDriver(IO_POOL_PROVIDER));
     }
 }
