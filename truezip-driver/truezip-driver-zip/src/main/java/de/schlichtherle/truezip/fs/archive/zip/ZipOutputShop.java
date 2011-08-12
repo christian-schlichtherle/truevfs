@@ -152,63 +152,66 @@ implements OutputShop<ZipArchiveEntry> {
     }
 
     @Override
-    public OutputSocket<ZipArchiveEntry> getOutputSocket(final ZipArchiveEntry entry) {
-        if (null == entry)
+    public OutputSocket<ZipArchiveEntry> getOutputSocket(final ZipArchiveEntry lt) { // local target
+        if (null == lt)
             throw new NullPointerException();
 
         class Output extends OutputSocket<ZipArchiveEntry> {
             @Override
             public ZipArchiveEntry getLocalTarget() {
-                return entry;
+                return lt;
             }
 
             @Override
             public OutputStream newOutputStream()
             throws IOException {
                 if (isBusy())
-                    throw new OutputBusyException(entry.getName());
-                if (entry.isDirectory()) {
-                    entry.setMethod(STORED);
-                    entry.setCrc(0);
-                    entry.setCompressedSize(0);
-                    entry.setSize(0);
-                    return new EntryOutputStream(entry);
-                }
-                final Entry peer = getPeerTarget();
+                    throw new OutputBusyException(lt.getName());
+                final Entry pt = getPeerTarget();
                 long size;
-                if (null != peer && UNKNOWN != (size = peer.getSize(DATA))) {
-                    entry.setSize(size);
-                    if (peer instanceof ZipArchiveEntry) {
+                if (lt.isDirectory()) {
+                    lt.setMethod(STORED);
+                    lt.setCrc(0);
+                    lt.setCompressedSize(0);
+                    lt.setSize(0);
+                    return new EntryOutputStream(lt, true);
+                } else if (null != pt && UNKNOWN != (size = pt.getSize(DATA))) {
+                    lt.setSize(size);
+                    if (pt instanceof ZipArchiveEntry) {
                         // Set up entry attributes for Direct Data Copying (DDC).
                         // A preset method in the entry takes priority.
                         // The ZIP.RAES drivers use this feature to enforce
                         // deflation for enhanced authentication security.
-                        final ZipArchiveEntry zipPeer = (ZipArchiveEntry) peer;
-                        if (entry.getMethod() == UNKNOWN)
-                            entry.setMethod(zipPeer.getMethod());
-                        if (entry.getMethod() == zipPeer.getMethod())
-                            entry.setCompressedSize(zipPeer.getCompressedSize());
-                        entry.setCrc(zipPeer.getCrc());
-                        return new EntryOutputStream(entry, false);
+                        final ZipArchiveEntry zpt = (ZipArchiveEntry) pt;
+                        lt.setPlatform(zpt.getPlatform());
+                        lt.setEncrypted(zpt.isEncrypted());
+                        //if (entry.getMethod() == UNKNOWN)
+                            lt.setMethod(zpt.getMethod());
+                        lt.setCrc(zpt.getCrc());
+                        //if (entry.getMethod() == zipPeer.getMethod())
+                            lt.setCompressedSize(zpt.getCompressedSize());
+                        lt.setExtra(zpt.getExtra());
+                        return new EntryOutputStream(lt,
+                                lt.isEncrypted() || zpt.isEncrypted());
                     }
                 }
-                switch (entry.getMethod()) {
+                switch (lt.getMethod()) {
                     case UNKNOWN:
-                        entry.setMethod(DEFLATED);
+                        lt.setMethod(DEFLATED);
                         break;
                     case STORED:
-                        if (       UNKNOWN == entry.getCrc()
-                                || UNKNOWN == entry.getCompressedSize()
-                                || UNKNOWN == entry.getSize())
+                        if (       UNKNOWN == lt.getCrc()
+                                || UNKNOWN == lt.getCompressedSize()
+                                || UNKNOWN == lt.getSize())
                             return new BufferedEntryOutputStream(
-                                    getPool().allocate(), entry);
+                                    getPool().allocate(), lt);
                         break;
                     case DEFLATED:
                         break;
                     default:
                         assert false : "unsupported method";
                 }
-                return new EntryOutputStream(entry);
+                return new EntryOutputStream(lt, true);
             }
         } // Output
 
@@ -268,15 +271,11 @@ implements OutputShop<ZipArchiveEntry> {
      * These preconditions are checked by
      * {@link #getOutputSocket(ZipArchiveEntry)}.
      */
-    private class EntryOutputStream extends DecoratingOutputStream {
-        EntryOutputStream(ZipArchiveEntry entry) throws IOException {
-            this(entry, true);
-        }
-
-        EntryOutputStream(ZipArchiveEntry entry, boolean deflate)
+    private final class EntryOutputStream extends DecoratingOutputStream {
+        EntryOutputStream(ZipArchiveEntry entry, boolean process)
         throws IOException {
             super(ZipOutputShop.this);
-            putNextEntry(entry, deflate);
+            putNextEntry(entry, process);
         }
 
         @Override
@@ -291,7 +290,7 @@ implements OutputShop<ZipArchiveEntry> {
      * When the stream gets closed, the I/O pool entry is then copied to this
      * output shop and finally deleted.
      */
-    private class BufferedEntryOutputStream extends CheckedOutputStream {
+    private final class BufferedEntryOutputStream extends CheckedOutputStream {
         final IOPool.Entry<?> temp;
         boolean closed;
 
