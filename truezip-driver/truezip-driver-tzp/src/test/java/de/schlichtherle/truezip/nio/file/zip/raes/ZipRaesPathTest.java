@@ -34,12 +34,12 @@ import static org.junit.Assert.*;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class TZipRaesPathTest extends TPathTestSuite {
+public final class ZipRaesPathTest extends TPathTestSuite {
 
     private static final MockView<AesCipherParameters>
             view = new MockView<AesCipherParameters>();
 
-    public TZipRaesPathTest() {
+    public ZipRaesPathTest() {
         super(  FsScheme.create("tzp"),
                 new SafeZipRaesDriver(  IO_POOL_PROVIDER,
                                         new PromptingKeyManagerService(view)) {
@@ -143,5 +143,6 @@ public final class TZipRaesPathTest extends TPathTestSuite {
 
     @Override
     public void testGrow() {
+        // GROWing is not supported with ZIP.RAES.
     }
 }

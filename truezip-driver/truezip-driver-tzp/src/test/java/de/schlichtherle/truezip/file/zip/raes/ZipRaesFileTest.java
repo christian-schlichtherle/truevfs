@@ -15,29 +15,28 @@
  */
 package de.schlichtherle.truezip.file.zip.raes;
 
-import de.schlichtherle.truezip.key.MockView;
 import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.TFileTestSuite;
-import de.schlichtherle.truezip.fs.archive.zip.raes.SafeZipRaesDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.fs.archive.zip.raes.PromptingKeyManagerService;
-import java.io.IOException;
-import org.junit.Test;
-
+import de.schlichtherle.truezip.fs.archive.zip.raes.SafeZipRaesDriver;
+import de.schlichtherle.truezip.key.MockView;
 import static de.schlichtherle.truezip.key.MockView.Action.*;
+import java.io.IOException;
 import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class TZipRaesFileTest extends TFileTestSuite {
+public final class ZipRaesFileTest extends TFileTestSuite {
 
     private static final MockView<AesCipherParameters>
             view = new MockView<AesCipherParameters>();
 
-    public TZipRaesFileTest() {
+    public ZipRaesFileTest() {
         super(  FsScheme.create("tzp"),
                 new SafeZipRaesDriver(  IO_POOL_PROVIDER,
                                         new PromptingKeyManagerService(view)) {
@@ -133,5 +132,6 @@ public final class TZipRaesFileTest extends TFileTestSuite {
 
     @Override
     public void testGrow() {
+        // GROWing is not supported with ZIP.RAES.
     }
 }
