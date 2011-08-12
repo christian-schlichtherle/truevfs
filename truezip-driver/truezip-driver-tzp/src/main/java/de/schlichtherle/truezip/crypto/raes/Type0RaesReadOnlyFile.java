@@ -26,7 +26,6 @@ import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import net.jcip.annotations.NotThreadSafe;
-import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.Mac;
 import org.bouncycastle.crypto.PBEParametersGenerator;
 import static org.bouncycastle.crypto.PBEParametersGenerator.PKCS12PasswordToBytes;
@@ -51,9 +50,10 @@ final class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
     private final KeyStrength keyStrength;
 
     /**
-     * The parameters required to init the Message Authentication Code (MAC).
+     * The key parameter required to init the SHA-256 Message Authentication
+     * Code (HMAC).
      */
-    private final CipherParameters macParam;
+    private final KeyParameter sha256MacParam;
 
     /**
      * The footer of the data envelope containing the authentication codes.
@@ -129,7 +129,7 @@ final class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
         final PBEParametersGenerator
                 gen = new PKCS12ParametersGenerator(new SHA256Digest());
         ParametersWithIV aesCtrParam;
-        CipherParameters sha256HMacParam;
+        KeyParameter sha256MacParam;
         byte[] buf;
         long lastTry = 0; // don't enforce suspension on first prompt!
         do {
@@ -142,18 +142,22 @@ final class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
             gen.init(pass, salt, iCount);
             aesCtrParam = (ParametersWithIV) gen.generateDerivedParameters(
                     keyStrengthBits, AES_BLOCK_SIZE_BITS);
-            sha256HMacParam = gen.generateDerivedMacParameters(keyStrengthBits);
+            sha256MacParam = (KeyParameter) gen.generateDerivedMacParameters(
+                    keyStrengthBits);
             paranoidWipe(pass);
 
             lastTry = SuspensionPenalty.enforce(lastTry);
 
             // Compute and verify KLAC.
-            klac.init(sha256HMacParam);
+            klac.init(sha256MacParam);
             final byte[] cipherKey = ((KeyParameter) aesCtrParam.getParameters()).getKey();
             klac.update(cipherKey, 0, cipherKey.length);
             buf = new byte[klac.getMacSize()];
             RaesOutputStream.klac(klac, length, buf);
         } while (!ArrayHelper.equals(this.footer, 0, buf, 0, buf.length / 2));
+
+        // Init parameters for authenticate().
+        this.sha256MacParam = sha256MacParam;
 
         // Init cipher.
         final SeekableBlockCipher
@@ -161,9 +165,7 @@ final class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
         cipher.init(false, aesCtrParam);
         init(cipher, start, length);
 
-        this.macParam = sha256HMacParam;
-
-        // Commit parameters.
+        // Commit key strength to parameters.
         param.setKeyStrength(keyStrength);
     }
 
@@ -179,9 +181,9 @@ final class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
     }
 
     @Override
-    public void authenticate() throws RaesAuthenticationException, IOException {
+    public void authenticate() throws IOException {
         final Mac mac = new HMac(new SHA256Digest());
-        mac.init(macParam);
+        mac.init(sha256MacParam);
         final byte[] buf = computeMac(mac);
         assert buf.length == mac.getMacSize();
         if (!ArrayHelper.equals(buf, 0, footer, footer.length / 2, footer.length / 2))

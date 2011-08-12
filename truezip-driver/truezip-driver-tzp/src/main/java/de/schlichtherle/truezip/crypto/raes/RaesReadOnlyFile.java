@@ -148,7 +148,7 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
      */
     public static RaesReadOnlyFile getInstance(
             final ReadOnlyFile rof,
-            @Nullable RaesParameters param)
+            @CheckForNull RaesParameters param)
     throws IOException {
         // Load header data.
         final byte[] leadIn = new byte[LEAD_IN_LENGTH];

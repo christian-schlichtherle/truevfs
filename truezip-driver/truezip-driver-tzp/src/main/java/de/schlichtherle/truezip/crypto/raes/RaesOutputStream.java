@@ -79,7 +79,7 @@ public abstract class RaesOutputStream extends CipherOutputStream {
      */
     public static RaesOutputStream getInstance(
             final OutputStream out,
-            final @Nullable RaesParameters param)
+            final @CheckForNull RaesParameters param)
     throws IOException {
         if (null == out)
             throw new NullPointerException();
