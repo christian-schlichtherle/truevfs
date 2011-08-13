@@ -102,28 +102,24 @@ final class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
         final byte[] salt = new byte[keyStrengthBytes];
         rof.readFully(salt);
 
-        // Init start of encrypted data.
-        final long start = header.length + salt.length;
-
-        // Init KLAC.
+        // Init KLAC and footer.
         final Mac klac = new HMac(new SHA256Digest());
+        this.footer = new byte[klac.getMacSize()];
+
+        // Init start, end and length of encrypted data.
+        final long start = header.length + salt.length;
+        final long end = fileLength - this.footer.length;
+        final long length = end - start;
 
         // Load footer data.
-        {
-            this.footer = new byte[klac.getMacSize()];
-            final long end = fileLength - this.footer.length;
-            rof.seek(end);
-            rof.readFully(this.footer);
-            if (-1 != rof.read()) {
-                // This should never happen unless someone is writing to the
-                // end of the file concurrently!
-                throw new RaesException(
-                        "Expected end of file after data envelope trailer!");
-            }
+        rof.seek(end);
+        rof.readFully(this.footer);
+        if (-1 != rof.read()) {
+            // This should never happen unless someone is writing to the
+            // end of the file concurrently!
+            throw new RaesException(
+                    "Expected end of file after data envelope trailer!");
         }
-
-        // Init encrypted data length.
-        final long length = fileLength - this.footer.length - start;
 
         // Derive cipher and MAC parameters.
         final PBEParametersGenerator
