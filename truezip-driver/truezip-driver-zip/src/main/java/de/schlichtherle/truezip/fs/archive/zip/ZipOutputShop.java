@@ -189,7 +189,7 @@ implements OutputShop<ZipArchiveEntry> {
                         //if (entry.getMethod() == UNKNOWN)
                             lt.setMethod(zpt.getMethod());
                         lt.setCrc(zpt.getCrc());
-                        //if (entry.getMethod() == zipPeer.getMethod())
+                        //if (STORED == lt.getMethod())
                             lt.setCompressedSize(zpt.getCompressedSize());
                         lt.setExtra(zpt.getExtra());
                         return new EntryOutputStream(lt,
