@@ -151,7 +151,6 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
                         try {
                             temp.release();
                         } catch (IOException discard) {
-                            throw ex;
                         }
                         throw ex;
                     }
