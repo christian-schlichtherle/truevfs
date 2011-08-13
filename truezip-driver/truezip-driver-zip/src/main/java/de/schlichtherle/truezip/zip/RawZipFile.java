@@ -96,7 +96,7 @@ implements Iterable<E>, Closeable {
     private @CheckForNull byte[] comment;
 
     /** The total number of bytes in this ZIP file. */
-    private long length = -1;
+    private long length;
 
     /** The number of bytes in the preamble of this ZIP file. */
     private long preamble;
