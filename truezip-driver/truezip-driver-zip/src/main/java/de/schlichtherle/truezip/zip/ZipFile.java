@@ -361,7 +361,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
 
     @Override
     protected synchronized InputStream getInputStream(
-            String name, boolean check, boolean process)
+            String name, Boolean check, boolean process)
     throws  IOException {
         final InputStream in = super.getInputStream(name, check, process);
         return in == null ? null : new SynchronizedInputStream(in, this);
