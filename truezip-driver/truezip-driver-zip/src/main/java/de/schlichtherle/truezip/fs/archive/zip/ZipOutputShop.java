@@ -167,15 +167,16 @@ implements OutputShop<ZipArchiveEntry> {
             throws IOException {
                 if (isBusy())
                     throw new OutputBusyException(lt.getName());
-                final Entry pt = getPeerTarget();
-                long size;
+                final Entry pt;
+                final long size;
                 if (lt.isDirectory()) {
                     lt.setMethod(STORED);
                     lt.setCrc(0);
                     lt.setCompressedSize(0);
                     lt.setSize(0);
                     return new EntryOutputStream(lt, true);
-                } else if (null != pt && UNKNOWN != (size = pt.getSize(DATA))) {
+                } else if (null != (pt = getPeerTarget())
+                        && UNKNOWN != (size = pt.getSize(DATA))) {
                     lt.setSize(size);
                     if (pt instanceof ZipArchiveEntry) {
                         // Set up entry attributes for Direct Data Copying (DDC).
@@ -192,7 +193,7 @@ implements OutputShop<ZipArchiveEntry> {
                             lt.setCompressedSize(zpt.getCompressedSize());
                         lt.setExtra(zpt.getExtra());
                         return new EntryOutputStream(lt,
-                                lt.isEncrypted() || zpt.isEncrypted());
+                                false /*lt.isEncrypted() || zpt.isEncrypted()*/); // FIXME!
                     }
                 }
                 switch (lt.getMethod()) {

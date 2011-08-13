@@ -16,14 +16,11 @@
 
 package de.schlichtherle.truezip.fs.archive.zip;
 
-import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.zip.CRC32Exception;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -51,40 +48,13 @@ public final class CheckedZipInputShop extends ZipInputShop {
         super(driver, model, rof);
     }
 
-    /** Overridden to read from a checked input stream. */
+    /**
+     * {@inheritDoc}
+     * 
+     * @return {@code true}.
+     */
     @Override
-    public InputSocket<ZipArchiveEntry> getInputSocket(final String name) {
-        if (null == name)
-            throw new NullPointerException();
-
-        class Input extends InputSocket<ZipArchiveEntry> {
-            @Override
-            public ZipArchiveEntry getLocalTarget() throws IOException {
-                final ZipArchiveEntry entry = getEntry(name);
-                if (null == entry)
-                    throw new FileNotFoundException(name + " (entry not found)");
-                return entry;
-            }
-
-            @Override
-            public ReadOnlyFile newReadOnlyFile() throws IOException {
-                throw new UnsupportedOperationException(); // TODO: Support this feature for STORED entries.
-            }
-
-            @Override
-            public InputStream newInputStream() throws IOException {
-                final ZipArchiveEntry lt = getLocalTarget();
-                final Entry pt = getPeerTarget();
-                final ZipArchiveEntry zpt = pt instanceof ZipArchiveEntry
-                        ? (ZipArchiveEntry) pt
-                        : null;
-                return getInputStream(
-                        lt.getName(),
-                        true,
-                        lt.isEncrypted() || null == zpt || zpt.isEncrypted());
-            }
-        } // Input
-
-        return new Input();
+    protected boolean check(ZipArchiveEntry entry) {
+        return true;
     }
 }
