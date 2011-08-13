@@ -98,6 +98,18 @@ implements InputShop<ZipArchiveEntry> {
         return super.size();
     }
 
+    /**
+     * Whether or not the content of the given entry shall get
+     * checked/authenticated when reading it.
+     * If this method returns {@code true} and the check fails,
+     * then an {@link IOException} gets thrown.
+     * 
+     * @return {@code entry.isEncrypted()}.
+     */
+    protected boolean check(ZipArchiveEntry entry) {
+        return entry.isEncrypted();
+    }
+
     @Override
     public InputSocket<ZipArchiveEntry> getInputSocket(final String name) {
         if (null == name)
@@ -126,8 +138,8 @@ implements InputShop<ZipArchiveEntry> {
                         : null;
                 return getInputStream(
                         lt.getName(),
-                        false,
-                        lt.isEncrypted() || null == zpt || zpt.isEncrypted());
+                        check(lt),
+                        /*lt.isEncrypted() ||*/ null == zpt /*|| zpt.isEncrypted()*/); // FIXME!
             }
         } // Input
 
