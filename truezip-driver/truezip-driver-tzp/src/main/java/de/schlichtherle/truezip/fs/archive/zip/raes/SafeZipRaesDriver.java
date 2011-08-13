@@ -15,14 +15,8 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip.raes;
 
-import de.schlichtherle.truezip.fs.FsModel;
-import de.schlichtherle.truezip.fs.archive.zip.CheckedZipInputShop;
-import de.schlichtherle.truezip.fs.archive.zip.ZipArchiveEntry;
-import de.schlichtherle.truezip.fs.archive.zip.ZipInputShop;
 import de.schlichtherle.truezip.key.KeyManagerProvider;
-import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
-import de.schlichtherle.truezip.socket.InputShop;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
@@ -61,47 +55,10 @@ public class SafeZipRaesDriver extends ZipRaesDriver {
         super(ioPoolProvider, keyManagerProvider);
     }
 
-    /**
-     * The default trigger for authentication in bytes ({@value}).
-     * Input archive files smaller than or equal to this size get verified
-     * using the RAES Message Authentication Code (MAC) before they are
-     * decrypted.
-     */
     private static final long AUTHENTICATION_TRIGGER = 512 * 1024;
 
     @Override
     public final long getAuthenticationTrigger() {
         return AUTHENTICATION_TRIGGER;
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * If the net file length of the archive is larger than the authentication
-     * trigger, then a {@link CheckedZipInputShop} for CRC-32
-     * authentication is returned, otherwise a plain {@link ZipInputShop}
-     * which doesn't do any authentication.
-     * <p>
-     * This complements the behaviour of the
-     * {@link ZipRaesDriver#newInputShop} method in the super
-     * class, which authenticates the cipher text using the MAC iff the gross
-     * file length is smaller than or equal to the authentication trigger.
-     * <p>
-     * Note that this leaves a small window for gross file lengths of about
-     * {@link #getAuthenticationTrigger} bytes where the archive is both MAC
-     * and CRC-32 authenticated.
-     */
-    @Override
-    protected final InputShop<ZipArchiveEntry> newInputShop(FsModel model, ReadOnlyFile rof)
-    throws IOException {
-        // Optimization: If the read-only file is smaller than the
-        // authentication trigger, then its entire cipher text has already
-        // been authenticated by
-        // {@link ZipRaesDriver#newInputShop}.
-        // Hence, checking the CRC-32 value of the plain text ZIP file is
-        // redundant.
-        return rof.length() > getAuthenticationTrigger()
-                ? new CheckedZipInputShop(this, model, rof)
-                : super.newInputShop(model, rof);
     }
 }

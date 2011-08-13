@@ -62,10 +62,9 @@ public class ParanoidZipRaesDriver extends ZipRaesDriver {
 
     /**
      * This implementation returns a new {@link ZipOutputShop}.
-     * <p>
-     * Note that this limits the number of concurrent output entry streams
-     * to one in order to inhibit writing unencrypted temporary files for
-     * buffering the written entries.
+     * This restricts the number of concurrent output entry streams to one in
+     * order to inhibit writing unencrypted temporary files for buffering the
+     * written entries.
      */
     @Override
     protected OutputShop<ZipArchiveEntry> newOutputShop(
