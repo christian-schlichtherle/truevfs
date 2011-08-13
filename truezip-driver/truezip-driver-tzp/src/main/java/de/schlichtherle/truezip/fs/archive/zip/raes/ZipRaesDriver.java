@@ -146,29 +146,36 @@ public abstract class ZipRaesDriver extends JarDriver {
     }
 
     /**
-     * Constructs a new abstract ZIP.RAES driver which
-     * uses the given byte
-     * size to trigger verification of the Message Authentication Code (MAC).
-     * Note that the given parameter only affects the authentication of the
-     * <em>cipher text</em> in input archives - the <em>cipher key</em> and
-     * <em>file length</em> are always authenticated with RAES.
-     *
      * Returns the value of the property {@code authenticationTrigger}.
-     * If the size of an input file is smaller than or equal to this value,
-     * the Message Authentication Code (MAC) for the entire
-     * <em>cipher text</em> is computed and verified in order to authenticate
-     * the file.
-     * Otherwise, only the <em>cipher key</em> and the <em>file length</em>
-     * get authenticated.
+     * <p>
+     * If the cipher text length of an input RAES file is smaller than or equal
+     * to this value, then the Hash-based Message Authentication Code (HMAC)
+     * for the entire cipher text is computed and verified in order to
+     * authenticate the input RAES file.
+     * <p>
+     * Otherwise, if the cipher text length of an input RAES file is greater
+     * than this value, then initially only the cipher key and the cipher text
+     * length get authenticated.
+     * In addition, whenever an entry is subsequently accessed, then it's
+     * CRC-32 value is checked.
      * <p>
      * Consequently, if the value of this property is set to a negative value,
-     * the cipher text gets <em>never</em> verified, and if set to
-     * {@link Long#MAX_VALUE}, the cipher text gets <em>always</em>
-     * authenticated.
+     * then the entire cipher text gets <em>never</em> authenticated (CRC-32
+     * checking only), and if set to {@link Long#MAX_VALUE}, then the entire
+     * cipher text gets <em>always</em> authenticated (no CRC-32 checking).
      *
      * @return The value of the property {@code authenticationTrigger}.
      */
     protected abstract long getAuthenticationTrigger();
+
+    @Override
+    protected final boolean check(ZipInputShop input, ZipArchiveEntry entry) {
+        // Optimization: If the cipher text alias the encrypted ZIP file is
+        // smaller than the authentication trigger, then its entire cipher text
+        // has already been authenticated by {@link ZipRaesDriver#newInputShop}.
+        // Hence, checking the CRC-32 value of the entry is redundant.
+        return input.length() > getAuthenticationTrigger();
+    }
 
     @Override
     public final FsController<?>
@@ -224,13 +231,8 @@ public abstract class ZipRaesDriver extends JarDriver {
         try {
             final RaesReadOnlyFile rrof = RaesReadOnlyFile.getInstance(
                     rof, raesParameters(model));
-            if (rof.length() <= getAuthenticationTrigger()) { // compare rof, not rrof!
-                // Note: If authentication fails, this is reported through some
-                // sort of IOException, not a FileNotFoundException!
-                // This allows the client to treat the tampered archive like an
-                // ordinary file which may be read, written or deleted.
+            if (rrof.length() <= getAuthenticationTrigger()) // compare rrof, not rof!
                 rrof.authenticate();
-            }
             return newInputShop(model, rrof);
         } catch (IOException ex) {
             rof.close();
