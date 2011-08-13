@@ -750,22 +750,20 @@ implements Iterable<E>, Closeable {
             if (WINZIP_AES != method)
                 throw new ZipException(name
                         + " (encrypted compression method " + method + " is not supported)");
-            final WinZipAesEntryReadOnlyFile
-                    erof = new WinZipAesEntryReadOnlyFile(rof,
-                        new WinZipAesEntryParameters(
-                                parameters(
-                                    WinZipAesParameters.class,
-                                    getCryptoParameters()),
-                                entry));
+            rof = new WinZipAesEntryReadOnlyFile(rof,
+                    new WinZipAesEntryParameters(
+                        parameters(
+                            WinZipAesParameters.class,
+                            getCryptoParameters()),
+                        entry));
             if (check) {
-                erof.authenticate();
+                ((WinZipAesEntryReadOnlyFile) rof).authenticate();
                 // Disable redundant CRC-32 check.
                 check = false;
             }
             final WinZipAesEntryExtraField field
                     = (WinZipAesEntryExtraField) entry.getExtraField(WINZIP_AES_ID);
             method = field.getMethod();
-            rof = erof;
         }
         if (check) {
             // Check CRC-32 in the Local File Header or Data Descriptor.
