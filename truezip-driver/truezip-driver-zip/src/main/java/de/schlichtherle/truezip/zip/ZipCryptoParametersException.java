@@ -30,16 +30,7 @@ public class ZipCryptoParametersException extends ZipCryptoException {
     private static final long serialVersionUID = 2036769236408934681L;
 
     /**
-     * Constructs a RAES parameters exception with
-     * a detail message indicating that no suitable {@link ZipCryptoParameters}
-     * have been found.
-     */
-    public ZipCryptoParametersException() {
-        super("No suitable crypto parameters available!");
-    }
-
-    /**
-     * Constructs a RAES parameters exception with
+     * Constructs a ZIP crypto parameters exception with
      * the given detail message.
      *
      * @param msg the detail message.
@@ -49,7 +40,7 @@ public class ZipCryptoParametersException extends ZipCryptoException {
     }
 
     /**
-     * Constructs a RAES parameters exception with
+     * Constructs a ZIP crypto parameters exception with
      * the given cause.
      *
      * @param cause the cause for this exception to get thrown.
