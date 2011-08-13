@@ -74,9 +74,6 @@ final class Type0RaesOutputStream extends RaesOutputStream {
     /** The offset where the encrypted application data starts. */
     private long start;
 
-    /** Whether this stream has been closed or not. */
-    private boolean closed;
-
     Type0RaesOutputStream(
             final OutputStream out,
             final Type0RaesParameters param)
