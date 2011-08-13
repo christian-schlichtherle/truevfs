@@ -90,26 +90,24 @@ final class WinZipAesEntryReadOnlyFile extends CipherReadOnlyFile {
         final byte[] passwdVerifier = new byte[PWD_VERIFIER_BITS / 8];
         rof.readFully(passwdVerifier);
 
-        // Init start of encrypted data.
-        final long start = salt.length + passwdVerifier.length;
-
-        // Init MAC and load authentication code.
+        // Init MAC and authentication code.
         final Mac mac = new HMac(new SHA1Digest());
-        {
-            this.authenticationCode = new byte[mac.getMacSize() / 2];
-            final long end = fileLength - this.authenticationCode.length;
-            rof.seek(end);
-            rof.readFully(this.authenticationCode);
-            if (-1 != rof.read()) {
-                // This should never happen unless someone is writing to the
-                // end of the file concurrently!
-                throw new ZipCryptoException(
-                        "Expected end of file after authentication code!");
-            }
-        }
+        this.authenticationCode = new byte[mac.getMacSize() / 2];
 
-        // Init encrypted data length.
-        final long length = fileLength - this.authenticationCode.length - start;
+        // Init start, end and length of encrypted data.
+        final long start = salt.length + passwdVerifier.length;
+        final long end = fileLength - this.authenticationCode.length;
+        final long length = end - start;
+
+        // Load authentication code.
+        rof.seek(end);
+        rof.readFully(this.authenticationCode);
+        if (-1 != rof.read()) {
+            // This should never happen unless someone is writing to the
+            // end of the file concurrently!
+            throw new ZipCryptoException(
+                    "Expected end of file after authentication code!");
+        }
 
         // Derive cipher and MAC parameters.
         final PBEParametersGenerator gen = new PKCS5S2ParametersGenerator();
