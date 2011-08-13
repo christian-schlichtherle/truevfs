@@ -19,6 +19,7 @@ import de.schlichtherle.truezip.entry.Entry;
 import static de.schlichtherle.truezip.entry.Entry.Access.*;
 import static de.schlichtherle.truezip.entry.Entry.Size.*;
 import de.schlichtherle.truezip.entry.Entry.Type;
+import static de.schlichtherle.truezip.entry.Entry.Type.*;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsModel;
@@ -420,7 +421,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
         } else if (mknod.get(STORE)) { // #2 priority
             entry.setMethod(STORED);
         }
-        if (mknod.get(ENCRYPT)) // FIXME: && type != DIRECTORY
+        if (mknod.get(ENCRYPT) && DIRECTORY != type)
             entry.setEncrypted(true);
         return entry;
     }
