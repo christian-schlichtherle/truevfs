@@ -23,6 +23,7 @@ import de.schlichtherle.truezip.util.Pool;
 import static de.schlichtherle.truezip.zip.Constants.*;
 import static de.schlichtherle.truezip.zip.LittleEndian.*;
 import static de.schlichtherle.truezip.zip.WinZipAesEntryExtraField.*;
+import static de.schlichtherle.truezip.zip.ZipCryptoUtils.*;
 import static de.schlichtherle.truezip.zip.ZipEntry.*;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
@@ -806,24 +807,6 @@ implements Iterable<E>, Closeable {
         if (check)
             in = new CheckedInputStream(in, entry, bufSize);
         return in;
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <P extends ZipCryptoParameters> P parameters(
-            final Class<P> type,
-            final @CheckForNull ZipCryptoParameters param)
-    throws ZipCryptoParametersException {
-        // Order is important here to support multiple interface implementations!
-        if (null == param) {
-            throw new ZipCryptoParametersException("No crypto parameters available!");
-        } else if (type.isAssignableFrom(param.getClass())) {
-            return (P) param;
-        } else if (param instanceof ZipCryptoParametersProvider) {
-            return parameters(type,
-                    ((ZipCryptoParametersProvider) param).get(type));
-        } else {
-            throw new ZipCryptoParametersException();
-        }
     }
 
     private static int getBufferSize(final ZipEntry entry) {
