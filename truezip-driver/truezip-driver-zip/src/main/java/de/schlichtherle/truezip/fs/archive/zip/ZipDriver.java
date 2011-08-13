@@ -201,6 +201,30 @@ implements ZipEntryFactory<ZipArchiveEntry> {
         return true;
     }
 
+    /**
+     * Whether or not the content of the given entry shall get
+     * checked/authenticated when reading it.
+     * If this method returns {@code true} and the check fails,
+     * then an {@link IOException} gets thrown.
+     * 
+     * @return {@code entry.isEncrypted()}.
+     */
+    protected boolean check(ZipInputShop input, ZipArchiveEntry entry) {
+        return entry.isEncrypted();
+    }
+
+    final boolean process(ZipInputShop input, ZipArchiveEntry local, ZipArchiveEntry peer) {
+        return process(local, peer);
+    }
+
+    final boolean process(ZipOutputShop output, ZipArchiveEntry local, ZipArchiveEntry peer) {
+        return process(local, peer);
+    }
+
+    protected boolean process(ZipArchiveEntry local, ZipArchiveEntry peer) {
+        return false; // local.isEncrypted() || peer.isEncrypted(); // FIXME!
+    }
+
     @Override
     protected final IOPool<?> getPool() {
         return ioPool;

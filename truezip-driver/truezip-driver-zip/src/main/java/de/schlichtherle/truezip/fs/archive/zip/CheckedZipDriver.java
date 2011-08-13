@@ -15,11 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
-import de.schlichtherle.truezip.fs.FsModel;
-import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
-import de.schlichtherle.truezip.socket.InputShop;
-import java.io.IOException;
 import net.jcip.annotations.Immutable;
 
 /**
@@ -36,9 +32,8 @@ import net.jcip.annotations.Immutable;
  * So if just the CRC-32 value for the entry in the archive file has been
  * modified, you can still read its entire contents.
  * 
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
- * @see CheckedZipInputShop
  */
 @Immutable
 public class CheckedZipDriver extends ZipDriver {
@@ -48,8 +43,7 @@ public class CheckedZipDriver extends ZipDriver {
     }
 
     @Override
-    protected InputShop<ZipArchiveEntry> newInputShop(FsModel model, ReadOnlyFile rof)
-    throws IOException {
-        return new CheckedZipInputShop(this, model, rof);
+    protected boolean check(ZipInputShop input, ZipArchiveEntry entry) {
+        return true;
     }
 }

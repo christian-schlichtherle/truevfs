@@ -29,14 +29,14 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * An input shop for reading ZIP archive files.
+ * An input shop for reading ZIP files.
  *
  * @see     ZipOutputShop
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-public class ZipInputShop
+public final class ZipInputShop
 extends RawZipFile<ZipArchiveEntry>
 implements InputShop<ZipArchiveEntry> {
 
@@ -98,18 +98,6 @@ implements InputShop<ZipArchiveEntry> {
         return super.size();
     }
 
-    /**
-     * Whether or not the content of the given entry shall get
-     * checked/authenticated when reading it.
-     * If this method returns {@code true} and the check fails,
-     * then an {@link IOException} gets thrown.
-     * 
-     * @return {@code entry.isEncrypted()}.
-     */
-    protected boolean check(ZipArchiveEntry entry) {
-        return entry.isEncrypted();
-    }
-
     @Override
     public InputSocket<ZipArchiveEntry> getInputSocket(final String name) {
         if (null == name)
@@ -136,10 +124,11 @@ implements InputShop<ZipArchiveEntry> {
                 final ZipArchiveEntry zpt = pt instanceof ZipArchiveEntry
                         ? (ZipArchiveEntry) pt
                         : null;
+                final ZipDriver driver = ZipInputShop.this.driver;
                 return getInputStream(
                         lt.getName(),
-                        check(lt),
-                        /*lt.isEncrypted() ||*/ null == zpt /*|| zpt.isEncrypted()*/); // FIXME!
+                        driver.check(ZipInputShop.this, lt),
+                        null == zpt || driver.process(ZipInputShop.this, lt, zpt));
             }
         } // Input
 

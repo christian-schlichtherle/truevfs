@@ -46,7 +46,7 @@ import java.util.zip.CheckedOutputStream;
 import net.jcip.annotations.NotThreadSafe;
 
 /**
- * An output shop for writing ZIP archive files.
+ * An output shop for writing ZIP files.
  * This output shop can only write one entry at a time.
  * Archive drivers may wrap this class in a
  * {@link FsMultiplexedOutputShop} to overcome this limitation.
@@ -193,7 +193,7 @@ implements OutputShop<ZipArchiveEntry> {
                             lt.setCompressedSize(zpt.getCompressedSize());
                         lt.setExtra(zpt.getExtra());
                         return new EntryOutputStream(lt,
-                                false /*lt.isEncrypted() || zpt.isEncrypted()*/); // FIXME!
+                                driver.process(ZipOutputShop.this, lt, zpt));
                     }
                 }
                 switch (lt.getMethod()) {
