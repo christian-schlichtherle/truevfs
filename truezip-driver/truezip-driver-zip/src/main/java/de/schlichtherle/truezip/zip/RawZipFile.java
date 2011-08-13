@@ -631,25 +631,25 @@ implements Iterable<E>, Closeable {
     protected abstract @CheckForNull ZipCryptoParameters getCryptoParameters();
 
     /**
-     * Equivalent to {@link #getInputStream(String, boolean, boolean)
-     * getInputStream(name, false, true)}.
+     * Equivalent to {@link #getInputStream(String, Boolean, boolean)
+     * getInputStream(name, null, true)}.
      */
     public final @Nullable InputStream getInputStream(String name)
     throws IOException {
-        return getInputStream(name, false, true);
+        return getInputStream(name, null, true);
     }
 
     /**
-     * Equivalent to {@link #getInputStream(String, boolean, boolean)
-     * getInputStream(entry.getName(), false, true)} instead.
+     * Equivalent to {@link #getInputStream(String, Boolean, boolean)
+     * getInputStream(entry.getName(), null, true)} instead.
      */
     public final @Nullable InputStream getInputStream(ZipEntry entry)
     throws IOException {
-        return getInputStream(entry.getName(), false, true);
+        return getInputStream(entry.getName(), null, true);
     }
 
     /**
-     * Equivalent to {@link #getInputStream(String, boolean, boolean)
+     * Equivalent to {@link #getInputStream(String, Boolean, boolean)
      * getInputStream(name, true, true)}.
      */
     public final @Nullable InputStream getCheckedInputStream(String name)
@@ -658,7 +658,7 @@ implements Iterable<E>, Closeable {
     }
 
     /**
-     * Equivalent to {@link #getInputStream(String, boolean, boolean)
+     * Equivalent to {@link #getInputStream(String, Boolean, boolean)
      * getInputStream(entry.getName(), true, true)} instead.
      */
     public final @Nullable InputStream getCheckedInputStream(ZipEntry entry)
@@ -674,23 +674,28 @@ implements Iterable<E>, Closeable {
      * streams returned by this method are closed, too.
      *
      * @param  name The name of the entry to get the stream for.
-     * @param  check Whether or not the entry's CRC-32 value gets checked.
-     *         If {@code process} and this parameter are both {@code true},
-     *         then two additional checks are performed for the ZIP entry:
-     *         <ol>
-     *         <li>All entry headers are checked to have consistent
-     *             declarations of the CRC-32 value for the inflated entry
-     *             data.
-     *         <li>When calling {@link InputStream#close} on the returned entry
-     *             stream, the CRC-32 value computed from the inflated entry
-     *             data is checked against the declared CRC-32 values.
-     *             This is independent from the {@code inflate} parameter.
-     *         </ol>
-     *         If any of these checks fail, a {@link CRC32Exception} is thrown.
-     *         <p>
-     *         This parameter should be {@code false} for most
-     *         applications, and is the default for the sibling of this class
-     *         in {@link java.util.zip.ZipFile java.util.zip.ZipFile}.
+     * @param  check Whether or not the entry content gets checked/authenticated.
+     *         If the parameter {@code process} is {@code false}, then this
+     *         parameter is ignored.
+     *         Otherwise, if this parameter is {@code null}, then it is set to
+     *         the {@link ZipEntry#isEncrypted()} property of the given entry.
+     *         Finally, if this parameter is {@code true},
+     *         then the following additional check is performed for the entry:
+     *         <ul>
+     *         <li>If the entry is encrypted, then the Message Authentication
+     *             Code (MAC) value gets computed and checked.
+     *             If this check fails, then a
+     *             {@link ZipAuthenticationException} gets thrown from this
+     *             method (pre-check).
+     *         <li>If the entry is <em>not</em> encrypted, then the CRC-32
+     *             value gets computed and checked.
+     *             First, the local file header is checked to hold the same
+     *             CRC-32 value than the central directory record.
+     *             Second, the CRC-32 value is computed and checked.
+     *             If this check fails, then a {@link CRC32Exception}
+     *             gets thrown when {@link InputStream#close} is called on the
+     *             returned entry stream (post-check).
+     *         </ul>
      * @param  process Whether or not the entry contents should get processed,
      *         e.g. inflated.
      *         This should be set to {@code false} if and only if the
@@ -698,15 +703,15 @@ implements Iterable<E>, Closeable {
      *         an output ZIP file.
      * @return A stream to read the entry data from or {@code null} if the
      *         entry does not exist.
-     * @throws CRC32Exception If the declared CRC-32 values of the inflated
-     *         entry data are inconsistent across the entry headers.
+     * @throws ZipAuthenticationException If the entry is encrypted and
+     *         checking the MAC fails.
      * @throws ZipException If this file is not compatible to the ZIP File
      *         Format Specification.
      * @throws IOException If the entry cannot get read from this ZipFile.
      */
     protected @Nullable InputStream getInputStream(
             final String name,
-            boolean check,
+            Boolean check,
             final boolean process)
     throws IOException {
         assertOpen();
@@ -738,6 +743,8 @@ implements Iterable<E>, Closeable {
             assert UNKNOWN != entry.getCrc();
             return new ReadOnlyFileInputStream(rof);
         }
+        if (null == check)
+            check = entry.isEncrypted();
         int method = entry.getMethod();
         if (entry.isEncrypted()) {
             if (WINZIP_AES != method)
@@ -750,16 +757,19 @@ implements Iterable<E>, Closeable {
                                     WinZipAesParameters.class,
                                     getCryptoParameters()),
                                 entry));
-            // Authenticate and disable redundant CRC-32 check.
-            erof.authenticate();
-            check = false;
+            if (check) {
+                erof.authenticate();
+                // Disable redundant CRC-32 check.
+                check = false;
+            }
             final WinZipAesEntryExtraField field
                     = (WinZipAesEntryExtraField) entry.getExtraField(WINZIP_AES_ID);
             method = field.getMethod();
+            rof = erof;
         }
         if (check) {
             // Check CRC-32 in the Local File Header or Data Descriptor.
-            final long localCrc;
+            long localCrc;
             if (entry.getGeneralPurposeBitFlag(GPBF_DATA_DESCRIPTOR)) {
                 // The CRC-32 is in the Data Descriptor after the compressed
                 // size.
@@ -769,10 +779,9 @@ implements Iterable<E>, Closeable {
                 final byte[] dd = new byte[8];
                 archive.seek(offset + entry.getCompressedSize());
                 archive.readFully(dd);
-                final long ddSig = readUInt(dd, 0);
-                localCrc = ddSig == DD_SIG
-                        ? readUInt(dd, 4)
-                        : ddSig;
+                localCrc = readUInt(dd, 0);
+                if (DD_SIG == localCrc)
+                    localCrc = readUInt(dd, 4);
             } else {
                 // The CRC-32 in the Local File Header.
                 localCrc = readUInt(lfh, 14);
