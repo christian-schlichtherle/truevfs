@@ -94,7 +94,7 @@ implements OutputShop<ZipArchiveEntry> {
                     }
                 }
             }
-            // Retain postamble of input ZIP archive.
+            // Retain postamble of input ZIP file.
             if (0 < source.getPostambleLength()) {
                 this.postamble = getPool().allocate();
                 Streams.copy(   source.getPostambleInputStream(),
