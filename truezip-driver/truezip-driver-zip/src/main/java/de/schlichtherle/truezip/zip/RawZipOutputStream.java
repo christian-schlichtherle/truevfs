@@ -560,17 +560,17 @@ implements Iterable<E> {
      */
     private boolean writeCentralFileHeader(final ZipEntry entry)
     throws IOException {
-        if (UNKNOWN == entry.getSize()) {
+        final long crc = entry.getCrc();
+        final long csize = entry.getCompressedSize();
+        final long size = entry.getSize();
+        if (UNKNOWN == (crc | csize | size)) {
             // See http://java.net/jira/browse/TRUEZIP-144 :
-            // The kernel may set this property to UNKNOWN after the entry
-            // content has already been written in order to signal that this
-            // entry should not get included in the central directory.
+            // The kernel may set any of these properties to UNKNOWN after the
+            // entry content has already been written in order to signal that
+            // this entry should not get included in the central directory.
             // E.g. this may happen with the GROW output option preference.
             return false;
         }
-        final LEDataOutputStream dos = this.dos;
-        final long csize = entry.getEncodedCompressedSize();
-        final long size = entry.getEncodedSize();
         final long offset = entry.getEncodedOffset();
         final boolean zip64 = entry.isZip64ExtensionsRequired();
         final int method = entry.getEncodedMethod();
@@ -580,6 +580,7 @@ implements Iterable<E> {
                 : STORED != method || directory
                     ? 20
                     : 10;
+        final LEDataOutputStream dos = this.dos;
         // Central File Header.
         dos.writeInt(CFH_SIG);
         // Version Made By.
@@ -593,7 +594,7 @@ implements Iterable<E> {
         // Last Mod. File Time / Date.
         dos.writeInt((int) entry.getEncodedTime());
         // CRC-32.
-        dos.writeInt((int) entry.getEncodedCrc());
+        dos.writeInt((int) crc);
         // Compressed Size.
         dos.writeInt((int) csize);
         // Uncompressed Size.
