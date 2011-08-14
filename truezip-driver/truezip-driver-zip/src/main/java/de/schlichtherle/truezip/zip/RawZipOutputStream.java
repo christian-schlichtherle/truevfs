@@ -392,6 +392,7 @@ implements Iterable<E> {
     throws IOException {
         closeEntry();
         final OutputMethod method = newOutputMethod(entry, process);
+        method.init(entry.clone()); // test!
         method.init(entry);
         this.entry = entry;
         final OutputStream out = method.start();
@@ -876,8 +877,8 @@ implements Iterable<E> {
 
         @Override
         public void init(ZipEntry entry) throws IOException  {
-            this.delegate.init(entry);
             entry.setCompressedSize(UNKNOWN);
+            this.delegate.init(entry);
         }
 
         @Override
@@ -971,7 +972,6 @@ implements Iterable<E> {
         @Override
         public void init(final ZipEntry entry) throws IOException {
             // HC SUNT DRACONES - ORDER IS CRITICAL!
-            assert null == this.entryParam;
             this.entryParam = new WinZipAesEntryParameters(this.generalParam,
                     entry);
             final AesKeyStrength keyStrength = this.entryParam.getKeyStrength();
