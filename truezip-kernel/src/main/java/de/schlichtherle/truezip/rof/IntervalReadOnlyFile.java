@@ -62,7 +62,7 @@ public class IntervalReadOnlyFile extends DecoratingReadOnlyFile {
      * @param length the length of the interval.
      */
     public IntervalReadOnlyFile(
-            final @Nullable ReadOnlyFile rof,
+            final ReadOnlyFile rof,
             final long length)
     throws IOException {
         this(rof, rof.getFilePointer(), length, true);
