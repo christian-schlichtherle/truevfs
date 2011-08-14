@@ -1532,9 +1532,9 @@ extends TestBase<D> {
             assertGrow(entry1);
             assertGrow(entry2);
 
-            // FIXME: http://java.net/jira/browse/TRUEZIP-144
-            /*entry1.rm();
-            entry2.rm();*/
+            // See http://java.net/jira/browse/TRUEZIP-144 .
+            entry1.rm();
+            entry2.rm();
 
             TFile.umount();
             assertTrue(file.length() > 6 * data.length); // six entries plus two central directories
@@ -1542,7 +1542,7 @@ extends TestBase<D> {
             config.close();
         }
 
-        //assertThat(archive.list().length, is(0));
+        assertThat(archive.list().length, is(0));
     }
 
     private void assertGrow(final TFile entry) throws IOException {

@@ -210,7 +210,7 @@ final class FileController extends FsModelController<FsModel>  {
     }
 
     @Override
-    public void unlink(FsEntryName name)
+    public void unlink(FsEntryName name, BitField<FsOutputOption> options)
     throws IOException {
         final File file = new File(target, name.getPath());
         if (!file.delete())

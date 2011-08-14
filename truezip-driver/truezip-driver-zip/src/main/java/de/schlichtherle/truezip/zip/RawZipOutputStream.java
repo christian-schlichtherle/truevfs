@@ -544,25 +544,36 @@ implements Iterable<E> {
         closeEntry();
         final LEDataOutputStream dos = this.dos;
         this.cdOffset = dos.size();
-        for (ZipEntry entry : this.entries.values())
-            writeCentralFileHeader(entry);
+        final Iterator<E> i = this.entries.values().iterator();
+        while (i.hasNext())
+            if (!writeCentralFileHeader(i.next()))
+                i.remove();
         writeEndOfCentralDirectory();
     }
 
     /**
      * Writes a Central File Header record.
      *
+     * @return {@code false} if and only if the record has been skipped,
+     *         i.e. not written for some other reason than an I/O error.
      * @throws IOException On any I/O error.
      */
-    private void writeCentralFileHeader(final ZipEntry entry)
+    private boolean writeCentralFileHeader(final ZipEntry entry)
     throws IOException {
-        assert null != entry;
+        if (UNKNOWN == entry.getSize()) {
+            // See http://java.net/jira/browse/TRUEZIP-144 :
+            // The kernel may set this property to UNKNOWN after the entry
+            // content has already been written in order to signal that this
+            // entry should not get included in the central directory.
+            // E.g. this may happen with the GROW output option preference.
+            return false;
+        }
         final LEDataOutputStream dos = this.dos;
         final long csize = entry.getEncodedCompressedSize();
         final long size = entry.getEncodedSize();
         final long offset = entry.getEncodedOffset();
         final boolean zip64 = entry.isZip64ExtensionsRequired();
-        final int method = entry.getMethod();
+        final int method = entry.getEncodedMethod();
         final boolean directory = entry.isDirectory();
         final int version = zip64
                 ? 45
@@ -610,6 +621,8 @@ implements Iterable<E> {
         dos.write(extra);
         // File Comment.
         dos.write(comment);
+
+        return true;
     }
 
     private byte[] getCommentEncoded(final ZipEntry entry) {

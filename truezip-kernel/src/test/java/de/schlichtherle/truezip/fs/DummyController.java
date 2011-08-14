@@ -112,7 +112,8 @@ public class DummyController<M extends FsModel> extends FsController<M> {
     }
 
     @Override
-    public void unlink(FsEntryName name) throws IOException {
+    public void unlink(FsEntryName name, BitField<FsOutputOption> options)
+    throws IOException {
         throw new IOException("Read only dummy file system controller!");
     }
 

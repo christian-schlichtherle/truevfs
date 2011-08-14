@@ -425,7 +425,7 @@ public final class TFileSystem extends FileSystem {
     }
 
     void delete(TPath path) throws IOException {
-        getController().unlink(path.getEntryName());
+        getController().unlink(path.getEntryName(), path.getOutputPreferences());
     }
 
     FsEntry getEntry(TPath path) throws IOException {

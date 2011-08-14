@@ -464,12 +464,13 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     }
 
     @Override
-    public void unlink(FsEntryName name) throws IOException {
+    public void unlink(FsEntryName name, BitField<FsOutputOption> options)
+    throws IOException {
         try {
-            delegate.unlink(name);
+            delegate.unlink(name, options);
         } catch (FsFalsePositiveException ex) {
             try {
-                getParent().unlink(resolveParent(name));
+                getParent().unlink(resolveParent(name), options);
             } catch (FsException ex2) {
                 assert !(ex2 instanceof FsFalsePositiveException);
                 throw ex2;
