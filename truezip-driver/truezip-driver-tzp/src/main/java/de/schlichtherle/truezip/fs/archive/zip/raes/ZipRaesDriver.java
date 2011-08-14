@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip.raes;
 
+import de.schlichtherle.truezip.fs.archive.zip.KeyProviderSyncStrategy;
 import de.schlichtherle.truezip.crypto.raes.RaesOutputStream;
 import de.schlichtherle.truezip.crypto.raes.RaesParameters;
 import de.schlichtherle.truezip.crypto.raes.RaesReadOnlyFile;
@@ -32,10 +33,7 @@ import de.schlichtherle.truezip.fs.archive.zip.JarDriver;
 import de.schlichtherle.truezip.fs.archive.zip.OptionOutputSocket;
 import de.schlichtherle.truezip.fs.archive.zip.ZipArchiveEntry;
 import de.schlichtherle.truezip.fs.archive.zip.ZipInputShop;
-import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.key.KeyManagerProvider;
-import de.schlichtherle.truezip.key.KeyProvider;
-import de.schlichtherle.truezip.key.PromptingKeyProvider;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.socket.InputShop;
@@ -110,15 +108,6 @@ public abstract class ZipRaesDriver extends JarDriver {
     }
 
     /**
-     * Returns the key manager for accessing RAES encrypted data.
-     * 
-     * @return The key manager for accessing RAES encrypted data.
-     */
-    protected final KeyManager<AesCipherParameters> getKeyManager() {
-        return keyManagerProvider.get(AesCipherParameters.class);
-    }
-
-    /**
      * Returns the RAES parameters for the given file system model
      * or {@code null} if not available.
      * <p>
@@ -131,18 +120,8 @@ public abstract class ZipRaesDriver extends JarDriver {
      */
     protected @CheckForNull RaesParameters raesParameters(FsModel model) {
         return new KeyManagerRaesParameters(
-                getKeyManager(),
+                keyManagerProvider.get(AesCipherParameters.class),
                 mountPointUri(model));
-    }
-
-    /**
-     * Returns the key provider sync strategy,
-     * which is {@link KeyProviderSyncStrategy#RESET_CANCELLED_KEY}.
-     *
-     * @return The key provider sync strategy.
-     */
-    protected KeyProviderSyncStrategy getKeyProviderSyncStrategy() {
-        return KeyProviderSyncStrategy.RESET_CANCELLED_KEY;
     }
 
     /**
@@ -178,10 +157,10 @@ public abstract class ZipRaesDriver extends JarDriver {
     }
 
     @Override
-    public final FsController<?>
+    public FsController<?>
     newController(FsModel model, FsController<?> parent) {
-        return new ZipRaesController(
-                super.newController(model, parent), this);
+        return new ZipRaesController(newDefaultControllerChain(model, parent),
+                this);
     }
 
     /**
@@ -276,45 +255,4 @@ public abstract class ZipRaesDriver extends JarDriver {
             throw ex;
         }
     }
-
-    /**
-     * Defines strategies for updating a key provider once a RAES encrypted
-     * ZIP file has been successfully synchronized.
-     */
-    public enum KeyProviderSyncStrategy {
-
-        /**
-         * Calls {@link PromptingKeyProvider#resetCancelledKey}
-         * if and only if the given provider is a {@link PromptingKeyProvider}.
-         */
-        RESET_CANCELLED_KEY {
-            @Override
-            void sync(KeyProvider<?> provider) {
-                if (provider instanceof PromptingKeyProvider<?>)
-                    ((PromptingKeyProvider<?>) provider).resetCancelledKey();
-            }
-        },
-
-        /**
-         * Calls {@link PromptingKeyProvider#resetUnconditionally}
-         * if and only if the given provider is a {@link PromptingKeyProvider}.
-         */
-        RESET_UNCONDITIONALLY {
-            @Override
-            void sync(KeyProvider<?> provider) {
-                if (provider instanceof PromptingKeyProvider<?>)
-                    ((PromptingKeyProvider<?>) provider).resetUnconditionally();
-            }
-        };
-
-        /**
-         * This method is called upon a call to
-         * {@link ZipRaesController#sync} after a successful
-         * synchronization of a RAES encrypted ZIP file.
-         *
-         * @param provider the key provider for the RAES encrypted ZIP file
-         *        which has been successfully synchronized.
-         */
-        abstract void sync(KeyProvider<?> provider);
-    } // KeyProviderSyncStrategy
 }

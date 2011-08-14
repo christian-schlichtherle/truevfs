@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.nio.file.zip.raes;
 
+import de.schlichtherle.truezip.fs.archive.zip.KeyProviderSyncStrategy;
 import de.schlichtherle.truezip.key.MockView;
 import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
 import static java.nio.file.Files.*;

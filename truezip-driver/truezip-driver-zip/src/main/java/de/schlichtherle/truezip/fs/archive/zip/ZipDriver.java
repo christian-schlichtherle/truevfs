@@ -104,6 +104,17 @@ implements ZipEntryFactory<ZipArchiveEntry> {
     }
 
     /**
+     * Returns the key provider sync strategy.
+     * The implementation in the class {@link ZipDriver} returns 
+     * {@link KeyProviderSyncStrategy#RESET_CANCELLED_KEY}.
+     *
+     * @return The key provider sync strategy.
+     */
+    protected KeyProviderSyncStrategy getKeyProviderSyncStrategy() {
+        return KeyProviderSyncStrategy.RESET_CANCELLED_KEY;
+    }
+
+    /**
      * Returns the provider for key managers for accessing protected resources
      * (encryption).
      * <p>
@@ -326,6 +337,65 @@ implements ZipEntryFactory<ZipArchiveEntry> {
         return Deflater.BEST_COMPRESSION;
     }
 
+    @Override
+    public FsController<?>
+    newController(FsModel model, FsController<?> parent) {
+        return new ZipController(newDefaultControllerChain(model, parent),
+                this);
+    }
+
+    /**
+     * Equivalent to {@code super.newController(model, parent)}.
+     * Call this method when overriding {@link #newController} and you need the
+     * default file system controller chain instead of the implementation in
+     * the class {@link ZipDriver}.
+     */
+    protected final FsController<?>
+    newDefaultControllerChain(FsModel model, FsController<?> parent) {
+        return super.newController(model, parent);
+    }
+
+    @Override
+    public ZipArchiveEntry newEntry(
+            String name,
+            final Type type,
+            final Entry template,
+            final BitField<FsOutputOption> mknod)
+    throws CharConversionException {
+        assertEncodable(name);
+        name = toZipOrTarEntryName(name, type);
+        final ZipArchiveEntry entry;
+        if (template instanceof ZipArchiveEntry) {
+            entry = newEntry(name, (ZipArchiveEntry) template);
+        } else {
+            entry = newEntry(name);
+            if (null != template) {
+                entry.setTime(template.getTime(WRITE));
+                entry.setSize(template.getSize(DATA));
+            }
+        }
+        if (mknod.get(COMPRESS)) { // #1 priority
+            if (DEFLATED != entry.getMethod()) {
+                entry.setMethod(DEFLATED);
+                entry.setCompressedSize(UNKNOWN);
+            }
+        } else if (mknod.get(STORE)) { // #2 priority
+            entry.setMethod(STORED);
+        }
+        if (mknod.get(ENCRYPT) && DIRECTORY != type)
+            entry.setEncrypted(true);
+        return entry;
+    }
+
+    @Override
+    public ZipArchiveEntry newEntry(String name) {
+        return new ZipArchiveEntry(name);
+    }
+
+    protected ZipArchiveEntry newEntry(String name, ZipArchiveEntry template) {
+        return new ZipArchiveEntry(name, template);
+    }
+
     /**
      * {@inheritDoc}
      * <p>
@@ -441,46 +511,5 @@ implements ZipEntryFactory<ZipArchiveEntry> {
         return new FsMultiplexedOutputShop<ZipArchiveEntry>(
                 new ZipOutputShop(this, model, out, source),
                 getPool());
-    }
-
-    @Override
-    public ZipArchiveEntry newEntry(
-            String name,
-            final Type type,
-            final Entry template,
-            final BitField<FsOutputOption> mknod)
-    throws CharConversionException {
-        assertEncodable(name);
-        name = toZipOrTarEntryName(name, type);
-        final ZipArchiveEntry entry;
-        if (template instanceof ZipArchiveEntry) {
-            entry = newEntry(name, (ZipArchiveEntry) template);
-        } else {
-            entry = newEntry(name);
-            if (null != template) {
-                entry.setTime(template.getTime(WRITE));
-                entry.setSize(template.getSize(DATA));
-            }
-        }
-        if (mknod.get(COMPRESS)) { // #1 priority
-            if (DEFLATED != entry.getMethod()) {
-                entry.setMethod(DEFLATED);
-                entry.setCompressedSize(UNKNOWN);
-            }
-        } else if (mknod.get(STORE)) { // #2 priority
-            entry.setMethod(STORED);
-        }
-        if (mknod.get(ENCRYPT) && DIRECTORY != type)
-            entry.setEncrypted(true);
-        return entry;
-    }
-
-    @Override
-    public ZipArchiveEntry newEntry(String name) {
-        return new ZipArchiveEntry(name);
-    }
-
-    protected ZipArchiveEntry newEntry(String name, ZipArchiveEntry template) {
-        return new ZipArchiveEntry(name, template);
     }
 }
