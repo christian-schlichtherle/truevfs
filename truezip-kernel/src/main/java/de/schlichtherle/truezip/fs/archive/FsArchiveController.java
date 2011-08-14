@@ -21,6 +21,7 @@ import de.schlichtherle.truezip.entry.Entry.Access;
 import static de.schlichtherle.truezip.entry.Entry.Access.*;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
+import de.schlichtherle.truezip.fs.FsConcurrentModel;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
@@ -78,7 +79,7 @@ import net.jcip.annotations.NotThreadSafe;
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
 abstract class FsArchiveController<E extends FsArchiveEntry>
-extends FsModelController<FsContextModel> {
+extends FsModelController<FsConcurrentModel> {
 
     private static final Logger
             logger = Logger.getLogger(  FsArchiveController.class.getName(),
@@ -87,12 +88,15 @@ extends FsModelController<FsContextModel> {
     private static final BitField<FsSyncOption>
             UNLINK_SYNC_OPTIONS = BitField.of(ABORT_CHANGES);
 
+    private final ThreadLocal<FsOperationContext>
+            context = new ThreadLocal<FsOperationContext>();
+
     /**
      * Constructs a new basic archive controller.
      *
      * @param model the non-{@code null} archive model.
      */
-    FsArchiveController(final FsContextModel model) {
+    FsArchiveController(final FsConcurrentModel model) {
         super(model);
         if (null == model.getParent())
             throw new IllegalArgumentException();
@@ -101,13 +105,35 @@ extends FsModelController<FsContextModel> {
     /**
      * Returns a JavaBean which represents the original values of selected
      * parameters for the {@link FsContextController} operation in progress.
+     * <p>
+     * Note that this is a thread-local property!
      * 
      * @return A JavaBean which represents the original values of selected
      *         parameters for the {@link FsContextController} operation in
      *         progress.
      */
     final FsOperationContext getContext() {
-        return getModel().getContext();
+        return context.get();
+    }
+
+    /**
+     * Sets the JavaBean which represents the original values of selected
+     * parameters for the {@link FsContextController} operation in progress.
+     * This method should only get called by the class
+     * {@link FsContextController}.
+     * <p>
+     * Note that this is a thread-local property!
+     * 
+     * @param context the JavaBean which represents the original values of
+     *        selected parameters for the {@link FsContextController}
+     *        operation in progress.
+     * @see   #getContext()
+     */
+    final void setContext(final @CheckForNull FsOperationContext context) {
+        if (null != context)
+            this.context.set(context);
+        else
+            this.context.remove();
     }
 
     /** Equivalent to {@link #autoMount(boolean) autoMount(false)}. */

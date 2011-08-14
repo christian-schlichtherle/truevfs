@@ -19,6 +19,7 @@ import de.schlichtherle.truezip.entry.Entry;
 import static de.schlichtherle.truezip.entry.Entry.*;
 import static de.schlichtherle.truezip.entry.Entry.Access.*;
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
+import de.schlichtherle.truezip.fs.FsConcurrentModel;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
@@ -108,7 +109,7 @@ extends FsFileSystemArchiveController<E> {
      * @param driver the archive driver.
      */
     FsDefaultArchiveController(
-            final FsContextModel model,
+            final FsConcurrentModel model,
             final FsController<?> parent,
             final FsArchiveDriver<E> driver) {
         super(model);
