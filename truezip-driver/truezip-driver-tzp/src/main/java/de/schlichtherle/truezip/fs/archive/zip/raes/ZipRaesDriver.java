@@ -159,8 +159,7 @@ public abstract class ZipRaesDriver extends JarDriver {
     @Override
     public FsController<?>
     newController(FsModel model, FsController<?> parent) {
-        return new ZipRaesController(newDefaultControllerChain(model, parent),
-                this);
+        return new ZipRaesController(superNewController(model, parent), this);
     }
 
     /**
