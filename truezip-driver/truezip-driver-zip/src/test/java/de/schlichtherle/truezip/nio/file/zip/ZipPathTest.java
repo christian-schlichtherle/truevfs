@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.nio.file.zip;
 
-import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.fs.archive.zip.ZipDriver;
 import de.schlichtherle.truezip.nio.file.TPathTestSuite;
 
@@ -25,7 +24,13 @@ import de.schlichtherle.truezip.nio.file.TPathTestSuite;
  */
 public final class ZipPathTest extends TPathTestSuite {
 
-    public ZipPathTest() {
-        super(FsScheme.create("tar"), new ZipDriver(IO_POOL_PROVIDER));
+    @Override
+    protected String getSuffixList() {
+        return "zip";
+    }
+
+    @Override
+    protected ZipDriver newArchiveDriver() {
+        return new ZipDriver(IO_POOL_PROVIDER);
     }
 }

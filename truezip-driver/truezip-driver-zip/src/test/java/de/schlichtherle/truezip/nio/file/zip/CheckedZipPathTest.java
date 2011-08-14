@@ -16,16 +16,21 @@
 package de.schlichtherle.truezip.nio.file.zip;
 
 import de.schlichtherle.truezip.fs.archive.zip.CheckedZipDriver;
-import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.nio.file.TPathTestSuite;
 
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class CheckedZipPathTest extends TPathTestSuite {
-    
-    public CheckedZipPathTest() {
-        super(FsScheme.create("zip"), new CheckedZipDriver(IO_POOL_PROVIDER));
+public final class CheckedZipPathTest extends TPathTestSuite<CheckedZipDriver> {
+
+    @Override
+    protected String getSuffixList() {
+        return "zip";
+    }
+
+    @Override
+    protected CheckedZipDriver newArchiveDriver() {
+        return new CheckedZipDriver(IO_POOL_PROVIDER);
     }
 }

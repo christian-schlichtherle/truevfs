@@ -15,44 +15,40 @@
  */
 package de.schlichtherle.truezip.nio.file.zip.raes;
 
-import de.schlichtherle.truezip.fs.archive.zip.KeyProviderSyncStrategy;
-import de.schlichtherle.truezip.key.MockView;
 import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
-import static java.nio.file.Files.*;
-import de.schlichtherle.truezip.fs.archive.zip.raes.SafeZipRaesDriver;
-import de.schlichtherle.truezip.fs.FsScheme;
-import de.schlichtherle.truezip.fs.archive.zip.raes.PromptingKeyManagerService;
+import de.schlichtherle.truezip.fs.archive.zip.raes.TestZipRaesDriver;
+import de.schlichtherle.truezip.key.MockView;
+import static de.schlichtherle.truezip.key.MockView.Action.*;
 import de.schlichtherle.truezip.nio.file.TFileSystemProvider;
 import de.schlichtherle.truezip.nio.file.TPath;
 import de.schlichtherle.truezip.nio.file.TPathTestSuite;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
-import org.junit.Test;
-
-import static de.schlichtherle.truezip.key.MockView.Action.*;
+import static java.nio.file.Files.*;
 import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class ZipRaesPathTest extends TPathTestSuite {
+public final class ZipRaesPathTest extends TPathTestSuite<TestZipRaesDriver> {
 
-    private static final MockView<AesCipherParameters>
-            view = new MockView<AesCipherParameters>();
+    private @Nullable MockView<AesCipherParameters> view;
 
-    public ZipRaesPathTest() {
-        super(  FsScheme.create("tzp"),
-                new SafeZipRaesDriver(  IO_POOL_PROVIDER,
-                                        new PromptingKeyManagerService(view)) {
-            @Override
-            public KeyProviderSyncStrategy getKeyProviderSyncStrategy() {
-                return KeyProviderSyncStrategy.RESET_UNCONDITIONALLY;
-            }
-        });
+    @Override
+    protected String getSuffixList() {
+        return "tzp";
+    }
+
+    @Override
+    protected TestZipRaesDriver newArchiveDriver() {
+        return new TestZipRaesDriver(IO_POOL_PROVIDER, view);
     }
 
     @Override
     public void setUp() throws Exception {
+        this.view = new MockView<AesCipherParameters>();
         super.setUp();
         final AesCipherParameters key = new AesCipherParameters();
         key.setPassword("secret".toCharArray());
@@ -60,49 +56,42 @@ public final class ZipRaesPathTest extends TPathTestSuite {
         view.setAction(ENTER);
     }
 
+    @Override
+    public void tearDown() throws Exception {
+        view.setAction(ENTER);
+        super.tearDown();
+    }
+
     @Test
     public void testCancelling() throws IOException {
         view.setAction(CANCEL);
 
         final TPath archive = getArchive();
-        final TPath entry1 = archive.resolve("entry1");
-
         assertFalse(exists(newNonArchivePath(archive)));
 
+        final TPath entry1 = archive.resolve("entry1");
         try {
             createDirectory(entry1);
             fail("An IOException should have been thrown because password prompting has been disabled!");
         } catch (IOException expected) {
         }
-        assertFalse(exists(newNonArchivePath(entry1)));
-        assertFalse(exists(newNonArchivePath(archive)));
-
         try {
             createFile(entry1);
             fail("An IOException should have been thrown because password prompting has been disabled!");
         } catch (IOException expected) {
         }
-        assertFalse(exists(newNonArchivePath(entry1)));
-        assertFalse(exists(newNonArchivePath(archive)));
 
-        final TPath entry2 = entry1.resolve("entry2");
+        final TPath entry2 = archive.resolve("entry2");
         try {
             createDirectory(entry2);
             fail("An IOException should have been thrown because password prompting has been disabled!");
         } catch (IOException expected) {
         }
-        assertFalse(exists(newNonArchivePath(entry2)));
-        assertFalse(exists(newNonArchivePath(entry1)));
-        assertFalse(exists(newNonArchivePath(archive)));
-
         try {
             createFile(entry2);
             fail("An IOException should have been thrown because password prompting has been disabled!");
         } catch (IOException expected) {
         }
-        assertFalse(exists(newNonArchivePath(entry2)));
-        assertFalse(exists(newNonArchivePath(entry1)));
-        assertFalse(exists(newNonArchivePath(archive)));
     }
 
     @Test

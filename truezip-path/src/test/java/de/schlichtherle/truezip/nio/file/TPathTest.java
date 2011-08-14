@@ -36,9 +36,10 @@ import org.junit.Test;
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-public class TPathTest extends TestBase {
+public class TPathTest extends MockTestBase {
 
     @Test
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testIllegalConstructorParameters() {
         if ('\\' == separatorChar) {
             for (Object[] params : new Object[][] {
@@ -468,7 +469,7 @@ public class TPathTest extends TestBase {
         }
         // Once created, the prospective archive file detection does not change
         // because a TPath is immutable.
-        assert archive.getArchiveDetector() == getDetector();
+        assert archive.getArchiveDetector() == getArchiveDetector();
         assert archive.isArchive();
         assert file.getArchiveDetector() == TArchiveDetector.NULL;
         assert !file.isArchive();

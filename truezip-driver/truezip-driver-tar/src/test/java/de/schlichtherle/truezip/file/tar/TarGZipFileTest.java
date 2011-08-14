@@ -17,16 +17,21 @@ package de.schlichtherle.truezip.file.tar;
 
 import de.schlichtherle.truezip.file.TFileTestSuite;
 import de.schlichtherle.truezip.fs.archive.tar.TarGZipDriver;
-import de.schlichtherle.truezip.fs.FsScheme;
 
 /**
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class TarGZipFileTest extends TFileTestSuite {
+public final class TarGZipFileTest extends TFileTestSuite<TarGZipDriver> {
 
-    public TarGZipFileTest() {
-        super(FsScheme.create("tar.gz"), new TarGZipDriver(IO_POOL_PROVIDER));
+    @Override
+    protected String getSuffixList() {
+        return "tar.gz";
+    }
+
+    @Override
+    protected TarGZipDriver newArchiveDriver() {
+        return new TarGZipDriver(IO_POOL_PROVIDER);
     }
 
     @Override

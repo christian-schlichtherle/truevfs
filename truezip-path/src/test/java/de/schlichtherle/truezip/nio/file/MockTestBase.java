@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2011 Schlichtherle IT Services
+ * Copyright (C) 2011 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,24 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.file.zip;
+package de.schlichtherle.truezip.nio.file;
 
-import de.schlichtherle.truezip.file.TFileTestSuite;
-import de.schlichtherle.truezip.fs.archive.zip.JarDriver;
+import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class JarFileTest extends TFileTestSuite<JarDriver> {
+@DefaultAnnotation(NonNull.class)
+public abstract class MockTestBase extends TestBase<MockArchiveDriver> {
 
     @Override
     protected String getSuffixList() {
-        return "jar";
+        return "mok|mok1|mok2";
     }
 
     @Override
-    protected JarDriver newArchiveDriver() {
-        return new JarDriver(IO_POOL_PROVIDER);
+    protected MockArchiveDriver newArchiveDriver() {
+        return new MockArchiveDriver();
     }
 }

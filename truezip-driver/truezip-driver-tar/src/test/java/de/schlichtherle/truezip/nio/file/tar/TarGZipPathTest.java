@@ -16,17 +16,22 @@
 package de.schlichtherle.truezip.nio.file.tar;
 
 import de.schlichtherle.truezip.fs.archive.tar.TarGZipDriver;
-import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.nio.file.TPathTestSuite;
 
 /**
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class TarGZipPathTest extends TPathTestSuite {
+public final class TarGZipPathTest extends TPathTestSuite<TarGZipDriver> {
 
-    public TarGZipPathTest() {
-        super(FsScheme.create("tar.gz"), new TarGZipDriver(IO_POOL_PROVIDER));
+    @Override
+    protected String getSuffixList() {
+        return "tar.gz";
+    }
+
+    @Override
+    protected TarGZipDriver newArchiveDriver() {
+        return new TarGZipDriver(IO_POOL_PROVIDER);
     }
 
     @Override

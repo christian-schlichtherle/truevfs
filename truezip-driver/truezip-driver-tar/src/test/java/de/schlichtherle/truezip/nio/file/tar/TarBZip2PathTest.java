@@ -16,23 +16,28 @@
 package de.schlichtherle.truezip.nio.file.tar;
 
 import de.schlichtherle.truezip.fs.archive.tar.TarBZip2Driver;
-import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.nio.file.TPathTestSuite;
 import org.apache.tools.bzip2.CBZip2OutputStream;
 
 /**
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class TarBZip2PathTest extends TPathTestSuite {
+public final class TarBZip2PathTest extends TPathTestSuite<TarBZip2Driver> {
 
-    public TarBZip2PathTest() {
-        super(FsScheme.create("tar.bz2"), new TarBZip2Driver(IO_POOL_PROVIDER) {
+    @Override
+    protected String getSuffixList() {
+        return "tar.bz2";
+    }
+
+    @Override
+    protected TarBZip2Driver newArchiveDriver() {
+        return new TarBZip2Driver(IO_POOL_PROVIDER) {
             @Override
             public int getLevel() {
                 return CBZip2OutputStream.MIN_BLOCKSIZE;
             }
-        });
+        };
     }
 
     @Override

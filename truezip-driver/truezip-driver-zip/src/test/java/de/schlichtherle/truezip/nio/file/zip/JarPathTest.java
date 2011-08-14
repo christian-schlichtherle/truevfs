@@ -16,16 +16,21 @@
 package de.schlichtherle.truezip.nio.file.zip;
 
 import de.schlichtherle.truezip.fs.archive.zip.JarDriver;
-import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.nio.file.TPathTestSuite;
 
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class JarPathTest extends TPathTestSuite {
-    
-    public JarPathTest() {
-        super(FsScheme.create("jar"), new JarDriver(IO_POOL_PROVIDER));
+public final class JarPathTest extends TPathTestSuite<JarDriver> {
+
+    @Override
+    protected String getSuffixList() {
+        return "jar";
+    }
+
+    @Override
+    protected JarDriver newArchiveDriver() {
+        return new JarDriver(IO_POOL_PROVIDER);
     }
 }

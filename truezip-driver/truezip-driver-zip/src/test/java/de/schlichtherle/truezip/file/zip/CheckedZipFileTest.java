@@ -17,15 +17,20 @@ package de.schlichtherle.truezip.file.zip;
 
 import de.schlichtherle.truezip.file.TFileTestSuite;
 import de.schlichtherle.truezip.fs.archive.zip.CheckedZipDriver;
-import de.schlichtherle.truezip.fs.FsScheme;
 
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class CheckedZipFileTest extends TFileTestSuite {
-    
-    public CheckedZipFileTest() {
-        super(FsScheme.create("zip"), new CheckedZipDriver(IO_POOL_PROVIDER));
+public final class CheckedZipFileTest extends TFileTestSuite<CheckedZipDriver> {
+
+    @Override
+    protected String getSuffixList() {
+        return "zip";
+    }
+
+    @Override
+    protected CheckedZipDriver newArchiveDriver() {
+        return new CheckedZipDriver(IO_POOL_PROVIDER);
     }
 }

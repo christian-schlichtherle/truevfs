@@ -15,15 +15,14 @@
  */
 package de.schlichtherle.truezip.nio.file;
 
-import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.fs.FsMountPoint;
+import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
 import java.io.File;
 import static de.schlichtherle.truezip.nio.file.TFileSystemProvider.Parameter.*;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.net.URI;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,28 +31,26 @@ import java.util.Map;
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-public abstract class TestBase extends de.schlichtherle.truezip.file.TestBase {
+public abstract class TestBase<D extends FsArchiveDriver<?>>
+extends de.schlichtherle.truezip.file.TestBase<D> {
 
-    public static final FsMountPoint
+    protected static final FsMountPoint
             ROOT_DIRECTORY = FsMountPoint.create(URI.create("file:/"));
-    public static final FsMountPoint
+    protected static final FsMountPoint
             CURRENT_DIRECTORY = FsMountPoint.create(new File("").toURI());
-    public static final String[] NO_MORE = new String[0];
+    protected static final String[] NO_MORE = new String[0];
 
-    private final Map<String, ?> environment;
+    private @Nullable Map<String, ?> environment;
 
-    protected TestBase() {
-        this(null);
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        final Map<String, Object> map = new HashMap<String, Object>();
+        map.put(ARCHIVE_DETECTOR, super.getArchiveDetector());
+        this.environment = map;
     }
 
-    protected TestBase(final @CheckForNull TArchiveDetector detector) {
-        super(detector);
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put(ARCHIVE_DETECTOR, super.getDetector());
-        environment = Collections.unmodifiableMap(map);
-    }
-
-    protected final Map<String, ?> getEnvironment() {
+    protected final @Nullable Map<String, ?> getEnvironment() {
         return environment;
     }
 }

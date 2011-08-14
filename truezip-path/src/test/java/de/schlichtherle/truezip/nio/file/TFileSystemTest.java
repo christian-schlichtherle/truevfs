@@ -30,7 +30,8 @@ import org.junit.Test;
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-public class TFileSystemTest extends TestBase {
+public class TFileSystemTest extends MockTestBase {
+
     @Test
     public void testNewFileSystem() throws IOException {
         for (String[] params : new String[][] {

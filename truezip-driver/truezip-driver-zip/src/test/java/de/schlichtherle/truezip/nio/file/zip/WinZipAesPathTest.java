@@ -13,21 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.file.zip;
+package de.schlichtherle.truezip.nio.file.zip;
 
 import de.schlichtherle.truezip.file.TConfig;
-import de.schlichtherle.truezip.file.TFileTestSuite;
+import de.schlichtherle.truezip.file.zip.TestWinZipAesDriver;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
-import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.key.MockView;
 import de.schlichtherle.truezip.key.pbe.AesPbeParameters;
+import de.schlichtherle.truezip.nio.file.TPathTestSuite;
 import edu.umd.cs.findbugs.annotations.Nullable;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class WinZipAesFileTest extends TFileTestSuite<TestWinZipAesDriver> {
+public final class WinZipAesPathTest extends TPathTestSuite<TestWinZipAesDriver> {
 
     private @Nullable MockView<AesPbeParameters> view;
 
