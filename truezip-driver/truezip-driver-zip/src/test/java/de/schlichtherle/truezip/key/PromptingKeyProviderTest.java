@@ -15,9 +15,6 @@
  */
 package de.schlichtherle.truezip.key;
 
-import de.schlichtherle.truezip.key.PromptingKeyManager;
-import de.schlichtherle.truezip.key.PromptingKeyProvider;
-import de.schlichtherle.truezip.key.UnknownKeyException;
 import java.net.URI;
 import org.junit.Before;
 import org.junit.Test;

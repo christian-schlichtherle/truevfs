@@ -20,6 +20,7 @@ import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.net.URI;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * A container for key providers for reading and writing protected resources.
@@ -30,12 +31,14 @@ import java.net.URI;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 @DefaultAnnotation(NonNull.class)
 public interface KeyManager<K> {
 
     /**
-     * Returns the key provider for the given protected resource.
-     * If no key provider is mapped, a new key provider is created and returned.
+     * Returns the mapped key provider for the given protected resource.
+     * If no key provider is mapped yet, a new key provider is created and
+     * returned.
      *
      * @param  resource the URI of the protected resource.
      * @return The key provider mapped for the protected resource.
@@ -43,7 +46,7 @@ public interface KeyManager<K> {
     KeyProvider<K> getKeyProvider(URI resource);
 
     /**
-     * Moves the key provider from the URI {@code oldResource} to
+     * Moves the mapped key provider from the URI {@code oldResource} to
      * {@code newResource}.
      * 
      * @param  oldResource the old URI of the protected resource.
@@ -56,7 +59,7 @@ public interface KeyManager<K> {
     @Nullable KeyProvider<K> moveKeyProvider(URI oldResource, URI newResource);
 
     /**
-     * Removes the key provider for the given protected resource.
+     * Removes the mapped key provider for the given protected resource.
      * It is an error to use the returned key provider.
      *
      * @param  resource the URI of the protected resource.

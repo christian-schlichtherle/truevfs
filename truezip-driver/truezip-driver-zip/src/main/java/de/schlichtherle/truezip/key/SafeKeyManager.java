@@ -56,7 +56,7 @@ implements KeyManager<K> {
     public synchronized P getKeyProvider(final URI resource) {
         if (null == resource)
             throw new NullPointerException();
-        P provider = getNullableKeyProvider(resource);
+        P provider = providers.get(resource);
         if (null == provider) {
             provider = newKeyProvider();
             providers.put(resource, provider);
@@ -67,11 +67,16 @@ implements KeyManager<K> {
     /**
      * Returns the key provider which is mapped for the given {@code resource}
      * or {@code null} if no key provider is mapped.
+     * <p>
+     * TODO: Make this part of the interface {@link KeyManager} in the next
+     * major version.
      * 
      * @param  resource the nullable URI of the protected resource.
      * @return The key provider mapped for the protected resource.
      */
-    protected final @Nullable P getNullableKeyProvider(@Nullable URI resource) {
+    public synchronized @Nullable P getMappedKeyProvider(URI resource) {
+        if (null == resource)
+            throw new NullPointerException();
         return providers.get(resource);
     }
 

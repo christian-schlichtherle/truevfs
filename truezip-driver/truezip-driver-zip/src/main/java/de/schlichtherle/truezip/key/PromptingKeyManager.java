@@ -70,13 +70,21 @@ extends SafeKeyManager<K, PromptingKeyProvider<K>> {
     }
 
     @Override
+    public synchronized PromptingKeyProvider<K> getMappedKeyProvider(URI resource) {
+        final PromptingKeyProvider<K> provider = super.getMappedKeyProvider(resource);
+        if (null != provider)
+            provider.setResource(resource);
+        return provider;
+    }
+
+    @Override
     public synchronized PromptingKeyProvider<K> moveKeyProvider(URI oldResource, URI newResource) {
         final PromptingKeyProvider<K>
                 oldProvider = super.moveKeyProvider(oldResource, newResource);
         if (null != oldProvider)
             oldProvider.setResource(null);
         final PromptingKeyProvider<K>
-                newProvider = super.getNullableKeyProvider(newResource);
+                newProvider = super.getMappedKeyProvider(newResource);
         if (null != newProvider)
             newProvider.setResource(newResource);
         return oldProvider;
