@@ -47,7 +47,7 @@ implements Cloneable {
 
     private final String name;
     private EnumMap<Type, E> map = new EnumMap<Type, E>(Type.class);
-    private @Nullable Type type;
+    private @Nullable Type key;
     private @Nullable LinkedHashSet<String> members;
 
     /**
@@ -96,7 +96,7 @@ implements Cloneable {
 
     @Override
     public String getName() {
-        return name;
+        return this.name;
     }
 
     /**
@@ -113,7 +113,7 @@ implements Cloneable {
      *         {@link #getTime(Access)} shall get forwarded.
      */
     public @Nullable Type getKey() {
-        return this.type;
+        return this.key;
     }
 
     /**
@@ -129,7 +129,7 @@ implements Cloneable {
      *        {@link #getTime(Access)} shall get forwarded.
      */
     public void setKey(final @Nullable Type type) {
-        this.type = type;
+        this.key = type;
     }
 
     /**
@@ -142,7 +142,7 @@ implements Cloneable {
      * @return The previously mapped entry.
      */
     public @Nullable E putEntry(Type type, E entry) {
-        return map.put(this.type = type, entry);
+        return this.map.put(this.key = type, entry);
     }
 
     /**
@@ -152,7 +152,7 @@ implements Cloneable {
      * @return The previously mapped entry.
      */
     public @Nullable E removeEntry(Type type) {
-        return map.remove(type);
+        return this.map.remove(type);
     }
 
     /**
@@ -162,7 +162,7 @@ implements Cloneable {
      * @return The entry for the given type.
      */
     public @Nullable E getEntry(Type type) {
-        return map.get(type);
+        return this.map.get(type);
     }
 
     /**
@@ -171,7 +171,7 @@ implements Cloneable {
      * @return the archive entry mapped for the {@link #getKey() key} property.
      */
     public @Nullable E getEntry() {
-        return map.get(this.type);
+        return this.map.get(this.key);
     }
 
     /**
@@ -182,7 +182,7 @@ implements Cloneable {
      * @return a collection of the mapped entries
      */
     public Collection<E> getEntries() {
-        return map.values();
+        return this.map.values();
     }
 
     /**
@@ -194,7 +194,7 @@ implements Cloneable {
      */
     @Override
     public Set<Type> getTypes() {
-        return map.keySet();
+        return this.map.keySet();
     }
 
     /**
@@ -205,7 +205,7 @@ implements Cloneable {
      */
     @Override
     public boolean isType(Type type) {
-        return map.containsKey(type);
+        return this.map.containsKey(type);
     }
 
     /**
@@ -216,9 +216,9 @@ implements Cloneable {
      */
     @Override
     public long getSize(Size type) {
-        if (DIRECTORY == this.type)
+        if (DIRECTORY == this.key)
             return UNKNOWN; // TODO: Evaluate 0
-        return map.get(this.type).getSize(type);
+        return this.map.get(this.key).getSize(type);
     }
 
     /**
@@ -229,7 +229,7 @@ implements Cloneable {
      */
     @Override
     public long getTime(Access type) {
-        return map.get(this.type).getTime(type);
+        return this.map.get(this.key).getTime(type);
     }
 
     /**
@@ -243,7 +243,7 @@ implements Cloneable {
      */
     @Override
     public @Nullable Set<String> getMembers() {
-        if (!map.containsKey(DIRECTORY))
+        if (!this.map.containsKey(DIRECTORY))
             return this.members = null;
         final Set<String> members = this.members;
         return null != members
