@@ -103,6 +103,11 @@ extends FsController<M> {
     }
 
     @Override
+    public boolean isExecutable(FsEntryName name) throws IOException {
+        return delegate.isExecutable(name);
+    }
+
+    @Override
     public void setReadOnly(FsEntryName name) throws IOException {
         delegate.setReadOnly(name);
     }
