@@ -219,24 +219,31 @@ extends FsDecoratingController< FsConcurrentModel,
     }
 
     @Override
-    public boolean setTime(FsEntryName name, BitField<Access> types, long value)
+    public boolean setTime(
+            FsEntryName name,
+            Map<Access, Long> times,
+            BitField<FsOutputOption> options)
     throws IOException {
         assertNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
-            return delegate.setTime(name, types, value);
+            return delegate.setTime(name, times, options);
         } finally {
             writeLock().unlock();
         }
     }
 
     @Override
-    public boolean setTime(FsEntryName name, Map<Access, Long> times)
+    public boolean setTime(
+            FsEntryName name,
+            BitField<Access> types,
+            long value,
+            BitField<FsOutputOption> options)
     throws IOException {
         assertNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
-            return delegate.setTime(name, times);
+            return delegate.setTime(name, types, value, options);
         } finally {
             writeLock().unlock();
         }

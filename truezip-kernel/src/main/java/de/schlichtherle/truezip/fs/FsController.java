@@ -144,27 +144,6 @@ public abstract class FsController<M extends FsModel> {
 
     /**
      * Makes an attempt to set the last access time of all types in the given
-     * bit field for the file system entry with the given name.
-     * If {@code false} is returned or an {@link IOException} is thrown, then
-     * still some of the last access times may have been set.
-     * Whether or not this is an atomic operation is specific to the
-     * implementation.
-     * 
-     * @param  name the file system entry name.
-     * @param  types the access types.
-     * @param  value the last access time.
-     * @return {@code true} if and only if setting the access time for all
-     *         types in {@code types} succeeded.
-     * @throws IOException on any I/O error.
-     */
-    public abstract boolean setTime(
-            FsEntryName name,
-            BitField<Access> types,
-            long value)
-    throws IOException;
-
-    /**
-     * Makes an attempt to set the last access time of all types in the given
      * map for the file system entry with the given name.
      * If {@code false} is returned or an {@link IOException} is thrown, then
      * still some of the last access times may have been set.
@@ -182,13 +161,40 @@ public abstract class FsController<M extends FsModel> {
      */
     public boolean setTime(
             FsEntryName name,
-            Map<Access, Long> times)
+            Map<Access, Long> times,
+            BitField<FsOutputOption> options)
     throws IOException {
         boolean ok = true;
         for (Map.Entry<Access, Long> time : times.entrySet())
-            ok &= setTime(name, BitField.of(time.getKey()), time.getValue());
+            ok &= setTime(
+                    name,
+                    BitField.of(time.getKey()),
+                    time.getValue(),
+                    options);
         return ok;
     }
+
+    /**
+     * Makes an attempt to set the last access time of all types in the given
+     * bit field for the file system entry with the given name.
+     * If {@code false} is returned or an {@link IOException} is thrown, then
+     * still some of the last access times may have been set.
+     * Whether or not this is an atomic operation is specific to the
+     * implementation.
+     * 
+     * @param  name the file system entry name.
+     * @param  types the access types.
+     * @param  value the last access time.
+     * @return {@code true} if and only if setting the access time for all
+     *         types in {@code types} succeeded.
+     * @throws IOException on any I/O error.
+     */
+    public abstract boolean setTime(
+            FsEntryName name,
+            BitField<Access> types,
+            long value,
+            BitField<FsOutputOption> options)
+    throws IOException;
 
     /**
      * Returns an input socket for reading the contents of the file system

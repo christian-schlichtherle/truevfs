@@ -103,7 +103,11 @@ final class HttpController extends FsModelController<FsModel>  {
     }
 
     @Override
-    public boolean setTime(FsEntryName name, BitField<Access> types, long value)
+    public boolean setTime(
+            FsEntryName name,
+            BitField<Access> types,
+            long value,
+            BitField<FsOutputOption> options)
     throws IOException {
         throw new ReadOnlyFileSystemTypeException();
     }

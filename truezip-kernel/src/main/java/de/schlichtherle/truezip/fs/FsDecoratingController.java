@@ -113,17 +113,22 @@ extends FsController<M> {
     }
 
     @Override
-    public boolean
-    setTime(FsEntryName name, BitField<Access> types, long value)
+    public boolean setTime(
+            FsEntryName name,
+            Map<Access, Long> times,
+            BitField<FsOutputOption> options)
     throws IOException {
-        return delegate.setTime(name, types, value);
+        return delegate.setTime(name, times, options);
     }
 
     @Override
-    public boolean
-    setTime(FsEntryName name, Map<Access, Long> times)
+    public boolean setTime(
+            FsEntryName name,
+            BitField<Access> types,
+            long value,
+            BitField<FsOutputOption> options)
     throws IOException {
-        return delegate.setTime(name, times);
+        return delegate.setTime(name, types, value, options);
     }
 
     @Override

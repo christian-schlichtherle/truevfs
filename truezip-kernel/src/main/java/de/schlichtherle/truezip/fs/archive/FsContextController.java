@@ -166,26 +166,33 @@ extends FsDecoratingController<FsConcurrentModel, FsDefaultArchiveController<?>>
     }
 
     @Override
-    public boolean setTime(FsEntryName name, BitField<Access> types, long value)
+    public boolean setTime(
+            FsEntryName name,
+            Map<Access, Long> times,
+            BitField<FsOutputOption> options)
     throws IOException {
         final FsDefaultArchiveController<?> delegate = this.delegate;
         final FsOperationContext context = delegate.getContext();
-        delegate.setContext(NULL);
+        delegate.setContext(makeContext(options));
         try {
-            return delegate.setTime(name, types, value);
+            return delegate.setTime(name, times, options);
         } finally {
             delegate.setContext(context);
         }
     }
 
     @Override
-    public boolean setTime(FsEntryName name, Map<Access, Long> times)
+    public boolean setTime(
+            FsEntryName name,
+            BitField<Access> types,
+            long value,
+            BitField<FsOutputOption> options)
     throws IOException {
         final FsDefaultArchiveController<?> delegate = this.delegate;
         final FsOperationContext context = delegate.getContext();
-        delegate.setContext(NULL);
+        delegate.setContext(makeContext(options));
         try {
-            return delegate.setTime(name, times);
+            return delegate.setTime(name, types, value, options);
         } finally {
             delegate.setContext(context);
         }
