@@ -393,7 +393,8 @@ extends FsModelController<FsConcurrentModel> {
     }
 
     @Override
-    public void unlink(final FsEntryName name) throws IOException {
+    public void unlink(final FsEntryName name, BitField<FsOutputOption> options)
+    throws IOException {
         autoSync(name, null);
         if (name.isRoot()) {
             final FsArchiveFileSystem<E> fileSystem;

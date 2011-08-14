@@ -409,12 +409,12 @@ extends FsDecoratingController< FsConcurrentModel,
     }
 
     @Override
-    public void unlink(FsEntryName name)
+    public void unlink(FsEntryName name, BitField<FsOutputOption> options)
     throws IOException {
         assertNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
-            delegate.unlink(name);
+            delegate.unlink(name, options);
         } finally {
             writeLock().unlock();
         }

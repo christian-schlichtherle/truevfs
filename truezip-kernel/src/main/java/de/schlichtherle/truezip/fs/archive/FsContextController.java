@@ -76,7 +76,7 @@ extends FsDecoratingController<FsConcurrentModel, FsDefaultArchiveController<?>>
      * @param controller the decorated file system controller.
      */
     FsContextController(
-            @NonNull FsDefaultArchiveController<?> controller) {
+            FsDefaultArchiveController<?> controller) {
         super(controller);
     }
 
@@ -328,9 +328,9 @@ extends FsDecoratingController<FsConcurrentModel, FsDefaultArchiveController<?>>
 
     @Override
     public void mknod(
-            @NonNull FsEntryName name,
-            @NonNull Type type,
-            @NonNull BitField<FsOutputOption> options,
+            FsEntryName name,
+            Type type,
+            BitField<FsOutputOption> options,
             @CheckForNull Entry template)
     throws IOException {
         final FsDefaultArchiveController<?> delegate = this.delegate;
@@ -344,13 +344,13 @@ extends FsDecoratingController<FsConcurrentModel, FsDefaultArchiveController<?>>
     }
 
     @Override
-    public void unlink(FsEntryName name)
+    public void unlink(FsEntryName name, BitField<FsOutputOption> options)
     throws IOException {
         final FsDefaultArchiveController<?> delegate = this.delegate;
         final FsOperationContext context = delegate.getContext();
-        delegate.setContext(NULL);
+        delegate.setContext(makeContext(options));
         try {
-            delegate.unlink(name);
+            delegate.unlink(name, options);
         } finally {
             delegate.setContext(context);
         }
@@ -359,8 +359,8 @@ extends FsDecoratingController<FsConcurrentModel, FsDefaultArchiveController<?>>
     @Override
     public <X extends IOException>
     void sync(
-            @NonNull final BitField<FsSyncOption> options,
-            @NonNull final ExceptionHandler<? super FsSyncException, X> handler)
+            final BitField<FsSyncOption> options,
+            final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         final FsDefaultArchiveController<?> delegate = this.delegate;
         final FsOperationContext context = delegate.getContext();

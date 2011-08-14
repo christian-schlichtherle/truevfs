@@ -236,7 +236,7 @@ public abstract class FsController<M extends FsModel> {
     throws IOException;
 
     public abstract void
-    unlink(FsEntryName name)
+    unlink(FsEntryName name, BitField<FsOutputOption> options)
     throws IOException;
 
     /**

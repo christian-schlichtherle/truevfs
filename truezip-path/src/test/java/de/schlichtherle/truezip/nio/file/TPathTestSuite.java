@@ -1600,9 +1600,9 @@ extends TestBase<D> {
             assertGrow(entry1);
             assertGrow(entry2);
 
-            // FIXME: http://java.net/jira/browse/TRUEZIP-144
-            /*delete(entry1);
-            delete(entry2);*/
+            // See http://java.net/jira/browse/TRUEZIP-144 .
+            delete(entry1);
+            delete(entry2);
 
             TFileSystemProvider.umount();
             assertTrue(size(path) > 6 * data.length); // six entries plus two central directories
@@ -1610,7 +1610,7 @@ extends TestBase<D> {
             config.close();
         }
 
-        //assertThat(listFiles(archive).length, is(0));
+        assertThat(listFiles(archive).length, is(0));
     }
 
     private void assertGrow(final TPath entry) throws IOException {

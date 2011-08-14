@@ -241,18 +241,18 @@ extends FsDecoratingController< FsConcurrentModel,
     }
 
     @Override
-    public void unlink(final FsEntryName name)
+    public void unlink(final FsEntryName name, BitField<FsOutputOption> options)
     throws IOException {
         assert getModel().isWriteLockedByCurrentThread();
 
         final EntryCache cache = caches.get(name);
         if (null != cache) {
             //cache.flush(); // redundant
-            delegate.unlink(name);
+            delegate.unlink(name, options);
             caches.remove(name);
             cache.clear();
         } else {
-            delegate.unlink(name);
+            delegate.unlink(name, options);
         }
     }
 

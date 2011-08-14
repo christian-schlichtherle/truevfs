@@ -262,10 +262,11 @@ extends FsFileSystemArchiveController<E> {
     }
 
     @Override
-    public void unlink(FsEntryName name) throws IOException {
-        super.unlink(name);
+    public void unlink(FsEntryName name, BitField<FsOutputOption> options)
+    throws IOException {
+        super.unlink(name, options);
         if (name.isRoot())
-            parent.unlink(parentName);
+            parent.unlink(parentName, options);
     }
 
     @Override
@@ -276,7 +277,7 @@ extends FsFileSystemArchiveController<E> {
         final FsCovariantEntry<E> ce;
         if (null == (f = getFileSystem()) || null == (ce = f.getEntry(name)))
             return false;
-        // HIC SUNT DRACONES
+        // HC SUNT DRACONES!
         Boolean grow = null;
         String aen; // archive entry name
         final Output oa = getOutput(); // output archive

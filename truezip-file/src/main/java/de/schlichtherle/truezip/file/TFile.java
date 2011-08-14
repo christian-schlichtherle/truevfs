@@ -2647,7 +2647,9 @@ public final class TFile extends File {
         if (node instanceof TFile) {
             TFile file = (TFile) node;
             if (null != file.innerArchive) {
-                file.innerArchive.getController().unlink(file.getInnerFsEntryName());
+                file.innerArchive.getController().unlink(
+                        file.getInnerFsEntryName(),
+                        TConfig.get().getOutputPreferences());
                 return;
             }
             node = file.delegate;

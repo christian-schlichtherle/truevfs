@@ -152,8 +152,9 @@ extends FsController<M> {
     }
 
     @Override
-    public void unlink(FsEntryName name) throws IOException {
-        delegate.unlink(name);
+    public void unlink(FsEntryName name, BitField<FsOutputOption> options)
+    throws IOException {
+        delegate.unlink(name, options);
     }
 
     @Override

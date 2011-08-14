@@ -590,26 +590,39 @@ implements Iterable<FsCovariantEntry<E>> {
             throw new FsArchiveFileSystemException(name.toString(),
                     "root directory cannot get unlinked");
         final String path = name.getPath();
-        final FsCovariantEntry<E> entry = master.get(path);
-        if (entry == null)
+        final FsCovariantEntry<E> ce = master.get(path);
+        if (null == ce)
             throw new FsArchiveFileSystemException(name.toString(),
                     "archive entry does not exist");
-        if (entry.isType(DIRECTORY) && 0 < entry.getMembers().size())
+        if (ce.isType(DIRECTORY) && 0 < ce.getMembers().size())
             throw new FsArchiveFileSystemException(name.toString(),
                     "directory is not empty");
         touch();
         master.remove(path);
+        {
+            // See http://java.net/jira/browse/TRUEZIP-144 :
+            // This is used to signal to the driver that the entry should not
+            // be included in the central directory even if the entry is
+            // already physically present in the archive file (ZIP).
+            // This signal will be ignored by drivers which do no support a
+            // central directory (TAR).
+            final E ae = ce.getEntry();
+            for (Size type : ALL_SIZE_SET)
+                ae.setSize(type, UNKNOWN);
+            for (Access type : ALL_ACCESS_SET)
+                ae.setTime(type, UNKNOWN);
+        }
         splitter.split(path);
         final String parentPath = splitter.getParentPath();
-        final FsCovariantEntry<E> parentCE = master.get(parentPath);
-        assert null != parentCE : "The parent directory of \"" + name.toString()
+        final FsCovariantEntry<E> pce = master.get(parentPath);
+        assert null != pce : "The parent directory of \"" + name.toString()
                     + "\" is missing - archive file system is corrupted!";
-        final boolean ok = parentCE.remove(splitter.getMemberName());
+        final boolean ok = pce.remove(splitter.getMemberName());
         assert ok : "The parent directory of \"" + name.toString()
                     + "\" does not contain this entry - archive file system is corrupted!";
-        final E parentAE = parentCE.getEntry(DIRECTORY);
-        if (parentAE.getTime(Access.WRITE) != UNKNOWN) // never touch ghosts!
-            parentAE.setTime(Access.WRITE, System.currentTimeMillis());
+        final E pae = pce.getEntry(DIRECTORY);
+        if (UNKNOWN != pae.getTime(Access.WRITE)) // never touch ghosts!
+            pae.setTime(Access.WRITE, System.currentTimeMillis());
     }
 
     public boolean setTime(
