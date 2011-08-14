@@ -220,36 +220,34 @@ implements ZipEntryFactory<ZipArchiveEntry> {
     }
 
     final boolean process(ZipOutputShop output, ZipArchiveEntry local, ZipArchiveEntry peer) {
-        return process(local, peer);
+        return process(peer, local);
     }
 
     /**
-     * Returns {@code true} if and only if the content of the given local
-     * target entry needs processing when it gets copied from or to the given
-     * peer target entry.
-     * This method gets called on either target of a copy operation and should
-     * return {@code false} unless both target entries can mutually agree on
-     * transferring raw (unprocessed) content.
+     * Returns {@code true} if and only if the content of the given input
+     * target entry needs processing when it gets copied to the given output
+     * target entry.
+     * This method gets called twice (once on each side of a copy operation)
+     * and should return {@code false} unless both target entries can mutually
+     * agree on transferring raw (unprocessed) content.
      * Note that it is an error to compare the properties of the target entries
-     * because this method may get called before or after either target gets
-     * mutated to compare equal with the other!
+     * because this method may get called before the local output target gets
+     * mutated to compare equal with the peer input target!
      * <p>
      * The implementation in the class {@link ZipDriver} returns
-     * {@code local.isEncrypted() || peer.isEncrypted()}.
-     * The first part of this expression covers the case that both entries use
-     * different compression methods.
-     * The remaining part of this expression is a safety net which covers the
+     * {@code local.isEncrypted() || peer.isEncrypted()} in order to cover the
      * typical case that the cipher keys of both targets are not the same.
      * Note that there is no secure way to explicitly test for this.
      * 
-     * @param  local the local target entry for copying the contents.
-     * @param  peer the peer target entry for copying the contents.
-     * @return Whether the content of the local target entry needs to get
-     *         processed for copying or can get read or sent in raw format.
+     * @param  input the input target entry for copying the contents.
+     * @param  output the output target entry for copying the contents.
+     * @return Whether the content to get copied from the input target entry
+     *         to the output target entry needs to get processed or can get
+     *         sent in raw format.
      * @since  TrueZIP 7.3
      */
-    protected boolean process(ZipArchiveEntry local, ZipArchiveEntry peer) {
-        return local.isEncrypted() || peer.isEncrypted();
+    protected boolean process(ZipArchiveEntry input, ZipArchiveEntry output) {
+        return input.isEncrypted() || output.isEncrypted();
     }
 
     @Override
