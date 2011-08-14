@@ -94,7 +94,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         }
         if (name.isRoot())
             getKeyManager().removeKeyProvider(
-                    driver.mountPointUri(getModel()));
+                    driver.resourceUri(getModel(), name.toString()));
     }
 
     @Override

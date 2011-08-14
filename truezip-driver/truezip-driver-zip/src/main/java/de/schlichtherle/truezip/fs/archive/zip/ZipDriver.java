@@ -156,17 +156,13 @@ implements ZipEntryFactory<ZipArchiveEntry> {
     protected @CheckForNull ZipCryptoParameters zipCryptoParameters(
             FsModel model,
             Charset charset) {
-        return new KeyManagerZipCryptoParameters(
-                getKeyManagerProvider(),
-                mountPointUri(model),
-                charset);
+        return new KeyManagerZipCryptoParameters(this, model, charset);
     }
 
     /**
-     * Returns a URI which represents the mount point of the given model as a
-     * resource URI for looking up a {@link KeyProvider}.
-     * Note that this URI needs to be matched exactly when setting a password
-     * programmatically!
+     * A template method which derives the URI which represents the mount point
+     * of the given file system model as the base resource URI for looking up
+     * {@link KeyProvider}s.
      * <p>
      * The implementation in the class {@link ZipDriver} returns the
      * expression {@code model.getMountPoint().toHierarchicalUri()}
@@ -174,11 +170,31 @@ implements ZipEntryFactory<ZipArchiveEntry> {
      * expression {@code model.getMountPoint().toUri()}.
      * 
      * @param  model the file system model.
-     * @return A URI representing the file system model's mount point.
+     * @return The URI which represents the file system model's mount point.
      * @see    <a href="http://java.net/jira/browse/TRUEZIP-72">#TRUEZIP-72</a>
      */
     public URI mountPointUri(FsModel model) {
         return model.getMountPoint().toHierarchicalUri();
+    }
+
+    /**
+     * A template method which derives the resource URI for looking up a
+     * {@link KeyProvider} from the given file system model and entry name.
+     * <p>
+     * The implementation in the class {@code ZipDriver} ignores the given
+     * entry name and just returns the expression {@code mountPointUri(model)}
+     * in order to lookup the same key provider for all entries in a ZIP file.
+     * <p>
+     * An alternative implementation in a sub-class could return the expression
+     * {@code mountPointUri(model).resolve("/" + name)} instead.
+     * 
+     * @param  model the file system model.
+     * @param  name the entry name.
+     * @return The URI for looking up a {@link KeyProvider}.
+     */
+    public URI resourceUri(FsModel model, String name) {
+        //return mountPointUri(model).resolve("/" + name);
+        return mountPointUri(model);
     }
 
     /**

@@ -27,6 +27,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * An input shop for reading ZIP files.
@@ -35,6 +36,7 @@ import java.io.InputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 @DefaultAnnotation(NonNull.class)
 public final class ZipInputShop
 extends RawZipFile<ZipArchiveEntry>
@@ -43,7 +45,8 @@ implements InputShop<ZipArchiveEntry> {
     private final ZipDriver driver;
     private final FsModel model;
     private boolean appendee;
-
+    private ZipCryptoParameters param;
+    
     public ZipInputShop(
             final ZipDriver driver,
             final FsModel model,
@@ -66,7 +69,10 @@ implements InputShop<ZipArchiveEntry> {
 
     @Override
     protected ZipCryptoParameters getCryptoParameters() {
-        return driver.zipCryptoParameters(this);
+        ZipCryptoParameters param = this.param;
+        if (null == param)
+            this.param = param = driver.zipCryptoParameters(this);
+        return param;
     }
 
     /**

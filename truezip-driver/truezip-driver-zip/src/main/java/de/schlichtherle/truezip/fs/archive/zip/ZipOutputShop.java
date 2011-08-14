@@ -29,7 +29,6 @@ import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.JointIterator;
 import de.schlichtherle.truezip.zip.RawZipOutputStream;
 import de.schlichtherle.truezip.zip.ZipCryptoParameters;
-import static de.schlichtherle.truezip.zip.ZipEntry.DEFLATED;
 import static de.schlichtherle.truezip.zip.ZipEntry.STORED;
 import static de.schlichtherle.truezip.zip.ZipEntry.UNKNOWN;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -65,6 +64,7 @@ implements OutputShop<ZipArchiveEntry> {
     private final FsModel model;
     private @CheckForNull IOPool.Entry<?> postamble;
     private @CheckForNull ZipArchiveEntry tempEntry;
+    private ZipCryptoParameters param;
 
     public ZipOutputShop(   final ZipDriver driver,
                             final FsModel model,
@@ -121,10 +121,13 @@ implements OutputShop<ZipArchiveEntry> {
     public Charset getRawCharset() {
         return super.getRawCharset();
     }
-
+    
     @Override
     protected ZipCryptoParameters getCryptoParameters() {
-        return driver.zipCryptoParameters(this);
+        ZipCryptoParameters param = this.param;
+        if (null == param)
+            this.param = param = driver.zipCryptoParameters(this);
+        return param;
     }
 
     @Override
