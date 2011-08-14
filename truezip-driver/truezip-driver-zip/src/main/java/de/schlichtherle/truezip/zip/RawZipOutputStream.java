@@ -956,7 +956,7 @@ implements Iterable<E> {
     private final class DeflaterOutputMethod
     extends DecoratingOutputMethod {
 
-        @CheckForNull ZipDeflaterOutputStream out;
+        @Nullable ZipDeflaterOutputStream out;
 
         DeflaterOutputMethod(OutputMethod processor) {
             super(processor);
@@ -1002,7 +1002,7 @@ implements Iterable<E> {
     private abstract class Crc32OutputMethod
     extends DecoratingOutputMethod {
 
-        @CheckForNull Crc32OutputStream out;
+        @Nullable Crc32OutputStream out;
 
         Crc32OutputMethod(OutputMethod processor) {
             super(processor);

@@ -712,7 +712,7 @@ implements Iterable<E>, Closeable {
      */
     protected @Nullable InputStream getInputStream(
             final String name,
-            Boolean check,
+            @CheckForNull Boolean check,
             final boolean process)
     throws IOException {
         assertOpen();
