@@ -56,11 +56,10 @@ import net.jcip.annotations.Immutable;
 /**
  * An archive driver which builds ZIP files.
  * Do <em>not</em> use this driver for custom application file formats
- * - use {@link JarDriver} instead!
+ * - use {@link JarDriver} instead.
  * <p>
  * This driver does <em>not</em> check the CRC value of any entries in existing
- * archives
- * - use {@link CheckedZipDriver} instead!
+ * archives - use {@link CheckedZipDriver} or {@link CheckedJarDriver} instead.
  *
  * @see     CheckedZipDriver
  * @author  Christian Schlichtherle
@@ -180,6 +179,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
      *         ZIP entry with an equal name.
      *         This holds true even if the central directory is used to access
      *         the ZIP entries in random order.
+     * @since  TrueZIP 7.3
      */
     @Override
     public boolean getRedundantContentSupport() {
@@ -195,6 +195,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
      *         ZIP entry with an equal name.
      *         This holds true even if the central directory is used to access
      *         the ZIP entries in random order.
+     * @since  TrueZIP 7.3
      */
     @Override
     public boolean getRedundantMetaDataSupport() {
@@ -208,6 +209,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
      * then an {@link IOException} gets thrown.
      * 
      * @return {@code entry.isEncrypted()}.
+     * @since  TrueZIP 7.3
      */
     protected boolean check(ZipInputShop input, ZipArchiveEntry entry) {
         return entry.isEncrypted();
@@ -221,8 +223,27 @@ implements ZipEntryFactory<ZipArchiveEntry> {
         return process(local, peer);
     }
 
+    /**
+     * Returns {@code true} if and only if the content of the given local
+     * target entry needs processing when it gets copied from or to the given
+     * peer target entry.
+     * This method gets called on either target of a copy operation and should
+     * return {@code false} unless both target entries can mutually agree on
+     * transferring raw (unprocessed) content.
+     * <p>
+     * The implementation in the class {@link ZipDriver} returns
+     * {@code local.isEncrypted() || peer.isEncrypted()} because chances are
+     * that the cipher keys of both targets are not the same (and there is no
+     * secure way to test for this).
+     * 
+     * @param  local the local target entry for copying the contents.
+     * @param  peer the peer target entry for copying the contents.
+     * @return Whether the content of the local target entry needs to get
+     *         processed for copying or can get read or sent in raw format.
+     * @since  TrueZIP 7.3
+     */
     protected boolean process(ZipArchiveEntry local, ZipArchiveEntry peer) {
-        return false; // local.isEncrypted() || peer.isEncrypted(); // FIXME!
+        return local.isEncrypted() || peer.isEncrypted();
     }
 
     @Override
