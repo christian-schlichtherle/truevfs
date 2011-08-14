@@ -646,9 +646,7 @@ public class ZipEntry implements Cloneable {
     }
 
     final boolean isDataDescriptorRequired() {
-        return UNKNOWN == getCrc()
-                || UNKNOWN == getCompressedSize()
-                || UNKNOWN == getSize();
+        return UNKNOWN == (getCrc() | getCompressedSize() | getSize());
     }
 
     final boolean isZip64ExtensionsRequired() {
