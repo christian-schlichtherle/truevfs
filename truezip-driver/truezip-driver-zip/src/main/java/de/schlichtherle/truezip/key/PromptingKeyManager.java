@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.key;
 import de.schlichtherle.truezip.key.PromptingKeyProvider.View;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.net.URI;
 import net.jcip.annotations.ThreadSafe;
 
@@ -70,7 +71,7 @@ extends SafeKeyManager<K, PromptingKeyProvider<K>> {
     }
 
     @Override
-    public synchronized PromptingKeyProvider<K> getMappedKeyProvider(URI resource) {
+    public synchronized @Nullable PromptingKeyProvider<K> getMappedKeyProvider(URI resource) {
         final PromptingKeyProvider<K> provider = super.getMappedKeyProvider(resource);
         if (null != provider)
             provider.setResource(resource);
