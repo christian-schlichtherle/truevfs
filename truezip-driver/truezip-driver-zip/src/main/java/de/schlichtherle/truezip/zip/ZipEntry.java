@@ -16,8 +16,8 @@
 package de.schlichtherle.truezip.zip;
 
 import static de.schlichtherle.truezip.zip.Constants.*;
-import static de.schlichtherle.truezip.zip.ExtraField.*;
 import static de.schlichtherle.truezip.zip.LittleEndian.*;
+import static de.schlichtherle.truezip.zip.WinZipAesEntryExtraField.*;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -257,7 +257,15 @@ public class ZipEntry implements Cloneable {
      * @see ZipOutputStream#getMethod
      */
     public final int getMethod() {
-        return isInit(METHOD) ? method & UShort.MAX_VALUE : UNKNOWN;
+        if (!isInit(METHOD))
+            return UNKNOWN;
+        if (WINZIP_AES == getEncodedMethod()) {
+            final WinZipAesEntryExtraField field = (WinZipAesEntryExtraField)
+                    getExtraField(WINZIP_AES_ID);
+            if (null != field)
+                return field.getMethod();
+        }
+        return method & UShort.MAX_VALUE;
     }
 
     /**
@@ -272,7 +280,6 @@ public class ZipEntry implements Cloneable {
         switch (method) {
             case STORED:
             case DEFLATED:
-            case WINZIP_AES:
                 this.method = (short) method;
                 setInit(METHOD, true);
                 break;
@@ -337,7 +344,15 @@ public class ZipEntry implements Cloneable {
     }
 
     public final long getCrc() {
-        return isInit(CRC) ? crc & UInt.MAX_VALUE : UNKNOWN;
+        if (!isInit(CRC))
+            return UNKNOWN;
+        if (WINZIP_AES == getEncodedMethod()) {
+            final WinZipAesEntryExtraField field = (WinZipAesEntryExtraField)
+                    getExtraField(WINZIP_AES_ID);
+            if (null != field && VV_AE_2 == field.getVendorVersion())
+                return UNKNOWN;
+        }
+        return crc & UInt.MAX_VALUE;
     }
 
     public final void setCrc(final long crc) {
