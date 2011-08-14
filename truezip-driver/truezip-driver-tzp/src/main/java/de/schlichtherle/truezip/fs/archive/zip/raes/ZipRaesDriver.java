@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip.raes;
 
-import de.schlichtherle.truezip.fs.archive.zip.KeyProviderSyncStrategy;
 import de.schlichtherle.truezip.crypto.raes.RaesOutputStream;
 import de.schlichtherle.truezip.crypto.raes.RaesParameters;
 import de.schlichtherle.truezip.crypto.raes.RaesReadOnlyFile;
@@ -61,6 +60,9 @@ import net.jcip.annotations.Immutable;
 @DefaultAnnotation(NonNull.class)
 public abstract class ZipRaesDriver extends JarDriver {
 
+    /**
+     * The key manager provider for accessing protected resources (cryptography).
+     */
     private final KeyManagerProvider keyManagerProvider;
 
     /**
@@ -95,8 +97,8 @@ public abstract class ZipRaesDriver extends JarDriver {
      * Returns the provider for key managers for accessing protected resources
      * (encryption).
      * <p>
-     * The implementation in {@link ZipRaesDriver} always returns the parameter
-     * provided to the constructor.
+     * The implementation in {@link ZipRaesDriver} simply returns the value of
+     * the field {@link #keyManagerProvider}.
      * 
      * @return The provider for key managers for accessing protected resources
      *         (encryption).
@@ -120,7 +122,7 @@ public abstract class ZipRaesDriver extends JarDriver {
      */
     protected @CheckForNull RaesParameters raesParameters(FsModel model) {
         return new KeyManagerRaesParameters(
-                keyManagerProvider.get(AesCipherParameters.class),
+                getKeyManagerProvider().get(AesCipherParameters.class),
                 mountPointUri(model));
     }
 
