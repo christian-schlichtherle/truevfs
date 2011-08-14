@@ -52,7 +52,7 @@ public enum KeyProviderSyncStrategy {
     };
 
     /**
-     * This method gets called upon a call to {@link ZipRaesController#sync}
+     * This method gets called upon a call to {@link ZipController#sync}
      * after a successful synchronization of an encrypted ZIP file.
      *
      * @param provider the key provider for the encrypted ZIP file which has
