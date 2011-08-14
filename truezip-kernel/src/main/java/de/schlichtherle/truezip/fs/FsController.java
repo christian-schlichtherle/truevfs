@@ -139,9 +139,10 @@ public abstract class FsController<M extends FsModel> {
      *         types in {@code types} succeeded.
      * @throws IOException on any I/O error.
      */
-    public abstract boolean setTime(FsEntryName name,
-                                    BitField<Access> types,
-                                    long value)
+    public abstract boolean setTime(
+            FsEntryName name,
+            BitField<Access> types,
+            long value)
     throws IOException;
 
     /**
@@ -161,7 +162,9 @@ public abstract class FsController<M extends FsModel> {
      *         {@code null}.
      * @since  TrueZIP 7.2
      */
-    public boolean setTime(FsEntryName name, Map<Access, Long> times)
+    public boolean setTime(
+            FsEntryName name,
+            Map<Access, Long> times)
     throws IOException {
         boolean ok = true;
         for (Map.Entry<Access, Long> time : times.entrySet())
