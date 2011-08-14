@@ -163,6 +163,7 @@ implements OutputShop<ZipArchiveEntry> {
             }
 
             @Override
+            @SuppressWarnings("fallthrough")
             public OutputStream newOutputStream()
             throws IOException {
                 if (isBusy())
@@ -197,9 +198,6 @@ implements OutputShop<ZipArchiveEntry> {
                     }
                 }
                 switch (lt.getMethod()) {
-                    case UNKNOWN:
-                        lt.setMethod(DEFLATED);
-                        break;
                     case STORED:
                         if (       UNKNOWN == lt.getCrc()
                                 || UNKNOWN == lt.getCompressedSize()
@@ -207,6 +205,9 @@ implements OutputShop<ZipArchiveEntry> {
                             return new BufferedEntryOutputStream(
                                     getPool().allocate(), lt);
                         break;
+                    case UNKNOWN:
+                        lt.setMethod(DEFLATED);
+                        // fall-through!
                     case DEFLATED:
                         break;
                     default:
