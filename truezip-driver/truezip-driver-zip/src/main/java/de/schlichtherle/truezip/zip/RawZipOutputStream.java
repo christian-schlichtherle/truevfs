@@ -909,7 +909,7 @@ implements Iterable<E> {
             this.entryParam = new WinZipAesEntryParameters(this.generalParam,
                     entry);
             final AesKeyStrength keyStrength = this.entryParam.getKeyStrength();
-            final WinZipAesEntryExtraField field;
+            WinZipAesEntryExtraField field = null;
             int method = entry.getMethod();
             long csize = entry.getCompressedSize();
             if (WINZIP_AES == method) {
@@ -921,9 +921,9 @@ implements Iterable<E> {
                         csize -= overhead(field.getKeyStrength());
                     entry.setEncodedMethod(method); // restore for delegate.init(*)
                 }
-            } else {
-                field = new WinZipAesEntryExtraField();
             }
+            if (null == field)
+                field = new WinZipAesEntryExtraField();
             field.setKeyStrength(keyStrength);
             field.setMethod(method);
             final long size = entry.getSize();
