@@ -34,7 +34,7 @@ import net.jcip.annotations.NotThreadSafe;
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
-abstract class Crc32OutputStream extends CheckedOutputStream {
+class Crc32OutputStream extends CheckedOutputStream {
     Crc32OutputStream(@CheckForNull OutputStream out) {
         super(out, new CRC32());
     }

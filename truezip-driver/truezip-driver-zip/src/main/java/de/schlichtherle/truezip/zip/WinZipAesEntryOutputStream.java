@@ -18,8 +18,6 @@ package de.schlichtherle.truezip.zip;
 import de.schlichtherle.truezip.crypto.CipherOutputStream;
 import de.schlichtherle.truezip.crypto.param.KeyStrength;
 import de.schlichtherle.truezip.io.LEDataOutputStream;
-import static de.schlichtherle.truezip.zip.WinZipAesEntryExtraField.*;
-import static de.schlichtherle.truezip.zip.ZipEntry.*;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
@@ -71,8 +69,6 @@ final class WinZipAesEntryOutputStream extends CipherOutputStream {
     /** The Message Authentication Code (MAC). */
     private Mac mac;
 
-    private boolean modifiedEntry;
-
     /**
      * The low level data output stream.
      * Used for writing the header and footer.
@@ -82,42 +78,11 @@ final class WinZipAesEntryOutputStream extends CipherOutputStream {
     WinZipAesEntryOutputStream(
             final LEDataOutputStream out,
             final WinZipAesEntryParameters param)
-    throws ZipKeyException {
+    throws IOException {
         super(out, new BufferedBlockCipher(new WinZipAesCipher()));
         assert null != out;
         assert null != param;
         this.param = param;
-
-        modifyEntry();
-    }
-
-    /**
-     * Modify the compressed size and the CRC-32 of the entry if required.
-     */
-    private void modifyEntry() throws ZipKeyException {
-        if (this.modifiedEntry)
-            return;
-        final WinZipAesEntryParameters param = this.param;
-        final ZipEntry entry = param.getEntry();
-        long csize = entry.getCompressedSize();
-        if (UNKNOWN == csize) {
-            assert UNKNOWN == entry.getCrc();
-            return;
-        }
-        assert UNKNOWN != entry.getCrc();
-        this.modifiedEntry = true;
-        csize += param.getKeyStrength().getBytes() / 2 // salt value
-                + 2   // password verification value
-                + 10; // authentication code
-        entry.setEncodedCompressedSize(csize);
-        final WinZipAesEntryExtraField
-                field = (WinZipAesEntryExtraField) entry.getExtraField(WINZIP_AES_ID);
-        if (VV_AE_2 == field.getVendorVersion())
-            entry.setEncodedCrc(0);
-    }
-
-    void start() throws IOException {
-        final WinZipAesEntryParameters param = this.param;
 
         // Init key strength.
         final KeyStrength keyStrength = param.getKeyStrength();
@@ -164,25 +129,31 @@ final class WinZipAesEntryOutputStream extends CipherOutputStream {
         mac.init(sha1HMacParam);
 
         // Reinit chain of output streams as Encrypt-then-MAC.
-        final LEDataOutputStream dos =
-                this.dos = (LEDataOutputStream) this.delegate;
-        this.delegate = new MacOutputStream(dos, mac);
+        this.dos = (LEDataOutputStream) this.delegate;
+        this.delegate = new MacOutputStream(this.dos, mac);
 
         // Write header.
-        dos.write(salt);
+        this.dos.write(salt);
         writePasswordVerifier(keyParam);
     }
 
     private void writePasswordVerifier(KeyParameter keyParam)
     throws IOException {
-        dos.write(  keyParam.getKey(),
-                    2 * param.getKeyStrength().getBytes(),
-                    PWD_VERIFIER_BITS / 8);
+        this.dos.write(
+                keyParam.getKey(),
+                2 * param.getKeyStrength().getBytes(),
+                PWD_VERIFIER_BITS / 8);
     }
 
     /** Wipe the given array. */
     private void paranoidWipe(final byte[] passwd) {
         shaker.nextBytes(passwd);
+    }
+
+    int getOverhead() throws ZipKeyException {
+        return param.getKeyStrength().getBytes() / 2 // salt value
+                + 2   // password verification value
+                + 10; // authentication code
     }
 
     @Override
@@ -195,8 +166,6 @@ final class WinZipAesEntryOutputStream extends CipherOutputStream {
         final byte[] buf = new byte[mac.getMacSize()]; // MAC buffer
         final int bufLength = mac.doFinal(buf, 0);
         assert bufLength == buf.length;
-        dos.write(buf, 0, bufLength / 2);
-
-        modifyEntry();
+        this.dos.write(buf, 0, bufLength / 2);
     }
 }

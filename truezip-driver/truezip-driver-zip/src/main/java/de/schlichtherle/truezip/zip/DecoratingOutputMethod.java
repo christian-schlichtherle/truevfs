@@ -32,24 +32,24 @@ import net.jcip.annotations.NotThreadSafe;
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
-abstract class DecoratingOutputMethod<P extends OutputMethod>
+abstract class DecoratingOutputMethod
 implements OutputMethod {
 
-    final P delegate;
+    final OutputMethod delegate;
 
-    DecoratingOutputMethod(final P processor) {
+    DecoratingOutputMethod(final OutputMethod processor) {
         assert null != processor;
         this.delegate = processor;
     }
 
     @Override
-    public OutputStream init(ZipEntry entry) throws IOException {
-        return delegate.init(entry);
+    public void init(ZipEntry entry) throws IOException {
+        delegate.init(entry);
     }
 
     @Override
-    public void start() throws IOException {
-        delegate.start();
+    public OutputStream start() throws IOException {
+        return delegate.start();
     }
 
     @Override
