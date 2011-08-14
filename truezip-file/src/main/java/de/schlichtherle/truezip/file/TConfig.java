@@ -21,6 +21,7 @@ import static de.schlichtherle.truezip.fs.FsInputOptions.*;
 import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
+import de.schlichtherle.truezip.fs.FsOutputOptions;
 import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
 import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 import de.schlichtherle.truezip.util.BitField;
@@ -444,7 +445,7 @@ public final class TConfig implements Closeable {
      * @param  preferences the input preferences.
      * @throws IllegalArgumentException if an option is present in
      *         {@code preferences} which is not present in
-     *         {@link #INPUT_PREFERENCES_MASK}.
+     *         {@link FsInputOptions#INPUT_PREFERENCES_MASK}.
      * @since  TrueZIP 7.3
      */
     public void setInputPreferences(final BitField<FsInputOption> preferences) {
@@ -473,7 +474,7 @@ public final class TConfig implements Closeable {
      * @param  preferences the output preferences.
      * @throws IllegalArgumentException if an option is present in
      *         {@code preferences} which is not present in
-     *         {@link #OUTPUT_PREFERENCES_MASK} or if both
+     *         {@link FsOutputOptions#OUTPUT_PREFERENCES_MASK} or if both
      *         {@link FsOutputOption#STORE} and
      *         {@link FsOutputOption#COMPRESS} have been set.
      * @since  TrueZIP 7.3
