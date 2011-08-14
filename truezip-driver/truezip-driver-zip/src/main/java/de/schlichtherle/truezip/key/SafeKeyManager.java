@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.key;
 
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -55,12 +56,23 @@ implements KeyManager<K> {
     public synchronized P getKeyProvider(final URI resource) {
         if (null == resource)
             throw new NullPointerException();
-        P provider = providers.get(resource);
+        P provider = getNullableKeyProvider(resource);
         if (null == provider) {
             provider = newKeyProvider();
             providers.put(resource, provider);
         }
         return provider;
+    }
+
+    /**
+     * Returns the key provider which is mapped for the given {@code resource}
+     * or {@code null} if no key provider is mapped.
+     * 
+     * @param  resource the nullable URI of the protected resource.
+     * @return The key provider mapped for the protected resource.
+     */
+    protected final @Nullable P getNullableKeyProvider(@Nullable URI resource) {
+        return providers.get(resource);
     }
 
     @Override
@@ -69,9 +81,11 @@ implements KeyManager<K> {
             throw new NullPointerException();
         if (oldResource.equals(newResource))
             throw new IllegalArgumentException();
-        final P provider = removeKeyProvider0(oldResource);
-        //provider.setKey(null);
-        return providers.put(newResource, provider);
+        final P provider = providers.remove(oldResource);
+        if (null != provider)
+            return providers.put(newResource, provider);
+        else
+            return providers.remove(newResource);
     }
 
     /**
@@ -84,15 +98,9 @@ implements KeyManager<K> {
     public synchronized P removeKeyProvider(final URI resource) {
         if (null == resource)
             throw new NullPointerException();
-        final P provider = removeKeyProvider0(resource);
-        provider.setKey(null);
-        return provider;
-    }
-
-    private P removeKeyProvider0(final URI resource) {
         final P provider = providers.remove(resource);
-        if (null == provider)
-            throw new IllegalArgumentException();
+        if (null != provider)
+            provider.setKey(null);
         return provider;
     }
 

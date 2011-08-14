@@ -77,12 +77,7 @@ public abstract class KeyManagerTestSuite<M extends KeyManager<?>> {
         } catch (NullPointerException expected) {
         }
 
-        try {
-            manager.moveKeyProvider(idA, idB);
-            fail();
-        } catch (IllegalArgumentException expected) {
-            // no provider mapped yet
-        }
+        assertNull(manager.moveKeyProvider(idA, idB));
 
         KeyProvider<?> provA1 = manager.getKeyProvider(idA);
         assertNotNull(provA1);
@@ -102,32 +97,17 @@ public abstract class KeyManagerTestSuite<M extends KeyManager<?>> {
     public void testRemoveKeyProvider() {
         URI id = URI.create("a");
 
-        try {
-            manager.removeKeyProvider(id);
-            fail();
-        } catch (IllegalArgumentException expected) {
-            // no provider mapped yet
-        }
+        assertNull(manager.removeKeyProvider(id));
 
         KeyProvider<?> prov1 = manager.getKeyProvider(id);
         assertNotNull(manager.removeKeyProvider(id));
 
-        try {
-            manager.removeKeyProvider(id);
-            fail();
-        } catch (IllegalArgumentException expected) {
-            // no provider mapped any more
-        }
+        assertNull(manager.removeKeyProvider(id));
 
         KeyProvider<?> prov2 = manager.getKeyProvider(id);
         assertNotNull(manager.removeKeyProvider(id));
 
-        try {
-            manager.removeKeyProvider(id);
-            fail();
-        } catch (IllegalArgumentException expected) {
-            // no provider mapped any more
-        }
+        assertNull(manager.removeKeyProvider(id));
 
         assertFalse(prov1.equals(prov2));
     }

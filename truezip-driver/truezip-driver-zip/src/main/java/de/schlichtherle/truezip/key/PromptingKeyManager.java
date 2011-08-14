@@ -76,8 +76,9 @@ extends SafeKeyManager<K, PromptingKeyProvider<K>> {
         if (null != oldProvider)
             oldProvider.setResource(null);
         final PromptingKeyProvider<K>
-                newProvider = super.getKeyProvider(newResource);
-        newProvider.setResource(newResource);
+                newProvider = super.getNullableKeyProvider(newResource);
+        if (null != newProvider)
+            newProvider.setResource(newResource);
         return oldProvider;
     }
 
@@ -85,7 +86,8 @@ extends SafeKeyManager<K, PromptingKeyProvider<K>> {
     public synchronized PromptingKeyProvider<K> removeKeyProvider(URI resource) {
         final PromptingKeyProvider<K>
                 provider = super.removeKeyProvider(resource);
-        provider.setResource(null);
+        if (null != provider)
+            provider.setResource(null);
         return provider;
     }
 
