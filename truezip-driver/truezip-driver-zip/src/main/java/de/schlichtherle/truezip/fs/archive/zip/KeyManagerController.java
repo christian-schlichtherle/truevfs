@@ -23,11 +23,14 @@ import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.fs.FsSyncOption;
 import de.schlichtherle.truezip.key.KeyManager;
+import de.schlichtherle.truezip.key.KeyProvider;
+import de.schlichtherle.truezip.key.SafeKeyManager;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
+import java.net.URI;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -96,13 +99,20 @@ extends FsDecoratingController<FsModel, FsController<?>> {
 
     @Override
     public <X extends IOException> void
-    sync(   BitField<FsSyncOption> options,
-            ExceptionHandler<? super FsSyncException, X> handler)
+    sync(   final BitField<FsSyncOption> options,
+            final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         delegate.sync(options, handler);
-        driver.getKeyProviderSyncStrategy().sync(
-                getKeyManager().getKeyProvider(
-                    driver.mountPointUri(
-                        getModel())));
+        final KeyManager<?> manager = getKeyManager();
+        final URI resource = driver.mountPointUri(getModel());
+        final KeyProvider<?> provider;
+        if (manager instanceof SafeKeyManager) {
+            // Don't create a key provider if there wasn't one mapped already.
+            provider = ((SafeKeyManager) manager).getMappedKeyProvider(resource);
+        } else {
+            provider = manager.getKeyProvider(resource);
+        }
+        if (null != provider)
+            driver.getKeyProviderSyncStrategy().sync(provider);
     }
 }

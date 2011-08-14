@@ -25,8 +25,8 @@ import net.jcip.annotations.ThreadSafe;
 
 /**
  * This file system controller decorates another file system controller in
- * order to manage the authentication key required for accessing its target
- * RAES encrypted ZIP archive file (ZIP.RAES).
+ * order to manage the authentication key(s) required for accessing its target
+ * encrypted ZIP archive file.
  * 
  * @author  Christian Schlichtherle
  * @version $Id$
