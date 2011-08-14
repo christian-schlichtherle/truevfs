@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.fs.archive.mock;
 
 import static de.schlichtherle.truezip.entry.Entry.*;
+import static de.schlichtherle.truezip.entry.Entry.Size.*;
 import de.schlichtherle.truezip.entry.EntryContainer;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
@@ -153,8 +154,8 @@ implements EntryContainer<MockArchiveEntry> {
                             try {
                                 delegate.close();
                             } finally {
-                                for (Size type : ALL_SIZE_SET)
-                                    entry.setSize(type, io.getSize(type));
+                                // Never copy anything but the DATA size!
+                                entry.setSize(DATA, io.getSize(DATA));
                                 for (Access type : ALL_ACCESS_SET)
                                     entry.setTime(type, io.getTime(type));
                             }
