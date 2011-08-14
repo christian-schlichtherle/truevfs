@@ -340,8 +340,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
     @Override
     public FsController<?>
     newController(FsModel model, FsController<?> parent) {
-        return new ZipController(newDefaultControllerChain(model, parent),
-                this);
+        return new ZipController(superNewController(model, parent), this);
     }
 
     /**
@@ -351,7 +350,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
      * the class {@link ZipDriver}.
      */
     protected final FsController<?>
-    newDefaultControllerChain(FsModel model, FsController<?> parent) {
+    superNewController(FsModel model, FsController<?> parent) {
         return super.newController(model, parent);
     }
 
