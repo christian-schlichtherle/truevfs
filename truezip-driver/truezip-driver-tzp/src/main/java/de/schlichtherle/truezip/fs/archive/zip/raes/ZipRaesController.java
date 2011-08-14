@@ -16,21 +16,17 @@
 package de.schlichtherle.truezip.fs.archive.zip.raes;
 
 import de.schlichtherle.truezip.crypto.raes.RaesKeyException;
+import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
 import de.schlichtherle.truezip.entry.Entry;
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
 import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.FsDecoratingController;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import de.schlichtherle.truezip.fs.FsFalsePositiveException;
-import de.schlichtherle.truezip.fs.FsModel;
-import de.schlichtherle.truezip.fs.FsSyncException;
-import de.schlichtherle.truezip.fs.FsSyncOption;
 import de.schlichtherle.truezip.fs.archive.FsArchiveEntry;
 import de.schlichtherle.truezip.fs.archive.FsCovariantEntry;
-import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.ExceptionHandler;
+import de.schlichtherle.truezip.fs.archive.zip.KeyManagerController;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
@@ -41,28 +37,37 @@ import net.jcip.annotations.ThreadSafe;
  * order to manage the authentication key required for accessing its target
  * RAES encrypted ZIP archive file (ZIP.RAES).
  * 
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
 final class ZipRaesController
-extends FsDecoratingController<FsModel, FsController<?>> {
+extends KeyManagerController<ZipRaesDriver> {
 
     private static final String ROOT_PATH = ROOT.getPath();
-
-    private final ZipRaesDriver driver;
 
     /**
      * Constructs a new ZIP.RAES archive controller.
      *
-     * @param controller the non-{@code null} archive controller.
+     * @param controller the non-{@code null} file system controller to
+     *        decorate.
      * @param driver the ZIP.RAES driver.
      */
-    ZipRaesController(  final FsController<?> controller,
-                        final ZipRaesDriver driver) {
-        super(controller);
-        this.driver = driver;
+    ZipRaesController(
+            final FsController<?> controller,
+            final ZipRaesDriver driver) {
+        super(controller, driver);
+    }
+
+    @Override
+    protected Class<?> getKeyType() {
+        return AesCipherParameters.class;
+    }
+
+    @Override
+    protected Class<? extends IOException> getKeyExceptionType() {
+        return RaesKeyException.class;
     }
 
     @Override
@@ -92,40 +97,5 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             special.putEntry(SPECIAL, driver.newEntry(ROOT_PATH, SPECIAL, entry));
             return special;
         }
-    }
-
-    @Override
-    public void unlink(final FsEntryName name) throws IOException {
-        try {
-            delegate.unlink(name);
-        } catch (final FsFalsePositiveException ex) {
-            // If the false positive exception is caused by a RAES key
-            // exception, then throw this instead in order to avoid delegating
-            // this method to the parent file system.
-            // This prevents the application from inadvertently deleting a
-            // RAES encrypted ZIP file just because its key wasn't available
-            // because e.g. the user has cancelled key prompting.
-            final Throwable cause = ex.getCause();
-            throw cause instanceof RaesKeyException
-                    ? (RaesKeyException) cause
-                    : ex;
-        }
-        if (name.isRoot())
-            driver  .getKeyManager()
-                    .removeKeyProvider(
-                        driver.mountPointUri(getModel()));
-    }
-
-    @Override
-    public <X extends IOException> void
-    sync(   BitField<FsSyncOption> options,
-            ExceptionHandler<? super FsSyncException, X> handler)
-    throws X {
-        delegate.sync(options, handler);
-        driver  .getKeyProviderSyncStrategy()
-                .sync(
-                    driver  .getKeyManager()
-                            .getKeyProvider(
-                                driver.mountPointUri(getModel())));
     }
 }
