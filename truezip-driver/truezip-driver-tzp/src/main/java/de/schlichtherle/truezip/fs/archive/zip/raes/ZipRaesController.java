@@ -42,7 +42,7 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-final class ZipRaesController
+public class ZipRaesController
 extends KeyManagerController<ZipRaesDriver> {
 
     private static final String ROOT_PATH = ROOT.getPath();
