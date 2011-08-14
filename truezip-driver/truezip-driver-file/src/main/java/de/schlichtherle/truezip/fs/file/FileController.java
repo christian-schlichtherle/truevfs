@@ -142,22 +142,29 @@ final class FileController extends FsModelController<FsModel>  {
     }
 
     @Override
-    public boolean setTime(FsEntryName name, BitField<Access> types, long value)
-    throws IOException {
-        final File file = new File(target, name.getPath());
-        boolean ok = true;
-        for (final Access type : types)
-            ok &= WRITE == type && file.setLastModified(value);
-        return ok;
-    }
-
-    @Override
-    public boolean setTime(FsEntryName name, Map<Access, Long> times)
+    public boolean setTime(
+            FsEntryName name,
+            Map<Access, Long> times,
+            BitField<FsOutputOption> options)
     throws IOException {
         final File file = new File(target, name.getPath());
         boolean ok = true;
         for (Map.Entry<Access, Long> time : times.entrySet())
             ok &= WRITE == time.getKey() && file.setLastModified(time.getValue());
+        return ok;
+    }
+
+    @Override
+    public boolean setTime(
+            FsEntryName name,
+            BitField<Access> types,
+            long value,
+            BitField<FsOutputOption> options)
+    throws IOException {
+        final File file = new File(target, name.getPath());
+        boolean ok = true;
+        for (final Access type : types)
+            ok &= WRITE == type && file.setLastModified(value);
         return ok;
     }
 

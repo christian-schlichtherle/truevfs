@@ -93,12 +93,21 @@ public class DummyController<M extends FsModel> extends FsController<M> {
     }
 
     @Override
-    public boolean setTime(FsEntryName name, BitField<Access> types, long value) throws IOException {
+    public boolean setTime(
+            FsEntryName name,
+            Map<Access, Long> times,
+            BitField<FsOutputOption> options)
+    throws IOException {
         throw new IOException("Read only dummy file system controller!");
     }
 
     @Override
-    public boolean setTime(FsEntryName name, Map<Access, Long> times) throws IOException {
+    public boolean setTime(
+            FsEntryName name,
+            BitField<Access> types,
+            long value,
+            BitField<FsOutputOption> options)
+    throws IOException {
         throw new IOException("Read only dummy file system controller!");
     }
 

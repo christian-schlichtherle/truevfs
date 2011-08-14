@@ -1532,6 +1532,9 @@ extends TestBase<D> {
             assertGrow(entry1);
             assertGrow(entry2);
 
+            assertTrue(entry1.setLastModified(System.currentTimeMillis()));
+            assertTrue(entry2.setLastModified(System.currentTimeMillis()));
+
             // See http://java.net/jira/browse/TRUEZIP-144 .
             entry1.rm();
             entry2.rm();

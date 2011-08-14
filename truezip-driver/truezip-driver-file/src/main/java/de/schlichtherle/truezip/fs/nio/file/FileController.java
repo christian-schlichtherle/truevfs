@@ -144,21 +144,10 @@ final class FileController extends FsModelController<FsModel>  {
     }
 
     @Override
-    public boolean setTime( final FsEntryName name,
-                            final BitField<Access> types,
-                            final long value)
-    throws IOException {
-        final Path file = target.resolve(name.getPath());
-        final FileTime time = FileTime.fromMillis(value);
-        getBasicFileAttributeView(file).setTimes(
-                types.get(WRITE)  ? time : null,
-                types.get(READ)   ? time : null,
-                types.get(CREATE) ? time : null);
-        return types.clear(WRITE).clear(READ).clear(CREATE).isEmpty();
-    }
-
-    @Override
-    public boolean setTime(final FsEntryName name, final Map<Access, Long> times)
+    public boolean setTime(
+            final FsEntryName name,
+            final Map<Access, Long> times,
+            BitField<FsOutputOption> options)
     throws IOException {
         final Path file = target.resolve(name.getPath());
         final Map<Access, Long> t = new EnumMap<Access, Long>(times);
@@ -167,6 +156,21 @@ final class FileController extends FsModelController<FsModel>  {
                 toFileTime(t.remove(READ)),
                 toFileTime(t.remove(CREATE)));
         return t.isEmpty();
+    }
+
+    @Override
+    public boolean setTime(
+            final FsEntryName name,
+            final BitField<Access> types,
+            final long value, BitField<FsOutputOption> options)
+    throws IOException {
+        final Path file = target.resolve(name.getPath());
+        final FileTime time = FileTime.fromMillis(value);
+        getBasicFileAttributeView(file).setTimes(
+                types.get(WRITE)  ? time : null,
+                types.get(READ)   ? time : null,
+                types.get(CREATE) ? time : null);
+        return types.clear(WRITE).clear(READ).clear(CREATE).isEmpty();
     }
 
     @Override

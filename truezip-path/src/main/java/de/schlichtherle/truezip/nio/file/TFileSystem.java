@@ -30,7 +30,6 @@ import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
-import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import de.schlichtherle.truezip.fs.FsFilteringManager;
@@ -525,7 +524,10 @@ public final class TFileSystem extends FileSystem {
                 times.put(READ, lastAccessTime.toMillis());
             if (null != createTime)
                 times.put(CREATE, createTime.toMillis());
-            controller.setTime(path.getEntryName(), times);
+            controller.setTime(
+                    path.getEntryName(),
+                    times,
+                    path.getOutputPreferences());
         }
     } // class FsEntryAttributeView
 

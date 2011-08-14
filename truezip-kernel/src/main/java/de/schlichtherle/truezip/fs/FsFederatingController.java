@@ -223,13 +223,16 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     }
 
     @Override
-    public boolean setTime(FsEntryName name, BitField<Access> types, long value)
+    public boolean setTime(
+            FsEntryName name,
+            Map<Access, Long> times,
+            BitField<FsOutputOption> options)
     throws IOException {
         try {
-            return delegate.setTime(name, types, value);
+            return delegate.setTime(name, times, options);
         } catch (FsFalsePositiveException ex) {
             try {
-                return getParent().setTime(resolveParent(name), types, value);
+                return getParent().setTime(resolveParent(name), times, options);
             } catch (FsException ex2) {
                 assert !(ex2 instanceof FsFalsePositiveException);
                 throw ex2;
@@ -240,13 +243,17 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     }
 
     @Override
-    public boolean setTime(FsEntryName name, Map<Access, Long> times)
+    public boolean setTime(
+            FsEntryName name,
+            BitField<Access> types,
+            long value,
+            BitField<FsOutputOption> options)
     throws IOException {
         try {
-            return delegate.setTime(name, times);
+            return delegate.setTime(name, types, value, options);
         } catch (FsFalsePositiveException ex) {
             try {
-                return getParent().setTime(resolveParent(name), times);
+                return getParent().setTime(resolveParent(name), types, value, options);
             } catch (FsException ex2) {
                 assert !(ex2 instanceof FsFalsePositiveException);
                 throw ex2;

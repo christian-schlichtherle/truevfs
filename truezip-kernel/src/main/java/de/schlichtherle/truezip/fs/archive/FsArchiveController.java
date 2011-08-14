@@ -189,19 +189,21 @@ extends FsModelController<FsConcurrentModel> {
 
     @Override
     public final boolean setTime(   FsEntryName name,
-                                    BitField<Access> types,
-                                    long value)
+                                    Map<Access, Long> times,
+                                    BitField<FsOutputOption> options)
     throws IOException {
         autoSync(name, null);
-        return autoMount().setTime(name, types, value);
+        return autoMount().setTime(name, times);
     }
 
     @Override
     public final boolean setTime(   FsEntryName name,
-                                    Map<Access, Long> times)
+                                    BitField<Access> types,
+                                    long value,
+                                    BitField<FsOutputOption> options)
     throws IOException {
         autoSync(name, null);
-        return autoMount().setTime(name, times);
+        return autoMount().setTime(name, types, value);
     }
 
     @Override

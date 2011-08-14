@@ -2263,8 +2263,11 @@ public final class TFile extends File {
     public boolean setLastModified(final long time) {
         if (null != innerArchive) {
             try {
-                innerArchive.getController()
-                        .setTime(getInnerFsEntryName(), BitField.of(Access.WRITE), time);
+                innerArchive.getController().setTime(
+                        getInnerFsEntryName(),
+                        BitField.of(Access.WRITE),
+                        time,
+                        TConfig.get().getOutputPreferences());
                 return true;
             } catch (IOException ex) {
                 return false;
