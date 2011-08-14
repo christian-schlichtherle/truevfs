@@ -106,15 +106,33 @@ public abstract class FsController<M extends FsModel> {
     public abstract @Nullable FsEntry getEntry(FsEntryName name)
     throws IOException;
 
+    /**
+     * Returns {@code false} if the named file system entry is not readable.
+     * 
+     * @param  name the name of the file system entry.
+     * @return {@code false} if the named file system entry is not readable.
+     * @throws IOException On any I/O error.
+     */
     public abstract boolean isReadable(FsEntryName name) throws IOException;
 
+    /**
+     * Returns {@code false} if the named file system entry is not writable.
+     * 
+     * @param  name the name of the file system entry.
+     * @return {@code false} if the named file system entry is not writable.
+     * @throws IOException On any I/O error.
+     */
     public abstract boolean isWritable(FsEntryName name) throws IOException;
 
     /**
-     * Returns {@code false}.
+     * Returns {@code false} if the named file system entry is not executable.
+     * <p>
+     * The implementation in the class {@link FsController} always returns
+     * {@code false}.
      * 
      * @param  name the name of the file system entry.
-     * @return {@code false}.
+     * @return {@code false} if the named file system entry is not executable.
+     * @throws IOException On any I/O error.
      * @since  TrueZIP 7.2.
      */
     public boolean isExecutable(FsEntryName name) throws IOException {
@@ -238,6 +256,14 @@ public abstract class FsController<M extends FsModel> {
             @CheckForNull Entry template)
     throws IOException;
 
+    /**
+     * Removes the named file system entry from the file system.
+     * If the named file system entry is a directory, it must be empty.
+     * 
+     * @param  name the file system entry name.
+     * @param  options output options for this operation.
+     * @throws IOException On any I/O error.
+     */
     public abstract void
     unlink(FsEntryName name, BitField<FsOutputOption> options)
     throws IOException;

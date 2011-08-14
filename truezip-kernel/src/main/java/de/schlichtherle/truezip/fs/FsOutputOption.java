@@ -19,13 +19,14 @@ import java.io.IOException;
 import net.jcip.annotations.Immutable;
 
 /**
- * Defines the potential options for data output operations.
+ * Defines options for output operations.
  * Not all options may be supported or available for all operations and
  * certain combinations may even be illegal.
- * It's up to the particular operation to define which options are
- * supported and available.
- * If an option is not supported, it must be silently ignored.
- * If an option is not available, an {@link IOException} must be thrown.
+ * It's up to the particular operation and file system driver implementation
+ * to define which options are supported and available.
+ * If an option is not supported, it must get silently ignored.
+ * If an option is not available or illegal, an {@link IOException} must get
+ * thrown.
  *
  * @see     FsInputOption
  * @see     FsOutputOptions
