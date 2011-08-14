@@ -208,6 +208,9 @@ extends FsDriver {
     /**
      * Creates a new input shop for reading the archive entries for the
      * given {@code model} from the given {@code input} socket's target.
+     * <p>
+     * Note that the returned input shop does <em>not</em> need to be
+     * thread-safe.
      * 
      * @param  model the file system model.
      * @param  input the input socket for reading the contents of the
@@ -326,6 +329,9 @@ extends FsDriver {
     /**
      * Creates a new output shop for writing archive entries for the
      * given {@code model} to the given {@code output} socket's target.
+     * <p>
+     * Note that the returned output shop does <em>not</em> need to be
+     * thread-safe.
      * 
      * @param  model the file system model.
      * @param  output the output socket for writing the contents of the
