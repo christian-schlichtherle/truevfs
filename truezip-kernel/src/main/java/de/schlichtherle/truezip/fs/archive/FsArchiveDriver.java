@@ -22,6 +22,7 @@ import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsCachingController;
 import de.schlichtherle.truezip.fs.FsConcurrentController;
+import de.schlichtherle.truezip.fs.FsConcurrentModel;
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsException;
@@ -176,7 +177,7 @@ extends FsDriver {
                    new FsCachingController(
                         new FsContextController(
                             new FsDefaultArchiveController<E>(
-                                new FsContextModel(model),
+                                new FsConcurrentModel(model),
                                 parent,
                                 this)),
                         getPool()));
