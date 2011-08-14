@@ -150,12 +150,6 @@ final class WinZipAesEntryOutputStream extends CipherOutputStream {
         shaker.nextBytes(passwd);
     }
 
-    int getOverhead() throws ZipKeyException {
-        return param.getKeyStrength().getBytes() / 2 // salt value
-                + 2   // password verification value
-                + 10; // authentication code
-    }
-
     @Override
     protected void finish() throws IOException {
         // Flush partial block to out, if any.

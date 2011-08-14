@@ -875,6 +875,12 @@ implements Iterable<E> {
         }
 
         @Override
+        public void init(ZipEntry entry) throws IOException  {
+            entry.setCompressedSize(UNKNOWN);
+            this.delegate.init(entry);
+        }
+
+        @Override
         public OutputStream start() throws IOException {
             assert null == this.out;
             return this.out = new ZipDeflaterOutputStream(this.delegate.start());
@@ -978,6 +984,11 @@ implements Iterable<E> {
                 entry.setEncodedMethod(method); // restore for delegate.init(*)
             } else {
                 field = new WinZipAesEntryExtraField();
+                long csize = entry.getCompressedSize();
+                if (UNKNOWN != csize) {
+                    csize += this.entryParam.getOverhead();
+                    entry.setCompressedSize(csize);
+                }
             }
             field.setKeyStrength(keyStrength);
             field.setMethod(method);
@@ -986,14 +997,12 @@ implements Iterable<E> {
                 field.setVendorVersion(VV_AE_1);
             } else {
                 field.setVendorVersion(VV_AE_2);
+                entry.setEncodedCrc(0);
                 this.fixCrc = true;
             }
             entry.addExtraField(field);
             this.delegate.init(entry);
             entry.setEncodedMethod(WINZIP_AES);
-            if (this.fixCrc)
-                entry.setEncodedCrc(0);
-            entry.setCompressedSize(UNKNOWN);
         }
         
         @Override
