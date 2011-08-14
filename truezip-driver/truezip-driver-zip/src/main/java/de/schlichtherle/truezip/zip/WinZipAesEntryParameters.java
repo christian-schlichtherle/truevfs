@@ -62,10 +62,4 @@ final class WinZipAesEntryParameters {
     byte[] getReadPassword(boolean invalid) throws ZipKeyException {
         return param.getReadPassword(entry.getName(), invalid);
     }
-
-    int getOverhead() throws ZipKeyException {
-        return getKeyStrength().getBytes() / 2 // salt value
-                + 2   // password verification value
-                + 10; // authentication code
-    }
 }
