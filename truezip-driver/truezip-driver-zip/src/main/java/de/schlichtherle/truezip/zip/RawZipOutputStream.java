@@ -913,10 +913,11 @@ implements Iterable<E> {
         public void finish() throws IOException {
             final ZipEntry entry = RawZipOutputStream.this.entry;
             final long expectedCrc = entry.getCrc();
-            assert UNKNOWN != expectedCrc;
-            final long actualCrc = this.out.getChecksum().getValue();
-            if (expectedCrc != actualCrc)
-                throw new CRC32Exception(entry.getName(), expectedCrc, actualCrc);
+            if (UNKNOWN != expectedCrc) {
+                final long actualCrc = this.out.getChecksum().getValue();
+                if (expectedCrc != actualCrc)
+                    throw new CRC32Exception(entry.getName(), expectedCrc, actualCrc);
+            }
             this.delegate.finish();
         }
     } // Crc32CheckingOutputMethod
@@ -995,7 +996,6 @@ implements Iterable<E> {
                 field.setVendorVersion(VV_AE_1);
             } else {
                 field.setVendorVersion(VV_AE_2);
-                entry.setEncodedCrc(0);
                 this.fixCrc = true;
             }
             entry.addExtraField(field);
@@ -1005,6 +1005,8 @@ implements Iterable<E> {
             }
             this.delegate.init(entry);
             entry.setEncodedMethod(WINZIP_AES);
+            if (this.fixCrc)
+                entry.setCrc(UNKNOWN);
         }
 
         int overhead(AesKeyStrength keyStrength) {
