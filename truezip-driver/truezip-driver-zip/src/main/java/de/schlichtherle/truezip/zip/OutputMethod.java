@@ -36,6 +36,7 @@ interface OutputMethod {
 
     /**
      * Checks the given {@code entry} and updates it.
+     * This method may be called multiple times, so it must be reentrant!
      * 
      * @param  entry the ZIP entry to check and update.
      * @throws IOException if checking the given entry failed for some reason.
