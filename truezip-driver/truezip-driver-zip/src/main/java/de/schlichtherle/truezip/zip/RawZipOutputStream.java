@@ -876,8 +876,8 @@ implements Iterable<E> {
 
         @Override
         public void init(ZipEntry entry) throws IOException  {
-            entry.setCompressedSize(UNKNOWN);
             this.delegate.init(entry);
+            entry.setCompressedSize(UNKNOWN);
         }
 
         @Override
@@ -977,18 +977,16 @@ implements Iterable<E> {
             final AesKeyStrength keyStrength = this.entryParam.getKeyStrength();
             final WinZipAesEntryExtraField field;
             int method = entry.getMethod();
+            long csize = entry.getCompressedSize();
             if (WINZIP_AES == method) {
                 field = (WinZipAesEntryExtraField) entry.getExtraField(
                         WINZIP_AES_ID);
                 method = field.getMethod();
+                if (UNKNOWN != csize)
+                    csize -= overhead(field.getKeyStrength());
                 entry.setEncodedMethod(method); // restore for delegate.init(*)
             } else {
                 field = new WinZipAesEntryExtraField();
-                long csize = entry.getCompressedSize();
-                if (UNKNOWN != csize) {
-                    csize += this.entryParam.getOverhead();
-                    entry.setCompressedSize(csize);
-                }
             }
             field.setKeyStrength(keyStrength);
             field.setMethod(method);
@@ -1001,8 +999,18 @@ implements Iterable<E> {
                 this.fixCrc = true;
             }
             entry.addExtraField(field);
+            if (UNKNOWN != csize) {
+                csize += overhead(keyStrength);
+                entry.setCompressedSize(csize);
+            }
             this.delegate.init(entry);
             entry.setEncodedMethod(WINZIP_AES);
+        }
+
+        int overhead(AesKeyStrength keyStrength) {
+            return keyStrength.getBytes() / 2 // salt value
+                    + 2   // password verification value
+                    + 10; // authentication code
         }
         
         @Override
