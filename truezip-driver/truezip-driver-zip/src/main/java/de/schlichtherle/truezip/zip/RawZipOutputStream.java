@@ -863,86 +863,6 @@ implements Iterable<E> {
         }
     } // RawOutputMethod
 
-    private final class DeflaterOutputMethod
-    extends DecoratingOutputMethod {
-
-        @CheckForNull ZipDeflaterOutputStream out;
-
-        DeflaterOutputMethod(OutputMethod processor) {
-            super(processor);
-        }
-
-        @Override
-        public void init(ZipEntry entry) throws IOException  {
-            entry.setCompressedSize(UNKNOWN);
-            this.delegate.init(entry);
-        }
-
-        @Override
-        public OutputStream start() throws IOException {
-            assert null == this.out;
-            return this.out = new ZipDeflaterOutputStream(this.delegate.start());
-        }
-
-        @Override
-        public void finish() throws IOException {
-            this.out.finish();
-            this.delegate.finish();
-        }
-    } // DeflateOutputMethod
-
-    private final class Crc32CheckingOutputMethod
-    extends DecoratingOutputMethod {
-
-        @CheckForNull Crc32OutputStream out;
-
-        Crc32CheckingOutputMethod(OutputMethod processor) {
-            super(processor);
-        }
-
-        @Override
-        public OutputStream start() throws IOException {
-            assert null == this.out;
-            return this.out = new Crc32OutputStream(this.delegate.start());
-        }
-
-        @Override
-        public void finish() throws IOException {
-            final ZipEntry entry = RawZipOutputStream.this.entry;
-            final long expectedCrc = entry.getCrc();
-            if (UNKNOWN != expectedCrc) {
-                final long actualCrc = this.out.getChecksum().getValue();
-                if (expectedCrc != actualCrc)
-                    throw new CRC32Exception(entry.getName(), expectedCrc, actualCrc);
-            }
-            this.delegate.finish();
-        }
-    } // Crc32CheckingOutputMethod
-
-    private final class Crc32UpdatingOutputMethod
-    extends DecoratingOutputMethod {
-
-        @CheckForNull Crc32OutputStream out;
-
-        Crc32UpdatingOutputMethod(OutputMethod processor) {
-            super(processor);
-        }
-
-        @Override
-        public OutputStream start() throws IOException {
-            assert null == this.out;
-            return this.out = new Crc32OutputStream(this.delegate.start());
-        }
-
-        @Override
-        public void finish() throws IOException {
-            final long crc = this.out.getChecksum().getValue();
-            final ZipEntry entry = RawZipOutputStream.this.entry;
-            entry.setEncodedCrc(crc);
-            this.delegate.finish();
-        }
-    } // Crc32UpdatingOutputMethod
-
     private abstract class EncryptedOutputMethod
     extends DecoratingOutputMethod {
 
@@ -1033,6 +953,34 @@ implements Iterable<E> {
         }
     } // WinZipAesOutputMethod
 
+    private final class DeflaterOutputMethod
+    extends DecoratingOutputMethod {
+
+        @CheckForNull ZipDeflaterOutputStream out;
+
+        DeflaterOutputMethod(OutputMethod processor) {
+            super(processor);
+        }
+
+        @Override
+        public void init(ZipEntry entry) throws IOException  {
+            entry.setCompressedSize(UNKNOWN);
+            this.delegate.init(entry);
+        }
+
+        @Override
+        public OutputStream start() throws IOException {
+            assert null == this.out;
+            return this.out = new ZipDeflaterOutputStream(this.delegate.start());
+        }
+
+        @Override
+        public void finish() throws IOException {
+            this.out.finish();
+            this.delegate.finish();
+        }
+    } // DeflateOutputMethod
+
     private final class ZipDeflaterOutputStream
     extends DeflaterOutputStream {
 
@@ -1050,4 +998,56 @@ implements Iterable<E> {
             deflater.reset();
         }
     } // ZipDeflaterOutputStream
+
+    private abstract class Crc32OutputMethod
+    extends DecoratingOutputMethod {
+
+        @CheckForNull Crc32OutputStream out;
+
+        Crc32OutputMethod(OutputMethod processor) {
+            super(processor);
+        }
+
+        @Override
+        public OutputStream start() throws IOException {
+            assert null == this.out;
+            return this.out = new Crc32OutputStream(this.delegate.start());
+        }
+    } // Crc32OutputMethod
+
+    private final class Crc32CheckingOutputMethod
+    extends Crc32OutputMethod {
+
+        Crc32CheckingOutputMethod(OutputMethod processor) {
+            super(processor);
+        }
+
+        @Override
+        public void finish() throws IOException {
+            final ZipEntry entry = RawZipOutputStream.this.entry;
+            final long expectedCrc = entry.getCrc();
+            if (UNKNOWN != expectedCrc) {
+                final long actualCrc = this.out.getChecksum().getValue();
+                if (expectedCrc != actualCrc)
+                    throw new CRC32Exception(entry.getName(), expectedCrc, actualCrc);
+            }
+            this.delegate.finish();
+        }
+    } // Crc32CheckingOutputMethod
+
+    private final class Crc32UpdatingOutputMethod
+    extends Crc32OutputMethod {
+
+        Crc32UpdatingOutputMethod(OutputMethod processor) {
+            super(processor);
+        }
+
+        @Override
+        public void finish() throws IOException {
+            final ZipEntry entry = RawZipOutputStream.this.entry;
+            final long crc = this.out.getChecksum().getValue();
+            entry.setEncodedCrc(crc);
+            this.delegate.finish();
+        }
+    } // Crc32UpdatingOutputMethod
 }
