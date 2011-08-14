@@ -429,9 +429,11 @@ implements Iterable<E> {
                 param = parameters(WinZipAesParameters.class, param);
                 final WinZipAesEntryExtraField field = (WinZipAesEntryExtraField)
                         entry.getExtraField(WINZIP_AES_ID);
-                method = field.getMethod();
-                if (VV_AE_2 == field.getVendorVersion())
-                    skipCrc = true;
+                if (null != field) {
+                    method = field.getMethod();
+                    if (VV_AE_2 == field.getVendorVersion())
+                        skipCrc = true;
+                }
             }
             processor = newEncryptedOutputMethod((RawOutputMethod) processor,
                     param);
@@ -899,10 +901,12 @@ implements Iterable<E> {
             if (WINZIP_AES == method) {
                 field = (WinZipAesEntryExtraField) entry.getExtraField(
                         WINZIP_AES_ID);
-                method = field.getMethod();
-                if (UNKNOWN != csize)
-                    csize -= overhead(field.getKeyStrength());
-                entry.setEncodedMethod(method); // restore for delegate.init(*)
+                if (null != field) {
+                    method = field.getMethod();
+                    if (UNKNOWN != csize)
+                        csize -= overhead(field.getKeyStrength());
+                    entry.setEncodedMethod(method); // restore for delegate.init(*)
+                }
             } else {
                 field = new WinZipAesEntryExtraField();
             }
