@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.fs.archive;
 import de.schlichtherle.truezip.entry.Entry;
 import static de.schlichtherle.truezip.entry.Entry.*;
 import de.schlichtherle.truezip.entry.Entry.Access;
-import de.schlichtherle.truezip.entry.Entry.Size;
+import static de.schlichtherle.truezip.entry.Entry.Size.*;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.SequentialIOException;
@@ -250,9 +250,9 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
                 try {
                     final Entry src = input.getLocalTarget();
                     final AE dst = getTarget();
-                    for (Size type : ALL_SIZE_SET)
-                        if (UNKNOWN == dst.getSize(type))
-                            dst.setSize(type, src.getSize(type));
+                    // Never copy anything but the DATA size!
+                    if (UNKNOWN == dst.getSize(DATA))
+                        dst.setSize(DATA, src.getSize(DATA));
                     for (Access type : ALL_ACCESS_SET)
                         if (UNKNOWN == dst.getTime(type))
                             dst.setTime(type, src.getTime(type));
