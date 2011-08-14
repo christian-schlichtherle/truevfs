@@ -185,23 +185,26 @@ implements OutputShop<ZipArchiveEntry> {
                         // The ZIP.RAES drivers use this feature to enforce
                         // deflation for enhanced authentication security.
                         final ZipArchiveEntry zpt = (ZipArchiveEntry) pt;
-                        lt.setPlatform(zpt.getPlatform());
-                        lt.setEncrypted(zpt.isEncrypted());
-                        //if (UNKNOWN == lt.getMethod()) {
+                        process = driver.process(ZipOutputShop.this, lt, zpt);
+                        if (!process) {
+                            lt.setPlatform(zpt.getPlatform());
+                            lt.setEncrypted(zpt.isEncrypted());
                             lt.setMethod(zpt.getMethod());
                             lt.setCompressedSize(zpt.getCompressedSize());
-                        //}
-                        lt.setCrc(zpt.getCrc());
-                        lt.setExtra(zpt.getExtra());
-                        process = driver.process(ZipOutputShop.this, lt, zpt);
+                            lt.setCrc(zpt.getCrc());
+                            lt.setExtra(zpt.getExtra());
+                        }
                     }
                 }
-                if (STORED == lt.getMethod())
+                if (STORED == lt.getMethod()) {
                     if (       UNKNOWN == lt.getCrc()
                             || UNKNOWN == lt.getCompressedSize()
-                            || UNKNOWN == lt.getSize())
+                            || UNKNOWN == lt.getSize()) {
+                        assert process : "The CRC-32, compressed size and size properties should be set in the peer target!";
                         return new BufferedEntryOutputStream(
                                 getPool().allocate(), lt, process);
+                    }
+                }
                 return new EntryOutputStream(lt, process);
             }
         } // Output
