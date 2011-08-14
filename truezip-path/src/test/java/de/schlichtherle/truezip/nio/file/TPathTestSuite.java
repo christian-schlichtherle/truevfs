@@ -15,13 +15,11 @@
  */
 package de.schlichtherle.truezip.nio.file;
 
-import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.file.TConfig;
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.TFileTestSuite;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
-import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
@@ -56,9 +54,7 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import static org.hamcrest.CoreMatchers.*;
-import org.junit.After;
 import static org.junit.Assert.*;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -70,7 +66,8 @@ import org.junit.Test;
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-public abstract class TPathTestSuite extends TestBase {
+public abstract class TPathTestSuite<D extends FsArchiveDriver<?>>
+extends TestBase<D> {
 
     private static final Logger logger = Logger.getLogger(
             TPathTestSuite.class.getName());
@@ -88,21 +85,10 @@ public abstract class TPathTestSuite extends TestBase {
     protected static final IOPoolProvider
             IO_POOL_PROVIDER = new ByteArrayIOPoolService(4 * DATA.length / 3); // account for archive file type specific overhead
     
-    private final FsScheme scheme;
-
     private Path temp;
     private TPath archive;
     private byte[] data;
 
-    protected TPathTestSuite(   final FsScheme scheme,
-                                final FsArchiveDriver<?> driver) {
-        super(new TArchiveDetector(scheme.toString(), driver));
-        if (null == driver)
-            throw new NullPointerException();
-        this.scheme = scheme;
-    }
-
-    @Before
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -122,10 +108,6 @@ public abstract class TPathTestSuite extends TestBase {
         return archive;
     }
 
-    protected final String getSuffix() {
-        return "." + scheme;
-    }
-
     protected final byte[] getData() {
         return data.clone();
     }
@@ -134,7 +116,6 @@ public abstract class TPathTestSuite extends TestBase {
         return data.length;
     }
 
-    @After
     @Override
     public void tearDown() throws Exception {
         try {
@@ -1366,7 +1347,6 @@ public abstract class TPathTestSuite extends TestBase {
         // Create test archive file.
         createTestArchive(nEntries);
         
-        // Define thread class to enumerate and read all entries.
         class CheckAllEntriesThread extends IOThread {
             @Override
             public void work() throws IOException {
@@ -1375,16 +1355,16 @@ public abstract class TPathTestSuite extends TestBase {
         } // CheckAllEntriesThread
         
         // Create and start all threads.
-        final CheckAllEntriesThread[] threads = new CheckAllEntriesThread[nThreads];
+        final IOThread[] threads = new IOThread[nThreads];
         for (int i = 0; i < nThreads; i++) {
-            final CheckAllEntriesThread thread = new CheckAllEntriesThread();
+            final IOThread thread = new CheckAllEntriesThread();
             thread.start();
             threads[i] = thread;
         }
         
         // Wait for all threads until done.
         for (int i = 0; i < nThreads; i++) {
-            final CheckAllEntriesThread thread = threads[i];
+            final IOThread thread = threads[i];
             thread.join();
             if (thread.failure != null)
                 throw new IOException(thread.failure);
@@ -1492,16 +1472,16 @@ public abstract class TPathTestSuite extends TestBase {
         } // WritingThread
         
         // Create and start all threads.
-        final WritingThread[] threads = new WritingThread[nThreads];
+        final IOThread[] threads = new IOThread[nThreads];
         for (int i = 0; i < nThreads; i++) {
-            final WritingThread thread = new WritingThread(i);
+            final IOThread thread = new WritingThread(i);
             thread.start();
             threads[i] = thread;
         }
         
         // Wait for all threads to finish.
         for (int i = 0; i < nThreads; i++) {
-            final WritingThread thread = threads[i];
+            final IOThread thread = threads[i];
             thread.join();
             if (thread.failure != null)
                 throw new Exception(thread.failure);
@@ -1564,23 +1544,23 @@ public abstract class TPathTestSuite extends TestBase {
         } // WritingThread
         
         // Create and start all threads.
-        final WritingThread[] threads = new WritingThread[nThreads];
+        final IOThread[] threads = new IOThread[nThreads];
         for (int i = 0; i < nThreads; i++) {
-            final WritingThread thread = new WritingThread();
+            final IOThread thread = new WritingThread();
             thread.start();
             threads[i] = thread;
         }
         
         // Wait for all threads to finish.
         for (int i = 0; i < nThreads; i++) {
-            final WritingThread thread = threads[i];
+            final IOThread thread = threads[i];
             thread.join();
             if (thread.failure != null)
                 throw new Exception(thread.failure);
         }
     }
 
-    private abstract class IOThread extends Thread {
+    private static abstract class IOThread extends Thread {
         Throwable failure;
 
         IOThread() {

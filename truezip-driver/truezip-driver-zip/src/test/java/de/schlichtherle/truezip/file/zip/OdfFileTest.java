@@ -17,15 +17,20 @@ package de.schlichtherle.truezip.file.zip;
 
 import de.schlichtherle.truezip.file.TFileTestSuite;
 import de.schlichtherle.truezip.fs.archive.zip.OdfDriver;
-import de.schlichtherle.truezip.fs.FsScheme;
 
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class OdfFileTest extends TFileTestSuite {
-    
-    public OdfFileTest() {
-        super(FsScheme.create("odf"), new OdfDriver(IO_POOL_PROVIDER));
+public class OdfFileTest extends TFileTestSuite<OdfDriver> {
+
+    @Override
+    protected String getSuffixList() {
+        return "odf";
+    }
+
+    @Override
+    protected OdfDriver newArchiveDriver() {
+        return new OdfDriver(IO_POOL_PROVIDER);
     }
 }

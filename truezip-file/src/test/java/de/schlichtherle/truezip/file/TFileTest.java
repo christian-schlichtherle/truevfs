@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.file;
 
+import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.File;
@@ -31,8 +32,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.URI;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import static de.schlichtherle.truezip.file.TArchiveDetector.NULL;
@@ -48,24 +47,36 @@ import static org.junit.Assert.*;
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-public class TFileTest extends TestBase {
+public class TFileTest extends TestBase<MockArchiveDriver> {
 
     private static final Logger logger
             = Logger.getLogger(TFileTest.class.getName());
 
     private TFile archive;
 
-    @Before
     @Override
-    public void setUp() throws Exception {
-        super.setUp();
-        archive = new TFile("archive.mok");
+    protected String getSuffixList() {
+        return "mok|mok1|mok2";
     }
 
     @Override
-	@After
-    public void tearDown() {
-        assertFalse(new File("archive.zip").exists());
+    protected MockArchiveDriver newArchiveDriver() {
+        return new MockArchiveDriver();
+    }
+
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        archive = new TFile("archive" + getSuffix());
+    }
+
+    @Override
+    public void tearDown() throws Exception {
+        try {
+            assertFalse(new File("archive" + getSuffix()).exists());
+        } finally {
+            super.tearDown();
+        }
     }
 
     @Test

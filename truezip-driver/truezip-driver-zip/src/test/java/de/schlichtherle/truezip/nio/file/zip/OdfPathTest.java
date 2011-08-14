@@ -16,16 +16,21 @@
 package de.schlichtherle.truezip.nio.file.zip;
 
 import de.schlichtherle.truezip.fs.archive.zip.OdfDriver;
-import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.nio.file.TPathTestSuite;
 
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class OdfPathTest extends TPathTestSuite {
-    
-    public OdfPathTest() {
-        super(FsScheme.create("odf"), new OdfDriver(IO_POOL_PROVIDER));
+public class OdfPathTest extends TPathTestSuite<OdfDriver> {
+
+    @Override
+    protected String getSuffixList() {
+        return "odf";
+    }
+
+    @Override
+    protected OdfDriver newArchiveDriver() {
+        return new OdfDriver(IO_POOL_PROVIDER);
     }
 }

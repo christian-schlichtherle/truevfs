@@ -24,7 +24,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -32,15 +31,18 @@ import org.junit.Test;
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-public class TFileSystemProviderTest extends TestBase {
+public class TFileSystemProviderTest extends MockTestBase {
 
     private TFileSystemProvider provider;
 
-    @Before
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        provider = TFileSystemProvider.class.newInstance();
+        try {
+            provider = TFileSystemProvider.class.newInstance();
+        } catch (Exception ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     @Test

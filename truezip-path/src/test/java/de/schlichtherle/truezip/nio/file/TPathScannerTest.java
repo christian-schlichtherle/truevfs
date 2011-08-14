@@ -33,7 +33,8 @@ import static org.hamcrest.CoreMatchers.*;
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-public class TPathScannerTest extends TestBase {
+public class TPathScannerTest extends MockTestBase {
+
     @Test
     public void testScan() throws URISyntaxException {
         if ('\\' == separatorChar) {
