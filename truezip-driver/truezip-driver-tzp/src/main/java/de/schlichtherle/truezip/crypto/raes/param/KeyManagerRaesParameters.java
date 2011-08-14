@@ -20,11 +20,6 @@ import de.schlichtherle.truezip.crypto.raes.RaesParameters;
 import de.schlichtherle.truezip.crypto.raes.RaesParametersProvider;
 import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters;
 import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
-import de.schlichtherle.truezip.fs.FsModel;
-import de.schlichtherle.truezip.fs.archive.zip.ZipDriver;
-import de.schlichtherle.truezip.fs.archive.zip.ZipInputShop;
-import de.schlichtherle.truezip.fs.archive.zip.ZipOutputShop;
-import de.schlichtherle.truezip.fs.archive.zip.raes.ZipRaesDriver;
 import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.key.KeyManagerProvider;
 import de.schlichtherle.truezip.key.KeyProvider;
@@ -32,7 +27,6 @@ import de.schlichtherle.truezip.key.UnknownKeyException;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URI;
-import java.nio.charset.Charset;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -102,7 +96,7 @@ implements RaesParametersProvider {
 
     /**
      * Adapts a {@code KeyProvider} for {@link  AesCipherParameters} obtained
-     * from the {@link manager} to {@code Type0RaesParameters}.
+     * from the {@link #manager} to {@code Type0RaesParameters}.
      */
     private class Type0 implements Type0RaesParameters {
         @Override
