@@ -35,28 +35,24 @@ import net.jcip.annotations.NotThreadSafe;
 interface OutputMethod {
 
     /**
-     * Checks and updates the given {@code entry} and returns an output stream
+     * Checks the given {@code entry} and updates it.
+     * 
+     * @param  entry the ZIP entry to check and update.
+     * @throws IOException if checking the given entry failed for some reason.
+     */
+    void init(ZipEntry entry) throws IOException;
+
+    /**
+     * Starts writing the initialized ZIP entry and returns an output stream
      * for writing its contents.
-     * You must call {@link #start()}
-     * before writing the ZIP entry contents to the returned output stream.
-     * Likewise, you must call {@link #finish()}
-     * after writing the ZIP contents to the returned output stream.
+     * You must call {@link #finish()} after writing the contents to the
+     * returned output stream.
      * You must not call {@link OutputStream#close()} on the returned output
      * stream!
      * 
-     * @param  entry the ZIP entry to check and update.
-     * @return the output stream to write the ZIP entry contents to.
-     * @throws IOException if initializing the given ZIP entry is not possible
-     *         for some reason.
-     */
-    OutputStream init(ZipEntry entry) throws IOException;
-
-    /**
-     * Starts writing the initialized ZIP entry.
-     * 
      * @throws IOException on any I/O error.
      */
-    void start() throws IOException;
+    OutputStream start() throws IOException;
 
     /**
      * Finishes writing the initialized ZIP entry.
