@@ -163,13 +163,13 @@ implements OutputShop<ZipArchiveEntry> {
             }
 
             @Override
-            @SuppressWarnings("fallthrough")
             public OutputStream newOutputStream()
             throws IOException {
                 if (isBusy())
                     throw new OutputBusyException(lt.getName());
                 final Entry pt;
                 final long size;
+                boolean process = true;
                 if (lt.isDirectory()) {
                     lt.setMethod(STORED);
                     lt.setCrc(0);
@@ -187,33 +187,22 @@ implements OutputShop<ZipArchiveEntry> {
                         final ZipArchiveEntry zpt = (ZipArchiveEntry) pt;
                         lt.setPlatform(zpt.getPlatform());
                         lt.setEncrypted(zpt.isEncrypted());
-                        //if (entry.getMethod() == UNKNOWN)
+                        //if (UNKNOWN == lt.getMethod()) {
                             lt.setMethod(zpt.getMethod());
-                        lt.setCrc(zpt.getCrc());
-                        //if (STORED == lt.getMethod())
                             lt.setCompressedSize(zpt.getCompressedSize());
+                        //}
+                        lt.setCrc(zpt.getCrc());
                         lt.setExtra(zpt.getExtra());
-                        return new EntryOutputStream(lt,
-                                driver.process(ZipOutputShop.this, lt, zpt));
+                        process = driver.process(ZipOutputShop.this, lt, zpt);
                     }
                 }
-                switch (lt.getMethod()) {
-                    case STORED:
-                        if (       UNKNOWN == lt.getCrc()
-                                || UNKNOWN == lt.getCompressedSize()
-                                || UNKNOWN == lt.getSize())
-                            return new BufferedEntryOutputStream(
-                                    getPool().allocate(), lt);
-                        break;
-                    case UNKNOWN:
-                        lt.setMethod(DEFLATED);
-                        // fall-through!
-                    case DEFLATED:
-                        break;
-                    default:
-                        assert false : "unsupported method";
-                }
-                return new EntryOutputStream(lt, true);
+                if (STORED == lt.getMethod())
+                    if (       UNKNOWN == lt.getCrc()
+                            || UNKNOWN == lt.getCompressedSize()
+                            || UNKNOWN == lt.getSize())
+                        return new BufferedEntryOutputStream(
+                                getPool().allocate(), lt, process);
+                return new EntryOutputStream(lt, process);
             }
         } // Output
 
@@ -294,16 +283,19 @@ implements OutputShop<ZipArchiveEntry> {
      */
     private final class BufferedEntryOutputStream extends CheckedOutputStream {
         final IOPool.Entry<?> temp;
+        final boolean process;
         boolean closed;
 
         BufferedEntryOutputStream(
                 final IOPool.Entry<?> temp,
-                final ZipArchiveEntry entry)
+                final ZipArchiveEntry entry,
+                final boolean process)
         throws IOException {
             super(temp.getOutputSocket().newOutputStream(), new CRC32());
             assert STORED == entry.getMethod();
             this.temp = temp;
             ZipOutputShop.this.tempEntry = entry;
+            this.process = process;
         }
 
         @Override
@@ -335,7 +327,7 @@ implements OutputShop<ZipArchiveEntry> {
                 try {
                     final ZipArchiveEntry tempEntry = ZipOutputShop.this.tempEntry;
                     assert null != tempEntry;
-                    putNextEntry(tempEntry);
+                    putNextEntry(tempEntry, this.process);
                     try {
                         Streams.cat(in, ZipOutputShop.this);
                     } finally {

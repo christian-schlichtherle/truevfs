@@ -230,11 +230,17 @@ implements ZipEntryFactory<ZipArchiveEntry> {
      * This method gets called on either target of a copy operation and should
      * return {@code false} unless both target entries can mutually agree on
      * transferring raw (unprocessed) content.
+     * Note that it is an error to compare the properties of the target entries
+     * because this method may get called before or after either target gets
+     * mutated to compare equal with the other!
      * <p>
      * The implementation in the class {@link ZipDriver} returns
-     * {@code local.isEncrypted() || peer.isEncrypted()} because chances are
-     * that the cipher keys of both targets are not the same (and there is no
-     * secure way to test for this).
+     * {@code local.isEncrypted() || peer.isEncrypted()}.
+     * The first part of this expression covers the case that both entries use
+     * different compression methods.
+     * The remaining part of this expression is a safety net which covers the
+     * typical case that the cipher keys of both targets are not the same.
+     * Note that there is no secure way to explicitly test for this.
      * 
      * @param  local the local target entry for copying the contents.
      * @param  peer the peer target entry for copying the contents.

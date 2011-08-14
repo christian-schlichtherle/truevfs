@@ -699,15 +699,12 @@ implements Iterable<E> {
      */
     @Override
     public void close() throws IOException {
+        finish();
         if (this.closed)
             return;
         this.closed = true;
-        try {
-            finish();
-        } finally {
-            this.entries.clear();
-            this.delegate.close();
-        }
+        this.entries.clear();
+        this.delegate.close();
     }
 
     /* Adjusts the number of written bytes for appending mode. */
