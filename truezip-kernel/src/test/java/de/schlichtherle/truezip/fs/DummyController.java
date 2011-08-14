@@ -26,6 +26,7 @@ import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
+import java.util.Map;
 import javax.swing.Icon;
 
 /**
@@ -93,6 +94,11 @@ public class DummyController<M extends FsModel> extends FsController<M> {
 
     @Override
     public boolean setTime(FsEntryName name, BitField<Access> types, long value) throws IOException {
+        throw new IOException("Read only dummy file system controller!");
+    }
+
+    @Override
+    public boolean setTime(FsEntryName name, Map<Access, Long> times) throws IOException {
         throw new IOException("Read only dummy file system controller!");
     }
 
