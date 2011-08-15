@@ -28,7 +28,6 @@ import net.jcip.annotations.NotThreadSafe;
  * A JavaBean which represents the original values of selected parameters
  * for the {@link FsContextController} operation in progress.
  *
- * @see     FsContextModel
  * @see     FsContextController
  * @since   TrueZIP 7.3
  * @author  Christian Schlichtherle

@@ -51,7 +51,6 @@ import net.jcip.annotations.NotThreadSafe;
  * order to inject the original values of selected parameters for its operation
  * in progress.
  * 
- * @see     FsContextModel
  * @since   TrueZIP 7.3
  * @author  Christian Schlichtherle
  * @version $Id$
