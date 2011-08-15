@@ -21,6 +21,9 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * A factory for {@link ZipEntry}s.
+ * <p>
+ * <b>Warning:</b> This interface is <em>not</em> intended for public use
+ * - its API may change at will without prior notification!
  *
  * @see     RawZipFile
  * @param   <E> The type of the created ZIP entries.
