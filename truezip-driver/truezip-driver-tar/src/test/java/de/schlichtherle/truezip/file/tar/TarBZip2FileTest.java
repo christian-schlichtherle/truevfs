@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.file.tar;
 
-import de.schlichtherle.truezip.file.TFileTestSuite;
 import de.schlichtherle.truezip.fs.archive.tar.TarBZip2Driver;
 import org.apache.tools.bzip2.CBZip2OutputStream;
 
@@ -23,7 +22,7 @@ import org.apache.tools.bzip2.CBZip2OutputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class TarBZip2FileTest extends TFileTestSuite<TarBZip2Driver> {
+public final class TarBZip2FileTest extends TarFileTestSuite<TarBZip2Driver> {
 
     @Override
     protected String getSuffixList() {
@@ -38,9 +37,5 @@ public final class TarBZip2FileTest extends TFileTestSuite<TarBZip2Driver> {
                 return CBZip2OutputStream.MIN_BLOCKSIZE;
             }
         };
-    }
-
-    @Override
-    public void testGrowing() {
     }
 }

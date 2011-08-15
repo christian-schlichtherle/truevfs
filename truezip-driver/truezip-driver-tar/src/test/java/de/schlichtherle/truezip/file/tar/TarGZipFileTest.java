@@ -15,14 +15,13 @@
  */
 package de.schlichtherle.truezip.file.tar;
 
-import de.schlichtherle.truezip.file.TFileTestSuite;
 import de.schlichtherle.truezip.fs.archive.tar.TarGZipDriver;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class TarGZipFileTest extends TFileTestSuite<TarGZipDriver> {
+public final class TarGZipFileTest extends TarFileTestSuite<TarGZipDriver> {
 
     @Override
     protected String getSuffixList() {
@@ -32,9 +31,5 @@ public final class TarGZipFileTest extends TFileTestSuite<TarGZipDriver> {
     @Override
     protected TarGZipDriver newArchiveDriver() {
         return new TarGZipDriver(IO_POOL_PROVIDER);
-    }
-
-    @Override
-    public void testGrowing() {
     }
 }

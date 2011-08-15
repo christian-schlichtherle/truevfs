@@ -13,23 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.file.tar;
+package de.schlichtherle.truezip.nio.file.tar;
 
-import de.schlichtherle.truezip.fs.archive.tar.TarDriver;
+import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
+import de.schlichtherle.truezip.nio.file.TPathTestSuite;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class TarFileTest extends TarFileTestSuite<TarDriver> {
+public abstract class TarPathTestSuite<D extends FsArchiveDriver<?>>
+extends TPathTestSuite<D> {
 
+    /**
+     * Skipped because appending to TAR files is currently not supported.
+     * 
+     * @deprecated 
+     */
+    @Deprecated
     @Override
-    protected String getSuffixList() {
-        return "tar";
-    }
-
-    @Override
-    protected TarDriver newArchiveDriver() {
-        return new TarDriver(IO_POOL_PROVIDER);
+    public final void testGrowing() {
     }
 }
