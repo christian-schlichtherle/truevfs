@@ -18,7 +18,6 @@ package de.schlichtherle.truezip.zip;
 import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
-import static org.hamcrest.CoreMatchers.*;
 import static de.schlichtherle.truezip.zip.ZipEntry.*;
 import static org.junit.Assert.*;
 
@@ -415,6 +414,56 @@ public final class ZipEntryTest {
         assertEquals(UInt.MAX_VALUE, entry.getEncodedSize());
         entry.setEncodedSize(UInt.MAX_VALUE + 1); // ZIP64!
         assertEquals(UInt.MAX_VALUE, entry.getEncodedSize());
+    }
+
+    @Test
+    public void testExternalAttributes() {
+        try {
+            entry.setExternalAttributes(UNKNOWN - 1);
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
+
+        try {
+            entry.setExternalAttributes(UInt.MAX_VALUE + 1);
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
+
+        assertEquals(UNKNOWN, entry.getExternalAttributes());
+        entry.setExternalAttributes(UInt.MIN_VALUE);
+        assertEquals(UInt.MIN_VALUE, entry.getExternalAttributes());
+        entry.setExternalAttributes(UInt.MAX_VALUE);
+        assertEquals(UInt.MAX_VALUE, entry.getExternalAttributes());
+        entry.setExternalAttributes(UNKNOWN);
+        assertEquals(UNKNOWN, entry.getExternalAttributes());
+    }
+
+    @Test
+    public void testEncodedExternalAttributes() {
+        try {
+            entry.setEncodedExternalAttributes(UNKNOWN - 1);
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
+
+        try {
+            entry.setEncodedExternalAttributes(UInt.MIN_VALUE - 1);
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
+
+        try {
+            entry.setEncodedExternalAttributes(UInt.MAX_VALUE + 1);
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
+
+        assertEquals(0, entry.getEncodedExternalAttributes());
+        entry.setEncodedExternalAttributes(UInt.MIN_VALUE);
+        assertEquals(UInt.MIN_VALUE, entry.getEncodedExternalAttributes());
+        entry.setEncodedExternalAttributes(UInt.MAX_VALUE);
+        assertEquals(UInt.MAX_VALUE, entry.getEncodedExternalAttributes());
     }
 
     @Test

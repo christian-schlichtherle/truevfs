@@ -50,7 +50,7 @@ public class ZipEntry implements Cloneable {
     private static final int PLATFORM = 1, METHOD = 1 << 1,
                              CRC = 1 << 2, CSIZE = 1 << 3,
                              SIZE = 1 << 4, OFFSET = 1 << 5,
-                             DTIME = 1 << 6;
+                             DTIME = 1 << 6, EATTR = 1 << 7;
 
     /** The unknown value for numeric properties. */
     public static final byte UNKNOWN = -1;
@@ -101,6 +101,7 @@ public class ZipEntry implements Cloneable {
     private int crc;                    // 4 bytes unsigned int (UInt)
     private long csize;                 // 63 bits unsigned integer (ULong)
     private long size;                  // 63 bits unsigned integer (Ulong)
+    private int eattr;                  // 4 bytes unsigned int (Uint)
 
     /** Relative Offset Of Local File Header. */
     private long offset;                // 63 bits unsigned integer (ULong)
@@ -136,6 +137,7 @@ public class ZipEntry implements Cloneable {
         this.crc = template.crc;
         this.csize = template.csize;
         this.size = template.size;
+        this.eattr = template.eattr;
         this.offset = template.offset;
         final ExtraFields templateFields = template.fields;
         this.fields = templateFields == null ? null : templateFields.clone();
@@ -437,6 +439,33 @@ public class ZipEntry implements Cloneable {
         assert ULong.check(size);
         this.size = size;
         setInit(SIZE, true);
+    }
+
+    public final long getExternalAttributes() {
+        return isInit(EATTR) ? eattr & UInt.MAX_VALUE : UNKNOWN;
+    }
+
+    public final void setExternalAttributes(final long eattr) {
+        final boolean known = UNKNOWN != eattr;
+        if (known) {
+            UInt.check(eattr, name, "external file attributes out of range");
+            this.eattr = (int) eattr;
+        } else {
+            this.eattr = 0;
+        }
+        setInit(EATTR, known);
+    }
+
+    final long getEncodedExternalAttributes() {
+        if (!isInit(EATTR))
+            return isDirectory() ? 0x10 : 0;
+        return eattr & UInt.MAX_VALUE;
+    }
+
+    final void setEncodedExternalAttributes(final long eattr) {
+        assert UInt.check(eattr);
+        this.eattr = (int) eattr;
+        setInit(EATTR, true);
     }
 
     final long getOffset() {
