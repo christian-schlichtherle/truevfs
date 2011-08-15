@@ -18,7 +18,6 @@ package de.schlichtherle.truezip.file.zip;
 import de.schlichtherle.truezip.file.TConfig;
 import de.schlichtherle.truezip.file.TFileTestSuite;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
-import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.key.MockView;
 import de.schlichtherle.truezip.key.pbe.AesPbeParameters;
 import edu.umd.cs.findbugs.annotations.Nullable;
