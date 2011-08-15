@@ -613,7 +613,7 @@ implements Iterable<E> {
         // Internal File Attributes.
         dos.writeShort(0);
         // External File Attributes.
-        dos.writeInt(directory ? 0x10 : 0); // fixed issue #27.
+        dos.writeInt((int) entry.getEncodedExternalAttributes());
         // Relative Offset Of Local File Header.
         dos.writeInt((int) offset);
         // File Name.

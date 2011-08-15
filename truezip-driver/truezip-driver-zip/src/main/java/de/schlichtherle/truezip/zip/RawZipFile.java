@@ -252,10 +252,11 @@ implements Iterable<E>, Closeable {
                 off += 2;
                 final int commentLen = readUShort(cfh, off);
                 off += 2;
-                off += 2;   // Disk Number
-                //entry.setInternalAttributes(readUShort(cfh, off));
+                //entry.setEncodedDiskNumber(readUShort(cfh, off));
                 off += 2;
-                //entry.setExternalAttributes(readUInt(cfh, off));
+                //entry.setEncodedInternalAttributes(readUShort(cfh, off));
+                off += 2;
+                entry.setEncodedExternalAttributes(readUInt(cfh, off));
                 off += 4;
                 // Relative Offset Of Local File Header.
                 long lfhOff = readUInt(cfh, off);
