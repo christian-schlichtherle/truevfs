@@ -49,9 +49,9 @@ public final class ZipRaesTest extends ZipTestSuite {
                 out, raesParameters);
         try {
             return new ZipOutputStream(ros);
-        } catch (RuntimeException exc) {
+        } catch (RuntimeException ex) {
             ros.close();
-            throw exc;
+            throw ex;
         }
     }
 
@@ -63,9 +63,9 @@ public final class ZipRaesTest extends ZipTestSuite {
                 out, raesParameters);
         try {
             return new ZipOutputStream(ros, cs);
-        } catch (RuntimeException exc) {
+        } catch (RuntimeException ex) {
             ros.close();
-            throw exc;
+            throw ex;
         }
     }
 
@@ -78,9 +78,9 @@ public final class ZipRaesTest extends ZipTestSuite {
             if (rof.length() < AUTHENTICATION_TRIGGER) // heuristic
                 rof.authenticate();
             return new ZipFile(rof);
-        } catch (RuntimeException exc) {
+        } catch (RuntimeException ex) {
             rof.close();
-            throw exc;
+            throw ex;
         } catch (IOException exc) {
             rof.close();
             throw exc;
@@ -100,12 +100,12 @@ public final class ZipRaesTest extends ZipTestSuite {
             if (rof.length() < AUTHENTICATION_TRIGGER) // heuristic
                 rof.authenticate();
             return new ZipFile(rof, cs);
-        } catch (RuntimeException exc) {
+        } catch (RuntimeException ex) {
             rof.close();
-            throw exc;
-        } catch (IOException exc) {
+            throw ex;
+        } catch (IOException ex) {
             rof.close();
-            throw exc;
+            throw ex;
         }
     }
 
@@ -118,12 +118,12 @@ public final class ZipRaesTest extends ZipTestSuite {
             if (rof.length() < AUTHENTICATION_TRIGGER) // heuristic
                 rof.authenticate();
             return new ZipFile(rof);
-        } catch (RuntimeException exc) {
+        } catch (RuntimeException ex) {
             rof.close();
-            throw exc;
-        } catch (IOException exc) {
+            throw ex;
+        } catch (IOException ex) {
             rof.close();
-            throw exc;
+            throw ex;
         }
     }
 
@@ -141,9 +141,9 @@ public final class ZipRaesTest extends ZipTestSuite {
             if (rof.length() < AUTHENTICATION_TRIGGER) // heuristic
                 rof.authenticate();
             return new ZipFile(rof, charset);
-        } catch (RuntimeException exc) {
+        } catch (RuntimeException ex) {
             rof.close();
-            throw exc;
+            throw ex;
         } catch (IOException exc) {
             rof.close();
             throw exc;
@@ -159,9 +159,9 @@ public final class ZipRaesTest extends ZipTestSuite {
             if (rrof.length() < AUTHENTICATION_TRIGGER) // heuristic
                 rrof.authenticate();
             return new ZipFile(rrof);
-        } catch (RuntimeException exc) {
+        } catch (RuntimeException ex) {
             rrof.close();
-            throw exc;
+            throw ex;
         } catch (IOException exc) {
             rrof.close();
             throw exc;
@@ -181,12 +181,34 @@ public final class ZipRaesTest extends ZipTestSuite {
             if (rrof.length() < AUTHENTICATION_TRIGGER) // heuristic
                 rrof.authenticate();
             return new ZipFile(rrof, cs);
-        } catch (RuntimeException exc) {
+        } catch (RuntimeException ex) {
             rrof.close();
-            throw exc;
-        } catch (IOException exc) {
+            throw ex;
+        } catch (IOException ex) {
             rrof.close();
-            throw exc;
+            throw ex;
         }
+    }
+
+    /**
+     * Skipped because appending to a RAES encrypted ZIP file is not possible
+     * by design.
+     * 
+     * @deprecated 
+     */
+    @Deprecated
+    @Override
+    public void testBadGetCheckedInputStream() {
+    }
+
+    /**
+     * Skipped because appending to a RAES encrypted ZIP file is not possible
+     * by design.
+     * 
+     * @deprecated 
+     */
+    @Deprecated
+    @Override
+    public void testAppending() {
     }
 }
