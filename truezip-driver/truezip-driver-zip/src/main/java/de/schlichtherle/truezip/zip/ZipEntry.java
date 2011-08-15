@@ -126,7 +126,7 @@ public class ZipEntry implements Cloneable {
      * Constructs a new ZIP entry with the given name and all other properties
      * copied from the given template.
      */
-    public ZipEntry(final String name, final ZipEntry template) {
+    protected ZipEntry(final String name, final ZipEntry template) {
         UShort.check(name.length());
         this.init = template.init;
         this.name = name;
