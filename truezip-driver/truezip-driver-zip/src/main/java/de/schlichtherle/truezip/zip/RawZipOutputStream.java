@@ -723,7 +723,7 @@ implements Iterable<E> {
         this.delegate.close();
     }
 
-    /* Adjusts the number of written bytes for appending mode. */
+    /** Adjusts the number of written bytes in the offset for appending mode. */
     private static final class AppendingLEDataOutputStream
     extends LEDataOutputStream {
         AppendingLEDataOutputStream(OutputStream out, RawZipFile<?> appendee) {
