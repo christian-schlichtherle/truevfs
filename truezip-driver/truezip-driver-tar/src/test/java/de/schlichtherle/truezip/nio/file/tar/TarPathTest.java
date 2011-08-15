@@ -35,6 +35,6 @@ public final class TarPathTest extends TPathTestSuite<TarDriver> {
     }
 
     @Override
-    public void testGrow() {
+    public void testGrowing() {
     }
 }

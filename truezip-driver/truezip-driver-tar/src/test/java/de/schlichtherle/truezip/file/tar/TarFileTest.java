@@ -35,6 +35,6 @@ public final class TarFileTest extends TFileTestSuite<TarDriver> {
     }
 
     @Override
-    public void testGrow() {
+    public void testGrowing() {
     }
 }

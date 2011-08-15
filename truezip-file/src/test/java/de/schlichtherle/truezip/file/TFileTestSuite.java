@@ -1512,25 +1512,25 @@ extends TestBase<D> {
     } // IOThread
 
     @Test
-    public void testGrow() throws IOException {
+    public void testGrowing() throws IOException {
         final TFile file = newNonArchiveFile(archive);
         final TFile entry1 = new TFile(archive, "entry1");
         final TFile entry2 = new TFile(archive, "entry2");
 
-        final TConfig config = TConfig.push();
+        TConfig config = TConfig.push();
         try {
             config.setOutputPreferences(config.getOutputPreferences().set(GROW));
 
-            assertGrow(entry1);
-            assertGrow(entry2);
+            write(entry1);
+            write(entry2);
 
             TFile.umount();
             assertTrue(file.length() > 2 * data.length); // two entries plus one central directory
 
-            assertGrow(entry1);
-            assertGrow(entry2);
-            assertGrow(entry1);
-            assertGrow(entry2);
+            write(entry1);
+            write(entry2);
+            write(entry1);
+            write(entry2);
 
             assertTrue(entry1.setLastModified(System.currentTimeMillis()));
             assertTrue(entry2.setLastModified(System.currentTimeMillis()));
@@ -1546,9 +1546,21 @@ extends TestBase<D> {
         }
 
         assertThat(archive.list().length, is(0));
+
+        config = TConfig.push();
+        try {
+            config.setOutputPreferences(config.getOutputPreferences().set(GROW));
+
+            archive.rm();
+            TFile.umount();
+        } finally {
+            config.close();
+        }
+
+        assertNull(archive.list());
     }
 
-    private void assertGrow(final TFile entry) throws IOException {
+    private void write(final TFile entry) throws IOException {
         final OutputStream out = new TFileOutputStream(entry);
         try {
             out.write(data);
