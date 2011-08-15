@@ -125,7 +125,7 @@ public final class ZipRaesFileTest extends TFileTestSuite<TestZipRaesDriver> {
     }
 
     /**
-     * Skipped because appending to a RAES encrypted ZIP file is not possible
+     * Skipped because appending to RAES encrypted ZIP files is not possible
      * by design.
      * 
      * @deprecated 
