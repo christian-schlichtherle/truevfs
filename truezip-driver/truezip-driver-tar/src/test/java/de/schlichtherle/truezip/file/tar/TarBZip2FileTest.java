@@ -41,6 +41,6 @@ public final class TarBZip2FileTest extends TFileTestSuite<TarBZip2Driver> {
     }
 
     @Override
-    public void testGrow() {
+    public void testGrowing() {
     }
 }

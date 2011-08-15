@@ -132,6 +132,6 @@ public final class ZipRaesFileTest extends TFileTestSuite<TestZipRaesDriver> {
      */
     @Deprecated
     @Override
-    public void testGrow() {
+    public void testGrowing() {
     }
 }

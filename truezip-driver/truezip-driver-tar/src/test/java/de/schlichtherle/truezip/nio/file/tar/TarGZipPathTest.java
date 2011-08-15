@@ -35,6 +35,6 @@ public final class TarGZipPathTest extends TPathTestSuite<TarGZipDriver> {
     }
 
     @Override
-    public void testGrow() {
+    public void testGrowing() {
     }
 }

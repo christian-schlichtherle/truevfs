@@ -35,6 +35,6 @@ public final class TarGZipFileTest extends TFileTestSuite<TarGZipDriver> {
     }
 
     @Override
-    public void testGrow() {
+    public void testGrowing() {
     }
 }

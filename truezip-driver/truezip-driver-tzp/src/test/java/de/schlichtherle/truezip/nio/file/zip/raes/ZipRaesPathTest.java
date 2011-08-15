@@ -139,6 +139,6 @@ public final class ZipRaesPathTest extends TPathTestSuite<TestZipRaesDriver> {
      */
     @Deprecated
     @Override
-    public void testGrow() {
+    public void testGrowing() {
     }
 }

@@ -1580,25 +1580,25 @@ extends TestBase<D> {
     } // IOThread
 
     @Test
-    public void testGrow() throws IOException {
+    public void testGrowing() throws IOException {
         final TPath path = newNonArchivePath(archive);
         final TPath entry1 = archive.resolve("entry1");
         final TPath entry2 = archive.resolve("entry2");
 
-        final TConfig config = TConfig.push();
+        TConfig config = TConfig.push();
         try {
             config.setOutputPreferences(config.getOutputPreferences().set(GROW));
 
-            assertGrow(entry1);
-            assertGrow(entry2);
+            write(entry1);
+            write(entry2);
 
             TFileSystemProvider.umount();
             assertTrue(size(path) > 2 * data.length); // two entries plus one central directory
 
-            assertGrow(entry1);
-            assertGrow(entry2);
-            assertGrow(entry1);
-            assertGrow(entry2);
+            write(entry1);
+            write(entry2);
+            write(entry1);
+            write(entry2);
 
             // See http://java.net/jira/browse/TRUEZIP-144 .
             delete(entry1);
@@ -1611,9 +1611,21 @@ extends TestBase<D> {
         }
 
         assertThat(listFiles(archive).length, is(0));
+
+        config = TConfig.push();
+        try {
+            config.setOutputPreferences(config.getOutputPreferences().set(GROW));
+
+            delete(archive);
+            TFileSystemProvider.umount();
+        } finally {
+            config.close();
+        }
+
+        assertNull(listFiles(archive));
     }
 
-    private void assertGrow(final TPath entry) throws IOException {
+    private void write(final TPath entry) throws IOException {
         final OutputStream out = newOutputStream(entry);
         try {
             out.write(data);
