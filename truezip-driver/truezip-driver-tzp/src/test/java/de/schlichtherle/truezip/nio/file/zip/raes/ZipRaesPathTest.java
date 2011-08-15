@@ -131,8 +131,14 @@ public final class ZipRaesPathTest extends TPathTestSuite<TestZipRaesDriver> {
         archive.toFile().rm_r();
     }
 
+    /**
+     * Skipped because appending to a RAES encrypted ZIP file is not possible
+     * by design.
+     * 
+     * @deprecated 
+     */
+    @Deprecated
     @Override
     public void testGrow() {
-        // GROWing is not supported with ZIP.RAES.
     }
 }
