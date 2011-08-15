@@ -42,7 +42,7 @@
     </action>
     <action>
         <actionName>CUSTOM-javadoc:aggregate-jar</actionName>
-        <displayName>javadoc:jar</displayName>
+        <displayName>javadoc:aggregate-jar</displayName>
         <goals>
             <goal>javadoc:aggregate-jar</goal>
         </goals>
