@@ -36,11 +36,11 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 @DefaultAnnotation(NonNull.class)
 public class ZipArchiveEntry extends ZipEntry implements FsArchiveEntry {
 
-    ZipArchiveEntry(String name) {
+    public ZipArchiveEntry(String name) {
         super(name);
     }
 
-    ZipArchiveEntry(String name, ZipEntry template) {
+    protected ZipArchiveEntry(String name, ZipEntry template) {
         super(name, template);
     }
 

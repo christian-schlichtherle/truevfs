@@ -30,11 +30,11 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 @DefaultAnnotation(NonNull.class)
 public class JarArchiveEntry extends ZipArchiveEntry {
 
-    JarArchiveEntry(String name) {
+    public JarArchiveEntry(String name) {
         super(name);
     }
 
-    JarArchiveEntry(String name, ZipEntry template) {
+    protected JarArchiveEntry(String name, ZipEntry template) {
         super(name, template);
     }
 
