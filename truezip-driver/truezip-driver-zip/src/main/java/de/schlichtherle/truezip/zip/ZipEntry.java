@@ -530,8 +530,6 @@ public class ZipEntry implements Cloneable {
     /**
      * Returns a protective copy of the serialized Extra Fields.
      *
-     * @param  zip64 Whether or not a ZIP64 Extended Information Extra Field,
-     *         if present, shall be included in the returned data or not.
      * @return A new byte array holding the serialized Extra Fields.
      *         {@code null} is never returned.
      * @see    #getEncodedExtraFields()
