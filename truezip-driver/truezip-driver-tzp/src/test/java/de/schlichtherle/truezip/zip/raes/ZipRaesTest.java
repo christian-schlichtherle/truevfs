@@ -191,8 +191,7 @@ public final class ZipRaesTest extends ZipTestSuite {
     }
 
     /**
-     * Skipped because appending to a RAES encrypted ZIP file is not possible
-     * by design.
+     * Skipped because the test is specific to plain ZIP files.
      * 
      * @deprecated 
      */
@@ -202,7 +201,7 @@ public final class ZipRaesTest extends ZipTestSuite {
     }
 
     /**
-     * Skipped because appending to a RAES encrypted ZIP file is not possible
+     * Skipped because appending to RAES encrypted ZIP files is not possible
      * by design.
      * 
      * @deprecated 
