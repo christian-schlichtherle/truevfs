@@ -16,13 +16,12 @@
 package de.schlichtherle.truezip.nio.file.tar;
 
 import de.schlichtherle.truezip.fs.archive.tar.TarGZipDriver;
-import de.schlichtherle.truezip.nio.file.TPathTestSuite;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class TarGZipPathTest extends TPathTestSuite<TarGZipDriver> {
+public final class TarGZipPathTest extends TarPathTestSuite<TarGZipDriver> {
 
     @Override
     protected String getSuffixList() {
@@ -32,9 +31,5 @@ public final class TarGZipPathTest extends TPathTestSuite<TarGZipDriver> {
     @Override
     protected TarGZipDriver newArchiveDriver() {
         return new TarGZipDriver(IO_POOL_PROVIDER);
-    }
-
-    @Override
-    public void testGrowing() {
     }
 }

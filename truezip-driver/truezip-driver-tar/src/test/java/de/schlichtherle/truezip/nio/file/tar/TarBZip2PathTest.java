@@ -16,14 +16,13 @@
 package de.schlichtherle.truezip.nio.file.tar;
 
 import de.schlichtherle.truezip.fs.archive.tar.TarBZip2Driver;
-import de.schlichtherle.truezip.nio.file.TPathTestSuite;
 import org.apache.tools.bzip2.CBZip2OutputStream;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class TarBZip2PathTest extends TPathTestSuite<TarBZip2Driver> {
+public final class TarBZip2PathTest extends TarPathTestSuite<TarBZip2Driver> {
 
     @Override
     protected String getSuffixList() {
@@ -38,9 +37,5 @@ public final class TarBZip2PathTest extends TPathTestSuite<TarBZip2Driver> {
                 return CBZip2OutputStream.MIN_BLOCKSIZE;
             }
         };
-    }
-
-    @Override
-    public void testGrowing() {
     }
 }

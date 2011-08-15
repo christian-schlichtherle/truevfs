@@ -15,21 +15,23 @@
  */
 package de.schlichtherle.truezip.file.tar;
 
-import de.schlichtherle.truezip.fs.archive.tar.TarDriver;
+import de.schlichtherle.truezip.file.TFileTestSuite;
+import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class TarFileTest extends TarFileTestSuite<TarDriver> {
+public abstract class TarFileTestSuite<D extends FsArchiveDriver<?>>
+extends TFileTestSuite<D> {
 
+    /**
+     * Skipped because appending to TAR files is currently not supported.
+     * 
+     * @deprecated 
+     */
+    @Deprecated
     @Override
-    protected String getSuffixList() {
-        return "tar";
-    }
-
-    @Override
-    protected TarDriver newArchiveDriver() {
-        return new TarDriver(IO_POOL_PROVIDER);
+    public final void testGrowing() {
     }
 }
