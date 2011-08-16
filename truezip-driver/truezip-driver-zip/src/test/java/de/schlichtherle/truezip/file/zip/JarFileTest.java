@@ -19,7 +19,7 @@ import de.schlichtherle.truezip.file.TFileTestSuite;
 import de.schlichtherle.truezip.fs.archive.zip.JarDriver;
 
 /**
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public final class JarFileTest extends TFileTestSuite<JarDriver> {
