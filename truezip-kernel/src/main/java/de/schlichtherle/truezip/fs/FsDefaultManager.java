@@ -144,7 +144,7 @@ public final class FsDefaultManager extends FsManager {
         for (final Link<ScheduledModel> link : schedulers.values()) {
             final ScheduledModel model = Links.getTarget(link);
             final FsFederatingController controller
-                    = null == model ? null : model.controller;
+                    = model == null ? null : model.controller;
             if (null != controller)
                 snapshot.add(controller);
         }
