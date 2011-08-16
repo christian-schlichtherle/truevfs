@@ -37,7 +37,7 @@ public abstract class FilteringIterator<T> implements Iterator<T> {
     private @CheckForNull T next;
 
     /**
-     * Constructs a new filtering iterator which filters the given decorator.
+     * Constructs a new filtering iterator which filters the given iterator.
      * 
      * @param iterator the iterator to filter.
      */
@@ -46,16 +46,13 @@ public abstract class FilteringIterator<T> implements Iterator<T> {
         this.iterator = iterator;
     }
 
-    private void peek() {
-        if (null != hasNext)
-            return;
-        while (iterator.hasNext()) {
-            if (accept(next = iterator.next())) {
-                hasNext = true;
-                return;
-            }
-        }
-        hasNext = false;
+    /**
+     * Constructs a new filtering iterator which filters the given iterable.
+     * 
+     * @param iterable the iterable to filter.
+     */
+    protected FilteringIterator(final Iterable<T> iterable) {
+        this.iterator = iterable.iterator();
     }
 
     /**
@@ -70,16 +67,19 @@ public abstract class FilteringIterator<T> implements Iterator<T> {
 
     @Override
     public boolean hasNext() {
-        peek();
-        return hasNext;
+        if (null != hasNext)
+            return hasNext;
+        while (iterator.hasNext())
+            if (accept(next = iterator.next()))
+                return hasNext = true;
+        return hasNext = false;
     }
 
     @Override
     public T next() {
-        peek();
-        if (!hasNext)
+        if (!hasNext())
             throw new NoSuchElementException();
-        hasNext = null;
+        hasNext = null; // consume
         return next;
     }
 
