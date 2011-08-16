@@ -112,6 +112,10 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             // Don't create a key provider if there wasn't one mapped already.
             provider = ((SafeKeyManager) manager).getMappedKeyProvider(resource);
         } else {
+            // TODO: This might create a memory leak.
+            // It's unlikely that a third party implements the KeyManager
+            // interface and does NOT use extend the SafeKeyManager class,
+            // though.
             provider = manager.getKeyProvider(resource);
         }
         if (null != provider)
