@@ -308,35 +308,33 @@ public class CanonicalStringSet extends AbstractSet<String> {
     }
 
     private class CanonicalStringIterator implements Iterator<String> {
-        private final StringTokenizer i;
+        private final StringTokenizer tokenizer;
         private @CheckForNull String canonical;
 
         private CanonicalStringIterator(final String list) {
-            i = new StringTokenizer(list, "" + separator); // NOI18N
+            tokenizer = new StringTokenizer(list, "" + separator); // NOI18N
             advance();
+        }
+
+        private void advance() {
+            while (tokenizer.hasMoreTokens())
+                if (null != (canonical = canonicalizer.map(tokenizer.nextToken())))
+                    return;
+            canonical = null; // no such element
         }
 
         @Override
         public boolean hasNext() {
-            return canonical != null;
+            return null != canonical;
         }
 
         @Override
         public String next() {
+            final String canonical = this.canonical;
             if (null == canonical)
                 throw new NoSuchElementException();
-            final String c = canonical;
             advance();
-            return c;
-        }
-
-        private void advance() {
-            while (i.hasMoreTokens()) {
-                canonical = canonicalizer.map(i.nextToken());
-                if (null != canonical)
-                    return;
-            }
-            canonical = null; // no such element
+            return canonical;
         }
 
         @Override
