@@ -238,9 +238,12 @@ public final class TConfig implements Closeable {
 
     private static volatile @CheckForNull InheritableThreadLocalConfigStack configs;
 
-    /** The file system manager to use within this package. */
-    private static final FsManager manager = FsManagerLocator.SINGLETON.get();
-
+    // I don't think these fields should be volatile.
+    // This would make a difference if and only if two threads were changing
+    // the GLOBAL configuration concurrently, which they should never do.
+    // Instead, the GLOBAL configurations should only changed once at
+    // application startup and then each thread should modify only its thread
+    // local configuration which has been obtained by a call to TConfig.push().
     private TArchiveDetector detector;
     private BitField<FsInputOption> inputPreferences;
     private BitField<FsOutputOption> outputPreferences;
@@ -258,9 +261,9 @@ public final class TConfig implements Closeable {
     public static TConfig get() {
         final InheritableThreadLocalConfigStack configs = TConfig.configs;
         if (null == configs)
-            return Holder.GLOBAL;
+            return Global.INSTANCE;
         final TConfig session = configs.get().peek();
-        return null != session ? session : Holder.GLOBAL;
+        return null != session ? session : Global.INSTANCE;
     }
 
     /**
@@ -275,12 +278,12 @@ public final class TConfig implements Closeable {
         synchronized (TConfig.class) {
             configs = TConfig.configs;
             if (null == configs)
-                configs = TConfig.configs = new InheritableThreadLocalConfigStack();
+                TConfig.configs = configs = new InheritableThreadLocalConfigStack();
         }
         final Deque<TConfig> stack = configs.get();
         TConfig template = stack.peek();
         if (null == template)
-            template = Holder.GLOBAL;
+            template = Global.INSTANCE;
         final TConfig config = new TConfig(template);
         stack.push(config);
         return config;
@@ -333,12 +336,13 @@ public final class TConfig implements Closeable {
      * Returns the file system manager to use within this package.
      * Note that the current implementation effectively returns
      * {@code FsManagerLocator.SINGLETON.get()}.
-     * However, this may be subject to change.
+     * However, this is considered to be an implementation which may be subject
+     * to change.
      * 
      * @return The file system manager to use within this package.
      */
     FsManager getManager() {
-        return manager;
+        return FsManagerLocator.SINGLETON.get();
     }
 
     /**
@@ -348,7 +352,7 @@ public final class TConfig implements Closeable {
      * @see    #setLenient(boolean)
      */
     public boolean isLenient() {
-        return outputPreferences.get(CREATE_PARENTS);
+        return this.outputPreferences.get(CREATE_PARENTS);
     }
 
     /**
@@ -406,7 +410,7 @@ public final class TConfig implements Closeable {
      * @see #setArchiveDetector
      */
     public TArchiveDetector getArchiveDetector() {
-        return detector;
+        return this.detector;
     }
 
     /**
@@ -421,7 +425,7 @@ public final class TConfig implements Closeable {
      *        path names for prospective archive files.
      * @see   #getArchiveDetector()
      */
-    public void setArchiveDetector(TArchiveDetector detector) {
+    public void setArchiveDetector(final TArchiveDetector detector) {
         if (null == detector)
             throw new NullPointerException();
         this.detector = detector;
@@ -434,7 +438,7 @@ public final class TConfig implements Closeable {
      * @since  TrueZIP 7.3
      */
     public BitField<FsInputOption> getInputPreferences() {
-        return inputPreferences;
+        return this.inputPreferences;
     }
 
     /**
@@ -463,7 +467,7 @@ public final class TConfig implements Closeable {
      * @since  TrueZIP 7.3
      */
     public BitField<FsOutputOption> getOutputPreferences() {
-        return outputPreferences;
+        return this.outputPreferences;
     }
 
     /**
@@ -525,11 +529,11 @@ public final class TConfig implements Closeable {
     } // InheritableThreadLocalConfigStack
 
     /** Holds the global configuration. */
-    private static final class Holder {
-        static final TConfig GLOBAL = new TConfig();
+    private static final class Global {
+        static final TConfig INSTANCE = new TConfig();
 
         /** Make lint happy. */
-        private Holder() {
+        private Global() {
         }
     } // Holder
 }
