@@ -19,7 +19,7 @@ import de.schlichtherle.truezip.fs.archive.zip.JarDriver;
 import de.schlichtherle.truezip.nio.file.TPathTestSuite;
 
 /**
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public final class JarPathTest extends TPathTestSuite<JarDriver> {
