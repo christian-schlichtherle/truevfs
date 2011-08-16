@@ -180,7 +180,8 @@ implements Iterable<E>, Closeable {
                 brof = (BufferedReadOnlyFile) rof;
             else
                 brof = new BufferedReadOnlyFile(rof);
-            mountCentralDirectory(brof, preambled, postambled);
+            loadCentralDirectory(brof, findCentralDirectory(brof, preambled, postambled));
+            //recoverFileEntries();
             // Do NOT close brof - would close rof as well!
         } catch (IOException ex) {
             source.release(rof);
@@ -193,23 +194,181 @@ implements Iterable<E>, Closeable {
     }
 
     /**
-     * Reads the central directory of the given file and populates
-     * the internal tables with ZipEntry instances.
+     * Positions the file pointer at the first Central Directory File Header.
+     * Performs some means to check that this is really a ZIP file.
+     * <p>
+     * As a side effect, the following fields may be set:
+     * <ul>
+     * <li>{@link #length}
+     * <li>{@link #comment}
+     * <li>{@link #postamble}
+     * <li>{@link #mapper}
+     * </ul>
+     *
+     * @throws ZipException If the file is not compatible to the ZIP File
+     *         Format Specification.
+     * @throws IOException On any other I/O error.
+     */
+    private int findCentralDirectory(
+            final ReadOnlyFile rof,
+            boolean preambled,
+            final boolean postambled)
+    throws ZipException, IOException {
+        final byte[] sig = new byte[4];
+        if (!preambled) {
+            rof.seek(0);
+            rof.readFully(sig);
+            final long signature = readUInt(sig, 0);
+            // Constraint: A ZIP file must start with a Local File Header
+            // or a (ZIP64) End Of Central Directory Record iff it's emtpy.
+            preambled = signature == LFH_SIG
+                      || signature == ZIP64_EOCDR_SIG
+                      || signature == EOCDR_SIG;
+        }
+        if (preambled) {
+            this.length = rof.length();
+            final long max = this.length - EOCDR_MIN_LEN;
+            final long min = !postambled && max >= 0xffff ? max - 0xffff : 0;
+            for (long eocdrOffset = max; eocdrOffset >= min; eocdrOffset--) {
+                rof.seek(eocdrOffset);
+                rof.readFully(sig);
+                if (EOCDR_SIG != readUInt(sig, 0))
+                    continue;
+                long diskNo;        // number of this disk
+                long cdDiskNo;      // number of the disk with the start of the central directory
+                long cdEntriesDisk; // total number of entries in the central directory on this disk
+                long cdEntries;     // total number of entries in the central directory
+                long cdSize;        // size of the central directory
+                long cdOffset;      // offset of start of central directory with respect to the starting disk number
+                int commentLen;     // .ZIP file comment length
+                int off = 0;
+                // Process EOCDR.
+                final byte[] eocdr = new byte[EOCDR_MIN_LEN - sig.length];
+                rof.readFully(eocdr);
+                diskNo = readUShort(eocdr, off);
+                off += 2;
+                cdDiskNo = readUShort(eocdr, off);
+                off += 2;
+                cdEntriesDisk = readUShort(eocdr, off);
+                off += 2;
+                cdEntries = readUShort(eocdr, off);
+                off += 2;
+                if (0 != diskNo || 0 != cdDiskNo || cdEntriesDisk != cdEntries)
+                    throw new ZipException(
+                            "ZIP file spanning/splitting is not supported!");
+                cdSize = readUInt(eocdr, off);
+                off += 4;
+                cdOffset = readUInt(eocdr, off);
+                off += 4;
+                commentLen = readUShort(eocdr, off);
+                //off += 2;
+                if (0 < commentLen) {
+                    final byte[] comment = new byte[commentLen];
+                    rof.readFully(comment);
+                    this.comment = comment;
+                }
+                this.postamble = this.length - rof.getFilePointer();
+                // Check for ZIP64 End Of Central Directory Locator.
+                try {
+                    // Read Zip64 End Of Central Directory Locator.
+                    rof.seek(eocdrOffset - ZIP64_EOCDL_LEN);
+                    final byte[] zip64eocdl = new byte[ZIP64_EOCDL_LEN];
+                    rof.readFully(zip64eocdl);
+                    off = 0; // reuse
+                    final long zip64eocdlSig = readUInt(zip64eocdl, off);
+                    off += 4;
+                    if (ZIP64_EOCDL_SIG != zip64eocdlSig)
+                        throw new IOException( // MUST be IOException, not ZipException - see catch clauses!
+                                "No ZIP64 End Of Central Directory Locator signature found!");
+                    final long zip64eocdrDisk;      // number of the disk with the start of the zip64 end of central directory record
+                    final long zip64eocdrOffset;    // relative offset of the zip64 end of central directory record
+                    final long totalDisks;          // total number of disks
+                    zip64eocdrDisk = readUInt(zip64eocdl, off);
+                    off += 4;
+                    zip64eocdrOffset = readLong(zip64eocdl, off);
+                    off += 8;
+                    totalDisks = readUInt(zip64eocdl, off);
+                    //off += 4;
+                    if (0 != zip64eocdrDisk || 1 != totalDisks)
+                        throw new ZipException( // MUST be ZipException, not IOException - see catch clauses!
+                                "ZIP file spanning/splitting is not supported!");
+                    // Read Zip64 End Of Central Directory Record.
+                    final byte[] zip64eocdr = new byte[ZIP64_EOCDR_MIN_LEN];
+                    rof.seek(zip64eocdrOffset);
+                    rof.readFully(zip64eocdr);
+                    off = 0; // reuse
+                    final long zip64eocdrSig = readUInt(zip64eocdr, off);
+                    off += 4;
+                    if (ZIP64_EOCDR_SIG != zip64eocdrSig)
+                        throw new ZipException( // MUST be ZipException, not IOException - see catch clauses!
+                                "No ZIP64 End Of Central Directory Record signature found!");
+                    //final long zip64eocdrSize;  // Size Of ZIP64 End Of Central Directory Record
+                    //final int madeBy;           // Version Made By
+                    //final int needed2extract;   // Version Needed To Extract
+                    //zip64eocdrSize = readLong(zip64eocdr, off);
+                    off += 8;
+                    //madeBy = readUShort(zip64eocdr, off);
+                    off += 2;
+                    //needed2extract = readUShort(zip64eocdr, off);
+                    off += 2;
+                    diskNo = readUInt(zip64eocdr, off);
+                    off += 4;
+                    cdDiskNo = readUInt(zip64eocdr, off);
+                    off += 4;
+                    cdEntriesDisk = readLong(zip64eocdr, off);
+                    off += 8;
+                    cdEntries = readLong(zip64eocdr, off);
+                    off += 8;
+                    if (0 != diskNo || 0 != cdDiskNo || cdEntriesDisk != cdEntries)
+                        throw new ZipException( // MUST be ZipException, not IOException - see catch clauses!
+                                "ZIP file spanning/splitting is not supported!");
+                    if (cdEntries < 0 || Integer.MAX_VALUE < cdEntries)
+                        throw new ZipException( // MUST be ZipException, not IOException - see catch clauses!
+                                "Total Number Of Entries In The Central Directory out of range!");
+                    cdSize = readLong(zip64eocdr, off);
+                    off += 8;
+                    cdOffset = readLong(zip64eocdr, off);
+                    //off += 8;
+                    rof.seek(cdOffset);
+                    this.mapper = new OffsetMapper();
+                } catch (ZipException ex) {
+                    throw ex;
+                } catch (IOException ex) {
+                    // Seek and check first CDFH, probably using an offset mapper.
+                    long start = eocdrOffset - cdSize;
+                    rof.seek(start);
+                    start -= cdOffset;
+                    this.mapper = 0 != start
+                            ? new IrregularOffsetMapper(start)
+                            : new OffsetMapper();
+                }
+                return (int) cdEntries;
+            }
+        }
+        throw new ZipException(
+                "No End Of Central Directory Record signature found!");
+    }
+
+    /**
+     * Reads the central directory from the given read only file file and
+     * populates the internal tables with ZipEntry instances.
      * <p>
      * The ZipEntrys will know all data that can be obtained from
      * the central directory alone, but not the data that requires the
      * local file header or additional data to be read.
+     * <p>
+     * As a side effect, the following fields may be set:
+     * <ul>
+     * <li>{@link #preamble}
+     * <li>{@link #charset}
+     * </ul>
      *
      * @throws ZipException If the file is not compatible to the ZIP File
      *         Format Specification.
      * @throws IOException On any other I/O related issue.
      */
-    private void mountCentralDirectory(
-            final ReadOnlyFile rof,
-            final boolean preambled,
-            final boolean postambled)
+    private void loadCentralDirectory(final ReadOnlyFile rof, int numEntries)
     throws IOException {
-        int numEntries = findCentralDirectory(rof, preambled, postambled);
         assert this.mapper != null;
         this.preamble = Long.MAX_VALUE;
         final byte[] sig = new byte[4];
@@ -301,169 +460,18 @@ implements Iterable<E>, Closeable {
         // may get negative (Java does not support unsigned integers).
         // Although beyond the spec, we silently tolerate this in the test.
         // Thanks to Jean-Francois Thamie for this hint!
-        if (numEntries % 0x10000 != 0)
+        if (0 != numEntries % 0x10000)
             throw new ZipException(
                     "Expected " +
                     Math.abs(numEntries) +
                     (numEntries > 0 ? " more" : " less") +
                     " entries in the Central Directory!");
-        if (this.preamble == ULong.MAX_VALUE)
+        if (ULong.MAX_VALUE == this.preamble)
             this.preamble = 0;
     }
 
     private String decode(byte[] bytes) {
         return new String(bytes, charset);
-    }
-
-    /**
-     * Positions the file pointer at the first Central File Header.
-     * Performs some means to check that this is really a ZIP file.
-     * <p>
-     * As a side effect, both {@code mapper} and {@code postamble}
-     * will be set.
-     *
-     * @throws ZipException If the file is not compatible to the ZIP File
-     *         Format Specification.
-     * @throws IOException On any other I/O error.
-     */
-    private int findCentralDirectory(
-            final ReadOnlyFile rof,
-            boolean preambled,
-            final boolean postambled)
-    throws ZipException, IOException {
-        final byte[] sig = new byte[4];
-        if (!preambled) {
-            rof.seek(0);
-            rof.readFully(sig);
-            final long signature = readUInt(sig, 0);
-            // Constraint: A ZIP file must start with a Local File Header
-            // or a (ZIP64) End Of Central Directory Record iff it's emtpy.
-            preambled = signature == LFH_SIG
-                      || signature == ZIP64_EOCDR_SIG
-                      || signature == EOCDR_SIG;
-        }
-        if (preambled) {
-            this.length = rof.length();
-            final long max = this.length - EOCDR_MIN_LEN;
-            final long min = !postambled && max >= 0xffff ? max - 0xffff : 0;
-            for (long eocdrOffset = max; eocdrOffset >= min; eocdrOffset--) {
-                rof.seek(eocdrOffset);
-                rof.readFully(sig);
-                if (readUInt(sig, 0) != EOCDR_SIG)
-                    continue;
-                long diskNo;        // number of this disk
-                long cdDiskNo;      // number of the disk with the start of the central directory
-                long cdEntriesDisk; // total number of entries in the central directory on this disk
-                long cdEntries;     // total number of entries in the central directory
-                long cdSize;        // size of the central directory
-                long cdOffset;      // offset of start of central directory with respect to the starting disk number
-                int commentLen;     // .ZIP file comment length
-                int off = 0;
-                // Process EOCDR.
-                final byte[] eocdr = new byte[EOCDR_MIN_LEN - sig.length];
-                rof.readFully(eocdr);
-                diskNo = readUShort(eocdr, off);
-                off += 2;
-                cdDiskNo = readUShort(eocdr, off);
-                off += 2;
-                cdEntriesDisk = readUShort(eocdr, off);
-                off += 2;
-                cdEntries = readUShort(eocdr, off);
-                off += 2;
-                if (diskNo != 0 || cdDiskNo != 0 || cdEntriesDisk != cdEntries)
-                    throw new ZipException(
-                            "ZIP file spanning/splitting is not supported!");
-                cdSize = readUInt(eocdr, off);
-                off += 4;
-                cdOffset = readUInt(eocdr, off);
-                off += 4;
-                commentLen = readUShort(eocdr, off);
-                //off += 2;
-                if (0 < commentLen) {
-                    final byte[] comment = new byte[commentLen];
-                    rof.readFully(comment);
-                    this.comment = comment;
-                }
-                this.postamble = this.length - rof.getFilePointer();
-                // Check for ZIP64 End Of Central Directory Locator.
-                try {
-                    // Read Zip64 End Of Central Directory Locator.
-                    final byte[] zip64eocdl = new byte[ZIP64_EOCDL_LEN];
-                    rof.seek(eocdrOffset - ZIP64_EOCDL_LEN);
-                    rof.readFully(zip64eocdl);
-                    off = 0; // reuse
-                    final long zip64eocdlSig = readUInt(zip64eocdl, off);
-                    off += 4;
-                    if (zip64eocdlSig != ZIP64_EOCDL_SIG)
-                        throw new IOException( // MUST be IOException, not ZipException - see catch clauses!
-                                "No ZIP64 End Of Central Directory Locator signature found!");
-                    final long zip64eocdrDisk;      // number of the disk with the start of the zip64 end of central directory record
-                    final long zip64eocdrOffset;    // relative offset of the zip64 end of central directory record
-                    final long totalDisks;          // total number of disks
-                    zip64eocdrDisk = readUInt(zip64eocdl, off);
-                    off += 4;
-                    zip64eocdrOffset = readLong(zip64eocdl, off);
-                    off += 8;
-                    totalDisks = readUInt(zip64eocdl, off);
-                    //off += 4;
-                    if (zip64eocdrDisk != 0 || totalDisks != 1)
-                        throw new ZipException( // MUST be ZipException, not IOException - see catch clauses!
-                                "ZIP file spanning/splitting is not supported!");
-                    // Read Zip64 End Of Central Directory Record.
-                    final byte[] zip64eocdr = new byte[ZIP64_EOCDR_MIN_LEN];
-                    rof.seek(zip64eocdrOffset);
-                    rof.readFully(zip64eocdr);
-                    off = 0; // reuse
-                    final long zip64eocdrSig = readUInt(zip64eocdr, off);
-                    off += 4;
-                    if (zip64eocdrSig != ZIP64_EOCDR_SIG)
-                        throw new ZipException( // MUST be ZipException, not IOException - see catch clauses!
-                                "No ZIP64 End Of Central Directory Record signature found!");
-                    //final long zip64eocdrSize;  // Size Of ZIP64 End Of Central Directory Record
-                    //final int madeBy;           // Version Made By
-                    //final int needed2extract;   // Version Needed To Extract
-                    //zip64eocdrSize = readLong(zip64eocdr, off);
-                    off += 8;
-                    //madeBy = readUShort(zip64eocdr, off);
-                    off += 2;
-                    //needed2extract = readUShort(zip64eocdr, off);
-                    off += 2;
-                    diskNo = readUInt(zip64eocdr, off);
-                    off += 4;
-                    cdDiskNo = readUInt(zip64eocdr, off);
-                    off += 4;
-                    cdEntriesDisk = readLong(zip64eocdr, off);
-                    off += 8;
-                    cdEntries = readLong(zip64eocdr, off);
-                    off += 8;
-                    if (diskNo != 0 || cdDiskNo != 0 || cdEntriesDisk != cdEntries)
-                        throw new ZipException( // MUST be ZipException, not IOException - see catch clauses!
-                                "ZIP file spanning/splitting is not supported!");
-                    if (cdEntries < 0 || Integer.MAX_VALUE < cdEntries)
-                        throw new ZipException( // MUST be ZipException, not IOException - see catch clauses!
-                                "Total Number Of Entries In The Central Directory out of range!");
-                    cdSize = readLong(zip64eocdr, off);
-                    off += 8;
-                    cdOffset = readLong(zip64eocdr, off);
-                    //off += 8;
-                    rof.seek(cdOffset);
-                    this.mapper = new OffsetMapper();
-                } catch (ZipException ze) {
-                    throw ze;
-                } catch (IOException ioe) {
-                    // Seek and check first CFH, probably using an offset mapper.
-                    long start = eocdrOffset - cdSize;
-                    rof.seek(start);
-                    start -= cdOffset;
-                    this.mapper = 0 != start
-                            ? new IrregularOffsetMapper(start)
-                            : new OffsetMapper();
-                }
-                return (int) cdEntries;
-            }
-        }
-        throw new ZipException(
-                "No End Of Central Directory Record signature found!");
     }
 
     @SuppressWarnings("ReturnOfCollectionOrArrayField")
