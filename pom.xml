@@ -189,17 +189,9 @@
         <site>
             <id>truezip-website</id>
             <name>TrueZIP Website</name>
-            <!-- java.net doesn't support scp, so you need to provide a profile
-                 in your settings.xml which is active by default and sets the
-                 following property to a file URL which refers to a directory
-                 which is a Mercurial repository so that any updates to this
-                 directory can be pushed to the Mercurial repository for
-                 TrueZIP's website at java.net.
-                 This Mercurial repository is located at
-                 https://hg.java.net/hg/truezip~web or
-                 ssh://hg.java.net/truezip~web .
-                 -->
-            <url>${truezip-website.url}</url>
+            <!-- Since maven-site-plugin 3.0, this can't refer to a property
+                 anymore. :-( -->
+            <url>file:/C:/Users/christian/Documents/Schlichtherle_IT_Services/Projekte/truezip~web/</url>
         </site>
     </distributionManagement>
 
