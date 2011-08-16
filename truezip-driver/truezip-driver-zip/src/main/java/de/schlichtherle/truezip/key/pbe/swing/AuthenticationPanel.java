@@ -40,7 +40,7 @@ import javax.swing.text.JTextComponent;
  * A panel displaying a password panel or a key file panel in order to let
  * the user select an authentication method and enter a key.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
@@ -64,6 +64,7 @@ public class AuthenticationPanel extends JPanel {
      * Constructs a new authentication panel.
      * This version of the constructor does not remember the key file path.
      */
+    @SuppressWarnings("unchecked")
     public AuthenticationPanel() {
         initComponents();
 
