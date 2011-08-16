@@ -56,7 +56,7 @@ import net.jcip.annotations.NotThreadSafe;
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
-public final class ZipOutputShop
+public class ZipOutputShop
 extends RawZipOutputStream<ZipArchiveEntry>
 implements OutputShop<ZipArchiveEntry> {
 
