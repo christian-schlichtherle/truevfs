@@ -19,7 +19,7 @@ import de.schlichtherle.truezip.file.TFileTestSuite;
 import de.schlichtherle.truezip.fs.archive.zip.CheckedZipDriver;
 
 /**
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public final class CheckedZipFileTest extends TFileTestSuite<CheckedZipDriver> {
