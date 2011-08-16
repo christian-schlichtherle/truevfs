@@ -19,7 +19,7 @@ import de.schlichtherle.truezip.fs.archive.zip.OdfDriver;
 import de.schlichtherle.truezip.nio.file.TPathTestSuite;
 
 /**
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public class OdfPathTest extends TPathTestSuite<OdfDriver> {
