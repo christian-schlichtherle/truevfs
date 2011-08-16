@@ -16,12 +16,11 @@
 package de.schlichtherle.truezip.fs;
 
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
+import de.schlichtherle.truezip.util.FilteringIterator;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -33,6 +32,7 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
+@DefaultAnnotation(NonNull.class)
 public final class FsFilteringManager
 extends FsDecoratingManager<FsManager> {
 
@@ -55,34 +55,37 @@ extends FsDecoratingManager<FsManager> {
 
     @Override
     public int getSize() {
-        return getControllers().size();
+        int size = 0;
+        for (FsController<?> controller : this)
+            size++;
+        return size;
     }
 
     @Override
     public Iterator<FsController<?>> iterator() {
-        return getControllers().iterator();
+        return new FilteredControllerIterator();
     }
 
-    private Collection<FsController<?>> getControllers() {
-        final List<FsController<?>> snapshot
-                = new ArrayList<FsController<?>>(delegate.getSize());
-        final URI p = prefix;
-        final String ps = p.getScheme();
-        final String pp = p.getPath();
+    private final class FilteredControllerIterator
+    extends FilteringIterator<FsController<?>> {
+        final String ps = prefix.getScheme();
+        final String pp = prefix.getPath();
         final int ppl = pp.length();
-        assert 0 < ppl;
         final boolean pps = SEPARATOR_CHAR == pp.charAt(ppl - 1);
-        URI mp;
-        String mpp;
-        for (final FsController<?> controller : delegate) {
-            mp = controller.getModel().getMountPoint().toHierarchicalUri();
-            if (mp.getScheme().equals(ps)
+
+        FilteredControllerIterator() {
+            super(delegate.iterator());
+        }
+
+        @Override
+        protected boolean accept(final FsController<?> controller) {
+            final URI mp = controller.getModel().getMountPoint().toHierarchicalUri();
+            final String mpp;
+            return mp.getScheme().equals(ps)
                     && (mpp = mp.getPath()).startsWith(pp)
                     && (pps 
                         || mpp.length() == ppl
-                        || SEPARATOR_CHAR == mpp.charAt(ppl)))
-                snapshot.add(controller);
+                        || SEPARATOR_CHAR == mpp.charAt(ppl));
         }
-        return snapshot;
     }
 }
