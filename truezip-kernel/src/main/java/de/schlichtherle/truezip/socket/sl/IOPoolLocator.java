@@ -74,7 +74,7 @@ public final class IOPoolLocator implements IOPoolProvider {
     }
 
     /** A static data utility class used for lazy initialization. */
-    private static class Boot {
+    private static final class Boot {
         static final IOPoolService SERVICE;
         static {
             final Logger logger = Logger.getLogger(
