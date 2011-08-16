@@ -60,7 +60,7 @@ public final class KeyManagerLocator extends AbstractKeyManagerProvider {
     }
 
     /** A static data utility class used for lazy initialization. */
-    private static class Boot {
+    private static final class Boot {
         static final Map<Class<?>, KeyManager<?>> MANAGERS;
         static {
             final Logger logger = Logger.getLogger(
