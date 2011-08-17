@@ -1600,7 +1600,7 @@ public final class TFile extends File {
         final FsScheme scheme = detector.getScheme(path);
         if (null == scheme)
             throw new ServiceConfigurationError(
-                    "unknown file system scheme for path \""
+                    "Unknown file system scheme for path \""
                     + path
                     + "\"! Check run-time class path configuration.");
         final FsMountPoint mountPoint;
