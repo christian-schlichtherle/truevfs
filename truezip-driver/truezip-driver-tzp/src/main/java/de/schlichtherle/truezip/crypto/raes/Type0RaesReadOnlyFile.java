@@ -110,6 +110,8 @@ final class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
         final long start = header.length + salt.length;
         final long end = fileLength - this.footer.length;
         final long length = end - start;
+        if (length < 0)
+            throw new RaesException("False positive Type 0 RAES file is too short!");
 
         // Load footer data.
         rof.seek(end);
