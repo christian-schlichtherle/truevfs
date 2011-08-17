@@ -354,9 +354,8 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
 
         final ZipFile zipIn = newZipFile(file);
         InputStream in = zipIn.getInputStream("file");
-        for (int i = 0, c; (c = in.read()) != -1; i++) {
+        for (int i = 0, c; (c = in.read()) != -1; i++)
             assertEquals(data[i] & 0xFF, c);
-        }
         in.close();
         zipIn.close();
     }
