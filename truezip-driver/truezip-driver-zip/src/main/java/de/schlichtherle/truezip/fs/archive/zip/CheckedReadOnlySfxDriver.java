@@ -45,6 +45,11 @@ public class CheckedReadOnlySfxDriver extends ReadOnlySfxDriver {
         super(ioPoolProvider);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @return {@code true}
+     */
     @Override
     protected boolean check(ZipInputShop input, ZipArchiveEntry entry) {
         return true;
