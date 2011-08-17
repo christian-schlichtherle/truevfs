@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Schlichtherle IT Services
+ * Copyright (C) 2006-2011 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.zip;
 
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
+import de.schlichtherle.truezip.util.JSE7;
+import java.io.IOException;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.util.HashSet;
@@ -26,29 +25,47 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.zip.Inflater;
-import net.jcip.annotations.ThreadSafe;
+import java.util.zip.InflaterInputStream;
 
 /**
- * Provides utility methods for pooling {@link Inflater}s.
- * Inflater objects are expensive to allocate, so pooling them improves
- * performance.
+ * An inflater input stream which uses a pooled {@link Inflater} and provides
+ * access to it.
+ * Inflaters are expensive to allocate, so pooling them improves performance.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@ThreadSafe
-@DefaultAnnotation(NonNull.class)
-final class Inflaters {
+final class ZipInflaterInputStream extends InflaterInputStream {
 
     private static final Set<Inflater>
             allocated = new HashSet<Inflater>();
     private static final List<Reference<Inflater>>
             released = new LinkedList<Reference<Inflater>>();
 
-    private Inflaters() {
+    private boolean closed;
+
+    ZipInflaterInputStream(DummyByteInputStream in, int size) {
+        super(in, allocate(), size);
     }
 
-    static Inflater allocate() {
+    Inflater getInflater() {
+        return inf;
+    }
+
+    @Override
+    public void close() throws IOException {
+        if (closed) {
+            return;
+        }
+        closed = true;
+        try {
+            super.close();
+        } finally {
+            release(inf);
+        }
+    }
+
+    private static Inflater allocate() {
         Inflater inflater = null;
 
         synchronized (released) {
@@ -61,7 +78,9 @@ final class Inflaters {
                 }
             }
             if (null == inflater)
-                inflater = new Inflater(true);
+                inflater = JSE7.AVAILABLE
+                        ? new Inflater(true)        // JDK 7 is OK
+                        : new Jdk6Inflater(true);   // JDK 6 needs fixing
 
             // We MUST make sure that we keep a strong reference to the
             // inflater in order to retain it from being released again and
@@ -77,7 +96,7 @@ final class Inflaters {
         return inflater;
     }
 
-    static void release(Inflater inflater) {
+    private static void release(Inflater inflater) {
         inflater.reset();
         synchronized (released) {
             released.add(new SoftReference<Inflater>(inflater));

@@ -89,7 +89,7 @@ interface Constants {
             /* crc-32                          */ 4 +
             /* compressed size                 */ 4 +
             /* uncompressed size               */ 4 +
-            /* filename length                 */ 2 +
+            /* file name length                */ 2 +
             /* extra field length              */ 2 +
             /* file comment length             */ 2 +
             /* disk number start               */ 2 +
