@@ -206,4 +206,16 @@ public class IntervalReadOnlyFile extends DecoratingReadOnlyFile {
         this.fp = fp + read;
         return read;
     }
+
+    /**
+     * Closes the decorated read only file if and only if it is exclusively
+     * accessed by this decorating read only file.
+     * 
+     * @throws IOException On any I/O error.
+     */
+    @Override
+    public void close() throws IOException {
+        if (this.exclusive)
+            this.delegate.close();
+    }
 }
