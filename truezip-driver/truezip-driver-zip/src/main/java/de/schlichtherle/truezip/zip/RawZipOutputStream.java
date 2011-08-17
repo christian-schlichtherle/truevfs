@@ -561,7 +561,6 @@ implements Iterable<E> {
      */
     private boolean writeCentralFileHeader(final ZipEntry entry)
     throws IOException {
-        final long crc = entry.getEncodedCrc();
         final long csize = entry.getCompressedSize();
         final long size = entry.getSize();
         // This test MUST NOT include the CRC-32 because VV_AE_2 sets it to
@@ -597,7 +596,7 @@ implements Iterable<E> {
         // Last Mod. File Time / Date.
         dos.writeInt((int) entry.getEncodedTime());
         // CRC-32.
-        dos.writeInt((int) crc);
+        dos.writeInt((int) entry.getEncodedCrc());
         // Compressed Size.
         dos.writeInt((int) csize);
         // Uncompressed Size.
@@ -980,12 +979,11 @@ implements Iterable<E> {
             this.out.finish();
             if (this.suppressCrc) {
                 final ZipEntry entry = RawZipOutputStream.this.entry;
-                final long crc = entry.getCrc();
                 entry.setEncodedCrc(0);
                 this.delegate.finish();
                 // Set to UNKNOWN in order to signal to
                 // Crc32CheckingOutputMethod that it should not check it and
-                // signal to writeCentralFileHeader that it should write 0.
+                // signal to writeCentralFileHeader() that it should write 0.
                 entry.setCrc(UNKNOWN);
             } else {
                 this.delegate.finish();
