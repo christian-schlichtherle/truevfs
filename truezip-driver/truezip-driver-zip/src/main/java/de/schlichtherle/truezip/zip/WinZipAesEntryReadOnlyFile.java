@@ -72,6 +72,8 @@ final class WinZipAesEntryReadOnlyFile extends CipherReadOnlyFile {
         assert entry.isEncrypted();
         final WinZipAesEntryExtraField
                 field = (WinZipAesEntryExtraField) entry.getExtraField(WINZIP_AES_ID);
+        if (null == field)
+            throw new ZipCryptoException(entry.getName() + " (missing extra field for WinZip AES entry)");
 
         // Init key strength.
         final AesKeyStrength keyStrength = field.getKeyStrength();
@@ -98,6 +100,8 @@ final class WinZipAesEntryReadOnlyFile extends CipherReadOnlyFile {
         final long start = salt.length + passwdVerifier.length;
         final long end = fileLength - this.authenticationCode.length;
         final long length = end - start;
+        if (length < 0)
+            throw new ZipCryptoException(entry.getName() + " (false positive WinZip AES entry is too short)");
 
         // Load authentication code.
         rof.seek(end);
@@ -106,7 +110,7 @@ final class WinZipAesEntryReadOnlyFile extends CipherReadOnlyFile {
             // This should never happen unless someone is writing to the
             // end of the file concurrently!
             throw new ZipCryptoException(
-                    "Expected end of file after authentication code!");
+                    "Expected end of file after WinZip AES authentication code!");
         }
 
         // Derive cipher and MAC parameters.
@@ -184,6 +188,6 @@ final class WinZipAesEntryReadOnlyFile extends CipherReadOnlyFile {
         assert buf.length == mac.getMacSize();
         if (!ArrayHelper.equals(buf, 0, authenticationCode, 0, authenticationCode.length / 2))
             throw new ZipAuthenticationException(entry.getName()
-                    + " (authenticated entry content has been tampered with)");
+                    + " (authenticated WinZip AES entry content has been tampered with)");
     }
 }
