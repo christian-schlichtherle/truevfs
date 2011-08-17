@@ -33,8 +33,8 @@ import net.jcip.annotations.NotThreadSafe;
 @DefaultAnnotation(NonNull.class)
 public abstract class FilteringIterator<T> implements Iterator<T> {
     private final Iterator<T> iterator;
-    private Boolean hasNext;
-    private @CheckForNull T next;
+    private @CheckForNull Boolean hasNext;
+    private @Nullable T next;
 
     /**
      * Constructs a new filtering iterator which filters the given iterator.
@@ -76,7 +76,7 @@ public abstract class FilteringIterator<T> implements Iterator<T> {
     }
 
     @Override
-    public T next() {
+    public @Nullable T next() {
         if (!hasNext())
             throw new NoSuchElementException();
         hasNext = null; // consume
