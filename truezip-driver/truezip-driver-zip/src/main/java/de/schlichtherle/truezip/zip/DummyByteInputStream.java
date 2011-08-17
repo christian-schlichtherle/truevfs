@@ -61,16 +61,6 @@ final class DummyByteInputStream extends ReadOnlyFileInputStream {
         return read;
     }
 
-    /**
-     * @return The number of bytes remaining in this entry, yet maximum
-     *         {@code Integer.MAX_VALUE}.
-     *         Note that this is only relevant for entries which have been
-     *         stored with the {@code STORED} method.
-     *         For entries stored according to the {@code DEFLATED}
-     *         method, the value returned by this method on the
-     *         {@code InputStream} returned by {@link #getInputStream}
-     *         is actually determined by an {@link InflaterInputStream}.
-     */
     @Override
     public int available() throws IOException {
         int available = super.available();
