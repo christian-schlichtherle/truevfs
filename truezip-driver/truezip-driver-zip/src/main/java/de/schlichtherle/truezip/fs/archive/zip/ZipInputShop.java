@@ -55,6 +55,7 @@ implements InputShop<ZipArchiveEntry> {
         super(rof, driver.getCharset(), driver.getPreambled(), driver.getPostambled(), driver);
         this.driver = driver;
         this.model = model;
+        super.recoverLostEntries();
     }
 
     /**

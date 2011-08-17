@@ -21,6 +21,7 @@ import de.schlichtherle.truezip.io.LEDataOutputStream;
 import de.schlichtherle.truezip.util.JSE7;
 import static de.schlichtherle.truezip.zip.Constants.*;
 import static de.schlichtherle.truezip.zip.WinZipAesEntryExtraField.*;
+import static de.schlichtherle.truezip.zip.WinZipAesUtils.*;
 import static de.schlichtherle.truezip.zip.ZipCryptoUtils.*;
 import static de.schlichtherle.truezip.zip.ZipEntry.*;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -36,7 +37,7 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.zip.DeflaterOutputStream;
+import java.util.zip.Deflater;
 import java.util.zip.ZipException;
 import net.jcip.annotations.NotThreadSafe;
 
@@ -70,8 +71,8 @@ implements Iterable<E> {
 
     /** This instance is used for deflated output. */
     private final ZipDeflater deflater = JSE7.AVAILABLE
-            ? new ZipDeflater()
-            : new Jdk6Deflater();
+            ? new ZipDeflater()     // JDK 7 is OK
+            : new Jdk6Deflater();   // JDK 6 needs fixing
 
     /** The encoded file comment. */
     private @CheckForNull byte[] comment;
@@ -400,7 +401,7 @@ implements Iterable<E> {
         this.delegate = out;
         // Store entry now so that a subsequent call to getEntry(...) returns
         // it.
-        entries.put(entry.getName(), entry);
+        this.entries.put(entry.getName(), entry);
     }
 
     /**
@@ -560,10 +561,12 @@ implements Iterable<E> {
      */
     private boolean writeCentralFileHeader(final ZipEntry entry)
     throws IOException {
-        final long crc = entry.getCrc();
+        final long crc = entry.getEncodedCrc();
         final long csize = entry.getCompressedSize();
         final long size = entry.getSize();
-        if (UNKNOWN == (crc | csize | size)) {
+        // This test MUST NOT include the CRC-32 because VV_AE_2 sets it to
+        // UNKNOWN!
+        if (UNKNOWN == (csize | size)) {
             // See http://java.net/jira/browse/TRUEZIP-144 :
             // The kernel may set any of these properties to UNKNOWN after the
             // entry content has already been written in order to signal that
@@ -728,7 +731,7 @@ implements Iterable<E> {
     extends LEDataOutputStream {
         AppendingLEDataOutputStream(OutputStream out, RawZipFile<?> appendee) {
             super(out);
-            super.written = appendee.getOffsetMapper().location(appendee.length());
+            super.written = appendee.getOffsetMapper().unmap(appendee.length());
         }
     } // AppendingLEDataOutputStream
 
@@ -892,7 +895,7 @@ implements Iterable<E> {
 
         final WinZipAesParameters generalParam;
         @CheckForNull WinZipAesEntryParameters entryParam;
-        boolean fixCrc;
+        boolean suppressCrc;
         @CheckForNull WinZipAesEntryOutputStream out;
 
         WinZipAesOutputMethod(
@@ -931,23 +934,22 @@ implements Iterable<E> {
                 field.setVendorVersion(VV_AE_1);
             } else {
                 field.setVendorVersion(VV_AE_2);
-                this.fixCrc = true;
+                this.suppressCrc = true;
             }
             entry.addExtraField(field);
             if (UNKNOWN != csize) {
                 csize += overhead(keyStrength);
-                entry.setCompressedSize(csize);
+                entry.setEncodedCompressedSize(csize);
             }
-            this.delegate.init(entry);
+            if (this.suppressCrc) {
+                final long crc = entry.getCrc();
+                entry.setEncodedCrc(0);
+                this.delegate.init(entry);
+                entry.setCrc(crc);
+            } else {
+                this.delegate.init(entry);
+            }
             entry.setEncodedMethod(WINZIP_AES);
-            if (this.fixCrc)
-                entry.setCrc(UNKNOWN);
-        }
-
-        int overhead(AesKeyStrength keyStrength) {
-            return keyStrength.getBytes() / 2 // salt value
-                    + 2   // password verification value
-                    + 10; // authentication code
         }
         
         @Override
@@ -955,9 +957,20 @@ implements Iterable<E> {
             // see DeflatedOutputMethod.finish().
             assert null != this.entryParam;
             assert null == this.out;
-            return this.out = new WinZipAesEntryOutputStream(
-                    (LEDataOutputStream) delegate.start(),
-                    this.entryParam);
+            if (this.suppressCrc) {
+                final ZipEntry entry = RawZipOutputStream.this.entry;
+                final long crc = entry.getCrc();
+                entry.setEncodedCrc(0);
+                this.out = new WinZipAesEntryOutputStream(
+                        (LEDataOutputStream) delegate.start(),
+                        this.entryParam);
+                entry.setCrc(crc);
+            } else {
+                this.out = new WinZipAesEntryOutputStream(
+                        (LEDataOutputStream) delegate.start(),
+                        this.entryParam);
+            }
+            return this.out;
         }
 
         @Override
@@ -965,9 +978,18 @@ implements Iterable<E> {
             // see DeflatedOutputMethod.finish().
             assert null != this.out;
             this.out.finish();
-            if (this.fixCrc)
-                RawZipOutputStream.this.entry.setEncodedCrc(0);
-            this.delegate.finish();
+            if (this.suppressCrc) {
+                final ZipEntry entry = RawZipOutputStream.this.entry;
+                final long crc = entry.getCrc();
+                entry.setEncodedCrc(0);
+                this.delegate.finish();
+                // Set to UNKNOWN in order to signal to
+                // Crc32CheckingOutputMethod that it should not check it and
+                // signal to writeCentralFileHeader that it should write 0.
+                entry.setCrc(UNKNOWN);
+            } else {
+                this.delegate.finish();
+            }
         }
     } // WinZipAesOutputMethod
 
@@ -989,33 +1011,23 @@ implements Iterable<E> {
         @Override
         public OutputStream start() throws IOException {
             assert null == this.out;
-            return this.out = new ZipDeflaterOutputStream(this.delegate.start());
+            return this.out = new ZipDeflaterOutputStream(
+                    this.delegate.start(),
+                    RawZipOutputStream.this.deflater,
+                    MAX_FLATER_BUF_LENGTH);
         }
 
         @Override
         public void finish() throws IOException {
             this.out.finish();
-            this.delegate.finish();
-        }
-    } // DeflateOutputMethod
-
-    private final class ZipDeflaterOutputStream
-    extends DeflaterOutputStream {
-
-        ZipDeflaterOutputStream(OutputStream out) {
-            super(out, RawZipOutputStream.this.deflater, MAX_FLATER_BUF_LENGTH);
-        }
-
-        @Override
-        public void finish() throws IOException {
-            super.finish();
             final ZipEntry entry = RawZipOutputStream.this.entry;
-            final ZipDeflater deflater = RawZipOutputStream.this.deflater;
+            final Deflater deflater = RawZipOutputStream.this.deflater;
             entry.setEncodedCompressedSize(deflater.getBytesWritten());
             entry.setEncodedSize(deflater.getBytesRead());
             deflater.reset();
+            this.delegate.finish();
         }
-    } // ZipDeflaterOutputStream
+    } // DeflaterOutputMethod
 
     private abstract class Crc32OutputMethod
     extends DecoratingOutputMethod {
@@ -1031,6 +1043,9 @@ implements Iterable<E> {
             assert null == this.out;
             return this.out = new Crc32OutputStream(this.delegate.start());
         }
+
+        @Override
+        public abstract void finish() throws IOException;
     } // Crc32OutputMethod
 
     private final class Crc32CheckingOutputMethod
@@ -1042,6 +1057,7 @@ implements Iterable<E> {
 
         @Override
         public void finish() throws IOException {
+            this.delegate.finish();
             final ZipEntry entry = RawZipOutputStream.this.entry;
             final long expectedCrc = entry.getCrc();
             if (UNKNOWN != expectedCrc) {
@@ -1049,7 +1065,6 @@ implements Iterable<E> {
                 if (expectedCrc != actualCrc)
                     throw new CRC32Exception(entry.getName(), expectedCrc, actualCrc);
             }
-            this.delegate.finish();
         }
     } // Crc32CheckingOutputMethod
 
