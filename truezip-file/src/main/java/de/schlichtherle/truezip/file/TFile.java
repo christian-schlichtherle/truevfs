@@ -1598,6 +1598,7 @@ public final class TFile extends File {
         assert this == innerArchive;
         final String path = Paths.normalize(delegate.getPath(), separatorChar);
         final FsScheme scheme = detector.getScheme(path);
+        // FIXME: http://java.net/jira/browse/TRUEZIP-154
         if (null == scheme)
             throw new ServiceConfigurationError(
                     "Unknown file system scheme for path \""
