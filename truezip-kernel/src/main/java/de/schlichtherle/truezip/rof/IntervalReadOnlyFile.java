@@ -72,9 +72,9 @@ public class IntervalReadOnlyFile extends DecoratingReadOnlyFile {
      * Constructs a new interval read only file starting at the given position
      * of the file pointer in the given decorated read only file.
      * <p>
-     * Note that this constructor assumes that it does not have exclusive
-     * access to the decorated read only file and positions the file pointer
-     * in the decorated read only file before each read operation!
+     * Note that this constructor assumes that it does <em>not</em> have
+     * exclusive access to the decorated read only file and positions the file
+     * pointer in the decorated read only file before each read operation!
      *
      * @param rof the read only file to decorate.
      * @param start the start of the interval.
