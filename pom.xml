@@ -137,6 +137,7 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <configuration>
                         <systemPropertyVariables>
+                            <!--de.schlichtherle.truezip.zip.forceZip64Ext>true</de.schlichtherle.truezip.zip.forceZip64Ext-->
                             <java.util.logging.config.file>${java.util.logging.config.file}</java.util.logging.config.file>
                         </systemPropertyVariables>
                     </configuration>
