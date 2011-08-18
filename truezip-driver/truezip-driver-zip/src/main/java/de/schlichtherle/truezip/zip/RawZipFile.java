@@ -689,13 +689,15 @@ implements Iterable<E>, Closeable {
                         csize = readUInt(dd, 4);
                         size = readUInt(dd, 8);
                     }
-                    if (entry.getEncodedCrc() != crc)
+                    if (entry.getCrc() != crc)
                         throw new CRC32Exception(entry.getName(),
                                 entry.getCrc(), crc);
-                    if (entry.getEncodedCompressedSize() != csize)
-                        throw new ZipException(entry.getName() + " (invalid compressed size in Data Descriptor)");
-                    if (entry.getEncodedSize() != size)
-                        throw new ZipException(entry.getName() + " (invalid uncompressed size in Data Descriptor)");
+                    if (entry.getCompressedSize() != csize)
+                        throw new ZipException(entry.getName()
+                                + " (invalid compressed size in Data Descriptor)");
+                    if (entry.getSize() != size)
+                        throw new ZipException(entry.getName()
+                                + " (invalid uncompressed size in Data Descriptor)");
                 } else {
                     // This is the easy one.
                     // The entry is not using a Data Descriptor, so we can
