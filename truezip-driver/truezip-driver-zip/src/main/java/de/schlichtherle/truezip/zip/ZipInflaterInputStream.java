@@ -54,9 +54,8 @@ final class ZipInflaterInputStream extends InflaterInputStream {
 
     @Override
     public void close() throws IOException {
-        if (closed) {
+        if (closed)
             return;
-        }
         closed = true;
         try {
             super.close();
