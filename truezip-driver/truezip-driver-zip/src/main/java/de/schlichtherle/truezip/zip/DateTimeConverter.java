@@ -232,6 +232,7 @@ public enum DateTimeConverter {
             dtime = MAX_DOS_TIME;
         final int time = (int) dtime;
         final GregorianCalendar cal = getGregorianCalendar();
+        cal.set(Calendar.ERA, GregorianCalendar.AD);
         cal.set(Calendar.YEAR, 1980 + ((time >> 25) & 0x7f));
         cal.set(Calendar.MONTH, ((time >> 21) & 0x0f) - 1);
         cal.set(Calendar.DAY_OF_MONTH, (time >> 16) & 0x1f);
