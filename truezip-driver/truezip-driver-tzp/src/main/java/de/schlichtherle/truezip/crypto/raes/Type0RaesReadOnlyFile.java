@@ -24,6 +24,7 @@ import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.util.ArrayHelper;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import java.io.EOFException;
 import java.io.IOException;
 import net.jcip.annotations.NotThreadSafe;
 import org.bouncycastle.crypto.Mac;
@@ -110,8 +111,11 @@ final class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
         final long start = header.length + salt.length;
         final long end = fileLength - this.footer.length;
         final long length = end - start;
-        if (length < 0)
-            throw new RaesException("False positive Type 0 RAES file is too short!");
+        if (length < 0) {
+            // Wrap an EOFException so that a caller can identify this issue.
+            throw new RaesException("False positive Type 0 RAES file is too short!",
+                    new EOFException());
+        }
 
         // Load footer data.
         rof.seek(end);
