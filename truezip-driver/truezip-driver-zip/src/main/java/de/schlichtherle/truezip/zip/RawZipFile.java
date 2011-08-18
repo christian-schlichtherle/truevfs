@@ -187,7 +187,7 @@ implements Iterable<E>, Closeable {
             if (!preambled)
                 assertNotPreambled(brof);
             final int numEntries = findCentralDirectory(brof, postambled);
-            loadCentralDirectory(brof, numEntries);
+            mountCentralDirectory(brof, numEntries);
             if (this.preamble + this.postamble >= this.length) {
                 assert 0 == numEntries;
                 if (preambled) // otherwise already checked
@@ -207,8 +207,6 @@ implements Iterable<E>, Closeable {
 
     private void assertNotPreambled(final ReadOnlyFile rof)
     throws IOException {
-        if (0 == this.length)
-            return; // accept a zero length file
         final byte[] sig = new byte[4];
         rof.seek(0);
         rof.readFully(sig);
@@ -396,7 +394,7 @@ implements Iterable<E>, Closeable {
      *         Format Specification.
      * @throws IOException On any other I/O related issue.
      */
-    private void loadCentralDirectory(final ReadOnlyFile rof, int numEntries)
+    private void mountCentralDirectory(final ReadOnlyFile rof, int numEntries)
     throws IOException {
         final byte[] cfh = new byte[CFH_MIN_LEN];
         for (; ; numEntries--) {
@@ -514,20 +512,20 @@ implements Iterable<E>, Closeable {
 
     /**
      * Recovers any lost entries which have been added to the ZIP file after
-     * the last Central Directory.
-     * The method will start parsing entries at the start of the postamble and
-     * continue until it hits EOF or non-entry data.
-     * As a side effect, it will not only add any found entries to the internal
-     * map of entries, but will also cut the postamble accordingly.
+     * the (last) Central Directory.
+     * This method start parsing entries at the start of the postamble and
+     * continues until it hits EOF or non-entry data.
+     * As a side effect, it will not only add any found entries to its internal
+     * map, but will also cut the start of the postamble accordingly.
      * <p>
      * This method should get called immediately after the constructor.
-     * The reason why it's not part of the constructor is that it requires an
-     * otherwise fully initialized object, e.g. it may call
+     * The reason why it's not part of the constructor though is that it
+     * requires an otherwise fully initialized object, e.g. it may call
      * {@link #getCryptoParameters()}
      * 
      * @throws ZipException if an invalid entry is found.
-     * @throws IOException if the archive file has already been closed or any
-     *         I/O error occurs which is not simply caused by a truncated entry.
+     * @throws IOException if any I/O error occurs which is not just caused
+     *         by an EOF due to a truncated entry.
      */
     protected void recoverLostEntries() throws IOException {
         assertOpen();
@@ -644,14 +642,14 @@ implements Iterable<E>, Closeable {
                             cin = new CheckedInputStream(in, new CRC32());
                     try {
                         entry.setEncodedSize(cin.skip(Long.MAX_VALUE));
-                        if (null == field || VV_AE_2 != field.getVendorVersion())
-                            entry.setEncodedCrc(cin.getChecksum().getValue());
-                        else
+                        if (null != field && field.getVendorVersion() == VV_AE_2)
                             entry.setEncodedCrc(0);
+                        else
+                            entry.setEncodedCrc(cin.getChecksum().getValue());
                         // Sync file pointer on deflated input again.
                         if (null != iin) {
                             Inflater inf = iin.getInflater();
-                            assert inf.finished();
+                            assert inf.finished(); // JDK6: R/W 1210/2057; JDK 7: R/W 1193/2057
                             fp += inf.getBytesRead();
                         } else {
                             assert STORED == method;
@@ -660,7 +658,7 @@ implements Iterable<E>, Closeable {
                     } finally {
                         cin.close();
                     }
-                    if (entry.isEncrypted())
+                    if (null != field)
                         fp += overhead(field.getKeyStrength());
                     entry.setEncodedCompressedSize(fp - start);
 
@@ -718,16 +716,8 @@ implements Iterable<E>, Closeable {
                 // in the ZIP file!
                 this.entries.put(entry.getName(), entry);
             }
-        } catch (RuntimeException ex) {
-            // This should not happen - it's a smell of poor condition checking
-            // in one of the methods called within the try block!
-            // I would normally rather throw an AssertionError, but in this
-            // special context only, it's safe to ignore this and return.
-            assert false;
-            return; // stop entry recovery
-        } catch (ZipException ex) {
-            return; // stop entry recovery
         } catch (final IOException ex) {
+            // Let's tolerate only EOFException.
             Throwable cause = ex;
             do {
                 if (cause instanceof EOFException)
