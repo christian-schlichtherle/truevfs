@@ -51,7 +51,7 @@ final class Jdk6Inflater extends Inflater {
 
     @Override
     public long getBytesRead() {
-        return read;
+        return read - getRemaining();
     }
 
     @Override
