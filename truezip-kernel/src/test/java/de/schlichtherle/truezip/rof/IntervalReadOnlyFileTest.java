@@ -60,7 +60,8 @@ public final class IntervalReadOnlyFileTest extends ReadOnlyFileTestSuite {
     @Override
     protected ReadOnlyFile newReadOnlyFile(File file) throws IOException {
         final ReadOnlyFile rof = new DefaultReadOnlyFile(temp2);
-        return new IntervalReadOnlyFile(rof, DATA.length, DATA.length);
+        rof.seek(DATA.length);
+        return new IntervalReadOnlyFile(rof, DATA.length);
     }
 
     @After
