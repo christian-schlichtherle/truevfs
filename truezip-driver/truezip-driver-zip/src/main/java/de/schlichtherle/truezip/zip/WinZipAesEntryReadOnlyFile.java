@@ -25,6 +25,7 @@ import static de.schlichtherle.truezip.zip.WinZipAesEntryExtraField.*;
 import static de.schlichtherle.truezip.zip.WinZipAesEntryOutputStream.*;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import java.io.EOFException;
 import java.io.IOException;
 import net.jcip.annotations.NotThreadSafe;
 import org.bouncycastle.crypto.Mac;
@@ -100,8 +101,12 @@ final class WinZipAesEntryReadOnlyFile extends CipherReadOnlyFile {
         final long start = salt.length + passwdVerifier.length;
         final long end = fileLength - this.authenticationCode.length;
         final long length = end - start;
-        if (length < 0)
-            throw new ZipCryptoException(entry.getName() + " (false positive WinZip AES entry is too short)");
+        if (length < 0) {
+            // Wrap an EOFException so that RawZipFile can identify this issue.
+            throw new ZipCryptoException(entry.getName()
+                    + " (false positive WinZip AES entry is too short)",
+                    new EOFException());
+        }
 
         // Load authentication code.
         rof.seek(end);
