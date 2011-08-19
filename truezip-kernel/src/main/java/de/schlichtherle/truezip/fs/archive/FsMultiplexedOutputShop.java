@@ -279,7 +279,8 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
 
     @Override
     public void close() throws IOException {
-        assert !isBusy();
+        if (isBusy())
+            throw new IOException("Output shop is still busy!");
         try {
             storeBuffers();
             assert buffers.isEmpty();
