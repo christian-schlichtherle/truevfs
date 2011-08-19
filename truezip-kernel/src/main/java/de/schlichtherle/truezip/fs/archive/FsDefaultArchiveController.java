@@ -376,7 +376,7 @@ extends FsFileSystemArchiveController<E> {
                                         + outStreams;
                 if (!options.get(FORCE_CLOSE_OUTPUT))
                     throw handler.fail( new FsSyncException(getModel(),
-                                            new OutputBusyException(message)));
+                                        new OutputBusyException(message)));
                 handler.warn(   new FsSyncWarningException(getModel(),
                                 new OutputBusyException(message)));
             }
@@ -389,7 +389,7 @@ extends FsFileSystemArchiveController<E> {
                                         + inStreams;
                 if (!options.get(FORCE_CLOSE_INPUT))
                     throw handler.fail( new FsSyncException(getModel(),
-                                            new InputBusyException(message)));
+                                        new InputBusyException(message)));
                 handler.warn(   new FsSyncWarningException(getModel(),
                                 new InputBusyException(message)));
             }
