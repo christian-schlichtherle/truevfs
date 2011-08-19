@@ -40,7 +40,7 @@ public class FsSyncException extends SequentialIOException {
      *             access - do <em>not</em> call it directly!
      */
     @Deprecated
-	public FsSyncException(String message) {
+    public FsSyncException(String message) {
         super(message);
     }
 

@@ -16,6 +16,9 @@
 
 package de.schlichtherle.truezip.util;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.NotThreadSafe;
 
 /**
@@ -29,24 +32,25 @@ import net.jcip.annotations.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
+@DefaultAnnotation(NonNull.class)
 public abstract class AbstractExceptionBuilder< C extends Exception,
                                                 E extends Exception>
 implements ExceptionBuilder<C, E> {
 
-    private E assembly;
+    private @CheckForNull E assembly;
 
     /**
      * This method is called to update the given {@code previous} result of
      * the assembly with the given {@code cause}.
      * 
-     * @param previous The previous result of the assembly or {@code null} if
-     *        this is the first call since the creation of this instance or the
-     *        last assembly has been checked out.
-     * @param cause A(nother) non-{@code null} cause exception to add to the
-     *        assembly.
+     * @param  cause A(nother) non-{@code null} cause exception to add to the
+     *         assembly.
+     * @param  previous The previous result of the assembly or {@code null} if
+     *         this is the first call since the creation of this instance or the
+     *         last assembly has been checked out.
      * @return The assembled exception. {@code null} is not permitted.
      */
-    protected abstract E update(C cause, E previous);
+    protected abstract E update(C cause, @CheckForNull E previous);
 
     /**
      * This method is called to post-process the given result of the assembly
@@ -55,21 +59,13 @@ implements ExceptionBuilder<C, E> {
      * The implementation in the class {@link AbstractExceptionBuilder} simply
      * returns the parameter.
      *
-     * @param assembly The checked out result of the exception assembly
-     *        - may be {@code null}.
-     * @return The post-processed checked out result of the exception assembly
-     *         - may be {@code null}.
+     * @param  assembly The checked out result of the exception assembly.
+     * @return The post-processed checked out result of the exception assembly.
      */
     protected E post(E assembly) {
         return assembly;
     }
 
-    private E checkout() {
-        E t = assembly;
-        assembly = null;
-        return t;
-    }
-
     /**
      * {@inheritDoc}
      *
@@ -77,11 +73,12 @@ implements ExceptionBuilder<C, E> {
      * @see #post(Exception)
      */
     @Override
-	public final E fail(C cause) {
+    public final E fail(C cause) {
         if (cause == null)
             throw new NullPointerException();
-        assembly = update(cause, assembly);
-        return post(checkout());
+        final E assembly = update(cause, this.assembly);
+        this.assembly = null;
+        return post(assembly);
     }
 
     /**
@@ -90,10 +87,10 @@ implements ExceptionBuilder<C, E> {
      * @see #update(Exception, Exception)
      */
     @Override
-	public final void warn(C cause) {
+    public final void warn(C cause) {
         if (cause == null)
             throw new NullPointerException();
-        assembly = update(cause, assembly);
+        this.assembly = update(cause, this.assembly);
     }
 
     /**
@@ -102,9 +99,11 @@ implements ExceptionBuilder<C, E> {
      * @see #post(Exception)
      */
     @Override
-	public final void check() throws E {
-        E t = post(checkout());
-        if (t != null)
-            throw t;
+    public final void check() throws E {
+        final E assembly = this.assembly;
+        if (null != assembly) {
+            this.assembly = null;
+            throw post(assembly);
+        }
     }
 }

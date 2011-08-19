@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.util;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.NotThreadSafe;
 
@@ -36,6 +37,7 @@ import net.jcip.annotations.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
+@DefaultAnnotation(NonNull.class)
 public interface ExceptionBuilder<C extends Exception, E extends Exception>
 extends ExceptionHandler<C, E> {
 
@@ -50,7 +52,7 @@ extends ExceptionHandler<C, E> {
      * @return The assembled exception to throw.
      */
     @Override
-    @NonNull E fail(@NonNull C cause);
+    E fail(C cause);
 
     /**
      * Adds the {@code cause} exception to the assembly and
@@ -64,7 +66,7 @@ extends ExceptionHandler<C, E> {
      *         the caller to abort its task.
      */
     @Override
-    void warn(@NonNull C cause) throws E;
+    void warn(C cause) throws E;
 
     /**
      * Either returns or checks out and throws

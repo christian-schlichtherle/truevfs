@@ -16,22 +16,26 @@
 package de.schlichtherle.truezip.io;
 
 import de.schlichtherle.truezip.util.AbstractExceptionBuilder;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.NotThreadSafe;
 
 /**
- * Assembles a {@link SequentialIOException} from one or more {@link Exception}s by
+ * Assembles a {@link SequentialIOException} from one or more
+ * {@link Exception}s by
  * {@link SequentialIOException#initPredecessor(SequentialIOException) chaining}
  * them.
  * When the assembly is thrown or returned later, it is sorted by
  * {@link SequentialIOException#sortPriority() priority}.
  *
- * @param   <C> The type of the cause exception.
+ * @param   <C> The type of the cause exceptions.
  * @param   <E> The type of the assembled exception.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @NotThreadSafe
-public class SequentialIOExceptionBuilder<   C extends Exception,
+@DefaultAnnotation(NonNull.class)
+public class SequentialIOExceptionBuilder<  C extends Exception,
                                             E extends SequentialIOException>
 extends AbstractExceptionBuilder<C, E> {
 
@@ -97,6 +101,6 @@ extends AbstractExceptionBuilder<C, E> {
     @SuppressWarnings("unchecked")
     @Override
     protected final E post(E assembly) {
-        return null == assembly ? null : (E) assembly.sortPriority();
+        return (E) assembly.sortPriority();
     }
 }
