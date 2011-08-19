@@ -145,7 +145,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
             boolean closed;
 
             OutputStream() throws FileNotFoundException {
-                super(new FileOutputStream(temp.getFile(), options.get(APPEND))); // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
+                super(new FileOutputStream(temp.getFile(), options.get(APPEND))); // Do NOT extend FileOutputStream: It implements finalize(), which may cause deadlocks!
             }
 
             @Override
