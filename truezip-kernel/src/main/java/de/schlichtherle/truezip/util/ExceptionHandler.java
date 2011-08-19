@@ -16,7 +16,9 @@
 
 package de.schlichtherle.truezip.util;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * A generic callback interface designed to be implemented by <i>client
@@ -89,11 +91,13 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * The second type parameter determines the type of exception which may be
  * thrown by the exception handlers themselves and is freely selectable.
  *
- * @param <C> The type of the cause exception.
- * @param <E> The type of the thrown exception.
- * @author Christian Schlichtherle
+ * @param   <C> The type of the cause exception.
+ * @param   <E> The type of the thrown exception.
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
+@DefaultAnnotation(NonNull.class)
 public interface ExceptionHandler<C extends Exception, E extends Exception> {
 
     /**
@@ -108,7 +112,7 @@ public interface ExceptionHandler<C extends Exception, E extends Exception> {
      * @param   cause the exception to handle.
      * @return  The exception to throw.
      */
-    @NonNull E fail(@NonNull C cause);
+    E fail(C cause);
 
     /**
      * Called to handle an exceptional condition which
@@ -123,5 +127,5 @@ public interface ExceptionHandler<C extends Exception, E extends Exception> {
      * @throws Exception if the implementation wants the caller to abort its
      *         task.
      */
-    void warn(@NonNull C cause) throws E;
+    void warn(C cause) throws E;
 }

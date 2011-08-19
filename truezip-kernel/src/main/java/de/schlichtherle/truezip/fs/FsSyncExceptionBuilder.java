@@ -27,7 +27,7 @@ import net.jcip.annotations.NotThreadSafe;
  * When the assembly is thrown or returned later, it is sorted by
  * {@link SequentialIOException#sortPriority() priority}.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @NotThreadSafe
