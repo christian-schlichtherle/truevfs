@@ -152,7 +152,7 @@ extends TestBase<D> {
         try {
             Thread.sleep(50);
         } catch (InterruptedException ex) {
-            Logger.getLogger(TPathTestSuite.class.getName()).log(Level.WARNING, "Current thread was interrupted while waiting!", ex);
+            logger.log(Level.WARNING, "Current thread was interrupted while waiting!", ex);
         }
     }
 

@@ -171,7 +171,7 @@ extends TestBase<D> {
         try {
             Thread.sleep(50);
         } catch (InterruptedException ex) {
-            Logger.getLogger(TFileTestSuite.class.getName()).log(Level.WARNING, "Current thread was interrupted while waiting!", ex);
+            logger.log(Level.WARNING, "Current thread was interrupted while waiting!", ex);
         }
     }
 
