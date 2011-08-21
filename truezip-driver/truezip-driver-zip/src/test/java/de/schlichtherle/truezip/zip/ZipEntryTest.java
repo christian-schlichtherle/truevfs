@@ -69,34 +69,34 @@ public final class ZipEntryTest {
     }
 
     @Test
-    public void testEncodedPlatform() {
+    public void testRawPlatform() {
         try {
-            entry.setEncodedPlatform(UNKNOWN - 1);
+            entry.setRawPlatform(UNKNOWN - 1);
             fail();
         } catch (IllegalArgumentException expected) {
         }
 
         try {
-            entry.setEncodedPlatform(UByte.MIN_VALUE - 1);
+            entry.setRawPlatform(UByte.MIN_VALUE - 1);
             fail();
         } catch (IllegalArgumentException expected) {
         }
 
         try {
-            entry.setEncodedPlatform(UByte.MAX_VALUE + 1);
+            entry.setRawPlatform(UByte.MAX_VALUE + 1);
             fail();
         } catch (IllegalArgumentException expected) {
         }
 
-        assertEquals(0, entry.getEncodedPlatform());
-        entry.setEncodedPlatform(UByte.MIN_VALUE);
-        assertEquals(UByte.MIN_VALUE, entry.getEncodedPlatform());
-        entry.setEncodedPlatform(PLATFORM_FAT);
-        assertEquals(PLATFORM_FAT, entry.getEncodedPlatform());
-        entry.setEncodedPlatform(PLATFORM_UNIX);
-        assertEquals(PLATFORM_UNIX, entry.getEncodedPlatform());
-        entry.setEncodedPlatform(UByte.MAX_VALUE);
-        assertEquals(UByte.MAX_VALUE, entry.getEncodedPlatform());
+        assertEquals(0, entry.getRawPlatform());
+        entry.setRawPlatform(UByte.MIN_VALUE);
+        assertEquals(UByte.MIN_VALUE, entry.getRawPlatform());
+        entry.setRawPlatform(PLATFORM_FAT);
+        assertEquals(PLATFORM_FAT, entry.getRawPlatform());
+        entry.setRawPlatform(PLATFORM_UNIX);
+        assertEquals(PLATFORM_UNIX, entry.getRawPlatform());
+        entry.setRawPlatform(UByte.MAX_VALUE);
+        assertEquals(UByte.MAX_VALUE, entry.getRawPlatform());
     }
 
     @Test
@@ -160,34 +160,34 @@ public final class ZipEntryTest {
     }
 
     @Test
-    public void testEncodedMethod() {
+    public void testRawMethod() {
         try {
-            entry.setEncodedMethod(UNKNOWN - 1);
+            entry.setRawMethod(UNKNOWN - 1);
             fail();
         } catch (IllegalArgumentException expected) {
         }
 
         try {
-            entry.setEncodedMethod(UShort.MIN_VALUE - 1);
+            entry.setRawMethod(UShort.MIN_VALUE - 1);
             fail();
         } catch (IllegalArgumentException expected) {
         }
 
         try {
-            entry.setEncodedMethod(UShort.MAX_VALUE + 1);
+            entry.setRawMethod(UShort.MAX_VALUE + 1);
             fail();
         } catch (IllegalArgumentException expected) {
         }
 
-        assertEquals(0, entry.getEncodedMethod());
-        entry.setEncodedMethod(UShort.MIN_VALUE);
-        assertEquals(UShort.MIN_VALUE, entry.getEncodedMethod());
-        entry.setEncodedMethod(STORED);
-        assertEquals(STORED, entry.getEncodedMethod());
-        entry.setEncodedMethod(DEFLATED);
-        assertEquals(DEFLATED, entry.getEncodedMethod());
-        entry.setEncodedMethod(UShort.MAX_VALUE);
-        assertEquals(UShort.MAX_VALUE, entry.getEncodedMethod());
+        assertEquals(0, entry.getRawMethod());
+        entry.setRawMethod(UShort.MIN_VALUE);
+        assertEquals(UShort.MIN_VALUE, entry.getRawMethod());
+        entry.setRawMethod(STORED);
+        assertEquals(STORED, entry.getRawMethod());
+        entry.setRawMethod(DEFLATED);
+        assertEquals(DEFLATED, entry.getRawMethod());
+        entry.setRawMethod(UShort.MAX_VALUE);
+        assertEquals(UShort.MAX_VALUE, entry.getRawMethod());
     }
 
     @Test
@@ -227,31 +227,31 @@ public final class ZipEntryTest {
     }
 
     @Test
-    public void testEncodedTime() {
+    public void testRawTime() {
         try {
-            entry.setEncodedTime(UNKNOWN - 1);
+            entry.setRawTime(UNKNOWN - 1);
             fail();
         } catch (IllegalArgumentException expected) {
         }
 
         try {
-            entry.setEncodedTime(UInt.MIN_VALUE - 1);
+            entry.setRawTime(UInt.MIN_VALUE - 1);
             fail();
         } catch (IllegalArgumentException expected) {
         }
 
         try {
-            entry.setEncodedTime(UInt.MAX_VALUE + 1);
+            entry.setRawTime(UInt.MAX_VALUE + 1);
             fail();
         } catch (IllegalArgumentException expected) {
         }
 
-        assertEquals(0, entry.getEncodedTime());
+        assertEquals(0, entry.getRawTime());
 
-        entry.setEncodedTime(UInt.MIN_VALUE);
-        assertEquals(UInt.MIN_VALUE, entry.getEncodedTime());
-        entry.setEncodedTime(UInt.MAX_VALUE);
-        assertEquals(UInt.MAX_VALUE, entry.getEncodedTime());
+        entry.setRawTime(UInt.MIN_VALUE);
+        assertEquals(UInt.MIN_VALUE, entry.getRawTime());
+        entry.setRawTime(UInt.MAX_VALUE);
+        assertEquals(UInt.MAX_VALUE, entry.getRawTime());
     }
 
     @Test
@@ -278,30 +278,30 @@ public final class ZipEntryTest {
     }
 
     @Test
-    public void testEncodedCrc() {
+    public void testRawCrc() {
         try {
-            entry.setEncodedCrc(UNKNOWN - 1);
+            entry.setRawCrc(UNKNOWN - 1);
             fail();
         } catch (IllegalArgumentException expected) {
         }
 
         try {
-            entry.setEncodedCrc(UInt.MIN_VALUE - 1);
+            entry.setRawCrc(UInt.MIN_VALUE - 1);
             fail();
         } catch (IllegalArgumentException expected) {
         }
 
         try {
-            entry.setEncodedCrc(UInt.MAX_VALUE + 1);
+            entry.setRawCrc(UInt.MAX_VALUE + 1);
             fail();
         } catch (IllegalArgumentException expected) {
         }
 
-        assertEquals(0, entry.getEncodedCrc());
-        entry.setEncodedCrc(UInt.MIN_VALUE);
-        assertEquals(UInt.MIN_VALUE, entry.getEncodedCrc());
-        entry.setEncodedCrc(UInt.MAX_VALUE);
-        assertEquals(UInt.MAX_VALUE, entry.getEncodedCrc());
+        assertEquals(0, entry.getRawCrc());
+        entry.setRawCrc(UInt.MIN_VALUE);
+        assertEquals(UInt.MIN_VALUE, entry.getRawCrc());
+        entry.setRawCrc(UInt.MAX_VALUE);
+        assertEquals(UInt.MAX_VALUE, entry.getRawCrc());
     }
 
     @Test
@@ -331,33 +331,33 @@ public final class ZipEntryTest {
     }
 
     @Test
-    public void testEncodedCompressedSize() {
+    public void testRawCompressedSize() {
         try {
-            entry.setEncodedCompressedSize(UNKNOWN - 1);
+            entry.setRawCompressedSize(UNKNOWN - 1);
             fail();
         } catch (IllegalArgumentException expected) {
         }
 
         try {
-            entry.setEncodedCompressedSize(ULong.MIN_VALUE - 1);
+            entry.setRawCompressedSize(ULong.MIN_VALUE - 1);
             fail();
         } catch (IllegalArgumentException expected) {
         }
 
         try {
-            entry.setEncodedCompressedSize(ULong.MAX_VALUE + 1);
+            entry.setRawCompressedSize(ULong.MAX_VALUE + 1);
             fail();
         } catch (IllegalArgumentException expected) {
         }
 
-        assertEquals(0, entry.getEncodedCompressedSize());
+        assertEquals(0, entry.getRawCompressedSize());
 
-        entry.setEncodedCompressedSize(UInt.MIN_VALUE);
-        assertEquals(UInt.MIN_VALUE, entry.getEncodedCompressedSize());
-        entry.setEncodedCompressedSize(UInt.MAX_VALUE);
-        assertEquals(UInt.MAX_VALUE, entry.getEncodedCompressedSize());
-        entry.setEncodedCompressedSize(UInt.MAX_VALUE + 1); // ZIP64!
-        assertEquals(UInt.MAX_VALUE, entry.getEncodedCompressedSize());
+        entry.setRawCompressedSize(UInt.MIN_VALUE);
+        assertEquals(UInt.MIN_VALUE, entry.getRawCompressedSize());
+        entry.setRawCompressedSize(UInt.MAX_VALUE);
+        assertEquals(UInt.MAX_VALUE, entry.getRawCompressedSize());
+        entry.setRawCompressedSize(UInt.MAX_VALUE + 1); // ZIP64!
+        assertEquals(UInt.MAX_VALUE, entry.getRawCompressedSize());
     }
 
     @Test
@@ -387,33 +387,33 @@ public final class ZipEntryTest {
     }
 
     @Test
-    public void testEncodedSize() {
+    public void testRawSize() {
         try {
-            entry.setEncodedSize(UNKNOWN - 1);
+            entry.setRawSize(UNKNOWN - 1);
             fail();
         } catch (IllegalArgumentException expected) {
         }
 
         try {
-            entry.setEncodedSize(ULong.MIN_VALUE - 1);
+            entry.setRawSize(ULong.MIN_VALUE - 1);
             fail();
         } catch (IllegalArgumentException expected) {
         }
 
         try {
-            entry.setEncodedSize(ULong.MAX_VALUE + 1);
+            entry.setRawSize(ULong.MAX_VALUE + 1);
             fail();
         } catch (IllegalArgumentException expected) {
         }
 
-        assertEquals(0, entry.getEncodedSize());
+        assertEquals(0, entry.getRawSize());
 
-        entry.setEncodedSize(UInt.MIN_VALUE);
-        assertEquals(UInt.MIN_VALUE, entry.getEncodedSize());
-        entry.setEncodedSize(UInt.MAX_VALUE);
-        assertEquals(UInt.MAX_VALUE, entry.getEncodedSize());
-        entry.setEncodedSize(UInt.MAX_VALUE + 1); // ZIP64!
-        assertEquals(UInt.MAX_VALUE, entry.getEncodedSize());
+        entry.setRawSize(UInt.MIN_VALUE);
+        assertEquals(UInt.MIN_VALUE, entry.getRawSize());
+        entry.setRawSize(UInt.MAX_VALUE);
+        assertEquals(UInt.MAX_VALUE, entry.getRawSize());
+        entry.setRawSize(UInt.MAX_VALUE + 1); // ZIP64!
+        assertEquals(UInt.MAX_VALUE, entry.getRawSize());
     }
 
     @Test
@@ -440,64 +440,64 @@ public final class ZipEntryTest {
     }
 
     @Test
-    public void testEncodedExternalAttributes() {
+    public void testRawExternalAttributes() {
         try {
-            entry.setEncodedExternalAttributes(UNKNOWN - 1);
+            entry.setRawExternalAttributes(UNKNOWN - 1);
             fail();
         } catch (IllegalArgumentException expected) {
         }
 
         try {
-            entry.setEncodedExternalAttributes(UInt.MIN_VALUE - 1);
+            entry.setRawExternalAttributes(UInt.MIN_VALUE - 1);
             fail();
         } catch (IllegalArgumentException expected) {
         }
 
         try {
-            entry.setEncodedExternalAttributes(UInt.MAX_VALUE + 1);
+            entry.setRawExternalAttributes(UInt.MAX_VALUE + 1);
             fail();
         } catch (IllegalArgumentException expected) {
         }
 
-        assertEquals(0, entry.getEncodedExternalAttributes());
-        entry.setEncodedExternalAttributes(UInt.MIN_VALUE);
-        assertEquals(UInt.MIN_VALUE, entry.getEncodedExternalAttributes());
-        entry.setEncodedExternalAttributes(UInt.MAX_VALUE);
-        assertEquals(UInt.MAX_VALUE, entry.getEncodedExternalAttributes());
+        assertEquals(0, entry.getRawExternalAttributes());
+        entry.setRawExternalAttributes(UInt.MIN_VALUE);
+        assertEquals(UInt.MIN_VALUE, entry.getRawExternalAttributes());
+        entry.setRawExternalAttributes(UInt.MAX_VALUE);
+        assertEquals(UInt.MAX_VALUE, entry.getRawExternalAttributes());
     }
 
     @Test
-    public void testEncodedOffset() {
+    public void testRawOffset() {
         try {
-            entry.setEncodedOffset(UNKNOWN - 1);
+            entry.setRawOffset(UNKNOWN - 1);
             fail();
         } catch (IllegalArgumentException expected) {
         }
 
         try {
-            entry.setEncodedOffset(ULong.MIN_VALUE - 1);
+            entry.setRawOffset(ULong.MIN_VALUE - 1);
             fail();
         } catch (IllegalArgumentException expected) {
         }
 
         try {
-            entry.setEncodedOffset(ULong.MAX_VALUE + 1);
+            entry.setRawOffset(ULong.MAX_VALUE + 1);
             fail();
         } catch (IllegalArgumentException expected) {
         }
 
         assertEquals(UNKNOWN, entry.getOffset());
-        assertEquals(0, entry.getEncodedOffset());
+        assertEquals(0, entry.getRawOffset());
 
-        entry.setEncodedOffset(UInt.MIN_VALUE);
+        entry.setRawOffset(UInt.MIN_VALUE);
         assertEquals(UInt.MIN_VALUE, entry.getOffset());
-        assertEquals(UInt.MIN_VALUE, entry.getEncodedOffset());
-        entry.setEncodedOffset(UInt.MAX_VALUE);
+        assertEquals(UInt.MIN_VALUE, entry.getRawOffset());
+        entry.setRawOffset(UInt.MAX_VALUE);
         assertEquals(UInt.MAX_VALUE, entry.getOffset());
-        assertEquals(UInt.MAX_VALUE, entry.getEncodedOffset());
-        entry.setEncodedOffset(UInt.MAX_VALUE + 1); // ZIP64!
+        assertEquals(UInt.MAX_VALUE, entry.getRawOffset());
+        entry.setRawOffset(UInt.MAX_VALUE + 1); // ZIP64!
         assertEquals(UInt.MAX_VALUE + 1, entry.getOffset());
-        assertEquals(UInt.MAX_VALUE, entry.getEncodedOffset());
+        assertEquals(UInt.MAX_VALUE, entry.getRawOffset());
     }
 
     @Test
@@ -520,24 +520,24 @@ public final class ZipEntryTest {
             (byte) 0x00, (byte) 0x00, // Data Size: 0x0000
         };
 
-        entry.setEncodedSize(UInt.MAX_VALUE);
-        entry.setEncodedCompressedSize(UInt.MAX_VALUE);
-        entry.setEncodedOffset(UInt.MAX_VALUE);
-        entry.setEncodedExtraFields(set); // this must be last in the sequence!
+        entry.setRawSize(UInt.MAX_VALUE);
+        entry.setRawCompressedSize(UInt.MAX_VALUE);
+        entry.setRawOffset(UInt.MAX_VALUE);
+        entry.setRawExtraFields(set); // this must be last in the sequence!
         assertEquals(0x0fedcba987654321L, entry.getSize());
-        assertEquals(UInt.MAX_VALUE, entry.getEncodedSize());
+        assertEquals(UInt.MAX_VALUE, entry.getRawSize());
         assertEquals(0x0fedcba987654322L, entry.getCompressedSize());
-        assertEquals(UInt.MAX_VALUE, entry.getEncodedCompressedSize());
+        assertEquals(UInt.MAX_VALUE, entry.getRawCompressedSize());
         assertEquals(0x0fedcba987654323L, entry.getOffset());
-        assertEquals(UInt.MAX_VALUE, entry.getEncodedOffset());
+        assertEquals(UInt.MAX_VALUE, entry.getRawOffset());
 
         set[0] = (byte) 0xff;
 
-        byte[] got1 = entry.getEncodedExtraFields();
+        byte[] got1 = entry.getRawExtraFields();
         assertNotNull(got1);
         assertNotSame(set, got1);
 
-        final byte[] got2 = entry.getEncodedExtraFields();
+        final byte[] got2 = entry.getRawExtraFields();
         assertNotNull(got2);
         assertNotSame(set, got2);
 

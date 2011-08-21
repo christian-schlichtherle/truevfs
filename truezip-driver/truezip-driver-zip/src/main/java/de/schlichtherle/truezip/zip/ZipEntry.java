@@ -195,11 +195,11 @@ public class ZipEntry implements Cloneable {
         setInit(PLATFORM, known);
     }
 
-    final short getEncodedPlatform() {
+    final short getRawPlatform() {
         return (short) (platform & UByte.MAX_VALUE);
     }
 
-    final void setEncodedPlatform(final int platform) {
+    final void setRawPlatform(final int platform) {
         assert UByte.check(platform);
         this.platform = (byte) platform;
         setInit(PLATFORM, true);
@@ -287,11 +287,11 @@ public class ZipEntry implements Cloneable {
         }
     }
 
-    final int getEncodedMethod() {
+    final int getRawMethod() {
         return method & UShort.MAX_VALUE;
     }
 
-    final void setEncodedMethod(final int method) {
+    final void setRawMethod(final int method) {
         assert UShort.check(method);
         this.method = (short) method;
         setInit(METHOD, true);
@@ -313,11 +313,11 @@ public class ZipEntry implements Cloneable {
         setInit(DTIME, known);
     }
 
-    final long getEncodedTime() {
+    final long getRawTime() {
         return dtime & UInt.MAX_VALUE;
     }
 
-    final void setEncodedTime(final long dtime) {
+    final void setRawTime(final long dtime) {
         assert UInt.check(dtime);
         this.dtime = (int) dtime;
         setInit(DTIME, true);
@@ -352,11 +352,11 @@ public class ZipEntry implements Cloneable {
         setInit(CRC, known);
     }
 
-    final long getEncodedCrc() {
+    final long getRawCrc() {
         return crc & UInt.MAX_VALUE;
     }
 
-    final void setEncodedCrc(final long crc) {
+    final void setRawCrc(final long crc) {
         assert UInt.check(crc);
         this.crc = (int) crc;
         setInit(CRC, true);
@@ -386,7 +386,7 @@ public class ZipEntry implements Cloneable {
         this.csize = csize;
     }
 
-    final long getEncodedCompressedSize() {
+    final long getRawCompressedSize() {
         final long csize = this.csize;
         if (UNKNOWN == csize)
             return 0;
@@ -395,7 +395,7 @@ public class ZipEntry implements Cloneable {
                 : csize;
     }
 
-    final void setEncodedCompressedSize(final long csize) {
+    final void setRawCompressedSize(final long csize) {
         assert ULong.check(csize);
         this.csize = csize;
     }
@@ -424,7 +424,7 @@ public class ZipEntry implements Cloneable {
         this.size = size;
     }
 
-    final long getEncodedSize() {
+    final long getRawSize() {
         final long size = this.size;
         if (UNKNOWN == size)
             return 0;
@@ -433,7 +433,7 @@ public class ZipEntry implements Cloneable {
                 : size;
     }
 
-    final void setEncodedSize(final long size) {
+    final void setRawSize(final long size) {
         assert ULong.check(size);
         this.size = size;
     }
@@ -453,13 +453,13 @@ public class ZipEntry implements Cloneable {
         setInit(EATTR, known);
     }
 
-    final long getEncodedExternalAttributes() {
+    final long getRawExternalAttributes() {
         if (!isInit(EATTR))
             return isDirectory() ? 0x10 : 0;
         return eattr & UInt.MAX_VALUE;
     }
 
-    final void setEncodedExternalAttributes(final long eattr) {
+    final void setRawExternalAttributes(final long eattr) {
         assert UInt.check(eattr);
         this.eattr = (int) eattr;
         setInit(EATTR, true);
@@ -469,7 +469,7 @@ public class ZipEntry implements Cloneable {
         return offset;
     }
 
-    final long getEncodedOffset() {
+    final long getRawOffset() {
         final long offset = this.offset;
         if (UNKNOWN == offset)
             return 0;
@@ -478,7 +478,7 @@ public class ZipEntry implements Cloneable {
                 : offset;
     }
 
-    final void setEncodedOffset(final long offset) {
+    final void setRawOffset(final long offset) {
         assert ULong.check(offset);
         this.offset = offset;
     }
@@ -533,9 +533,9 @@ public class ZipEntry implements Cloneable {
      *
      * @return A new byte array holding the serialized Extra Fields.
      *         {@code null} is never returned.
-     * @see    #getEncodedExtraFields()
+     * @see    #getRawExtraFields()
      */
-    final byte[] getEncodedExtraFields() {
+    final byte[] getRawExtraFields() {
         return getExtraFields(true);
     }
 
@@ -544,7 +544,7 @@ public class ZipEntry implements Cloneable {
      * This method <em>must not</em> get called before the uncompressed size,
      * compressed size and offset have been initialized!
      */
-    final void setEncodedExtraFields(final byte[] data) {
+    final void setRawExtraFields(final byte[] data) {
         assert 0 < data.length && UShort.check(data.length);
         setExtraFields(data, true);
     }
@@ -631,24 +631,24 @@ public class ZipEntry implements Cloneable {
         final byte[] data = ef.getDataBlock();
         int off = 0;
         // Read in Uncompressed Size.
-        final long size = getEncodedSize();
+        final long size = getRawSize();
         if (UInt.MAX_VALUE <= size) {
             assert UInt.MAX_VALUE == size;
-            setEncodedSize(readLong(data, off));
+            setRawSize(readLong(data, off));
             off += 8;
         }
         // Read in Compressed Size.
-        final long csize = getEncodedCompressedSize();
+        final long csize = getRawCompressedSize();
         if (UInt.MAX_VALUE <= csize) {
             assert UInt.MAX_VALUE == csize;
-            setEncodedCompressedSize(readLong(data, off));
+            setRawCompressedSize(readLong(data, off));
             off += 8;
         }
         // Read in Relative Header Offset.
-        final long offset = getEncodedOffset();
+        final long offset = getRawOffset();
         if (UInt.MAX_VALUE <= offset) {
             assert UInt.MAX_VALUE == offset;
-            setEncodedOffset(readLong(data, off));
+            setRawOffset(readLong(data, off));
             //off += 8;
         }
     }
@@ -663,12 +663,12 @@ public class ZipEntry implements Cloneable {
         this.comment = comment;
     }
 
-    final String getDecodedComment() {
+    final String getRawComment() {
         final String comment = this.comment;
         return null != comment ? comment : "";
     }
 
-    final void setDecodedComment(final String comment) {
+    final void setRawComment(final String comment) {
         assert UShort.check(comment.length());
         this.comment = comment;
     }
@@ -690,7 +690,10 @@ public class ZipEntry implements Cloneable {
                     || UInt.MAX_VALUE <= getOffset();
     }
 
-    /** Returns a string representation of this object. */
+    /**
+     * Returns a string representation of this object for debugging and logging
+     * purposes.
+     */
     @Override
     public String toString() {
         return new StringBuilder(getClass().getName())
@@ -700,12 +703,12 @@ public class ZipEntry implements Cloneable {
                 .append(getTime())
                 .append(",method=")
                 .append(getMethod())
+                .append(",crc=")
+                .append(getCrc())
                 .append(",size=")
                 .append(getSize())
                 .append(",compressedSize=")
                 .append(getCompressedSize())
-                .append(",crc=")
-                .append(getCrc())
                 .append("]")
                 .toString();
     }

@@ -417,7 +417,7 @@ implements Iterable<E>, Closeable {
                 // central file header signature   4 bytes  (0x02014b50)
                 off += 4;
                 // version made by                 2 bytes
-                entry.setEncodedPlatform(readUShort(cfh, off) >> 8);
+                entry.setRawPlatform(readUShort(cfh, off) >> 8);
                 off += 2;
                 // version needed to extract       2 bytes
                 off += 2;
@@ -425,20 +425,20 @@ implements Iterable<E>, Closeable {
                 entry.setGeneralPurposeBitFlags(gpbf);
                 off += 2; // General Purpose Bit Flags
                 // compression method              2 bytes
-                entry.setEncodedMethod(readUShort(cfh, off));
+                entry.setRawMethod(readUShort(cfh, off));
                 off += 2;
                 // last mod file time              2 bytes
                 // last mod file date              2 bytes
-                entry.setEncodedTime(readUInt(cfh, off));
+                entry.setRawTime(readUInt(cfh, off));
                 off += 4;
                 // crc-32                          4 bytes
-                entry.setEncodedCrc(readUInt(cfh, off));
+                entry.setRawCrc(readUInt(cfh, off));
                 off += 4;
                 // compressed size                 4 bytes
-                entry.setEncodedCompressedSize(readUInt(cfh, off));
+                entry.setRawCompressedSize(readUInt(cfh, off));
                 off += 4;
                 // uncompressed size               4 bytes
-                entry.setEncodedSize(readUInt(cfh, off));
+                entry.setRawSize(readUInt(cfh, off));
                 off += 4;
                 // file name length                2 bytes
                 off += 2;
@@ -454,23 +454,23 @@ implements Iterable<E>, Closeable {
                 //entry.setEncodedInternalAttributes(readUShort(cfh, off));
                 off += 2;
                 // external file attributes        4 bytes
-                entry.setEncodedExternalAttributes(readUInt(cfh, off));
+                entry.setRawExternalAttributes(readUInt(cfh, off));
                 off += 4;
                 // relative offset of local header 4 bytes
                 long lfhOff = readUInt(cfh, off);
-                entry.setEncodedOffset(lfhOff); // must be unmapped!
+                entry.setRawOffset(lfhOff); // must be unmapped!
                 //off += 4;
                 // extra field (variable size)
                 if (0 < extraLen) {
                     final byte[] extra = new byte[extraLen];
                     rof.readFully(extra);
-                    entry.setEncodedExtraFields(extra);
+                    entry.setRawExtraFields(extra);
                 }
                 // file comment (variable size)
                 if (0 < commentLen) {
                     final byte[] comment = new byte[commentLen];
                     rof.readFully(comment);
-                    entry.setDecodedComment(decode(comment));
+                    entry.setRawComment(decode(comment));
                 }
                 // Re-read virtual offset after ZIP64 Extended Information
                 // Extra Field may have been parsed, map it to the real
@@ -562,32 +562,32 @@ implements Iterable<E>, Closeable {
                 entry.setGeneralPurposeBitFlags(gpbf);
                 off += 2; // General Purpose Bit Flags
                 // compression method              2 bytes
-                entry.setEncodedMethod(readUShort(lfh, off));
+                entry.setRawMethod(readUShort(lfh, off));
                 off += 2;
                 // last mod file time              2 bytes
                 // last mod file date              2 bytes
-                entry.setEncodedTime(readUInt(lfh, off));
+                entry.setRawTime(readUInt(lfh, off));
                 off += 4;
                 // crc-32                          4 bytes
-                entry.setEncodedCrc(readUInt(lfh, off));
+                entry.setRawCrc(readUInt(lfh, off));
                 off += 4;
                 // compressed size                 4 bytes
-                entry.setEncodedCompressedSize(readUInt(lfh, off));
+                entry.setRawCompressedSize(readUInt(lfh, off));
                 off += 4;
                 // uncompressed size               4 bytes
-                entry.setEncodedSize(readUInt(lfh, off));
+                entry.setRawSize(readUInt(lfh, off));
                 off += 4;
                 // file name length                2 bytes
                 off += 2;
                 // extra field length              2 bytes
                 final int extraLen = readUShort(lfh, off);
                 //off += 2;
-                entry.setEncodedOffset(this.mapper.unmap(fp));
+                entry.setRawOffset(this.mapper.unmap(fp));
                 // extra field (variable size)
                 if (0 < extraLen) {
                     final byte[] extra = new byte[extraLen];
                     rof.readFully(extra);
-                    entry.setEncodedExtraFields(extra);
+                    entry.setRawExtraFields(extra);
                 }
 
                 // Process entry contents.
@@ -641,11 +641,11 @@ implements Iterable<E>, Closeable {
                     final CheckedInputStream
                             cin = new CheckedInputStream(in, new CRC32());
                     try {
-                        entry.setEncodedSize(cin.skip(Long.MAX_VALUE));
+                        entry.setRawSize(cin.skip(Long.MAX_VALUE));
                         if (null != field && field.getVendorVersion() == VV_AE_2)
-                            entry.setEncodedCrc(0);
+                            entry.setRawCrc(0);
                         else
-                            entry.setEncodedCrc(cin.getChecksum().getValue());
+                            entry.setRawCrc(cin.getChecksum().getValue());
                         // Sync file pointer on deflated input again.
                         if (null != iin) {
                             Inflater inf = iin.getInflater();
@@ -660,7 +660,7 @@ implements Iterable<E>, Closeable {
                     }
                     if (null != field)
                         fp += overhead(field.getKeyStrength());
-                    entry.setEncodedCompressedSize(fp - start);
+                    entry.setRawCompressedSize(fp - start);
 
                     // We have reconstituted all meta data for the entry now.
                     // Next comes the Data Descriptor.
