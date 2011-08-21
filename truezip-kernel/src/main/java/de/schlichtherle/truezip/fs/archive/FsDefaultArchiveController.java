@@ -368,8 +368,9 @@ extends FsFileSystemArchiveController<E> {
         // set and FORCE_CLOSE_OUTPUT may be unset in which case we
         // don't even need to check open input streams if there are
         // some open output streams.
-        if (getOutput() != null) {
-            final int outStreams = getOutput().waitCloseOthers(
+        final Output output = getOutput();
+        if (null != output) {
+            final int outStreams = output.waitCloseOthers(
                     options.get(WAIT_CLOSE_OUTPUT) ? 0 : 50);
             if (outStreams > 0) {
                 final String message =  "Number of open output streams: "
@@ -381,8 +382,9 @@ extends FsFileSystemArchiveController<E> {
                                 new OutputBusyException(message)));
             }
         }
-        if (getInput() != null) {
-            final int inStreams = getInput().waitCloseOthers(
+        final Input input = getInput();
+        if (null != input) {
+            final int inStreams = input.waitCloseOthers(
                     options.get(WAIT_CLOSE_INPUT) ? 0 : 50);
             if (inStreams > 0) {
                 final String message =  "Number of open input streams: "
@@ -414,14 +416,12 @@ extends FsFileSystemArchiveController<E> {
         class FilterExceptionHandler
         implements ExceptionHandler<IOException, X> {
             @Override
-            public X fail(IOException cannotHappen) {
-                throw new AssertionError(cannotHappen);
+            public X fail(IOException shouldNotHappen) {
+                throw new AssertionError(shouldNotHappen);
             }
 
             @Override
             public void warn(IOException cause) throws X {
-                if (null == cause)
-                    throw new NullPointerException();
                 handler.warn(new FsSyncWarningException(getModel(), cause));
             }
         } // class FilterExceptionHandler
