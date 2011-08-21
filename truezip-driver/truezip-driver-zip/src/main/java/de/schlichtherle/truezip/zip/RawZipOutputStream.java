@@ -422,7 +422,7 @@ implements Iterable<E> {
         }
         int method = entry.getMethod();
         if (UNKNOWN == method)
-            entry.setEncodedMethod(method = getMethod());
+            entry.setRawMethod(method = getMethod());
         boolean skipCrc = false;
         if (entry.isEncrypted() || WINZIP_AES == method) {
             ZipCryptoParameters param = getCryptoParameters();
@@ -573,9 +573,9 @@ implements Iterable<E> {
             // E.g. this may happen with the GROW output option preference.
             return false;
         }
-        final long offset = entry.getEncodedOffset();
+        final long offset = entry.getRawOffset();
         final boolean zip64 = entry.isZip64ExtensionsRequired();
-        final int method = entry.getEncodedMethod();
+        final int method = entry.getRawMethod();
         final boolean directory = entry.isDirectory();
         final int version = zip64
                 ? 45
@@ -586,7 +586,7 @@ implements Iterable<E> {
         // Central File Header.
         dos.writeInt(CFH_SIG);
         // Version Made By.
-        dos.writeShort((entry.getEncodedPlatform() << 8) | 63);
+        dos.writeShort((entry.getRawPlatform() << 8) | 63);
         // Version Needed To Extract.
         dos.writeShort(version);
         // General Purpose Bit Flags.
@@ -594,9 +594,9 @@ implements Iterable<E> {
         // Compression Method.
         dos.writeShort(method);
         // Last Mod. File Time / Date.
-        dos.writeInt((int) entry.getEncodedTime());
+        dos.writeInt((int) entry.getRawTime());
         // CRC-32.
-        dos.writeInt((int) entry.getEncodedCrc());
+        dos.writeInt((int) entry.getRawCrc());
         // Compressed Size.
         dos.writeInt((int) csize);
         // Uncompressed Size.
@@ -605,7 +605,7 @@ implements Iterable<E> {
         final byte[] name = encode(entry.getName());
         dos.writeShort(name.length);
         // Extra Field Length.
-        final byte[] extra = entry.getEncodedExtraFields();
+        final byte[] extra = entry.getRawExtraFields();
         dos.writeShort(extra.length);
         // File Comment Length.
         final byte[] comment = getCommentEncoded(entry);
@@ -615,7 +615,7 @@ implements Iterable<E> {
         // Internal File Attributes.
         dos.writeShort(0);
         // External File Attributes.
-        dos.writeInt((int) entry.getEncodedExternalAttributes());
+        dos.writeInt((int) entry.getRawExternalAttributes());
         // Relative Offset Of Local File Header.
         dos.writeInt((int) offset);
         // File Name.
@@ -629,7 +629,7 @@ implements Iterable<E> {
     }
 
     private byte[] getCommentEncoded(final ZipEntry entry) {
-        return encode(entry.getDecodedComment());
+        return encode(entry.getRawComment());
     }
 
     /**
@@ -747,8 +747,8 @@ implements Iterable<E> {
         throws ZipException {
             {
                 final long size = encode(entry.getName()).length
-                                + entry.getEncodedExtraFields().length
-                                + encode(entry.getDecodedComment()).length;
+                                + entry.getRawExtraFields().length
+                                + encode(entry.getRawComment()).length;
                 if (UShort.MAX_VALUE < size)
                     throw new ZipException(entry.getName()
                             + " (the total size "
@@ -768,7 +768,7 @@ implements Iterable<E> {
                             + " (unknown uncompressed size)");
             }
             if (UNKNOWN == entry.getPlatform())
-                entry.setEncodedPlatform(PLATFORM_FAT);
+                entry.setRawPlatform(PLATFORM_FAT);
             if (UNKNOWN == entry.getTime())
                 entry.setTime(System.currentTimeMillis());
         }
@@ -780,14 +780,14 @@ implements Iterable<E> {
         public OutputStream start() throws IOException {
             final LEDataOutputStream dos = RawZipOutputStream.this.dos;
             final ZipEntry entry = RawZipOutputStream.this.entry;
-            final long crc = entry.getEncodedCrc();
-            final long csize = entry.getEncodedCompressedSize();
-            final long size = entry.getEncodedSize();
+            final long crc = entry.getRawCrc();
+            final long csize = entry.getRawCompressedSize();
+            final long size = entry.getRawSize();
             final long offset = dos.size();
             final boolean encrypted = entry.isEncrypted();
             final boolean dd = entry.isDataDescriptorRequired();
             final boolean zip64 = entry.isZip64ExtensionsRequired();
-            final int method = entry.getEncodedMethod();
+            final int method = entry.getRawMethod();
             final boolean directory = entry.isDirectory();
             final int version = zip64
                     ? 45
@@ -811,7 +811,7 @@ implements Iterable<E> {
             // Compression Method.
             dos.writeShort(method);
             // Last Mod. Time / Date in DOS format.
-            dos.writeInt((int) entry.getEncodedTime());
+            dos.writeInt((int) entry.getRawTime());
             // CRC-32.
             // Compressed Size.
             // Uncompressed Size.
@@ -828,7 +828,7 @@ implements Iterable<E> {
             final byte[] name = encode(entry.getName());
             dos.writeShort(name.length);
             // Extra Field Length.
-            final byte[] extra = entry.getEncodedExtraFields();
+            final byte[] extra = entry.getRawExtraFields();
             dos.writeShort(extra.length);
             // File Name.
             dos.write(name);
@@ -836,7 +836,7 @@ implements Iterable<E> {
             dos.write(extra);
             // Commit changes.
             entry.setGeneralPurposeBitFlags(general);
-            entry.setEncodedOffset(offset);
+            entry.setRawOffset(offset);
             // Update data start.
             RawZipOutputStream.this.dataStart = dos.size();
             return dos;
@@ -853,10 +853,10 @@ implements Iterable<E> {
                     - RawZipOutputStream.this.dataStart;
             final ZipEntry entry = RawZipOutputStream.this.entry;
             if (entry.getGeneralPurposeBitFlag(GPBF_DATA_DESCRIPTOR)) {
-                entry.setEncodedCompressedSize(csize);
+                entry.setRawCompressedSize(csize);
                 final boolean zip64 = entry.isZip64ExtensionsRequired();
-                final long size = entry.getEncodedSize();
-                final long crc = entry.getEncodedCrc();
+                final long size = entry.getRawSize();
+                final long crc = entry.getRawCrc();
                 // Data Descriptor Signature.
                 dos.writeInt(DD_SIG);
                 // CRC-32.
@@ -921,7 +921,7 @@ implements Iterable<E> {
                     method = field.getMethod();
                     if (UNKNOWN != csize)
                         csize -= overhead(field.getKeyStrength());
-                    entry.setEncodedMethod(method); // restore for delegate.init(*)
+                    entry.setRawMethod(method); // restore for delegate.init(*)
                 }
             }
             if (null == field)
@@ -938,17 +938,17 @@ implements Iterable<E> {
             entry.addExtraField(field);
             if (UNKNOWN != csize) {
                 csize += overhead(keyStrength);
-                entry.setEncodedCompressedSize(csize);
+                entry.setRawCompressedSize(csize);
             }
             if (this.suppressCrc) {
                 final long crc = entry.getCrc();
-                entry.setEncodedCrc(0);
+                entry.setRawCrc(0);
                 this.delegate.init(entry);
                 entry.setCrc(crc);
             } else {
                 this.delegate.init(entry);
             }
-            entry.setEncodedMethod(WINZIP_AES);
+            entry.setRawMethod(WINZIP_AES);
         }
         
         @Override
@@ -959,7 +959,7 @@ implements Iterable<E> {
             if (this.suppressCrc) {
                 final ZipEntry entry = RawZipOutputStream.this.entry;
                 final long crc = entry.getCrc();
-                entry.setEncodedCrc(0);
+                entry.setRawCrc(0);
                 this.out = new WinZipAesEntryOutputStream(
                         (LEDataOutputStream) delegate.start(),
                         this.entryParam);
@@ -979,7 +979,7 @@ implements Iterable<E> {
             this.out.finish();
             if (this.suppressCrc) {
                 final ZipEntry entry = RawZipOutputStream.this.entry;
-                entry.setEncodedCrc(0);
+                entry.setRawCrc(0);
                 this.delegate.finish();
                 // Set to UNKNOWN in order to signal to
                 // Crc32CheckingOutputMethod that it should not check it and
@@ -1020,8 +1020,8 @@ implements Iterable<E> {
             this.out.finish();
             final ZipEntry entry = RawZipOutputStream.this.entry;
             final Deflater deflater = RawZipOutputStream.this.deflater;
-            entry.setEncodedCompressedSize(deflater.getBytesWritten());
-            entry.setEncodedSize(deflater.getBytesRead());
+            entry.setRawCompressedSize(deflater.getBytesWritten());
+            entry.setRawSize(deflater.getBytesRead());
             deflater.reset();
             this.delegate.finish();
         }
@@ -1077,7 +1077,7 @@ implements Iterable<E> {
         public void finish() throws IOException {
             final ZipEntry entry = RawZipOutputStream.this.entry;
             final long crc = this.out.getChecksum().getValue();
-            entry.setEncodedCrc(crc);
+            entry.setRawCrc(crc);
             this.delegate.finish();
         }
     } // Crc32UpdatingOutputMethod
