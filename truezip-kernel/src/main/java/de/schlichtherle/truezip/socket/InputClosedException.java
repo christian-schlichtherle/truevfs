@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.socket;
 
 import java.io.IOException;
@@ -23,15 +22,19 @@ import net.jcip.annotations.ThreadSafe;
  * Indicates that an input resource (input stream etc.) for an entry has been
  * forced to close.
  *
- * @see OutputClosedException
- * @author Christian Schlichtherle
+ * @see     OutputClosedException
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
 public class InputClosedException extends IOException {
     private static final long serialVersionUID = 4563928734723923649L;
-    
-    InputClosedException() {
-        super("input resource has been forced to close()");
+
+    public InputClosedException() {
+        super("Input resource has been forced to close!");
+    }
+
+    public InputClosedException(Throwable cause) {
+        super("Input resource has been forced to close!", cause);
     }
 }
