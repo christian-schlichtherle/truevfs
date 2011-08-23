@@ -50,7 +50,7 @@ public class SynchronizedInputStream extends DecoratingInputStream {
      */
     public SynchronizedInputStream(final InputStream in, final Object lock) {
         super(in);
-        this.lock = lock != null ? lock : this;
+        this.lock = null != lock ? lock : this;
     }
 
     @Override

@@ -22,8 +22,8 @@ import java.io.OutputStream;
  * A decorator which synchronizes all access to an {@link OutputStream}
  * via an object provided to its constructor.
  *
- * @see SynchronizedInputStream
- * @author Christian Schlichtherle
+ * @see     SynchronizedInputStream
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public class SynchronizedOutputStream extends DecoratingOutputStream {
@@ -50,7 +50,7 @@ public class SynchronizedOutputStream extends DecoratingOutputStream {
      */
     public SynchronizedOutputStream(final OutputStream out, final Object lock) {
         super(out);
-        this.lock = null == lock ? this : lock;
+        this.lock = null != lock ? lock : this;
     }
 
     @Override
