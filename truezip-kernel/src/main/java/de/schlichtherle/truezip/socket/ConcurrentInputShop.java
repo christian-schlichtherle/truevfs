@@ -17,20 +17,13 @@ package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.io.InputBusyException;
 import de.schlichtherle.truezip.io.SynchronizedInputStream;
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.rof.SynchronizedReadOnlyFile;
 import de.schlichtherle.truezip.util.ExceptionHandler;
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.WeakHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import net.jcip.annotations.NotThreadSafe;
 import net.jcip.annotations.ThreadSafe;
 
@@ -48,25 +41,7 @@ import net.jcip.annotations.ThreadSafe;
 public class ConcurrentInputShop<E extends Entry>
 extends DecoratingInputShop<E, InputShop<E>> {
 
-    private static final String CLASS_NAME
-            = ConcurrentInputShop.class.getName();
-    private static final Logger logger
-            = Logger.getLogger(CLASS_NAME, CLASS_NAME);
-
-    /**
-     * The pool of all open entry streams.
-     * This is implemented as a map where the keys are the streams and the
-     * value is the current thread.
-     * The weak hash map allows the garbage collector to pick up an entry
-     * stream if there are no more references to it.
-     * This reduces the likeliness of an {@link InputBusyException}
-     * in case a sloppy client application has forgot to close a stream before
-     * this input shop gets closed.
-     */
-    private final Map<Closeable, Thread> threads
-            = new WeakHashMap<Closeable, Thread>();
-
-    private volatile boolean closed;
+    private final ResourceAccountant accountant = new ResourceAccountant(this);
 
     /**
      * Constructs a concurrent input shop.
@@ -92,39 +67,8 @@ extends DecoratingInputShop<E, InputShop<E>> {
      *
      * @return The number of all open streams.
      */
-    public synchronized final int waitCloseOthers(final long timeout) {
-        if (closed)
-            return 0;
-        final long start = System.currentTimeMillis();
-        final int threadStreams = threadStreams();
-        try {
-            while (threads.size() > threadStreams) {
-                long toWait;
-                if (timeout > 0) {
-                    toWait = timeout - (System.currentTimeMillis() - start);
-                    if (toWait <= 0)
-                        break;
-                } else {
-                    toWait = 0;
-                }
-                System.gc(); // trigger garbage collection
-                System.runFinalization(); // trigger finalizers - is this required at all?
-                wait(toWait);
-            }
-        } catch (InterruptedException ex) {
-            logger.log(Level.WARNING, "wait.interrupted", ex);
-        }
-        return threads.size();
-    }
-
-    /** Returns the number of streams opened by the current thread. */
-    private int threadStreams() {
-        final Thread thisThread = Thread.currentThread();
-        int n = 0;
-        for (final Thread thread : threads.values())
-            if (thisThread == thread)
-                n++;
-        return n;
+    public final int waitCloseOthers(long timeout) {
+        return accountant.waitStop(timeout);
     }
 
     /**
@@ -134,43 +78,26 @@ extends DecoratingInputShop<E, InputShop<E>> {
      * streams will throw an {@code IOException}, with the exception of
      * their {@code close()} method.
      */
-    public synchronized final <X extends Exception>
-    void closeAll(final ExceptionHandler<IOException, X> handler)
-    throws X {
-        if (closed)
-            return;
-        for (Iterator<Closeable> i = threads.keySet().iterator(); i.hasNext(); ) {
-            try {
-                Closeable closeable = i.next();
-                i.remove();
-                closeable.close();
-            } catch (IOException ex) {
-                handler.warn(ex);
-            }
-        }
-        assert threads.isEmpty();
+    public final <X extends Exception>
+    void closeAll(ExceptionHandler<IOException, X> handler) throws X {
+        accountant.closeAll(handler);
     }
 
     /**
      * Closes this concurrent output shop.
      *
-     * @throws IllegalStateException If any open input streams or read only
-     *         files are detected.
-     * @see    #closeAll
+     * @throws IOException If any open input streams or read only files are
+     *         detected.
      */
     @Override
     public synchronized final void close() throws IOException {
-        if (!threads.isEmpty())
-            throw new IllegalStateException();
-        if (closed)
-            return;
-        closed = true;
-        super.close();
+        accountant.close();
+        delegate.close();
     }
 
     /** Needs to be externally synchronized! */
     private void assertNotShopClosed() throws IOException {
-        if (closed)
+        if (accountant.isClosed())
             throw new InputClosedException();
     }
 
@@ -188,8 +115,8 @@ extends DecoratingInputShop<E, InputShop<E>> {
             public ReadOnlyFile newReadOnlyFile() throws IOException {
                 synchronized (ConcurrentInputShop.this) {
                     assertNotShopClosed();
-                    return new SynchronizedConcurrentReadOnlyFile(
-                            new ConcurrentReadOnlyFile(
+                    return new ConcurrentReadOnlyFile(
+                            new DisconnectableReadOnlyFile(
                                 getBoundSocket().newReadOnlyFile()));
                 }
             }
@@ -198,8 +125,8 @@ extends DecoratingInputShop<E, InputShop<E>> {
             public InputStream newInputStream() throws IOException {
                 synchronized (ConcurrentInputShop.this) {
                     assertNotShopClosed();
-                    return new SynchronizedConcurrentInputStream(
-                            new ConcurrentInputStream(
+                    return new ConcurrentInputStream(
+                            new DisconnectableInputStream(
                                 getBoundSocket().newInputStream()));
                 }
             }
@@ -209,114 +136,28 @@ extends DecoratingInputShop<E, InputShop<E>> {
     }
 
     @ThreadSafe
-    private final class SynchronizedConcurrentReadOnlyFile
+    private final class ConcurrentReadOnlyFile
     extends SynchronizedReadOnlyFile {
         @SuppressWarnings("LeakingThisInConstructor")
-        private SynchronizedConcurrentReadOnlyFile(final ReadOnlyFile rof) {
+        private ConcurrentReadOnlyFile(final ReadOnlyFile rof) {
             super(rof, ConcurrentInputShop.this);
-            assert lock == ConcurrentInputShop.this;
-            //synchronized (lock) {
-                //assertNotShopClosed();
-                threads.put(rof, Thread.currentThread());
-            //}
+            accountant.startAccountingFor(this);
         }
 
         @Override
         public void close() throws IOException {
+            if (accountant.isClosed())
+                return;
             synchronized (lock) {
-                if (closed)
-                    return;
-                try {
+                if (accountant.stopAccountingFor(this))
                     delegate.close();
-                } finally {
-                    threads.remove(delegate);
-                    lock.notify(); // there can be only one waiting thread!
-                }
             }
-        }
-    } // class SynchronizedConcurrentReadOnlyFile
-
-    @ThreadSafe
-    private final class SynchronizedConcurrentInputStream
-    extends SynchronizedInputStream {
-        @SuppressWarnings("LeakingThisInConstructor")
-        SynchronizedConcurrentInputStream(final InputStream in) {
-            super(in, ConcurrentInputShop.this);
-            assert lock == ConcurrentInputShop.this;
-            //synchronized (lock) {
-                //assertNotShopClosed();
-                threads.put(in, Thread.currentThread());
-            //}
-        }
-
-        @Override
-        public void close() throws IOException {
-            synchronized (lock) {
-                if (closed)
-                    return;
-                try {
-                    delegate.close();
-                } finally {
-                    threads.remove(delegate);
-                    lock.notify(); // there can be only one waiting thread!
-                }
-            }
-        }
-    } // class SynchronizedConcurrentInputStream
-
-    @NotThreadSafe
-    private final class ConcurrentReadOnlyFile extends DecoratingReadOnlyFile {
-        ConcurrentReadOnlyFile(ReadOnlyFile rof) {
-            super(rof);
-        }
-
-        @Override
-        public long length() throws IOException {
-            assertNotShopClosed();
-            return delegate.length();
-        }
-
-        @Override
-        public long getFilePointer() throws IOException {
-            assertNotShopClosed();
-            return delegate.getFilePointer();
-        }
-
-        @Override
-        public void seek(long pos) throws IOException {
-            assertNotShopClosed();
-            delegate.seek(pos);
-        }
-
-        @Override
-        public int read() throws IOException {
-            assertNotShopClosed();
-            return delegate.read();
-        }
-
-        @Override
-        public int read(byte[] b, int off, int len) throws IOException {
-            assertNotShopClosed();
-            return delegate.read(b, off, len);
-        }
-
-        /*@Override
-        public void readFully(byte[] b, int off, int len) throws IOException {
-            assertNotShopClosed();
-            delegate.readFully(b, off, len);
-        }*/
-
-        @Override
-        public void close() throws IOException {
-            if (!closed)
-                delegate.close();
         }
 
         /**
-         * The finalizer in this class forces this input read only file to
-         * close.
-         * This ensures that an input target can be updated although the
-         * client application may have "forgot" to close this instance before.
+         * The finalizer in this class forces this stream to close in order to
+         * protect the decorated stream against client applications which don't
+         * always close this stream.
          */
         @Override
         @SuppressWarnings("FinalizeDeclaration")
@@ -327,35 +168,137 @@ extends DecoratingInputShop<E, InputShop<E>> {
                 super.finalize();
             }
         }
-    } // class ConcurrentReadOnlyFile
+    } // ConcurrentReadOnlyFile
+
+    @ThreadSafe
+    private final class ConcurrentInputStream
+    extends SynchronizedInputStream {
+        @SuppressWarnings("LeakingThisInConstructor")
+        ConcurrentInputStream(final InputStream in) {
+            super(in, ConcurrentInputShop.this);
+            accountant.startAccountingFor(this);
+        }
+
+        @Override
+        public void close() throws IOException {
+            if (accountant.isClosed())
+                return;
+            synchronized (lock) {
+                if (accountant.stopAccountingFor(this))
+                    delegate.close();
+            }
+        }
+
+        /**
+         * The finalizer in this class forces this stream to close in order to
+         * protect the decorated stream against client applications which don't
+         * always close this stream.
+         */
+        @Override
+        @SuppressWarnings("FinalizeDeclaration")
+        protected void finalize() throws Throwable {
+            try {
+                close();
+            } finally {
+                super.finalize();
+            }
+        }
+    } // ConcurrentInputStream
 
     @NotThreadSafe
-    private final class ConcurrentInputStream extends DecoratingInputStream {
-        ConcurrentInputStream(final InputStream in) {
-            super(in);
+    private static final class DisconnectableReadOnlyFile
+    extends DecoratingReadOnlyFile {
+        private boolean closed;
+
+        DisconnectableReadOnlyFile(ReadOnlyFile rof) {
+            super(rof);
+        }
+
+        void assertNotClosed() throws IOException {
+            if (closed)
+                throw new InputClosedException();
+        }
+
+        @Override
+        public long length() throws IOException {
+            assertNotClosed();
+            return delegate.length();
+        }
+
+        @Override
+        public long getFilePointer() throws IOException {
+            assertNotClosed();
+            return delegate.getFilePointer();
+        }
+
+        @Override
+        public void seek(long pos) throws IOException {
+            assertNotClosed();
+            delegate.seek(pos);
         }
 
         @Override
         public int read() throws IOException {
-            assertNotShopClosed();
+            assertNotClosed();
             return delegate.read();
         }
 
         @Override
         public int read(byte[] b, int off, int len) throws IOException {
-            assertNotShopClosed();
+            assertNotClosed();
+            return delegate.read(b, off, len);
+        }
+
+        /*@Override
+        public void readFully(byte[] b, int off, int len) throws IOException {
+            assertNotClosed();
+            delegate.readFully(b, off, len);
+        }*/
+
+        @Override
+        public void close() throws IOException {
+            if (closed)
+                return;
+            closed = true;
+            delegate.close();
+        }
+    } // DisconnectableReadOnlyFile
+
+    @NotThreadSafe
+    private static final class DisconnectableInputStream
+    extends DecoratingInputStream {
+        private boolean closed;
+
+        DisconnectableInputStream(InputStream in) {
+            super(in);
+        }
+
+        void assertNotClosed() throws IOException {
+            if (closed)
+                throw new InputClosedException();
+        }
+
+        @Override
+        public int read() throws IOException {
+            assertNotClosed();
+            return delegate.read();
+        }
+
+        @Override
+        public int read(byte[] b, int off, int len) throws IOException {
+            assertNotClosed();
             return delegate.read(b, off, len);
         }
 
         @Override
         public long skip(long n) throws IOException {
-            assertNotShopClosed();
+            assertNotClosed();
             return delegate.skip(n);
         }
 
         @Override
         public int available() throws IOException {
-            assertNotShopClosed();
+            assertNotClosed();
             return delegate.available();
         }
 
@@ -367,7 +310,7 @@ extends DecoratingInputShop<E, InputShop<E>> {
 
         @Override
         public void reset() throws IOException {
-            assertNotShopClosed();
+            assertNotClosed();
             delegate.reset();
         }
 
@@ -378,23 +321,10 @@ extends DecoratingInputShop<E, InputShop<E>> {
 
         @Override
         public void close() throws IOException {
-            if (!closed)
-                delegate.close();
+            if (closed)
+                return;
+            closed = true;
+            delegate.close();
         }
-
-        /**
-         * The finalizer in this class forces this input stream to close.
-         * This ensures that an input target can be updated although the
-         * client application may have "forgot" to close this instance before.
-         */
-        @Override
-        @SuppressWarnings("FinalizeDeclaration")
-        protected void finalize() throws Throwable {
-            try {
-                close();
-            } finally {
-                super.finalize();
-            }
-        }
-    } // class ConcurrentInputStream
+    } // DisconnectableInputStream
 }
