@@ -1,0 +1,192 @@
+/*
+ * Copyright (C) 2011 Schlichtherle IT Services
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.schlichtherle.truezip.socket;
+
+import de.schlichtherle.truezip.io.SequentialIOException;
+import de.schlichtherle.truezip.io.SequentialIOExceptionBuilder;
+import edu.umd.cs.findbugs.annotations.Nullable;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import java.io.Closeable;
+import java.io.IOException;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.*;
+
+/**
+ * @author  Christian Schlichtherle
+ * @version $Id$
+ */
+@DefaultAnnotation(NonNull.class)
+public class ResourceAccountantTest {
+
+    private static long TIMEOUT_MILLIS = 100;
+
+    private @Nullable ResourceAccountant manager;
+
+    @Before
+    public void setUp() {
+        manager = new ResourceAccountant(this);
+    }
+
+    @Test
+    public void testClosing() throws IOException {
+        final Resource resource = new AccountingResource();
+        try {
+            manager.close();
+            fail();
+        } catch (IOException expected) {
+        }
+        resource.close();
+
+        assertFalse(manager.isClosed());
+        assertFalse(manager.isClosed());
+        manager.close();
+        assertTrue(manager.isClosed());
+        assertTrue(manager.isClosed());
+
+        try {
+            manager.startAccountingFor(resource);
+            fail();
+        } catch (IllegalStateException expected) {
+        }
+        assertFalse(manager.stopAccountingFor(resource));
+        assertThat(manager.waitStop(0), is(0));
+    }
+
+    @Test
+    public void testAccounting() throws IOException {
+        final Resource resource = new AccountingResource();
+        resource.close();
+
+        assertTrue(manager.startAccountingFor(resource));
+        assertThat(resource.getCloseCounter(), is(1));
+        resource.close();
+        assertThat(resource.getCloseCounter(), is(2));
+        assertFalse(manager.stopAccountingFor(resource));
+        resource.close();
+        assertFalse(manager.stopAccountingFor(resource));
+        assertThat(resource.getCloseCounter(), is(2));
+    }
+
+    @Test
+    public void testWaitForCurrentThread() throws InterruptedException {
+        assertTrue(manager.startAccountingFor(new Resource()));
+        long time = System.currentTimeMillis();
+        int resources = manager.waitStop(TIMEOUT_MILLIS);
+        assertTrue("Timeout!", System.currentTimeMillis() < time + TIMEOUT_MILLIS);
+        assert 0 <= resources && resources <= 1;
+    }
+
+    @Test
+    public void testWaitForOtherThreads() throws InterruptedException {
+        final Thread[] threads = new Thread[] {
+            new ResourceHog(),
+            new EvilResourceHog(),
+        };
+        for (int i = 0; i < threads.length; i++) {
+            final Class<?> clazz = threads[i].getClass();
+            threads[i].start();
+            threads[i].join();
+            threads[i] = null;
+            System.gc();
+            long time = System.currentTimeMillis();
+            int resources = manager.waitStop(TIMEOUT_MILLIS);
+            assertTrue("Timeout waiting for " + clazz.getName(),
+                    System.currentTimeMillis() < time + TIMEOUT_MILLIS);
+            assertThat(resources, is(0));
+        }
+    }
+
+    @Test
+    public void testCloseAll() throws IOException, InterruptedException {
+        final Thread[] threads = new Thread[] {
+            new ResourceHog(),
+            new EvilResourceHog(),
+        };
+        for (Thread thread : threads) {
+            thread.start();
+            thread.join();
+        }
+        long time = System.currentTimeMillis();
+        int resources = manager.waitStop(TIMEOUT_MILLIS);
+        assertTrue("No timeout!",
+                System.currentTimeMillis() >= time + TIMEOUT_MILLIS);
+        assertThat(resources, is(2));
+        manager.closeAll(new ExceptionBuilder());
+        time = System.currentTimeMillis();
+        resources = manager.waitStop(TIMEOUT_MILLIS);
+        assertTrue("Timeout!",
+                System.currentTimeMillis() < time + TIMEOUT_MILLIS);
+        assertThat(resources, is(0));
+    }
+
+    private final class ResourceHog extends Thread {
+        @Override
+        public void run() {
+            assertTrue(manager.startAccountingFor(new Resource()));
+        }
+    } // ResourceHog
+
+    private final class EvilResourceHog extends Thread {
+        final Resource resource = new Resource();
+
+        @Override
+        public void run() {
+            assertTrue(manager.startAccountingFor(resource));
+        }
+    } // EvilResourceHog
+
+    private class Resource implements Closeable {
+        volatile int closeCounter;
+
+        final int getCloseCounter() {
+            return closeCounter;
+        }
+
+        @Override
+        public void close() throws IOException {
+            synchronized (ResourceAccountantTest.this) {
+                closeCounter++;
+            }
+        }
+    } // Resource
+
+    private final class AccountingResource extends Resource {
+        @SuppressWarnings("LeakingThisInConstructor")
+        AccountingResource() {
+            assertTrue(manager.startAccountingFor(this));
+            assertFalse(manager.startAccountingFor(this));
+        }
+
+        @Override
+        public void close() throws IOException {
+            synchronized (ResourceAccountantTest.this) {
+                if (manager.stopAccountingFor(this))
+                    super.close();
+                assertFalse(manager.stopAccountingFor(this));
+            }
+        }
+    } // AccountingResource
+
+    private static final class ExceptionBuilder
+    extends SequentialIOExceptionBuilder<IOException, SequentialIOException> {
+        public ExceptionBuilder() {
+            super(IOException.class, SequentialIOException.class);
+        }
+    }
+}
