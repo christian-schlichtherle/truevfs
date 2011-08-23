@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.socket;
 
 import java.io.IOException;
@@ -23,15 +22,19 @@ import net.jcip.annotations.ThreadSafe;
  * Indicates that an output resource (output stream etc.) for an entry has been
  * forced to close.
  *
- * @see InputClosedException
- * @author Christian Schlichtherle
+ * @see     InputClosedException
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
 public class OutputClosedException extends IOException {
     private static final long serialVersionUID = 4563928734723923649L;
-    
-    OutputClosedException() {
-        super("output resource has been forced to close()");
+
+    public OutputClosedException() {
+        super("Output resource has been forced to close!");
+    }
+
+    public OutputClosedException(Throwable cause) {
+        super("Output resource has been forced to close!", cause);
     }
 }
