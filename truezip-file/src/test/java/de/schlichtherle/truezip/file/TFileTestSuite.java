@@ -541,7 +541,7 @@ extends TestBase<D> {
             }
             assertTrue(file2.isFile());
             try {
-                file2.input(in1); // fis1 may be invalidated after update!
+                file2.input(in1);
                 fail("Expected exception when reading from entry input stream of an unmounted archive file!");
             } catch (IOException expected) {
                 assertFalse(file2.exists()); // previous op has removed file2!
