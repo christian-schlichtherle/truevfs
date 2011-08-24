@@ -1,0 +1,27 @@
+    -----------------------
+    About
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+About
+
+    This module contains the file system driver service class
+    {{{../../apidocs/de/schlichtherle/truezip/fs/archive/zip/ZipDriverService.html}ZipDriverService}}
+    which provides the following map of file system drivers:
+
+*--*--*
+||URI Schemes||File System Driver Class|
+*--+--+
+|<<<ear>>>, <<<jar>>>, <<<war>>>|{{{../../apidocs/de/schlichtherle/truezip/fs/archive/zip/JarDriver.html}<<<JarDriver>>>}}|
+*--+--+
+|<<<exe>>>|{{{../../apidocs/de/schlichtherle/truezip/fs/archive/zip/ReadOnlySfxDriver.html}<<<ReadOnlySfxDriver>>>}}|
+*--+--+
+|<<<odb>>>, <<<odf>>>, <<<odg>>>, <<<odm>>>, <<<odp>>>, <<<ods>>>, <<<odt>>>, <<<otg>>>, <<<oth>>>, <<<otp>>>, <<<ots>>>, <<<ott>>>|{{{../../apidocs/de/schlichtherle/truezip/fs/archive/zip/OdfDriver.html}<<<OdfDriver>>>}}|
+*--+--+
+|<<<zip>>>|{{{../../apidocs/de/schlichtherle/truezip/fs/archive/zip/ZipDriver.html}<<<ZipDriver>>>}}|
+*--+--+
+
+    Add the JAR artifact of this module to the run time class path to
+    make its file system drivers available for service location in the
+    client API modules.
