@@ -56,8 +56,8 @@ final class ResourceAccountant implements Closeable {
     private static final Logger logger
             = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 
-    private final Condition condition;
     private final Lock lock;
+    private final Condition condition;
 
     /**
      * The pool of all accounted closeable resources.
