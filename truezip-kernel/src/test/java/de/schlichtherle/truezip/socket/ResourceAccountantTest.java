@@ -38,12 +38,12 @@ public class ResourceAccountantTest {
     private static long TIMEOUT_MILLIS = 100;
 
     private Lock lock;
-    private ResourceAccountant manager;
+    private ResourceAccountant accountant;
 
     @Before
     public void setUp() {
         this.lock = new ReentrantLock();
-        this.manager = new ResourceAccountant(lock);
+        this.accountant = new ResourceAccountant(lock);
     }
 
     @After
@@ -55,25 +55,25 @@ public class ResourceAccountantTest {
     public void testClosing() throws IOException {
         final Resource resource = new AccountingResource();
         try {
-            manager.close();
+            accountant.close();
             fail();
         } catch (IOException expected) {
         }
         resource.close();
 
-        assertFalse(manager.isClosed());
-        assertFalse(manager.isClosed());
-        manager.close();
-        assertTrue(manager.isClosed());
-        assertTrue(manager.isClosed());
+        assertFalse(accountant.isClosed());
+        assertFalse(accountant.isClosed());
+        accountant.close();
+        assertTrue(accountant.isClosed());
+        assertTrue(accountant.isClosed());
 
         try {
-            manager.startAccountingFor(resource);
+            accountant.startAccountingFor(resource);
             fail();
         } catch (IllegalStateException expected) {
         }
-        assertFalse(manager.stopAccountingFor(resource));
-        assertThat(manager.waitStop(0), is(0));
+        assertFalse(accountant.stopAccountingFor(resource));
+        assertThat(accountant.waitStop(0), is(0));
     }
 
     @Test
@@ -81,22 +81,22 @@ public class ResourceAccountantTest {
         final Resource resource = new AccountingResource();
         resource.close();
 
-        assertTrue(manager.startAccountingFor(resource));
+        assertTrue(accountant.startAccountingFor(resource));
         assertThat(resource.getCloseCounter(), is(1));
         resource.close();
         assertThat(resource.getCloseCounter(), is(2));
-        assertFalse(manager.stopAccountingFor(resource));
+        assertFalse(accountant.stopAccountingFor(resource));
         resource.close();
-        assertFalse(manager.stopAccountingFor(resource));
+        assertFalse(accountant.stopAccountingFor(resource));
         assertThat(resource.getCloseCounter(), is(2));
     }
 
     @Test
     public void testWaitForCurrentThread() throws InterruptedException {
         final Resource resource = new Resource();
-        assertTrue(manager.startAccountingFor(resource));
+        assertTrue(accountant.startAccountingFor(resource));
         long time = System.currentTimeMillis();
-        int resources = manager.waitStop(TIMEOUT_MILLIS);
+        int resources = accountant.waitStop(TIMEOUT_MILLIS);
         assertTrue("Timeout!", System.currentTimeMillis() < time + TIMEOUT_MILLIS);
         assertThat(resources, is(1));
     }
@@ -114,7 +114,7 @@ public class ResourceAccountantTest {
             threads[i] = null;
             System.gc();
             long time = System.currentTimeMillis();
-            int resources = manager.waitStop(TIMEOUT_MILLIS);
+            int resources = accountant.waitStop(TIMEOUT_MILLIS);
             assertTrue("Timeout waiting for " + clazz.getName(),
                     System.currentTimeMillis() < time + TIMEOUT_MILLIS);
             assertThat(resources, is(0));
@@ -132,13 +132,13 @@ public class ResourceAccountantTest {
             thread.join();
         }
         long time = System.currentTimeMillis();
-        int resources = manager.waitStop(TIMEOUT_MILLIS);
+        int resources = accountant.waitStop(TIMEOUT_MILLIS);
         assertTrue("No timeout!",
                 System.currentTimeMillis() >= time + TIMEOUT_MILLIS);
         assertThat(resources, is(2));
-        manager.closeAll(SequentialIOExceptionBuilder.create());
+        accountant.closeAll(SequentialIOExceptionBuilder.create());
         time = System.currentTimeMillis();
-        resources = manager.waitStop(TIMEOUT_MILLIS);
+        resources = accountant.waitStop(TIMEOUT_MILLIS);
         assertTrue("Timeout!",
                 System.currentTimeMillis() < time + TIMEOUT_MILLIS);
         assertThat(resources, is(0));
@@ -153,7 +153,7 @@ public class ResourceAccountantTest {
     private final class ResourceHog extends Thread {
         @Override
         public void run() {
-            assertTrue(manager.startAccountingFor(new Resource()));
+            assertTrue(accountant.startAccountingFor(new Resource()));
         }
     } // ResourceHog
 
@@ -169,7 +169,7 @@ public class ResourceAccountantTest {
 
         @Override
         public void run() {
-            assertTrue(manager.startAccountingFor(resource));
+            assertTrue(accountant.startAccountingFor(resource));
         }
     } // EvilResourceHog
 
@@ -194,15 +194,15 @@ public class ResourceAccountantTest {
     private final class AccountingResource extends Resource {
         @SuppressWarnings("LeakingThisInConstructor")
         AccountingResource() {
-            assertTrue(manager.startAccountingFor(this));
-            assertFalse(manager.startAccountingFor(this));
+            assertTrue(accountant.startAccountingFor(this));
+            assertFalse(accountant.startAccountingFor(this));
         }
 
         @Override
         public void close() throws IOException {
-            if (manager.stopAccountingFor(this))
+            if (accountant.stopAccountingFor(this))
                 super.close();
-            assertFalse(manager.stopAccountingFor(this));
+            assertFalse(accountant.stopAccountingFor(this));
         }
     } // AccountingResource
 }
