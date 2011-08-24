@@ -73,7 +73,7 @@ public class ResourceAccountantTest {
         } catch (IllegalStateException expected) {
         }
         assertFalse(accountant.stopAccountingFor(resource));
-        assertThat(accountant.waitStop(0), is(0));
+        assertThat(accountant.waitStopAccounting(0), is(0));
     }
 
     @Test
@@ -96,7 +96,7 @@ public class ResourceAccountantTest {
         final Resource resource = new Resource();
         assertTrue(accountant.startAccountingFor(resource));
         long time = System.currentTimeMillis();
-        int resources = accountant.waitStop(TIMEOUT_MILLIS);
+        int resources = accountant.waitStopAccounting(TIMEOUT_MILLIS);
         assertTrue("Timeout!", System.currentTimeMillis() < time + TIMEOUT_MILLIS);
         assertThat(resources, is(1));
     }
@@ -114,7 +114,7 @@ public class ResourceAccountantTest {
             threads[i] = null;
             System.gc();
             long time = System.currentTimeMillis();
-            int resources = accountant.waitStop(TIMEOUT_MILLIS);
+            int resources = accountant.waitStopAccounting(TIMEOUT_MILLIS);
             assertTrue("Timeout waiting for " + clazz.getName(),
                     System.currentTimeMillis() < time + TIMEOUT_MILLIS);
             assertThat(resources, is(0));
@@ -132,13 +132,13 @@ public class ResourceAccountantTest {
             thread.join();
         }
         long time = System.currentTimeMillis();
-        int resources = accountant.waitStop(TIMEOUT_MILLIS);
+        int resources = accountant.waitStopAccounting(TIMEOUT_MILLIS);
         assertTrue("No timeout!",
                 System.currentTimeMillis() >= time + TIMEOUT_MILLIS);
         assertThat(resources, is(2));
         accountant.closeAll(SequentialIOExceptionBuilder.create());
         time = System.currentTimeMillis();
-        resources = accountant.waitStop(TIMEOUT_MILLIS);
+        resources = accountant.waitStopAccounting(TIMEOUT_MILLIS);
         assertTrue("Timeout!",
                 System.currentTimeMillis() < time + TIMEOUT_MILLIS);
         assertThat(resources, is(0));
