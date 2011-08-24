@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.socket;
 
+import de.schlichtherle.truezip.io.ResourceAccountant;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.io.SynchronizedOutputStream;
