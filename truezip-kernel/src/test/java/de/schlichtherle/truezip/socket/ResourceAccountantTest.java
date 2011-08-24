@@ -18,7 +18,6 @@ package de.schlichtherle.truezip.socket;
 import org.junit.After;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import de.schlichtherle.truezip.io.SequentialIOException;
 import de.schlichtherle.truezip.io.SequentialIOExceptionBuilder;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -36,7 +35,7 @@ import static org.hamcrest.CoreMatchers.*;
 @DefaultAnnotation(NonNull.class)
 public class ResourceAccountantTest {
 
-    private static long TIMEOUT_MILLIS = 1000;
+    private static long TIMEOUT_MILLIS = 100;
 
     private Lock lock;
     private ResourceAccountant manager;
@@ -145,6 +144,12 @@ public class ResourceAccountantTest {
         assertThat(resources, is(0));
     }
 
+    /**
+     * A resource hog is a thread which starts accounting for a resource, but
+     * never stops accounting for it.
+     * We want to make sure that the TrueZIP resource collector picks up the
+     * stale resource then.
+     */
     private final class ResourceHog extends Thread {
         @Override
         public void run() {
@@ -152,6 +157,13 @@ public class ResourceAccountantTest {
         }
     } // ResourceHog
 
+    /**
+     * An evil resource hog is a thread which starts accounting for a resource,
+     * but never stops accounting for it <em>and</em> keeps a strong reference
+     * to it.
+     * We want to make sure that the TrueZIP resource collector picks up the
+     * stale resource then.
+     */
     private final class EvilResourceHog extends Thread {
         final Resource resource = new Resource();
 

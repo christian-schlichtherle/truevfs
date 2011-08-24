@@ -64,8 +64,8 @@ final class ResourceAccountant implements Closeable {
      * The weak hash map allows the garbage collector to pick up a closeable
      * resource if there are no more references to it.
      */
-    private volatile @Nullable Map<Closeable, ResourceReference>
-            threads = new WeakHashMap<Closeable, ResourceReference>();
+    private volatile @Nullable Map<Closeable, AccountReference>
+            threads = new WeakHashMap<Closeable, AccountReference>();
 
     /**
      * Constructs a new resource accountant with the given synchronization
@@ -109,7 +109,8 @@ final class ResourceAccountant implements Closeable {
                 throw new IllegalStateException("Already closed!");
             if (this.threads.containsKey(resource))
                 return false;
-            this.threads.put(resource, new ResourceReference(resource));
+            this.threads.put(resource,
+                    new AccountReference(new Account(resource)));
             return true;
         } finally {
             this.lock.unlock();
@@ -130,10 +131,13 @@ final class ResourceAccountant implements Closeable {
         try {
             if (isClosed())
                 return false;
-            final ResourceReference ref = this.threads.remove(resource);
+            final AccountReference ref = this.threads.remove(resource);
             if (null == ref)
-                return false;
-            if (null != ref.get() && ref.getOwner() != Thread.currentThread())
+                return false; // wasn't accounted (anymore)
+            final Account account = ref.get();
+            if (null == account)
+                return false; // picked up by the garbage collector concurrently
+            if (account.owner != Thread.currentThread())
                 this.condition.signal();
             return true;
         } finally {
@@ -195,9 +199,11 @@ final class ResourceAccountant implements Closeable {
         assert !isClosed();
         int n = 0;
         final Thread currentThread = Thread.currentThread();
-        for (final ResourceReference ref : this.threads.values())
-            if (ref.getOwner() == currentThread)
+        for (final AccountReference ref : this.threads.values()) {
+            final Account account = ref.get();
+            if (null != account && account.owner == currentThread)
                 n++;
+        }
         return n;
     }
 
@@ -257,20 +263,33 @@ final class ResourceAccountant implements Closeable {
     }
 
     /**
+     * A simple data holder for a resource and the thread which started
+     * accounting for it.
+     */
+    private static final class Account {
+        final Closeable resource;
+        final Thread owner = Thread.currentThread();
+
+        Account(final Closeable resource) {
+            assert null != resource;
+            this.resource = resource;
+        }
+    } // Account
+
+    /**
      * Accounts for a resource and its owner, which is the thread in which the
      * account is created.
      */
-    private final class ResourceReference extends WeakReference<Closeable> {
-        private final Thread owner = Thread.currentThread();
-
-        ResourceReference(Closeable resource) {
-            super(resource, ResourceCollector.queue);
+    private final class AccountReference extends WeakReference<Account> {
+        AccountReference(Account account) {
+            super(account, AccountCollector.queue);
         }
 
-        Thread getOwner() {
-            return owner;
-        }
-
+        /**
+         * Notifies the resource accountant for this reference.
+         * This method is called even if accounting for the closeable resource
+         * has been properly stopped.
+         */
         void notifyAccountant() {
             final Lock lock = ResourceAccountant.this.lock;
             lock.lock();
@@ -282,24 +301,29 @@ final class ResourceAccountant implements Closeable {
         }
     }
 
-    private static final class ResourceCollector extends Thread {
+    private static final class AccountCollector extends Thread {
         static {
-            new ResourceCollector().start();
+            new AccountCollector().start();
         }
 
-        static final ReferenceQueue<Closeable>
-                queue = new ReferenceQueue<Closeable>();
+        static final ReferenceQueue<Account>
+                queue = new ReferenceQueue<Account>();
 
-        private ResourceCollector() {
-            super("TrueZIP Resource Collector");
+        private AccountCollector() {
+            super("TrueZIP Resource Account Collector");
             setDaemon(true);
         }
 
+        /**
+         * Runs an endless loop removing account references which have been
+         * picked up by the garbage collector and notifies their respective
+         * resource accountant.
+         */
         @Override
         public void run() {
             while (true) {
                 try {
-                    ((ResourceReference) queue.remove()).notifyAccountant();
+                    ((AccountReference) queue.remove()).notifyAccountant();
                 } catch (InterruptedException ex) {
                     logger.log(Level.WARNING, "interrupted", ex);
                 }
