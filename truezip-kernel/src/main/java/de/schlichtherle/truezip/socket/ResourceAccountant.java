@@ -277,18 +277,18 @@ final class ResourceAccountant implements Closeable {
     } // Account
 
     /**
-     * Accounts for a resource and its owner, which is the thread in which the
-     * account is created.
+     * A reference to an {@link Account} which can notify its resource
+     * accountant.
      */
     private final class AccountReference extends WeakReference<Account> {
         AccountReference(Account account) {
-            super(account, AccountCollector.queue);
+            super(account, AccountReferenceCollector.queue);
         }
 
         /**
          * Notifies the resource accountant for this reference.
-         * This method is called even if accounting for the closeable resource
-         * has been properly stopped.
+         * This method may get called even if accounting for the closeable
+         * resource has been properly stopped.
          */
         void notifyAccountant() {
             final Lock lock = ResourceAccountant.this.lock;
@@ -301,16 +301,16 @@ final class ResourceAccountant implements Closeable {
         }
     }
 
-    private static final class AccountCollector extends Thread {
+    private static final class AccountReferenceCollector extends Thread {
         static {
-            new AccountCollector().start();
+            new AccountReferenceCollector().start();
         }
 
         static final ReferenceQueue<Account>
                 queue = new ReferenceQueue<Account>();
 
-        private AccountCollector() {
-            super("TrueZIP Resource Account Collector");
+        private AccountReferenceCollector() {
+            super("TrueZIP Account Reference Collector");
             setDaemon(true);
         }
 
