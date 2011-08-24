@@ -42,11 +42,11 @@ extends AbstractExceptionBuilder<C, E> {
     private final Class<E> clazz;
 
     /**
-     * Static constructor provided for comforting the most prominent use case.
+     * Static constructor provided for comforting the most essential use case.
      */
-    public static SequentialIOExceptionBuilder<SequentialIOException, SequentialIOException>
+    public static SequentialIOExceptionBuilder<Exception, SequentialIOException>
     create() {
-        return new SequentialIOExceptionBuilder<SequentialIOException, SequentialIOException>(SequentialIOException.class, SequentialIOException.class);
+        return new SequentialIOExceptionBuilder<Exception, SequentialIOException>(Exception.class, SequentialIOException.class);
     }
 
     public SequentialIOExceptionBuilder(Class<C> c, Class<E> e) {
