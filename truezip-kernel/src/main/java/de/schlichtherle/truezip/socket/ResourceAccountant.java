@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.util.ExceptionHandler;
+import de.schlichtherle.truezip.util.ThreadGroups;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
@@ -64,8 +65,8 @@ final class ResourceAccountant implements Closeable {
      * The weak hash map allows the garbage collector to pick up a closeable
      * resource if there are no more references to it.
      */
-    private volatile @Nullable Map<Closeable, AccountReference>
-            threads = new WeakHashMap<Closeable, AccountReference>();
+    private volatile @Nullable Map<Closeable, Reference>
+            threads = new WeakHashMap<Closeable, Reference>();
 
     /**
      * Constructs a new resource accountant with the given synchronization
@@ -109,8 +110,7 @@ final class ResourceAccountant implements Closeable {
                 throw new IllegalStateException("Already closed!");
             if (this.threads.containsKey(resource))
                 return false;
-            this.threads.put(resource,
-                    new AccountReference(new Account(resource)));
+            this.threads.put(resource, new Reference(new Account(resource)));
             return true;
         } finally {
             this.lock.unlock();
@@ -131,14 +131,14 @@ final class ResourceAccountant implements Closeable {
         try {
             if (isClosed())
                 return false;
-            final AccountReference ref = this.threads.remove(resource);
+            final Reference ref = this.threads.remove(resource);
             if (null == ref)
                 return false; // wasn't accounted (anymore)
             final Account account = ref.get();
             if (null == account)
                 return false; // picked up by the garbage collector concurrently
             if (account.owner != Thread.currentThread())
-                this.condition.signal();
+                this.condition.signalAll();
             return true;
         } finally {
             this.lock.unlock();
@@ -199,7 +199,7 @@ final class ResourceAccountant implements Closeable {
         assert !isClosed();
         int n = 0;
         final Thread currentThread = Thread.currentThread();
-        for (final AccountReference ref : this.threads.values()) {
+        for (final Reference ref : this.threads.values()) {
             final Account account = ref.get();
             if (null != account && account.owner == currentThread)
                 n++;
@@ -263,8 +263,8 @@ final class ResourceAccountant implements Closeable {
     }
 
     /**
-     * A simple data holder for a resource and the thread which started
-     * accounting for it.
+     * A simple data holder for a closeable resource and the thread which
+     * started accounting for it.
      */
     private static final class Account {
         final Closeable resource;
@@ -277,53 +277,55 @@ final class ResourceAccountant implements Closeable {
     } // Account
 
     /**
-     * A reference to an {@link Account} which can notify its resource
-     * accountant.
+     * A reference to an {@link Account} which can notify its
+     * {@link ResourceAccountant}.
      */
-    private final class AccountReference extends WeakReference<Account> {
-        AccountReference(Account account) {
-            super(account, AccountReferenceCollector.queue);
+    private final class Reference extends WeakReference<Account> {
+        Reference(Account account) {
+            super(account, Notifier.queue);
         }
 
         /**
-         * Notifies the resource accountant for this reference.
-         * This method may get called even if accounting for the closeable
+         * Notifies the resource accountant of this reference.
+         * Mind that this method is called even if accounting for the closeable
          * resource has been properly stopped.
          */
         void notifyAccountant() {
             final Lock lock = ResourceAccountant.this.lock;
             lock.lock();
             try {
-                ResourceAccountant.this.condition.signal();
+                ResourceAccountant.this.condition.signalAll();
             } finally {
                 lock.unlock();
             }
         }
     }
 
-    private static final class AccountReferenceCollector extends Thread {
-        static {
-            new AccountReferenceCollector().start();
-        }
-
+    /**
+     * Runs an endless loop removing account references which have been
+     * picked up by the garbage collector and notifies their respective
+     * resource accountant.
+     */
+    private static final class Notifier extends Thread {
         static final ReferenceQueue<Account>
                 queue = new ReferenceQueue<Account>();
 
-        private AccountReferenceCollector() {
-            super("TrueZIP Account Reference Collector");
+        static {
+            new Notifier().start();
+        }
+
+        private Notifier() {
+            super(ThreadGroups.getTopLevel(),
+                    "TrueZIP ResourceAccountant Notifier");
+            setPriority(MAX_PRIORITY - 2);
             setDaemon(true);
         }
 
-        /**
-         * Runs an endless loop removing account references which have been
-         * picked up by the garbage collector and notifies their respective
-         * resource accountant.
-         */
         @Override
         public void run() {
             while (true) {
                 try {
-                    ((AccountReference) queue.remove()).notifyAccountant();
+                    ((Reference) queue.remove()).notifyAccountant();
                 } catch (InterruptedException ex) {
                     logger.log(Level.WARNING, "interrupted", ex);
                 }
