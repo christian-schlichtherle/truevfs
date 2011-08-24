@@ -15,9 +15,11 @@
  */
 package de.schlichtherle.truezip.socket;
 
+import org.junit.After;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import de.schlichtherle.truezip.io.SequentialIOException;
 import de.schlichtherle.truezip.io.SequentialIOExceptionBuilder;
-import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.Closeable;
@@ -34,13 +36,20 @@ import static org.hamcrest.CoreMatchers.*;
 @DefaultAnnotation(NonNull.class)
 public class ResourceAccountantTest {
 
-    private static long TIMEOUT_MILLIS = 100;
+    private static long TIMEOUT_MILLIS = 1000;
 
-    private @Nullable ResourceAccountant manager;
+    private Lock lock;
+    private ResourceAccountant manager;
 
     @Before
     public void setUp() {
-        manager = new ResourceAccountant(this);
+        this.lock = new ReentrantLock();
+        this.manager = new ResourceAccountant(lock);
+    }
+
+    @After
+    public void tearDown() {
+        System.gc();
     }
 
     @Test
@@ -85,11 +94,12 @@ public class ResourceAccountantTest {
 
     @Test
     public void testWaitForCurrentThread() throws InterruptedException {
-        assertTrue(manager.startAccountingFor(new Resource()));
+        final Resource resource = new Resource();
+        assertTrue(manager.startAccountingFor(resource));
         long time = System.currentTimeMillis();
         int resources = manager.waitStop(TIMEOUT_MILLIS);
         assertTrue("Timeout!", System.currentTimeMillis() < time + TIMEOUT_MILLIS);
-        assert 0 <= resources && resources <= 1;
+        assertThat(resources, is(1));
     }
 
     @Test
@@ -127,7 +137,7 @@ public class ResourceAccountantTest {
         assertTrue("No timeout!",
                 System.currentTimeMillis() >= time + TIMEOUT_MILLIS);
         assertThat(resources, is(2));
-        manager.closeAll(new ExceptionBuilder());
+        manager.closeAll(SequentialIOExceptionBuilder.create());
         time = System.currentTimeMillis();
         resources = manager.waitStop(TIMEOUT_MILLIS);
         assertTrue("Timeout!",
@@ -160,8 +170,11 @@ public class ResourceAccountantTest {
 
         @Override
         public void close() throws IOException {
-            synchronized (ResourceAccountantTest.this) {
+            ResourceAccountantTest.this.lock.lock();
+            try {
                 closeCounter++;
+            } finally {
+                ResourceAccountantTest.this.lock.unlock();
             }
         }
     } // Resource
@@ -175,18 +188,9 @@ public class ResourceAccountantTest {
 
         @Override
         public void close() throws IOException {
-            synchronized (ResourceAccountantTest.this) {
-                if (manager.stopAccountingFor(this))
-                    super.close();
-                assertFalse(manager.stopAccountingFor(this));
-            }
+            if (manager.stopAccountingFor(this))
+                super.close();
+            assertFalse(manager.stopAccountingFor(this));
         }
     } // AccountingResource
-
-    private static final class ExceptionBuilder
-    extends SequentialIOExceptionBuilder<IOException, SequentialIOException> {
-        public ExceptionBuilder() {
-            super(IOException.class, SequentialIOException.class);
-        }
-    }
 }

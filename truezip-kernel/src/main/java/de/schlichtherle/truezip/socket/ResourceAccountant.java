@@ -21,12 +21,15 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.Closeable;
 import java.io.IOException;
-import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.jcip.annotations.ThreadSafe;
@@ -53,28 +56,29 @@ final class ResourceAccountant implements Closeable {
     private static final Logger logger
             = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 
-    private final Object lock;
-
-    private final ReferenceQueue<Account>
-            queue = new ReferenceQueue<Account>();
+    private final Condition condition;
+    private final Lock lock;
 
     /**
      * The pool of all accounted closeable resources.
      * The weak hash map allows the garbage collector to pick up a closeable
      * resource if there are no more references to it.
      */
-    private volatile @Nullable Map<Closeable, Reference<Account>>
-            threads = new WeakHashMap<Closeable, Reference<Account>>();
+    private volatile @Nullable Map<Closeable, ResourceReference>
+            threads = new WeakHashMap<Closeable, ResourceReference>();
 
     /**
      * Constructs a new resource accountant with the given synchronization
      * lock.
      * 
-     * @param lock the synchronization lock to use for accounting.
+     * @param lock the synchronization lock to use for accounting resources.
+     *             Though not required by the use in this class, this
+     *             parameter should normally be an instance of
+     *             {@link ReentrantLock} because chances are that it gets
+     *             locked recursively.
      */
-    public ResourceAccountant(final Object lock) {
-        if (null == lock)
-            throw new NullPointerException();
+    public ResourceAccountant(final Lock lock) {
+        this.condition = lock.newCondition();
         this.lock = lock;
     }
 
@@ -99,11 +103,16 @@ final class ResourceAccountant implements Closeable {
      *         been closed.
      */
     public boolean startAccountingFor(final Closeable resource) {
-        synchronized (this.lock) {
+        this.lock.lock();
+        try {
             if (isClosed())
                 throw new IllegalStateException("Already closed!");
-            return null == this.threads.put(resource,
-                    new WeakReference<Account>(new Account(resource), this.queue));
+            if (this.threads.containsKey(resource))
+                return false;
+            this.threads.put(resource, new ResourceReference(resource));
+            return true;
+        } finally {
+            this.lock.unlock();
         }
     }
 
@@ -117,10 +126,18 @@ final class ResourceAccountant implements Closeable {
      *         accounted for.
      */
     public boolean stopAccountingFor(final Closeable resource) {
-        synchronized (this.lock) {
+        this.lock.lock();
+        try {
             if (isClosed())
                 return false;
-            return null != this.threads.remove(resource);
+            final ResourceReference ref = this.threads.remove(resource);
+            if (null == ref)
+                return false;
+            if (null != ref.get() && ref.getOwner() != Thread.currentThread())
+                this.condition.signal();
+            return true;
+        } finally {
+            this.lock.unlock();
         }
     }
 
@@ -142,7 +159,8 @@ final class ResourceAccountant implements Closeable {
      * @return The number of <em>all</em> accounted closeable resources.
      */
     public int waitStop(final long timeout) {
-        synchronized (this.lock) {
+        this.lock.lock();
+        try {
             if (isClosed())
                 return 0;
             final long start = System.currentTimeMillis();
@@ -156,12 +174,15 @@ final class ResourceAccountant implements Closeable {
                     } else {
                         toWait = 0;
                     }
-                    this.queue.remove(timeout);
+                    if (!this.condition.await(timeout, TimeUnit.MILLISECONDS))
+                        break;
                 }
             } catch (InterruptedException ex) {
                 logger.log(Level.WARNING, "interrupted", ex);
             }
             return this.threads.size();
+        } finally {
+            this.lock.unlock();
         }
     }
 
@@ -172,13 +193,11 @@ final class ResourceAccountant implements Closeable {
      */
     private int threadLocalResources() {
         assert !isClosed();
-        final Thread currentThread = Thread.currentThread();
         int n = 0;
-        for (final Reference<Account> reference : this.threads.values()) {
-            final Account account = reference.get();
-            if (null != account && account.owner == currentThread)
+        final Thread currentThread = Thread.currentThread();
+        for (final ResourceReference ref : this.threads.values())
+            if (ref.getOwner() == currentThread)
                 n++;
-        }
         return n;
     }
 
@@ -191,9 +210,10 @@ final class ResourceAccountant implements Closeable {
      * lock provided to the constructor - use with care!
      */
     public <X extends Exception>
-    void closeAll(final ExceptionHandler<IOException, X> handler)
+    void closeAll(final ExceptionHandler<? super IOException, X> handler)
     throws X {
-        synchronized (this.lock) {
+        this.lock.lock();
+        try {
             if (isClosed())
                 return;
             for (final Iterator<Closeable> i = this.threads.keySet().iterator(); i.hasNext(); ) {
@@ -209,6 +229,8 @@ final class ResourceAccountant implements Closeable {
                 }
             }
             assert this.threads.isEmpty();
+        } finally {
+            this.lock.unlock();
         }
     }
 
@@ -221,13 +243,16 @@ final class ResourceAccountant implements Closeable {
      */
     @Override
     public void close() throws IOException {
-        synchronized (lock) {
+        this.lock.lock();
+        try {
             if (isClosed())
                 return;
             final int size = this.threads.size();
             if (0 != size)
                 throw new IOException("There are still " + size + " accounted closeable resources!");
             this.threads = null;
+        } finally {
+            this.lock.unlock();
         }
     }
 
@@ -235,12 +260,50 @@ final class ResourceAccountant implements Closeable {
      * Accounts for a resource and its owner, which is the thread in which the
      * account is created.
      */
-    private static final class Account {
-        final Thread owner = Thread.currentThread();
-        final Closeable resource;
+    private final class ResourceReference extends WeakReference<Closeable> {
+        private final Thread owner = Thread.currentThread();
 
-        Account(Closeable resource) {
-            this.resource = resource;
+        ResourceReference(Closeable resource) {
+            super(resource, ResourceCollector.queue);
         }
-    } // Account
+
+        Thread getOwner() {
+            return owner;
+        }
+
+        void notifyAccountant() {
+            final Lock lock = ResourceAccountant.this.lock;
+            lock.lock();
+            try {
+                ResourceAccountant.this.condition.signal();
+            } finally {
+                lock.unlock();
+            }
+        }
+    }
+
+    private static final class ResourceCollector extends Thread {
+        static {
+            new ResourceCollector().start();
+        }
+
+        static final ReferenceQueue<Closeable>
+                queue = new ReferenceQueue<Closeable>();
+
+        private ResourceCollector() {
+            super("TrueZIP Resource Collector");
+            setDaemon(true);
+        }
+
+        @Override
+        public void run() {
+            while (true) {
+                try {
+                    ((ResourceReference) queue.remove()).notifyAccountant();
+                } catch (InterruptedException ex) {
+                    logger.log(Level.WARNING, "interrupted", ex);
+                }
+            }
+        }
+    }
 }

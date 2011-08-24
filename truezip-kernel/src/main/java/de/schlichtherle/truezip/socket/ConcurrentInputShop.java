@@ -24,6 +24,8 @@ import de.schlichtherle.truezip.rof.SynchronizedReadOnlyFile;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import net.jcip.annotations.NotThreadSafe;
 import net.jcip.annotations.ThreadSafe;
 
@@ -41,16 +43,24 @@ import net.jcip.annotations.ThreadSafe;
 public class ConcurrentInputShop<E extends Entry>
 extends DecoratingInputShop<E, InputShop<E>> {
 
-    private final ResourceAccountant accountant = new ResourceAccountant(this);
+    private final ResourceAccountant accountant;
+    private final Lock lock;
 
     /**
      * Constructs a concurrent input shop.
      *
      * @param  input the shop to decorate.
+     * @param  lock the synchronization lock to use for accounting streams.
+     *              Though not required by the use in this class, this
+     *              parameter should normally be an instance of
+     *              {@link ReentrantLock} because chances are that it gets
+     *              locked recursively.
      * @throws NullPointerException if {@code input} is {@code null}.
      */
-    public ConcurrentInputShop(final InputShop<E> input) {
+    public ConcurrentInputShop(InputShop<E> input, Lock lock) {
         super(input);
+        this.accountant = new ResourceAccountant(lock);
+        this.lock = lock;
     }
 
     /**
@@ -90,9 +100,14 @@ extends DecoratingInputShop<E, InputShop<E>> {
      *         detected.
      */
     @Override
-    public synchronized final void close() throws IOException {
-        accountant.close();
-        delegate.close();
+    public final void close() throws IOException {
+        this.lock.lock();
+        try {
+            accountant.close();
+            delegate.close();
+        } finally {
+            this.lock.unlock();
+        }
     }
 
     /** Needs to be externally synchronized! */
@@ -113,21 +128,27 @@ extends DecoratingInputShop<E, InputShop<E>> {
 
             @Override
             public ReadOnlyFile newReadOnlyFile() throws IOException {
-                synchronized (ConcurrentInputShop.this) {
+                ConcurrentInputShop.this.lock.lock();
+                try {
                     assertNotShopClosed();
                     return new ConcurrentReadOnlyFile(
                             new DisconnectableReadOnlyFile(
                                 getBoundSocket().newReadOnlyFile()));
+                } finally {
+                    ConcurrentInputShop.this.lock.unlock();
                 }
             }
 
             @Override
             public InputStream newInputStream() throws IOException {
-                synchronized (ConcurrentInputShop.this) {
+                ConcurrentInputShop.this.lock.lock();
+                try {
                     assertNotShopClosed();
                     return new ConcurrentInputStream(
                             new DisconnectableInputStream(
                                 getBoundSocket().newInputStream()));
+                } finally {
+                    ConcurrentInputShop.this.lock.unlock();
                 }
             }
         } // Input
@@ -139,19 +160,15 @@ extends DecoratingInputShop<E, InputShop<E>> {
     private final class ConcurrentReadOnlyFile
     extends SynchronizedReadOnlyFile {
         @SuppressWarnings("LeakingThisInConstructor")
-        private ConcurrentReadOnlyFile(final ReadOnlyFile rof) {
-            super(rof, ConcurrentInputShop.this);
+        private ConcurrentReadOnlyFile(ReadOnlyFile rof) {
+            super(rof);
             accountant.startAccountingFor(this);
         }
 
         @Override
         public void close() throws IOException {
-            if (accountant.isClosed())
-                return;
-            synchronized (lock) {
-                if (accountant.stopAccountingFor(this))
-                    delegate.close();
-            }
+            if (accountant.stopAccountingFor(this))
+                super.close();
         }
 
         /**
@@ -162,6 +179,8 @@ extends DecoratingInputShop<E, InputShop<E>> {
         @Override
         @SuppressWarnings("FinalizeDeclaration")
         protected void finalize() throws Throwable {
+            if (accountant.isClosed())
+                return;
             try {
                 close();
             } finally {
@@ -174,19 +193,15 @@ extends DecoratingInputShop<E, InputShop<E>> {
     private final class ConcurrentInputStream
     extends SynchronizedInputStream {
         @SuppressWarnings("LeakingThisInConstructor")
-        ConcurrentInputStream(final InputStream in) {
-            super(in, ConcurrentInputShop.this);
+        ConcurrentInputStream(InputStream in) {
+            super(in);
             accountant.startAccountingFor(this);
         }
 
         @Override
         public void close() throws IOException {
-            if (accountant.isClosed())
-                return;
-            synchronized (lock) {
-                if (accountant.stopAccountingFor(this))
-                    delegate.close();
-            }
+            if (accountant.stopAccountingFor(this))
+                super.close();
         }
 
         /**
@@ -197,6 +212,8 @@ extends DecoratingInputShop<E, InputShop<E>> {
         @Override
         @SuppressWarnings("FinalizeDeclaration")
         protected void finalize() throws Throwable {
+            if (accountant.isClosed())
+                return;
             try {
                 close();
             } finally {

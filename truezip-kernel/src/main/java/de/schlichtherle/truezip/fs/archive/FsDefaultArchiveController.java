@@ -604,7 +604,7 @@ extends FsFileSystemArchiveController<E> {
      */
     private final class Input extends ConcurrentInputShop<E> {
         Input(InputShop<E> input) {
-            super(input);
+            super(input, getModel().writeLock());
         }
 
         /** Exposes the product of the archive driver this input is wrapping. */
@@ -622,7 +622,7 @@ extends FsFileSystemArchiveController<E> {
      */
     private final class Output extends ConcurrentOutputShop<E> {
         Output(OutputShop<E> output) {
-            super(output);
+            super(output, getModel().writeLock());
         }
 
         /** Exposes the product of the archive driver this output is wrapping. */
