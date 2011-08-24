@@ -78,7 +78,7 @@ extends DecoratingInputShop<E, InputShop<E>> {
      * @return The number of all open streams.
      */
     public final int waitCloseOthers(long timeout) {
-        return accountant.waitStop(timeout);
+        return accountant.waitStopAccounting(timeout);
     }
 
     /**

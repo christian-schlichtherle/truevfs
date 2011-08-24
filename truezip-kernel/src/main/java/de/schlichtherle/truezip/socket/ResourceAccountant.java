@@ -72,7 +72,7 @@ final class ResourceAccountant implements Closeable {
      * Constructs a new resource accountant with the given lock.
      * You must make sure not to use two instances of this class which share
      * the same lock!
-     * Otherwise {@link #waitStop} will not work as designed!
+     * Otherwise {@link #waitStopAccounting} will not work as designed!
      * 
      * @param lock the lock to use for accounting resources.
      *             Though not required by the use in this class, this
@@ -168,7 +168,7 @@ final class ResourceAccountant implements Closeable {
      *         If this is {@code 0}, then there is no timeout for waiting.
      * @return The number of <em>all</em> accounted closeable resources.
      */
-    public int waitStop(final long timeout) {
+    public int waitStopAccounting(final long timeout) {
         this.lock.lock();
         try {
             if (isClosed())
@@ -249,7 +249,7 @@ final class ResourceAccountant implements Closeable {
     /**
      * Closes this resource accountant.
      *
-     * @see    #waitStop(long)
+     * @see    #waitStopAccounting(long)
      * @see    #closeAll
      * @throws IOException If any accounted closeable resources are detected.
      */
