@@ -21,6 +21,8 @@ import de.schlichtherle.truezip.io.SynchronizedOutputStream;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import net.jcip.annotations.NotThreadSafe;
 import net.jcip.annotations.ThreadSafe;
 
@@ -37,16 +39,24 @@ import net.jcip.annotations.ThreadSafe;
 public class ConcurrentOutputShop<E extends Entry>
 extends DecoratingOutputShop<E, OutputShop<E>> {
 
-    private final ResourceAccountant accountant = new ResourceAccountant(this);
+    private final ResourceAccountant accountant;
+    private final Lock lock;
 
     /**
      * Constructs a concurrent output shop.
      * 
      * @param  output the shop to decorate.
+     * @param  lock the synchronization lock to use for accounting streams.
+     *              Though not required by the use in this class, this
+     *              parameter should normally be an instance of
+     *              {@link ReentrantLock} because chances are that it gets
+     *              locked recursively.
      * @throws NullPointerException if {@code output} is {@code null}.
      */
-    public ConcurrentOutputShop(final OutputShop<E> output) {
+    public ConcurrentOutputShop(OutputShop<E> output, Lock lock) {
         super(output);
+        this.accountant = new ResourceAccountant(lock);
+        this.lock = lock;
     }
 
     /**
@@ -86,9 +96,14 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
      * @see    #closeAll
      */
     @Override
-    public synchronized final void close() throws IOException {
-        accountant.close();
-        delegate.close();
+    public final void close() throws IOException {
+        this.lock.lock();
+        try {
+            accountant.close();
+            delegate.close();
+        } finally {
+            this.lock.unlock();
+        }
     }
 
     /** Needs to be externally synchronized! */
@@ -109,11 +124,14 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
 
             @Override
             public OutputStream newOutputStream() throws IOException {
-                synchronized (ConcurrentOutputShop.this) {
+                ConcurrentOutputShop.this.lock.lock();
+                try {
                     assertNotShopClosed();
                     return new ConcurrentOutputStream(
                         new DisconnectableOutputStream(
                             getBoundSocket().newOutputStream()));
+                } finally {
+                    ConcurrentOutputShop.this.lock.unlock();
                 }
             }
         } // Output
@@ -125,19 +143,15 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
     private final class ConcurrentOutputStream
     extends SynchronizedOutputStream {
         @SuppressWarnings("LeakingThisInConstructor")
-        ConcurrentOutputStream(final OutputStream out) {
-            super(out, ConcurrentOutputShop.this);
+        ConcurrentOutputStream(OutputStream out) {
+            super(out);
             accountant.startAccountingFor(this);
         }
 
         @Override
         public void close() throws IOException {
-            if (accountant.isClosed())
-                return;
-            synchronized (lock) {
-                if (accountant.stopAccountingFor(this))
-                    delegate.close();
-            }
+            if (accountant.stopAccountingFor(this))
+                super.close();
         }
 
         /**
@@ -148,6 +162,8 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
         @Override
         @SuppressWarnings("FinalizeDeclaration")
         protected void finalize() throws Throwable {
+            if (accountant.isClosed())
+                return;
             try {
                 close();
             } finally {
