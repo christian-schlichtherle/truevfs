@@ -372,8 +372,8 @@ extends FsFileSystemArchiveController<E> {
         if (null != output) {
             final int outStreams = output.waitCloseOthers(
                     options.get(WAIT_CLOSE_OUTPUT) ? 0 : 50);
-            if (outStreams > 0) {
-                final String message =  "Number of open output streams: "
+            if (0 < outStreams) {
+                final String message =  "Number of open entry output resources: "
                                         + outStreams;
                 if (!options.get(FORCE_CLOSE_OUTPUT))
                     throw handler.fail( new FsSyncException(getModel(),
@@ -386,8 +386,8 @@ extends FsFileSystemArchiveController<E> {
         if (null != input) {
             final int inStreams = input.waitCloseOthers(
                     options.get(WAIT_CLOSE_INPUT) ? 0 : 50);
-            if (inStreams > 0) {
-                final String message =  "Number of open input streams: "
+            if (0 < inStreams) {
+                final String message =  "Number of open entry input resources: "
                                         + inStreams;
                 if (!options.get(FORCE_CLOSE_INPUT))
                     throw handler.fail( new FsSyncException(getModel(),
