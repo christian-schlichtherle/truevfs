@@ -22,6 +22,8 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.Iterator;
@@ -36,9 +38,12 @@ import java.util.logging.Logger;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * Accounts for {@link Closeable} resources used in multiple threads while
- * holding a lock provided to the constructor.
+ * Accounts for {@link Closeable} resources
+ * ({@link InputStream}, {@link OutputStream} etc.) which are used in multiple
+ * threads.
  * <p>
+ * For synchronization, each accountant uses a lock which has to be provided
+ * to its {@link #ResourceAccountant constructor}.
  * In order to start accounting for a closeable resource,
  * call {@link #startAccountingFor(Closeable)}.
  * In order to stop accounting for a closeable resource,
@@ -140,7 +145,7 @@ final class ResourceAccountant implements Closeable {
             if (null == account)
                 return false; // picked up by the garbage collector concurrently
             if (account.owner != Thread.currentThread())
-                this.condition.signalAll();
+                this.condition.signal();
             return true;
         } finally {
             this.lock.unlock();
@@ -300,7 +305,7 @@ final class ResourceAccountant implements Closeable {
             final Lock lock = ResourceAccountant.this.lock;
             lock.lock();
             try {
-                ResourceAccountant.this.condition.signalAll();
+                ResourceAccountant.this.condition.signal();
             } finally {
                 lock.unlock();
             }
