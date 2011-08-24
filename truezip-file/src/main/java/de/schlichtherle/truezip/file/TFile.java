@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.file;
 
-import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.util.UriBuilder;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import de.schlichtherle.truezip.io.Paths.Splitter;
@@ -2377,8 +2376,7 @@ public final class TFile extends File {
      * listFiles(filenameFilter, getArchiveDetector())}.
      */
     @Override
-    public @Nullable TFile[] listFiles(
-            @CheckForNull FilenameFilter filter) {
+    public @Nullable TFile[] listFiles(@CheckForNull FilenameFilter filter) {
         return listFiles(filter, detector);
     }
 
@@ -2406,16 +2404,23 @@ public final class TFile extends File {
             final FsEntry entry;
             try {
                 entry = innerArchive.getController().getEntry(getInnerFsEntryName());
-            } catch (IOException ex) {
+            } catch (IOException ignored) {
                 return null;
             }
             if (null == entry)
                 return null;
             return filter(entry.getMembers(), filter, detector);
         }
-        return filter(  Arrays.asList(delegate.list(filter)),
-                        (FilenameFilter) null,
-                        detector);
+        return filter(delegate.list(filter), (FilenameFilter) null, detector);
+    }
+
+    private @Nullable TFile[] filter(
+            @CheckForNull String[] members,
+            @CheckForNull FilenameFilter filter,
+            TArchiveDetector detector) {
+        return null == members
+                ? null
+                : filter(Arrays.asList(members), filter, detector);
     }
 
     private @Nullable TFile[] filter(
@@ -2424,12 +2429,20 @@ public final class TFile extends File {
             final TArchiveDetector detector) {
         if (null == members)
             return null;
-        final Collection<TFile>
-                accepted = new ArrayList<TFile>(members.size());
-        for (final String member : members)
-            if (null == filter || filter.accept(this, member))
-                accepted.add(new TFile(this, member, detector));
-        return accepted.toArray(new TFile[accepted.size()]);
+        if (null != filter) {
+            final Collection<TFile>
+                    accepted = new ArrayList<TFile>(members.size());
+            for (final String member : members)
+                if (filter.accept(this, member))
+                    accepted.add(new TFile(this, member, detector));
+            return accepted.toArray(new TFile[accepted.size()]);
+        } else {
+            final TFile[] accepted = new TFile[members.size()];
+            int i = 0;
+            for (final String member : members)
+                accepted[i++] = new TFile(this, member, detector);
+            return accepted;
+        }
     }
 
     /**

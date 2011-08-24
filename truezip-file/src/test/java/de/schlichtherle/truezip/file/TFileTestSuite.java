@@ -1219,6 +1219,10 @@ extends TestBase<D> {
         final File dir = createTempFile();
         final TFile dir2 = new TFile(dir);
 
+        assertNull(dir.listFiles());
+        assertNull(dir2.listFiles());
+        assertNull(newNonArchiveFile(dir2).listFiles());
+
         TFile.rm(dir);
 
         // Create regular directory for testing.

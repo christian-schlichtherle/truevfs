@@ -1293,6 +1293,10 @@ extends TestBase<D> {
         final Path dir = createTempFile();
         final TPath dir2 = new TPath(dir);
 
+        assertNull(listFiles(dir));
+        assertNull(listFiles(dir2));
+        assertNull(listFiles(newNonArchivePath(dir2)));
+
         delete(dir);
 
         // Create regular directory for testing.
