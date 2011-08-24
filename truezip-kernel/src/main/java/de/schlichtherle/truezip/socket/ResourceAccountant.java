@@ -37,7 +37,7 @@ import net.jcip.annotations.ThreadSafe;
 
 /**
  * Accounts for {@link Closeable} resources used in multiple threads while
- * holding a synchronization lock provided to the constructor.
+ * holding a lock provided to the constructor.
  * <p>
  * In order to start accounting for a closeable resource,
  * call {@link #startAccountingFor(Closeable)}.
@@ -69,10 +69,12 @@ final class ResourceAccountant implements Closeable {
             threads = new WeakHashMap<Closeable, Reference>();
 
     /**
-     * Constructs a new resource accountant with the given synchronization
-     * lock.
+     * Constructs a new resource accountant with the given lock.
+     * You must make sure not to use two instances of this class which share
+     * the same lock!
+     * Otherwise {@link #waitStop} will not work as designed!
      * 
-     * @param lock the synchronization lock to use for accounting resources.
+     * @param lock the lock to use for accounting resources.
      *             Though not required by the use in this class, this
      *             parameter should normally be an instance of
      *             {@link ReentrantLock} because chances are that it gets
@@ -154,8 +156,12 @@ final class ResourceAccountant implements Closeable {
      * {@code java.util.logging} and control is returned to the caller.
      * <p>
      * Upon return of this method, threads may immediately start accounting
-     * for closeable resources again unless the caller also synchronizes on the
-     * lock provided to the constructor - use with care!
+     * for closeable resources again unless the caller also locks the lock
+     * provided to the constructor - use with care!
+     * <p>
+     * Mind that this method will not work as designed if any two instances of
+     * this class share the same lock that has been provided to their
+     * constructor!
      *
      * @param  the number of milliseconds to await the closing of resources
      *         which have been accounted for in <em>other</em> threads.
@@ -193,7 +199,7 @@ final class ResourceAccountant implements Closeable {
     /**
      * Returns the number of closeable resources which have been accounted for
      * in the <em>current</em> thread.
-     * This method must be externally synchronized!
+     * This method must not get called if the {@link #lock} is not locked!
      */
     private int threadLocalResources() {
         assert !isClosed();
@@ -212,8 +218,8 @@ final class ResourceAccountant implements Closeable {
      * stops accounting for it and closes it.
      * <p>
      * Upon return of this method, threads may immediately start accounting
-     * for closeable resources again unless the caller also synchronizes on the
-     * lock provided to the constructor - use with care!
+     * for closeable resources again unless the caller also locks the lock
+     * provided to the constructor - use with care!
      */
     public <X extends Exception>
     void closeAll(final ExceptionHandler<? super IOException, X> handler)
