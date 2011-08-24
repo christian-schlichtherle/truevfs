@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.socket;
+package de.schlichtherle.truezip.io;
 
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.ThreadGroups;
@@ -55,7 +55,7 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-final class ResourceAccountant implements Closeable {
+public final class ResourceAccountant implements Closeable {
 
     private static final String CLASS_NAME
             = ResourceAccountant.class.getName();
