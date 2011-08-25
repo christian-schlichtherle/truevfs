@@ -51,31 +51,6 @@ public class ResourceAccountantTest {
     }
 
     @Test
-    public void testClosing() throws IOException {
-        final Resource resource = new AccountingResource();
-        try {
-            accountant.close();
-            fail();
-        } catch (IOException expected) {
-        }
-        resource.close();
-
-        assertFalse(accountant.isClosed());
-        assertFalse(accountant.isClosed());
-        accountant.close();
-        assertTrue(accountant.isClosed());
-        assertTrue(accountant.isClosed());
-
-        try {
-            accountant.startAccountingFor(resource);
-            fail();
-        } catch (IllegalStateException expected) {
-        }
-        assertFalse(accountant.stopAccountingFor(resource));
-        assertThat(accountant.waitStopAccounting(0), is(0));
-    }
-
-    @Test
     public void testAccounting() throws IOException {
         final Resource resource = new AccountingResource();
         resource.close();

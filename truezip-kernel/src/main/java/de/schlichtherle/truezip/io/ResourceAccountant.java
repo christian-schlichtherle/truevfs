@@ -159,23 +159,23 @@ public final class ResourceAccountant {
     public int waitStopAccounting(final long timeout) {
         this.lock.lock();
         try {
+            int size;
             final long start = System.currentTimeMillis();
-            try {
-                while (this.threads.size() > threadLocalResources()) {
-                    long toWait;
-                    if (timeout > 0) {
-                        toWait = timeout - (System.currentTimeMillis() - start);
-                        if (toWait <= 0)
-                            break;
-                    } else {
-                        toWait = 0;
-                    }
-                    if (!this.condition.await(timeout, TimeUnit.MILLISECONDS))
+            while ((size = this.threads.size()) > threadLocalResources()) {
+                long toWait;
+                if (timeout > 0) {
+                    toWait = timeout - (System.currentTimeMillis() - start);
+                    if (toWait <= 0)
                         break;
+                } else {
+                    toWait = 0;
                 }
-            } catch (InterruptedException ex) {
-                logger.log(Level.WARNING, "interrupted", ex);
+                if (!this.condition.await(toWait, TimeUnit.MILLISECONDS))
+                    return this.threads.size(); // may have changed while waiting!
             }
+            return size;
+        } catch (InterruptedException ex) {
+            logger.log(Level.WARNING, "interrupted", ex);
             return this.threads.size();
         } finally {
             this.lock.unlock();
