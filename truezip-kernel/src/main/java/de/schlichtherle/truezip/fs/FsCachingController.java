@@ -46,7 +46,6 @@ import java.nio.channels.SeekableByteChannel;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.concurrent.locks.Lock;
 import net.jcip.annotations.Immutable;
 import net.jcip.annotations.NotThreadSafe;
 
@@ -383,23 +382,16 @@ extends FsDecoratingController< FsConcurrentModel,
         }
 
         void commitOutput() throws IOException {
-            // TODO: Not necessarily true because this is called from close()!
-            // assert getModel().isWriteLockedByCurrentThread();!
             assert getModel().isTouched();
             if (null != template)
                 return;
-            // TODO: Locking does not belong here - move out!
-            final Lock lock = getModel().writeLock();
-            lock.lock();
-            try {
-                delegate.mknod(
-                        name,
-                        FILE,
-                        outputOptions.clear(EXCLUSIVE),
-                        cache.getEntry());
-            } finally {
-                lock.unlock();
-            }
+            // Not necessarily true because this is called from close()!
+            getModel().assertWriteLockedByCurrentThread();
+            delegate.mknod(
+                    name,
+                    FILE,
+                    outputOptions.clear(EXCLUSIVE),
+                    cache.getEntry());
         }
 
         /** An input socket proxy. */

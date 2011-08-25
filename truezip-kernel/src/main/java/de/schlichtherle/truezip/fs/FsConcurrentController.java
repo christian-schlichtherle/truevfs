@@ -18,6 +18,10 @@ package de.schlichtherle.truezip.fs;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.entry.Entry.Access;
+import de.schlichtherle.truezip.io.DecoratingInputStream;
+import de.schlichtherle.truezip.io.DecoratingOutputStream;
+import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
+import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
@@ -291,7 +295,7 @@ extends FsDecoratingController< FsConcurrentModel,
             /*try {
                 readLock().lock();
                 try {
-                    return getBoundSocket().newReadOnlyFile();
+                    return new ConcurrentReadOnlyFile(getBoundSocket().newReadOnlyFile());
                 } finally {
                     readLock().unlock();
                 }
@@ -299,7 +303,7 @@ extends FsDecoratingController< FsConcurrentModel,
                 assertNotReadLockedByCurrentThread(/*ex*/null);
                 writeLock().lock();
                 try {
-                    return getBoundSocket().newReadOnlyFile();
+                    return new ConcurrentReadOnlyFile(getBoundSocket().newReadOnlyFile());
                 } finally {
                     writeLock().unlock();
                 }
@@ -311,7 +315,7 @@ extends FsDecoratingController< FsConcurrentModel,
             /*try {
                 readLock().lock();
                 try {
-                    return getBoundSocket().newSeekableByteChannel();
+                return new ConcurrentSeekableByteChannel(getBoundSocket().newSeekableByteChannel());
                 } finally {
                     readLock().unlock();
                 }
@@ -319,7 +323,7 @@ extends FsDecoratingController< FsConcurrentModel,
                 assertNotReadLockedByCurrentThread(/*ex*/null);
                 writeLock().lock();
                 try {
-                    return getBoundSocket().newSeekableByteChannel();
+                return new ConcurrentSeekableByteChannel(getBoundSocket().newSeekableByteChannel());
                 } finally {
                     writeLock().unlock();
                 }
@@ -331,7 +335,7 @@ extends FsDecoratingController< FsConcurrentModel,
             /*try {
                 readLock().lock();
                 try {
-                    return getBoundSocket().newInputStream();
+                    return new ConcurrentInputStream(getBoundSocket().newInputStream());
                 } finally {
                     readLock().unlock();
                 }
@@ -339,7 +343,7 @@ extends FsDecoratingController< FsConcurrentModel,
                 assertNotReadLockedByCurrentThread(/*ex*/null);
                 writeLock().lock();
                 try {
-                    return getBoundSocket().newInputStream();
+                    return new ConcurrentInputStream(getBoundSocket().newInputStream());
                 } finally {
                     writeLock().unlock();
                 }
@@ -381,7 +385,7 @@ extends FsDecoratingController< FsConcurrentModel,
             assertNotReadLockedByCurrentThread(null);
             writeLock().lock();
             try {
-                return getBoundSocket().newSeekableByteChannel();
+                return new ConcurrentSeekableByteChannel(getBoundSocket().newSeekableByteChannel());
             } finally {
                 writeLock().unlock();
             }
@@ -392,7 +396,7 @@ extends FsDecoratingController< FsConcurrentModel,
             assertNotReadLockedByCurrentThread(null);
             writeLock().lock();
             try {
-                return getBoundSocket().newOutputStream();
+                return new ConcurrentOutputStream(getBoundSocket().newOutputStream());
             } finally {
                 writeLock().unlock();
             }
@@ -441,4 +445,76 @@ extends FsDecoratingController< FsConcurrentModel,
             writeLock().unlock();
         }
     }
+
+    private final class ConcurrentReadOnlyFile
+    extends DecoratingReadOnlyFile {
+        ConcurrentReadOnlyFile(ReadOnlyFile rof) {
+            super(rof);
+        }
+
+        @Override
+        public void close() throws IOException {
+            assertNotReadLockedByCurrentThread(null);
+            writeLock().lock();
+            try {
+                delegate.close();
+            } finally {
+                writeLock().unlock();
+            }
+        }
+    } // ConcurrentReadOnlyFile
+
+    private final class ConcurrentSeekableByteChannel
+    extends DecoratingSeekableByteChannel {
+        ConcurrentSeekableByteChannel(SeekableByteChannel sbc) {
+            super(sbc);
+        }
+
+        @Override
+        public void close() throws IOException {
+            assertNotReadLockedByCurrentThread(null);
+            writeLock().lock();
+            try {
+                delegate.close();
+            } finally {
+                writeLock().unlock();
+            }
+        }
+    } // ConcurrentSeekableByteChannel
+
+    private final class ConcurrentInputStream
+    extends DecoratingInputStream {
+        ConcurrentInputStream(InputStream in) {
+            super(in);
+        }
+
+        @Override
+        public void close() throws IOException {
+            assertNotReadLockedByCurrentThread(null);
+            writeLock().lock();
+            try {
+                delegate.close();
+            } finally {
+                writeLock().unlock();
+            }
+        }
+    } // ConcurrentInputStream
+
+    private final class ConcurrentOutputStream
+    extends DecoratingOutputStream {
+        ConcurrentOutputStream(OutputStream out) {
+            super(out);
+        }
+
+        @Override
+        public void close() throws IOException {
+            assertNotReadLockedByCurrentThread(null);
+            writeLock().lock();
+            try {
+                delegate.close();
+            } finally {
+                writeLock().unlock();
+            }
+        }
+    } // ConcurrentInputStream
 }
