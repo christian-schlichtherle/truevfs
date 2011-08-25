@@ -35,10 +35,10 @@ import de.schlichtherle.truezip.fs.FsSyncOption;
 import static de.schlichtherle.truezip.fs.FsSyncOption.*;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import static de.schlichtherle.truezip.fs.archive.FsArchiveFileSystem.*;
-import de.schlichtherle.truezip.io.InputBusyException;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.OutputBusyException;
 import static de.schlichtherle.truezip.io.Paths.isRoot;
+import de.schlichtherle.truezip.io.ResourceAccountant;
 import de.schlichtherle.truezip.socket.ConcurrentInputShop;
 import de.schlichtherle.truezip.socket.ConcurrentOutputShop;
 import de.schlichtherle.truezip.socket.DelegatingOutputSocket;
@@ -54,7 +54,6 @@ import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import static java.lang.Boolean.*;
 import java.util.Collections;
@@ -86,17 +85,19 @@ extends FsFileSystemArchiveController<E> {
     private final FsController<?> parent;
     private final FsEntryName parentName;
 
+    private @CheckForNull ResourceAccountant accountant;
+
     /**
      * An {@link Input} object used to mount the (virtual) archive file system
      * and read the entries from the archive file.
      */
-    private @Nullable Input input;
+    private @CheckForNull Input input;
 
     /**
      * The (possibly temporary) {@link Output} we are writing newly
      * created or modified entries to.
      */
-    private @Nullable Output output;
+    private @CheckForNull Output output;
 
     private final FsArchiveFileSystemTouchListener<E> touchListener
             = new TouchListener();
@@ -129,6 +130,13 @@ extends FsFileSystemArchiveController<E> {
         assert null != parent;
         assert null != parentName;
         return true;
+    }
+
+    private ResourceAccountant getAccountant() {
+        final ResourceAccountant accountant = this.accountant;
+        return null != accountant
+                ? accountant
+                : (this.accountant = new ResourceAccountant(getModel().writeLock()));
     }
 
     private Input getInput() {
@@ -364,38 +372,20 @@ extends FsFileSystemArchiveController<E> {
             final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
-        // Check output streams first, because FORCE_CLOSE_INPUT may be
-        // set and FORCE_CLOSE_OUTPUT may be unset in which case we
-        // don't even need to check open input streams if there are
-        // some open output streams.
-        final Output output = getOutput();
-        if (null != output) {
-            final int outStreams = output.waitCloseOthers(
-                    options.get(WAIT_CLOSE_OUTPUT) ? 0 : 50);
-            if (0 < outStreams) {
-                final String message =  "Number of open entry output resources: "
-                                        + outStreams;
-                if (!options.get(FORCE_CLOSE_OUTPUT))
-                    throw handler.fail( new FsSyncException(getModel(),
-                                        new OutputBusyException(message)));
-                handler.warn(   new FsSyncWarningException(getModel(),
-                                new OutputBusyException(message)));
-            }
-        }
-        final Input input = getInput();
-        if (null != input) {
-            final int inStreams = input.waitCloseOthers(
-                    options.get(WAIT_CLOSE_INPUT) ? 0 : 50);
-            if (0 < inStreams) {
-                final String message =  "Number of open entry input resources: "
-                                        + inStreams;
-                if (!options.get(FORCE_CLOSE_INPUT))
-                    throw handler.fail( new FsSyncException(getModel(),
-                                        new InputBusyException(message)));
-                handler.warn(   new FsSyncWarningException(getModel(),
-                                new InputBusyException(message)));
-            }
-        }
+        final ResourceAccountant accountant = this.accountant;
+        if (null == accountant)
+            return;
+        final boolean wait = options.get(WAIT_CLOSE_INPUT)
+                || options.get(WAIT_CLOSE_OUTPUT);
+        final int resources = accountant.waitStopAccounting(wait ? 0 : 50);
+        if (0 >= resources)
+            return;
+        final IOException cause = new OutputBusyException("Number of open entry resources: " + resources);
+        final boolean force = options.get(FORCE_CLOSE_INPUT)
+                || options.get(FORCE_CLOSE_OUTPUT);
+        if (!force)
+            throw handler.fail(new FsSyncException(getModel(), cause));
+        handler.warn(new FsSyncWarningException(getModel(), cause));
     }
 
     /**
@@ -424,15 +414,11 @@ extends FsFileSystemArchiveController<E> {
             public void warn(IOException cause) throws X {
                 handler.warn(new FsSyncWarningException(getModel(), cause));
             }
-        } // class FilterExceptionHandler
+        } // FilterExceptionHandler
 
-        final FilterExceptionHandler decoratorHandler = new FilterExceptionHandler();
-        final Output output = getOutput();
-        if (null != output)
-            output.closeAll((ExceptionHandler<IOException, X>) decoratorHandler);
-        final Input input = getInput();
-        if (null != input)
-            input.closeAll((ExceptionHandler<IOException, X>) decoratorHandler);
+        final ResourceAccountant accountant = this.accountant;
+        if (null != accountant)
+            accountant.closeAll(new FilterExceptionHandler());
     }
 
     /**
@@ -604,7 +590,7 @@ extends FsFileSystemArchiveController<E> {
      */
     private final class Input extends ConcurrentInputShop<E> {
         Input(InputShop<E> input) {
-            super(input, getModel().writeLock());
+            super(input, getAccountant());
         }
 
         /** Exposes the product of the archive driver this input is wrapping. */
@@ -622,7 +608,7 @@ extends FsFileSystemArchiveController<E> {
      */
     private final class Output extends ConcurrentOutputShop<E> {
         Output(OutputShop<E> output) {
-            super(output, getModel().writeLock());
+            super(output, getAccountant());
         }
 
         /** Exposes the product of the archive driver this output is wrapping. */

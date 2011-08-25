@@ -288,62 +288,62 @@ extends FsDecoratingController< FsConcurrentModel,
 
         @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
-            try {
+            /*try {
                 readLock().lock();
                 try {
                     return getBoundSocket().newReadOnlyFile();
                 } finally {
                     readLock().unlock();
                 }
-            } catch (FsNotWriteLockedException ex) {
-                assertNotReadLockedByCurrentThread(ex);
+            } catch (FsNotWriteLockedException ex) {*/
+                assertNotReadLockedByCurrentThread(/*ex*/null);
                 writeLock().lock();
                 try {
                     return getBoundSocket().newReadOnlyFile();
                 } finally {
                     writeLock().unlock();
                 }
-            }
+            //}
         }
 
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            try {
+            /*try {
                 readLock().lock();
                 try {
                     return getBoundSocket().newSeekableByteChannel();
                 } finally {
                     readLock().unlock();
                 }
-            } catch (FsNotWriteLockedException ex) {
-                assertNotReadLockedByCurrentThread(ex);
+            } catch (FsNotWriteLockedException ex) {*/
+                assertNotReadLockedByCurrentThread(/*ex*/null);
                 writeLock().lock();
                 try {
                     return getBoundSocket().newSeekableByteChannel();
                 } finally {
                     writeLock().unlock();
                 }
-            }
+            //}
         }
 
         @Override
         public InputStream newInputStream() throws IOException {
-            try {
+            /*try {
                 readLock().lock();
                 try {
                     return getBoundSocket().newInputStream();
                 } finally {
                     readLock().unlock();
                 }
-            } catch (FsNotWriteLockedException ex) {
-                assertNotReadLockedByCurrentThread(ex);
+            } catch (FsNotWriteLockedException ex) {*/
+                assertNotReadLockedByCurrentThread(/*ex*/null);
                 writeLock().lock();
                 try {
                     return getBoundSocket().newInputStream();
                 } finally {
                     writeLock().unlock();
                 }
-            }
+            //}
         }
     } // Input
 

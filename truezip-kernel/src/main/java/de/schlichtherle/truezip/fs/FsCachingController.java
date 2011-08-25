@@ -46,6 +46,7 @@ import java.nio.channels.SeekableByteChannel;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
 import net.jcip.annotations.Immutable;
 import net.jcip.annotations.NotThreadSafe;
 
@@ -387,13 +388,21 @@ extends FsDecoratingController< FsConcurrentModel,
             assert getModel().isTouched();
             if (null != template)
                 return;
-            delegate.mknod(
-                    name,
-                    FILE,
-                    outputOptions.clear(EXCLUSIVE),
-                    cache.getEntry());
+            // TODO: Locking does not belong here - move out!
+            final Lock lock = getModel().writeLock();
+            lock.lock();
+            try {
+                delegate.mknod(
+                        name,
+                        FILE,
+                        outputOptions.clear(EXCLUSIVE),
+                        cache.getEntry());
+            } finally {
+                lock.unlock();
+            }
         }
 
+        /** An input socket proxy. */
         final class Input extends DecoratingInputSocket<Entry> {
             Input(InputSocket <?> input) {
                 super(input);
@@ -461,7 +470,7 @@ extends FsDecoratingController< FsConcurrentModel,
             }
         } // Output
 
-        /** An output stream proxy. */
+        /** A seekable byte channel proxy. */
         final class EntrySeekableByteChannel
         extends DecoratingSeekableByteChannel {
             EntrySeekableByteChannel(SeekableByteChannel sbc) {

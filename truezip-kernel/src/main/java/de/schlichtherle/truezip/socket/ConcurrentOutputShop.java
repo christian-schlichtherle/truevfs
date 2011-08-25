@@ -19,17 +19,16 @@ import de.schlichtherle.truezip.io.ResourceAccountant;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.io.SynchronizedOutputStream;
-import de.schlichtherle.truezip.util.ExceptionHandler;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import net.jcip.annotations.NotThreadSafe;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * Decorates another output shop to add accounting and multithreading
- * synchronization for all output streams created by the decorated output shop.
+ * Decorates another output shop to add synchronization for all output streams
+ * created by the decorated output shop in a multithreaded environment.
  *
  * @see     ConcurrentInputShop
  * @param   <E> The type of the entries.
@@ -37,79 +36,37 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
+@DefaultAnnotation(NonNull.class)
 public class ConcurrentOutputShop<E extends Entry>
 extends DecoratingOutputShop<E, OutputShop<E>> {
 
+    private volatile boolean closed;
     private final ResourceAccountant accountant;
-    private final Lock lock;
 
     /**
      * Constructs a concurrent output shop.
      * 
-     * @param  output the shop to decorate.
-     * @param  lock the synchronization lock to use for accounting streams.
-     *              Though not required by the use in this class, this
-     *              parameter should normally be an instance of
-     *              {@link ReentrantLock} because chances are that it gets
-     *              locked recursively.
-     * @throws NullPointerException if {@code output} is {@code null}.
+     * @param output the shop to decorate.
      */
-    public ConcurrentOutputShop(OutputShop<E> output, Lock lock) {
+    public ConcurrentOutputShop(
+            final OutputShop<E> output,
+            final ResourceAccountant accountant) {
         super(output);
-        this.accountant = new ResourceAccountant(lock);
-        this.lock = lock;
+        if (null == accountant)
+            throw new NullPointerException();
+        this.accountant = accountant;
     }
 
-    /**
-     * Waits until all entry output streams which have been opened by <em>other
-     * threads</em> get closed or a timeout occurs.
-     * If the current thread is interrupted while waiting,
-     * a warn message is logged using {@code java.util.logging} and
-     * this method returns.
-     * <p>
-     * Unless otherwise prevented, another thread could immediately open
-     * another stream upon return of this method.
-     * So there is actually no guarantee that really <em>all</em> streams
-     * are closed upon return of this method - use carefully!
-     *
-     * @return The number of all open streams.
-     */
-    public final int waitCloseOthers(long timeout) {
-        return accountant.waitStopAccounting(timeout);
-    }
-
-    /**
-     * Closes and disconnects <em>all</em> entry output streams created by this
-     * concurrent output shop.
-     * <i>Disconnecting</i> means that any subsequent operation on the entry
-     * streams will throw an {@code IOException}, with the exception of
-     * their {@code close()} method.
-     */
-    public final <X extends Exception>
-    void closeAll(ExceptionHandler<IOException, X> handler) throws X {
-        accountant.closeAll(handler);
-    }
-
-    /**
-     * Closes this concurrent output shop.
-     *
-     * @throws IllegalStateException If any open output streams are detected.
-     * @see    #closeAll
-     */
     @Override
-    public final void close() throws IOException {
-        this.lock.lock();
-        try {
-            accountant.close();
-            delegate.close();
-        } finally {
-            this.lock.unlock();
-        }
+    public synchronized void close() throws IOException {
+        if (closed)
+            return;
+        closed = true;
+        super.close();
     }
 
-    /** Needs to be externally synchronized! */
-    private void assertNotShopClosed() throws IOException {
-        if (accountant.isClosed())
+    private void assertNotClosed() throws IOException {
+        if (closed)
             throw new OutputClosedException();
     }
 
@@ -125,14 +82,11 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
 
             @Override
             public OutputStream newOutputStream() throws IOException {
-                ConcurrentOutputShop.this.lock.lock();
-                try {
-                    assertNotShopClosed();
+                synchronized (ConcurrentOutputShop.this) {
+                    assertNotClosed();
                     return new ConcurrentOutputStream(
                         new DisconnectableOutputStream(
                             getBoundSocket().newOutputStream()));
-                } finally {
-                    ConcurrentOutputShop.this.lock.unlock();
                 }
             }
         } // Output
@@ -144,15 +98,19 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
     private final class ConcurrentOutputStream
     extends SynchronizedOutputStream {
         @SuppressWarnings("LeakingThisInConstructor")
-        ConcurrentOutputStream(OutputStream out) {
-            super(out);
+        ConcurrentOutputStream(DisconnectableOutputStream out) {
+            super(out, ConcurrentOutputShop.this);
             accountant.startAccountingFor(this);
         }
 
         @Override
         public void close() throws IOException {
-            if (accountant.stopAccountingFor(this))
-                super.close();
+            accountant.stopAccountingFor(this);
+            synchronized (ConcurrentOutputStream.this) {
+                if (closed)
+                    return;
+                delegate.close();
+            }
         }
 
         /**
@@ -163,8 +121,6 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
         @Override
         @SuppressWarnings("FinalizeDeclaration")
         protected void finalize() throws Throwable {
-            if (accountant.isClosed())
-                return;
             try {
                 close();
             } finally {
@@ -174,17 +130,10 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
     } // ConcurrentOutputStream
 
     @NotThreadSafe
-    private static final class DisconnectableOutputStream
+    private final class DisconnectableOutputStream
     extends DecoratingOutputStream {
-        private boolean closed;
-
-        private DisconnectableOutputStream(OutputStream out) {
+        DisconnectableOutputStream(OutputStream out) {
             super(out);
-        }
-
-        void assertNotClosed() throws IOException {
-            if (closed)
-                throw new OutputClosedException();
         }
 
         @Override
@@ -209,7 +158,6 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
         public void close() throws IOException {
             if (closed)
                 return;
-            closed = true;
             delegate.close();
         }
     } // DisconnectableOutputStream
