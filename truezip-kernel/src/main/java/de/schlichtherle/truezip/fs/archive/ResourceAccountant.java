@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io;
+package de.schlichtherle.truezip.fs.archive;
 
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.ThreadGroups;
@@ -55,7 +55,7 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-public final class ResourceAccountant {
+final class ResourceAccountant {
 
     private static final String CLASS_NAME
             = ResourceAccountant.class.getName();
@@ -85,7 +85,7 @@ public final class ResourceAccountant {
      *             {@link ReentrantLock} because chances are that it gets
      *             locked recursively.
      */
-    public ResourceAccountant(final Lock lock) {
+    ResourceAccountant(final Lock lock) {
         this.condition = lock.newCondition();
         this.lock = lock;
     }
@@ -97,7 +97,7 @@ public final class ResourceAccountant {
      * @return {@code true} if and only if the given closeable resource is not
      *         already accounted for.
      */
-    public boolean startAccountingFor(final Closeable resource) {
+    boolean startAccountingFor(final Closeable resource) {
         this.lock.lock();
         try {
             if (this.threads.containsKey(resource))
@@ -118,7 +118,7 @@ public final class ResourceAccountant {
      * @return {@code true} if and only if the given closeable resource was
      *         accounted for.
      */
-    public boolean stopAccountingFor(final Closeable resource) {
+    boolean stopAccountingFor(final Closeable resource) {
         this.lock.lock();
         try {
             final Reference ref = this.threads.remove(resource);
@@ -127,7 +127,7 @@ public final class ResourceAccountant {
             final Account account = ref.get();
             if (null == account)
                 return false; // picked up by the garbage collector concurrently
-            if (account.owner != Thread.currentThread())
+            //if (account.owner != Thread.currentThread())
                 this.condition.signal();
             return true;
         } finally {
@@ -156,7 +156,7 @@ public final class ResourceAccountant {
      *         If this is {@code 0}, then there is no timeout for waiting.
      * @return The number of <em>all</em> accounted closeable resources.
      */
-    public int waitStopAccounting(final long timeout) {
+    int waitStopAccounting(final long timeout) {
         this.lock.lock();
         try {
             int size;
@@ -206,7 +206,7 @@ public final class ResourceAccountant {
      * for closeable resources again unless the caller also locks the lock
      * provided to the constructor - use with care!
      */
-    public <X extends Exception>
+    <X extends Exception>
     void closeAll(final ExceptionHandler<? super IOException, X> handler)
     throws X {
         this.lock.lock();

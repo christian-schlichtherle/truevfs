@@ -15,54 +15,49 @@
  */
 package de.schlichtherle.truezip.socket;
 
-import de.schlichtherle.truezip.io.ResourceAccountant;
+import de.schlichtherle.truezip.io.OutputClosedException;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.io.SynchronizedOutputStream;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.OutputStream;
 import net.jcip.annotations.NotThreadSafe;
-import net.jcip.annotations.ThreadSafe;
 
 /**
- * Decorates another output shop to add synchronization for all output streams
- * created by the decorated output shop in a multithreaded environment.
+ * Decorates another output shop in order to disconnect any entry resources
+ * when this output shop gets closed.
  *
- * @see     ConcurrentInputShop
+ * @see     DisconnectingInputShop
  * @param   <E> The type of the entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@ThreadSafe
+@NotThreadSafe
 @DefaultAnnotation(NonNull.class)
-public class ConcurrentOutputShop<E extends Entry>
+public final class DisconnectingOutputShop<E extends Entry>
 extends DecoratingOutputShop<E, OutputShop<E>> {
 
-    private volatile boolean closed;
-    private final ResourceAccountant accountant;
+    private boolean closed;
 
     /**
-     * Constructs a concurrent output shop.
+     * Constructs a disconnecting output shop.
      * 
      * @param output the shop to decorate.
      */
-    public ConcurrentOutputShop(
-            final OutputShop<E> output,
-            final ResourceAccountant accountant) {
+    public DisconnectingOutputShop(OutputShop<E> output) {
         super(output);
-        if (null == accountant)
-            throw new NullPointerException();
-        this.accountant = accountant;
     }
 
     @Override
-    public synchronized void close() throws IOException {
+    public void close() throws IOException {
         if (closed)
             return;
-        closed = true;
-        super.close();
+        try {
+            delegate.close();
+        } finally {
+            closed = true;
+        }
     }
 
     private void assertNotClosed() throws IOException {
@@ -77,59 +72,22 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
 
         class Output extends DecoratingOutputSocket<E> {
             Output() {
-                super(ConcurrentOutputShop.super.getOutputSocket(entry));
+                super(DisconnectingOutputShop.super.getOutputSocket(entry));
             }
+
+            // TODO: Implement newSeekableByteChannel()
 
             @Override
             public OutputStream newOutputStream() throws IOException {
-                synchronized (ConcurrentOutputShop.this) {
-                    assertNotClosed();
-                    return new ConcurrentOutputStream(
-                        new DisconnectableOutputStream(
-                            getBoundSocket().newOutputStream()));
-                }
+                assertNotClosed();
+                return new DisconnectableOutputStream(
+                        getBoundSocket().newOutputStream());
             }
         } // Output
 
         return new Output();
     }
 
-    @ThreadSafe
-    private final class ConcurrentOutputStream
-    extends SynchronizedOutputStream {
-        @SuppressWarnings("LeakingThisInConstructor")
-        ConcurrentOutputStream(DisconnectableOutputStream out) {
-            super(out, ConcurrentOutputShop.this);
-            accountant.startAccountingFor(this);
-        }
-
-        @Override
-        public void close() throws IOException {
-            accountant.stopAccountingFor(this);
-            synchronized (ConcurrentOutputStream.this) {
-                if (closed)
-                    return;
-                delegate.close();
-            }
-        }
-
-        /**
-         * The finalizer in this class forces this stream to close in order to
-         * protect the decorated stream against client applications which don't
-         * always close this stream.
-         */
-        @Override
-        @SuppressWarnings("FinalizeDeclaration")
-        protected void finalize() throws Throwable {
-            try {
-                close();
-            } finally {
-                super.finalize();
-            }
-        }
-    } // ConcurrentOutputStream
-
-    @NotThreadSafe
     private final class DisconnectableOutputStream
     extends DecoratingOutputStream {
         DisconnectableOutputStream(OutputStream out) {

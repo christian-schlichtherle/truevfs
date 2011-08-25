@@ -17,8 +17,8 @@ package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.io.InputBusyException;
 import de.schlichtherle.truezip.io.OutputBusyException;
-import de.schlichtherle.truezip.socket.InputClosedException;
-import de.schlichtherle.truezip.socket.OutputClosedException;
+import de.schlichtherle.truezip.io.InputClosedException;
+import de.schlichtherle.truezip.io.OutputClosedException;
 import java.io.IOException;
 import net.jcip.annotations.Immutable;
 
