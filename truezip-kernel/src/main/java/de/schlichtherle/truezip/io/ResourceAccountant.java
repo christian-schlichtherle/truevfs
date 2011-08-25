@@ -55,7 +55,7 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-public final class ResourceAccountant implements Closeable {
+public final class ResourceAccountant {
 
     private static final String CLASS_NAME
             = ResourceAccountant.class.getName();
@@ -91,30 +91,15 @@ public final class ResourceAccountant implements Closeable {
     }
 
     /**
-     * Returns {@code true} if and only if this resource accountant has
-     * been {@link #close() closed}.
-     * 
-     * @return {@code true} if and only if this resource accountant has
-     *         been {@link #close() closed}.
-     */
-    public boolean isClosed() {
-        return null == this.threads;
-    }
-
-    /**
      * Starts accounting for the given closeable resource.
      * 
      * @param  resource the closeable resource to start accounting for.
      * @return {@code true} if and only if the given closeable resource is not
      *         already accounted for.
-     * @throws IllegalStateException if this resource accountant has already
-     *         been closed.
      */
     public boolean startAccountingFor(final Closeable resource) {
         this.lock.lock();
         try {
-            if (isClosed())
-                throw new IllegalStateException("Already closed!");
             if (this.threads.containsKey(resource))
                 return false;
             this.threads.put(resource, new Reference(new Account(resource)));
@@ -136,8 +121,6 @@ public final class ResourceAccountant implements Closeable {
     public boolean stopAccountingFor(final Closeable resource) {
         this.lock.lock();
         try {
-            if (isClosed())
-                return false;
             final Reference ref = this.threads.remove(resource);
             if (null == ref)
                 return false; // wasn't accounted (anymore)
@@ -157,7 +140,7 @@ public final class ResourceAccountant implements Closeable {
      * for in <em>other</em> threads get stopped accounting for or a timeout
      * occurs.
      * If the current thread is interrupted while waiting,
-     * then immediately a warn message is logged using
+     * then immediately a warning message is logged using
      * {@code java.util.logging} and control is returned to the caller.
      * <p>
      * Upon return of this method, threads may immediately start accounting
@@ -176,8 +159,6 @@ public final class ResourceAccountant implements Closeable {
     public int waitStopAccounting(final long timeout) {
         this.lock.lock();
         try {
-            if (isClosed())
-                return 0;
             final long start = System.currentTimeMillis();
             try {
                 while (this.threads.size() > threadLocalResources()) {
@@ -207,7 +188,6 @@ public final class ResourceAccountant implements Closeable {
      * This method must not get called if the {@link #lock} is not locked!
      */
     private int threadLocalResources() {
-        assert !isClosed();
         int n = 0;
         final Thread currentThread = Thread.currentThread();
         for (final Reference ref : this.threads.values()) {
@@ -231,8 +211,6 @@ public final class ResourceAccountant implements Closeable {
     throws X {
         this.lock.lock();
         try {
-            if (isClosed())
-                return;
             for (final Iterator<Closeable> i = this.threads.keySet().iterator(); i.hasNext(); ) {
                 try {
                     final Closeable closeable = i.next();
@@ -246,28 +224,6 @@ public final class ResourceAccountant implements Closeable {
                 }
             }
             assert this.threads.isEmpty();
-        } finally {
-            this.lock.unlock();
-        }
-    }
-
-    /**
-     * Closes this resource accountant.
-     *
-     * @see    #waitStopAccounting(long)
-     * @see    #closeAll
-     * @throws IOException If any accounted closeable resources are detected.
-     */
-    @Override
-    public void close() throws IOException {
-        this.lock.lock();
-        try {
-            if (isClosed())
-                return;
-            final int size = this.threads.size();
-            if (0 != size)
-                throw new IOException("There are still " + size + " accounted closeable resources!");
-            this.threads = null;
         } finally {
             this.lock.unlock();
         }
