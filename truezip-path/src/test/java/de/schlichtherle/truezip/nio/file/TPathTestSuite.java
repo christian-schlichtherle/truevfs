@@ -539,7 +539,7 @@ extends TestBase<D> {
 
             // in1 is still open!
             try {
-                TFileSystemProvider.umount(); // forces closing of fis1
+                TFileSystemProvider.umount(); // forces closing of in1
                 fail("Expected warning exception when synchronizing a busy archive file!");
             } catch (FsSyncWarningException ex) {
                 if (!(ex.getCause() instanceof FileBusyException))
