@@ -690,6 +690,11 @@ extends FsFileSystemArchiveController<E> {
 
         @Override
         public void close() throws IOException {
+            assert getModel().isWriteLockedByCurrentThread();
+            close0();
+        }
+
+        void close0() throws IOException {
             getAccountant().stopAccountingFor(this);
             delegate.close();
         }
@@ -698,7 +703,7 @@ extends FsFileSystemArchiveController<E> {
         @SuppressWarnings("FinalizeDeclaration")
         protected void finalize() throws Throwable {
             try {
-                close();
+                close0();
             } finally {
                 super.finalize();
             }
@@ -714,6 +719,11 @@ extends FsFileSystemArchiveController<E> {
 
         @Override
         public void close() throws IOException {
+            assert getModel().isWriteLockedByCurrentThread();
+            close0();
+        }
+
+        void close0() throws IOException {
             getAccountant().stopAccountingFor(this);
             delegate.close();
         }
@@ -722,7 +732,7 @@ extends FsFileSystemArchiveController<E> {
         @SuppressWarnings("FinalizeDeclaration")
         protected void finalize() throws Throwable {
             try {
-                close();
+                close0();
             } finally {
                 super.finalize();
             }
@@ -738,6 +748,11 @@ extends FsFileSystemArchiveController<E> {
 
         @Override
         public void close() throws IOException {
+            assert getModel().isWriteLockedByCurrentThread();
+            close0();
+        }
+
+        void close0() throws IOException {
             getAccountant().stopAccountingFor(this);
             delegate.close();
         }
@@ -746,7 +761,7 @@ extends FsFileSystemArchiveController<E> {
         @SuppressWarnings("FinalizeDeclaration")
         protected void finalize() throws Throwable {
             try {
-                close();
+                close0();
             } finally {
                 super.finalize();
             }
