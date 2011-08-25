@@ -22,7 +22,7 @@ import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
 import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
-import de.schlichtherle.truezip.socket.OutputClosedException;
+import de.schlichtherle.truezip.io.OutputClosedException;
 import de.schlichtherle.truezip.socket.spi.ByteArrayIOPoolService;
 import de.schlichtherle.truezip.util.ArrayHelper;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
