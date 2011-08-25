@@ -15,58 +15,51 @@
  */
 package de.schlichtherle.truezip.socket;
 
-import de.schlichtherle.truezip.io.ResourceAccountant;
+import de.schlichtherle.truezip.io.InputClosedException;
 import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.io.SynchronizedInputStream;
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.rof.SynchronizedReadOnlyFile;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
 import net.jcip.annotations.NotThreadSafe;
-import net.jcip.annotations.ThreadSafe;
 
 /**
- * Decorates another input shop to add synchronization for all input streams
- * or read only files created by the decorated input shop in a multithreaded
- * environment.
+ * Decorates another input shop in order to disconnect any entry resources
+ * when this input shop gets closed.
  *
- * @see     ConcurrentOutputShop
+ * @see     DisconnectingOutputShop
  * @param   <E> The type of the entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@ThreadSafe
+@NotThreadSafe
 @DefaultAnnotation(NonNull.class)
-public class ConcurrentInputShop<E extends Entry>
+public final class DisconnectingInputShop<E extends Entry>
 extends DecoratingInputShop<E, InputShop<E>> {
 
-    private volatile boolean closed;
-    private final ResourceAccountant accountant;
+    private boolean closed;
 
     /**
-     * Constructs a concurrent input shop.
+     * Constructs a disconnecting input shop.
      *
      * @param input the shop to decorate.
      */
-    public ConcurrentInputShop(
-            final InputShop<E> input,
-            final ResourceAccountant accountant) {
+    public DisconnectingInputShop(InputShop<E> input) {
         super(input);
-        if (null == accountant)
-            throw new NullPointerException();
-        this.accountant = accountant;
     }
 
     @Override
-    public synchronized void close() throws IOException {
+    public void close() throws IOException {
         if (closed)
             return;
-        closed = true;
-        super.close();
+        try {
+            delegate.close();
+        } finally {
+            closed = true;
+        }
     }
 
     private void assertNotClosed() throws IOException {
@@ -75,110 +68,35 @@ extends DecoratingInputShop<E, InputShop<E>> {
     }
 
     @Override
-    public final InputSocket<? extends E> getInputSocket(final String name) {
+    public InputSocket<? extends E> getInputSocket(final String name) {
         if (null == name)
             throw new NullPointerException();
 
         class Input extends DecoratingInputSocket<E> {
             Input() {
-                super(ConcurrentInputShop.super.getInputSocket(name));
+                super(DisconnectingInputShop.super.getInputSocket(name));
             }
 
             @Override
             public ReadOnlyFile newReadOnlyFile() throws IOException {
-                synchronized (ConcurrentInputShop.this) {
-                    assertNotClosed();
-                    return new ConcurrentReadOnlyFile(
-                            new DisconnectableReadOnlyFile(
-                                getBoundSocket().newReadOnlyFile()));
-                }
+                assertNotClosed();
+                return new DisconnectableReadOnlyFile(
+                        getBoundSocket().newReadOnlyFile());
             }
+
+            // TODO: Implement newSeekableByteChannel()
 
             @Override
             public InputStream newInputStream() throws IOException {
-                synchronized (ConcurrentInputShop.this) {
-                    assertNotClosed();
-                    return new ConcurrentInputStream(
-                            new DisconnectableInputStream(
-                                getBoundSocket().newInputStream()));
-                }
+                assertNotClosed();
+                return new DisconnectableInputStream(
+                        getBoundSocket().newInputStream());
             }
         } // Input
 
         return new Input();
     }
 
-    @ThreadSafe
-    private final class ConcurrentReadOnlyFile
-    extends SynchronizedReadOnlyFile {
-        @SuppressWarnings("LeakingThisInConstructor")
-        ConcurrentReadOnlyFile(DisconnectableReadOnlyFile rof) {
-            super(rof, ConcurrentInputShop.this);
-            accountant.startAccountingFor(this);
-        }
-
-        @Override
-        public void close() throws IOException {
-            accountant.stopAccountingFor(this);
-            synchronized (ConcurrentInputShop.this) {
-                if (closed)
-                    return;
-                delegate.close();
-            }
-        }
-
-        /**
-         * The finalizer in this class forces this stream to close in order to
-         * protect the decorated stream against client applications which don't
-         * always close this stream.
-         */
-        @Override
-        @SuppressWarnings("FinalizeDeclaration")
-        protected void finalize() throws Throwable {
-            try {
-                close();
-            } finally {
-                super.finalize();
-            }
-        }
-    } // ConcurrentReadOnlyFile
-
-    @ThreadSafe
-    private final class ConcurrentInputStream
-    extends SynchronizedInputStream {
-        @SuppressWarnings("LeakingThisInConstructor")
-        ConcurrentInputStream(DisconnectableInputStream in) {
-            super(in, ConcurrentInputShop.this);
-            accountant.startAccountingFor(this);
-        }
-
-        @Override
-        public void close() throws IOException {
-            accountant.stopAccountingFor(this);
-            synchronized (ConcurrentInputShop.this) {
-                if (closed)
-                    return;
-                delegate.close();
-            }
-        }
-
-        /**
-         * The finalizer in this class forces this stream to close in order to
-         * protect the decorated stream against client applications which don't
-         * always close this stream.
-         */
-        @Override
-        @SuppressWarnings("FinalizeDeclaration")
-        protected void finalize() throws Throwable {
-            try {
-                close();
-            } finally {
-                super.finalize();
-            }
-        }
-    } // ConcurrentInputStream
-
-    @NotThreadSafe
     private final class DisconnectableReadOnlyFile
     extends DecoratingReadOnlyFile {
         DisconnectableReadOnlyFile(ReadOnlyFile rof) {
@@ -229,7 +147,6 @@ extends DecoratingInputShop<E, InputShop<E>> {
         }
     } // DisconnectableReadOnlyFile
 
-    @NotThreadSafe
     private final class DisconnectableInputStream
     extends DecoratingInputStream {
         DisconnectableInputStream(InputStream in) {

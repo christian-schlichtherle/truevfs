@@ -35,13 +35,22 @@ import de.schlichtherle.truezip.fs.FsSyncOption;
 import static de.schlichtherle.truezip.fs.FsSyncOption.*;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import static de.schlichtherle.truezip.fs.archive.FsArchiveFileSystem.*;
+import de.schlichtherle.truezip.io.DecoratingInputStream;
+import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.OutputBusyException;
 import static de.schlichtherle.truezip.io.Paths.isRoot;
-import de.schlichtherle.truezip.io.ResourceAccountant;
-import de.schlichtherle.truezip.socket.ConcurrentInputShop;
-import de.schlichtherle.truezip.socket.ConcurrentOutputShop;
+import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
+import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.socket.SynchronizedInputShop;
+import de.schlichtherle.truezip.socket.SynchronizedOutputShop;
+import de.schlichtherle.truezip.socket.DecoratingInputShop;
+import de.schlichtherle.truezip.socket.DecoratingInputSocket;
+import de.schlichtherle.truezip.socket.DecoratingOutputShop;
+import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.socket.DelegatingOutputSocket;
+import de.schlichtherle.truezip.socket.DisconnectingInputShop;
+import de.schlichtherle.truezip.socket.DisconnectingOutputShop;
 import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.socket.InputService;
 import de.schlichtherle.truezip.socket.InputShop;
@@ -55,6 +64,8 @@ import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import static java.lang.Boolean.*;
 import java.util.Collections;
 import java.util.Iterator;
@@ -88,16 +99,16 @@ extends FsFileSystemArchiveController<E> {
     private @CheckForNull ResourceAccountant accountant;
 
     /**
-     * An {@link Input} object used to mount the (virtual) archive file system
+     * An {@link InputArchive} object used to mount the (virtual) archive file system
      * and read the entries from the archive file.
      */
-    private @CheckForNull Input input;
+    private @CheckForNull InputArchive inputArchive;
 
     /**
-     * The (possibly temporary) {@link Output} we are writing newly
+     * The (possibly temporary) {@link OutputArchive} we are writing newly
      * created or modified entries to.
      */
-    private @CheckForNull Output output;
+    private @CheckForNull OutputArchive outputArchive;
 
     private final FsArchiveFileSystemTouchListener<E> touchListener
             = new TouchListener();
@@ -139,23 +150,23 @@ extends FsFileSystemArchiveController<E> {
                 : (this.accountant = new ResourceAccountant(getModel().writeLock()));
     }
 
-    private Input getInput() {
-        return input;
+    private InputArchive getInputArchive() {
+        return inputArchive;
     }
 
-    private void setInput(final @CheckForNull Input input) {
-        this.input = input;
-        if (null != input)
+    private void setInputArchive(final @CheckForNull InputArchive inputArchive) {
+        this.inputArchive = inputArchive;
+        if (null != inputArchive)
             getModel().setTouched(true);
     }
 
-    private Output getOutput() {
-        return output;
+    private OutputArchive getOutputArchive() {
+        return outputArchive;
     }
 
-    private void setOutput(final @CheckForNull Output output) {
-        this.output = output;
-        if (null != output)
+    private void setOutputArchive(final @CheckForNull OutputArchive outputArchive) {
+        this.outputArchive = outputArchive;
+        if (null != outputArchive)
             getModel().setTouched(true);
     }
 
@@ -185,9 +196,11 @@ extends FsFileSystemArchiveController<E> {
             final boolean readOnly = !parent.isWritable(parentName);
             final InputSocket<?> socket = driver.getInputSocket(
                     parent, parentName, MOUNT_INPUT_OPTIONS);
-            setInput(new Input(driver.newInputShop(getModel(), socket)));
+            setInputArchive(new InputArchive(driver.newInputShop(
+                    getModel(),
+                    socket)));
             setFileSystem(newPopulatedFileSystem(driver,
-                    getInput().getDelegate(),
+                    getInputArchive().getDriverProduct(),
                     socket.getLocalTarget(),
                     readOnly));
         } catch (FsException ex) {
@@ -221,7 +234,7 @@ extends FsFileSystemArchiveController<E> {
     }
 
     /**
-     * Ensures that {@link #output} is not {@code null}.
+     * Ensures that {@link #getOutputArchive} does not return {@code null}.
      * This method will use
      * <code>{@link #getContext()}.{@link FsOperationContext#getOutputOptions()}</code>
      * to obtain the output options to use for writing the entry in the parent
@@ -230,25 +243,28 @@ extends FsFileSystemArchiveController<E> {
      * @throws IOException on any I/O error.
      * @return The output.
      */
-    private Output makeOutput() throws IOException {
-        Output output = getOutput();
-        if (null != output)
-            return output;
+    private OutputArchive makeOutput() throws IOException {
+        OutputArchive oa = getOutputArchive();
+        if (null != oa)
+            return oa;
         final BitField<FsOutputOption> options = getContext()
                 .getOutputOptions()
                 .and(OUTPUT_PREFERENCES_MASK)
                 .set(CACHE);
         final OutputSocket<?> socket = driver.getOutputSocket(
                 parent, parentName, options, null);
-        final Input input = getInput();
-        setOutput(output = new Output(driver.newOutputShop(getModel(), socket,
-                     null != input ? input.getDelegate() : null)));
-        return output;
+        final InputArchive ia = getInputArchive();
+        oa = new OutputArchive(driver.newOutputShop(
+                getModel(),
+                socket,
+                null == ia ? null : ia.getDriverProduct()));
+        setOutputArchive(oa);
+        return oa;
     }
 
     @Override
     InputSocket<?> getInputSocket(final String name) {
-        return getInput().getInputSocket(name);
+        return getInputArchive().getInputSocket(name);
     }
 
     @Override
@@ -288,7 +304,7 @@ extends FsFileSystemArchiveController<E> {
         // HC SUNT DRACONES!
         Boolean grow = null;
         String aen; // archive entry name
-        final Output oa = getOutput(); // output archive
+        final OutputArchive oa = getOutputArchive(); // output archive
         final E oae; // output archive entry
         if (null != oa) {
             aen = ce.getEntry().getName();
@@ -302,7 +318,7 @@ extends FsFileSystemArchiveController<E> {
             aen = null;
             oae = null;
         }
-        final Input ia = getInput(); // input archive
+        final InputArchive ia = getInputArchive(); // input archive
         final E iae; // input archive entry
         if (null != ia) {
             if (null == aen)
@@ -331,7 +347,7 @@ extends FsFileSystemArchiveController<E> {
             final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
-        assert !isTouched() || null != getOutput(); // file system touched => output archive
+        assert !isTouched() || null != getOutputArchive(); // file system touched => output archive
         assert getModel().isWriteLockedByCurrentThread();
         if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT))
             throw new IllegalArgumentException();
@@ -345,8 +361,8 @@ extends FsFileSystemArchiveController<E> {
                 commitSync(handler);
             } finally {
                 assert null == getFileSystem();
-                assert null == getInput();
-                assert null == getOutput();
+                assert null == getInputArchive();
+                assert null == getOutputArchive();
                 // TODO: Remove a condition and clear a flag in the model
                 // instead.
                 if (options.get(ABORT_CHANGES) || options.get(CLEAR_CACHE))
@@ -437,7 +453,7 @@ extends FsFileSystemArchiveController<E> {
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         assert isTouched();
-        assert null != getOutput();
+        assert null != getOutputArchive();
 
         class FilterExceptionHandler
         implements ExceptionHandler<IOException, X> {
@@ -460,10 +476,10 @@ extends FsFileSystemArchiveController<E> {
             }
         } // class FilterExceptionHandler
 
-        final Input input = getInput();
+        final InputArchive ia = getInputArchive();
         copy(   getFileSystem(),
-                null != input ? input.getDelegate() : new DummyInputService<E>(),
-                getOutput().getDelegate(),
+                null == ia ? new DummyInputService<E>() : ia.getDriverProduct(),
+                getOutputArchive().getDriverProduct(),
                 (ExceptionHandler<IOException, X>) new FilterExceptionHandler());
     }
 
@@ -519,21 +535,21 @@ extends FsFileSystemArchiveController<E> {
     throws X {
         setFileSystem(null);
         try {
-            final Input input = getInput();
-            setInput(null);
-            if (input != null) {
+            final InputArchive ia = getInputArchive();
+            setInputArchive(null);
+            if (ia != null) {
                 try {
-                    input.close();
+                    ia.close();
                 } catch (IOException ex) {
                     handler.warn(new FsSyncWarningException(getModel(), ex));
                 }
             }
         } finally {
-            final Output output = getOutput();
-            setOutput(null);
-            if (output != null) {
+            final OutputArchive oa = getOutputArchive();
+            setOutputArchive(null);
+            if (oa != null) {
                 try {
-                    output.close();
+                    oa.close();
                 } catch (IOException ex) {
                     throw handler.fail(new FsSyncException(getModel(), ex));
                 }
@@ -581,41 +597,161 @@ extends FsFileSystemArchiveController<E> {
         }
     } // DummyInputService
 
-    /**
-     * This inner class makes this archive controller instance strongly
-     * reachable from any created input stream.
-     * This is required by the memory management to ensure that for any
-     * prospective archive file at most one archive controller object is in
-     * use at any time.
-     */
-    private final class Input extends ConcurrentInputShop<E> {
-        Input(InputShop<E> input) {
-            super(input, getAccountant());
+    private final class InputArchive
+    extends DecoratingInputShop<E, InputShop<E>> {
+        final InputShop<E> driverProduct;
+
+        InputArchive(final InputShop<E> driverProduct) {
+            super(new DisconnectingInputShop<E>(
+                    new SynchronizedInputShop<E>(driverProduct)));
+            this.driverProduct = driverProduct;
         }
 
-        /** Exposes the product of the archive driver this input is wrapping. */
-        InputShop<E> getDelegate() {
-            return delegate;
-        }
-    } // class Input
-
-    /**
-     * This inner class makes this archive controller instance strongly
-     * reachable from any created output stream.
-     * This is required by the memory management to ensure that for any
-     * prospective archive file at most one archive controller object is in
-     * use at any time.
-     */
-    private final class Output extends ConcurrentOutputShop<E> {
-        Output(OutputShop<E> output) {
-            super(output, getAccountant());
+        /**
+         * Exposes the product of the archive driver this input archive is
+         * decorating.
+         */
+        InputShop<E> getDriverProduct() {
+            return driverProduct;
         }
 
-        /** Exposes the product of the archive driver this output is wrapping. */
-        OutputShop<E> getDelegate() {
-            return delegate;
+        @Override
+        public InputSocket<? extends E> getInputSocket(final String name) {
+            if (null == name)
+                throw new NullPointerException();
+
+            class Input extends DecoratingInputSocket<E> {
+                Input() {
+                    super(InputArchive.super.getInputSocket(name));
+                }
+
+                @Override
+                public ReadOnlyFile newReadOnlyFile() throws IOException {
+                    return new AccountedReadOnlyFile(
+                            getBoundSocket().newReadOnlyFile());
+                }
+
+                @Override
+                public InputStream newInputStream() throws IOException {
+                    return new AccountedInputStream(
+                            getBoundSocket().newInputStream());
+                }
+            } // Input
+
+            return new Input();
         }
-    } // class Output
+    } // InputArchive
+
+    private final class OutputArchive
+    extends DecoratingOutputShop<E, OutputShop<E>> {
+        final OutputShop<E> driverProduct;
+
+        OutputArchive(final OutputShop<E> driverProduct) {
+            super(new DisconnectingOutputShop<E>(
+                    new SynchronizedOutputShop<E>(driverProduct)));
+            this.driverProduct = driverProduct;
+        }
+
+        /**
+         * Exposes the product of the archive driver this output archive is
+         * decorating.
+         */
+        OutputShop<E> getDriverProduct() {
+            return driverProduct;
+        }
+
+        @Override
+        public final OutputSocket<? extends E> getOutputSocket(final E entry) {
+            if (null == entry)
+                throw new NullPointerException();
+
+            class Output extends DecoratingOutputSocket<E> {
+                Output() {
+                    super(OutputArchive.super.getOutputSocket(entry));
+                }
+
+                @Override
+                public OutputStream newOutputStream() throws IOException {
+                    return new AccountedOutputStream(
+                            getBoundSocket().newOutputStream());
+                }
+            } // Output
+
+            return new Output();
+        }
+    } // OutputArchive
+
+    private final class AccountedReadOnlyFile extends DecoratingReadOnlyFile {
+        @SuppressWarnings("LeakingThisInConstructor")
+        AccountedReadOnlyFile(ReadOnlyFile rof) {
+            super(rof);
+            getAccountant().startAccountingFor(this);
+        }
+
+        @Override
+        public void close() throws IOException {
+            getAccountant().stopAccountingFor(this);
+            delegate.close();
+        }
+
+        @Override
+        @SuppressWarnings("FinalizeDeclaration")
+        protected void finalize() throws Throwable {
+            try {
+                close();
+            } finally {
+                super.finalize();
+            }
+        }
+    } // AccountedReadOnlyFile
+
+    private final class AccountedInputStream extends DecoratingInputStream {
+        @SuppressWarnings("LeakingThisInConstructor")
+        AccountedInputStream(InputStream in) {
+            super(in);
+            getAccountant().startAccountingFor(this);
+        }
+
+        @Override
+        public void close() throws IOException {
+            getAccountant().stopAccountingFor(this);
+            delegate.close();
+        }
+
+        @Override
+        @SuppressWarnings("FinalizeDeclaration")
+        protected void finalize() throws Throwable {
+            try {
+                close();
+            } finally {
+                super.finalize();
+            }
+        }
+    } // AccountedInputStream
+
+    private final class AccountedOutputStream extends DecoratingOutputStream {
+        @SuppressWarnings("LeakingThisInConstructor")
+        AccountedOutputStream(OutputStream out) {
+            super(out);
+            getAccountant().startAccountingFor(this);
+        }
+
+        @Override
+        public void close() throws IOException {
+            getAccountant().stopAccountingFor(this);
+            delegate.close();
+        }
+
+        @Override
+        @SuppressWarnings("FinalizeDeclaration")
+        protected void finalize() throws Throwable {
+            try {
+                close();
+            } finally {
+                super.finalize();
+            }
+        }
+    } // AccountedOutputStream
 
     /**
      * An archive file system listener which makes the output before it

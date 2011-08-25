@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io;
+package de.schlichtherle.truezip.fs.archive;
 
+import de.schlichtherle.truezip.io.SequentialIOExceptionBuilder;
 import org.junit.After;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
