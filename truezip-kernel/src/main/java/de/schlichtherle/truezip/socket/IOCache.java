@@ -68,7 +68,7 @@ import net.jcip.annotations.ThreadSafe;
 public final class IOCache implements Flushable, Closeable {
 
     private static final BufferSocketFactory FACTORY = JSE7.AVAILABLE
-            ? BufferSocketFactory.NIO
+            ? BufferSocketFactory.NIO2
             : BufferSocketFactory.OIO;
 
     private final Lock lock = new Lock();
@@ -492,7 +492,7 @@ public final class IOCache implements Flushable, Closeable {
             }
         },
 
-        NIO() {
+        NIO2() {
             @Override
             InputSocket<?> newInputSocket(Buffer buffer) {
                 return buffer.new Nio2BufferInputSocket();

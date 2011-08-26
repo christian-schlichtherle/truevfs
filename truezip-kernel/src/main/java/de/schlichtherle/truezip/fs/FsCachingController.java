@@ -82,6 +82,11 @@ public final class FsCachingController
 extends FsDecoratingController< FsConcurrentModel,
                                 FsController<? extends FsConcurrentModel>> {
 
+    private static final EntryOutputSocketFactory
+            ENTRY_OUTPUT_SOCKET_FACTORY = JSE7.AVAILABLE
+                ? EntryOutputSocketFactory.NIO2
+                : EntryOutputSocketFactory.OIO;
+
     private static final Strategy STRATEGY = WRITE_BACK;
 
     private final IOPool<?> pool;
@@ -107,14 +112,15 @@ extends FsDecoratingController< FsConcurrentModel,
     public InputSocket<?> getInputSocket(
             FsEntryName name,
             BitField<FsInputOption> options) {
-        return new Input(name, options);
+        return new CachingInputSocket(name, options);
     }
 
-    private final class Input extends DecoratingInputSocket<Entry> {
+    private final class CachingInputSocket
+    extends DecoratingInputSocket<Entry> {
         final FsEntryName name;
         final BitField<FsInputOption> options;
 
-        Input(final FsEntryName name, final BitField<FsInputOption> options) {
+        CachingInputSocket(final FsEntryName name, final BitField<FsInputOption> options) {
             super(delegate.getInputSocket(name, options));
             this.name = name;
             this.options = options;
@@ -168,15 +174,16 @@ extends FsDecoratingController< FsConcurrentModel,
             FsEntryName name,
             BitField<FsOutputOption> options,
             Entry template) {
-        return new Output(name, options, template);
+        return new CachingOutputSocket(name, options, template);
     }
 
-    private final class Output extends DecoratingOutputSocket<Entry> {
+    private final class CachingOutputSocket
+    extends DecoratingOutputSocket<Entry> {
         final FsEntryName name;
         final BitField<FsOutputOption> options;
         final @CheckForNull Entry template;
 
-        Output( final FsEntryName name,
+        CachingOutputSocket( final FsEntryName name,
                 final BitField<FsOutputOption> options,
                 final @CheckForNull Entry template) {
             super(delegate.getOutputSocket(name, options, template));
@@ -296,27 +303,29 @@ extends FsDecoratingController< FsConcurrentModel,
         }
     }
 
-    private static final EntryOutputSocketFactory FACTORY = JSE7.AVAILABLE
-            ? EntryOutputSocketFactory.NIO
-            : EntryOutputSocketFactory.OIO;
-
     @Immutable
     private enum EntryOutputSocketFactory {
         OIO() {
             @Override
-            OutputSocket<?> newOutputSocket(EntryCache cache, OutputSocket <?> output) {
+            OutputSocket<?> newOutputSocket(
+                    EntryCache cache,
+                    OutputSocket <?> output) {
                 return cache.new Output(output);
             }
         },
 
-        NIO() {
+        NIO2() {
             @Override
-            OutputSocket<?> newOutputSocket(EntryCache cache, OutputSocket <?> output) {
+            OutputSocket<?> newOutputSocket(
+                    EntryCache cache,
+                    OutputSocket <?> output) {
                 return cache.new Nio2Output(output);
             }
         };
         
-        abstract OutputSocket<?> newOutputSocket(EntryCache cache, OutputSocket <?> output);
+        abstract OutputSocket<?> newOutputSocket(
+                EntryCache cache,
+                OutputSocket <?> output);
     } // EntryOutputSocketFactory
 
     /** A cache for the contents of an individual file system entry. */
@@ -370,9 +379,8 @@ extends FsDecoratingController< FsConcurrentModel,
             final OutputSocket<?> output = this.output;
             return null != output
                     ? output
-                    : (this.output = FACTORY.newOutputSocket(
-                        this,
-                        cache.getOutputSocket()));
+                    : (this.output = ENTRY_OUTPUT_SOCKET_FACTORY
+                        .newOutputSocket(this, cache.getOutputSocket()));
         }
 
         void beginOutput() throws IOException {

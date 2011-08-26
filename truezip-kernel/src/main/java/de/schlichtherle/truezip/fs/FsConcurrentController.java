@@ -29,6 +29,7 @@ import de.schlichtherle.truezip.socket.DecoratingInputSocket;
 import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
+import de.schlichtherle.truezip.util.JSE7;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -40,6 +41,7 @@ import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import javax.swing.Icon;
+import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -56,6 +58,11 @@ import net.jcip.annotations.ThreadSafe;
 public final class FsConcurrentController
 extends FsDecoratingController< FsConcurrentModel,
                                 FsController<? extends FsConcurrentModel>> {
+
+    private static final ConcurrentSocketFactory
+            CONCURRENT_SOCKET_FACTORY = JSE7.AVAILABLE
+                ? ConcurrentSocketFactory.NIO2
+                : ConcurrentSocketFactory.OIO;
 
     private volatile @CheckForNull ReadLock readLock;
     private volatile @CheckForNull WriteLock writeLock;
@@ -256,11 +263,134 @@ extends FsDecoratingController< FsConcurrentModel,
     @Override
     public InputSocket<?> getInputSocket(   FsEntryName name,
                                             BitField<FsInputOption> options) {
-        return new Input(delegate.getInputSocket(name, options));
+        return CONCURRENT_SOCKET_FACTORY.newInputSocket(this,
+                delegate.getInputSocket(name, options));
     }
 
-    private final class Input extends DecoratingInputSocket<Entry> {
-        Input(InputSocket<?> input) {
+    @Override
+    public OutputSocket<?> getOutputSocket( FsEntryName name,
+                                            BitField<FsOutputOption> options,
+                                            Entry template) {
+        return CONCURRENT_SOCKET_FACTORY.newOutputSocket(this,
+                delegate.getOutputSocket(name, options, template));
+    }
+
+    @Override
+    public void mknod(
+            @NonNull FsEntryName name,
+            @NonNull Type type,
+            @NonNull BitField<FsOutputOption> options,
+            @CheckForNull Entry template)
+    throws IOException {
+        assertNotReadLockedByCurrentThread(null);
+        writeLock().lock();
+        try {
+            delegate.mknod(name, type, options, template);
+        } finally {
+            writeLock().unlock();
+        }
+    }
+
+    @Override
+    public void unlink(FsEntryName name, BitField<FsOutputOption> options)
+    throws IOException {
+        assertNotReadLockedByCurrentThread(null);
+        writeLock().lock();
+        try {
+            delegate.unlink(name, options);
+        } finally {
+            writeLock().unlock();
+        }
+    }
+
+    @Override
+    public <X extends IOException>
+    void sync(
+            @NonNull final BitField<FsSyncOption> options,
+            @NonNull final ExceptionHandler<? super FsSyncException, X> handler)
+    throws X {
+        //assertNotReadLockedByCurrentThread(null);
+        writeLock().lock();
+        try {
+            delegate.sync(options, handler);
+        } finally {
+            writeLock().unlock();
+        }
+    }
+
+    @Immutable
+    private enum ConcurrentSocketFactory {
+        OIO() {
+            @Override
+            InputSocket<?> newInputSocket(
+                    FsConcurrentController controller,
+                    InputSocket<?> input) {
+                return controller.new ConcurrentInputSocket(input);
+            }
+
+            @Override
+            OutputSocket<?> newOutputSocket(
+                    FsConcurrentController controller,
+                    OutputSocket<?> output) {
+                return controller.new ConcurrentOutputSocket(output);
+            }
+        },
+
+        NIO2() {
+            @Override
+            InputSocket<?> newInputSocket(
+                    FsConcurrentController controller,
+                    InputSocket<?> input) {
+                return controller.new Nio2ConcurrentInputSocket(input);
+            }
+
+            @Override
+            OutputSocket<?> newOutputSocket(
+                    FsConcurrentController controller,
+                    OutputSocket<?> output) {
+                return controller.new Nio2ConcurrentOutputSocket(output);
+            }
+        };
+        
+        abstract InputSocket<?> newInputSocket(
+                FsConcurrentController controller,
+                InputSocket <?> input);
+        
+        abstract OutputSocket<?> newOutputSocket(
+                FsConcurrentController controller,
+                OutputSocket <?> output);
+    } // SocketFactory
+
+    private final class Nio2ConcurrentInputSocket
+    extends ConcurrentInputSocket {
+        Nio2ConcurrentInputSocket(InputSocket<?> input) {
+            super(input);
+        }
+
+        @Override
+        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            /*try {
+                readLock().lock();
+                try {
+                return new ConcurrentSeekableByteChannel(getBoundSocket().newSeekableByteChannel());
+                } finally {
+                    readLock().unlock();
+                }
+            } catch (FsNotWriteLockedException ex) {*/
+                assertNotReadLockedByCurrentThread(/*ex*/null);
+                writeLock().lock();
+                try {
+                return new ConcurrentSeekableByteChannel(getBoundSocket().newSeekableByteChannel());
+                } finally {
+                    writeLock().unlock();
+                }
+            //}
+        }
+    } // Nio2ConcurrentInputSocket
+
+    private class ConcurrentInputSocket
+    extends DecoratingInputSocket<Entry> {
+        ConcurrentInputSocket(InputSocket<?> input) {
             super(input);
         }
 
@@ -311,26 +441,6 @@ extends FsDecoratingController< FsConcurrentModel,
         }
 
         @Override
-        public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            /*try {
-                readLock().lock();
-                try {
-                return new ConcurrentSeekableByteChannel(getBoundSocket().newSeekableByteChannel());
-                } finally {
-                    readLock().unlock();
-                }
-            } catch (FsNotWriteLockedException ex) {*/
-                assertNotReadLockedByCurrentThread(/*ex*/null);
-                writeLock().lock();
-                try {
-                return new ConcurrentSeekableByteChannel(getBoundSocket().newSeekableByteChannel());
-                } finally {
-                    writeLock().unlock();
-                }
-            //}
-        }
-
-        @Override
         public InputStream newInputStream() throws IOException {
             /*try {
                 readLock().lock();
@@ -349,17 +459,29 @@ extends FsDecoratingController< FsConcurrentModel,
                 }
             //}
         }
-    } // Input
+    } // ConcurrentInputSocket
 
-    @Override
-    public OutputSocket<?> getOutputSocket( FsEntryName name,
-                                            BitField<FsOutputOption> options,
-                                            Entry template) {
-        return new Output(delegate.getOutputSocket(name, options, template));
-    }
+    private final class Nio2ConcurrentOutputSocket
+    extends ConcurrentOutputSocket {
+        Nio2ConcurrentOutputSocket(OutputSocket<?> output) {
+            super(output);
+        }
 
-    private final class Output extends DecoratingOutputSocket<Entry> {
-        Output(OutputSocket<?> output) {
+        @Override
+        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            assertNotReadLockedByCurrentThread(null);
+            writeLock().lock();
+            try {
+                return new ConcurrentSeekableByteChannel(getBoundSocket().newSeekableByteChannel());
+            } finally {
+                writeLock().unlock();
+            }
+        }
+    } // Nio2ConcurrentOutputSocket
+
+    private class ConcurrentOutputSocket
+    extends DecoratingOutputSocket<Entry> {
+        ConcurrentOutputSocket(OutputSocket<?> output) {
             super(output);
         }
 
@@ -381,17 +503,6 @@ extends FsDecoratingController< FsConcurrentModel,
         }
 
         @Override
-        public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            assertNotReadLockedByCurrentThread(null);
-            writeLock().lock();
-            try {
-                return new ConcurrentSeekableByteChannel(getBoundSocket().newSeekableByteChannel());
-            } finally {
-                writeLock().unlock();
-            }
-        }
-
-        @Override
         public OutputStream newOutputStream() throws IOException {
             assertNotReadLockedByCurrentThread(null);
             writeLock().lock();
@@ -401,50 +512,7 @@ extends FsDecoratingController< FsConcurrentModel,
                 writeLock().unlock();
             }
         }
-    } // Output
-
-    @Override
-    public void mknod(
-            @NonNull FsEntryName name,
-            @NonNull Type type,
-            @NonNull BitField<FsOutputOption> options,
-            @CheckForNull Entry template)
-    throws IOException {
-        assertNotReadLockedByCurrentThread(null);
-        writeLock().lock();
-        try {
-            delegate.mknod(name, type, options, template);
-        } finally {
-            writeLock().unlock();
-        }
-    }
-
-    @Override
-    public void unlink(FsEntryName name, BitField<FsOutputOption> options)
-    throws IOException {
-        assertNotReadLockedByCurrentThread(null);
-        writeLock().lock();
-        try {
-            delegate.unlink(name, options);
-        } finally {
-            writeLock().unlock();
-        }
-    }
-
-    @Override
-    public <X extends IOException>
-    void sync(
-            @NonNull final BitField<FsSyncOption> options,
-            @NonNull final ExceptionHandler<? super FsSyncException, X> handler)
-    throws X {
-        //assertNotReadLockedByCurrentThread(null);
-        writeLock().lock();
-        try {
-            delegate.sync(options, handler);
-        } finally {
-            writeLock().unlock();
-        }
-    }
+    } // ConcurrentOutputSocket
 
     private final class ConcurrentReadOnlyFile
     extends DecoratingReadOnlyFile {
