@@ -15,8 +15,13 @@
  */
 package de.schlichtherle.truezip.io;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.OutputStream;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * A decorator which synchronizes all access to an {@link OutputStream}
@@ -26,6 +31,8 @@ import java.io.OutputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
+@DefaultAnnotation(NonNull.class)
 public class SynchronizedOutputStream extends DecoratingOutputStream {
 
     /** The object to synchronize on - never {@code null}. */
@@ -37,7 +44,7 @@ public class SynchronizedOutputStream extends DecoratingOutputStream {
      *
      * @param out the output stream to wrap in this decorator.
      */
-    public SynchronizedOutputStream(final OutputStream out) {
+    public SynchronizedOutputStream(@Nullable OutputStream out) {
     	this(out, null);
     }
 
@@ -48,7 +55,9 @@ public class SynchronizedOutputStream extends DecoratingOutputStream {
      * @param lock the object to synchronize on.
      *        If {@code null}, then this object is used, not the stream.
      */
-    public SynchronizedOutputStream(final OutputStream out, final Object lock) {
+    public SynchronizedOutputStream(
+            final @Nullable OutputStream out,
+            final @CheckForNull Object lock) {
         super(out);
         this.lock = null != lock ? lock : this;
     }
