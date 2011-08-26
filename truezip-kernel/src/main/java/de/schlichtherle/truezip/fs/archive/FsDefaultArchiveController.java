@@ -622,12 +622,16 @@ extends FsFileSystemArchiveController<E> {
 
                 @Override
                 public ReadOnlyFile newReadOnlyFile() throws IOException {
+                    assert getModel().isWriteLockedByCurrentThread();
+
                     return new AccountedReadOnlyFile(
                             getBoundSocket().newReadOnlyFile());
                 }
 
                 @Override
                 public InputStream newInputStream() throws IOException {
+                    assert getModel().isWriteLockedByCurrentThread();
+
                     return new AccountedInputStream(
                             getBoundSocket().newInputStream());
                 }
@@ -667,6 +671,8 @@ extends FsFileSystemArchiveController<E> {
 
                 @Override
                 public OutputStream newOutputStream() throws IOException {
+                    assert getModel().isWriteLockedByCurrentThread();
+
                     return new AccountedOutputStream(
                             getBoundSocket().newOutputStream());
                 }
