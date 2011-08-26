@@ -113,6 +113,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      * @throws ZipException if {@code name} is not compatible with the ZIP
      *         File Format Specification.
      * @throws IOException on any other I/O related issue.
+     * @see    #recoverLostEntries()
      */
     public ZipFile(
             final String path,
@@ -176,6 +177,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      * @throws ZipException if {@code file} is not compatible with the ZIP
      *         File Format Specification.
      * @throws IOException on any other I/O related issue.
+     * @see    #recoverLostEntries()
      */
     public ZipFile(
             final File file,
@@ -239,6 +241,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      * @throws ZipException if {@code rof} is not compatible with the ZIP
      *         File Format Specification.
      * @throws IOException on any other I/O related issue.
+     * @see    #recoverLostEntries()
      */
     public ZipFile(
             ReadOnlyFile rof,
@@ -252,6 +255,11 @@ public class ZipFile extends RawZipFile<ZipEntry> {
                 postambled,
                 DefaultZipEntryFactory.SINGLETON);
         this.name = rof.toString();
+    }
+
+    @Override
+    protected synchronized void recoverLostEntries() throws IOException {
+        super.recoverLostEntries();
     }
 
     /**
