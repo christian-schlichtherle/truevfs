@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io;
 
+import de.schlichtherle.truezip.util.ThreadGroups;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
@@ -60,23 +61,12 @@ public final class Streams {
      * Optimized for performance.
      */
     public static final int BUFFER_SIZE = 8 * 1024;
-    
-    /** You cannot instantiate this class. */
-    private Streams() {
-    }
 
     private static final ExecutorService executor
             = Executors.newCachedThreadPool(new InputStreamReaderThreadFactory());
-
-    /** A factory for input stream reader daemon threads. */
-    private static class InputStreamReaderThreadFactory
-    implements ThreadFactory {
-        @Override
-        public Thread newThread(Runnable r) {
-            Thread t = new Thread(r, "TrueZIP InputStream Reader");
-            t.setDaemon(true);
-            return t;
-        }
+    
+    /** You cannot instantiate this class. */
+    private Streams() {
     }
 
     /**
@@ -340,4 +330,16 @@ public final class Streams {
         /** The actual number of bytes read into the buffer. */
         int read;
     } // Buffer
+
+    /** A factory for input stream reader daemon threads. */
+    private static class InputStreamReaderThreadFactory
+    implements ThreadFactory {
+        @Override
+        public Thread newThread(Runnable r) {
+            Thread t = new Thread(ThreadGroups.getTopLevel(),
+                    r, "TrueZIP InputStream Reader");
+            t.setDaemon(true);
+            return t;
+        }
+    } // InputStreamReaderThreadFactory
 }

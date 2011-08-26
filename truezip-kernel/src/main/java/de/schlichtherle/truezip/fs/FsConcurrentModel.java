@@ -32,7 +32,7 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-public class FsConcurrentModel extends FsDecoratingModel<FsModel> {
+public final class FsConcurrentModel extends FsDecoratingModel<FsModel> {
 
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
@@ -40,11 +40,11 @@ public class FsConcurrentModel extends FsDecoratingModel<FsModel> {
         super(model);
     }
 
-    ReadLock readLock() {
+    public ReadLock readLock() {
         return lock.readLock();
     }
 
-    WriteLock writeLock() {
+    public WriteLock writeLock() {
         return lock.writeLock();
     }
 

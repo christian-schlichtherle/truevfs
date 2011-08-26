@@ -382,11 +382,11 @@ extends FsDecoratingController< FsConcurrentModel,
         }
 
         void commitOutput() throws IOException {
-            // TODO: Not necessarily true because this is called from close()!
-            // assert getModel().isWriteLockedByCurrentThread();!
             assert getModel().isTouched();
             if (null != template)
                 return;
+            // Not necessarily true because this is called from close()!
+            getModel().assertWriteLockedByCurrentThread();
             delegate.mknod(
                     name,
                     FILE,
@@ -394,6 +394,7 @@ extends FsDecoratingController< FsConcurrentModel,
                     cache.getEntry());
         }
 
+        /** An input socket proxy. */
         final class Input extends DecoratingInputSocket<Entry> {
             Input(InputSocket <?> input) {
                 super(input);
@@ -461,7 +462,7 @@ extends FsDecoratingController< FsConcurrentModel,
             }
         } // Output
 
-        /** An output stream proxy. */
+        /** A seekable byte channel proxy. */
         final class EntrySeekableByteChannel
         extends DecoratingSeekableByteChannel {
             EntrySeekableByteChannel(SeekableByteChannel sbc) {

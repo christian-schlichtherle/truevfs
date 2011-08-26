@@ -74,7 +74,7 @@ implements ExceptionBuilder<C, E> {
      */
     @Override
     public final E fail(C cause) {
-        if (cause == null)
+        if (null == cause)
             throw new NullPointerException();
         final E assembly = update(cause, this.assembly);
         this.assembly = null;
@@ -88,7 +88,7 @@ implements ExceptionBuilder<C, E> {
      */
     @Override
     public final void warn(C cause) {
-        if (cause == null)
+        if (null == cause)
             throw new NullPointerException();
         this.assembly = update(cause, this.assembly);
     }

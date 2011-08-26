@@ -1028,12 +1028,13 @@ public final class TFile extends File {
      * This method is equivalent to calling
      * {@link #sync(BitField)
         sync(   BitField.of(FsSyncOption.CLEAR_CACHE)
-                .set(FsSyncOption.FORCE_CLOSE_INPUT, closeStreams)
-                .set(FsSyncOption.FORCE_CLOSE_OUTPUT, closeStreams))
+                .set(FsSyncOption.FORCE_CLOSE_INPUT, forceCloseInputAndOutput)
+                .set(FsSyncOption.FORCE_CLOSE_OUTPUT, forceCloseInputAndOutput))
      * }.
      *
-     * @param  closeStreams see {@link FsSyncOption#FORCE_CLOSE_INPUT} and
-     *         {@link FsSyncOption#FORCE_CLOSE_OUTPUT}.
+     * @param  forceCloseInputAndOutput see
+     *         {@link FsSyncOption#FORCE_CLOSE_INPUT}
+     *         and {@link FsSyncOption#FORCE_CLOSE_OUTPUT}.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         occur.
      *         This implies that the respective parent file system has been
@@ -1044,11 +1045,11 @@ public final class TFile extends File {
      *         This implies loss of data!
      * @see    #sync(BitField)
      */
-    public static void umount(boolean closeStreams)
+    public static void umount(boolean forceCloseInputAndOutput)
     throws FsSyncException {
         sync(   BitField.of(CLEAR_CACHE)
-                    .set(FORCE_CLOSE_INPUT, closeStreams)
-                    .set(FORCE_CLOSE_OUTPUT, closeStreams));
+                    .set(FORCE_CLOSE_INPUT, forceCloseInputAndOutput)
+                    .set(FORCE_CLOSE_OUTPUT, forceCloseInputAndOutput));
     }
 
     /**
@@ -1064,16 +1065,16 @@ public final class TFile extends File {
      * This method is equivalent to calling
      * {@link #sync(BitField)
         sync(   BitField.of(FsSyncOption.CLEAR_CACHE)
-                .set(FsSyncOption.WAIT_CLOSE_INPUT, waitForInputStreams)
-                .set(FsSyncOption.FORCE_CLOSE_INPUT, closeInputStreams)
-                .set(FsSyncOption.WAIT_CLOSE_OUTPUT, waitForOutputStreams)
-                .set(FsSyncOption.FORCE_CLOSE_OUTPUT, closeOutputStreams))
+                .set(FsSyncOption.WAIT_CLOSE_INPUT, waitCloseInput)
+                .set(FsSyncOption.FORCE_CLOSE_INPUT, forceCloseInput)
+                .set(FsSyncOption.WAIT_CLOSE_OUTPUT, waitCloseOutput)
+                .set(FsSyncOption.FORCE_CLOSE_OUTPUT, forceCloseOutput))
      * }.
      *
-     * @param  waitForInputStreams see {@link FsSyncOption#WAIT_CLOSE_INPUT}.
-     * @param  closeInputStreams see {@link FsSyncOption#FORCE_CLOSE_INPUT}.
-     * @param  waitForOutputStreams see {@link FsSyncOption#WAIT_CLOSE_OUTPUT}.
-     * @param  closeOutputStreams see {@link FsSyncOption#FORCE_CLOSE_OUTPUT}.
+     * @param  waitCloseInput see {@link FsSyncOption#WAIT_CLOSE_INPUT}.
+     * @param  forceCloseInput see {@link FsSyncOption#FORCE_CLOSE_INPUT}.
+     * @param  waitCloseOutput see {@link FsSyncOption#WAIT_CLOSE_OUTPUT}.
+     * @param  forceCloseOutput see {@link FsSyncOption#FORCE_CLOSE_OUTPUT}.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         occur.
      *         This implies that the respective parent file system has been
@@ -1085,14 +1086,14 @@ public final class TFile extends File {
      * @see    #sync(BitField)
      */
     public static void umount(
-            boolean waitForInputStreams, boolean closeInputStreams,
-            boolean waitForOutputStreams, boolean closeOutputStreams)
+            boolean waitCloseInput, boolean forceCloseInput,
+            boolean waitCloseOutput, boolean forceCloseOutput)
     throws FsSyncException {
         sync(   BitField.of(CLEAR_CACHE)
-                    .set(WAIT_CLOSE_INPUT, waitForInputStreams)
-                    .set(FORCE_CLOSE_INPUT, closeInputStreams)
-                    .set(WAIT_CLOSE_OUTPUT, waitForOutputStreams)
-                    .set(FORCE_CLOSE_OUTPUT, closeOutputStreams));
+                    .set(WAIT_CLOSE_INPUT, waitCloseInput)
+                    .set(FORCE_CLOSE_INPUT, forceCloseInput)
+                    .set(WAIT_CLOSE_OUTPUT, waitCloseOutput)
+                    .set(FORCE_CLOSE_OUTPUT, forceCloseOutput));
     }
 
     /**
@@ -1143,13 +1144,14 @@ public final class TFile extends File {
      * {@link #sync(BitField)
         sync(   archive,
                 BitField.of(FsSyncOption.CLEAR_CACHE)
-                .set(FsSyncOption.FORCE_CLOSE_INPUT, closeStreams)
-                .set(FsSyncOption.FORCE_CLOSE_OUTPUT, closeStreams))
+                .set(FsSyncOption.FORCE_CLOSE_INPUT, forceCloseInputAndOutput)
+                .set(FsSyncOption.FORCE_CLOSE_OUTPUT, forceCloseInputAndOutput))
      * }.
      *
      * @param  archive a top level federated file system, i.e. a prospective
      *         archive file.
-     * @param  closeStreams see {@link FsSyncOption#FORCE_CLOSE_INPUT} and
+     * @param  forceCloseInputAndOutput see
+     *         {@link FsSyncOption#FORCE_CLOSE_INPUT} and
      *         {@link FsSyncOption#FORCE_CLOSE_OUTPUT}.
      * @throws IllegalArgumentException if {@code archive} is not a top level
      *         federated file system or the combination of synchronization
@@ -1167,12 +1169,12 @@ public final class TFile extends File {
      *         This implies loss of data!
      * @see    #sync(TFile, BitField)
      */
-    public static void umount(TFile archive, boolean closeStreams)
+    public static void umount(TFile archive, boolean forceCloseInputAndOutput)
     throws FsSyncException {
         sync(   archive,
                 BitField.of(CLEAR_CACHE)
-                    .set(FORCE_CLOSE_INPUT, closeStreams)
-                    .set(FORCE_CLOSE_OUTPUT, closeStreams));
+                    .set(FORCE_CLOSE_INPUT, forceCloseInputAndOutput)
+                    .set(FORCE_CLOSE_OUTPUT, forceCloseInputAndOutput));
     }
 
     /**
@@ -1190,18 +1192,18 @@ public final class TFile extends File {
      * {@link #sync(BitField)
         sync(   archive,
                 BitField.of(FsSyncOption.CLEAR_CACHE)
-                .set(FsSyncOption.WAIT_CLOSE_INPUT, waitForInputStreams)
-                .set(FsSyncOption.FORCE_CLOSE_INPUT, closeInputStreams)
-                .set(FsSyncOption.WAIT_CLOSE_OUTPUT, waitForOutputStreams)
-                .set(FsSyncOption.FORCE_CLOSE_OUTPUT, closeOutputStreams))
+                .set(FsSyncOption.WAIT_CLOSE_INPUT, waitCloseInput)
+                .set(FsSyncOption.FORCE_CLOSE_INPUT, forceCloseInput)
+                .set(FsSyncOption.WAIT_CLOSE_OUTPUT, waitCloseOutput)
+                .set(FsSyncOption.FORCE_CLOSE_OUTPUT, forceCloseOutput))
      * }.
      *
      * @param  archive a top level federated file system, i.e. a prospective
      *         archive file.
-     * @param  waitForInputStreams see {@link FsSyncOption#WAIT_CLOSE_INPUT}.
-     * @param  closeInputStreams see {@link FsSyncOption#FORCE_CLOSE_INPUT}.
-     * @param  waitForOutputStreams see {@link FsSyncOption#WAIT_CLOSE_OUTPUT}.
-     * @param  closeOutputStreams see {@link FsSyncOption#FORCE_CLOSE_OUTPUT}.
+     * @param  waitCloseInput see {@link FsSyncOption#WAIT_CLOSE_INPUT}.
+     * @param  forceCloseInput see {@link FsSyncOption#FORCE_CLOSE_INPUT}.
+     * @param  waitCloseOutput see {@link FsSyncOption#WAIT_CLOSE_OUTPUT}.
+     * @param  forceCloseOutput see {@link FsSyncOption#FORCE_CLOSE_OUTPUT}.
      * @throws IllegalArgumentException if {@code archive} is not a top level
      *         federated file system or the combination of synchronization
      *         options is illegal, e.g. if
@@ -1219,15 +1221,15 @@ public final class TFile extends File {
      * @see    #sync(TFile, BitField)
      */
     public static void umount(TFile archive,
-            boolean waitForInputStreams, boolean closeInputStreams,
-            boolean waitForOutputStreams, boolean closeOutputStreams)
+            boolean waitCloseInput, boolean forceCloseInput,
+            boolean waitCloseOutput, boolean forceCloseOutput)
     throws FsSyncException {
         sync(   archive,
                 BitField.of(CLEAR_CACHE)
-                    .set(WAIT_CLOSE_INPUT, waitForInputStreams)
-                    .set(FORCE_CLOSE_INPUT, closeInputStreams)
-                    .set(WAIT_CLOSE_OUTPUT, waitForOutputStreams)
-                    .set(FORCE_CLOSE_OUTPUT, closeOutputStreams));
+                    .set(WAIT_CLOSE_INPUT, waitCloseInput)
+                    .set(FORCE_CLOSE_INPUT, forceCloseInput)
+                    .set(WAIT_CLOSE_OUTPUT, waitCloseOutput)
+                    .set(FORCE_CLOSE_OUTPUT, forceCloseOutput));
     }
 
     /**
