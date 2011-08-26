@@ -75,7 +75,7 @@ public final class FsResourceAccountant {
 
     /**
      * Constructs a new resource accountant with the given lock.
-     * You must make sure not to use two instances of this class which share
+     * You MUST MAKE SURE not to use two instances of this class which share
      * the same lock!
      * Otherwise {@link #waitStopAccounting} will not work as designed!
      * 
@@ -146,9 +146,8 @@ public final class FsResourceAccountant {
      * for closeable resources again unless the caller also locks the lock
      * provided to the constructor - use with care!
      * <p>
-     * Mind that this method will not work as designed if any two instances of
-     * this class share the same lock that has been provided to their
-     * constructor!
+     * Mind that this method WILL NOT WORK if any two instances of this class
+     * share the same lock that has been provided to their constructor!
      *
      * @param  the number of milliseconds to await the closing of resources
      *         which have been accounted for in <em>other</em> threads.

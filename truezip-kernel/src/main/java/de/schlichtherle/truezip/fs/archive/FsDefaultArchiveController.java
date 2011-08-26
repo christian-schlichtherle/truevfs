@@ -369,8 +369,12 @@ extends FsFileSystemArchiveController<E> {
     }
 
     /**
-     * Waits for all entry input and entry output streams to close or forces
+     * Waits for all entry input and output resources to close or forces
      * them to close, dependending on the {@code options}.
+     * Mind that this method deliberately handles entry input and output
+     * resources in an equal manner because
+     * {@link FsResourceAccountant#waitStopAccounting} WILL NOT WORK if any two
+     * resource accountants share the same lock!
      *
      * @param  options a bit field of synchronization options.
      * @param  handler the exception handling strategy for consuming input
