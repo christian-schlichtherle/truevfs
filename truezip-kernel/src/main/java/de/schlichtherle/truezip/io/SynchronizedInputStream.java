@@ -15,8 +15,13 @@
  */
 package de.schlichtherle.truezip.io;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * A decorator which synchronizes all access to an {@link InputStream}
@@ -26,6 +31,8 @@ import java.io.InputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
+@DefaultAnnotation(NonNull.class)
 public class SynchronizedInputStream extends DecoratingInputStream {
 
     /** The object to synchronize on - never {@code null}. */
@@ -37,7 +44,7 @@ public class SynchronizedInputStream extends DecoratingInputStream {
      *
      * @param in the input stream to wrap in this decorator.
      */
-    public SynchronizedInputStream(final InputStream in) {
+    public SynchronizedInputStream(@Nullable InputStream in) {
         this(in, null);
     }
 
@@ -48,9 +55,11 @@ public class SynchronizedInputStream extends DecoratingInputStream {
      * @param lock the object to synchronize on.
      *        If {@code null}, then this object is used, not the stream.
      */
-    public SynchronizedInputStream(final InputStream in, final Object lock) {
+    public SynchronizedInputStream(
+            final @Nullable InputStream in,
+            final @CheckForNull Object lock) {
         super(in);
-        this.lock = lock != null ? lock : this;
+        this.lock = null != lock ? lock : this;
     }
 
     @Override

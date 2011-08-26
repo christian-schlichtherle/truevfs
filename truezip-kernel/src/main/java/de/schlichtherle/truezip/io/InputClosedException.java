@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.socket;
+package de.schlichtherle.truezip.io;
 
 import java.io.IOException;
 import net.jcip.annotations.ThreadSafe;
@@ -31,10 +31,10 @@ public class InputClosedException extends IOException {
     private static final long serialVersionUID = 4563928734723923649L;
 
     public InputClosedException() {
-        super("Input resource has been forced to close!");
+        super("Input resource has been closed!");
     }
 
     public InputClosedException(Throwable cause) {
-        super("Input resource has been forced to close!", cause);
+        super("Input resource has been closed!", cause);
     }
 }
