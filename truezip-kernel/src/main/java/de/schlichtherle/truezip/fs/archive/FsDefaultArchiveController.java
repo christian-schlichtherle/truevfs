@@ -63,6 +63,7 @@ import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -150,7 +151,7 @@ extends FsFileSystemArchiveController<E> {
                 : (this.accountant = new ResourceAccountant(getModel().writeLock()));
     }
 
-    private InputArchive getInputArchive() {
+    private @CheckForNull InputArchive getInputArchive() {
         return inputArchive;
     }
 
@@ -160,7 +161,7 @@ extends FsFileSystemArchiveController<E> {
             getModel().setTouched(true);
     }
 
-    private OutputArchive getOutputArchive() {
+    private @CheckForNull OutputArchive getOutputArchive() {
         return outputArchive;
     }
 
@@ -196,11 +197,11 @@ extends FsFileSystemArchiveController<E> {
             final boolean readOnly = !parent.isWritable(parentName);
             final InputSocket<?> socket = driver.getInputSocket(
                     parent, parentName, MOUNT_INPUT_OPTIONS);
-            setInputArchive(new InputArchive(driver.newInputShop(
-                    getModel(),
-                    socket)));
+            final InputArchive ia = new InputArchive(
+                    driver.newInputShop(getModel(), socket));
+            setInputArchive(ia);
             setFileSystem(newPopulatedFileSystem(driver,
-                    getInputArchive().getDriverProduct(),
+                    ia.getDriverProduct(),
                     socket.getLocalTarget(),
                     readOnly));
         } catch (FsException ex) {
@@ -264,7 +265,9 @@ extends FsFileSystemArchiveController<E> {
 
     @Override
     InputSocket<?> getInputSocket(final String name) {
-        return getInputArchive().getInputSocket(name);
+        final InputArchive ia = getInputArchive();
+        assert null != ia; // make FindBugs happy
+        return ia.getInputSocket(name);
     }
 
     @Override
@@ -447,9 +450,6 @@ extends FsFileSystemArchiveController<E> {
     private <X extends IOException> void performSync(
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
-        assert isTouched();
-        assert null != getOutputArchive();
-
         class FilterExceptionHandler
         implements ExceptionHandler<IOException, X> {
             IOException last;
@@ -469,12 +469,15 @@ extends FsFileSystemArchiveController<E> {
                     throw handler.fail(new FsSyncException(getModel(), cause));
                 handler.warn(new FsSyncWarningException(getModel(), cause));
             }
-        } // class FilterExceptionHandler
+        } // FilterExceptionHandler
 
+        assert isTouched();
+        final OutputArchive oa = getOutputArchive();
+        assert null != oa;
         final InputArchive ia = getInputArchive();
         copy(   getFileSystem(),
                 null == ia ? new DummyInputService<E>() : ia.getDriverProduct(),
-                getOutputArchive().getDriverProduct(),
+                oa.getDriverProduct(),
                 (ExceptionHandler<IOException, X>) new FilterExceptionHandler());
     }
 
