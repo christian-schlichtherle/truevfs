@@ -41,6 +41,7 @@ import net.jcip.annotations.ThreadSafe;
  * Accounts for {@link Closeable} resources
  * ({@link InputStream}, {@link OutputStream} etc.) which are used in multiple
  * threads.
+ * You cannot use this class outside its package.
  * <p>
  * For synchronization, each accountant uses a lock which has to be provided
  * to its {@link #FsResourceAccountant constructor}.
@@ -55,7 +56,7 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-final class FsResourceAccountant {
+public final class FsResourceAccountant {
 
     private static final String CLASS_NAME
             = FsResourceAccountant.class.getName();
@@ -265,7 +266,7 @@ final class FsResourceAccountant {
                 lock.unlock();
             }
         }
-    }
+    } // Reference
 
     /**
      * Runs an endless loop removing account references which have been
@@ -281,8 +282,7 @@ final class FsResourceAccountant {
         }
 
         private Notifier() {
-            super(ThreadGroups.getTopLevel(),
-                    "TrueZIP ResourceAccountant Notifier");
+            super(ThreadGroups.getTopLevel(), Notifier.class.getName());
             setPriority(MAX_PRIORITY - 2);
             setDaemon(true);
         }
@@ -297,5 +297,5 @@ final class FsResourceAccountant {
                 }
             }
         }
-    }
+    } // Notifier
 }
