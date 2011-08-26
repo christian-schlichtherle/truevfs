@@ -33,17 +33,17 @@ import static org.hamcrest.CoreMatchers.*;
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-public class ResourceAccountantTest {
+public class FsResourceAccountantTest {
 
     private static long TIMEOUT_MILLIS = 100;
 
     private Lock lock;
-    private ResourceAccountant accountant;
+    private FsResourceAccountant accountant;
 
     @Before
     public void setUp() {
         this.lock = new ReentrantLock();
-        this.accountant = new ResourceAccountant(lock);
+        this.accountant = new FsResourceAccountant(lock);
     }
 
     @After
@@ -157,11 +157,11 @@ public class ResourceAccountantTest {
 
         @Override
         public void close() throws IOException {
-            ResourceAccountantTest.this.lock.lock();
+            FsResourceAccountantTest.this.lock.lock();
             try {
                 closeCounter++;
             } finally {
-                ResourceAccountantTest.this.lock.unlock();
+                FsResourceAccountantTest.this.lock.unlock();
             }
         }
     } // Resource
