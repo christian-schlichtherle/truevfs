@@ -152,6 +152,7 @@ implements Iterable<E>, Closeable {
      * @throws ZipException if {@code archive} is not compatible to the ZIP
      *         File Format Specification.
      * @throws IOException on any other I/O related issue.
+     * @see    #recoverLostEntries()
      */
     protected RawZipFile(
             ReadOnlyFile archive,
@@ -523,15 +524,16 @@ implements Iterable<E>, Closeable {
     /**
      * Recovers any lost entries which have been added to the ZIP file after
      * the (last) Central Directory.
-     * This method start parsing entries at the start of the postamble and
+     * This method starts parsing entries at the start of the postamble and
      * continues until it hits EOF or non-entry data.
      * As a side effect, it will not only add any found entries to its internal
      * map, but will also cut the start of the postamble accordingly.
      * <p>
      * This method should get called immediately after the constructor.
      * The reason why it's not part of the constructor though is that it
-     * requires an otherwise fully initialized object, e.g. it may call
-     * {@link #getCryptoParameters()}
+     * requires an otherwise fully initialized object, e.g. it will require
+     * {@link #getCryptoParameters() crypto parameters} in order to recover any
+     * encrypted entries.
      * 
      * @throws ZipException if an invalid entry is found.
      * @throws IOException if any I/O error occurs which is not just caused
