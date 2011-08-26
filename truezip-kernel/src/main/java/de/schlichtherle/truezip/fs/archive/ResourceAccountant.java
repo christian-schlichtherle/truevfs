@@ -167,11 +167,11 @@ final class ResourceAccountant {
                     toWait = timeout - (System.currentTimeMillis() - start);
                     if (toWait <= 0)
                         break;
+                    if (!this.condition.await(toWait, TimeUnit.MILLISECONDS))
+                        return this.threads.size(); // may have changed while waiting!
                 } else {
-                    toWait = 0;
+                    this.condition.await();
                 }
-                if (!this.condition.await(toWait, TimeUnit.MILLISECONDS))
-                    return this.threads.size(); // may have changed while waiting!
             }
             return size;
         } catch (InterruptedException ex) {
