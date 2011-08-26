@@ -390,10 +390,10 @@ extends FsDecoratingConcurrentModelController<
         }
 
         void commitOutput() throws IOException {
+            assert isWriteLockedByCurrentThread();
             assert isTouched();
             if (null != template)
                 return;
-            assertWriteLockedByCurrentThread();
             delegate.mknod(
                     name,
                     FILE,
@@ -478,6 +478,7 @@ extends FsDecoratingConcurrentModelController<
 
             @Override
             public void close() throws IOException {
+                assert isWriteLockedByCurrentThread();
                 try {
                     delegate.close();
                 } finally {
@@ -494,7 +495,7 @@ extends FsDecoratingConcurrentModelController<
 
             @Override
             public void close() throws IOException {
-                assertWriteLockedByCurrentThread();
+                assert isWriteLockedByCurrentThread();
                 try {
                     delegate.close();
                 } finally {
