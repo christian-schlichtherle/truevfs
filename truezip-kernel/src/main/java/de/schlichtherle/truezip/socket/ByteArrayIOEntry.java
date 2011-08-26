@@ -47,6 +47,10 @@ import net.jcip.annotations.NotThreadSafe;
 @NotThreadSafe
 public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
 
+    private static final SocketFactory FACTORY = JSE7.AVAILABLE
+            ? SocketFactory.NIO2
+            : SocketFactory.OIO;
+
     private final String name;
     private @Nullable byte[] data;
     private final EnumMap<Access, Long>
@@ -157,10 +161,6 @@ public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
         return name;
     }
 
-    private static final SocketFactory FACTORY = JSE7.AVAILABLE
-            ? SocketFactory.NIO
-            : SocketFactory.OIO;
-
     @Immutable
     private enum SocketFactory {
         OIO() {
@@ -175,7 +175,7 @@ public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
             }
         },
 
-        NIO() {
+        NIO2() {
             @Override
             InputSocket<ByteArrayIOEntry> newInputSocket(ByteArrayIOEntry entry) {
                 return entry.new Nio2ByteArrayInputSocket();
