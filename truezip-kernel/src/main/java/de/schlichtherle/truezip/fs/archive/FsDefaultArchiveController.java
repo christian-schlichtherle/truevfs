@@ -97,7 +97,7 @@ extends FsFileSystemArchiveController<E> {
     private final FsController<?> parent;
     private final FsEntryName parentName;
 
-    private @CheckForNull ResourceAccountant accountant;
+    private @CheckForNull FsResourceAccountant accountant;
 
     /**
      * An {@link InputArchive} object used to mount the (virtual) archive file system
@@ -144,11 +144,11 @@ extends FsFileSystemArchiveController<E> {
         return true;
     }
 
-    private ResourceAccountant getAccountant() {
-        final ResourceAccountant accountant = this.accountant;
+    private FsResourceAccountant getAccountant() {
+        final FsResourceAccountant accountant = this.accountant;
         return null != accountant
                 ? accountant
-                : (this.accountant = new ResourceAccountant(getModel().writeLock()));
+                : (this.accountant = new FsResourceAccountant(getModel().writeLock()));
     }
 
     private @CheckForNull InputArchive getInputArchive() {
@@ -386,7 +386,7 @@ extends FsFileSystemArchiveController<E> {
             final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
-        final ResourceAccountant accountant = this.accountant;
+        final FsResourceAccountant accountant = this.accountant;
         if (null == accountant)
             return;
         final boolean wait = options.get(WAIT_CLOSE_INPUT)
@@ -430,7 +430,7 @@ extends FsFileSystemArchiveController<E> {
             }
         } // FilterExceptionHandler
 
-        final ResourceAccountant accountant = this.accountant;
+        final FsResourceAccountant accountant = this.accountant;
         if (null != accountant)
             accountant.closeAll(new FilterExceptionHandler());
     }
