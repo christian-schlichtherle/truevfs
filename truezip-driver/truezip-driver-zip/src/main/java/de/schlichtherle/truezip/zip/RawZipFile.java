@@ -91,7 +91,7 @@ implements Iterable<E>, Closeable {
     public static final Charset DEFAULT_CHARSET = Constants.DEFAULT_CHARSET;
 
     /** Maps entry names to zip entries. */
-    private final Map<String, E> entries = new LinkedHashMap<String, E>();
+    private Map<String, E> entries;
 
     /** The charset to use for entry names and comments. */
     private Charset charset;
@@ -384,7 +384,12 @@ implements Iterable<E>, Closeable {
      * the central directory alone, but not the data that requires the
      * local file header or additional data to be read.
      * <p>
-     * As a side effect, the following fields may get updated:
+     * As a side effect, the following fields will get initialized:
+     * <ul>
+     * <li>{@link #entries}
+     * </ul>
+     * <p>
+     * The following fields may get updated:
      * <ul>
      * <li>{@link #preamble}
      * <li>{@link #charset}
@@ -396,6 +401,8 @@ implements Iterable<E>, Closeable {
      */
     private void mountCentralDirectory(final ReadOnlyFile rof, int numEntries)
     throws IOException {
+        final Map<String, E>
+                entries = new LinkedHashMap<String, E>(numEntries * 4 / 3 + 1);
         final byte[] cfh = new byte[CFH_MIN_LEN];
         for (; ; numEntries--) {
             rof.readFully(cfh, 0, 4);
@@ -489,7 +496,7 @@ implements Iterable<E>, Closeable {
             // by the ZipEntryFactory.
             // Note that this name may differ from what has been found
             // in the ZIP file!
-            this.entries.put(entry.getName(), entry);
+            entries.put(entry.getName(), entry);
         }
 
         // Check if the number of entries found matches the number of entries
@@ -508,6 +515,9 @@ implements Iterable<E>, Closeable {
                     Math.abs(numEntries) +
                     (numEntries > 0 ? " more" : " less") +
                     " entries in the Central Directory!");
+
+        // Commit map of entries.
+        this.entries = entries;
     }
 
     /**
