@@ -127,8 +127,7 @@ final class ResourceAccountant {
             final Account account = ref.get();
             if (null == account)
                 return false; // picked up by the garbage collector concurrently
-            //if (account.owner != Thread.currentThread())
-                this.condition.signal();
+            this.condition.signalAll();
             return true;
         } finally {
             this.lock.unlock();
@@ -261,7 +260,7 @@ final class ResourceAccountant {
             final Lock lock = ResourceAccountant.this.lock;
             lock.lock();
             try {
-                ResourceAccountant.this.condition.signal();
+                ResourceAccountant.this.condition.signalAll();
             } finally {
                 lock.unlock();
             }
