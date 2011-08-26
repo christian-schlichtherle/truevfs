@@ -534,6 +534,7 @@ implements Iterable<E>, Closeable {
      * requires an otherwise fully initialized object, e.g. it will require
      * {@link #getCryptoParameters() crypto parameters} in order to recover any
      * encrypted entries.
+     * Calling this method multiple times will show no effect.
      * 
      * @throws ZipException if an invalid entry is found.
      * @throws IOException if any I/O error occurs which is not just caused
