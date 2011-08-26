@@ -15,21 +15,30 @@
  */
 package de.schlichtherle.truezip.file;
 
-import de.schlichtherle.truezip.util.UriBuilder;
-import de.schlichtherle.truezip.fs.FsSyncWarningException;
-import de.schlichtherle.truezip.io.Paths.Splitter;
-import de.schlichtherle.truezip.io.Paths;
+import static de.schlichtherle.truezip.entry.Entry.Size.*;
+import static de.schlichtherle.truezip.entry.Entry.Type.*;
 import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.FsEntryName;
-import de.schlichtherle.truezip.fs.FsScheme;
-import de.schlichtherle.truezip.fs.FsPath;
-import de.schlichtherle.truezip.fs.FsMountPoint;
-import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.fs.FsEntry;
+import static de.schlichtherle.truezip.fs.FsEntry.*;
+import de.schlichtherle.truezip.fs.FsEntryName;
+import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import de.schlichtherle.truezip.fs.FsFilteringManager;
+import de.schlichtherle.truezip.fs.FsMountPoint;
+import de.schlichtherle.truezip.fs.FsOutputOption;
+import static de.schlichtherle.truezip.fs.FsOutputOption.*;
+import de.schlichtherle.truezip.fs.FsPath;
+import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.fs.FsSyncOption;
+import static de.schlichtherle.truezip.fs.FsSyncOption.*;
+import static de.schlichtherle.truezip.fs.FsSyncOptions.*;
+import de.schlichtherle.truezip.fs.FsSyncWarningException;
+import static de.schlichtherle.truezip.fs.FsUriModifier.*;
+import de.schlichtherle.truezip.io.Paths;
+import de.schlichtherle.truezip.io.Paths.Splitter;
+import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.UriBuilder;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -57,15 +66,6 @@ import java.util.TreeSet;
 import javax.swing.Icon;
 import javax.swing.filechooser.FileSystemView;
 import net.jcip.annotations.Immutable;
-
-import static de.schlichtherle.truezip.fs.FsEntry.*;
-import static de.schlichtherle.truezip.fs.FsEntryName.*;
-import static de.schlichtherle.truezip.fs.FsSyncOption.*;
-import static de.schlichtherle.truezip.fs.FsSyncOptions.*;
-import static de.schlichtherle.truezip.fs.FsUriModifier.*;
-import static de.schlichtherle.truezip.entry.Entry.Size.*;
-import static de.schlichtherle.truezip.entry.Entry.Type.*;
-import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 
 /**
  * A replacement for the class {@link File} which provides transparent
