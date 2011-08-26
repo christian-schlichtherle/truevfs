@@ -43,7 +43,7 @@ import net.jcip.annotations.ThreadSafe;
  * threads.
  * <p>
  * For synchronization, each accountant uses a lock which has to be provided
- * to its {@link #ResourceAccountant constructor}.
+ * to its {@link #FsResourceAccountant constructor}.
  * In order to start accounting for a closeable resource,
  * call {@link #startAccountingFor(Closeable)}.
  * In order to stop accounting for a closeable resource,
@@ -55,10 +55,10 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-final class ResourceAccountant {
+final class FsResourceAccountant {
 
     private static final String CLASS_NAME
-            = ResourceAccountant.class.getName();
+            = FsResourceAccountant.class.getName();
     private static final Logger logger
             = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 
@@ -85,7 +85,7 @@ final class ResourceAccountant {
      *             {@link ReentrantLock} because chances are that it gets
      *             locked recursively.
      */
-    ResourceAccountant(final Lock lock) {
+    FsResourceAccountant(final Lock lock) {
         this.condition = lock.newCondition();
         this.lock = lock;
     }
@@ -244,7 +244,7 @@ final class ResourceAccountant {
 
     /**
      * A reference to an {@link Account} which can notify its
-     * {@link ResourceAccountant}.
+     * {@link FsResourceAccountant}.
      */
     private final class Reference extends WeakReference<Account> {
         Reference(Account account) {
@@ -257,10 +257,10 @@ final class ResourceAccountant {
          * resource has been properly stopped.
          */
         void notifyAccountant() {
-            final Lock lock = ResourceAccountant.this.lock;
+            final Lock lock = FsResourceAccountant.this.lock;
             lock.lock();
             try {
-                ResourceAccountant.this.condition.signalAll();
+                FsResourceAccountant.this.condition.signalAll();
             } finally {
                 lock.unlock();
             }
