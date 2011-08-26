@@ -63,7 +63,7 @@ public final class Streams {
     public static final int BUFFER_SIZE = 8 * 1024;
 
     private static final ExecutorService executor
-            = Executors.newCachedThreadPool(new InputStreamReaderThreadFactory());
+            = Executors.newCachedThreadPool(new ReaderFactory());
     
     /** You cannot instantiate this class. */
     private Streams() {
@@ -332,14 +332,17 @@ public final class Streams {
     } // Buffer
 
     /** A factory for input stream reader daemon threads. */
-    private static class InputStreamReaderThreadFactory
-    implements ThreadFactory {
+    private static final class ReaderFactory implements ThreadFactory {
         @Override
         public Thread newThread(Runnable r) {
-            Thread t = new Thread(ThreadGroups.getTopLevel(),
-                    r, "TrueZIP InputStream Reader");
-            t.setDaemon(true);
-            return t;
+            return new Reader(r);
         }
-    } // InputStreamReaderThreadFactory
+    } // ReaderThreadFactory
+
+    private static final class Reader extends Thread {
+        Reader(Runnable r) {
+            super(ThreadGroups.getTopLevel(), r, Reader.class.getName());
+            setDaemon(true);
+        }
+    } // Reader
 }
