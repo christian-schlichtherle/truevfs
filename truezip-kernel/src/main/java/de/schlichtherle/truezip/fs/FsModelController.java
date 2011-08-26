@@ -21,7 +21,8 @@ import net.jcip.annotations.Immutable;
 
 /**
  * An abstract file system controller which implements the {@link #getModel()}
- * method.
+ * method so that it can forward calls to its additional protected methods to
+ * this model for the convenience of sub-classes.
  *
  * @since   TrueZIP 7.2
  * @author  Christian Schlichtherle
@@ -48,5 +49,17 @@ extends FsController<M>  {
     @Override
     public final M getModel() {
         return model;
+    }
+
+    protected FsMountPoint getMountPoint() {
+        return model.getMountPoint();
+    }
+
+    protected boolean isTouched() {
+        return model.isTouched();
+    }
+
+    protected void setTouched(boolean touched) {
+        model.setTouched(touched);
     }
 }

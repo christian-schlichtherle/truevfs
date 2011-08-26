@@ -42,12 +42,10 @@ import net.jcip.annotations.ThreadSafe;
 public abstract class FsDecoratingController<
         M extends FsModel,
         C extends FsController<? extends M>>
-extends FsController<M> {
+extends FsModelController<M> {
 
     /** The decorated file system controller. */
     protected final C delegate;
-
-    private volatile M model;
 
     /**
      * Constructs a new decorating file system controller.
@@ -55,15 +53,8 @@ extends FsController<M> {
      * @param controller the decorated file system controller.
      */
     protected FsDecoratingController(final C controller) {
-        if (null == controller)
-            throw new NullPointerException();
+        super(controller.getModel());
         this.delegate = controller;
-    }
-
-    @Override
-    public final M getModel() {
-        final M model = this.model;
-        return null != model ? model : (this.model = delegate.getModel());
     }
 
     @Override

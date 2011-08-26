@@ -50,14 +50,15 @@ import net.jcip.annotations.ThreadSafe;
  * access by its clients.
  * 
  * @see     FsConcurrentModel
+ * @see     FsNotWriteLockedException
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
 public final class FsConcurrentController
-extends FsDecoratingController< FsConcurrentModel,
-                                FsController<? extends FsConcurrentModel>> {
+extends FsDecoratingConcurrentModelController<
+        FsController<? extends FsConcurrentModel>> {
 
     private static final ConcurrentSocketFactory
             CONCURRENT_SOCKET_FACTORY = JSE7.AVAILABLE
@@ -73,28 +74,24 @@ extends FsDecoratingController< FsConcurrentModel,
      * @param controller the decorated file system controller.
      */
     public FsConcurrentController(
-            @NonNull FsController<? extends FsConcurrentModel> controller) {
+            FsController<? extends FsConcurrentModel> controller) {
         super(controller);
     }
 
-    private ReadLock readLock() {
+    @Override
+    protected ReadLock readLock() {
         final ReadLock readLock = this.readLock;
         return null != readLock
                 ? readLock
                 : (this.readLock = getModel().readLock());
     }
 
-    private WriteLock writeLock() {
+    @Override
+    protected WriteLock writeLock() {
         final WriteLock writeLock = this.writeLock;
         return null != writeLock
                 ? writeLock
                 : (this.writeLock = getModel().writeLock());
-    }
-
-    private void assertNotReadLockedByCurrentThread(
-            @CheckForNull FsNotWriteLockedException ex)
-    throws FsNotWriteLockedException {
-        getModel().assertNotReadLockedByCurrentThread(ex);
     }
 
     @Override
@@ -359,7 +356,7 @@ extends FsDecoratingController< FsConcurrentModel,
         abstract OutputSocket<?> newOutputSocket(
                 FsConcurrentController controller,
                 OutputSocket <?> output);
-    } // SocketFactory
+    } // ConcurrentSocketFactory
 
     private final class Nio2ConcurrentInputSocket
     extends ConcurrentInputSocket {

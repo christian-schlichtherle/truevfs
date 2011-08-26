@@ -79,12 +79,13 @@ import net.jcip.annotations.ThreadSafe;
  * Failing that, the initial exception would get rethrown in order to signal
  * to the caller that the user had cancelled password prompting.
  *
+ * @see     FsFalsePositiveException
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-final class FsFederatingController
+public final class FsFederatingController
 extends FsDecoratingController<FsModel, FsController<?>> {
 
     private volatile @CheckForNull FsPath path;
@@ -105,9 +106,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
 
     private FsPath getPath() {
         final FsPath path = this.path;
-        return null != path
-                ? path
-                : (this.path = getModel().getMountPoint().getPath());
+        return null != path ? path : (this.path = getMountPoint().getPath());
     }
 
     @Override

@@ -21,18 +21,20 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * Indicates that a controller is not write locked and the lock cannot get
+ * Indicates that a resource is not write locked and the lock cannot get
  * acquired by the current thread for some reason.
- * Note that the write lock is required for any change to the state of a
- * controller which uses a {@link FsConcurrentModel} - not just to the state
- * of the file system.
+ * This exception type is reserved for use within the TrueZIP Kernel in order
+ * to catch it and relock the resource.
+ * Unless there is a bug, an exception of this type <em>never</em> pops up to
+ * a TrueZIP application.
  *
+ * @see     FsConcurrentController
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-final class FsNotWriteLockedException extends FsException {
+public final class FsNotWriteLockedException extends FsException {
     private static final long serialVersionUID = 2345952581284762637L;
 
     FsNotWriteLockedException(FsConcurrentModel model) {

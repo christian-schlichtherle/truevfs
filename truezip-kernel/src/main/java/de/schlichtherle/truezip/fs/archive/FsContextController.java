@@ -18,8 +18,7 @@ package de.schlichtherle.truezip.fs.archive;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Access;
 import de.schlichtherle.truezip.entry.Entry.Type;
-import de.schlichtherle.truezip.fs.FsConcurrentModel;
-import de.schlichtherle.truezip.fs.FsDecoratingController;
+import de.schlichtherle.truezip.fs.FsDecoratingConcurrentModelController;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsInputOption;
@@ -58,7 +57,7 @@ import net.jcip.annotations.NotThreadSafe;
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
 final class FsContextController
-extends FsDecoratingController<FsConcurrentModel, FsDefaultArchiveController<?>> {
+extends FsDecoratingConcurrentModelController<FsDefaultArchiveController<?>> {
 
     private static final FsOperationContext
             NULL = new FsOperationContext();

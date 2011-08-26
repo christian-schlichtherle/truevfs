@@ -22,6 +22,7 @@ import static de.schlichtherle.truezip.entry.Entry.Access.*;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
 import de.schlichtherle.truezip.fs.FsConcurrentModel;
+import de.schlichtherle.truezip.fs.FsConcurrentModelController;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
@@ -30,7 +31,6 @@ import de.schlichtherle.truezip.fs.FsEntryNotFoundException;
 import de.schlichtherle.truezip.fs.FsException;
 import de.schlichtherle.truezip.fs.FsFalsePositiveException;
 import de.schlichtherle.truezip.fs.FsInputOption;
-import de.schlichtherle.truezip.fs.FsModelController;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import de.schlichtherle.truezip.fs.FsSyncException;
@@ -79,7 +79,7 @@ import net.jcip.annotations.NotThreadSafe;
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
 abstract class FsArchiveController<E extends FsArchiveEntry>
-extends FsModelController<FsConcurrentModel> {
+extends FsConcurrentModelController {
 
     private static final Logger
             logger = Logger.getLogger(  FsArchiveController.class.getName(),
@@ -424,7 +424,7 @@ extends FsModelController<FsConcurrentModel> {
             if (1 < fileSystem.getSize())
                 logger.log(Level.WARNING, "unlink.absolute",
                         new Object[] {  fileSystem.getSize() - 1,
-                                        getModel().getMountPoint() });
+                                        getMountPoint() });
             sync(UNLINK_SYNC_OPTIONS);
         } else { // !isRoot(path)
             autoMount().unlink(name);
