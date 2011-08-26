@@ -269,11 +269,12 @@ public final class FsResourceAccountant {
     } // Reference
 
     /**
-     * Runs an endless loop removing account references which have been
-     * picked up by the garbage collector and notifies their respective
-     * resource accountant.
+     * A high priority daemon thread which runs an endless loop in order to
+     * remove account references which have been picked up by the garbage
+     * collector and notify their respective resource accountant.
+     * You cannot use this class outside its package.
      */
-    private static final class Notifier extends Thread {
+    public static final class Notifier extends Thread {
         static final ReferenceQueue<Account>
                 queue = new ReferenceQueue<Account>();
 
@@ -281,7 +282,7 @@ public final class FsResourceAccountant {
             new Notifier().start();
         }
 
-        private Notifier() {
+        Notifier() {
             super(ThreadGroups.getTopLevel(), Notifier.class.getName());
             setPriority(MAX_PRIORITY - 2);
             setDaemon(true);

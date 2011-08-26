@@ -331,7 +331,7 @@ public final class Streams {
         int read;
     } // Buffer
 
-    /** A factory for input stream reader daemon threads. */
+    /** A factory for reader threads. */
     private static final class ReaderFactory implements ThreadFactory {
         @Override
         public Thread newThread(Runnable r) {
@@ -339,7 +339,11 @@ public final class Streams {
         }
     } // ReaderThreadFactory
 
-    private static final class Reader extends Thread {
+    /**
+     * A pooled and cached daemon thread which reads input streams.
+     * You cannot use this class outside its package.
+     */
+    public static final class Reader extends Thread {
         Reader(Runnable r) {
             super(ThreadGroups.getTopLevel(), r, Reader.class.getName());
             setDaemon(true);
