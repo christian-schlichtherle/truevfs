@@ -26,7 +26,7 @@ import net.jcip.annotations.ThreadSafe;
  * by the TrueZIP Kernel.
  * <p>
  * ONLY THE TRUEZIP KERNEL IS ALLOWED TO THROW AN EXCEPTION OF THIS TYPE!
- * DO NOT CREATE OR EVEN THROW AN EXCEPTION OF THIS TYPE (INCLUDING SUB CLASSES)
+ * DO NOT CREATE OR THROW AN EXCEPTION OF THIS TYPE (INCLUDING SUB-CLASSES)
  * ANYWHERE ELSE!
  *
  * @see     FsController
@@ -38,11 +38,19 @@ import net.jcip.annotations.ThreadSafe;
 public abstract class FsException extends IOException {
     private static final long serialVersionUID = 2947623946725372554L;
 
+    private transient FsModel model;
+
     FsException(FsModel model) {
-        super(model.getMountPoint().toString());
+        this.model = model;
     }
 
     FsException(FsModel model, @CheckForNull Throwable cause) {
-        super(model.getMountPoint().toString(), cause);
+        super(cause);
+        this.model = model;
+    }
+
+    @Override
+    public String getMessage() {
+        return model == null ? null : model.getMountPoint().toString();
     }
 }

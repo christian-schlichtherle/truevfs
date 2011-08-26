@@ -22,13 +22,14 @@ import net.jcip.annotations.ThreadSafe;
 
 /**
  * Indicates that a file system is a false positive file system.
- * This exception type is solely used within the TrueZIP Kernel in order to
- * reroute file system operations to the parent file system of a false positive
- * federated file system, i.e. a false positive archive file.
- * An exception of this type should <em>never</em> escape from the TrueZIP
- * Kernel and is <em>always</em> associated with another {@link IOException}
- * as its {@link #getCause()}.
+ * This exception type is reserved for use within the TrueZIP Kernel in order
+ * to reroute file system operations to the parent file system of a false
+ * positive federated file system, i.e. a false positive archive file.
+ * Unless there is a bug, an exception of this type <em>never</em> pops up to
+ * a TrueZIP application and is <em>always</em> associated with another
+ * {@link IOException} as its {@link #getCause()}.
  *
+ * @see     FsFederatingController
  * @author  Christian Schlichtherle
  * @version $Id$
  */

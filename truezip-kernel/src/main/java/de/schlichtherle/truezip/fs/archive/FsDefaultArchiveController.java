@@ -131,7 +131,7 @@ extends FsFileSystemArchiveController<E> {
             throw new IllegalArgumentException("Parent/member mismatch!");
         this.driver = driver;
         this.parent = parent;
-        this.parentName = getModel().getMountPoint().getPath().resolve(ROOT)
+        this.parentName = getMountPoint().getPath().resolve(ROOT)
                 .getEntryName();
         assert invariants();
     }
@@ -147,7 +147,7 @@ extends FsFileSystemArchiveController<E> {
         final FsResourceAccountant accountant = this.accountant;
         return null != accountant
                 ? accountant
-                : (this.accountant = new FsResourceAccountant(getModel().writeLock()));
+                : (this.accountant = new FsResourceAccountant(writeLock()));
     }
 
     private @CheckForNull InputArchive getInputArchive() {
@@ -157,7 +157,7 @@ extends FsFileSystemArchiveController<E> {
     private void setInputArchive(final @CheckForNull InputArchive inputArchive) {
         this.inputArchive = inputArchive;
         if (null != inputArchive)
-            getModel().setTouched(true);
+            setTouched(true);
     }
 
     private @CheckForNull OutputArchive getOutputArchive() {
@@ -167,7 +167,7 @@ extends FsFileSystemArchiveController<E> {
     private void setOutputArchive(final @CheckForNull OutputArchive outputArchive) {
         this.outputArchive = outputArchive;
         if (null != outputArchive)
-            getModel().setTouched(true);
+            setTouched(true);
     }
 
     @Override
@@ -334,7 +334,7 @@ extends FsFileSystemArchiveController<E> {
     }
 
     private boolean autoSync() throws FsSyncException, FsException {
-        getModel().assertWriteLockedByCurrentThread();
+        assertWriteLockedByCurrentThread();
         sync(AUTO_SYNC_OPTIONS);
         return true;
     }
@@ -344,14 +344,14 @@ extends FsFileSystemArchiveController<E> {
             final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
-        assert !isTouched() || null != getOutputArchive(); // file system touched => output archive
-        assert getModel().isWriteLockedByCurrentThread();
+        assert !isFileSystemTouched() || null != getOutputArchive(); // file system touched => output archive
+        assert isWriteLockedByCurrentThread();
         if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT))
             throw new IllegalArgumentException();
         awaitSync(options, handler);
         beginSync(handler);
         try {
-            if (!options.get(ABORT_CHANGES) && isTouched())
+            if (!options.get(ABORT_CHANGES) && isFileSystemTouched())
                 performSync(handler);
         } finally {
             try {
@@ -363,7 +363,7 @@ extends FsFileSystemArchiveController<E> {
                 // TODO: Remove a condition and clear a flag in the model
                 // instead.
                 if (options.get(ABORT_CHANGES) || options.get(CLEAR_CACHE))
-                    getModel().setTouched(false);
+                    setTouched(false);
             }
         }
     }
@@ -474,7 +474,7 @@ extends FsFileSystemArchiveController<E> {
             }
         } // FilterExceptionHandler
 
-        assert isTouched();
+        assert isFileSystemTouched();
         final OutputArchive oa = getOutputArchive();
         assert null != oa;
         final InputArchive ia = getInputArchive();
@@ -558,7 +558,7 @@ extends FsFileSystemArchiveController<E> {
         }
     }
 
-    private boolean isTouched() {
+    private boolean isFileSystemTouched() {
         final FsArchiveFileSystem<E> fileSystem = getFileSystem();
         return null != fileSystem && fileSystem.isTouched();
     }
@@ -628,7 +628,7 @@ extends FsFileSystemArchiveController<E> {
 
                 @Override
                 public ReadOnlyFile newReadOnlyFile() throws IOException {
-                    assert getModel().isWriteLockedByCurrentThread();
+                    assert isWriteLockedByCurrentThread();
 
                     return new AccountedReadOnlyFile(
                             getBoundSocket().newReadOnlyFile());
@@ -636,7 +636,7 @@ extends FsFileSystemArchiveController<E> {
 
                 @Override
                 public InputStream newInputStream() throws IOException {
-                    assert getModel().isWriteLockedByCurrentThread();
+                    assert isWriteLockedByCurrentThread();
 
                     return new AccountedInputStream(
                             getBoundSocket().newInputStream());
@@ -677,7 +677,7 @@ extends FsFileSystemArchiveController<E> {
 
                 @Override
                 public OutputStream newOutputStream() throws IOException {
-                    assert getModel().isWriteLockedByCurrentThread();
+                    assert isWriteLockedByCurrentThread();
 
                     return new AccountedOutputStream(
                             getBoundSocket().newOutputStream());
@@ -697,7 +697,7 @@ extends FsFileSystemArchiveController<E> {
 
         @Override
         public void close() throws IOException {
-            assert getModel().isWriteLockedByCurrentThread();
+            assert isWriteLockedByCurrentThread();
             getAccountant().stopAccountingFor(this);
             delegate.close();
         }
@@ -723,7 +723,7 @@ extends FsFileSystemArchiveController<E> {
 
         @Override
         public void close() throws IOException {
-            assert getModel().isWriteLockedByCurrentThread();
+            assert isWriteLockedByCurrentThread();
             getAccountant().stopAccountingFor(this);
             delegate.close();
         }
@@ -749,7 +749,7 @@ extends FsFileSystemArchiveController<E> {
 
         @Override
         public void close() throws IOException {
-            assert getModel().isWriteLockedByCurrentThread();
+            assert isWriteLockedByCurrentThread();
             getAccountant().stopAccountingFor(this);
             delegate.close();
         }
@@ -777,13 +777,13 @@ extends FsFileSystemArchiveController<E> {
         throws IOException {
             assert event.getSource() == getFileSystem();
             makeOutput();
-            assert getModel().isTouched();
+            assert isTouched();
         }
 
         @Override
         public void afterTouch(FsArchiveFileSystemEvent<? extends E> event) {
             assert event.getSource() == getFileSystem();
-            //getModel().setTouched(true);
+            //setTouched(true);
         }
     } // TouchListener
 }

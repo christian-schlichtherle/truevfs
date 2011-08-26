@@ -101,7 +101,7 @@ extends FsArchiveController<E> {
         @Override
         FsArchiveFileSystem<E> autoMount(final boolean autoCreate)
         throws IOException {
-            getModel().assertWriteLockedByCurrentThread();
+            assertWriteLockedByCurrentThread();
             try {
                 mount(autoCreate);
             } catch (FsCacheableFalsePositiveException ex) {
