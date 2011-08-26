@@ -50,7 +50,6 @@ import net.jcip.annotations.ThreadSafe;
  * In order to stop accounting for a closeable resource,
  * call {@link #stopAccountingFor(Closeable)}.
  *
- * @param   <R> The type of the resources.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
