@@ -366,22 +366,13 @@ extends FsDecoratingConcurrentModelController<
 
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            /*try {
-                readLock().lock();
-                try {
+            assertNotReadLockedByCurrentThread(null);
+            writeLock().lock();
+            try {
                 return new ConcurrentSeekableByteChannel(getBoundSocket().newSeekableByteChannel());
-                } finally {
-                    readLock().unlock();
-                }
-            } catch (FsNotWriteLockedException ex) {*/
-                assertNotReadLockedByCurrentThread(/*ex*/null);
-                writeLock().lock();
-                try {
-                return new ConcurrentSeekableByteChannel(getBoundSocket().newSeekableByteChannel());
-                } finally {
-                    writeLock().unlock();
-                }
-            //}
+            } finally {
+                writeLock().unlock();
+            }
         }
     } // Nio2ConcurrentInputSocket
 
@@ -419,42 +410,24 @@ extends FsDecoratingConcurrentModelController<
 
         @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
-            /*try {
-                readLock().lock();
-                try {
-                    return new ConcurrentReadOnlyFile(getBoundSocket().newReadOnlyFile());
-                } finally {
-                    readLock().unlock();
-                }
-            } catch (FsNotWriteLockedException ex) {*/
-                assertNotReadLockedByCurrentThread(/*ex*/null);
-                writeLock().lock();
-                try {
-                    return new ConcurrentReadOnlyFile(getBoundSocket().newReadOnlyFile());
-                } finally {
-                    writeLock().unlock();
-                }
-            //}
+            assertNotReadLockedByCurrentThread(null);
+            writeLock().lock();
+            try {
+                return new ConcurrentReadOnlyFile(getBoundSocket().newReadOnlyFile());
+            } finally {
+                writeLock().unlock();
+            }
         }
 
         @Override
         public InputStream newInputStream() throws IOException {
-            /*try {
-                readLock().lock();
-                try {
-                    return new ConcurrentInputStream(getBoundSocket().newInputStream());
-                } finally {
-                    readLock().unlock();
-                }
-            } catch (FsNotWriteLockedException ex) {*/
-                assertNotReadLockedByCurrentThread(/*ex*/null);
-                writeLock().lock();
-                try {
-                    return new ConcurrentInputStream(getBoundSocket().newInputStream());
-                } finally {
-                    writeLock().unlock();
-                }
-            //}
+            assertNotReadLockedByCurrentThread(null);
+            writeLock().lock();
+            try {
+                return new ConcurrentInputStream(getBoundSocket().newInputStream());
+            } finally {
+                writeLock().unlock();
+            }
         }
     } // ConcurrentInputSocket
 

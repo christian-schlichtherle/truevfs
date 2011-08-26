@@ -21,8 +21,8 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * Indicates that a resource is not write locked and the lock cannot get
- * acquired by the current thread for some reason.
+ * Indicates that a resource should be write locked by the current thread,
+ * but the write lock cannot get acquired for some reason.
  * This exception type is reserved for use within the TrueZIP Kernel in order
  * to catch it and relock the resource.
  * Unless there is a bug, an exception of this type <em>never</em> pops up to

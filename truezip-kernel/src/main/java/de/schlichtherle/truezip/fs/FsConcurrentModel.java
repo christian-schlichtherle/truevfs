@@ -77,6 +77,11 @@ public final class FsConcurrentModel extends FsDecoratingModel<FsModel> {
     }
 
     /**
+     * Asserts that the read lock is <em>not</em> held by the current thread,
+     * so that the caller can safely acquire the write lock without dead
+     * locking.
+     * Use this method for lock control.
+     * 
      * @param  ex the caught exception.
      * @throws FsNotWriteLockedException if the <i>read lock</i> is
      *         held by the current thread.
