@@ -635,6 +635,7 @@ implements Iterable<E>, Closeable {
                         method = field.getMethod();
                     }
                     final int bufSize = getBufferSize(entry);
+                    CountingInputStream din = null;
                     InputStream in;
                     switch (method) {
                         case STORED:
@@ -646,8 +647,9 @@ implements Iterable<E>, Closeable {
                                     bufSize);
                             break;
                         case BZIP2:
-                            in = new BZip2CompressorInputStream(
+                            din = new CountingInputStream(
                                     new ReadOnlyFileInputStream(erof));
+                            in = new BZip2CompressorInputStream(din);
                             break;
                         default:
                             throw new ZipException(entry.getName()
@@ -675,8 +677,7 @@ implements Iterable<E>, Closeable {
                                 fp += inf.getBytesRead();
                                 break;
                             case BZIP2:
-                                fp += ((BZip2CompressorInputStream) in)
-                                        .getBytesRead();
+                                fp += din.getBytesRead();
                                 break;
                             default:
                                 throw new AssertionError();

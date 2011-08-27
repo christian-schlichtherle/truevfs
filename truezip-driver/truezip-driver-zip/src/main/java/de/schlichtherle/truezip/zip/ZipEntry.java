@@ -60,15 +60,24 @@ public class ZipEntry implements Cloneable {
     /** Unix platform. */
     public static final short PLATFORM_UNIX = 3;
 
-    /** Compression method for <em>Stored</em> (uncompressed) entries. */
+    /**
+     * Method for <em>Stored</em> (uncompressed) entries.
+     * 
+     * @see   #setMethod(int)
+     */
     public static final int STORED = 0;
 
-    /** Compression method for <em>Deflated</em> compressed entries. */
+    /**
+     * Method for <em>Deflated</em> compressed entries.
+     * 
+     * @see   #setMethod(int)
+     */
     public static final int DEFLATED = 8;
 
     /**
-     * Compression method for <em>BZIP2</em> compressed entries.
+     * Method for <em>BZIP2</em> compressed entries.
      * 
+     * @see   #setMethod(int)
      * @since TrueZIP 7.3
      */
     public static final int BZIP2 = 12;
@@ -272,8 +281,8 @@ public class ZipEntry implements Cloneable {
     /**
      * Returns the compression method for this entry.
      *
-     * @see #setMethod
-     * @see ZipOutputStream#getMethod
+     * @see #setMethod(int)
+     * @see ZipOutputStream#getMethod()
      */
     public final int getMethod() {
         return isInit(METHOD) ? method & UShort.MAX_VALUE : UNKNOWN;
@@ -282,8 +291,8 @@ public class ZipEntry implements Cloneable {
     /**
      * Sets the compression method for this entry.
      *
-     * @see #getMethod
-     * @see ZipOutputStream#setMethod
+     * @see    #getMethod()
+     * @see    ZipOutputStream#setMethod(int)
      * @throws IllegalArgumentException If {@code method} is not
      *         {@link #STORED}, {@link #DEFLATED}, {@link #BZIP2} or
      *         {@link #UNKNOWN}.
