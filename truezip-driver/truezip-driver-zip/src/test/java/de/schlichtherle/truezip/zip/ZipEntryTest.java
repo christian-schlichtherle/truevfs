@@ -155,6 +155,8 @@ public final class ZipEntryTest {
         assertEquals(STORED, entry.getMethod());
         entry.setMethod(DEFLATED);
         assertEquals(DEFLATED, entry.getMethod());
+        entry.setMethod(BZIP2);
+        assertEquals(BZIP2, entry.getMethod());
         entry.setMethod(UNKNOWN);
         assertEquals(UNKNOWN, entry.getMethod());
     }
