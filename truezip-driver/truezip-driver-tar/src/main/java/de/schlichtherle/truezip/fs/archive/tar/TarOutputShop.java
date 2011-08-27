@@ -31,7 +31,7 @@ import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import org.apache.tools.tar.TarOutputStream;
+import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 
 import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
@@ -59,12 +59,12 @@ import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
  */
 @DefaultAnnotation(NonNull.class)
 public class TarOutputShop
-extends TarOutputStream
-implements OutputShop<TarArchiveEntry> {
+extends TarArchiveOutputStream
+implements OutputShop<TTarArchiveEntry> {
 
-    /** Maps entry names to tar entries [String -> TarArchiveEntry]. */
-    private final Map<String, TarArchiveEntry> entries
-            = new LinkedHashMap<String, TarArchiveEntry>();
+    /** Maps entry names to tar entries [String -> TTarArchiveEntry]. */
+    private final Map<String, TTarArchiveEntry> entries
+            = new LinkedHashMap<String, TTarArchiveEntry>();
 
     private final IOPool<?> pool;
     private boolean busy;
@@ -81,23 +81,23 @@ implements OutputShop<TarArchiveEntry> {
     }
 
     @Override
-    public Iterator<TarArchiveEntry> iterator() {
+    public Iterator<TTarArchiveEntry> iterator() {
         return entries.values().iterator();
     }
 
     @Override
-    public TarArchiveEntry getEntry(String name) {
+    public TTarArchiveEntry getEntry(String name) {
         return entries.get(name);
     }
 
     @Override
-    public OutputSocket<TarArchiveEntry> getOutputSocket(final TarArchiveEntry entry) {
+    public OutputSocket<TTarArchiveEntry> getOutputSocket(final TTarArchiveEntry entry) {
         if (null == entry)
             throw new NullPointerException();
 
-        class Output extends OutputSocket<TarArchiveEntry> {
+        class Output extends OutputSocket<TTarArchiveEntry> {
             @Override
-            public TarArchiveEntry getLocalTarget() {
+            public TTarArchiveEntry getLocalTarget() {
                 return entry;
             }
 
@@ -141,15 +141,15 @@ implements OutputShop<TarArchiveEntry> {
      * It can only be used if this output stream is not currently busy
      * writing another entry and the entry holds enough information to
      * write the entry header.
-     * These preconditions are checked by {@link #getOutputSocket(TarArchiveEntry)}.
+     * These preconditions are checked by {@link #getOutputSocket(TTarArchiveEntry)}.
      */
     private class EntryOutputStream extends DecoratingOutputStream {
         private boolean closed;
 
-        EntryOutputStream(final TarArchiveEntry entry)
+        EntryOutputStream(final TTarArchiveEntry entry)
         throws IOException {
             super(TarOutputShop.this);
-            putNextEntry(entry);
+            putArchiveEntry(entry);
             entries.put(entry.getName(), entry);
             busy = true;
         }
@@ -167,7 +167,7 @@ implements OutputShop<TarArchiveEntry> {
             // Order is important here!
             closed = true;
             busy = false;
-            closeEntry();
+            closeArchiveEntry();
         }
     } // class EntryOutputStream
 
@@ -178,10 +178,10 @@ implements OutputShop<TarArchiveEntry> {
      */
     private class TempEntryOutputStream extends DecoratingOutputStream {
         private final IOPool.Entry<?> temp;
-        private final TarArchiveEntry entry;
+        private final TTarArchiveEntry entry;
         private boolean closed;
 
-        TempEntryOutputStream(final IOPool.Entry<?> temp, final TarArchiveEntry entry)
+        TempEntryOutputStream(final IOPool.Entry<?> temp, final TTarArchiveEntry entry)
         throws IOException {
             super(temp.getOutputSocket().newOutputStream());
             this.temp = temp;
@@ -210,11 +210,11 @@ implements OutputShop<TarArchiveEntry> {
             try {
                 final InputStream in = temp.getInputSocket().newInputStream();
                 try {
-                    putNextEntry(entry);
+                    putArchiveEntry(entry);
                     try {
                         Streams.cat(in, TarOutputShop.this);
                     } finally {
-                        closeEntry();
+                        closeArchiveEntry();
                     }
                 } finally {
                     in.close();

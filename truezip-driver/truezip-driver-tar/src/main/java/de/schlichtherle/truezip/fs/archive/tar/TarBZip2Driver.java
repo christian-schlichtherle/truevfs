@@ -31,8 +31,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import net.jcip.annotations.Immutable;
-import org.apache.tools.bzip2.CBZip2InputStream;
-import org.apache.tools.bzip2.CBZip2OutputStream;
+import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
+import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 
 /**
  * An archive driver which builds BZIP2 compressed TAR files (TAR.BZIP2).
@@ -65,12 +65,12 @@ public class TarBZip2Driver extends TarDriver {
      * Returns the compression level to use when writing a BZIP2 output stream.
      * <p>
      * The implementation in the class {@link TarBZip2Driver} returns
-     * {@link CBZip2OutputStream#MAX_BLOCKSIZE}.
+     * {@link BZip2CompressorOutputStream#MAX_BLOCKSIZE}.
      * 
      * @return The compression level to use when writing a BZIP2 output stream.
      */
     public int getLevel() {
-        return CBZip2OutputStream.MAX_BLOCKSIZE;
+        return BZip2CompressorOutputStream.MAX_BLOCKSIZE;
     }
 
     /**
@@ -86,27 +86,19 @@ public class TarBZip2Driver extends TarDriver {
     }
 
     /**
-     * Returns a newly created and verified {@link CBZip2InputStream}.
+     * Returns a newly created and verified {@link BZip2CompressorInputStream}.
      * This method performs a simple verification by computing the checksum
      * for the first record only.
-     * This method is required because the {@code CBZip2InputStream}
+     * This method is required because the {@code BZip2CompressorInputStream}
      * unfortunately does not do sufficient verification!
      */
     @Override
     protected TarInputShop newTarInputShop(
             final FsModel model, final InputStream in)
     throws IOException {
-        // Consume and check the first two magic bytes. This is required for
-        // the CBZip2InputStream class.
-        if (in.read() != 'B' || in.read() != 'Z')
-            throw new IOException("Not a BZIP2 compressed input stream!");
-        final byte[] magic = new byte[2];
-        final InputStream vin = TarInputShop.readAhead(in, magic);
-        if (magic[0] != 'h' || magic[1] < '1' || '9' < magic[1])
-            throw new IOException("Not a BZIP2 compressed input stream!");
-        return new TarInputShop(this,
-                new CBZip2InputStream(
-                    new BufferedInputStream(vin, getBufferSize())));
+        return super.newTarInputShop(model,
+                new BZip2CompressorInputStream(
+                    new BufferedInputStream(in, getBufferSize())));
     }
 
     @Override
@@ -115,12 +107,8 @@ public class TarBZip2Driver extends TarDriver {
             final OutputStream out,
             final TarInputShop source)
     throws IOException {
-        // Produce the first two magic bytes. This is required for the
-        // CBZip2OutputStream class.
-        out.write(new byte[] { 'B', 'Z' });
-        return super.newTarOutputShop(
-                model,
-                new CBZip2OutputStream(
+        return super.newTarOutputShop(model,
+                new BZip2CompressorOutputStream(
                     new BufferedOutputStream(out, getBufferSize()),
                     getLevel()),
                 source);

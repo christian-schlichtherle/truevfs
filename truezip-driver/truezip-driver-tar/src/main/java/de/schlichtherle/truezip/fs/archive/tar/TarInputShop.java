@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
+import org.apache.commons.compress.archivers.ArchiveEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
@@ -35,13 +36,12 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import org.apache.tools.tar.TarBuffer;
-import org.apache.tools.tar.TarEntry;
-import org.apache.tools.tar.TarInputStream;
-import org.apache.tools.tar.TarUtils;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.archivers.tar.TarUtils;
 
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
-import static org.apache.tools.tar.TarConstants.*;
+import static org.apache.commons.compress.archivers.tar.TarConstants.*;
 
 /**
  * Presents a {@link TarInputStream} as a randomly accessible archive.
@@ -60,16 +60,22 @@ import static org.apache.tools.tar.TarConstants.*;
  */
 @DefaultAnnotation(NonNull.class)
 public class TarInputShop
-implements InputShop<TarArchiveEntry> {
+implements InputShop<TTarArchiveEntry> {
 
-    private static final byte[] NULL_RECORD = new byte[TarBuffer.DEFAULT_RCDSIZE];
+    /** Default record size */
+    private static final int DEFAULT_RCDSIZE = 512;
+
+    /** Default block size */
+    public static final int DEFAULT_BLKSIZE = 20 * DEFAULT_RCDSIZE * 20;
+
+    private static final byte[] NULL_RECORD = new byte[DEFAULT_RCDSIZE];
 
     private static final int CHECKSUM_OFFSET
             = NAMELEN + MODELEN + UIDLEN + GIDLEN + SIZELEN + MODTIMELEN;
 
     /** Maps entry names to I/O pool entries. */
-    private final Map<String, TarArchiveEntry>
-            entries = new LinkedHashMap<String, TarArchiveEntry>();
+    private final Map<String, TTarArchiveEntry>
+            entries = new LinkedHashMap<String, TTarArchiveEntry>();
 
     /**
      * Extracts the entire TAR input stream into a temporary directory in order
@@ -84,16 +90,16 @@ implements InputShop<TarArchiveEntry> {
      */
     public TarInputShop(final TarDriver driver, final InputStream in)
     throws IOException {
-        final TarInputStream tin = newValidatedTarInputStream(in);
+        final TarArchiveInputStream tin = newValidatedTarInputStream(in);
         final IOPool<?> pool = driver.getPool();
         try {
-            TarEntry tinEntry;
-            while (null != (tinEntry = tin.getNextEntry())) {
+            TarArchiveEntry tinEntry;
+            while (null != (tinEntry = (TarArchiveEntry) tin.getNextEntry())) {
                 final String name = getName(tinEntry);
-                TarArchiveEntry entry = entries.get(name);
+                TTarArchiveEntry entry = entries.get(name);
                 if (null != entry)
                     entry.release();
-                entry = new TarArchiveEntry(name, tinEntry);
+                entry = new TTarArchiveEntry(name, tinEntry);
                 if (!tinEntry.isDirectory()) {
                     final Entry<?> temp = pool.allocate();
                     entry.setTemp(temp);
@@ -126,36 +132,39 @@ implements InputShop<TarArchiveEntry> {
      * @return the fixed name of the given TAR entry.
      * @see <a href="http://java.net/jira/browse/TRUEZIP-62">Issue TRUEZIP-62</a>
      */
-    private static String getName(TarEntry entry) {
+    private static String getName(ArchiveEntry entry) {
         final String name = entry.getName();
         return entry.isDirectory() && !name.endsWith(SEPARATOR) ? name + SEPARATOR_CHAR : name;
     }
 
     /**
-     * Returns a newly created and validated {@link TarInputStream}.
+     * Returns a newly created and validated {@link TarArchiveInputStream}.
      * This method performs a simple validation by computing the checksum
      * for the first record only.
-     * This method is required because the {@code TarInputStream}
+     * This method is required because the {@code TarArchiveInputStream}
      * unfortunately does not do any validation!
      */
-    private static TarInputStream newValidatedTarInputStream(
+    private static TarArchiveInputStream newValidatedTarInputStream(
             final InputStream in)
     throws IOException {
-        final byte[] buf = new byte[TarBuffer.DEFAULT_RCDSIZE];
+        final byte[] buf = new byte[DEFAULT_RCDSIZE];
         final InputStream vin = readAhead(in, buf);
         // If the record is the null record, the TAR file is empty and we're
         // done with validating.
         if (!Arrays.equals(buf, NULL_RECORD)) {
-            final long expected = TarUtils.parseOctal(buf, CHECKSUM_OFFSET, 8);
-            for (int i = 0; i < 8; i++)
-                buf[CHECKSUM_OFFSET + i] = ' ';
-            final long is = TarUtils.computeCheckSum(buf);
-            if (expected != is)
-                throw new IOException(
-                        "Illegal initial record in TAR file: Expected checksum " + expected + ", is " + is + "!");
+            try {
+                final long expected = TarUtils.parseOctal(buf, CHECKSUM_OFFSET, 8);
+                for (int i = 0; i < 8; i++)
+                    buf[CHECKSUM_OFFSET + i] = ' ';
+                final long is = TarUtils.computeCheckSum(buf);
+                if (expected != is)
+                    throw new IOException(
+                            "Illegal initial record in TAR file: Expected checksum " + expected + ", is " + is + "!");
+            } catch (IllegalArgumentException ex) {
+                throw new IOException("Illegal initial record in TAR file!");
+            }
         }
-        return new TarInputStream(
-                vin, TarBuffer.DEFAULT_BLKSIZE, TarBuffer.DEFAULT_RCDSIZE);
+        return new TarArchiveInputStream(vin, DEFAULT_BLKSIZE, DEFAULT_RCDSIZE);
     }
 
     /**
@@ -202,24 +211,24 @@ implements InputShop<TarArchiveEntry> {
     }
 
     @Override
-    public final Iterator<TarArchiveEntry> iterator() {
+    public final Iterator<TTarArchiveEntry> iterator() {
         return entries.values().iterator();
     }
 
     @Override
-    public final TarArchiveEntry getEntry(String name) {
+    public final TTarArchiveEntry getEntry(String name) {
         return entries.get(name);
     }
 
     @Override
-    public InputSocket<TarArchiveEntry> getInputSocket(final String name) {
+    public InputSocket<TTarArchiveEntry> getInputSocket(final String name) {
         if (null == name)
             throw new NullPointerException();
 
-        class Input extends InputSocket<TarArchiveEntry> {
+        class Input extends InputSocket<TTarArchiveEntry> {
             @Override
-            public TarArchiveEntry getLocalTarget() throws IOException {
-                final TarArchiveEntry entry = getEntry(name);
+            public TTarArchiveEntry getLocalTarget() throws IOException {
+                final TTarArchiveEntry entry = getEntry(name);
                 if (null == entry)
                     throw new FileNotFoundException(name + " (entry not found)");
                 if (entry.isDirectory())
@@ -248,8 +257,8 @@ implements InputShop<TarArchiveEntry> {
     }
 
     private void close0() throws IOException {
-        Collection<TarArchiveEntry> values = entries.values();
-        for (Iterator<TarArchiveEntry> i = values.iterator(); i.hasNext(); i.remove())
+        Collection<TTarArchiveEntry> values = entries.values();
+        for (Iterator<TTarArchiveEntry> i = values.iterator(); i.hasNext(); i.remove())
             i.next().release();
     }
 }

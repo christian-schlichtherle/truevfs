@@ -52,7 +52,7 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 @DefaultAnnotation(NonNull.class)
-public class TarDriver extends FsCharsetArchiveDriver<TarArchiveEntry> {
+public class TarDriver extends FsCharsetArchiveDriver<TTarArchiveEntry> {
 
     /**
      * The default character set for entry names and comments, which is
@@ -113,7 +113,7 @@ public class TarDriver extends FsCharsetArchiveDriver<TarArchiveEntry> {
     }
 
     @Override
-    public TarArchiveEntry newEntry(
+    public TTarArchiveEntry newEntry(
             String name,
             final Type type,
             final Entry template,
@@ -121,9 +121,9 @@ public class TarDriver extends FsCharsetArchiveDriver<TarArchiveEntry> {
     throws CharConversionException {
         assertEncodable(name);
         name = toZipOrTarEntryName(name, type);
-        final TarArchiveEntry entry;
-        if (template instanceof TarArchiveEntry) {
-            entry = newEntry(name, (TarArchiveEntry) template);
+        final TTarArchiveEntry entry;
+        if (template instanceof TTarArchiveEntry) {
+            entry = newEntry(name, (TTarArchiveEntry) template);
         } else {
             entry = newEntry(name);
             if (null != template) {
@@ -134,12 +134,12 @@ public class TarDriver extends FsCharsetArchiveDriver<TarArchiveEntry> {
         return entry;
     }
     
-    public TarArchiveEntry newEntry(String name) {
-        return new TarArchiveEntry(name);
+    public TTarArchiveEntry newEntry(String name) {
+        return new TTarArchiveEntry(name);
     }
 
-    public TarArchiveEntry newEntry(String name, TarArchiveEntry template) {
-        return new TarArchiveEntry(name, template);
+    public TTarArchiveEntry newEntry(String name, TTarArchiveEntry template) {
+        return new TTarArchiveEntry(name, template);
     }
 
     /**
@@ -174,14 +174,14 @@ public class TarDriver extends FsCharsetArchiveDriver<TarArchiveEntry> {
      * {@link FsMultiplexedOutputShop}.
      */
     @Override
-    public OutputShop<TarArchiveEntry> newOutputShop(
+    public OutputShop<TTarArchiveEntry> newOutputShop(
             FsModel model,
             OutputSocket<?> output,
-            InputShop<TarArchiveEntry> source)
+            InputShop<TTarArchiveEntry> source)
     throws IOException {
         final OutputStream out = output.newOutputStream();
         try {
-            return new FsMultiplexedOutputShop<TarArchiveEntry>(
+            return new FsMultiplexedOutputShop<TTarArchiveEntry>(
                     newTarOutputShop(model, out, (TarInputShop) source),
                     getPool());
         } catch (IOException ex) {
