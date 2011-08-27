@@ -43,6 +43,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import net.jcip.annotations.Immutable;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 
 /**
  * An archive driver which builds Tape Archive files (TAR).
@@ -122,8 +123,8 @@ public class TarDriver extends FsCharsetArchiveDriver<TTarArchiveEntry> {
         assertEncodable(name);
         name = toZipOrTarEntryName(name, type);
         final TTarArchiveEntry entry;
-        if (template instanceof TTarArchiveEntry) {
-            entry = newEntry(name, (TTarArchiveEntry) template);
+        if (template instanceof TarArchiveEntry) {
+            entry = newEntry(name, (TarArchiveEntry) template);
         } else {
             entry = newEntry(name);
             if (null != template) {
@@ -133,12 +134,12 @@ public class TarDriver extends FsCharsetArchiveDriver<TTarArchiveEntry> {
         }
         return entry;
     }
-    
+
     public TTarArchiveEntry newEntry(String name) {
         return new TTarArchiveEntry(name);
     }
 
-    public TTarArchiveEntry newEntry(String name, TTarArchiveEntry template) {
+    public TTarArchiveEntry newEntry(String name, TarArchiveEntry template) {
         return new TTarArchiveEntry(name, template);
     }
 
