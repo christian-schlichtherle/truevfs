@@ -380,8 +380,8 @@ implements ZipEntryFactory<ZipArchiveEntry> {
         assertEncodable(name);
         name = toZipOrTarEntryName(name, type);
         final ZipArchiveEntry entry;
-        if (template instanceof ZipArchiveEntry) {
-            entry = newEntry(name, (ZipArchiveEntry) template);
+        if (template instanceof ZipEntry) {
+            entry = newEntry(name, (ZipEntry) template);
         } else {
             entry = newEntry(name);
             if (null != template) {
@@ -389,16 +389,18 @@ implements ZipEntryFactory<ZipArchiveEntry> {
                 entry.setSize(template.getSize(DATA));
             }
         }
-        if (mknod.get(COMPRESS)) { // #1 priority
-            if (DEFLATED != entry.getMethod()) {
-                entry.setMethod(DEFLATED);
-                entry.setCompressedSize(UNKNOWN);
-            }
-        } else if (mknod.get(STORE)) { // #2 priority
+        if (mknod.get(STORE))
             entry.setMethod(STORED);
+        if (DIRECTORY != type) {
+            if (UNKNOWN == entry.getMethod()) {
+                final int method = getDefaultCompressionMethod();
+                entry.setMethod(method);
+                if (STORED != method)
+                    entry.setCompressedSize(UNKNOWN);
+            }
+            if (mknod.get(ENCRYPT))
+                entry.setEncrypted(true);
         }
-        if (mknod.get(ENCRYPT) && DIRECTORY != type)
-            entry.setEncrypted(true);
         return entry;
     }
 
@@ -409,6 +411,20 @@ implements ZipEntryFactory<ZipArchiveEntry> {
 
     protected ZipArchiveEntry newEntry(String name, ZipEntry template) {
         return new ZipArchiveEntry(name, template);
+    }
+
+    /**
+     * Returns the default compression method for new ZIP entries.
+     * <p>
+     * The implementation in the class {@link ZipDriver} returns
+     * {@link ZipEntry#DEFLATED}.
+     * 
+     * @return The default compression method for new ZIP entries.
+     * @see    ZipEntry#DEFLATED
+     * @see    ZipEntry#BZIP2
+     */
+    protected int getDefaultCompressionMethod() {
+        return DEFLATED;
     }
 
     /**
