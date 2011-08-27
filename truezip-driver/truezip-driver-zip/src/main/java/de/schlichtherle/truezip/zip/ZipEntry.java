@@ -60,11 +60,18 @@ public class ZipEntry implements Cloneable {
     /** Unix platform. */
     public static final short PLATFORM_UNIX = 3;
 
-    /** Compression method for uncompressed (<em>stored</em>) entries. */
+    /** Compression method for <em>Stored</em> (uncompressed) entries. */
     public static final int STORED = 0;
 
-    /** Compression method for compressed (<em>deflated</em>) entries. */
+    /** Compression method for <em>Deflated</em> compressed entries. */
     public static final int DEFLATED = 8;
+
+    /**
+     * Compression method for <em>BZIP2</em> compressed entries.
+     * 
+     * @since TrueZIP 7.3
+     */
+    public static final int BZIP2 = 12;
 
     /**
      * Pseudo compression method for WinZip AES encrypted entries.
@@ -205,6 +212,17 @@ public class ZipEntry implements Cloneable {
         setInit(PLATFORM, true);
     }
 
+    final int getRawVersionNeededToExtract() {
+        final int method = getRawMethod();
+        return BZIP2 == method
+                ? 46
+                : isZip64ExtensionsRequired()
+                    ? 45
+                    : DEFLATED == method || isDirectory()
+                        ? 20
+                        : 10;
+    }
+
     /** Returns the General Purpose Bit Flags. */
     final int getGeneralPurposeBitFlags() {
         return general & UShort.MAX_VALUE;
@@ -267,12 +285,14 @@ public class ZipEntry implements Cloneable {
      * @see #getMethod
      * @see ZipOutputStream#setMethod
      * @throws IllegalArgumentException If {@code method} is not
-     *         {@link #STORED}, {@link #DEFLATED} or {@link #UNKNOWN}.
+     *         {@link #STORED}, {@link #DEFLATED}, {@link #BZIP2} or
+     *         {@link #UNKNOWN}.
      */
     public final void setMethod(final int method) {
         switch (method) {
             case STORED:
             case DEFLATED:
+            case BZIP2:
             case WINZIP_AES:
                 this.method = (short) method;
                 setInit(METHOD, true);

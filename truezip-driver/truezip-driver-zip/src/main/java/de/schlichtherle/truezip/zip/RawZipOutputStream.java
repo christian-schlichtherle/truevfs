@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.zip.Deflater;
 import java.util.zip.ZipException;
 import net.jcip.annotations.NotThreadSafe;
+import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 
 /**
  * Provides unsafe (raw) access to a ZIP file using unsynchronized
@@ -301,8 +302,9 @@ implements Iterable<E> {
      * This property is only used if a {@link ZipEntry} does not specify a
      * compression method.
      * <p>
-     * Legal values are {@link ZipEntry#STORED} (uncompressed) and
-     * {@link ZipEntry#DEFLATED} (compressed).
+     * Legal values are {@link ZipEntry#STORED} (uncompressed)
+     * {@link ZipEntry#DEFLATED} (compressed) and
+     * {@link ZipEntry#BZIP2} (compressed).
      *
      * @see #getMethod
      * @see ZipEntry#setMethod
@@ -320,6 +322,14 @@ implements Iterable<E> {
      */
     public int getLevel() {
         return deflater.getLevel();
+    }
+
+    private int getBZip2BlockSize() {
+        final int level = getLevel();
+        if (BZip2CompressorOutputStream.MIN_BLOCKSIZE <= level
+                && level <= BZip2CompressorOutputStream.MAX_BLOCKSIZE)
+            return level;
+        return BZip2CompressorOutputStream.MAX_BLOCKSIZE;
     }
 
     /**
@@ -449,6 +459,11 @@ implements Iterable<E> {
                 if (!skipCrc)
                     processor = new Crc32UpdatingOutputMethod(processor);
                 break;
+            case BZIP2:
+                processor = new BZip2OutputMethod(processor);
+                if (!skipCrc)
+                    processor = new Crc32UpdatingOutputMethod(processor);
+                break;
             default:
                 throw new ZipException(entry.getName()
                         + " (unsupported compression method "
@@ -573,26 +588,17 @@ implements Iterable<E> {
             // E.g. this may happen with the GROW output option preference.
             return false;
         }
-        final long offset = entry.getRawOffset();
-        final boolean zip64 = entry.isZip64ExtensionsRequired();
-        final int method = entry.getRawMethod();
-        final boolean directory = entry.isDirectory();
-        final int version = zip64
-                ? 45
-                : STORED != method || directory
-                    ? 20
-                    : 10;
         final LEDataOutputStream dos = this.dos;
         // Central File Header.
         dos.writeInt(CFH_SIG);
         // Version Made By.
         dos.writeShort((entry.getRawPlatform() << 8) | 63);
         // Version Needed To Extract.
-        dos.writeShort(version);
+        dos.writeShort(entry.getRawVersionNeededToExtract());
         // General Purpose Bit Flags.
         dos.writeShort(entry.getGeneralPurposeBitFlags());
         // Compression Method.
-        dos.writeShort(method);
+        dos.writeShort(entry.getRawMethod());
         // Last Mod. File Time / Date.
         dos.writeInt((int) entry.getRawTime());
         // CRC-32.
@@ -617,7 +623,7 @@ implements Iterable<E> {
         // External File Attributes.
         dos.writeInt((int) entry.getRawExternalAttributes());
         // Relative Offset Of Local File Header.
-        dos.writeInt((int) offset);
+        dos.writeInt((int) entry.getRawOffset());
         // File Name.
         dos.write(name);
         // Extra Field(s).
@@ -780,20 +786,9 @@ implements Iterable<E> {
         public OutputStream start() throws IOException {
             final LEDataOutputStream dos = RawZipOutputStream.this.dos;
             final ZipEntry entry = RawZipOutputStream.this.entry;
-            final long crc = entry.getRawCrc();
-            final long csize = entry.getRawCompressedSize();
-            final long size = entry.getRawSize();
             final long offset = dos.size();
             final boolean encrypted = entry.isEncrypted();
             final boolean dd = entry.isDataDescriptorRequired();
-            final boolean zip64 = entry.isZip64ExtensionsRequired();
-            final int method = entry.getRawMethod();
-            final boolean directory = entry.isDirectory();
-            final int version = zip64
-                    ? 45
-                    : STORED != method || directory
-                        ? 20
-                        : 10;
             // Compose General Purpose Bit Flag.
             // See appendix D of PKWARE's ZIP File Format Specification.
             final boolean utf8 = UTF8.equals(charset);
@@ -805,11 +800,11 @@ implements Iterable<E> {
             // Local File Header Signature.
             dos.writeInt(LFH_SIG);
             // Version Needed To Extract.
-            dos.writeShort(version);
+            dos.writeShort(entry.getRawVersionNeededToExtract());
             // General Purpose Bit Flag.
             dos.writeShort(general);
             // Compression Method.
-            dos.writeShort(method);
+            dos.writeShort(entry.getRawMethod());
             // Last Mod. Time / Date in DOS format.
             dos.writeInt((int) entry.getRawTime());
             // CRC-32.
@@ -820,9 +815,9 @@ implements Iterable<E> {
                 dos.writeInt(0);
                 dos.writeInt(0);
             } else {
-                dos.writeInt((int) crc);
-                dos.writeInt((int) csize);
-                dos.writeInt((int) size);
+                dos.writeInt((int) entry.getRawCrc());
+                dos.writeInt((int) entry.getRawCompressedSize());
+                dos.writeInt((int) entry.getRawSize());
             }
             // File Name Length.
             final byte[] name = encode(entry.getName());
@@ -929,7 +924,7 @@ implements Iterable<E> {
             field.setKeyStrength(keyStrength);
             field.setMethod(method);
             final long size = entry.getSize();
-            if (20 <= size /* && BZIP2 != method */) {
+            if (20 <= size && BZIP2 != method) {
                 field.setVendorVersion(VV_AE_1);
             } else {
                 field.setVendorVersion(VV_AE_2);
@@ -990,6 +985,48 @@ implements Iterable<E> {
             }
         }
     } // WinZipAesOutputMethod
+
+    private final class BZip2OutputMethod
+    extends DecoratingOutputMethod {
+
+        @Nullable BZip2CompressorOutputStream cout;
+        @Nullable LEDataOutputStream dout;
+        long start;
+
+        BZip2OutputMethod(OutputMethod processor) {
+            super(processor);
+        }
+
+        @Override
+        public void init(ZipEntry entry) throws IOException  {
+            entry.setCompressedSize(UNKNOWN);
+            this.delegate.init(entry);
+        }
+
+        @Override
+        public OutputStream start() throws IOException {
+            assert null == this.cout;
+            assert null == this.dout;
+            OutputStream out = this.delegate.start();
+            this.start = RawZipOutputStream.this.dos.size();
+            final long size = entry.getSize();
+            final int blockSize = UNKNOWN != size
+                    ? BZip2CompressorOutputStream.chooseBlockSize(size)
+                    : getBZip2BlockSize();
+            out = this.cout = new BZip2CompressorOutputStream(out, blockSize);
+            return this.dout = new LEDataOutputStream(out);
+        }
+
+        @Override
+        public void finish() throws IOException {
+            this.dout.flush(); // superfluous - should not buffer
+            this.cout.finish();
+            final ZipEntry entry = RawZipOutputStream.this.entry;
+            entry.setRawCompressedSize(RawZipOutputStream.this.dos.size() - this.start);
+            entry.setRawSize(this.dout.size());
+            this.delegate.finish();
+        }
+    } // BZip2OutputMethod
 
     private final class DeflaterOutputMethod
     extends DecoratingOutputMethod {
