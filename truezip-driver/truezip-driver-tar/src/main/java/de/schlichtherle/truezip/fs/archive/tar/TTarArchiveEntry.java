@@ -57,10 +57,10 @@ implements FsArchiveEntry, Releasable<IOException> {
             final String name,
             final TarArchiveEntry template) {
         super(name, true);
-        this.init = SIZE | MODTIME;
+        //this.init = SIZE | MODTIME;
         super.setMode(template.getMode());
-        this.setModTime(template.getModTime());
-        this.setSize(template.getSize());
+        this.setModTime0(template.getModTime().getTime());
+        this.setSize0(template.getSize());
         super.setUserId(template.getUserId());
         super.setUserName(template.getUserName());
         super.setGroupId(template.getGroupId());
@@ -105,7 +105,11 @@ implements FsArchiveEntry, Releasable<IOException> {
     }
 
     @Override
-    public final void setSize(final long size) {
+    public void setSize(long size) {
+        setSize0(size);
+    }
+
+    private void setSize0(final long size) {
         final boolean known = UNKNOWN != size;
         super.setSize(known ? size : 0);
         setInit(SIZE, known);
@@ -136,7 +140,11 @@ implements FsArchiveEntry, Releasable<IOException> {
     }
 
     @Override
-    public final void setModTime(final long time) {
+    public void setModTime(long time) {
+        setModTime0(time);
+    }
+
+    private void setModTime0(final long time) {
         final boolean known = UNKNOWN != time;
         super.setModTime(known ? time : 0);
         setInit(MODTIME, known);
