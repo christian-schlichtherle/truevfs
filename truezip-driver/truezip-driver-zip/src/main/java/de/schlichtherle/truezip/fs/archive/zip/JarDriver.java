@@ -20,6 +20,7 @@ import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.zip.ZipEntry;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.CharConversionException;
@@ -75,7 +76,7 @@ public class JarDriver extends ZipDriver {
     }
 
     @Override
-    protected JarArchiveEntry newEntry(String name, ZipArchiveEntry template) {
+    protected JarArchiveEntry newEntry(String name, ZipEntry template) {
         return new JarArchiveEntry(name, template);
     }
 }
