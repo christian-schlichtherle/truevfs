@@ -421,7 +421,8 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
                             }
                             assertEquals(-1, read);
                             assertEquals(off, data.length);
-                            assertEquals(0, in.read(new byte[0]));
+                            read = in.read(new byte[0]);
+                            assertTrue(0 == read || -1 == read);
                         } finally {
                             in.close();
                         }

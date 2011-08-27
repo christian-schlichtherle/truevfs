@@ -44,6 +44,7 @@ import java.util.zip.CheckedInputStream;
 import java.util.zip.Inflater;
 import java.util.zip.ZipException;
 import net.jcip.annotations.NotThreadSafe;
+import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 
 /**
  * Provides unsafe (raw) access to a ZIP file using unsynchronized methods and
@@ -402,8 +403,8 @@ implements Iterable<E>, Closeable {
      */
     private void mountCentralDirectory(final ReadOnlyFile rof, int numEntries)
     throws IOException {
-        final Map<String, E>
-                entries = new LinkedHashMap<String, E>(numEntries * 4 / 3 + 1);
+        final Map<String, E> entries = new LinkedHashMap<String, E>(
+                Math.max(numEntries * 4 / 3 + 1, 16));
         final byte[] cfh = new byte[CFH_MIN_LEN];
         for (; ; numEntries--) {
             rof.readFully(cfh, 0, 4);
@@ -634,16 +635,19 @@ implements Iterable<E>, Closeable {
                         method = field.getMethod();
                     }
                     final int bufSize = getBufferSize(entry);
-                    ZipInflaterInputStream iin = null;
                     InputStream in;
                     switch (method) {
-                        case DEFLATED:
-                            iin = new ZipInflaterInputStream(
-                                    new DummyByteInputStream(erof), bufSize);
-                            in = iin;
-                            break;
                         case STORED:
                             in = new ReadOnlyFileInputStream(erof);
+                            break;
+                        case DEFLATED:
+                            in = new ZipInflaterInputStream(
+                                    new DummyByteInputStream(erof),
+                                    bufSize);
+                            break;
+                        case BZIP2:
+                            in = new BZip2CompressorInputStream(
+                                    new ReadOnlyFileInputStream(erof));
                             break;
                         default:
                             throw new ZipException(entry.getName()
@@ -660,13 +664,22 @@ implements Iterable<E>, Closeable {
                         else
                             entry.setRawCrc(cin.getChecksum().getValue());
                         // Sync file pointer on deflated input again.
-                        if (null != iin) {
-                            Inflater inf = iin.getInflater();
-                            assert inf.finished(); // JDK6: R/W 1210/2057; JDK 7: R/W 1193/2057
-                            fp += inf.getBytesRead();
-                        } else {
-                            assert STORED == method;
-                            fp = rof.getFilePointer();
+                        switch (method) {
+                            case STORED:
+                                fp = rof.getFilePointer();
+                                break;
+                            case DEFLATED:
+                                Inflater inf = ((ZipInflaterInputStream) in)
+                                        .getInflater();
+                                assert inf.finished(); // JDK6: R/W 1210/2057; JDK 7: R/W 1193/2057
+                                fp += inf.getBytesRead();
+                                break;
+                            case BZIP2:
+                                fp += ((BZip2CompressorInputStream) in)
+                                        .getBytesRead();
+                                break;
+                            default:
+                                throw new AssertionError();
                         }
                     } finally {
                         cin.close();
@@ -1075,12 +1088,16 @@ implements Iterable<E>, Closeable {
         final int bufSize = getBufferSize(entry);
         InputStream in;
         switch (method) {
-            case DEFLATED:
-                in = new ZipInflaterInputStream(
-                        new DummyByteInputStream(erof), bufSize);
-                break;
             case STORED:
                 in = new ReadOnlyFileInputStream(erof);
+                break;
+            case DEFLATED:
+                in = new ZipInflaterInputStream(new DummyByteInputStream(erof),
+                        bufSize);
+                break;
+            case BZIP2:
+                in = new BZip2CompressorInputStream(
+                        new ReadOnlyFileInputStream(erof));
                 break;
             default:
                 throw new ZipException(name
@@ -1089,7 +1106,7 @@ implements Iterable<E>, Closeable {
                         + " is not supported)");
         }
         if (check)
-            in = new ZipCheckedInputStream(in, entry, bufSize);
+            in = new Crc32CheckingInputStream(in, entry, bufSize);
         return in;
     }
 

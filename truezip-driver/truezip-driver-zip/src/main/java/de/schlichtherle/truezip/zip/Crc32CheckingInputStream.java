@@ -21,17 +21,18 @@ import java.util.zip.CRC32;
 import java.util.zip.CheckedInputStream;
 
 /**
- * Compares the actual CRC to the expected CRC in the close() method and
- * throws a CRC32Exception on a mismatch.
+ * Compares the CRC computed from the content to the CRC in the ZIP entry
+ * and throws a CRC32Exception if it detects a mismatch in its method
+ * {@link #close()}.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-final class ZipCheckedInputStream extends CheckedInputStream {
+final class Crc32CheckingInputStream extends CheckedInputStream {
     private final ZipEntry entry;
     private final int size;
 
-    ZipCheckedInputStream(
+    Crc32CheckingInputStream(
             final InputStream in,
             final ZipEntry entry,
             final int size) {
