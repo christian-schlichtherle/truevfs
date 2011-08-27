@@ -86,7 +86,8 @@ public class TarGZipDriver extends TarDriver {
     @Override
     protected TarInputShop newTarInputShop(FsModel model, InputStream in)
     throws IOException {
-        return new TarInputShop(this, new GZIPInputStream(in, getBufferSize()));
+        return super.newTarInputShop(model,
+                new GZIPInputStream(in, getBufferSize()));
     }
 
     @Override
@@ -95,8 +96,7 @@ public class TarGZipDriver extends TarDriver {
             final OutputStream out,
             final TarInputShop source)
     throws IOException {
-        return super.newTarOutputShop(
-                model,
+        return super.newTarOutputShop(model,
                 new GZIPOutputStream(out, getBufferSize(), getLevel()),
                 source);
     }

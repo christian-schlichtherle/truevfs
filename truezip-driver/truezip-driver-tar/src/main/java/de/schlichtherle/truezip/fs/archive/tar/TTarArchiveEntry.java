@@ -26,7 +26,8 @@ import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
-import org.apache.tools.tar.TarEntry;
+import java.util.Date;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 
 /**
  * An entry in a TAR archive which implements the {@code FsArchiveEntry}
@@ -36,31 +37,45 @@ import org.apache.tools.tar.TarEntry;
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-public class TarArchiveEntry
-extends TarEntry
+public class TTarArchiveEntry
+extends TarArchiveEntry
 implements FsArchiveEntry, Releasable<IOException> {
 
+    // Bit masks for initialized fields.
+    private static final int SIZE = 1, MODTIME = 1 << 1;
+
+    private byte init; // bit flags for init state
     private @CheckForNull Entry<?> temp;
 
-    public TarArchiveEntry(final String name) {
+    public TTarArchiveEntry(final String name) {
         super(name, true);
         // Fix super class constructor.
-        super.setModTime(Long.MIN_VALUE);
-        super.setSize(UNKNOWN);
         super.setUserName(System.getProperty("user.name", ""));
     }
 
-    public TarArchiveEntry(
+    protected TTarArchiveEntry(
             final String name,
-            final TarEntry template) {
+            final TarArchiveEntry template) {
         super(name, true);
+        this.init = SIZE | MODTIME;
         super.setMode(template.getMode());
-        super.setModTime(template.getModTime());
-        super.setSize(template.getSize());
+        this.setModTime(template.getModTime());
+        this.setSize(template.getSize());
         super.setUserId(template.getUserId());
         super.setUserName(template.getUserName());
         super.setGroupId(template.getGroupId());
         super.setGroupName(template.getGroupName());
+    }
+
+    private boolean isInit(final int mask) {
+        return 0 != (init & mask);
+    }
+
+    private void setInit(final int mask, final boolean init) {
+        if (init)
+            this.init |=  mask;
+        else
+            this.init &= ~mask;
     }
 
     @Nullable Entry<?> getTemp() {
@@ -85,6 +100,18 @@ implements FsArchiveEntry, Releasable<IOException> {
     }
 
     @Override
+    public final long getSize() {
+        return isInit(SIZE) ? super.getSize() : UNKNOWN;
+    }
+
+    @Override
+    public final void setSize(final long size) {
+        final boolean known = UNKNOWN != size;
+        super.setSize(known ? size : 0);
+        setInit(SIZE, known);
+    }
+
+    @Override
     public long getSize(final Size type) {
         switch (type) {
             case DATA:
@@ -101,6 +128,18 @@ implements FsArchiveEntry, Releasable<IOException> {
             return false;
         setSize(size);
         return true;
+    }
+
+    @Override
+    public final Date getModTime() {
+        return isInit(MODTIME) ? super.getModTime() : new Date(UNKNOWN);
+    }
+
+    @Override
+    public final void setModTime(final long time) {
+        final boolean known = UNKNOWN != time;
+        super.setModTime(known ? time : 0);
+        setInit(MODTIME, known);
     }
 
     @Override

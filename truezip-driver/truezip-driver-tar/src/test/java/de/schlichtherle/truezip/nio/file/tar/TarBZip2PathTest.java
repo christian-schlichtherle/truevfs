@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.nio.file.tar;
 
 import de.schlichtherle.truezip.fs.archive.tar.TarBZip2Driver;
-import org.apache.tools.bzip2.CBZip2OutputStream;
+import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 
 /**
  * @author  Christian Schlichtherle
@@ -34,7 +34,7 @@ public final class TarBZip2PathTest extends TarPathTestSuite<TarBZip2Driver> {
         return new TarBZip2Driver(IO_POOL_PROVIDER) {
             @Override
             public int getLevel() {
-                return CBZip2OutputStream.MIN_BLOCKSIZE;
+                return BZip2CompressorOutputStream.MIN_BLOCKSIZE;
             }
         };
     }
