@@ -47,7 +47,7 @@ import net.jcip.annotations.Immutable;
 /**
  * An archive driver which builds Tape Archive files (TAR).
  * 
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @Immutable
