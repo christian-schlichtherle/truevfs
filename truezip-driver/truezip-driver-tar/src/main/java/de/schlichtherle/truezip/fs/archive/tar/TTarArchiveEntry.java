@@ -33,7 +33,7 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
  * An entry in a TAR archive which implements the {@code FsArchiveEntry}
  * interface.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
