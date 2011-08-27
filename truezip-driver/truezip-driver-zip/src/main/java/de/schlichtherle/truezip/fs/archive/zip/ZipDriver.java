@@ -407,7 +407,7 @@ implements ZipEntryFactory<ZipArchiveEntry> {
         return new ZipArchiveEntry(name);
     }
 
-    protected ZipArchiveEntry newEntry(String name, ZipArchiveEntry template) {
+    protected ZipArchiveEntry newEntry(String name, ZipEntry template) {
         return new ZipArchiveEntry(name, template);
     }
 
