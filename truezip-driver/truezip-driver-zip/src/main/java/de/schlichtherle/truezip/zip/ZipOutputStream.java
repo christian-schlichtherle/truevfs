@@ -22,7 +22,6 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
-import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -60,25 +59,33 @@ import net.jcip.annotations.ThreadSafe;
 @DefaultAnnotation(NonNull.class)
 public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
 
+    /**
+     * The default character set used for entry names and comments in ZIP files.
+     * This is {@code "UTF-8"} for compatibility with Sun's JDK implementation.
+     */
+    public static final Charset DEFAULT_CHARSET = Constants.DEFAULT_CHARSET;
+
     private @CheckForNull ZipCryptoParameters cryptoParameters;
 
     /**
      * Constructs a ZIP output stream which decorates the given output stream
      * using the {@code "UTF-8"} charset.
+     * 
+     * @param  out The output stream to write the ZIP file to.
      */
     public ZipOutputStream(OutputStream out) {
-        super(out, DEFAULT_CHARSET);
+        super(out, null, DEFAULT_CHARSET);
     }
 
     /**
      * Constructs a ZIP output stream which decorates the given output stream
      * using the given charset.
      *
-     * @throws UnsupportedCharsetException If {@code charset} is not supported
-     *         by this JVM.
+     * @param  out The output stream to write the ZIP file to.
+     * @param  charset the character set to use.
      */
     public ZipOutputStream(OutputStream out, Charset charset) {
-        super(out, charset);
+        super(out, null, charset);
     }
 
     /**
@@ -89,11 +96,11 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
      *         If {@code appendee} is not {@code null}, then this must be set
      *         up so that it appends to the same ZIP file from which
      *         {@code appendee} is reading.
-     * @param  appendee the raw ZIP file to append to.
+     * @param  appendee the ZIP file to append to.
      *         This may already be closed.
      */
     public ZipOutputStream(OutputStream out, ZipFile appendee) {
-        super(out, appendee);
+        super(out, appendee, null);
     }
 
     @Override
