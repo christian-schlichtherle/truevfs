@@ -294,16 +294,17 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
     }
 
     /**
-     * Returns the value of the property {@code method}.
-     * This is the compression method to use when writing an entry to a ZIP
-     * output stream.
+     * Returns the compression method for new ZIP entries.
+     * This is used when writing an entry to a ZIP output stream.
      * <p>
      * The implementation in the class {@link ZipDriver} returns
      * {@link ZipEntry#DEFLATED}.
      *
-     * @return The value of the property {@code method}.
+     * Returns The compression method for new ZIP entries.
+     * @see    ZipEntry#DEFLATED
+     * @see    ZipEntry#BZIP2
      */
-    protected int getMethod() {
+    public int getMethod() {
         return DEFLATED;
     }
 
@@ -317,7 +318,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
      *
      * @return The value of the property {@code level}.
      */
-    protected int getLevel() {
+    public int getLevel() {
         return Deflater.BEST_COMPRESSION;
     }
 
@@ -361,7 +362,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
             entry.setMethod(STORED);
         if (DIRECTORY != type) {
             if (UNKNOWN == entry.getMethod()) {
-                final int method = getDefaultCompressionMethod();
+                final int method = getMethod();
                 entry.setMethod(method);
                 if (STORED != method)
                     entry.setCompressedSize(UNKNOWN);
@@ -379,20 +380,6 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
 
     protected ZipArchiveEntry newEntry(String name, ZipEntry template) {
         return new ZipArchiveEntry(name, template);
-    }
-
-    /**
-     * Returns the default compression method for new ZIP entries.
-     * <p>
-     * The implementation in the class {@link ZipDriver} returns
-     * {@link ZipEntry#DEFLATED}.
-     * 
-     * @return The default compression method for new ZIP entries.
-     * @see    ZipEntry#DEFLATED
-     * @see    ZipEntry#BZIP2
-     */
-    protected int getDefaultCompressionMethod() {
-        return DEFLATED;
     }
 
     /**
