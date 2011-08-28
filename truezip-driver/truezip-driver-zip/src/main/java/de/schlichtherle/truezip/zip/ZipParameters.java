@@ -13,28 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.zip;
 
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
- * A factory for {@link ZipEntry}s.
- *
- * @see     RawZipFile
- * @param   <E> The type of the created ZIP entries.
+ * A marker interface for ZIP parameters.
+ * 
+ * @since   TrueZIP 7.3
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
-public interface ZipEntryFactory<E extends ZipEntry> extends ZipParameters {
-
-    /**
-     * Returns a new ZIP entry with the given {@code name}.
-     *
-     * @param  name the entry name.
-     * @return A new ZIP entry with the given {@code name}.
-     */
-    E newEntry(String name);
+@NotThreadSafe
+public interface ZipParameters {
 }

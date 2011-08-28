@@ -15,10 +15,11 @@
  */
 package de.schlichtherle.truezip.zip;
 
+import java.util.zip.ZipException;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * Thrown to indicate that no suitable ZIP crypto parameters have been provided
+ * Thrown to indicate that no suitable ZIP parameters have been provided
  * or something is wrong with these parameters.
  *
  * @since   TrueZIP 7.3
@@ -26,26 +27,26 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-public class ZipCryptoParametersException extends ZipCryptoException {
-    private static final long serialVersionUID = 2036769236408934681L;
+public class ZipParametersException extends ZipException {
+    private static final long serialVersionUID = 2032776586423467951L;
 
     /**
-     * Constructs a ZIP crypto parameters exception with
+     * Constructs a ZIP parameters exception with
      * the given detail message.
      *
      * @param msg the detail message.
      */
-    public ZipCryptoParametersException(String msg) {
+    public ZipParametersException(String msg) {
         super(msg);
     }
 
     /**
-     * Constructs a ZIP crypto parameters exception with
+     * Constructs a ZIP parameters exception with
      * the given cause.
      *
      * @param cause the cause for this exception to get thrown.
      */
-    public ZipCryptoParametersException(Throwable cause) {
-        super(cause);
+    public ZipParametersException(Throwable cause) {
+        super.initCause(cause);
     }
 }

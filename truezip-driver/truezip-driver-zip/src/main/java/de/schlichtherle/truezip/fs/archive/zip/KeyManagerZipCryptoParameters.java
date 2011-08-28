@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
+import de.schlichtherle.truezip.zip.ZipParameters;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.crypto.param.AesKeyStrength;
 import de.schlichtherle.truezip.key.KeyManager;
@@ -24,7 +25,7 @@ import de.schlichtherle.truezip.key.UnknownKeyException;
 import de.schlichtherle.truezip.key.pbe.AesPbeParameters;
 import de.schlichtherle.truezip.zip.WinZipAesParameters;
 import de.schlichtherle.truezip.zip.ZipCryptoParameters;
-import de.schlichtherle.truezip.zip.ZipCryptoParametersProvider;
+import de.schlichtherle.truezip.zip.ZipParametersProvider;
 import de.schlichtherle.truezip.zip.ZipKeyException;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -47,7 +48,7 @@ import static org.bouncycastle.crypto.PBEParametersGenerator.*;
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
 public class KeyManagerZipCryptoParameters
-implements ZipCryptoParametersProvider {
+implements ZipParametersProvider, ZipCryptoParameters {
 
     /** The ZIP driver which has been provided to the constructor. */
     private final ZipDriver driver;
@@ -92,7 +93,7 @@ implements ZipCryptoParametersProvider {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public <P extends ZipCryptoParameters> P get(Class<P> type) {
+    public <P extends ZipParameters> P get(Class<P> type) {
         if (type.isAssignableFrom(WinZipAesParameters.class))
             return (P) new WinZipAes();
         return null;

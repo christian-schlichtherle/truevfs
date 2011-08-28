@@ -20,27 +20,25 @@ import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
- * These {@link ZipCryptoParameters} delegate to some other instance of a
- * sibling interface or itself in order to locate the parameters required to
- * read or write a certain ZIP crypto type.
- * This enables implementations to retrieve ZIP crypto parameters on demand
- * rather than providing them upfront for any possible type.
+ * A provider of {@link ZipParameters} for a given type.
+ * The implementation of this interface enables to retrieve ZIP parameters on
+ * demand rather than providing them upfront for any possible type.
  *
  * @since   TrueZIP 7.3
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-public interface ZipCryptoParametersProvider extends ZipCryptoParameters {
+public interface ZipParametersProvider extends ZipParameters {
 
     /**
-     * Returns {@link ZipCryptoParameters} of the given {@code type}
+     * Returns {@link ZipParameters} of the given {@code type}
      * or {@code null} if not available.
      *
-     * @param  type the {@link ZipCryptoParameters} interface class which's
-     *         implementation is searched.
-     * @return {@link ZipCryptoParameters} of the given {@code type}
+     * @param  type the {@link ZipParameters} interface class which's
+     *         implementation is required.
+     * @return {@link ZipParameters} of the given {@code type}
      *         or {@code null} if not available.
      */
-    @CheckForNull <P extends ZipCryptoParameters> P get(Class<P> type);
+    @CheckForNull <P extends ZipParameters> P get(Class<P> type);
 }

@@ -22,7 +22,7 @@ import de.schlichtherle.truezip.util.JSE7;
 import static de.schlichtherle.truezip.zip.Constants.*;
 import static de.schlichtherle.truezip.zip.WinZipAesEntryExtraField.*;
 import static de.schlichtherle.truezip.zip.WinZipAesUtils.*;
-import static de.schlichtherle.truezip.zip.ZipCryptoUtils.*;
+import static de.schlichtherle.truezip.zip.ZipParametersUtils.*;
 import static de.schlichtherle.truezip.zip.ZipEntry.*;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
@@ -485,7 +485,7 @@ implements Iterable<E> {
      *         encrypted ZIP file is created.
      *         If you need more control over this, pass in an instance which's
      *         run time class just implements the
-     *         {@link ZipCryptoParametersProvider} interface.
+     *         {@link ZipParametersProvider} interface.
      *         Instances of this interface are queried to find crypto
      *         parameters which match a known encrypted ZIP file type.
      *         This algorithm is recursively applied.
@@ -495,22 +495,22 @@ implements Iterable<E> {
      */
     private EncryptedOutputMethod newEncryptedOutputMethod(
             final RawOutputMethod processor,
-            final @CheckForNull ZipCryptoParameters param)
-    throws ZipCryptoParametersException {
+            @CheckForNull ZipParameters param)
+    throws ZipParametersException {
         assert null != processor;
-        // Order is important here to support multiple interface implementations!
-        if (param == null) {
-            throw new ZipCryptoParametersException("No crypto parameters available!");
-        } else if (param instanceof WinZipAesParameters) {
-            return new WinZipAesOutputMethod(processor,
-                    (WinZipAesParameters) param);
-        } else if (param instanceof ZipCryptoParametersProvider) {
-            return newEncryptedOutputMethod(processor,
-                    ((ZipCryptoParametersProvider) param).get(
-                        ZipCryptoParameters.class));
-        } else {
-            throw new ZipCryptoParametersException("No suitable crypto parameters available!");
+        while (null != param) {
+            // Order is important here to support multiple interface implementations!
+            if (param instanceof WinZipAesParameters) {
+                return new WinZipAesOutputMethod(processor,
+                        (WinZipAesParameters) param);
+            } else if (param instanceof ZipParametersProvider) {
+                param = ((ZipParametersProvider) param)
+                        .get(ZipCryptoParameters.class);
+            } else {
+                break;
+            }
         }
+        throw new ZipParametersException("No suitable crypto parameters available!");
     }
 
     /**

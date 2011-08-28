@@ -24,7 +24,7 @@ import static de.schlichtherle.truezip.zip.Constants.*;
 import static de.schlichtherle.truezip.zip.LittleEndian.*;
 import static de.schlichtherle.truezip.zip.WinZipAesEntryExtraField.*;
 import static de.schlichtherle.truezip.zip.WinZipAesUtils.*;
-import static de.schlichtherle.truezip.zip.ZipCryptoUtils.*;
+import static de.schlichtherle.truezip.zip.ZipParametersUtils.*;
 import static de.schlichtherle.truezip.zip.ZipEntry.*;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
@@ -57,8 +57,9 @@ import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
  * parameter, this is used to decode comments and entry names in the ZIP file.
  * However, if an entry has bit 11 set in its General Purpose Bit Flags,
  * then this parameter is ignored and "UTF-8" is used for this entry.
- * This is in accordance to Appendix D of PKWARE's ZIP File Format
- * Specification, version 6.3.0 and later.
+ * This is in accordance to Appendix D of PKWARE's
+ * <a href="http://www.pkware.com/documents/casestudies/APPNOTE.TXT">ZIP File Format Specification</a>,
+ * version 6.3.0 and later.
  * <p>
  * This class is able to skip a preamble like the one found in self extracting
  * archives.
@@ -192,8 +193,9 @@ implements Iterable<E>, Closeable {
             mountCentralDirectory(brof, numEntries);
             if (this.preamble + this.postamble >= this.length) {
                 assert 0 == numEntries;
-                if (preambled) // otherwise already checked
-                    assertNotPreambled(brof);
+                assert preambled; // otherwise already checked
+                assertNotPreambled(brof);
+                assert false;
                 this.preamble = 0;
             }
             // Do NOT close brof - would close rof as well!

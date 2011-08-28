@@ -18,14 +18,14 @@ package de.schlichtherle.truezip.zip;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * Thrown to indicate that retrieving a key to encrypt or decrypt a ZIP entry
- * has failed for some reason.
+ * Thrown to indicate that retrieving a key to encrypt or decrypt or
+ * authenticate a ZIP entry has failed for some reason.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
-public class ZipKeyException extends ZipCryptoParametersException {
+public class ZipKeyException extends ZipParametersException {
     private static final long serialVersionUID = 5762312735142938698L;
 
     /**

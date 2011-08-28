@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.zip;
 
+import net.jcip.annotations.NotThreadSafe;
+
 /**
  * A marker interface for ZIP crypto parameters.
  * ZIP files feature different types of encryption or authentication.
@@ -27,5 +29,6 @@ package de.schlichtherle.truezip.zip;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface ZipCryptoParameters {
+@NotThreadSafe
+public interface ZipCryptoParameters extends ZipParameters {
 }
