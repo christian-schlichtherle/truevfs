@@ -15,10 +15,8 @@
  */
 package de.schlichtherle.truezip.zip;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import net.jcip.annotations.NotThreadSafe;
 
 /**
  * Provides parameters for reading ZIP files.
@@ -31,10 +29,9 @@ import net.jcip.annotations.NotThreadSafe;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@NotThreadSafe
 @DefaultAnnotation(NonNull.class)
 public interface ZipFileParameters<E extends ZipEntry>
-extends ZipEntryFactory<E>, ZipCharsetParameters, ZipCryptoParameters {
+extends ZipCharsetParameters, ZipEntryFactory<E> {
 
     /**
      * Returns the flag for allowing a preamble.
@@ -75,17 +72,4 @@ extends ZipEntryFactory<E>, ZipCharsetParameters, ZipCryptoParameters {
      * @return The flag for allowing a postamble of arbitrary length.
      */
     boolean getPostambled();
-
-    /**
-     * Returns the nullable crypto parameters.
-     * Crypto parameters are required for writing and reading entries which
-     * are encrypted and authenticated, e.g. according to WinZip's
-     * <a href="http://www.winzip.com/win/en/aes_info.htm">AES Encryption Information: Encryption Specification AE-1 and AE-2</a>
-     * <p>
-     * If this method returns {@code null}, then writing or reading WinZip AES
-     * entries will fail with a {@link ZipCryptoParametersException}.
-     * 
-     * @return The nullable crypto parameters.
-     */
-    @CheckForNull ZipCryptoParameters getCryptoParameters();
 }

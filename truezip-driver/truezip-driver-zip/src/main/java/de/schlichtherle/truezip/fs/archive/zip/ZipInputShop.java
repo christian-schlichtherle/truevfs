@@ -52,7 +52,7 @@ implements InputShop<ZipArchiveEntry> {
             final FsModel model,
             final ReadOnlyFile rof)
     throws IOException {
-        super(rof, driver.getCharset(), driver.getPreambled(), driver.getPostambled(), driver);
+        super(rof, driver);
         this.driver = driver;
         this.model = model;
         super.recoverLostEntries();

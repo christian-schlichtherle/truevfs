@@ -22,7 +22,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 /**
  * A factory for {@link ZipEntry}s.
  *
- * @see     RawZipFile
  * @param   <E> The type of the created ZIP entries.
  * @author  Christian Schlichtherle
  * @version $Id$

@@ -122,10 +122,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
             final boolean postambled)
     throws IOException {
         super(  new DefaultReadOnlyFilePool(path),
-                charset,
-                preambled,
-                postambled,
-                DefaultZipEntryFactory.SINGLETON);
+                new DefaultZipFileParameters(charset, preambled, postambled));
         this.name = path;
     }
 
@@ -186,10 +183,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
             final boolean postambled)
     throws IOException {
         super(  new DefaultReadOnlyFilePool(file),
-                charset,
-                preambled,
-                postambled,
-                DefaultZipEntryFactory.SINGLETON);
+                new DefaultZipFileParameters(charset, preambled, postambled));
         this.name = file.toString();
     }
 
@@ -249,11 +243,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
             boolean preambled,
             boolean postambled)
     throws IOException {
-        super(  rof,
-                charset,
-                preambled,
-                postambled,
-                DefaultZipEntryFactory.SINGLETON);
+        super(rof, new DefaultZipFileParameters(charset, preambled, postambled));
         this.name = rof.toString();
     }
 

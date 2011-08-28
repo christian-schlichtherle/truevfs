@@ -16,18 +16,42 @@
 
 package de.schlichtherle.truezip.zip;
 
+import java.nio.charset.Charset;
+
 /**
- * The default factory for {@link ZipEntry}s.
+ * The default implementation of {@link ZipFileParameters}.
  *
+ * @since   TrueZIP 7.3
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-final class DefaultZipEntryFactory implements ZipEntryFactory<ZipEntry> {
+final class DefaultZipFileParameters implements ZipFileParameters<ZipEntry> {
 
-    static final ZipEntryFactory<ZipEntry> SINGLETON
-    		= new DefaultZipEntryFactory();
+    final Charset charset;
+    final boolean preambled, postambled;
 
-    private DefaultZipEntryFactory() {
+    DefaultZipFileParameters(
+            final Charset charset,
+            final boolean preambled,
+            final boolean postambled) {
+        this.charset = charset;
+        this.preambled = preambled;
+        this.postambled = postambled;
+    }
+
+    @Override
+    public Charset getCharset() {
+        return charset;
+    }
+
+    @Override
+    public boolean getPreambled() {
+        return preambled;
+    }
+
+    @Override
+    public boolean getPostambled() {
+        return postambled;
     }
 
     @Override

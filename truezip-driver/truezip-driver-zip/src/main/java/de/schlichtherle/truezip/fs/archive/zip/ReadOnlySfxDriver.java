@@ -50,7 +50,7 @@ public class ReadOnlySfxDriver extends ZipDriver {
     }
 
     @Override
-    protected final boolean getPreambled() {
+    public final boolean getPreambled() {
         return true;
     }
 

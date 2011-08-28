@@ -32,7 +32,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.Closeable;
 import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -92,16 +91,10 @@ implements Iterable<E>, Closeable {
      */
     public static final Charset DEFAULT_CHARSET = Constants.DEFAULT_CHARSET;
 
-    /** Maps entry names to zip entries. */
-    private Map<String, E> entries;
+    /** The nullable data source. */
+    private @CheckForNull ReadOnlyFile rof;
 
-    /** The charset to use for entry names and comments. */
-    private Charset charset;
-
-    /** The encoded file comment. */
-    private @CheckForNull byte[] comment;
-
-    /** The total number of bytes in this ZIP file. */
+    /** The total number of bytes in the ZIP file. */
     private long length;
 
     /** The number of bytes in the preamble of this ZIP file. */
@@ -110,90 +103,65 @@ implements Iterable<E>, Closeable {
     /** The number of bytes in the postamble of this ZIP file. */
     private long postamble;
 
+    private final ZipEntryFactory<E> param;
+
+    /** The charset to use for entry names and comments. */
+    private Charset charset;
+
+    /** The encoded file comment. */
+    private @CheckForNull byte[] comment;
+
+    /** Maps entry names to zip entries. */
+    private Map<String, E> entries;
+
     /** Maps offsets specified in the ZIP file to real offsets in the file. */
     private OffsetMapper mapper = new OffsetMapper();
 
-    private final ZipEntryFactory<E> factory;
-
-    /** The nullable data source. */
-    private @CheckForNull ReadOnlyFile rof;
-
-    /** The number of allocate streams reading from this ZIP file. */
-    private int openEntries;
+    /** The number of open resources for reading the entries in this ZIP file. */
+    private int open;
 
     /**
-     * Reads the given {@code archive} in order to provide random access
-     * to its ZIP entries.
+     * Reads the given {@code zip} file in order to provide random access
+     * to its entries.
      *
-     * @param  archive the {@link ReadOnlyFile} instance to be read in order to
-     *         provide random access to its ZIP entries.
-     * @param  charset the charset to use for decoding entry names and ZIP file
-     *         comment.
-     * @param  preambled if this is {@code true}, then the ZIP file may have a
-     *         preamble.
-     *         Otherwise, the ZIP file must start with either a Local File
-     *         Header (LFH) signature or an End Of Central Directory (EOCD)
-     *         Header, causing this constructor to fail if the file is actually
-     *         a false positive ZIP file, i.e. not compatible to the ZIP File
-     *         Format Specification.
-     *         This may be useful to read Self Extracting ZIP files (SFX),
-     *         which usually contain the application code required for
-     *         extraction in the preamble.
-     * @param  postambled if this is {@code true}, then the ZIP file may have a
-     *         postamble of arbitrary length.
-     *         Otherwise, the ZIP file must not have a postamble which exceeds
-     *         64KB size, including the End Of Central Directory record
-     *         (i.e. including the ZIP file comment), causing this constructor
-     *         to fail if the file is actually a false positive ZIP file, i.e.
-     *         not compatible to the ZIP File Format Specification.
-     *         This may be useful to read Self Extracting ZIP files (SFX) with
-     *         large postambles.
-     * @param  factory a factory for {@link ZipEntry}s.
-     * @throws FileNotFoundException if {@code archive} cannot get opened for
-     *         reading.
-     * @throws ZipException if {@code archive} is not compatible to the ZIP
+     * @param  zip the ZIP file to be read.
+     * @param  param the parameters for accessing the entries in the ZIP file.
+     * @throws ZipException if the file is not compatible to the ZIP
      *         File Format Specification.
      * @throws IOException on any other I/O related issue.
      * @see    #recoverLostEntries()
      */
     protected RawZipFile(
-            ReadOnlyFile archive,
-            Charset charset,
-            boolean preambled,
-            boolean postambled,
-            ZipEntryFactory<E> factory)
+            ReadOnlyFile zip,
+            ZipFileParameters<E> param)
     throws IOException {
-        this(   new SingleReadOnlyFilePool(archive),
-                charset, preambled, postambled, factory);
+        this(new SingleReadOnlyFilePool(zip), param);
     }
 
     RawZipFile(
             final Pool<ReadOnlyFile, IOException> source,
-            final Charset charset,
-            final boolean preambled,
-            final boolean postambled,
-            final ZipEntryFactory<E> factory)
+            final ZipFileParameters<E> param)
     throws IOException {
-        if (null == charset || null == factory)
+        if (null == param)
             throw new NullPointerException();
         final ReadOnlyFile rof = source.allocate();
         try {
             this.rof = rof;
             this.length = rof.length();
-            this.charset = charset;
-            this.factory = factory;
+            this.param = param;
+            this.charset = param.getCharset();
             final BufferedReadOnlyFile brof;
             if (rof instanceof BufferedReadOnlyFile)
                 brof = (BufferedReadOnlyFile) rof;
             else
                 brof = new BufferedReadOnlyFile(rof);
-            if (!preambled)
+            if (!param.getPreambled())
                 assertNotPreambled(brof);
-            final int numEntries = findCentralDirectory(brof, postambled);
+            final int numEntries = findCentralDirectory(brof, param.getPostambled());
             mountCentralDirectory(brof, numEntries);
             if (this.preamble + this.postamble >= this.length) {
                 assert 0 == numEntries;
-                assert preambled; // otherwise already checked
+                assert param.getPreambled(); // otherwise already checked
                 assertNotPreambled(brof);
                 assert false;
                 this.preamble = 0;
@@ -204,9 +172,10 @@ implements Iterable<E>, Closeable {
             throw ex;
         }
         assert null != this.rof;
-        //assert null != this.factory; // pleases FindBugs!
-        assert null != this.mapper;
+        assert null != this.param;
         assert null != this.charset;
+        assert null != this.entries;
+        assert null != this.mapper;
     }
 
     private void assertNotPreambled(final ReadOnlyFile rof)
@@ -237,6 +206,7 @@ implements Iterable<E>, Closeable {
      * The following fields may get updated:
      * <ul>
      * <li>{@link #comment}
+     * <li>{@link #mapper}
      * </ul>
      *
      * @throws ZipException If the file is not compatible to the ZIP File
@@ -422,7 +392,7 @@ implements Iterable<E>, Closeable {
             final boolean utf8 = 0 != (gpbf & GPBF_UTF8);
             if (utf8)
                 this.charset = UTF8;
-            final E entry = this.factory.newEntry(decode(name));
+            final E entry = this.param.newEntry(decode(name));
             try {
                 int off = 0;
                 // central file header signature   4 bytes  (0x02014b50)
@@ -568,7 +538,7 @@ implements Iterable<E>, Closeable {
                 final boolean utf8 = 0 != (gpbf & GPBF_UTF8);
                 if (utf8)
                     this.charset = UTF8;
-                final E entry = this.factory.newEntry(decode(name));
+                final E entry = this.param.newEntry(decode(name));
                 int off = 0;
                 // local file header signature     4 bytes  (0x04034b50)
                 off += 4;
@@ -783,7 +753,7 @@ implements Iterable<E>, Closeable {
      * one or more entries.
      */
     public boolean busy() {
-        return 0 < openEntries;
+        return 0 < open;
     }
 
     /**
@@ -1156,7 +1126,7 @@ implements Iterable<E>, Closeable {
         throws IOException {
             super(RawZipFile.this.rof, start, length);
             assert null != RawZipFile.this.rof;
-            RawZipFile.this.openEntries++;
+            RawZipFile.this.open++;
         }
 
         @Override
@@ -1164,7 +1134,7 @@ implements Iterable<E>, Closeable {
             if (this.closed)
                 return;
             this.closed = true;
-            RawZipFile.this.openEntries--;
+            RawZipFile.this.open--;
             // Never close the raw ZIP file!
             //super.close();
         }

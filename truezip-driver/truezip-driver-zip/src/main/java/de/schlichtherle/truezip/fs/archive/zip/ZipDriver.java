@@ -41,7 +41,8 @@ import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.zip.ZipCryptoParameters;
 import de.schlichtherle.truezip.zip.ZipEntry;
 import static de.schlichtherle.truezip.zip.ZipEntry.*;
-import de.schlichtherle.truezip.zip.ZipEntryFactory;
+import de.schlichtherle.truezip.zip.ZipFileParameters;
+import de.schlichtherle.truezip.zip.ZipOutputStreamParameters;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -69,7 +70,7 @@ import net.jcip.annotations.Immutable;
 @DefaultAnnotation(NonNull.class)
 public class ZipDriver
 extends FsCharsetArchiveDriver<ZipArchiveEntry>
-implements ZipEntryFactory<ZipArchiveEntry> {
+implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
 
     /**
      * The character set for entry names and comments in &quot;traditional&quot;
@@ -282,46 +283,13 @@ implements ZipEntryFactory<ZipArchiveEntry> {
         return ioPool;
     }
 
-    /**
-     * Returns the value of the property {@code preambled}.
-     * If this is {@code true}, then a ZIP file is allowed to contain arbitrary
-     * data as its preamble before the actual ZIP file data.
-     * Self Extracting Archives typically use a preamble to store the
-     * application code that is required to extract the ZIP file contents.
-     * <p>
-     * Note that searching for a preamble can seriously degrade the performance
-     * if the file is not compatible to the ZIP File Format Specification.
-     * <p>
-     * The implementation in the class {@link ZipDriver} returns {@code false}.
-     *
-     * @return The value of the property {@code preambled}.
-     */
-    protected boolean getPreambled() {
+    @Override
+    public boolean getPreambled() {
         return false;
     }
 
-    /**
-     * Returns the value of the property {@code postambled}.
-     * If this is {@code true}, then a ZIP file is allowed to contain arbitrary
-     * length data as its postamble after the actual ZIP file data.
-     * <p>
-     * If this is {@code false}, then a ZIP file may still have a postamble.
-     * However, the postamble must not exceed 64KB size, including the End Of
-     * Central Directory record and thus the ZIP file comment.
-     * This causes the initial ZIP file compatibility test to fail fast if the
-     * file is not compatible to the ZIP File Format Specification.
-     * <p>
-     * Note that searching for an arbitrary length postamble can seriously
-     * degrade the performance if the file is not compatible to the ZIP File
-     * Format Specification.
-     * So this should be set to {@code true} only if Self Extracting Archives
-     * with very large postambles need to get supported.
-     * <p>
-     * The implementation in the class {@link ZipDriver} returns {@code false}.
-     *
-     * @return The value of the property {@code postambled}.
-     */
-    protected boolean getPostambled() {
+    @Override
+    public boolean getPostambled() {
         return false;
     }
 

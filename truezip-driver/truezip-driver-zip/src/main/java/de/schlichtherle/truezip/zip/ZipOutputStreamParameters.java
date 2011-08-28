@@ -15,10 +15,6 @@
  */
 package de.schlichtherle.truezip.zip;
 
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
-import net.jcip.annotations.NotThreadSafe;
-
 /**
  * An interface for {@link ZipOutputStream} parameters.
  * 
@@ -26,8 +22,6 @@ import net.jcip.annotations.NotThreadSafe;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@NotThreadSafe
-@DefaultAnnotation(NonNull.class)
 public interface ZipOutputStreamParameters
-extends ZipCharsetParameters, ZipCryptoParameters {
+extends ZipCharsetParameters {
 }
