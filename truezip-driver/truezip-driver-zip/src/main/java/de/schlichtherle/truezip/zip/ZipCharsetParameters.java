@@ -18,7 +18,6 @@ package de.schlichtherle.truezip.zip;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.nio.charset.Charset;
-import net.jcip.annotations.NotThreadSafe;
 
 /**
  * Defines the default character set for accessing ZIP files.
@@ -27,7 +26,6 @@ import net.jcip.annotations.NotThreadSafe;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@NotThreadSafe
 @DefaultAnnotation(NonNull.class)
 public interface ZipCharsetParameters extends ZipParameters {
 
