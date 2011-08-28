@@ -20,7 +20,6 @@ import de.schlichtherle.truezip.crypto.param.KeyStrength;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.OutputStream;
 import net.jcip.annotations.NotThreadSafe;
@@ -79,22 +78,23 @@ public abstract class RaesOutputStream extends CipherOutputStream {
      */
     public static RaesOutputStream getInstance(
             final OutputStream out,
-            final @CheckForNull RaesParameters param)
+            @CheckForNull RaesParameters param)
     throws IOException {
         if (null == out)
             throw new NullPointerException();
-        // Order is important here to support multiple interface implementations!
-        if (param == null) {
-            throw new RaesParametersException("No RAES parameters available!");
-        } else if (param instanceof Type0RaesParameters) {
-            return new Type0RaesOutputStream(out,
-                    (Type0RaesParameters) param);
-        } else if (param instanceof RaesParametersProvider) {
-            return getInstance(out,
-                    ((RaesParametersProvider) param).get(RaesParameters.class));
-        } else {
-            throw new RaesParametersException();
+        while (null != param) {
+            // Order is important here to support multiple interface implementations!
+            if (param instanceof Type0RaesParameters) {
+                return new Type0RaesOutputStream(out,
+                        (Type0RaesParameters) param);
+            } else if (param instanceof RaesParametersProvider) {
+                param = ((RaesParametersProvider) param)
+                        .get(RaesParameters.class);
+            } else {
+                break;
+            }
         }
+        throw new RaesParametersException("No suitable RAES parameters available!");
     }
 
     RaesOutputStream(   @CheckForNull OutputStream out,

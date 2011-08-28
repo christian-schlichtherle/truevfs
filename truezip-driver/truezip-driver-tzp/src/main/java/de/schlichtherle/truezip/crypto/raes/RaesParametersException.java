@@ -30,15 +30,6 @@ public class RaesParametersException extends RaesException {
 
     /**
      * Constructs a RAES parameters exception with
-     * a detail message indicating that no suitable {@link RaesParameters}
-     * have been found.
-     */
-    public RaesParametersException() {
-        super("No suitable RAES parameters available!");
-    }
-
-    /**
-     * Constructs a RAES parameters exception with
      * the given detail message.
      *
      * @param msg the detail message.
