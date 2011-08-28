@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>6.2.1 Release Notes</title>
+        <meta name="Author" content="Christian Schlichtherle"/>
+    </head>
+    <body>
+        <div id="content">
+            <h1>Release Notes for TrueZIP 6.2.1</h1>
+            <p class="subtitle">(September 7<sup>th</sup>, 2006)</p>
+            <h2>Contents</h2>
+            <ol>
+                <li><a href="#introduction">Introduction</a></li>
+                <li><a href="#updates">List of Updates (Change Log)</a></li>
+            </ol>
+            <h2><a name="introduction">Introduction</a></h2>
+            <p>This is a maintenance release.</p>
+            <table id="legend">
+                <thead>
+                    <tr>
+                        <th colspan="2">Legend</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>New</th>
+                        <td>Introduces a new feature.</td>
+                    </tr>
+                    <tr>
+                        <th>Fixed</th>
+                        <td>Introduces a bug fix of an existing feature.</td>
+                    </tr>
+                    <tr>
+                        <th>Enhanced</th>
+                        <td>
+                            Introduces the enhancement of an existing feature.
+                            This update is fully backwards compatible.
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Changed</th>
+                        <td>
+                            Introduces the change of an existing feature.
+                            This update may cause
+                            <a href="releases.html#compatibility">
+                                backwards incompatibilities
+                            </a>.
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Deprecated</th>
+                        <td>Introduces the deprecation of an existing feature.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h2><a name="updates">List of Updates (Change Log)</a></h2>
+            <p>
+                Following is an overview of all updates in this release
+                which affect the public API.
+                Please note that internal refactorings are not listed.
+                For a full list of updates, please refer to the CVS repository
+                and diff to the tag <code>TrueZIP-6_2</code>.
+            </p>
+            <ol>
+                <li><b>Enhanced:</b> Exception messages have been revised in various packages
+                    in order to provide more meaningful information, helping developers to
+                understand the root cause.</li>
+                <li><b>Fixed:</b> The methods <code>en/decrypt</code> in the class <code>
+                    de.schlichtherle.io.RaesFileUtils</code> looked up the key using the normal
+                path name instead of the canonical path name.</li>
+            </ol>
+        </div>
+    </body>
+</html>

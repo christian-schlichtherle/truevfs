@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (C) 2005-2011 Schlichtherle IT Services
+  -
+  - Licensed under the Apache License, Version 2.0 (the "License");
+  - you may not use this file except in compliance with the License.
+  - You may obtain a copy of the License at
+  -
+  -     http://www.apache.org/licenses/LICENSE-2.0
+  -
+  - Unless required by applicable law or agreed to in writing, software
+  - distributed under the License is distributed on an "AS IS" BASIS,
+  - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  - See the License for the specific language governing permissions and
+  - limitations under the License.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head><title>Package Summary</title></head>
+    <body>
+        <p>
+            A drop-in replacement for the classes in the package
+            {@link java.util.zip} for reading and writing ZIP files.
+        </p>
+        <p>
+            The classes in this package read and write ZIP files according to
+            a subset of PKWARE's
+            <a href="http://www.pkware.com/documents/casestudies/APPNOTE.TXT">
+                ZIP File Format Specification
+            </a>,
+            Version 6.3.2 from September 28, 2007.
+            The subset has been selected in order to achieve the following
+            objectives:
+        </p>
+        <ul>
+            <li>
+                Full interoperability with ZIP files read or written by the
+                package {@link java.util.zip} of Sun's Java SE&nbsp;7
+                implementation.
+            </li>
+            <li>
+                Support for arbitrary character sets, in particular
+                IBM Code Page 437 (alias IBM PC) for PKZIP compatibility
+                and UTF-8 for Java Archive (JAR) compatibility.
+                Note that using any other character set except CP437 or UTF-8
+                is strongly discouraged because it will result in
+                interoperability issues with third party tools, especially
+                when sharing archive files between different locales!
+            </li>
+            <li>
+                Support for reading and writing ZIP64 extensions with the
+                following restrictions:
+                <ol>
+                    <li>
+                        The maximum file size is {@link java.lang.Long#MAX_VALUE}.
+                    </li>
+                    <li>
+                        The maximum number of entries in the Central Directory
+                        is {@link java.lang.Integer#MAX_VALUE}.
+                    </li>
+                    <li>
+                        The offsets in ZIP64 files must respect a preamble if
+                        present, i.e. they must by exact.
+                        This is in contrast to ZIP32 files where the offsets
+                        do not need to respect a preamble if present.
+                        Preambles are primarily used to contain self extracting
+                        (SFX) executable code.
+                    </li>
+                </ol>
+            </li>
+            <li>
+                {@link de.schlichtherle.truezip.zip.ZipFile} supports
+                reading archive data from the random access read only
+                interface {@link de.schlichtherle.truezip.rof.ReadOnlyFile},
+                which allows to read archive data from composite data sources
+                like e.g. RAES encrypted ZIP files directly without the need
+                to decrypt them to a temporary file first.
+            </li>
+        </ul>
+    </body>
+</html>

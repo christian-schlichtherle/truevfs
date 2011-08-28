@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>6.3 Release Notes</title>
+        <meta name="Author" content="Christian Schlichtherle"/>
+    </head>
+    <body>
+        <div id="content">
+            <h1>Release Notes for TrueZIP 6.3</h1>
+            <p class="subtitle">(October 6<sup>th</sup>, 2006)</p>
+            <h2>Contents</h2>
+            <ol>
+                <li><a href="#introduction">Introduction</a></li>
+                <li><a href="#updates">List of Updates (Change Log)</a></li>
+            </ol>
+            <h2><a name="introduction">Introduction</a></h2>
+            <p>This is a minor feature release which adds some new parameters to make it
+            easier to update/unmount archive files safely in multithreaded environments.</p>
+            <table id="legend">
+                <thead>
+                    <tr>
+                        <th colspan="2">Legend</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>New</th>
+                        <td>Introduces a new feature.</td>
+                    </tr>
+                    <tr>
+                        <th>Fixed</th>
+                        <td>Introduces a bug fix of an existing feature.</td>
+                    </tr>
+                    <tr>
+                        <th>Enhanced</th>
+                        <td>
+                            Introduces the enhancement of an existing feature.
+                            This update is fully backwards compatible.
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Changed</th>
+                        <td>
+                            Introduces the change of an existing feature.
+                            This update may cause
+                            <a href="releases.html#compatibility">
+                                backwards incompatibilities
+                            </a>.
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Deprecated</th>
+                        <td>Introduces the deprecation of an existing feature.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h2><a name="updates">List of Updates (Change Log)</a></h2>
+            <p>
+                Following is an overview of all updates in this release
+                which affect the public API.
+                Please note that internal refactorings are not listed.
+                For a full list of updates, please refer to the CVS repository
+                and diff to the tag <code>TrueZIP-6_2_1</code>.
+            </p>
+            <ol>
+                <li><b>New:</b> The methods de.schlichtherle.io.File.<a href="apidocs/de/schlichtherle/io/File.html#update">update</a>/<a href="apidocs/de/schlichtherle/io/File.html#umount">umount</a>(...)
+                    provide new parameters which make it easier to update archives safely in
+                    multithreaded environments: You can now update individual archive files only
+                    and/or wait until all other threads have closed their archive entry streams.
+                    Furthermore, you can now specify the forced closing of entry streams
+                    separately for input and output streams. For more information, please refer to
+                the Javadoc.</li>
+                <li><b>Fixed:</b> Ghost directories (directories for which there is no
+                    information present in an archive, but for which one or more children exist) were written to
+                the archive on update.</li>
+                <li><b>Fixed:</b> A <code>ClassCastException</code> was thrown when updating
+                an archive on some non-Sun provided J2SE APIs.</li>
+                <li><b>Fixed:</b> The prologue length for an empty ZIP file was set to
+                    Long.MAX_VALUE. This caused the empty ZIP file to be prepended to any update
+                    of the ZIP file, which didn't negatively affect ZIP file format compatibility
+                but unnecessarily bloated the updated ZIP file by 22 bytes on each update.</li>
+                <li>
+                    <b>Fixed &amp; Enhanced:</b> Updated the Javadoc of some classes.
+                </li>
+            </ol>
+        </div>
+    </body>
+</html>
