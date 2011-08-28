@@ -59,12 +59,6 @@ public abstract class RawZipOutputStream<E extends ZipEntry>
 extends DecoratingOutputStream
 implements Iterable<E> {
 
-    /**
-     * The default character set used for entry names and comments in ZIP files.
-     * This is {@code "UTF-8"} for compatibility with Sun's JDK implementation.
-     */
-    public static final Charset DEFAULT_CHARSET = Constants.DEFAULT_CHARSET;
-
     private final LEDataOutputStream dos;
 
     /** The charset to use for entry names and comments. */
@@ -104,43 +98,7 @@ implements Iterable<E> {
 
     /**
      * Constructs a raw ZIP output stream which decorates the given output
-     * stream using the given charset.
-     *
-     * @throws UnsupportedCharsetException If {@code charset} is not supported
-     *         by this JVM.
-     */
-    protected RawZipOutputStream(
-            final OutputStream out,
-            final Charset charset) {
-        super(newLEDataOutputStream(out, null));
-        if (null == charset)
-            throw new NullPointerException();
-        this.dos = (LEDataOutputStream) this.delegate;
-        this.charset = charset;
-    }
-
-    /**
-     * Constructs a raw ZIP output stream which decorates the given output
-     * stream and appends to the given raw ZIP file.
-     *
-     * @param  out The output stream to write the ZIP file to.
-     *         If {@code appendee} is not {@code null}, then this must be set
-     *         up so that it appends to the same ZIP file from which
-     *         {@code appendee} is reading.
-     * @param  appendee the raw ZIP file to append to.
-     *         This may already be closed.
-     */
-    protected RawZipOutputStream(
-            final OutputStream out,
-            final RawZipFile<E> appendee) {
-        this(out, appendee, null);
-    }
-
-    /**
-     * Constructs a raw ZIP output stream which decorates the given output
      * stream and optionally apppends to the given raw ZIP file.
-     * <p>
-     * This constructor is not intended for ordinary use.
      *
      * @param  out The output stream to write the ZIP file to.
      *         If {@code appendee} is not {@code null}, then this must be set
@@ -148,8 +106,9 @@ implements Iterable<E> {
      *         {@code appendee} is reading.
      * @param  appendee the raw ZIP file to append to.
      *         This may already be closed.
-     * @param  charset the character set to use if {@code appendee} is
-     *         {@code null}.
+     * @param  charset the character set to use for encoding comments and entry
+     *         names
+     *         if {@code appendee} is {@code null}.
      * @since  TrueZIP 7.3
      */
     protected RawZipOutputStream(
@@ -315,6 +274,14 @@ implements Iterable<E> {
         this.method = (short) test.getMethod();
     }
 
+    private int getBZip2BlockSize() {
+        final int level = getLevel();
+        if (BZip2CompressorOutputStream.MIN_BLOCKSIZE <= level
+                && level <= BZip2CompressorOutputStream.MAX_BLOCKSIZE)
+            return level;
+        return BZip2CompressorOutputStream.MAX_BLOCKSIZE;
+    }
+
     /**
      * Returns the current compression level.
      * 
@@ -322,14 +289,6 @@ implements Iterable<E> {
      */
     public int getLevel() {
         return deflater.getLevel();
-    }
-
-    private int getBZip2BlockSize() {
-        final int level = getLevel();
-        if (BZip2CompressorOutputStream.MIN_BLOCKSIZE <= level
-                && level <= BZip2CompressorOutputStream.MAX_BLOCKSIZE)
-            return level;
-        return BZip2CompressorOutputStream.MAX_BLOCKSIZE;
     }
 
     /**
