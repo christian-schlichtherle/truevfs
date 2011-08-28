@@ -89,7 +89,7 @@ public abstract class ZipRaesDriver extends JarDriver {
      * @return {@code true}
      */
     @Override
-    protected final boolean getPreambled() {
+    public final boolean getPreambled() {
         return true;
     }
 
