@@ -171,19 +171,19 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
     @SuppressWarnings("unchecked")
     private static <P extends RaesParameters> P parameters(
             final Class<P> type,
-            final @CheckForNull RaesParameters param)
+            @CheckForNull RaesParameters param)
     throws RaesParametersException {
-        // Order is important here to support multiple interface implementations!
-        if (null == param) {
-            throw new RaesParametersException("No RAES parameters available!");
-        } else if (type.isAssignableFrom(param.getClass())) {
-            return (P) param;
-        } else if (param instanceof RaesParametersProvider) {
-            return parameters(type,
-                    ((RaesParametersProvider) param).get(type));
-        } else {
-            throw new RaesParametersException();
+        while (null != param) {
+            // Order is important here to support multiple interface implementations!
+            if (type.isAssignableFrom(param.getClass())) {
+                return (P) param;
+            } else if (param instanceof RaesParametersProvider) {
+                param = ((RaesParametersProvider) param).get(type);
+            } else {
+                break;
+            }
         }
+        throw new RaesParametersException("No suitable RAES parameters available!");
     }
 
     /**
