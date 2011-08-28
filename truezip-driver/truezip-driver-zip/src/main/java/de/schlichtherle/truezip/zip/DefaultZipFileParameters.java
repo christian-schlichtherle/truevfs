@@ -34,6 +34,8 @@ final class DefaultZipFileParameters implements ZipFileParameters<ZipEntry> {
             final Charset charset,
             final boolean preambled,
             final boolean postambled) {
+        if (null == charset)
+            throw new NullPointerException();
         this.charset = charset;
         this.preambled = preambled;
         this.postambled = postambled;
