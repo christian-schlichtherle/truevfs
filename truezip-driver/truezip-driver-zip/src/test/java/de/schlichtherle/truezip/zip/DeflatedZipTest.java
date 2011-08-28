@@ -15,9 +15,17 @@
  */
 package de.schlichtherle.truezip.zip;
 
+import static de.schlichtherle.truezip.zip.ZipEntry.*;
+
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class ZipTest extends ZipTestSuite {
+public final class DeflatedZipTest extends ZipTestSuite {
+    @Override
+    public ZipEntry newEntry(String name) {
+        ZipEntry entry = new ZipEntry(name);
+        entry.setMethod(DEFLATED);
+        return entry;
+    }
 }
