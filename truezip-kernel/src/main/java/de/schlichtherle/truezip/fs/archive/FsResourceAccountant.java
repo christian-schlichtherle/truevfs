@@ -247,7 +247,7 @@ public final class FsResourceAccountant {
      */
     private final class Reference extends WeakReference<Account> {
         Reference(Account account) {
-            super(account, Notifier.queue);
+            super(account, Collector.queue);
         }
 
         /**
@@ -268,20 +268,20 @@ public final class FsResourceAccountant {
 
     /**
      * A high priority daemon thread which runs an endless loop in order to
-     * remove account references which have been picked up by the garbage
+     * collect account references which have been picked up by the garbage
      * collector and notify their respective resource accountant.
      * You cannot use this class outside its package.
      */
-    public static final class Notifier extends Thread {
+    public static final class Collector extends Thread {
         static final ReferenceQueue<Account>
                 queue = new ReferenceQueue<Account>();
 
         static {
-            new Notifier().start();
+            new Collector().start();
         }
 
-        Notifier() {
-            super(ThreadGroups.getTopLevel(), Notifier.class.getName());
+        Collector() {
+            super(ThreadGroups.getTopLevel(), Collector.class.getName());
             setPriority(MAX_PRIORITY - 2);
             setDaemon(true);
         }
@@ -296,5 +296,5 @@ public final class FsResourceAccountant {
                 }
             }
         }
-    } // Notifier
+    } // Collector
 }
