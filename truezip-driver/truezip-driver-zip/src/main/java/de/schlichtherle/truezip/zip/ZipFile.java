@@ -248,7 +248,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
     }
 
     @Override
-    protected synchronized void recoverLostEntries() throws IOException {
+    public synchronized void recoverLostEntries() throws IOException {
         super.recoverLostEntries();
     }
 
@@ -326,15 +326,13 @@ public class ZipFile extends RawZipFile<ZipEntry> {
 
     @Override
     public synchronized InputStream getPreambleInputStream() throws IOException {
-        return new SynchronizedInputStream(
-                super.getPreambleInputStream(),
+        return new SynchronizedInputStream(super.getPreambleInputStream(),
                 this);
     }
 
     @Override
     public synchronized InputStream getPostambleInputStream() throws IOException {
-        return new SynchronizedInputStream(
-                super.getPostambleInputStream(),
+        return new SynchronizedInputStream(super.getPostambleInputStream(),
                 this);
     }
 
