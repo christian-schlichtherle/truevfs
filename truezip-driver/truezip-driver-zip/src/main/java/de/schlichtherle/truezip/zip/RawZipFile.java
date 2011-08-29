@@ -125,7 +125,7 @@ implements Iterable<E>, Closeable {
      * to its entries.
      *
      * @param  zip the ZIP file to be read.
-     * @param  param the parameters for accessing the entries in the ZIP file.
+     * @param  param the parameters for reading the ZIP file.
      * @throws ZipException if the file is not compatible to the ZIP
      *         File Format Specification.
      * @throws IOException on any other I/O related issue.

@@ -42,6 +42,7 @@ import de.schlichtherle.truezip.zip.ZipCryptoParameters;
 import de.schlichtherle.truezip.zip.ZipEntry;
 import static de.schlichtherle.truezip.zip.ZipEntry.*;
 import de.schlichtherle.truezip.zip.ZipFileParameters;
+import de.schlichtherle.truezip.zip.ZipOutputStream;
 import de.schlichtherle.truezip.zip.ZipOutputStreamParameters;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
@@ -283,41 +284,68 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
         return ioPool;
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The implementation in the class {@link ZipDriver}
+     * returns {@code false}.
+     * 
+     * @return {@code false}
+     */
     @Override
     public boolean getPreambled() {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The implementation in the class {@link ZipDriver}
+     * returns {@code false}.
+     * 
+     * @return {@code false}
+     */
     @Override
     public boolean getPostambled() {
         return false;
     }
 
     /**
-     * Returns the compression method for new ZIP entries.
-     * This is used when writing an entry to a ZIP output stream.
+     * {@inheritDoc}
      * <p>
-     * The implementation in the class {@link ZipDriver} returns
-     * {@link ZipEntry#DEFLATED}.
-     *
-     * Returns The compression method for new ZIP entries.
-     * @see    ZipEntry#DEFLATED
-     * @see    ZipEntry#BZIP2
+     * The implementation in the class {@link ZipDriver}
+     * returns {@code ZipOutputStream#INITIAL_SIZE}.
+     * 
+     * @since  TrueZIP 7.3
+     * @return {@code ZipOutputStream#INITIAL_SIZE}
      */
+    @Override
+    public int getInitialSize() {
+        return ZipOutputStream.INITIAL_SIZE;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The implementation in the class {@link ZipDriver}
+     * returns {@code ZipEntry#DEFLATED}.
+     * 
+     * @return {@code ZipEntry#DEFLATED}
+     */
+    @Override
     public int getMethod() {
         return DEFLATED;
     }
 
     /**
-     * Returns the value of the property {@code level}.
-     * This is the compression level to use when deflating an entry to a ZIP
-     * output stream.
+     * {@inheritDoc}
      * <p>
-     * The implementation in the class {@link ZipDriver} returns
-     * {@link Deflater#BEST_COMPRESSION}.
-     *
-     * @return The value of the property {@code level}.
+     * The implementation in the class {@link ZipDriver}
+     * returns {@code Deflater#BEST_COMPRESSION}.
+     * 
+     * @return {@code Deflater#BEST_COMPRESSION}
      */
+    @Override
     public int getLevel() {
         return Deflater.BEST_COMPRESSION;
     }

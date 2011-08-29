@@ -31,7 +31,6 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
-import java.nio.charset.UnsupportedCharsetException;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -64,6 +63,9 @@ implements Iterable<E> {
     /** The charset to use for entry names and comments. */
     private final Charset charset;
 
+    /** Default compression method for next entry. */
+    private int method;
+
     /** This instance is used for deflated output. */
     private final ZipDeflater deflater = JSE7.AVAILABLE
             ? new ZipDeflater()     // JDK 7 is OK
@@ -72,17 +74,11 @@ implements Iterable<E> {
     /** The encoded file comment. */
     private @CheckForNull byte[] comment;
 
-    /** Default compression method for next entry. */
-    private short method = DEFLATED;
-
     /**
      * The list of ZIP entries started to be written so far.
      * Maps entry names to zip entries.
      */
-    private final Map<String, E> entries = new LinkedHashMap<String, E>();
-
-    /** Start of entry data. */
-    private long dataStart;
+    private final Map<String, E> entries;
 
     /** Start of central directory. */
     private long cdOffset;
@@ -104,30 +100,32 @@ implements Iterable<E> {
      *         If {@code appendee} is not {@code null}, then this must be set
      *         up so that it appends to the same ZIP file from which
      *         {@code appendee} is reading.
-     * @param  appendee the raw ZIP file to append to.
+     * @param  appendee the nullable raw ZIP file to append to.
      *         This may already be closed.
-     * @param  charset the character set to use for encoding comments and entry
-     *         names
-     *         if {@code appendee} is {@code null}.
+     * @param  param the parameters for writing the ZIP file.
      * @since  TrueZIP 7.3
      */
     protected RawZipOutputStream(
             final OutputStream out,
             final @CheckForNull RawZipFile<E> appendee,
-            final @CheckForNull Charset charset) {
+            final ZipOutputStreamParameters param) {
         super(newLEDataOutputStream(out, appendee));
         this.dos = (LEDataOutputStream) this.delegate;
         if (null != appendee) {
             this.charset = appendee.getRawCharset();
             this.comment = appendee.getRawComment();
-            final Map<String, E> entries = this.entries;
+            final Map<String, E> entries = new LinkedHashMap<String, E>(
+                    (appendee.size() + param.getInitialSize()) * 4 / 3 + 1);
             for (E entry : appendee)
                 entries.put(entry.getName(), entry);
+            this.entries = entries;
         } else {
-            if (null == charset)
-                throw new NullPointerException();
-            this.charset = charset;
+            this.charset = param.getCharset();
+            this.entries = new LinkedHashMap<String, E>(
+                    param.getInitialSize() * 4 / 3 + 1);
         }
+        setMethod0(param.getMethod());
+        setLevel0(param.getLevel());
     }
 
     private static LEDataOutputStream newLEDataOutputStream(
@@ -246,7 +244,6 @@ implements Iterable<E> {
      * Returns the default compression method for subsequent entries.
      * This property is only used if a {@link ZipEntry} does not specify a
      * compression method.
-     * <p>
      * The initial value is {@link ZipEntry#DEFLATED}.
      *
      * @see #setMethod
@@ -257,21 +254,25 @@ implements Iterable<E> {
     }
 
     /**
-     * Sets the default compression method for subsequent entries.
+     * Sets the default compression method for entries.
      * This property is only used if a {@link ZipEntry} does not specify a
      * compression method.
-     * <p>
-     * Legal values are {@link ZipEntry#STORED} (uncompressed)
-     * {@link ZipEntry#DEFLATED} (compressed) and
-     * {@link ZipEntry#BZIP2} (compressed).
+     * Legal values are {@link ZipEntry#STORED}, {@link ZipEntry#DEFLATED}
+     * and {@link ZipEntry#BZIP2}.
      *
-     * @see #getMethod
-     * @see ZipEntry#setMethod
+     * @param  method the default compression method for entries.
+     * @throws IllegalArgumentException if the method is invalid.
+     * @see    #getMethod
+     * @see    ZipEntry#setMethod
      */
     public void setMethod(final int method) {
+        setMethod0(method);
+    }
+
+    private void setMethod0(final int method) {
         final ZipEntry test = new ZipEntry("");
         test.setMethod(method);
-        this.method = (short) test.getMethod();
+        this.method = test.getMethod();
     }
 
     private int getBZip2BlockSize() {
@@ -283,21 +284,33 @@ implements Iterable<E> {
     }
 
     /**
-     * Returns the current compression level.
+     * Returns the compression level for entries.
+     * This property is only used if the effective compression method is
+     * {@link ZipEntry#DEFLATED} or {@link ZipEntry#BZIP2}.
      * 
-     * @return The current compression level.
+     * @return The compression level for entries.
+     * @see    #setLevel
      */
     public int getLevel() {
         return deflater.getLevel();
     }
 
     /**
-     * Sets the compression level for subsequent entries.
+     * Sets the compression level for entries.
+     * This property is only used if the effective compression method is
+     * {@link ZipEntry#DEFLATED} or {@link ZipEntry#BZIP2}.
+     * Legal values range from {@code Deflater#BEST_SPEED} to
+     * {@code Deflater#BEST_COMPRESSION}.
      * 
-     * @param level the compression level.
+     * @param  level the compression level for entries.
      * @throws IllegalArgumentException if the compression level is invalid.
+     * @see    #getLevel
      */
     public void setLevel(int level) {
+	setLevel0(level);
+    }
+
+    private void setLevel0(int level) {
 	deflater.setLevel(level);
     }
 
@@ -605,8 +618,8 @@ implements Iterable<E> {
     private void writeEndOfCentralDirectory() throws IOException {
         final LEDataOutputStream dos = this.dos;
         final long cdEntries = entries.size();
-        final long cdSize = dos.size() - cdOffset;
         final long cdOffset = this.cdOffset;
+        final long cdSize = dos.size() - cdOffset;
         final boolean cdEntriesZip64 = cdEntries > UShort.MAX_VALUE || FORCE_ZIP64_EXT;
         final boolean cdSizeZip64    = cdSize    > UInt  .MAX_VALUE || FORCE_ZIP64_EXT;
         final boolean cdOffsetZip64  = cdOffset  > UInt  .MAX_VALUE || FORCE_ZIP64_EXT;
@@ -703,6 +716,9 @@ implements Iterable<E> {
 
         final boolean process;
 
+        /** Start of entry data. */
+        private long dataStart;
+
         RawOutputMethod(final boolean process) {
             this.process = process;
         }
@@ -792,7 +808,7 @@ implements Iterable<E> {
             entry.setGeneralPurposeBitFlags(general);
             entry.setRawOffset(offset);
             // Update data start.
-            RawZipOutputStream.this.dataStart = dos.size();
+            this.dataStart = dos.size();
             return dos;
         }
 
@@ -804,7 +820,7 @@ implements Iterable<E> {
         public void finish() throws IOException {
             final LEDataOutputStream dos = RawZipOutputStream.this.dos;
             final long csize = RawZipOutputStream.this.dos.size()
-                    - RawZipOutputStream.this.dataStart;
+                    - this.dataStart;
             final ZipEntry entry = RawZipOutputStream.this.entry;
             if (entry.getGeneralPurposeBitFlag(GPBF_DATA_DESCRIPTOR)) {
                 entry.setRawCompressedSize(csize);
