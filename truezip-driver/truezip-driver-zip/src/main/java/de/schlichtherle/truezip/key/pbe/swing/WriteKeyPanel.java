@@ -137,7 +137,7 @@ public class WriteKeyPanel extends KeyPanel {
                         Arrays.fill(newPasswd1, (char) 0);
                         Arrays.fill(newPasswd2, (char) 0);
                     }
-                    //@SuppressWarnings("SF_SWITCH_FALLTHROUGH") // false positive!
+                    //@edu.umd.cs.findbugs.annotations.SuppressWarnings("SF_SWITCH_FALLTHROUGH") // false positive!
 
                 case AuthenticationPanel.AUTH_KEY_FILE:
                     final File keyFile = authenticationPanel.getKeyFile();

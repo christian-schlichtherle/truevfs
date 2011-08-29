@@ -172,7 +172,7 @@ implements Iterable<E>, Closeable {
             throw ex;
         }
         assert null != this.rof;
-        assert null != this.param;
+        //assert null != this.param; // make FindBugs happy
         assert null != this.charset;
         assert null != this.entries;
         assert null != this.mapper;
