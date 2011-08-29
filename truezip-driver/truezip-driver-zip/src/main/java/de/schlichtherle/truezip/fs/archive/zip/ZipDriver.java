@@ -445,7 +445,10 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
         try {
             input.recoverLostEntries();
         } catch (IOException ex) {
-            logger.log(Level.WARNING, "junkInTheTrunk", ex);
+            logger.log(Level.WARNING, "junkInTheTrunk", new Object[] {
+                mountPointUri(model),
+                input.getPostambleLength(),
+            });
         }
         return input;
     }
