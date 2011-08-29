@@ -165,7 +165,7 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
         this.window = new byte[windowLen];
         invalidateWindow();
 
-        assert this.window.length > 0;
+        assert 0 < this.window.length;
     }
 
     /**
@@ -173,23 +173,22 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
      *
      * @throws IOException If the preconditions do not hold.
      */
-    private void assertOpen() throws IOException {
+    protected final void assertOpen() throws IOException {
         if (null == delegate)
             throw new IOException("File is closed!");
     }
 
     @Override
-    public long length()
-    throws IOException {
+    public long length() throws IOException {
         // Check state.
         assertOpen();
 
-        final long newLength = delegate.length();
-        if (newLength != length) {
-            length = newLength;
+        final long length = delegate.length();
+        if (length != this.length) {
+            this.length = length;
             invalidateWindow();
         }
-        return newLength;
+        return length;
     }
 
     @Override
