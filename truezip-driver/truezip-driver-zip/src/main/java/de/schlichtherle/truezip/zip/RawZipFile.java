@@ -150,11 +150,8 @@ implements Iterable<E>, Closeable {
             this.length = rof.length();
             this.param = param;
             this.charset = param.getCharset();
-            final BufferedReadOnlyFile brof;
-            if (rof instanceof BufferedReadOnlyFile)
-                brof = (BufferedReadOnlyFile) rof;
-            else
-                brof = new BufferedReadOnlyFile(rof);
+            final ReadOnlyFile
+                    brof = new SafeBufferedReadOnlyFile(rof, this.length);
             if (!param.getPreambled())
                 assertNotPreambled(brof);
             final int numEntries = findCentralDirectory(brof, param.getPostambled());
@@ -516,11 +513,8 @@ implements Iterable<E>, Closeable {
     protected void recoverLostEntries() throws IOException {
         assertOpen();
         assert null != this.rof; // makes FindBugs happy
-        final BufferedReadOnlyFile rof;
-        if (this.rof instanceof BufferedReadOnlyFile)
-            rof = (BufferedReadOnlyFile) this.rof;
-        else
-            rof = new BufferedReadOnlyFile(this.rof);
+        final ReadOnlyFile
+                rof = new SafeBufferedReadOnlyFile(this.rof, this.length);
         try {
             while (LFH_MIN_LEN < this.postamble) {
                 long fp = this.length - this.postamble;
@@ -1139,4 +1133,27 @@ implements Iterable<E>, Closeable {
             //super.close();
         }
     } // EntryReadOnlyFile
+
+    /**
+     * A buffered read only file which is safe for use with a concurrently
+     * growing file, e.g. when another thread is appending to it.
+     */
+    private static final class SafeBufferedReadOnlyFile
+    extends BufferedReadOnlyFile {
+
+        final long length;
+
+        public SafeBufferedReadOnlyFile(ReadOnlyFile rof, long length)
+        throws IOException {
+            super(rof);
+            assert length <= rof.length();
+            this.length = length;
+        }
+
+        @Override
+        public long length() throws IOException {
+            assertOpen();
+            return length;
+        }
+    } // SafeBufferedReadOnlyFile
 }
