@@ -53,23 +53,20 @@ public class FsResourceAccountantTest {
 
     @Test
     public void testAccounting() throws IOException {
-        final Resource resource = new AccountingResource();
+        final Resource resource = new Resource();
+        accountant.startAccountingFor(resource);
         resource.close();
-
-        assertTrue(accountant.startAccountingFor(resource));
-        assertThat(resource.getCloseCounter(), is(1));
+        accountant.startAccountingFor(resource); // redundant
         resource.close();
-        assertThat(resource.getCloseCounter(), is(2));
-        assertFalse(accountant.stopAccountingFor(resource));
+        accountant.stopAccountingFor(resource);
         resource.close();
-        assertFalse(accountant.stopAccountingFor(resource));
-        assertThat(resource.getCloseCounter(), is(2));
+        accountant.stopAccountingFor(resource); // redundant
     }
 
     @Test
     public void testWaitForCurrentThread() throws InterruptedException {
         final Resource resource = new Resource();
-        assertTrue(accountant.startAccountingFor(resource));
+        accountant.startAccountingFor(resource);
         long time = System.currentTimeMillis();
         int resources = accountant.waitStopAccounting(TIMEOUT_MILLIS);
         assertTrue("Timeout!", System.currentTimeMillis() < time + TIMEOUT_MILLIS);
@@ -128,7 +125,9 @@ public class FsResourceAccountantTest {
     private final class ResourceHog extends Thread {
         @Override
         public void run() {
-            assertTrue(accountant.startAccountingFor(new Resource()));
+            Resource resource = new Resource();
+            accountant.startAccountingFor(resource);
+            accountant.startAccountingFor(resource); // redundant call should do no harm
         }
     } // ResourceHog
 
@@ -144,40 +143,14 @@ public class FsResourceAccountantTest {
 
         @Override
         public void run() {
-            assertTrue(accountant.startAccountingFor(resource));
+            accountant.startAccountingFor(resource);
+            accountant.startAccountingFor(resource); // redundant call should do no harm
         }
     } // EvilResourceHog
 
     private class Resource implements Closeable {
-        volatile int closeCounter;
-
-        final int getCloseCounter() {
-            return closeCounter;
-        }
-
         @Override
-        public void close() throws IOException {
-            FsResourceAccountantTest.this.lock.lock();
-            try {
-                closeCounter++;
-            } finally {
-                FsResourceAccountantTest.this.lock.unlock();
-            }
+        public void close() {
         }
     } // Resource
-
-    private final class AccountingResource extends Resource {
-        @SuppressWarnings("LeakingThisInConstructor")
-        AccountingResource() {
-            assertTrue(accountant.startAccountingFor(this));
-            assertFalse(accountant.startAccountingFor(this));
-        }
-
-        @Override
-        public void close() throws IOException {
-            if (accountant.stopAccountingFor(this))
-                super.close();
-            assertFalse(accountant.stopAccountingFor(this));
-        }
-    } // AccountingResource
 }

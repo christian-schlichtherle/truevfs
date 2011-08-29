@@ -24,6 +24,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.Iterator;
@@ -70,8 +71,8 @@ public final class FsResourceAccountant {
      * The weak hash map allows the garbage collector to pick up a closeable
      * resource if there are no more references to it.
      */
-    private volatile @Nullable Map<Closeable, Reference>
-            threads = new WeakHashMap<Closeable, Reference>();
+    private volatile @Nullable Map<Closeable, Account>
+            threads = new WeakHashMap<Closeable, Account>();
 
     /**
      * Constructs a new resource accountant with the given lock.
@@ -94,16 +95,12 @@ public final class FsResourceAccountant {
      * Starts accounting for the given closeable resource.
      * 
      * @param  resource the closeable resource to start accounting for.
-     * @return {@code true} if and only if the given closeable resource is not
-     *         already accounted for.
      */
-    boolean startAccountingFor(final Closeable resource) {
+    void startAccountingFor(final Closeable resource) {
         this.lock.lock();
         try {
-            if (this.threads.containsKey(resource))
-                return false;
-            this.threads.put(resource, new Reference(new Account(resource)));
-            return true;
+            if (!this.threads.containsKey(resource))
+                this.threads.put(resource, new Account(resource));
         } finally {
             this.lock.unlock();
         }
@@ -115,18 +112,14 @@ public final class FsResourceAccountant {
      * {@link Closeable#close()} in the given closeable resource.
      * 
      * @param  resource the closeable resource to stop accounting for.
-     * @return {@code true} if and only if the given closeable resource was
-     *         accounted for.
      */
-    boolean stopAccountingFor(final Closeable resource) {
+    void stopAccountingFor(final Closeable resource) {
         this.lock.lock();
         try {
-            final Reference ref = this.threads.remove(resource);
+            final Account ref = this.threads.remove(resource);
             if (null != ref) {
+                assert !ref.isEnqueued();
                 this.condition.signalAll();
-                return true;
-            } else {
-                return false;
             }
         } finally {
             this.lock.unlock();
@@ -187,11 +180,9 @@ public final class FsResourceAccountant {
     private int threadLocalResources() {
         int n = 0;
         final Thread currentThread = Thread.currentThread();
-        for (final Reference ref : this.threads.values()) {
-            final Account account = ref.get();
-            if (null != account && account.owner == currentThread)
+        for (final Account ref : this.threads.values())
+            if (ref.owner.get() == currentThread)
                 n++;
-        }
         return n;
     }
 
@@ -227,26 +218,15 @@ public final class FsResourceAccountant {
     }
 
     /**
-     * A simple data holder for a closeable resource and the thread which
-     * started accounting for it.
-     */
-    private static final class Account {
-        final Closeable resource;
-        final Thread owner = Thread.currentThread();
-
-        Account(final Closeable resource) {
-            assert null != resource;
-            this.resource = resource;
-        }
-    } // Account
-
-    /**
-     * A reference to an {@link Account} which can notify its
+     * A reference to a {@link Closeable} which can notify its
      * {@link FsResourceAccountant}.
      */
-    private final class Reference extends WeakReference<Account> {
-        Reference(Account account) {
-            super(account, Collector.queue);
+    private final class Account extends WeakReference<Closeable> {
+        final Reference<Thread>
+                owner = new WeakReference<Thread>(Thread.currentThread());
+
+        Account(Closeable resource) {
+            super(resource, Collector.queue);
         }
 
         /**
@@ -263,7 +243,7 @@ public final class FsResourceAccountant {
                 lock.unlock();
             }
         }
-    } // Reference
+    } // Account
 
     /**
      * A high priority daemon thread which runs an endless loop in order to
@@ -272,8 +252,8 @@ public final class FsResourceAccountant {
      * You cannot use this class outside its package.
      */
     public static final class Collector extends Thread {
-        static final ReferenceQueue<Account>
-                queue = new ReferenceQueue<Account>();
+        static final ReferenceQueue<Closeable>
+                queue = new ReferenceQueue<Closeable>();
 
         static {
             new Collector().start();
@@ -289,7 +269,7 @@ public final class FsResourceAccountant {
         public void run() {
             while (true) {
                 try {
-                    ((Reference) queue.remove()).notifyAccountant();
+                    ((Account) queue.remove()).notifyAccountant();
                 } catch (InterruptedException ex) {
                     logger.log(Level.WARNING, "interrupted", ex);
                 }
