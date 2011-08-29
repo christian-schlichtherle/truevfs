@@ -46,7 +46,7 @@ implements InputShop<ZipArchiveEntry> {
     private final FsModel model;
     private boolean appendee;
     private ZipCryptoParameters param;
-    
+
     public ZipInputShop(
             final ZipDriver driver,
             final FsModel model,
@@ -55,7 +55,6 @@ implements InputShop<ZipArchiveEntry> {
         super(rof, driver);
         this.driver = driver;
         this.model = model;
-        super.recoverLostEntries();
     }
 
     /**

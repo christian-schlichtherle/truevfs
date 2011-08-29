@@ -31,7 +31,6 @@ import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.Closeable;
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -493,233 +492,228 @@ implements Iterable<E>, Closeable {
 
     /**
      * Recovers any lost entries which have been added to the ZIP file after
-     * the (last) Central Directory.
+     * the (last) End Of Central Directory Record (EOCDR).
+     * This method should be called soon after the constructor.
+     * It requires a fully initialized object, hence it's not part of the
+     * constructor.
+     * For example, to recover encrypted entries, it may require
+     * {@link #getCryptoParameters() crypto parameters}.
+     * <p>
      * This method starts parsing entries at the start of the postamble and
-     * continues until it hits EOF or non-entry data.
+     * continues until it hits EOF or any non-entry data.
      * As a side effect, it will not only add any found entries to its internal
      * map, but will also cut the start of the postamble accordingly.
      * <p>
-     * This method should get called immediately after the constructor.
-     * The reason why it's not part of the constructor though is that it
-     * requires an otherwise fully initialized object, e.g. it will require
-     * {@link #getCryptoParameters() crypto parameters} in order to recover any
-     * encrypted entries.
-     * Calling this method multiple times will show no effect.
+     * Note that it's very likely that this method terminates with an
+     * exception unless the postamble is empty or contains only valid ZIP
+     * entries.
+     * Therefore it may be a good idea to log or silently ignore any exception
+     * thrown by this method.
+     * If an exception is thrown, you can check and recover the remaining
+     * postamble for post-mortem analysis by calling
+     * {@link #getPostambleLength()} and {@link #getPostambleInputStream()}.
      * 
      * @throws ZipException if an invalid entry is found.
-     * @throws IOException if any I/O error occurs which is not just caused
-     *         by an EOF due to a truncated entry.
+     * @throws IOException if any other I/O error occurs.
      */
-    protected void recoverLostEntries() throws IOException {
+    public void recoverLostEntries() throws IOException {
         assertOpen();
         assert null != this.rof; // makes FindBugs happy
         final ReadOnlyFile
                 rof = new SafeBufferedReadOnlyFile(this.rof, this.length);
-        try {
-            while (LFH_MIN_LEN < this.postamble) {
-                long fp = this.length - this.postamble;
-                rof.seek(fp);
-                final byte[] lfh = new byte[LFH_MIN_LEN];
-                rof.readFully(lfh, 0, 4);
-                if (LFH_SIG != readUInt(lfh, 0))
-                    break;
-                rof.readFully(lfh, 4, LFH_MIN_LEN - 4);
-                final int gpbf = readUShort(lfh, 6);
-                final int nameLen = readUShort(lfh, 26);
-                final byte[] name = new byte[nameLen];
-                rof.readFully(name);
-                // See appendix D of PKWARE's ZIP File Format Specification.
-                final boolean utf8 = 0 != (gpbf & GPBF_UTF8);
-                if (utf8)
-                    this.charset = UTF8;
-                final E entry = this.param.newEntry(decode(name));
-                int off = 0;
-                // local file header signature     4 bytes  (0x04034b50)
-                off += 4;
-                // version needed to extract       2 bytes
-                off += 2;
-                // general purpose bit flag        2 bytes
-                entry.setGeneralPurposeBitFlags(gpbf);
-                off += 2; // General Purpose Bit Flags
-                // compression method              2 bytes
-                entry.setRawMethod(readUShort(lfh, off));
-                off += 2;
-                // last mod file time              2 bytes
-                // last mod file date              2 bytes
-                entry.setRawTime(readUInt(lfh, off));
-                off += 4;
-                // crc-32                          4 bytes
-                entry.setRawCrc(readUInt(lfh, off));
-                off += 4;
-                // compressed size                 4 bytes
-                entry.setRawCompressedSize(readUInt(lfh, off));
-                off += 4;
-                // uncompressed size               4 bytes
-                entry.setRawSize(readUInt(lfh, off));
-                off += 4;
-                // file name length                2 bytes
-                off += 2;
-                // extra field length              2 bytes
-                final int extraLen = readUShort(lfh, off);
-                //off += 2;
-                entry.setRawOffset(this.mapper.unmap(fp));
-                // extra field (variable size)
-                if (0 < extraLen) {
-                    final byte[] extra = new byte[extraLen];
-                    rof.readFully(extra);
-                    entry.setRawExtraFields(extra);
-                }
+        while (0 < this.postamble) {
+            long fp = this.length - this.postamble;
+            rof.seek(fp);
+            final byte[] lfh = new byte[LFH_MIN_LEN];
+            rof.readFully(lfh, 0, 4);
+            final long sig = readUInt(lfh, 0);
+            if (LFH_SIG != sig)
+                throw new ZipException("Expected Local File Header signature 0x"
+                        + Long.toHexString(LFH_SIG)
+                        + ", but is 0x"
+                        + Long.toHexString(sig)
+                        + "!");
+            rof.readFully(lfh, 4, LFH_MIN_LEN - 4);
+            final int gpbf = readUShort(lfh, 6);
+            final int nameLen = readUShort(lfh, 26);
+            final byte[] name = new byte[nameLen];
+            rof.readFully(name);
+            // See appendix D of PKWARE's ZIP File Format Specification.
+            final boolean utf8 = 0 != (gpbf & GPBF_UTF8);
+            if (utf8)
+                this.charset = UTF8;
+            final E entry = this.param.newEntry(decode(name));
+            int off = 0;
+            // local file header signature     4 bytes  (0x04034b50)
+            off += 4;
+            // version needed to extract       2 bytes
+            off += 2;
+            // general purpose bit flag        2 bytes
+            entry.setGeneralPurposeBitFlags(gpbf);
+            off += 2; // General Purpose Bit Flags
+            // compression method              2 bytes
+            entry.setRawMethod(readUShort(lfh, off));
+            off += 2;
+            // last mod file time              2 bytes
+            // last mod file date              2 bytes
+            entry.setRawTime(readUInt(lfh, off));
+            off += 4;
+            // crc-32                          4 bytes
+            entry.setRawCrc(readUInt(lfh, off));
+            off += 4;
+            // compressed size                 4 bytes
+            entry.setRawCompressedSize(readUInt(lfh, off));
+            off += 4;
+            // uncompressed size               4 bytes
+            entry.setRawSize(readUInt(lfh, off));
+            off += 4;
+            // file name length                2 bytes
+            off += 2;
+            // extra field length              2 bytes
+            final int extraLen = readUShort(lfh, off);
+            //off += 2;
+            entry.setRawOffset(this.mapper.unmap(fp));
+            // extra field (variable size)
+            if (0 < extraLen) {
+                final byte[] extra = new byte[extraLen];
+                rof.readFully(extra);
+                entry.setRawExtraFields(extra);
+            }
 
-                // Process entry contents.
+            // Process entry contents.
+            if (entry.getGeneralPurposeBitFlag(GPBF_DATA_DESCRIPTOR)) {
+                // HC SUNT DRACONES!
+                // This is the tough one.
+                // We need to process the entry as if we were unzipping
+                // it because the CRC-32, the compressed size and the
+                // uncompressed size are unknown.
+                // Once we have done this, we compare our findings to
+                // the Data Descriptor which comes next.
                 final long start = fp = rof.getFilePointer();
-                if (entry.getGeneralPurposeBitFlag(GPBF_DATA_DESCRIPTOR)) {
-                    // HC SUNT DRACONES!
-                    // This is the tough one.
-                    // We need to process the entry as if we were unzipping
-                    // it because the CRC-32, the compressed size and the
-                    // uncompressed size are unknown.
-                    // Once we have done this, we compare our findings to
-                    // the Data Descriptor which comes next.
-                    ReadOnlyFile erof = new IntervalReadOnlyFile(rof,
-                            fp, this.length - fp);
-                    WinZipAesEntryExtraField field = null;
-                    int method = entry.getMethod();
-                    if (entry.isEncrypted()) {
-                        if (WINZIP_AES != method)
-                            throw new ZipException(entry.getName()
-                                    + " (encrypted compression method "
-                                    + method
-                                    + " is not supported)");
-                        erof = new WinZipAesEntryReadOnlyFile(erof,
-                                new WinZipAesEntryParameters(
-                                    parameters(
-                                        WinZipAesParameters.class,
-                                        getCryptoParameters()),
-                                    entry));
-                        field = (WinZipAesEntryExtraField)
-                                entry.getExtraField(WINZIP_AES_ID);
-                        method = field.getMethod();
-                    }
-                    final int bufSize = getBufferSize(entry);
-                    CountingInputStream din = null;
-                    InputStream in;
+                ReadOnlyFile erof = new IntervalReadOnlyFile(rof,
+                        fp, this.length - fp);
+                WinZipAesEntryExtraField field = null;
+                int method = entry.getMethod();
+                if (entry.isEncrypted()) {
+                    if (WINZIP_AES != method)
+                        throw new ZipException(entry.getName()
+                                + " (encrypted compression method "
+                                + method
+                                + " is not supported)");
+                    erof = new WinZipAesEntryReadOnlyFile(erof,
+                            new WinZipAesEntryParameters(
+                                parameters(
+                                    WinZipAesParameters.class,
+                                    getCryptoParameters()),
+                                entry));
+                    field = (WinZipAesEntryExtraField)
+                            entry.getExtraField(WINZIP_AES_ID);
+                    method = field.getMethod();
+                }
+                final int bufSize = getBufferSize(entry);
+                CountingInputStream din = null;
+                InputStream in;
+                switch (method) {
+                    case DEFLATED:
+                        in = new ZipInflaterInputStream(
+                                new DummyByteInputStream(erof),
+                                bufSize);
+                        break;
+                    case BZIP2:
+                        din = new CountingInputStream(
+                                new ReadOnlyFileInputStream(erof));
+                        in = new BZip2CompressorInputStream(din);
+                        break;
+                    default:
+                        throw new ZipException(entry.getName()
+                                + " (compression method "
+                                + method
+                                + " is not supported)");
+                }
+                final CheckedInputStream
+                        cin = new CheckedInputStream(in, new CRC32());
+                try {
+                    entry.setRawSize(cin.skip(Long.MAX_VALUE));
+                    if (null != field && field.getVendorVersion() == VV_AE_2)
+                        entry.setRawCrc(0);
+                    else
+                        entry.setRawCrc(cin.getChecksum().getValue());
+                    // Sync file pointer on deflated input again.
                     switch (method) {
-                        case STORED:
-                            in = new ReadOnlyFileInputStream(erof);
-                            break;
                         case DEFLATED:
-                            in = new ZipInflaterInputStream(
-                                    new DummyByteInputStream(erof),
-                                    bufSize);
+                            Inflater inf = ((ZipInflaterInputStream) in)
+                                    .getInflater();
+                            assert inf.finished(); // JDK6: R/W 1210/2057; JDK 7: R/W 1193/2057
+                            fp += inf.getBytesRead();
                             break;
                         case BZIP2:
-                            din = new CountingInputStream(
-                                    new ReadOnlyFileInputStream(erof));
-                            in = new BZip2CompressorInputStream(din);
+                            fp += din.getBytesRead();
                             break;
                         default:
-                            throw new ZipException(entry.getName()
-                                    + " (compression method "
-                                    + method
-                                    + " is not supported)");
+                            throw new AssertionError();
                     }
-                    final CheckedInputStream
-                            cin = new CheckedInputStream(in, new CRC32());
-                    try {
-                        entry.setRawSize(cin.skip(Long.MAX_VALUE));
-                        if (null != field && field.getVendorVersion() == VV_AE_2)
-                            entry.setRawCrc(0);
-                        else
-                            entry.setRawCrc(cin.getChecksum().getValue());
-                        // Sync file pointer on deflated input again.
-                        switch (method) {
-                            case STORED:
-                                fp = rof.getFilePointer();
-                                break;
-                            case DEFLATED:
-                                Inflater inf = ((ZipInflaterInputStream) in)
-                                        .getInflater();
-                                assert inf.finished(); // JDK6: R/W 1210/2057; JDK 7: R/W 1193/2057
-                                fp += inf.getBytesRead();
-                                break;
-                            case BZIP2:
-                                fp += din.getBytesRead();
-                                break;
-                            default:
-                                throw new AssertionError();
-                        }
-                    } finally {
-                        cin.close();
-                    }
-                    if (null != field)
-                        fp += overhead(field.getKeyStrength());
-                    entry.setRawCompressedSize(fp - start);
-
-                    // We have reconstituted all meta data for the entry now.
-                    // Next comes the Data Descriptor.
-                    // Let's parse and check it.
-                    final byte[] dd = new byte[
-                            entry.isZip64ExtensionsRequired()
-                            ? 4 + 8 + 8
-                            : 4 + 4 + 4];
-                    rof.seek(fp);
-                    rof.readFully(dd, 0, 4);
-                    long crc = readUInt(dd, 0);
-                    // Note the Data Descriptor's Signature is optional:
-                    // All newer apps should write it (and so does TrueZIP),
-                    // but older apps might not.
-                    if (DD_SIG == crc)
-                        rof.readFully(dd);
-                    else
-                        rof.readFully(dd, 4, dd.length - 4);
-                    crc = readUInt(dd, 0);
-                    final long csize;
-                    final long size;
-                    if (entry.isZip64ExtensionsRequired()) {
-                        csize = readLong(dd, 4);
-                        size = readLong(dd, 12);
-                    } else {
-                        csize = readUInt(dd, 4);
-                        size = readUInt(dd, 8);
-                    }
-                    if (entry.getCrc() != crc)
-                        throw new CRC32Exception(entry.getName(),
-                                entry.getCrc(), crc);
-                    if (entry.getCompressedSize() != csize)
-                        throw new ZipException(entry.getName()
-                                + " (invalid compressed size in Data Descriptor)");
-                    if (entry.getSize() != size)
-                        throw new ZipException(entry.getName()
-                                + " (invalid uncompressed size in Data Descriptor)");
-                } else {
-                    // This is the easy one.
-                    // The entry is not using a Data Descriptor, so we can
-                    // use the properties parsed from the Local File Header.
-                    fp += entry.getCompressedSize();
-                    rof.seek(fp - 1);
-                    if (fp > this.length || -1 == rof.read())
-                        return; // partial written entry
+                } finally {
+                    cin.close();
                 }
+                if (null != field)
+                    fp += overhead(field.getKeyStrength());
+                entry.setRawCompressedSize(fp - start);
 
-                // All is done. Now update the postamble length and add
-                // the entry do the map.
-                this.postamble = this.length - rof.getFilePointer();
-
-                // Map the entry using the name that has been determined
-                // by the ZipEntryFactory.
-                // Note that this name may differ from what has been found
-                // in the ZIP file!
-                this.entries.put(entry.getName(), entry);
+                // We have reconstituted all meta data for the entry now.
+                // Next comes the Data Descriptor.
+                // Let's parse and check it.
+                final byte[] dd = new byte[
+                        entry.isZip64ExtensionsRequired()
+                        ? 4 + 8 + 8
+                        : 4 + 4 + 4];
+                rof.seek(fp);
+                rof.readFully(dd, 0, 4);
+                long crc = readUInt(dd, 0);
+                // Note the Data Descriptor's Signature is optional:
+                // All newer apps should write it (and so does TrueZIP),
+                // but older apps might not.
+                if (DD_SIG == crc)
+                    rof.readFully(dd);
+                else
+                    rof.readFully(dd, 4, dd.length - 4);
+                crc = readUInt(dd, 0);
+                final long csize;
+                final long size;
+                if (entry.isZip64ExtensionsRequired()) {
+                    csize = readLong(dd, 4);
+                    size = readLong(dd, 12);
+                } else {
+                    csize = readUInt(dd, 4);
+                    size = readUInt(dd, 8);
+                }
+                if (entry.getCrc() != crc)
+                    throw new CRC32Exception(entry.getName(),
+                            entry.getCrc(), crc);
+                if (entry.getCompressedSize() != csize)
+                    throw new ZipException(entry.getName()
+                            + " (invalid compressed size in Data Descriptor)");
+                if (entry.getSize() != size)
+                    throw new ZipException(entry.getName()
+                            + " (invalid uncompressed size in Data Descriptor)");
+            } else {
+                // This is the easy one.
+                // The entry is not using a Data Descriptor, so we can
+                // use the properties parsed from the Local File Header.
+                fp += entry.getCompressedSize();
+                rof.seek(fp - 1);
+                if (fp > this.length || -1 == rof.read())
+                    throw new ZipException(entry.getName()
+                            + " (truncated ZIP entry)");
             }
-        } catch (final IOException ex) {
-            // Let's tolerate only EOFException.
-            Throwable cause = ex;
-            do {
-                if (cause instanceof EOFException)
-                    return; // ignore truncated entry
-                cause = cause.getCause();
-            } while (null != cause);
-            throw ex;
+
+            // Entry is almost recovered. Update the postamble length.
+            this.postamble = this.length - rof.getFilePointer();
+
+            // Map the entry using the name that has been determined
+            // by the ZipEntryFactory.
+            // Note that this name may differ from what has been found
+            // in the ZIP file!
+            this.entries.put(entry.getName(), entry);
         }
     }
 
@@ -991,10 +985,14 @@ implements Iterable<E>, Closeable {
         rof.seek(fp);
         final byte[] lfh = new byte[LFH_MIN_LEN];
         rof.readFully(lfh);
-        final long lfhSig = readUInt(lfh, 0);
-        if (LFH_SIG != lfhSig)
+        final long sig = readUInt(lfh, 0);
+        if (LFH_SIG != sig)
             throw new ZipException(name
-            + " (expected Local File Header Signature)");
+                    + " (expected Local File Header signature 0x"
+                    + Long.toHexString(LFH_SIG)
+                    + ", but is 0x"
+                    + Long.toHexString(sig)
+                    + ")");
         fp += LFH_MIN_LEN
                 + readUShort(lfh, LFH_FILE_NAME_LENGTH_OFF) // file name length
                 + readUShort(lfh, LFH_FILE_NAME_LENGTH_OFF + 2); // extra field length

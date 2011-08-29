@@ -52,6 +52,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.Deflater;
 import net.jcip.annotations.Immutable;
 
@@ -72,6 +74,10 @@ import net.jcip.annotations.Immutable;
 public class ZipDriver
 extends FsCharsetArchiveDriver<ZipArchiveEntry>
 implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
+
+    private static final Logger logger = Logger.getLogger(
+            ZipDriver.class.getName(),
+            ZipDriver.class.getName());
 
     /**
      * The character set for entry names and comments in &quot;traditional&quot;
@@ -435,7 +441,13 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
             FsModel model,
             ReadOnlyFile rof)
     throws IOException {
-        return new ZipInputShop(this, model, rof);
+        final ZipInputShop input = new ZipInputShop(this, model, rof);
+        try {
+            input.recoverLostEntries();
+        } catch (IOException ex) {
+            logger.log(Level.WARNING, "junkInTheTrunk", ex);
+        }
+        return input;
     }
 
     /**
