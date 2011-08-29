@@ -58,6 +58,8 @@ import net.jcip.annotations.NotThreadSafe;
 class FsArchiveFileSystem<E extends FsArchiveEntry>
 implements Iterable<FsCovariantEntry<E>> {
 
+    private static final int INITIAL_SIZE = 64;
+
     private static final String ROOT_PATH = ROOT.getPath();
 
     private final Splitter splitter = new Splitter();
@@ -92,7 +94,7 @@ implements Iterable<FsCovariantEntry<E>> {
         final long time = System.currentTimeMillis();
         for (Access access : ALL_ACCESS_SET)
             root.setTime(access, time);
-        final EntryTable<E> master = new EntryTable<E>(64);
+        final EntryTable<E> master = new EntryTable<E>(INITIAL_SIZE * 4 / 3 + 1);
         master.add(ROOT_PATH, root);
         this.master = master;
         this.touched = true;
@@ -146,7 +148,7 @@ implements Iterable<FsCovariantEntry<E>> {
         this.factory = driver;
         // Allocate some extra capacity to create missing parent directories.
         final EntryTable<E> master = new EntryTable<E>(
-                archive.getSize() * 4 / 3 + 1);
+                (archive.getSize() + INITIAL_SIZE) * 4 / 3 + 1);
         // Load entries from input archive.
         final List<String> paths = new ArrayList<String>(archive.getSize());
         final Normalizer normalizer = new Normalizer(SEPARATOR_CHAR);
