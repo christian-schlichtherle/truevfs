@@ -122,13 +122,12 @@ public final class FsResourceAccountant {
         this.lock.lock();
         try {
             final Reference ref = this.threads.remove(resource);
-            if (null == ref)
-                return false; // wasn't accounted (anymore)
-            final Account account = ref.get();
-            if (null == account)
-                return false; // picked up by the garbage collector concurrently
-            this.condition.signalAll();
-            return true;
+            if (null != ref) {
+                this.condition.signalAll();
+                return true;
+            } else {
+                return false;
+            }
         } finally {
             this.lock.unlock();
         }
