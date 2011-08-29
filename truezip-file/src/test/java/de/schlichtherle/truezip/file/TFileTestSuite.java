@@ -1033,7 +1033,7 @@ extends TestBase<D> {
             try {
                 archive.rm_r();
                 fail();
-            } catch (IOException ex) {
+            } catch (IOException expected) {
             }
         } finally {
             out1.close();
@@ -1049,7 +1049,7 @@ extends TestBase<D> {
             try {
                 archive.rm_r();
                 fail();
-            } catch (IOException ex) {
+            } catch (IOException expected) {
             }
         } finally {
             out2.close();
@@ -1069,7 +1069,7 @@ extends TestBase<D> {
                 try {
                     archive.rm_r();
                     fail();
-                } catch (IOException ex) {
+                } catch (IOException expected) {
                 }
             } finally {
                 in2.close();
@@ -1089,7 +1089,7 @@ extends TestBase<D> {
             try {
                 archive.rm_r();
                 fail();
-            } catch (IOException ex) {
+            } catch (IOException expected) {
             }
         } finally {
             in1.close();
