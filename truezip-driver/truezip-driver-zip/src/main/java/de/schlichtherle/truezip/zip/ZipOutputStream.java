@@ -60,10 +60,21 @@ import net.jcip.annotations.ThreadSafe;
 public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
 
     /**
+     * The initial size (not capacity) of the internal hash map to hold the
+     * entries.
+     * 
+     * @since  TrueZIP 7.3
+     */
+    public static final int INITIAL_SIZE = 64;
+
+    /**
      * The default character set used for entry names and comments in ZIP files.
      * This is {@code "UTF-8"} for compatibility with Sun's JDK implementation.
      */
     public static final Charset DEFAULT_CHARSET = Constants.DEFAULT_CHARSET;
+
+    private static final ZipOutputStreamParameters DEFAULT_PARAM
+            = new DefaultZipOutputStreamParameters(DEFAULT_CHARSET);
 
     private @CheckForNull ZipCryptoParameters cryptoParameters;
 
@@ -74,7 +85,7 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
      * @param  out The output stream to write the ZIP file to.
      */
     public ZipOutputStream(OutputStream out) {
-        super(out, null, DEFAULT_CHARSET);
+        super(out, null, DEFAULT_PARAM);
     }
 
     /**
@@ -85,7 +96,7 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
      * @param  charset the character set to use.
      */
     public ZipOutputStream(OutputStream out, Charset charset) {
-        super(out, null, charset);
+        super(out, null, new DefaultZipOutputStreamParameters(charset));
     }
 
     /**
@@ -100,7 +111,9 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
      *         This may already be closed.
      */
     public ZipOutputStream(OutputStream out, ZipFile appendee) {
-        super(out, appendee, null);
+        super(out, appendee, DEFAULT_PARAM);
+        if (null == appendee)
+            throw new NullPointerException();
     }
 
     @Override
@@ -201,17 +214,12 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
     public synchronized String getComment() {
         return super.getComment();
     }
-    
-    @Override
-    public synchronized void setLevel(int level) {
-        super.setLevel(level);
-    }
 
-    @Override
-    public synchronized int getLevel() {
-        return super.getLevel();
-    }
-
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The initial value is {@code ZipEntry#DEFLATED}.
+     */
     @Override
     public synchronized int getMethod() {
         return super.getMethod();
@@ -220,6 +228,21 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
     @Override
     public synchronized void setMethod(int method) {
         super.setMethod(method);
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The initial value is {@code Deflater#DEFAULT_COMPRESSION}.
+     */
+    @Override
+    public synchronized int getLevel() {
+        return super.getLevel();
+    }
+    
+    @Override
+    public synchronized void setLevel(int level) {
+        super.setLevel(level);
     }
 
     /**

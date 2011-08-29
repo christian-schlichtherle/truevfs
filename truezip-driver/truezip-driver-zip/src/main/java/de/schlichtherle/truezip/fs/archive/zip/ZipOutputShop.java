@@ -72,11 +72,9 @@ implements OutputShop<ZipArchiveEntry> {
     throws IOException {
         super(  out,
                 null != source && source.isAppendee() ? source : null,
-                driver.getCharset());
+                driver);
         if (null == model)
             throw new NullPointerException();
-        super.setMethod(driver.getMethod());
-        super.setLevel(driver.getLevel());
         this.driver = driver;
         this.model = model;
         if (null != source) {

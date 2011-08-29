@@ -49,6 +49,14 @@ public class ReadOnlySfxDriver extends ZipDriver {
         super(ioPoolProvider, SFX_CHARSET);
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The implementation in the class {@link ZipDriver}
+     * returns {@code true}.
+     * 
+     * @return {@code true}
+     */
     @Override
     public final boolean getPreambled() {
         return true;

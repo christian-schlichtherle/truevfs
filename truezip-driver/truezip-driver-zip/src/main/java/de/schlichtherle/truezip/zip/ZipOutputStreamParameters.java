@@ -24,4 +24,36 @@ package de.schlichtherle.truezip.zip;
  */
 public interface ZipOutputStreamParameters
 extends ZipCharsetParameters {
+
+    /**
+     * Returns the initial size (not capacity) of the internal hash map to hold
+     * the entries.
+     * 
+     * @return The initial size (not capacity) of the internal hash map to hold
+     * the entries.
+     */
+    int getInitialSize();
+
+    /**
+     * Returns the default compression method for entries.
+     * This property is only used if a {@link ZipEntry} does not specify a
+     * compression method.
+     * Legal values are {@link ZipEntry#STORED}, {@link ZipEntry#DEFLATED}
+     * and {@link ZipEntry#BZIP2}.
+     *
+     * @return The default compression method for entries.
+     * @see    ZipEntry#getMethod
+     */
+    int getMethod();
+
+    /**
+     * Returns the compression level for entries.
+     * This property is only used if the effective compression method is
+     * {@link ZipEntry#DEFLATED} or {@link ZipEntry#BZIP2}.
+     * Legal values range from {@code Deflater#BEST_SPEED} to
+     * {@code Deflater#BEST_COMPRESSION}.
+     * 
+     * @return The compression level for entries.
+     */
+    int getLevel();
 }

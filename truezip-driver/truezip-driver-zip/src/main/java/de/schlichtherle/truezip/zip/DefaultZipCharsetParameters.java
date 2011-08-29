@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.zip;
 
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
@@ -22,41 +21,26 @@ import java.nio.charset.Charset;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * The default implementation of {@link ZipFileParameters}.
- *
+ * Default implementation of {@link ZipCharsetParameters}.
+ * 
  * @since   TrueZIP 7.3
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-class DefaultZipFileParameters
-extends DefaultZipCharsetParameters
-implements ZipFileParameters<ZipEntry> {
+class DefaultZipCharsetParameters implements ZipCharsetParameters {
 
-    private final boolean preambled, postambled;
+    private final Charset charset;
 
-    DefaultZipFileParameters(
-            final Charset charset,
-            final boolean preambled,
-            final boolean postambled) {
-        super(charset);
-        this.preambled = preambled;
-        this.postambled = postambled;
+    DefaultZipCharsetParameters(final Charset charset) {
+        if (null == charset)
+            throw new NullPointerException();
+        this.charset = charset;
     }
 
     @Override
-    public boolean getPreambled() {
-        return preambled;
-    }
-
-    @Override
-    public boolean getPostambled() {
-        return postambled;
-    }
-
-    @Override
-    public ZipEntry newEntry(String name) {
-        return new ZipEntry(name);
+    public Charset getCharset() {
+        return charset;
     }
 }
