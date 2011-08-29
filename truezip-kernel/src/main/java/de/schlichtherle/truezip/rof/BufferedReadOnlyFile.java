@@ -160,7 +160,7 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
             throw new IllegalArgumentException();
 
         super.delegate = rof;
-        this.length = rof.length();
+        //this.length = rof.length();
         this.fp = rof.getFilePointer();
         this.window = new byte[windowLen];
         invalidateWindow();
