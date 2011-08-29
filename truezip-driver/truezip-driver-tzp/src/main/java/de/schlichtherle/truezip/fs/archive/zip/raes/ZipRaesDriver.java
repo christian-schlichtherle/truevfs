@@ -84,7 +84,8 @@ public abstract class ZipRaesDriver extends JarDriver {
     /**
      * {@inheritDoc}
      * <p>
-     * Since TrueZIP 7.3, this method returns {@code true} for future use.
+     * Since TrueZIP 7.3, the implementation in the class {@link ZipRaesDriver}
+     * returns {@code true} for future use.
      * 
      * @return {@code true}
      */
