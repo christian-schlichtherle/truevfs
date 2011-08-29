@@ -299,8 +299,8 @@ implements Iterable<E> {
      * Sets the compression level for entries.
      * This property is only used if the effective compression method is
      * {@link ZipEntry#DEFLATED} or {@link ZipEntry#BZIP2}.
-     * Legal values range from {@code Deflater#BEST_SPEED} to
-     * {@code Deflater#BEST_COMPRESSION}.
+     * Legal values are {@link Deflater#DEFAULT_COMPRESSION} or range from
+     * {@code Deflater#BEST_SPEED} to {@code Deflater#BEST_COMPRESSION}.
      * 
      * @param  level the compression level for entries.
      * @throws IllegalArgumentException if the compression level is invalid.
