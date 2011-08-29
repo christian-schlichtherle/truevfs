@@ -152,15 +152,13 @@ implements Iterable<E>, Closeable {
             final ReadOnlyFile
                     brof = new SafeBufferedReadOnlyFile(rof, this.length);
             if (!param.getPreambled())
-                assertNotPreambled(brof);
+                assertZipFileSignature(brof);
             final int numEntries = findCentralDirectory(brof, param.getPostambled());
             mountCentralDirectory(brof, numEntries);
             if (this.preamble + this.postamble >= this.length) {
                 assert 0 == numEntries;
-                assert param.getPreambled(); // otherwise already checked
-                assertNotPreambled(brof);
-                assert false;
-                this.preamble = 0;
+                if (param.getPreambled()) // otherwise already checked
+                    assertZipFileSignature(brof);
             }
             // Do NOT close brof - would close rof as well!
         } catch (IOException ex) {
@@ -174,10 +172,10 @@ implements Iterable<E>, Closeable {
         assert null != this.mapper;
     }
 
-    private void assertNotPreambled(final ReadOnlyFile rof)
+    private void assertZipFileSignature(final ReadOnlyFile rof)
     throws IOException {
         final byte[] sig = new byte[4];
-        rof.seek(0);
+        rof.seek(this.preamble);
         rof.readFully(sig);
         final long signature = readUInt(sig, 0);
         // Constraint: A ZIP file must start with a Local File Header
