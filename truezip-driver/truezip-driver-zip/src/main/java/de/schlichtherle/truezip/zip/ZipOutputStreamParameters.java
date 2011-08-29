@@ -28,6 +28,8 @@ extends ZipCharsetParameters {
     /**
      * Returns the initial size (not capacity) of the internal hash map to hold
      * the entries.
+     * When appending to an existing archive file, the number of entries in the
+     * appendee is added to this property.
      * 
      * @return The initial size (not capacity) of the internal hash map to hold
      * the entries.
