@@ -27,14 +27,6 @@ import net.jcip.annotations.ThreadSafe;
 @ThreadSafe
 public class ZipKeyException extends ZipParametersException {
     private static final long serialVersionUID = 5762312735142938698L;
-
-    /**
-     * Creates a ZIP key exception with
-     * a detail message indicating that ZIP entry key retrieval has failed.
-     */
-    public ZipKeyException() {
-        super("ZIP entry key retrieval has failed!");
-    }
     
     /**
      * Creates a ZIP key exception with
