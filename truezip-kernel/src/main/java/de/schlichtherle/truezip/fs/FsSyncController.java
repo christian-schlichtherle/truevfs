@@ -25,6 +25,7 @@ import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.JSE7;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
@@ -78,8 +79,8 @@ extends FsDecoratingController<M, C> {
         try {
             return delegate.getOpenIcon();
         } catch (FsNotSyncedException ex) {
-            sync(SYNC_OPTIONS);
-            return delegate.getOpenIcon();
+            delegate.sync(SYNC_OPTIONS);
+            return getOpenIcon(); // retry
         }
     }
 
@@ -88,8 +89,8 @@ extends FsDecoratingController<M, C> {
         try {
             return delegate.getClosedIcon();
         } catch (FsNotSyncedException ex) {
-            sync(SYNC_OPTIONS);
-            return delegate.getClosedIcon();
+            delegate.sync(SYNC_OPTIONS);
+            return getClosedIcon(); // retry
         }
     }
 
@@ -98,8 +99,8 @@ extends FsDecoratingController<M, C> {
         try {
             return delegate.isReadOnly();
         } catch (FsNotSyncedException ex) {
-            sync(SYNC_OPTIONS);
-            return delegate.isReadOnly();
+            delegate.sync(SYNC_OPTIONS);
+            return isReadOnly(); // retry
         }
     }
 
@@ -109,8 +110,8 @@ extends FsDecoratingController<M, C> {
         try {
             return delegate.getEntry(name);
         } catch (FsNotSyncedException ex) {
-            sync(SYNC_OPTIONS);
-            return delegate.getEntry(name);
+            delegate.sync(SYNC_OPTIONS);
+            return getEntry(name); // retry
         }
     }
 
@@ -119,8 +120,8 @@ extends FsDecoratingController<M, C> {
         try {
             return delegate.isReadable(name);
         } catch (FsNotSyncedException ex) {
-            sync(SYNC_OPTIONS);
-            return delegate.isReadable(name);
+            delegate.sync(SYNC_OPTIONS);
+            return isReadable(name); // retry
         }
     }
 
@@ -129,8 +130,8 @@ extends FsDecoratingController<M, C> {
         try {
             return delegate.isWritable(name);
         } catch (FsNotSyncedException ex) {
-            sync(SYNC_OPTIONS);
-            return delegate.isWritable(name);
+            delegate.sync(SYNC_OPTIONS);
+            return isWritable(name); // retry
         }
     }
 
@@ -139,8 +140,8 @@ extends FsDecoratingController<M, C> {
         try {
             delegate.setReadOnly(name);
         } catch (FsNotSyncedException ex) {
-            sync(SYNC_OPTIONS);
-            delegate.setReadOnly(name);
+            delegate.sync(SYNC_OPTIONS);
+            setReadOnly(name); // retry
         }
     }
 
@@ -153,8 +154,8 @@ extends FsDecoratingController<M, C> {
         try {
             return delegate.setTime(name, times, options);
         } catch (FsNotSyncedException ex) {
-            sync(SYNC_OPTIONS);
-            return delegate.setTime(name, times, options);
+            delegate.sync(SYNC_OPTIONS);
+            return setTime(name, times, options); // retry
         }
     }
 
@@ -168,8 +169,8 @@ extends FsDecoratingController<M, C> {
         try {
             return delegate.setTime(name, types, value, options);
         } catch (FsNotSyncedException ex) {
-            sync(SYNC_OPTIONS);
-            return delegate.setTime(name, types, value, options);
+            delegate.sync(SYNC_OPTIONS);
+            return setTime(name, types, value, options); // retry
         }
     }
 
@@ -198,8 +199,8 @@ extends FsDecoratingController<M, C> {
         try {
             delegate.mknod(name, type, options, template);
         } catch (FsNotSyncedException ex) {
-            sync(SYNC_OPTIONS);
-            delegate.mknod(name, type, options, template);
+            delegate.sync(SYNC_OPTIONS);
+            mknod(name, type, options, template); // retry
         }
     }
 
@@ -209,8 +210,8 @@ extends FsDecoratingController<M, C> {
         try {
             delegate.unlink(name, options);
         } catch (FsNotSyncedException ex) {
-            sync(SYNC_OPTIONS);
-            delegate.unlink(name, options);
+            delegate.sync(SYNC_OPTIONS);
+            unlink(name, options); // retry
         }
     }
 
@@ -268,8 +269,8 @@ extends FsDecoratingController<M, C> {
             try {
                 return getBoundSocket().newSeekableByteChannel();
             } catch (FsNotSyncedException ex) {
-                sync(SYNC_OPTIONS);
-                return getBoundSocket().newSeekableByteChannel();
+                delegate.sync(SYNC_OPTIONS);
+                return newSeekableByteChannel(); // retry
             }
         }
     } // Nio2SyncInputSocket
@@ -285,8 +286,8 @@ extends FsDecoratingController<M, C> {
             try {
                 return getBoundSocket().getLocalTarget();
             } catch (FsNotSyncedException ex) {
-                sync(SYNC_OPTIONS);
-                return getBoundSocket().getLocalTarget();
+                delegate.sync(SYNC_OPTIONS);
+                return getLocalTarget(); // retry
             }
         }
 
@@ -301,8 +302,8 @@ extends FsDecoratingController<M, C> {
             try {
                 return getBoundSocket().newReadOnlyFile();
             } catch (FsNotSyncedException ex) {
-                sync(SYNC_OPTIONS);
-                return getBoundSocket().newReadOnlyFile();
+                delegate.sync(SYNC_OPTIONS);
+                return newReadOnlyFile(); // retry
             }
         }
 
@@ -311,8 +312,8 @@ extends FsDecoratingController<M, C> {
             try {
                 return getBoundSocket().newInputStream();
             } catch (FsNotSyncedException ex) {
-                sync(SYNC_OPTIONS);
-                return getBoundSocket().newInputStream();
+                delegate.sync(SYNC_OPTIONS);
+                return newInputStream(); // retry
             }
         }
     } // SyncInputSocket
@@ -328,8 +329,8 @@ extends FsDecoratingController<M, C> {
             try {
                 return getBoundSocket().newSeekableByteChannel();
             } catch (FsNotSyncedException ex) {
-                sync(SYNC_OPTIONS);
-                return getBoundSocket().newSeekableByteChannel();
+                delegate.sync(SYNC_OPTIONS);
+                return newSeekableByteChannel(); // retry
             }
         }
     } // Nio2SyncOutputSocket
@@ -345,8 +346,8 @@ extends FsDecoratingController<M, C> {
             try {
                 return getBoundSocket().getLocalTarget();
             } catch (FsNotSyncedException ex) {
-                sync(SYNC_OPTIONS);
-                return getBoundSocket().getLocalTarget();
+                delegate.sync(SYNC_OPTIONS);
+                return getLocalTarget(); // retry
             }
         }
 
@@ -361,8 +362,8 @@ extends FsDecoratingController<M, C> {
             try {
                 return getBoundSocket().newOutputStream();
             } catch (FsNotSyncedException ex) {
-                sync(SYNC_OPTIONS);
-                return getBoundSocket().newOutputStream();
+                delegate.sync(SYNC_OPTIONS);
+                return newOutputStream(); // retry
             }
         }
     } // SyncOutputSocket
