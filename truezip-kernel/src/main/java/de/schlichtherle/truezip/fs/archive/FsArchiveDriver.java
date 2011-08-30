@@ -30,6 +30,7 @@ import de.schlichtherle.truezip.fs.FsInputOption;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
+import de.schlichtherle.truezip.fs.FsSyncController;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.InputSocket;
@@ -175,12 +176,12 @@ extends FsDriver {
     newController(FsModel model, FsController<?> parent) {
         return  new FsConcurrentController(
                     new FsCachingController(
-                        //new FsResourceController(
+                        new FsSyncController<FsConcurrentModel, FsController<? extends FsConcurrentModel>>(
                             new FsContextController(
                                 new FsDefaultArchiveController<E>(
                                     new FsConcurrentModel(model),
                                     parent,
-                                    this)),
+                                    this))),
                         getPool()));
     }
 
