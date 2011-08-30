@@ -1,0 +1,45 @@
+    -----------------------
+    About
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+About
+
+    This module contains the file system driver service classes
+    {{{../../apidocs/de/schlichtherle/truezip/fs/file/FileDriverService.html}<<<de.schlichtherle.truezip.fs.file.FileDriverService>>>}}
+    and
+    {{{../../apidocs/de/schlichtherle/truezip/fs/nio/file/FileDriverService.html}<<<de.schlichtherle.truezip.fs.nio.file.FileDriverService>>>}}.
+
+    The class
+    {{{../../apidocs/de/schlichtherle/truezip/fs/file/FileDriverService.html}<<<de.schlichtherle.truezip.fs.file.FileDriverService>>>}}
+    provides the following map of file system drivers based on the
+    java.io.File* API for JSE 6:
+
+*--*--*
+||URI Schemes||File System Driver Class|
+*--+--+
+|<<<file>>>|{{{../../apidocs/de/schlichtherle/truezip/fs/file/FileDriver.html}<<<de.schlichtherle.truezip.fs.file.FileDriver>>>}}|
+*--+--+
+
+    The class
+    {{{../../apidocs/de/schlichtherle/truezip/fs/nio/file/FileDriverService.html}<<<de.schlichtherle.truezip.fs.nio.file.FileDriverService>>>}}
+    provides the following map of file system drivers based on the
+    NIO.2 API for JSE 7 and later:
+
+*--*--*
+||URI Schemes||File System Driver Class|
+*--+--+
+|<<<file>>>|{{{../../apidocs/de/schlichtherle/truezip/fs/nio/file/FileDriver.html}<<<de.schlichtherle.truezip.fs.nio.file.FileDriver>>>}}|
+*--+--+
+
+    Add the JAR artifact of this module to the run time class path to
+    make its file system drivers available for service location in the
+    client API modules.
+
+    When using service location, one of the two file system drivers is
+    automatically selected based on its priority:
+    In a JSE&#160;6 compliant JVM, the file system driver based on the
+    java.io.File*&#160;API is preferred.
+    In a JSE&#160;7 compliant JVM, the file system driver based on the
+    NIO.2&#160;API is preferred.

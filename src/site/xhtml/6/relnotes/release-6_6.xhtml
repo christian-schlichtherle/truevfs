@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>6.6 Release Notes</title>
+        <meta name="Author" content="Christian Schlichtherle"/>
+    </head>
+    <body>
+        <div id="content">
+            <h1>Release Notes for TrueZIP 6.6</h1>
+            <p class="subtitle">(April 3<sup>rd</sup>, 2007)</p>
+            <h2>Contents</h2>
+            <ol>
+                <li><a href="#introduction">Introduction</a></li>
+                <li><a href="#updates">List of Updates (Change Log)</a></li>
+            </ol>
+            <h2><a name="introduction">Introduction</a></h2>
+            <table id="legend">
+                <thead>
+                    <tr>
+                        <th colspan="2">Legend</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>New</th>
+                        <td>Introduces a new feature.</td>
+                    </tr>
+                    <tr>
+                        <th>Fixed</th>
+                        <td>Introduces a bug fix of an existing feature.</td>
+                    </tr>
+                    <tr>
+                        <th>Enhanced</th>
+                        <td>
+                            Introduces the enhancement of an existing feature.
+                            This update is fully backwards compatible.
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Changed</th>
+                        <td>
+                            Introduces the change of an existing feature.
+                            This update may cause
+                            <a href="releases.html#compatibility">
+                                backwards incompatibilities
+                            </a>.
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Deprecated</th>
+                        <td>Introduces the deprecation of an existing feature.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h2><a name="updates">List of Updates (Change Log)</a></h2>
+            <p>
+                Following is an overview of all updates in this release
+                which affect the public API.
+                Please note that internal refactorings are not listed.
+                For a full list of updates, please refer to the CVS repository
+                and diff to the tag <code>TrueZIP-6_5_4</code>.
+            </p>
+            <h3>Cross Package Updates</h3>
+            <ol>
+                <li><b>Enhanced:</b> Javadoc here and there.</li>
+            </ol>
+            <h3>Updates in the Package <code>de.schlichtherle.io.archive.tar</code></h3>
+            <ol>
+                <li><b>Fixed:</b> <code>TarEntry</code> now initializes the size property
+                    with <code>UNKNOWN</code> and protects the time property against erratical
+                subclassing.</li>
+                <li><b>Enhanced:</b> The <code>TarDriver</code> class now accept a single
+                integer argument in a newly added constructor to set the compression level.</li>
+            </ol>
+            <h3>Updates in the Package <code>de.schlichtherle.io.archive.zip</code></h3>
+            <ol>
+                <li><b>Enhanced:</b> Removed redundant <code>IOException</code> declaration
+                from constructor signature in <code>OdfOutputArchive</code>.</li>
+                <li><b>Enhanced:</b> All driver classes now accept a single integer argument
+                in a newly added constructor to set the compression level.</li>
+            </ol>
+            <h3>Updates in the Package <code>de.schlichtherle.io.util</code></h3>
+            <ol>
+                <li>
+                    <b>New:</b> The class
+                    <code><a href="apidocs/de/schlichtherle/io/util/Temps.html">Temps</a></code>
+                    has been introduced as a central utility to create temporary files and to
+                    control their directory on a per-class-loader basis.
+                </li>
+                <li>
+                    <b>New:</b> The class
+                    <code><a href="apidocs/de/schlichtherle/io/util/SuffixSet.html">SuffixSet</a></code>
+                    is a convenient and powerful means to operate with expressions such as
+                    <code>"ear|jar|war|zip"</code>.
+                </li>
+            </ol>
+            <h3>Updates in the Package <code>de.schlichtherle.util</code></h3>
+            <ol>
+                <li>
+                    <b>New:</b> The class
+                    <code><a href="apidocs/de/schlichtherle/util/CanonicalStringSet.html">CanonicalStringSet</a></code>
+                    is the general purpose base class for
+                    <code>de.schlichtherle.io.util.SuffixSet</code>.
+                </li>
+            </ol>
+            <h3>Updates in the Package <code>de.schlichtherle.util.zip</code></h3>
+            <ol>
+                <li><b>Enhanced:</b> <code>BasicZipOutputStream</code> now writes 6.3 as the
+                    "Version Made By" field in order to indicate that it uses the General Bit 11
+                is used to flag UTF-8 encoding according to the PKZIP spec version 6.3.</li>
+            </ol>
+        </div>
+    </body>
+</html>

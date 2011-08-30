@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>6.1 Release Notes</title>
+        <meta name="Author" content="Christian Schlichtherle"/>
+    </head>
+    <body>
+        <div id="content">
+            <h1>Release Notes for TrueZIP 6.1</h1>
+            <p class="subtitle">(July 10<sup>th</sup>, 2006)</p>
+            <h2>Contents</h2>
+            <ol>
+                <li><a href="#introduction">Introduction</a></li>
+                <li><a href="#updates">List of Updates (Change Log)</a></li>
+            </ol>
+            <h2><a name="introduction">Introduction</a></h2>
+            <p>This is a bug fix and minor feature release. The primary focus has been
+                to fix multithreading issues and enhance the Javadoc. The new feature is the
+                extension of the ZIP archive driver family with CRC-32 checked versions for
+                optional usage. Updating is considered critical for
+            multithreaded environments such as application servers.</p>
+            <h3>New CRC-32 checked ZIP archive drivers</h3>
+            <p>TrueZIP now supports checking of the CRC-32 value in existing ZIP archive
+                files. While this feature has been available for a while in the class
+                de.schlichtherle.util.zip.ZipFile (as opposed to java.util.zip.ZipFile), it
+                wasn't used by the ZIP archive driver family in the package <code>
+                de.schlichtherle.io.archive.zip</code>. With TrueZIP 6.1. a number of new
+            drivers have been introduced to support this feature:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Default Driver</th>
+                        <th>Optional driver</th>
+                    </tr>
+                    <tr style="font-size: 0.8em">
+                        <th>Does <strong>not</strong> check the CRC-32 value in existing
+                        archives</th>
+                        <th><strong>Does</strong> check the CRC-32 value in existing archives</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>JarDriver</code></td>
+                        <td><code>CheckedJarDriver</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>ReadOnlySfxDriver</code></td>
+                        <td><code>CheckedReadOnlySfxDriver</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>Zip32Driver</code></td>
+                        <td><code>CheckedZip32Driver</code></td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>Because CRC-32 checking comes at a notable performance penalty, the checked
+                archive drivers are just <i>optional</i> and hence are not used by default. If
+                you think that this is an issue, please bear in mind that any application based
+                on the class <code>java.util.zip.ZipFile</code> currently does not support
+            CRC-32.</p>
+            <p>&nbsp;If you want to use these optional drivers for increased safety, you
+                either (1) have to create a custom instance of the class <code>
+                de.schlichtherle.io.DefaultArchiveDetector</code> or (2) provide a custom
+                version of the configuration file <code>
+                META-INF/service/de.schlichtherle.io.archive.spi.ArchiveDetector.properties</code>
+                on your classpath. For the first approach, please refer to the Javadoc and have
+                a look at the source code for the <code>nzip</code> utility in the default
+                package. For the second approach, please have a look at the default
+            configuration file within <code>truezip-6.jar</code>.</p>
+            <p>If you are using the checked ZIP archive drivers, the CRC-32 value of any
+                input stream referring to an archive entry is calculated and compared to the
+                CRC-32 value provided in the archive file as soon as you call the <code>close()</code>
+                method of the input stream. If there is a mismatch, the <code>close()</code>
+            method throws a <code>de.schlichtherle.util.zip.CRC32Exception</code>.</p>
+            <h3>More unit tests</h3>
+            <p>Some more JUnit tests have been added to the <code>test</code> directory in
+                order to test multithreading and the GUI of the Swing based implementation of
+                the Key Manager in the package <code>de.schlichtherle.key.passwd.swing</code>.
+                All tests have been run on the following combinations of JDKs and platforms and
+            should be running on all other platforms with the same JDK as well:</p>
+            <ul>
+                <li>Sun's JDK 1.4.2-b28 for Windows<sup>1</sup></li>
+                <li>Sun's JDK 1.4.2_12-b03 for Windows</li>
+                <li>Sun's JDK 1.5.0-b64 for Windows<sup>12</sup></li>
+                <li>Sun's JDK 1.5.0_07-b03 for Windows<sup>2</sup></li>
+                <li>Sun's JDK 1.6.0-beta2-b86 for Windows</li>
+            </ul>
+            <ol>
+                <li>The tests <code>de.schlichtherle.io.FileTestBase.testMultithreading1()</code>
+                    and <code>de.schlichtherle.util.zip.ZipTestBase.testMultithreading()</code>
+                    may or may not fail with an <code>OutOfMemoryException</code>. This does <i>
+                    not</i> constitute an issue with TrueZIP. If this happens, simply try to
+                    increase the maximum memory available to the JVM using the -<code>Xmx</code>
+                    switch (<code>-Xmx100m</code> for example). Later versions of the JDK do not
+                    show this issue, so I guess this is because of a change in the garbage
+                collection algorithm.</li>
+                <li>The test
+                    de.schlichtherle.key.passwd.swing.PromptingKeyManagerTest.testMultithreadedKeyMgmtLifeCycle()
+                    will most likely fail on this combination of JDK/platform. Again, this does <i>
+                    not </i>constitute an issue with TrueZIP. This is because the Jemmy library
+                    calls <code>Thread.sleep(10)</code>, which actually sleeps much longer for an
+                arbitrary amount of time and hence causes Jemmy to timeout.</li>
+            </ol>
+            <p>For the GUI tests to run you now need to have Jemmy 2.2.6 or later in your
+                class path. You can download Jemmy at <a href="http://jemmy.netbeans.org">
+                http://jemmy.netbeans.org</a>. Please note that the test <code>
+                de.schlichtherle.key.passwd.swing.PromptingKeyManagerTest.testMultihreadedKeyMgmtLifeCycle()</code>
+                runs in Robot mode and hence will hijack your mouse and keyboard for the
+                duration of the test (aprox. 2 minutes). <b>Do not change the window during this
+                    test, or you will get a bad surprise from all the input that would then be
+            received by the other window!</b></p>
+            <table id="legend">
+                <thead>
+                    <tr>
+                        <th colspan="2">Legend</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>New</th>
+                        <td>Introduces a new feature.</td>
+                    </tr>
+                    <tr>
+                        <th>Fixed</th>
+                        <td>Introduces a bug fix of an existing feature.</td>
+                    </tr>
+                    <tr>
+                        <th>Enhanced</th>
+                        <td>
+                            Introduces the enhancement of an existing feature.
+                            This update is fully backwards compatible.
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Changed</th>
+                        <td>
+                            Introduces the change of an existing feature.
+                            This update may cause
+                            <a href="releases.html#compatibility">
+                                backwards incompatibilities
+                            </a>.
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Deprecated</th>
+                        <td>Introduces the deprecation of an existing feature.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h2><a name="updates">List of Updates (Change Log)</a></h2>
+            <p>
+                Following is an overview of all updates in this release
+                which affect the public API.
+                Please note that internal refactorings are not listed.
+                For a full list of updates, please refer to the CVS repository
+                and diff to the tag <code>TrueZIP-6_0</code>.
+            </p>
+            <h3>Multithreading</h3>
+            <ol>
+                <li><b>Fixed:</b> The classes <code>de.schlichtherle.util.zip.ZipOutputStream</code>
+                    and <code>de.schlichtherle.io.OutputArchiveMetaData</code> dead locked each
+                    other if used in multithreading environments. This affected the public <code>
+                File*</code> classes in the package <code>de.schlichtherle.io</code>.</li>
+                <li><b>Fixed:</b> <code>
+                    de.schlichtherle.io.archive.spi.AbstractArchiveDriver.ensureEncodable()</code>
+                    threw a <code>RuntimeException</code> if used in multithreading environments.
+                This affected most classes in the package <code>de.schlichtherle.io</code>.</li>
+                <li><b>Fixed:</b> <code>de.schlichtherle.io.ArchiveEntryMetaData.list*()</code>
+                    threw an AssertionError if used in multithreading environments and assertions
+                    were enabled. If assertions were disabled, wrong results may have been
+                produced. This affected the methods <code>de.schlichtherle.io.File.list*()</code>.</li>
+                <li><b>Fixed:</b> <code>de.schlichtherle.util.zip.ZipFile.getInputStream()</code>
+                    threw a <code>ZipException</code> if used in multithreading environments. This
+                affected the class <code>de.schlichtherle.io.FileInputStream</code>.</li>
+            </ol>
+            <h3>Key Manager</h3>
+            <p>The Key Manager in the package <code>de.schlichtherle.key</code> has
+            undergone some changes/enhancements:</p>
+            <ol>
+                <li><b>Fixed:</b> <code>KeyManager.setInstance()</code>
+                was always ignored.</li>
+                <li><b>Fixed:</b> <code>
+                    KeyManager.resetAndClearKeyProviders()</code> always
+                threw a <code>ConcurrentModificationException</code>.</li>
+                <li><b>Enhanced:</b> The method <code>
+                    KeyManager.getKeyProvider(String, Class)</code> can now determine a more
+                    suitable class substitute for the second parameter, e.g. if the second
+                    parameter is <code>AesKeyProvider.class</code>.
+                    This provides better support for loose coupling between client applications
+                and key provider implementations.</li>
+                <li>
+                    <b>Changed:</b> The Swing based implementation of the Key
+                    Manager, which is located in the package
+                    <code>de.schlichtherle.key.passwd.swing</code>,
+                    has been more or less rewritten in order to fix some bugs
+                    (including multithreading issues) and provide a more
+                    maintainable and extensible code base.
+                    The impact of this change should be minor because these
+                    classes were a specific implementation of the Key Manager
+                    service and were not for public use anyway unless a client
+                    application needed to customize this implementation.
+                </li>
+            </ol>
+            <h3>Miscellaneous</h3>
+            <ol>
+                <li><b>Fixed:</b> <code>de.schlichtherle.util.zip.ZipFile.getCheckedInputStream()</code>
+                    returned a buggy input stream: The CRC32 was only correctly computed (and
+                    hence the check in the <code>close()</code> method run successfully) if the
+                    input stream was read until the end of file using either <code>read(byte[])</code>
+                    or <code>read(byte[], int, int)</code> and neither <code>read()</code> nor
+                <code>skip()</code> were used.</li>
+                <li><b>Enhanced:</b> On a CRC32 mismatch in a ZIP file, the <code>close()</code>
+                    method of the input stream returned by <code>
+                    de.schlichtherle.util.zip.ZipFile.getCheckedInputStream()</code> now throws a
+                    <code>de.schlichtherle.util.zip.CRC32Exception</code>, which is a new subclass
+                    of <code>de.schlichtherle.util.zip.ZipException</code>, which was thrown
+                    instead before. In case the configured ZIP driver supports this feature (see
+                    next section), the
+                    <code>close()</code> method of the class <code>
+                de.schlichtherle.io.FileInputStream</code> throws this exception, too.</li>
+                <li><b>Fixed:</b> Depending on the use case, the private event listener code
+                    in <code>de.schlichtherle.swing.EnhancedPanel</code> threw a <code>
+                NullPointerException</code> from the AWT event dispatch thread.</li>
+                <li><b>Fixed:</b> Removed obsolete <code>get/setDosTime()</code> methods from
+                <code>de.schlichtherle.io.archive.zip.Zip32Entry</code> class.</li>
+                <li><b>Enhanced:</b> <code>PanelEvent</code>s fired by <code>
+                    de.schlichtherle.swing.EnhancedPanel</code> are now coalesced, so that for
+                    each event cause only one event is generated, no matter how the Swing API is
+                utilized by the client application to show or hide an ancestor window.</li>
+                <li><b>Enhanced:</b> The logging in <code>
+                    de.schlichtherle.io.DefaultArchiveDetector</code> has been refined in order to provide more
+                suitable messages for tracking down class loader issues.</li>
+                <li><b>Enhanced:</b> The Javadoc for many classes has been reviewed and fixed
+                or enhanced.</li>
+            </ol>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,221 @@
+    -----------------------
+    Kick-Starting TrueZIP Applications In Eclipse
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+Kick-Starting TrueZIP Applications In Eclipse
+
+    This guide shows how to kick-start a TrueZIP application in Eclipse
+    with the help of a Maven archetype.
+    If you are using NetBeans, then please read the guide for
+    {{{./netbeans.html}NetBeans}}
+    instead.
+    If you are using none of these, then please read the guide for the
+    {{{./shell.html}Command Line Shell}}
+    instead.
+
+* Motivation
+
+    A typical issue for beginners is understanding the dependency of TrueZIP 7
+    on
+    {{{../../truezip-driver/index.html}file system driver modules}}
+    at run time:
+    The modules
+    {{{../../truezip-file/index.html}TrueZIP File*}}
+    and
+    {{{../../truezip-path/index.html}TrueZIP Path}}
+    use a
+    {{{../../apidocs/de/schlichtherle/truezip/fs/sl/FsDriverLocator.html#SINGLETON}file system driver service locator singleton}}
+    which scans the class path for
+    {{{../../apidocs/de/schlichtherle/truezip/fs/spi/FsDriverService.html}file system driver services}}.
+    These file system driver services are contained in
+    {{{../../truezip-driver/index.html}file system driver modules}}.
+    By adding file system driver modules to the run time class path of an
+    application, you trigger the TrueZIP File* module to add their file system
+    drivers to the
+    {{{../../apidocs/de/schlichtherle/truezip/file/TFile.html#getDefaultArchiveDetector()}initial set up}}
+    of its
+    {{{../../apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html#ALL}archive detection}}.
+
+    Although it's straightforward, setting up the class path can be a daunting
+    task for TrueZIP beginners, so a Maven archetype is provided as a template
+    for TrueZIP File* applications.
+    This archetype shows how to setup the run time dependencies and, as an
+    alternative, how to avoid using the service locator by using dependency
+    injection instead.
+
+* Prerequisites
+
+    You need to have the following software installed:
+
+    * {{{http://www.eclipse.org/downloads/}Eclipse Helios}}
+
+    * JSE 6 for applications of the TrueZIP File* module.
+
+    * JSE 7 for applications of the TrueZIP Path module.
+
+    []
+
+* Set Up Eclipse
+
+    You need to have the Maven Integration feature installed.
+    If you are using Eclipse Indigo with Java Developer Tools, then you need
+    nothing extra.
+    Otherwise, you can easily install the feature by selecting the menu item
+    <Help> -\> <Eclipse Marketplace...>.
+
+    You can verify the installation by selecting <Help> -> <About Eclipse>.
+    The dialog should show a button with the red label <m2>:
+
+[eclipse/01_About_Eclipse.png] About Eclipse
+
+    If you click on this button, a property dialog is opened which should look
+    like this:
+
+[eclipse/02_About_Eclipse_Features.png] About Eclipse Features
+
+    Once installed, it's a very good idea to configure the feature preferences
+    in your current Workspace now or in your projects later.
+    Sonatype Inc. provides online documentation for this task at
+    {{http://www.sonatype.com/books/m2eclipse-book/reference/preferences.html}}.
+
+* Generate Maven Archetype
+
+    To generate the application archetype, select <File> -> <New> -> <Other...>
+    or type <Ctrl+N> to open the following dialog:
+
+[eclipse/03_New.png] New
+
+    Select <Maven> -\> <Maven Project> and click <Next> to open the following
+    dialog:
+
+[eclipse/04_New_Maven_Project.png] New Maven Project
+
+    Click <Next> to open the following dialog:
+
+[eclipse/05_New_Maven_Project.png] New Maven Project
+
+    Make sure to have <All Catalogs> or <Nexus Indexer> selected in the
+    <Catalog> drop down combo box, enter <truezip> into the <Filter> field,
+    select the latest entry with the Artifact Id <truezip-archetype-file> and
+    click <Next> to open the following dialog:
+
+[eclipse/06_New_Maven_Project.png] New Maven Project
+
+    Enter the appropriate values for your project's <Group Id>, <Artifact Id>,
+    <Version> and <Package> and then click <Finish> to see the magical
+    population of the Package Explorer with your shiny new TrueZIP File*
+    application happen:
+
+[eclipse/07_Package_Explorer.png] Package Explorer
+
+* Explore Your Application
+
+    The project directory contains the following files:
+
+    [<<<pom.xml>>>]
+    This is the Maven Project Object Model (POM).
+    The POM declares the properties of your project to Maven so that it can
+    build, install and run it.
+    Within the \<project\>/\<dependencies\> element is the declaration of the
+    dependencies of your application, i.e. the JARs required to compile and run
+    it.
+    Each file system driver module on the run time class path adds to the
+    initial set up of detected archive types by the TrueZIP File* and TrueZIP
+    Path API as explained above, so please edit it
+    {{{Edit_Your_Application}later}} to meet your application requirements.
+    For now, please leave this file alone.
+
+    [<<<src/main/java/com/company/project/Application.java>>>]
+    This abstract base class runs the setup-work-sync life cycle of a typical
+    TrueZIP application.
+    It overrides the method
+    {{{../../apidocs/de/schlichtherle/truezip/file/TApplication.html#setup()}<<<TApplication.setup()>>>}}
+    in order to customize the initial setup.
+
+    [<<<src/main/java/com/company/project/Cat.java>>>]
+    This command line utility recursively copies its file arguments to the 
+    standard output in order.
+    If you name any archive file entries in the arguments, they get
+    copied, too.
+
+    For example, if the JAR for the module <<<truezip-driver-zip>>> is
+    present on the run time class path, you could use the argument
+    <<<archive.zip/readme.txt>>> to print the contents of the entry
+    <<<readme.txt>>> in the archive file <<<archive.zip>>>.
+
+    [<<<src/main/java/com/company/project/Copy.java>>>]
+    This command line utility recursively copies its first file or
+    directory argument to its second file or directory argument.
+    Instead of a directory, you can name any configured archive file type in
+    the path names, too.
+    If you name any archive files in the destination path name, they get
+    automatically created.
+
+    For example, if the JAR for the module <<<truezip-driver-zip>>> is
+    present on the run time class path and the destination path name is
+    <<<archive.zip>>>, a ZIP file with this name gets created unless it
+    already exists.
+
+    [<<<src/main/java/com/company/project/Pickr.java>>>]
+    This utility is only available with the archetype for the TrueZIP File*
+    module.
+    It llets you pick a file using a
+    {{{../../apidocs/de/schlichtherle/truezip/file/swing/TFileChooser.html}<<<TFileChooser>>>}}
+    and prints it's path.
+    Of course, <<<TFileChooser>>> can browse archive files, too.
+
+    For example, if the JAR for the module <<<truezip-driver-zip>>> is present
+    on the run time class path and a ZIP file <<<archive.zip>>> exists, then
+    you can double click it to browse its entries.
+    
+    [<<<src/main/java/com/company/project/Tree.java>>>]
+    This command line utility prints the tree graph of the directory structure
+    of its file or directory arguments to the standard output.
+    Instead of a directory, you can name any configured archive file type as an
+    argument, too.
+
+    For example, if the JAR for the module <<<truezip-driver-zip>>> is present
+    on the run time class path and the path name argument is <<<archive.zip>>>
+    and this file actually exists as a ZIP file, then the tree graph of the
+    directory structure of this ZIP file gets printed.
+
+    []
+
+* Build And Run Your Application
+
+    To build and install your application in your local Maven repository,
+    select your project in the Package Explorer view and select <Run> ->
+    <Run As> -\> <Maven install>.
+    This should open a Console view with the output of the Maven command.
+    Close to its end, it should read <<<[INFO] BUILD SUCCESS>>>:
+
+[eclipse/08_Console.png] Console
+
+    To run the main class <<<Tree>>>, select it in the Package Explorer view
+    and select <Run> -\> <Run As> -\> <Java Application>.
+    This should produce a similar output to the following in the Console view:
+
+[eclipse/09_Console.png] Console
+
+    Note that the contents of the JAR file
+    <<<target/project-0.1-SNAPSHOT.jar>>> get listed, too!
+    This is because the configuration file <<<pom.xml>>> is set up to recognize
+    JAR files as virtual directories by adding the module TrueZIP Driver ZIP
+    with the artifactId <<<truezip-driver-zip>>> to the run time class path.
+    You can change this by editing the configuration file <<<pom.xml>>> or 
+    the method <<<Application.html.setup()>>>.
+
+* Edit Your Application
+
+    Now you're ready and set to edit your application to meet your requirements.
+
+    Mind that the class <<<Application>>> is just a template to show the
+    setup-work-sync life cycle of a typical TrueZIP application:
+    You don't need to use this class at all as long as your application
+    implements this life cycle somehow.
+
+    Finally, don't forget to configure the run time dependencies in the
+    <<<pom.xml>>> unless your application explicitly configures the archive
+    detection in its setup phase.
