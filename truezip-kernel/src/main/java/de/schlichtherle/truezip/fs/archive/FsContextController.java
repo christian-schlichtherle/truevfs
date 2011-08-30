@@ -199,13 +199,12 @@ extends FsDecoratingConcurrentModelController<FsDefaultArchiveController<?>> {
     @Override
     public InputSocket<?> getInputSocket(   FsEntryName name,
                                             BitField<FsInputOption> options) {
-        return new Input(name, options);
+        return new ContextInputSocket(delegate.getInputSocket(name, options));
     }
 
-    private final class Input extends DecoratingInputSocket<Entry> {
-        Input(  FsEntryName name,
-                BitField<FsInputOption> options) {
-            super(delegate.getInputSocket(name, options));
+    private final class ContextInputSocket extends DecoratingInputSocket<Entry> {
+        ContextInputSocket(InputSocket<?> input) {
+            super(input);
         }
 
         @Override
@@ -271,13 +270,13 @@ extends FsDecoratingConcurrentModelController<FsDefaultArchiveController<?>> {
     public OutputSocket<?> getOutputSocket( FsEntryName name,
                                             BitField<FsOutputOption> options,
                                             Entry template) {
-        return new Output(name, options, template);
+        return new ContextOutputSocket(name, options, template);
     }
 
-    private final class Output extends DecoratingOutputSocket<Entry> {
+    private final class ContextOutputSocket extends DecoratingOutputSocket<Entry> {
         final FsOperationContext operation;
 
-        Output( FsEntryName name,
+        ContextOutputSocket( FsEntryName name,
                 BitField<FsOutputOption> options,
                 Entry template) {
             super(delegate.getOutputSocket(name, options, template));
