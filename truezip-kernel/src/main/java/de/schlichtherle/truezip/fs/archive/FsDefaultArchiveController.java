@@ -116,7 +116,7 @@ extends FsFileSystemArchiveController<E> {
     /**
      * Constructs a new archive file system controller.
      * 
-     * @param model the file system model.
+     * @param model the concurrent file system model.
      * @param parent the parent file system
      * @param driver the archive driver.
      */

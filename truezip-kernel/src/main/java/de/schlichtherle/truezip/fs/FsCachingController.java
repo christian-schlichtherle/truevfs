@@ -96,7 +96,7 @@ extends FsDecoratingConcurrentModelController<
     /**
      * Constructs a new content caching file system controller.
      *
-     * @param controller the decorated file system controller.
+     * @param controller the decorated concurrent file system controller.
      * @param pool the pool of temporary entries to hold the copied entry data.
      */
     public FsCachingController(
