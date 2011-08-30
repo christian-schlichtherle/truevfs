@@ -85,9 +85,6 @@ extends FsConcurrentModelController {
             FsArchiveController.class.getName(),
             FsArchiveController.class.getName());
 
-    private static final BitField<FsSyncOption>
-            UNLINK_SYNC_OPTIONS = BitField.of(ABORT_CHANGES);
-
     private final ThreadLocal<FsOperationContext>
             context = new ThreadLocal<FsOperationContext>();
 
@@ -400,25 +397,8 @@ extends FsConcurrentModelController {
     public void unlink(final FsEntryName name, BitField<FsOutputOption> options)
     throws IOException {
         checkAccess(name, null);
+        final FsArchiveFileSystem<E> fileSystem = autoMount();
         if (name.isRoot()) {
-            final FsArchiveFileSystem<E> fileSystem;
-            try {
-                fileSystem = autoMount();
-            } catch (FsFalsePositiveException ex) {
-                try {
-                    // The parent archive controller will unlink our target
-                    // archive file next, so we need to reset anyway.
-                    // The only effect of calling sync for a false positive
-                    // archive file is that it will reset the mount state so
-                    // that the file system can be successfully mounted again
-                    // if the target archive file is subsequently modified to
-                    // be a regular archive file.
-                    sync(UNLINK_SYNC_OPTIONS);
-                } catch (IOException cannotHappen) {
-                    throw new AssertionError(cannotHappen);
-                }
-                throw ex; // continue with unlinking our target archive file.
-            }
             if (!fileSystem.getEntry(ROOT).getMembers().isEmpty())
                 throw new IOException("root directory not empty");
             // Check for any archive entries with absolute entry names.
@@ -427,9 +407,8 @@ extends FsConcurrentModelController {
                 logger.log(Level.WARNING, "unlink.absolute",
                         new Object[] {  fileSystem.getSize() - 1,
                                         getMountPoint() });
-            sync(UNLINK_SYNC_OPTIONS);
-        } else { // !isRoot(path)
-            autoMount().unlink(name);
+        } else {
+            fileSystem.unlink(name);
         }
     }
 

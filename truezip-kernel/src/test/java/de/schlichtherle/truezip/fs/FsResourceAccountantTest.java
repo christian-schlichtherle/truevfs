@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.fs.archive;
+package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.io.SequentialIOExceptionBuilder;
 import org.junit.After;
@@ -68,7 +68,7 @@ public class FsResourceAccountantTest {
         final Resource resource = new Resource();
         accountant.startAccountingFor(resource);
         long time = System.currentTimeMillis();
-        int resources = accountant.waitStopAccounting(TIMEOUT_MILLIS);
+        int resources = accountant.waitOtherThreads(TIMEOUT_MILLIS);
         assertTrue("Timeout!", System.currentTimeMillis() < time + TIMEOUT_MILLIS);
         assertThat(resources, is(1));
     }
@@ -86,7 +86,7 @@ public class FsResourceAccountantTest {
             threads[i] = null;
             System.gc();
             long time = System.currentTimeMillis();
-            int resources = accountant.waitStopAccounting(TIMEOUT_MILLIS);
+            int resources = accountant.waitOtherThreads(TIMEOUT_MILLIS);
             assertTrue("Timeout waiting for " + clazz.getName(),
                     System.currentTimeMillis() < time + TIMEOUT_MILLIS);
             assertThat(resources, is(0));
@@ -104,13 +104,13 @@ public class FsResourceAccountantTest {
             thread.join();
         }
         long time = System.currentTimeMillis();
-        int resources = accountant.waitStopAccounting(TIMEOUT_MILLIS);
+        int resources = accountant.waitOtherThreads(TIMEOUT_MILLIS);
         assertTrue("No timeout!",
                 System.currentTimeMillis() >= time + TIMEOUT_MILLIS);
         assertThat(resources, is(2));
-        accountant.closeAll(SequentialIOExceptionBuilder.create());
+        accountant.closeAllResources(SequentialIOExceptionBuilder.create());
         time = System.currentTimeMillis();
-        resources = accountant.waitStopAccounting(TIMEOUT_MILLIS);
+        resources = accountant.waitOtherThreads(TIMEOUT_MILLIS);
         assertTrue("Timeout!",
                 System.currentTimeMillis() < time + TIMEOUT_MILLIS);
         assertThat(resources, is(0));

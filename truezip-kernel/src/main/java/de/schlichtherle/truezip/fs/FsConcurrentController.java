@@ -295,6 +295,19 @@ extends FsDecoratingConcurrentModelController<
         writeLock().lock();
         try {
             delegate.unlink(name, options);
+            final FsController<?> parent;
+            if (name.isRoot() && null != (parent = getParent())) {
+                // We have just removed the virtual root directory of a
+                // federated file system, i.e. archive file.
+                // Now unlink the entry for the archive file in the parent file
+                // system.
+                // Note that this code belongs conceptually in
+                // FsFederatedController.
+                // However, then this operation wouldn't be atomic anymore.
+                parent.unlink(
+                        getMountPoint().getPath().resolve(name).getEntryName(),
+                        options);
+            }
         } finally {
             writeLock().unlock();
         }

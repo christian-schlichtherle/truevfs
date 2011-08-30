@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.fs.archive;
+package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.ThreadGroups;
@@ -51,6 +51,7 @@ import net.jcip.annotations.ThreadSafe;
  * In order to stop accounting for a closeable resource,
  * call {@link #stopAccountingFor(Closeable)}.
  *
+ * @see     FsResourceController
  * @since   TrueZIP 7.3
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -78,7 +79,7 @@ public final class FsResourceAccountant {
      * Constructs a new resource accountant with the given lock.
      * You MUST MAKE SURE not to use two instances of this class which share
      * the same lock!
-     * Otherwise {@link #waitStopAccounting} will not work as designed!
+     * Otherwise {@link #waitOtherThreads} will not work as designed!
      * 
      * @param lock the lock to use for accounting resources.
      *             Though not required by the use in this class, this
@@ -146,7 +147,7 @@ public final class FsResourceAccountant {
      *         If this is {@code 0}, then there is no timeout for waiting.
      * @return The number of <em>all</em> accounted closeable resources.
      */
-    int waitStopAccounting(final long timeout) {
+    int waitOtherThreads(final long timeout) {
         this.lock.lock();
         try {
             int size;
@@ -195,7 +196,7 @@ public final class FsResourceAccountant {
      * provided to the constructor - use with care!
      */
     <X extends Exception>
-    void closeAll(final ExceptionHandler<? super IOException, X> handler)
+    void closeAllResources(final ExceptionHandler<? super IOException, X> handler)
     throws X {
         this.lock.lock();
         try {

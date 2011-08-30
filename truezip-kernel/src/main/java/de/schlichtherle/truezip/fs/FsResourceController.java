@@ -13,19 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.fs.archive;
+package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.fs.FsConcurrentModel;
-import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.FsDecoratingConcurrentModelController;
-import de.schlichtherle.truezip.fs.FsEntryName;
-import de.schlichtherle.truezip.fs.FsInputOption;
-import de.schlichtherle.truezip.fs.FsOutputOption;
-import de.schlichtherle.truezip.fs.FsSyncException;
-import de.schlichtherle.truezip.fs.FsSyncOption;
 import static de.schlichtherle.truezip.fs.FsSyncOption.*;
-import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
@@ -107,10 +98,8 @@ extends FsDecoratingConcurrentModelController<
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         assert isWriteLockedByCurrentThread();
-        if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT))
-            throw new IllegalArgumentException();
-        awaitSync(options, handler);
-        beginSync(handler);
+        waitOtherThreads(options, handler);
+        closeAllResources(handler);
         delegate.sync(options, handler);
     }
 
@@ -119,7 +108,7 @@ extends FsDecoratingConcurrentModelController<
      * them to close, dependending on the {@code options}.
      * Mind that this method deliberately handles entry input and output
      * resources in an equal manner because
-     * {@link FsResourceAccountant#waitStopAccounting} WILL NOT WORK if any two
+     * {@link FsResourceAccountant#waitOtherThreads} WILL NOT WORK if any two
      * resource accountants share the same lock!
      *
      * @param  options a bit field of synchronization options.
@@ -131,7 +120,7 @@ extends FsDecoratingConcurrentModelController<
      * @throws IOException at the discretion of the exception {@code handler}
      *         upon the occurence of an {@link FsSyncException}.
      */
-    private <X extends IOException> void awaitSync(
+    private <X extends IOException> void waitOtherThreads(
             final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
@@ -140,7 +129,7 @@ extends FsDecoratingConcurrentModelController<
             return;
         final boolean wait = options.get(WAIT_CLOSE_INPUT)
                 || options.get(WAIT_CLOSE_OUTPUT);
-        final int resources = accountant.waitStopAccounting(wait ? 0 : 50);
+        final int resources = accountant.waitOtherThreads(wait ? 0 : 50);
         if (0 >= resources)
             return;
         final IOException cause = new OutputBusyException("Number of open entry resources: " + resources);
@@ -163,7 +152,7 @@ extends FsDecoratingConcurrentModelController<
      * @throws IOException at the discretion of the exception {@code handler}
      *         upon the occurence of an {@link FsSyncException}.
      */
-    private <X extends IOException> void beginSync(
+    private <X extends IOException> void closeAllResources(
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         class FilterExceptionHandler
@@ -181,7 +170,7 @@ extends FsDecoratingConcurrentModelController<
 
         final FsResourceAccountant accountant = this.accountant;
         if (null != accountant)
-            accountant.closeAll(new FilterExceptionHandler());
+            accountant.closeAllResources(new FilterExceptionHandler());
     }
 
     @Immutable

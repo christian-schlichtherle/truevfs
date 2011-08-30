@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.fs.archive;
 
+import de.schlichtherle.truezip.fs.FsResourceController;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.socket.OutputShop;
@@ -174,15 +175,19 @@ extends FsDriver {
     @Override
     public FsController<?>
     newController(FsModel model, FsController<?> parent) {
+        assert !(model instanceof FsConcurrentModel);
+        final FsConcurrentModel cmodel;
+        /*if (model instanceof FsConcurrentModel)
+            cmodel = (FsConcurrentModel) model;
+        else*/
+            cmodel = new FsConcurrentModel(model);
         return  new FsSyncController<FsConcurrentModel, FsController<? extends FsConcurrentModel>>(
                     new FsConcurrentController(
                         new FsCachingController(
                             new FsResourceController(
                                 new FsContextController(
                                     new FsDefaultArchiveController<E>(
-                                        new FsConcurrentModel(model),
-                                        parent,
-                                        this))),
+                                            cmodel, parent, this))),
                             getPool())));
     }
 

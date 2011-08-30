@@ -263,14 +263,6 @@ extends FsFileSystemArchiveController<E> {
     }
 
     @Override
-    public void unlink(FsEntryName name, BitField<FsOutputOption> options)
-    throws IOException {
-        super.unlink(name, options);
-        if (name.isRoot())
-            parent.unlink(parentName, options);
-    }
-
-    @Override
     void checkAccess(   final FsEntryName name,
                         final @CheckForNull Access intention)
     throws FsNotSyncedException {
