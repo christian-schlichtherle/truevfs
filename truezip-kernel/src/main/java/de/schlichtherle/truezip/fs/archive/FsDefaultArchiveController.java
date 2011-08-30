@@ -89,9 +89,6 @@ extends FsFileSystemArchiveController<E> {
 
     private static final BitField<FsInputOption>
             MOUNT_INPUT_OPTIONS = BitField.of(FsInputOption.CACHE);
-    private static final BitField<FsSyncOption>
-            AUTO_SYNC_OPTIONS = BitField.of(WAIT_CLOSE_INPUT,
-                                            WAIT_CLOSE_OUTPUT);
 
     private final FsArchiveDriver<E> driver;
     private final FsController<?> parent;
