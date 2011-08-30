@@ -44,6 +44,7 @@ import net.jcip.annotations.ThreadSafe;
  * file system if the decorated file system controller throws an
  * {@link FsNotSyncedException}.
  * 
+ * @since   TrueZIP 7.3
  * @see     FsNotSyncedException
  * @author  Christian Schlichtherle
  * @version $Id$
