@@ -74,7 +74,7 @@ extends TestBase<D> {
 
     protected static final IOPoolProvider
             IO_POOL_PROVIDER = new ByteArrayIOPoolService(4 * DATA.length / 3); // account for archive file type specific overhead
-    
+
     private File temp;
     private TFile archive;
     private byte[] data;
