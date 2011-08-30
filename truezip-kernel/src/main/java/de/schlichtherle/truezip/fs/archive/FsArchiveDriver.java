@@ -177,11 +177,12 @@ extends FsDriver {
         return  new FsSyncController<FsConcurrentModel, FsController<? extends FsConcurrentModel>>(
                     new FsConcurrentController(
                         new FsCachingController(
-                            new FsContextController(
-                                new FsDefaultArchiveController<E>(
-                                    new FsConcurrentModel(model),
-                                    parent,
-                                    this)),
+                            new FsResourceController(
+                                new FsContextController(
+                                    new FsDefaultArchiveController<E>(
+                                        new FsConcurrentModel(model),
+                                        parent,
+                                        this))),
                             getPool())));
     }
 

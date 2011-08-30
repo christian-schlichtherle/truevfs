@@ -36,19 +36,12 @@ import de.schlichtherle.truezip.fs.FsSyncOption;
 import static de.schlichtherle.truezip.fs.FsSyncOption.*;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import static de.schlichtherle.truezip.fs.archive.FsArchiveFileSystem.*;
-import de.schlichtherle.truezip.io.DecoratingInputStream;
-import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.InputException;
-import de.schlichtherle.truezip.io.OutputBusyException;
 import static de.schlichtherle.truezip.io.Paths.isRoot;
-import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
-import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.SynchronizedInputShop;
 import de.schlichtherle.truezip.socket.SynchronizedOutputShop;
 import de.schlichtherle.truezip.socket.DecoratingInputShop;
-import de.schlichtherle.truezip.socket.DecoratingInputSocket;
 import de.schlichtherle.truezip.socket.DecoratingOutputShop;
-import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.socket.DelegatingOutputSocket;
 import de.schlichtherle.truezip.socket.DisconnectingInputShop;
 import de.schlichtherle.truezip.socket.DisconnectingOutputShop;
@@ -65,8 +58,6 @@ import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import static java.lang.Boolean.*;
 import java.util.Collections;
 import java.util.Iterator;
@@ -93,8 +84,6 @@ extends FsFileSystemArchiveController<E> {
     private final FsArchiveDriver<E> driver;
     private final FsController<?> parent;
     private final FsEntryName parentName;
-
-    private @CheckForNull FsResourceAccountant accountant;
 
     /**
      * An {@link InputArchive} object used to mount the (virtual) archive file system
@@ -139,13 +128,6 @@ extends FsFileSystemArchiveController<E> {
         assert null != parent;
         assert null != parentName;
         return true;
-    }
-
-    private FsResourceAccountant getAccountant() {
-        final FsResourceAccountant accountant = this.accountant;
-        return null != accountant
-                ? accountant
-                : (this.accountant = new FsResourceAccountant(writeLock()));
     }
 
     private @CheckForNull InputArchive getInputArchive() {
@@ -339,11 +321,6 @@ extends FsFileSystemArchiveController<E> {
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         assert !isFileSystemTouched() || null != getOutputArchive(); // file system touched => output archive
-        assert isWriteLockedByCurrentThread();
-        if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT))
-            throw new IllegalArgumentException();
-        awaitSync(options, handler);
-        beginSync(handler);
         try {
             if (!options.get(ABORT_CHANGES) && isFileSystemTouched())
                 performSync(handler);
@@ -360,76 +337,6 @@ extends FsFileSystemArchiveController<E> {
                     setTouched(false);
             }
         }
-    }
-
-    /**
-     * Waits for all entry input and output resources to close or forces
-     * them to close, dependending on the {@code options}.
-     * Mind that this method deliberately handles entry input and output
-     * resources in an equal manner because
-     * {@link FsResourceAccountant#waitStopAccounting} WILL NOT WORK if any two
-     * resource accountants share the same lock!
-     *
-     * @param  options a bit field of synchronization options.
-     * @param  handler the exception handling strategy for consuming input
-     *         {@code FsSyncException}s and/or assembling output
-     *         {@code IOException}s.
-     * @param  <X> The type of the {@code IOException} to throw at the
-     *         discretion of the exception {@code handler}.
-     * @throws IOException at the discretion of the exception {@code handler}
-     *         upon the occurence of an {@link FsSyncException}.
-     */
-    private <X extends IOException> void awaitSync(
-            final BitField<FsSyncOption> options,
-            final ExceptionHandler<? super FsSyncException, X> handler)
-    throws X {
-        final FsResourceAccountant accountant = this.accountant;
-        if (null == accountant)
-            return;
-        final boolean wait = options.get(WAIT_CLOSE_INPUT)
-                || options.get(WAIT_CLOSE_OUTPUT);
-        final int resources = accountant.waitStopAccounting(wait ? 0 : 50);
-        if (0 >= resources)
-            return;
-        final IOException cause = new OutputBusyException("Number of open entry resources: " + resources);
-        final boolean force = options.get(FORCE_CLOSE_INPUT)
-                || options.get(FORCE_CLOSE_OUTPUT);
-        if (!force)
-            throw handler.fail(new FsSyncException(getModel(), cause));
-        handler.warn(new FsSyncWarningException(getModel(), cause));
-    }
-
-    /**
-     * Closes and disconnects all entry streams of the output and input
-     * archive.
-     *
-     * @param  handler the exception handling strategy for consuming input
-     *         {@code FsSyncException}s and/or assembling output
-     *         {@code IOException}s.
-     * @param  <X> The type of the {@code IOException} to throw at the
-     *         discretion of the exception {@code handler}.
-     * @throws IOException at the discretion of the exception {@code handler}
-     *         upon the occurence of an {@link FsSyncException}.
-     */
-    private <X extends IOException> void beginSync(
-            final ExceptionHandler<? super FsSyncException, X> handler)
-    throws X {
-        class FilterExceptionHandler
-        implements ExceptionHandler<IOException, X> {
-            @Override
-            public X fail(IOException shouldNotHappen) {
-                throw new AssertionError(shouldNotHappen);
-            }
-
-            @Override
-            public void warn(IOException cause) throws X {
-                handler.warn(new FsSyncWarningException(getModel(), cause));
-            }
-        } // FilterExceptionHandler
-
-        final FsResourceAccountant accountant = this.accountant;
-        if (null != accountant)
-            accountant.closeAll(new FilterExceptionHandler());
     }
 
     /**
@@ -475,7 +382,7 @@ extends FsFileSystemArchiveController<E> {
         copy(   getFileSystem(),
                 null == ia ? new DummyInputService<E>() : ia.getDriverProduct(),
                 oa.getDriverProduct(),
-                (ExceptionHandler<IOException, X>) new FilterExceptionHandler());
+                new FilterExceptionHandler());
     }
 
     private static <E extends FsArchiveEntry, X extends IOException> void copy(
@@ -609,34 +516,6 @@ extends FsFileSystemArchiveController<E> {
         InputShop<E> getDriverProduct() {
             return driverProduct;
         }
-
-        @Override
-        public InputSocket<? extends E> getInputSocket(final String name) {
-            if (null == name)
-                throw new NullPointerException();
-
-            class Input extends DecoratingInputSocket<E> {
-                Input() {
-                    super(InputArchive.super.getInputSocket(name));
-                }
-
-                @Override
-                public ReadOnlyFile newReadOnlyFile() throws IOException {
-                    assert isWriteLockedByCurrentThread();
-                    return new AccountedReadOnlyFile(
-                            getBoundSocket().newReadOnlyFile());
-                }
-
-                @Override
-                public InputStream newInputStream() throws IOException {
-                    assert isWriteLockedByCurrentThread();
-                    return new AccountedInputStream(
-                            getBoundSocket().newInputStream());
-                }
-            } // Input
-
-            return new Input();
-        }
     } // InputArchive
 
     private final class OutputArchive
@@ -656,106 +535,7 @@ extends FsFileSystemArchiveController<E> {
         OutputShop<E> getDriverProduct() {
             return driverProduct;
         }
-
-        @Override
-        public final OutputSocket<? extends E> getOutputSocket(final E entry) {
-            if (null == entry)
-                throw new NullPointerException();
-
-            class Output extends DecoratingOutputSocket<E> {
-                Output() {
-                    super(OutputArchive.super.getOutputSocket(entry));
-                }
-
-                @Override
-                public OutputStream newOutputStream() throws IOException {
-                    assert isWriteLockedByCurrentThread();
-                    return new AccountedOutputStream(
-                            getBoundSocket().newOutputStream());
-                }
-            } // Output
-
-            return new Output();
-        }
     } // OutputArchive
-
-    private final class AccountedReadOnlyFile extends DecoratingReadOnlyFile {
-        @SuppressWarnings("LeakingThisInConstructor")
-        AccountedReadOnlyFile(ReadOnlyFile rof) {
-            super(rof);
-            getAccountant().startAccountingFor(this);
-        }
-
-        @Override
-        public void close() throws IOException {
-            assert isWriteLockedByCurrentThread();
-            getAccountant().stopAccountingFor(this);
-            delegate.close();
-        }
-
-        @Override
-        @SuppressWarnings("FinalizeDeclaration")
-        protected void finalize() throws Throwable {
-            try {
-                //getAccountant().stopAccountingFor(this); // superfluous - done by GC!
-                delegate.close();
-            } finally {
-                super.finalize();
-            }
-        }
-    } // AccountedReadOnlyFile
-
-    private final class AccountedInputStream extends DecoratingInputStream {
-        @SuppressWarnings("LeakingThisInConstructor")
-        AccountedInputStream(InputStream in) {
-            super(in);
-            getAccountant().startAccountingFor(this);
-        }
-
-        @Override
-        public void close() throws IOException {
-            assert isWriteLockedByCurrentThread();
-            getAccountant().stopAccountingFor(this);
-            delegate.close();
-        }
-
-        @Override
-        @SuppressWarnings("FinalizeDeclaration")
-        protected void finalize() throws Throwable {
-            try {
-                //getAccountant().stopAccountingFor(this); // superfluous - done by GC!
-                delegate.close();
-            } finally {
-                super.finalize();
-            }
-        }
-    } // AccountedInputStream
-
-    private final class AccountedOutputStream extends DecoratingOutputStream {
-        @SuppressWarnings("LeakingThisInConstructor")
-        AccountedOutputStream(OutputStream out) {
-            super(out);
-            getAccountant().startAccountingFor(this);
-        }
-
-        @Override
-        public void close() throws IOException {
-            assert isWriteLockedByCurrentThread();
-            getAccountant().stopAccountingFor(this);
-            delegate.close();
-        }
-
-        @Override
-        @SuppressWarnings("FinalizeDeclaration")
-        protected void finalize() throws Throwable {
-            try {
-                //getAccountant().stopAccountingFor(this); // superfluous - done by GC!
-                delegate.close();
-            } finally {
-                super.finalize();
-            }
-        }
-    } // AccountedOutputStream
 
     /**
      * An archive file system listener which makes the output before it
