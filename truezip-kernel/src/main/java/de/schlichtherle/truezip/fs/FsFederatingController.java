@@ -266,15 +266,68 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     public InputSocket<?> getInputSocket(
             final FsEntryName name,
             final BitField<FsInputOption> options) {
-        return new Input(name, options);
+        return new FederatingInputSocket(
+                delegate.getInputSocket(name, options),
+                name, options);
     }
 
-    private final class Input extends DecoratingInputSocket<Entry> {
+    @Override
+    public OutputSocket<?> getOutputSocket(
+            FsEntryName name,
+            BitField<FsOutputOption> options,
+            @CheckForNull Entry template) {
+        return new FederatingOutputSocket(
+                delegate.getOutputSocket(name, options, template),
+                name, options, template);
+    }
+
+    @Override
+    public void mknod(
+            FsEntryName name,
+            Type type,
+            BitField<FsOutputOption> options,
+            @CheckForNull Entry template)
+    throws IOException {
+        try {
+            delegate.mknod(name, type, options, template);
+        } catch (FsFalsePositiveException ex) {
+            try {
+                getParent().mknod(resolveParent(name), type, options, template);
+            } catch (FsException ex2) {
+                assert !(ex2 instanceof FsFalsePositiveException);
+                throw ex2;
+            } catch (IOException discard) {
+                throw ex.getCause();
+            }
+        }
+    }
+
+    @Override
+    public void unlink(FsEntryName name, BitField<FsOutputOption> options)
+    throws IOException {
+        try {
+            delegate.unlink(name, options);
+        } catch (FsFalsePositiveException ex) {
+            try {
+                getParent().unlink(resolveParent(name), options);
+            } catch (FsException ex2) {
+                assert !(ex2 instanceof FsFalsePositiveException);
+                throw ex2;
+            } catch (IOException discard) {
+                throw ex.getCause();
+            }
+        }
+    }
+
+    private final class FederatingInputSocket
+    extends DecoratingInputSocket<Entry> {
         final FsEntryName name;
         final BitField<FsInputOption> options;
 
-        Input(final FsEntryName name, final BitField<FsInputOption> options) {
-            super(delegate.getInputSocket(name, options));
+        FederatingInputSocket(  final InputSocket<?> input,
+                final FsEntryName name,
+                final BitField<FsInputOption> options) {
+            super(input);
             this.name = name;
             this.options = options;
         }
@@ -360,25 +413,20 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                 }
             }
         }
-    } // Input
+    } // FederatingInputSocket
 
-    @Override
-    public OutputSocket<?> getOutputSocket(
-            FsEntryName name,
-            BitField<FsOutputOption> options,
-            @CheckForNull Entry template) {
-        return new Output(name, options, template);
-    }
-
-    private final class Output extends DecoratingOutputSocket<Entry> {
+    private final class FederatingOutputSocket
+    extends DecoratingOutputSocket<Entry> {
         final FsEntryName name;
         final BitField<FsOutputOption> options;
         final @CheckForNull Entry template;
 
-        Output( final FsEntryName name,
+        FederatingOutputSocket(
+                final OutputSocket<?> output,
+                final FsEntryName name,
                 final BitField<FsOutputOption> options,
                 final @CheckForNull Entry template) {
-            super(delegate.getOutputSocket(name, options, template));
+            super(output);
             this.name = name;
             this.options = options;
             this.template = template;
@@ -446,43 +494,5 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                 }
             }
         }
-    } // Output
-
-    @Override
-    public void mknod(
-            FsEntryName name,
-            Type type,
-            BitField<FsOutputOption> options,
-            @CheckForNull Entry template)
-    throws IOException {
-        try {
-            delegate.mknod(name, type, options, template);
-        } catch (FsFalsePositiveException ex) {
-            try {
-                getParent().mknod(resolveParent(name), type, options, template);
-            } catch (FsException ex2) {
-                assert !(ex2 instanceof FsFalsePositiveException);
-                throw ex2;
-            } catch (IOException discard) {
-                throw ex.getCause();
-            }
-        }
-    }
-
-    @Override
-    public void unlink(FsEntryName name, BitField<FsOutputOption> options)
-    throws IOException {
-        try {
-            delegate.unlink(name, options);
-        } catch (FsFalsePositiveException ex) {
-            try {
-                getParent().unlink(resolveParent(name), options);
-            } catch (FsException ex2) {
-                assert !(ex2 instanceof FsFalsePositiveException);
-                throw ex2;
-            } catch (IOException discard) {
-                throw ex.getCause();
-            }
-        }
-    }
+    } // FederatingOutputSocket
 }

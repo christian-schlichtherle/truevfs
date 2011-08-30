@@ -112,121 +112,20 @@ extends FsDecoratingConcurrentModelController<
     public InputSocket<?> getInputSocket(
             FsEntryName name,
             BitField<FsInputOption> options) {
-        return new CachingInputSocket(name, options);
+        return new CachingInputSocket(
+                delegate.getInputSocket(name, options),
+                name, options);
     }
-
-    private final class CachingInputSocket
-    extends DecoratingInputSocket<Entry> {
-        final FsEntryName name;
-        final BitField<FsInputOption> options;
-
-        CachingInputSocket(final FsEntryName name, final BitField<FsInputOption> options) {
-            super(delegate.getInputSocket(name, options));
-            this.name = name;
-            this.options = options;
-        }
-
-        @Override
-        public InputSocket<?> getBoundSocket() throws IOException {
-            EntryCache cache = caches.get(name);
-            if (null == cache) {
-                if (!options.get(FsInputOption.CACHE))
-                    return super.getBoundSocket(); // don't cache
-                assertWriteLockedByCurrentThread();
-                cache = new EntryCache(name);
-            }
-            return cache.configure(options).getInputSocket().bind(this);
-        }
-
-        @Override
-        public Entry getLocalTarget() throws IOException {
-            // Same implementation as super class, but makes stack trace nicer.
-            return getBoundSocket().getLocalTarget();
-        }
-
-        @Override
-        public Entry getPeerTarget() throws IOException {
-            // Same implementation as super class, but makes stack trace nicer.
-            return getBoundSocket().getPeerTarget();
-        }
-
-        @Override
-        public ReadOnlyFile newReadOnlyFile() throws IOException {
-            // Same implementation as super class, but makes stack trace nicer.
-            return getBoundSocket().newReadOnlyFile();
-        }
-
-        @Override
-        public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            // Same implementation as super class, but makes stack trace nicer.
-            return getBoundSocket().newSeekableByteChannel();
-        }
-
-        @Override
-        public InputStream newInputStream() throws IOException {
-            // Same implementation as super class, but makes stack trace nicer.
-            return getBoundSocket().newInputStream();
-        }
-    } // Input
 
     @Override
     public OutputSocket<?> getOutputSocket(
             FsEntryName name,
             BitField<FsOutputOption> options,
             Entry template) {
-        return new CachingOutputSocket(name, options, template);
+        return new CachingOutputSocket(
+                delegate.getOutputSocket(name, options, template),
+                name, options, template);
     }
-
-    private final class CachingOutputSocket
-    extends DecoratingOutputSocket<Entry> {
-        final FsEntryName name;
-        final BitField<FsOutputOption> options;
-        final @CheckForNull Entry template;
-
-        CachingOutputSocket( final FsEntryName name,
-                final BitField<FsOutputOption> options,
-                final @CheckForNull Entry template) {
-            super(delegate.getOutputSocket(name, options, template));
-            this.name = name;
-            this.options = options;
-            this.template = template;
-        }
-
-        @Override
-        public OutputSocket<?> getBoundSocket() throws IOException {
-            EntryCache cache = caches.get(name);
-            if (null == cache) {
-                if (!options.get(FsOutputOption.CACHE))
-                    return super.getBoundSocket(); // don't cache
-                cache = new EntryCache(name);
-            }
-            return cache.configure(options, template).getOutputSocket().bind(this);
-        }
-
-        @Override
-        public Entry getLocalTarget() throws IOException {
-            // Same implementation as super class, but makes stack trace nicer.
-            return getBoundSocket().getLocalTarget();
-        }
-
-        @Override
-        public Entry getPeerTarget() throws IOException {
-            // Same implementation as super class, but makes stack trace nicer.
-            return getBoundSocket().getPeerTarget();
-        }
-
-        @Override
-        public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            // Same implementation as super class, but makes stack trace nicer.
-            return getBoundSocket().newSeekableByteChannel();
-        }
-
-        @Override
-        public OutputStream newOutputStream() throws IOException {
-            // Same implementation as super class, but makes stack trace nicer.
-            return getBoundSocket().newOutputStream();
-        }
-    } // Output
 
     @Override
     public void mknod(  final FsEntryName name,
@@ -302,6 +201,116 @@ extends FsDecoratingConcurrentModelController<
             }
         }
     }
+
+    private final class CachingInputSocket
+    extends DecoratingInputSocket<Entry> {
+        final FsEntryName name;
+        final BitField<FsInputOption> options;
+
+        CachingInputSocket(
+                final InputSocket<?> input,
+                final FsEntryName name,
+                final BitField<FsInputOption> options) {
+            super(input);
+            this.name = name;
+            this.options = options;
+        }
+
+        @Override
+        public InputSocket<?> getBoundSocket() throws IOException {
+            EntryCache cache = caches.get(name);
+            if (null == cache) {
+                if (!options.get(FsInputOption.CACHE))
+                    return super.getBoundSocket(); // don't cache
+                assertWriteLockedByCurrentThread();
+                cache = new EntryCache(name);
+            }
+            return cache.configure(options).getInputSocket().bind(this);
+        }
+
+        @Override
+        public Entry getLocalTarget() throws IOException {
+            // Same implementation as super class, but makes stack trace nicer.
+            return getBoundSocket().getLocalTarget();
+        }
+
+        @Override
+        public Entry getPeerTarget() throws IOException {
+            // Same implementation as super class, but makes stack trace nicer.
+            return getBoundSocket().getPeerTarget();
+        }
+
+        @Override
+        public ReadOnlyFile newReadOnlyFile() throws IOException {
+            // Same implementation as super class, but makes stack trace nicer.
+            return getBoundSocket().newReadOnlyFile();
+        }
+
+        @Override
+        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            // Same implementation as super class, but makes stack trace nicer.
+            return getBoundSocket().newSeekableByteChannel();
+        }
+
+        @Override
+        public InputStream newInputStream() throws IOException {
+            // Same implementation as super class, but makes stack trace nicer.
+            return getBoundSocket().newInputStream();
+        }
+    } // CachingInputSocket
+
+    private final class CachingOutputSocket
+    extends DecoratingOutputSocket<Entry> {
+        final FsEntryName name;
+        final BitField<FsOutputOption> options;
+        final @CheckForNull Entry template;
+
+        CachingOutputSocket(
+                final OutputSocket<?> output,
+                final FsEntryName name,
+                final BitField<FsOutputOption> options,
+                final @CheckForNull Entry template) {
+            super(output);
+            this.name = name;
+            this.options = options;
+            this.template = template;
+        }
+
+        @Override
+        public OutputSocket<?> getBoundSocket() throws IOException {
+            EntryCache cache = caches.get(name);
+            if (null == cache) {
+                if (!options.get(FsOutputOption.CACHE))
+                    return super.getBoundSocket(); // don't cache
+                cache = new EntryCache(name);
+            }
+            return cache.configure(options, template).getOutputSocket().bind(this);
+        }
+
+        @Override
+        public Entry getLocalTarget() throws IOException {
+            // Same implementation as super class, but makes stack trace nicer.
+            return getBoundSocket().getLocalTarget();
+        }
+
+        @Override
+        public Entry getPeerTarget() throws IOException {
+            // Same implementation as super class, but makes stack trace nicer.
+            return getBoundSocket().getPeerTarget();
+        }
+
+        @Override
+        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            // Same implementation as super class, but makes stack trace nicer.
+            return getBoundSocket().newSeekableByteChannel();
+        }
+
+        @Override
+        public OutputStream newOutputStream() throws IOException {
+            // Same implementation as super class, but makes stack trace nicer.
+            return getBoundSocket().newOutputStream();
+        }
+    } // CachingOutputSocket
 
     @Immutable
     private enum EntryOutputSocketFactory {
