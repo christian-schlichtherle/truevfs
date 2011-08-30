@@ -61,7 +61,7 @@ extends FsCharsetArchiveDriver<MockArchiveEntry> {
             FsModel model,
             InputSocket<?> input)
     throws IOException {
-        throw new UnsupportedOperationException("This mock archive driver is not designed for doing I/O.");
+        throw new UnsupportedOperationException("The mock archive driver does not support I/O.");
     }
 
     @Override
@@ -70,7 +70,7 @@ extends FsCharsetArchiveDriver<MockArchiveEntry> {
             OutputSocket<?> output,
             InputShop<MockArchiveEntry> source)
     throws IOException {
-        throw new UnsupportedOperationException("This mock archive driver is not designed for doing I/O.");
+        throw new UnsupportedOperationException("The mock archive driver does not support I/O.");
     }
 
     @Override
