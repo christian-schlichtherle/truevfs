@@ -348,7 +348,7 @@ extends FsDecoratingConcurrentModelController<
                 return controller.new Nio2ConcurrentOutputSocket(output);
             }
         };
-        
+
         abstract InputSocket<?> newInputSocket(
                 FsConcurrentController controller,
                 InputSocket <?> input);
