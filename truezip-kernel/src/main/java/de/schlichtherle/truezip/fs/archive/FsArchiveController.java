@@ -210,13 +210,14 @@ extends FsConcurrentModelController {
     public final InputSocket<?> getInputSocket(
             FsEntryName name,
             BitField<FsInputOption> options) {
-        return new Input(name);
+        return new ArchiveInputSocket(name);
     }
 
-    private final class Input extends InputSocket<FsArchiveEntry> {
+    private final class ArchiveInputSocket
+    extends InputSocket<FsArchiveEntry> {
         final FsEntryName name;
 
-        Input(final FsEntryName name) {
+        ArchiveInputSocket(final FsEntryName name) {
             this.name = name;
         }
 
@@ -256,7 +257,7 @@ extends FsConcurrentModelController {
         public InputStream newInputStream() throws IOException {
             return getBoundSocket().newInputStream();
         }
-    } // Input
+    } // ArchiveInputSocket
 
     abstract InputSocket<?> getInputSocket(String name);
 
@@ -265,15 +266,16 @@ extends FsConcurrentModelController {
             FsEntryName name,
             BitField<FsOutputOption> options,
             Entry template) {
-        return new Output(name, options, template);
+        return new ArchiveOutputSocket(name, options, template);
     }
 
-    private final class Output extends OutputSocket<FsArchiveEntry> {
+    private final class ArchiveOutputSocket
+    extends OutputSocket<FsArchiveEntry> {
         final FsEntryName name;
         final boolean append;
         final @CheckForNull Entry template;
 
-        Output( final FsEntryName name,
+        ArchiveOutputSocket( final FsEntryName name,
                 final BitField<FsOutputOption> options,
                 final @CheckForNull Entry template) {
             this.name = name;
@@ -309,7 +311,7 @@ extends FsConcurrentModelController {
             InputStream in = null;
             if (append) {
                 try {
-                    in = new Input(name).newInputStream();
+                    in = new ArchiveInputSocket(name).newInputStream();
                 } catch (IOException ex) {
                     // When appending, there is no need for the entry to exist,
                     // so we can safely ignore this - fall through!
@@ -340,7 +342,7 @@ extends FsConcurrentModelController {
                 }
             }
         }
-    } // Output
+    } // ArchiveOutputSocket
 
     private static final class ProxyEntry
     extends DecoratingEntry<FsArchiveEntry>
