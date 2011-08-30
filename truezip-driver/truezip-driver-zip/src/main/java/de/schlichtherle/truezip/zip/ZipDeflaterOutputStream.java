@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.zip;
 
+import de.schlichtherle.truezip.util.CachedResourcePool;
 import de.schlichtherle.truezip.util.JSE7;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -65,7 +66,8 @@ final class ZipDeflaterOutputStream extends DeflaterOutputStream {
         }
     }
 
-    private static class DeflaterCache extends CachedResourcePool<Deflater> {
+    private static class DeflaterCache
+    extends CachedResourcePool<Deflater, RuntimeException> {
         @Override
         protected Deflater newResource() {
             return new Deflater(DEFAULT_COMPRESSION, true);
