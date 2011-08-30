@@ -17,7 +17,6 @@ package de.schlichtherle.truezip.fs.archive;
 
 import de.schlichtherle.truezip.fs.FsConcurrentModel;
 import de.schlichtherle.truezip.fs.FsFalsePositiveException;
-import de.schlichtherle.truezip.fs.FsModel;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -190,7 +189,7 @@ extends FsArchiveController<E> {
 final class FsCacheableFalsePositiveException extends FsFalsePositiveException {
     private static final long serialVersionUID = 5436924103910446876L;
 
-    FsCacheableFalsePositiveException(FsModel model, IOException cause) {
-        super(model, cause);
+    FsCacheableFalsePositiveException(IOException cause) {
+        super(cause);
     }
 } // FsCacheableFalsePositiveException

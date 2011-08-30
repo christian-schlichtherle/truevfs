@@ -37,12 +37,10 @@ import net.jcip.annotations.ThreadSafe;
 public final class FsNotWriteLockedException extends FsException {
     private static final long serialVersionUID = 2345952581284762637L;
 
-    FsNotWriteLockedException(FsConcurrentModel model) {
-        super(model);
+    FsNotWriteLockedException() {
     }
 
-    FsNotWriteLockedException(  FsConcurrentModel model,
-                                @CheckForNull FsNotWriteLockedException ex) {
-        super(model, ex);
+    FsNotWriteLockedException(FsNotWriteLockedException ex) {
+        super(ex);
     }
 }

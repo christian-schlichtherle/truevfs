@@ -36,21 +36,12 @@ import net.jcip.annotations.ThreadSafe;
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
 public abstract class FsException extends IOException {
-    private static final long serialVersionUID = 2947623946725372554L;
+    private static final long serialVersionUID = 2941522346756372554L;
 
-    private transient FsModel model;
-
-    FsException(FsModel model) {
-        this.model = model;
+    FsException() {
     }
 
-    FsException(FsModel model, @CheckForNull Throwable cause) {
+    FsException(Throwable cause) {
         super(cause);
-        this.model = model;
-    }
-
-    @Override
-    public String getMessage() {
-        return model == null ? null : model.getMountPoint().toString();
     }
 }

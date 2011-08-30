@@ -73,7 +73,7 @@ public final class FsConcurrentModel extends FsDecoratingModel<FsModel> {
     public void assertWriteLockedByCurrentThread()
     throws FsNotWriteLockedException {
         if (!lock.isWriteLockedByCurrentThread())
-            throw new FsNotWriteLockedException(this);
+            throw new FsNotWriteLockedException();
     }
 
     /**
@@ -90,7 +90,7 @@ public final class FsConcurrentModel extends FsDecoratingModel<FsModel> {
             @CheckForNull FsNotWriteLockedException ex)
     throws FsNotWriteLockedException {
         if (0 < lock.getReadHoldCount())
-            throw new FsNotWriteLockedException(this, ex);
+            throw new FsNotWriteLockedException(ex);
     }
 
     /**
