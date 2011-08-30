@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
@@ -23,7 +22,7 @@ import net.jcip.annotations.ThreadSafe;
 
 /**
  * An abstract exception which indicates an exceptional condition discovered
- * by the TrueZIP Kernel.
+ * in the TrueZIP Kernel.
  * <p>
  * ONLY THE TRUEZIP KERNEL IS ALLOWED TO THROW AN EXCEPTION OF THIS TYPE!
  * DO NOT CREATE OR THROW AN EXCEPTION OF THIS TYPE (INCLUDING SUB-CLASSES)
@@ -36,7 +35,7 @@ import net.jcip.annotations.ThreadSafe;
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
 public abstract class FsException extends IOException {
-    private static final long serialVersionUID = 2941522346756372554L;
+    private static final long serialVersionUID = 2941522346633732554L;
 
     FsException() {
     }
