@@ -89,10 +89,11 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             // This prevents the application from inadvertently deleting an
             // encrypted ZIP file just because e.g. the user has cancelled key
             // prompting.
-            final Throwable cause = ex.getCause();
-            throw null != cause && getKeyExceptionType().isAssignableFrom(cause.getClass())
-                    ? (IOException) cause
-                    : ex;
+            final IOException cause = ex.getCause();
+            if (null != cause
+                    && getKeyExceptionType().isAssignableFrom(cause.getClass()))
+                throw cause;
+            throw ex;
         }
         if (name.isRoot())
             getKeyManager().removeKeyProvider(
