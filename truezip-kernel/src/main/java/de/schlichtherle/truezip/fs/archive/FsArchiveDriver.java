@@ -174,12 +174,13 @@ extends FsDriver {
     public FsController<?>
     newController(FsModel model, FsController<?> parent) {
         return  new FsConcurrentController(
-                   new FsCachingController(
-                        new FsContextController(
-                            new FsDefaultArchiveController<E>(
-                                new FsConcurrentModel(model),
-                                parent,
-                                this)),
+                    new FsCachingController(
+                        //new FsResourceController(
+                            new FsContextController(
+                                new FsDefaultArchiveController<E>(
+                                    new FsConcurrentModel(model),
+                                    parent,
+                                    this)),
                         getPool()));
     }
 

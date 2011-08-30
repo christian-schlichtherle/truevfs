@@ -38,8 +38,8 @@ import net.jcip.annotations.ThreadSafe;
 @DefaultAnnotation(NonNull.class)
 public class FsFalsePositiveException extends FsException {
 
-    public FsFalsePositiveException(FsModel model, IOException cause) {
-        super(model, cause);
+    public FsFalsePositiveException(IOException cause) {
+        super(cause);
         assert null != cause;
         assert !(cause instanceof FsException);
     }
