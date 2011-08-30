@@ -116,6 +116,7 @@ public class WriteKeyPanel extends KeyPanel {
         this.error.setText(error);
     }
 
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("SF_SWITCH_FALLTHROUGH")
     @Override
     boolean updateParam(final SafePbeParameters<?, ?> param) {
         try {
@@ -137,7 +138,6 @@ public class WriteKeyPanel extends KeyPanel {
                         Arrays.fill(newPasswd1, (char) 0);
                         Arrays.fill(newPasswd2, (char) 0);
                     }
-                    //@edu.umd.cs.findbugs.annotations.SuppressWarnings("SF_SWITCH_FALLTHROUGH") // false positive!
 
                 case AuthenticationPanel.AUTH_KEY_FILE:
                     final File keyFile = authenticationPanel.getKeyFile();

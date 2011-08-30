@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.zip;
 
+import java.util.zip.Deflater;
+
 /**
  * An interface for {@link ZipOutputStream} parameters.
  * 

@@ -322,9 +322,12 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
      * The implementation in the class {@link ZipDriver}
      * returns {@code ZipOutputStream#INITIAL_SIZE}.
      * 
-     * @since  TrueZIP 7.3
-     * @return {@code ZipOutputStream#INITIAL_SIZE}
+     * @since      TrueZIP 7.3
+     * @return     {@code ZipOutputStream#INITIAL_SIZE}
+     * @deprecated This method is reserved for future use - do <em>not</em> use
+     *             or override this method!
      */
+    @Deprecated
     @Override
     public int getInitialSize() {
         return ZipOutputStream.INITIAL_SIZE;
