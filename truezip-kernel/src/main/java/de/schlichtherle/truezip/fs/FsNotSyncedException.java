@@ -30,7 +30,8 @@ import net.jcip.annotations.ThreadSafe;
  * Unless there is a bug, an exception of this type <em>never</em> pops up to
  * a TrueZIP application.
  *
- * @see     FsConcurrentController
+ * @since   TrueZIP 7.3
+ * @see     FsSyncController
  * @author  Christian Schlichtherle
  * @version $Id$
  */
