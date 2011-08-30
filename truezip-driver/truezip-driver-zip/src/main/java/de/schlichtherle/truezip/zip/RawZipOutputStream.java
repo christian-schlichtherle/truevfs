@@ -18,7 +18,6 @@ package de.schlichtherle.truezip.zip;
 import de.schlichtherle.truezip.crypto.param.AesKeyStrength;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.LEDataOutputStream;
-import de.schlichtherle.truezip.util.JSE7;
 import static de.schlichtherle.truezip.zip.Constants.*;
 import static de.schlichtherle.truezip.zip.WinZipAesEntryExtraField.*;
 import static de.schlichtherle.truezip.zip.WinZipAesUtils.*;
@@ -66,10 +65,8 @@ implements Iterable<E> {
     /** Default compression method for next entry. */
     private int method;
 
-    /** This instance is used for deflated output. */
-    private final ZipDeflater deflater = JSE7.AVAILABLE
-            ? new ZipDeflater()     // JDK 7 is OK
-            : new Jdk6Deflater();   // JDK 6 needs fixing
+    /** Default compression level for the methods DEFLATED and BZIP2. */
+    private int level;
 
     /** The encoded file comment. */
     private @CheckForNull byte[] comment;
@@ -292,7 +289,7 @@ implements Iterable<E> {
      * @see    #setLevel
      */
     public int getLevel() {
-        return deflater.getLevel();
+        return level;
     }
 
     /**
@@ -311,7 +308,10 @@ implements Iterable<E> {
     }
 
     private void setLevel0(int level) {
-	deflater.setLevel(level);
+        if ((level < Deflater.BEST_SPEED || Deflater.BEST_COMPRESSION < level)
+                && Deflater.DEFAULT_COMPRESSION != level)
+            throw new IllegalArgumentException("Invalid compression level!");
+        this.level = level;
     }
 
     /**
@@ -987,7 +987,7 @@ implements Iterable<E> {
             final long size = entry.getSize();
             final int blockSize = UNKNOWN != size
                     ? BZip2CompressorOutputStream.chooseBlockSize(size)
-                    : getBZip2BlockSize();
+                    : RawZipOutputStream.this.getBZip2BlockSize();
             out = this.cout = new BZip2CompressorOutputStream(out, blockSize);
             return this.dout = new LEDataOutputStream(out);
         }
@@ -1023,18 +1023,18 @@ implements Iterable<E> {
             assert null == this.out;
             return this.out = new ZipDeflaterOutputStream(
                     this.delegate.start(),
-                    RawZipOutputStream.this.deflater,
+                    RawZipOutputStream.this.getLevel(),
                     MAX_FLATER_BUF_LENGTH);
         }
 
         @Override
         public void finish() throws IOException {
             this.out.finish();
+            final Deflater deflater = this.out.getDeflater();
             final ZipEntry entry = RawZipOutputStream.this.entry;
-            final Deflater deflater = RawZipOutputStream.this.deflater;
             entry.setRawCompressedSize(deflater.getBytesWritten());
             entry.setRawSize(deflater.getBytesRead());
-            deflater.reset();
+            this.out.resetDeflater();
             this.delegate.finish();
         }
     } // DeflaterOutputMethod

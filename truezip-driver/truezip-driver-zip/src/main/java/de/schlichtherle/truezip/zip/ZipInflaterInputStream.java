@@ -17,13 +17,6 @@ package de.schlichtherle.truezip.zip;
 
 import de.schlichtherle.truezip.util.JSE7;
 import java.io.IOException;
-import java.lang.ref.Reference;
-import java.lang.ref.SoftReference;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
@@ -37,15 +30,14 @@ import java.util.zip.InflaterInputStream;
  */
 final class ZipInflaterInputStream extends InflaterInputStream {
 
-    private static final Set<Inflater>
-            allocated = new HashSet<Inflater>();
-    private static final List<Reference<Inflater>>
-            released = new LinkedList<Reference<Inflater>>();
+    private static final InflaterCache cache = JSE7.AVAILABLE
+                        ? new InflaterCache()        // JDK 7 is OK
+                        : new Jdk6InflaterCache();   // JDK 6 needs fixing
 
     private boolean closed;
 
     ZipInflaterInputStream(DummyByteInputStream in, int size) {
-        super(in, allocate(), size);
+        super(in, cache.allocate(), size);
     }
 
     Inflater getInflater() {
@@ -60,46 +52,22 @@ final class ZipInflaterInputStream extends InflaterInputStream {
         try {
             super.close();
         } finally {
-            release(inf);
+            inf.reset();
+            cache.release(inf);
         }
     }
 
-    private static Inflater allocate() {
-        Inflater inflater = null;
-
-        synchronized (released) {
-            for (Iterator<Reference<Inflater>> i = released.iterator(); i.hasNext(); ) {
-                inflater = i.next().get();
-                i.remove();
-                if (null != inflater) {
-                    //inflater.reset();
-                    break;
-                }
-            }
-            if (null == inflater)
-                inflater = JSE7.AVAILABLE
-                        ? new Inflater(true)        // JDK 7 is OK
-                        : new Jdk6Inflater(true);   // JDK 6 needs fixing
-
-            // We MUST make sure that we keep a strong reference to the
-            // inflater in order to retain it from being released again and
-            // then finalized when the close() method of the InputStream
-            // returned by getInputStream(...) is called from within another
-            // finalizer.
-            // The finalizer of the inflater calls end() and leaves the object
-            // in a state so that the subsequent call to reset() throws an NPE.
-            // The ZipFile class in Sun's JSE 5 shows this bug.
-            allocated.add(inflater);
+    private static class InflaterCache extends CachedResourcePool<Inflater> {
+        @Override
+        protected Inflater newResource() {
+            return new Inflater(true);
         }
-
-        return inflater;
     }
 
-    private static void release(Inflater inflater) {
-        inflater.reset();
-        synchronized (released) {
-            released.add(new SoftReference<Inflater>(inflater));
-            allocated.remove(inflater);
+    private static final class Jdk6InflaterCache extends InflaterCache {
+        @Override
+        protected Inflater newResource() {
+            return new Jdk6Inflater(true);
         }
     }
 }

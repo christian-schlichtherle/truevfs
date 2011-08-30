@@ -28,10 +28,6 @@ import java.util.zip.Inflater;
 final class Jdk6Inflater extends Inflater {
     private long read = 0, written = 0;
 
-    Jdk6Inflater() {
-        this(false);
-    }
-
     Jdk6Inflater(boolean nowrap) {
         super(nowrap);
     }
