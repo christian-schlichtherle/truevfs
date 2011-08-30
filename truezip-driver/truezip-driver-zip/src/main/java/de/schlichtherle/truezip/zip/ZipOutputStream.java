@@ -60,8 +60,8 @@ import net.jcip.annotations.ThreadSafe;
 public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
 
     /**
-     * The initial size (not capacity) of the internal hash map to hold the
-     * entries.
+     * The default initial size (not capacity) of the internal hash map to hold
+     * the entries, which is {@value}.
      * 
      * @since  TrueZIP 7.3
      */
