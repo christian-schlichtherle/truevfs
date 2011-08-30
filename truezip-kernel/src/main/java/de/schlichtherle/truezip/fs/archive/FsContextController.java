@@ -71,7 +71,7 @@ extends FsDecoratingConcurrentModelController<FsDefaultArchiveController<?>> {
     /**
      * Constructs a new operation file system controller.
      *
-     * @param controller the decorated file system controller.
+     * @param controller the decorated concurrent file system controller.
      */
     FsContextController(
             FsDefaultArchiveController<?> controller) {

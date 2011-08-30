@@ -71,7 +71,7 @@ extends FsDecoratingConcurrentModelController<
     /**
      * Constructs a new concurrent file system controller.
      *
-     * @param controller the decorated file system controller.
+     * @param controller the decorated concurrent file system controller.
      */
     public FsConcurrentController(
             FsController<? extends FsConcurrentModel> controller) {

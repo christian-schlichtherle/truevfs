@@ -58,10 +58,9 @@ import net.jcip.annotations.ThreadSafe;
 @DefaultAnnotation(NonNull.class)
 public final class FsResourceAccountant {
 
-    private static final String CLASS_NAME
-            = FsResourceAccountant.class.getName();
-    private static final Logger logger
-            = Logger.getLogger(CLASS_NAME, CLASS_NAME);
+    private static final Logger logger = Logger.getLogger(
+            FsResourceAccountant.class.getName(),
+            FsResourceAccountant.class.getName());
 
     private final Lock lock;
     private final Condition condition;
@@ -271,7 +270,7 @@ public final class FsResourceAccountant {
                 try {
                     ((Account) queue.remove()).notifyAccountant();
                 } catch (InterruptedException ex) {
-                    logger.log(Level.WARNING, "interrupted", ex);
+                    logger.log(Level.FINE, "interrupted", ex);
                 }
             }
         }
