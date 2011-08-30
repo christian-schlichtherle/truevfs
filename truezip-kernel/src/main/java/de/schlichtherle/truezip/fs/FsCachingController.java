@@ -82,6 +82,9 @@ public final class FsCachingController
 extends FsDecoratingConcurrentModelController<
         FsController<? extends FsConcurrentModel>> {
 
+    private static final BitField<FsSyncOption>
+            ABORT_CHANGES_OPTIONS = BitField.of(ABORT_CHANGES);
+
     private static final EntryOutputSocketFactory
             ENTRY_OUTPUT_SOCKET_FACTORY = JSE7.AVAILABLE
                 ? EntryOutputSocketFactory.NIO2
@@ -151,6 +154,35 @@ extends FsDecoratingConcurrentModelController<
     throws IOException {
         assert isWriteLockedByCurrentThread();
 
+        if (name.isRoot()) {
+            try {
+                unlink0(name, options);
+            } catch (FsFalsePositiveException ex) {
+                try {
+                    // Next, the FsFederatingController will try to unlink the
+                    // target archive file in the parent file system, so we need
+                    // to reset anyway.
+                    // The only effect of calling sync for a false positive
+                    // archive file is that it will reset the mount state so
+                    // that the file system can be successfully mounted again
+                    // if the target archive file is subsequently modified to
+                    // be a regular archive file.
+                    sync(ABORT_CHANGES_OPTIONS);
+                } catch (IOException cannotHappen) {
+                    throw new AssertionError(cannotHappen);
+                }
+                // Continue with unlinking the target archive file in the parent
+                // file system.
+                throw ex;
+            }
+            sync(ABORT_CHANGES_OPTIONS);
+        } else {
+            unlink0(name, options);
+        }
+    }
+
+    private void unlink0(final FsEntryName name, BitField<FsOutputOption> options)
+    throws IOException {
         final EntryCache cache = caches.get(name);
         if (null != cache) {
             //cache.flush(); // redundant
