@@ -76,72 +76,79 @@ extends FsDecoratingController<M, C> {
 
     @Override
     public Icon getOpenIcon() throws IOException {
-        try {
-            return delegate.getOpenIcon();
-        } catch (FsNotSyncedException ex) {
-            delegate.sync(SYNC_OPTIONS);
-            return getOpenIcon(); // retry
+        while (true) {
+            try {
+                return delegate.getOpenIcon();
+            } catch (FsNotSyncedException ex) {
+                delegate.sync(SYNC_OPTIONS);
+            }
         }
     }
 
     @Override
     public Icon getClosedIcon() throws IOException {
-        try {
-            return delegate.getClosedIcon();
-        } catch (FsNotSyncedException ex) {
-            delegate.sync(SYNC_OPTIONS);
-            return getClosedIcon(); // retry
+        while (true) {
+            try {
+                return delegate.getClosedIcon();
+            } catch (FsNotSyncedException ex) {
+                delegate.sync(SYNC_OPTIONS);
+            }
         }
     }
 
     @Override
     public boolean isReadOnly() throws IOException {
-        try {
-            return delegate.isReadOnly();
-        } catch (FsNotSyncedException ex) {
-            delegate.sync(SYNC_OPTIONS);
-            return isReadOnly(); // retry
+        while (true) {
+            try {
+                return delegate.isReadOnly();
+            } catch (FsNotSyncedException ex) {
+                delegate.sync(SYNC_OPTIONS);
+            }
         }
     }
 
     @Override
     public FsEntry getEntry(FsEntryName name)
     throws IOException {
-        try {
-            return delegate.getEntry(name);
-        } catch (FsNotSyncedException ex) {
-            delegate.sync(SYNC_OPTIONS);
-            return getEntry(name); // retry
+        while (true) {
+            try {
+                return delegate.getEntry(name);
+            } catch (FsNotSyncedException ex) {
+                delegate.sync(SYNC_OPTIONS);
+            }
         }
     }
 
     @Override
     public boolean isReadable(FsEntryName name) throws IOException {
-        try {
-            return delegate.isReadable(name);
-        } catch (FsNotSyncedException ex) {
-            delegate.sync(SYNC_OPTIONS);
-            return isReadable(name); // retry
+        while (true) {
+            try {
+                return delegate.isReadable(name);
+            } catch (FsNotSyncedException ex) {
+                delegate.sync(SYNC_OPTIONS);
+            }
         }
     }
 
     @Override
     public boolean isWritable(FsEntryName name) throws IOException {
-        try {
-            return delegate.isWritable(name);
-        } catch (FsNotSyncedException ex) {
-            delegate.sync(SYNC_OPTIONS);
-            return isWritable(name); // retry
+        while (true) {
+            try {
+                return delegate.isWritable(name);
+            } catch (FsNotSyncedException ex) {
+                delegate.sync(SYNC_OPTIONS);
+            }
         }
     }
 
     @Override
     public void setReadOnly(FsEntryName name) throws IOException {
-        try {
-            delegate.setReadOnly(name);
-        } catch (FsNotSyncedException ex) {
-            delegate.sync(SYNC_OPTIONS);
-            setReadOnly(name); // retry
+        while (true) {
+            try {
+                delegate.setReadOnly(name);
+            } catch (FsNotSyncedException ex) {
+                delegate.sync(SYNC_OPTIONS);
+            }
         }
     }
 
@@ -151,11 +158,12 @@ extends FsDecoratingController<M, C> {
             Map<Access, Long> times,
             BitField<FsOutputOption> options)
     throws IOException {
-        try {
-            return delegate.setTime(name, times, options);
-        } catch (FsNotSyncedException ex) {
-            delegate.sync(SYNC_OPTIONS);
-            return setTime(name, times, options); // retry
+        while (true) {
+            try {
+                return delegate.setTime(name, times, options);
+            } catch (FsNotSyncedException ex) {
+                delegate.sync(SYNC_OPTIONS);
+            }
         }
     }
 
@@ -166,11 +174,12 @@ extends FsDecoratingController<M, C> {
             long value,
             BitField<FsOutputOption> options)
     throws IOException {
-        try {
-            return delegate.setTime(name, types, value, options);
-        } catch (FsNotSyncedException ex) {
-            delegate.sync(SYNC_OPTIONS);
-            return setTime(name, types, value, options); // retry
+        while (true) {
+            try {
+                return delegate.setTime(name, types, value, options);
+            } catch (FsNotSyncedException ex) {
+                delegate.sync(SYNC_OPTIONS);
+            }
         }
     }
 
@@ -196,22 +205,26 @@ extends FsDecoratingController<M, C> {
             @NonNull BitField<FsOutputOption> options,
             @CheckForNull Entry template)
     throws IOException {
-        try {
-            delegate.mknod(name, type, options, template);
-        } catch (FsNotSyncedException ex) {
-            delegate.sync(SYNC_OPTIONS);
-            mknod(name, type, options, template); // retry
+        while (true) {
+            try {
+                delegate.mknod(name, type, options, template);
+                return;
+            } catch (FsNotSyncedException ex) {
+                delegate.sync(SYNC_OPTIONS);
+            }
         }
     }
 
     @Override
     public void unlink(FsEntryName name, BitField<FsOutputOption> options)
     throws IOException {
-        try {
-            delegate.unlink(name, options);
-        } catch (FsNotSyncedException ex) {
-            delegate.sync(SYNC_OPTIONS);
-            unlink(name, options); // retry
+        while (true) {
+            try {
+                delegate.unlink(name, options);
+                return;
+            } catch (FsNotSyncedException ex) {
+                delegate.sync(SYNC_OPTIONS);
+            }
         }
     }
 
@@ -266,11 +279,12 @@ extends FsDecoratingController<M, C> {
 
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            try {
-                return getBoundSocket().newSeekableByteChannel();
-            } catch (FsNotSyncedException ex) {
-                delegate.sync(SYNC_OPTIONS);
-                return newSeekableByteChannel(); // retry
+            while (true) {
+                try {
+                    return getBoundSocket().newSeekableByteChannel();
+                } catch (FsNotSyncedException ex) {
+                    delegate.sync(SYNC_OPTIONS);
+                }
             }
         }
     } // Nio2SyncInputSocket
@@ -283,11 +297,12 @@ extends FsDecoratingController<M, C> {
 
         @Override
         public Entry getLocalTarget() throws IOException {
-            try {
-                return getBoundSocket().getLocalTarget();
-            } catch (FsNotSyncedException ex) {
-                delegate.sync(SYNC_OPTIONS);
-                return getLocalTarget(); // retry
+            while (true) {
+                try {
+                    return getBoundSocket().getLocalTarget();
+                } catch (FsNotSyncedException ex) {
+                    delegate.sync(SYNC_OPTIONS);
+                }
             }
         }
 
@@ -299,21 +314,23 @@ extends FsDecoratingController<M, C> {
 
         @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
-            try {
-                return getBoundSocket().newReadOnlyFile();
-            } catch (FsNotSyncedException ex) {
-                delegate.sync(SYNC_OPTIONS);
-                return newReadOnlyFile(); // retry
+            while (true) {
+                try {
+                    return getBoundSocket().newReadOnlyFile();
+                } catch (FsNotSyncedException ex) {
+                    delegate.sync(SYNC_OPTIONS);
+                }
             }
         }
 
         @Override
         public InputStream newInputStream() throws IOException {
-            try {
-                return getBoundSocket().newInputStream();
-            } catch (FsNotSyncedException ex) {
-                delegate.sync(SYNC_OPTIONS);
-                return newInputStream(); // retry
+            while (true) {
+                try {
+                    return getBoundSocket().newInputStream();
+                } catch (FsNotSyncedException ex) {
+                    delegate.sync(SYNC_OPTIONS);
+                }
             }
         }
     } // SyncInputSocket
@@ -326,11 +343,12 @@ extends FsDecoratingController<M, C> {
 
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            try {
-                return getBoundSocket().newSeekableByteChannel();
-            } catch (FsNotSyncedException ex) {
-                delegate.sync(SYNC_OPTIONS);
-                return newSeekableByteChannel(); // retry
+            while (true) {
+                try {
+                    return getBoundSocket().newSeekableByteChannel();
+                } catch (FsNotSyncedException ex) {
+                    delegate.sync(SYNC_OPTIONS);
+                }
             }
         }
     } // Nio2SyncOutputSocket
@@ -343,11 +361,12 @@ extends FsDecoratingController<M, C> {
 
         @Override
         public Entry getLocalTarget() throws IOException {
-            try {
-                return getBoundSocket().getLocalTarget();
-            } catch (FsNotSyncedException ex) {
-                delegate.sync(SYNC_OPTIONS);
-                return getLocalTarget(); // retry
+            while (true) {
+                try {
+                    return getBoundSocket().getLocalTarget();
+                } catch (FsNotSyncedException ex) {
+                    delegate.sync(SYNC_OPTIONS);
+                }
             }
         }
 
@@ -359,11 +378,12 @@ extends FsDecoratingController<M, C> {
 
         @Override
         public OutputStream newOutputStream() throws IOException {
-            try {
-                return getBoundSocket().newOutputStream();
-            } catch (FsNotSyncedException ex) {
-                delegate.sync(SYNC_OPTIONS);
-                return newOutputStream(); // retry
+            while (true) {
+                try {
+                    return getBoundSocket().newOutputStream();
+                } catch (FsNotSyncedException ex) {
+                    delegate.sync(SYNC_OPTIONS);
+                }
             }
         }
     } // SyncOutputSocket
