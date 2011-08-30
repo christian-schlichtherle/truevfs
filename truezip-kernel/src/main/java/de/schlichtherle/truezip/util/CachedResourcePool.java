@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.zip;
+package de.schlichtherle.truezip.util;
 
-import de.schlichtherle.truezip.util.Pool;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.lang.ref.Reference;
@@ -35,7 +34,8 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-abstract class CachedResourcePool<R> implements Pool<R, RuntimeException> {
+public abstract class CachedResourcePool<R, E extends Exception>
+implements Pool<R, E> {
 
     private final Set<R> allocated = new HashSet<R>();
     private final Map<R, Reference<R>> released = new HashMap<R, Reference<R>>();
@@ -45,10 +45,10 @@ abstract class CachedResourcePool<R> implements Pool<R, RuntimeException> {
      * 
      * @return A new resource.
      */
-    protected abstract R newResource();
+    protected abstract R newResource() throws E;
 
     @Override
-    public R allocate() {
+    public R allocate() throws E {
         R resource = null;
         synchronized (this) {
             final Iterator<Reference<R>> i = released.values().iterator();
@@ -71,7 +71,7 @@ abstract class CachedResourcePool<R> implements Pool<R, RuntimeException> {
     }
 
     @Override
-    public synchronized void release(R resource) {
+    public synchronized void release(R resource) throws E {
         released.put(resource, new SoftReference<R>(resource));
         allocated.remove(resource);
     }

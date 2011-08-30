@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.zip;
 
+import de.schlichtherle.truezip.util.CachedResourcePool;
 import de.schlichtherle.truezip.util.JSE7;
 import java.io.IOException;
 import java.util.zip.Inflater;
@@ -57,7 +58,8 @@ final class ZipInflaterInputStream extends InflaterInputStream {
         }
     }
 
-    private static class InflaterCache extends CachedResourcePool<Inflater> {
+    private static class InflaterCache
+    extends CachedResourcePool<Inflater, RuntimeException> {
         @Override
         protected Inflater newResource() {
             return new Inflater(true);
