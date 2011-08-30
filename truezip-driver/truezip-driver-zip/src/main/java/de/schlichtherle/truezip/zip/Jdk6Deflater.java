@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.zip;
 
+import java.util.zip.Deflater;
+
 /**
  * Fixes 32 bit field size in JDK 6 implementation of
  * {@link java.util.zip.Deflater}.
@@ -22,8 +24,12 @@ package de.schlichtherle.truezip.zip;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-final class Jdk6Deflater extends ZipDeflater {
+final class Jdk6Deflater extends Deflater {
     private long read = 0, written = 0;
+
+    Jdk6Deflater(int level, boolean nowrap) {
+        super(level, nowrap);
+    }
 
     @Override
     public void setInput(byte[] b, int off, int len) {
