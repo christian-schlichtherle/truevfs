@@ -31,7 +31,6 @@ import de.schlichtherle.truezip.fs.FsEntryNotFoundException;
 import de.schlichtherle.truezip.fs.FsFalsePositiveException;
 import de.schlichtherle.truezip.fs.FsInputOption;
 import de.schlichtherle.truezip.fs.FsNotSyncedException;
-import de.schlichtherle.truezip.fs.FsNotWriteLockedException;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import de.schlichtherle.truezip.fs.FsSyncOption;
@@ -42,6 +41,7 @@ import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -442,11 +442,8 @@ extends FsConcurrentModelController {
      *         If {@code null}, then only an update to the archive entry meta
      *         data (i.e. a pure virtual file system operation with no I/O)
      *         is intended.
-     * @throws IOException if any I/O error occurs when synchronizing the
-     *         archive file to its parent file system.
-     * @throws FsNotWriteLockedException
      * @throws FsNotSyncedException If a sync operation is required.
      */
     abstract void checkAccess(FsEntryName name, @CheckForNull Access intention)
-    throws FsNotWriteLockedException, FsNotSyncedException;
+    throws FsNotSyncedException;
 }

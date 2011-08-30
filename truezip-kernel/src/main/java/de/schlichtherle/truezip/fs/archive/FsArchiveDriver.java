@@ -174,15 +174,15 @@ extends FsDriver {
     @Override
     public FsController<?>
     newController(FsModel model, FsController<?> parent) {
-        return  new FsConcurrentController(
-                    new FsCachingController(
-                        new FsSyncController<FsConcurrentModel, FsController<? extends FsConcurrentModel>>(
+        return  new FsSyncController<FsConcurrentModel, FsController<? extends FsConcurrentModel>>(
+                    new FsConcurrentController(
+                        new FsCachingController(
                             new FsContextController(
                                 new FsDefaultArchiveController<E>(
                                     new FsConcurrentModel(model),
                                     parent,
-                                    this))),
-                        getPool()));
+                                    this)),
+                            getPool())));
     }
 
     /**
