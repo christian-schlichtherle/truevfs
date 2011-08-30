@@ -28,7 +28,6 @@ import de.schlichtherle.truezip.fs.FsException;
 import de.schlichtherle.truezip.fs.FsFalsePositiveException;
 import de.schlichtherle.truezip.fs.FsInputOption;
 import de.schlichtherle.truezip.fs.FsNotSyncedException;
-import de.schlichtherle.truezip.fs.FsNotWriteLockedException;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
@@ -295,12 +294,12 @@ extends FsFileSystemArchiveController<E> {
     @Override
     void checkAccess(   final FsEntryName name,
                         final @CheckForNull Access intention)
-    throws FsNotWriteLockedException, FsNotSyncedException {
+    throws FsNotSyncedException {
+        // HC SUNT DRACONES!
         final FsArchiveFileSystem<E> f;
         final FsCovariantEntry<E> ce;
         if (null == (f = getFileSystem()) || null == (ce = f.getEntry(name)))
             return;
-        // HC SUNT DRACONES!
         Boolean grow = null;
         String aen; // archive entry name
         final OutputArchive oa = getOutputArchive(); // output archive
@@ -312,7 +311,6 @@ extends FsFileSystemArchiveController<E> {
                 if (!(grow = getContext().get(GROW))
                         || null == intention && !driver.getRedundantMetaDataSupport()
                         || WRITE == intention && !driver.getRedundantContentSupport()) {
-                    assertWriteLockedByCurrentThread();
                     throw new FsNotSyncedException();
                 }
             }
@@ -334,7 +332,6 @@ extends FsFileSystemArchiveController<E> {
             iae = null;
         }
         if (READ == intention && (null == iae || iae != oae && oae != null)) {
-            assertWriteLockedByCurrentThread();
             throw new FsNotSyncedException();
         }
     }
