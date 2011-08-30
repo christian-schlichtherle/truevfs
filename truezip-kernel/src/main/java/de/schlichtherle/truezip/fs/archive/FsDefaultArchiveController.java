@@ -27,6 +27,8 @@ import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import de.schlichtherle.truezip.fs.FsException;
 import de.schlichtherle.truezip.fs.FsFalsePositiveException;
 import de.schlichtherle.truezip.fs.FsInputOption;
+import de.schlichtherle.truezip.fs.FsNotSyncedException;
+import de.schlichtherle.truezip.fs.FsNotWriteLockedException;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
@@ -291,13 +293,13 @@ extends FsFileSystemArchiveController<E> {
     }
 
     @Override
-    boolean autoSync(   final FsEntryName name,
+    void checkAccess(   final FsEntryName name,
                         final @CheckForNull Access intention)
-    throws FsSyncException, FsException {
+    throws FsNotWriteLockedException, FsNotSyncedException {
         final FsArchiveFileSystem<E> f;
         final FsCovariantEntry<E> ce;
         if (null == (f = getFileSystem()) || null == (ce = f.getEntry(name)))
-            return false;
+            return;
         // HC SUNT DRACONES!
         Boolean grow = null;
         String aen; // archive entry name
@@ -306,11 +308,14 @@ extends FsFileSystemArchiveController<E> {
         if (null != oa) {
             aen = ce.getEntry().getName();
             oae = oa.getEntry(aen);
-            if (null != oae)
+            if (null != oae) {
                 if (!(grow = getContext().get(GROW))
                         || null == intention && !driver.getRedundantMetaDataSupport()
-                        || WRITE == intention && !driver.getRedundantContentSupport())
-                    return autoSync();
+                        || WRITE == intention && !driver.getRedundantContentSupport()) {
+                    assertWriteLockedByCurrentThread();
+                    throw new FsNotSyncedException();
+                }
+            }
         } else {
             aen = null;
             oae = null;
@@ -324,19 +329,14 @@ extends FsFileSystemArchiveController<E> {
             if (null != iae)
                 if (FALSE.equals(grow)
                         || null == grow && !getContext().get(GROW))
-                    return false;
+                    return;
         } else {
             iae = null;
         }
-        if (READ == intention && (null == iae || iae != oae && oae != null))
-            return autoSync();
-        return false;
-    }
-
-    private boolean autoSync() throws FsSyncException, FsException {
-        assertWriteLockedByCurrentThread();
-        sync(AUTO_SYNC_OPTIONS);
-        return true;
+        if (READ == intention && (null == iae || iae != oae && oae != null)) {
+            assertWriteLockedByCurrentThread();
+            throw new FsNotSyncedException();
+        }
     }
 
     @Override

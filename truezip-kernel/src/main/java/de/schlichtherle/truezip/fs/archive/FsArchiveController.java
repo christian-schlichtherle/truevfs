@@ -28,12 +28,12 @@ import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import de.schlichtherle.truezip.fs.FsEntryNotFoundException;
-import de.schlichtherle.truezip.fs.FsException;
 import de.schlichtherle.truezip.fs.FsFalsePositiveException;
 import de.schlichtherle.truezip.fs.FsInputOption;
+import de.schlichtherle.truezip.fs.FsNotSyncedException;
+import de.schlichtherle.truezip.fs.FsNotWriteLockedException;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
-import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.fs.FsSyncOption;
 import static de.schlichtherle.truezip.fs.FsSyncOption.*;
 import de.schlichtherle.truezip.io.InputException;
@@ -81,9 +81,9 @@ import net.jcip.annotations.NotThreadSafe;
 abstract class FsArchiveController<E extends FsArchiveEntry>
 extends FsConcurrentModelController {
 
-    private static final Logger
-            logger = Logger.getLogger(  FsArchiveController.class.getName(),
-                                        FsArchiveController.class.getName());
+    private static final Logger logger = Logger.getLogger(
+            FsArchiveController.class.getName(),
+            FsArchiveController.class.getName());
 
     private static final BitField<FsSyncOption>
             UNLINK_SYNC_OPTIONS = BitField.of(ABORT_CHANGES);
@@ -192,7 +192,7 @@ extends FsConcurrentModelController {
                                     Map<Access, Long> times,
                                     BitField<FsOutputOption> options)
     throws IOException {
-        autoSync(name, null);
+        checkAccess(name, null);
         return autoMount().setTime(name, times);
     }
 
@@ -202,7 +202,7 @@ extends FsConcurrentModelController {
                                     long value,
                                     BitField<FsOutputOption> options)
     throws IOException {
-        autoSync(name, null);
+        checkAccess(name, null);
         return autoMount().setTime(name, types, value);
     }
 
@@ -222,10 +222,8 @@ extends FsConcurrentModelController {
 
         @Override
         public FsArchiveEntry getLocalTarget() throws IOException {
-            if (!autoSync(name, READ)) {
-                autoMount();        // detect false positives
-                getPeerTarget();    // triggers autoSync() if in same file system
-            }
+            getPeerTarget();    // may trigger sync() if in same file system
+            checkAccess(name, READ);
             final FsCovariantEntry<E> entry = autoMount().getEntry(name);
             if (null == entry)
                 throw new FsEntryNotFoundException(getModel(),
@@ -284,8 +282,9 @@ extends FsConcurrentModelController {
         }
 
         FsArchiveFileSystemOperation<E> mknod() throws IOException {
-            autoSync(name, WRITE);
-            final BitField<FsOutputOption> options = getContext().getOutputOptions();
+            checkAccess(name, WRITE);
+            final BitField<FsOutputOption> options = getContext()
+                    .getOutputOptions();
             // Start creating or overwriting the archive entry.
             // This will fail if the entry already exists as a directory.
             return autoMount(!name.isRoot() && options.get(CREATE_PARENTS))
@@ -376,6 +375,7 @@ extends FsConcurrentModelController {
             final Entry template)
     throws IOException {
         assert options.equals(getContext().getOutputOptions());
+        checkAccess(name, null); // TODO: Explain why this is redundant!
         if (name.isRoot()) {
             try {
                 autoMount(); // detect false positives!
@@ -397,7 +397,7 @@ extends FsConcurrentModelController {
     @Override
     public void unlink(final FsEntryName name, BitField<FsOutputOption> options)
     throws IOException {
-        autoSync(name, null);
+        checkAccess(name, null);
         if (name.isRoot()) {
             final FsArchiveFileSystem<E> fileSystem;
             try {
@@ -432,22 +432,21 @@ extends FsConcurrentModelController {
     }
 
     /**
-     * Synchronizes the target archive file if and only if required.
-     * <p>
-     * <b>Warning:</b> As a side effect, the state of this controller may get
-     * entirely reset (virtual filesystem, entries, streams, etc.)!
+     * Checks if the intended access to the named archive entry in the virtual
+     * file system is possible without performing a
+     * {@link FsController#sync(BitField, ExceptionHandler) sync} operation in
+     * advance.
      *
      * @param  name the file system entry name.
      * @param  intention the intended I/O operation on the archive entry.
      *         If {@code null}, then only an update to the archive entry meta
      *         data (i.e. a pure virtual file system operation with no I/O)
      *         is intended.
-     * @see    FsController#sync
      * @throws IOException if any I/O error occurs when synchronizing the
      *         archive file to its parent file system.
-     * @return Whether or not a synchronization has been performed.
+     * @throws FsNotWriteLockedException
+     * @throws FsNotSyncedException If a sync operation is required.
      */
-    abstract boolean autoSync(  FsEntryName name,
-                                @CheckForNull Access intention)
-    throws FsSyncException, FsException;
+    abstract void checkAccess(FsEntryName name, @CheckForNull Access intention)
+    throws FsNotWriteLockedException, FsNotSyncedException;
 }
