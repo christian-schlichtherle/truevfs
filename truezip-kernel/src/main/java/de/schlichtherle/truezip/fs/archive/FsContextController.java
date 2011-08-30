@@ -270,16 +270,18 @@ extends FsDecoratingConcurrentModelController<FsDefaultArchiveController<?>> {
     public OutputSocket<?> getOutputSocket( FsEntryName name,
                                             BitField<FsOutputOption> options,
                                             Entry template) {
-        return new ContextOutputSocket(name, options, template);
+        return new ContextOutputSocket(
+                delegate.getOutputSocket(name, options, template),
+                options);
     }
 
     private final class ContextOutputSocket extends DecoratingOutputSocket<Entry> {
         final FsOperationContext operation;
 
-        ContextOutputSocket( FsEntryName name,
-                BitField<FsOutputOption> options,
-                Entry template) {
-            super(delegate.getOutputSocket(name, options, template));
+        ContextOutputSocket(
+                OutputSocket<?> output,
+                BitField<FsOutputOption> options) {
+            super(output);
             this.operation = makeContext(options);
             
         }
