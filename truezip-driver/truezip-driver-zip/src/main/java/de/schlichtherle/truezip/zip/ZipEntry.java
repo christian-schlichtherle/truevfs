@@ -254,7 +254,7 @@ public class ZipEntry implements Cloneable {
      * Note that only WinZip AES encryption is currently supported.
      * 
      * @return {@code true} if and only if this ZIP entry is encrypted.
-     * @since   TrueZIP 7.3
+     * @since  TrueZIP 7.3
      */
     public final boolean isEncrypted() {
         return getGeneralPurposeBitFlag(GPBF_ENCRYPTED);
@@ -262,10 +262,14 @@ public class ZipEntry implements Cloneable {
 
     /**
      * Sets the encryption flag for this ZIP entry.
-     * Note that only WinZip AES encryption is currently supported.
+     * If you set this to {@code true}, you will also need to provide
+     * {@link ZipOutputStream#setCryptoParameters(ZipCryptoParameters) crypto parameters}.
+     * <p>
+     * Note that only {@link WinZipAesParameters WinZip AES encryption} is
+     * currently supported.
      * 
      * @param encrypted whether or not this ZIP entry should get encrypted.
-     * @since   TrueZIP 7.3
+     * @since TrueZIP 7.3
      */
     public final void setEncrypted(boolean encrypted) {
         setGeneralPurposeBitFlag(GPBF_ENCRYPTED, encrypted);
@@ -292,10 +296,12 @@ public class ZipEntry implements Cloneable {
      */
     public final void setMethod(final int method) {
         switch (method) {
+            case WINZIP_AES:
+                // This is only present to support manual copying of properties.
+                // It should never be set by applications.
             case STORED:
             case DEFLATED:
             case BZIP2:
-            case WINZIP_AES:
                 this.method = (short) method;
                 setInit(METHOD, true);
                 break;
@@ -460,10 +466,22 @@ public class ZipEntry implements Cloneable {
         this.size = size;
     }
 
+    /**
+     * Returns the external file attributes.
+     * 
+     * @since  TrueZIP 7.3
+     * @return The external file attributes.
+     */
     public final long getExternalAttributes() {
         return isInit(EATTR) ? eattr & UInt.MAX_VALUE : UNKNOWN;
     }
 
+    /**
+     * Sets the external file attributes.
+     * 
+     * @param eattr the external file attributes.
+     * @since TrueZIP 7.3
+     */
     public final void setExternalAttributes(final long eattr) {
         final boolean known = UNKNOWN != eattr;
         if (known) {
