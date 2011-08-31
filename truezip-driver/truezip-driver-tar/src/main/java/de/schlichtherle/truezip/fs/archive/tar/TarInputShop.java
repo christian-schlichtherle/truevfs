@@ -44,7 +44,7 @@ import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import static org.apache.commons.compress.archivers.tar.TarConstants.*;
 
 /**
- * Presents a {@link TarInputStream} as a randomly accessible archive.
+ * Presents a {@link TarArchiveInputStream} as a randomly accessible archive.
  * <p>
  * <b>Warning:</b> 
  * The constructor of this class extracts each entry in the archive to a

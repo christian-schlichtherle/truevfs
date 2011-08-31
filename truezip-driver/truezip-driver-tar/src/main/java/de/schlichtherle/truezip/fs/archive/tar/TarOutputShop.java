@@ -41,13 +41,13 @@ import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
  * <p>
  * Because the TAR file format needs to know each entry's length in advance,
  * entries from an unknown source are actually written to temp files and copied
- * to the underlying {@code TarOutputStream} upon a call to their
+ * to the underlying {@link TarArchiveOutputStream} upon a call to their
  * {@link OutputStream#close} method.
  * Note that this implies that the {@code close()} method may fail with
  * an {@link IOException}.
  * <p>
  * If the size of an entry is known in advance it's directly written to the
- * underlying {@link TarOutputStream} instead.
+ * underlying {@code TarArchiveOutputStream} instead.
  * <p>
  * This output archive can only write one entry concurrently.
  * Archive drivers may wrap this class in a {@link FsMultiplexedOutputShop}
