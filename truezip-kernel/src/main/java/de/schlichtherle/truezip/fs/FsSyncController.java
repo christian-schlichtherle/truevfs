@@ -235,14 +235,14 @@ extends FsDecoratingController<M, FsController<? extends M>> {
             InputSocket<?> newInputSocket(
                     FsSyncController<?> controller,
                     InputSocket<?> input) {
-                return controller.new SyncInputSocket(input);
+                return controller.new Input(input);
             }
 
             @Override
             OutputSocket<?> newOutputSocket(
                     FsSyncController<?> controller,
                     OutputSocket<?> output) {
-                return controller.new SyncOutputSocket(output);
+                return controller.new Output(output);
             }
         },
 
@@ -251,14 +251,14 @@ extends FsDecoratingController<M, FsController<? extends M>> {
             InputSocket<?> newInputSocket(
                     FsSyncController<?> controller,
                     InputSocket<?> input) {
-                return controller.new Nio2SyncInputSocket(input);
+                return controller.new Nio2Input(input);
             }
 
             @Override
             OutputSocket<?> newOutputSocket(
                     FsSyncController<?> controller,
                     OutputSocket<?> output) {
-                return controller.new Nio2SyncOutputSocket(output);
+                return controller.new Nio2Output(output);
             }
         };
 
@@ -271,9 +271,9 @@ extends FsDecoratingController<M, FsController<? extends M>> {
                 OutputSocket <?> output);
     } // SyncSocketFactory
 
-    private final class Nio2SyncInputSocket
-    extends SyncInputSocket {
-        Nio2SyncInputSocket(InputSocket<?> input) {
+    private final class Nio2Input
+    extends Input {
+        Nio2Input(InputSocket<?> input) {
             super(input);
         }
 
@@ -287,11 +287,11 @@ extends FsDecoratingController<M, FsController<? extends M>> {
                 }
             }
         }
-    } // Nio2SyncInputSocket
+    } // Nio2Input
 
-    private class SyncInputSocket
+    private class Input
     extends DecoratingInputSocket<Entry> {
-        SyncInputSocket(InputSocket<?> input) {
+        Input(InputSocket<?> input) {
             super(input);
         }
 
@@ -333,11 +333,11 @@ extends FsDecoratingController<M, FsController<? extends M>> {
                 }
             }
         }
-    } // SyncInputSocket
+    } // Input
 
-    private final class Nio2SyncOutputSocket
-    extends SyncOutputSocket {
-        Nio2SyncOutputSocket(OutputSocket<?> output) {
+    private final class Nio2Output
+    extends Output {
+        Nio2Output(OutputSocket<?> output) {
             super(output);
         }
 
@@ -351,11 +351,11 @@ extends FsDecoratingController<M, FsController<? extends M>> {
                 }
             }
         }
-    } // Nio2SyncOutputSocket
+    } // Nio2Output
 
-    private class SyncOutputSocket
+    private class Output
     extends DecoratingOutputSocket<Entry> {
-        SyncOutputSocket(OutputSocket<?> output) {
+        Output(OutputSocket<?> output) {
             super(output);
         }
 
@@ -386,5 +386,5 @@ extends FsDecoratingController<M, FsController<? extends M>> {
                 }
             }
         }
-    } // SyncOutputSocket
+    } // Output
 }

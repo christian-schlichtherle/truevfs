@@ -335,14 +335,14 @@ extends FsDecoratingConcurrentModelController<
             InputSocket<?> newInputSocket(
                     FsConcurrentController controller,
                     InputSocket<?> input) {
-                return controller.new ConcurrentInputSocket(input);
+                return controller.new Input(input);
             }
 
             @Override
             OutputSocket<?> newOutputSocket(
                     FsConcurrentController controller,
                     OutputSocket<?> output) {
-                return controller.new ConcurrentOutputSocket(output);
+                return controller.new Output(output);
             }
         },
 
@@ -351,14 +351,14 @@ extends FsDecoratingConcurrentModelController<
             InputSocket<?> newInputSocket(
                     FsConcurrentController controller,
                     InputSocket<?> input) {
-                return controller.new Nio2ConcurrentInputSocket(input);
+                return controller.new Nio2Input(input);
             }
 
             @Override
             OutputSocket<?> newOutputSocket(
                     FsConcurrentController controller,
                     OutputSocket<?> output) {
-                return controller.new Nio2ConcurrentOutputSocket(output);
+                return controller.new Nio2Output(output);
             }
         };
 
@@ -371,9 +371,9 @@ extends FsDecoratingConcurrentModelController<
                 OutputSocket <?> output);
     } // ConcurrentSocketFactory
 
-    private final class Nio2ConcurrentInputSocket
-    extends ConcurrentInputSocket {
-        Nio2ConcurrentInputSocket(InputSocket<?> input) {
+    private final class Nio2Input
+    extends Input {
+        Nio2Input(InputSocket<?> input) {
             super(input);
         }
 
@@ -387,11 +387,11 @@ extends FsDecoratingConcurrentModelController<
                 writeLock().unlock();
             }
         }
-    } // Nio2ConcurrentInputSocket
+    } // Nio2Input
 
-    private class ConcurrentInputSocket
+    private class Input
     extends DecoratingInputSocket<Entry> {
-        ConcurrentInputSocket(InputSocket<?> input) {
+        Input(InputSocket<?> input) {
             super(input);
         }
 
@@ -442,11 +442,11 @@ extends FsDecoratingConcurrentModelController<
                 writeLock().unlock();
             }
         }
-    } // ConcurrentInputSocket
+    } // Input
 
-    private final class Nio2ConcurrentOutputSocket
-    extends ConcurrentOutputSocket {
-        Nio2ConcurrentOutputSocket(OutputSocket<?> output) {
+    private final class Nio2Output
+    extends Output {
+        Nio2Output(OutputSocket<?> output) {
             super(output);
         }
 
@@ -460,11 +460,11 @@ extends FsDecoratingConcurrentModelController<
                 writeLock().unlock();
             }
         }
-    } // Nio2ConcurrentOutputSocket
+    } // Nio2Output
 
-    private class ConcurrentOutputSocket
+    private class Output
     extends DecoratingOutputSocket<Entry> {
-        ConcurrentOutputSocket(OutputSocket<?> output) {
+        Output(OutputSocket<?> output) {
             super(output);
         }
 
@@ -495,7 +495,7 @@ extends FsDecoratingConcurrentModelController<
                 writeLock().unlock();
             }
         }
-    } // ConcurrentOutputSocket
+    } // Output
 
     private final class ConcurrentReadOnlyFile
     extends DecoratingReadOnlyFile {

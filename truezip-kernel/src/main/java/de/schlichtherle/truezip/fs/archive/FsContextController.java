@@ -199,138 +199,17 @@ extends FsDecoratingConcurrentModelController<FsDefaultArchiveController<?>> {
     @Override
     public InputSocket<?> getInputSocket(   FsEntryName name,
                                             BitField<FsInputOption> options) {
-        return new ContextInputSocket(delegate.getInputSocket(name, options));
+        return new Input(delegate.getInputSocket(name, options));
     }
-
-    private final class ContextInputSocket extends DecoratingInputSocket<Entry> {
-        ContextInputSocket(InputSocket<?> input) {
-            super(input);
-        }
-
-        @Override
-        public Entry getLocalTarget() throws IOException {
-            final FsDefaultArchiveController<?>
-                    delegate = FsContextController.this.delegate;
-            final FsOperationContext context = delegate.getContext();
-            delegate.setContext(NULL);
-            try {
-                return getBoundSocket().getLocalTarget();
-            } finally {
-                delegate.setContext(context);
-            }
-        }
-
-        @Override
-        public Entry getPeerTarget() throws IOException {
-            // Same implementation as super class, but makes stack trace nicer.
-            return getBoundSocket().getPeerTarget();
-        }
-
-        @Override
-        public ReadOnlyFile newReadOnlyFile() throws IOException {
-            final FsDefaultArchiveController<?>
-                    delegate = FsContextController.this.delegate;
-            final FsOperationContext context = delegate.getContext();
-            delegate.setContext(NULL);
-            try {
-                return getBoundSocket().newReadOnlyFile();
-            } finally {
-                delegate.setContext(context);
-            }
-        }
-
-        @Override
-        public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            final FsDefaultArchiveController<?>
-                    delegate = FsContextController.this.delegate;
-            final FsOperationContext context = delegate.getContext();
-            delegate.setContext(NULL);
-            try {
-                return getBoundSocket().newSeekableByteChannel();
-            } finally {
-                delegate.setContext(context);
-            }
-        }
-
-        @Override
-        public InputStream newInputStream() throws IOException {
-            final FsDefaultArchiveController<?>
-                    delegate = FsContextController.this.delegate;
-            final FsOperationContext context = delegate.getContext();
-            delegate.setContext(NULL);
-            try {
-                return getBoundSocket().newInputStream();
-            } finally {
-                delegate.setContext(context);
-            }
-        }
-    } // Input
 
     @Override
     public OutputSocket<?> getOutputSocket( FsEntryName name,
                                             BitField<FsOutputOption> options,
                                             Entry template) {
-        return new ContextOutputSocket(
+        return new Output(
                 delegate.getOutputSocket(name, options, template),
                 options);
     }
-
-    private final class ContextOutputSocket extends DecoratingOutputSocket<Entry> {
-        final FsOperationContext operation;
-
-        ContextOutputSocket(
-                OutputSocket<?> output,
-                BitField<FsOutputOption> options) {
-            super(output);
-            this.operation = makeContext(options);
-            
-        }
-
-        @Override
-        public Entry getLocalTarget() throws IOException {
-            final FsDefaultArchiveController<?>
-                    delegate = FsContextController.this.delegate;
-            final FsOperationContext context = delegate.getContext();
-            delegate.setContext(operation);
-            try {
-                return getBoundSocket().getLocalTarget();
-            } finally {
-                delegate.setContext(context);
-            }
-        }
-
-        @Override
-        public Entry getPeerTarget() throws IOException {
-            // Same implementation as super class, but makes stack trace nicer.
-            return getBoundSocket().getPeerTarget();
-        }
-
-        @Override
-        public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            final FsDefaultArchiveController<?>
-                    delegate = FsContextController.this.delegate;
-            final FsOperationContext context = delegate.getContext();
-            delegate.setContext(operation);
-            try {
-                return getBoundSocket().newSeekableByteChannel();
-            } finally {
-                delegate.setContext(context);
-            }
-        }
-
-        @Override
-        public OutputStream newOutputStream() throws IOException {
-            final FsDefaultArchiveController<?>
-                    delegate = FsContextController.this.delegate;
-            final FsOperationContext context = delegate.getContext();
-            delegate.setContext(operation);
-            try {
-                return getBoundSocket().newOutputStream();
-            } finally {
-                delegate.setContext(context);
-            }
-        }
-    } // Output
 
     @Override
     public void mknod(
@@ -398,4 +277,125 @@ extends FsDecoratingConcurrentModelController<FsDefaultArchiveController<?>> {
         }
         return context;
     }
+
+    private final class Input extends DecoratingInputSocket<Entry> {
+        Input(InputSocket<?> input) {
+            super(input);
+        }
+
+        @Override
+        public Entry getLocalTarget() throws IOException {
+            final FsDefaultArchiveController<?>
+                    delegate = FsContextController.this.delegate;
+            final FsOperationContext context = delegate.getContext();
+            delegate.setContext(NULL);
+            try {
+                return getBoundSocket().getLocalTarget();
+            } finally {
+                delegate.setContext(context);
+            }
+        }
+
+        @Override
+        public Entry getPeerTarget() throws IOException {
+            // Same implementation as super class, but makes stack trace nicer.
+            return getBoundSocket().getPeerTarget();
+        }
+
+        @Override
+        public ReadOnlyFile newReadOnlyFile() throws IOException {
+            final FsDefaultArchiveController<?>
+                    delegate = FsContextController.this.delegate;
+            final FsOperationContext context = delegate.getContext();
+            delegate.setContext(NULL);
+            try {
+                return getBoundSocket().newReadOnlyFile();
+            } finally {
+                delegate.setContext(context);
+            }
+        }
+
+        @Override
+        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            final FsDefaultArchiveController<?>
+                    delegate = FsContextController.this.delegate;
+            final FsOperationContext context = delegate.getContext();
+            delegate.setContext(NULL);
+            try {
+                return getBoundSocket().newSeekableByteChannel();
+            } finally {
+                delegate.setContext(context);
+            }
+        }
+
+        @Override
+        public InputStream newInputStream() throws IOException {
+            final FsDefaultArchiveController<?>
+                    delegate = FsContextController.this.delegate;
+            final FsOperationContext context = delegate.getContext();
+            delegate.setContext(NULL);
+            try {
+                return getBoundSocket().newInputStream();
+            } finally {
+                delegate.setContext(context);
+            }
+        }
+    } // Input
+
+    private final class Output extends DecoratingOutputSocket<Entry> {
+        final FsOperationContext operation;
+
+        Output(
+                OutputSocket<?> output,
+                BitField<FsOutputOption> options) {
+            super(output);
+            this.operation = makeContext(options);
+            
+        }
+
+        @Override
+        public Entry getLocalTarget() throws IOException {
+            final FsDefaultArchiveController<?>
+                    delegate = FsContextController.this.delegate;
+            final FsOperationContext context = delegate.getContext();
+            delegate.setContext(operation);
+            try {
+                return getBoundSocket().getLocalTarget();
+            } finally {
+                delegate.setContext(context);
+            }
+        }
+
+        @Override
+        public Entry getPeerTarget() throws IOException {
+            // Same implementation as super class, but makes stack trace nicer.
+            return getBoundSocket().getPeerTarget();
+        }
+
+        @Override
+        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            final FsDefaultArchiveController<?>
+                    delegate = FsContextController.this.delegate;
+            final FsOperationContext context = delegate.getContext();
+            delegate.setContext(operation);
+            try {
+                return getBoundSocket().newSeekableByteChannel();
+            } finally {
+                delegate.setContext(context);
+            }
+        }
+
+        @Override
+        public OutputStream newOutputStream() throws IOException {
+            final FsDefaultArchiveController<?>
+                    delegate = FsContextController.this.delegate;
+            final FsOperationContext context = delegate.getContext();
+            delegate.setContext(operation);
+            try {
+                return getBoundSocket().newOutputStream();
+            } finally {
+                delegate.setContext(context);
+            }
+        }
+    } // Output
 }
