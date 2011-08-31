@@ -422,10 +422,10 @@ extends FsDriver {
      * @throws CharConversionException if {@code name} contains characters
      *         which are invalid.
      */
-    public abstract E
-    newEntry(   String name,
-                Type type,
-                @CheckForNull Entry template,
-                BitField<FsOutputOption> mknod)
+    public abstract E newEntry(
+            String name,
+            Type type,
+            @CheckForNull Entry template,
+            BitField<FsOutputOption> mknod)
     throws CharConversionException;
 }
