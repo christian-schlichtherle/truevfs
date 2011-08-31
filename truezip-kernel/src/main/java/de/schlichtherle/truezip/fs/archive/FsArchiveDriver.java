@@ -181,7 +181,7 @@ extends FsDriver {
             cmodel = (FsConcurrentModel) model;
         else*/
             cmodel = new FsConcurrentModel(model);
-        return  new FsSyncController<FsModel>(
+        return  new FsSyncController<FsConcurrentModel>(
                     new FsConcurrentController(
                         new FsCachingController(
                             new FsResourceController(
