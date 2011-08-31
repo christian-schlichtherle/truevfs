@@ -143,6 +143,8 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
     /**
      * Returns the ZIP crypto parameters for the given file system model
      * and character set or {@code null} if not available.
+     * To enable the use of this method when writing an archive entry with the
+     * client APIs, you must use {@link FsOutputOption#ENCRYPT}.
      * <p>
      * The implementation in the class {@link ZipDriver} returns
      * {@code new KeyManagerZipCryptoParameters(getKeyManagerProvider(), mountPointUri(model), charset)}.
