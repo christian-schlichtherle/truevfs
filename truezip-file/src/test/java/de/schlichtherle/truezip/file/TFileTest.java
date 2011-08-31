@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.file;
 
+import java.net.URISyntaxException;
+import java.util.ServiceConfigurationError;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -530,6 +532,40 @@ public class TFileTest extends TestBase<MockArchiveDriver> {
 
                 assertThat(clone, not(sameInstance(original)));
                 assertThat(clone, equalTo(original.getAbsoluteFile()));
+            }
+        }
+    }
+
+    /**
+     * Tests issue #TRUEZIP-154.
+     * 
+     * @see     <a href="http://java.net/jira/browse/TRUEZIP-154">ServiceConfigurationError: Unknown file system scheme for path without a suffix</a>
+     * @author  hierynomus (Reporter)
+     * @author  Christian Schlichtherle
+     */
+    @Test
+    public void testIssue154() throws URISyntaxException {
+        for (String param : new String[] {
+            "mok:file:/foo!/",
+            "mok:mok:file:/foo!/bar!/",
+        }) {
+            FsPath path = new FsPath(new URI(param));
+            try {
+                assertIssue154(new TFile(path));
+                assertIssue154(new TFile(path.toUri()));
+            } catch (ServiceConfigurationError error) {
+                throw new AssertionError(param, error);
+            }
+        }
+    }
+
+    private void assertIssue154(TFile file) {
+        for (; null != file; file = file.getEnclArchive()) {
+            assertTrue(file.isArchive());
+            try {
+                file.exists();
+                fail("The mock archive driver should not support I/O.");
+            } catch (UnsupportedOperationException expected) {
             }
         }
     }
