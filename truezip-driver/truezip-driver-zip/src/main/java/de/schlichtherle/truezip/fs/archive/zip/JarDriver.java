@@ -55,15 +55,6 @@ public class JarDriver extends ZipDriver {
     }
 
     @Override
-    public JarArchiveEntry newEntry(String path,
-                                    Type type,
-                                    Entry template,
-                                    BitField<FsOutputOption> mknod)
-    throws CharConversionException {
-        return (JarArchiveEntry) super.newEntry(path, type, template, mknod);
-    }
-
-    @Override
     public JarArchiveEntry newEntry(String name) {
         return new JarArchiveEntry(name);
     }
