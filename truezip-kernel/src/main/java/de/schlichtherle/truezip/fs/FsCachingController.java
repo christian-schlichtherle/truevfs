@@ -85,16 +85,16 @@ extends FsDecoratingConcurrentModelController<
     private static final BitField<FsSyncOption>
             ABORT_CHANGES_OPTIONS = BitField.of(ABORT_CHANGES);
 
-    private static final EntryOutputSocketFactory
-            ENTRY_OUTPUT_SOCKET_FACTORY = JSE7.AVAILABLE
-                ? EntryOutputSocketFactory.NIO2
-                : EntryOutputSocketFactory.OIO;
+    private static final EntrySocketFactory
+            ENTRY_SOCKET_FACTORY = JSE7.AVAILABLE
+                ? EntrySocketFactory.NIO2
+                : EntrySocketFactory.OIO;
 
     private static final Strategy STRATEGY = WRITE_BACK;
 
     private final IOPool<?> pool;
-    private final Map<FsEntryName, EntryCache>
-            caches = new HashMap<FsEntryName, EntryCache>();
+    private final Map<FsEntryName, EntryController>
+            controllers = new HashMap<FsEntryName, EntryController>();
 
     /**
      * Constructs a new content caching file system controller.
@@ -115,7 +115,7 @@ extends FsDecoratingConcurrentModelController<
     public InputSocket<?> getInputSocket(
             FsEntryName name,
             BitField<FsInputOption> options) {
-        return new CachingInputSocket(
+        return new Input(
                 delegate.getInputSocket(name, options),
                 name, options);
     }
@@ -125,7 +125,7 @@ extends FsDecoratingConcurrentModelController<
             FsEntryName name,
             BitField<FsOutputOption> options,
             Entry template) {
-        return new CachingOutputSocket(
+        return new Output(
                 delegate.getOutputSocket(name, options, template),
                 name, options, template);
     }
@@ -138,12 +138,12 @@ extends FsDecoratingConcurrentModelController<
     throws IOException {
         assert isWriteLockedByCurrentThread();
 
-        final EntryCache cache = caches.get(name);
-        if (null != cache) {
+        final EntryController controller = controllers.get(name);
+        if (null != controller) {
             //cache.flush(); // redundant
             delegate.mknod(name, type, options, template);
-            caches.remove(name);
-            cache.clear();
+            controllers.remove(name);
+            controller.clear();
         } else {
             delegate.mknod(name, type, options, template);
         }
@@ -183,12 +183,12 @@ extends FsDecoratingConcurrentModelController<
 
     private void unlink0(final FsEntryName name, BitField<FsOutputOption> options)
     throws IOException {
-        final EntryCache cache = caches.get(name);
-        if (null != cache) {
+        final EntryController controller = controllers.get(name);
+        if (null != controller) {
             //cache.flush(); // redundant
             delegate.unlink(name, options);
-            caches.remove(name);
-            cache.clear();
+            controllers.remove(name);
+            controller.clear();
         } else {
             delegate.unlink(name, options);
         }
@@ -210,22 +210,23 @@ extends FsDecoratingConcurrentModelController<
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         assert isWriteLockedByCurrentThread();
-        if (0 >= caches.size())
+        if (0 >= controllers.size())
             return;
         final boolean flush = !options.get(ABORT_CHANGES);
         final boolean clear = !flush || options.get(CLEAR_CACHE);
-        for (final Iterator<EntryCache> i = caches.values().iterator(); i.hasNext(); ) {
-            final EntryCache cache = i.next();
+        final Iterator<EntryController> i = controllers.values().iterator();
+        while (i.hasNext()) {
+            final EntryController controller = i.next();
             try {
                 if (flush)
-                    cache.flush();
+                    controller.flush();
             } catch (IOException ex) {
                 throw handler.fail(new FsSyncException(getModel(), ex));
             } finally  {
                 try {
                     if (clear) {
                         i.remove();
-                        cache.clear();
+                        controller.clear();
                     }
                 } catch (IOException ex) {
                     handler.warn(new FsSyncWarningException(getModel(), ex));
@@ -234,13 +235,12 @@ extends FsDecoratingConcurrentModelController<
         }
     }
 
-    private final class CachingInputSocket
+    private final class Input
     extends DecoratingInputSocket<Entry> {
         final FsEntryName name;
         final BitField<FsInputOption> options;
 
-        CachingInputSocket(
-                final InputSocket<?> input,
+        Input(  final InputSocket<?> input,
                 final FsEntryName name,
                 final BitField<FsInputOption> options) {
             super(input);
@@ -250,14 +250,14 @@ extends FsDecoratingConcurrentModelController<
 
         @Override
         public InputSocket<?> getBoundSocket() throws IOException {
-            EntryCache cache = caches.get(name);
-            if (null == cache) {
+            EntryController controller = controllers.get(name);
+            if (null == controller) {
                 if (!options.get(FsInputOption.CACHE))
                     return super.getBoundSocket(); // don't cache
                 assertWriteLockedByCurrentThread();
-                cache = new EntryCache(name);
+                controller = new EntryController(name);
             }
-            return cache.configure(options).getInputSocket().bind(this);
+            return controller.configure(options).getInputSocket().bind(this);
         }
 
         @Override
@@ -289,16 +289,15 @@ extends FsDecoratingConcurrentModelController<
             // Same implementation as super class, but makes stack trace nicer.
             return getBoundSocket().newInputStream();
         }
-    } // CachingInputSocket
+    } // Input
 
-    private final class CachingOutputSocket
+    private final class Output
     extends DecoratingOutputSocket<Entry> {
         final FsEntryName name;
         final BitField<FsOutputOption> options;
         final @CheckForNull Entry template;
 
-        CachingOutputSocket(
-                final OutputSocket<?> output,
+        Output( final OutputSocket<?> output,
                 final FsEntryName name,
                 final BitField<FsOutputOption> options,
                 final @CheckForNull Entry template) {
@@ -310,13 +309,13 @@ extends FsDecoratingConcurrentModelController<
 
         @Override
         public OutputSocket<?> getBoundSocket() throws IOException {
-            EntryCache cache = caches.get(name);
-            if (null == cache) {
+            EntryController controller = controllers.get(name);
+            if (null == controller) {
                 if (!options.get(FsOutputOption.CACHE))
                     return super.getBoundSocket(); // don't cache
-                cache = new EntryCache(name);
+                controller = new EntryController(name);
             }
-            return cache.configure(options, template).getOutputSocket().bind(this);
+            return controller.configure(options, template).getOutputSocket().bind(this);
         }
 
         @Override
@@ -342,35 +341,35 @@ extends FsDecoratingConcurrentModelController<
             // Same implementation as super class, but makes stack trace nicer.
             return getBoundSocket().newOutputStream();
         }
-    } // CachingOutputSocket
+    } // Output
 
     @Immutable
-    private enum EntryOutputSocketFactory {
+    private enum EntrySocketFactory {
         OIO() {
             @Override
             OutputSocket<?> newOutputSocket(
-                    EntryCache cache,
+                    EntryController controller,
                     OutputSocket <?> output) {
-                return cache.new Output(output);
+                return controller.new EntryOutput(output);
             }
         },
 
         NIO2() {
             @Override
             OutputSocket<?> newOutputSocket(
-                    EntryCache cache,
+                    EntryController controller,
                     OutputSocket <?> output) {
-                return cache.new Nio2Output(output);
+                return controller.new Nio2EntryOutput(output);
             }
         };
         
         abstract OutputSocket<?> newOutputSocket(
-                EntryCache cache,
+                EntryController controller,
                 OutputSocket <?> output);
-    } // EntryOutputSocketFactory
+    } // EntryOutputFactory
 
     /** A cache for the contents of an individual file system entry. */
-    private final class EntryCache {
+    private final class EntryController {
         final FsEntryName name;
         final IOCache cache;
         volatile @CheckForNull InputSocket<?> input;
@@ -378,20 +377,20 @@ extends FsDecoratingConcurrentModelController<
         volatile @Nullable BitField<FsOutputOption> outputOptions;
         volatile @CheckForNull Entry template;
 
-        EntryCache(final FsEntryName name) {
+        EntryController(final FsEntryName name) {
             this.name = name;
             this.cache = STRATEGY.newCache(pool);
         }
 
-        EntryCache configure(BitField<FsInputOption> options) {
+        EntryController configure(BitField<FsInputOption> options) {
             // Consume FsInputOption.CACHE.
             options = options.clear(FsInputOption.CACHE);
-            cache.configure(new Input(delegate.getInputSocket(name, options)));
+            cache.configure(new EntryInput(delegate.getInputSocket(name, options)));
             input = null;
             return this;
         }
 
-        EntryCache configure(   BitField<FsOutputOption> options,
+        EntryController configure(   BitField<FsOutputOption> options,
                                 final @CheckForNull Entry template) {
             // Consume FsOutputOption.CACHE.
             this.outputOptions = options = options.clear(FsOutputOption.CACHE); // consume
@@ -420,7 +419,7 @@ extends FsDecoratingConcurrentModelController<
             final OutputSocket<?> output = this.output;
             return null != output
                     ? output
-                    : (this.output = ENTRY_OUTPUT_SOCKET_FACTORY
+                    : (this.output = ENTRY_SOCKET_FACTORY
                         .newOutputSocket(this, cache.getOutputSocket()));
         }
 
@@ -443,8 +442,8 @@ extends FsDecoratingConcurrentModelController<
         }
 
         /** An input socket proxy. */
-        final class Input extends DecoratingInputSocket<Entry> {
-            Input(InputSocket <?> input) {
+        final class EntryInput extends DecoratingInputSocket<Entry> {
+            EntryInput(InputSocket <?> input) {
                 super(input);
             }
 
@@ -465,7 +464,7 @@ extends FsDecoratingConcurrentModelController<
                 assert isTouched();
                 return new EntryInputStream(in);
             }
-        } // Input
+        } // EntryInput
 
         /** An input stream proxy. */
         final class EntryInputStream extends DecoratingInputStream {
@@ -476,13 +475,13 @@ extends FsDecoratingConcurrentModelController<
             @Override
             public void close() throws IOException {
                 delegate.close();
-                caches.put(name, EntryCache.this);
+                controllers.put(name, EntryController.this);
             }
         } // EntryInputStream
 
         /** An output socket proxy which supports NIO.2. */
-        final class Nio2Output extends Output {
-            Nio2Output(OutputSocket <?> output) {
+        final class Nio2EntryOutput extends EntryOutput {
+            Nio2EntryOutput(OutputSocket <?> output) {
                 super(output);
             }
 
@@ -490,14 +489,14 @@ extends FsDecoratingConcurrentModelController<
             public SeekableByteChannel newSeekableByteChannel() throws IOException {
                 beginOutput();
                 final SeekableByteChannel sbc = getBoundSocket().newSeekableByteChannel();
-                caches.put(name, EntryCache.this);
+                controllers.put(name, EntryController.this);
                 return new EntrySeekableByteChannel(sbc);
             }
-        } // Nio2EntryOutputSocket
+        } // Nio2EntryOutput
 
         /** An output socket proxy. */
-        class Output extends DecoratingOutputSocket<Entry> {
-            Output(OutputSocket <?> output) {
+        class EntryOutput extends DecoratingOutputSocket<Entry> {
+            EntryOutput(OutputSocket <?> output) {
                 super(output);
             }
 
@@ -505,10 +504,10 @@ extends FsDecoratingConcurrentModelController<
             public final OutputStream newOutputStream() throws IOException {
                 beginOutput();
                 final OutputStream out = getBoundSocket().newOutputStream();
-                caches.put(name, EntryCache.this);
+                controllers.put(name, EntryController.this);
                 return new EntryOutputStream(out);
             }
-        } // Output
+        } // EntryOutput
 
         /** A seekable byte channel proxy. */
         final class EntrySeekableByteChannel

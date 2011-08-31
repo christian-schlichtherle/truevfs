@@ -181,14 +181,14 @@ extends FsDecoratingConcurrentModelController<
             InputSocket<?> newInputSocket(
                     FsResourceController controller,
                     InputSocket<?> input) {
-                return controller.new AccountingInputSocket(input);
+                return controller.new Input(input);
             }
 
             @Override
             OutputSocket<?> newOutputSocket(
                     FsResourceController controller,
                     OutputSocket<?> output) {
-                return controller.new AccountingOutputSocket(output);
+                return controller.new Output(output);
             }
         },
 
@@ -197,14 +197,14 @@ extends FsDecoratingConcurrentModelController<
             InputSocket<?> newInputSocket(
                     FsResourceController controller,
                     InputSocket<?> input) {
-                return controller.new Nio2AccountingInputSocket(input);
+                return controller.new Nio2Input(input);
             }
 
             @Override
             OutputSocket<?> newOutputSocket(
                     FsResourceController controller,
                     OutputSocket<?> output) {
-                return controller.new Nio2AccountingOutputSocket(output);
+                return controller.new Nio2Output(output);
             }
         };
 
@@ -217,9 +217,9 @@ extends FsDecoratingConcurrentModelController<
                 OutputSocket <?> output);
     } // AccountingSocketFactory
 
-    private final class Nio2AccountingInputSocket
-    extends AccountingInputSocket {
-        Nio2AccountingInputSocket(InputSocket<?> input) {
+    private final class Nio2Input
+    extends Input {
+        Nio2Input(InputSocket<?> input) {
             super(input);
         }
 
@@ -229,11 +229,11 @@ extends FsDecoratingConcurrentModelController<
             return new AccountedSeekableByteChannel(
                     getBoundSocket().newSeekableByteChannel());
         }
-    } // Nio2AccountingInputSocket
+    } // Nio2Input
 
-    private class AccountingInputSocket
+    private class Input
     extends DecoratingInputSocket<Entry> {
-        AccountingInputSocket(InputSocket<?> input) {
+        Input(InputSocket<?> input) {
             super(input);
         }
 
@@ -262,11 +262,11 @@ extends FsDecoratingConcurrentModelController<
             return new AccountedInputStream(
                     getBoundSocket().newInputStream());
         }
-    } // AccountingInputSocket
+    } // Input
 
-    private final class Nio2AccountingOutputSocket
-    extends AccountingOutputSocket {
-        Nio2AccountingOutputSocket(OutputSocket<?> output) {
+    private final class Nio2Output
+    extends Output {
+        Nio2Output(OutputSocket<?> output) {
             super(output);
         }
 
@@ -276,11 +276,11 @@ extends FsDecoratingConcurrentModelController<
             return new AccountedSeekableByteChannel(
                     getBoundSocket().newSeekableByteChannel());
         }
-    } // AccountingSyncOutputSocket
+    } // Nio2Output
 
-    private class AccountingOutputSocket
+    private class Output
     extends DecoratingOutputSocket<Entry> {
-        AccountingOutputSocket(OutputSocket<?> output) {
+        Output(OutputSocket<?> output) {
             super(output);
         }
 
@@ -302,7 +302,7 @@ extends FsDecoratingConcurrentModelController<
             return new AccountedOutputStream(
                     getBoundSocket().newOutputStream());
         }
-    } // AccountingOutputSocket
+    } // Output
 
     private final class AccountedReadOnlyFile
     extends DecoratingReadOnlyFile {
