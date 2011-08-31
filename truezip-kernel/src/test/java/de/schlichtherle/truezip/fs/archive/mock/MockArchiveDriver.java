@@ -67,10 +67,11 @@ extends FsCharsetArchiveDriver<MockArchiveEntry> {
     }
 
     @Override
-    public MockArchiveEntry newEntry(   String name,
-                                        Type type,
-                                        Entry template,
-                                        BitField<FsOutputOption> mknod)
+    public MockArchiveEntry newEntry(
+            String name,
+            Type type,
+            Entry template,
+            BitField<FsOutputOption> mknod)
     throws CharConversionException {
         return new MockArchiveEntry(
                 toZipOrTarEntryName(name, type),
