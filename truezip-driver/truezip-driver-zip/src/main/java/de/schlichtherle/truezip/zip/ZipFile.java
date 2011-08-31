@@ -334,21 +334,17 @@ public class ZipFile extends RawZipFile<ZipEntry> {
         return super.busy();
     }
 
-    /**
-     * Returns the crypto parameters.
-     * 
-     * @return The crypto parameters.
-     * @since  TrueZIP 7.3
-     */
     @Override
     public synchronized @Nullable ZipCryptoParameters getCryptoParameters() {
         return cryptoParameters;
     }
 
     /**
-     * Sets the crypto parameters.
+     * Sets the parameters for encryption or authentication of entries.
      * 
-     * @param cryptoParameters the crypto parameters.
+     * @param cryptoParameters the parameters for encryption or authentication
+     *        of entries.
+     * @since TrueZIP 7.3
      */
     public synchronized void setCryptoParameters(
             final @CheckForNull ZipCryptoParameters cryptoParameters) {
