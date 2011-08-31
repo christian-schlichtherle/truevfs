@@ -449,7 +449,7 @@ public class TFileTest extends TestBase<MockArchiveDriver> {
             { "/archive.mok", "mok:file:/archive.mok!/" },
             { "/archive.mok/entry", "mok:file:/archive.mok!/entry" },
             { "/foo.mok1/bar.mok2", "mok2:mok1:file:/foo.mok1!/bar.mok2!/" },
-            { "/dist.mok1/app.mok2/META-INF/MANIFEST.MF", "mok1:mok2:file:/dist.mok1!/app.mok2!/META-INF/MANIFEST.MF" },
+            { "/dist.mok1/app.mok2/META-INF/MANIFEST.MF", "mok2:mok1:file:/dist.mok1!/app.mok2!/META-INF/MANIFEST.MF" },
         }) {
             final String name = params[0];
             final URI uri = URI.create(params[1]);

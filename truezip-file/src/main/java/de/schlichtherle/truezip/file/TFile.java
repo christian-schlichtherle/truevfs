@@ -642,6 +642,7 @@ public final class TFile extends File {
         this.detector = detector;
 
         final FsMountPoint mp = path.getMountPoint();
+        final FsScheme mps = mp.getScheme();
         final FsPath mpp = mp.getPath();
         final FsEntryName en;
 
@@ -653,14 +654,14 @@ public final class TFile extends File {
         } else if ((en = path.getEntryName()).isRoot()) {
             assert path.toUri().isOpaque();
             if (mpp.toUri().isOpaque()) {
-                this.enclArchive
-                        = new TFile(mpp.getMountPoint(), detector);
+                this.enclArchive = new TFile(mpp.getMountPoint(), detector);
                 this.enclEntryName = mpp.getEntryName();
             } else {
                 this.enclArchive = null;
                 this.enclEntryName = null;
             }
             this.innerArchive = this;
+            this.controller = getController(mp);
         } else {
             assert path.toUri().isOpaque();
             this.enclArchive = new TFile(mp, detector);
@@ -679,24 +680,25 @@ public final class TFile extends File {
         this.delegate = new File(super.getPath());
         this.detector = detector;
 
-        final FsPath mountPointPath = mountPoint.getPath();
+        final FsPath mpp = mountPoint.getPath();
 
-        if (null == mountPointPath) {
+        if (null == mpp) {
             assert !mountPoint.toUri().isOpaque();
             this.enclArchive = null;
             this.enclEntryName = null;
             this.innerArchive = null;
         } else {
             assert mountPoint.toUri().isOpaque();
-            if (mountPointPath.toUri().isOpaque()) {
+            if (mpp.toUri().isOpaque()) {
                 this.enclArchive
-                        = new TFile(mountPointPath.getMountPoint(), detector);
-                this.enclEntryName = mountPointPath.getEntryName();
+                        = new TFile(mpp.getMountPoint(), detector);
+                this.enclEntryName = mpp.getEntryName();
             } else {
                 this.enclArchive = null;
                 this.enclEntryName = null;
             }
             this.innerArchive = this;
+            this.controller = getController(mountPoint);
         }
 
         assert invariants();
@@ -715,9 +717,10 @@ public final class TFile extends File {
             final int iapl = innerArchive.getPath().length();
             if (path.length() == iapl) {
                 this.detector = innerArchive.detector;
-                this.innerArchive = this;
                 this.enclArchive = innerArchive.enclArchive;
                 this.enclEntryName = innerArchive.enclEntryName;
+                this.innerArchive = this;
+                this.controller = innerArchive.controller;
             } else {
                 this.detector = detector;
                 this.innerArchive = this.enclArchive = innerArchive;
@@ -1616,7 +1619,11 @@ public final class TFile extends File {
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
         }
-        return controller = TConfig.get().getManager().getController(mountPoint, detector);
+        return controller = getController(mountPoint);
+    }
+
+    private FsController<?> getController(FsMountPoint mountPoint) {
+        return TConfig.get().getManager().getController(mountPoint, detector);
     }
 
     /**
@@ -1892,8 +1899,7 @@ public final class TFile extends File {
     public URI toURI() {
         try {
             if (this == innerArchive) {
-                final FsScheme scheme = detector.getScheme(delegate.getPath());
-                assert null != scheme; // make FindBugs happy!
+                final FsScheme scheme = getScheme();
                 if (null != enclArchive) {
                     return new FsMountPoint(
                             scheme,
@@ -1925,8 +1931,7 @@ public final class TFile extends File {
     public FsPath toFsPath() {
         try {
             if (this == innerArchive) {
-                final FsScheme scheme = detector.getScheme(delegate.getPath());
-                assert null != scheme; // make FindBugs happy!
+                final FsScheme scheme = getScheme();
                 if (null != enclArchive) {
                     return new FsPath(
                             new FsMountPoint(
@@ -1950,6 +1955,14 @@ public final class TFile extends File {
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
         }
+    }
+
+    private @Nullable FsScheme getScheme() {
+        if (this != innerArchive)
+            return null;
+        if (null != controller)
+            return controller.getModel().getMountPoint().getScheme();
+        return detector.getScheme(delegate.getPath());
     }
 
     /**
@@ -3713,8 +3726,7 @@ public final class TFile extends File {
     }
 
     private static @Nullable String getSuffix(final TFile file) {
-        final TArchiveDetector detector = file.getArchiveDetector();
-        final FsScheme scheme = detector.getScheme(file.getName());
+        final FsScheme scheme = file.getScheme();
         return null != scheme ? "." + scheme : null;
     }
 
