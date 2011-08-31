@@ -410,7 +410,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
         return new ZipArchiveEntry(name);
     }
 
-    protected ZipArchiveEntry newEntry(String name, ZipEntry template) {
+    public ZipArchiveEntry newEntry(String name, ZipEntry template) {
         return new ZipArchiveEntry(name, template);
     }
 
