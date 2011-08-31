@@ -45,17 +45,17 @@ import net.jcip.annotations.ThreadSafe;
  * file system if the decorated file system controller throws an
  * {@link FsNotSyncedException}.
  * 
- * @since   TrueZIP 7.3
+ * @param   <M> The type of the file system model shared by the decorator chain
+ *          of file system controllers.
  * @see     FsNotSyncedException
+ * @since   TrueZIP 7.3
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-public final class FsSyncController<
-        M extends FsModel,
-        C extends FsController<? extends M>>
-extends FsDecoratingController<M, C> {
+public final class FsSyncController<M extends FsModel>
+extends FsDecoratingController<M, FsController<? extends M>> {
 
     private static final BitField<FsSyncOption>
             SYNC_OPTIONS = BitField.of(WAIT_CLOSE_INPUT, WAIT_CLOSE_OUTPUT);
@@ -70,7 +70,7 @@ extends FsDecoratingController<M, C> {
      *
      * @param controller the decorated concurrent file system controller.
      */
-    public FsSyncController(C controller) {
+    public FsSyncController(FsController<? extends M> controller) {
         super(controller);
     }
 
@@ -233,14 +233,14 @@ extends FsDecoratingController<M, C> {
         OIO() {
             @Override
             InputSocket<?> newInputSocket(
-                    FsSyncController<?, ?> controller,
+                    FsSyncController<?> controller,
                     InputSocket<?> input) {
                 return controller.new SyncInputSocket(input);
             }
 
             @Override
             OutputSocket<?> newOutputSocket(
-                    FsSyncController<?, ?> controller,
+                    FsSyncController<?> controller,
                     OutputSocket<?> output) {
                 return controller.new SyncOutputSocket(output);
             }
@@ -249,25 +249,25 @@ extends FsDecoratingController<M, C> {
         NIO2() {
             @Override
             InputSocket<?> newInputSocket(
-                    FsSyncController<?, ?> controller,
+                    FsSyncController<?> controller,
                     InputSocket<?> input) {
                 return controller.new Nio2SyncInputSocket(input);
             }
 
             @Override
             OutputSocket<?> newOutputSocket(
-                    FsSyncController<?, ?> controller,
+                    FsSyncController<?> controller,
                     OutputSocket<?> output) {
                 return controller.new Nio2SyncOutputSocket(output);
             }
         };
 
         abstract InputSocket<?> newInputSocket(
-                FsSyncController<?, ?> controller,
+                FsSyncController<?> controller,
                 InputSocket <?> input);
         
         abstract OutputSocket<?> newOutputSocket(
-                FsSyncController<?, ?> controller,
+                FsSyncController<?> controller,
                 OutputSocket <?> output);
     } // SyncSocketFactory
 

@@ -43,6 +43,7 @@ import net.jcip.annotations.NotThreadSafe;
 /**
  * Accounts input and output resources returned by its decorated controller.
  * 
+ * @see     FsResourceAccountant
  * @since   TrueZIP 7.3
  * @author  Christian Schlichtherle
  * @version $Id$

@@ -142,8 +142,9 @@ public final class FsResourceAccountant {
      * Mind that this method WILL NOT WORK if any two instances of this class
      * share the same lock that has been provided to their constructor!
      *
-     * @param  the number of milliseconds to await the closing of resources
-     *         which have been accounted for in <em>other</em> threads.
+     * @param  timeout the number of milliseconds to await the closing of
+     *         resources which have been accounted for in <em>other</em>
+     *         threads.
      *         If this is {@code 0}, then there is no timeout for waiting.
      * @return The number of <em>all</em> accounted closeable resources.
      */
