@@ -540,8 +540,6 @@ public class TFileTest extends TestBase<MockArchiveDriver> {
      * Tests issue #TRUEZIP-154.
      * 
      * @see     <a href="http://java.net/jira/browse/TRUEZIP-154">ServiceConfigurationError: Unknown file system scheme for path without a suffix</a>
-     * @author  hierynomus (Reporter)
-     * @author  Christian Schlichtherle
      */
     @Test
     public void testIssue154() throws URISyntaxException {
