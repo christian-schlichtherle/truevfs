@@ -159,7 +159,7 @@ public abstract class ZipRaesDriver extends JarDriver {
     }
 
     /**
-     * Creates a new {@link JarArchiveEntry}, enforcing that the data gets
+     * Returns a new {@link JarArchiveEntry}, enforcing that the data gets
      * {@code DEFLATED} when written, even if copying data from a
      * {@code STORED} source entry.
      * This feature strengthens the security level of the authentication
@@ -174,11 +174,11 @@ public abstract class ZipRaesDriver extends JarDriver {
      * size of the resulting archive file and heat the CPU.
      */
     @Override
-    public JarArchiveEntry
-    newEntry(   String path,
-                Type type,
-                Entry template,
-                BitField<FsOutputOption> mknod)
+    public ZipArchiveEntry newEntry(
+            String path,
+            Type type,
+            Entry template,
+            BitField<FsOutputOption> mknod)
     throws CharConversionException {
         return super.newEntry(path, type, template,
                 mknod.set(COMPRESS).clear(ENCRYPT));
