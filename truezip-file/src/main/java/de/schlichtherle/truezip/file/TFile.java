@@ -642,7 +642,6 @@ public final class TFile extends File {
         this.detector = detector;
 
         final FsMountPoint mp = path.getMountPoint();
-        final FsScheme mps = mp.getScheme();
         final FsPath mpp = mp.getPath();
         final FsEntryName en;
 
