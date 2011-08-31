@@ -871,9 +871,9 @@ implements Iterable<E>, Closeable {
     }
 
     /**
-     * Returns the crypto parameters.
+     * Returns the parameters for encryption or authentication of entries.
      * 
-     * @return The crypto parameters.
+     * Returns The parameters for encryption or authentication of entries.
      * @since  TrueZIP 7.3
      */
     protected abstract @CheckForNull ZipCryptoParameters getCryptoParameters();

@@ -238,21 +238,20 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
         super.setLevel(level);
     }
 
-    /**
-     * Returns the crypto parameters.
-     * 
-     * @return The crypto parameters.
-     * @since  TrueZIP 7.3
-     */
     @Override
     public synchronized @Nullable ZipCryptoParameters getCryptoParameters() {
         return cryptoParameters;
     }
 
     /**
-     * Sets the crypto parameters.
+     * Sets the parameters for encryption or authentication of entries.
+     * <p>
+     * Note that only {@link WinZipAesParameters WinZip AES encryption} is
+     * currently supported.
      * 
-     * @param cryptoParameters the crypto parameters.
+     * @param cryptoParameters the parameters for encryption or authentication
+     *        of entries.
+     * @since TrueZIP 7.3
      */
     public synchronized void setCryptoParameters(
             final @CheckForNull ZipCryptoParameters cryptoParameters) {
