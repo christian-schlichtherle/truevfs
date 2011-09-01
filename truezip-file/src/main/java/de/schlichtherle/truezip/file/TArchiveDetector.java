@@ -9,12 +9,13 @@
 package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.fs.FsAbstractCompositeDriver;
-import de.schlichtherle.truezip.fs.sl.FsDriverLocator;
-import de.schlichtherle.truezip.util.SuffixSet;
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsDriverProvider;
 import de.schlichtherle.truezip.fs.FsScheme;
+import de.schlichtherle.truezip.fs.sl.FsDriverLocator;
 import de.schlichtherle.truezip.fs.spi.FsDriverService;
+import static de.schlichtherle.truezip.util.Maps.*;
+import de.schlichtherle.truezip.util.SuffixSet;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -120,7 +121,8 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
         final Map<FsScheme, FsDriver> outDrivers;
         if (null != suffixes) {
             inSuffixes = new SuffixSet(suffixes);
-            outDrivers = new HashMap<FsScheme, FsDriver>(inDrivers.size() * 4 / 3 + 1);
+            outDrivers = new HashMap<FsScheme, FsDriver>(
+                    initialCapacity(inDrivers.size()));
         } else {
             inSuffixes = null;
             outDrivers = inDrivers;
@@ -240,7 +242,8 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
                             final Map<FsScheme, FsDriver> config) {
         final Map<FsScheme, FsDriver> inDrivers = provider.get();
         final Map<FsScheme, FsDriver> 
-                outDrivers = new HashMap<FsScheme, FsDriver>(inDrivers.size() * 4 / 3 + 1);
+                outDrivers = new HashMap<FsScheme, FsDriver>(
+                        initialCapacity(inDrivers.size()));
         final SuffixSet outSuffixes = new SuffixSet();
         for (final Map.Entry<FsScheme, FsDriver> entry : inDrivers.entrySet()) {
             final FsDriver driver = entry.getValue();

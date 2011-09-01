@@ -12,6 +12,7 @@ import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsDriverProvider;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.fs.spi.FsDriverService;
+import static de.schlichtherle.truezip.util.Maps.*;
 import de.schlichtherle.truezip.util.ServiceLocator;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -82,7 +83,7 @@ public final class FsDriverLocator implements FsDriverProvider {
             }
             final Map<FsScheme, FsDriver>
                     fast = new LinkedHashMap<FsScheme, FsDriver>(
-                        sorted.size() * 4 / 3 + 1);
+                        initialCapacity(sorted.size()));
             for (final Map.Entry<FsScheme, FsDriver> entry : sorted.entrySet()) {
                 final FsScheme scheme = entry.getKey();
                 final FsDriver driver = entry.getValue();

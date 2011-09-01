@@ -11,11 +11,12 @@ package de.schlichtherle.truezip.zip;
 import de.schlichtherle.truezip.crypto.param.AesKeyStrength;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.LEDataOutputStream;
+import static de.schlichtherle.truezip.util.Maps.*;
 import static de.schlichtherle.truezip.zip.Constants.*;
 import static de.schlichtherle.truezip.zip.WinZipAesEntryExtraField.*;
 import static de.schlichtherle.truezip.zip.WinZipAesUtils.*;
-import static de.schlichtherle.truezip.zip.ZipParametersUtils.*;
 import static de.schlichtherle.truezip.zip.ZipEntry.*;
+import static de.schlichtherle.truezip.zip.ZipParametersUtils.*;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -105,14 +106,14 @@ implements Iterable<E> {
             this.charset = appendee.getRawCharset();
             this.comment = appendee.getRawComment();
             final Map<String, E> entries = new LinkedHashMap<String, E>(
-                    (appendee.size() + param.getInitialSize()) * 4 / 3 + 1);
+                    initialCapacity(appendee.size() + param.getOverheadSize()));
             for (E entry : appendee)
                 entries.put(entry.getName(), entry);
             this.entries = entries;
         } else {
             this.charset = param.getCharset();
             this.entries = new LinkedHashMap<String, E>(
-                    param.getInitialSize() * 4 / 3 + 1);
+                    initialCapacity(param.getOverheadSize()));
         }
         setMethod0(param.getMethod());
         setLevel0(param.getLevel());

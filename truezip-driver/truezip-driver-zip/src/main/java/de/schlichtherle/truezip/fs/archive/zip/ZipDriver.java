@@ -315,17 +315,17 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
      * {@inheritDoc}
      * <p>
      * The implementation in the class {@link ZipDriver}
-     * returns {@code ZipOutputStream#INITIAL_SIZE}.
+     * returns {@code ZipOutputStream#OVERHEAD_SIZE}.
      * 
      * @since      TrueZIP 7.3
-     * @return     {@code ZipOutputStream#INITIAL_SIZE}
+     * @return     {@code ZipOutputStream#OVERHEAD_SIZE}
      * @deprecated This method is reserved for future use - do <em>not</em> use
      *             or override this method!
      */
     @Deprecated
     @Override
-    public int getInitialSize() {
-        return ZipOutputStream.INITIAL_SIZE;
+    public int getOverheadSize() {
+        return ZipOutputStream.OVERHEAD_SIZE;
     }
 
     /**

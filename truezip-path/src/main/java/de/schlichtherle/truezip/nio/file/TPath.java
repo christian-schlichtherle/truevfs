@@ -27,6 +27,7 @@ import static de.schlichtherle.truezip.nio.file.TPathScanner.*;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
+import static de.schlichtherle.truezip.util.Maps.*;
 import de.schlichtherle.truezip.util.QuotedUriSyntaxException;
 import de.schlichtherle.truezip.util.UriBuilder;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -1000,7 +1001,7 @@ public final class TPath implements Path {
 
     BitField<FsInputOption> mapInput(final OpenOption... options) {
         final HashSet<OpenOption> set = new HashSet<OpenOption>(
-                options.length * 4 / 3 + 1);
+                initialCapacity(options.length));
         Collections.addAll(set, options);
         return mapInput(set);
     }
@@ -1018,7 +1019,7 @@ public final class TPath implements Path {
 
     BitField<FsOutputOption> mapOutput(final OpenOption... options) {
         final HashSet<OpenOption> set = new HashSet<OpenOption>(
-                options.length * 4 / 3 + 1);
+                initialCapacity(options.length));
         Collections.addAll(set, options);
         return mapOutput(set);
     }

@@ -21,6 +21,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
 import static de.schlichtherle.truezip.io.Paths.*;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.Link;
+import static de.schlichtherle.truezip.util.Maps.*;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -48,10 +49,21 @@ import net.jcip.annotations.NotThreadSafe;
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
-class FsArchiveFileSystem<E extends FsArchiveEntry>
+public class FsArchiveFileSystem<E extends FsArchiveEntry>
 implements Iterable<FsCovariantEntry<E>> {
 
-    private static final int INITIAL_SIZE = 64;
+    /**
+     * The number of entries which can be additionally accomodated by
+     * the internal hash map without resizing it, which is {@value}.
+     * When a new file system is created, this constant is used in order to
+     * compute the initial capacity of the internal hash map.
+     * When an existing file system is mounted, this constant is added to the
+     * number of entries in order to compute the initial capacity of the
+     * internal hash map.
+     * 
+     * @since  TrueZIP 7.3
+     */
+    public static final int OVERHEAD_SIZE = 64;
 
     private static final String ROOT_PATH = ROOT.getPath();
 
@@ -87,7 +99,8 @@ implements Iterable<FsCovariantEntry<E>> {
         final long time = System.currentTimeMillis();
         for (Access access : ALL_ACCESS_SET)
             root.setTime(access, time);
-        final EntryTable<E> master = new EntryTable<E>(INITIAL_SIZE * 4 / 3 + 1);
+        final EntryTable<E> master = new EntryTable<E>(
+                initialCapacity(OVERHEAD_SIZE));
         master.add(ROOT_PATH, root);
         this.master = master;
         this.touched = true;
@@ -141,7 +154,7 @@ implements Iterable<FsCovariantEntry<E>> {
         this.factory = driver;
         // Allocate some extra capacity to create missing parent directories.
         final EntryTable<E> master = new EntryTable<E>(
-                (archive.getSize() + INITIAL_SIZE) * 4 / 3 + 1);
+                initialCapacity(archive.getSize() + OVERHEAD_SIZE));
         // Load entries from input archive.
         final List<String> paths = new ArrayList<String>(archive.getSize());
         final Normalizer normalizer = new Normalizer(SEPARATOR_CHAR);
@@ -408,7 +421,7 @@ implements Iterable<FsCovariantEntry<E>> {
      *         be linked into this archive file system upon a call to its
      *         {@link FsArchiveFileSystemOperation#run} method.
      */
-    public FsArchiveFileSystemOperation<E> mknod(
+    FsArchiveFileSystemOperation<E> mknod(
             final FsEntryName name,
             final Entry.Type type,
             final BitField<FsOutputOption> options,
@@ -579,7 +592,7 @@ implements Iterable<FsCovariantEntry<E>> {
      * @throws FsArchiveFileSystemException If the operation fails for some other
      *         reason.
      */
-    public void unlink(final FsEntryName name)
+    void unlink(final FsEntryName name)
     throws FsArchiveFileSystemException {
         if (name.isRoot())
             throw new FsArchiveFileSystemException(name.toString(),
@@ -620,7 +633,7 @@ implements Iterable<FsCovariantEntry<E>> {
             pae.setTime(Access.WRITE, System.currentTimeMillis());
     }
 
-    public boolean setTime(
+    boolean setTime(
             final FsEntryName name,
             final BitField<Access> types,
             final long value)
@@ -641,7 +654,7 @@ implements Iterable<FsCovariantEntry<E>> {
         return ok;
     }
 
-    public boolean setTime(
+    boolean setTime(
             final FsEntryName name,
             final Map<Access, Long> times)
     throws FsArchiveFileSystemException {
@@ -660,11 +673,11 @@ implements Iterable<FsCovariantEntry<E>> {
         return ok;
     }
 
-    public boolean isWritable(FsEntryName name) {
+    boolean isWritable(FsEntryName name) {
         return !isReadOnly();
     }
 
-    public void setReadOnly(FsEntryName name)
+    void setReadOnly(FsEntryName name)
     throws FsArchiveFileSystemException {
         if (!isReadOnly())
             throw new FsArchiveFileSystemException(name.getPath(),
