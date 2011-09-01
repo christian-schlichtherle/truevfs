@@ -72,9 +72,9 @@ About
     As a framework, TrueZIP provides the interfaces and classes to
     write file system drivers which plug-in to its federated file
     system space.
-    The TrueZIP Kernel module provides multithreading, multiplexing,
-    caching and buffering so that the file system drivers do not need to
-    take care of this.
+    The TrueZIP Kernel module provides federating, multithreading, multiplexing,
+    caching and accounting so that archive file system drivers do not need to
+    take care of these aspects of a virtual file system.
 
     There is no tutorial for how to write a file system driver yet,
     but there's comprehensive Javadoc:
