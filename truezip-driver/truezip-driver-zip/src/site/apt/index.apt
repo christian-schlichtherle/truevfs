@@ -59,8 +59,9 @@ Key Features
         {{{../../apidocs/de/schlichtherle/truezip/fs/FsOutputOption.html#ENCRYPT}<<<FsOutputOption.ENCRYPT>>>}},
         e.g. in
         {{{../../apidocs/de/schlichtherle/truezip/file/TConfig.html#setOutputPreferences(de.schlichtherle.truezip.util.BitField)}<<<TConfig.setOutputPreferences(BitField)>>>}},
-        or install a custom file system driver which sets this option before
-        calling its super-class implementation in
+        or
+        {{{../../faq.html#installDriverFile}install a custom file system driver}}
+        which sets this option before calling its super-class implementation in
         {{{../../apidocs/de/schlichtherle/truezip/fs/archive/zip/ZipDriver.html#newEntry(java.lang.String,de.schlichtherle.truezip.fs.entry.Entry.Type,de.schlichtherle.truezip.fs.entry.Entry,de.schlichtherle.truezip.util.BitField)}<<<ZipDriver.newEntry(String, Entry.Type, Entry, BitField)>>>}}.
         In either case, if you don't want to use the built-in
         {{{../../apidocs/de/schlichtherle/truezip/fs/archive/zip/KeyManagerZipCryptoParameters.html}<<<KeyManagerZipCryptoParameters>>>}}
@@ -87,7 +88,9 @@ Key Features
         need to do anything - decompression happens automatically.
 
         To use this feature for writing a BZIP2 compressed ZIP entry with
-        a client API, install a custom file system driver which overrides
+        a client API,
+        {{{../../faq.html#installDriverFile}install a custom file system driver}}
+        which overrides
         {{{../../apidocs/de/schlichtherle/truezip/fs/archive/zip/ZipDriver.html#getMethod()}<<<ZipDriver.getMethod()>>>}}.
 
         To use this feature for writing a BZIP2 compressed ZIP entry with
@@ -99,8 +102,9 @@ Key Features
         names can get set when using a file system driver or the ZIP classes
         directly.
 
-        To use this feature with a client API, provide a custom file system
-        driver which overrides
+        To use this feature with a client API,
+        {{{../../faq.html#installDriverFile}install a custom file system driver}}
+        which overrides
         {{{../../apidocs/de/schlichtherle/truezip/fs/archive/zip/ZipDriver.html#getCharset()}<<<ZipDriver.getCharset()>>>}}.
 
         To use this feature with the ZIP API, call
