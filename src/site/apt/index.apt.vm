@@ -6,12 +6,12 @@
 
 About
 
-* Welcome to the TrueZIP User Website!
+* Welcome to the TrueZIP&#160;User&#160;Website!
 
     TrueZIP is a Java based plug-in framework for virtual file
     systems (VFS) which provides transparent access to archive
     files as if they were just plain directories.
-    The most recent version is TrueZIP ${project.version}.
+    The most recent version is TrueZIP&#160;${project.version}.
     See the
     {{{http://java.net/jira/browse/TRUEZIP#selectedTab=com.atlassian.jira.plugin.system.project:changelog-panel}Change Log}}.
 
@@ -65,16 +65,16 @@ About
 
     Writing an application for either API is really easy:
     Have a look at the {{{./usecases/index.html}Use Cases}} for some samples
-    using the TrueZIP File* API.
+    using the API of the module TrueZIP&#160;File*.
 
 ** Extending TrueZIP
 
     As a framework, TrueZIP provides the interfaces and classes to
     write file system drivers which plug-in to its federated file
     system space.
-    The TrueZIP Kernel module provides federating, multithreading, multiplexing,
-    caching and accounting so that archive file system drivers do not need to
-    take care of these aspects of a virtual file system.
+    The module TrueZIP&#160;Kernel provides federating, multithreading,
+    multiplexing, caching and accounting so that archive file system drivers
+    do not need to take care of these aspects of a virtual file system.
 
     There is no tutorial for how to write a file system driver yet,
     but there's comprehensive Javadoc:
@@ -116,14 +116,14 @@ About
     []
 
     If you're still not fed up, you might also want to check out
-    {{{http://truezip.schlichtherle.de}The TrueZIP Blog}}
+    {{{http://truezip.schlichtherle.de}The&#160;TrueZIP&#160;Blog}}
     or the
-    {{{http://java.net/projects/truezip}TrueZIP Developer Website}}.
+    {{{http://java.net/projects/truezip}TrueZIP&#160;Developer&#160;Website}}.
 
     Note that the documentation on this site is generally split across modules,
     so please check the section <Project Modules> in the navigation bar on
     this page, too.
 
-* Migration from TrueZIP 6
+* Migration from TrueZIP&#160;6
 
     There's an {{{./migration.html}article}} for this here, too!
