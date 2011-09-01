@@ -34,7 +34,6 @@ final class ZipDeflaterOutputStream extends DeflaterOutputStream {
 
     ZipDeflaterOutputStream(OutputStream out, int level, int size) {
         super(out, cache.allocate(), size);
-        def.reset();
         def.setLevel(level);
     }
 
@@ -64,6 +63,11 @@ final class ZipDeflaterOutputStream extends DeflaterOutputStream {
         @Override
         protected Deflater newResource() {
             return new Deflater(DEFAULT_COMPRESSION, true);
+        }
+
+        @Override
+        protected void reset(Deflater def) {
+            def.reset();
         }
     }
 

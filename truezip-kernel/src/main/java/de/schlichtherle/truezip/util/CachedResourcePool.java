@@ -22,6 +22,7 @@ import net.jcip.annotations.ThreadSafe;
 /**
  * A memory sensitive pool of cached resources.
  *
+ * @since   TrueZIP 7.3
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -40,6 +41,15 @@ implements Pool<R, E> {
      */
     protected abstract R newResource() throws E;
 
+    /**
+     * Resets the given resource which is allocated from the pool before it
+     * gets returned to the client.
+     * <p>
+     * The implementation in the class {@link CachedResourcePool} does nothing.
+     */
+    protected void reset(R resource) throws E {
+    }
+
     @Override
     public R allocate() throws E {
         R resource = null;
@@ -55,7 +65,9 @@ implements Pool<R, E> {
         // Creating a new resource may be costly, so we do not want to lock
         // this object while waiting for it.
         // As a downside, this may result in redundant creation of a resource.
-        if (null == resource)
+        if (null != resource)
+            reset(resource);
+        else
             resource = newResource();
         synchronized (this) {
             allocated.add(resource);
