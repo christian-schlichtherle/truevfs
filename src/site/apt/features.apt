@@ -42,7 +42,7 @@ Key Features
         provides convenient and powerful methods for fast bulk I/O operations
         like file or directory tree copying, moving, deleting, traversing etc.
         For example, by using the multi-threaded method
-        {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#cat(java.io.InputStream, java.io.OutputStream)}<<<TFile.cat(InputStream, OutputStream)>>>}},
+        {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#cat(java.io.InputStream,java.io.OutputStream)}<<<TFile.cat(InputStream, OutputStream)>>>}},
         you'll never need to use a naive read-then-write loop again.
 
     [Unlimited Archive File Nesting]

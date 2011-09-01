@@ -167,7 +167,7 @@ Concepts
     For example, the abstract class
     {{{./apidocs/de/schlichtherle/truezip/fs/FsDriver.html}<<<FsDriver>>>}}
     consists of only one abstract method
-    {{{./apidocs/de/schlichtherle/truezip/fs/FsDriver.html#newController(de.schlichtherle.fs.FsModel, de.schlichtherle.fs.FsController)}<<<FsDriver.newController(FsModel, FsController)>>>}}
+    {{{./apidocs/de/schlichtherle/truezip/fs/FsDriver.html#newController(de.schlichtherle.fs.FsModel,de.schlichtherle.fs.FsController)}<<<FsDriver.newController(FsModel, FsController)>>>}}
     which needs to get implemented in any file system driver module.    
 
 ** Composition Over Inheritance
