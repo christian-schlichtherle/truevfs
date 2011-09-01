@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (C) 2011 Schlichtherle IT Services
+  -
+  - All rights reserved. This program and the accompanying materials
+  - are made available under the terms of the Eclipse Public License v1.0
+  - which accompanies this distribution, and is available at
+  - http://www.eclipse.org/legal/epl-v10.html
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>de.schlichtherle</groupId>
+        <artifactId>epl10-oss-parent</artifactId>
+        <version>1</version>
+    </parent>
+
+    <groupId>de.schlichtherle.truezip</groupId>
+    <artifactId>truezip</artifactId>
+    <version>7.3-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>TrueZIP</name>
+    <description>
+        TrueZIP is a Java based plug-in framework for virtual file
+        systems (VFS) which provides transparent access to archive
+        files as if they were just plain directories.
+
+        As an API, TrueZIP provides transparent, uniform, thread-safe,
+        read/write access to archive files as if they were just plain
+        directories in a file system path.
+
+        As a framework, TrueZIP provides the interfaces and classes to
+        write file system drivers which plug-in to its federated file
+        system space.
+    </description>
+    <url>http://truezip.java.net</url>
+    <inceptionYear>2005</inceptionYear>
+    <issueManagement>
+        <system>JIRA</system>
+        <url>http://java.net/jira/browse/TRUEZIP</url>
+    </issueManagement>
+    <mailingLists>
+        <mailingList>
+            <name>Announce Mailing List</name>
+            <subscribe>mailto:sympa@truezip.java.net?subject=subscribe%20announce</subscribe>
+            <unsubscribe>mailto:sympa@truezip.java.net?subject=unsubscribe%20announce</unsubscribe>
+            <archive>http://java.net/projects/truezip/lists/announce/archive</archive>
+        </mailingList>
+        <mailingList>
+            <name>Users Mailing List</name>
+            <subscribe>mailto:sympa@truezip.java.net?subject=subscribe%20users</subscribe>
+            <unsubscribe>mailto:sympa@truezip.java.net?subject=unsubscribe%20users</unsubscribe>
+            <post>users@truezip.java.net</post>
+            <archive>http://java.net/projects/truezip/lists/users/archive</archive>
+        </mailingList>
+        <mailingList>
+            <name>Developers Mailing List</name>
+            <subscribe>mailto:sympa@truezip.java.net?subject=subscribe%20dev</subscribe>
+            <unsubscribe>mailto:sympa@truezip.java.net?subject=unsubscribe%20dev</unsubscribe>
+            <post>dev@truezip.java.net</post>
+            <archive>http://java.net/projects/truezip/lists/dev/archive</archive>
+        </mailingList>
+    </mailingLists>
+    <scm>
+        <connection>scm:hg:https://hg.java.net/hg/truezip~v7</connection>
+        <developerConnection>scm:hg:ssh://hg.java.net/truezip~v7</developerConnection>
+        <url>http://java.net/projects/truezip/sources/v7/show</url>
+    </scm>
+
+    <modules>
+        <module>truezip-archetype</module>
+        <module>truezip-driver</module>
+        <module>truezip-file</module>
+        <module>truezip-kernel</module>
+        <module>truezip-path</module>
+        <module>truezip-samples</module>
+        <module>truezip-swing</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truezip-driver-file</artifactId>
+                <version>${project.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truezip-kernel</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truezip-kernel</artifactId>
+                <version>${project.version}</version>
+                <type>test-jar</type>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.netbeans</groupId>
+                <artifactId>jemmy</artifactId>
+                <version>2.2.7.5</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>findbugs</groupId>
+            <artifactId>annotations</artifactId>
+            <version>1.0.0</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.2</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <configuration>
+                        <systemPropertyVariables>
+                            <!--de.schlichtherle.truezip.zip.forceZip64Ext>true</de.schlichtherle.truezip.zip.forceZip64Ext-->
+                            <java.util.logging.config.file>${java.util.logging.config.file}</java.util.logging.config.file>
+                        </systemPropertyVariables>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <configuration>
+                        <reportPlugins combine.children="append">
+                            <plugin>
+                                <groupId>org.codehaus.mojo</groupId>
+                                <artifactId>findbugs-maven-plugin</artifactId>
+                                <version>2.3.2</version>
+                            </plugin>
+                            <plugin>
+                                <groupId>org.codehaus.mojo</groupId>
+                                <artifactId>jdepend-maven-plugin</artifactId>
+                                <version>2.0-beta-2</version>
+                            </plugin>
+                        </reportPlugins>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <plugin>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-maven</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion>
+                                    <version>3.0.3</version>
+                                </requireMavenVersion>
+                                <requireJavaVersion>
+                                    <version>1.7</version>
+                                </requireJavaVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <distributionManagement>
+        <site>
+            <id>truezip-website</id>
+            <name>TrueZIP Website</name>
+            <!-- Since maven-site-plugin 3.0, this can't refer to a property
+                 anymore. :-( -->
+            <url>file:/C:/Users/christian/Documents/Schlichtherle_IT_Services/Projekte/truezip~web/</url>
+        </site>
+    </distributionManagement>
+
+    <properties>
+        <java.util.logging.config.file>logging.properties</java.util.logging.config.file>
+    </properties>
+</project>

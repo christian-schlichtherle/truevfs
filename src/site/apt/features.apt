@@ -1,0 +1,89 @@
+    -----------------------
+    Key Features
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+Key Features
+
+    [Reliable]
+        The TrueZIP project uses code assertions, unit tests, integration tests
+        and static code analysis tools like FindBugs and JDepend in order to
+        meet its own high reliability standards.
+        The project aims for zero bug tolerance so that you can persist your
+        application data using TrueZIP with ease of mind (no warranties
+        included).
+
+    [Modular Architecture]
+        The TrueZIP project employs a
+        {{{./concepts.html}three-tier architecture}} with a client API tier,
+        a kernel tier and a driver tier.
+        The client API tier and the driver tier consist of several modules to
+        give you the freedom to select what suits your needs best.
+
+    [Easy To Use]
+        The client API modules
+        {{{./truezip-file/index.html}TrueZIP File*}}
+        and
+        {{{./truezip-path/index.html}TrueZIP Path}}
+        provide convenient read/write access to archive files as if they were
+        just plain directories in a file system.
+        For example, by using the classes
+        {{{./apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}},
+        {{{./apidocs/de/schlichtherle/truezip/file/TFileInputStream.html}<<<TFileInputStream>>>}},
+        {{{./apidocs/de/schlichtherle/truezip/file/TFileOutputStream.html}<<<TFileOutputStream>>>}}
+        et al, you can instantly access ZIP files, TAR files and their
+        relatives or your own
+        {{{./usecases/aff.html}application file format}} or even your own
+        {{{./usecases/eaff.html}encrypted application file format}}.
+
+    [Fast Bulk I/O]
+        The client API module {{{./truezip-file/index.html}TrueZIP File*}}
+        provides convenient and powerful methods for fast bulk I/O operations
+        like file or directory tree copying, moving, deleting, traversing etc.
+        For example, by using the multi-threaded method
+        {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#cat(java.io.InputStream, java.io.OutputStream)}<<<TFile.cat(InputStream, OutputStream)>>>}},
+        you'll never need to use a naive read-then-write loop again.
+
+    [Unlimited Archive File Nesting]
+        The {{{./truezip-kernel/index.html}TrueZIP Kernel}} module supports
+        virtual file system federation, i.e. unlimited nesting of archive files.
+        This enables an application to access archive files within any other
+        virtual file systems, e.g. you could read the contents of a ZIP file
+        which is accessed via HTTP(S) or you could write an entry to a JAR file
+        within a WAR file.
+
+    [Robust]
+        The TrueZIP Kernel properly recognizes false positive archive files,
+        so it does not get confused by an arbitrary file which inadvertenly
+        uses a suffix of a detectable archive file type.
+
+    [Thread-Safe]
+        The TrueZIP Kernel applies fine grained locking, caching and accounting
+        of resources where required so that multiple threads can safely and
+        concurrently read and write entries within the same archive file.
+
+    [Scalable]
+        The TrueZIP Kernel and driver modules apply pooling of expensive
+        resources in order to reduce the overall memory footprint.
+        Given enough heap space to hold the archive file system meta data,
+        TrueZIP can access thousands of archive files with thousands of entries
+        in many different threads concurrently.
+
+    [Pluggable File System Drivers]
+        TrueZIP can support virtually any file system type via its pluggable 
+        {{{./apidocs/de/schlichtherle/truezip/fs/FsDriver.html}file system driver}}
+        architecture in the driver tier.
+        TrueZIP ships with file system drivers for the file system schemes
+        FILE, HTTP(S), ZIP, TAR and their relatives like JAR, TGZ, TBZ2 etc.
+        To make a file system driver available to your application, simply add
+        the JAR artifact of the driver module to the application's run time
+        class path.
+
+    []
+
+    For a list of features of an individual driver module, please visit the
+    home page of the respective driver module.
+    You can find the home page in the navigation bar.
+
+    []

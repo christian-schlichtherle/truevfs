@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (C) 2006-2011 Schlichtherle IT Services
+  -
+  - All rights reserved. This program and the accompanying materials
+  - are made available under the terms of the Eclipse Public License v1.0
+  - which accompanies this distribution, and is available at
+  - http://www.eclipse.org/legal/epl-v10.html
+  -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>6.0 Release Notes</title>
+        <meta name="Author" content="Christian Schlichtherle"/>
+    </head>
+    <body>
+        <h1>Release Notes for TrueZIP 6.0</h1>
+        <p class="subtitle">(April 5<sup>th</sup>, 2006)</p>
+        <h2>Contents</h2>
+        <ol>
+            <li><a href="#introduction">Introduction</a></li>
+            <li><a href="#updates">List of Updates (Change Log)</a></li>
+        </ol>
+        <h2><a name="introduction">Introduction</a></h2>
+        <p>As of version 6, TrueZIP has developed from a Java based virtual file system
+            for ZIP32 files to a Java based virtual file system for basically any archive
+            type! This has been achieved by the introduction of a plug-in driver
+            architecture. As of this release, the following archive families are supported
+        out of the box:</p>
+        <ul>
+            <li>ZIP32 archives including relatives such as JAR and RAES encrypted ZIP32
+            files.</li>
+            <li>TAR archives including relatives such as TAR.GZ and TAR.BZ2.</li>
+        </ul>
+        <p>Future versions will see support for additional archive types, such as ZIP64
+        (currently planned for TrueZIP 6.1).</p>
+
+        <p>Happy zipping! (and tarring and tar.gzipping and
+        tar.bzip2ing...)</p>
+        <table id="legend">
+            <thead>
+                <tr>
+                    <th colspan="2">Legend</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th>New</th>
+                    <td>Introduces a new feature.</td>
+                </tr>
+                <tr>
+                    <th>Fixed</th>
+                    <td>Introduces a bug fix of an existing feature.</td>
+                </tr>
+                <tr>
+                    <th>Enhanced</th>
+                    <td>
+                        Introduces the enhancement of an existing feature.
+                        This update is fully backwards compatible.
+                    </td>
+                </tr>
+                <tr>
+                    <th>Changed</th>
+                    <td>
+                        Introduces the change of an existing feature.
+                        This update may cause
+                        <a href="releases.html#compatibility">
+                            backwards incompatibilities
+                        </a>.
+                    </td>
+                </tr>
+                <tr>
+                    <th>Deprecated</th>
+                    <td>Introduces the deprecation of an existing feature.</td>
+                </tr>
+            </tbody>
+        </table>
+        <h2><a name="updates">List of Updates (Change Log)</a></h2>
+        <p>The generalization from supporting only ZIP32 archives to virtually any
+            archive type has made some refactorings of the public API inevitable. This
+            opportunity has been used to introduce some more refactorings of the low level
+            APIs, too. This affects primarily the classes for the RAES <i>implementation</i>
+            (the RAES <i>specification</i> has not changed) and the Swing based password
+            manager (which has now become a general key manager with a pluggable user
+            interface). All these changes have been made in order to make the code base much
+            more extensible, which is expected to reduce the need for future refactorings of
+        the public API.</p>
+        <p>This means you must recompile your client applications if they have been
+            using TrueZIP 5 before. If this is unacceptible to you, you may opt to stay
+            with TrueZIP 5. TrueZIP 5 will be continued to be maintained for a while.
+            However, it is recommended to migrate to TrueZIP 6 in order to benefit at least of its
+        enhanced performance.</p>
+        <p>The changes in the high level API in the package <code>de.schlichtherle.io</code>
+            have been kept to a minimum and are quite obvious, so it should be easy to
+            migrate your client application. For a head start, please <a href="#HeadStart">
+        see below</a>.</p>
+        <h2>About the TAR Plug-In Driver Family</h2>
+
+        <p>Although the TAR archive file format is widely used, it is
+            also pretty much obsolete (its in use since the early 70ies). The main
+            issue with it from TrueZIP's point of view is that it does not support
+        a central directory. So the first time you do this:</p>
+        <pre><code>String[] members = new File("my-killer-app-sources.tar.gz").list();</code></pre>
+        <p>... the entire archive is going to be decompressed on the fly
+            and its entries are extracted to your temp file system for future use!
+            Of course, this is not acceptable if your client application is going
+            to do a quick listing on a big TAR file only. But it's still the most
+            efficient strategy if your application is going to work on the archive
+            subsequently - traversing its directory tree, copying, renaming or
+        deleting its entries, etc.</p>
+
+        <p>The good news is that TrueZIP's plug-in driver architecture is
+            flexible enough so that another driver could be implemented which behaves
+            differently (you can even install the driver at runtime, just when you
+            discover that you need it). Hence, a smarter driver could be
+            implemented which decompresses the archive entries based on heuristics.
+            For example, the driver could load the file system in memory and then
+            again decompress the entire archive when one of the archive's entries
+            is requested for the first time. However, in case of a compressed TAR archive
+            (using GZIP or BZIP2 for example) the downside of this strategy
+            is that the archive would need to be decompressed twice: The first time
+            to construct the virtual file system from its entries and the second time to extract one or more
+        of these entries. As you can see, neither solution is optimal.</p>
+
+        <p>In case you're worried about the persistence of the temporary
+            files, please note that they stay resident until either of the
+        following happens:</p>
+
+        <ol>
+
+            <li>Explicitly: The client application calls File.update() or File.umount() to tell TrueZIP that its finished with the archive.</li>
+
+            <li>Implicitly: The client application does not hold any
+                reference to the archive or any of it entries anymore and the finalizer
+            picks up TrueZIP's internal cache data.</li>
+
+            <li>Implicitly: The client application terminates - TrueZIP
+            uses a JVM shutdown hook for cleanup.</li>
+
+        </ol>
+
+        <p>Because of this issue with the TAR file format, an
+            application's performance could easily be downgraded if a TAR file is
+            hit by accident. In order to avoid this, <b>the "<code>.tar</code>",
+                "<code>.tar.gz</code>", "<code>.tgz</code>", "<code>.tar.bz2</code>"
+                and "<code>.tbz2</code>" file suffixes are not recognized
+            by default!</b> In order to make your application recognize these
+            suffixes, you must use an <code>
+            ArchiveDetector</code> object (the successor to the <code>ZipDetector</code>
+            used in versions up to TrueZIP 5.1.X). For example, to recognize these suffixes
+            with all your <code>File*</code> classes instances, you
+        could do:</p>
+        <pre><code>File.setDefaultArchiveDetector(DefaultArchiveDetector.ALL);</code></pre>
+        <p>In fact, this is what the <code>nzip</code>
+            utility main class does. As an alternative, you could also pass an ArchiveDetector explicitly to the constructor of the File* classes or change the default suffixes in the plug-in driver
+            configuration resource file (see the
+            <a href="apidocs/de/schlichtherle/io/DefaultArchiveDetector.html">Javadoc</a> on the <code>DefaultArchiveDetector</code>
+        class for more information).</p>
+        <h3>About the TAR.BZ2 Driver</h3>
+        <p>Due to various issues with the BZIP2 implementation in Ant 1.6.5, <b>the
+                driver for TAR.BZ2 archives is considered to be <i>experimental</i> - use with
+        care only!</b></p>
+        <p>In particular, the driver is slooowww and very exhaustive on memory. It's memory usage is even
+            so exhaustive that the JUnit tests for the ".tar.bz2" suffix run about
+            half an hour and then failed with an OutOfMemory error (in contrast to
+            about 76 seconds for the same tests with ".tar.gz&quot;!). So you should use this
+        driver only with small archives.</p>
+        <h3>Credits</h3>
+        <p>I am very
+            thankful to the Apache Software Foundation for the TAR code in Ant 1.6.5! Thanks
+            to this I did not have to write the
+        low-level part of the TAR driver myself.</p>
+        <h2><a name="HeadStart"></a>How to get going with TrueZIP 6</h2>
+
+        <p>To see TrueZIP 6 in action, you will need the following:</p>
+
+        <ol>
+
+            <li>The latest JAR for TrueZIP "<code>truezip.jar</code>".
+                You can download it
+            <a href="https://truezip.dev.java.net/servlets/ProjectDocumentList">here</a>.</li>
+
+            <li>For TAR support: "<code>ant.jar</code>" from
+            Apache Ant Version 1.6.5 or higher. You can download Ant at <a href="http://ant.apache.org/"> http://ant.apache.org</a>.</li>
+
+            <li>For RAES encrypted ZIP file support: Bouncy Castle's
+                Lightweight Crypto API for JDK 1.4 Version 1.30 or higher. Check for
+                "lcrypto-jdk14-130"
+            at <a href="http://www.bouncycastle.org/latest_releases.html">http://www.bouncycastle.org/latest_releases.html</a>.</li>
+
+            <li>For Javadoc: You can read the Javadoc online
+            <a href="apidocs/index.html">here</a>.</li>
+
+            <li>For source code: The source distribution of TrueZIP &quot;truezip-src.zip".
+                You can download it
+            <a href="https://truezip.dev.java.net/servlets/ProjectDocumentList">here</a>.</li>
+            <li>For unit testing: JUnit 3.8.1 or later. You can download JUnit at
+            <a href="http://junit.org">http://junit.org</a>.</li>
+
+        </ol>
+        <p>To play around with it, I recommend to start running the <code>nzip</code>
+            utility main class first. For a tutorial on this utility, read
+        <a href="https://truezip.dev.java.net/index.html#nzip">this section</a>.</p>
+
+        <p>To start using the API, I recommend to read the
+            <a href="https://truezip.dev.java.net/tutorial-6.html">Tutorial
+            for TrueZIP Version 6</a> and then read the
+            <a href="https://truezip.dev.java.net/nonav/source/browse/truezip/src/nzip.java?view=markup">source code of the nzip
+            utility main class</a> to see the changes in the API which were inevitable
+            in order to move TrueZIP from a <i>ZIP-only</i> virtual
+        file system to a <i>generic-archive</i> virtual file system.</p>
+
+        <h2>Implementing plug-in Archive Drivers</h2>
+        <p>Implementing a plug-in driver for custom archive types is comparably easy.
+            The package <code>
+            <a href="apidocs/de/schlichtherle/io/archive/spi/package-summary.html">de.schlichtherle.io.archive.spi</a></code>
+            contains the interfaces which you need to implement. It has been kept as simple as
+            reasonable. Please refer to the
+            <a href="apidocs/de/schlichtherle/io/archive/spi/package-summary.html">
+        Javadoc</a> of this package for more information.</p>
+        <p>Once implemented, you need to register your driver with the class <code>
+            DefaultArchiveDetector</code>. Please refer to its
+        <a href="apidocs/de/schlichtherle/io/DefaultArchiveDetector.html">Javadoc</a> for more information.</p>
+        <p>If you have implemented a pure Java based archive driver for a reasonable
+            well-known archive type and don't mind sharing it with the community, I would be
+            happy to add it as a contribution! Please send an email to christian at
+        schlichtherle.de in this case.</p>
+    </body>
+</html>

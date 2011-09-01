@@ -1,0 +1,21 @@
+    -----------------------
+    About
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+About
+
+    This module contains the file system driver service class
+    {{{../../apidocs/de/schlichtherle/truezip/fs/http/HttpDriverService.html}HttpDriverServive}}
+    which provides the following map of file system drivers:
+
+*--*--*
+||URI Schemes||File System Driver Class|
+*--+--+
+|<<<http>>>, <<<https>>>|{{{../../apidocs/de/schlichtherle/truezip/fs/http/HttpDriver.html}<<<HttpDriver>>>}}|
+*--+--+
+
+    Add the JAR artifact of this module to the run time class path to
+    make its file system drivers available for service location in the
+    client API modules.

@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (C) 2011 Schlichtherle IT Services
+  -
+  - All rights reserved. This program and the accompanying materials
+  - are made available under the terms of the Eclipse Public License v1.0
+  - which accompanies this distribution, and is available at
+  - http://www.eclipse.org/legal/epl-v10.html
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>de.schlichtherle.truezip</groupId>
+        <artifactId>truezip</artifactId>
+        <version>7.3-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>truezip-samples</artifactId>
+
+    <name>TrueZIP Samples</name>
+    <description>
+        Sample applications to demonstrate the usage of various TrueZIP module
+        APIs.
+
+        Some of these samples use rather advanced or exotic features which
+        makes them more complex than necessary for a typical application.
+
+        By design, the sample applications use all file system drivers which
+        can be located at runtime.
+        Location of the available file system drivers is performed by
+        scanning the class path - see the Javaodoc for the TrueZIP Kernel class
+        de.schlichtherle.truezip.fs.sl.FsDriverLocator for more information.
+    </description>
+
+    <dependencies>
+        <!-- A TrueZIP application typically has a compile time dependency on
+             one or more of the modules TrueZIP File*, TrueZIP Path or TrueZIP
+             Kernel.
+             -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truezip-file</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truezip-path</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truezip-kernel</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- Currently unused: Provides some nice swing classes. -->
+        <!--dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truezip-swing</artifactId>
+            <version>${project.version}</version>
+        </dependency-->
+
+        <!-- A TrueZIP application typically has a dependency on one or more
+             file system driver modules for accessing their respective file
+             system types.
+               When using the TrueZIP File* API, file system drivers get
+             automatically enumerated on the run time class path by a service
+             locator singleton, so adding a run time dependency is sufficient
+             for accessing the respective file system types.
+               These sample applications have some compile time dependencies
+             however because they configure and inject some drivers directly.
+             -->
+
+        <!-- The file system driver for the file scheme in JSE 6.
+             This driver provides access to the following URI schemes:
+             file: platform file system.
+             -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truezip-driver-file</artifactId>
+        </dependency>
+
+        <!-- The file system driver for the file scheme in JSE 7+.
+             This driver provides access to the following URI schemes:
+             file: platform file system.
+             -->
+        <!--dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truezip-driver-file-jse7</artifactId>
+        </dependency-->
+
+        <!-- This driver provides access to the following URI schemes:
+             http|https: Hyper Text Transport protocol.
+             -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truezip-driver-http</artifactId>
+            <version>${project.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- This driver provides access to the following URI schemes and
+             archive file suffixes:
+             tar: TAR file format.
+             tgz|tar.gz: GZIP compressed TAR file format.
+             tbz|tb2|tar.bz2: BZIP2 compressed TAR file format.
+             -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truezip-driver-tar</artifactId>
+            <version>${project.version}</version>
+            <!-- <scope>runtime</scope> -->
+        </dependency>
+
+        <!-- This driver provides access to the following URI schemes and
+             archive file suffixes:
+             tzp|zip.rae|zip.raes: RAES encrypted ZIP file format.
+             -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truezip-driver-tzp</artifactId>
+            <version>${project.version}</version>
+            <!-- <scope>runtime</scope> -->
+        </dependency>
+
+        <!-- This driver provides access to the following URI schemes and
+             archive file suffixes:
+             zip: ZIP file format.
+             ear|jar|war: JAR file format.
+             odg|odp|ods|odt|otg|otp|ots|ott|odb|odf|odm|oth: Open Document File format.
+             exe: Self extracting ZIP file format.
+             -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truezip-driver-zip</artifactId>
+            <version>${project.version}</version>
+            <!-- <scope>runtime</scope> -->
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>de.schlichtherle.truezip.sample.file.app.Nzip</mainClass>
+                                </manifest>
+                            </archive>
+                            <descriptors>
+                                <descriptor>src/assembly/jar-with-dependencies.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

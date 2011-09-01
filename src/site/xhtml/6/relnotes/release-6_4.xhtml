@@ -1,0 +1,483 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (C) 2006-2011 Schlichtherle IT Services
+  -
+  - All rights reserved. This program and the accompanying materials
+  - are made available under the terms of the Eclipse Public License v1.0
+  - which accompanies this distribution, and is available at
+  - http://www.eclipse.org/legal/epl-v10.html
+  -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>6.4 Release Notes</title>
+        <meta name="Author" content="Christian Schlichtherle"/>
+    </head>
+    <body>
+        <div id="content">
+            <h1>Release Notes for TrueZIP 6.4</h1>
+            <p class="subtitle">(December 21<sup>st</sup>, 2006)</p>
+            <h2>Contents</h2>
+            <ol>
+                <li><a href="#introduction">Introduction</a></li>
+                <li><a href="#updates">List of Updates (Change Log)</a></li>
+            </ol>
+            <h2><a name="introduction">Introduction</a></h2>
+            <p>Though this is a minor version number release, it's a major improvement. The
+                primary focus has been to fortify the code and optimize it: Many bugs were fixed, accompanied by new or enhanced JUnit
+                tests in order to prevent future regressions. Furthermore, performance has been
+                significantly improved in some sectors, especially if a client application
+                happens to deal a lot with false positive archive files, TAR files or RAES
+                encrypted ZIP files. In addition, the Swing based key prompting GUI has now been
+                extensively tested on Linux in order to fix some bugs which only showed on this
+            platform.</p>
+            <p><b>Upgrading is highly recommended for everybody!</b></p>
+            <table id="legend">
+                <thead>
+                    <tr>
+                        <th colspan="2">Legend</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>New</th>
+                        <td>Introduces a new feature.</td>
+                    </tr>
+                    <tr>
+                        <th>Fixed</th>
+                        <td>Introduces a bug fix of an existing feature.</td>
+                    </tr>
+                    <tr>
+                        <th>Enhanced</th>
+                        <td>
+                            Introduces the enhancement of an existing feature.
+                            This update is fully backwards compatible.
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Changed</th>
+                        <td>
+                            Introduces the change of an existing feature.
+                            This update may cause
+                            <a href="releases.html#compatibility">
+                                backwards incompatibilities
+                            </a>.
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Deprecated</th>
+                        <td>Introduces the deprecation of an existing feature.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h2><a name="updates">List of Updates (Change Log)</a></h2>
+            <p>
+                Following is an overview of all updates in this release
+                which affect the public API.
+                Please note that internal refactorings are not listed.
+                For a full list of updates, please refer to the CVS repository
+                and diff to the tag <code>TrueZIP-6_3_2</code>.
+            </p>
+            <h3>Cross Package Updates</h3>
+            <ol>
+                <li><b>Enhanced:</b> In addition to the default Swing based key manager class
+                    <code>de.schlichtherle.key.passwd.swing.PromptingKeyManager</code>, the
+                    classes <code>
+                    de.schlichtherle.crypto.io.raes.Type0RaesReadOnlyFile</code> and <code>
+                    de.schlichtherle.key.SharedKeyProvider</code> now both enforce a three second
+                    suspension penalty if a wrong key was provided. This has been added for
+                    protection against exhaustive key searches by malicious key provider
+                    implementations or abuses of even friendly implementations. The delay has no
+                    recognizable effect on the Swing based key manager because the key provider UI
+                    implementations used by this key manager already enforce the same suspension
+                penalty by disabling the OK button for three seconds.</li>
+                <li><b>Enhanced:</b> <code>InputArchive</code> and <code>
+                    OutputArchive</code> in the package <code>de.schlichtherle.io.archive.spi</code>
+                    implementations do not need to be thread safe at all anymore. The
+                    synchronization is now completely handled by the archive controller and its
+                    companion meta data classes. This fixes some synchronization issues with the
+                TAR driver and potentially the ZIP driver.</li>
+                <li><b>Enhanced:</b> Javadoc here and there.</li>
+            </ol>
+            <h3>Updates in the Base Package</h3>
+            <ol>
+                <li><b>New:</b> The <code>nzip</code> utility main class has two new
+                    commands: &quot;isArchive&quot; prints whether a file system node is a prospective
+                    archive file and &quot;length&quot; prints the length of a file system node. These
+                commands may be useful in scripts.</li>
+                <li><b>Enhanced:</b> The utility main classes now include version information
+                when printing their usage (finally).</li>
+            </ol>
+            <h3>Updates in the Package <code>de.schlichtherle.awt</code></h3>
+            <ol>
+                <li><b>Enhanced:</b> Added the method <code>invokeAndWaitInterruptibly</code>
+                    to the class <code>EventQueue</code> in order to interrupt AWT's Event
+                    Dispatch Thread (EDT) too, if the waiting thread was interrupted. The method
+                    <code>invokeAndWaitUninterruptibly</code> now logs with the FINE level in case
+                an interrupt was attempted.</li>
+            </ol>
+            <h3>Updates in the Package <code>de.schlichtherle.crypto.generators</code></h3>
+            <ol>
+                <li><b>Enhanced:</b> Seeding algorithm in constructor of class <code>
+                    DigestRandom</code> to make creation of instances an order of a magnitude
+                    faster - at least on Linux, where the <code>SUN</code> provider's <code>
+                    SHA1PRNG</code> implementation uses the slow, but secure <i>/dev/random</i>
+                    device. This significantly improves performance when working with lots of RAES
+                    encrypted ZIP files on Linux, as the salt for each file is created from a new,
+                self-seeding <code>DigestRandom</code> object.</li>
+            </ol>
+            <h3>Updates in the Package <code>de.schlichtherle.io</code></h3>
+            <ol>
+                <li><b>Fixed:</b> The JVM shutdown hook in the class <code>ArchiveController</code>
+                    did not delete the temp files unless the client application called <code>
+                    File.umount()</code> after the last modification. This was a regression and
+                used to work in earlier versions.</li>
+                <li><b>Fixed:</b> Wrong initialization if &quot;dot-only&quot; paths (<code>&quot;&quot;</code>,
+                    <code>&quot;.&quot;</code>, <code>&quot;./&quot;</code>, <code>&quot;./.&quot;</code>, ...) were passed as
+                    the child parameter to the &quot;parent constructor&quot; <code>File(java.io.File
+                parent, String child, ArchiveDetector detector)</code>.</li>
+                <li><b>Fixed:</b> The synchronization strategy in the package private classes
+                    <code>(In|Out)putArchiveMetaData</code> has been revised in order to to
+                    completely exempt archive drivers from the need to be thread safe. This fixes
+                    some racing conditions and dead locks which were known to be present with the
+                TAR driver family and potentially the ZIP driver family, too.</li>
+                <li><b>Fixed:</b> The method <code>File.delete()</code> sometimes returned
+                    <code>true</code> where it should have returned <code>false</code>,
+                    in particular when called on archive
+                files which still have open input streams.</li>
+                <li><b>Fixed:</b> The method <code>File.cp(File, File)</code> accepted source
+                    and destination files which effectively referred to the same file or where the
+                    source contained the destination.
+                    This resulted in undefined behaviour. Now a <code>ContainsFileException</code> is
+                thrown instead.</li>
+                <li><b>Fixed:</b> The method <code>File.cp(File, File)</code> sometimes failed to copy
+                    false positives, i.e. a node in the file system which appears to be an archive
+                    file, but actually is something else (a regular directory or plain file). In
+                    particular, this was true when copying entries within the same false positive
+                    directory, i.e. entries in the same regular directory. For the same reason, as
+                    opposed to its contract, <code>File.cp()</code> did throw an <code>
+                    InputIOException</code> instead of a <code>FileNotFoundException</code> if the
+                input file or any of its parent directories was a false positive.</li>
+                <li><b>Fixed/Enhanced:</b> The class <code>DefaultArchiveDetector</code>
+                    had some bugs when instantiated with obscure constructor parameters like
+                    uppercase file suffixes or null arguments. It
+                    has been reimplemented to work with collections and thread locals for enhanced
+                performance and maintainability.</li>
+                <li><b>Fixed:</b> When an input stream for an entry in an otherwise unmodified
+                    archive file was used which's <code>File</code> instance hasn't been kept, the
+                    stream was sometimes arbitrarily closed. This happened because the archive
+                    controller was mistakenly garbage collected. The package private classes <code>
+                    InputArchiveMetaData</code> and <code>OutputArchiveMetaData</code> have been
+                    fixed to hold a strong reference to the archive controller now, so that the
+                archive controller is strongly reachable from any entry stream.</li>
+                <li><b>Enhanced:</b> The methods <code>File.listFiles(*)</code> now always
+                    return an array of <code>File</code> instances instead of just an array of
+                    <code>java.io.File</code> instances entirely populated with File instances.
+                    This is in preparation for the migration to Java 5 where these methods will
+                    also explicitly declare this return value in order to get rid of those ugly
+                type casts.</li>
+                <li><b>New:</b> The classes <code>File(Reader|Writer)</code>
+                    have been added as drop-in replacements for the equal named classes in the
+                <code>java.io</code> package.</li>
+                <li><b>Enhanced:</b> The <code>ArchiveController</code> class now protects the
+                    access to its file system with a state pattern in order to remember false
+                    positive archive files. In case of the unit tests for the <code>File</code>
+                    class, this results in <em>three times faster</em> performance, primarily
+                    because the unit tests are testing false positive archives a lot! The state is
+                    reset when <code>File.delete()</code> is called on the false positive archive
+                file or <code>File.update()</code> or <code>File.umount()</code>.</li>
+                <li><b>Enhanced:</b> If running on JSE 5 or later, TrueZIP automatically
+                    takes advantage of the cached thread pools available in the <code>
+                    java.util.concurrent</code> package when copying data asynchronously. This
+                provides some performance benefits. Full backwards compatibility to J2SE 1.4.2 is retained.</li>
+                <li><b>Enhanced:</b> File.setLenient() now also controls how TrueZIP shall
+                    behave on unclosed archive entry streams: If set to false, a hard reference to
+                    all archive entry streams is maintained by TrueZIP, causing an <code>
+                    ArchiveBusy(Warning)?Exception</code> to be thrown on the next call to <code>
+                    File.update()</code> or <code>File.umount()</code> in case of an unclosed
+                    archive entry stream. If set to true (the default), then TrueZIP behaves as
+                    before and will close archive entry streams when they are garbage collected,
+                    reducing the likeliness of an <code>ArchiveBusy(Warning)?Exception</code> to
+                    be thrown on the next call to <code>File.update()</code> or <code>File.umount()</code>.
+                    This is to support testing client applications for the presence of the
+                &quot;unclosed streams issue&quot;.</li>
+                <li><b>Enhanced:</b> <code>ArchiveController.mkdir(*)</code> doesn't try to
+                    mount the file system anymore if the target file exists already. This avoids
+                    to prompt for a key in case the target file is an RAES encrypted ZIP file
+                    although the key is not really required at this time and slightly enhances the
+                performance.</li>
+                <li><b>Deprecated:</b> <code>File.getDelegate()</code>. This method exists for
+                    technical reasons only! In case you want to convert an instance of this class
+                    which recognized the leaf of its path as an archive file to a file instance
+                which doesn't recognize this archive file, use the following code instead: <code>ArchiveDetector.NULL.createFile((File) file.getParentFile(), file.getName())</code>.</li>
+                <li><b>Fixed:</b> <code>File.createNewFile()</code> failed for entries in a
+                false positive archive file which is actually a native directory.</li>
+            </ol>
+            <h3>Updates in the Package <code>de.schlichtherle.io.archive.spi</code></h3>
+            <ol>
+                <li><b>New:</b> The class <code>TransientIOException</code> may now be used by
+                    archive drivers to signal that an <code>IOException</code> occured as a
+                    transient event when accessing an archive file and another try to access the
+                    same archive file may finally succeed. On the other hand, if the archive
+                    controller catches an <code>IOException</code> from an an archive driver when
+                    trying to access an archive file which is <i>not</i> a <code>
+                    TransientIOException</code>, then the archive controller may consider the
+                    archive file to be a false positive and cache the exception until <code>
+                    File.umount()</code> or <code>File.update()</code> is called. This is used by
+                    the RAES encrypted ZIP file driver family when prompting for passwords has
+                    been cancelled by the user and another attempt to prompt the user should be
+                allowed.</li>
+                <li><b>Enhanced:</b> The archive driver specification has been relaxed so that <code>InputArchive</code> and <code>
+                    OutputArchive</code> implementations do not need to be thread safe anymore.
+                    The synchronization is now completely handled by the archive controller and
+                    its companion meta data classes. This fixes some synchronization issues with
+                    the TAR driver and potentially the ZIP driver, too. Old drivers will work to
+                the specification, obviously.</li>
+                <li><b>Enhanced:</b> <code>TransientIOException</code> has been added to the
+                    Javadoc of the methods <code>ArchiveDriver.createInputArchive</code> and <code>
+                    ArchiveDriver.createOutputArchive</code>. Since this is an <code>IOException</code>,
+                existing archive drivers are not affected.</li>
+                <li><b>Changed:</b> The classes <code>InputArchiveBusyException</code> and
+                    <code>OutputArchiveBusyException</code> are now subclasses of <code>
+                    FileBusyException</code> in order to simplify the cause chain: Previously, a
+                    <code>FileBusyException</code> may have had an <code>(In|Out)putArchiveBusyException</code>
+                as its cause.</li>
+            </ol>
+            <h3>Updates in the Package <code>de.schlichtherle.io.archive.tar</code></h3>
+            <ol>
+                <li>
+                    <b>Fixed:</b> The <code>storeDirectory</code> method in the <code>
+                    TarOutputArchive</code> class did not set the entry size to zero before
+                    writing the directory entry although it has never written any data to it.
+                    This caused interoperability issues with some tools when TAR
+                    files have been created on Unix:
+                    Most notably, Ant's <code>TarInputStream</code> class failed
+                    on the resulting archive files (GNU TAR accepted it).
+                </li>
+                <li><b>Enhanced:</b> <code>TarInputArchive</code> now uses a smarter read ahead algorithm
+                    to validate TAR files. However, only raw TAR archives benefit from it due to a
+                    bug in Sun's J2SE 1.4.2_12 (has been fixed in JSE 1.5.0-b64) which requires a
+                workaround to render it useless. Check the source code for details.</li>
+                <li><b>Enhanced:</b> Due to the relaxed archive driver specification, <code>TarOutputArchive</code> doesn't need to be thread safe anymore and so the
+                redundant synchronization has been removed for better performance.</li>
+                <li><b>Enhanced:</b> The <code>TarBZip2Driver</code> now uses buffered I/O for
+                    the underlying stream for much better performance. It also provides a new
+                    constructor argument to set the block size for the BZip2 algorithm - the
+                    default is the maximum block size. The new test case for this driver uses this
+                    to set the block size to the minimum in order to reduce the exhaustive memory
+                    occupation of the BZip2 implementation in the Ant code and make the test work.
+                    <b>Warning:</b> This driver is still experimental: Ant's underlying BZip2
+                    implementation is very exhaustive on memory and slow (I'm not sure whether
+                    this is an implementation issue or a general issue with the BZip2
+                    specification). <i>Do not use this driver in productive environments for other
+                    than small archives!</i> If you need to use it nevertheless, use Ant 1.7.0 RC1
+                    or later. The BZip2 implementation in this version has been much improved and
+                    is required to pass TrueZIP's comprehensive unit tests for the File class with
+                this driver.</li>
+                <li><b>Enhanced:</b> The <code>TarDriver</code> class now offers a new method for
+                    overriding: <code>createInputStream(ReadOnlyFile)</code>. When writing a
+                    custom driver, you should override this method instead of <code>createInputArchive(Archive, InputStream)</code> in order to support proper
+                closing of all streams in the chain. <code>TarGZipDriver</code> and <code>TarBZip2Driver</code> have been revised appropriately.</li>
+                <li><b>Enhanced:</b> Javadoc in almost all classes.</li>
+            </ol>
+            <h3>Updates in the Package <code>de.schlichtherle.io.archive.zip</code></h3>
+            <ol>
+                <li><b>Fixed:</b> The class <code>Zip32OutputArchive</code> produced corrupted
+                    file entries if and only if any of the methods <code>copy(All)?(To|From)</code>
+                    or <code>cp</code> in the class <code>File</code> in the package <code>
+                    de.schlichtherle.io</code> were used and a ZIP file entry in the source used
+                    the <code>STORE</code> rather than the <code>DEFLATE</code> method. Note that
+                    the methods <code>archiveCopy(All)?(To|From)</code> or <code>cp_p</code> were
+                    not affected. Likewise, no data was corrupted if the source didn't contain ZIP
+                file entries or none of these entries used the <code>STORE</code> method.</li>
+                <li><b>Enhanced/Fixed:</b> The <code>Checked*</code> driver classes have been
+                    changed to use the new feature of the <code>ZipFile</code> class in the package
+                    <code>de.schlichtherle.util.zip</code> to read deflated data while concurrently checking
+                    the CRC-32 value of the inflated data. The primary effect is to fix a bug
+                    which could have potentially corrupted data when copying entry data between
+                    archives operated by two ZIP drivers which handle checking differently.
+                    Another nice side effect is that these classes now support Direct Data Copying
+                    (DDC), which obsoletes the need to recompress data when copying an entry
+                    between two archives. This further implies that updating RAES encrypted ZIP
+                files is now faster.</li>
+                <li><b>Enhanced:</b> Due to the relaxed archive driver specification, <code>
+                    Zip32(In|Out)putArchive</code> don't need to be thread safe anymore and so the
+                    redundant synchronization has been removed for better performance. The
+                    superclass of these classes are now the newly introduced <code>
+                    BasicZip(File|OutputStream)</code> classes in the package <code>
+                de.schlichtherle.util.zip</code>.</li>
+            </ol>
+            <h3>Updates in the Package <code>de.schlichtherle.io.archive.zip.raes</code></h3>
+            <ol>
+                <li><b>Enhanced:</b> The class <code>AbstractZip32RaesDriver</code> now
+                    provides an optional constructor parameter to adjust the authentication
+                    trigger, which is the largest size of an archive file which's RAES provided
+                    Message Authentication Code (MAC) will be checked. This defaults to <code>
+                    Long.MAX_VALUE</code> and may be overridden by subclasses (such as <code>
+                    SafeZip32RaesDriver</code>) in order to provide a different means to verify
+                the integrity of an encrypted archive file.</li>
+                <li><b>New:</b> <code>ParanoidZip32RaesDriver</code> has been introduced: This
+                    archive driver always authenticates input archive files using the RAES
+                    provided Message Authentication Code (MAC) <i>before</i> the archive can be
+                    accessed by client applications. This can take quite a while for large archive
+                files. This driver is now advertised accordingly in the configuration file.</li>
+                <li><b>Enhanced:</b> The authentication strategy in <code>SafeZip32RaesDriver</code>
+                    has been refined: For input archive files up to 512 KB, the cipher text gets
+                    authenticated using the RAES provided Message Authentication Code (MAC) <i>
+                    before</i> the archive can be accessed by a client application. For larger
+                    input archive files, the MAC is not used, but instead the CRC-32 value of the
+                    decrypted and deflated archive entries is checked when the archive entry
+                    stream is <i>closed</i> by the client application, resulting in some <code>
+                    IOException</code>. For more information why this operation mode is considered
+                safe, please refer to the Javadoc.</li>
+                <li><b>Changed:</b> <code>UnsafeZip32RaesDriver</code> has been deprecated and
+                is no longer advertised in the configuration file.</li>
+            </ol>
+            <h3>Updates in the Package <code>de.schlichtherle.io.rof</code></h3>
+            <ol>
+                <li><b>Enhanced:</b> The class <code>ReadOnlyFileInputStream</code> now
+                supports marking if the underlying ReadOnlyFile does.</li>
+            </ol>
+            <h3>Updates in the Package <code>de.schlichtherle.io.swing</code></h3>
+            <ol>
+                <li><b>Fixed/Enhanced:</b> <code>FileComboBoxBrowser</code> now sorts nicely using a
+                    <code>Collator</code> for the default locale; case is now always ignored when
+                    auto completing; plain <code>java.io.File</code> instances can now be used for
+                the directory, too; a few initialization bugs have been fixed.</li>
+                <li><b>Fixed:</b> <code>JFileChooser</code> may have dead locked when used to
+                    browse RAES encrypted ZIP files. This has been fixed at the cost of proper
+                repainting when prompting for keys.</li>
+                <li><b>Enhanced:</b> <code>JFileChooser</code> now shows correct icons and
+                type descriptions for false positive archive files.</li>
+            </ol>
+            <h3>Updates in the Package <code>de.schlichtherle.io.util</code></h3>
+            <ol>
+                <li>
+                    <b>Fixed:</b> The utility methods in the class
+                    <code>Paths</code> did not always deliver correct results.
+                    This negatively affected the way some other classes,
+                    most notably the class <code>de.schlichtherle.io.File</code>
+                    interpreted paths.
+                    In addition, the methods have been moved from
+                    <code>Path</code>
+                    to
+                    <code>Paths</code>
+                    again and <code>Path</code> has been deprecated.
+                    Backwards compatibility on source code level has been
+                    retained, however.
+                </li>
+                <li><b>New:</b> Synchronized(In|Out)putStream as synchronized stream
+                decorators. Used as utilities in some other classes.</li>
+            </ol>
+            <h3>Updates in the Package <code>de.schlichtherle.key</code></h3>
+            <ol>
+                <li><b>Enhanced:</b> The contract in <code>PromptingKeyProviderUI</code> has
+                    been extended so that an implementation may optionally throw a <code>
+                    RuntimeException</code> with an <code>UnknownKeyException</code> as its cause
+                    in order to abort the prompting without the <code>PromptingKeyProvider</code>
+                    instance to change its state. This is useful when the prompting thread has
+                    been interrupted, in which case a subsequent attempt should still proceed
+                instead of being automatically cancelled without actually prompting.</li>
+                <li><b>Fixed:</b> Potential synchronization / dead lock problems in the key
+                manager and key provider classes.</li>
+                <li><b>Enhanced:</b> The abstract class <code>KeyManager</code> now loads its
+                    default implementation by
+                    class name in order to remove the compile time dependency on the sub package.
+                    In case you are using a class optimizer, don't forget to add all subclasses of
+                    <code>KeyManager</code> to the list of classes which are
+                never renamed or discarded.</li>
+                <li><b>New:</b> If the JVM is running in headless mode and the API conforms to
+                    JSE 6 (the class <code>java.io.Console</code> is available), then the console
+                    I/O based key manager implementation in the class <code>de.schlichtherle.key.passwd.console.PromptingKeyManager</code>
+                    is used instead of the Swing based key manager implementation in the class
+                <code>de.schlichtherle.key.passwd.swing.PromptingKeyManager</code>.</li>
+                <li>
+                    <b>Changed:</b> The classes
+                    <code>Prompting(Aes)?KeyProvider</code> now simply return their
+                    base class names as the UI class identifiers instead of their
+                    full class name.
+                    Client applications should not be affected, however.
+                </li>
+                <li>
+                    <b>Changed:</b> The class <code>SharedKeyProvider</code> has
+                    been renamed to <code>AbstractKeyProvider</code> because of
+                    its misleading name.
+                    A deprecated stub class with the old name is retained as a
+                    sub class of the new name in order to maintain backwards
+                    compatibility.
+                </li>
+            </ol>
+            <h3>New Package <code>de.schlichtherle.key.passwd.console</code></h3>
+            <ol>
+                <li><b>New:</b> This package has been added to provide a simple key manager
+                    implementation which uses console I/O to prompt the user for passwords. This
+                    key manager is used by default if the JVM is running in headless mode and the
+                    API complies to JSE6 (i.e. the class <code>java.io.Console</code> is
+                    available)!&nbsp; To request it explicitly, set the system property <code>
+                    de.schlichtherle.key.KeyManager</code> to <code>
+                    de.schlichtherle.key.passwd.console.PromptingKeyManager</code>. This key
+                    manager does not support key files and disables prompting if no console is
+                attached to the JVM.</li>
+            </ol>
+            <h3>Updates in the Package <code>de.schlichtherle.key.passwd.swing</code></h3>
+            <ol>
+                <li><b>Fixed:</b> The classes in this package were likely to cause
+                    dead locks if the <code>JFileChooser</code> class in the package <code>
+                    de.schlichtherle.io.swing</code> was used to browse RAES encrypted ZIP files.
+                    This was caused by the implementation of the base class in the javax.swing
+                package and its associated Basic L&amp;F File Loader Threads.</li>
+                <li><b>Fixed:</b> The method <code>getParentWindow</code> in the class <code>
+                PromptingKeyManager</code> did not always return the correct window.</li>
+                <li><b>Fixed:</b> The event listening in <code>CreateKeyPanel</code> and
+                    <code>OpenKeyPanel</code> has been refined so that the <code>Feedback</code>
+                    implementation instance is not run every time you switch between password
+                    entry mode and key file entry mode. In addition, on Linux, the focus is now
+                    properly moved to the input fields upon invalid input. This involved a change
+                in the class <code>AuthenticationPanel</code>, too.</li>
+                <li><b>Enhanced:</b> For reliability reasons, <code>CreateKeyPanel</code> now
+                ensures that a key file is read-only.</li>
+                <li><b>New:</b> The class <code>HurlingWindowFeedback</code> has been
+                    introduced as the successor to <code>QuakingWindowFeedback</code> - the latter
+                    is now a sub class of the first. <code>HurlingWindowFeedback</code> has also
+                    been improved to use <code>Math.sin(*)</code> to modulate the amplitude of the
+                hurling. Have fun!</li>
+                <li><b>Enhanced:</b> The class hierarchy for the <code>Feedback</code>
+                    interface and its standard implementations starting with <code>BasicFeedback</code>
+                    has been revised to make the standard implementations more reusable. The
+                    effect is that the <code>HurlingWindowFeedback</code> implementation can now
+                    also be used as the feedback when mismatching passwords or illegal key files
+                    for a newly created or updated RAES encrypted ZIP file is entered. In fact,
+                    this is the default configuration when using the <code>nzip</code> main class
+                    utility. As a result of this, some classes and interfaces have been marked as
+                deprecated.</li>
+            </ol>
+            <h3>Updates in the Package <code>de.schlichtherle.swing</code></h3>
+            <ol>
+                <li><b>Fixed:</b> <code>AbstractComboBoxBrowser</code> now properly
+                initializes the combo box before the first input.</li>
+                <li><b>Enhanced:</b> The class <code>EnhancedPanel</code>
+                    fires its <code>PanelEvents</code> <em>synchronously</em> again instead of
+                    posting them to the Event Queue, thereby reducing event listening problems of
+                some classes in the package <code>de.schlichtherle.key.passwd.swing</code>.</li>
+            </ol>
+            <h3>Updates in the Package <code>de.schlichtherle.util.zip</code></h3>
+            <ol>
+                <li><b>Fixed:</b> Potential racing conditions in <code>
+                    ZipFile.getPreambleInputStream()</code> and <code>
+                ZipFile.getPostambleInputStream()</code>.</li>
+                <li><b>Enhanced:</b> The <code>Zip(File|OutputStream)</code> classes have been
+                    refactored so that they now subclass the newly introduced <code>
+                    BasicZip(File|OutputStream)</code> classes. Since the relaxed archive driver
+                    specification does not require the ZIP driver to be thread safe anymore, the
+                ZIP driver family uses these new subclasses for better performance.</li>
+                <li><b>Enhanced:</b> The new method <code>getInputStream(String, boolean,
+                    boolean)</code> in the class <code>ZipFile</code> now optionally supports
+                    reading of deflated data while checking the CRC-32 value of the inflated data
+                    in the <code>close()</code> method of the returned entry input stream. This is
+                    used by the checked ZIP driver family in the package <code>
+                    de.schlichtherle.io.archive.zip</code> and others in order to support the
+                Direct Data Copying (DDC) feature.</li>
+            </ol>
+        </div>
+    </body>
+</html>
