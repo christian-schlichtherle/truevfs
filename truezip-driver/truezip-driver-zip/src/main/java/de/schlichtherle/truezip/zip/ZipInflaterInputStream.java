@@ -32,6 +32,7 @@ final class ZipInflaterInputStream extends InflaterInputStream {
 
     ZipInflaterInputStream(DummyByteInputStream in, int size) {
         super(in, cache.allocate(), size);
+        inf.reset();
     }
 
     Inflater getInflater() {
@@ -46,7 +47,6 @@ final class ZipInflaterInputStream extends InflaterInputStream {
         try {
             super.close();
         } finally {
-            inf.reset();
             cache.release(inf);
         }
     }
