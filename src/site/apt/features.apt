@@ -23,9 +23,9 @@ Key Features
 
     [Easy To Use]
         The client API modules
-        {{{./truezip-file/index.html}TrueZIP File*}}
+        {{{./truezip-file/index.html}TrueZIP&#160;File*}}
         and
-        {{{./truezip-path/index.html}TrueZIP Path}}
+        {{{./truezip-path/index.html}TrueZIP&#160;Path}}
         provide convenient read/write access to archive files as if they were
         just plain directories in a file system.
         For example, by using the classes
@@ -38,7 +38,7 @@ Key Features
         {{{./usecases/eaff.html}encrypted application file format}}.
 
     [Fast Bulk I/O]
-        The client API module {{{./truezip-file/index.html}TrueZIP File*}}
+        The client API module {{{./truezip-file/index.html}TrueZIP&#160;File*}}
         provides convenient and powerful methods for fast bulk I/O operations
         like file or directory tree copying, moving, deleting, traversing etc.
         For example, by using the multi-threaded method
@@ -46,7 +46,7 @@ Key Features
         you'll never need to use a naive read-then-write loop again.
 
     [Unlimited Archive File Nesting]
-        The {{{./truezip-kernel/index.html}TrueZIP Kernel}} module supports
+        The {{{./truezip-kernel/index.html}TrueZIP&#160;Kernel}} module supports
         virtual file system federation, i.e. unlimited nesting of archive files.
         This enables an application to access archive files within any other
         virtual file systems, e.g. you could read the contents of a ZIP file
@@ -54,22 +54,24 @@ Key Features
         within a WAR file.
 
     [Robust]
-        The TrueZIP Kernel properly recognizes false positive archive files,
-        so it does not get confused by an arbitrary file which inadvertenly
-        uses a suffix of a detectable archive file type.
+        The TrueZIP&#160;Kernel properly recognizes false positive archive
+        files, so it does not get confused by an arbitrary file which
+        inadvertenly uses a suffix of a detectable archive file type.
 
     [Thread-Safe]
-        The TrueZIP Kernel applies fine grained locking, caching and accounting
-        of resources where required so that multiple threads can safely and
-        concurrently read and write entries within the same archive file.
+        The TrueZIP&#160;Kernel applies fine grained locking, caching and
+        accounting of resources where required so that multiple threads can
+        safely and concurrently read and write entries within the same archive
+        file.
 
     [Scalable]
         Given enough heap space to hold the archive file system meta data,
         TrueZIP can access thousands of archive files with thousands of entries
         in many different threads concurrently.
-        The TrueZIP Kernel precomputes the initial capacity of HashMap objects
-        as much as possible in order to reduce heap fragmentation caused by
-        frequent resizing of hash tables when adding large numbers of entries.
+        The TrueZIP&#160;Kernel precomputes the initial capacity of HashMap
+        objects as much as possible in order to reduce heap fragmentation
+        caused by frequent resizing of hash tables when adding large numbers of
+        entries.
 
     [Pluggable File System Drivers]
         TrueZIP can support virtually any file system type via its pluggable 
