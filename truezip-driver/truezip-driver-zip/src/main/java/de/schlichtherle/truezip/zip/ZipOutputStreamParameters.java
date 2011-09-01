@@ -22,7 +22,7 @@ extends ZipCharsetParameters {
 
     /**
      * Returns the number of entries which can be additionally accomodated by
-     * the internal hash map without resizing it, which is {@value}.
+     * the internal hash map without resizing it.
      * When a new ZIP file is created, this constant is used in order to
      * compute the initial capacity of the internal hash map.
      * When an existing ZIP file is appended to, this constant is added to the
