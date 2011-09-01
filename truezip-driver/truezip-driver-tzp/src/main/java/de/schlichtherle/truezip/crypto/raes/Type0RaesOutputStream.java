@@ -118,6 +118,10 @@ final class Type0RaesOutputStream extends RaesOutputStream {
         // Init KLAC.
         final Mac klac = this.klac = new HMac(new SHA256Digest()); // cannot reuse digest!
         klac.init(sha256HMmacParam); // resets the digest
+
+        // Update the KLAC with the cipher key.
+        // This is actually redundant, but it's part of the spec, so it
+        // cannot get changed anymore.
         final byte[] cipherKey = ((KeyParameter) aesCtrParam.getParameters())
                 .getKey();
         klac.update(cipherKey, 0, cipherKey.length);

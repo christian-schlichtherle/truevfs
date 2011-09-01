@@ -145,6 +145,10 @@ final class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
 
             // Compute and verify KLAC.
             klac.init(sha256MacParam);
+            
+            // Update the KLAC with the cipher key.
+            // This is actually redundant, but it's part of the spec, so it
+            // cannot get changed anymore.
             final byte[] cipherKey = ((KeyParameter) aesCtrParam.getParameters()).getKey();
             klac.update(cipherKey, 0, cipherKey.length);
             buf = new byte[klac.getMacSize()];

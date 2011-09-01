@@ -28,8 +28,8 @@ Key Features
     alias TZP (short) alias RAES encrypted ZIP file (long).
 
     [Wrapper File Format]
-        A ZIP.RAES file is a regular JAR file which is wrapped in an envelope
-        named Random Access Encryption Specification (RAES).
+        A ZIP.RAES file is a JAR file which is wrapped in an envelope named
+        Random Access Encryption Specification (RAES).
         RAES encrypts and authenticates its entire pay load.
         This means that information leakage is kept to a minimum because all
         entry data and entry meta data is protected.
@@ -49,7 +49,7 @@ Key Features
         RAES Type 0 uses PKCS #12 V1.0 as its Password Based Key Derivation
         Function (PBKDF).
         Hence passwords are encoded as 16 bit Unicode characters (similar, but
-        not identical to UTF-8).
+        not identical to UTF-16BE).
         Since the payload is a JAR file, UTF-8 is used to encode the ZIP file
         comment and entry names.
 
