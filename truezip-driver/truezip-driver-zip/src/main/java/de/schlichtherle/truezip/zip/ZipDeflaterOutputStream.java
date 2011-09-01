@@ -8,9 +8,7 @@
  */
 package de.schlichtherle.truezip.zip;
 
-import de.schlichtherle.truezip.util.CachedResourcePool;
 import de.schlichtherle.truezip.util.JSE7;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.zip.Deflater;
 import static java.util.zip.Deflater.*;
@@ -26,14 +24,12 @@ import java.util.zip.DeflaterOutputStream;
  */
 final class ZipDeflaterOutputStream extends DeflaterOutputStream {
 
-    private static final DeflaterCache cache = JSE7.AVAILABLE
-                        ? new DeflaterCache()        // JDK 7 is OK
-                        : new Jdk6DeflaterCache();   // JDK 6 needs fixing
-
-    private boolean released;
+    private static final DeflaterFactory factory = JSE7.AVAILABLE
+                        ? new DeflaterFactory()        // JDK 7 is OK
+                        : new Jdk6DeflaterFactory();   // JDK 6 needs fixing
 
     ZipDeflaterOutputStream(OutputStream out, int level, int size) {
-        super(out, cache.allocate(), size);
+        super(out, factory.newDeflater(), size);
         def.setLevel(level);
     }
 
@@ -41,39 +37,15 @@ final class ZipDeflaterOutputStream extends DeflaterOutputStream {
         return def;
     }
 
-    void releaseDeflater() throws IOException {
-        if (released)
-            return;
-        released = true;
-        cache.release(def);
-    }
-
-    @Override
-    public void close() throws IOException {
-        assert false;
-        try {
-            super.close();
-        } finally {
-            releaseDeflater();
-        }
-    }
-
-    private static class DeflaterCache
-    extends CachedResourcePool<Deflater, RuntimeException> {
-        @Override
-        protected Deflater newResource() {
+    private static class DeflaterFactory {
+        protected Deflater newDeflater() {
             return new Deflater(DEFAULT_COMPRESSION, true);
         }
-
-        @Override
-        protected void reset(Deflater def) {
-            def.reset();
-        }
     }
 
-    private static final class Jdk6DeflaterCache extends DeflaterCache {
+    private static final class Jdk6DeflaterFactory extends DeflaterFactory {
         @Override
-        protected Deflater newResource() {
+        protected Deflater newDeflater() {
             return new Jdk6Deflater(DEFAULT_COMPRESSION, true);
         }
     }

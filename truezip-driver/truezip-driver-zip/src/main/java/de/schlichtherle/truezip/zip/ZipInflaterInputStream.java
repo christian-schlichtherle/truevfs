@@ -8,7 +8,6 @@
  */
 package de.schlichtherle.truezip.zip;
 
-import de.schlichtherle.truezip.util.CachedResourcePool;
 import de.schlichtherle.truezip.util.JSE7;
 import java.io.IOException;
 import java.util.zip.Inflater;
@@ -24,14 +23,14 @@ import java.util.zip.InflaterInputStream;
  */
 final class ZipInflaterInputStream extends InflaterInputStream {
 
-    private static final InflaterCache cache = JSE7.AVAILABLE
-                        ? new InflaterCache()        // JDK 7 is OK
-                        : new Jdk6InflaterCache();   // JDK 6 needs fixing
+    private static final InflaterFactory factory = JSE7.AVAILABLE
+                        ? new InflaterFactory()        // JDK 7 is OK
+                        : new Jdk6InflaterFactory();   // JDK 6 needs fixing
 
     private boolean closed;
 
     ZipInflaterInputStream(DummyByteInputStream in, int size) {
-        super(in, cache.allocate(), size);
+        super(in, factory.newInflater(), size);
     }
 
     Inflater getInflater() {
@@ -43,29 +42,18 @@ final class ZipInflaterInputStream extends InflaterInputStream {
         if (closed)
             return;
         closed = true;
-        try {
-            super.close();
-        } finally {
-            cache.release(inf);
-        }
+        super.close();
     }
 
-    private static class InflaterCache
-    extends CachedResourcePool<Inflater, RuntimeException> {
-        @Override
-        protected Inflater newResource() {
+    private static class InflaterFactory {
+        protected Inflater newInflater() {
             return new Inflater(true);
         }
-
-        @Override
-        protected void reset(Inflater inf) {
-            inf.reset();
-        }
     }
 
-    private static final class Jdk6InflaterCache extends InflaterCache {
+    private static final class Jdk6InflaterFactory extends InflaterFactory {
         @Override
-        protected Inflater newResource() {
+        protected Inflater newInflater() {
             return new Jdk6Inflater(true);
         }
     }
