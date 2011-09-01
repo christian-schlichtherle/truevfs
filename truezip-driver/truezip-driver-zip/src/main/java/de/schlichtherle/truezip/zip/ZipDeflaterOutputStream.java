@@ -30,10 +30,11 @@ final class ZipDeflaterOutputStream extends DeflaterOutputStream {
                         ? new DeflaterCache()        // JDK 7 is OK
                         : new Jdk6DeflaterCache();   // JDK 6 needs fixing
 
-    private boolean reset;
+    private boolean released;
 
     ZipDeflaterOutputStream(OutputStream out, int level, int size) {
         super(out, cache.allocate(), size);
+        def.reset();
         def.setLevel(level);
     }
 
@@ -41,11 +42,10 @@ final class ZipDeflaterOutputStream extends DeflaterOutputStream {
         return def;
     }
 
-    void resetDeflater() throws IOException {
-        if (reset)
+    void releaseDeflater() throws IOException {
+        if (released)
             return;
-        reset = true;
-        def.reset();
+        released = true;
         cache.release(def);
     }
 
@@ -55,7 +55,7 @@ final class ZipDeflaterOutputStream extends DeflaterOutputStream {
         try {
             super.close();
         } finally {
-            resetDeflater();
+            releaseDeflater();
         }
     }
 
